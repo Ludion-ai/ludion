@@ -50,7 +50,7 @@ export function tokenize(text: string): string[] {
 const isExact = (term: string) => /^[\d:-]/.test(term);
 
 /** A light English stemmer: plural -s, then -ing or -ed. */
-function stem(term: string): string {
+export function stem(term: string): string {
   if (isExact(term)) return term;
   let s = term;
   if (s.length > 3 && s.endsWith("s") && !s.endsWith("ss")) s = s.slice(0, -1);

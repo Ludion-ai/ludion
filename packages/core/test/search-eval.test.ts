@@ -133,6 +133,7 @@ const ON_TOPIC: Record<string, [string, string]> = {
   "dict keeps insertion order": ["Are Python dicts ordered?", "Does dict preserve insertion order in Python 3.7?"],
   "CSS :has() selector": ["Can I use the :has() selector in all browsers?", "Is CSS :has supported in Firefox?"],
   "RETURNING on INSERT": ["Does SQLite support RETURNING?", "How do I return a row from an INSERT in SQLite?"],
+  "changed what `toHaveTextContent` does": ["Does toHaveTextContent match part of the text in Vitest 5?", "How do I check partial text content with Vitest 5 browser mode?"],
   "removed the distutils module": ["What changed about distutils in Python 3.12?", "distutils import error on Python 3.12"],
 };
 

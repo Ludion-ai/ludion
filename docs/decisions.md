@@ -4,6 +4,45 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-11: Lesson format 1
+
+- **Two schemas.** `lessons/lessons.schema.json` is format 1, the only format a new lesson may use: `verify` checks added lessons against the base branch's copy of it. `lessons/lessons-v0.schema.json` is format 0, frozen, so the lessons already on main stay valid (lessons are immutable). Code reads either one (`validateLesson` dispatches on `format`). A format 0 lesson is corrected by a format 1 lesson that `replaces` it.
+- **Fields** (canonical order): `format: 1`, `id`, `subject`, `package {ecosystem: npm | pypi | runtime, name}`, `versions` (semver range where the fact holds), `kind` (removed | renamed | deprecated | added | default | behavior), `symbol`, `replacement?` (required for renamed), `signal` (loud | silent), `detail?`, `evidence`, `author`, `author_id`, `drafted_by?: "agent"`, `replaces?`, `created_at`.
+  - `subject` must equal the directory derived from the package: npm `@scope/name` → `scope.name`; anything else lowercased.
+- The site's design samples include a format 1 lesson, and `test` builds them, so a page that only handles format 0 fails CI.
+- **The claim is generated** (`packages/core` `generateClaim`): `<package> <versions> <removed|renamed … to|deprecated|added|changed the default of|changed what> \`<symbol>\` [; use \`<replacement>\` instead]. <Detail.> [Silent: code written for older versions still runs, without an error.]`. Same fields, same sentence. The index's `claim` holds it, so search, the site, and `ludion_ask` need no special case.
+- **`symbol` and `replacement`** look like code: up to 6 space-separated tokens of identifier, path, flag, and call characters; no quotes, backticks, or angle brackets; no invisible characters, URLs, command lines, or instructions to an AI (unlike `detail`, `//` and square brackets are allowed, which is harmless inside a code span). The symbol must also appear in the evidence: in a test's code or a quote. Backticks are also stripped when the claim is built, so no field can end a code span early. This came from a security review: these fields go into the sentence assistants read.
+- **`detail`**: at most 160 characters, **printable ASCII only, without backticks, angle brackets, or square brackets, and with no `//`** (so no markdown links or protocol-relative URLs). The text guards come from #21: no invisible characters, URLs, command lines, or instructions to an AI. ASCII-only means lookalike characters (fullwidth letters, for example) can't slip past those guards, and no markup reaches the generated claim. Lessons are written in English.
+  - It must be **grounded**: every meaningful word, lightly stemmed, must appear in a **source quote** or in the fields (package, versions, symbol, replacement).
+  - Only articles, basic prepositions, and forms of "be" are ignored. Negations (not, no, never, without), comparatives (only, more, before, after), modals, and numbers all count, so a detail can't say the opposite of its quote.
+  - Test code and expected errors don't ground anything: the teacher writes them, so they would ground any word. A lesson whose only evidence is tests can still have a detail made of its fields' words; anything more needs a source.
+  - `verify` fails a detail that isn't grounded and names the missing words.
+- **What the schema can't say** is checked by `lessonProblems` in `packages/core`, which `verify` and `ludion teach` both run:
+  - the subject matches the package;
+  - `versions` is a real range: `semver.validRange` accepts it, it doesn't mean every version (`*`, `x`, `||||`), and it has no empty `||` alternatives;
+  - the detail is grounded;
+  - every quote names the symbol, and at least one piece of evidence (a quote or a test's code) names it.
+- **Follow-up**: a test that prints a `skip:` line still counts toward the derived label. The PR gets the `skipped` label for the maintainer; making the label depend on CI's result needs results stored with the index, which can come with reverify.
+- **Evidence** is a test or a source.
+  - **Test**: `{runtime, packages?, code, expect?, error?}`.
+    - `runtime` is one of `node@18`/`20`/`22`/`24` or `python@3.9`–`3.14`.
+    - `packages` holds at most 5 exact versions.
+    - `expect: fail` needs `error`, and `error` goes only with it.
+  - **Source**: `{url, quote}`. The quote is 40 to 300 characters, so a sentence rather than a headline, and **must name the symbol**, which `verify` checks; together that is how "states the fact itself" is enforced by machine.
+- **Labels**:
+  - `differential` (shown as "Verified across versions"): the **same code**, on the **same runtime with the same other pins**, passes on a version of the lesson's own package **inside** `versions` and fails as expected on a version **outside** it. So only the lesson's package differs. An npm pin counts only on a node runtime, and a pypi pin only on python. A runtime pin (node@22) names a whole release line, so it counts only when the entire line is inside (`semver.subset`) or entirely outside (`!semver.intersects`) the range; a range with a gap that cuts the line says nothing. A prerelease pin says nothing either, because ranges leave prereleases out. Anything less is labeled `test`;
+  - `test`: any test;
+  - `source`: sources only;
+  - `proof`: format 0 Lean runs.
+- **Running tests with pinned packages** (`tools/verify/src/docker.ts`), in two containers:
+  1. The packages are installed with the network on, install scripts off (`npm install --ignore-scripts`; `pip install --only-binary :all:`), and no lesson code.
+  2. The lesson code runs in a fresh container with `--network none`, read-only root, and the same limits as before. The work folder is mounted at `/w` (`NODE_PATH=/w/node_modules`, `PYTHONPATH=/w/site`, `LUDION_PACKAGES=/w`).
+  - Both containers run as the host user where there is one, so the work folder can be removed afterwards.
+  - Timeouts: 30 seconds, 90 with packages (tests that start a tool such as vitest need longer), and 180 for the install. Both containers are named, so a timeout kills the container itself, not just the Docker client.
+  - Pinned packages are written in code-point order, so the canonical file doesn't depend on the machine's locale.
+- **Removed with #13's teaching path**: the App bot rule in `verify` (any bot now fails: lessons come from the teacher's own account), and `/api/*`, `/auth/*`, and the `SOURCE_CHECK_LIMITER` binding in `wrangler.jsonc`.
+- Not here yet: seed lessons, which will carry `drafted_by: "agent"`. Before the first one merges, the site, `ludion_ask`, and `ludion sync` must show that label wherever the lesson appears.
+
 ### 2026-10-11: Switching to spec v2
 
 - CLAUDE.md is the v2 spec, word for word. `.claude/rules/` is deleted. What those files said about the system as it runs today is kept below under "Carried over from v0"; what v2 changes is recorded here as the work happens.
@@ -39,7 +78,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
 
 ### Infrastructure
 
-- One Cloudflare Worker, `ludion` (Hono), serving the prerendered Astro site from `apps/site/dist` as static assets, `/index.json`, and `/mcp`. Custom domain `ludion.ai` in `wrangler.jsonc`. `run_worker_first` covers `/mcp`, `/mcp/*`, `/@*`, and also `/api/*` and `/auth/*`; `/@<login>` serves `/teachers/<lowercase login>/` from the assets, or the 404 page. `/api/*`, `/auth/*`, and the `SOURCE_CHECK_LIMITER` rate-limit binding in `wrangler.jsonc` are leftovers of the dropped server-side teaching path, to be removed.
+- One Cloudflare Worker, `ludion` (Hono), serving the prerendered Astro site from `apps/site/dist` as static assets, `/index.json`, and `/mcp`. Custom domain `ludion.ai` in `wrangler.jsonc`. `run_worker_first` covers `/mcp`, `/mcp/*`, and `/@*`; `/@<login>` serves `/teachers/<lowercase login>/` from the assets, or the 404 page. (`/api/*`, `/auth/*`, and the `SOURCE_CHECK_LIMITER` binding were removed with format 1.)
 - No content database (no KV, D1, or R2): GitHub is the database, and the index is rebuilt with every deploy.
 - **Deploys** happen only in `.github/workflows/deploy.yml`:
   - Triggers: every push to `main`, and `workflow_dispatch`.
@@ -62,7 +101,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
 - The active set: all lessons on main minus every id named in another lesson's `replaces`.
 - `index.json` (`{version: 1, built_at, lessons, teachers}`) is built from the active set at site build. Each lesson carries:
   - `teacher`: the current login for `teacher_id`, looked up by numeric id with `GET /user/{id}` once per id per build, falling back to the login stored in that teacher's newest lesson;
-  - `verified_by`: `proof` if any Lean run, else `test` if any run, else `source`;
+  - `verified_by`: `proof` if any Lean run, else `test` if any run, else `source` (format 1 adds `differential`; see "Lesson format 1");
   - `verified_at` and `pr`: from the git commit that added the file, where `pr` is parsed from the squash message's `(#n)` and a shallow clone is unshallowed first;
   - the lesson's GitHub URL.
 - `teachers` is keyed by `teacher_id` (as a string). Lessons are sorted newest first, and the build warns above 5 MB. `index.json` is open to every origin (`Access-Control-Allow-Origin: *`), on purpose: the lessons are a commons.
@@ -78,7 +117,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
     - deleted ones are retractions (label `retract`);
     - modified ones fail ("Lessons are immutable").
 - **Trust boundary**: `verify` runs the PR's own copy of `tools/verify`, so it cannot be the authority on what a PR may change (a PR could edit the checker). Today a human reviews before merging. If lesson PRs are ever merged automatically, that decision must be made on a trusted side that runs only base-branch code and lists the PR's files through the API.
-- Author rule: a person's PR must have `author_id` equal to the PR author's numeric id. `tools/verify/src/pr.ts` still has a rule for PRs opened by the Ludion App's bot (`app_bot_id`); it is harmless while `app_bot_id` is unset (every bot fails), and it is to be removed now that #13 is closed.
+- Author rule: a person's PR must have `author_id` equal to the PR author's numeric id. Any bot fails (the App bot rule was removed with format 1).
 - **Runners**: `python` (`python:3.14-slim`), `bash` (same image), `node` (`node:24-slim`), `lean` (none yet: label `needs-lean`).
   - Docker flags: `--network none --memory 512m --cpus 1 --pids-limit 128 --read-only --tmpfs /tmp`, a 30-second timeout, and images pulled before any timed run.
   - Code arrives on stdin; exit 0 means the claim holds; a `skip:` line means the runner can't test it.

@@ -8,7 +8,8 @@ import EvidenceRun from "../../components/EvidenceRun.astro";
 import EvidenceSource from "../../components/EvidenceSource.astro";
 import { claimSize } from "../../build/claim-size.ts";
 import { siteData, type LessonPage } from "../../build/data.ts";
-import { en, formatDate } from "../../strings/en.ts";
+import { en, formatDate, testLabel } from "../../strings/en.ts";
+import { asTest, claimOf, versionOf } from "@ludion/core";
 
 // Every lesson on main, replaced ones included: history stays visible.
 export async function getStaticPaths() {
@@ -19,23 +20,24 @@ export async function getStaticPaths() {
 const { page } = Astro.props as { page: LessonPage };
 const { config, teacherHref, pages } = await siteData();
 // Corrections are shown by their claims, not their ids.
-const claimOf = new Map(pages.map((p) => [p.lesson.id, p.lesson.claim]));
+const claimById = new Map(pages.map((p) => [p.lesson.id, claimOf(p.lesson)]));
 const { lesson } = page;
+const claim = claimOf(lesson);
 const repo = `https://github.com/${config.org}/${config.repo}`;
 ---
 
-<Base title={`${lesson.claim} | Ludion`} description={lesson.claim}>
+<Base title={`${claim} | Ludion`} description={claim}>
   <article class="lesson wrap">
     {
       page.correctedBy && (
         <p class="banner" role="note">
-          {en.lesson.correctedBy} <a href={`/lessons/${page.correctedBy}/`}>{claimOf.get(page.correctedBy) ?? page.correctedBy}</a>
+          {en.lesson.correctedBy} <a href={`/lessons/${page.correctedBy}/`}>{claimById.get(page.correctedBy) ?? page.correctedBy}</a>
         </p>
       )
     }
     <div class="top">
       <div>
-        <h1 class:list={["claim", claimSize(lesson.claim)]}><Claim text={lesson.claim} /></h1>
+        <h1 class:list={["claim", claimSize(claim)]}><Claim text={claim} /></h1>
         <Signature
           teacher={page.teacher}
           teacherId={lesson.author_id}
@@ -51,7 +53,7 @@ const repo = `https://github.com/${config.org}/${config.repo}`;
         <StatusChip status="verified" label={en.lesson.verifiedBy[page.verified_by]} by={page.verified_by} size="large" />
         <dl>
           <div><dt>{en.record.verified}</dt><dd><time datetime={page.verified_at}>{formatDate(page.verified_at)}</time></dd></div>
-          <div><dt>{en.record.appliesTo}</dt><dd><SubjectTag subject={lesson.subject} version={lesson.version} /></dd></div>
+          <div><dt>{en.record.appliesTo}</dt><dd><SubjectTag subject={lesson.subject} version={versionOf(lesson)} /></dd></div>
           <div>
             <dt>{en.record.check}</dt>
             <dd class="links">
@@ -66,13 +68,10 @@ const repo = `https://github.com/${config.org}/${config.repo}`;
     <section class="evidence" aria-labelledby="evidence">
       <h2 id="evidence">{en.lesson.evidence}</h2>
       {
-        lesson.evidence.map((e) =>
-          "run" in e ? (
-            <EvidenceRun runner={e.run.runner} code={e.run.code} />
-          ) : (
-            <EvidenceSource url={e.source.url} quote={e.source.quote} />
-          ),
-        )
+        lesson.evidence.map((e) => {
+          const t = asTest(e);
+          return t ? <EvidenceRun runner={testLabel(t)} code={t.code} /> : "source" in e && <EvidenceSource url={e.source.url} quote={e.source.quote} />;
+        })
       }
       {
         page.corrects.length > 0 && (
@@ -81,7 +80,7 @@ const repo = `https://github.com/${config.org}/${config.repo}`;
             <ul class="corrected">
               {page.corrects.map((id) => (
                 <li>
-                  <a href={`/lessons/${id}/`}>{claimOf.get(id) ?? id}</a>
+                  <a href={`/lessons/${id}/`}>{claimById.get(id) ?? id}</a>
                 </li>
               ))}
             </ul>

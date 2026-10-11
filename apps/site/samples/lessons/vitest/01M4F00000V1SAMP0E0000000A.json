@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4F00000V1SAMP0E0000000A",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "behavior",
+  "symbol": "toHaveTextContent",
+  "replacement": "toMatchTextContent",
+  "signal": "loud",
+  "detail": "toHaveTextContent is strict; add toMatchTextContent as alternative",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.3"
+        },
+        "code": "// sample only: never run\nprocess.exit(0)"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "// sample only: never run\nprocess.exit(0)",
+        "expect": "fail",
+        "error": "sample error text"
+      }
+    },
+    {
+      "source": {
+        "url": "https://github.com/vitest-dev/vitest/releases/tag/v5.0.0",
+        "quote": "toHaveTextContent is strict, add toMatchTextContent as alternative"
+      }
+    }
+  ],
+  "author": "github:alice-chen",
+  "author_id": 101,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:00:00Z"
+}

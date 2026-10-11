@@ -7,9 +7,11 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "minisearch": "^7.2.0"
+    "minisearch": "^7.2.0",
+    "semver": "^7.8.5"
   },
   "devDependencies": {
+    "@types/semver": "^7.8.0",
     "ajv": "^8.20.0"
   }
 }

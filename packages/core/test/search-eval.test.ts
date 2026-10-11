@@ -141,7 +141,7 @@ const ON_TOPIC: Record<string, [string, string]> = {
   "added `--repeats`": ["How do I run each test several times in a row with the Vitest CLI to find flaky tests?", "What does vitest --repeats do?"],
   "added `-p`": ["Is there a short flag for --project in the Vitest CLI?", "What does vitest -p do?"],
   "changed what `vitest list` does": ["Does vitest list run my test files to collect the tests?", "How does vitest list find tests without executing them?"],
-  "changed what `vitest` does": ["Will Vitest find a vitest.config.ts in a parent directory when I run it from a subfolder?", "I run vitest inside packages/foo and it ignores the root config. Is that expected?"],
+  "changed what `vitest.config` does": ["Will Vitest find a vitest.config.ts in a parent directory when I run it from a subfolder?", "I run vitest inside packages/foo and it ignores the root config. Is that expected?"],
   "exactly equal to the expected string": ["Does toHaveTextContent in Vitest match a substring of the element's text?", "How do I check that an element's text contains a phrase in Vitest browser mode?"],
   "changed the default of `--merge-reports`": ["Where does vitest --reporter=blob write its output by default?", "Which folder does vitest --merge-reports read from by default?"],
   "changed what `deploy` does": ["Does wrangler deploy create my KV namespaces and queues automatically if they don't exist yet?", "Is automatic resource provisioning in wrangler deploy still in beta?"],

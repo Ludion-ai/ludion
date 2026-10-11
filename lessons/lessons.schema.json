@@ -208,8 +208,8 @@
         },
         {
           "type": "string",
-          "pattern": "^[\\x20-\\x3B=\\x3F-\\x5A\\x5C\\x5E\\x5F\\x61-\\x7E]*$",
-          "description": "Printable ASCII only, without backticks, angle brackets, or square brackets: lookalike characters would slip past the guards above, and markup would reach the generated claim."
+          "pattern": "^[\\x20-\\x3B=>\\x3F-\\x5A\\x5C\\x5E\\x5F\\x61-\\x7E]*$",
+          "description": "Printable ASCII only, without backticks, <, or square brackets: lookalike characters would slip past the guards above, and markup would reach the generated claim. A lone > is allowed (vitest names nested tests math > adds); it opens no tag, and every claim already shows ranges like >=5.0.0."
         },
         {
           "not": {

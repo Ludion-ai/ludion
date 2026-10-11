@@ -1,0 +1,72 @@
+[
+  {
+    "condition": "before",
+    "trial": 1,
+    "correct": true,
+    "pathRight": true,
+    "why": "right path, with include-hidden-files: true"
+  },
+  {
+    "condition": "before",
+    "trial": 2,
+    "correct": true,
+    "pathRight": true,
+    "why": "right path, with include-hidden-files: true"
+  },
+  {
+    "condition": "before",
+    "trial": 3,
+    "correct": false,
+    "pathRight": true,
+    "why": "right path, but without include-hidden-files: true (uploads nothing)"
+  },
+  {
+    "condition": "before",
+    "trial": 4,
+    "correct": true,
+    "pathRight": true,
+    "why": "right path, with include-hidden-files: true"
+  },
+  {
+    "condition": "before",
+    "trial": 5,
+    "correct": true,
+    "pathRight": true,
+    "why": "right path, with include-hidden-files: true"
+  },
+  {
+    "condition": "after",
+    "trial": 1,
+    "correct": true,
+    "pathRight": true,
+    "why": "right path, with include-hidden-files: true"
+  },
+  {
+    "condition": "after",
+    "trial": 2,
+    "correct": false,
+    "pathRight": true,
+    "why": "right path, but without include-hidden-files: true (uploads nothing)"
+  },
+  {
+    "condition": "after",
+    "trial": 3,
+    "correct": false,
+    "pathRight": true,
+    "why": "right path, but without include-hidden-files: true (uploads nothing)"
+  },
+  {
+    "condition": "after",
+    "trial": 4,
+    "correct": false,
+    "pathRight": true,
+    "why": "right path, but without include-hidden-files: true (uploads nothing)"
+  },
+  {
+    "condition": "after",
+    "trial": 5,
+    "correct": true,
+    "pathRight": true,
+    "why": "right path, with include-hidden-files: true"
+  }
+]

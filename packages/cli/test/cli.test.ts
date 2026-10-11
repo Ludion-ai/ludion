@@ -135,7 +135,7 @@ describe("teach", () => {
     const l = toLesson(draft, undefined, new Date());
     expect(await check(l, { fetchFn: page(QUOTE), docker: false })).toEqual({ problems: [], tests: "none", sources: "found" });
     const ungrounded = toLesson({ ...draft, detail: "toHaveTextContent is never strict" }, undefined, new Date());
-    expect((await check(ungrounded, { fetchFn: page(QUOTE), docker: false })).problems).toEqual([expect.stringContaining("doesn't contain: never")]);
+    expect((await check(ungrounded, { fetchFn: page(QUOTE), docker: false })).problems).toEqual([expect.stringContaining("no source quote contains: never")]);
     expect((await check(l, { fetchFn: page("something else entirely"), docker: false })).problems).toEqual([expect.stringContaining("Source https://github.com")]);
     const withTest = toLesson({ ...draft, detail: undefined, evidence: [{ test: { runtime: "node@24", code: "x" } }] }, undefined, new Date());
     expect(await check(withTest, { docker: false })).toMatchObject({ problems: [], tests: expect.stringMatching(/^not run \(Docker isn't installed here/) });

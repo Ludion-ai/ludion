@@ -4,10 +4,21 @@
   "description": "Tells your coding assistant what changed in the versions your project installed.",
   "license": "Apache-2.0",
   "type": "module",
-  "bin": { "ludion": "dist/cli.js" },
-  "files": ["dist"],
-  "engines": { "node": ">=20" },
-  "repository": { "type": "git", "url": "git+https://github.com/Ludion-ai/ludion.git", "directory": "packages/cli" },
+  "bin": {
+    "ludion": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ludion-ai/ludion.git",
+    "directory": "packages/cli"
+  },
   "homepage": "https://ludion.ai",
   "scripts": {
     "build": "node build.ts"

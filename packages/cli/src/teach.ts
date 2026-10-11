@@ -3,7 +3,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import {
-  checkSource, formatLesson, generateClaim, newId, quotesMissingSymbol, subjectFor, ungroundedWords, validateLessonV1,
+  checkSource, formatLesson, generateClaim, lessonProblems, newId, subjectFor, validateLessonV1,
   type FetchFn, type LessonV1,
 } from "@ludion/core";
 import { interpretRun, runInDocker, type RunFn } from "../../../tools/verify/src/docker.ts";
@@ -68,9 +68,7 @@ export async function check(lesson: LessonV1, opts: { fetchFn?: FetchFn; run?: R
   const problems: string[] = [];
   const v = validateLessonV1(JSON.parse(formatLesson(lesson)));
   if (!v.ok) return { problems: v.errors.map((e) => `${e.path}: ${e.message}`), tests: "not run", sources: "not checked" };
-  const words = ungroundedWords(lesson);
-  if (words.length) problems.push(`The detail uses words the evidence doesn't contain: ${words.join(", ")}. Use the evidence's own words, or leave the detail out.`);
-  for (const q of quotesMissingSymbol(lesson)) problems.push(`The quote "${q.slice(0, 80)}" doesn't name ${lesson.symbol}. Quote a sentence that states the fact itself.`);
+  problems.push(...lessonProblems(lesson));
 
   const sources = lesson.evidence.flatMap((e) => ("source" in e ? [e.source] : []));
   const fetchFn = opts.fetchFn ?? createSafeFetch();

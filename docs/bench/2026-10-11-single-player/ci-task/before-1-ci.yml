@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npx vitest run --reporter=junit
+
+      - name: Upload JUnit report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report
+          # Vitest's default junit location when no outputFile is configured
+          path: .vitest/junit/output.xml
+          # .vitest is a hidden directory, which upload-artifact skips by default
+          include-hidden-files: true
+          if-no-files-found: error

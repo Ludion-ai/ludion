@@ -1,6 +1,6 @@
 ---
 // A subject is a directory (lessons/<subject>/), so it reads like one: "python/", with the version after it.
-// Plain text with a slash, never the seal's block.
+// Plain text with a slash, never the seal's block. Links to the subject's page.
 interface Props {
   subject: string;
   version?: string | null;
@@ -8,7 +8,7 @@ interface Props {
 const { subject, version } = Astro.props;
 ---
 
-<span class="tag"><span class="subject">{subject}/</span>{version && <span class="version">{version}</span>}</span>
+<span class="tag"><a class="subject" href={`/${subject}/`}>{subject}/</a>{version && <span class="version">{version}</span>}</span>
 
 <style>
   .tag {
@@ -22,5 +22,9 @@ const { subject, version } = Astro.props;
   .subject {
     color: var(--ink);
     font-weight: 600;
+    text-decoration: none;
+  }
+  .subject:hover {
+    text-decoration: underline;
   }
 </style>

@@ -1,0 +1,84 @@
+---
+// A retracted lesson: its file was deleted from main. The page stays at the same address and says so first; what the
+// lesson said is struck through, with the teacher it was signed by and the retraction's pull request.
+import Base from "../layouts/Base.astro";
+import SubjectTag from "./SubjectTag.astro";
+import { siteData, type Tombstone } from "../build/data.ts";
+import { en, formatDate } from "../strings/en.ts";
+import { claimOf, versionOf } from "@ludion/core";
+
+const { tombstone: t } = Astro.props as { tombstone: Tombstone };
+const { config } = await siteData();
+const repo = `https://github.com/${config.org}/${config.repo}`;
+const claim = t.lesson ? claimOf(t.lesson) : undefined;
+---
+
+<Base title={en.tombstone.title(t.id)} description={en.tombstone.banner(formatDate(t.retracted_at))}>
+  <article class="wrap">
+    <h1>{en.tombstone.heading}</h1>
+    <p class="banner" role="note">{en.tombstone.banner(formatDate(t.retracted_at))}</p>
+    {
+      claim ? (
+        <section aria-labelledby="said">
+          <h2 id="said">{en.tombstone.said}</h2>
+          <p class="claim"><s>{claim}</s></p>
+          <p class="meta">
+            {t.teacher && <span>{en.lesson.taughtBy} @{t.teacher}</span>}
+            <SubjectTag subject={t.subject} version={t.lesson && versionOf(t.lesson)} />
+          </p>
+        </section>
+      ) : (
+        <p>{en.tombstone.unreadable}</p>
+      )
+    }
+    <p class="links">
+      {t.pr !== null && <a href={`${repo}/pull/${t.pr}`}>{en.tombstone.pr(t.pr)}</a>}
+      <a href={`${repo}/commits/main/lessons/${t.subject}/${t.id}.json`}>{en.tombstone.history}</a>
+    </p>
+  </article>
+</Base>
+
+<style>
+  h1 {
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 20px;
+  }
+  .banner {
+    margin: 0 0 36px;
+    padding: 10px 14px;
+    border: 1.5px dashed var(--checking-line);
+    border-radius: 3px;
+    color: var(--checking-fg);
+  }
+  h2 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .claim {
+    font-size: clamp(21px, 2.5vw, 28px);
+    line-height: 1.25;
+    color: var(--muted);
+    max-width: 32em;
+    margin: 0 0 16px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+  .links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    margin: 0;
+  }
+</style>

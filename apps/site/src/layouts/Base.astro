@@ -36,6 +36,8 @@ const canonicalUrl = new URL(path, config.site).href;
         <a class="home" href="/" aria-label={en.site.name}><Wordmark /></a>
         <nav aria-label={en.nav.label}>
           <a href="/lessons/" aria-current={Astro.url.pathname.startsWith("/lessons") ? "page" : undefined}>{en.nav.lessons}</a>
+          <a href="/models/" aria-current={Astro.url.pathname.startsWith("/models") ? "page" : undefined}>{en.nav.models}</a>
+          <a href="/start/" aria-current={Astro.url.pathname.startsWith("/start") ? "page" : undefined}>{en.nav.start}</a>
         </nav>
       </div>
     </header>
@@ -68,6 +70,10 @@ const canonicalUrl = new URL(path, config.site).href;
     display: inline-flex;
     padding: 6px 0;
     text-decoration: none;
+  }
+  nav {
+    display: flex;
+    gap: 24px;
   }
   nav a {
     font-size: 15px;

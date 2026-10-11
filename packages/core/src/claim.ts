@@ -6,6 +6,9 @@ import { stem, tokenize } from "./search.ts";
 import type { Lesson, LessonV1 } from "./types.ts";
 import { isV1 } from "./types.ts";
 
+/** Top-level paths of the site and the Worker. A subject gets a page at /<subject>/, so it can't be one of these. */
+export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "_astro", "404"]);
+
 /** The directory for a package: npm @scope/name → scope.name; anything else lowercased as is. */
 export function subjectFor(pkg: LessonV1["package"]): string {
   return pkg.name.replace(/^@/, "").replace("/", ".").toLowerCase();
@@ -93,6 +96,7 @@ export function quotesMissingSymbol(l: LessonV1): string[] {
 export function lessonProblems(l: LessonV1): string[] {
   const problems: string[] = [];
   if (l.subject !== subjectFor(l.package)) problems.push(`The subject for package ${l.package.name} is ${subjectFor(l.package)}, not ${l.subject}.`);
+  if (RESERVED_SUBJECTS.has(l.subject)) problems.push(`The subject ${l.subject} is taken by a page of the site (ludion.ai/${l.subject}/). Lessons about a package with this name can't be taught yet; open an issue.`);
   const range = semver.validRange(l.versions);
   // A range that means every version (*, x, ||||) can't describe a change, and empty || alternatives are a typo.
   if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);

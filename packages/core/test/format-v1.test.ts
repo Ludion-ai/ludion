@@ -126,6 +126,11 @@ describe("the format 1 schema", () => {
 });
 
 describe("lessonProblems", () => {
+  it("refuses a subject that a page of the site would shadow", () => {
+    const l = lessonV1({ package: { ecosystem: "npm", name: "models" }, subject: "models" });
+    expect(lessonProblems(l)).toEqual([expect.stringContaining("The subject models is taken by a page of the site")]);
+  });
+
   it("is empty for a good lesson, and names a range that isn't one", () => {
     expect(lessonProblems(lessonV1())).toEqual([]);
     for (const versions of ["||||", "*", "x", ">=5.0.0 ||"]) {

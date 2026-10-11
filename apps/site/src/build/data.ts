@@ -3,10 +3,11 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
-  buildIndex, resolveLogins, storedLogin, validateLesson, verifiedBy,
+  buildIndex, RESERVED_SUBJECTS, resolveLogins, storedLogin, validateLesson, verifiedBy,
   type GitInfo, type Index, type Lesson, type VerifiedBy,
 } from "@ludion/core";
-import { ADDED_LOG_FORMAT, parseAddedLog } from "./git-info.ts";
+import { ADDED_LOG_FORMAT, DELETED_LOG_FORMAT, parseAddedLog, parseDeletedLog } from "./git-info.ts";
+import { readModels, type Models } from "./models.ts";
 import { teacherPages } from "./teacher-pages.ts";
 
 export interface Config {
@@ -26,8 +27,23 @@ export interface LessonPage {
   correctedBy: string | null;
 }
 
+/** A retracted lesson: its file was deleted from main. Its page stays, struck through, so links keep working. */
+export interface Tombstone {
+  id: string;
+  subject: string;
+  /** The lesson as it was before deletion; undefined if that version can't be read as a lesson. */
+  lesson?: Lesson;
+  teacher?: string;
+  retracted_at: string;
+  pr: number | null;
+}
+
 export interface SiteData {
   config: Config;
+  /** Retracted lessons, newest retraction first. */
+  tombstones: Tombstone[];
+  /** FreshBench per-model verdicts (docs/bench/models.json), or null before the first run. */
+  models: Models | null;
   /** index.json: the active set. */
   index: Index;
   /** Every lesson on main, replaced ones included, newest verified first. */
@@ -81,6 +97,29 @@ function readLessons(dir: string): Lesson[] {
   return lessons;
 }
 
+/** Lessons deleted from main and not back since, read as they were just before deletion. */
+function tombstonesOf(root: string, present: Set<string>, loginOf: (l: Lesson) => string): Tombstone[] {
+  const deleted = parseDeletedLog(git(root, "log", "--diff-filter=D", "--name-only", `--format=${DELETED_LOG_FORMAT}`, "--", "lessons/"));
+  const out: Tombstone[] = [];
+  for (const [id, d] of Object.entries(deleted)) {
+    if (present.has(id)) continue;
+    let lesson: Lesson | undefined;
+    try {
+      const v = validateLesson(JSON.parse(git(root, "show", `${d.commit}^:${d.path}`)));
+      if (v.ok) lesson = v.lesson;
+    } catch {
+      // The old version may not parse under today's schema; the tombstone still names the id and the retraction.
+    }
+    out.push({ id, subject: d.path.split("/")[1]!, lesson, teacher: lesson && loginOf(lesson), retracted_at: d.retracted_at, pr: d.pr });
+  }
+  return out.sort((a, b) => (a.retracted_at < b.retracted_at ? 1 : -1));
+}
+
+/** A subject named like a top-level page would be shadowed by it: fail the build with what to do. */
+export function reservedSubjects(subjects: Iterable<string>): string[] {
+  return [...new Set(subjects)].filter((s) => RESERVED_SUBJECTS.has(s));
+}
+
 function gitInfo(root: string): GitInfo {
   if (git(root, "rev-parse", "--is-shallow-repository").trim() === "true") {
     console.log("[ludion] Shallow clone: fetching full history for verified_at and pr.");
@@ -109,6 +148,8 @@ async function load(): Promise<SiteData> {
     if (!logins.has(l.author_id)) logins.set(l.author_id, storedLogin(l.author));
   }
 
+  const clash = reservedSubjects(all.map((l) => l.subject));
+  if (clash.length) throw new Error(`Subject ${clash.join(", ")} is also a top-level page of the site, so its subject page can't be built. Add a check for it in verify, or rename the page.`);
   const index = buildIndex(all, info, resolved, config);
   const json = JSON.stringify(index);
   if (json.length > SIZE_WARNING) console.warn(`[ludion] index.json is ${(json.length / 1048576).toFixed(1)} MB, above 5 MB. The Worker and the ask box load it whole.`);
@@ -134,6 +175,8 @@ async function load(): Promise<SiteData> {
 
   return {
     config,
+    tombstones: samples ? [] : tombstonesOf(root, new Set(all.map((l) => l.id)), (l) => logins.get(l.author_id) ?? storedLogin(l.author)),
+    models: readModels(root),
     index,
     pages,
     teacherPages: owners,

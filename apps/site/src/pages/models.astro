@@ -1,0 +1,114 @@
+---
+// Measured only: every number on this page comes from docs/bench/models.json, written by a FreshBench run whose
+// files are in docs/bench/. Lessons without a measurement aren't listed.
+import Base from "../layouts/Base.astro";
+import { modelTotals } from "../build/models.ts";
+import { siteData } from "../build/data.ts";
+import { en, formatDate } from "../strings/en.ts";
+
+const { models, index, config } = await siteData();
+const m = en.models;
+const active = new Map(index.lessons.map((l) => [l.id, l]));
+const totals = models ? modelTotals(models, new Set(active.keys())) : [];
+const measured = models ? Object.keys(models.lessons).filter((id) => active.has(id)).map((id) => ({ lesson: active.get(id)!, verdicts: models.lessons[id]! })) : [];
+const ids = models ? Object.keys(models.models) : [];
+---
+
+<Base title={m.title} description={m.intro}>
+  <article class="wrap">
+    <h1>{m.heading}</h1>
+    <p class="intro">{m.intro}</p>
+    {
+      !models || measured.length === 0 ? (
+        <p>{m.none}</p>
+      ) : (
+        <>
+          <p class="meta">
+            {m.measured(formatDate(models.measured_at))} <a href={`https://github.com/${config.org}/${config.repo}/tree/main/${models.bench}`}>{m.run}</a>
+          </p>
+          <table class="totals">
+            <thead>
+              <tr><th scope="col">{m.model}</th><th scope="col">{m.knows}</th><th scope="col">{m.misses}</th></tr>
+            </thead>
+            <tbody>
+              {totals.map((t) => (
+                <tr><th scope="row">{t.name}</th><td>{t.knows}</td><td>{t.misses}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <h2>{m.perLesson}</h2>
+          <div class="scroll">
+            <table class="lessons">
+              <thead>
+                <tr><th scope="col">{m.lesson}</th>{ids.map((id) => <th scope="col">{models.models[id]!.name}</th>)}</tr>
+              </thead>
+              <tbody>
+                {measured.map(({ lesson, verdicts }) => (
+                  <tr>
+                    <th scope="row"><a href={`/lessons/${lesson.id}/`}>{lesson.claim}</a></th>
+                    {ids.map((id) => <td>{verdicts[id] ? m.verdict[verdicts[id]!] : ""}</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  h1 {
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+  .intro {
+    margin: 18px 0 24px;
+    max-width: 46em;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .meta {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 24px;
+  }
+  .meta a {
+    color: var(--ink);
+  }
+  h2 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 40px 0 12px;
+  }
+  table {
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 8px 16px 8px 0;
+    border-top: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  thead th {
+    border-top: 0;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  td {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .lessons tbody th {
+    font-weight: 500;
+    min-width: 18em;
+    max-width: 40em;
+  }
+  .scroll {
+    overflow-x: auto;
+  }
+</style>

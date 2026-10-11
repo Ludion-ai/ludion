@@ -45,10 +45,11 @@ export function tooMany(failed: number, checked: number): boolean {
  * What tonight decides: the failing list. When the failures look like the check's own fault, tonight changes nothing:
  * last night's list stands, so lessons already confirmed failing stay withheld and no new ones are.
  */
-export function decide(tonight: LessonResult[], lastNight: LessonResult[] | undefined, now: Date, lastFailing: Failing[] = []): FailingFile {
+export function decide(tonight: LessonResult[], lastNight: LessonResult[] | undefined, now: Date, lastFailing: Failing[] = [], lastCheckedAt?: string): FailingFile {
   const failing = confirmedFailures(tonight, lastNight);
   const checked_at = now.toISOString().replace(/\.\d{3}Z$/, "Z");
-  if (tooMany(failing.length, tonight.length)) return { checked_at, failing: lastFailing, suspended: { failed: failing.length, checked: tonight.length } };
+  // The carried list keeps its own date: it is the night those failures were found, not the night the check broke.
+  if (tooMany(failing.length, tonight.length)) return { checked_at: lastCheckedAt ?? checked_at, failing: lastFailing, suspended: { failed: failing.length, checked: tonight.length } };
   return { checked_at, failing };
 }
 
@@ -71,7 +72,7 @@ export function retractionIssue(f: Failing, repo: string, runUrl: string): { tit
   return {
     title: `Retract ${f.id}: its evidence fails the nightly check`,
     body: [
-      `The nightly reverify (${runUrl}) found that the evidence of \`${f.file}\` fails. Ludion stopped serving the lesson at the next deploy; it stays on main until it is fixed or retracted.`,
+      `The nightly reverify (${runUrl}) found that the evidence of \`${f.file}\` fails. Ludion stopped serving the lesson at the next deploy; it stays on main, withheld, until it passes its check again or is retracted.`,
       "",
       "What failed:",
       "",

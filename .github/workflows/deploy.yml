@@ -69,12 +69,16 @@ jobs:
           # too: their list is uploaded before they start a deploy.
           runs=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --limit 10 \
             --json databaseId,event --jq '.[] | select(.event == "schedule" or .event == "workflow_dispatch") | .databaseId')
+          # Each check is assigned before it is tested, so an API error stops the step (bash -e) instead of quietly
+          # falling back to an older list. A run without a list is skipped; a list that exists must download.
           for run in $runs; do
-            [ "$(trusted "$run")" = "true" ] || continue
-            if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify; then
-              echo "Using the failing list from reverify run $run."
-              exit 0
-            fi
+            ok=$(trusted "$run")
+            [ "$ok" = "true" ] || continue
+            lists=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts" --jq '[.artifacts[] | select(.name == "reverify-failing" and .expired == false)] | length')
+            [ "$lists" -gt 0 ] || continue
+            gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify
+            echo "Using the failing list from reverify run $run."
+            exit 0
           done
           echo "::warning::No reverify failing list found; nothing is withheld."
       # Build before testing: the Worker tests serve the built site through ASSETS.
@@ -83,7 +87,7 @@ jobs:
         env:
           # Read-only, this job only: looks up teachers' current logins by id (docs/decisions.md).
           GITHUB_READ_TOKEN: ${{ github.token }}
-          # Lessons failing the nightly reverify leave the index until fixed or retracted (docs/decisions.md).
+          # Lessons failing the nightly reverify leave the index until they pass their check again or are retracted (docs/decisions.md).
           LUDION_WITHHOLD: .reverify/failing.json
 
       - run: npm test

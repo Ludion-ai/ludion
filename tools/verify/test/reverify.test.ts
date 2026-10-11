@@ -38,7 +38,7 @@ describe("decide", () => {
     expect(decide(many, undefined, new Date("2026-10-12T04:40:00Z"))).toEqual({ checked_at: "2026-10-12T04:40:00Z", failing: [], suspended: { failed: 10, checked: 10 } });
     // A suspended night keeps last night's list: lessons already confirmed failing stay withheld.
     const kept = [{ id: A, file: `lessons/x/${A}.json`, reasons: [failedTest] }];
-    expect(decide(many, undefined, new Date(), kept).failing).toEqual(kept);
+    expect(decide(many, undefined, new Date(), kept, "2026-10-11T04:40:00Z")).toMatchObject({ failing: kept, checked_at: "2026-10-11T04:40:00Z" });
     expect(decide([result(A, "failed", [failedTest]), result(B, "passed")], undefined, new Date()).failing.map((f) => f.id)).toEqual([A]);
   });
 

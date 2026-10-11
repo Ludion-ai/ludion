@@ -1,7 +1,8 @@
 # Nightly reverify (docs/decisions.md, "Nightly reverify"). Two jobs, so lesson code never runs next to a write token:
 # `check` runs the evidence of every active lesson on main (tests in Docker, network off; sources through the guarded
-# fetch) with a read-only token; `report` reads its results only, starts a deploy when the set of failing lessons
-# changed (so they leave the index at once), and prepares a retraction branch and an issue per failing lesson.
+# fetch) with a read-only token; `report` reads its results only, starts a deploy when the failing list changed and
+# every night while it isn't empty (so failing lessons leave the index), and prepares a retraction branch and an issue
+# per failing lesson.
 name: reverify
 
 on:
@@ -82,11 +83,13 @@ jobs:
           if [ -n "$prev" ]; then
             gh run download "$prev" --repo "$GITHUB_REPOSITORY" --name reverify-results --dir last-night || echo "No results from run $prev."
           fi
-          for run in $(echo "$runs" | jq -r '.[].databaseId'); do
-            if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir last-failing; then
-              echo "The current list comes from run $run."
-              break
-            fi
+          ids=$(echo "$runs" | jq -r '.[].databaseId')
+          for run in $ids; do
+            lists=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts" --jq '[.artifacts[] | select(.name == "reverify-failing" and .expired == false)] | length')
+            [ "$lists" -gt 0 ] || continue
+            gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir last-failing
+            echo "The current list comes from run $run."
+            break
           done
 
       - name: Decide what fails tonight

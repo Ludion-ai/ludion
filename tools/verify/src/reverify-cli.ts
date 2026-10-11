@@ -28,8 +28,10 @@ function count(args: string[]): number {
     console.error(USAGE);
     return 2;
   }
-  const lastFailing = lastFailingPath && existsSync(lastFailingPath) ? ((JSON.parse(readFileSync(lastFailingPath, "utf8")) as Partial<FailingFile>).failing ?? []).map(safeFailing).filter((f): f is Failing => !!f) : [];
-  const decision = decide(tonight, results(lastPath), new Date(), lastFailing);
+  const last = lastFailingPath && existsSync(lastFailingPath) ? (JSON.parse(readFileSync(lastFailingPath, "utf8")) as Partial<FailingFile>) : {};
+  const lastFailing = (last.failing ?? []).map(safeFailing).filter((f): f is Failing => !!f);
+  const lastCheckedAt = typeof last.checked_at === "string" ? last.checked_at : undefined;
+  const decision = decide(tonight, results(lastPath), new Date(), lastFailing, lastCheckedAt);
   writeFileSync(out, JSON.stringify(decision, null, 2) + "\n");
   const failed = tonight.filter((r) => r.status === "failed").length;
   if (decision.suspended) console.log(`${decision.suspended.failed} of ${tonight.length} lessons count as failing tonight: that looks like the check, not the lessons. Last night's list stands (${decision.failing.length} withheld).`);

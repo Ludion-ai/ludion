@@ -21,8 +21,8 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
   - An issue that exists for the lesson, open or closed, isn't opened again: closing it is a person's decision. Ids and paths read back from the artifact are checked, and `git rm` gets `--`.
   - Upload and deploy come first, so a reporting error never stops withholding.
 - **Accepted limits**:
-  - If the example lesson (distutils) ever fails, deploys fail at the Worker tests and `check-production.ts` until it is fixed or retracted, and production keeps serving the last index. The fact is a removal from a released Python, so this is unlikely, and the failure is loud.
-  - A deploy started by a push while a reverify run is still going uses the previous night's list. The reverify run starts its own deploy if the list changed.
+  - If the example lesson (distutils) ever fails, deploys fail at the Worker tests and `check-production.ts` until it passes its check again or is retracted, and production keeps serving the last index. The fact is a removal from a released Python, so this is unlikely, and the failure is loud.
+  - A deploy started by a push uses the newest reverify run that has a list, including one still going (its list is uploaded before it dispatches). Reverify also deploys every night while the list isn't empty, so a missed or failed deploy is caught up within a day.
 
 ### 2026-10-11: Measuring Done 3
 

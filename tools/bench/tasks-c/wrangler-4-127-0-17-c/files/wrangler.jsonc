@@ -1,0 +1,8 @@
+{
+  "name": "bench-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workflows": [
+    { "name": "sync-orders", "binding": "SYNC_ORDERS", "class_name": "SyncOrders" }
+  ]
+}

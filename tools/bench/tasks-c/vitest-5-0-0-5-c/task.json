@@ -1,0 +1,50 @@
+{
+  "id": "vitest-5-0-0-5-c",
+  "change": "vitest-5-0-0-5",
+  "library": "vitest",
+  "prompt": "Add a custom test runner in test/timing-runner.ts and use it in vitest.config.ts. It must keep Vitest's normal behavior and, after each test finishes, print one line `TIMING <full test name> <duration in ms>` to stdout. We'll add more per-test hooks to this runner later, so build it as a runner, not a reporter.",
+  "correct": [
+    [
+      { "files": ["test/timing-runner.ts", "test/timing-runner.mts", "test/timing-runner.js", "test/timing-runner.mjs"], "pattern": "import\\s*\\{[^}]*\\bTestRunner\\b[^}]*\\}\\s*from\\s*['\"]vitest['\"]" },
+      { "files": ["test/timing-runner.ts", "test/timing-runner.mts", "test/timing-runner.js", "test/timing-runner.mjs"], "pattern": "['\"]vitest/runners['\"]", "absent": true },
+      { "files": ["test/timing-runner.ts", "test/timing-runner.mts", "test/timing-runner.js", "test/timing-runner.mjs"], "pattern": "^[ \\t]*import\\s+(?!type\\b)[^;]*?from\\s*['\"]@vitest/runner(?:/[^'\"]*)?['\"]", "flags": "m", "absent": true },
+      { "files": ["vitest.config.ts", "vitest.config.mts", "vitest.config.js", "vitest.config.mjs"], "pattern": "runner\\s*:[\\s\\S]{0,200}?timing-runner" }
+    ],
+    [
+      { "files": ["test/timing-runner.ts", "test/timing-runner.mts", "test/timing-runner.js", "test/timing-runner.mjs"], "pattern": "import\\s+\\*\\s+as\\s+(\\w+)\\s+from\\s*['\"]vitest['\"][\\s\\S]*\\b\\1\\.TestRunner\\b" },
+      { "files": ["test/timing-runner.ts", "test/timing-runner.mts", "test/timing-runner.js", "test/timing-runner.mjs"], "pattern": "['\"]vitest/runners['\"]", "absent": true },
+      { "files": ["test/timing-runner.ts", "test/timing-runner.mts", "test/timing-runner.js", "test/timing-runner.mjs"], "pattern": "^[ \\t]*import\\s+(?!type\\b)[^;]*?from\\s*['\"]@vitest/runner(?:/[^'\"]*)?['\"]", "flags": "m", "absent": true },
+      { "files": ["vitest.config.ts", "vitest.config.mts", "vitest.config.js", "vitest.config.mjs"], "pattern": "runner\\s*:[\\s\\S]{0,200}?timing-runner" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "test/timing-runner.ts": "import { TestRunner } from \"vitest\";\nimport type { Task } from \"vitest\";\n\nfunction fullName(task: Task): string {\n  return task.suite && task.suite.name ? `${fullName(task.suite)} > ${task.name}` : task.name;\n}\n\nexport default class TimingRunner extends TestRunner {\n  override onAfterRunTask(test: Task) {\n    super.onAfterRunTask(test);\n    console.log(`TIMING ${fullName(test)} ${Math.round(test.result?.duration ?? 0)}`);\n  }\n}\n",
+        "vitest.config.ts": "import { defineConfig } from \"vitest/config\";\n\nexport default defineConfig({\n  test: {\n    include: [\"src/**/*.test.js\"],\n    runner: \"./test/timing-runner.ts\",\n  },\n});\n"
+      },
+      {
+        "test/timing-runner.ts": "import * as vitest from 'vitest';\nimport type { Task } from '@vitest/runner';\n\nexport default class TimingRunner extends vitest.TestRunner {\n  onAfterRunTask(test: Task) {\n    super.onAfterRunTask(test);\n    console.log(`TIMING ${test.name} ${test.result?.duration ?? 0}`);\n  }\n}\n",
+        "vitest.config.ts": "import { defineConfig } from 'vitest/config';\n\nexport default defineConfig({ test: { include: ['src/**/*.test.js'], runner: 'test/timing-runner.ts' } });\n"
+      },
+      {
+        "test/timing-runner.ts": "import { TestRunner, type Task } from \"vitest\";\n\nexport default class TimingRunner extends TestRunner {\n  onAfterRunTask(test: Task) {\n    super.onAfterRunTask(test);\n    console.log(`TIMING ${test.fullName} ${test.result?.duration ?? 0}`);\n  }\n}\n",
+        "vitest.config.ts": "import { fileURLToPath } from \"node:url\";\nimport { defineConfig } from \"vitest/config\";\n\nexport default defineConfig({\n  test: {\n    include: [\"src/**/*.test.js\"],\n    runner: fileURLToPath(new URL(\"./test/timing-runner.ts\", import.meta.url)),\n  },\n});\n"
+      }
+    ],
+    "wrong": [
+      {
+        "test/timing-runner.ts": "import { VitestTestRunner } from \"vitest/runners\";\nimport type { Task } from \"@vitest/runner\";\n\nexport default class TimingRunner extends VitestTestRunner {\n  onAfterRunTask(test: Task) {\n    super.onAfterRunTask(test);\n    console.log(`TIMING ${test.name} ${test.result?.duration ?? 0}`);\n  }\n}\n",
+        "vitest.config.ts": "import { defineConfig } from \"vitest/config\";\n\nexport default defineConfig({\n  test: {\n    include: [\"src/**/*.test.js\"],\n    runner: \"./test/timing-runner.ts\",\n  },\n});\n"
+      },
+      {
+        "test/timing-runner.ts": "import { TestRunner } from \"vitest\";\nimport { getFullName } from \"@vitest/runner/utils\";\nimport { type Task } from \"vitest\";\n\nexport default class TimingRunner extends TestRunner {\n  onAfterRunTask(test: Task) {\n    super.onAfterRunTask(test);\n    console.log(`TIMING ${getFullName(test)} ${test.result?.duration ?? 0}`);\n  }\n}\n",
+        "vitest.config.ts": "import { defineConfig } from \"vitest/config\";\n\nexport default defineConfig({\n  test: {\n    include: [\"src/**/*.test.js\"],\n    runner: \"./test/timing-runner.ts\",\n  },\n});\n"
+      },
+      {
+        "test/timing-runner.ts": "import { TestRunner, type Task } from \"vitest\";\n\nexport default class TimingRunner extends TestRunner {\n  onAfterRunTask(test: Task) {\n    super.onAfterRunTask(test);\n    console.log(`TIMING ${test.name} ${test.result?.duration ?? 0}`);\n  }\n}\n"
+      }
+    ]
+  },
+  "trap": "Vitest 4 runners extended VitestTestRunner from 'vitest/runners' (with helpers from @vitest/runner); Vitest 5 removed that entry point and no longer installs @vitest/runner, so the runner must extend TestRunner from 'vitest'."
+}

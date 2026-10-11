@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { parseAddedLog, parseDeletedLog } from "../src/build/git-info.ts";
 import { modelTotals, type Models } from "../src/build/models.ts";
-import { reservedSubjects } from "../src/build/data.ts";
+import { readWithheld, reservedSubjects } from "../src/build/data.ts";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { teacherPages } from "../src/build/teacher-pages.ts";
 
 const R = "\x1e";
@@ -81,5 +84,14 @@ describe("modelTotals", () => {
       { id: "a", name: "A", knows: 1, misses: 1 },
       { id: "b", name: "B", knows: 0, misses: 1 },
     ]);
+  });
+});
+describe("readWithheld", () => {
+  it("reads only lesson ids from reverify's failing.json, relative to the repo root", () => {
+    const root = mkdtempSync(join(tmpdir(), "ludion-withhold-"));
+    writeFileSync(join(root, "failing.json"), JSON.stringify({ checked_at: "2026-10-12T04:40:00Z", failing: [{ id: "01K70000000000000000000004" }, { id: "../../etc" }, { id: 7 }] }));
+    expect(readWithheld(root, "failing.json")).toEqual({ ids: new Set(["01K70000000000000000000004"]), checkedAt: "2026-10-12T04:40:00Z" });
+    expect(readWithheld(root, "missing.json")).toEqual({ ids: new Set(), checkedAt: null });
+    expect(readWithheld(root, undefined)).toEqual({ ids: new Set(), checkedAt: null });
   });
 });

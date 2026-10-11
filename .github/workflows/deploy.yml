@@ -6,6 +6,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      reverify_run:
+        description: "The reverify run whose failing list to use (reverify passes it; empty: the newest successful run)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -20,6 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
+    permissions:
+      contents: read
+      # Reads the newest reverify run's failing list (an artifact), so failing lessons are withheld from the index.
+      actions: read
     steps:
       - name: Note when this job started
         run: echo "STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
@@ -37,12 +46,26 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
 
+      - name: Get the lessons failing reverify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVERIFY_RUN: ${{ inputs.reverify_run }}
+        run: |
+          run="$REVERIFY_RUN"
+          case "$run" in *[!0-9]*) echo "reverify_run must be a run id."; exit 1 ;; esac
+          [ -n "$run" ] || run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$run" ]; then
+            gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify || echo "No failing list in run $run."
+          fi
+
       # Build before testing: the Worker tests serve the built site through ASSETS.
       - name: Build
         run: npm run build
         env:
           # Read-only, this job only: looks up teachers' current logins by id (docs/decisions.md).
           GITHUB_READ_TOKEN: ${{ github.token }}
+          # Lessons failing the nightly reverify leave the index until fixed or retracted (docs/decisions.md).
+          LUDION_WITHHOLD: .reverify/failing.json
 
       - run: npm test
 

@@ -4,6 +4,15 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-11: Nightly reverify
+
+- **`reverify.yml`** runs at 04:23 UTC every night and by hand. It has two jobs, so lesson code never runs next to a write token:
+  - `check` (`contents: read`, no secrets, checkout without credentials) runs `npm run verify -- lessons/ --run` on main: tests in Docker with the network off, sources through the guarded fetch. It uploads `results.json`.
+  - `report` (`contents: write`, `pull-requests: write`, `actions: write`) reads those results and runs only main's own `tools/verify/src/reverify-cli.ts`.
+- **What counts as failing**: a test that ran and failed counts at once. A failure that could be an outage counts only if the same lesson also failed the night before: every reason is a source check, a failed package install, or Docker not starting.
+- **Retraction PRs**: one per failing lesson, from branch `retract/<id>`, deleting the file, labeled `retract`. It's skipped when one is already open. The PR body fences what failed as text, because it comes from lesson output. GitHub runs no checks on PRs opened with the Actions token, so the body says to close and reopen the PR to run them; a person merges it anyway, because it changes `lessons/`.
+- **Failing lessons leave the index at once**: `report` uploads `failing.json` (lesson ids and when). When the set of failing ids changed since last night, it starts `deploy.yml` with its run id. `deploy.yml` downloads that run's list (else the newest successful reverify run's) and builds with `LUDION_WITHHOLD`. `buildIndex` takes failing lessons out after computing the active set, so a failing correction never brings back the lesson it corrected. They leave `index.json`, the shards, search, and the lists. Their pages stay, with a banner that the lesson failed its nightly check and a retraction is open. Main stays the truth: the lesson is still there until the retraction merges, and it is only withheld.
+
 ### 2026-10-11: Site pages for v2
 
 - **`/<subject>/`** lists the subject's active lessons, newest first; every subject tag links to it. A subject can't be a top-level path of the site or the Worker (`RESERVED_SUBJECTS` in `packages/core`: lessons, teachers, index, start, models, mcp, api, auth, _astro, 404): `lessonProblems` refuses it, so `verify` and `ludion teach` do too, and the site build fails if one slips in.
@@ -191,9 +200,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
   - This matters again in v2, where `ludion teach` checks sources on the teacher's machine.
 - Labels (`skipped`, `needs-lean`, `retract`) are set by a separate `label` job (`pull-requests: write`) that only reads the results artifact and never runs lesson code; on fork PRs its token is read-only and it logs and exits 0.
 - `test`: typecheck, build (first, because the Worker tests serve the built site), Vitest (Node and workerd projects), and Playwright with axe on every page in both themes.
-- **`reverify.yml`** (designed, not built yet; v2 still asks for nightly reverify):
-  - Two jobs, so lesson code never runs next to a write token: `check` (`contents: read`) runs every active lesson as `verify` does and uploads `results.json`; `report` (`contents: write, pull-requests: write`) opens one retraction PR per failure and skips lessons that already have an open one.
-  - A `source` failure counts only if it also failed the previous night (the site may just be down); a `run` failure counts at once.
+- **`reverify.yml`**: see "Nightly reverify" under the v2 decisions.
 
 ### Search and MCP
 

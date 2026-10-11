@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4N4KZ0P7MBRC476PA4MSKSX",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "behavior",
+  "symbol": "-t",
+  "signal": "silent",
+  "detail": "The pattern is matched against the full name: the enclosing suite names and the test name joined with ' > ' (the same string shown in the reporter output).",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/namepattern\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"math.test.mjs\", [\n  \"import { describe, test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => { writeFileSync(new URL('./ran.txt', import.meta.url), 'yes') })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"-t\", \"math > adds\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst counts = \"total \" + report.numTotalTests + \", passed \" + report.numPassedTests + \", failed \" + report.numFailedTests + \", skipped \" + report.numPendingTests;\nconsole.log(counts);\nconst ran = fs.existsSync(path.join(dir, \"ran.txt\"));\nif (ran && r.status === 0 && report.numPassedTests === 1) {\n  console.log(\"PASS: -t 'math > adds' matched the full name math > adds\");\n  process.exit(0);\n}\n// The symptom of the old behavior: vitest ran normally and skipped the test.\nif (!ran && report.numTotalTests === 1 && report.numPendingTests === 1 && report.numPassedTests === 0 && report.numFailedTests === 0) {\n  console.error(\"FAIL: -t 'math > adds' did not run the test adds inside describe('math')\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (\" + counts + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/namepattern\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"math.test.mjs\", [\n  \"import { describe, test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => { writeFileSync(new URL('./ran.txt', import.meta.url), 'yes') })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"-t\", \"math > adds\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst counts = \"total \" + report.numTotalTests + \", passed \" + report.numPassedTests + \", failed \" + report.numFailedTests + \", skipped \" + report.numPendingTests;\nconsole.log(counts);\nconst ran = fs.existsSync(path.join(dir, \"ran.txt\"));\nif (ran && r.status === 0 && report.numPassedTests === 1) {\n  console.log(\"PASS: -t 'math > adds' matched the full name math > adds\");\n  process.exit(0);\n}\n// The symptom of the old behavior: vitest ran normally and skipped the test.\nif (!ran && report.numTotalTests === 1 && report.numPendingTests === 1 && report.numPassedTests === 0 && report.numFailedTests === 0) {\n  console.error(\"FAIL: -t 'math > adds' did not run the test adds inside describe('math')\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (\" + counts + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: -t 'math > adds' did not run the test adds inside describe('math')"
+      }
+    },
+    {
+      "source": {
+        "url": "https://vitest.dev/config/testnamepattern",
+        "quote": "The pattern is matched against the test's full name: the enclosing suite names and the test name joined with ' > ' (the same string shown in the reporter output). For example, the test below has the full name math > adds, so it is matched by -t 'math > adds' or -t adds:"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:27:34Z"
+}

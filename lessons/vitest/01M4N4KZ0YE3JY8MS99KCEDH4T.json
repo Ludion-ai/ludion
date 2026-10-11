@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4N4KZ0YE3JY8MS99KCEDH4T",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "default",
+  "symbol": "--merge-reports",
+  "signal": "silent",
+  "detail": "It merges every blob report located in the .vitest/blob/ folder by default.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/blob\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"a.test.mjs\", \"import { test, expect } from 'vitest'\\ntest('blob probe', () => { expect(1).toBe(1) })\\n\");\nconst run = vitest([\"run\", \"--reporter=blob\"]);\nconsole.log(run.out);\nif (run.status !== 0) {\n  console.error(\"ERROR: vitest run --reporter=blob exited \" + run.status);\n  process.exit(2);\n}\nconst blob = path.join(dir, \".vitest\", \"blob\", \"blob.json\");\nif (!fs.existsSync(blob)) {\n  // The symptom of the old default: the report went to .vitest-reports/ instead.\n  if (fs.existsSync(path.join(dir, \".vitest-reports\", \"blob.json\"))) {\n    console.error(\"FAIL: the blob reporter did not write .vitest/blob/blob.json by default\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: no blob report was found in either folder\");\n  process.exit(2);\n}\n// --merge-reports without a path must read the same default folder.\nconst merge = vitest([\"run\", \"--merge-reports\"]);\nconsole.log(merge.out);\nif (merge.status !== 0 || !/1 passed/.test(merge.out)) {\n  console.error(\"FAIL: --merge-reports without a path did not merge .vitest/blob (exit \" + merge.status + \")\");\n  process.exit(1);\n}\nconsole.log(\"PASS: blob report written to and merged from .vitest/blob/\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/blob\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"a.test.mjs\", \"import { test, expect } from 'vitest'\\ntest('blob probe', () => { expect(1).toBe(1) })\\n\");\nconst run = vitest([\"run\", \"--reporter=blob\"]);\nconsole.log(run.out);\nif (run.status !== 0) {\n  console.error(\"ERROR: vitest run --reporter=blob exited \" + run.status);\n  process.exit(2);\n}\nconst blob = path.join(dir, \".vitest\", \"blob\", \"blob.json\");\nif (!fs.existsSync(blob)) {\n  // The symptom of the old default: the report went to .vitest-reports/ instead.\n  if (fs.existsSync(path.join(dir, \".vitest-reports\", \"blob.json\"))) {\n    console.error(\"FAIL: the blob reporter did not write .vitest/blob/blob.json by default\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: no blob report was found in either folder\");\n  process.exit(2);\n}\n// --merge-reports without a path must read the same default folder.\nconst merge = vitest([\"run\", \"--merge-reports\"]);\nconsole.log(merge.out);\nif (merge.status !== 0 || !/1 passed/.test(merge.out)) {\n  console.error(\"FAIL: --merge-reports without a path did not merge .vitest/blob (exit \" + merge.status + \")\");\n  process.exit(1);\n}\nconsole.log(\"PASS: blob report written to and merged from .vitest/blob/\");\n",
+        "expect": "fail",
+        "error": "FAIL: the blob reporter did not write .vitest/blob/blob.json by default"
+      }
+    },
+    {
+      "source": {
+        "url": "https://vitest.dev/guide/cli",
+        "quote": "Merges every blob report located in the specified folder (.vitest/blob/ by default). You can use any reporters with this command (except blob): sh vitest --merge-reports --reporter=junit"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:27:34Z"
+}

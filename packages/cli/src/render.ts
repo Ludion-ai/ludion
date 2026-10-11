@@ -1,6 +1,6 @@
 // .ludion/lessons.md, and the lines that wire it into CLAUDE.md, AGENTS.md, and Cursor rules.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, isAbsolute } from "node:path";
 import type { Selection } from "./match.ts";
 
 /** The first line of everything Ludion hands an assistant (the same line ludion_ask starts with). */
@@ -45,6 +45,23 @@ export function withBlock(text: string, block: string): string {
   return (text.length && !text.endsWith("\n") ? `${text}\n` : text) + (text.length ? "\n" : "") + full + "\n";
 }
 
+/**
+ * Write a file inside the project, and only inside it. Sync runs on its own (a session-start hook) in projects
+ * someone else may have prepared, so a symlinked target or parent could point the write anywhere: refuse those.
+ */
+export function safeWrite(dir: string, rel: string, text: string): void {
+  const root = realpathSync(dir);
+  const target = join(root, rel);
+  for (let p = dirname(target); p.length > root.length; p = dirname(p)) {
+    if (existsSync(p) && lstatSync(p).isSymbolicLink()) throw new Error(`${relative(root, p)} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
+  }
+  mkdirSync(dirname(target), { recursive: true });
+  const inside = relative(root, realpathSync(dirname(target)));
+  if (inside.startsWith("..") || isAbsolute(inside)) throw new Error(`${rel} would be written outside the project. Sync refused.`);
+  if (existsSync(target) && lstatSync(target).isSymbolicLink()) throw new Error(`${rel} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
+  writeFileSync(target, text);
+}
+
 export interface WireResult {
   written: string[];
 }
@@ -56,15 +73,14 @@ export interface WireResult {
  */
 export function writeAndWire(dir: string, lessonsMd: string): WireResult {
   const written: string[] = [];
-  mkdirSync(join(dir, ".ludion"), { recursive: true });
-  writeFileSync(join(dir, ".ludion", "lessons.md"), lessonsMd);
+  safeWrite(dir, join(".ludion", "lessons.md"), lessonsMd);
   written.push(".ludion/lessons.md");
 
   const claude = join(dir, "CLAUDE.md");
   const claudeText = existsSync(claude) ? readFileSync(claude, "utf8") : "";
   const claudeNew = withBlock(claudeText, "@.ludion/lessons.md");
   if (claudeNew !== claudeText) {
-    writeFileSync(claude, claudeNew);
+    safeWrite(dir, "CLAUDE.md", claudeNew);
     written.push("CLAUDE.md");
   }
 
@@ -73,14 +89,13 @@ export function writeAndWire(dir: string, lessonsMd: string): WireResult {
     const text = readFileSync(agents, "utf8");
     const next = withBlock(text, "Before writing code that uses this project's packages, read `.ludion/lessons.md`: changes in the installed versions that you may not know.");
     if (next !== text) {
-      writeFileSync(agents, next);
+      safeWrite(dir, "AGENTS.md", next);
       written.push("AGENTS.md");
     }
   }
 
   if (existsSync(join(dir, ".cursor"))) {
-    mkdirSync(join(dir, ".cursor", "rules"), { recursive: true });
-    writeFileSync(join(dir, ".cursor", "rules", "ludion.mdc"), `---\ndescription: Changes in this project's installed package versions (written by ludion sync)\nalwaysApply: true\n---\n\n${lessonsMd}`);
+    safeWrite(dir, join(".cursor", "rules", "ludion.mdc"), `---\ndescription: Changes in this project's installed package versions (written by ludion sync)\nalwaysApply: true\n---\n\n${lessonsMd}`);
     written.push(".cursor/rules/ludion.mdc");
   }
   return { written };

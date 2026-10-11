@@ -13,9 +13,13 @@ export interface Installed {
   source: string;
 }
 
+/**
+ * Record one installed version. Lockfiles may come from anyone, and versions end up in text an assistant reads,
+ * so only a clean semver version is kept (no spaces, quotes, or anything else).
+ */
 function add(map: Map<string, Set<string>>, name: string, version: string): void {
-  if (!name || !/^\d+\.\d+\.\d+/.test(version)) return;
-  const v = version.replace(/\(.*$/, "").trim();
+  const v = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?/.exec(version.trim())?.[0];
+  if (!name || !v || !/^(@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i.test(name)) return;
   let set = map.get(name);
   if (!set) map.set(name, (set = new Set()));
   set.add(v);
@@ -82,6 +86,7 @@ function nodeVersion(dir: string): string {
     if (existsSync(p)) {
       const v = readFileSync(p, "utf8").trim().replace(/^v/, "");
       if (/^\d+(\.\d+){0,2}$/.test(v)) return v;
+      // Anything else (lts/*, a codename) is ignored, and this Node is used.
     }
   }
   return process.versions.node;

@@ -1,0 +1,41 @@
+{
+  "id": "wrangler-4-111-0-0-c",
+  "change": "wrangler-4-111-0-0",
+  "library": "wrangler",
+  "prompt": "Add a staging environment to this Worker. In staging, ENVIRONMENT should be \"staging\", and CACHE needs its own KV namespace (id 9a8b7c6d5e4f40312a1b2c3d4e5f6a7b). Add npm scripts `deploy:staging`, which deploys staging, and `tail:staging`, which streams the staging Worker's logs. Production deploys with `npm run deploy` must keep working as before.",
+  "correct": [
+    [
+      { "files": ["wrangler.jsonc"], "pattern": "legacy_env", "absent": true },
+      { "files": ["wrangler.jsonc"], "pattern": "\"env\"\\s*:\\s*\\{[\\s\\S]*\"staging\"\\s*:\\s*\\{" },
+      { "files": ["wrangler.jsonc"], "pattern": "9a8b7c6d5e4f40312a1b2c3d4e5f6a7b" },
+      { "files": ["package.json"], "pattern": "\"deploy:staging\"\\s*:\\s*\"(?:[^\"\\\\\\n]|\\\\.)*((--env|-e)[= ]+(\\\\\"|')?staging|CLOUDFLARE_ENV=staging)" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"vars\": { \"ENVIRONMENT\": \"production\" },\n  \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"3f1c2a9e8b7d4c6e9f0a1b2c3d4e5f60\" }],\n  \"env\": {\n    \"staging\": {\n      \"vars\": { \"ENVIRONMENT\": \"staging\" },\n      \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\" }]\n    }\n  }\n}\n",
+        "package.json": "{\n  \"name\": \"bench-wrangler\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"wrangler dev\",\n    \"deploy\": \"wrangler deploy\",\n    \"deploy:staging\": \"wrangler deploy --env staging\",\n    \"tail:staging\": \"wrangler tail --env staging\"\n  },\n  \"devDependencies\": { \"wrangler\": \"4.148.0\" }\n}\n"
+      },
+      {
+        "wrangler.jsonc": "{\n  // legacy_env removed\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"vars\": { \"ENVIRONMENT\": \"production\" },\n  \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"3f1c2a9e8b7d4c6e9f0a1b2c3d4e5f60\" }],\n  \"env\": { \"staging\": { \"vars\": { \"ENVIRONMENT\": \"staging\" }, \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\" }] } }\n}\n",
+        "package.json": "{\n  \"scripts\": {\n    \"deploy\": \"wrangler deploy\",\n    \"deploy:staging\": \"wrangler deploy -e=staging\",\n    \"tail:staging\": \"wrangler tail bench-worker-staging\"\n  }\n}\n"
+      },
+      {
+        "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"env\": { \"staging\": { \"vars\": { \"ENVIRONMENT\": \"staging\" }, \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\" }] } }\n}\n",
+        "package.json": "{\n  \"scripts\": { \"deploy\": \"wrangler deploy\", \"deploy:staging\": \"wrangler deploy --env 'staging'\", \"tail:staging\": \"wrangler tail --env=\\\"staging\\\"\" }\n}\n"
+      }
+    ],
+    "wrong": [
+      {
+        "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"env\": { \"staging\": { \"vars\": { \"ENVIRONMENT\": \"staging\" }, \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\" }] } }\n}\n",
+        "package.json": "{\n  \"scripts\": { \"deploy\": \"wrangler deploy\", \"deploy:staging\": \"wrangler deploy\", \"tail:staging\": \"wrangler tail --env staging\" }\n}\n"
+      },
+      {
+        "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"legacy_env\": false,\n  \"vars\": { \"ENVIRONMENT\": \"production\" },\n  \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"3f1c2a9e8b7d4c6e9f0a1b2c3d4e5f60\" }],\n  \"env\": {\n    \"staging\": {\n      \"vars\": { \"ENVIRONMENT\": \"staging\" },\n      \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"9a8b7c6d5e4f40312a1b2c3d4e5f6a7b\" }]\n    }\n  }\n}\n",
+        "package.json": "{\n  \"name\": \"bench-wrangler\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"wrangler dev\",\n    \"deploy\": \"wrangler deploy\",\n    \"deploy:staging\": \"wrangler deploy --env staging\",\n    \"tail:staging\": \"wrangler tail bench-worker --env staging\"\n  },\n  \"devDependencies\": { \"wrangler\": \"4.148.0\" }\n}\n"
+      }
+    ]
+  },
+  "trap": "The project still sets \"legacy_env\": false (service environments); wrangler 4.111+ rejects any legacy_env field, so keeping it while adding the staging environment leaves a config that fails to deploy."
+}

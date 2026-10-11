@@ -35,9 +35,11 @@ async function main() {
     const work = join(mkdtempSync(join(tmpdir(), "ludion-hook-")), "work");
     cpSync(task.project, work, { recursive: true });
     cpSync(task.overlay, work, { recursive: true });
-    const args = [...claudeArgs(task.prompt, { condition: "project", model: values.model!, maxTurns: 25, maxBudgetUsd: 2, allowEdits: true }), "--plugin-dir", plugin];
+    const args = [...claudeArgs({ condition: "project", model: values.model!, maxTurns: 25, maxBudgetUsd: 2, allowEdits: true }), "--plugin-dir", plugin];
     const log = await new Promise<string[]>((done, fail) => {
-      const child = spawn("claude", args, { cwd: work, stdio: ["ignore", "pipe", "pipe"], windowsHide: true, env: { ...runEnv(), LUDION_HOME: home } });
+      const child = spawn("claude", args, { cwd: work, stdio: ["pipe", "pipe", "pipe"], windowsHide: true, env: { ...runEnv(), LUDION_HOME: home } });
+      child.stdin.on("error", () => {});
+      child.stdin.end(task.prompt);
       const timer = setTimeout(() => child.kill(), 15 * 60_000);
       let stdout = "";
       child.stdout.on("data", (d) => (stdout += d));

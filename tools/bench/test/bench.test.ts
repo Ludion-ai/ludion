@@ -10,7 +10,7 @@ const base = { model: "opus", maxTurns: 8, maxBudgetUsd: 1 };
 
 describe("claudeArgs", () => {
   it("gives no tools and no MCP servers in the none condition", () => {
-    const args = claudeArgs("q", { ...base, condition: "none" });
+    const args = claudeArgs({ ...base, condition: "none" });
     expect(args.slice(args.indexOf("--tools"), args.indexOf("--tools") + 2)).toEqual(["--tools", ""]);
     expect(args).toContain("--strict-mcp-config");
     expect(args).not.toContain("--mcp-config");
@@ -18,15 +18,15 @@ describe("claudeArgs", () => {
   });
 
   it("gives web search and fetch in the web condition, and Ludion's ask on top in the ludion condition", () => {
-    const web = claudeArgs("q", { ...base, condition: "web" });
+    const web = claudeArgs({ ...base, condition: "web" });
     expect(web[web.indexOf("--tools") + 1]).toBe("WebSearch,WebFetch");
-    const ludion = claudeArgs("q", { ...base, condition: "ludion" }, "/tmp/mcp.json");
+    const ludion = claudeArgs({ ...base, condition: "ludion" }, "/tmp/mcp.json");
     expect(ludion[ludion.indexOf("--allowedTools") + 1]).toBe("WebSearch,WebFetch,mcp__ludion__ludion_ask");
     expect(ludion[ludion.indexOf("--mcp-config") + 1]).toBe("/tmp/mcp.json");
   });
 
   it("loads only the run folder's settings, keeps no session, and caps turns and spending", () => {
-    const args = claudeArgs("q", { ...base, condition: "web" });
+    const args = claudeArgs({ ...base, condition: "web" });
     expect(args[args.indexOf("--setting-sources") + 1]).toBe("project");
     expect(args).toContain("--no-session-persistence");
     expect(args[args.indexOf("--max-turns") + 1]).toBe("8");
@@ -89,11 +89,16 @@ describe("project condition", () => {
 
   it("uses Claude Code's default tools, allows only the safe set, and accepts edits only when edits are allowed", () => {
     const base = { model: "opus", maxTurns: 8, maxBudgetUsd: 1, condition: "project" as const };
-    const ro = claudeArgs("q", base);
+    const ro = claudeArgs(base);
     expect(ro[ro.indexOf("--tools") + 1]).toBe("default");
     expect(ro).not.toContain("--permission-mode");
-    const rw = claudeArgs("q", { ...base, allowEdits: true });
+    const rw = claudeArgs({ ...base, allowEdits: true });
     expect(rw[rw.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
+  });
+
+  it("keeps the prompt off the command line (it goes to stdin), so a long judge prompt can't exceed Windows' limit", () => {
+    const args = claudeArgs({ model: "opus", maxTurns: 1, maxBudgetUsd: 1, condition: "none" });
+    expect(args.slice(0, 2)).toEqual(["-p", "--output-format"]);
   });
 
   it("passes no tokens or other secrets from this shell to the run", () => {

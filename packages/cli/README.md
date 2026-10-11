@@ -13,6 +13,6 @@ npx ludion teach draft.json            # check it and save it to your ledger (~/
 npx ludion teach draft.json --public   # then open a pull request in your name, with your own gh
 ```
 
-`teach` shows you the whole lesson, checks its sources, and runs its tests in Docker with the network off, if you have Docker. Lessons in your ledger reach every project on your machine at the next `sync`. With `--public`, after you confirm, the lesson goes to <https://github.com/Ludion-ai/ludion> as a pull request from your GitHub account, where CI checks it again. Your assistant can draft lessons for you through the Ludion MCP server (`ludion_teach`), but only you can run the command.
+`teach` shows you the whole lesson, checks its sources, and runs its tests in Docker with the network off, if you have Docker. Lessons in your ledger reach every project on your machine at the next `sync`. With `--public`, after you confirm at the terminal, the lesson goes to <https://github.com/Ludion-ai/ludion> as a pull request from your GitHub account, where CI checks it again. Your assistant can draft lessons for you through the Ludion MCP server (`ludion_teach`), but only you can run the command.
 
 No telemetry. Apache-2.0. Lessons are CC BY-SA 4.0.

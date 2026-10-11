@@ -22,6 +22,10 @@ export interface Shard {
 
 type Fetch = (url: string) => Promise<Response>;
 
+/** Every index request gives up after this long: sync runs at session start and must never stall it. */
+const FETCH_TIMEOUT_MS = 5000;
+const timedFetch: Fetch = (u) => fetch(u, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+
 /** Subjects this project could have lessons for: each installed npm package, and the node runtime. */
 export function wantedSubjects(installed: Installed): string[] {
   return [...new Set([...[...installed.npm.keys()].map((name) => subjectFor({ ecosystem: "npm", name })), "node"])];
@@ -47,7 +51,7 @@ export function shardLesson(l: ShardLesson): SyncLesson | undefined {
 }
 
 /** Lessons from the shards of the subjects this project uses. Throws with a plain message when the site can't be reached. */
-export async function fetchLessons(installed: Installed, fetchFn: Fetch = (u) => fetch(u)): Promise<{ lessons: SyncLesson[]; built_at: string | null }> {
+export async function fetchLessons(installed: Installed, fetchFn: Fetch = timedFetch): Promise<{ lessons: SyncLesson[]; built_at: string | null }> {
   const res = await fetchFn(`${SITE}/index/subjects.json`);
   if (res.status === 404) return { lessons: [], built_at: null };
   if (!res.ok) throw new Error(`${SITE}/index/subjects.json answered ${res.status}.`);

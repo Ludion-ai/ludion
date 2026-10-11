@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // ludion: tells your coding assistant what changed in the versions your project installed.
 //   ludion sync [--dir <path>] [--model <id>] [--quiet] [--offline]
-//   ludion teach <draft.json | - | --draft <base64url>> [--public] [--yes] [--drafted-by-agent]
+//   ludion teach <draft.json | - | --draft <base64url>> [--public] [--drafted-by-agent]
 // No telemetry: the only network requests are the index shards (sync), source pages (teach), and gh (teach --public).
 import { createInterface } from "node:readline/promises";
 import { resolve } from "node:path";
@@ -20,9 +20,10 @@ const HELP = `ludion: tells your coding assistant what changed in the versions y
       Read the lockfile, fetch the lessons for the installed versions, leave out what the model
       is measured to know, and write .ludion/lessons.md (imported from CLAUDE.md).
 
-  ludion teach <draft.json | - | --draft <value>> [--public] [--yes] [--drafted-by-agent]
+  ludion teach <draft.json | - | --draft <value>> [--public] [--drafted-by-agent]
       Check a lesson on this machine (tests run only in Docker) and save it to your ledger
-      (~/.ludion). --public opens a pull request with your own gh after showing you the whole lesson.
+      (~/.ludion). --public shows you the whole lesson, asks you to confirm at the terminal, and opens
+      a pull request with your own gh.
 `;
 
 async function sync(argv: string[]): Promise<number> {
@@ -47,7 +48,8 @@ async function sync(argv: string[]): Promise<number> {
   const summary = selection.kept.length
     ? [...new Set(selection.kept.map(({ lesson, versions }) => `${lesson.package.name} ${versions.join("/")}`))].join(", ")
     : `${installed.npm.size} packages from ${installed.source}, node ${installed.node}`;
-  const { written } = writeAndWire(dir, renderLessons(selection, summary, new Date()));
+  const { written, skipped } = writeAndWire(dir, renderLessons(selection, summary, new Date()));
+  for (const s of skipped) console.error(`ludion: ${s}`);
   say(`ludion: ${selection.kept.length} lesson${selection.kept.length === 1 ? "" : "s"} for this project${selection.prunedForModel.length ? ` (${selection.prunedForModel.length} left out: ${model} is measured to know them)` : ""}. Wrote ${written.join(", ")}.`);
   return 0;
 }
@@ -64,7 +66,7 @@ async function teach(argv: string[]): Promise<number> {
   const { values, positionals } = parseArgs({
     args: argv,
     allowPositionals: true,
-    options: { draft: { type: "string" }, public: { type: "boolean" }, yes: { type: "boolean" }, "drafted-by-agent": { type: "boolean" } },
+    options: { draft: { type: "string" }, public: { type: "boolean" }, "drafted-by-agent": { type: "boolean" } },
   });
   const source = values.draft ?? positionals[0];
   if (!source) {
@@ -73,7 +75,8 @@ async function teach(argv: string[]): Promise<number> {
   }
   const draft = readDraft(source);
   if (values["drafted-by-agent"]) draft.drafted_by = "agent";
-  const who = ghIdentity();
+  // The teacher's GitHub account matters only for a public lesson; without --public, gh isn't called.
+  const who = values.public ? ghIdentity() : undefined;
   const now = new Date();
   const lesson = toLesson(draft, who, now);
   console.log(showLesson(lesson));
@@ -94,7 +97,12 @@ async function teach(argv: string[]): Promise<number> {
     console.error("To teach in public, sign in to GitHub with gh first (gh auth login), then run this again with --public.");
     return 1;
   }
-  const ok = values.yes || (await confirm(`\nOpen a pull request to make this lesson public, signed as @${who.login}? [y/N] `));
+  // The person signs: --public asks at a terminal, and there is no flag to skip it, so an assistant can't answer for them.
+  if (!process.stdin.isTTY) {
+    console.error("Teaching in public needs you at a terminal to confirm. Run this command yourself; it stays in your ledger until then.");
+    return 1;
+  }
+  const ok = await confirm(`\nOpen a pull request to make this lesson public, signed as @${who.login}? [y/N] `);
   if (!ok) {
     console.log("Not published. It stays in your ledger.");
     return 0;

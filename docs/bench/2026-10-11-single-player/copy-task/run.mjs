@@ -1,3 +1,5 @@
+// RECORD ONLY: the script as it was run on 2026-10-11. Don't run it again: it gives the agent broad Bash and
+// edit permissions together. tools/bench/src/agent.ts (project condition) is the narrowed harness to use instead.
 // Done 1 (single player): Claude Code in project B, before and after `ludion sync`, on a task that depends on a
 // silent vitest 5 change (the junit reporter's default output file). Usage: node run-done1.mjs <trials> <out dir>
 import { spawn, spawnSync } from "node:child_process";

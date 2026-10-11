@@ -28,12 +28,27 @@ function add(map: Map<string, Set<string>>, name: string, version: string): void
 /** package-lock.json v2/v3: "packages": {"node_modules/a/node_modules/@s/b": {"version": "1.2.3"}}. */
 export function fromPackageLock(text: string): Map<string, Set<string>> {
   const map = new Map<string, Set<string>>();
-  const lock = JSON.parse(text) as { packages?: Record<string, { version?: string; link?: boolean }> };
-  for (const [path, info] of Object.entries(lock.packages ?? {})) {
-    if (!path || info.link || !info.version) continue;
-    const name = path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
-    add(map, name, info.version);
+  type V1 = { version?: string; dependencies?: Record<string, V1> };
+  const lock = JSON.parse(text) as { packages?: Record<string, { version?: string; link?: boolean; name?: string }>; dependencies?: Record<string, V1> };
+  if (lock.packages) {
+    for (const [path, info] of Object.entries(lock.packages)) {
+      // Only installed packages: workspace folders (packages/x) have no node_modules/ in their path.
+      const at = path.lastIndexOf("node_modules/");
+      if (at < 0 || info.link || !info.version) continue;
+      // An alias ("my-vitest": "npm:vitest@5") records the real package in "name".
+      add(map, info.name ?? path.slice(at + "node_modules/".length), info.version);
+    }
+    return map;
   }
+  // lockfileVersion 1: a nested "dependencies" tree.
+  const walk = (deps: Record<string, V1> | undefined) => {
+    for (const [name, info] of Object.entries(deps ?? {})) {
+      const alias = /^npm:((?:@[^@/]+\/)?[^@]+)@/.exec(info.version ?? "");
+      add(map, alias ? alias[1]! : name, alias ? info.version!.slice(alias[0].length) : (info.version ?? ""));
+      walk(info.dependencies);
+    }
+  };
+  walk(lock.dependencies);
   return map;
 }
 

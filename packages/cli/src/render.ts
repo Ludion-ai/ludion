@@ -1,5 +1,5 @@
 // .ludion/lessons.md, and the lines that wire it into CLAUDE.md, AGENTS.md, and Cursor rules.
-import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative } from "node:path";
 import type { Selection } from "./match.ts";
 
@@ -12,7 +12,8 @@ const END = "<!-- ludion: end -->";
 function teacherLine(l: Selection["kept"][number]["lesson"]): string {
   const who = l.teacher === "you" ? "Taught by you (in your ledger, not public)" : `Taught by ${l.teacher}`;
   const drafted = l.drafted_by === "agent" ? ", drafted by an agent" : "";
-  const verified = l.verified.startsWith("not verified") ? l.verified : `verified by ${l.verified}${l.verified_at ? ` on ${l.verified_at.slice(0, 10)}` : ""}`;
+  const label = l.verified === "differential" ? "tests across versions" : l.verified;
+  const verified = l.verified.startsWith("not verified") ? l.verified : `verified by ${label}${l.verified_at ? ` on ${l.verified_at.slice(0, 10)}` : ""}`;
   return `${who}${drafted}; ${verified}.${l.url ? ` ${l.url}` : ""}`;
 }
 
@@ -40,7 +41,7 @@ export function renderLessons(selection: Selection, installedSummary: string, no
 export function withBlock(text: string, block: string): string {
   const full = `${BEGIN}\n${block}\n${END}`;
   const start = text.indexOf(BEGIN);
-  const end = text.indexOf(END);
+  const end = start >= 0 ? text.indexOf(END, start + BEGIN.length) : -1;
   if (start >= 0 && end > start) return text.slice(0, start) + full + text.slice(end + END.length);
   return (text.length && !text.endsWith("\n") ? `${text}\n` : text) + (text.length ? "\n" : "") + full + "\n";
 }
@@ -69,48 +70,68 @@ export function safeWrite(dir: string, rel: string, text: string): void {
   renameSync(tmp, join(parent, basename(target)));
 }
 
-/** Read a project file only if it is a real file (not a link): its text goes back into a file sync writes. */
-function readReal(path: string): string {
-  const st = lstatSync(path, { throwIfNoEntry: false });
-  if (!st) return "";
-  if (st.isSymbolicLink()) throw new Error(`${basename(path)} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
-  return readFileSync(path, "utf8");
-}
 export interface WireResult {
   written: string[];
+  /** Files left alone, with why: a link, or not a regular file. Sync goes on without them. */
+  skipped: string[];
+}
+
+class Skip extends Error {}
+
+/** Read a wiring file only if it is a regular file; missing → "". A link or a folder is skipped, not fatal. */
+function readWiring(path: string, name: string): string {
+  const st = lstatSync(path, { throwIfNoEntry: false });
+  if (!st) return "";
+  if (st.isSymbolicLink()) throw new Skip(`${name} is a symbolic link; left as it is (point it at a real file to let sync wire it).`);
+  if (!st.isFile()) throw new Skip(`${name} is not a regular file; left as it is.`);
+  return readFileSync(path, "utf8");
 }
 
 /**
  * Write .ludion/lessons.md and point the project's assistant instructions at it:
  * CLAUDE.md (created if missing) imports it; AGENTS.md, if present, names it; Cursor, if .cursor/ exists, gets a rule
- * with the lessons inline (Cursor rules can't include other files).
+ * with the lessons inline (Cursor rules can't include other files). A file that is a link or not a regular file is
+ * skipped with a reason: sync runs at session start and must not fail the session over a project's layout.
  */
 export function writeAndWire(dir: string, lessonsMd: string): WireResult {
   const written: string[] = [];
-  safeWrite(dir, join(".ludion", "lessons.md"), lessonsMd);
-  written.push(".ludion/lessons.md");
-
-  const claude = join(dir, "CLAUDE.md");
-  const claudeText = readReal(claude);
-  const claudeNew = withBlock(claudeText, "@.ludion/lessons.md");
-  if (claudeNew !== claudeText) {
-    safeWrite(dir, "CLAUDE.md", claudeNew);
-    written.push("CLAUDE.md");
-  }
-
-  const agents = join(dir, "AGENTS.md");
-  if (lstatSync(agents, { throwIfNoEntry: false })) {
-    const text = readReal(agents);
-    const next = withBlock(text, "Before writing code that uses this project's packages, read `.ludion/lessons.md`: changes in the installed versions that you may not know.");
-    if (next !== text) {
-      safeWrite(dir, "AGENTS.md", next);
-      written.push("AGENTS.md");
+  const skipped: string[] = [];
+  const step = (fn: () => string | undefined) => {
+    try {
+      const w = fn();
+      if (w) written.push(w);
+    } catch (err) {
+      if (err instanceof Skip || /is a symbolic link|outside the project/.test((err as Error).message)) skipped.push((err as Error).message);
+      else throw err;
     }
+  };
+
+  step(() => (safeWrite(dir, join(".ludion", "lessons.md"), lessonsMd), ".ludion/lessons.md"));
+  if (!written.includes(".ludion/lessons.md")) return { written, skipped };
+
+  step(() => {
+    const text = readWiring(join(dir, "CLAUDE.md"), "CLAUDE.md");
+    const next = withBlock(text, "@.ludion/lessons.md");
+    if (next === text) return undefined;
+    safeWrite(dir, "CLAUDE.md", next);
+    return "CLAUDE.md";
+  });
+
+  if (lstatSync(join(dir, "AGENTS.md"), { throwIfNoEntry: false })) {
+    step(() => {
+      const text = readWiring(join(dir, "AGENTS.md"), "AGENTS.md");
+      const next = withBlock(text, "Before writing code that uses this project's packages, read `.ludion/lessons.md`: changes in the installed versions that you may not know.");
+      if (next === text) return undefined;
+      safeWrite(dir, "AGENTS.md", next);
+      return "AGENTS.md";
+    });
   }
 
-  if (existsSync(join(dir, ".cursor"))) {
-    safeWrite(dir, join(".cursor", "rules", "ludion.mdc"), `---\ndescription: Changes in this project's installed package versions (written by ludion sync)\nalwaysApply: true\n---\n\n${lessonsMd}`);
-    written.push(".cursor/rules/ludion.mdc");
+  if (lstatSync(join(dir, ".cursor"), { throwIfNoEntry: false })) {
+    step(() => {
+      safeWrite(dir, join(".cursor", "rules", "ludion.mdc"), `---\ndescription: Changes in this project's installed package versions (written by ludion sync)\nalwaysApply: true\n---\n\n${lessonsMd}`);
+      return ".cursor/rules/ludion.mdc";
+    });
   }
-  return { written };
+  return { written, skipped };
 }

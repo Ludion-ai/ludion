@@ -40,6 +40,10 @@ Cost: $2.28 for the CI task and $1.83 for the copy task, 20 runs in all.
 - **The task was the wrong kind for the second half.** With default tools and vitest installed, Claude Code read vitest's code or ran the suite and saw where the file went. A change the agent can observe by running the project is one it fixes itself. That is the CLAUDE.md point that failures which make noise get fixed in the agent's own loop.
 - **Next**: screen changes under the same realistic conditions, and pick ones the agent gets wrong with its default tools: changes it can't observe locally (platform behavior, a deprecated call that still runs, a weaker default), or ones it has no reason to check. The realistic FreshBench (Done 3) needs the same screening.
 
+## Safety note
+
+These runs gave the agent broad Bash (`npx`, `npm`, `node`, `cat`, `find`, `git`) together with edit permission, on this machine. That was too much for an agent that reads web pages and package code: an injected instruction could have used it. The `run.mjs` files are kept as a record and say not to run them again. The bench's project condition in `tools/bench/src/agent.ts` never gives both write and run: questions get read-only tools plus the project's own tests, and tasks get edits with no Bash. The environment passed to the run is scrubbed of tokens.
+
 ## Files
 
 - `junit-lesson-draft.json`: the draft taught in project A.

@@ -41,12 +41,14 @@ export function ghIdentity(): Identity | undefined {
 
 /** The lesson the draft becomes. Without a GitHub account yet, the author fields are placeholders until --public. */
 export function toLesson(draft: Draft, who: Identity | undefined, now: Date, id = newId(now.getTime())): LessonV1 {
-  const { format: _f, subject, ...fields } = draft;
+  // A draft can't choose its own id, author, or time: those fields are dropped and set here.
+  const { format: _f, subject, ...rest } = draft as Draft & Record<string, unknown>;
+  const { id: _i, author: _a, author_id: _ai, created_at: _c, ...fields } = rest;
   return {
+    ...fields,
     format: 1,
     id,
     subject: subject ?? subjectFor(draft.package),
-    ...fields,
     author: `github:${who?.login ?? "you"}`,
     author_id: who?.id ?? 1,
     created_at: now.toISOString().replace(/\.\d{3}Z$/, "Z"),
@@ -96,9 +98,13 @@ export async function check(lesson: LessonV1, opts: { fetchFn?: FetchFn; run?: R
   return { problems, tests: testsState, sources: sourcesState };
 }
 
+/** Control characters shown as \u{…}, so nothing in a draft can hide or rewrite lines on the terminal before the person confirms. */
+export const visible = (s: string): string => s.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202E\u2060-\u206F\uFEFF]/g, (c) => `\\u{${c.codePointAt(0)!.toString(16)}}`);
+
 /** The whole lesson as the teacher should see it before signing. */
 export function showLesson(lesson: LessonV1): string {
   const lines = [generateClaim(lesson), ""];
+  if (lesson.replaces?.length) lines.push(`Replaces: ${lesson.replaces.join(", ")} (those lessons leave the index when this one is merged)`, "");
   for (const e of lesson.evidence) {
     if ("source" in e) lines.push(`Source: ${e.source.url}`, `  "${e.source.quote}"`);
     else {
@@ -109,7 +115,7 @@ export function showLesson(lesson: LessonV1): string {
     lines.push("");
   }
   lines.push(`Signal: ${lesson.signal}. File: lessons/${lesson.subject}/${lesson.id}.json`);
-  return lines.join("\n");
+  return visible(lines.join("\n"));
 }
 
 export function ledgerEntry(lesson: LessonV1, report: CheckReport, now: Date): LedgerEntry {

@@ -9,7 +9,7 @@ import { select, type SyncLesson } from "../src/match.ts";
 import { openPullRequest, prTexts } from "../src/publish.ts";
 import { DATA_LINE, renderLessons, withBlock, writeAndWire } from "../src/render.ts";
 import { fetchLessons, shardLesson, type ShardLesson } from "../src/shards.ts";
-import { check, toLesson, type Draft } from "../src/teach.ts";
+import { check, showLesson, toLesson, type Draft } from "../src/teach.ts";
 
 const tmp = () => mkdtempSync(join(tmpdir(), "ludion-cli-"));
 const installed = (npm: Record<string, string[]>, node = "24.3.0"): Installed => ({ npm: new Map(Object.entries(npm).map(([k, v]) => [k, new Set(v)])), node, source: "test" });
@@ -48,6 +48,14 @@ describe("lockfiles", () => {
   it("reads yarn.lock, classic and berry", () => {
     expect([...fromYarnLock('vitest@^5.0.0, vitest@^5.0.1:\n  version "5.0.3"\n').get("vitest")!]).toEqual(["5.0.3"]);
     expect([...fromYarnLock('"@scope/x@npm:^1.0.0":\n  version: 1.2.0\n').get("@scope/x")!]).toEqual(["1.2.0"]);
+  });
+
+  it("reads only installed packages from package-lock: no workspace folders, aliases under their real name, and v1 lockfiles", () => {
+    const v3 = fromPackageLock(JSON.stringify({ packages: { "packages/my-vitest": { version: "1.0.0" }, "node_modules/my-vitest": { version: "5.0.3", name: "vitest" } } }));
+    expect([...v3.keys()]).toEqual(["vitest"]);
+    const v1 = fromPackageLock(JSON.stringify({ lockfileVersion: 1, dependencies: { vitest: { version: "5.0.3", dependencies: { tinyspy: { version: "4.0.0" } } }, "old-vitest": { version: "npm:vitest@4.1.11" } } }));
+    expect([...v1.get("vitest")!]).toEqual(["5.0.3", "4.1.11"]);
+    expect([...v1.get("tinyspy")!]).toEqual(["4.0.0"]);
   });
 
   it("keeps only clean versions and names, so a lockfile can't put text in front of the assistant", () => {
@@ -98,6 +106,21 @@ describe("lessons.md and wiring", () => {
     expect(renderLessons({ kept: [], prunedForModel: [] }, "x", new Date())).toContain("No lesson matches this project's versions yet.");
   });
 
+  it("skips a wiring file that is a link or a folder, and still writes the lessons", () => {
+    const dir = tmp();
+    mkdirSync(join(dir, "AGENTS.md"));
+    symlinkSync(tmp(), join(dir, "CLAUDE.md"), "junction");
+    const r = writeAndWire(dir, "lessons\n");
+    expect(r.written).toEqual([".ludion/lessons.md"]);
+    expect(r.skipped).toEqual([expect.stringMatching(/CLAUDE\.md is a symbolic link/), expect.stringMatching(/AGENTS\.md is not a regular file/)]);
+  });
+
+  it("finds its own end marker after its begin marker, so a stray one earlier in the file doesn't make blocks pile up", () => {
+    let text = "Docs mention <!-- ludion: end --> here.\n";
+    for (let i = 0; i < 3; i++) text = withBlock(text, "@.ludion/lessons.md");
+    expect(text.match(/ludion: begin/g)).toHaveLength(1);
+  });
+
   it("replaces its own block on every sync and leaves the rest of the file alone", () => {
     const once = withBlock("# My project\n\nRules.\n", "@.ludion/lessons.md");
     expect(withBlock(once, "@.ludion/lessons.md")).toBe(once);
@@ -108,7 +131,9 @@ describe("lessons.md and wiring", () => {
     const dir = tmp();
     const elsewhere = tmp();
     symlinkSync(elsewhere, join(dir, ".ludion"), "junction");
-    expect(() => writeAndWire(dir, "lessons\n")).toThrow(/\.ludion is a symbolic link/);
+    const r = writeAndWire(dir, "lessons\n");
+    expect(r.written).toEqual([]);
+    expect(r.skipped).toEqual([expect.stringMatching(/\.ludion is a symbolic link/)]);
     expect(existsSync(join(elsewhere, "lessons.md"))).toBe(false);
   });
 
@@ -116,7 +141,7 @@ describe("lessons.md and wiring", () => {
     const dir = tmp();
     const missing = join(tmp(), "not-there-yet");
     symlinkSync(missing, join(dir, ".ludion"), "junction");
-    expect(() => writeAndWire(dir, "lessons\n")).toThrow(/\.ludion is a symbolic link/);
+    expect(writeAndWire(dir, "lessons\n").skipped).toEqual([expect.stringMatching(/\.ludion is a symbolic link/)]);
     expect(existsSync(missing)).toBe(false);
   });
 
@@ -137,6 +162,9 @@ describe("teach", () => {
     const l = toLesson(draft, { login: "alice", id: 7 }, new Date("2026-10-11T01:02:03.456Z"), "01K7Z000000000000000000001");
     expect(l).toMatchObject({ format: 1, subject: "vitest", author: "github:alice", author_id: 7, created_at: "2026-10-11T01:02:03Z" });
     expect(toLesson(draft, undefined, new Date())).toMatchObject({ author: "github:you", author_id: 1 });
+    // A draft can't choose its own id, author, or time.
+    const forged = toLesson({ ...draft, id: "01K7Z000000000000000000099", author: "github:mallory", author_id: 666 } as Draft, { login: "alice", id: 7 }, new Date(), "01K7Z000000000000000000001");
+    expect(forged).toMatchObject({ id: "01K7Z000000000000000000001", author: "github:alice", author_id: 7 });
   });
 
   it("checks schema, grounding, symbol, and the source; reports tests it can't run here instead of failing them", async () => {
@@ -155,6 +183,16 @@ describe("teach", () => {
     const run = async (spec: unknown) => (seen.push(spec), { kind: "done" as const, exitCode: 0, stdout: "", stderr: "", timedOut: false });
     expect(await check(withTest, { docker: true, run })).toMatchObject({ problems: [], tests: "passed" });
     expect(seen).toEqual([{ runtime: "node@24", code: "toHaveTextContent(x)", packages: { vitest: "5.0.3" } }]);
+  });
+});
+
+describe("showLesson", () => {
+  it("shows replaces, and makes control characters visible so nothing hides lines before the person confirms", () => {
+    const l = toLesson({ ...draft, replaces: ["01K6ZQ4T9X0N8V2H7M3P5R1S6W"], evidence: [{ test: { runtime: "node@24", code: "toHaveTextContent()\u001b[2K\u001b[1Ahidden" } }] }, undefined, new Date());
+    const text = showLesson(l);
+    expect(text).toContain("Replaces: 01K6ZQ4T9X0N8V2H7M3P5R1S6W");
+    expect(text).not.toContain("\u001b");
+    expect(text).toContain("\\u{1b}[2K");
   });
 });
 

@@ -1,0 +1,12 @@
+{
+  "package": { "ecosystem": "npm", "name": "vitest" },
+  "versions": ">=5.0.0",
+  "kind": "default",
+  "symbol": "junit",
+  "signal": "silent",
+  "detail": "the junit reporter output is written to .vitest/junit/output.xml by default",
+  "evidence": [
+    { "source": { "url": "https://vitest.dev/guide/reporters", "quote": "By default it is written to .vitest/junit/output.xml" } },
+    { "source": { "url": "https://vitest.dev/guide/reporters", "quote": "The json, junit and html reporters instead write to a scoped location under .vitest/" } }
+  ]
+}

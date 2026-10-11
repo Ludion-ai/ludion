@@ -1,0 +1,1 @@
+{"name":"project-b","private":true,"type":"module","scripts":{"test":"vitest run","test:report":"vitest run --reporter=junit; status=$?; mkdir -p reports && cp .vitest/junit/output.xml reports/junit.xml && exit $status"},"devDependencies":{"vitest":"5.0.3"}}

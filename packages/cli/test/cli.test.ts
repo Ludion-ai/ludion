@@ -137,16 +137,16 @@ describe("teach", () => {
     const ungrounded = toLesson({ ...draft, detail: "toHaveTextContent is never strict" }, undefined, new Date());
     expect((await check(ungrounded, { fetchFn: page(QUOTE), docker: false })).problems).toEqual([expect.stringContaining("no source quote contains: never")]);
     expect((await check(l, { fetchFn: page("something else entirely"), docker: false })).problems).toEqual([expect.stringContaining("Source https://github.com")]);
-    const withTest = toLesson({ ...draft, detail: undefined, evidence: [{ test: { runtime: "node@24", code: "x" } }] }, undefined, new Date());
+    const withTest = toLesson({ ...draft, detail: undefined, evidence: [{ test: { runtime: "node@24", code: "toHaveTextContent(x)" } }] }, undefined, new Date());
     expect(await check(withTest, { docker: false })).toMatchObject({ problems: [], tests: expect.stringMatching(/^not run \(Docker isn't installed here/) });
   });
 
   it("runs tests through the Docker runner when Docker is there", async () => {
-    const withTest = toLesson({ ...draft, detail: undefined, evidence: [{ test: { runtime: "node@24", packages: { vitest: "5.0.3" }, code: "x" } }] }, undefined, new Date());
+    const withTest = toLesson({ ...draft, detail: undefined, evidence: [{ test: { runtime: "node@24", packages: { vitest: "5.0.3" }, code: "toHaveTextContent(x)" } }] }, undefined, new Date());
     const seen: unknown[] = [];
     const run = async (spec: unknown) => (seen.push(spec), { kind: "done" as const, exitCode: 0, stdout: "", stderr: "", timedOut: false });
     expect(await check(withTest, { docker: true, run })).toMatchObject({ problems: [], tests: "passed" });
-    expect(seen).toEqual([{ runtime: "node@24", code: "x", packages: { vitest: "5.0.3" } }]);
+    expect(seen).toEqual([{ runtime: "node@24", code: "toHaveTextContent(x)", packages: { vitest: "5.0.3" } }]);
   });
 });
 

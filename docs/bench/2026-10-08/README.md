@@ -1,6 +1,8 @@
 # FreshBench v0: 2026-10-08
 
-The first FreshBench run, following the method proposed in #19 (`bench.md` there, never merged; the method is now in `docs/decisions.md`, Bench). One change's answer key here is known to be wrong (WebdriverIO, `vitest-5-0-0-6`, in both the A and B sets), so every vitest score and every overall score below includes one question graded against a wrong key. It is to be fixed against primary sources and the scores recomputed (`docs/progress.md`). The window is the 90 days before 2026-10-08: 2026-07-10 to 2026-10-08.
+> **Corrected on 2026-10-11.** Five answer keys were wrong or incomplete when checked against primary sources. Re-judged with the corrected keys: A with web search is **44%** (not 47%), and vitest B with drafts in context is **9/10** (not 10/10), because the WebdriverIO draft taught a wrong fact. See `rejudge-2026-10-11/`. The numbers below are the original ones.
+
+The first FreshBench run, following the method proposed in #19 (`bench.md` there, never merged; the method is now in `docs/decisions.md`, Bench). The window is the 90 days before 2026-10-08: 2026-07-10 to 2026-10-08.
 
 ## Libraries, and why these three
 

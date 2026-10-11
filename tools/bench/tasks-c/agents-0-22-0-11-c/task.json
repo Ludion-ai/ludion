@@ -1,0 +1,42 @@
+{
+  "id": "agents-0-22-0-11-c",
+  "change": "agents-0-22-0-11",
+  "library": "agents",
+  "prompt": "src/client/Chat.jsx shows a live tokens-per-second meter (src/client/TokenMeter.jsx) while the assistant's reply streams. The meter counts re-renders, so the message list has to re-render on every streamed chunk, never in batches. Make sure the chat UI updates for each chunk as soon as it arrives.",
+  "correct": [
+    [
+      { "files": ["src/client/Chat.jsx"], "pattern": "\\bthrottle\\s*:\\s*(?:false|0)(?![\\w.])" }
+    ],
+    [
+      { "files": ["src/client/Chat.jsx"], "pattern": "\\bexperimental_throttle\\s*:\\s*(?:false|0)(?![\\w.])" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "src/client/Chat.jsx": "import { useState } from 'react';\nimport { useAgent } from 'agents/react';\nimport { useAgentChat } from 'agents/chat/react';\nimport { TokenMeter } from './TokenMeter.jsx';\n\nexport function Chat({ room }) {\n  const agent = useAgent({ agent: 'Chat', name: room });\n  const { messages, sendMessage, status } = useAgentChat({ agent, throttle: false });\n  const [input, setInput] = useState('');\n  return <TokenMeter messages={messages} streaming={status === 'streaming'} />;\n}\n"
+      },
+      {
+        "src/client/Chat.jsx": "import { useAgent } from 'agents/react';\nimport { useAgentChat } from 'agents/chat/react';\nexport function Chat({ room }) {\n  const agent = useAgent({ agent: 'Chat', name: room });\n  const chat = useAgentChat({\n    agent,\n    throttle: 0,\n  });\n  return null;\n}\n"
+      },
+      {
+        "src/client/Chat.jsx": "import { useAgent } from 'agents/react';\nimport { useAgentChat } from 'agents/chat/react';\nexport function Chat({ room }) {\n  const agent = useAgent({ agent: 'Chat', name: room });\n  const chat = useAgentChat({ agent, experimental_throttle: false });\n  return null;\n}\n"
+      },
+      {
+        "src/client/Chat.jsx": "import { useAgent } from 'agents/react';\nimport { useAgentChat } from 'agents/chat/react';\nexport function Chat({ room }) {\n  const agent = useAgent({ agent: 'Chat', name: room });\n  const chat = useAgentChat({ agent, experimental_throttle: 0 });\n  return null;\n}\n"
+      }
+    ],
+    "wrong": [
+      {
+        "src/client/Chat.jsx": "import { useState } from 'react';\nimport { flushSync } from 'react-dom';\nimport { useAgent } from 'agents/react';\nimport { useAgentChat } from 'agents/chat/react';\nimport { TokenMeter } from './TokenMeter.jsx';\n\nexport function Chat({ room }) {\n  const agent = useAgent({ agent: 'Chat', name: room });\n  const { messages, sendMessage, status } = useAgentChat({ agent });\n  const [input, setInput] = useState('');\n  return <TokenMeter messages={messages} streaming={status === 'streaming'} />;\n}\n"
+      },
+      {
+        "src/client/Chat.jsx": "import { useAgent } from 'agents/react';\nimport { useAgentChat } from 'agents/chat/react';\nexport function Chat({ room }) {\n  const agent = useAgent({ agent: 'Chat', name: room });\n  const chat = useAgentChat({ agent, throttle: 50 });\n  return null;\n}\n"
+      },
+      {
+        "src/client/Chat.jsx": "import { useAgent } from 'agents/react';\nimport { useAgentChat } from 'agents/chat/react';\nexport function Chat({ room }) {\n  const agent = useAgent({ agent: 'Chat', name: room });\n  const chat = useAgentChat({ agent, experimental_throttle: 16 });\n  return null;\n}\n"
+      }
+    ]
+  },
+  "trap": "Since 0.22 useAgentChat coalesces re-renders every 50 ms by default; believing it renders every chunk unthrottled leaves the batching in place (it needs `throttle: false`)."
+}

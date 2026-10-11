@@ -95,7 +95,8 @@ export function lessonProblems(l: LessonV1): string[] {
   if (l.subject !== subjectFor(l.package)) problems.push(`The subject for package ${l.package.name} is ${subjectFor(l.package)}, not ${l.subject}.`);
   const range = semver.validRange(l.versions);
   // A range that means every version (*, x, ||||) can't describe a change, and empty || alternatives are a typo.
-  if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
+  // `<` before a letter (only x can be there) means nothing as a range, and it would put a tag-like `<x` into the claim.
+  if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions) || /<\s*[A-Za-z]/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
   const words = ungroundedWords(l);
   if (words.length) problems.push(`The detail uses words no source quote contains: ${words.join(", ")}. Use the quotes' own words, or leave the detail out.`);
   for (const quote of quotesMissingSymbol(l)) problems.push(`The quote "${quote.slice(0, 80)}" doesn't name ${l.symbol}. Quote a sentence that states the fact itself, not a headline.`);

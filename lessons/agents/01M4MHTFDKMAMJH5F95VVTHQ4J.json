@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "id": "01M4MH5HFCHPQCF2YQ2Z75X6BG",
+  "id": "01M4MHTFDKMAMJH5F95VVTHQ4J",
   "subject": "agents",
   "package": {
     "ecosystem": "npm",
@@ -10,7 +10,7 @@
   "kind": "added",
   "symbol": "transport",
   "signal": "silent",
-  "detail": "useAgent speaks the Agent protocol over a transport: the default cf-websocket, a hibernating WebSocket, or the experimental capnweb.",
+  "detail": "useAgent speaks the Agent protocol over one of two wires: cf-websocket (the default, a hibernating WebSocket) or the experimental capnweb transport.",
   "evidence": [
     {
       "test": {
@@ -43,5 +43,5 @@
   "author": "github:Ludion-ai",
   "author_id": 292738933,
   "drafted_by": "agent",
-  "created_at": "2026-10-11T03:47:38Z"
+  "created_at": "2026-10-11T03:59:04Z"
 }

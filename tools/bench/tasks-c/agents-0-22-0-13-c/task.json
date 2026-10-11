@@ -1,0 +1,38 @@
+{
+  "id": "agents-0-22-0-13-c",
+  "change": "agents-0-22-0-13",
+  "library": "agents",
+  "prompt": "Counter (src/counter.js) is a plain Durable Object that other Workers call over RPC, and it must stay a plain DurableObject (don't turn it into an Agent). Make it run `compact()` automatically every day at 03:00 UTC. Use the scheduling from the agents package we already depend on (persisted schedules, cron parsing) instead of hand-writing alarm() code.",
+  "correct": [
+    [
+      { "files": ["src/counter.js"], "pattern": "from\\s*[\"']agents/schedules[\"']" },
+      { "files": ["src/counter.js"], "pattern": "\\bnew\\s+Scheduler\\s*(?:<[^>]*>)?\\s*\\(" },
+      { "files": ["src/counter.js"], "pattern": "\\bLifecycle\\s*\\.\\s*install\\s*\\(|\\bnew\\s+Lifecycle\\s*(?:<[^>]*>)?\\s*\\(" },
+      { "files": ["src/counter.js"], "pattern": "\\.\\s*use\\s*\\(" },
+      { "files": ["src/counter.js"], "pattern": "\\bclass\\s+Counter\\s+extends\\s+DurableObject\\b" },
+      { "files": ["src/counter.js"], "pattern": "\\bextends\\s+Agent\\b", "absent": true }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "src/counter.js": "import { DurableObject } from 'cloudflare:workers';\nimport { Lifecycle } from 'agents/lifecycle';\nimport { Scheduler } from 'agents/schedules';\n\nexport class Counter extends DurableObject {\n  scheduler = new Scheduler({\n    callbacks: {\n      compact: () => this.compact(),\n    },\n  });\n\n  lifecycle = Lifecycle.install(this).use(this.scheduler);\n\n  constructor(ctx, env) {\n    super(ctx, env);\n    ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS hits (at INTEGER NOT NULL)');\n    ctx.blockConcurrencyWhile(async () => {\n      await this.lifecycle.start();\n      const existing = await this.scheduler.list({ callback: 'compact' });\n      if (existing.length === 0) await this.scheduler.set('0 3 * * *', 'compact');\n    });\n  }\n\n  async hit() {\n    this.ctx.storage.sql.exec('INSERT INTO hits (at) VALUES (?)', Date.now());\n    return this.count();\n  }\n\n  async count() {\n    return this.ctx.storage.sql.exec('SELECT COUNT(*) AS n FROM hits').one().n;\n  }\n\n  async compact() {\n    this.ctx.storage.sql.exec('DELETE FROM hits WHERE at < ?', Date.now() - 30 * 24 * 3600 * 1000);\n  }\n}\n"
+      },
+      {
+        "src/counter.js": "import { DurableObject } from 'cloudflare:workers';\nimport { Lifecycle } from 'agents/lifecycle';\nimport { Scheduler } from 'agents/schedules';\n\nexport class Counter extends DurableObject {\n  scheduler = new Scheduler({ callbacks: { compact: () => this.compact() } });\n  lifecycle = new Lifecycle(this);\n\n  constructor(ctx, env) {\n    super(ctx, env);\n    this.lifecycle.use(this.scheduler);\n    this.lifecycle.installHandlers();\n    ctx.blockConcurrencyWhile(async () => {\n      await this.lifecycle.start();\n      if ((await this.scheduler.list({ callback: 'compact' })).length === 0) await this.scheduler.set('0 3 * * *', 'compact');\n    });\n  }\n\n  async compact() {}\n}\n"
+      }
+    ],
+    "wrong": [
+      {
+        "src/counter.js": "import { DurableObject } from 'cloudflare:workers';\nimport { Lifecycle } from 'agents/lifecycle';\nimport { Scheduler } from 'agents/schedules';\n\nexport class Counter extends DurableObject {\n  scheduler = new Scheduler({ callbacks: { compact: () => this.compact() } });\n  lifecycle = Lifecycle.install(this);\n\n  constructor(ctx, env) {\n    super(ctx, env);\n    ctx.blockConcurrencyWhile(() => this.scheduler.set('0 3 * * *', 'compact'));\n  }\n\n  async compact() {}\n}\n"
+      },
+      {
+        "src/counter.js": "import { DurableObject } from 'cloudflare:workers';\nimport { parseCronExpression } from 'cron-schedule';\n\nexport class Counter extends DurableObject {\n  constructor(ctx, env) {\n    super(ctx, env);\n    ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS hits (at INTEGER NOT NULL)');\n    ctx.blockConcurrencyWhile(async () => {\n      if ((await ctx.storage.getAlarm()) === null) await this.armNext();\n    });\n  }\n\n  async armNext() {\n    const next = parseCronExpression('0 3 * * *').getNextDate(new Date());\n    await this.ctx.storage.setAlarm(next.getTime());\n  }\n\n  async alarm() {\n    await this.compact();\n    await this.armNext();\n  }\n\n  async compact() {\n    this.ctx.storage.sql.exec('DELETE FROM hits WHERE at < ?', Date.now() - 30 * 24 * 3600 * 1000);\n  }\n}\n"
+      },
+      {
+        "src/counter.js": "import { Agent } from 'agents';\n\nexport class Counter extends Agent {\n  async onStart() {\n    await this.schedule('0 3 * * *', 'compact');\n  }\n  async compact() {\n    this.sql`DELETE FROM hits WHERE at < ${Date.now() - 2592000000}`;\n  }\n}\n"
+      }
+    ]
+  },
+  "trap": "Believing the agents scheduler only exists on Agent leads to converting Counter into an Agent or hand-writing alarms; since 0.22 `Scheduler` from `agents/schedules` installs on any Durable Object through `Lifecycle.install(this).use(...)`."
+}

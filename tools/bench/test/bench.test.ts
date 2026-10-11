@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { claudeArgs, parseStream, projectTools, runEnv } from "../src/agent.ts";
 import { contextFor, parseGrade } from "../src/freshbench.ts";
 import { arrayObjects, gradeVitestExtends } from "../src/tasks.ts";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { codeText, gradeRules, loadRuleTasks } from "../src/rule-tasks.ts";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -136,5 +138,28 @@ describe("vitest-extends grader", () => {
 
   it("finds the array's own objects, not nested ones", () => {
     expect(arrayObjects(`[{ a: { b: 1 } }, "./x.ts", { c: "}" }]`)).toEqual([`{ a: { b: 1 } }`, `{ c: "}" }`]);
+  });
+});
+
+describe("C tasks", () => {
+  const tasks = loadRuleTasks(fileURLToPath(new URL("../tasks-c/", import.meta.url)));
+  const reader = (files: Record<string, string>, overlay: string) => (path: string) =>
+    path in files ? files[path] : existsSync(join(overlay, path)) ? readFileSync(join(overlay, path), "utf8") : undefined;
+
+  it.each(tasks.map((t) => [t.id, t] as const))("%s grades its own examples", (_id, task) => {
+    expect(task.examples.correct.length, "at least one correct example").toBeGreaterThan(0);
+    expect(task.examples.wrong.length, "at least one stale example").toBeGreaterThan(0);
+    for (const files of task.examples.correct) expect(gradeRules(task, reader(files, task.overlay)).verdict).toBe("correct");
+    for (const files of task.examples.wrong) expect(gradeRules(task, reader(files, task.overlay)).verdict).toBe("wrong");
+    // The project as handed over is never already correct.
+    expect(gradeRules(task, reader({}, task.overlay)).verdict).toBe("wrong");
+  });
+
+  it("drops comments before matching, but keeps URLs in strings", () => {
+    expect(codeText("a.ts", 'const u = "https://x.dev"; // extends: false\n/* extends: false */')).toBe('const u = "https://x.dev"; \n');
+    expect(codeText("wrangler.toml", 'name = "x" # comment')).toBe('name = "x" ');
+    // Globs in strings aren't comments: 'a/*.ts' ... 'b/**/x' must survive.
+    const cfg = "include: ['test/contract/*.test.ts'], name: 'contract', extends: false, other: ['src/**/x.ts'] // note";
+    expect(codeText("vitest.config.ts", cfg)).toBe("include: ['test/contract/*.test.ts'], name: 'contract', extends: false, other: ['src/**/x.ts'] ");
   });
 });

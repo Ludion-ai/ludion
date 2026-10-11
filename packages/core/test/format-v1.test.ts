@@ -105,10 +105,11 @@ describe("the format 1 schema", () => {
   });
 
   it("refuses shell redirection in the detail, but not a lone > between words", () => {
-    for (const detail of ["echo x >> logfile", "cmd > /etc/hosts", "toHaveTextContent 2>&1", "run it >&2", "save > ~/out"]) {
+    for (const detail of ["echo x >> logfile", "cmd > /etc/hosts", "toHaveTextContent 2>&1", "run it >&2", "save > ~/out", "cmd >| /etc/hosts", "cmd > '~/.bashrc'", "echo x > .bashrc", "cmd > ./x", "cmd > C:\\Windows\\x", "cmd >\\\\srv\\x", "a 5>3 b"]) {
       expect(messages(lessonV1({ detail })), detail).toEqual([expect.stringContaining("command line")]);
     }
-    for (const detail of ["toHaveTextContent math > adds", "pip freeze > requirements.txt"]) expect(messages(lessonV1({ detail })), detail).toEqual([]);
+    // A > between words stays allowed, including the -t seed's own wording.
+    for (const detail of ["toHaveTextContent math > adds", "pip freeze > requirements.txt", "returns >= 0", "x => y", "a > b: c", "joined with ' > ', so -t 'math > adds' matches"]) expect(messages(lessonV1({ detail })), detail).toEqual([]);
   });
 
   it("allows a lone > in the detail (math > adds), but never <", () => {

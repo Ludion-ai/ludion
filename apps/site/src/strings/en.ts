@@ -45,7 +45,7 @@ export const en = {
     correctedBy: "This lesson was corrected by",
     viewFile: "View the file on GitHub",
     pullRequest: (n: number) => `Pull request #${n}`,
-    drafted: "drafted by an agent",
+    drafted: ", drafted by an agent",
     draftedAlone: "Drafted by an agent",
   },
   record: {
@@ -68,7 +68,7 @@ export const en = {
   tombstone: {
     title: (id: string) => `Retracted lesson ${id} | Ludion`,
     heading: "Retracted",
-    banner: (date: string) => `This lesson was retracted on ${date}. It no longer holds, and Ludion no longer serves it.`,
+    banner: (date: string) => `This lesson was retracted on ${date}. Ludion no longer serves it.`,
     said: "It said",
     unreadable: "Its file can't be shown in today's lesson format.",
     pr: (n: number) => `Retraction: pull request #${n}`,
@@ -78,9 +78,11 @@ export const en = {
     title: "Models | Ludion",
     heading: "Models",
     intro:
-      "Which changes each model already knows, measured by FreshBench. Each model answered a question about each change twice, without tools, and an answer key checked against primary sources graded it. A model knows a change only when both answers were right. ludion sync leaves out the lessons the model it writes for already knows.",
+      "Which changes each model already knows, measured by FreshBench. ludion sync leaves out the lessons that the model it writes for is measured to know.",
     none: "No model has been measured yet.",
     measured: (date: string) => `Measured on ${date}.`,
+    method: "How it was measured:",
+    notMeasured: "not measured",
     run: "The run's questions, answers, and grades",
     model: "Model",
     knows: "Knows",
@@ -92,7 +94,7 @@ export const en = {
   start: {
     title: "Start | Ludion",
     heading: "Start",
-    intro: "Ludion tells your coding assistant what changed in the versions your project installed, only the changes it doesn't already know, each checked by a machine and signed by the person who taught it.",
+    intro: "Ludion tells your coding assistant what changed in the versions your project installed. Each change is checked by a machine and signed by the person who taught it.",
     claudeCode: "In Claude Code",
     claudeCodeBody:
       "The plugin runs ludion sync at the start of every session and adds the Ludion MCP server (ludion_ask, ludion_teach).",
@@ -102,11 +104,12 @@ export const en = {
     mcp: "Just the MCP server",
     teach: "Teach a lesson",
     teachBody:
-      "When your assistant gets a change wrong, ask it to draft a lesson with ludion_teach, then run the command it gives you. ludion teach shows you the whole lesson, checks its sources, runs its tests only in Docker, and saves it to your ledger, so sync writes it in every project on your machine. Add --public to open a pull request in your own name; CI checks it again, and a maintainer merges it.",
+      "When your assistant gets a change wrong, ask it to draft a lesson with ludion_teach, then run the command it gives you. ludion teach shows you the whole lesson, checks its sources, runs its tests only in Docker, and saves it to your ledger, so sync writes it in every project on your machine that installs a matching version. Add --public to open a pull request in your own name; CI checks it again, and a maintainer merges it.",
     privacy: "What leaves your machine",
     privacyBody:
-      "sync downloads the lesson lists for the packages in your lockfile, and nothing else. No telemetry. teach fetches the source pages it cites, and --public uses your own gh.",
-  },  footer: {
+      "sync downloads the lesson lists for the packages in your lockfile, and nothing else. No telemetry. teach fetches the source pages it cites, and --public uses your own gh. Through the MCP server, ludion_ask sends your question to ludion.ai, and ludion_teach sends the draft.",
+  },
+  footer: {
     count: (lessons: number, teachers: number) =>
       `${lessons} ${lessons === 1 ? "lesson" : "lessons"} from ${teachers} ${teachers === 1 ? "teacher" : "teachers"}.`,
     license: "Lessons are CC BY-SA 4.0. Code is Apache-2.0.",

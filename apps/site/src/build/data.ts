@@ -98,7 +98,7 @@ function readLessons(dir: string): Lesson[] {
 }
 
 /** Lessons deleted from main and not back since, read as they were just before deletion. */
-function tombstonesOf(root: string, present: Set<string>, loginOf: (l: Lesson) => string): Tombstone[] {
+function tombstonesOf(root: string, present: Set<string>): Tombstone[] {
   const deleted = parseDeletedLog(git(root, "log", "--diff-filter=D", "--name-only", `--format=${DELETED_LOG_FORMAT}`, "--", "lessons/"));
   const out: Tombstone[] = [];
   for (const [id, d] of Object.entries(deleted)) {
@@ -110,7 +110,7 @@ function tombstonesOf(root: string, present: Set<string>, loginOf: (l: Lesson) =
     } catch {
       // The old version may not parse under today's schema; the tombstone still names the id and the retraction.
     }
-    out.push({ id, subject: d.path.split("/")[1]!, lesson, teacher: lesson && loginOf(lesson), retracted_at: d.retracted_at, pr: d.pr });
+    out.push({ id, subject: d.path.split("/")[1]!, lesson, retracted_at: d.retracted_at, pr: d.pr });
   }
   return out.sort((a, b) => (a.retracted_at < b.retracted_at ? 1 : -1));
 }
@@ -135,7 +135,9 @@ async function load(): Promise<SiteData> {
   const all = readLessons(join(root, samples ? "apps/site/samples/lessons" : "lessons"));
   const info = samples ? samples.git : gitInfo(root);
 
-  const ids = new Set(all.map((l) => l.author_id));
+  const deleted = samples ? [] : tombstonesOf(root, new Set(all.map((l) => l.id)));
+  // Retracted lessons' teachers too: a tombstone shows their current login, looked up by id like everyone's.
+  const ids = new Set([...all, ...deleted.flatMap((t) => (t.lesson ? [t.lesson] : []))].map((l) => l.author_id));
   const resolved = samples
     ? new Map(Object.entries(samples.teachers).map(([id, login]) => [Number(id), login]))
     : await resolveLogins(ids, fetch, process.env.GITHUB_READ_TOKEN || undefined);
@@ -175,7 +177,7 @@ async function load(): Promise<SiteData> {
 
   return {
     config,
-    tombstones: samples ? [] : tombstonesOf(root, new Set(all.map((l) => l.id)), (l) => logins.get(l.author_id) ?? storedLogin(l.author)),
+    tombstones: deleted.map((t) => (t.lesson ? { ...t, teacher: resolved.get(t.lesson.author_id) ?? logins.get(t.lesson.author_id) ?? storedLogin(t.lesson.author) } : t)),
     models: readModels(root),
     index,
     pages,

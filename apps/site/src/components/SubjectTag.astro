@@ -4,11 +4,13 @@
 interface Props {
   subject: string;
   version?: string | null;
+  /** False where the subject has no page (no active lesson left in it). */
+  link?: boolean;
 }
-const { subject, version } = Astro.props;
+const { subject, version, link = true } = Astro.props;
 ---
 
-<span class="tag"><a class="subject" href={`/${subject}/`}>{subject}/</a>{version && <span class="version">{version}</span>}</span>
+<span class="tag">{link ? <a class="subject" href={`/${subject}/`}>{subject}/</a> : <span class="subject">{subject}/</span>}{version && <span class="version">{version}</span>}</span>
 
 <style>
   .tag {

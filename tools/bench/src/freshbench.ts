@@ -1,6 +1,6 @@
 // FreshBench v0 (bench.md). Two commands:
 //   run   <questions.json> <out dir> <label> --set A|B --condition none|web|ludion|project [--context <drafts.json>] [--only id,id] [--cap-usd N] [--spent-usd N]
-//         project condition: --projects <dir from projects.ts> [--sync <ludion cli> --ludion-home <dir> --offline true] [--model <id>]
+//         [--model <id>] (default opus); project condition: --projects <dir from projects.ts> [--sync <ludion cli> --ludion-home <dir> --offline true]
 //   judge <questions.json> <out dir> <label> [--cap-usd N]
 // `run` asks each question and saves answers-<label>.json plus each run's raw log; `judge` grades those answers
 // against the answer key in a separate call with no tools and saves grades-<label>.json.
@@ -131,7 +131,7 @@ async function run(questionsPath: string, outDir: string, label: string): Promis
   const budget = { capUsd: Number(arg("--cap-usd", "80")), spentUsd: Number(arg("--spent-usd", "0")), maxRuns: 300, runs: 0 };
   const r = await runBatch(jobs, budget);
   const answers = r.done.map(({ job, run }) => ({ id: job.id, answer: run.answer, toolCalls: run.toolCalls, costUsd: run.costUsd, turns: run.turns, isError: run.isError, mcp: run.mcpServers }));
-  writeFileSync(join(outDir, `answers-${label}.json`), JSON.stringify({ label, set, condition, context: contextPath ?? null, model: MODEL, spentUsd: budget.spentUsd, skipped: r.skipped.map((j) => j.id), answers }, null, 2) + "\n");
+  writeFileSync(join(outDir, `answers-${label}.json`), JSON.stringify({ label, set, condition, context: contextPath ?? null, model, spentUsd: budget.spentUsd, skipped: r.skipped.map((j) => j.id), answers }, null, 2) + "\n");
   console.log(`${label}: ${answers.length} answered, ${r.skipped.length} skipped, total spent $${budget.spentUsd.toFixed(2)}`);
 }
 

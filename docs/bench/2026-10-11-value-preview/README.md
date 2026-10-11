@@ -2,6 +2,8 @@
 
 A preview of CLAUDE.md "Done when" 3, run before the seed lessons are public. This is not the Done 3 measurement: that one syncs from the deployed index after the seeds merge.
 
+> **Reference only.** It was measured on the A questions, which the seeds were drafted from, and seeds were rewritten after the measurement. The official Done 3 measurement freezes the seeds first, then measures on the B questions and the C tasks, never the A questions. If a seed is rewritten after a measurement, that measurement is discarded and repeated (`docs/decisions.md`, "Measuring Done 3").
+
 **Setup**: the same 45 A questions, keys, model (`opus`), tools, and prepared projects as the realistic screening (`../2026-10-11-realistic/`, "without"). The one difference: before each run, `ludion sync --offline` wrote the 29 seed lessons drafted that day into the project (`.ludion/lessons.md`, imported from CLAUDE.md), from a local ledger. The ledger is in `ledger/`: those drafts as they were, before the rewording below. Because they came from a ledger, each lesson's line said "not verified: tests not run" rather than "verified". The answers were graded by the same judge.
 
 Command: `node tools/bench/src/freshbench.ts run docs/bench/2026-10-11-value-preview/questions.json docs/bench/2026-10-11-value-preview A-project-sync --set A --condition project --projects <cache> --sync <ludion cli.js> --ludion-home <seed ledger home> --offline true --cap-usd 30`, then `judge`. Cost: $4.50 for the answers, $5.69 with judging.

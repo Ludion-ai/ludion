@@ -19,7 +19,7 @@ export function createApp(): Hono<{ Bindings: Env }> {
     // Responses from env.ASSETS have immutable headers; copy before adding ours.
     c.res = new Response(c.res.body, c.res);
     c.res.headers.set("X-Content-Type-Options", "nosniff");
-    // HTTPS only, for a year. No includeSubDomains or preload: they are hard to undo (docs/decisions.md, Infrastructure).
+    // HTTPS only, for a year. No includeSubDomains or preload: they are hard to undo (docs/decisions.md, "Deploy safety").
     c.res.headers.set("Strict-Transport-Security", HSTS);
   });
 

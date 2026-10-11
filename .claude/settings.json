@@ -28,7 +28,8 @@
       "PowerShell(git push -f *)",
       "PowerShell(git push --force-with-lease *)",
       "PowerShell(gh repo delete *)",
-      "PowerShell(Invoke-Expression *)"
+      "PowerShell(Invoke-Expression *)",
+      "PowerShell(iex *)"
     ]
   },
   "hooks": {

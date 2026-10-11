@@ -37,6 +37,17 @@ export function renderLessons(selection: Selection, installedSummary: string, no
   return lines.join("\n") + "\n";
 }
 
+/** The lessons in a lessons.md, without the header lines that change on every sync (date, installed summary). */
+export function lessonLines(md: string): string {
+  return md.split("\n").filter((l) => l.startsWith("- ") || l.startsWith("  ")).join("\n");
+}
+
+/** The current .ludion/lessons.md if it is a regular file, else "". */
+export function readLessonsFile(dir: string): string {
+  const path = join(dir, ".ludion", "lessons.md");
+  return lstatSync(path, { throwIfNoEntry: false })?.isFile() ? readFileSync(path, "utf8") : "";
+}
+
 /** Replace the block between the markers, or append it. Returns the new text. */
 export function withBlock(text: string, block: string): string {
   const full = `${BEGIN}\n${block}\n${END}`;

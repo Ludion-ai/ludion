@@ -4,6 +4,15 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-11: The Claude Code plugin
+
+- **Where**: `plugin/` in this repo, listed by `.claude-plugin/marketplace.json` at the repo root. Install: `/plugin marketplace add Ludion-ai/ludion`, then `/plugin install ludion@ludion` (or `claude plugin install ludion@ludion`). `claude plugin validate` passes on both.
+- **What it does**: a SessionStart hook (`startup|resume|clear`; not `compact`, which keeps the session) runs `npx -y ludion@<version> sync --quiet --dir "${CLAUDE_PROJECT_DIR}"` with a 120-second timeout, and `plugin.json` adds the remote MCP server `ludion` (`https://ludion.ai/mcp`, http).
+- **The hook's output is what reaches the session.** Measured on Claude Code 2.1.296: a SessionStart hook runs after CLAUDE.md has been read, so a file the hook writes (even a fast one) reaches only the next session, while the hook's stdout reaches this one. So `sync --quiet` prints nothing unless the lessons changed, or CLAUDE.md was just wired while there are lessons; then it prints the new lessons. The comparison skips the header lines that change on every sync (date, installed summary).
+- **The CLI version is pinned** in the hook, and a test keeps it equal to `packages/cli/package.json`. A plugin install then runs exactly the version that was reviewed here, never whatever npm serves next; a new CLI version ships with a plugin version bump.
+- **Held with the CLI**: the plugin runs `npx ludion`, so it isn't announced or installable from `main` until the owner has published `ludion` on npm (same reason as the CLI).
+- One command for both shells: no redirects or shell-only syntax, so it runs whether Claude Code picks Git Bash or PowerShell on Windows.
+
 ### 2026-10-11: The ludion CLI, index shards, and the v2 MCP tools
 
 - **Package**: `packages/cli`, published as `ludion` on npm. **Not yet, and nothing tells users to run `npx ludion` until it is**: an unregistered name could be taken by anyone, and `npx` would then run their code with the user's `gh` signed in. This PR is held off `main` until the owner has published the package (npm trusted publishing is the owner's step). The root package is named `ludion-repo`, so the two names don't clash.

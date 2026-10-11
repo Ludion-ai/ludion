@@ -1,0 +1,12 @@
+{
+  "name": "ludion",
+  "description": "Ludion for Claude Code",
+  "owner": { "name": "Ludion", "url": "https://ludion.ai" },
+  "plugins": [
+    {
+      "name": "ludion",
+      "source": "./plugin",
+      "description": "Runs ludion sync when a session starts, and adds the Ludion MCP server."
+    }
+  ]
+}

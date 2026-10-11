@@ -6,8 +6,11 @@ import { stem, tokenize } from "./search.ts";
 import type { Lesson, LessonV1 } from "./types.ts";
 import { isV1 } from "./types.ts";
 
-/** Top-level paths of the site and the Worker. A subject gets a page at /<subject>/, so it can't be one of these. */
-export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "_astro", "404"]);
+/**
+ * Names a subject can't take: top-level paths of the site and the Worker (a subject gets a page at /<subject>/), files at
+ * the site's root, and `subjects`, whose shard would be /index/subjects.json.
+ */
+export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "404", "index.json", "index.html", "404.html", "subjects"]);
 
 /** The directory for a package: npm @scope/name → scope.name; anything else lowercased as is. */
 export function subjectFor(pkg: LessonV1["package"]): string {
@@ -99,7 +102,8 @@ export function lessonProblems(l: LessonV1): string[] {
   if (RESERVED_SUBJECTS.has(l.subject)) problems.push(`The subject ${l.subject} is taken by a page of the site (ludion.ai/${l.subject}/). Lessons about a package with this name can't be taught yet; open an issue.`);
   const range = semver.validRange(l.versions);
   // A range that means every version (*, x, ||||) can't describe a change, and empty || alternatives are a typo.
-  if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
+  // `<` before a letter (only x can be there) means nothing as a range, and it would put a tag-like `<x` into the claim.
+  if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions) || /<\s*[A-Za-z]/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
   const words = ungroundedWords(l);
   if (words.length) problems.push(`The detail uses words no source quote contains: ${words.join(", ")}. Use the quotes' own words, or leave the detail out.`);
   for (const quote of quotesMissingSymbol(l)) problems.push(`The quote "${quote.slice(0, 80)}" doesn't name ${l.symbol}. Quote a sentence that states the fact itself, not a headline.`);

@@ -5,10 +5,11 @@ import Base from "../layouts/Base.astro";
 import SubjectTag from "./SubjectTag.astro";
 import { siteData, type Tombstone } from "../build/data.ts";
 import { en, formatDate } from "../strings/en.ts";
-import { claimOf, versionOf } from "@ludion/core";
+import { claimOf, isV1, versionOf } from "@ludion/core";
 
 const { tombstone: t } = Astro.props as { tombstone: Tombstone };
-const { config } = await siteData();
+const { config, index } = await siteData();
+const subjectHasPage = index.lessons.some((l) => l.subject === t.subject);
 const repo = `https://github.com/${config.org}/${config.repo}`;
 const claim = t.lesson ? claimOf(t.lesson) : undefined;
 ---
@@ -23,8 +24,8 @@ const claim = t.lesson ? claimOf(t.lesson) : undefined;
           <h2 id="said">{en.tombstone.said}</h2>
           <p class="claim"><s>{claim}</s></p>
           <p class="meta">
-            {t.teacher && <span>{en.lesson.taughtBy} @{t.teacher}</span>}
-            <SubjectTag subject={t.subject} version={t.lesson && versionOf(t.lesson)} />
+            {t.teacher && <span>{en.lesson.taughtBy} @{t.teacher}{t.lesson && isV1(t.lesson) && t.lesson.drafted_by === "agent" && en.lesson.drafted}</span>}
+            <SubjectTag subject={t.subject} version={t.lesson && versionOf(t.lesson)} link={subjectHasPage} />
           </p>
         </section>
       ) : (

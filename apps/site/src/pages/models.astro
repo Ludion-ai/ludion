@@ -23,6 +23,7 @@ const ids = models ? Object.keys(models.models) : [];
       ) : (
         <>
           <p class="intro">{m.intro}</p>
+          <p class="meta">{m.method} {models.method}</p>
           <p class="meta">
             {m.measured(formatDate(models.measured_at))} <a href={`https://github.com/${config.org}/${config.repo}/tree/main/${models.bench}`}>{m.run}</a>
           </p>
@@ -46,7 +47,7 @@ const ids = models ? Object.keys(models.models) : [];
                 {measured.map(({ lesson, verdicts }) => (
                   <tr>
                     <th scope="row"><a href={`/lessons/${lesson.id}/`}>{lesson.claim}</a></th>
-                    {ids.map((id) => <td>{verdicts[id] ? m.verdict[verdicts[id]!] : ""}</td>)}
+                    {ids.map((id) => <td>{verdicts[id] ? m.verdict[verdicts[id]!] : m.notMeasured}</td>)}
                   </tr>
                 ))}
               </tbody>

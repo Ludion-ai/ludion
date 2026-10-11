@@ -49,12 +49,16 @@ export function tokenize(text: string): string[] {
 /** Version numbers, flags and pseudo-classes: matched exactly, never stemmed, never by prefix or typo. */
 const isExact = (term: string) => /^[\d:-]/.test(term);
 
-/** A light English stemmer: plural -ies or -s, then -ing or -ed. */
+/**
+ * A light English stemmer: -ies, -ied and -ie to -y (directories, directory; cookies, cookie; copied, copy), else
+ * plural -s, then -ing or -ed. Short words keep their -ie (tie, pie), and their plurals lose only the -s, so both meet.
+ */
 export function stem(term: string): string {
   if (isExact(term)) return term;
   let s = term;
-  if (s.length > 4 && s.endsWith("ies")) s = `${s.slice(0, -3)}y`;
-  else if (s.length > 3 && s.endsWith("s") && !s.endsWith("ss")) s = s.slice(0, -1);
+  if (s.length > 4 && (s.endsWith("ies") || s.endsWith("ied"))) return `${s.slice(0, -3)}y`;
+  if (s.length > 4 && s.endsWith("ie")) return `${s.slice(0, -2)}y`;
+  if (s.length > 3 && s.endsWith("s") && !s.endsWith("ss")) s = s.slice(0, -1);
   if (s.length > 5 && s.endsWith("ing")) s = s.slice(0, -3);
   else if (s.length > 4 && s.endsWith("ed")) s = s.slice(0, -2);
   return s;

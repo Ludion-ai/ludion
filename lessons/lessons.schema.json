@@ -129,7 +129,7 @@
           "description": "No instructions to an AI or the reader."
         }
       ],
-      "pattern": "^[A-Za-z0-9_@$.:/<>()\\[\\]{}=*#,+-]+(?: [A-Za-z0-9_@$.:/<>()\\[\\]{}=*#,+-]+){0,5}$"
+      "pattern": "^[A-Za-z0-9_@$.:/()\\[\\]{}=*#,+-]+(?: [A-Za-z0-9_@$.:/()\\[\\]{}=*#,+-]+){0,5}$"
     },
     "replacement": {
       "type": "string",
@@ -164,7 +164,7 @@
           "description": "No instructions to an AI or the reader."
         }
       ],
-      "pattern": "^[A-Za-z0-9_@$.:/<>()\\[\\]{}=*#,+-]+(?: [A-Za-z0-9_@$.:/<>()\\[\\]{}=*#,+-]+){0,5}$"
+      "pattern": "^[A-Za-z0-9_@$.:/()\\[\\]{}=*#,+-]+(?: [A-Za-z0-9_@$.:/()\\[\\]{}=*#,+-]+){0,5}$"
     },
     "signal": {
       "type": "string",

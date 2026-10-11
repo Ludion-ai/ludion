@@ -9,10 +9,13 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - **Two schemas.** `lessons/lessons.schema.json` is format 1, the only format a new lesson may use: `verify` checks added lessons against the base branch's copy of it. `lessons/lessons-v0.schema.json` is format 0, frozen, so the lessons already on main stay valid (lessons are immutable). Code reads either one (`validateLesson` dispatches on `format`). A format 0 lesson is corrected by a format 1 lesson that `replaces` it.
 - **Fields** (canonical order): `format: 1`, `id`, `subject`, `package {ecosystem: npm | pypi | runtime, name}`, `versions` (semver range where the fact holds), `kind` (removed | renamed | deprecated | added | default | behavior), `symbol`, `replacement?` (required for renamed), `signal` (loud | silent), `detail?`, `evidence`, `author`, `author_id`, `drafted_by?: "agent"`, `replaces?`, `created_at`.
   - `subject` must equal the directory derived from the package: npm `@scope/name` → `scope.name`; anything else lowercased.
+- The site's design samples include a format 1 lesson, and `test` builds them, so a page that only handles format 0 fails CI.
 - **The claim is generated** (`packages/core` `generateClaim`): `<package> <versions> <removed|renamed … to|deprecated|added|changed the default of|changed what> \`<symbol>\` [; use \`<replacement>\` instead]. <Detail.> [Silent: code written for older versions still runs, without an error.]`. Same fields, same sentence. The index's `claim` holds it, so search, the site, and `ludion_ask` need no special case.
-- **`symbol` and `replacement`** look like code: up to 6 space-separated tokens of identifier, path, flag, and call characters; no quotes or backticks; and the same text guards as `detail`. Backticks are also stripped when the claim is built, so no field can end a code span early. This came from a security review: these fields go into the sentence assistants read.
+- **`symbol` and `replacement`** look like code: up to 6 space-separated tokens of identifier, path, flag, and call characters; no quotes, backticks, or angle brackets; and the same text guards as `detail`. Backticks are also stripped when the claim is built, so no field can end a code span early. This came from a security review: these fields go into the sentence assistants read.
 - **`detail`**: at most 160 characters. The text guards come from #21: no invisible characters, URLs, command lines, or instructions to an AI.
-  - It must be **grounded**: every meaningful word, as search sees words (stopwords dropped, lightly stemmed), must appear in the evidence or the fields. The evidence means quotes, test code, and expected errors; the fields are the package, versions, symbol, and replacement.
+  - It must be **grounded**: every meaningful word, lightly stemmed, must appear in a **source quote** or in the fields (package, versions, symbol, replacement).
+  - Only articles, basic prepositions, and forms of "be" are ignored. Negations (not, no, never, without), comparatives (only, more, before, after), modals, and numbers all count, so a detail can't say the opposite of its quote.
+  - Test code and expected errors don't ground anything: the teacher writes them, so they would ground any word. A lesson whose only evidence is tests can still have a detail made of its fields' words; anything more needs a source.
   - `verify` fails a detail that isn't grounded and names the missing words.
 - **Evidence** is a test or a source.
   - **Test**: `{runtime, packages?, code, expect?, error?}`.
@@ -21,7 +24,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
     - `expect: fail` needs `error`, and `error` goes only with it.
   - **Source**: `{url, quote}`. The quote is 40 to 300 characters, so a sentence rather than a headline, and **must name the symbol**, which `verify` checks; together that is how "states the fact itself" is enforced by machine.
 - **Labels**:
-  - `differential`: a passing test and an expected-failing test on different pinned versions (shown as "Verified across versions");
+  - `differential` (shown as "Verified across versions"): the **same code** passes on a pinned version of the lesson's own package **inside** `versions` and fails as expected on a pinned version **outside** it. The pin comes from `packages`, or from the runtime for a node or python lesson. Anything less is labeled `test`;
   - `test`: any test;
   - `source`: sources only;
   - `proof`: format 0 Lean runs.
@@ -29,7 +32,8 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
   1. The packages are installed with the network on, install scripts off (`npm install --ignore-scripts`; `pip install --only-binary :all:`), and no lesson code.
   2. The lesson code runs in a fresh container with `--network none`, read-only root, and the same limits as before. The work folder is mounted at `/w` (`NODE_PATH=/w/node_modules`, `PYTHONPATH=/w/site`, `LUDION_PACKAGES=/w`).
   - Both containers run as the host user where there is one, so the work folder can be removed afterwards.
-  - Timeouts: 30 seconds, 90 with packages (tests that start a tool such as vitest need longer), and 180 for the install.
+  - Timeouts: 30 seconds, 90 with packages (tests that start a tool such as vitest need longer), and 180 for the install. Both containers are named, so a timeout kills the container itself, not just the Docker client.
+  - Pinned packages are written in code-point order, so the canonical file doesn't depend on the machine's locale.
 - **Removed with #13's teaching path**: the App bot rule in `verify` (any bot now fails: lessons come from the teacher's own account), and `/api/*`, `/auth/*`, and the `SOURCE_CHECK_LIMITER` binding in `wrangler.jsonc`.
 - Not here yet: seed lessons, which will carry `drafted_by: "agent"`. Before the first one merges, the site, `ludion_ask`, and `ludion sync` must show that label wherever the lesson appears.
 

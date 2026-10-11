@@ -154,7 +154,7 @@ describe("verifyLesson, format 1", () => {
   it("passes a grounded lesson whose quote names the symbol, and reports its generated claim", async () => {
     const r = await verifyLesson(file(v1()), c());
     expect(r).toMatchObject({ status: "passed", reasons: [] });
-    expect(r.claim).toBe("vitest >=5.0.0 changed what `toHaveTextContent` does. ToHaveTextContent is strict.");
+    expect(r.claim).toBe("vitest >=5.0.0 changed what `toHaveTextContent` does. toHaveTextContent is strict.");
   });
 
   it("fails a detail with words the evidence doesn't contain", async () => {

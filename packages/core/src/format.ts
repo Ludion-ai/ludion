@@ -9,7 +9,7 @@ function formatEvidenceV0(e: EvidenceV0): EvidenceV0 {
 function formatEvidenceV1(e: EvidenceV1): EvidenceV1 {
   if ("test" in e) {
     const test: Record<string, unknown> = { runtime: e.test.runtime };
-    if (e.test.packages != null) test.packages = Object.fromEntries(Object.entries(e.test.packages).sort(([a], [b]) => a.localeCompare(b)));
+    if (e.test.packages != null) test.packages = Object.fromEntries(Object.entries(e.test.packages).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
     test.code = e.test.code;
     if (e.test.expect != null) test.expect = e.test.expect;
     if (e.test.error != null) test.error = e.test.error;

@@ -1,7 +1,7 @@
 // Format 1 lessons have no free-written claim. The sentence assistants read is generated from the structured
 // fields; the only free text is `detail`, and every meaningful word in it must appear in the evidence (CLAUDE.md,
 // "Claims are generated, not written").
-import { processTerm, tokenize } from "./search.ts";
+import { stem, tokenize } from "./search.ts";
 import type { Lesson, LessonV1 } from "./types.ts";
 import { isV1 } from "./types.ts";
 
@@ -13,11 +13,10 @@ export function subjectFor(pkg: LessonV1["package"]): string {
 /** A code span. The schema forbids backticks in symbols; stripping them here too means no field can end the span early. */
 const code = (s: string) => `\`${s.replace(/`/g, "")}\``;
 
-/** "detail text" → "Detail text." */
+/** The detail as a sentence: its own case kept (it may start with an identifier), a full stop added. */
 function sentence(text: string): string {
   const t = text.trim();
-  const s = t.charAt(0).toUpperCase() + t.slice(1);
-  return /[.!?]$/.test(s) ? s : `${s}.`;
+  return /[.!?]$/.test(t) ? t : `${t}.`;
 }
 
 /** The sentence an assistant reads, built from the fields. Same fields, same sentence. */
@@ -48,18 +47,25 @@ export function versionOf(l: Lesson): string | undefined {
   return isV1(l) ? l.versions : (l.version ?? undefined);
 }
 
-/** Meaningful words as search sees them: lowercased, stopwords dropped, lightly stemmed. */
+/**
+ * Words that carry no claim of their own. Everything else must be grounded, including negations (not, no, never,
+ * without), comparatives (more, only, before, after), modals (must, should), and numbers: dropping those would let a
+ * detail say the opposite of its evidence.
+ */
+const NEUTRAL = new Set("a an the and or of to in on at by for from with as is are was were be been being it its this that these those which who".split(" "));
+
+/** Meaningful words: lowercased, neutral words dropped, lightly stemmed. */
 function meaningful(text: string): string[] {
-  return tokenize(text).map(processTerm).filter((t): t is string => !!t && t.length > 1);
+  return tokenize(text).filter((t) => !NEUTRAL.has(t)).map(stem);
 }
 
-/** Every text a lesson's detail may draw on: its evidence, plus the fields the claim already states. */
+/**
+ * What a detail may draw on: the source quotes, which are someone else's words found on a public page, and the fields
+ * the claim already states. Not test code or expected errors: the teacher writes those, so they would ground anything.
+ */
 function evidenceText(l: LessonV1): string {
   const parts = [l.package.name, l.versions, l.symbol, l.replacement ?? ""];
-  for (const e of l.evidence) {
-    if ("test" in e) parts.push(e.test.code, e.test.error ?? "", ...Object.keys(e.test.packages ?? {}));
-    else parts.push(e.source.quote);
-  }
+  for (const e of l.evidence) if ("source" in e) parts.push(e.source.quote);
   return parts.join("\n");
 }
 

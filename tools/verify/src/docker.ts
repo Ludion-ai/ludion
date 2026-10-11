@@ -74,14 +74,14 @@ export function dockerArgs(runtime: string, name: string, workDir?: string): str
 }
 
 /** `docker run` arguments for installing a test's packages: network on, no install scripts, no lesson code. */
-export function installArgs(runtime: string, workDir: string, packages: Record<string, string>): string[] {
+export function installArgs(runtime: string, workDir: string, packages: Record<string, string>, name = `ludion-install-${crypto.randomUUID()}`): string[] {
   const img = imageFor(runtime);
   if (!img) throw new Error(`Unknown runtime ${runtime}.`);
   const install =
     img.language === "node"
       ? ["npm", "install", "--ignore-scripts", "--no-audit", "--no-fund", "--loglevel=error"]
       : ["pip", "install", "--no-cache-dir", "--only-binary", ":all:", "--target", "/w/site", ...Object.entries(packages).map(([n, v]) => `${n}==${v}`)];
-  return ["run", "--rm", ...LIMITS, ...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/w/.home", "-e", "npm_config_cache=/w/.npm", img.image, ...install];
+  return ["run", "--rm", "--name", name, ...LIMITS, ...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/w/.home", "-e", "npm_config_cache=/w/.npm", img.image, ...install];
 }
 
 function run(args: string[], stdin: string | undefined, timeoutMs: number, name?: string): Promise<RawRun> {
@@ -120,7 +120,8 @@ export const runInDocker: RunFn = async (spec) => {
   const workDir = mkdtempSync(join(tmpdir(), "ludion-test-"));
   try {
     if (img.language === "node") writeFileSync(join(workDir, "package.json"), JSON.stringify({ private: true, dependencies: packages }));
-    const install = await run(installArgs(spec.runtime, workDir, packages), undefined, INSTALL_TIMEOUT_MS);
+    const installName = `ludion-install-${crypto.randomUUID()}`;
+    const install = await run(installArgs(spec.runtime, workDir, packages, installName), undefined, INSTALL_TIMEOUT_MS, installName);
     if (install.kind === "error") return install;
     if (install.timedOut || install.exitCode !== 0) {
       const tail = (install.stderr || install.stdout).trim().slice(-OUTPUT_LIMIT);

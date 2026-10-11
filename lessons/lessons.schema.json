@@ -208,8 +208,15 @@
         },
         {
           "type": "string",
-          "pattern": "^[\\x20-\\x3B=\\x3F-\\x5F\\x61-\\x7E]*$",
-          "description": "Printable ASCII only, without backticks or angle brackets: lookalike characters would slip past the guards above, and markup would reach the generated claim."
+          "pattern": "^[\\x20-\\x3B=\\x3F-\\x5A\\x5C\\x5E\\x5F\\x61-\\x7E]*$",
+          "description": "Printable ASCII only, without backticks, angle brackets, or square brackets: lookalike characters would slip past the guards above, and markup would reach the generated claim."
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "//"
+          },
+          "description": "No protocol-relative links (//host)."
         }
       ]
     },

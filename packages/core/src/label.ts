@@ -14,20 +14,20 @@ const language = (runtime: string) => runtime.split("@")[0];
  */
 export function pinInRange(test: Test, lesson: Pick<LessonV1, "package" | "versions">): boolean | undefined {
   const { ecosystem, name } = lesson.package;
-  const sat = (v: string) => semver.satisfies(v, lesson.versions, { includePrerelease: false });
   if (ecosystem === "runtime") {
     if (language(test.runtime) !== name) return undefined;
-    const line = test.runtime.slice(name.length + 1);
-    const parts = line.split(".");
-    const low = semver.coerce(line)?.version;
-    if (!low) return undefined;
-    const high = parts.length === 1 ? `${parts[0]}.999999.999999` : `${parts[0]}.${parts[1]}.999999`;
-    const lo = sat(low);
-    return lo === sat(high) ? lo : undefined;
+    // The whole release line: node@22 → 22.x, python@3.12 → 3.12.x. Inside only if every version of the line is,
+    // outside only if none is; a range with a gap that cuts the line says nothing.
+    const line = `${test.runtime.slice(name.length + 1)}.x`;
+    if (semver.subset(line, lesson.versions, { includePrerelease: false })) return true;
+    if (!semver.intersects(line, lesson.versions, { includePrerelease: false })) return false;
+    return undefined;
   }
   if ((ecosystem === "npm" && language(test.runtime) !== "node") || (ecosystem === "pypi" && language(test.runtime) !== "python")) return undefined;
   const pinned = test.packages?.[name];
-  return pinned != null && semver.valid(pinned) ? sat(pinned) : undefined;
+  // A prerelease pin says nothing: ranges leave prereleases out, so it would look "outside" without being so.
+  if (pinned == null || !semver.valid(pinned) || semver.prerelease(pinned)) return undefined;
+  return semver.satisfies(pinned, lesson.versions);
 }
 
 /** Everything a test pins apart from the lesson's own package: these must be the same on both sides of a pair. */

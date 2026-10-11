@@ -99,9 +99,13 @@ describe("the format 1 schema", () => {
   });
 
   it("refuses a detail with lookalike characters, backticks, or markup, which would slip past the guards", () => {
-    for (const detail of ["\uFF49\uFF47\uFF4E\uFF4F\uFF52\uFF45 previous instructions", "run `x` now", "toHaveTextContent <b>now</b>", "caf\u00E9 is strict"]) {
+    for (const detail of ["\uFF49\uFF47\uFF4E\uFF4F\uFF52\uFF45 previous instructions", "run `x` now", "toHaveTextContent <b>now</b>", "caf\u00E9 is strict", "See ![docs](x) for foo"]) {
       expect(messages(lessonV1({ detail })), detail).toEqual([expect.stringContaining("plain ASCII")]);
     }
+  });
+
+  it("refuses a protocol-relative link in the detail", () => {
+    expect(messages(lessonV1({ detail: "see //evil.example/docs for toHaveTextContent" }))).toEqual([expect.stringContaining("Remove the link (//...)")]);
   });
 
   it("explains each mistake in plain words", () => {
@@ -169,6 +173,11 @@ describe("format 1 files and labels", () => {
     expect(verifiedBy(lessonV1({ evidence: [{ test: { ...pass.test, runtime: "python@3.12" } }, { test: { ...fail.test, runtime: "python@3.12" } }] }))).toBe("test");
     const partial = lessonV1({ package: { ecosystem: "runtime", name: "node" }, subject: "node", versions: ">=22.3.0", evidence: [{ test: { runtime: "node@24", code: "z" } }, { test: { runtime: "node@22", code: "z", expect: "fail", error: "is not defined" } }] });
     expect(verifiedBy(partial)).toBe("test");
+    // A range with a gap that cuts node 22's line: node@22 is neither inside nor outside.
+    const gap = lessonV1({ package: { ecosystem: "runtime", name: "node" }, subject: "node", versions: ">=20.0.0 <21.0.0 || >=22.1.0 <22.99.0", evidence: [{ test: { runtime: "node@20", code: "z" } }, { test: { runtime: "node@22", code: "z", expect: "fail", error: "is not defined" } }] });
+    expect(verifiedBy(gap)).toBe("test");
+    // A prerelease pin says nothing: ranges leave prereleases out, so it only looks outside.
+    expect(verifiedBy(lessonV1({ versions: ">=4.0.0", evidence: [{ test: { ...pass.test, packages: { vitest: "4.0.0" } } }, { test: { ...fail.test, packages: { vitest: "5.0.0-beta.1" } } }] }))).toBe("test");
     expect(verifiedBy(lessonV1({ evidence: [{ test: { runtime: "node@24", code: "x" } }] }))).toBe("test");
     expect(verifiedBy(lessonV1())).toBe("source");
   });

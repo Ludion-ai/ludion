@@ -36,7 +36,8 @@ const TEXT_GUARDS = [
   "Remove the link. Links belong in a source, with a sentence quoted from the page.",
   "Remove the command line (a pipe into a shell, curl or wget into a pipe, rm -rf, or $(...)). Runnable code goes in a test.",
   "Remove the instructions to an AI or to the reader. The detail states a fact.",
-  "Write the detail in plain ASCII, without backticks or angle brackets: it goes into the generated sentence as is.",
+  "Write the detail in plain ASCII, without backticks, angle brackets, or square brackets: it goes into the generated sentence as is.",
+  "Remove the link (//...). Links belong in a source.",
 ];
 
 const SUBJECT_GUARD =

@@ -195,7 +195,7 @@
         {
           "not": {
             "type": "string",
-            "pattern": "\\|\\s*(?:[Ss][Uu][Dd][Oo]\\s+)?(?:[Ss][Hh]|[Bb][Aa][Ss][Hh]|[Zz][Ss][Hh]|[Dd][Aa][Ss][Hh]|[Pp][Yy][Tt][Hh][Oo][Nn]|[Pp][Yy][Tt][Hh][Oo][Nn]3|[Nn][Oo][Dd][Ee]|[Pp][Ee][Rr][Ll]|[Rr][Uu][Bb][Yy]|[Ii][Ee][Xx]|[Pp][Ww][Ss][Hh]|[Pp][Oo][Ww][Ee][Rr][Ss][Hh][Ee][Ll][Ll])\\b|\\b(?:[Cc][Uu][Rr][Ll]|[Ww][Gg][Ee][Tt])\\b[^|]*\\||\\b[Rr][Mm]\\s+-[A-Za-z]*(?:[Rr][A-Za-z]*[Ff]|[Ff][A-Za-z]*[Rr])|\\$\\(|>>|[0-9&]>|>&|>\\s*[~/$%]"
+            "pattern": "\\|\\s*(?:[Ss][Uu][Dd][Oo]\\s+)?(?:[Ss][Hh]|[Bb][Aa][Ss][Hh]|[Zz][Ss][Hh]|[Dd][Aa][Ss][Hh]|[Pp][Yy][Tt][Hh][Oo][Nn]|[Pp][Yy][Tt][Hh][Oo][Nn]3|[Nn][Oo][Dd][Ee]|[Pp][Ee][Rr][Ll]|[Rr][Uu][Bb][Yy]|[Ii][Ee][Xx]|[Pp][Ww][Ss][Hh]|[Pp][Oo][Ww][Ee][Rr][Ss][Hh][Ee][Ll][Ll])\\b|\\b(?:[Cc][Uu][Rr][Ll]|[Ww][Gg][Ee][Tt])\\b[^|]*\\||\\b[Rr][Mm]\\s+-[A-Za-z]*(?:[Rr][A-Za-z]*[Ff]|[Ff][A-Za-z]*[Rr])|\\$\\(|>>|[0-9&]>|>[&|]|>\\s*[\"']?\\s*[~/$%.\\\\]|>\\s*[\"']?[A-Za-z]:[\\\\/]"
           },
           "description": "No command lines or shell redirections."
         },

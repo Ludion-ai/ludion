@@ -112,6 +112,14 @@ describe("lessons.md and wiring", () => {
     expect(existsSync(join(elsewhere, "lessons.md"))).toBe(false);
   });
 
+  it("refuses a dangling link too, which a check that follows links would miss", () => {
+    const dir = tmp();
+    const missing = join(tmp(), "not-there-yet");
+    symlinkSync(missing, join(dir, ".ludion"), "junction");
+    expect(() => writeAndWire(dir, "lessons\n")).toThrow(/\.ludion is a symbolic link/);
+    expect(existsSync(missing)).toBe(false);
+  });
+
   it("writes .ludion/lessons.md, imports it from CLAUDE.md, and touches AGENTS.md and Cursor only when the project has them", () => {
     const dir = tmp();
     writeFileSync(join(dir, "AGENTS.md"), "# Agents\n");

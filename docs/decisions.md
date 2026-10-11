@@ -22,7 +22,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
     - AGENTS.md, if present, gets a block that names the file.
     - If `.cursor/` exists, `.cursor/rules/ludion.mdc` gets the lessons inline, because Cursor rules can't include files.
     - Every sync rewrites its own block and leaves the rest of the file alone.
-  - **Writes stay inside the project**: sync will run on its own at session start in projects someone else prepared, so it refuses to write through a symlinked target or parent and checks that the real path is inside the project.
+  - **Writes stay inside the project**: sync will run on its own at session start in projects someone else prepared, so it refuses to write through a symlinked target or parent (checked with lstat, never existsSync, so a dangling link is caught too), checks that the real path is inside the project, and writes a temporary file in that folder and renames it over the target (a rename replaces a link instead of following it). CLAUDE.md and AGENTS.md are read only if they are real files.
   - **When the index can't be reached**, sync still writes the ledger's lessons and never blocks the session.
 - **`ludion teach`**:
   - Takes a draft (a file, `-` for stdin, or `--draft <base64url>` from `ludion_teach`) and builds the lesson: a new id, the subject from the package, the author from the teacher's own `gh` if signed in.

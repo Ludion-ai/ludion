@@ -1,6 +1,6 @@
 // .ludion/lessons.md, and the lines that wire it into CLAUDE.md, AGENTS.md, and Cursor rules.
-import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, isAbsolute } from "node:path";
+import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
+import { basename, dirname, isAbsolute, join, relative } from "node:path";
 import type { Selection } from "./match.ts";
 
 /** The first line of everything Ludion hands an assistant (the same line ludion_ask starts with). */
@@ -52,16 +52,30 @@ export function withBlock(text: string, block: string): string {
 export function safeWrite(dir: string, rel: string, text: string): void {
   const root = realpathSync(dir);
   const target = join(root, rel);
+  // lstat, never existsSync: existsSync follows links, so a dangling link would look like a missing file.
+  const isLink = (p: string) => lstatSync(p, { throwIfNoEntry: false })?.isSymbolicLink() === true;
   for (let p = dirname(target); p.length > root.length; p = dirname(p)) {
-    if (existsSync(p) && lstatSync(p).isSymbolicLink()) throw new Error(`${relative(root, p)} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
+    if (isLink(p)) throw new Error(`${relative(root, p)} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
   }
   mkdirSync(dirname(target), { recursive: true });
-  const inside = relative(root, realpathSync(dirname(target)));
+  const parent = realpathSync(dirname(target));
+  const inside = relative(root, parent);
   if (inside.startsWith("..") || isAbsolute(inside)) throw new Error(`${rel} would be written outside the project. Sync refused.`);
-  if (existsSync(target) && lstatSync(target).isSymbolicLink()) throw new Error(`${rel} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
-  writeFileSync(target, text);
+  if (isLink(target)) throw new Error(`${rel} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
+  // Write a temporary file in the checked folder and rename it over the target: a rename replaces a link that
+  // appeared in the meantime instead of following it.
+  const tmp = join(parent, `.${basename(target)}.ludion-${process.pid}-${Date.now()}.tmp`);
+  writeFileSync(tmp, text, { flag: "wx" });
+  renameSync(tmp, join(parent, basename(target)));
 }
 
+/** Read a project file only if it is a real file (not a link): its text goes back into a file sync writes. */
+function readReal(path: string): string {
+  const st = lstatSync(path, { throwIfNoEntry: false });
+  if (!st) return "";
+  if (st.isSymbolicLink()) throw new Error(`${basename(path)} is a symbolic link; ludion writes only real files inside the project. Remove the link and sync again.`);
+  return readFileSync(path, "utf8");
+}
 export interface WireResult {
   written: string[];
 }
@@ -77,7 +91,7 @@ export function writeAndWire(dir: string, lessonsMd: string): WireResult {
   written.push(".ludion/lessons.md");
 
   const claude = join(dir, "CLAUDE.md");
-  const claudeText = existsSync(claude) ? readFileSync(claude, "utf8") : "";
+  const claudeText = readReal(claude);
   const claudeNew = withBlock(claudeText, "@.ludion/lessons.md");
   if (claudeNew !== claudeText) {
     safeWrite(dir, "CLAUDE.md", claudeNew);
@@ -85,8 +99,8 @@ export function writeAndWire(dir: string, lessonsMd: string): WireResult {
   }
 
   const agents = join(dir, "AGENTS.md");
-  if (existsSync(agents)) {
-    const text = readFileSync(agents, "utf8");
+  if (lstatSync(agents, { throwIfNoEntry: false })) {
+    const text = readReal(agents);
     const next = withBlock(text, "Before writing code that uses this project's packages, read `.ludion/lessons.md`: changes in the installed versions that you may not know.");
     if (next !== text) {
       safeWrite(dir, "AGENTS.md", next);

@@ -1,8 +1,10 @@
 // FreshBench v0 (bench.md). Two commands:
-//   run   <questions.json> <out dir> <label> --set A|B --condition none|web|ludion [--context <drafts.json>] [--only id,id] [--cap-usd N] [--spent-usd N]
+//   run   <questions.json> <out dir> <label> --set A|B --condition none|web|ludion|project [--context <drafts.json>] [--only id,id] [--cap-usd N] [--spent-usd N]
+//         project condition: --projects <dir from projects.ts> [--sync <ludion cli> --ludion-home <dir> --offline true] [--model <id>]
 //   judge <questions.json> <out dir> <label> [--cap-usd N]
 // `run` asks each question and saves answers-<label>.json plus each run's raw log; `judge` grades those answers
 // against the answer key in a separate call with no tools and saves grades-<label>.json.
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runBatch, type Job } from "./batch.ts";
@@ -101,11 +103,29 @@ async function run(questionsPath: string, outDir: string, label: string): Promis
   const only = arg("--only")?.split(",");
   const contextPath = arg("--context");
   const appendSystemPrompt = contextPath ? contextFor(readJson<Draft[]>(contextPath)) : undefined;
+  // project condition: a prepared project per library (projects.ts), and optionally `ludion sync` before each run.
+  const projects = arg("--projects");
+  const syncCli = arg("--sync");
+  const ludionHome = arg("--ludion-home");
+  const model = arg("--model", MODEL)!;
+  const prepare = syncCli
+    ? (work: string) => {
+        const r = spawnSync(process.execPath, [syncCli, "sync", "--dir", work, "--model", model, ...(arg("--offline") === "true" ? ["--offline"] : [])], { encoding: "utf8", env: { ...process.env, ...(ludionHome ? { LUDION_HOME: ludionHome } : {}) } });
+        if (r.status !== 0) throw new Error(`ludion sync failed: ${r.stderr}`);
+      }
+    : undefined;
   const questions = readJson<Question[]>(questionsPath).filter((q) => q.set === set && (!only || only.includes(q.id)));
   const jobs: Job[] = questions.map((q) => ({
     id: q.id,
     prompt: q.question + ANSWER_SUFFIX,
-    options: { condition, model: MODEL, maxTurns: 10, maxBudgetUsd: condition === "none" ? 0.5 : 1.5, appendSystemPrompt },
+    options: {
+      condition,
+      model,
+      maxTurns: condition === "project" ? 25 : 10,
+      maxBudgetUsd: condition === "none" ? 0.5 : condition === "project" ? 2 : 1.5,
+      appendSystemPrompt,
+      ...(condition === "project" ? { project: join(projects!, q.library), prepare, timeoutMs: 15 * 60_000 } : {}),
+    },
     logPath: join(outDir, "runs", label, `${q.id}.jsonl`),
   }));
   const budget = { capUsd: Number(arg("--cap-usd", "80")), spentUsd: Number(arg("--spent-usd", "0")), maxRuns: 300, runs: 0 };

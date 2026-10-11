@@ -3,6 +3,7 @@ import { claudeArgs, parseStream, projectTools, runEnv } from "../src/agent.ts";
 import { contextFor, parseGrade } from "../src/freshbench.ts";
 import { arrayObjects, gradeVitestExtends } from "../src/tasks.ts";
 import { codeText, gradeRules, loadRuleTasks } from "../src/rule-tasks.ts";
+import { losses, scores } from "../src/harm.ts";
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
@@ -161,5 +162,14 @@ describe("C tasks", () => {
     // Globs in strings aren't comments: 'a/*.ts' ... 'b/**/x' must survive.
     const cfg = "include: ['test/contract/*.test.ts'], name: 'contract', extends: false, other: ['src/**/x.ts'] // note";
     expect(codeText("vitest.config.ts", cfg)).toBe("include: ['test/contract/*.test.ts'], name: 'contract', extends: false, other: ['src/**/x.ts'] ");
+  });
+});
+describe("harm check", () => {
+  it("lists changes that scored lower with sync, counting B questions by change and only the trials asked for", () => {
+    const without = scores({ grades: [{ id: "a-1-b", grade: "correct" }, { id: "b-2-b", grade: "wrong" }] });
+    const withSync = scores({ grades: [{ id: "a-1-b", grade: "no_answer" }, { id: "b-2-b", grade: "correct" }] });
+    expect(losses(without, withSync)).toEqual([{ change: "a-1", without: { correct: 1, runs: 1 }, with: { correct: 0, runs: 1 } }]);
+    const c = scores({ trials: 1, rows: [{ change: "c-3", trial: 1, verdict: "wrong" }, { change: "c-3", trial: 2, verdict: "correct" }] });
+    expect(c).toEqual({ "c-3": { correct: 0, runs: 1 } });
   });
 });

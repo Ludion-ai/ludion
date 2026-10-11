@@ -19,4 +19,4 @@ Realistic coding tasks for the official Done 3 measurement (`docs/decisions.md`,
 
 vitest-5-0-0-14-c resembles the Done 1 task (`tools/bench/tasks/vitest-extends`): same change, different project and goal. Done 1 isn't part of Done 3.
 
-Run: `node tools/bench/src/tasks-run.ts <projects cache> <out dir> <label> [--trials 3] [--sync <ludion cli.js> --site <url>]`.
+Run: `node tools/bench/src/tasks-run.ts <projects cache> <out dir> <label> [--only id,id] [--sync <ludion cli.js> --site <url>]`. One trial per task. A batch stops at an error that isn't the run's own turn or dollar limit (the plan's session limit, for example), saves nothing for that run, and the same command continues from there, on another day if needed.

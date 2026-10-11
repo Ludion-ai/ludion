@@ -7,7 +7,7 @@ What was built, what the check showed, what was decided and why. Newest first. N
 | | Check | State |
 | - | - | - |
 | 1 | Single player: a lesson taught in project A shows up via `ludion sync` in project B, and Claude Code in B gets right the task it got wrong before | **shown**: 1/5 before, 5/5 after sync, 3/3 through the plugin hook (`docs/bench/2026-10-11-done1/`) |
-| 2 | Plumbing: `ludion teach --public` → merge → within five minutes `ludion sync` elsewhere writes it with the teacher's name, and `ludion_ask` returns it | waits for the npm publish and the owner's own `teach --public`; the draft is ready |
+| 2 | Plumbing: `ludion teach --public` → merge → within five minutes `ludion sync` elsewhere writes it with the teacher's name, and `ludion_ask` returns it | waits for the npm publish (as `ludion-ai`: npm refused `ludion`) and the owner's own `teach --public`; the draft is ready |
 | 3 | Value: FreshBench on the wedge, Claude Code with default tools in a project with the new version installed, with vs without `ludion sync`: +20 points | preview only (34/45 vs 14/45 on the A questions, reference value); the official run freezes the seeds, then measures B questions and C tasks |
 
 ## Log

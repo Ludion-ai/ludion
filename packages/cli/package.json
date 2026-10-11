@@ -1,11 +1,12 @@
 {
-  "name": "ludion",
+  "name": "ludion-ai",
   "version": "0.1.0",
   "description": "Tells your coding assistant what changed in the versions your project installed.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "ludion": "dist/cli.js"
+    "ludion": "dist/cli.js",
+    "ludion-ai": "dist/cli.js"
   },
   "files": [
     "dist",

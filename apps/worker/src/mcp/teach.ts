@@ -10,9 +10,9 @@ export const LINK_LIMIT = 8_000;
 
 export type TeachResult = { isError: false; text: string; command: string } | { isError: true; text: string };
 
-/** The command for a draft: `npx ludion teach --draft <base64url of the draft's JSON>`. */
+/** The command for a draft: `npx ludion-ai teach --draft <base64url of the draft's JSON>`. */
 export function teachCommand(draft: unknown): string {
-  return `npx ludion teach --draft ${btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(draft)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")}`;
+  return `npx ludion-ai teach --draft ${btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(draft)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")}`;
 }
 
 export function teach(draft: Record<string, unknown>): TeachResult {

@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4MH5K00CG0TQXE8PR72H8V7",
+  "subject": "wrangler",
+  "package": {
+    "ecosystem": "npm",
+    "name": "wrangler"
+  },
+  "versions": ">=4.127.0",
+  "kind": "added",
+  "symbol": "workflows[].concurrency.limit",
+  "signal": "silent",
+  "detail": "The limit is the maximum number of Workflow instances that can run concurrently.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.148.0"
+        },
+        "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfunction wrangler(args, extraEnv, dropEnv) {\n  const env = Object.assign({}, process.env, { CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home }, extraEnv || {});\n  for (const k of dropEnv || []) delete env[k];\n  const r = spawnSync(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", ...args], { cwd: dir, encoding: \"utf8\", timeout: 40000, env });\n  const out = (String(r.stdout || \"\") + String(r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\n  return { status: r.status, out };\n}\nfunction fail(msg, out) {\n  console.error(\"FAIL: \" + msg);\n  if (out) console.error(out.slice(-2000));\n  process.exit(1);\n}\nfunction write(name, content) {\n  fs.writeFileSync(path.join(dir, name), typeof content === \"string\" ? content : JSON.stringify(content, null, 2));\n}\nwrite(\"index.js\", 'export class MyWorkflow {}\\nexport default { fetch() { return new Response(\"ok\"); } };\\n');\nconst cfg = (limit) => ({ name: \"wf-concurrency\", main: \"index.js\", compatibility_date: \"2026-01-01\", workflows: [{ binding: \"WF\", name: \"my-workflow\", class_name: \"MyWorkflow\", concurrency: { limit } }] });\nwrite(\"wrangler.json\", cfg(10));\nlet r = wrangler([\"deploy\", \"--dry-run\", \"--outdir\", \"out\"]);\nif (/Unexpected fields found in workflows\\[0\\] field: \"concurrency\"/.test(r.out)) fail(\"workflows[].concurrency is not a known Wrangler config field\", r.out);\nif (r.status !== 0 || !r.out.includes(\"--dry-run: exiting now.\")) fail(\"dry run with concurrency.limit 10 failed\", r.out);\nwrite(\"wrangler.json\", cfg(0));\nr = wrangler([\"deploy\", \"--dry-run\", \"--outdir\", \"out2\"]);\nif (r.status === 0 || !r.out.includes('\"concurrency.limit\" field must be a positive integer')) fail(\"concurrency.limit 0 was not rejected\", r.out);\nconsole.log(\"OK: workflows[].concurrency.limit is validated\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.126.0"
+        },
+        "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfunction wrangler(args, extraEnv, dropEnv) {\n  const env = Object.assign({}, process.env, { CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home }, extraEnv || {});\n  for (const k of dropEnv || []) delete env[k];\n  const r = spawnSync(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", ...args], { cwd: dir, encoding: \"utf8\", timeout: 40000, env });\n  const out = (String(r.stdout || \"\") + String(r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\n  return { status: r.status, out };\n}\nfunction fail(msg, out) {\n  console.error(\"FAIL: \" + msg);\n  if (out) console.error(out.slice(-2000));\n  process.exit(1);\n}\nfunction write(name, content) {\n  fs.writeFileSync(path.join(dir, name), typeof content === \"string\" ? content : JSON.stringify(content, null, 2));\n}\nwrite(\"index.js\", 'export class MyWorkflow {}\\nexport default { fetch() { return new Response(\"ok\"); } };\\n');\nconst cfg = (limit) => ({ name: \"wf-concurrency\", main: \"index.js\", compatibility_date: \"2026-01-01\", workflows: [{ binding: \"WF\", name: \"my-workflow\", class_name: \"MyWorkflow\", concurrency: { limit } }] });\nwrite(\"wrangler.json\", cfg(10));\nlet r = wrangler([\"deploy\", \"--dry-run\", \"--outdir\", \"out\"]);\nif (/Unexpected fields found in workflows\\[0\\] field: \"concurrency\"/.test(r.out)) fail(\"workflows[].concurrency is not a known Wrangler config field\", r.out);\nif (r.status !== 0 || !r.out.includes(\"--dry-run: exiting now.\")) fail(\"dry run with concurrency.limit 10 failed\", r.out);\nwrite(\"wrangler.json\", cfg(0));\nr = wrangler([\"deploy\", \"--dry-run\", \"--outdir\", \"out2\"]);\nif (r.status === 0 || !r.out.includes('\"concurrency.limit\" field must be a positive integer')) fail(\"concurrency.limit 0 was not rejected\", r.out);\nconsole.log(\"OK: workflows[].concurrency.limit is validated\");\n",
+        "expect": "fail",
+        "error": "FAIL: workflows[].concurrency is not a known Wrangler config field"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.148.0/packages/wrangler/CHANGELOG.md",
+        "quote": "Add support for configuring a per-workflow max concurrency limit via `workflows[].concurrency.limit` in your Wrangler config. The limit is the maximum number of Workflow instances that can run concurrently."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T03:47:40Z"
+}

@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4MHV3GDHXN7PFXPC2R22W2Z",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "default",
+  "symbol": "extends",
+  "signal": "silent",
+  "detail": "Projects defined with an inline configuration inherit all options from the root-level configuration.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.3"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/inlineproject\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// Root config: setupFiles at the root, one inline project without extends.\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    setupFiles: ['./setup.mjs'],\",\n  \"    projects: [{ test: { name: 'inline', include: ['probe.test.mjs'] } }],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"setup.mjs\", \"globalThis.__ROOT_SETUP_RAN__ = true\\n\");\nwrite(\"probe.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('probe', () => { writeFileSync(new URL('./result.txt', import.meta.url), String(globalThis.__ROOT_SETUP_RAN__ === true)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"]);\nconsole.log(r.out);\nconst resultFile = path.join(dir, \"result.txt\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the inline project's test did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst inherited = fs.readFileSync(resultFile, \"utf8\");\nif (inherited !== \"true\") {\n  console.error(\"FAIL: the inline project did not inherit the root setupFiles (extends is not on by default)\");\n  process.exit(1);\n}\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest exited \" + r.status);\n  process.exit(2);\n}\nconsole.log(\"PASS: the inline project inherited the root setupFiles without extends: true\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/inlineproject\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// Root config: setupFiles at the root, one inline project without extends.\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    setupFiles: ['./setup.mjs'],\",\n  \"    projects: [{ test: { name: 'inline', include: ['probe.test.mjs'] } }],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"setup.mjs\", \"globalThis.__ROOT_SETUP_RAN__ = true\\n\");\nwrite(\"probe.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('probe', () => { writeFileSync(new URL('./result.txt', import.meta.url), String(globalThis.__ROOT_SETUP_RAN__ === true)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"]);\nconsole.log(r.out);\nconst resultFile = path.join(dir, \"result.txt\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the inline project's test did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst inherited = fs.readFileSync(resultFile, \"utf8\");\nif (inherited !== \"true\") {\n  console.error(\"FAIL: the inline project did not inherit the root setupFiles (extends is not on by default)\");\n  process.exit(1);\n}\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest exited \" + r.status);\n  process.exit(2);\n}\nconsole.log(\"PASS: the inline project inherited the root setupFiles without extends: true\");\n",
+        "expect": "fail",
+        "error": "FAIL: the inline project did not inherit the root setupFiles (extends is not on by default)"
+      }
+    },
+    {
+      "source": {
+        "url": "https://vitest.dev/guide/projects",
+        "quote": "Projects defined with an inline configuration inherit all options from the root-level configuration. This is controlled by the extends option, which is enabled by default since Vitest 5.0:"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T03:59:25Z"
+}

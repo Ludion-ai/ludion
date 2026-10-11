@@ -1,0 +1,49 @@
+{
+  "format": 1,
+  "id": "01M4MH5HF67TJ707QGGG9VYATK",
+  "subject": "agents",
+  "package": {
+    "ecosystem": "npm",
+    "name": "agents"
+  },
+  "versions": ">=0.20.0",
+  "kind": "added",
+  "symbol": "server/discover",
+  "signal": "silent",
+  "detail": "The Agents MCP client uses server/discover with Stateless servers and falls back to the initialize handshake on the same connection for Legacy servers.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "@modelcontextprotocol/client": "2.0.0",
+          "agents": "0.27.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction distFiles() {\n  const dist = path.join(root, \"dist\");\n  return fs.readdirSync(dist).filter((f) => f.endsWith(\".js\")).map((f) => ({ file: f, src: fs.readFileSync(path.join(dist, f), \"utf8\") }));\n}\nconst conn = distFiles().find((f) => f.src.includes(\"var MCPClientConnection = class\"));\nif (!conn) {\n  console.error(\"FAIL: could not find the MCP client connection in agents \" + pkg.version);\n  process.exit(1);\n}\nconst v2 = /import \\{[^}]*\\bClient\\b[^}]*\\} from \"@modelcontextprotocol\\/client\";/.test(conn.src);\nconst stateless = conn.src.includes('\"2026-07-28\"');\nif (!v2 || !stateless) {\n  console.error(\"FAIL: the agents MCP client uses the SDK v1 Client, which never sends server/discover (v2 client=\" + v2 + \", stateless 2026-07-28=\" + stateless + \")\");\n  process.exit(1);\n}\nconst croot = \"/w/node_modules/@modelcontextprotocol/client\";\nconst cpkg = JSON.parse(fs.readFileSync(path.join(croot, \"package.json\"), \"utf8\"));\nconst csrc = fs.readFileSync(path.join(croot, cpkg.exports[\".\"].import.default), \"utf8\");\nif (!csrc.includes('method: \"server/discover\"')) {\n  console.error(\"FAIL: @modelcontextprotocol/client \" + cpkg.version + \" has no server/discover probe\");\n  process.exit(1);\n}\nconsole.log(\"OK: agents \" + pkg.version + \" MCP client is the v2 Client from @modelcontextprotocol/client \" + cpkg.version + \", which probes server/discover\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "@modelcontextprotocol/client": "2.0.0",
+          "agents": "0.19.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction distFiles() {\n  const dist = path.join(root, \"dist\");\n  return fs.readdirSync(dist).filter((f) => f.endsWith(\".js\")).map((f) => ({ file: f, src: fs.readFileSync(path.join(dist, f), \"utf8\") }));\n}\nconst conn = distFiles().find((f) => f.src.includes(\"var MCPClientConnection = class\"));\nif (!conn) {\n  console.error(\"FAIL: could not find the MCP client connection in agents \" + pkg.version);\n  process.exit(1);\n}\nconst v2 = /import \\{[^}]*\\bClient\\b[^}]*\\} from \"@modelcontextprotocol\\/client\";/.test(conn.src);\nconst stateless = conn.src.includes('\"2026-07-28\"');\nif (!v2 || !stateless) {\n  console.error(\"FAIL: the agents MCP client uses the SDK v1 Client, which never sends server/discover (v2 client=\" + v2 + \", stateless 2026-07-28=\" + stateless + \")\");\n  process.exit(1);\n}\nconst croot = \"/w/node_modules/@modelcontextprotocol/client\";\nconst cpkg = JSON.parse(fs.readFileSync(path.join(croot, \"package.json\"), \"utf8\"));\nconst csrc = fs.readFileSync(path.join(croot, cpkg.exports[\".\"].import.default), \"utf8\");\nif (!csrc.includes('method: \"server/discover\"')) {\n  console.error(\"FAIL: @modelcontextprotocol/client \" + cpkg.version + \" has no server/discover probe\");\n  process.exit(1);\n}\nconsole.log(\"OK: agents \" + pkg.version + \" MCP client is the v2 Client from @modelcontextprotocol/client \" + cpkg.version + \", which probes server/discover\");\n",
+        "expect": "fail",
+        "error": "uses the SDK v1 Client"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/docs/agents/mcp-client.md",
+        "quote": "Agents uses the MCP v2 client and automatically negotiates the protocol version for every connection. It uses `server/discover` with Stateless servers and falls back to the `initialize` handshake on the same connection for Legacy Streamable HTTP, SSE, and RPC servers."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T03:47:38Z"
+}

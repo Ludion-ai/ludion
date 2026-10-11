@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4MHV3GJPQF0P9HY72XP8C98",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "behavior",
+  "symbol": "vitest",
+  "signal": "silent",
+  "detail": "Vitest no longer searches parent directories for config files; if running vitest from a subdirectory, pass the config explicitly.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.3"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/parentconfig\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// A config file in the parent directory sets an env var; the test file in sub/ records what it sees.\nwrite(\"vitest.config.mjs\", \"export default { test: { env: { FROM_PARENT_CONFIG: 'yes' } } }\\n\");\nwrite(\"sub/probe.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('probe', () => { writeFileSync(new URL('./seen.txt', import.meta.url), String(process.env.FROM_PARENT_CONFIG)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"], path.join(dir, \"sub\"));\nconsole.log(r.out);\nconst seenFile = path.join(dir, \"sub\", \"seen.txt\");\nif (!fs.existsSync(seenFile)) {\n  console.error(\"ERROR: the probe test did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst seen = fs.readFileSync(seenFile, \"utf8\");\nif (seen === \"yes\") {\n  console.error(\"FAIL: running vitest from a subdirectory used the vitest.config of the parent directory\");\n  process.exit(1);\n}\nif (seen !== \"undefined\" || r.status !== 0) {\n  console.error(\"ERROR: unexpected result \" + seen + \" (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconsole.log(\"PASS: vitest run from a subdirectory did not use the parent directory's vitest.config\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/parentconfig\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// A config file in the parent directory sets an env var; the test file in sub/ records what it sees.\nwrite(\"vitest.config.mjs\", \"export default { test: { env: { FROM_PARENT_CONFIG: 'yes' } } }\\n\");\nwrite(\"sub/probe.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('probe', () => { writeFileSync(new URL('./seen.txt', import.meta.url), String(process.env.FROM_PARENT_CONFIG)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"], path.join(dir, \"sub\"));\nconsole.log(r.out);\nconst seenFile = path.join(dir, \"sub\", \"seen.txt\");\nif (!fs.existsSync(seenFile)) {\n  console.error(\"ERROR: the probe test did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst seen = fs.readFileSync(seenFile, \"utf8\");\nif (seen === \"yes\") {\n  console.error(\"FAIL: running vitest from a subdirectory used the vitest.config of the parent directory\");\n  process.exit(1);\n}\nif (seen !== \"undefined\" || r.status !== 0) {\n  console.error(\"ERROR: unexpected result \" + seen + \" (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconsole.log(\"PASS: vitest run from a subdirectory did not use the parent directory's vitest.config\");\n",
+        "expect": "fail",
+        "error": "FAIL: running vitest from a subdirectory used the vitest.config of the parent directory"
+      }
+    },
+    {
+      "source": {
+        "url": "https://vitest.dev/guide/migration",
+        "quote": "Vitest no longer searches parent directories for config files. If you previously relied on running vitest from a subdirectory while using a config file from a parent directory, pass the config explicitly"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T03:59:25Z"
+}

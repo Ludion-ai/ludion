@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4MH5HF8CJM4DQCDMC5F08SK",
+  "subject": "agents",
+  "package": {
+    "ecosystem": "npm",
+    "name": "agents"
+  },
+  "versions": ">=0.22.0",
+  "kind": "added",
+  "symbol": "Scheduler",
+  "signal": "silent",
+  "detail": "Scheduler, under agents/schedules, is a reusable Lifecycle capability for persistent delayed, dated, cron, and interval callbacks.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "agents": "0.27.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction typesWithImports(entry) {\n  const exp = pkg.exports[entry];\n  if (!exp) return null;\n  const file = path.join(root, exp.types);\n  let text = fs.readFileSync(file, \"utf8\");\n  for (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n    const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n    if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n  }\n  return text;\n}\nconst exp = pkg.exports[\"./schedules\"];\nif (!exp) {\n  console.error(\"FAIL: agents \" + pkg.version + \" has no agents/schedules entry point, so there is no Scheduler\");\n  process.exit(1);\n}\nconst types = typesWithImports(\"./schedules\");\nconst js = fs.readFileSync(path.join(root, exp.import), \"utf8\");\nconst checks = {\n  exported: /export \\{[^}]*\\bScheduler\\b[^}]*\\}/.test(js),\n  capability: /declare class Scheduler<[\\s\\S]*?> extends LifecycleCapability \\{/.test(types),\n  set: /\\n  set<Name extends keyof Handlers & string>\\(/.test(types),\n  every: /\\n  every<Name extends keyof Handlers & string>\\(/.test(types)\n};\nif (!Object.values(checks).every(Boolean)) {\n  console.error(\"FAIL: agents/schedules does not export the Scheduler capability \" + JSON.stringify(checks));\n  process.exit(1);\n}\nconsole.log(\"OK: agents \" + pkg.version + \" agents/schedules exports Scheduler extends LifecycleCapability with typed set() and every()\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "agents": "0.21.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction typesWithImports(entry) {\n  const exp = pkg.exports[entry];\n  if (!exp) return null;\n  const file = path.join(root, exp.types);\n  let text = fs.readFileSync(file, \"utf8\");\n  for (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n    const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n    if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n  }\n  return text;\n}\nconst exp = pkg.exports[\"./schedules\"];\nif (!exp) {\n  console.error(\"FAIL: agents \" + pkg.version + \" has no agents/schedules entry point, so there is no Scheduler\");\n  process.exit(1);\n}\nconst types = typesWithImports(\"./schedules\");\nconst js = fs.readFileSync(path.join(root, exp.import), \"utf8\");\nconst checks = {\n  exported: /export \\{[^}]*\\bScheduler\\b[^}]*\\}/.test(js),\n  capability: /declare class Scheduler<[\\s\\S]*?> extends LifecycleCapability \\{/.test(types),\n  set: /\\n  set<Name extends keyof Handlers & string>\\(/.test(types),\n  every: /\\n  every<Name extends keyof Handlers & string>\\(/.test(types)\n};\nif (!Object.values(checks).every(Boolean)) {\n  console.error(\"FAIL: agents/schedules does not export the Scheduler capability \" + JSON.stringify(checks));\n  process.exit(1);\n}\nconsole.log(\"OK: agents \" + pkg.version + \" agents/schedules exports Scheduler extends LifecycleCapability with typed set() and every()\");\n",
+        "expect": "fail",
+        "error": "has no agents/schedules entry point"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/packages/agents/CHANGELOG.md",
+        "quote": "Add `Scheduler`, a reusable Lifecycle capability for persistent delayed, dated, cron, and interval callbacks, under `agents/schedules`."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T03:47:38Z"
+}

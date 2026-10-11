@@ -1,0 +1,26 @@
+{
+  "id": "wrangler-4-122-0-2-c",
+  "change": "wrangler-4-122-0-2",
+  "library": "wrangler",
+  "prompt": "We just removed the last Node.js dependency from this Worker; src/ only uses web APIs now. Turn Node.js compatibility off for this Worker completely, so that node: modules and Node globals are not available at all and nothing Node-related can sneak back into the bundle. Keep the current compatibility date.",
+  "correct": [
+    [
+      { "files": ["wrangler.jsonc"], "pattern": "[\"']no_nodejs_compat[\"']" },
+      { "files": ["wrangler.jsonc"], "pattern": "[\"']no_nodejs_compat_v2[\"']" },
+      { "files": ["wrangler.jsonc"], "pattern": "[\"']nodejs_compat(_v2)?[\"']", "absent": true },
+      { "files": ["wrangler.jsonc"], "pattern": "\"compatibility_date\"\\s*:\\s*\"(2026-(08-(0[4-9]|[12]\\d|3[01])|09-\\d\\d|1[0-2]-\\d\\d)|20(2[7-9]|[3-9]\\d)-\\d\\d-\\d\\d)\"" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"compatibility_flags\": [\"no_nodejs_compat\", \"no_nodejs_compat_v2\"]\n}\n" },
+      { "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  // nodejs_compat is on by default for this date\n  \"compatibility_flags\": [\n    \"no_nodejs_compat_v2\",\n    \"no_nodejs_compat\"\n  ]\n}\n" }
+    ],
+    "wrong": [
+      { "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\"\n}\n" },
+      { "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"compatibility_flags\": [\"no_nodejs_compat\"]\n}\n" },
+      { "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-07-01\",\n  \"compatibility_flags\": [\"no_nodejs_compat\", \"no_nodejs_compat_v2\"]\n}\n" }
+    ]
+  },
+  "trap": "From compatibility date 2026-08-04 Workers turn on nodejs_compat and nodejs_compat_v2 by default, so just deleting the nodejs_compat flag (or adding only no_nodejs_compat) leaves Node.js compatibility on; both no_nodejs_compat and no_nodejs_compat_v2 are needed."
+}

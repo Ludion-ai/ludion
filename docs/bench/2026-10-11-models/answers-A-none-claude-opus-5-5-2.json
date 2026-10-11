@@ -1,0 +1,416 @@
+{
+  "label": "A-none-claude-opus-5-5-2",
+  "set": "A",
+  "condition": "none",
+  "context": null,
+  "model": "claude-opus-5-5",
+  "spentUsd": 11.260582,
+  "skipped": [],
+  "answers": [
+    {
+      "id": "wrangler-4-124-0-4-a",
+      "answer": "On `wrangler deploy`, `--latest` tells Wrangler to **use the latest version of the Workers runtime**. In practice, it sets the Worker's `compatibility_date` to today's date, so you don't need to specify one in your `wrangler.toml`/`wrangler.json` or with `--compatibility-date`. It's mainly a convenience for quick deploys without a config file.\n\nFor production Workers, it's better to pin an explicit `compatibility_date`. With `--latest`, runtime behavior changes can reach your Worker on any later deploy without you noticing. Wrangler warns you about this when you use the flag.",
+      "toolCalls": [],
+      "costUsd": 0.024839,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-122-0-2-a",
+      "answer": "If Node.js compatibility is now on by default for compatibility dates after August 2026, you'd turn it off with the matching disable flag in `compatibility_flags` in your Wrangler config. By Cloudflare's usual naming convention, that flag would likely be `no_nodejs_compat`, for example `compatibility_flags = [\"no_nodejs_compat\"]` in `wrangler.toml`. I can't confirm this, though. The default change and the exact flag name may be after my knowledge cutoff, so check Cloudflare's compatibility flags page before you rely on it. If you don't need anything newer, you can also set `compatibility_date` back to before the change, which avoids the default entirely.",
+      "toolCalls": [],
+      "costUsd": 0.027731,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-121-0-6-a",
+      "answer": "Set the `WRANGLER_SEND_METRICS` environment variable to `false`. This overrides any setting in Wrangler's global config. In PowerShell, use `$env:WRANGLER_SEND_METRICS = \"false\"` for the current session, or `setx WRANGLER_SEND_METRICS false` to keep it for new terminals. You can also turn it off without an env var by running `npx wrangler telemetry disable`, and check the current status with `npx wrangler telemetry status`.",
+      "toolCalls": [],
+      "costUsd": 0.022383,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-111-0-0-a",
+      "answer": "Use `--legacy-env` together with `--env`, for example `npx wrangler deploy --env staging --legacy-env true`. You can also set `legacy_env = true` in `wrangler.toml` so you don't need the flag each time.\n\nWith legacy environments (the default), each environment deploys as a separate Worker named `<name>-<env>`, such as `my-worker-staging`.\n\nIf you mean Cloudflare's deprecated **service environments**, where environments live under a single Worker, you would pass `--legacy-env false` instead. That mode is deprecated and isn't supported in recent Wrangler versions, so you may need an older Wrangler release or should migrate to the standard per-environment Workers.\n\nCheck `npx wrangler deploy --help` on your installed version, since `--legacy-env` is a hidden or advanced flag and its availability depends on the version.",
+      "toolCalls": [],
+      "costUsd": 0.030355,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-121-0-7-a",
+      "answer": "Wrangler has no plain `us` jurisdiction for D1. The supported values are `eu` and `fedramp`. To guarantee your data stays in the US, use the FedRAMP jurisdiction:\n\n```sh\nnpx wrangler d1 create my-db --jurisdiction fedramp\n```\n\nThe jurisdiction is fixed when you create the database, so you can't change it later.\n\nIf you only want the database placed in the US and don't need a guarantee, use a location hint such as `--location wnam` (western North America) or `--location enam` (eastern North America). A hint is best-effort only, and read replicas could still live elsewhere. Check the current D1 data-location docs in case the list of jurisdictions has grown.",
+      "toolCalls": [],
+      "costUsd": 0.027770999999999997,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-129-1-9-a",
+      "answer": "As of my knowledge (mid-2026), **yes**: Cloudflare Workers allow **3 MB on the Free plan and 10 MB on the Paid plan**, measured **after gzip compression**. There is also a separate **64 MB limit on the uncompressed** bundle, and the script must still start up within the global-scope startup time limit (currently 1 second).\n\nCloudflare has raised these limits before (paid was once 1 MB, then 5 MB), so check the [Workers Limits page](https://developers.cloudflare.com/workers/platform/limits/) for anything newer. If you're close to the cap, `wrangler deploy --dry-run --outdir dist` reports the compressed size without deploying.",
+      "toolCalls": [],
+      "costUsd": 0.025731,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-118-0-8-a",
+      "answer": "With plain `wrangler dev`, your Worker runs locally in workerd (via Miniflare), and `console.log` output goes straight to the terminal running it. You can also press `d` to open DevTools and see it there. Nothing is sent to Cloudflare's Workers Logs or traces; the `observability` settings in `wrangler.toml` only apply to deployed Workers.\n\nThe exception is `wrangler dev --remote`. There the code runs in a preview on Cloudflare's network and the logs are streamed back to your terminal.\n\nWrangler also writes its own debug logs to files under `~/.wrangler/logs`. You can control this with `WRANGLER_LOG_PATH` (where they go) and `WRANGLER_LOG` (how verbose they are).\n\nSeparately, Wrangler sends anonymous usage telemetry. You can turn it off in any of these ways:\n- Run `wrangler telemetry disable`.\n- Set `WRANGLER_SEND_METRICS=false`.\n- Add `send_metrics = false` to your config.\n\nTo stop log and trace collection for a deployed Worker, set `[observability] enabled = false` in `wrangler.toml`.",
+      "toolCalls": [],
+      "costUsd": 0.032587,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-141-0-10-a",
+      "answer": "Not really. When you deploy, Cloudflare restarts every Durable Object instance that moves to the new version. There's no setting that keeps an instance on old code for a set time. In-flight requests get a short grace period to finish, but open connections such as WebSockets are dropped, and clients must reconnect.\n\nThe closest option is **gradual deployments**. Use `wrangler versions upload`, then `wrangler versions deploy` to split traffic by percentage (for example, 90% old and 10% new). Each Durable Object ID is consistently assigned to one version, so some objects keep running old code while you ramp up. Any object that moves to the new version still restarts at that moment.\n\nFor anything stateful, plan for restarts. Persist state to storage rather than memory, and add client reconnect logic. The WebSocket Hibernation API also helps, since it can make deploys less disruptive than holding sockets in memory.",
+      "toolCalls": [],
+      "costUsd": 0.031198999999999998,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-145-0-11-a",
+      "answer": "Use `wrangler r2 sql query`, passing your R2 Data Catalog warehouse name and the SQL string:\n\n```sh\nnpx wrangler r2 sql query \"<WAREHOUSE>\" \"SELECT * FROM namespace.table LIMIT 10\"\n```\n\nThe warehouse name is shown in the bucket's R2 Data Catalog settings, usually in the form `<account_id>_<bucket_name>`. You'll need an API token with R2 SQL read permissions (plus R2 Data Catalog and storage access). Wrangler reads it from the `WRANGLER_R2_SQL_AUTH_TOKEN` environment variable. Run `npx wrangler r2 sql query --help` to confirm the exact flags, since R2 SQL is still evolving.",
+      "toolCalls": [],
+      "costUsd": 0.025211,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-116-0-16-a",
+      "answer": "As of my knowledge, `wrangler check startup` was not labeled alpha in the docs. I'm not certain of its current status, though; running `npx wrangler check startup --help` will show any `[alpha]`, `[beta]` or `[experimental]` tag in your installed version.\n\nThe command reports your Worker's **startup CPU time**, which is how long the global scope takes to evaluate when the Worker loads. That's the work that counts against the startup time limit. It builds your Worker, or takes an existing bundle via `--worker-bundle`, and profiles its initialization. It then writes a CPU profile, `worker-startup.cpuprofile` by default (`--outfile` changes it). You can open that file in Chrome DevTools or VS Code to see which modules or top-level code are slowing startup.",
+      "toolCalls": [],
+      "costUsd": 0.027242999999999996,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-125-0-19-a",
+      "answer": "No. Workers can't listen for inbound raw TCP on arbitrary ports like 5432. They are invoked by HTTP(S) requests, including WebSocket upgrades, and by events like cron triggers, queues, and email.\n\nWhat they *can* do is open **outbound** TCP connections using the `connect()` API from `cloudflare:sockets`. That's how a Worker talks to a Postgres database, and **Hyperdrive** adds connection pooling and caching on top. If you need clients to reach your database over raw TCP through Cloudflare, **Spectrum** proxies TCP/UDP to an origin server, but it doesn't run Worker code. The usual workaround is to have clients talk HTTP or WebSockets to the Worker, which then speaks the Postgres wire protocol outbound.",
+      "toolCalls": [],
+      "costUsd": 0.026927,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-127-0-17-a",
+      "answer": "As far as I know, Cloudflare Workflows has **no built-in per-workflow concurrency setting** in `wrangler.toml`/`wrangler.jsonc`. The only cap is the platform's account-level limit on concurrently running instances, and you can't lower it for one workflow. Check the current Workflows \"Limits\" docs in case a setting has been added since.\n\nTo cap concurrency yourself, the usual pattern is a **Durable Object acting as a semaphore**:\n\n- Make the first `step.do()` in the workflow ask the DO for a slot.\n- If no slot is free, wait and retry with `step.sleep()`. Alternatively, have the DO record the instance ID and later wake it with `instance.sendEvent()` while the workflow waits on `step.waitForEvent()`.\n- Release the slot in a final step, and also on failure, for example with try/finally around your steps.\n\nA simpler option is to throttle **creation** instead. Route requests through a Cloudflare Queue and have the consumer call `env.MY_WORKFLOW.create()` only when the number of running instances (tracked in a DO or KV) is below your limit. Queue `max_concurrency` on its own won't work, because `create()` returns as soon as the instance starts, not when it finishes.",
+      "toolCalls": [],
+      "costUsd": 0.030711,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-117-0-20-a",
+      "answer": "Miniflare now serves its local testing endpoints under the **`/cdn-cgi/`** path prefix. To fire the scheduled (cron) trigger locally, send a request to **`/cdn-cgi/handler/scheduled`**, for example:\n\n```\ncurl \"http://localhost:8787/cdn-cgi/handler/scheduled?cron=*+*+*+*+*\"\n```\n\nEmail handlers follow the same pattern at `/cdn-cgi/handler/email`. The older `/__scheduled` endpoint (and Miniflare's `/cdn-cgi/mf/scheduled`) is the legacy form. This answer is from memory, not from your project or current docs, so check the Miniflare/Wrangler changelog for the exact version you're using.",
+      "toolCalls": [],
+      "costUsd": 0.031559,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-113-0-21-a",
+      "answer": "**KV: yes, in recent Wrangler 4.x versions, if you leave the ID out.** If a `kv_namespaces` binding has only a `binding` name and no `id`, `wrangler deploy` creates the namespace and links it. This is Wrangler's automatic resource provisioning, which also covers R2 and D1. If you specify an `id`, that namespace must already exist. Older Wrangler versions never auto-create, so you'd need to run `wrangler kv namespace create` first.\n\n**Queues: don't count on it.** As far as I know, queues aren't part of auto-provisioning, so a producer or consumer binding pointing at a missing queue makes the deploy fail. Create them first with `wrangler queues create <name>`.\n\nThis feature has been changing, so check `wrangler --version` and the current Cloudflare docs or changelog to confirm what your version does.",
+      "toolCalls": [],
+      "costUsd": 0.029051,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-148-0-24-a",
+      "answer": "You can't delete secrets with `wrangler versions secret bulk`; it only creates or updates them. Any existing secrets not listed in your JSON/`.env` file carry over unchanged into the new version, so leaving a key out won't remove it.\n\nTo remove a secret, use:\n\n```\nwrangler versions secret delete <KEY>\n```\n\nThis creates a new Worker version without that secret. Then run `wrangler versions deploy` to make that version live. If you're not using gradual deployments, `wrangler secret delete <KEY>` removes it and deploys immediately.",
+      "toolCalls": [],
+      "costUsd": 0.024683,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-27-0-0-a",
+      "answer": "I can't confirm that `agents/channels` exists. I don't know of a \"Channels\" export in the Cloudflare Agents SDK (`agents` package). The subpaths I know of are `agents` (`Agent`, `routeAgentRequest`, `getAgentByName`), `agents/react` (`useAgent`), `agents/ai-react` (`useAgentChat`), `agents/ai-chat-agent` (`AIChatAgent`), `agents/client`, `agents/mcp`, and `agents/schedule`. Channels could be a newer addition, so check the `\"exports\"` field in `node_modules/agents/package.json` or the current docs at developers.cloudflare.com/agents. If it's listed there, the import would follow that subpath (for example, `import { ... } from \"agents/channels\"`). If it's not listed, look for a separate package or a feature with a different name.",
+      "toolCalls": [],
+      "costUsd": 0.0397236,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-27-0-2-a",
+      "answer": "I'm not aware of an official, dedicated terminal chat client for Cloudflare Agents, so check the current Agents docs in case one has shipped. There are a few practical ways to do it:\n\n- **Write a small Node script** using `AgentClient` from `agents/client`. It's WebSocket-based (built on PartySocket) and lets you call the agent's methods and get its state from a terminal script.\n- **Connect directly to the WebSocket** with a generic tool like `wscat` or `websocat`. The default route is `wss://<your-worker>/agents/<agent-class-kebab>/<instance-name>`. You can also use `curl` if the agent handles HTTP via `onRequest`.\n- **Use an MCP client** if the agent is an `McpAgent`. Any MCP-capable CLI, including Claude Code (`claude mcp add --transport http ...`), can connect to it and use it from the terminal.",
+      "toolCalls": [],
+      "costUsd": 0.029607,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-25-0-3-a",
+      "answer": "**Technically yes, but it isn't the supported pattern and it often breaks.** An `Agent` is a Durable Object, so a stub from `env.MyAgent.get(env.MyAgent.newUniqueId())` can invoke its public methods over DO RPC. But the Agents SDK (built on partyserver) expects every instance to have a **name**, which it sets when you use `getAgentByName(env.MyAgent, \"some-name\")` or route through `routeAgentRequest`. With a raw unique ID, that name is never set. Anything that touches `this.name` will throw an error like \"Attempting to read .name … before it was set\", and that includes state sync, scheduling, MCP, and parts of initialization/`onStart`.\n\n**Recommendation:** use `getAgentByName()`. If you need a unique instance, generate an ID yourself (e.g. `crypto.randomUUID()`) and pass it as the name. RPC calls will then behave reliably.",
+      "toolCalls": [],
+      "costUsd": 0.030343,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-24-0-5-a",
+      "answer": "No. In the Cloudflare Agents SDK, `this.queue()` persists the task (callback name plus a JSON-serializable payload) to the Agent's SQLite storage, and a later flush runs it, not the original call. When the flush runs the callback, it sets up the agent context with `agent: this` but leaves `connection`, `request` and `email` as `undefined`. So `getCurrentAgent()` gives you the agent instance, but not the connection or request that queued the task.\n\nIf the callback needs that information, put what you need into the payload, such as the connection ID or relevant request fields. You can then look the connection up again with `this.getConnection(id)`.\n\nI'm answering from memory of the SDK's source, not from code in your workspace, so check `_flushQueue` in the version you have installed.",
+      "toolCalls": [],
+      "costUsd": 0.027899,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-24-0-6-a",
+      "answer": "Your working directory is empty, so I can't check a specific version. This answer is from my general knowledge of Cloudflare's Agents SDK.\n\nAs far as I know, `useAgent` (from `agents/react`) only uses WebSockets. It wraps PartySocket's `usePartySocket`, which gives you a persistent socket with auto-reconnect, state sync and RPC via `agent.call()`. For one-off HTTP requests to an agent, the SDK has a separate helper, `agentFetch`, which sends plain HTTP to the agent's `onRequest` handler. SSE and streamable HTTP do appear in the SDK, but for MCP servers and clients (`McpAgent`), not as options for `useAgent`.\n\nIf you're on a newer release that added a transport option, check `node_modules/agents/dist/react.d.ts` to confirm.",
+      "toolCalls": [],
+      "costUsd": 0.039367,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-9-a",
+      "answer": "As of my knowledge (cutoff June 2026), **yes**: in the `agents` package, `Agent` is declared as `class Agent<Env, State> extends Server<Env>`, with `Server` imported from `partyserver`. That inheritance is why agents get PartyServer's Durable Object routing, WebSocket connection handling (`onConnect`, `onMessage`, `onClose`), `broadcast`, and `getConnections`. `Agent` then adds its own state sync, SQL storage, scheduling, and RPC on top.\n\nI haven't checked the current release, so this may have changed. To confirm, look at the class declaration in `node_modules/agents/dist/index.d.ts` or `packages/agents/src/index.ts` in the cloudflare/agents repo.",
+      "toolCalls": [],
+      "costUsd": 0.025379000000000002,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-23-0-7-a",
+      "answer": "I can't confirm `subAgent()`'s current status. This workspace has no project files or installed `agents` package to check, and the SDK has changed quickly.\n\nAs far as I know, `subAgent()` was added as an **experimental** API. It spins up a child agent with its own isolated storage, built on Durable Object Facets, and you call it through RPC from a parent agent. That makes it a reasonable choice when you specifically need a parent-owned child, but experimental APIs can be renamed or removed. If you only need to reach another agent instance, the stable route is a separate Durable Object binding with `getAgentByName()`.\n\nBefore relying on it, check the current Agents SDK changelog or docs, or the JSDoc in your installed `agents` package. If you point me at a project, I can check which version you're on and whether `subAgent()` is marked deprecated there.",
+      "toolCalls": [],
+      "costUsd": 0.031675,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-12-a",
+      "answer": "In the Cloudflare Agents SDK, when you call `this.schedule(when, \"methodName\", payload)`, the named method is invoked with two arguments: **`(payload, schedule)`**.\n\n1. **`payload`**: the data you passed as the third argument to `schedule()`. It is stored as JSON and parsed back before the call, so it must be JSON-serializable.\n2. **`schedule`**: the `Schedule` record itself. It includes the `id`, the `callback` name, the `payload`, and the `type` (`\"scheduled\"`, `\"delayed\"`, or `\"cron\"`), plus the matching timing fields such as `time`, `delayInSeconds`, or `cron`.\n\nMost callbacks only declare the first parameter, for example `async sendReminder(data: { message: string }) { ... }`. The second is there if you need the schedule metadata, such as the `id` to cancel a recurring task.\n\nThis is from memory, not checked against current docs, so confirm it against the version of `agents` you're using.",
+      "toolCalls": [],
+      "costUsd": 0.029086999999999995,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-13-a",
+      "answer": "Not directly. `this.schedule()` (along with `getSchedules()` and `cancelSchedule()`) is a method on the `Agent` class, not a standalone utility. It depends on Agent internals: it stores schedules in the Agent's SQLite tables and dispatches them through the Agent's own `alarm()` handler. As far as I know, the SDK doesn't export it in a form you can attach to a plain `DurableObject`.\n\nYou have two options:\n\n- **Extend `Agent` instead.** `Agent` is itself a Durable Object, so you lose nothing and get scheduling for free.\n- **Write the equivalent yourself.** Use `ctx.storage.setAlarm()` and an `alarm()` handler, with your own SQLite table of pending tasks. A DO has only one alarm, so you'd always set it to the earliest pending task.\n\nThe Agents SDK changes quickly, so check the current docs or source in case a standalone scheduler has been added.",
+      "toolCalls": [],
+      "costUsd": 0.028051,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-21-0-16-a",
+      "answer": "I couldn't confirm that API: there's no `createAISDKTelemetry` or `agents/observability` anywhere in this workspace, and I don't recognize `createAISDKTelemetry()` as an export of the Cloudflare `agents` package, so I can't give you a reliable signature. The pattern it most likely follows is the AI SDK's built-in telemetry hook: you pass `experimental_telemetry: { isEnabled: true, functionId: \"my-call\", metadata: {...} }` to `generateText`/`streamText`, and a configured OpenTelemetry tracer collects the spans. If your installed `agents` version does export that helper, check `node_modules/agents/package.json` under `\"exports\"` for `./observability/ai` and read its `.d.ts` to see what it returns. It's probably an object you spread into `experimental_telemetry`. If you install the package here or point me at its source, I can give you the exact usage.",
+      "toolCalls": [],
+      "costUsd": 0.032867,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-20-0-18-a",
+      "answer": "I couldn't verify against source, since the working directory is empty and has no `node_modules` to inspect. So this is from memory and may be out of date.\n\nAs far as I know, **no, not directly.** `createMcpHandler` in Cloudflare's `agents` package (`agents/mcp`) is typed against and depends on the v1 SDK, `@modelcontextprotocol/sdk`. It expects an `McpServer` from `@modelcontextprotocol/sdk/server/mcp.js` and wires it to its own Workers-compatible streamable HTTP transport. The v2 split packages (`@modelcontextprotocol/server`, etc.) are separate packages with their own `McpServer` class and types. Passing a v2 server would likely fail type-checking, and it may not work at runtime even with a cast.\n\nCheck the `agents` release notes or its `package.json` dependencies for a v2 version range. If it isn't there, either stay on `@modelcontextprotocol/sdk` v1 for `createMcpHandler`, or use the v2 SDK's own HTTP transport in a plain Worker `fetch` handler. If you install `agents` here, I can confirm by reading its types.",
+      "toolCalls": [],
+      "costUsd": 0.034575,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-20-0-19-a",
+      "answer": "It sends the MCP **`initialize` request**. The Agents SDK's `MCPClientManager` wraps the official MCP TypeScript SDK `Client`, and `client.connect(transport)` opens with a JSON-RPC `initialize` call. That call carries the client's `protocolVersion`, its `capabilities`, and `clientInfo` (name and version).\n\nAfter the server replies with its own capabilities, the client sends the `notifications/initialized` notification. Only then does it start discovery calls like `tools/list`, `resources/list` and `prompts/list`.\n\nAt the transport level, in the default \"auto\" mode it first tries Streamable HTTP, so the `initialize` goes as an HTTP POST. If that fails, it falls back to SSE. If the server requires OAuth, a 401 can trigger the auth flow before initialization completes.\n\nI answered this from memory of the SDK rather than by checking the source here, so details may vary by version.",
+      "toolCalls": [],
+      "costUsd": 0.028270999999999998,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-19-0-21-a",
+      "answer": "The model's tool call could not be parsed (retry also failed).",
+      "toolCalls": [],
+      "costUsd": 0.030651200000000003,
+      "turns": 2,
+      "isError": true,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-3-a",
+      "answer": "The test function returns before the assertion settles, so in a naive runner the test could pass even if the promise resolves to something other than `1` or rejects. Any failure would surface later as an unhandled rejection, or not at all.\n\nRecent Vitest versions (2.1+) guard against this. They track unawaited `.resolves`/`.rejects` assertions, auto-await them when the test ends so failures are still reported, and print a warning like *\"Promise returned by `expect(actual).resolves.toBe(expected)` was not awaited… Please remember to await the assertion.\"* That warning also said a future major version would make this a hard failure, so check the behavior in your installed version.\n\nEither way, write `await expect(promise).resolves.toBe(1)` or `return` it. The `@vitest/eslint-plugin` rule `valid-expect` can catch the missing `await`.",
+      "toolCalls": [],
+      "costUsd": 0.031283,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-4-a",
+      "answer": "No. Vitest only looks for `vitest.config.*` (or `vite.config.*`) in the project root, which defaults to the current working directory, and it does not walk up through parent directories. If you run it from a subfolder with no config there, it falls back to defaults and ignores the parent's config.\n\nTo use the parent config, you have three options:\n- Point at it explicitly: `vitest --config ../vitest.config.ts`\n- Set the root: `vitest --root ..`\n- Run from the parent directory with a filter: `vitest path/to/subfolder`",
+      "toolCalls": [],
+      "costUsd": 0.024918999999999997,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-5-a",
+      "answer": "Generally, no. `@vitest/runner` is an internal package that `vitest` already depends on, and Vitest re-exports the public pieces. Test APIs (`test`, `describe`, hooks, `TestContext`, etc.) come from `vitest`. Lower-level runner utilities for custom runners or tasks (e.g. `getCurrentSuite`, `createTaskCollector`, `setFn`) come from `vitest/suite`, and runner types are available from `vitest`.\n\nAdding `@vitest/runner` as a separate dependency risks installing a version that doesn't match your `vitest` version, which can cause subtle breakage like duplicate module instances or mismatched internal state. Only add it directly if you need something that genuinely isn't re-exported. In that case, pin it to exactly the same version as `vitest`.",
+      "toolCalls": [],
+      "costUsd": 0.026447,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-6-a",
+      "answer": "Install the provider package and WebdriverIO with `npm i -D vitest @vitest/browser-webdriverio webdriverio`. Then in `vitest.config.ts`, import the provider factory and enable browser mode:\n\n```ts\nimport { defineConfig } from 'vitest/config'\nimport { webdriverio } from '@vitest/browser-webdriverio'\n\nexport default defineConfig({\n  test: {\n    browser: {\n      enabled: true,\n      provider: webdriverio(), // options here are passed to WebdriverIO's remote()\n      instances: [{ browser: 'chrome' }, { browser: 'firefox' }],\n    },\n  },\n})\n```\n\nRun it with `npx vitest`. Supported browsers are `chrome`, `firefox`, `edge` and `safari`, and WebdriverIO downloads the drivers automatically.\n\nIn Vitest 3 and earlier, the setup is different. Install `@vitest/browser` and `webdriverio`, then set `provider: 'webdriverio'` as a string instead of calling a factory.",
+      "toolCalls": [],
+      "costUsd": 0.027950999999999997,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-7-a",
+      "answer": "Yes. `toHaveTextContent` comes from `@testing-library/jest-dom` (used in Vitest via `@testing-library/jest-dom/vitest`), and when you pass a **string** it checks whether the element's text **contains** that string. So `expect(el).toHaveTextContent('Hello')` passes for an element whose text is `\"Hello, world\"`. Whitespace is normalized by default; you can turn that off with `{ normalizeWhitespace: false }`.\n\nFor an exact match, use an anchored regex such as `toHaveTextContent(/^Hello$/)`, or compare directly with `expect(el.textContent).toBe('Hello')`.",
+      "toolCalls": [],
+      "costUsd": 0.024711,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-9-a",
+      "answer": "By default, `vitest --reporter=blob` writes to the `.vitest-reports/` directory in your project root, as `.vitest-reports/blob.json`. When you run with `--shard`, the filename includes the shard index and count, e.g. `.vitest-reports/blob-1-3.json`, so shards don't overwrite each other.\n\nYou can change the location with `--outputFile` (or `outputFile.blob` in config). `vitest --merge-reports` reads from `.vitest-reports/` by default, unless you pass it a different directory.",
+      "toolCalls": [],
+      "costUsd": 0.023527000000000003,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-12-a",
+      "answer": "Yes. Vitest browser-mode locators follow Playwright's semantics, so `page.getByText('Hello')` by default does a **case-insensitive substring match** with whitespace normalized. It would match an element containing \"hello world\", for example.\n\nTo require a whole-string, case-sensitive match, pass `{ exact: true }`, as in `page.getByText('Hello', { exact: true })`. You can also pass a regular expression for finer control.\n\nThe same `exact` option applies to the other text-based locators, such as `getByRole` with `name`, `getByLabelText`, `getByPlaceholder`, `getByAltText`, and `getByTitle`.",
+      "toolCalls": [],
+      "costUsd": 0.025007,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-13-a",
+      "answer": "`-t` (or `--testNamePattern`) is a regex matched against the test's **full name**: the enclosing `describe` names and the test name joined by spaces. So for:\n\n```ts\ndescribe('auth', () => {\n  describe('login', () => {\n    it('rejects bad password', () => { /* ... */ })\n  })\n})\n```\n\nrun:\n\n```bash\nnpx vitest run -t \"auth login rejects bad password\"\n```\n\nAny unique substring also works, such as `-t \"rejects bad password\"`. Add a file path to limit which files are scanned (`npx vitest run src/auth.test.ts -t \"login rejects\"`), and escape regex characters like `(`, `.`, or `?` that appear in the names.",
+      "toolCalls": [],
+      "costUsd": 0.026663,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-14-a",
+      "answer": "No, not by default. Inline project configs in `test.projects` don't inherit options from the root config. Each project only gets what you define inside it.\n\nTo opt in, set `extends: true` on the project. It will then merge with the root config, including plugins and `test` options like `setupFiles`. You can also set `extends` to a path to inherit from a different config file.\n\nSome options can't be set per project and only work in the root config, such as `reporters` and `coverage`. Those always apply to the whole run.",
+      "toolCalls": [],
+      "costUsd": 0.022347,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-15-a",
+      "answer": "Assuming you mean Playwright's `expect.poll`: the poll timeout covers the whole polling operation, including a call that is still pending. If your function returns a promise that never settles, Playwright doesn't wait forever. Once the timeout expires (the `timeout` option, or the expect timeout, 5s by default), the assertion fails with a timeout error such as \"Timeout 5000ms exceeded while waiting on the predicate.\" The test then fails, unless the overall test timeout is hit first, in which case that error is reported instead.\n\nVitest's `expect.poll` behaves the same way. It races each callback against the timeout and fails the assertion when time runs out, so a hanging promise counts as a failed assertion rather than a test that hangs indefinitely.",
+      "toolCalls": [],
+      "costUsd": 0.028719,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-16-a",
+      "answer": "Not in any useful way. Vitest hoists `vi.mock` calls to the top of the file so they run before your static `import`s, so the mock can't depend on a function call or an `if` condition at runtime. Putting it inside a block won't make it conditional, and by the time that code runs, the module has already been imported unmocked.\n\nIf you need runtime or conditional mocking, you have two options:\n\n- **`vi.doMock`:** It isn't hoisted, so you can call it inside a function or `if` block. It only affects modules you import afterward with dynamic `await import(...)`, often combined with `vi.resetModules()`.\n- **Mock at the top level and change behavior per test:** Call `vi.mock` once at the top, then use `vi.mocked(fn).mockReturnValue(...)` or `mockImplementation(...)` inside tests.",
+      "toolCalls": [],
+      "costUsd": 0.031423,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-17-a",
+      "answer": "Use `mockImplementation` and branch on the arguments inside it:\n\n```ts\nconst fn = vi.fn().mockImplementation((id: number) =>\n  id === 1 ? 'alice' : id === 2 ? 'bob' : undefined\n);\n```\n\nFor many cases, a lookup map keeps it tidy: `vi.fn((key) => ({ a: 1, b: 2 })[key])`. Vitest has no built-in `calledWith(...).mockReturnValue(...)` matcher like jest-when. If you want that style, the `vitest-when` package gives you `when(fn).calledWith(1).thenReturn('alice')`.",
+      "toolCalls": [],
+      "costUsd": 0.022331,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-18-a",
+      "answer": "Vitest has a per-test **`repeats`** option, e.g. `test('my test', { repeats: 10 }, () => { ... })` (or `describe(..., { repeats: 10 }, ...)`). It runs that test 10 times in a row, and the test fails if any run fails. I'm not certain your Vitest version has a global CLI flag for this. Run `npx vitest --help` and look for a `repeats` option.\n\nIf there isn't one, run the whole suite repeatedly from PowerShell and stop at the first failure:\n\n```powershell\n1..20 | % { npx vitest run; if ($LASTEXITCODE) { \"Failed on run $_\"; break } }\n```\n\nAdding `--sequence.shuffle` also helps expose tests that depend on running in a certain order.",
+      "toolCalls": [],
+      "costUsd": 0.028879,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-20-a",
+      "answer": "No, as far as I know `--project` has no short alias in the Vitest CLI; you have to write it out, e.g. `vitest --project=my-project`. You can repeat it to select several projects (`--project=a --project=b`), and it accepts wildcards like `--project=packages*`. Vitest does have short flags for some other options, such as `-c` for `--config`, `-r` for `--root`, `-t` for `--testNamePattern`, `-u` for `--update`, and `-w` for `--watch`. I haven't checked this against your installed version, so run `npx vitest --help` to confirm.",
+      "toolCalls": [],
+      "costUsd": 0.024339,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-24-a",
+      "answer": "Yes, partially. `vitest list` loads each test file the same way a normal run does, including transforms and `setupFiles`, so any top-level module code and every `describe` callback executes. That is how Vitest discovers the test names. The test bodies themselves (`it`/`test` callbacks) and hooks like `beforeAll`/`beforeEach` are not run; the tests are only collected and printed.\n\nAny side effects at import time or inside `describe` blocks will still happen. If you only need file paths, `vitest list --filesOnly` skips collection and doesn't execute the files.",
+      "toolCalls": [],
+      "costUsd": 0.025691,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-14-a",
+      "answer": "Pass your storage in the third (options) argument: `new MCPClientManager(name, version, { storage })`. Inside a Durable Object or Agent that's typically `new MCPClientManager(\"my-client\", \"1.0.0\", { storage: this.ctx.storage })`, and the manager uses it to save server connections and OAuth state so they survive hibernation and restarts. Because it's a plain `DurableObjectStorage`, you can also hand it any object that implements that interface, such as a wrapper or a test fake.\n\nYour working directory is empty, so I couldn't check this against your installed `agents` version. Older releases didn't take a `storage` option. If yours rejects it, look at the constructor signature in `node_modules/agents/dist/mcp/client.d.ts` or upgrade the package.",
+      "toolCalls": [],
+      "costUsd": 0.043163599999999996,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-11-a",
+      "answer": "",
+      "toolCalls": [],
+      "costUsd": 0,
+      "turns": 0,
+      "isError": true,
+      "mcp": {}
+    }
+  ]
+}

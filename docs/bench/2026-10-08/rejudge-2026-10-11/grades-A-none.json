@@ -1,0 +1,37 @@
+{
+  "label": "A-none",
+  "model": "opus",
+  "spentUsd": 0.136643,
+  "grades": [
+    {
+      "id": "vitest-5-0-0-5-a",
+      "grade": "wrong",
+      "why": "It claims vitest still depends on @vitest/runner and suggests pinning it as a usable option, missing that it is deprecated and no longer used by Vitest 5.",
+      "costUsd": 0.025578999999999998
+    },
+    {
+      "id": "wrangler-4-125-0-19-a",
+      "grade": "wrong",
+      "why": "It states the stale claim that Workers cannot accept inbound raw TCP, omitting the experimental local-dev `connect` trigger (TCP since 4.125.0, UDP since 4.139.0).",
+      "costUsd": 0.026930999999999997
+    },
+    {
+      "id": "wrangler-4-145-0-11-a",
+      "grade": "wrong",
+      "why": "It presents the stale `wrangler r2 sql` path, the beta status, and the `WRANGLER_R2_SQL_AUTH_TOKEN` variable as current, instead of `wrangler basin sql` with `WRANGLER_BASIN_SQL_AUTH_TOKEN`.",
+      "costUsd": 0.028575
+    },
+    {
+      "id": "agents-0-19-0-21-a",
+      "grade": "wrong",
+      "why": "It says agents supports only AI SDK v6 (ai ^6), which is the stale answer, instead of support for both v6 and v7.",
+      "costUsd": 0.026187
+    },
+    {
+      "id": "vitest-5-0-0-6-a",
+      "grade": "wrong",
+      "why": "The setup is accurate, but it never says the provider moved out of core to the vitest-community organization or that version 5.0.0 supports Vitest 5, so it matches the stale answer.",
+      "costUsd": 0.029371
+    }
+  ]
+}

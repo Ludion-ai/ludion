@@ -1,0 +1,39 @@
+{
+  "id": "agents-0-22-0-14-c",
+  "change": "agents-0-22-0-14",
+  "library": "agents",
+  "prompt": "ToolGateway (src/gateway.js) is a plain Durable Object that our other Workers call over RPC; keep it a plain DurableObject. Make it connect to the MCP server at env.TOOLS_MCP_URL using the MCP client manager from the agents package, and make `listTools()` return that server's tools. The connection must be persisted so it is restored after the object is evicted.",
+  "correct": [
+    [
+      { "files": ["src/gateway.js"], "pattern": "\\bnew\\s+MCPClientManager\\s*\\(" },
+      { "files": ["src/gateway.js"], "pattern": "\\bLifecycle\\s*\\.\\s*install\\s*\\(|\\bnew\\s+Lifecycle\\s*(?:<[^>]*>)?\\s*\\(" },
+      { "files": ["src/gateway.js"], "pattern": "\\.\\s*use\\s*\\(" },
+      { "files": ["src/gateway.js"], "pattern": "\\bclass\\s+ToolGateway\\s+extends\\s+DurableObject\\b" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "src/gateway.js": "import { DurableObject } from 'cloudflare:workers';\nimport { Lifecycle } from 'agents/lifecycle';\nimport { MCPClientManager } from 'agents/mcp/client';\n\nexport class ToolGateway extends DurableObject {\n  mcp = new MCPClientManager('tool-gateway', '1.0.0');\n  lifecycle = Lifecycle.install(this).use(this.mcp);\n\n  async listTools() {\n    await this.lifecycle.start();\n    if (!this.mcp.listServers?.().length) {\n      await this.mcp.registerServer('tools', { url: this.env.TOOLS_MCP_URL, name: 'tools' });\n      await this.mcp.connectToServer('tools');\n    }\n    await this.mcp.waitForConnections();\n    return this.mcp.listTools();\n  }\n}\n"
+      },
+      {
+        "src/gateway.js": "import { DurableObject } from 'cloudflare:workers';\nimport { Lifecycle } from 'agents/lifecycle';\nimport { MCPClientManager } from 'agents/mcp/client';\n\nexport class ToolGateway extends DurableObject {\n  mcp = new MCPClientManager('tool-gateway', '1.0.0', { storage: this.ctx.storage });\n  lifecycle = Lifecycle.install(this).use(this.mcp);\n  async listTools() { return this.mcp.listTools(); }\n}\n"
+      },
+      {
+        "src/gateway.js": "import { DurableObject } from 'cloudflare:workers';\nimport { Lifecycle } from 'agents/lifecycle';\nimport { MCPClientManager } from 'agents/mcp/client';\n\nexport class ToolGateway extends DurableObject {\n  mcp = new MCPClientManager('tool-gateway', '1.0.0', { env: this.env });\n  lifecycle = new Lifecycle(this);\n\n  constructor(ctx, env) {\n    super(ctx, env);\n    this.lifecycle.use(this.mcp);\n    this.lifecycle.installHandlers();\n  }\n\n  async listTools() {\n    await this.lifecycle.start();\n    return this.mcp.listTools();\n  }\n}\n"
+      }
+    ],
+    "wrong": [
+      {
+        "src/gateway.js": "import { DurableObject } from 'cloudflare:workers';\nimport { MCPClientManager } from 'agents/mcp/client';\n\nexport class ToolGateway extends DurableObject {\n  constructor(ctx, env) {\n    super(ctx, env);\n    this.mcp = new MCPClientManager('tool-gateway', '1.0.0', { storage: ctx.storage });\n  }\n\n  async listTools() {\n    await this.mcp.connect(this.env.TOOLS_MCP_URL);\n    return this.mcp.listTools();\n  }\n}\n"
+      },
+      {
+        "src/gateway.js": "import { DurableObject } from 'cloudflare:workers';\nimport { Lifecycle } from 'agents/lifecycle';\nimport { MCPClientManager } from 'agents/mcp/client';\n\nexport class ToolGateway extends DurableObject {\n  mcp = new MCPClientManager('tool-gateway', '1.0.0');\n  lifecycle = Lifecycle.install(this);\n  async listTools() { return this.mcp.listTools(); }\n}\n"
+      },
+      {
+        "src/gateway.js": "import { Agent } from 'agents';\n\nexport class ToolGateway extends Agent {\n  async listTools() {\n    await this.mcp.connect(this.env.TOOLS_MCP_URL);\n    return this.mcp.listTools();\n  }\n}\n"
+      }
+    ]
+  },
+  "trap": "Constructing MCPClientManager standalone with `{ storage: ctx.storage }` is the pre-0.22 way; that option is gone (silently ignored) and the manager gets its storage only from the Lifecycle it is installed on (`Lifecycle.install(this).use(this.mcp)`)."
+}

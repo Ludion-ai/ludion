@@ -1,0 +1,39 @@
+{
+  "lesson": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "default",
+    "symbol": "extends",
+    "signal": "silent",
+    "detail": "Projects defined with an inline configuration inherit all options from the root-level configuration; add extends: false to ignore the options.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://vitest.dev/guide/projects",
+          "quote": "Projects defined with an inline configuration inherit all options from the root-level configuration. This is controlled by the extends option, which is enabled by default since Vitest 5.0:"
+        }
+      },
+      {
+        "source": {
+          "url": "https://vitest.dev/guide/projects",
+          "quote": "add \"extends: false\" to ignore // the options defined in this config file"
+        }
+      }
+    ],
+    "drafted_by": "agent",
+    "format": 1,
+    "id": "01M4MFRSYTTA0WM4BHETX03399",
+    "subject": "vitest",
+    "author": "github:you",
+    "author_id": 1,
+    "created_at": "2026-10-11T03:23:12Z"
+  },
+  "taught_at": "2026-10-11T03:23:12Z",
+  "checks": {
+    "tests": "none",
+    "sources": "found"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "ludion-ai",
+  "version": "0.1.0",
+  "description": "Another name for the ludion package. Use ludion itself: npx ludion",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "ludion-ai": "bin/ludion-ai.js"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ludion-ai/ludion.git",
+    "directory": "packages/ludion-ai"
+  },
+  "homepage": "https://ludion.ai",
+  "dependencies": {
+    "ludion": "0.1.0"
+  }
+}

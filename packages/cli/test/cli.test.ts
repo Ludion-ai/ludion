@@ -226,6 +226,16 @@ describe("the Claude Code plugin", () => {
     expect(hook.command).toBe(`npx -y ludion@${version} sync --quiet --dir "\${CLAUDE_PROJECT_DIR}"`);
   });
 
+  it("keeps ludion-ai a plain alias: it runs this CLI's own bin, pinned to this version, under its own command name", () => {
+    const cli = json("packages/cli/package.json");
+    const alias = json("packages/ludion-ai/package.json");
+    expect(alias.dependencies).toEqual({ ludion: cli.version });
+    expect(alias.bin).toEqual({ "ludion-ai": "bin/ludion-ai.js" });
+    expect(alias.scripts).toBeUndefined();
+    const bin = readFileSync(join(import.meta.dirname, "../../ludion-ai/bin/ludion-ai.js"), "utf8");
+    expect(bin).toContain(`await import("ludion/${cli.bin.ludion}");`);
+  });
+
   it("adds the MCP server, and the marketplace points at the plugin folder", () => {
     expect(json("plugin/.claude-plugin/plugin.json").mcpServers).toEqual({ ludion: { type: "http", url: "https://ludion.ai/mcp" } });
     expect(json(".claude-plugin/marketplace.json").plugins).toEqual([expect.objectContaining({ name: "ludion", source: "./plugin" })]);

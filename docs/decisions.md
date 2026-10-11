@@ -65,6 +65,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
   - `npm run build -w ludion` bundles everything into one file, `dist/cli.js`, so the published package has no runtime dependencies.
   - It reuses `packages/core` and the Docker runner and guarded fetch from `tools/verify`.
   - **No telemetry.** The only network requests are the index shards (sync), source pages (teach), and the user's own `gh` (teach --public).
+  - **`ludion-ai`** (`packages/ludion-ai`) is another name for it, published by the same npm account. It replaces that name's 0.0.x versions, an earlier unrelated project. Its bin imports `ludion`'s own `dist/cli.js` with the same arguments, depends only on `ludion` pinned to the same version, and has no scripts (a test checks all three). Its command is `ludion-ai`, so a global install never shadows `ludion`. Its description and README say to use `npx ludion`. It is published right after `ludion`, with the same version.
 - **`ludion sync`**:
   - **Versions**: read from `package-lock.json` (v2, v3), `pnpm-lock.yaml`, or `yarn.lock` (classic and berry); with no lockfile, from `node_modules/<dep>/package.json`. The Node version comes from `.node-version` or `.nvmrc`, else the running Node.
   - **Text from projects**: lockfiles may come from anyone and versions end up in text an assistant reads, so only a clean semver version and a valid package name are kept.

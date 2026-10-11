@@ -15,4 +15,11 @@ npx ludion teach draft.json --public   # then open a pull request in your name, 
 
 `teach` shows you the whole lesson, checks its sources, and runs its tests in Docker with the network off, if you have Docker. Lessons in your ledger reach every project on your machine at the next `sync`. With `--public`, after you confirm at the terminal, the lesson goes to <https://github.com/Ludion-ai/ludion> as a pull request from your GitHub account, where CI checks it again. Your assistant can draft lessons for you through the Ludion MCP server (`ludion_teach`), but only you can run the command.
 
+In Claude Code, the plugin runs `sync` at the start of every session and adds the MCP server:
+
+```
+/plugin marketplace add Ludion-ai/ludion
+/plugin install ludion@ludion
+```
+
 No telemetry. Apache-2.0. Lessons are CC BY-SA 4.0.

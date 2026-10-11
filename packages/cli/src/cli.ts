@@ -10,7 +10,7 @@ import { ledgerLesson, readLedger, saveEntry } from "./ledger.ts";
 import { readInstalled } from "./lockfile.ts";
 import { select, type SyncLesson } from "./match.ts";
 import { openPullRequest } from "./publish.ts";
-import { renderLessons, writeAndWire } from "./render.ts";
+import { lessonLines, readLessonsFile, renderLessons, writeAndWire } from "./render.ts";
 import { fetchLessons } from "./shards.ts";
 import { check, ghIdentity, ledgerEntry, readDraft, showLesson, toLesson } from "./teach.ts";
 
@@ -19,6 +19,7 @@ const HELP = `ludion: tells your coding assistant what changed in the versions y
   ludion sync [--dir <path>] [--model <id>] [--quiet] [--offline]
       Read the lockfile, fetch the lessons for the installed versions, leave out what the model
       is measured to know, and write .ludion/lessons.md (imported from CLAUDE.md).
+      --quiet prints nothing unless the lessons changed; then it prints them (for session-start hooks).
 
   ludion teach <draft.json | - | --draft <value>> [--public] [--drafted-by-agent]
       Check a lesson on this machine (tests run only in Docker) and save it to your ledger
@@ -48,8 +49,16 @@ async function sync(argv: string[]): Promise<number> {
   const summary = selection.kept.length
     ? [...new Set(selection.kept.map(({ lesson, versions }) => `${lesson.package.name} ${versions.join("/")}`))].join(", ")
     : `${installed.npm.size} packages from ${installed.source}, node ${installed.node}`;
-  const { written, skipped } = writeAndWire(dir, renderLessons(selection, summary, new Date()));
+  const before = readLessonsFile(dir);
+  const lessonsMd = renderLessons(selection, summary, new Date());
+  const { written, skipped } = writeAndWire(dir, lessonsMd);
   for (const s of skipped) console.error(`ludion: ${s}`);
+  // A session-start hook runs after Claude Code has read CLAUDE.md, so a change written now reaches only the next
+  // session; the hook's output reaches this one. So --quiet prints the lessons, and only when they changed.
+  const now = lessonLines(lessonsMd);
+  if (values.quiet && written.includes(".ludion/lessons.md") && (lessonLines(before) !== now || (now && written.includes("CLAUDE.md")))) {
+    console.log(`ludion sync updated .ludion/lessons.md after this session read CLAUDE.md. The current lessons:\n\n${lessonsMd}`);
+  }
   say(`ludion: ${selection.kept.length} lesson${selection.kept.length === 1 ? "" : "s"} for this project${selection.prunedForModel.length ? ` (${selection.prunedForModel.length} left out: ${model} is measured to know them)` : ""}. Wrote ${written.join(", ")}.`);
   return 0;
 }
@@ -121,10 +130,14 @@ async function main(argv: string[]): Promise<number> {
   return command === undefined || command === "help" || command === "--help" ? 0 : 2;
 }
 
+// exitCode, never process.exit(): exiting while fetch's sockets are still closing trips a libuv assertion on
+// Windows (exit code 9 after a successful sync), which a session-start hook would report as a failure.
 main(process.argv.slice(2)).then(
-  (code) => process.exit(code),
+  (code) => {
+    process.exitCode = code;
+  },
   (err: Error) => {
     console.error(`ludion: ${err.message}`);
-    process.exit(1);
+    process.exitCode = 1;
   },
 );

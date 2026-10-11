@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx -y ludion@0.1.0 sync --quiet --dir \"${CLAUDE_PROJECT_DIR}\"",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

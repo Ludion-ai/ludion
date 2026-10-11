@@ -1,0 +1,21 @@
+{
+  "id": "vitest-5-0-0-13-c",
+  "change": "vitest-5-0-0-13",
+  "library": "vitest",
+  "prompt": "Add an npm script test:checkout to package.json that runs only the cart checkout tests in src/cart.test.js: the whole checkout block inside cart (including tests added to it later), not the checkout block inside wishlist. Use Vitest's test-name filter; don't edit the tests.",
+  "correct": [
+    [{ "files": ["package.json"], "pattern": "\"test:checkout\"\\s*:\\s*\"[^\\n]*(?:\\s-t|--testNamePattern)(?:=|\\s+)[^\\n]*cart(?:[^\\n]*?>|\\.\\*|\\.\\+)[^\\n]*checkout" }]
+  ],
+  "examples": {
+    "correct": [
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:checkout\": \"vitest run src/cart.test.js -t \\\"cart > checkout\\\"\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:checkout\": \"vitest run --testNamePattern=\\\"^cart.*checkout\\\"\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" }
+    ],
+    "wrong": [
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:checkout\": \"vitest run src/cart.test.js -t \\\"cart checkout\\\"\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:checkout\": \"vitest run -t \\\"^cart checkout \\\"\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:checkout\": \"vitest run src/cart.test.js -t \\\"charges the total|rejects an empty cart\\\"\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" }
+    ]
+  },
+  "trap": "Vitest 4 joined suite and test names with spaces, so -t \"cart checkout\" selected the block; Vitest 5 joins them with \" > \", and that pattern matches no test."
+}

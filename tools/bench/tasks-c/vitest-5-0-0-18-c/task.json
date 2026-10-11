@@ -1,0 +1,36 @@
+{
+  "id": "vitest-5-0-0-18-c",
+  "change": "vitest-5-0-0-18",
+  "library": "vitest",
+  "prompt": "One of our tests fails now and then on CI. Add an npm script test:flaky to package.json that runs every test 20 times within a single Vitest run, whatever each attempt's result, so we can catch the flaky one. Don't change the test files or the existing test script.",
+  "correct": [
+    [{ "files": ["package.json"], "pattern": "\"test:flaky\"\\s*:\\s*\"[^\\n]*\\bvitest\\b[^\\n]*--repeats(?:=|\\s+)(?:19|20)\\b" }],
+    [
+      { "files": ["package.json"], "pattern": "\"test:flaky\"\\s*:\\s*\"[^\\n]*\\bvitest\\b[^\\n]*(?:--config|\\s-c)(?:=|\\s+)" },
+      {
+        "files": ["vitest.flaky.config.ts", "vitest.flaky.config.mts", "vitest.flaky.config.js", "vitest.flaky.config.mjs", "vitest.repeat.config.ts", "vitest.repeat.config.mts", "vitest.repeat.config.js", "vitest.repeat.config.mjs", "vitest.repeats.config.ts", "vitest.repeats.config.mts", "vitest.repeats.config.js", "vitest.repeats.config.mjs", "vitest.stress.config.ts", "vitest.stress.config.mts", "vitest.stress.config.js", "vitest.stress.config.mjs"],
+        "pattern": "repeats\\s*:\\s*(?:19|20)\\b"
+      }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:flaky\": \"vitest run --repeats=20\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      {
+        "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:flaky\": \"vitest run --config vitest.flaky.config.js\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n",
+        "vitest.flaky.config.js": "import { defineConfig } from 'vitest/config';\n\nexport default defineConfig({ test: { repeats: 20 } });\n"
+      },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:flaky\": \"vitest run --repeats 19\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      {
+        "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:flaky\": \"vitest run -c vitest.repeat.config.ts\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n",
+        "vitest.repeat.config.ts": "import { defineConfig } from 'vitest/config';\n\nexport default defineConfig({ test: { repeats: 19 } });\n"
+      }
+    ],
+    "wrong": [
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:flaky\": \"vitest run --retry=20\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:flaky\": \"vitest run --repeats=2\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"test:flaky\": \"node scripts/run-20-times.mjs\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" }
+    ]
+  },
+  "trap": "Vitest 4 had only a per-test repeats option (or --retry, which stops at the first pass), so the stale answer edits tests, loops over runs, or uses --retry; Vitest 5 adds a global --repeats option (--repeats N runs each test N+1 times, so 19 and 20 are both accepted)."
+}

@@ -1,0 +1,25 @@
+{
+  "id": "wrangler-4-129-1-9-c",
+  "change": "wrangler-4-129-1-9",
+  "library": "wrangler",
+  "prompt": "Our CI builds the Worker with `npm run build`, which leaves the bundle in dist/index.js. Write scripts/check-size.mjs for CI to run right after the build: it must exit with code 1 when the bundle is too big for Cloudflare to accept a deploy on our plan (Workers Free), and otherwise print the bundle size and how much headroom is left. Add it to package.json as the `check-size` script. Plain Node, no new dependencies.",
+  "correct": [
+    [
+      { "files": ["scripts/check-size.mjs", "scripts/check-size.js", "scripts/check-size.ts", "scripts/check-size.cjs"], "pattern": "67108864|67_108_864|\\b64\\s*\\*\\s*1024\\s*\\*\\s*1024|\\b64\\s*\\*\\s*1_?048_?576|\\b64\\s*\\*\\s*\\(?\\s*1024\\s*\\*\\*\\s*2|\\b64\\s*\\*\\s*2\\s*\\*\\*\\s*20|\\b64\\s*<<\\s*20|1024\\s*\\*\\s*1024\\s*\\*\\s*64\\b|\\b64\\s*\\*\\s*[a-z_]*(mib|mb|mega)\\w*|\\b64_?000_?000\\b|\\b64e6\\b|(limit|max)\\w*\\s*=\\s*64\\b|\\b64\\s*\\*\\s*[a-z_]*kib\\w*\\s*\\*\\s*[a-z_]*kib\\w*", "flags": "i" },
+      { "files": ["scripts/check-size.mjs", "scripts/check-size.js", "scripts/check-size.ts", "scripts/check-size.cjs"], "pattern": "\\b(3|10)\\s*\\*\\s*1024\\s*\\*\\s*1024|1024\\s*\\*\\s*1024\\s*\\*\\s*(3|10)\\b|\\b(3145728|10485760|3_145_728|10_485_760)\\b|\\b(3|10)\\s*\\*\\s*1_?048_?576|\\b(3|10)\\s*\\*\\s*[a-z_]*(mib|mb|mega)\\w*|\\b(3|10)_?000_?000\\b|\\b(3|10)e6\\b|(limit|max)\\w*\\s*=\\s*(3|10)\\b|\\b(3|10)\\s*\\*\\s*[a-z_]*kib\\w*\\s*\\*\\s*[a-z_]*kib\\w*", "flags": "i", "absent": true }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { "scripts/check-size.mjs": "import { statSync } from \"node:fs\";\n\nconst LIMIT = 64 * 1024 * 1024; // Workers: 64 MiB uncompressed\nconst size = statSync(\"dist/index.js\").size;\nconst mib = (n) => (n / 1024 / 1024).toFixed(2);\nif (size > LIMIT) {\n  console.error(`Bundle is ${mib(size)} MiB, over the ${mib(LIMIT)} MiB limit.`);\n  process.exit(1);\n}\nconsole.log(`Bundle: ${mib(size)} MiB, headroom ${mib(LIMIT - size)} MiB.`);\n" },
+      { "scripts/check-size.mjs": "import { readFileSync } from \"node:fs\";\nimport { gzipSync } from \"node:zlib\";\n\nconst MiB = 1048576;\nconst MAX_UNCOMPRESSED = 64 * MiB;\nconst bundle = readFileSync(\"dist/index.js\");\nconsole.log(`gzip (for reference): ${(gzipSync(bundle).length / MiB).toFixed(2)} MiB`);\nif (bundle.length > MAX_UNCOMPRESSED) process.exit(1);\nconsole.log(`size ${(bundle.length / MiB).toFixed(2)} MiB, ${((MAX_UNCOMPRESSED - bundle.length) / MiB).toFixed(2)} MiB left`);\n" },
+      { "scripts/check-size.mjs": "import { statSync } from \"node:fs\";\n\nconst KIB = 1024;\nconst UNCOMPRESSED_CAP = 64 * KIB * KIB;\nconst size = statSync(\"dist/index.js\").size;\nif (size > UNCOMPRESSED_CAP) process.exit(1);\nconsole.log(`${size} bytes, ${UNCOMPRESSED_CAP - size} bytes left`);\n" }
+    ],
+    "wrong": [
+      { "scripts/check-size.mjs": "import { readFileSync } from \"node:fs\";\nimport { gzipSync } from \"node:zlib\";\n\nconst KIB = 1024;\nconst CAP = 3 * KIB * KIB;\nconst gz = gzipSync(readFileSync(\"dist/index.js\")).length;\nif (gz > CAP) process.exit(1);\nconsole.log(`${gz} of ${CAP} bytes compressed`);\n" },
+      { "scripts/check-size.mjs": "import { readFileSync } from \"node:fs\";\nimport { gzipSync } from \"node:zlib\";\n\nconst LIMIT = 3 * 1024 * 1024; // Free plan: 3 MiB after gzip\nconst gz = gzipSync(readFileSync(\"dist/index.js\")).length;\nif (gz > LIMIT) {\n  console.error(`Compressed bundle ${gz} bytes is over ${LIMIT}`);\n  process.exit(1);\n}\nconsole.log(`Compressed: ${gz} bytes, headroom ${LIMIT - gz} bytes`);\n" },
+      { "scripts/check-size.mjs": "import { readFileSync } from \"node:fs\";\nimport { gzipSync } from \"node:zlib\";\n\nconst MiB = 1024 * 1024;\nconst bundle = readFileSync(\"dist/index.js\");\nconst checks = [[\"compressed\", gzipSync(bundle).length, 3 * MiB], [\"uncompressed\", bundle.length, 64 * MiB]];\nfor (const [what, size, max] of checks) if (size > max) process.exit(1);\n" }
+    ]
+  },
+  "trap": "Workers now have one 64 MiB limit on the uncompressed bundle and no compressed limit; believing the Free plan caps the gzipped bundle at 3 MiB, the stale script fails CI on bundles Cloudflare would accept."
+}

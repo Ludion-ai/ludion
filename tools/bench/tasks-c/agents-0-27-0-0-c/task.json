@@ -1,0 +1,199 @@
+{
+  "id": "agents-0-27-0-0-c",
+  "change": "agents-0-27-0-0",
+  "library": "agents",
+  "prompt": "Our users want to talk to the Chat agent from Slack as well as over the WebSocket. Add Slack support using the Slack channel integration that ships with the agents package (no other Slack SDK). The Slack app's signing secret and bot token are in env.SLACK_SIGNING_SECRET and env.SLACK_BOT_TOKEN, and Slack will post its events to /webhooks/slack. Put the code under src/ and update wrangler.jsonc if anything is needed there.",
+  "correct": [
+    [
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ],
+    [
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/experimental/channels(?:/[\\w-]+)*[\"'`]" },
+      { "files": ["src/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/agent.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/chat.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-channel.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/slack-gateway.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/slack.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/channels/index.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true },
+      { "files": ["src/webhooks.js"], "pattern": "[\"'`]agents/channels(?:/[\\w-]+)*[\"'`]", "absent": true }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { ChannelGateway } from 'agents/experimental/channels';\nimport { slack } from 'agents/experimental/channels/slack';\n\nexport class Chat extends Agent {\n  async onMessage(connection, message) {\n    connection.send(`echo: ${message}`);\n  }\n  receive(event, origin) {\n    return this.channels.receive(event, origin);\n  }\n}\n\nexport default {\n  async fetch(request, env) {\n    const gateway = new ChannelGateway({\n      agent: (route) => env.Chat.getByName(route),\n      channels: {\n        slack: slack({\n          botToken: env.SLACK_BOT_TOKEN,\n          webhook: { signingSecret: env.SLACK_SIGNING_SECRET, path: '/webhooks/slack' },\n          participant: (event) => event.actor?.id ?? null,\n        }),\n      },\n    });\n    return (await gateway.fetch(request)) ?? (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/slack.js": "import { slack } from \"agents/experimental/channels/slack\";\n\nexport function slackChannel(env) {\n  return slack({ botToken: env.SLACK_BOT_TOKEN, webhook: { signingSecret: env.SLACK_SIGNING_SECRET } });\n}\n",
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { ChannelGateway } from 'agents/experimental/channels';\nimport { slackChannel } from './slack.js';\n\nexport class Chat extends Agent {}\n\nexport default {\n  async fetch(request, env) {\n    const gateway = new ChannelGateway({ agent: (r) => env.Chat.getByName(r), channels: { slack: slackChannel(env) } });\n    return (await gateway.fetch(request)) ?? (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/channels/slack.js": "import { ChannelGateway } from 'agents/experimental/channels';\nimport { slack } from 'agents/experimental/channels/slack';\nexport const makeGateway = (env) => new ChannelGateway({ agent: (r) => env.Chat.getByName(r), channels: { slack: slack({ botToken: env.SLACK_BOT_TOKEN, webhook: { signingSecret: env.SLACK_SIGNING_SECRET } }) } });\n",
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { makeGateway } from './channels/slack.js';\nexport class Chat extends Agent {}\nexport default {\n  async fetch(request, env) {\n    return (await makeGateway(env).fetch(request)) ?? (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/webhooks.js": "import { slack } from 'agents/experimental/channels/slack';\nexport const slackChannel = (env) => slack({ botToken: env.SLACK_BOT_TOKEN, webhook: { signingSecret: env.SLACK_SIGNING_SECRET, path: '/webhooks/slack' } });\n",
+        "src/index.js": "import { Agent } from 'agents';\nimport { slackChannel } from './webhooks.js';\nexport class Chat extends Agent {}\n"
+      }
+    ],
+    "wrong": [
+      {
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { ChannelGateway } from 'agents/channels';\nimport { slack } from 'agents/channels/slack';\n\nexport class Chat extends Agent {}\n\nexport default {\n  async fetch(request, env) {\n    const gateway = new ChannelGateway({ agent: (r) => env.Chat.getByName(r), channels: { slack: slack({ botToken: env.SLACK_BOT_TOKEN, webhook: { signingSecret: env.SLACK_SIGNING_SECRET } }) } });\n    return (await gateway.fetch(request)) ?? (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/slack.js": "import { slack } from 'agents/channels/slack';\nexport const make = (env) => slack({ botToken: env.SLACK_BOT_TOKEN });\n",
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { ChannelGateway } from 'agents/experimental/channels';\nimport { make } from './slack.js';\nexport class Chat extends Agent {}\n"
+      },
+      {
+        "src/channels/index.js": "import { ChannelGateway } from 'agents/channels';\nimport { slack } from 'agents/channels/slack';\nexport const makeGateway = (env) => new ChannelGateway({ agent: (r) => env.Chat.getByName(r), channels: { slack: slack({ botToken: env.SLACK_BOT_TOKEN }) } });\n",
+        "src/index.js": "import { Agent } from 'agents';\nimport { makeGateway } from './channels/index.js';\nexport class Chat extends Agent {}\n"
+      },
+      {
+        "src/slack-gateway.js": "import { slack } from 'agents/channels/slack';\nexport const s = (env) => slack({ botToken: env.SLACK_BOT_TOKEN });\n",
+        "src/slack-channel.js": "import { ChannelGateway } from 'agents/experimental/channels';\nexport { ChannelGateway };\n"
+      }
+    ]
+  },
+  "trap": "Believing Channels still lives at `agents/channels` gives an import that no longer resolves; in 0.27 it is exported only under `agents/experimental/channels` (Slack at `agents/experimental/channels/slack`)."
+}

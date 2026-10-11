@@ -1,0 +1,16 @@
+{
+  "name": "bench-agent",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "vars": { "TOOLS_MCP_URL": "https://tools.example.com/mcp" },
+  "durable_objects": {
+    "bindings": [
+      { "name": "Chat", "class_name": "Chat" },
+      { "name": "ToolGateway", "class_name": "ToolGateway" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Chat"] },
+    { "tag": "v2", "new_sqlite_classes": ["ToolGateway"] }
+  ]
+}

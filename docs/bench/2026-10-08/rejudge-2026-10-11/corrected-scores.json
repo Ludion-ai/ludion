@@ -1,0 +1,30 @@
+{
+  "A-none": {
+    "wrangler": "0/15",
+    "agents": "2/15",
+    "vitest": "1/15",
+    "all": "3/45"
+  },
+  "A-web": {
+    "wrangler": "6/15",
+    "agents": "10/15",
+    "vitest": "4/15",
+    "all": "20/45"
+  },
+  "B-none": {
+    "vitest": "2/10",
+    "all": "2/10"
+  },
+  "B-web": {
+    "vitest": "4/10",
+    "all": "4/10"
+  },
+  "B-none-drafts": {
+    "vitest": "9/10",
+    "all": "9/10"
+  },
+  "B-web-drafts": {
+    "vitest": "9/10",
+    "all": "9/10"
+  }
+}

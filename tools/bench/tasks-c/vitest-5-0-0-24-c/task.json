@@ -1,0 +1,24 @@
+{
+  "id": "vitest-5-0-0-24-c",
+  "change": "vitest-5-0-0-24",
+  "library": "vitest",
+  "prompt": "Our test dashboard needs a list of every test in this project, with each test's name exactly as the Vitest reporter shows it. Add an npm script list-tests to package.json that writes that list as JSON to tests.json, without executing any test (collecting them is fine).",
+  "correct": [
+    [
+      { "files": ["package.json"], "pattern": "\"list-tests\"\\s*:\\s*\"[^\\n]*\\bvitest\\s+list\\b[^\\n]*(?:--no-static-?[pP]arse\\b|--static-?[pP]arse(?:=|\\s+)false)" },
+      { "files": ["package.json"], "pattern": "\"list-tests\"\\s*:\\s*\"[^\\n]*--json" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"list-tests\": \"vitest list --no-static-parse --json=tests.json\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"list-tests\": \"vitest list --json tests.json --staticParse=false\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" }
+    ],
+    "wrong": [
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"list-tests\": \"vitest list --json=tests.json\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"list-tests\": \"vitest list --static-parse --json=tests.json\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-vitest\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"vitest run\",\n    \"list-tests\": \"vitest run --reporter=json --outputFile=tests.json\"\n  },\n  \"devDependencies\": { \"vitest\": \"5.0.3\" }\n}\n" }
+    ]
+  },
+  "trap": "Vitest 4's vitest list ran the test files to collect tests, so the names generated in the tax-cases loop came out right; Vitest 5 parses files statically by default and lists the loop's test under its unevaluated template, unless --no-static-parse is passed."
+}

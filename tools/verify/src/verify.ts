@@ -1,4 +1,4 @@
-import { activeSet, checkSource, claimOf, formatLesson, isV1, quotesMissingSymbol, subjectFor, ungroundedWords, validateLesson, type FetchFn, type Lesson, type LessonValidator } from "@ludion/core";
+import { activeSet, checkSource, claimOf, formatLesson, isV1, lessonProblems, validateLesson, type FetchFn, type Lesson, type LessonValidator } from "@ludion/core";
 import { interpretRun, type RunFn } from "./docker.ts";
 
 export type Status = "passed" | "failed" | "skipped";
@@ -83,18 +83,9 @@ export async function verifyLesson(file: LessonFile, ctx: VerifyContext): Promis
   if (file.path !== expected && !file.path.endsWith(`/${expected}`)) {
     fail(`The file must be at ${expected} (subject and id decide the path), not ${file.path}.`);
   }
-  if (isV1(lesson) && lesson.subject !== subjectFor(lesson.package)) {
-    fail(`The subject for package ${lesson.package.name} is ${subjectFor(lesson.package)}, not ${lesson.subject}.`);
-  }
 
-  // 3. Format 1: the only free text is grounded, and sources state the fact by naming the symbol.
-  if (isV1(lesson)) {
-    const words = ungroundedWords(lesson);
-    if (words.length) fail(`The detail uses words the evidence doesn't contain: ${words.join(", ")}. Use the evidence's own words, or leave the detail out.`);
-    for (const quote of quotesMissingSymbol(lesson)) {
-      fail(`The quote "${quote.slice(0, 80)}" doesn't name ${lesson.symbol}. Quote a sentence that states the fact itself, not a headline.`);
-    }
-  }
+  // 3. Format 1: what the schema can't say (subject, range, grounded detail, quotes that name the symbol).
+  if (isV1(lesson)) for (const p of lessonProblems(lesson)) fail(p);
 
   // 4. replaces must name lessons in the active set on main.
   if (lesson.replaces?.length) {

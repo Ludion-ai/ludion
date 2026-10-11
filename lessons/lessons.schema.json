@@ -205,6 +205,11 @@
             "pattern": "\\b(?:[Ii][Gg][Nn][Oo][Rr][Ee]|[Dd][Ii][Ss][Rr][Ee][Gg][Aa][Rr][Dd]|[Ff][Oo][Rr][Gg][Ee][Tt]|[Oo][Vv][Ee][Rr][Rr][Ii][Dd][Ee])\\s+(?:(?:[Aa][Ll][Ll]|[Aa][Nn][Yy]|[Tt][Hh][Ee]|[Yy][Oo][Uu][Rr])\\s+)*(?:[Pp][Rr][Ee][Vv][Ii][Oo][Uu][Ss]|[Pp][Rr][Ii][Oo][Rr]|[Aa][Bb][Oo][Vv][Ee]|[Ee][Aa][Rr][Ll][Ii][Ee][Rr]|[Pp][Rr][Ee][Cc][Ee][Dd][Ii][Nn][Gg]|[Oo][Tt][Hh][Ee][Rr])\\s+(?:[Ii][Nn][Ss][Tt][Rr][Uu][Cc][Tt][Ii][Oo][Nn][Ss]|[Ii][Nn][Ss][Tt][Rr][Uu][Cc][Tt][Ii][Oo][Nn]|[Pp][Rr][Oo][Mm][Pp][Tt][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Mm][Ee][Ss][Ss][Aa][Gg][Ee][Ss]|[Rr][Uu][Ll][Ee][Ss]|[Dd][Ii][Rr][Ee][Cc][Tt][Ii][Oo][Nn][Ss])|^\\s*(?:[Ss][Yy][Ss][Tt][Ee][Mm]|[Aa][Ss][Ss][Ii][Ss][Tt][Aa][Nn][Tt]|[Uu][Ss][Ee][Rr]|[Dd][Ee][Vv][Ee][Ll][Oo][Pp][Ee][Rr]|[Hh][Uu][Mm][Aa][Nn])\\s*:|\\b[Yy][Oo][Uu]\\s+[Aa][Rr][Ee]\\s+(?:(?:[Aa][Nn]|[Aa])\\s+)?(?:[Aa][Ii]|[Aa][Ss][Ss][Ii][Ss][Tt][Aa][Nn][Tt]|[Ll][Aa][Nn][Gg][Uu][Aa][Gg][Ee] [Mm][Oo][Dd][Ee][Ll]|[Ll][Ll][Mm]|[Cc][Hh][Aa][Tt][Bb][Oo][Tt]|[Ll][Aa][Rr][Gg][Ee] [Ll][Aa][Nn][Gg][Uu][Aa][Gg][Ee] [Mm][Oo][Dd][Ee][Ll])\\b|\\b(?:[Dd][Oo] [Nn][Oo][Tt]|[Dd][Oo][Nn]'[Tt]|[Dd][Oo][Nn]’[Tt]|[Nn][Ee][Vv][Ee][Rr])\\s+(?:[Tt][Ee][Ll][Ll]|[Ii][Nn][Ff][Oo][Rr][Mm]|[Mm][Ee][Nn][Tt][Ii][Oo][Nn]|[Rr][Ee][Vv][Ee][Aa][Ll]|[Ss][Hh][Oo][Ww]|[Ss][Aa][Yy])\\s+(?:(?:[Tt][Hh][Ii][Ss]|[Ii][Tt]|[Aa][Nn][Yy][Tt][Hh][Ii][Nn][Gg])\\s+)?(?:(?:[Tt][Oo])\\s+)?[Tt][Hh][Ee]\\s+(?:[Uu][Ss][Ee][Rr]|[Hh][Uu][Mm][Aa][Nn]|[Rr][Ee][Aa][Dd][Ee][Rr])|\\b(?:[Aa][Ii]|[Aa][Ss][Ss][Ii][Ss][Tt][Aa][Nn][Tt]|[Aa][Ss][Ss][Ii][Ss][Tt][Aa][Nn][Tt][Ss]|[Mm][Oo][Dd][Ee][Ll]|[Mm][Oo][Dd][Ee][Ll][Ss]|[Ll][Ll][Mm]|[Ll][Ll][Mm][Ss])\\s+(?:[Rr][Ee][Aa][Dd][Ii][Nn][Gg]|[Tt][Hh][Aa][Tt] [Rr][Ee][Aa][Dd][Ss]|[Ww][Hh][Oo] [Rr][Ee][Aa][Dd][Ss])\\s+[Tt][Hh][Ii][Ss]|\\b(?:[Nn][Ee][Ww]|[Uu][Pp][Dd][Aa][Tt][Ee][Dd])\\s+(?:[Ii][Nn][Ss][Tt][Rr][Uu][Cc][Tt][Ii][Oo][Nn][Ss]|[Ss][Yy][Ss][Tt][Ee][Mm] [Pp][Rr][Oo][Mm][Pp][Tt])\\s*:"
           },
           "description": "No instructions to an AI or the reader."
+        },
+        {
+          "type": "string",
+          "pattern": "^[\\x20-\\x3B=\\x3F-\\x5F\\x61-\\x7E]*$",
+          "description": "Printable ASCII only, without backticks or angle brackets: lookalike characters would slip past the guards above, and markup would reach the generated claim."
         }
       ]
     },

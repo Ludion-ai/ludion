@@ -160,7 +160,7 @@ describe("verifyLesson, format 1", () => {
   it("fails a detail with words the evidence doesn't contain", async () => {
     const r = await verifyLesson(file(v1({ detail: "toHaveTextContent is dangerous now" })), c());
     expect(r.status).toBe("failed");
-    expect(r.reasons).toEqual([expect.stringContaining("The detail uses words the evidence doesn't contain: dangerou")]);
+    expect(r.reasons).toEqual([expect.stringContaining("The detail uses words no source quote contains: dangerou")]);
   });
 
   it("fails a quote that doesn't name the symbol, and a subject that doesn't match the package", async () => {

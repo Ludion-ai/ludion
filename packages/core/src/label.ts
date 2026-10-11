@@ -4,25 +4,49 @@ import { isV1 } from "./types.ts";
 
 type Test = TestEvidence["test"];
 
-/** The version of the lesson's own package that a test pins: from `packages`, or from the runtime for node and python. */
-export function pinnedVersion(test: Test, pkg: LessonV1["package"]): string | undefined {
-  const raw = pkg.ecosystem === "runtime" ? (test.runtime.startsWith(`${pkg.name}@`) ? test.runtime.slice(pkg.name.length + 1) : undefined) : test.packages?.[pkg.name];
-  return raw == null ? undefined : (semver.valid(raw) ?? semver.coerce(raw)?.version ?? undefined);
+const language = (runtime: string) => runtime.split("@")[0];
+
+/**
+ * Whether a test's pin of the lesson's own package is inside `versions`: true, false, or undefined when it can't say.
+ * npm and pypi pins are exact versions, and count only on a runtime of the matching language (node for npm, python
+ * for pypi). A runtime pin (node@22, python@3.12) names a whole release line, so it counts only when the entire line
+ * is inside or outside the range: node@22 against >=22.3.0 says nothing.
+ */
+export function pinInRange(test: Test, lesson: Pick<LessonV1, "package" | "versions">): boolean | undefined {
+  const { ecosystem, name } = lesson.package;
+  const sat = (v: string) => semver.satisfies(v, lesson.versions, { includePrerelease: false });
+  if (ecosystem === "runtime") {
+    if (language(test.runtime) !== name) return undefined;
+    const line = test.runtime.slice(name.length + 1);
+    const parts = line.split(".");
+    const low = semver.coerce(line)?.version;
+    if (!low) return undefined;
+    const high = parts.length === 1 ? `${parts[0]}.999999.999999` : `${parts[0]}.${parts[1]}.999999`;
+    const lo = sat(low);
+    return lo === sat(high) ? lo : undefined;
+  }
+  if ((ecosystem === "npm" && language(test.runtime) !== "node") || (ecosystem === "pypi" && language(test.runtime) !== "python")) return undefined;
+  const pinned = test.packages?.[name];
+  return pinned != null && semver.valid(pinned) ? sat(pinned) : undefined;
+}
+
+/** Everything a test pins apart from the lesson's own package: these must be the same on both sides of a pair. */
+function otherPins(test: Test, lesson: LessonV1): string {
+  const others = Object.entries(test.packages ?? {}).filter(([n]) => !(lesson.package.ecosystem !== "runtime" && n === lesson.package.name));
+  others.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  return JSON.stringify([lesson.package.ecosystem === "runtime" ? language(test.runtime) : test.runtime, others]);
 }
 
 /**
- * A differential pair: the same code passes on a pinned version of the lesson's package inside `versions` and fails
- * as expected on a pinned version outside it. Only then does the label say "across versions".
+ * A differential pair: the same code, on the same runtime with the same other pins, passes on a version of the
+ * lesson's own package inside `versions` and fails as expected on a version outside it. Only the lesson's package
+ * differs, so the difference is the change the lesson names. Only then does the label say "across versions".
  */
 export function isDifferential(lesson: LessonV1): boolean {
   const tests = lesson.evidence.flatMap((e) => ("test" in e ? [e.test] : []));
-  const inRange = (t: Test) => {
-    const v = pinnedVersion(t, lesson.package);
-    return v == null ? undefined : semver.satisfies(v, lesson.versions, { includePrerelease: true });
-  };
-  const pass = tests.filter((t) => (t.expect ?? "pass") === "pass" && inRange(t) === true);
-  const fail = tests.filter((t) => t.expect === "fail" && inRange(t) === false);
-  return pass.some((p) => fail.some((f) => f.code === p.code));
+  const pass = tests.filter((t) => (t.expect ?? "pass") === "pass" && pinInRange(t, lesson) === true);
+  const fail = tests.filter((t) => t.expect === "fail" && pinInRange(t, lesson) === false);
+  return pass.some((p) => fail.some((f) => f.code === p.code && otherPins(f, lesson) === otherPins(p, lesson)));
 }
 
 /**

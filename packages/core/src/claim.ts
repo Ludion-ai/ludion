@@ -1,6 +1,7 @@
 // Format 1 lessons have no free-written claim. The sentence assistants read is generated from the structured
 // fields; the only free text is `detail`, and every meaningful word in it must appear in the evidence (CLAUDE.md,
 // "Claims are generated, not written").
+import semver from "semver";
 import { stem, tokenize } from "./search.ts";
 import type { Lesson, LessonV1 } from "./types.ts";
 import { isV1 } from "./types.ts";
@@ -82,4 +83,21 @@ const normalize = (s: string) => s.normalize("NFKC").toLowerCase().replace(/[`'"
 export function quotesMissingSymbol(l: LessonV1): string[] {
   const symbol = normalize(l.symbol);
   return l.evidence.flatMap((e) => ("source" in e && !normalize(e.source.quote).includes(symbol) ? [e.source.quote] : []));
+}
+
+/**
+ * What the schema can't say about a format 1 lesson, in plain words: the subject matches the package, `versions` is a
+ * real semver range, the detail is grounded, and every source quote names the symbol. `verify` and `ludion teach`
+ * both run these. Empty when the lesson is fine.
+ */
+export function lessonProblems(l: LessonV1): string[] {
+  const problems: string[] = [];
+  if (l.subject !== subjectFor(l.package)) problems.push(`The subject for package ${l.package.name} is ${subjectFor(l.package)}, not ${l.subject}.`);
+  const range = semver.validRange(l.versions);
+  // A range that means every version (*, x, ||||) can't describe a change, and empty || alternatives are a typo.
+  if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
+  const words = ungroundedWords(l);
+  if (words.length) problems.push(`The detail uses words no source quote contains: ${words.join(", ")}. Use the quotes' own words, or leave the detail out.`);
+  for (const quote of quotesMissingSymbol(l)) problems.push(`The quote "${quote.slice(0, 80)}" doesn't name ${l.symbol}. Quote a sentence that states the fact itself, not a headline.`);
+  return problems;
 }

@@ -12,11 +12,16 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - The site's design samples include a format 1 lesson, and `test` builds them, so a page that only handles format 0 fails CI.
 - **The claim is generated** (`packages/core` `generateClaim`): `<package> <versions> <removed|renamed … to|deprecated|added|changed the default of|changed what> \`<symbol>\` [; use \`<replacement>\` instead]. <Detail.> [Silent: code written for older versions still runs, without an error.]`. Same fields, same sentence. The index's `claim` holds it, so search, the site, and `ludion_ask` need no special case.
 - **`symbol` and `replacement`** look like code: up to 6 space-separated tokens of identifier, path, flag, and call characters; no quotes, backticks, or angle brackets; and the same text guards as `detail`. Backticks are also stripped when the claim is built, so no field can end a code span early. This came from a security review: these fields go into the sentence assistants read.
-- **`detail`**: at most 160 characters. The text guards come from #21: no invisible characters, URLs, command lines, or instructions to an AI.
+- **`detail`**: at most 160 characters, **printable ASCII only, without backticks or angle brackets**. The text guards come from #21: no invisible characters, URLs, command lines, or instructions to an AI. ASCII-only means lookalike characters (fullwidth letters, for example) can't slip past those guards, and no markup reaches the generated claim. Lessons are written in English.
   - It must be **grounded**: every meaningful word, lightly stemmed, must appear in a **source quote** or in the fields (package, versions, symbol, replacement).
   - Only articles, basic prepositions, and forms of "be" are ignored. Negations (not, no, never, without), comparatives (only, more, before, after), modals, and numbers all count, so a detail can't say the opposite of its quote.
   - Test code and expected errors don't ground anything: the teacher writes them, so they would ground any word. A lesson whose only evidence is tests can still have a detail made of its fields' words; anything more needs a source.
   - `verify` fails a detail that isn't grounded and names the missing words.
+- **What the schema can't say** is checked by `lessonProblems` in `packages/core`, which `verify` and `ludion teach` both run:
+  - the subject matches the package;
+  - `versions` is a real range: `semver.validRange` accepts it, it doesn't mean every version (`*`, `x`, `||||`), and it has no empty `||` alternatives;
+  - the detail is grounded;
+  - every quote names the symbol.
 - **Evidence** is a test or a source.
   - **Test**: `{runtime, packages?, code, expect?, error?}`.
     - `runtime` is one of `node@18`/`20`/`22`/`24` or `python@3.9`–`3.14`.
@@ -24,7 +29,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
     - `expect: fail` needs `error`, and `error` goes only with it.
   - **Source**: `{url, quote}`. The quote is 40 to 300 characters, so a sentence rather than a headline, and **must name the symbol**, which `verify` checks; together that is how "states the fact itself" is enforced by machine.
 - **Labels**:
-  - `differential` (shown as "Verified across versions"): the **same code** passes on a pinned version of the lesson's own package **inside** `versions` and fails as expected on a pinned version **outside** it. The pin comes from `packages`, or from the runtime for a node or python lesson. Anything less is labeled `test`;
+  - `differential` (shown as "Verified across versions"): the **same code**, on the **same runtime with the same other pins**, passes on a version of the lesson's own package **inside** `versions` and fails as expected on a version **outside** it. So only the lesson's package differs. An npm pin counts only on a node runtime, and a pypi pin only on python. A runtime pin (node@22) names a whole release line, so it counts only when the entire line is inside or outside the range. Anything less is labeled `test`;
   - `test`: any test;
   - `source`: sources only;
   - `proof`: format 0 Lean runs.

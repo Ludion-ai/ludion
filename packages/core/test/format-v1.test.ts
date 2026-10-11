@@ -104,6 +104,11 @@ describe("the format 1 schema", () => {
     }
   });
 
+  it("allows a lone > in the detail (math > adds), but never <", () => {
+    expect(messages(lessonV1({ detail: "toHaveTextContent math > adds" }))).toEqual([]);
+    expect(messages(lessonV1({ detail: "toHaveTextContent < adds" }))).toEqual([expect.stringContaining("plain ASCII")]);
+  });
+
   it("refuses a protocol-relative link in the detail", () => {
     expect(messages(lessonV1({ detail: "see //evil.example/docs for toHaveTextContent" }))).toEqual([expect.stringContaining("Remove the link (//...)")]);
   });

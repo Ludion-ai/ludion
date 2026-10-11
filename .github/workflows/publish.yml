@@ -1,0 +1,98 @@
+# Stages a new ludion-ai version on npm for the owner to approve on npmjs.com (docs/decisions.md, "Publishing").
+# Run by hand, from main only. There is no npm token anywhere: the stage job proves itself to npm with GitHub's OIDC
+# token (npm trusted publishing), and `npm stage publish` holds the version until the owner approves it with their
+# passkey. Actions are pinned to commit SHAs.
+name: publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  # Installs, tests, and packs, with no way to publish: dependencies' install scripts never run next to an OIDC token.
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx vitest run packages/cli
+      - run: npm run build -w ludion-ai
+
+      - name: Pack
+        working-directory: packages/cli
+        run: |
+          npm pack
+          # The package is one bundled file: anything beyond these three files, a dependency, or an install script
+          # means the package changed shape, and a person should look before it goes out.
+          tar -tzf ludion-ai-*.tgz | sort > files.txt
+          printf 'package/README.md\npackage/dist/cli.js\npackage/package.json\n' | diff - files.txt
+          node -e '
+            const p = require("./package.json");
+            const scripts = Object.keys(p.scripts ?? {}).filter((s) => /^(pre|post)?install$|^prepare$/.test(s));
+            if (Object.keys(p.dependencies ?? {}).length || scripts.length) { console.error("Dependencies or install scripts found."); process.exit(1); }'
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: package
+          path: packages/cli/ludion-ai-*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  # Only this job can talk to npm. The `npm` environment allows main only, and npm's trusted publisher names this
+  # file and that environment.
+  stage:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .node-version
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          registry-url: https://registry.npmjs.org
+
+      - name: Check Node and npm (Node 22.14 or later, npm 11.15 or later)
+        run: |
+          node -e '
+            const [major, minor] = process.versions.node.split(".").map(Number);
+            const [nMajor, nMinor] = require("child_process").execSync("npm -v").toString().trim().split(".").map(Number);
+            const nodeOk = major > 22 || (major === 22 && minor >= 14);
+            const npmOk = nMajor > 11 || (nMajor === 11 && nMinor >= 15);
+            console.log(`node ${process.versions.node}, npm ${nMajor}.${nMinor}`);
+            if (!nodeOk || !npmOk) { console.error("Trusted publishing here needs Node 22.14+ and npm 11.15+."); process.exit(1); }'
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: package
+
+      # Staged, not published: the version appears on npm only after the owner approves it on npmjs.com.
+      - run: npm stage publish ./ludion-ai-*.tgz --access public

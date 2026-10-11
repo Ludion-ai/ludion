@@ -4,6 +4,15 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Publishing
+
+- **The package is `ludion-ai`** (see "The ludion CLI" below for why). 0.1.0 was published by hand from the owner's npm account `ludion`, approved with the owner's passkey. Every later version goes through `.github/workflows/publish.yml`.
+- **`publish.yml`** runs by hand (`workflow_dispatch`), from main only, in two jobs:
+  - `build` (`contents: read`, no secrets) installs, typechecks, runs the CLI tests, builds, and packs. It fails if the tarball holds anything but `README.md`, `dist/cli.js`, and `package.json`, or if the package gets dependencies or install scripts. Dependencies' install scripts run only here, never next to an OIDC token.
+  - `stage` (environment `npm`, `id-token: write`) downloads only the tarball and runs `npm stage publish`. It checks Node 22.14+ and npm 11.15+ first.
+- **Trusted publishing, staged**: npm trusts this repository's `publish.yml` in the `npm` environment (OIDC), so there is no npm token in the repo or in GitHub secrets. The trusted publisher allows only `npm stage publish`, not `npm publish`: a staged version goes out only after the owner approves it on npmjs.com. So a workflow run alone can never put a version on npm. Provenance is added automatically, because the repository is public.
+- The `npm` environment allows deployments from `main` only. After the first staged version is approved, the package's publishing access becomes "Require two-factor authentication and disallow tokens".
+
 ### 2026-10-11: Nightly reverify
 
 - **`reverify.yml`** runs at 04:23 UTC every night and by hand. It has two jobs, so lesson code never runs next to a write token:
@@ -61,7 +70,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ### 2026-10-11: The ludion CLI, index shards, and the v2 MCP tools
 
-- **Package**: `packages/cli`, published as **`ludion-ai`** on npm. **Not yet, and nothing tells users to run `npx ludion-ai` until it is**: until 0.1.0 is ours, `npx` could run an older or someone else's version with the user's `gh` signed in. This PR is held off `main` until the owner has published the package (npm trusted publishing is the owner's step). The root package is named `ludion-repo`, so the names don't clash.
+- **Package**: `packages/cli`, published as **`ludion-ai`** on npm. **Not yet, and nothing tells users to run `npx ludion-ai` until it is**: until 0.1.0 is ours, `npx` could run an older or someone else's version with the user's `gh` signed in. This PR is held off `main` until the owner has published the package (npm trusted publishing is the owner's step; see "Publishing"). The root package is named `ludion-repo`, so the names don't clash.
   - **Why `ludion-ai`, not `ludion`** (changed 2026-10-12): npm refused to publish `ludion` ("Package name too similar to existing package luxon"). `ludion-ai` already belonged to the owner's npm account `ludion`; its 0.0.x versions were an earlier, unrelated project, and 0.1.0 replaces them. It matches the domain, and it is unscoped, so `npx ludion-ai` stays short (npm suggested `@ludion/ludion`). The commands keep the name `ludion`: the package has two bins, `ludion` and `ludion-ai`, both `dist/cli.js`, so `npx ludion-ai` runs it and a global install gives `ludion`. Where CLAUDE.md says `npx ludion`, the command is `npx ludion-ai`.
   - `npm run build -w ludion-ai` bundles everything into one file, `dist/cli.js`, so the published package has no runtime dependencies.
   - It reuses `packages/core` and the Docker runner and guarded fetch from `tools/verify`.

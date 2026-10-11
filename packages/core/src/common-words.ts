@@ -62,7 +62,7 @@ const ENGLISH =
 const PROGRAMMING =
   "api app application argument array async attribute await backend binary bind binding boolean bool browser buffer bug " +
   "builtin byte cache callback checkout cli client clone code command commit compile compiler component config " +
-  "configuration connect connection console constant container cookie core crash database debug declare default delete " +
+  "configuration configure connect connection console constant container cookie core crash database debug declare default delete " +
   "dependency deploy deployment dev developer device directory disable doc docs documentation download element empty " +
   "enabled entry exception execute exit export expression extension fetch file filter flag folder format framework " +
   "frontend hash header heap host import index input insert insertion install installation instance integer interface " +

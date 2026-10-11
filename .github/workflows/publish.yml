@@ -30,11 +30,11 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
-          cache: npm
+          # No dependency cache: this job builds what gets shipped.
 
       - run: npm ci
       - run: npm run typecheck
-      - run: npx vitest run packages/cli
+      - run: npx vitest run --project node packages/cli
       - run: npm run build -w ludion-ai
 
       - name: Pack
@@ -43,8 +43,8 @@ jobs:
           npm pack
           # The package is one bundled file: anything beyond these three files, a dependency, or an install script
           # means the package changed shape, and a person should look before it goes out.
-          tar -tzf ludion-ai-*.tgz | sort > files.txt
-          printf 'package/README.md\npackage/dist/cli.js\npackage/package.json\n' | diff - files.txt
+          tar -tzf ludion-ai-*.tgz | LC_ALL=C sort > files.txt
+          printf 'package/README.md\npackage/dist/cli.js\npackage/package.json\n' | LC_ALL=C sort | diff - files.txt
           node -e '
             const p = require("./package.json");
             const scripts = Object.keys(p.scripts ?? {}).filter((s) => /^(pre|post)?install$|^prepare$/.test(s));
@@ -78,6 +78,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
+          # The newest release of the line, so its npm is new enough for staged publishing.
+          check-latest: true
           registry-url: https://registry.npmjs.org
 
       - name: Check Node and npm (Node 22.14 or later, npm 11.15 or later)

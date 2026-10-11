@@ -1,4 +1,4 @@
-// FreshBench v0 (bench.md). Two commands:
+// FreshBench v0 (docs/decisions.md). Two commands:
 //   run   <questions.json> <out dir> <label> --set A|B --condition none|web|ludion|project [--context <drafts.json>] [--only id,id] [--cap-usd N] [--spent-usd N]
 //         [--model <id>] (default opus); project condition: --projects <dir from projects.ts> [--sync <ludion cli> --ludion-home <dir> --offline true]
 //   judge <questions.json> <out dir> <label> [--cap-usd N]
@@ -40,7 +40,7 @@ const arg = (name: string, fallback?: string) => {
 };
 const readJson = <T>(path: string): T => JSON.parse(readFileSync(path, "utf8")) as T;
 
-/** Drafts shown to the agent the way ludion_ask shows lessons (worker.md, MCP), so the test measures the lessons. */
+/** Drafts shown to the agent the way ludion_ask shows lessons (docs/decisions.md, Search and MCP), so the test measures the lessons. */
 export function contextFor(drafts: Draft[], today = new Date().toISOString().slice(0, 10)): string {
   const blocks = drafts.map((d, i) =>
     [

@@ -1,0 +1,32 @@
+{
+  "id": "wrangler-4-113-0-21-c",
+  "change": "wrangler-4-113-0-21",
+  "library": "wrangler",
+  "prompt": "Cache the upstream responses in src/index.js in a Workers KV namespace bound as CACHE: look the path up first, and on a miss fetch from upstream and store the body for one hour. We don't have a KV namespace for this yet, and I don't want anyone to create one by hand or copy ids around: our CI just runs `npm run deploy` (plain `wrangler deploy`) and I'd like to keep it that way, so the next deploy should work as is.",
+  "correct": [
+    [
+      { "files": ["wrangler.jsonc"], "pattern": "\"kv_namespaces\"\\s*:\\s*\\[" },
+      { "files": ["wrangler.jsonc"], "pattern": "\\{(?:(?!\"id\"\\s*:)[^{}])*\"binding\"\\s*:\\s*\"CACHE\"(?:(?!\"id\"\\s*:)[^{}])*\\}" },
+      { "files": ["src/index.js"], "pattern": "env\\.CACHE\\b|\\{\\s*CACHE\\s*\\}" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"kv_namespaces\": [{ \"binding\": \"CACHE\" }]\n}\n",
+        "src/index.js": "const UPSTREAM = \"https://api.example.com\";\n\nexport default {\n  async fetch(request, env) {\n    const key = new URL(request.url).pathname;\n    const hit = await env.CACHE.get(key);\n    if (hit !== null) return new Response(hit);\n    const body = await (await fetch(UPSTREAM + key)).text();\n    await env.CACHE.put(key, body, { expirationTtl: 3600 });\n    return new Response(body);\n  },\n};\n"
+      }
+    ],
+    "wrong": [
+      {
+        "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"kv_namespaces\": [{ \"binding\": \"CACHE\", \"id\": \"<KV_NAMESPACE_ID>\" }]\n}\n",
+        "src/index.js": "export default {\n  async fetch(request, env) {\n    const key = new URL(request.url).pathname;\n    const hit = await env.CACHE.get(key);\n    return new Response(hit ?? \"miss\");\n  },\n};\n"
+      },
+      {
+        "wrangler.jsonc": "{\n  \"name\": \"bench-worker\",\n  \"main\": \"src/index.js\",\n  \"compatibility_date\": \"2026-10-01\",\n  \"kv_namespaces\": [\n    {\n      \"binding\": \"CACHE\",\n      \"id\": \"REPLACE_ME\",\n      \"preview_id\": \"REPLACE_ME\"\n    }\n  ]\n}\n",
+        "src/index.js": "export default { async fetch(request, env) { return new Response(await env.CACHE.get(\"x\")); } };\n"
+      }
+    ]
+  },
+  "trap": "Wrangler now provisions KV (and other) resources on `wrangler deploy` for bindings without an id; believing a KV binding needs an existing namespace id, the stale answer leaves a placeholder id that someone must create and paste in."
+}

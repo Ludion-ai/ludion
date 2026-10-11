@@ -1,0 +1,37 @@
+{
+  "id": "vitest-5-0-0-3-c",
+  "change": "vitest-5-0-0-3",
+  "library": "vitest",
+  "prompt": "Add a test to src/coupon.test.js that the expired coupon OLD5 is rejected with the \"Coupon expired\" error.",
+  "correct": [
+    [{ "files": ["src/coupon.test.js", "src/coupon.test.ts"], "pattern": "(?:await|return)\\s+expect\\(\\s*(?:(?:async\\s*)?\\(\\)\\s*=>\\s*)?applyCoupon\\([^)]*['\"]OLD5['\"]" }],
+    [{ "files": ["src/coupon.test.js", "src/coupon.test.ts"], "pattern": "=>\\s*expect\\(\\s*applyCoupon\\([^)]*['\"]OLD5['\"]" }],
+    [{ "files": ["src/coupon.test.js", "src/coupon.test.ts"], "pattern": "await\\s+applyCoupon\\([^)]*['\"]OLD5['\"]" }],
+    [{ "files": ["src/coupon.test.js", "src/coupon.test.ts"], "pattern": "\\b(\\w+)\\s*=\\s*applyCoupon\\([^)]*['\"]OLD5['\"][\\s\\S]*(?:await|return)\\s+expect\\(\\s*\\1\\s*\\)" }]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "src/coupon.test.js": "import { test, expect } from 'vitest';\nimport { applyCoupon } from './coupon.js';\n\ntest('SAVE10 takes 10% off', async () => {\n  await expect(applyCoupon(200, 'SAVE10')).resolves.toBe(180);\n});\n\ntest('codes are case-insensitive', async () => {\n  await expect(applyCoupon(200, 'save10')).resolves.toBe(180);\n});\n\ntest('unknown codes are rejected', async () => {\n  await expect(applyCoupon(200, 'NOPE')).rejects.toThrow('Unknown coupon');\n});\n\ntest('expired codes are rejected', async () => {\n  await expect(applyCoupon(200, 'OLD5')).rejects.toThrow('Coupon expired');\n});\n"
+      },
+      {
+        "src/coupon.test.js": "import { test, expect } from 'vitest';\nimport { applyCoupon } from './coupon.js';\n\ntest('SAVE10 takes 10% off', () => {\n  expect(applyCoupon(200, 'SAVE10')).resolves.toBe(180);\n});\n\ntest('expired codes are rejected', () => expect(applyCoupon(200, 'OLD5')).rejects.toThrow('Coupon expired'));\n"
+      },
+      {
+        "src/coupon.test.js": "import { test, expect } from 'vitest';\nimport { applyCoupon } from './coupon.js';\n\ntest('expired codes are rejected', async () => {\n  const result = applyCoupon(200, 'OLD5');\n  await expect(result).rejects.toThrow('Coupon expired');\n});\n"
+      },
+      {
+        "src/coupon.test.js": "import { test, expect } from 'vitest';\nimport { applyCoupon } from './coupon.js';\n\ntest('expired codes are rejected', async () => {\n  await expect(async () => applyCoupon(200, 'OLD5')).rejects.toThrow('Coupon expired');\n});\n"
+      }
+    ],
+    "wrong": [
+      {
+        "src/coupon.test.js": "import { test, expect } from 'vitest';\nimport { applyCoupon } from './coupon.js';\n\ntest('SAVE10 takes 10% off', () => {\n  expect(applyCoupon(200, 'SAVE10')).resolves.toBe(180);\n});\n\ntest('codes are case-insensitive', () => {\n  expect(applyCoupon(200, 'save10')).resolves.toBe(180);\n});\n\ntest('unknown codes are rejected', () => {\n  expect(applyCoupon(200, 'NOPE')).rejects.toThrow('Unknown coupon');\n});\n\ntest('expired codes are rejected', () => {\n  expect(applyCoupon(200, 'OLD5')).rejects.toThrow('Coupon expired');\n});\n"
+      },
+      {
+        "src/coupon.test.js": "import { test, expect } from 'vitest';\nimport { applyCoupon } from './coupon.js';\n\ntest('expired codes are rejected', async () => {\n  expect(async () => applyCoupon(200, 'OLD5')).rejects.toThrow('Coupon expired');\n});\n"
+      }
+    ]
+  },
+  "trap": "Following the file's existing tests leaves the new expect(...).rejects un-awaited, which Vitest 4 auto-awaited with a warning but Vitest 5 marks as a failed test."
+}

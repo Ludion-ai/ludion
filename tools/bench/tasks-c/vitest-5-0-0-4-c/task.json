@@ -1,0 +1,38 @@
+{
+  "id": "vitest-5-0-0-4-c",
+  "change": "vitest-5-0-0-4",
+  "library": "vitest",
+  "prompt": "packages/api has no test script yet. Add one to packages/api/package.json so that running `npm test` inside packages/api runs only the api package's tests, with the same setup the root run uses (the @shared alias and test/setup.ts). Running `npm test` from the repo root must keep working as it does now. Don't change the source or test files.",
+  "correct": [
+    [{ "files": ["packages/api/package.json"], "pattern": "\"test\"\\s*:\\s*\"[^\\n]*\\bvitest\\b[^\\n]*\\s(?:--config|-c)(?:=|\\s+)" }],
+    [
+      { "files": ["packages/api/package.json"], "pattern": "\"test\"\\s*:\\s*\"[^\\n]*\\bvitest\\b[^\\n]*--root(?:=|\\s+)\\S*\\.\\." },
+      { "files": ["packages/api/package.json"], "pattern": "\"test\"\\s*:\\s*\"[^\\n]*(?:packages/api|--project|\\s-p\\s|--dir)" }
+    ],
+    [
+      {
+        "files": ["packages/api/vitest.config.ts", "packages/api/vitest.config.mts", "packages/api/vitest.config.cts", "packages/api/vitest.config.js", "packages/api/vitest.config.mjs", "packages/api/vitest.config.cjs", "packages/api/vite.config.ts", "packages/api/vite.config.mts", "packages/api/vite.config.js", "packages/api/vite.config.mjs"],
+        "pattern": "@shared|mergeConfig|\\bextends\\b|vitest\\.config|setupFiles"
+      },
+      { "files": ["packages/api/package.json"], "pattern": "\"test\"\\s*:\\s*\"[^\\n]*\\bvitest\\b" }
+    ],
+    [{ "files": ["packages/api/package.json"], "pattern": "\"test\"\\s*:\\s*\"[^\\n]*\\bcd\\s+\\.\\./\\.\\.[^\\n]*packages/api" }],
+    [{ "files": ["packages/api/package.json"], "pattern": "\"test\"\\s*:\\s*\"[^\\n]*--prefix(?:=|\\s+)\\.\\./\\.\\.[^\\n]*packages/api" }]
+  ],
+  "examples": {
+    "correct": [
+      { "packages/api/package.json": "{\n  \"name\": \"@acme/api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": { \"test\": \"vitest run --config ../../vitest.config.ts --dir .\" }\n}\n" },
+      {
+        "packages/api/package.json": "{\n  \"name\": \"@acme/api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": { \"test\": \"vitest run\" }\n}\n",
+        "packages/api/vitest.config.ts": "import { defineConfig, mergeConfig } from \"vitest/config\";\nimport root from \"../../vitest.config\";\n\nexport default mergeConfig(root, defineConfig({ test: { include: [\"test/**/*.test.ts\"] } }));\n"
+      },
+      { "packages/api/package.json": "{\n  \"name\": \"@acme/api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"cd ../.. && vitest run packages/api\"\n  }\n}\n" },
+      { "packages/api/package.json": "{\n  \"name\": \"@acme/api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"cd ../.. && npm test -- packages/api\"\n  }\n}\n" }
+    ],
+    "wrong": [
+      { "packages/api/package.json": "{\n  \"name\": \"@acme/api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": { \"test\": \"vitest run\" }\n}\n" },
+      { "packages/api/package.json": "{\n  \"name\": \"@acme/api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": { \"test\": \"vitest run --dir test\" }\n}\n" }
+    ]
+  },
+  "trap": "Vitest 4 walked up to the root vitest.config.ts, so a plain `vitest run` script looked enough; Vitest 5 no longer searches parent directories and runs without the alias and setup file."
+}

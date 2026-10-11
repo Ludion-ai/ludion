@@ -1,0 +1,33 @@
+{
+  "id": "agents-0-24-0-5-c",
+  "change": "agents-0-24-0-5",
+  "library": "agents",
+  "prompt": "In src/index.js the `export` command blocks `onMessage` until `buildExport()` finishes, which can take a minute. Move the export into the agent's queue (`this.queue()`) so `onMessage` returns right away (reply `export started`). When the queued export finishes, send `export ready: <url>` to the WebSocket client that asked for it, and only to that client.",
+  "correct": [
+    [
+      { "files": ["src/index.js"], "pattern": "this\\.queue\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bgetConnections?\\s*(?:<[^>]*>)?\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\{[^}]*\\bconnection\\b[^}]*\\}\\s*=\\s*getCurrentAgent\\s*(?:<[^>]*>)?\\s*\\(", "absent": true },
+      { "files": ["src/index.js"], "pattern": "getCurrentAgent\\s*(?:<[^>]*>)?\\s*\\(\\s*\\)\\s*\\.\\s*connection", "absent": true }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\n\nasync function buildExport(agentName) {\n  return `https://exports.example.com/${agentName}.zip`;\n}\n\nexport class Chat extends Agent {\n  async onMessage(connection, message) {\n    if (message === 'export') {\n      await this.queue('runExport', { connectionId: connection.id });\n      connection.send('export started');\n      return;\n    }\n    connection.send(`echo: ${message}`);\n  }\n\n  async runExport({ connectionId }) {\n    const url = await buildExport(this.name);\n    this.getConnection(connectionId)?.send(`export ready: ${url}`);\n  }\n}\n\nexport default {\n  async fetch(request, env) {\n    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/index.js": "import { Agent } from 'agents';\nexport class Chat extends Agent {\n  async onMessage(connection, message) {\n    if (message === 'export') {\n      await this.queue('runExport', { requester: connection.id });\n      connection.send('export started');\n    }\n  }\n  async runExport(payload) {\n    const url = 'u';\n    for (const conn of this.getConnections()) {\n      if (conn.id === payload.requester) conn.send(`export ready: ${url}`);\n    }\n  }\n}\n"
+      }
+    ],
+    "wrong": [
+      {
+        "src/index.js": "import { Agent, getCurrentAgent, routeAgentRequest } from 'agents';\n\nasync function buildExport(agentName) {\n  return `https://exports.example.com/${agentName}.zip`;\n}\n\nexport class Chat extends Agent {\n  async onMessage(connection, message) {\n    if (message === 'export') {\n      await this.queue('runExport', {});\n      connection.send('export started');\n      return;\n    }\n    connection.send(`echo: ${message}`);\n  }\n\n  async runExport() {\n    const { connection } = getCurrentAgent();\n    const url = await buildExport(this.name);\n    connection?.send(`export ready: ${url}`);\n  }\n}\n\nexport default {\n  async fetch(request, env) {\n    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/index.js": "import { Agent, getCurrentAgent } from 'agents';\nexport class Chat extends Agent {\n  async onMessage(connection, message) {\n    if (message === 'export') { await this.queue('runExport', { id: connection.id }); connection.send('export started'); }\n  }\n  async runExport() {\n    getCurrentAgent().connection.send('export ready: u');\n    this.getConnections();\n  }\n}\n"
+      }
+    ]
+  },
+  "trap": "Queued callbacks run later from the alarm loop in a fresh invocation, so `getCurrentAgent()` there has no `connection`; the requester must be passed by id and looked up again (e.g. `this.getConnection(id)`)."
+}

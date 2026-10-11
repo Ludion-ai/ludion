@@ -1,0 +1,35 @@
+{
+  "id": "wrangler-4-124-0-4-c",
+  "change": "wrangler-4-124-0-4",
+  "library": "wrangler",
+  "prompt": "Change our GitHub Actions deploy (.github/workflows/deploy.yml) so that every production deploy uses the day of the deploy itself (today's date, UTC) as the Worker's compatibility date, instead of the date written in wrangler.jsonc. Leave wrangler.jsonc as it is; its date stays the default for local development.",
+  "correct": [
+    [
+      { "files": [".github/workflows/deploy.yml"], "pattern": "--compatibility-date[= ]+(?![\"']?\\d{4}-\\d\\d-\\d\\d)\\S" },
+      { "files": [".github/workflows/deploy.yml"], "pattern": "--latest\\b", "absent": true },
+      { "files": ["package.json"], "pattern": "--latest\\b", "absent": true }
+    ],
+    [
+      { "files": ["package.json"], "pattern": "--compatibility-date[= ]+(?![\"']?\\d{4}-\\d\\d-\\d\\d)\\S" },
+      { "files": [".github/workflows/deploy.yml"], "pattern": "--latest\\b", "absent": true },
+      { "files": ["package.json"], "pattern": "--latest\\b", "absent": true }
+    ],
+    [
+      { "files": [".github/workflows/deploy.yml"], "pattern": "compatibility_date[\\s\\S]*\\$\\(date|\\$\\(date[\\s\\S]*compatibility_date" },
+      { "files": [".github/workflows/deploy.yml"], "pattern": "--latest\\b", "absent": true },
+      { "files": ["package.json"], "pattern": "--latest\\b", "absent": true }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { ".github/workflows/deploy.yml": "name: Deploy\n\non:\n  push:\n    branches: [main]\n\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    environment: production\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 24\n      - run: npm ci\n      - name: Deploy the Worker\n        run: npx wrangler deploy --compatibility-date \"$(date -u +%Y-%m-%d)\"\n        env:\n          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}\n" },
+      { ".github/workflows/deploy.yml": "name: Deploy\non:\n  push:\n    branches: [main]\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm ci\n      - run: echo \"TODAY=$(date -u +%F)\" >> \"$GITHUB_ENV\"\n      - run: npx wrangler deploy --compatibility-date=${{ env.TODAY }}\n        env:\n          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n" },
+      { ".github/workflows/deploy.yml": "name: Deploy\non:\n  push:\n    branches: [main]\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm ci\n      - run: npm run deploy:prod\n        env:\n          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n", "package.json": "{\n  \"scripts\": {\n    \"deploy\": \"wrangler deploy\",\n    \"deploy:prod\": \"wrangler deploy --compatibility-date $(date -u +%F)\"\n  }\n}\n" }
+    ],
+    "wrong": [
+      { ".github/workflows/deploy.yml": "name: Deploy\n\non:\n  push:\n    branches: [main]\n\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    environment: production\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 24\n      - run: npm ci\n      - name: Deploy the Worker\n        run: npx wrangler deploy --latest\n        env:\n          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}\n" },
+      { ".github/workflows/deploy.yml": "name: Deploy\non:\n  push:\n    branches: [main]\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm ci\n      - run: npm run deploy:prod\n        env:\n          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n", "package.json": "{\n  \"scripts\": {\n    \"deploy\": \"wrangler deploy\",\n    \"deploy:prod\": \"wrangler deploy --latest\"\n  }\n}\n" }
+    ]
+  },
+  "trap": "wrangler deploy --latest now sets the compatibility date to the bundled workerd's release date (2026-10-06 in 4.148.0), not today's date, so a deploy job built on --latest does not use the day of the deploy."
+}

@@ -1,5 +1,7 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -227,6 +229,28 @@ describe("the Claude Code plugin", () => {
   it("adds the MCP server, and the marketplace points at the plugin folder", () => {
     expect(json("plugin/.claude-plugin/plugin.json").mcpServers).toEqual({ ludion: { type: "http", url: "https://ludion.ai/mcp" } });
     expect(json(".claude-plugin/marketplace.json").plugins).toEqual([expect.objectContaining({ name: "ludion", source: "./plugin" })]);
+  });
+});
+
+describe("sync exits cleanly after fetching", () => {
+  // process.exit() while fetch's sockets closed tripped a libuv assertion on Windows (exit 9 after a good sync).
+  it("exits 0 after reading the shards from a site", async () => {
+    const server = createServer((req, res) => {
+      const body = req.url === "/index/subjects.json" ? { built_at: "2026-10-11T00:00:00Z", subjects: { vitest: { lessons: 0 } } } : { built_at: "2026-10-11T00:00:00Z", subject: "vitest", lessons: [] };
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify(body));
+    }).listen(0, "127.0.0.1");
+    await new Promise((r) => server.once("listening", r));
+    const { port } = server.address() as AddressInfo;
+    const dir = tmp();
+    writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/vitest": { version: "5.0.3" } } }));
+    const child = spawn(process.execPath, [join(import.meta.dirname, "../src/cli.ts"), "sync", "--dir", dir], { env: { ...process.env, LUDION_SITE: `http://127.0.0.1:${port}`, LUDION_HOME: tmp() } });
+    let stdout = "";
+    child.stdout.on("data", (d) => (stdout += d));
+    const code = await new Promise((r) => child.on("close", r));
+    server.close();
+    expect(code).toBe(0);
+    expect(stdout).toContain("0 lessons for this project");
   });
 });
 

@@ -1,7 +1,7 @@
 # Nightly reverify (docs/decisions.md, "Nightly reverify"). Two jobs, so lesson code never runs next to a write token:
-# `check` runs every lesson on main as verify does (tests in Docker, network off; sources through the guarded fetch)
-# with a read-only token; `report` reads its results only, opens a retraction PR per confirmed failure, and starts a
-# deploy when the set of failing lessons changed, so failing lessons leave the index at once.
+# `check` runs the evidence of every active lesson on main (tests in Docker, network off; sources through the guarded
+# fetch) with a read-only token; `report` reads its results only, starts a deploy when the set of failing lessons
+# changed (so they leave the index at once), and prepares a retraction branch and an issue per failing lesson.
 name: reverify
 
 on:
@@ -33,9 +33,9 @@ jobs:
 
       - run: npm ci
 
-      # A failing lesson makes verify exit 1; the results still go to report.
-      - name: Verify every lesson
-        run: npm run verify -- lessons/ --run --json results.json || echo "Some lessons failed; report decides what counts."
+      # A failing lesson makes verify exit 1; the results still go to report, which decides what counts.
+      - name: Check every active lesson's evidence
+        run: npm run verify -- lessons/ --run --evidence-only --json results.json || echo "Some lessons failed."
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -49,9 +49,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: write
-      pull-requests: write
-      actions: write
+      contents: write # pushes retract/<id> branches
+      issues: write
+      actions: write # starts deploy.yml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -67,21 +67,23 @@ jobs:
           name: reverify-results
           path: tonight
 
+      # Only this workflow's own runs on main count (scheduled or started by hand), never a pull request's, and only
+      # one at least 12 hours older, so a manual run soon after the nightly one doesn't count as "last night".
       - name: Get last night's results
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          prev=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --status success --limit 5 --json databaseId \
-            --jq "[.[] | select(.databaseId != $GITHUB_RUN_ID)][0].databaseId // empty")
+          cutoff=$(date -u -d '12 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+          prev=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --status completed --limit 20 \
+            --json databaseId,event,createdAt \
+            --jq "[.[] | select((.event == \"schedule\" or .event == \"workflow_dispatch\") and .createdAt < \"$cutoff\")][0].databaseId // empty")
           if [ -n "$prev" ]; then
             gh run download "$prev" --repo "$GITHUB_REPOSITORY" --name reverify-results --dir last-night || echo "No results from run $prev."
             gh run download "$prev" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir last-failing || echo "No failing list from run $prev."
           fi
 
-      - name: Count failures and open retraction PRs
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: node tools/verify/src/reverify-cli.ts tonight/results.json last-night/results.json --out failing.json --open-prs
+      - name: Decide what fails tonight
+        run: node tools/verify/src/reverify-cli.ts count tonight/results.json last-night/results.json --out failing.json
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -101,3 +103,10 @@ jobs:
           else
             echo "No change in failing lessons."
           fi
+
+      # Last, so a failure here never stops the list from being uploaded or the deploy from starting. Fails the run
+      # when tonight was suspended (too many failures at once) or a lesson couldn't be reported.
+      - name: Prepare retraction branches and issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/verify/src/reverify-cli.ts report failing.json

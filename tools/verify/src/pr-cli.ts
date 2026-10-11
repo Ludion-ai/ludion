@@ -4,12 +4,13 @@
 import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { validateLesson, type Lesson, type LessonValidator } from "@ludion/core";
+import { validateLesson, type Lesson } from "@ludion/core";
 import { compileLessonSchema } from "./base-schema.ts";
 import { pullImages, runInDocker } from "./docker.ts";
 import { parseNameStatus, planChanges, verifyPullRequest, type PullRequestAuthor } from "./pr.ts";
 import { countByStatus, labelsOf, printResults, stepSummary } from "./report.ts";
 import { createSafeFetch } from "./safe-fetch.ts";
+import { runtimesIn } from "./files.ts";
 import type { LessonFile } from "./verify.ts";
 
 const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
@@ -27,24 +28,6 @@ function baseLessons(baseRef: string): Lesson[] {
     }
   }
   return lessons;
-}
-
-/** The runners and runtimes the added lessons' tests need, so their images are pulled before any timed run. */
-function runtimesIn(files: LessonFile[], validate: LessonValidator): string[] {
-  const runtimes = new Set<string>();
-  for (const f of files) {
-    try {
-      const v = validate(JSON.parse(f.text));
-      if (!v.ok) continue;
-      for (const e of v.lesson.evidence as Lesson["evidence"]) {
-        if ("run" in e && e.run.runner !== "lean") runtimes.add(e.run.runner);
-        if ("test" in e) runtimes.add(e.test.runtime);
-      }
-    } catch {
-      // Reported when verified.
-    }
-  }
-  return [...runtimes];
 }
 
 async function main(): Promise<number> {

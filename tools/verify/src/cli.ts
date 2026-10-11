@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-// npm run verify -- <files or dirs> [--run] [--json <path>]
+// npm run verify -- <files or dirs> [--run] [--json <path>] [--evidence-only]
+// --evidence-only (nightly reverify): only active lessons, and only their evidence counts (verify.ts, evidenceOnly).
 import { writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { runInDocker } from "./docker.ts";
-import { collectLessonFiles, loadBaseLessons } from "./files.ts";
+import { activeSet, validateLesson } from "@ludion/core";
+import { pullImages, runInDocker } from "./docker.ts";
+import { collectLessonFiles, loadBaseLessons, runtimesIn } from "./files.ts";
 import { createSafeFetch } from "./safe-fetch.ts";
 import { countByStatus, labelsOf, printResults } from "./report.ts";
 import { verifyLesson, type LessonResult } from "./verify.ts";
 
-const USAGE = "Usage: npm run verify -- <lesson files or directories> [--run] [--json <path>]";
+const USAGE = "Usage: npm run verify -- <lesson files or directories> [--run] [--json <path>] [--evidence-only]";
 const CONCURRENCY = 4;
 
 async function main(): Promise<number> {
@@ -16,7 +18,7 @@ async function main(): Promise<number> {
   try {
     parsed = parseArgs({
       allowPositionals: true,
-      options: { run: { type: "boolean", default: false }, json: { type: "string" }, help: { type: "boolean", short: "h" } },
+      options: { run: { type: "boolean", default: false }, json: { type: "string" }, "evidence-only": { type: "boolean", default: false }, help: { type: "boolean", short: "h" } },
     });
   } catch (err) {
     console.error(`${(err as Error).message}\n${USAGE}`);
@@ -41,7 +43,21 @@ async function main(): Promise<number> {
     return 2;
   }
 
-  const ctx = { base: loadBaseLessons(root), fetchFn: createSafeFetch(), run: values.run ? runInDocker : undefined };
+  const base = loadBaseLessons(root);
+  if (values["evidence-only"]) {
+    // A replaced lesson is no longer served, so its evidence doesn't matter tonight.
+    const active = new Set(activeSet(base).map((l) => l.id));
+    files = files.filter((f) => {
+      try {
+        const v = validateLesson(JSON.parse(f.text));
+        return !v.ok || active.has(v.lesson.id);
+      } catch {
+        return true;
+      }
+    });
+  }
+  if (values.run) for (const failure of pullImages(runtimesIn(files, validateLesson))) console.error(failure);
+  const ctx = { base, fetchFn: createSafeFetch(), run: values.run ? runInDocker : undefined, evidenceOnly: values["evidence-only"] };
   const results: LessonResult[] = new Array(files.length);
   let next = 0;
   await Promise.all(

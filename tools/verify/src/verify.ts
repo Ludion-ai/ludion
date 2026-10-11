@@ -27,6 +27,11 @@ export interface VerifyContext {
   run?: RunFn;
   /** Schema to validate against. Absent: the precompiled ones (format 1, or format 0 for old files). CI passes the base branch's format 1 schema, so a new lesson must be format 1. */
   validate?: LessonValidator;
+  /**
+   * Nightly reverify: only the evidence counts. Format rules, paths and `replaces` were checked when the lesson
+   * merged; a later rule change must not withhold lessons that still hold. A file today's schema can't read is skipped.
+   */
+  evidenceOnly?: boolean;
 }
 
 function firstDifference(actual: string, expected: string): string {
@@ -68,27 +73,32 @@ export async function verifyLesson(file: LessonFile, ctx: VerifyContext): Promis
   // 1. Schema, then canonical form.
   const valid = (ctx.validate ?? validateLesson)(data);
   if (!valid.ok) {
+    if (ctx.evidenceOnly) {
+      result.status = "skipped";
+      result.reasons.push(`Today's schema can't read this lesson (${valid.errors.map((e) => e.path).join(", ")}), so its evidence wasn't checked.`);
+      return result;
+    }
     for (const e of valid.errors) fail(`${e.path}: ${e.message}`);
     return result;
   }
   const lesson = valid.lesson;
   result.claim = claimOf(lesson);
   const canonical = formatLesson(lesson);
-  if (file.text !== canonical) {
+  if (!ctx.evidenceOnly && file.text !== canonical) {
     fail(`The file is not in canonical form: ${firstDifference(file.text, canonical)}. Keys go in schema order with 2-space indent, LF line endings, and a trailing newline.`);
   }
 
   // 2. Path. A format 1 lesson's subject comes from its package.
   const expected = `lessons/${lesson.subject}/${lesson.id}.json`;
-  if (file.path !== expected && !file.path.endsWith(`/${expected}`)) {
+  if (!ctx.evidenceOnly && file.path !== expected && !file.path.endsWith(`/${expected}`)) {
     fail(`The file must be at ${expected} (subject and id decide the path), not ${file.path}.`);
   }
 
   // 3. Format 1: what the schema can't say (subject, range, grounded detail, quotes that name the symbol).
-  if (isV1(lesson)) for (const p of lessonProblems(lesson)) fail(p);
+  if (isV1(lesson) && !ctx.evidenceOnly) for (const p of lessonProblems(lesson)) fail(p);
 
   // 4. replaces must name lessons in the active set on main.
-  if (lesson.replaces?.length) {
+  if (lesson.replaces?.length && !ctx.evidenceOnly) {
     const active = new Set(activeSet(ctx.base.filter((l) => l.id !== lesson.id)).map((l) => l.id));
     for (const id of lesson.replaces) {
       if (!active.has(id)) fail(`replaces names ${id}, which is not an active lesson on main. Correct only lessons that are still active.`);

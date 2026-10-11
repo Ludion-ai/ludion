@@ -1,6 +1,6 @@
 // Nightly reverify (docs/decisions.md, "Nightly reverify"): which failing lessons count tonight. A failure that may
-// be the world's fault (a source page down, the npm registry or Docker unavailable) counts only when the same lesson
-// also failed the night before; a test that ran and failed counts at once.
+// be the world's fault (a source page down, the npm registry or Docker unavailable, a slow runner) counts only when
+// the same lesson also failed the night before; a test that ran and failed counts at once.
 import type { LessonResult } from "./verify.ts";
 
 export interface Failing {
@@ -11,12 +11,21 @@ export interface Failing {
 
 export interface FailingFile {
   checked_at: string;
+  /** Lessons withheld from the index until fixed or retracted. Empty when suspended. */
   failing: Failing[];
+  /** Set when so many lessons failed at once that the cause is likely the check, not the lessons: nothing is withheld. */
+  suspended?: { failed: number; checked: number };
 }
+
+const ID = /^[0-9A-HJKMNP-TV-Z]{26}$/;
+const FILE = /^lessons\/[a-z0-9][a-z0-9._-]{0,63}\/([0-9A-HJKMNP-TV-Z]{26})\.json$/;
 
 /** A reason that could be a passing outage rather than the lesson no longer holding. */
 export function isTransient(reason: string): boolean {
-  return /^evidence \d+ \(source\):/.test(reason) || /: Could not install |: Could not start Docker/.test(reason);
+  return (
+    /^evidence \d+ \(source\):/.test(reason) ||
+    /: Could not install |: Could not start Docker|: The test ran too long|: The test exited with code 125\b/.test(reason)
+  );
 }
 
 export function confirmedFailures(tonight: LessonResult[], lastNight: LessonResult[] | undefined): Failing[] {
@@ -27,28 +36,47 @@ export function confirmedFailures(tonight: LessonResult[], lastNight: LessonResu
     .map((r) => ({ id: r.id!, file: r.file, reasons: r.reasons }));
 }
 
+/** More failures at once than lessons plausibly break in a night: more than 3, and more than a fifth of all. */
+export function tooMany(failed: number, checked: number): boolean {
+  return failed > 3 && failed > checked / 5;
+}
+
+/** What tonight decides: the failing list, or nothing withheld when the failures look like the check's own fault. */
+export function decide(tonight: LessonResult[], lastNight: LessonResult[] | undefined, now: Date): FailingFile {
+  const failing = confirmedFailures(tonight, lastNight);
+  const checked_at = now.toISOString().replace(/\.\d{3}Z$/, "Z");
+  if (tooMany(failing.length, tonight.length)) return { checked_at, failing: [], suspended: { failed: failing.length, checked: tonight.length } };
+  return { checked_at, failing };
+}
+
+/** A failing entry read back from an artifact: only a real lesson id at its own path, else undefined. */
+export function safeFailing(f: Partial<Failing>): Failing | undefined {
+  if (typeof f.id !== "string" || !ID.test(f.id) || typeof f.file !== "string") return undefined;
+  const m = FILE.exec(f.file);
+  if (!m || m[1] !== f.id) return undefined;
+  return { id: f.id, file: f.file, reasons: Array.isArray(f.reasons) ? f.reasons.filter((r): r is string => typeof r === "string") : [] };
+}
+
 const fence = (s: string) => "```text\n" + s.replace(/```/g, "'''") + "\n```";
 
-/** The retraction PR's text. Reasons come from lesson output, so they're fenced as text, never markdown. */
-export function retractionPr(f: Failing, runUrl: string): { title: string; body: string } {
+/**
+ * The issue for a failing lesson. GitHub Actions can't open pull requests in this repository, so the retraction is
+ * a prepared branch; a person opens the PR with one click (and CI runs on it, which it wouldn't for a PR opened by
+ * Actions). Reasons come from lesson output, so they're fenced as text, never markdown.
+ */
+export function retractionIssue(f: Failing, repo: string, runUrl: string): { title: string; body: string } {
   return {
-    title: `Retract ${f.id}: its evidence no longer holds`,
+    title: `Retract ${f.id}: its evidence fails the nightly check`,
     body: [
-      "## What changed",
-      "",
-      `Deletes \`${f.file}\`: the nightly reverify (${runUrl}) found that its evidence fails. Ludion stopped serving it at the next deploy; merging this retracts it, and its page becomes a tombstone.`,
+      `The nightly reverify (${runUrl}) found that the evidence of \`${f.file}\` fails. Ludion stopped serving the lesson at the next deploy; it stays on main until it is fixed or retracted.`,
       "",
       "What failed:",
       "",
       fence(f.reasons.join("\n").slice(0, 6000)),
       "",
-      "If the lesson still holds and the check is wrong, close this PR and fix the check; if the fact changed, a new lesson can replace it.",
+      `**To retract it**, open the prepared pull request, which deletes the file: https://github.com/${repo}/compare/main...retract/${f.id}?expand=1. CI runs on it, and its page becomes a tombstone once merged.`,
       "",
-      "GitHub doesn't run checks on pull requests opened by Actions: close and reopen this PR to run them before merging.",
-      "",
-      "## How to undo",
-      "",
-      "Revert the merge commit; the file comes back as it was.",
+      "If the lesson still holds and the check is wrong, fix the check and close this issue. Closing it stops these reports for this lesson; the lesson stays withheld while it keeps failing.",
     ].join("\n"),
   };
 }

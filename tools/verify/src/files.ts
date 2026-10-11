@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { validateLesson, type Lesson } from "@ludion/core";
+import { validateLesson, type Lesson, type LessonValidator } from "@ludion/core";
 import type { LessonFile } from "./verify.ts";
 
 const NOT_LESSONS = new Set(["lessons.schema.json", "lessons-v0.schema.json"]);
@@ -51,4 +51,22 @@ export function loadBaseLessons(root: string): Lesson[] {
     }
   }
   return lessons;
+}
+
+/** The runners and runtimes these lessons' tests need, so their images are pulled before any timed run. */
+export function runtimesIn(files: LessonFile[], validate: LessonValidator): string[] {
+  const runtimes = new Set<string>();
+  for (const f of files) {
+    try {
+      const v = validate(JSON.parse(f.text));
+      if (!v.ok) continue;
+      for (const e of v.lesson.evidence as Lesson["evidence"]) {
+        if ("run" in e && e.run.runner !== "lean") runtimes.add(e.run.runner);
+        if ("test" in e) runtimes.add(e.test.runtime);
+      }
+    } catch {
+      // Reported when verified.
+    }
+  }
+  return [...runtimes];
 }

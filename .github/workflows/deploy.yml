@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       reverify_run:
-        description: "The reverify run whose failing list to use (reverify passes it; empty: the newest successful run)"
+        description: "The reverify run whose failing list to use (reverify passes it; empty: the newest one with a list)"
         required: false
         default: ""
 
@@ -46,18 +46,32 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
 
+      # Only reverify's own runs on main (scheduled or by hand) are trusted, never a pull request's: a PR can edit the
+      # workflow and upload any artifact. A run reverify passes in must be one of those and must have its list (fail
+      # closed); otherwise the newest trusted run with a list is used, and with none, nothing is withheld.
       - name: Get the lessons failing reverify
         env:
           GH_TOKEN: ${{ github.token }}
           REVERIFY_RUN: ${{ inputs.reverify_run }}
         run: |
-          run="$REVERIFY_RUN"
-          case "$run" in *[!0-9]*) echo "reverify_run must be a run id."; exit 1 ;; esac
-          [ -n "$run" ] || run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
-          if [ -n "$run" ]; then
-            gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify || echo "No failing list in run $run."
+          trusted() {
+            gh run view "$1" --repo "$GITHUB_REPOSITORY" --json event,headBranch,path \
+              --jq '(.event == "schedule" or .event == "workflow_dispatch") and .headBranch == "main" and .path == ".github/workflows/reverify.yml"'
+          }
+          if [ -n "$REVERIFY_RUN" ]; then
+            case "$REVERIFY_RUN" in *[!0-9]*) echo "reverify_run must be a run id."; exit 1 ;; esac
+            [ "$(trusted "$REVERIFY_RUN")" = "true" ] || { echo "Run $REVERIFY_RUN is not a reverify run on main."; exit 1; }
+            gh run download "$REVERIFY_RUN" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify
+            exit 0
           fi
-
+          for run in $(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --status completed --limit 10 \
+              --json databaseId,event --jq '.[] | select(.event == "schedule" or .event == "workflow_dispatch") | .databaseId'); do
+            if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify; then
+              echo "Using the failing list from reverify run $run."
+              exit 0
+            fi
+          done
+          echo "::warning::No reverify failing list found; nothing is withheld."
       # Build before testing: the Worker tests serve the built site through ASSETS.
       - name: Build
         run: npm run build

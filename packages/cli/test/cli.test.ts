@@ -254,6 +254,56 @@ describe("sync exits cleanly after fetching", () => {
   });
 });
 
+describe("sync when the index can't be fetched", () => {
+  // A site that answers 404 (an old deploy, a wrong LUDION_SITE) must not wipe the public lessons a project already has.
+  const run = async (dir: string, home: string, ...flags: string[]) => {
+    const server = createServer((_req, res) => res.writeHead(404).end("not found")).listen(0, "127.0.0.1");
+    await new Promise((r) => server.once("listening", r));
+    const { port } = server.address() as AddressInfo;
+    const child = spawn(process.execPath, [join(import.meta.dirname, "../src/cli.ts"), "sync", ...flags, "--dir", dir], { env: { ...process.env, LUDION_SITE: `http://127.0.0.1:${port}`, LUDION_HOME: home } });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => (stdout += d));
+    child.stderr.on("data", (d) => (stderr += d));
+    const code = await new Promise((r) => child.on("close", r));
+    server.close();
+    return { code, stdout, stderr };
+  };
+  const project = () => {
+    const dir = tmp();
+    writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/vitest": { version: "5.0.3" } } }));
+    return dir;
+  };
+
+  it("leaves an existing lessons file as it was and warns; exits 0 with --quiet so the session goes on, 1 by hand", async () => {
+    const dir = project();
+    mkdirSync(join(dir, ".ludion"));
+    const last = "the lessons from the last good sync";
+    writeFileSync(join(dir, ".ludion", "lessons.md"), last);
+    const quiet = await run(dir, tmp(), "--quiet");
+    expect(quiet.code).toBe(0);
+    expect(quiet.stdout).toBe("");
+    expect(quiet.stderr).toContain("answered 404");
+    expect(quiet.stderr).toContain("Left .ludion/lessons.md as it was");
+    expect(readFileSync(join(dir, ".ludion", "lessons.md"), "utf8")).toBe(last);
+    expect(existsSync(join(dir, "CLAUDE.md"))).toBe(false);
+    expect((await run(dir, tmp())).code).toBe(1);
+  });
+
+  it("with no lessons file yet, still writes the ledger's lessons", async () => {
+    const dir = project();
+    const home = tmp();
+    process.env.LUDION_HOME = home;
+    const lesson = toLesson(draft, undefined, new Date("2026-10-11T00:00:00Z"), "01K7Z000000000000000000004") as LessonV1;
+    saveEntry({ lesson, taught_at: "2026-10-11T00:00:00Z", checks: { tests: "none", sources: "found" } });
+    delete process.env.LUDION_HOME;
+    const r = await run(dir, home, "--quiet");
+    expect(r.code).toBe(0);
+    expect(r.stderr).toContain("Wrote only your ledger's lessons");
+    expect(readFileSync(join(dir, ".ludion", "lessons.md"), "utf8")).toContain(generateClaim(lesson));
+  });
+});
+
 describe("sync --quiet (the session-start hook)", () => {
   // The hook runs after Claude Code has read CLAUDE.md, so only its output reaches the session that started it.
   it("prints the lessons when they changed, and nothing when they didn't", () => {
@@ -296,8 +346,8 @@ describe("shards", () => {
     expect(shardLesson(entry)).toMatchObject({ teacher: "@alice", versions: ">=5.0.0", url: "https://ludion.ai/lessons/A" });
   });
 
-  it("treats a site without shards yet as no lessons", async () => {
-    expect(await fetchLessons(installed({}), async () => new Response("", { status: 404 }))).toEqual({ lessons: [], built_at: null });
+  it("treats a site without shards as an error, not as no lessons", async () => {
+    await expect(fetchLessons(installed({}), async () => new Response("", { status: 404 }))).rejects.toThrow("index/subjects.json answered 404");
   });
 });
 

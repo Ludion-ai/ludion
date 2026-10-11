@@ -4,6 +4,15 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-11: Measuring Done 3
+
+- **The seeds are frozen first**: every finding of their independent review is fixed, CI's `verify` passes, and the frozen commit is recorded with the result. If a seed is rewritten after a measurement, that measurement is discarded and run again.
+- **Measured on the B questions and the C tasks, never the A questions.** The seeds were drafted from the A questions' answer keys, and the value preview tuned seed wording against them (`docs/bench/2026-10-11-value-preview/`, reference only).
+  - **B questions**: the other 45 FreshBench questions (one per change), judged against the verified keys as before.
+  - **C tasks** (`tools/bench/tasks-c/`): coding tasks written from the answer keys alone, by authors who didn't see the seeds, the lessons, or the questions. Each task is graded by rules on the files the agent leaves (`tools/bench/src/rule-tasks.ts`), never by running them. Every task carries a correct and a stale example solution that its rules must tell apart (a test checks this).
+- **Realistic conditions**: Claude Code (`opus`) with its default tools in the prepared projects with the new versions installed. Questions are read-only; tasks have edits and no shell. "With sync" runs `ludion sync` against the site built from the frozen commit and served locally (`LUDION_SITE`). Each lesson line is then exactly what the public site serves (teacher, seed label, "verified" label), before production has it. After the seeds deploy, a confirming run syncs from ludion.ai.
+- **Pass**: +20 points or more on B questions and C tasks together, with vs without sync. Under +10, stop and find out whether delivery, seeds, or pruning is wrong.
+
 ### 2026-10-11: Seed lessons
 
 - **30 seeds**, drafted by agents from the verified answer keys (`docs/bench/2026-10-11-keys/`). They cover every silent change in the wedge that one lesson can state truthfully, plus one loud vitest change Claude Code got wrong in the realistic screening (`toHaveTextContent`). vitest-5-0-0-6 (WebdriverIO moved to the community organization, not removed) has no lesson: no kind makes a true sentence of "not removed".

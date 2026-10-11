@@ -1,0 +1,220 @@
+{
+  "id": "agents-0-20-0-18-c",
+  "change": "agents-0-20-0-18",
+  "library": "agents",
+  "prompt": "Add a stateless MCP server to this Worker at /mcp with one tool, `add`, that takes two numbers `a` and `b` and returns their sum as text. Use `createMcpHandler` from the agents package (no Durable Object for the MCP part), keep the existing agent routing working for every other path, and add any packages you import to package.json. Avoid deprecated APIs.",
+  "correct": [
+    [
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/mcp.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/mcp.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/mcp-server.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/mcp-server.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/server.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/server.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/server.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/server.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/server.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/mcp/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/mcp/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/mcp/server.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/mcp/server.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/index.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/index.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ],
+    [
+      { "files": ["src/tools.js"], "pattern": "\\bcreateMcpHandler\\s*\\(" },
+      { "files": ["src/tools.js"], "pattern": "\\bcreateMcpHandler\\s*\\(\\s*new\\b", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "^(?=[\\s\\S]*?\\bcreateMcpHandler\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*[,)])[\\s\\S]*\\b(?:const|let|var)\\s+\\1\\s*=\\s*new\\b", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "from\\s*[\"']@modelcontextprotocol/server[\"']" },
+      { "files": ["src/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp-server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/index.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/mcp/server.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true },
+      { "files": ["src/tools.js"], "pattern": "@modelcontextprotocol/sdk", "absent": true }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      {
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp/server';\nimport { McpServer } from '@modelcontextprotocol/server';\nimport { z } from 'zod';\n\nexport class Chat extends Agent {\n  async onMessage(connection, message) {\n    connection.send(`echo: ${message}`);\n  }\n}\n\nfunction createServer() {\n  const server = new McpServer({ name: 'bench', version: '1.0.0' });\n  server.registerTool(\n    'add',\n    { description: 'Adds two numbers', inputSchema: { a: z.number(), b: z.number() } },\n    async ({ a, b }) => ({ content: [{ type: 'text', text: String(a + b) }] }),\n  );\n  return server;\n}\n\nconst mcp = createMcpHandler(createServer, { route: '/mcp' });\n\nexport default {\n  async fetch(request, env, ctx) {\n    if (new URL(request.url).pathname === '/mcp') return mcp(request, env, ctx);\n    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp/server';\nimport { McpServer } from '@modelcontextprotocol/server';\nexport default {\n  async fetch(request, env, ctx) {\n    if (new URL(request.url).pathname === '/mcp') {\n      return createMcpHandler(() => {\n        const server = new McpServer({ name: 'bench', version: '1.0.0' });\n        return server;\n      })(request, env, ctx);\n    }\n    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/mcp.js": "import { McpServer } from \"@modelcontextprotocol/server\";\nexport function createServer() {\n  return new McpServer({ name: \"bench\", version: \"1.0.0\" });\n}\n",
+        "src/index.js": "import { routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp/server';\nimport { createServer } from './mcp.js';\nconst handler = createMcpHandler(createServer);\nexport default { fetch: (r, e, c) => handler(r, e, c) };\n"
+      },
+      {
+        "src/mcp/server.js": "import { McpServer } from '@modelcontextprotocol/server';\nexport const buildServer = () => new McpServer({ name: 'bench', version: '1.0.0' });\n",
+        "src/index.js": "import { routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp/server';\nimport { buildServer } from './mcp/server.js';\nconst handler = createMcpHandler(buildServer, { route: '/mcp' });\nexport default {\n  async fetch(request, env, ctx) {\n    if (new URL(request.url).pathname === '/mcp') return handler(request, env, ctx);\n    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/tools.js": "import { createMcpHandler } from 'agents/mcp/server';\nimport { McpServer } from '@modelcontextprotocol/server';\nexport const mcpHandler = createMcpHandler(() => new McpServer({ name: 'bench', version: '1.0.0' }));\n",
+        "src/index.js": "import { routeAgentRequest } from 'agents';\nimport { mcpHandler } from './tools.js';\nexport default {\n  async fetch(request, env, ctx) {\n    if (new URL(request.url).pathname === '/mcp') return mcpHandler(request, env, ctx);\n    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/mcp-server.js": "import { McpServer } from '@modelcontextprotocol/server';\nexport function createServer() { return new McpServer({ name: 'bench', version: '1.0.0' }); }\n",
+        "src/index.js": "import { routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp/server';\nimport { createServer } from './mcp-server.js';\nconst handler = createMcpHandler(createServer);\nexport default { fetch: (r, e, c) => handler(r, e, c) };\n"
+      }
+    ],
+    "wrong": [
+      {
+        "src/index.js": "import { Agent, routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp';\nimport { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';\nimport { z } from 'zod';\n\nexport class Chat extends Agent {}\n\nconst server = new McpServer({ name: 'bench', version: '1.0.0' });\nserver.tool('add', { a: z.number(), b: z.number() }, async ({ a, b }) => ({ content: [{ type: 'text', text: String(a + b) }] }));\n\nexport default {\n  async fetch(request, env, ctx) {\n    if (new URL(request.url).pathname === '/mcp') return createMcpHandler(server)(request, env, ctx);\n    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });\n  },\n};\n"
+      },
+      {
+        "src/index.js": "import { routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp/server';\nimport { McpServer } from '@modelcontextprotocol/server';\nconst server = new McpServer({ name: 'bench', version: '1.0.0' });\nconst handler = createMcpHandler(server);\nexport default { fetch: (r, e, c) => handler(r, e, c) };\n"
+      },
+      {
+        "src/server.js": "import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';\nexport const server = new McpServer({ name: 'bench', version: '1.0.0' });\n",
+        "src/index.js": "import { routeAgentRequest } from 'agents';\nimport { createMcpHandler } from 'agents/mcp/server';\nimport { server } from './server.js';\nconst handler = createMcpHandler(() => server);\nexport default { fetch: (r, e, c) => handler(r, e, c) };\n"
+      },
+      {
+        "src/mcp/index.js": "import { createMcpHandler } from 'agents/mcp/server';\nimport { McpServer } from '@modelcontextprotocol/server';\nconst server = new McpServer({ name: 'bench', version: '1.0.0' });\nexport const handler = createMcpHandler(server);\n",
+        "src/index.js": "import { routeAgentRequest } from 'agents';\nimport { handler } from './mcp/index.js';\nexport default { fetch: (r, e, c) => handler(r, e, c) };\n"
+      }
+    ]
+  },
+  "trap": "The familiar pattern passes one module-level SDK v1 `McpServer` (from `@modelcontextprotocol/sdk`) to `createMcpHandler`; since 0.20 it takes a factory returning an SDK v2 server from `@modelcontextprotocol/server`, and the v1-instance overload is deprecated."
+}

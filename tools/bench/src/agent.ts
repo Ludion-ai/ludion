@@ -66,12 +66,15 @@ export function runEnv(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv 
 
 const WEB_TOOLS = ["WebSearch", "WebFetch"];
 
-/** The command-line arguments for one condition. Exported for tests. */
-export function claudeArgs(prompt: string, o: RunOptions, mcpConfigPath?: string): string[] {
+/**
+ * The command-line arguments for one condition. Exported for tests. The prompt goes to stdin, not here: a judge
+ * prompt carries a whole answer, and Windows refuses command lines over 32,767 characters (spawn ENAMETOOLONG).
+ */
+export function claudeArgs(o: RunOptions, mcpConfigPath?: string): string[] {
   const tools = o.condition === "none" ? [] : o.condition === "project" ? ["default"] : WEB_TOOLS;
   const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : o.condition === "project" ? projectTools(o.allowEdits === true) : tools;
   const args = [
-    "-p", prompt,
+    "-p",
     "--output-format", "stream-json", "--verbose",
     "--model", o.model,
     "--max-turns", String(o.maxTurns),
@@ -131,7 +134,9 @@ export function runAgent(prompt: string, o: RunOptions): Promise<AgentRun> {
     writeFileSync(mcpConfigPath, JSON.stringify({ mcpServers: { ludion: { type: "http", url: o.ludionUrl ?? "https://ludion.ai/mcp" } } }));
   }
   return new Promise((resolve, reject) => {
-    const child = spawn("claude", claudeArgs(prompt, o, mcpConfigPath), { cwd: work, stdio: ["ignore", "pipe", "pipe"], windowsHide: true, env: runEnv() });
+    const child = spawn("claude", claudeArgs(o, mcpConfigPath), { cwd: work, stdio: ["pipe", "pipe", "pipe"], windowsHide: true, env: runEnv() });
+    child.stdin.on("error", () => {});
+    child.stdin.end(prompt);
     // A run that hangs (seen under rate limiting) is killed and counted as an error, so the batch moves on.
     const timer = setTimeout(() => child.kill(), o.timeoutMs ?? 10 * 60_000);
     let stdout = "";

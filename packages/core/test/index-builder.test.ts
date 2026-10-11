@@ -179,7 +179,8 @@ describe("search", () => {
 });
 
 describe("stem", () => {
-  it("maps -ies plurals to -y, so directories meets directory", () => {
+  it("maps -ies, -ied and -ie to -y, so plurals and past forms meet their word", () => {
+    for (const [a, b] of [["cookies", "cookie"], ["movies", "movie"], ["copied", "copy"], ["copies", "copy"], ["ties", "tie"], ["pies", "pie"]]) expect(stem(a!), a).toBe(stem(b!));
     expect(stem("directories")).toBe("directory");
     expect(stem("dependencies")).toBe("dependency");
     expect(stem("ties")).toBe("tie");

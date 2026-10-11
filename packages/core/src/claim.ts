@@ -6,8 +6,11 @@ import { stem, tokenize } from "./search.ts";
 import type { Lesson, LessonV1 } from "./types.ts";
 import { isV1 } from "./types.ts";
 
-/** Top-level paths of the site and the Worker. A subject gets a page at /<subject>/, so it can't be one of these. */
-export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "_astro", "404"]);
+/**
+ * Names a subject can't take: top-level paths of the site and the Worker (a subject gets a page at /<subject>/), files at
+ * the site's root, and `subjects`, whose shard would be /index/subjects.json.
+ */
+export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "404", "index.json", "index.html", "404.html", "subjects"]);
 
 /** The directory for a package: npm @scope/name → scope.name; anything else lowercased as is. */
 export function subjectFor(pkg: LessonV1["package"]): string {

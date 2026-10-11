@@ -168,6 +168,9 @@ const ON_TOPIC: Record<string, [string, string]> = {
   "removed the distutils module": ["What changed about distutils in Python 3.12?", "distutils import error on Python 3.12"],
 };
 
+/** Keys of lessons that teach the same change, so a question about it may find either. */
+const SAME_CHANGE: [string, string][] = [["toHaveTextContent is strict", "exactly equal to the expected string"]];
+
 describe("search quality", () => {
   it("covers every active lesson with two on-topic questions", () => {
     const covered = index.lessons.filter((l) => Object.keys(ON_TOPIC).some((key) => l.claim.includes(key)));
@@ -184,8 +187,9 @@ describe("search quality", () => {
     const check = (q: string, key: string) => {
       const want = index.lessons.find((l) => l.claim.includes(key))!;
       const got = search(index, q, { k: 3 });
-      // Two lessons about the same change (same subject and symbol) are equally right: the design sample and a seed teach one.
-      const same = (l: (typeof got)[number]) => l.id === want.id || (want.symbol != null && l.subject === want.subject && l.symbol === want.symbol);
+      // Listed pairs teach the same change, so either is the right answer (the design sample and a seed).
+      const twins = SAME_CHANGE.flatMap(([a, b]) => (a === key ? [b] : b === key ? [a] : []));
+      const same = (l: (typeof got)[number]) => l.id === want.id || twins.some((k) => l.claim.includes(k));
       return { q: short(q), ok: got.some(same), got: got.map((l) => l.claim.slice(0, 40)) };
     };
     // Questions can land before their lesson does (a lesson PR changes only lesson files): skip keys with no active lesson.

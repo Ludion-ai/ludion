@@ -30,7 +30,7 @@ const { avatarOf } = await siteData();
 
 <p class:list={["signature", p.size ?? "small"]}>
   {name && <span class="by">
-    {p.avatar && <img src={avatarOf(p.teacherId, 28)} alt="" width="28" height="28" />}<span class="visually-hidden">{en.lesson.taughtBy}</span><span aria-hidden="true">—</span>&nbsp;{p.teacherHref ? <a href={p.teacherHref}>@{p.teacher}</a> : <span>@{p.teacher}</span>}{p.drafted && <span class="drafted">, {en.lesson.drafted}</span>}
+    {p.avatar && <img src={avatarOf(p.teacherId, 28)} alt="" width="28" height="28" />}<span class="visually-hidden">{en.lesson.taughtBy}</span><span aria-hidden="true">—</span>&nbsp;{p.teacherHref ? <a href={p.teacherHref}>@{p.teacher}</a> : <span>@{p.teacher}</span>}{p.drafted && <span class="drafted">{en.lesson.drafted}</span>}
   </span>}
   {!name && p.drafted && <span class="drafted">{en.lesson.draftedAlone}</span>}
   {seal && <StatusChip status="verified" label={en.lesson.verifiedBy[p.verifiedBy]} by={p.verifiedBy} size={p.size} tone={tone} />}

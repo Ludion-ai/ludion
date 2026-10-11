@@ -1,0 +1,26 @@
+{
+  "id": "wrangler-4-121-0-7-c",
+  "change": "wrangler-4-121-0-7",
+  "library": "wrangler",
+  "prompt": "Add an npm script `db:create` to package.json that creates this project's D1 database, named `orders`. Our legal team requires that the database's data is stored and processed only inside the United States. (We're an ordinary commercial company, not a government agency.)",
+  "correct": [
+    [
+      { "files": ["package.json"], "pattern": "\"db:create\"\\s*:\\s*\"(?:[^\"\\\\\\n]|\\\\.)*\\bd1\\s+create\\b" },
+      { "files": ["package.json"], "pattern": "\"db:create\"\\s*:\\s*\"(?:[^\"\\\\\\n]|\\\\.)*\\borders\\b" },
+      { "files": ["package.json"], "pattern": "\"db:create\"\\s*:\\s*\"(?:[^\"\\\\\\n]|\\\\.)*--jurisdiction[= ]+(\\\\\"|')?us\\b" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { "package.json": "{\n  \"name\": \"bench-wrangler\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"wrangler dev\",\n    \"deploy\": \"wrangler deploy\",\n    \"db:create\": \"wrangler d1 create orders --jurisdiction us\"\n  },\n  \"devDependencies\": { \"wrangler\": \"4.148.0\" }\n}\n" },
+      { "package.json": "{\n  \"scripts\": {\n    \"db:create\": \"wrangler d1 create --jurisdiction=us orders\"\n  }\n}\n" },
+      { "package.json": "{\n  \"scripts\": { \"dev\": \"wrangler dev\", \"db:create\": \"wrangler d1 create orders --jurisdiction 'us'\" }\n}\n" }
+    ],
+    "wrong": [
+      { "package.json": "{\n  \"scripts\": { \"db:create\": \"wrangler d1 create orders\", \"db:create:us\": \"wrangler d1 create orders --jurisdiction us\" }\n}\n" },
+      { "package.json": "{\n  \"name\": \"bench-wrangler\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"wrangler dev\",\n    \"deploy\": \"wrangler deploy\",\n    \"db:create\": \"wrangler d1 create orders --location wnam\"\n  },\n  \"devDependencies\": { \"wrangler\": \"4.148.0\" }\n}\n" },
+      { "package.json": "{\n  \"scripts\": {\n    \"db:create\": \"wrangler d1 create orders --jurisdiction fedramp\"\n  }\n}\n" }
+    ]
+  },
+  "trap": "Believing D1 jurisdictions are only eu and fedramp, the stale answer falls back to a location hint such as --location wnam, which does not restrict where the data lives; wrangler 4.121+ offers --jurisdiction us."
+}

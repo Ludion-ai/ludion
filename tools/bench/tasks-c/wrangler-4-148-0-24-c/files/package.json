@@ -1,0 +1,11 @@
+{
+  "name": "bench-wrangler",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler versions upload",
+    "promote": "wrangler versions deploy"
+  },
+  "devDependencies": { "wrangler": "4.148.0" }
+}

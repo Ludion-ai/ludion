@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "id": "01M4MH5JZR3ER8AYC4WPHAHYT1",
+  "id": "01M4MHTK4ZKZWSMDR6D6M7Y7ET",
   "subject": "wrangler",
   "package": {
     "ecosystem": "npm",
@@ -8,9 +8,9 @@
   },
   "versions": ">=4.113.0",
   "kind": "behavior",
-  "symbol": "wrangler deploy",
+  "symbol": "deploy",
   "signal": "silent",
-  "detail": "When you run wrangler deploy, resources will be created for you, and their IDs will be written back to your configuration file.",
+  "detail": "Wrangler can automatically provision Flagship, Dispatch Namespaces and Queues when you deploy your Worker, without you having to create them ahead of time.",
   "evidence": [
     {
       "test": {
@@ -36,12 +36,12 @@
     {
       "source": {
         "url": "https://developers.cloudflare.com/workers/wrangler/configuration/",
-        "quote": "When you run wrangler deploy, resources will be created for you, and their IDs will be written back to your configuration file."
+        "quote": "Wrangler can automatically provision resources for you when you deploy your Worker without you having to create them ahead of time. This currently works for the following resources: KV, R2, D1, Flagship, AI Search, Agent Memory, Dispatch Namespaces and Queues."
       }
     }
   ],
   "author": "github:Ludion-ai",
   "author_id": 292738933,
   "drafted_by": "agent",
-  "created_at": "2026-10-11T03:47:40Z"
+  "created_at": "2026-10-11T03:59:08Z"
 }

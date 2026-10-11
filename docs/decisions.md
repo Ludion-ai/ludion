@@ -4,6 +4,14 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-11: Site pages for v2
+
+- **`/<subject>/`** lists the subject's active lessons, newest first; every subject tag links to it. A subject can't be a top-level path of the site or the Worker (`RESERVED_SUBJECTS` in `packages/core`: lessons, teachers, index, start, models, mcp, api, auth, _astro, 404): `lessonProblems` refuses it, so `verify` and `ludion teach` do too, and the site build fails if one slips in.
+- **`/start/`**: the plugin, `npx ludion sync`, the MCP server, teaching (ledger, then `--public`), and what leaves the machine. It names `npx ludion`, so it ships with the CLI, after the npm publish.
+- **`/models/`** shows only what `docs/bench/models.json` holds: per model, how many measured, still-active lessons it knows and misses, and a per-lesson table, with the date and a link to the run's files. Until then it says only that no model has been measured; the method text appears only next to data. `models.json` carries `measured_at`, `bench` (the run's folder), `method`, `models` (id → display name), and `lessons` (lesson id → model id → knows | misses); the shards read `lessons`.
+- **Tombstones**: a lesson file deleted from main (a retraction) keeps its page at `/lessons/<id>/`. It says it was retracted and when, shows what the lesson said, struck through, with its teacher and subject (read from the commit before the deletion), and links the retraction's pull request and the file's history. Retracted lessons never enter the index or the shards.
+- **Seed labels**: a lesson with `drafted_by: "agent"` says "drafted by an agent" next to its teacher in every list, on its page, and in the home replay; on the teacher's own page, where the name is left out, it says "Drafted by an agent" on its own.
+
 ### 2026-10-11: The Claude Code plugin
 
 - **Where**: `plugin/` in this repo, listed by `.claude-plugin/marketplace.json` at the repo root. Install: `/plugin marketplace add Ludion-ai/ludion`, then `/plugin install ludion@ludion` (or `claude plugin install ludion@ludion`). `claude plugin validate` passes on both.

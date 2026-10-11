@@ -14,15 +14,15 @@ const measured = models ? Object.keys(models.lessons).filter((id) => active.has(
 const ids = models ? Object.keys(models.models) : [];
 ---
 
-<Base title={m.title} description={m.intro}>
+<Base title={m.title} description={m.heading}>
   <article class="wrap">
     <h1>{m.heading}</h1>
-    <p class="intro">{m.intro}</p>
     {
       !models || measured.length === 0 ? (
-        <p>{m.none}</p>
+        <p class="intro">{m.none}</p>
       ) : (
         <>
+          <p class="intro">{m.intro}</p>
           <p class="meta">
             {m.measured(formatDate(models.measured_at))} <a href={`https://github.com/${config.org}/${config.repo}/tree/main/${models.bench}`}>{m.run}</a>
           </p>

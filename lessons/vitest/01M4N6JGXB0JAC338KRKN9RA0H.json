@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "id": "01M4N4KZ0YE3JY8MS99KCEDH4T",
+  "id": "01M4N6JGXB0JAC338KRKN9RA0H",
   "subject": "vitest",
   "package": {
     "ecosystem": "npm",
@@ -10,7 +10,7 @@
   "kind": "default",
   "symbol": "--merge-reports",
   "signal": "silent",
-  "detail": "It merges every blob report located in the .vitest/blob/ folder by default.",
+  "detail": "By default, Vitest stores all blob test results in .vitest/blob/, so they can be later merged using --merge-reports.",
   "evidence": [
     {
       "test": {
@@ -35,13 +35,13 @@
     },
     {
       "source": {
-        "url": "https://vitest.dev/guide/cli",
-        "quote": "Merges every blob report located in the specified folder (.vitest/blob/ by default). You can use any reporters with this command (except blob): sh vitest --merge-reports --reporter=junit"
+        "url": "https://vitest.dev/guide/reporters",
+        "quote": "Stores test results on the machine so they can be later merged using --merge-reports command. By default, stores all results in .vitest/blob/ folder, but can be overridden with --outputFile or --outputFile.blob flags."
       }
     }
   ],
   "author": "github:Ludion-ai",
   "author_id": 292738933,
   "drafted_by": "agent",
-  "created_at": "2026-10-11T09:27:34Z"
+  "created_at": "2026-10-11T10:01:44Z"
 }

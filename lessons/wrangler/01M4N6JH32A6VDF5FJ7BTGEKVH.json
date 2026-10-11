@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "id": "01M4N4KZ14M4FY1GWH0Z2058KZ",
+  "id": "01M4N6JH32A6VDF5FJ7BTGEKVH",
   "subject": "wrangler",
   "package": {
     "ecosystem": "npm",
@@ -10,7 +10,7 @@
   "kind": "default",
   "symbol": "nodejs_compat",
   "signal": "silent",
-  "detail": "With a compatibility date of 2026-08-04 or later it is on; to turn off Node.js compatibility completely, add both no_nodejs_compat and no_nodejs_compat_v2.",
+  "detail": "With a compatibility date of 2026-08-04 or later it is on; to turn it off, remove the positive flags and add both no_nodejs_compat and no_nodejs_compat_v2.",
   "evidence": [
     {
       "test": {
@@ -43,5 +43,5 @@
   "author": "github:Ludion-ai",
   "author_id": 292738933,
   "drafted_by": "agent",
-  "created_at": "2026-10-11T09:27:34Z"
+  "created_at": "2026-10-11T10:01:44Z"
 }

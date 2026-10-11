@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "id": "01M4N4KZ0S34T5QYGCBY2DCQWW",
+  "id": "01M4N6JH8SHRYQE5CPY9SN1QQJ",
   "subject": "vitest",
   "package": {
     "ecosystem": "npm",
@@ -10,7 +10,7 @@
   "kind": "added",
   "symbol": "--repeats",
   "signal": "silent",
-  "detail": "It repeats every test a given number of times regardless of the result, which is useful for hunting flaky tests.",
+  "detail": "It repeats every test regardless of the result, which is useful for hunting flaky tests.",
   "evidence": [
     {
       "test": {
@@ -43,5 +43,5 @@
   "author": "github:Ludion-ai",
   "author_id": 292738933,
   "drafted_by": "agent",
-  "created_at": "2026-10-11T09:27:34Z"
+  "created_at": "2026-10-11T10:01:44Z"
 }

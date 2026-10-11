@@ -4,6 +4,16 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-11: Deploy safety (from #20)
+
+- **Only main's newest commit deploys.** Right before `wrangler deploy`, `deploy.yml` fetches `origin/main` and fails if `HEAD` is older: "This run is for an old commit (…); main is now at …. Deploy main's newest commit with: gh workflow run deploy.yml --ref main". A rerun of an old run can't put old code over newer code, and a queued run whose commit was overtaken fails while the newer run deploys.
+- **HSTS**: `Strict-Transport-Security: max-age=31536000` on every Worker response and every static asset (`_headers`). No `includeSubDomains` or `preload`, because both are hard to undo. Together with Always Use HTTPS on the zone, plain HTTP isn't served.
+- **The command guard for Claude Code in this repo**:
+  - `.claude/settings.json` denies, in Bash and PowerShell forms: `wrangler deploy`, `wrangler versions deploy`, `wrangler secret`, `gh secret`, force pushes, `gh repo delete`, bare shells, and `Invoke-Expression`.
+  - A deny rule can't make an exception for `--dry-run`, and rules see each side of a pipe separately. So a PreToolUse hook (`.claude/hooks/guard.mjs`) sees the whole command: it blocks deploys in any spelling unless `--dry-run` is given, secrets, force pushes, repo deletion, and downloads piped into a shell. Tests list what it blocks and what it lets through.
+  - If `node` can't be found, the hook fails without blocking, and the deny rules still apply.
+  - It backs up the rule that production changes only through `deploy.yml`.
+
 ### 2026-10-11: Switching to spec v2
 
 - CLAUDE.md is the v2 spec, word for word. `.claude/rules/` is deleted. What those files said about the system as it runs today is kept below under "Carried over from v0"; what v2 changes is recorded here as the work happens.
@@ -48,7 +58,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
   - Actions are pinned to commit SHAs.
   - The build gets the job's own read-only token as `GITHUB_READ_TOKEN`, for teacher login lookups; it is never shipped in `dist/` or logged.
 - **No preview deployments**: a Worker's secrets are shared by every version of it, so a preview would run with production's secrets. `wrangler.jsonc` has no `env` blocks. Workers Builds is disconnected.
-- To deploy again, start a new run from main (`gh workflow run deploy.yml --ref main`). A rerun of an old run would deploy that run's old commit. Nothing stops that yet: the newest-commit guard from #20 is not on main, and a v2 PR brings it in.
+- To deploy again, start a new run from main (`gh workflow run deploy.yml --ref main`); a rerun of an old run fails the newest-commit check (see "Deploy safety").
 - `CLOUDFLARE_API_TOKEN` is currently a repository secret; the owner was advised to move it to the `production` environment. `CLOUDFLARE_ACCOUNT_ID` is an environment secret.
 - **Branch protection on main**:
   - PRs are required, with 0 approving reviews because there is one maintainer; set it back to 1 when a second maintainer joins.

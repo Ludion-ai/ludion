@@ -10,7 +10,10 @@ for (const colorScheme of ["light", "dark"] as const) {
     test.use({ colorScheme });
 
     test("axe finds no violations on any page", async ({ page, request }) => {
-      for (const path of await allPages(request)) {
+      const pages = await allPages(request);
+      // One test walks every page, and every lesson adds one: give each page its own few seconds.
+      test.setTimeout(30_000 + pages.length * 5_000);
+      for (const path of pages) {
         await page.goto(path);
         // Judge the finished page: wait for any one-off animation (the home page's replay) to end.
         await page.waitForFunction(() => document.getAnimations().every((a) => a.playState === "finished" || a.playState === "idle"));
@@ -23,7 +26,9 @@ for (const colorScheme of ["light", "dark"] as const) {
 }
 
 test("every page names its public URL as canonical", async ({ page, request }) => {
-  for (const path of await allPages(request)) {
+  const pages = await allPages(request);
+  test.setTimeout(30_000 + pages.length * 2_000);
+  for (const path of pages) {
     if (path === "/no-such-page/") continue;
     await page.goto(path);
     // Lesson and list pages: the trailing-slash URL. Teacher pages: /@<login>, which serves 200 directly.

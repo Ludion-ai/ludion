@@ -4,6 +4,14 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-11: Seed lessons
+
+- **30 seeds**, drafted by agents from the verified answer keys (`docs/bench/2026-10-11-keys/`). They cover every silent change in the wedge that one lesson can state truthfully, plus one loud vitest change Claude Code got wrong in the realistic screening (`toHaveTextContent`). vitest-5-0-0-6 (WebdriverIO moved to the community organization, not removed) has no lesson: no kind makes a true sentence of "not removed".
+- They're signed by @Ludion-ai, the account that opens their PRs, with `drafted_by: "agent"`. One PR per library, because each seed installs packages twice in `verify` and a single PR could run past its timeout. They merge only after the site pages that label them.
+- **Evidence**: 29 differential pairs (new version passes, the release before fails with a named error, same code) and one test that pins vitest and `@vitest/browser` together, labeled "test". Each also has a source quote naming the symbol. Many agents and wrangler tests read the installed package (exports, types, `--help`, dry runs) rather than start workerd.
+- **A lone `>` is allowed in a detail.** Without it, the `-t` seed couldn't name the ` > ` separator, and in the value preview Claude Code guessed spaces, the old behavior. It opens no tag, and every claim already shows `>=`. `<` stays refused.
+- **Search eval**: each seed has two on-topic questions, its FreshBench A and B questions. Questions can land before their lesson (a lesson PR changes only lesson files), so keys with no active lesson are skipped. Two lessons about the same subject and symbol count as the same answer (the design sample and the `toHaveTextContent` seed). "configure" joined the common words: it let "How do I configure nginx as a reverse proxy?" find wrangler lessons. With all 30 seeds: off-topic 20/20 find nothing, on-topic 79/86 (92%). The 7 misses are vague questions that never name the symbol ("make a mock return different values depending on its arguments"); `ludion_ask` is keyword search, and sync doesn't search.
+
 ### 2026-10-11: Site pages for v2
 
 - **`/<subject>/`** lists the subject's active lessons, newest first; every subject tag links to it. A subject can't be a top-level path of the site or the Worker (`RESERVED_SUBJECTS` in `packages/core`: lessons, teachers, index, start, models, mcp, api, auth, _astro, 404): `lessonProblems` refuses it, so `verify` and `ludion teach` do too, and the site build fails if one slips in.

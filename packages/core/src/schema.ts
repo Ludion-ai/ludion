@@ -34,7 +34,7 @@ const FIELD_MESSAGES: Record<string, string> = {
 const TEXT_GUARDS = [
   "Remove invisible characters and line breaks: this is one line of plain text.",
   "Remove the link. Links belong in a source, with a sentence quoted from the page.",
-  "Remove the command line (a pipe into a shell, curl or wget into a pipe, rm -rf, $(...), or a redirection like >> file, 2>&1, or > /path). Runnable code goes in a test.",
+  "Remove the command line (a pipe into a shell, curl or wget into a pipe, rm -rf, $(...), or a redirection like >> file, 2>&1, or > /path). Runnable code goes in a test. For a comparison, put spaces around > (5 > 3).",
   "Remove the instructions to an AI or to the reader. The detail states a fact.",
   "Write the detail in plain ASCII, without backticks, <, or square brackets: it goes into the generated sentence as is.",
   "Remove the link (//...). Links belong in a source.",

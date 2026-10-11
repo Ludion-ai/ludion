@@ -1,0 +1,13 @@
+{
+  "label": "B-none-drafts",
+  "model": "opus",
+  "spentUsd": 0.367411,
+  "grades": [
+    {
+      "id": "vitest-5-0-0-6-b",
+      "grade": "wrong",
+      "why": "It claims Vitest 5 removed the WebdriverIO provider, whereas the key says it was not removed but moved to community maintenance with version 5.0.0 working on Vitest 5.",
+      "costUsd": 0.025827
+    }
+  ]
+}

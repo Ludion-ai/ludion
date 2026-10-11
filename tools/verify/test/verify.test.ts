@@ -182,16 +182,16 @@ describe("verifyLesson, format 1", () => {
     const pair = v1({
       detail: undefined,
       evidence: [
-        { test: { runtime: "node@24", packages: { vitest: "5.0.3" }, code: "new()" } },
-        { test: { runtime: "node@24", packages: { vitest: "4.1.11" }, code: "old()", expect: "fail", error: "expected strict match" } },
+        { test: { runtime: "node@24", packages: { vitest: "5.0.3" }, code: "toHaveTextContent(new)" } },
+        { test: { runtime: "node@24", packages: { vitest: "4.1.11" }, code: "toHaveTextContent(old)", expect: "fail", error: "expected strict match" } },
       ],
     });
     expect(await verifyLesson(file(pair), c({ run }))).toMatchObject({ status: "passed" });
     expect(specs).toEqual([
-      { runtime: "node@24", code: "new()", packages: { vitest: "5.0.3" } },
-      { runtime: "node@24", code: "old()", packages: { vitest: "4.1.11" } },
+      { runtime: "node@24", code: "toHaveTextContent(new)", packages: { vitest: "5.0.3" } },
+      { runtime: "node@24", code: "toHaveTextContent(old)", packages: { vitest: "4.1.11" } },
     ]);
-    const wrongError = v1({ detail: undefined, evidence: [{ test: { runtime: "node@24", packages: { vitest: "4.1.11" }, code: "old()", expect: "fail", error: "a different message" } }] });
+    const wrongError = v1({ detail: undefined, evidence: [{ test: { runtime: "node@24", packages: { vitest: "4.1.11" }, code: "toHaveTextContent(old)", expect: "fail", error: "a different message" } }] });
     const r = await verifyLesson(file(wrongError), c({ run }));
     expect(r.reasons).toEqual([expect.stringContaining('evidence 1 (node@24 vitest@4.1.11): The test failed, but its output does not contain "a different message"')]);
   });

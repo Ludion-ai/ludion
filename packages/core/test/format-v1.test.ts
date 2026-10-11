@@ -133,12 +133,19 @@ describe("lessonProblems", () => {
     }
   });
 
+  it("names a symbol that no evidence mentions, so the field can't carry arbitrary words", () => {
+    const l = lessonV1({ symbol: "run npx evil-pkg", replacement: undefined, detail: undefined, evidence: [{ test: { runtime: "node@24", code: "process.exit(0)" } }] });
+    expect(lessonProblems(l)).toEqual([expect.stringContaining("No evidence names run npx evil-pkg")]);
+    expect(lessonProblems(lessonV1({ detail: undefined, evidence: [{ test: { runtime: "node@24", code: "expect(el).toHaveTextContent(\"x\")" } }] }))).toEqual([]);
+  });
+
   it("names a subject that doesn't match the package, an ungrounded detail, and a quote without the symbol", () => {
     const l = lessonV1({ subject: "vite", detail: "toHaveTextContent is never strict", evidence: [{ source: { url: "https://example.com/x", quote: "Breaking changes to the text matchers in browser mode" } }] });
     expect(lessonProblems(l)).toEqual([
       "The subject for package vitest is vitest, not vite.",
       expect.stringContaining("no source quote contains: never, strict."),
       expect.stringContaining("doesn't name toHaveTextContent"),
+      expect.stringContaining("No evidence names toHaveTextContent"),
     ]);
   });
 });

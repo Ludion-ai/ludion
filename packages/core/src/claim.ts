@@ -99,5 +99,9 @@ export function lessonProblems(l: LessonV1): string[] {
   const words = ungroundedWords(l);
   if (words.length) problems.push(`The detail uses words no source quote contains: ${words.join(", ")}. Use the quotes' own words, or leave the detail out.`);
   for (const quote of quotesMissingSymbol(l)) problems.push(`The quote "${quote.slice(0, 80)}" doesn't name ${l.symbol}. Quote a sentence that states the fact itself, not a headline.`);
+  // The symbol must be something the evidence is about: named in a quote or used in a test's code.
+  const symbol = normalize(l.symbol);
+  const named = l.evidence.some((e) => normalize("test" in e ? e.test.code : e.source.quote).includes(symbol));
+  if (!named) problems.push(`No evidence names ${l.symbol}: use it in a test's code or quote a sentence that names it.`);
   return problems;
 }

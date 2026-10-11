@@ -15,7 +15,7 @@ const lesson: LessonV1 = {
   kind: "behavior",
   symbol: "int.__add__",
   signal: "loud",
-  evidence: [{ test: { runtime: "python@3.12", code: "assert 1 + 1 == 2" } }],
+  evidence: [{ test: { runtime: "python@3.12", code: "assert int.__add__(1, 1) == 2" } }],
   author: "github:Alice",
   author_id: 1001,
   created_at: "2026-10-07T00:00:00Z",

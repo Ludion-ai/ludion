@@ -11,7 +11,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
   - `subject` must equal the directory derived from the package: npm `@scope/name` → `scope.name`; anything else lowercased.
 - The site's design samples include a format 1 lesson, and `test` builds them, so a page that only handles format 0 fails CI.
 - **The claim is generated** (`packages/core` `generateClaim`): `<package> <versions> <removed|renamed … to|deprecated|added|changed the default of|changed what> \`<symbol>\` [; use \`<replacement>\` instead]. <Detail.> [Silent: code written for older versions still runs, without an error.]`. Same fields, same sentence. The index's `claim` holds it, so search, the site, and `ludion_ask` need no special case.
-- **`symbol` and `replacement`** look like code: up to 6 space-separated tokens of identifier, path, flag, and call characters; no quotes, backticks, or angle brackets; and the same text guards as `detail`. Backticks are also stripped when the claim is built, so no field can end a code span early. This came from a security review: these fields go into the sentence assistants read.
+- **`symbol` and `replacement`** look like code: up to 6 space-separated tokens of identifier, path, flag, and call characters; no quotes, backticks, or angle brackets; no invisible characters, URLs, command lines, or instructions to an AI (unlike `detail`, `//` and square brackets are allowed, which is harmless inside a code span). The symbol must also appear in the evidence: in a test's code or a quote. Backticks are also stripped when the claim is built, so no field can end a code span early. This came from a security review: these fields go into the sentence assistants read.
 - **`detail`**: at most 160 characters, **printable ASCII only, without backticks, angle brackets, or square brackets, and with no `//`** (so no markdown links or protocol-relative URLs). The text guards come from #21: no invisible characters, URLs, command lines, or instructions to an AI. ASCII-only means lookalike characters (fullwidth letters, for example) can't slip past those guards, and no markup reaches the generated claim. Lessons are written in English.
   - It must be **grounded**: every meaningful word, lightly stemmed, must appear in a **source quote** or in the fields (package, versions, symbol, replacement).
   - Only articles, basic prepositions, and forms of "be" are ignored. Negations (not, no, never, without), comparatives (only, more, before, after), modals, and numbers all count, so a detail can't say the opposite of its quote.
@@ -21,7 +21,8 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
   - the subject matches the package;
   - `versions` is a real range: `semver.validRange` accepts it, it doesn't mean every version (`*`, `x`, `||||`), and it has no empty `||` alternatives;
   - the detail is grounded;
-  - every quote names the symbol.
+  - every quote names the symbol, and at least one piece of evidence (a quote or a test's code) names it.
+- **Follow-up**: a test that prints a `skip:` line still counts toward the derived label. The PR gets the `skipped` label for the maintainer; making the label depend on CI's result needs results stored with the index, which can come with reverify.
 - **Evidence** is a test or a source.
   - **Test**: `{runtime, packages?, code, expect?, error?}`.
     - `runtime` is one of `node@18`/`20`/`22`/`24` or `python@3.9`–`3.14`.

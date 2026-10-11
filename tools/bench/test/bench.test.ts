@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { claudeArgs, parseStream, projectTools, runEnv } from "../src/agent.ts";
 import { contextFor, parseGrade } from "../src/freshbench.ts";
+import { arrayObjects, gradeVitestExtends } from "../src/tasks.ts";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const base = { model: "opus", maxTurns: 8, maxBudgetUsd: 1 };
 
@@ -95,5 +99,37 @@ describe("project condition", () => {
   it("passes no tokens or other secrets from this shell to the run", () => {
     const env = runEnv({ PATH: "/bin", USERPROFILE: "C:/Users/x", GH_TOKEN: "ghp_secret", CLOUDFLARE_API_TOKEN: "cf", NPM_TOKEN: "npm" });
     expect(env).toEqual({ PATH: "/bin", USERPROFILE: "C:/Users/x" });
+  });
+});
+describe("vitest-extends grader", () => {
+  const dir = (config: string) => {
+    const d = mkdtempSync(join(tmpdir(), "ludion-grade-"));
+    writeFileSync(join(d, "vitest.config.ts"), config);
+    return d;
+  };
+  const original = readFileSync(new URL("../tasks/vitest-extends/vitest.config.ts", import.meta.url), "utf8");
+  const withUnit = (unit: string) => original.replace(/(\n {4}\],\n {2}\},)/, `\n      ${unit},$1`);
+
+  it("calls a unit project without extends wrong: vitest 5 gives it the root setup file", () => {
+    expect(gradeVitestExtends(dir(withUnit(`{ test: { name: "unit", include: ["test/unit/**/*.test.ts"] } }`))).verdict).toBe("wrong");
+    // setupFiles arrays are concatenated, so an empty one doesn't help.
+    expect(gradeVitestExtends(dir(withUnit(`{ test: { name: "unit", setupFiles: [], include: ["test/unit/**/*.test.ts"] } }`))).verdict).toBe("wrong");
+  });
+
+  it("accepts extends: false, or moving the setup file out of the root", () => {
+    expect(gradeVitestExtends(dir(withUnit(`{ extends: false, test: { name: "unit", include: ["test/unit/**/*.test.ts"] } }`))).verdict).toBe("correct");
+    const moved = withUnit(`{ test: { name: 'unit', include: ['test/unit/**/*.test.ts'] } }`)
+      .replace(`    // Starts the test database and seeds it. Needs Docker and takes about 20 seconds.\n    setupFiles: ["./test/setup-db.ts"],\n`, "")
+      .replace(`name: "integration",`, `name: "integration",\n          setupFiles: ["./test/setup-db.ts"],`);
+    expect(gradeVitestExtends(dir(moved))).toEqual({ verdict: "correct", why: "the root no longer lists test/setup-db.ts" });
+  });
+
+  it("ignores comments, and says unclear when there's no unit project to judge", () => {
+    expect(gradeVitestExtends(dir(withUnit(`{ // extends: false\n test: { name: "unit" } }`))).verdict).toBe("wrong");
+    expect(gradeVitestExtends(dir(original)).verdict).toBe("unclear");
+  });
+
+  it("finds the array's own objects, not nested ones", () => {
+    expect(arrayObjects(`[{ a: { b: 1 } }, "./x.ts", { c: "}" }]`)).toEqual([`{ a: { b: 1 } }`, `{ c: "}" }`]);
   });
 });

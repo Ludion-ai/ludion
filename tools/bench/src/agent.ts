@@ -1,11 +1,12 @@
 // Runs one question through Claude Code headless (`claude -p`) in a new empty folder, with a configuration that
 // exists only for the run (bench.md, Conditions), and returns what it said and which tools it called.
 import { spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-export type Condition = "none" | "web" | "ludion";
+/** none: no tools. web: web search and fetch. ludion: web plus Ludion's MCP. project: Claude Code's default tools in a copy of a project with the packages installed. */
+export type Condition = "none" | "web" | "ludion" | "project";
 
 export interface AgentRun {
   condition: Condition;
@@ -36,14 +37,39 @@ export interface RunOptions {
   ludionUrl?: string;
   /** Kill the run after this long. Default 10 minutes. */
   timeoutMs?: number;
+  /** project condition: a prepared project folder (packages installed) copied into the run's folder. */
+  project?: string;
+  /** project condition: let the agent edit files (then it gets no Bash). Default: read-only. */
+  allowEdits?: boolean;
+  /** Called with the run's folder before Claude Code starts (for example to run ludion sync). */
+  prepare?: (workDir: string) => void;
+}
+
+/**
+ * Tools for the project condition. The agent reads untrusted text (web pages, node_modules) on this machine, so it
+ * never gets both a way to write files and a way to run them:
+ * - read-only (the default, for questions): read and search, run the project's existing tests and read-only package
+ *   commands, use the web. It can't write, so the tests it runs are the project's own.
+ * - with edits (for tasks): read, search, edit, use the web, and no Bash at all; the harness runs the tests afterwards.
+ */
+export function projectTools(allowEdits: boolean): string[] {
+  const read = ["Read", "Glob", "Grep", "WebSearch", "WebFetch"];
+  return allowEdits
+    ? [...read, "Edit", "Write"]
+    : [...read, "Bash(npm test)", "Bash(npm ls:*)", "Bash(npm view:*)", "Bash(npx vitest run)", "Bash(npx wrangler --version)", "Bash(ls:*)"];
+}
+/** Only what Claude Code needs to start and find its own sign-in; no tokens or other secrets from this shell. */
+const ENV_KEEP = ["PATH", "Path", "PATHEXT", "SystemRoot", "SYSTEMROOT", "windir", "ComSpec", "TEMP", "TMP", "HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "HOMEDRIVE", "HOMEPATH", "NUMBER_OF_PROCESSORS", "OS", "LANG"];
+export function runEnv(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+  return Object.fromEntries(ENV_KEEP.filter((k) => env[k] !== undefined).map((k) => [k, env[k]]));
 }
 
 const WEB_TOOLS = ["WebSearch", "WebFetch"];
 
 /** The command-line arguments for one condition. Exported for tests. */
 export function claudeArgs(prompt: string, o: RunOptions, mcpConfigPath?: string): string[] {
-  const tools = o.condition === "none" ? [] : WEB_TOOLS;
-  const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : tools;
+  const tools = o.condition === "none" ? [] : o.condition === "project" ? ["default"] : WEB_TOOLS;
+  const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : o.condition === "project" ? projectTools(o.allowEdits === true) : tools;
   const args = [
     "-p", prompt,
     "--output-format", "stream-json", "--verbose",
@@ -57,6 +83,7 @@ export function claudeArgs(prompt: string, o: RunOptions, mcpConfigPath?: string
     "--tools", tools.length ? tools.join(",") : "",
   ];
   if (allowed.length) args.push("--allowedTools", allowed.join(","));
+  if (o.condition === "project" && o.allowEdits) args.push("--permission-mode", "acceptEdits");
   if (mcpConfigPath) args.push("--mcp-config", mcpConfigPath);
   if (o.appendSystemPrompt) args.push("--append-system-prompt", o.appendSystemPrompt);
   return args;
@@ -95,14 +122,16 @@ export function runAgent(prompt: string, o: RunOptions): Promise<AgentRun> {
   const dir = mkdtempSync(join(tmpdir(), "ludion-bench-"));
   const work = join(dir, "work");
   mkdirSync(work);
+  if (o.project) cpSync(o.project, work, { recursive: true });
   if (o.claudeMd) writeFileSync(join(work, "CLAUDE.md"), o.claudeMd + "\n");
+  o.prepare?.(work);
   let mcpConfigPath: string | undefined;
   if (o.condition === "ludion") {
     mcpConfigPath = join(dir, "mcp.json");
     writeFileSync(mcpConfigPath, JSON.stringify({ mcpServers: { ludion: { type: "http", url: o.ludionUrl ?? "https://ludion.ai/mcp" } } }));
   }
   return new Promise((resolve, reject) => {
-    const child = spawn("claude", claudeArgs(prompt, o, mcpConfigPath), { cwd: work, stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+    const child = spawn("claude", claudeArgs(prompt, o, mcpConfigPath), { cwd: work, stdio: ["ignore", "pipe", "pipe"], windowsHide: true, env: runEnv() });
     // A run that hangs (seen under rate limiting) is killed and counted as an error, so the batch moves on.
     const timer = setTimeout(() => child.kill(), o.timeoutMs ?? 10 * 60_000);
     let stdout = "";

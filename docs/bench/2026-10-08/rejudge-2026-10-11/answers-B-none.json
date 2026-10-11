@@ -1,0 +1,20 @@
+{
+  "label": "B-none",
+  "set": "B",
+  "condition": "none",
+  "context": null,
+  "model": "opus",
+  "spentUsd": 6.218976,
+  "skipped": [],
+  "answers": [
+    {
+      "id": "vitest-5-0-0-6-b",
+      "answer": "Vitest browser mode supports three providers:\n\n- **Playwright** (`@vitest/browser-playwright`) runs Chromium, Firefox, and WebKit. It is the recommended choice for CI and parallel runs.\n- **WebdriverIO** (`@vitest/browser-webdriverio`) runs Chrome, Firefox, Edge, and Safari through the WebDriver protocol.\n- **Preview** (`@vitest/browser-preview`) opens tests in your own local browser. It only simulates user events, so it's meant for local development, not CI.\n\nIn Vitest 4 you import the provider package and pass it to `test.browser.provider` (for example, `provider: playwright()`). Older versions used a string such as `'playwright'` instead.",
+      "toolCalls": [],
+      "costUsd": 0.025950999999999995,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    }
+  ]
+}

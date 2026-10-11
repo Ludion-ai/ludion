@@ -1,0 +1,54 @@
+{
+  "lesson": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.124.0",
+    "kind": "behavior",
+    "symbol": "--latest",
+    "signal": "silent",
+    "detail": "It resolves to the newest compatibility date supported by the installed runtime.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.148.0"
+          },
+          "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfunction wrangler(args, extraEnv, dropEnv) {\n  const env = Object.assign({}, process.env, { CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home }, extraEnv || {});\n  for (const k of dropEnv || []) delete env[k];\n  const r = spawnSync(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", ...args], { cwd: dir, encoding: \"utf8\", timeout: 40000, env });\n  const out = (String(r.stdout || \"\") + String(r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\n  return { status: r.status, out };\n}\nfunction fail(msg, out) {\n  console.error(\"FAIL: \" + msg);\n  if (out) console.error(out.slice(-2000));\n  process.exit(1);\n}\nfunction write(name, content) {\n  fs.writeFileSync(path.join(dir, name), typeof content === \"string\" ? content : JSON.stringify(content, null, 2));\n}\nwrite(\"index.js\", 'export default { fetch() { return new Response(\"ok\"); } };\\n');\nwrite(\"wrangler.json\", { name: \"latest-date\", main: \"index.js\" });\nconst wv = JSON.parse(fs.readFileSync(require.resolve(\"workerd/package.json\", { paths: [\"/w/node_modules/wrangler\"] }), \"utf8\")).version;\nconst m = /^1\\.(\\d{4})(\\d{2})(\\d{2})\\./.exec(wv);\nif (!m) fail(\"unexpected workerd version \" + wv);\nconst expected = m[1] + \"-\" + m[2] + \"-\" + m[3];\nconst r = wrangler([\"deploy\", \"--dry-run\", \"--outdir\", \"out\", \"--latest\"]);\nif (r.status !== 0) fail(\"wrangler deploy --dry-run --latest failed\", r.out);\nif (!r.out.includes(\"latest compatibility date supported by this version of Wrangler (\" + expected + \")\")) fail(\"--latest did not resolve to the release date of the bundled workerd (\" + expected + \")\", r.out);\nconsole.log(\"OK: --latest resolved to \" + expected);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.123.0"
+          },
+          "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfunction wrangler(args, extraEnv, dropEnv) {\n  const env = Object.assign({}, process.env, { CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home }, extraEnv || {});\n  for (const k of dropEnv || []) delete env[k];\n  const r = spawnSync(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", ...args], { cwd: dir, encoding: \"utf8\", timeout: 40000, env });\n  const out = (String(r.stdout || \"\") + String(r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\n  return { status: r.status, out };\n}\nfunction fail(msg, out) {\n  console.error(\"FAIL: \" + msg);\n  if (out) console.error(out.slice(-2000));\n  process.exit(1);\n}\nfunction write(name, content) {\n  fs.writeFileSync(path.join(dir, name), typeof content === \"string\" ? content : JSON.stringify(content, null, 2));\n}\nwrite(\"index.js\", 'export default { fetch() { return new Response(\"ok\"); } };\\n');\nwrite(\"wrangler.json\", { name: \"latest-date\", main: \"index.js\" });\nconst wv = JSON.parse(fs.readFileSync(require.resolve(\"workerd/package.json\", { paths: [\"/w/node_modules/wrangler\"] }), \"utf8\")).version;\nconst m = /^1\\.(\\d{4})(\\d{2})(\\d{2})\\./.exec(wv);\nif (!m) fail(\"unexpected workerd version \" + wv);\nconst expected = m[1] + \"-\" + m[2] + \"-\" + m[3];\nconst r = wrangler([\"deploy\", \"--dry-run\", \"--outdir\", \"out\", \"--latest\"]);\nif (r.status !== 0) fail(\"wrangler deploy --dry-run --latest failed\", r.out);\nif (!r.out.includes(\"latest compatibility date supported by this version of Wrangler (\" + expected + \")\")) fail(\"--latest did not resolve to the release date of the bundled workerd (\" + expected + \")\", r.out);\nconsole.log(\"OK: --latest resolved to \" + expected);\n",
+          "expect": "fail",
+          "error": "FAIL: --latest did not resolve to the release date of the bundled workerd"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.148.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Resolve `--latest` to the newest compatibility date supported by the installed runtime"
+        }
+      }
+    ],
+    "drafted_by": "agent",
+    "format": 1,
+    "id": "01M4MH2TX0DNAH0V7HTGHJ54CB",
+    "subject": "wrangler",
+    "author": "github:you",
+    "author_id": 1,
+    "created_at": "2026-10-11T03:46:09Z"
+  },
+  "taught_at": "2026-10-11T03:46:09Z",
+  "checks": {
+    "tests": "not run (Docker isn't installed here; CI runs them)",
+    "sources": "found"
+  }
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // The report side of nightly reverify. It reads verify's results and its own failing.json; it never runs lesson code.
-//   node tools/verify/src/reverify-cli.ts count <tonight results.json> [<last night results.json>] --out failing.json
+//   node tools/verify/src/reverify-cli.ts count <tonight results.json> [<last night results.json>] --out failing.json [--last-failing <failing.json>]
 //   node tools/verify/src/reverify-cli.ts report <failing.json>
 // count decides what fails tonight and never fails the run, so failing.json is always uploaded. report prepares a
 // retraction branch and an issue per failing lesson (needs gh and a token that can push and open issues); it exits 1
@@ -21,16 +21,18 @@ const run = (cmd: string, args: string[]) => execFileSync(cmd, args, { encoding:
 
 function count(args: string[]): number {
   const out = args[args.indexOf("--out") + 1];
-  const [tonightPath, lastPath] = args.filter((a, i) => a !== "--out" && args[i - 1] !== "--out");
+  const lastFailingPath = args.includes("--last-failing") ? args[args.indexOf("--last-failing") + 1] : undefined;
+  const [tonightPath, lastPath] = args.filter((a, i) => !a.startsWith("--") && !["--out", "--last-failing"].includes(args[i - 1]!));
   const tonight = results(tonightPath);
   if (!tonight || !out || !args.includes("--out")) {
     console.error(USAGE);
     return 2;
   }
-  const decision = decide(tonight, results(lastPath), new Date());
+  const lastFailing = lastFailingPath && existsSync(lastFailingPath) ? ((JSON.parse(readFileSync(lastFailingPath, "utf8")) as Partial<FailingFile>).failing ?? []).map(safeFailing).filter((f): f is Failing => !!f) : [];
+  const decision = decide(tonight, results(lastPath), new Date(), lastFailing);
   writeFileSync(out, JSON.stringify(decision, null, 2) + "\n");
   const failed = tonight.filter((r) => r.status === "failed").length;
-  if (decision.suspended) console.log(`${failed} of ${tonight.length} lessons failed at once: that looks like the check, not the lessons. Nothing is withheld tonight.`);
+  if (decision.suspended) console.log(`${decision.suspended.failed} of ${tonight.length} lessons count as failing tonight: that looks like the check, not the lessons. Last night's list stands (${decision.failing.length} withheld).`);
   else console.log(`${tonight.length} lessons checked; ${decision.failing.length} failing${failed > decision.failing.length ? `; ${failed - decision.failing.length} failed only on a source or an outage for the first night (counted if they fail again)` : ""}.`);
   return 0;
 }
@@ -59,7 +61,7 @@ function report(path: string | undefined): number {
   }
   const decision = JSON.parse(readFileSync(path, "utf8")) as Partial<FailingFile>;
   if (decision.suspended) {
-    console.error(`Suspended: ${decision.suspended.failed} of ${decision.suspended.checked} lessons failed at once. Nothing was withheld or reported; find out what broke the check.`);
+    console.error(`Suspended: ${decision.suspended.failed} of ${decision.suspended.checked} lessons counted as failing at once. Last night's list stands and nothing new was reported; find out what broke the check.`);
     return 1;
   }
   const repo = process.env.GITHUB_REPOSITORY ?? "";

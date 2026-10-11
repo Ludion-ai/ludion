@@ -67,23 +67,30 @@ jobs:
           name: reverify-results
           path: tonight
 
-      # Only this workflow's own runs on main count (scheduled or started by hand), never a pull request's, and only
-      # one at least 12 hours older, so a manual run soon after the nightly one doesn't count as "last night".
-      - name: Get last night's results
+      # Only this workflow's own runs on main count (scheduled or started by hand), never a pull request's.
+      # Last night's results: the newest completed one at least 12 hours older, so a manual run soon after the nightly
+      # one doesn't count as "last night". The list production uses: the newest one with a list, whatever its age.
+      - name: Get last night's results and the current list
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           cutoff=$(date -u -d '12 hours ago' +%Y-%m-%dT%H:%M:%SZ)
-          prev=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --status completed --limit 20 \
-            --json databaseId,event,createdAt \
-            --jq "[.[] | select((.event == \"schedule\" or .event == \"workflow_dispatch\") and .createdAt < \"$cutoff\")][0].databaseId // empty")
+          runs=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --limit 30 \
+            --json databaseId,event,createdAt,status \
+            --jq "[.[] | select((.event == \"schedule\" or .event == \"workflow_dispatch\") and .databaseId != $GITHUB_RUN_ID)]")
+          prev=$(echo "$runs" | jq -r --arg cutoff "$cutoff" '[.[] | select(.status == "completed" and .createdAt < $cutoff)][0].databaseId // empty')
           if [ -n "$prev" ]; then
             gh run download "$prev" --repo "$GITHUB_REPOSITORY" --name reverify-results --dir last-night || echo "No results from run $prev."
-            gh run download "$prev" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir last-failing || echo "No failing list from run $prev."
           fi
+          for run in $(echo "$runs" | jq -r '.[].databaseId'); do
+            if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir last-failing; then
+              echo "The current list comes from run $run."
+              break
+            fi
+          done
 
       - name: Decide what fails tonight
-        run: node tools/verify/src/reverify-cli.ts count tonight/results.json last-night/results.json --out failing.json
+        run: node tools/verify/src/reverify-cli.ts count tonight/results.json last-night/results.json --out failing.json --last-failing last-failing/failing.json
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -91,17 +98,18 @@ jobs:
           path: failing.json
           retention-days: 30
 
-      - name: Deploy if the failing lessons changed
+      # Deploys when the list changed, and every night while it isn't empty, so a deploy that failed is retried.
+      - name: Deploy if lessons are withheld or the list changed
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           now=$(jq -c '[.failing[].id] | sort' failing.json)
           before=$( [ -f last-failing/failing.json ] && jq -c '[.failing[].id] | sort' last-failing/failing.json || echo '[]')
-          if [ "$now" != "$before" ]; then
-            echo "Failing lessons changed ($before -> $now); deploying so the index follows."
+          if [ "$now" != "$before" ] || [ "$now" != "[]" ]; then
+            echo "Failing lessons: $before -> $now; deploying so the index follows."
             gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main -f reverify_run="$GITHUB_RUN_ID"
           else
-            echo "No change in failing lessons."
+            echo "No lessons withheld, and no change."
           fi
 
       # Last, so a failure here never stops the list from being uploaded or the deploy from starting. Fails the run

@@ -11,9 +11,9 @@ export interface Failing {
 
 export interface FailingFile {
   checked_at: string;
-  /** Lessons withheld from the index until fixed or retracted. Empty when suspended. */
+  /** Lessons withheld from the index until they pass again or are retracted. On a suspended night, last night's list. */
   failing: Failing[];
-  /** Set when so many lessons failed at once that the cause is likely the check, not the lessons: nothing is withheld. */
+  /** Set when so many lessons failed at once that the cause is likely the check: tonight changes nothing (last night's list stands). */
   suspended?: { failed: number; checked: number };
 }
 
@@ -41,11 +41,14 @@ export function tooMany(failed: number, checked: number): boolean {
   return failed > 3 && failed > checked / 5;
 }
 
-/** What tonight decides: the failing list, or nothing withheld when the failures look like the check's own fault. */
-export function decide(tonight: LessonResult[], lastNight: LessonResult[] | undefined, now: Date): FailingFile {
+/**
+ * What tonight decides: the failing list. When the failures look like the check's own fault, tonight changes nothing:
+ * last night's list stands, so lessons already confirmed failing stay withheld and no new ones are.
+ */
+export function decide(tonight: LessonResult[], lastNight: LessonResult[] | undefined, now: Date, lastFailing: Failing[] = []): FailingFile {
   const failing = confirmedFailures(tonight, lastNight);
   const checked_at = now.toISOString().replace(/\.\d{3}Z$/, "Z");
-  if (tooMany(failing.length, tonight.length)) return { checked_at, failing: [], suspended: { failed: failing.length, checked: tonight.length } };
+  if (tooMany(failing.length, tonight.length)) return { checked_at, failing: lastFailing, suspended: { failed: failing.length, checked: tonight.length } };
   return { checked_at, failing };
 }
 

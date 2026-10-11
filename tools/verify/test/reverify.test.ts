@@ -36,6 +36,9 @@ describe("decide", () => {
   it("withholds nothing when too many lessons fail at once", () => {
     const many = Array.from({ length: 10 }, (_, i) => result(`01K7000000000000000000001${i}`, "failed", [failedTest]));
     expect(decide(many, undefined, new Date("2026-10-12T04:40:00Z"))).toEqual({ checked_at: "2026-10-12T04:40:00Z", failing: [], suspended: { failed: 10, checked: 10 } });
+    // A suspended night keeps last night's list: lessons already confirmed failing stay withheld.
+    const kept = [{ id: A, file: `lessons/x/${A}.json`, reasons: [failedTest] }];
+    expect(decide(many, undefined, new Date(), kept).failing).toEqual(kept);
     expect(decide([result(A, "failed", [failedTest]), result(B, "passed")], undefined, new Date()).failing.map((f) => f.id)).toEqual([A]);
   });
 

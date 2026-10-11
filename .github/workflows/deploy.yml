@@ -54,9 +54,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REVERIFY_RUN: ${{ inputs.reverify_run }}
         run: |
+          # The runs API has the workflow file path (gh run view doesn't) and the repository the run's code came from.
           trusted() {
-            gh run view "$1" --repo "$GITHUB_REPOSITORY" --json event,headBranch,path \
-              --jq '(.event == "schedule" or .event == "workflow_dispatch") and .headBranch == "main" and .path == ".github/workflows/reverify.yml"'
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$1" \
+              --jq "(.event == \"schedule\" or .event == \"workflow_dispatch\") and .head_branch == \"main\" and .path == \".github/workflows/reverify.yml\" and .head_repository.full_name == \"$GITHUB_REPOSITORY\""
           }
           if [ -n "$REVERIFY_RUN" ]; then
             case "$REVERIFY_RUN" in *[!0-9]*) echo "reverify_run must be a run id."; exit 1 ;; esac
@@ -64,8 +65,12 @@ jobs:
             gh run download "$REVERIFY_RUN" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify
             exit 0
           fi
-          for run in $(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --status completed --limit 10 \
-              --json databaseId,event --jq '.[] | select(.event == "schedule" or .event == "workflow_dispatch") | .databaseId'); do
+          # Listed first, so a failure to list stops the step instead of withholding nothing. Runs still going count
+          # too: their list is uploaded before they start a deploy.
+          runs=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --limit 10 \
+            --json databaseId,event --jq '.[] | select(.event == "schedule" or .event == "workflow_dispatch") | .databaseId')
+          for run in $runs; do
+            [ "$(trusted "$run")" = "true" ] || continue
             if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify; then
               echo "Using the failing list from reverify run $run."
               exit 0

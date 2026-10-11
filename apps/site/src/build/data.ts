@@ -25,8 +25,8 @@ export interface LessonPage {
   /** Lessons this one corrects, and the lesson that corrects it, if any. */
   corrects: string[];
   correctedBy: string | null;
-  /** When the nightly reverify last found this lesson failing (it is withheld from the index), else null. */
-  failingSince: string | null;
+  /** The date of the nightly check that found this lesson failing (it is withheld from the index), else null. */
+  failedCheckAt: string | null;
 }
 
 /** A retracted lesson: its file was deleted from main. Its page stays, struck through, so links keep working. */
@@ -184,7 +184,7 @@ async function load(): Promise<SiteData> {
       pr: info[lesson.id]?.pr ?? null,
       corrects: lesson.replaces ?? [],
       correctedBy: correctedBy.get(lesson.id) ?? null,
-      failingSince: withheld.ids.has(lesson.id) ? (withheld.checkedAt ?? "") : null,
+      failedCheckAt: withheld.ids.has(lesson.id) ? (withheld.checkedAt ?? "") : null,
     }))
     .sort((a, b) => (a.verified_at < b.verified_at ? 1 : a.verified_at > b.verified_at ? -1 : 0));
 

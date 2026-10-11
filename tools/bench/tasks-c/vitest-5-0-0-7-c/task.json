@@ -1,0 +1,42 @@
+{
+  "id": "vitest-5-0-0-7-c",
+  "change": "vitest-5-0-0-7",
+  "library": "vitest",
+  "prompt": "Add a browser test in src/save-status.test.js for showSaved() in src/save-status.js: mount the status element, call showSaved(container, 3), and check with expect.element that the status region says it saved. Only check for the word \"Saved\": the rest of the message contains the local time, and the copy after it may change.",
+  "correct": [
+    [
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "\\.toMatchTextContent\\(" },
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "toHaveTextContent\\(\\s*(?:['\"`]Saved['\"`]|/)", "absent": true },
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "getByText\\(\\s*['\"`]Saved['\"`]\\s*\\)", "absent": true }
+    ],
+    [
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "getBy\\w+\\(\\s*/[^/\\n]*Saved" },
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "toHaveTextContent\\(\\s*(?:['\"`]Saved['\"`]|/)", "absent": true }
+    ],
+    [
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "getByText\\([^)]*exact\\s*:\\s*false" },
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "toHaveTextContent\\(\\s*(?:['\"`]Saved['\"`]|/)", "absent": true }
+    ],
+    [
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "textContent[^\\n]*\\)\\s*\\.(?:toContain|toMatch)\\(" },
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "toHaveTextContent\\(\\s*(?:['\"`]Saved['\"`]|/)", "absent": true },
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "getByText\\(\\s*['\"`]Saved['\"`]\\s*\\)", "absent": true }
+    ],
+    [
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "toHaveTextContent\\(\\s*`Saved[^`]*\\$\\{" },
+      { "files": ["src/save-status.test.js", "src/save-status.test.ts", "src/save-status.browser.test.js", "src/save-status.browser.test.ts"], "pattern": "toHaveTextContent\\(\\s*(?:['\"`]Saved['\"`]|/)", "absent": true }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { "src/save-status.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { mountStatus, showSaved } from './save-status.js';\n\ntest('says it saved', async () => {\n  mountStatus(document.body);\n  showSaved(document.body, 3);\n  await expect.element(page.getByRole('status')).toMatchTextContent('Saved');\n});\n" },
+      { "src/save-status.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { mountStatus, showSaved } from './save-status.js';\n\ntest('says it saved', async () => {\n  mountStatus(document.body);\n  showSaved(document.body, 3);\n  await expect.element(page.getByText(/^Saved/)).toBeVisible();\n});\n" },
+      { "src/save-status.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { mountStatus, showSaved } from './save-status.js';\n\ntest('says it saved', async () => {\n  mountStatus(document.body);\n  showSaved(document.body, 3);\n  await expect.element(page.getByText('Saved', { exact: false })).toBeInTheDocument();\n});\n" }
+    ],
+    "wrong": [
+      { "src/save-status.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { mountStatus, showSaved } from './save-status.js';\n\ntest('says it saved', async () => {\n  mountStatus(document.body);\n  showSaved(document.body, 3);\n  await expect.element(page.getByRole('status')).toHaveTextContent('Saved');\n});\n" },
+      { "src/save-status.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { mountStatus, showSaved } from './save-status.js';\n\ntest('says it saved', async () => {\n  mountStatus(document.body);\n  showSaved(document.body, 3);\n  await expect.element(page.getByRole('status')).toHaveTextContent(/Saved/);\n});\n" }
+    ]
+  },
+  "trap": "In Vitest 4 toHaveTextContent('Saved') was a partial match; in Vitest 5 it requires the whole text (and no longer takes a RegExp), so a partial check needs toMatchTextContent."
+}

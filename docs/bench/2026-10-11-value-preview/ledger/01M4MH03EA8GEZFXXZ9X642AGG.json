@@ -1,0 +1,54 @@
+{
+  "lesson": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.22.0",
+    "kind": "default",
+    "symbol": "throttle",
+    "signal": "silent",
+    "detail": "useAgentChat now coalesces updates every 50ms; pass throttle: false to render every chunk as it arrives, or a number to change the interval.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.27.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst entry = pkg.exports[\"./chat/react\"];\nconst src = fs.readFileSync(path.join(root, entry.import), \"utf8\");\nconst resolveSrc = /function resolveChatThrottleMs\\(options\\) \\{[\\s\\S]*?\\n\\}/.exec(src);\nconst optionsSrc = /function chatThrottleOptions\\(options\\) \\{[\\s\\S]*?\\n\\}/.exec(src);\nif (!resolveSrc || !optionsSrc || !src.includes(\"...chatThrottleOptions(\")) {\n  console.error(\"FAIL: agents \" + pkg.version + \" useAgentChat has no default throttle (agents/chat/react passes no throttle to useChat)\");\n  process.exit(1);\n}\nconst fns = new Function(resolveSrc[0] + \"\\n\" + optionsSrc[0] + \"\\nreturn { resolveChatThrottleMs, chatThrottleOptions };\")();\nconst got = {\n  byDefault: fns.resolveChatThrottleMs({}),\n  off: String(fns.resolveChatThrottleMs({ throttle: false })),\n  custom: fns.resolveChatThrottleMs({ throttle: 120 }),\n  passed: fns.chatThrottleOptions({})\n};\nif (got.byDefault !== 50 || got.off !== \"undefined\" || got.custom !== 120 || got.passed.throttle !== 50) {\n  console.error(\"FAIL: unexpected throttle values \" + JSON.stringify(got));\n  process.exit(1);\n}\nconst types = fs.readFileSync(path.join(root, entry.types), \"utf8\");\nif (!/throttle\\?: number \\| false/.test(types)) {\n  console.error(\"FAIL: useAgentChat options have no throttle?: number | false\");\n  process.exit(1);\n}\nconsole.log(\"OK: agents \" + pkg.version + \" useAgentChat throttle defaults to 50 ms; false turns it off: \" + JSON.stringify(got));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.21.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst entry = pkg.exports[\"./chat/react\"];\nconst src = fs.readFileSync(path.join(root, entry.import), \"utf8\");\nconst resolveSrc = /function resolveChatThrottleMs\\(options\\) \\{[\\s\\S]*?\\n\\}/.exec(src);\nconst optionsSrc = /function chatThrottleOptions\\(options\\) \\{[\\s\\S]*?\\n\\}/.exec(src);\nif (!resolveSrc || !optionsSrc || !src.includes(\"...chatThrottleOptions(\")) {\n  console.error(\"FAIL: agents \" + pkg.version + \" useAgentChat has no default throttle (agents/chat/react passes no throttle to useChat)\");\n  process.exit(1);\n}\nconst fns = new Function(resolveSrc[0] + \"\\n\" + optionsSrc[0] + \"\\nreturn { resolveChatThrottleMs, chatThrottleOptions };\")();\nconst got = {\n  byDefault: fns.resolveChatThrottleMs({}),\n  off: String(fns.resolveChatThrottleMs({ throttle: false })),\n  custom: fns.resolveChatThrottleMs({ throttle: 120 }),\n  passed: fns.chatThrottleOptions({})\n};\nif (got.byDefault !== 50 || got.off !== \"undefined\" || got.custom !== 120 || got.passed.throttle !== 50) {\n  console.error(\"FAIL: unexpected throttle values \" + JSON.stringify(got));\n  process.exit(1);\n}\nconst types = fs.readFileSync(path.join(root, entry.types), \"utf8\");\nif (!/throttle\\?: number \\| false/.test(types)) {\n  console.error(\"FAIL: useAgentChat options have no throttle?: number | false\");\n  process.exit(1);\n}\nconsole.log(\"OK: agents \" + pkg.version + \" useAgentChat throttle defaults to 50 ms; false turns it off: \" + JSON.stringify(got));\n",
+          "expect": "fail",
+          "error": "useAgentChat has no default throttle"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/packages/agents/CHANGELOG.md",
+          "quote": "`useAgentChat` now coalesces those updates every 50ms, which removes about 78%\n  of renders on a fast stream and matches the value the AI SDK documents. The\n  first chunk of a stream is never delayed. Pass `throttle: false` to render\n  every chunk as it arrives, or a number to change the interval."
+        }
+      }
+    ],
+    "drafted_by": "agent",
+    "format": 1,
+    "id": "01M4MH03EA8GEZFXXZ9X642AGG",
+    "subject": "agents",
+    "author": "github:you",
+    "author_id": 1,
+    "created_at": "2026-10-11T03:44:40Z"
+  },
+  "taught_at": "2026-10-11T03:44:40Z",
+  "checks": {
+    "tests": "not run (Docker isn't installed here; CI runs them)",
+    "sources": "found"
+  }
+}

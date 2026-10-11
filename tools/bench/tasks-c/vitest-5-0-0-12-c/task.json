@@ -1,0 +1,39 @@
+{
+  "id": "vitest-5-0-0-12-c",
+  "change": "vitest-5-0-0-12",
+  "library": "vitest",
+  "prompt": "Add a browser test in src/file-list.test.js for renderFileList() in src/file-list.js: render three files (a.txt, b.txt, c.txt), select a.txt and b.txt, click the delete button, and check that only c.txt is left. Find the delete button by its role and the word Delete; its label also shows how many files are selected, and the test shouldn't depend on that part.",
+  "correct": [
+    [
+      { "files": ["src/file-list.test.js", "src/file-list.test.ts", "src/file-list.browser.test.js", "src/file-list.browser.test.ts"], "pattern": "getBy\\w+\\((?=[^)]*['\"`]Delete)(?=[^)]*exact\\s*:\\s*false)" },
+      { "files": ["src/file-list.test.js", "src/file-list.test.ts", "src/file-list.browser.test.js", "src/file-list.browser.test.ts"], "pattern": "getByRole\\(\\s*['\"]button['\"]\\s*,\\s*\\{\\s*name\\s*:\\s*['\"`]Delete['\"`]\\s*,?\\s*\\}\\s*\\)", "absent": true },
+      { "files": ["src/file-list.test.js", "src/file-list.test.ts", "src/file-list.browser.test.js", "src/file-list.browser.test.ts"], "pattern": "getByText\\(\\s*['\"`]Delete['\"`]\\s*\\)", "absent": true }
+    ],
+    [
+      { "files": ["src/file-list.test.js", "src/file-list.test.ts", "src/file-list.browser.test.js", "src/file-list.browser.test.ts"], "pattern": "(?:name\\s*:\\s*|getByText\\(\\s*)/[^/\\n]*[Dd]elete" },
+      { "files": ["src/file-list.test.js", "src/file-list.test.ts", "src/file-list.browser.test.js", "src/file-list.browser.test.ts"], "pattern": "getByRole\\(\\s*['\"]button['\"]\\s*,\\s*\\{\\s*name\\s*:\\s*['\"`]Delete['\"`]\\s*,?\\s*\\}\\s*\\)", "absent": true },
+      { "files": ["src/file-list.test.js", "src/file-list.test.ts", "src/file-list.browser.test.js", "src/file-list.browser.test.ts"], "pattern": "getByText\\(\\s*['\"`]Delete['\"`]\\s*\\)", "absent": true }
+    ],
+    [
+      { "files": ["vitest.config.js", "vitest.config.ts", "vitest.config.mjs", "vitest.config.mts"], "pattern": "locators\\s*:\\s*\\{[^}]*exact\\s*:\\s*false" },
+      { "files": ["src/file-list.test.js", "src/file-list.test.ts", "src/file-list.browser.test.js", "src/file-list.browser.test.ts"], "pattern": "Delete" }
+    ]
+  ],
+  "examples": {
+    "correct": [
+      { "src/file-list.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { renderFileList } from './file-list.js';\n\ntest('deletes the selected files', async () => {\n  renderFileList(document.body, ['a.txt', 'b.txt', 'c.txt']);\n  await page.getByLabelText('a.txt').click();\n  await page.getByLabelText('b.txt').click();\n  await page.getByRole('button', { name: 'Delete', exact: false }).click();\n  await expect.element(page.getByText('c.txt')).toBeInTheDocument();\n  expect(page.getByRole('listitem').elements()).toHaveLength(1);\n});\n" },
+      { "src/file-list.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { renderFileList } from './file-list.js';\n\ntest('deletes the selected files', async () => {\n  renderFileList(document.body, ['a.txt', 'b.txt', 'c.txt']);\n  await page.getByRole('checkbox', { name: 'a.txt' }).click();\n  await page.getByRole('checkbox', { name: 'b.txt' }).click();\n  await page.getByRole('button', { name: /^Delete\\b/ }).click();\n  expect(page.getByRole('listitem').elements()).toHaveLength(1);\n});\n" },
+      {
+        "vitest.config.js": "import { defineConfig } from 'vitest/config';\nimport { playwright } from '@vitest/browser-playwright';\n\nexport default defineConfig({\n  test: {\n    browser: {\n      enabled: true,\n      provider: playwright(),\n      headless: true,\n      locators: { exact: false },\n      instances: [{ browser: 'chromium' }],\n    },\n  },\n});\n",
+        "src/file-list.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { renderFileList } from './file-list.js';\n\ntest('deletes the selected files', async () => {\n  renderFileList(document.body, ['a.txt', 'b.txt', 'c.txt']);\n  await page.getByLabelText('a.txt').click();\n  await page.getByLabelText('b.txt').click();\n  await page.getByRole('button', { name: 'Delete' }).click();\n  expect(page.getByRole('listitem').elements()).toHaveLength(1);\n});\n"
+      },
+      { "src/file-list.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { renderFileList } from './file-list.js';\n\ntest('deletes the selected files', async () => {\n  renderFileList(document.body, ['a.txt', 'b.txt', 'c.txt']);\n  await page.getByLabelText('a.txt').click();\n  await page.getByLabelText('b.txt').click();\n  await page.getByRole('button', { exact: false, name: 'Delete' }).click();\n  expect(page.getByRole('listitem').elements()).toHaveLength(1);\n});\n" }
+    ],
+    "wrong": [
+      { "src/file-list.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { renderFileList } from './file-list.js';\n\ntest('deletes the selected files', async () => {\n  renderFileList(document.body, ['a.txt', 'b.txt', 'c.txt']);\n  await page.getByLabelText('a.txt', { exact: false }).click();\n  await page.getByLabelText('b.txt').click();\n  await page.getByRole('button', { name: 'Delete', exact: true }).click();\n  expect(page.getByRole('listitem').elements()).toHaveLength(1);\n});\n" },
+      { "src/file-list.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { renderFileList } from './file-list.js';\n\ntest('deletes the selected files', async () => {\n  renderFileList(document.body, ['a.txt', 'b.txt', 'c.txt']);\n  await page.getByLabelText('a.txt').click();\n  await page.getByLabelText('b.txt').click();\n  await page.getByRole('button', { name: 'Delete' }).click();\n  await expect.element(page.getByText('c.txt')).toBeInTheDocument();\n  expect(page.getByRole('listitem').elements()).toHaveLength(1);\n});\n" },
+      { "src/file-list.test.js": "import { expect, test } from 'vitest';\nimport { page } from 'vitest/browser';\nimport { renderFileList } from './file-list.js';\n\ntest('deletes the selected files', async () => {\n  renderFileList(document.body, ['a.txt', 'b.txt', 'c.txt']);\n  await page.getByLabelText('a.txt').click();\n  await page.getByLabelText('b.txt').click();\n  await page.getByText('Delete').click();\n  expect(page.getByRole('listitem').elements()).toHaveLength(1);\n});\n" }
+    ]
+  },
+  "trap": "Vitest 4 locators matched a substring, so getByRole('button', { name: 'Delete' }) found \"Delete 2 files\"; Vitest 5 locators match the whole text by default (browser.locators.exact is true), so the button is not found."
+}

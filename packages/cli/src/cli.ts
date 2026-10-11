@@ -130,10 +130,14 @@ async function main(argv: string[]): Promise<number> {
   return command === undefined || command === "help" || command === "--help" ? 0 : 2;
 }
 
+// exitCode, never process.exit(): exiting while fetch's sockets are still closing trips a libuv assertion on
+// Windows (exit code 9 after a successful sync), which a session-start hook would report as a failure.
 main(process.argv.slice(2)).then(
-  (code) => process.exit(code),
+  (code) => {
+    process.exitCode = code;
+  },
   (err: Error) => {
     console.error(`ludion: ${err.message}`);
-    process.exit(1);
+    process.exitCode = 1;
   },
 );

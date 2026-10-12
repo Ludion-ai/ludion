@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#77",
+  "verdict": {
+    "id": "5.0.0#77",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "includeTaskLocation",
+    "why": "Test names no longer include the column when includeTaskLocation is enabled, so output differs for existing config."
+  },
+  "cost_usd": 0.26637180000000005,
+  "turns": 11,
+  "error": "no draft.json (run ended with an error)"
+}

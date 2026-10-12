@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#34",
+  "verdict": {
+    "id": "4.4.0#34",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "invalid_union options",
+    "why": "Invalid discriminator errors now include an extra options field, changing issue output."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

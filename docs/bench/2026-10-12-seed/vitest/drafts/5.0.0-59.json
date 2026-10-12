@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#59",
+  "verdict": {
+    "id": "5.0.0#59",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "sequential",
+    "why": "The sequential test API and options are deprecated and still work, and global concurrent handling changes."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#44",
+  "verdict": {
+    "id": "5.0.0#44",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "experimental.fsModuleCache",
+    "why": "fsModuleCache is promoted to a top-level option, so the old experimental location is no longer the right name."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

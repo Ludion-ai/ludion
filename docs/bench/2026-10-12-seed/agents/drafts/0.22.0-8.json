@@ -1,0 +1,32 @@
+{
+  "entry": "0.22.0#8",
+  "verdict": {
+    "id": "0.22.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "SDK-created spans now carry extra instrumentation and agent identity attributes."
+  },
+  "cost_usd": 0.9869448000000003,
+  "turns": 38,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.22.0",
+    "kind": "behavior",
+    "symbol": "instrumentation_scope.version",
+    "signal": "silent",
+    "detail": "Telemetry instrumentation_scope.version is hardcoded to 1; it is not the package version.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/AGENTS.md",
+          "quote": "- **Telemetry has an independent schema version** — `instrumentation_scope.version` is hardcoded to `\"1\"`; it is not the package version."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

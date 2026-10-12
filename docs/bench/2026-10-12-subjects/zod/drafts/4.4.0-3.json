@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#3",
+  "verdict": {
+    "id": "4.4.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "prefault",
+    "why": "Falsy prefault values are now emitted as defaults in JSON Schema output where they were previously omitted."
+  },
+  "cost_usd": 0.18101520000000001,
+  "turns": 7,
+  "error": "no draft.json (run ended with an error)"
+}

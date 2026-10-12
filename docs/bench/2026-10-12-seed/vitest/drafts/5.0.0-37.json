@@ -1,0 +1,56 @@
+{
+  "entry": "5.0.0#37",
+  "verdict": {
+    "id": "5.0.0#37",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "html reporter",
+    "why": "The html reporter's default output moved to .vitest, and the UI API access was hardened, so previous usage can stop working."
+  },
+  "cost_usd": 0.4955174,
+  "turns": 14,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "default",
+    "symbol": "--reporter=html outputDir",
+    "signal": "silent",
+    "detail": "By default the html reporter entry is written to .vitest/index.html; outputDir default is .vitest",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "5.0.0",
+            "@vitest/ui": "5.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/htmlreport\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), \"{}\\n\");\nfs.writeFileSync(path.join(dir, \"basic.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('ok', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=html\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 70000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst newEntry = fs.existsSync(path.join(dir, \".vitest\", \"index.html\"));\nconst oldEntry = fs.existsSync(path.join(dir, \"html\", \"index.html\"));\nconsole.log(\"exit \" + r.status + \", .vitest/index.html \" + newEntry + \", html/index.html \" + oldEntry);\nif (newEntry && !oldEntry) {\n  console.log(\"PASS: --reporter=html wrote its report entry to .vitest/index.html\");\n  process.exit(0);\n}\nif (oldEntry && !newEntry) {\n  console.error(\"FAIL: --reporter=html wrote its report entry to html/index.html, not .vitest/index.html\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: no single html report entry found (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "4.1.11",
+            "@vitest/ui": "4.1.11"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/htmlreport\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), \"{}\\n\");\nfs.writeFileSync(path.join(dir, \"basic.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('ok', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=html\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 70000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst newEntry = fs.existsSync(path.join(dir, \".vitest\", \"index.html\"));\nconst oldEntry = fs.existsSync(path.join(dir, \"html\", \"index.html\"));\nconsole.log(\"exit \" + r.status + \", .vitest/index.html \" + newEntry + \", html/index.html \" + oldEntry);\nif (newEntry && !oldEntry) {\n  console.log(\"PASS: --reporter=html wrote its report entry to .vitest/index.html\");\n  process.exit(0);\n}\nif (oldEntry && !newEntry) {\n  console.error(\"FAIL: --reporter=html wrote its report entry to html/index.html, not .vitest/index.html\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: no single html report entry found (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: --reporter=html wrote its report entry to html/index.html, not .vitest/index.html"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/reporters.md",
+          "quote": "The report entry is written to `<outputDir>/index.html` and the UI assets files live under `<outputDir>/ui/`. By default `outputDir` is `.vitest`, the shared Vitest artifact directory"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -107,6 +107,9 @@ describe("project condition", () => {
   it("passes no tokens or other secrets from this shell to the run", () => {
     const env = runEnv({ PATH: "/bin", USERPROFILE: "C:/Users/x", GH_TOKEN: "ghp_secret", CLOUDFLARE_API_TOKEN: "cf", NPM_TOKEN: "npm" });
     expect(env).toEqual({ PATH: "/bin", USERPROFILE: "C:/Users/x" });
+    // An API key in a person's shell stays out; only GitHub Actions (the seed watch) passes it.
+    expect(runEnv({ PATH: "/bin", ANTHROPIC_API_KEY: "k" })).toEqual({ PATH: "/bin" });
+    expect(runEnv({ PATH: "/bin", ANTHROPIC_API_KEY: "k", GITHUB_ACTIONS: "true", GH_TOKEN: "t" })).toEqual({ PATH: "/bin", ANTHROPIC_API_KEY: "k" });
   });
 });
 describe("vitest-extends grader", () => {

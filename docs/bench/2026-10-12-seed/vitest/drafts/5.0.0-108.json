@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#108",
+  "verdict": {
+    "id": "5.0.0#108",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "coverage.exclude",
+    "why": "coverage.exclude no longer inherits negation globs from test.include, changing which files are covered."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#4",
+  "verdict": {
+    "id": "4.4.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.cuid()",
+    "why": "The JSON Schema pattern emitted for CUID is now tighter, changing generated output."
+  },
+  "cost_usd": 0.1806544,
+  "turns": 6,
+  "error": "no draft.json (run ended with an error)"
+}

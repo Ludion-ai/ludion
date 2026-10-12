@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#33",
+  "verdict": {
+    "id": "4.4.0#33",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.record",
+    "why": "Record validation now skips non-enumerable properties, changing the output for such inputs."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

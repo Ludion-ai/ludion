@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#111",
+  "verdict": {
+    "id": "5.0.0#111",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "junit",
+    "why": "JUnit XML report output now includes unhandled errors."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

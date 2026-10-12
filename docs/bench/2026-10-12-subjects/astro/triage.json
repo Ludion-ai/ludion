@@ -1,0 +1,2718 @@
+[
+  {
+    "id": "5.18.2#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "styles",
+    "why": "SSR manifest entries for prerendered routes now contain styles instead of an empty array, which consumers of the manifest observe."
+  },
+  {
+    "id": "6.1.7#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes remote image dimension validation work on Netlify static builds as already intended."
+  },
+  {
+    "id": "6.1.7#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes --port being ignored after a server restart, restoring documented behavior."
+  },
+  {
+    "id": "6.1.7#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "/_image?f=svg",
+    "why": "The endpoint now refuses f=svg for non-SVG sources, so requests that used to succeed are rejected."
+  },
+  {
+    "id": "6.1.8#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes build output filenames containing special characters that broke deploys."
+  },
+  {
+    "id": "6.1.8#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance-only caching in the dev server with no observable change."
+  },
+  {
+    "id": "6.1.8#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes unstable asset hashes in client builds."
+  },
+  {
+    "id": "6.1.8#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes allowedDomains not being propagated in dev, as documented."
+  },
+  {
+    "id": "6.1.8#5",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Vague 'improves' wording does not say what changed for users."
+  },
+  {
+    "id": "6.1.8#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only adds tests."
+  },
+  {
+    "id": "6.1.8#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns build errors on skew-protection platforms into working builds."
+  },
+  {
+    "id": "6.1.9#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency patch updates with no described user-visible change."
+  },
+  {
+    "id": "6.1.9#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Hardening of astro-island resolution for malformed metadata is not specific about observable changes."
+  },
+  {
+    "id": "6.1.9#3",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Security hardening of error overlay and logging without a described observable change."
+  },
+  {
+    "id": "6.1.9#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Hardening of prototype-key lookups with no described user-visible change."
+  },
+  {
+    "id": "6.1.9#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes i18n domains returning 404 with trailingSlash never, contrary to documented behavior."
+  },
+  {
+    "id": "6.1.10#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a spurious warning in dev."
+  },
+  {
+    "id": "6.1.10#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Hardening of server island encryption; observable effect for users is not described."
+  },
+  {
+    "id": "6.1.10#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a spurious 404 for a dev toolbar sourcemap."
+  },
+  {
+    "id": "6.1.10#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an unnecessary full page reload in dev."
+  },
+  {
+    "id": "6.2.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "RenderOptions.waitUntil",
+    "why": "New waitUntil render option and CacheProvider.onRequest context.waitUntil; older versions ignore the extra option."
+  },
+  {
+    "id": "6.2.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "server.allowedHosts",
+    "why": "astro preview with the Cloudflare adapter now honors allowedHosts, so previously accepted hosts may now be blocked."
+  },
+  {
+    "id": "6.2.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "compressHTML: 'jsx'",
+    "why": "New 'jsx' value for compressHTML, which older versions reject at config validation."
+  },
+  {
+    "id": "6.2.0#4",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds the experimental logger option and log handlers only."
+  },
+  {
+    "id": "6.2.0#5",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only experimental flags: adds svgOptimizer and removes the experimental svgo flag."
+  },
+  {
+    "id": "6.2.0#6",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds a new experimental_-prefixed helper to the experimental Fonts API."
+  },
+  {
+    "id": "6.2.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix so scripts inside <template> elements are not wrongly deduplicated."
+  },
+  {
+    "id": "6.2.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes config validation failing for omitted integrations with newer Zod."
+  },
+  {
+    "id": "6.2.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a spurious warning when the optional server property is missing."
+  },
+  {
+    "id": "6.2.1#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Compatibility fix for Zod 4.4.0 in config validation and error formatting."
+  },
+  {
+    "id": "6.2.2#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dev head metadata propagation so styles are no longer trapped in templates."
+  },
+  {
+    "id": "6.2.2#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a build crash on animated AVIF into working pass-through."
+  },
+  {
+    "id": "6.2.2#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect scoped style output with lightningcss and nested & in :where()."
+  },
+  {
+    "id": "6.2.2#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes data-astro-prefetch=\"tap\" work on nested elements as documented."
+  },
+  {
+    "id": "6.2.2#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes style compilation failure with tsconfig path aliases."
+  },
+  {
+    "id": "6.2.2#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a regression stripping .html from dynamic params on endpoints."
+  },
+  {
+    "id": "6.2.2#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes missing styles from partial pages imported as components."
+  },
+  {
+    "id": "6.2.2#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a 404 on the index route with custom base and trailingSlash 'never'."
+  },
+  {
+    "id": "6.2.2#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes empty bodies for i18n rewrite fallback pages at build."
+  },
+  {
+    "id": "6.2.2#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes session.delete() not persisting when it is the first mutation."
+  },
+  {
+    "id": "6.2.2#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes script dedup state being consumed inside inert template contexts."
+  },
+  {
+    "id": "6.2.2#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization skipping a guaranteed-miss storage read; results are unchanged."
+  },
+  {
+    "id": "6.2.2#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Trims unused inline CSS from the SSR manifest with no observable output change."
+  },
+  {
+    "id": "6.2.2#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes conditional named slot callbacks wrongly receiving arguments."
+  },
+  {
+    "id": "6.2.2#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the position prop apply object-position as documented."
+  },
+  {
+    "id": "6.2.2#16",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes defineLiveCollection accept interface-typed data, fixing a type error."
+  },
+  {
+    "id": "6.3.0#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds the experimental.advancedRouting option and experimental entrypoints."
+  },
+  {
+    "id": "6.3.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "AstroCookies.consume",
+    "why": "Adds an instance consume() method (static one deprecated); older versions throw a TypeError if it is called."
+  },
+  {
+    "id": "6.3.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "astro-island",
+    "why": "Hydration import failures are now retried and emit error events instead of failing immediately."
+  },
+  {
+    "id": "6.3.0#4",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "image.dangerouslyProcessSVG",
+    "why": "The default image service no longer rasterizes SVG inputs unless this new flag is set to true."
+  },
+  {
+    "id": "6.3.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "image.remotePatterns",
+    "why": "Remote images that redirect were previously silently ignored; now redirects are followed and an error is thrown if a redirect target isn't allowed by remotePatterns/domains."
+  },
+  {
+    "id": "6.3.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Escaping interpolated values in the dev server redirect HTML template is a hardening change with no normally observable effect."
+  },
+  {
+    "id": "6.3.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes z.array(z.boolean()) in form actions to parse 'false' correctly, matching single z.boolean() behavior."
+  },
+  {
+    "id": "6.3.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes deleted content collection entries persisting in getCollection() during dev."
+  },
+  {
+    "id": "6.3.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes pushDirective in the CSP runtime duplicating directives."
+  },
+  {
+    "id": "6.3.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes Astro.preferredLocale to match the documented behavior."
+  },
+  {
+    "id": "6.3.0#11",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "The image endpoint now returns a consistent generic error message across adapters, which changes what error responses contain."
+  },
+  {
+    "id": "6.3.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a crash (TypeError on logger.flush) in astro dev SSR."
+  },
+  {
+    "id": "6.3.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes an outdated documentation snippet."
+  },
+  {
+    "id": "6.3.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes local images returning 404 on non-prerendered pages with the generic image endpoint."
+  },
+  {
+    "id": "6.3.2#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a regression so Astro.cache is defined as a no-op shim again, as previously documented."
+  },
+  {
+    "id": "6.3.2#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an HTMLElement is not defined error during HMR with the Cloudflare adapter."
+  },
+  {
+    "id": "6.3.2#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes non-prerendered routes failing when a dynamic prerendered route exists."
+  },
+  {
+    "id": "6.3.2#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Frees compiler memory at the end of the build, with no change to user-visible behavior."
+  },
+  {
+    "id": "6.3.2#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "isRemotePath",
+    "why": "isRemotePath() now rejects paths with control characters after a leading slash, so previously accepted inputs are treated differently."
+  },
+  {
+    "id": "6.3.2#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Only improves validation error messages for misplaced script-src/style-src directives; the same input was already rejected."
+  },
+  {
+    "id": "6.3.2#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes assetsPrefix missing from build in astro:config/server."
+  },
+  {
+    "id": "6.3.2#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "why": "Double-encoded URL paths now get a 400 response instead of silently falling back to partial decoding."
+  },
+  {
+    "id": "6.3.2#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes & being rendered as raw entity strings in meta tags."
+  },
+  {
+    "id": "6.3.3#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an XSS vulnerability by HTML-escaping slot names on hydrated components."
+  },
+  {
+    "id": "6.3.4#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds an option to experimental.advancedRouting."
+  },
+  {
+    "id": "6.3.4#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Fixes the Hono cache() middleware in the experimental advanced routing feature."
+  },
+  {
+    "id": "6.3.4#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "App.Providers",
+    "why": "Adds an App.Providers interface for typing custom context providers; older versions simply ignore the declaration."
+  },
+  {
+    "id": "6.3.4#4",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds FetchState.response to the experimental advanced routing API."
+  },
+  {
+    "id": "6.3.4#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Fetchable",
+    "why": "Adds a Fetchable type export from 'astro'; importing it on older versions is a type error."
+  },
+  {
+    "id": "6.3.4#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only removes a spurious Vite warning by changing how an internal package is bundled."
+  },
+  {
+    "id": "6.3.4#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes missing dev styles in a specific Cloudflare adapter setup."
+  },
+  {
+    "id": "6.3.4#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an HTTP 500 on action requests in dev into working behavior."
+  },
+  {
+    "id": "6.3.4#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Map and Set values in content collections now survive retrieval as expected."
+  },
+  {
+    "id": "6.3.4#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes entry.data type inference for schemaless live collections."
+  },
+  {
+    "id": "6.3.4#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal TypeScript dependency bump with no user changes needed."
+  },
+  {
+    "id": "6.3.4#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "SVGs with zero width or height no longer throw NoImageMetadata and now work."
+  },
+  {
+    "id": "6.3.5#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the position prop on Image and Picture breaking CSP."
+  },
+  {
+    "id": "6.3.5#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only rewords error messages for consistency."
+  },
+  {
+    "id": "6.3.5#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the dev server serving stale content after SSR-only module changes."
+  },
+  {
+    "id": "6.3.6#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores the alt=\"\" attribute that markdown images with empty alt text should have kept."
+  },
+  {
+    "id": "6.3.6#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale HMR content for components passed as props."
+  },
+  {
+    "id": "6.3.6#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes how long build times are formatted in logs."
+  },
+  {
+    "id": "6.3.6#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Remote SVG sources that errored after the v6.3 SVG gate now pass through."
+  },
+  {
+    "id": "6.3.6#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale HMR content for dynamically imported components via barrel files."
+  },
+  {
+    "id": "6.3.6#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "file() loader now generates a valid JSON Schema for top-level array data."
+  },
+  {
+    "id": "6.3.7#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Node adapter now passes binary req.body through instead of JSON-stringifying it."
+  },
+  {
+    "id": "6.3.7#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Documented Vite build options are now honored for client builds."
+  },
+  {
+    "id": "6.3.7#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "custom elements in .mdx",
+    "why": "Hyphenated custom elements in MDX now go through registered SSR renderers instead of rendering as raw HTML, with no error."
+  },
+  {
+    "id": "6.3.7#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Dynamic routes with a literal % in the URL return a page instead of a 400 error."
+  },
+  {
+    "id": "6.3.7#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a v6 regression that stopped astro:i18n being imported in client scripts."
+  },
+  {
+    "id": "6.3.8#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes 404s for dynamically imported chunks when assetQueryParams is used."
+  },
+  {
+    "id": "6.3.8#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "The invalid redirect config already errored; only the error is now clearer and earlier."
+  },
+  {
+    "id": "6.3.8#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes scoped styles being dropped for MDX content in named Fragment slots."
+  },
+  {
+    "id": "6.3.8#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes missing CSS for conditionally rendered Svelte components in production builds."
+  },
+  {
+    "id": "6.3.8#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation-only note about when compressHTML: \"jsx\" became available."
+  },
+  {
+    "id": "6.3.8#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false-positive warning logged on SSR dynamic routes; no behavior users rely on."
+  },
+  {
+    "id": "6.4.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "preserveBuildServerDir",
+    "why": "New adapter feature flag; older versions ignore the unknown feature without error, and code not using it is unaffected."
+  },
+  {
+    "id": "6.4.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "markdown.processor",
+    "why": "New markdown.processor option (with unified() and satteri() processors) that older versions reject as an unknown config key; the deprecation of markdown.remarkPlugins etc. is a separate listed change."
+  },
+  {
+    "id": "6.4.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "previewEntrypoint",
+    "why": "Adapters providing previewEntrypoint now bypass the static preview server and handle static and dynamic routes themselves, changing what astro preview does."
+  },
+  {
+    "id": "6.4.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes X-Forwarded-Host/Proto headers set in a custom app.ts handler be honored, fixing a bug."
+  },
+  {
+    "id": "6.4.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the static preview server to respect preserveBuildClientDir, matching intended behavior."
+  },
+  {
+    "id": "6.4.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a dev-mode race condition in the Vite dep optimizer."
+  },
+  {
+    "id": "6.4.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes server island rendering on static sites that was failing validation."
+  },
+  {
+    "id": "6.4.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes preview for static sites with non-prerendered routes so SSR routes are served as expected."
+  },
+  {
+    "id": "6.4.2#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a 'plugins is not iterable' crash into working behavior."
+  },
+  {
+    "id": "6.4.2#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes SSR dynamic routes 404ing behind a prerendered route with the same pattern, so routing works as expected."
+  },
+  {
+    "id": "6.4.3#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency version bump with no described observable change."
+  },
+  {
+    "id": "6.4.3#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a false positive in the dev toolbar accessibility audit."
+  },
+  {
+    "id": "6.4.3#3",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Concerns experimental.advancedRouting only."
+  },
+  {
+    "id": "6.4.3#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false warning in custom app.ts when the first request is a redirect."
+  },
+  {
+    "id": "6.4.3#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores redirectToDefaultLocale after a regression, matching documented behavior."
+  },
+  {
+    "id": "6.4.3#6",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Improves font fallback metrics for bold variants; the observable effect for users is minor and not clearly specified."
+  },
+  {
+    "id": "6.4.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "App.match() no longer throws on invalid percent-sequences, turning an error into working behavior."
+  },
+  {
+    "id": "6.4.4#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Avoids an unnecessary backend reload in dev when editing client components."
+  },
+  {
+    "id": "6.4.4#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a build error for static endpoints with .html in param values."
+  },
+  {
+    "id": "6.4.4#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a 500 error on dynamic routes with domain-based i18n in SSR."
+  },
+  {
+    "id": "6.4.4#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Astro.routePattern",
+    "why": "Astro.routePattern now preserves parameter name casing (e.g. /blog/[postId]) instead of lowercasing, which can change code comparing against the old lowercase value."
+  },
+  {
+    "id": "6.4.4#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dynamic routes returning '[object Object]' in certain runtimes."
+  },
+  {
+    "id": "6.4.4#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes styles being stripped when the project root path casing differs from the filesystem."
+  },
+  {
+    "id": "6.4.4#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes Astro.currentLocale to return the domain's locale as documented."
+  },
+  {
+    "id": "6.4.5#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects the experimental.logger destination."
+  },
+  {
+    "id": "6.4.5#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes Astro.request.url consistent with Astro.url behind proxies, matching documented allowedDomains behavior."
+  },
+  {
+    "id": "6.4.5#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Reverts an internal runtime detection change to fix a build time regression."
+  },
+  {
+    "id": "6.4.6#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a build error on image rename in dev into working hot reload."
+  },
+  {
+    "id": "6.4.6#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "addAttribute",
+    "why": "Attributes with invalid names (quotes, >, /, =, whitespace) are now silently dropped from output instead of rendered."
+  },
+  {
+    "id": "6.4.6#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "security.allowedDomains",
+    "why": "Prerendered error page fetches now use the validated origin or fall back to localhost instead of the request origin."
+  },
+  {
+    "id": "6.4.7#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes locale URL helpers honor trailingSlash: 'never' as documented."
+  },
+  {
+    "id": "6.4.7#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "double-encoded URLs",
+    "why": "Double-encoded paths previously got 400 and are now fully decoded before middleware and route matching."
+  },
+  {
+    "id": "6.4.7#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes redirect targets wrongly bundled into SSR function, a bundle size bug."
+  },
+  {
+    "id": "6.4.7#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes head element joining honor compressHTML as documented."
+  },
+  {
+    "id": "6.4.7#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves slot attribute on custom element children in MDX, fixing a bug against expected HTML behavior."
+  },
+  {
+    "id": "6.4.7#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale inline CSS in dev after edits."
+  },
+  {
+    "id": "6.4.7#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS leaking from client:only islands to unrelated pages."
+  },
+  {
+    "id": "6.4.7#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes HMR not triggering for middleware files in dev."
+  },
+  {
+    "id": "6.4.7#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes numeric IDs in content collection references that previously failed."
+  },
+  {
+    "id": "6.4.7#10",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Only adds a $schema to the generated wrangler config; no effect on users' code."
+  },
+  {
+    "id": "6.4.7#11",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Improved diagnostics wording for invalid .astro files; doesn't say what changed observably."
+  },
+  {
+    "id": "6.4.8#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what the new decoding limits are or how behavior changes."
+  },
+  {
+    "id": "7.0.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "vite",
+    "why": "Upgrade to Vite 8 can break custom Vite config and plugins written for the previous Vite version."
+  },
+  {
+    "id": "7.0.0#2",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "compressHTML",
+    "why": "Default changed to 'jsx', altering whitespace in rendered HTML when the option is unset."
+  },
+  {
+    "id": "7.0.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "astro dev",
+    "why": "When an AI agent is detected, astro dev now starts a detached background server instead of running in the foreground (opt out with ASTRO_DEV_BACKGROUND=0)."
+  },
+  {
+    "id": "7.0.0#4",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "@astrojs/db",
+    "why": "The package and the astro db, login, logout, link, and init commands are removed and fail."
+  },
+  {
+    "id": "7.0.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "experimental.rustCompiler",
+    "why": "The Rust compiler replaces the Go one and is stricter, so invalid syntax like unclosed tags now errors."
+  },
+  {
+    "id": "7.0.0#6",
+    "candidate": true,
+    "kind": "default",
+    "signal": "loud",
+    "symbol": "markdown.processor",
+    "why": "Default Markdown processor is now Sätteri, so remark/rehype plugin options require installing @astrojs/markdown-remark and otherwise fail."
+  },
+  {
+    "id": "7.0.0#7",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "fetchFile",
+    "why": "Advanced routing is now on by default with src/fetch.ts as entrypoint, and fetchFile moved to top-level config, so an existing src/fetch.ts now changes request handling."
+  },
+  {
+    "id": "7.0.0#8",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "createAnimationScope",
+    "why": "Deprecated astro:transitions exports (TRANSITION_* constants, isTransitionBefore*Event helpers, createAnimationScope) are removed, so imports of them fail."
+  },
+  {
+    "id": "7.0.0#9",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "getFetchState",
+    "why": "New public getFetchState() export from astro/hono, which older versions don't provide."
+  },
+  {
+    "id": "7.0.0#10",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "FontData.subset",
+    "why": "Adds a subset field to fontData entries; older versions simply lack the field."
+  },
+  {
+    "id": "7.0.0#11",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "experimental.logger",
+    "why": "Custom logger config moves from experimental.logger to top-level logger, and the old experimental key is no longer accepted."
+  },
+  {
+    "id": "7.0.0#12",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "experimental.queuedRendering",
+    "why": "The experimental.queuedRendering setting is removed and must be deleted from config."
+  },
+  {
+    "id": "7.0.0#13",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "experimental.cache",
+    "why": "experimental.cache and experimental.routeRules move to top-level cache and routeRules, so the old keys no longer work."
+  },
+  {
+    "id": "7.0.0#14",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "state.provide",
+    "why": "state.provide(), state.resolve(), state.finalizeAll() and App.Providers are removed from the public advanced routing API."
+  },
+  {
+    "id": "7.0.0#15",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Says only that URL decoding limits were hardened, without saying what is now rejected or changed."
+  },
+  {
+    "id": "7.0.0#16",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Astro.session",
+    "why": "session is now always defined on the context and logs a message when unconfigured, instead of being undefined."
+  },
+  {
+    "id": "7.0.0#17",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "astro/cache/provider-utils",
+    "why": "New astro/cache/provider-utils export with helpers for cache provider authors, absent in older versions."
+  },
+  {
+    "id": "7.0.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build performance optimization of an internal plugin with no observable change."
+  },
+  {
+    "id": "7.0.0#19",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes pages() to render the custom 500 page as documented instead of a default error response."
+  },
+  {
+    "id": "7.0.0#20",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes middleware() to render the custom 500/404 page instead of the host framework's default error response."
+  },
+  {
+    "id": "7.0.0#21",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes --port being ignored after a server restart, matching documented behavior."
+  },
+  {
+    "id": "7.0.0#22",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the 500 page getting an empty error prop for middleware errors."
+  },
+  {
+    "id": "7.0.0#23",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a spurious warning on prerendered pages."
+  },
+  {
+    "id": "7.0.0#24",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes an outdated warning about vite v8 support."
+  },
+  {
+    "id": "7.0.0#25",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "CacheProvider.setHeaders",
+    "why": "setHeaders now receives the Request as a second argument, which existing providers ignoring it will not use."
+  },
+  {
+    "id": "7.0.0#26",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops internal headers from leaking from pages() responses."
+  },
+  {
+    "id": "7.0.0#27",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Fixes build tool warnings only."
+  },
+  {
+    "id": "7.0.0#28",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes i18n domains returning 404 with trailingSlash never, turning an error into working behavior."
+  },
+  {
+    "id": "7.0.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes astro dev wrongly starting in background mode for Warp users."
+  },
+  {
+    "id": "7.0.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes network addresses missing in background dev server output, matching the foreground server."
+  },
+  {
+    "id": "7.0.1#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "astro.images",
+    "why": "Responsive image styles are now wrapped in @layer astro.images, changing cascade priority relative to user styles."
+  },
+  {
+    "id": "7.0.1#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a Windows failure of `astro dev --background` so it works as intended."
+  },
+  {
+    "id": "7.0.3#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a dev-mode bug where one route's getStaticPaths error blocked other routes."
+  },
+  {
+    "id": "7.0.3#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes HMR for action files so edits apply without restart, a bug fix."
+  },
+  {
+    "id": "7.0.3#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes localized custom 404 pages to work as i18n docs describe."
+  },
+  {
+    "id": "7.0.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Escapes transition directive values on islands, a security-style bug fix."
+  },
+  {
+    "id": "7.0.4#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dev-mode trailing slash handling for dynamic file endpoints to match documented behavior."
+  },
+  {
+    "id": "7.0.4#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Dev toolbar now emits a warning it should have emitted; a bug fix."
+  },
+  {
+    "id": "7.0.4#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds compatibility with sharp v0.35; no change to existing code behavior."
+  },
+  {
+    "id": "7.0.4#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes getCollection() returning empty for very large collections in dev."
+  },
+  {
+    "id": "7.0.4#6",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Compiler upgrade with bug fixes referenced externally; no specific user-visible change stated."
+  },
+  {
+    "id": "7.0.4#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal helper alignment; behavior unchanged for correctly configured proxies."
+  },
+  {
+    "id": "7.0.5#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a 500 error after dev server restart with adapters."
+  },
+  {
+    "id": "7.0.5#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of alias resolution with no expected user impact."
+  },
+  {
+    "id": "7.0.5#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes ClientRouter wiping head elements with server:defer in head."
+  },
+  {
+    "id": "7.0.5#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes style tags being dropped from output, restoring expected behavior."
+  },
+  {
+    "id": "7.0.5#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes background dev server failing to start when astro is hoisted."
+  },
+  {
+    "id": "7.0.5#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes prefetch not working inside server:defer components."
+  },
+  {
+    "id": "7.0.6#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false deprecation warning in the Container API."
+  },
+  {
+    "id": "7.0.6#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes route generation crashing on param value 0, which is a valid value."
+  },
+  {
+    "id": "7.0.6#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes missing CSS for virtual style modules in dev without JS."
+  },
+  {
+    "id": "7.0.6#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes security.checkOrigin apply consistently as documented."
+  },
+  {
+    "id": "7.0.6#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds a missing render() type overload, turning a type error into working code."
+  },
+  {
+    "id": "7.0.6#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes astro check failing to find @astrojs/check and typescript in some install layouts."
+  },
+  {
+    "id": "7.0.6#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes extensionless island import resolution so include/exclude match as intended."
+  },
+  {
+    "id": "7.0.6#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes Picture inferSize failing on rate-limited remote images by resolving dimensions once per render."
+  },
+  {
+    "id": "7.0.6#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "custom elements attribute rendering",
+    "why": "Attribute rendering on custom elements is hardened, so some attribute values may now be rendered differently."
+  },
+  {
+    "id": "7.0.6#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a crash of getViteConfig in Vitest browser mode."
+  },
+  {
+    "id": "7.0.6#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a regression so script placement in Astro.slots.render() matches prior expected behavior."
+  },
+  {
+    "id": "7.0.7#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes class name hash mismatch so styles apply as expected."
+  },
+  {
+    "id": "7.0.7#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a dev server memory leak."
+  },
+  {
+    "id": "7.0.7#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a dev server crash into working behavior."
+  },
+  {
+    "id": "7.0.7#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS @import ordering in build output so browsers honor them."
+  },
+  {
+    "id": "7.0.7#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a build regression leaving unresolved preload markers."
+  },
+  {
+    "id": "7.0.8#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes astro preview --open not opening a browser with custom preview adapters."
+  },
+  {
+    "id": "7.0.8#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "AstroRuntimeLogger",
+    "why": "Exposes a new type interface users can import; older versions simply lack it (type-only)."
+  },
+  {
+    "id": "7.0.8#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes astro dev --force work as intended."
+  },
+  {
+    "id": "7.0.8#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Compiler update fixing regressions; the entry doesn't say what changed for users."
+  },
+  {
+    "id": "7.0.8#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement with no observable change in output."
+  },
+  {
+    "id": "7.0.9#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an unwanted reload on first browser visit in dev."
+  },
+  {
+    "id": "7.0.9#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes islands failing to hydrate after a transient import failure."
+  },
+  {
+    "id": "7.1.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "deferRender",
+    "why": "New glob() loader option, default false keeps existing behavior; older versions ignore the unknown option."
+  },
+  {
+    "id": "7.1.0#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "New experimental collectionStorage option."
+  },
+  {
+    "id": "7.1.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "kind",
+    "why": "New object form with kind for CSP resources and hashes and runtime csp methods; older versions reject the object form in config validation."
+  },
+  {
+    "id": "7.1.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "paginate format",
+    "why": "New format() option for paginate; older versions ignore the unknown option and generate unformatted URLs."
+  },
+  {
+    "id": "7.1.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "--ignore-lock",
+    "why": "New astro dev flag; older versions would reject the unknown flag or not support it."
+  },
+  {
+    "id": "7.1.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "logger.entrypoint",
+    "why": "Logger entrypoint now accepts a URL; older versions reject non-string values in config validation."
+  },
+  {
+    "id": "7.1.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the JSON logger crashing in non-Node runtimes."
+  },
+  {
+    "id": "7.1.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes integrations being unable to update the logger via updateConfig()."
+  },
+  {
+    "id": "7.1.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a regression in the new element-specific CSP so configured resources keep their existing behavior."
+  },
+  {
+    "id": "7.1.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dev server returning 404 for ?url imported assets."
+  },
+  {
+    "id": "7.1.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes an unused, undocumented generic from a type, so documented usage is unaffected."
+  },
+  {
+    "id": "7.1.0#12",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Says only that escaping of dynamic values was hardened, without saying what output or accepted input changed."
+  },
+  {
+    "id": "7.1.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect routing of encoded paths with domain-based i18n, which is the documented behavior."
+  },
+  {
+    "id": "7.1.2#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Astro.cookies.set",
+    "why": "Cookie values made only of URL-safe characters are no longer percent-encoded in Set-Cookie headers, so the output changes with no error."
+  },
+  {
+    "id": "7.1.2#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes mutated Astro.locals not reaching custom error pages, which is the expected behavior."
+  },
+  {
+    "id": "7.1.2#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an unhandled promise rejection in the prefetch fetch fallback."
+  },
+  {
+    "id": "7.1.3#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes out-of-memory crashes during image optimization in CPU-limited containers."
+  },
+  {
+    "id": "7.1.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes duplicate CSS files being emitted in server output."
+  },
+  {
+    "id": "7.1.4#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds missing types for a prop that already worked at runtime, removing a false astro check error."
+  },
+  {
+    "id": "7.1.4#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes missing scoped styles in client:only islands in production builds."
+  },
+  {
+    "id": "7.1.4#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes session errors being swallowed by console.error instead of going through the logger."
+  },
+  {
+    "id": "7.1.4#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a session left in a partial state after a storage failure in regenerate()."
+  },
+  {
+    "id": "7.1.4#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a terminal window popping up on Windows when the dev server runs in the background."
+  },
+  {
+    "id": "7.1.4#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the glob() watcher honor negation patterns in dev, matching the initial scan and the documented behavior."
+  },
+  {
+    "id": "7.1.4#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes tsconfig path aliases not resolving in astro.config.ts."
+  },
+  {
+    "id": "7.1.5#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an error while finalizing a request preventing a response from being sent."
+  },
+  {
+    "id": "7.1.5#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a custom logger.entrypoint failing to load in a built server bundle."
+  },
+  {
+    "id": "7.1.5#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes action path resolution treating function properties as routable segments."
+  },
+  {
+    "id": "7.1.5#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the custom 404/500 page not rendering after a middleware rewrite to an empty error response."
+  },
+  {
+    "id": "7.1.5#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump of js-yaml with no described user-visible change."
+  },
+  {
+    "id": "7.1.6#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes concurrent static builds failing to generate i18n rewrite fallbacks."
+  },
+  {
+    "id": "7.1.6#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale CSS in dev after editing styles."
+  },
+  {
+    "id": "7.1.6#3",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds a chunkSize option to experimental.collectionStorage."
+  },
+  {
+    "id": "7.1.6#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Compiler dependency bump with no described user-visible change."
+  },
+  {
+    "id": "7.2.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "astro preview",
+    "why": "Besides adding --background, running astro preview from an AI coding agent now auto-starts in background mode (opt out with ASTRO_PREVIEW_BACKGROUND=0), so the same command behaves differently."
+  },
+  {
+    "id": "7.2.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "logger.entrypoint",
+    "why": "Project-root-relative paths like './src/logger.js' are newly accepted, and older versions would not resolve them."
+  },
+  {
+    "id": "7.2.0#3",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "The wider PrerenderResult return type exists to report metadata for experimental incremental builds."
+  },
+  {
+    "id": "7.2.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "session: false",
+    "why": "New config value to opt out of sessions, which older versions' config validation would reject."
+  },
+  {
+    "id": "7.2.0#5",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds the experimental.incrementalBuild flag."
+  },
+  {
+    "id": "7.2.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "digest",
+    "why": "New optional digest property on collection entries; reading it on older versions is a type error."
+  },
+  {
+    "id": "7.2.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Reference docs improvement only."
+  },
+  {
+    "id": "7.2.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a crash in astro dev with a specific --host address."
+  },
+  {
+    "id": "7.2.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes googleicons return only the requested glyphs, as documented (and it is under an experimental option)."
+  },
+  {
+    "id": "7.2.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects Astro.url.pathname for build.format 'preserve' to match the actual output file."
+  },
+  {
+    "id": "7.2.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a build crash caused by a hoisted dependency version."
+  },
+  {
+    "id": "7.2.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cookies set in custom 404/500 pages are no longer dropped, as expected."
+  },
+  {
+    "id": "7.2.0#13",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "devEngines",
+    "why": "Package manager detection for install commands now reads package.json devEngines, which can change the command used."
+  },
+  {
+    "id": "7.2.0#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes popover boolean rendering on custom elements to match the Popover API."
+  },
+  {
+    "id": "7.2.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS HMR after ClientRouter navigation."
+  },
+  {
+    "id": "7.2.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a CSP violation with experimental clientPrerender prefetching."
+  },
+  {
+    "id": "7.2.1#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes middleware HMR for imported modules."
+  },
+  {
+    "id": "7.2.1#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores a regressed check for reference() fields that point to missing entries."
+  },
+  {
+    "id": "7.2.1#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Markdown options documentation only."
+  },
+  {
+    "id": "7.2.1#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a 500 in the dev prerender environment into working behavior."
+  },
+  {
+    "id": "7.2.1#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes video and audio elements after view transitions."
+  },
+  {
+    "id": "7.2.1#8",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental.incrementalBuild hashing."
+  },
+  {
+    "id": "7.2.1#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement with no observable change in results."
+  },
+  {
+    "id": "7.2.1#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a build error from hash collisions in generated image import identifiers."
+  },
+  {
+    "id": "7.2.2#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale component styles in dev with the fallback development environment."
+  },
+  {
+    "id": "7.2.2#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Fixes incremental builds, which are experimental, for collectStaticImages prerenderers."
+  },
+  {
+    "id": "7.2.2#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes intermittent ImageNotFound build errors by limiting concurrent reads and retrying."
+  },
+  {
+    "id": "7.2.2#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the documented prerenderConflictBehavior option apply to the glob() and file() duplicate ID warnings."
+  },
+  {
+    "id": "7.2.2#5",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental.incrementalBuild caching."
+  },
+  {
+    "id": "7.2.2#6",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Performance fix for experimental incremental builds."
+  },
+  {
+    "id": "7.2.2#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Files in directories merely prefixed with 'pages' should never have been routes, so this matches the documented src/pages behavior."
+  },
+  {
+    "id": "7.2.2#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes astro dev failing to start because of a stale lock file after a restart."
+  },
+  {
+    "id": "7.2.3#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Concerns experimental.collectionStorage."
+  },
+  {
+    "id": "7.2.3#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale route matching in the dev server."
+  },
+  {
+    "id": "7.2.3#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an error into working behavior for astro/fetch helpers on rewritten requests."
+  },
+  {
+    "id": "7.2.3#4",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "app.pipeline",
+    "why": "The undocumented app.pipeline property and the AppPipeline export from astro/app are removed, so adapters using them now fail; app.getLogger() replaces app.pipeline.getLogger()."
+  },
+  {
+    "id": "7.2.3#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes a link in JSDoc."
+  },
+  {
+    "id": "7.2.3#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc documentation fixes only."
+  },
+  {
+    "id": "7.2.3#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a crash on malformed Host ports into handled requests."
+  },
+  {
+    "id": "7.2.3#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a dev server error on SSR full reload."
+  },
+  {
+    "id": "7.2.3#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Falls back to the console logger instead of failing the first request when a custom logger fails to load."
+  },
+  {
+    "id": "7.2.3#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a DataCloneError crash for transforms returning class instances."
+  },
+  {
+    "id": "7.2.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes builds hanging on malformed images."
+  },
+  {
+    "id": "7.2.4#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Base stripping now respects path-segment boundaries, matching how base is documented to work."
+  },
+  {
+    "id": "7.2.4#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a build TypeError for a documented option combination."
+  },
+  {
+    "id": "7.2.4#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes Astro.site work in the Container API as documented."
+  },
+  {
+    "id": "7.2.5#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Concerns experimental_getFontFileURL."
+  },
+  {
+    "id": "7.2.5#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Skips no-op pathname writes, with no observable change."
+  },
+  {
+    "id": "7.2.5#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes the target version named in deprecation message text."
+  },
+  {
+    "id": "7.2.5#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security hardening that rejects invalid session cookie values; Astro only issues UUID IDs."
+  },
+  {
+    "id": "7.2.5#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the documented CLI flags actually apply with --background."
+  },
+  {
+    "id": "7.2.5#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "addModuleImport()",
+    "why": "Module imports added via addModuleImport() without a deferredRender entry are no longer preserved across writes."
+  },
+  {
+    "id": "7.2.5#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes Accept-Language q-value handling follow RFC 7231 as documented."
+  },
+  {
+    "id": "7.2.5#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect error location and hints in build error output."
+  },
+  {
+    "id": "7.2.5#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a type mismatch so image() schema output matches imported image type."
+  },
+  {
+    "id": "7.2.5#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "unsafe-inline",
+    "why": "CSP config with 'unsafe-inline' now makes Astro omit hashes for that directive, changing emitted CSP output."
+  },
+  {
+    "id": "7.2.5#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a regression where content collection images failed to resolve."
+  },
+  {
+    "id": "7.2.5#12",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "memoryCache()",
+    "why": "Responses that set cookies via Astro.cookies or Astro.session are no longer cached, changing caching behavior."
+  },
+  {
+    "id": "7.2.5#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a dev server crash into working behavior."
+  },
+  {
+    "id": "7.2.5#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores a regression so transition:persist works for audio/video as documented."
+  },
+  {
+    "id": "7.2.5#15",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": ".apng",
+    "why": "New support for importing .apng files as image metadata for <img>; older versions don't support it, and image components reject APNG."
+  },
+  {
+    "id": "7.2.5#16",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Returns the correct 404 instead of a 500 error."
+  },
+  {
+    "id": "7.2.5#17",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Compiler bump with no stated user-visible change; details are only in a linked changelog."
+  },
+  {
+    "id": "7.2.5#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement with no change in observable behavior."
+  },
+  {
+    "id": "7.2.5#19",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incremental builds serving stale CSS references."
+  },
+  {
+    "id": "7.2.5#20",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dev server refusing to start in Docker after restart."
+  },
+  {
+    "id": "7.2.5#21",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a build failure into working behavior when vite.environments is defined."
+  },
+  {
+    "id": "7.2.5#22",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes glob() failing on filenames with colons."
+  },
+  {
+    "id": "7.2.6#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes new FetchState(request) failing in dev with optimized deps."
+  },
+  {
+    "id": "7.2.7#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal manifest loading optimization with no observable change."
+  },
+  {
+    "id": "7.2.7#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes route selection for normalized request paths."
+  },
+  {
+    "id": "7.2.7#3",
+    "candidate": true,
+    "kind": "default",
+    "signal": "loud",
+    "symbol": "compatibility_date",
+    "why": "Default and generated Cloudflare compatibility_date values change and Wrangler ^4.125.0 is now required, so older Wrangler versions are rejected."
+  },
+  {
+    "id": "7.2.7#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes rewrite() and next(payload) failing for GET/HEAD requests with host-provided bodies."
+  },
+  {
+    "id": "7.2.7#5",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects the experimental svgOptimizer."
+  },
+  {
+    "id": "7.2.8#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "sharp",
+    "why": "Minimum supported Sharp version is raised to 0.35.4, so older Sharp versions are no longer accepted."
+  },
+  {
+    "id": "7.2.8#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Swaps an internal dependency with no observable change."
+  },
+  {
+    "id": "7.2.9#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds missing typing for `.html` imports outside `.astro` files, which makes types match what already worked at runtime."
+  },
+  {
+    "id": "7.2.9#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a crash on `/index.html` against a dynamic route into working behavior."
+  },
+  {
+    "id": "7.2.9#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes stale internal manifest references to chunks that no longer exist, with no user-visible API change."
+  },
+  {
+    "id": "7.2.9#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes `set:text` escape in MDX script and style elements, as it is documented to do."
+  },
+  {
+    "id": "7.2.10#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes the dependency version range of `@astrojs/markdown-remark`, not astro's behavior."
+  },
+  {
+    "id": "7.2.10#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a runtime `Invalid URL` crash at server boot with minified builds."
+  },
+  {
+    "id": "7.2.10#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect logger initialization at runtime in dev."
+  },
+  {
+    "id": "7.2.10#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "It doesn't say what the caching headers or behavior become for responses with `Last-Modified` or `ETag`."
+  },
+  {
+    "id": "7.2.10#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects which route a prerender conflict warning names."
+  },
+  {
+    "id": "7.2.10#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops an empty `srcset` attribute from being rendered for Markdown images."
+  },
+  {
+    "id": "7.2.10#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale content in `astro dev` on Windows, restoring the expected behavior."
+  },
+  {
+    "id": "7.3.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "--ignore-lock",
+    "why": "New `astro preview` flag, which older versions most likely ignore as an unknown flag."
+  },
+  {
+    "id": "7.3.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "logger",
+    "why": "Image service hooks receive an extra `logger` argument, which older versions simply don't pass."
+  },
+  {
+    "id": "7.3.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "logger",
+    "why": "Cache provider `onRequest()` context gains a `logger` property, absent on older versions."
+  },
+  {
+    "id": "7.3.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "logger",
+    "why": "Remaining internal warnings and errors now go through the configured logger and log level instead of straight to the console."
+  },
+  {
+    "id": "7.3.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "memoryCache",
+    "why": "The memory cache now skips responses with `Vary: Cookie` or `Vary: *` that it previously cached."
+  },
+  {
+    "id": "7.3.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build performance improvement with no change to observable output."
+  },
+  {
+    "id": "7.3.0#7",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects `experimental.incrementalBuild`."
+  },
+  {
+    "id": "7.3.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores styles, links and scripts that should already have been rendered in server islands."
+  },
+  {
+    "id": "7.3.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes i18n fallback routes being generated with a corrupted path."
+  },
+  {
+    "id": "7.3.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an error that stopped `astro:assets` projects from starting or building."
+  },
+  {
+    "id": "7.3.2#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "set:html",
+    "why": "A dynamic `<script>{value}</script>` child in MDX is now escaped instead of rendered raw, and `set:html` is needed for raw output."
+  },
+  {
+    "id": "7.3.2#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a dev toolbar 504 error."
+  },
+  {
+    "id": "7.3.2#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes i18n fallback routing mangling paths that contain the locale code as a substring."
+  },
+  {
+    "id": "7.3.2#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes sessions breaking in dev with the Cloudflare adapter and middleware."
+  },
+  {
+    "id": "7.3.3#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Swaps an internal version-handling dependency with no observable change."
+  },
+  {
+    "id": "7.3.3#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Invalid and missing local image paths now get proper 400/404 responses instead of an error."
+  },
+  {
+    "id": "7.3.3#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes locale matching so preferredLocaleList works as documented."
+  },
+  {
+    "id": "7.3.3#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "--ignore-lock no longer errors in agent environments and starts in the foreground."
+  },
+  {
+    "id": "7.3.3#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes TypeScript autocompletion suggestions for getImage()."
+  },
+  {
+    "id": "7.3.3#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types now match the documented rule that widths and densities are mutually exclusive."
+  },
+  {
+    "id": "7.3.3#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement with no observable behavior change."
+  },
+  {
+    "id": "7.3.3#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an error when importing astro:actions under the Cloudflare vitest pool."
+  },
+  {
+    "id": "7.3.3#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Redirect body now matches the already-correct location header."
+  },
+  {
+    "id": "7.3.3#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dev toolbar apps losing their UI after ClientRouter navigation."
+  },
+  {
+    "id": "7.3.3#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes prerendered Cloudflare pages rendering as [object Object]."
+  },
+  {
+    "id": "7.3.3#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a dev regression that caused repeated middleware reloads."
+  },
+  {
+    "id": "7.3.3#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump for a security advisory with no API change."
+  },
+  {
+    "id": "7.3.3#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an unwanted page reload on cold dev starts with MDX entries."
+  },
+  {
+    "id": "7.3.3#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev server startup time optimization with no behavior change."
+  },
+  {
+    "id": "7.3.3#16",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Does not say which errors or what diagnostics changed."
+  },
+  {
+    "id": "7.3.3#17",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes nested SVG style elements not being hashed for CSP."
+  },
+  {
+    "id": "7.3.3#18",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental.incrementalBuild."
+  },
+  {
+    "id": "7.3.3#19",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dev server stripping base from URLs that merely share a prefix."
+  },
+  {
+    "id": "7.3.3#20",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc improvements only."
+  },
+  {
+    "id": "7.3.3#21",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS HMR for framework components after ClientRouter navigation."
+  },
+  {
+    "id": "7.3.3#22",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Does not say what changed in the generated CSS for users."
+  },
+  {
+    "id": "7.3.3#23",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes content collection HMR for prerendered pages with a separate prerender environment."
+  },
+  {
+    "id": "7.3.3#24",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes redirect targets corrupted by $ replacement patterns in params."
+  },
+  {
+    "id": "7.3.3#25",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes glob() loader keeping stale entries after the last file is deleted."
+  },
+  {
+    "id": "7.3.3#26",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Dev pre-bundling change that prevents a Cloudflare dev server crash, turning an error into working behavior."
+  },
+  {
+    "id": "7.3.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incremental builds re-rendering unchanged pages, which is a bug fix with no change to documented behavior."
+  },
+  {
+    "id": "7.3.4#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Only improves the error message shown for unsupported TypeScript 7, so no code written for the previous version behaves differently."
+  },
+  {
+    "id": "7.3.4#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects double-escaped ampersands in Markdown image alt and title so output matches the expected single escaping."
+  },
+  {
+    "id": "7.3.4#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "MissingLocale",
+    "why": "Error names reported in the dev overlay changed (the Error suffix was dropped), so code or tooling matching the old names silently stops matching."
+  },
+  {
+    "id": "7.3.4#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes needless re-evaluation of the server module graph in dev, a performance bug with no change to documented behavior."
+  },
+  {
+    "id": "7.3.4#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes domain-based i18n routing honor security.allowedDomains, as that option is documented to do."
+  },
+  {
+    "id": "7.3.4#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes invalid object-position CSS emitted for same-axis keyword pairs."
+  },
+  {
+    "id": "7.3.4#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "--background",
+    "why": "On Windows with an AI agent detected, astro dev and preview now run in the foreground instead of being backgrounded unless --background is passed."
+  },
+  {
+    "id": "7.3.5#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds renderComponent() to experimental_AstroContainer, an experimental entry point."
+  },
+  {
+    "id": "7.3.6#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an intermittent dev server crash with astro:actions in server islands."
+  },
+  {
+    "id": "7.3.6#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stale scoped styles during HMR."
+  },
+  {
+    "id": "7.3.6#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS from other pages leaking into a page's head in dev."
+  },
+  {
+    "id": "7.3.6#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes server islands with framework components rendering empty in dev with a custom src/fetch.ts."
+  },
+  {
+    "id": "7.3.6#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the composable i18n() handler render the custom 404 page, matching astro(), instead of an empty 404."
+  },
+  {
+    "id": "7.3.6#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS Module HMR in dev, with only dev class name hashing changing internally."
+  },
+  {
+    "id": "7.3.6#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes context.props being null in middleware and endpoints in certain composable handler orderings."
+  },
+  {
+    "id": "7.3.6#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a build crash on Windows with Node 25+ when clearing the output directory."
+  },
+  {
+    "id": "7.3.6#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes type errors reported in the built-in Picture and Font components during type-checking."
+  },
+  {
+    "id": "7.3.6#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes lost request state in Cloudflare dev mode when Vite discovers dependencies."
+  },
+  {
+    "id": "7.3.6#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS imported from an injectScript('page') script being dropped during build."
+  },
+  {
+    "id": "7.3.6#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a hang with server:defer inside a slot in an MDX entry."
+  },
+  {
+    "id": "7.3.6#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the glob() loader skipping files whose paths contain # or ?."
+  },
+  {
+    "id": "7.3.6#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes injectRoute() pages returning 404 with prefixDefaultLocale true."
+  },
+  {
+    "id": "7.3.6#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes content collection changes being ignored after a dev server restart."
+  },
+  {
+    "id": "7.3.6#16",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes Astro.cookies.get() return empty-valued cookies as expected."
+  },
+  {
+    "id": "7.3.6#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only makes the order of manifest assets deterministic for reproducible builds."
+  },
+  {
+    "id": "7.3.6#18",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "YAML frontmatter parsing",
+    "why": "YAML in frontmatter is now parsed with timestamp and merge key support, and YAML errors are formatted differently."
+  },
+  {
+    "id": "7.3.6#19",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "security.checkOrigin",
+    "why": "CSRF protection now also considers modern browser headers, so some requests may be accepted or rejected differently."
+  },
+  {
+    "id": "7.3.6#20",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a runtime ReferenceError for inlined scripts."
+  },
+  {
+    "id": "7.3.6#21",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes custom View Transition direction names with non-identifier characters match their animations."
+  },
+  {
+    "id": "7.3.6#22",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a 404 on a preloaded CSS file."
+  },
+  {
+    "id": "7.3.6#23",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes duplicate CSS in production builds."
+  },
+  {
+    "id": "7.3.6#24",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "astro/fetch redirects() actions() trailingSlash() middleware() pages()",
+    "why": "Composable handlers now return 400 for over-encoded paths, where redirects() and actions() used to return undefined."
+  },
+  {
+    "id": "7.3.6#25",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes rewrite picking the wrong route in dev."
+  },
+  {
+    "id": "7.3.6#26",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "The entry doesn't say what changed for users or what failed before."
+  },
+  {
+    "id": "7.3.6#27",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a dev dependency scan failure."
+  },
+  {
+    "id": "7.3.6#28",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes Astro not working in WebContainer environments."
+  },
+  {
+    "id": "7.3.6#29",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a spurious build warning."
+  },
+  {
+    "id": "7.3.6#30",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Replaces 500 responses with the correct 400 and 404 for malformed input."
+  },
+  {
+    "id": "7.3.6#31",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "security.allowedDomains",
+    "why": "The Node adapter now validates the Host header against allowedDomains, so requests with other hosts are handled differently."
+  },
+  {
+    "id": "7.3.6#32",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the fontsource provider resolve variable fonts named with the Variable suffix."
+  },
+  {
+    "id": "7.3.6#33",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes video muted state after ClientRouter navigation."
+  },
+  {
+    "id": "7.3.6#34",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Localized error pages now return the error status instead of 200."
+  },
+  {
+    "id": "7.3.6#35",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental_AstroContainer output."
+  },
+  {
+    "id": "7.3.7#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a build error and makes layout ignored in collections as documented."
+  },
+  {
+    "id": "7.3.7#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes astro add cloudflare install failure with pnpm 11+."
+  },
+  {
+    "id": "7.3.7#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Serves AVIF with the correct MIME type in dev."
+  },
+  {
+    "id": "7.3.7#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a TypeError thrown by the cache() handler."
+  },
+  {
+    "id": "7.3.7#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes checkOrigin behave as documented for non-form content types."
+  },
+  {
+    "id": "7.3.8#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Astro.cache being undefined on error-rendered 404/500 pages contradicts documented behavior; fix makes it work as documented."
+  },
+  {
+    "id": "7.3.8#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops `astro add` from wrongly removing existing allowBuilds approvals, restoring the expected behavior."
+  },
+  {
+    "id": "7.3.8#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal switch of bundling and transform tooling from esbuild to Oxc/Rolldown with no user-observable change."
+  },
+  {
+    "id": "7.3.8#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the glob() loader reload changed files in dev for extglob patterns, as it already does for other patterns."
+  }
+]

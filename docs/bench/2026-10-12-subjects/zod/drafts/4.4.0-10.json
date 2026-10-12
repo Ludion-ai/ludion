@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#10",
+  "verdict": {
+    "id": "4.4.0#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.record",
+    "why": "Non-enumerable properties are now skipped more consistently, changing which keys records process."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

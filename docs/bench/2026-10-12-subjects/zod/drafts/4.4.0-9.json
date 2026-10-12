@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#9",
+  "verdict": {
+    "id": "4.4.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "invalid_key",
+    "why": "Key refinement failures in records now surface as structured invalid_key issues instead of the previous error shape."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

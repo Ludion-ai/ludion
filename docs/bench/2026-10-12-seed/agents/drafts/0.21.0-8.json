@@ -1,0 +1,33 @@
+{
+  "entry": "0.21.0#8",
+  "verdict": {
+    "id": "0.21.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "useAgentChat",
+    "why": "Observer error frames are now terminal and no longer rendered as assistant messages."
+  },
+  "cost_usd": 0.37374700000000005,
+  "turns": 19,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.21.0",
+    "kind": "behavior",
+    "symbol": "useAgentChat",
+    "signal": "silent",
+    "detail": "useAgentChat observer error frames are terminal; plain-text error bodies are no longer parsed as stream chunks or merged into an empty assistant message.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.21.0/packages/agents/CHANGELOG.md",
+          "quote": "Treat `useAgentChat` observer error frames as terminal responses.\n\n  Plain-text error bodies are no longer parsed as stream chunks or merged into an empty assistant message."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

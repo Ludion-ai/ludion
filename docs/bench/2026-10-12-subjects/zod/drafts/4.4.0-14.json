@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#14",
+  "verdict": {
+    "id": "4.4.0#14",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "globalThis",
+    "why": "Global config is now shared through globalThis, so config set in one module instance now applies across mixed CJS/ESM instances."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

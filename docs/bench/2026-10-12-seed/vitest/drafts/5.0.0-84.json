@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#84",
+  "verdict": {
+    "id": "5.0.0#84",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "teardown",
+    "why": "A throwing teardown during close now yields a non-zero exit code, so runs that previously passed in CI now fail."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

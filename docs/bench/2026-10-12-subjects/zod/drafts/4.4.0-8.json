@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#8",
+  "verdict": {
+    "id": "4.4.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.discriminatedUnion",
+    "why": "Invalid discriminated union errors now include discriminator options and different messages, which can break snapshots."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

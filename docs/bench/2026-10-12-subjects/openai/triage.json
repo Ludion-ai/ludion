@@ -1,0 +1,4440 @@
+[
+  {
+    "id": "6.35.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "InputFileContent.detail",
+    "why": "Adds a new detail field to InputFileContent; older versions' types reject it but nothing else changes."
+  },
+  {
+    "id": "6.35.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "OAuthErrorCode",
+    "why": "Adds a new exported type that older versions lack."
+  },
+  {
+    "id": "6.35.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "prompt_cache_retention",
+    "why": "New parameter on responses compact that older versions' types reject."
+  },
+  {
+    "id": "6.35.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "web_search_call.results",
+    "why": "New ResponseIncludable value that older versions' types reject."
+  },
+  {
+    "id": "6.35.0#5",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'Manual updates' doesn't say what changed."
+  },
+  {
+    "id": "6.35.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "websocket binary messages",
+    "why": "Adds support for binary messages in the websocket clients."
+  },
+  {
+    "id": "6.35.0#7",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "websocket path parameters",
+    "why": "Websocket clients can now take path parameters."
+  },
+  {
+    "id": "6.35.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "websocket message queue",
+    "why": "Messages sent while waiting for a connection are now queued instead of failing or being dropped."
+  },
+  {
+    "id": "6.35.0#9",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "websockets in browser",
+    "why": "Websockets can now be used in the browser with simple auth."
+  },
+  {
+    "id": "6.35.0#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "websocket reconnection",
+    "why": "Websocket clients now reconnect automatically after a dropped connection."
+  },
+  {
+    "id": "6.35.0#11",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "WebSocket",
+    "why": "Exposes the underlying WebSocket type to TypeScript users."
+  },
+  {
+    "id": "6.35.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes failure on single messages larger than the queue, making them work."
+  },
+  {
+    "id": "6.35.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes gitignore for a generated directory."
+  },
+  {
+    "id": "6.35.0#14",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "prompt_cache_retention",
+    "why": "The enum value in types changed, so code using the old value may now fail type checking."
+  },
+  {
+    "id": "6.35.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Preserves ts-ignore comments in emitted output; no user-observable API change."
+  },
+  {
+    "id": "6.35.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI workflow removal."
+  },
+  {
+    "id": "6.35.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Formatting only."
+  },
+  {
+    "id": "6.35.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Formatter ignore config."
+  },
+  {
+    "id": "6.35.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Formatter tooling change."
+  },
+  {
+    "id": "6.35.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen-related internal update."
+  },
+  {
+    "id": "6.35.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "package.json duplicate key cleanup."
+  },
+  {
+    "id": "6.35.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Bootstrap script for development."
+  },
+  {
+    "id": "6.35.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Version bump."
+  },
+  {
+    "id": "6.35.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test tooling bump."
+  },
+  {
+    "id": "6.35.0#25",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation examples only."
+  },
+  {
+    "id": "6.36.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "group_type",
+    "why": "Adds new metadata fields (group_type/user) to admin resources that older versions simply didn't expose."
+  },
+  {
+    "id": "6.36.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "admin API key",
+    "why": "Adds support for using Admin API Keys per endpoint, a new callable capability."
+  },
+  {
+    "id": "6.36.0#3",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'admin API updates' doesn't say what changed."
+  },
+  {
+    "id": "6.36.0#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' gives no detail on what changed."
+  },
+  {
+    "id": "6.36.0#5",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' gives no detail on what changed."
+  },
+  {
+    "id": "6.36.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "adminAPIKey",
+    "why": "Auth now supports admin API key, changing which credential/header is sent for admin endpoints."
+  },
+  {
+    "id": "6.36.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Authorization",
+    "why": "Auth header selection is tightened, so requests may now send different auth headers than before."
+  },
+  {
+    "id": "6.36.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint/format tooling change with no user-observable effect."
+  },
+  {
+    "id": "6.36.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen-related internal update."
+  },
+  {
+    "id": "6.36.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen-related internal update."
+  },
+  {
+    "id": "6.37.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "quantity",
+    "why": "Adds a new quantity field to admin organization usage responses."
+  },
+  {
+    "id": "6.37.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "web_search_call.results",
+    "why": "New include option for responses that older versions' types reject."
+  },
+  {
+    "id": "6.37.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "realtime translate",
+    "why": "Launches realtime translate and updates image 2, new callable features not in older versions."
+  },
+  {
+    "id": "6.37.0#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' gives no detail on what changed."
+  },
+  {
+    "id": "6.37.0#5",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' gives no detail on what changed."
+  },
+  {
+    "id": "6.37.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "realtime 2",
+    "why": "Adds Realtime 2 support, new models/types older versions reject."
+  },
+  {
+    "id": "6.37.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a regression in the image generation size enum to match what was documented."
+  },
+  {
+    "id": "6.37.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "api-key headers",
+    "why": "Debug logs now redact api-key headers, changing logged output."
+  },
+  {
+    "id": "6.38.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "service_tier",
+    "why": "Adds a service_tier parameter to responses.compact that older types reject."
+  },
+  {
+    "id": "6.39.0#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'api update' doesn't say what changed."
+  },
+  {
+    "id": "6.39.0#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' gives no detail on what changed."
+  },
+  {
+    "id": "6.39.0#3",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' gives no detail on what changed."
+  },
+  {
+    "id": "6.39.0#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Spec/config update with no stated user-facing change."
+  },
+  {
+    "id": "6.39.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "RequestOptions",
+    "why": "Types now accept runtime fetch options that older types rejected."
+  },
+  {
+    "id": "6.39.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build tooling upgrade for Node 26 compatibility, no change to the package's behavior."
+  },
+  {
+    "id": "6.39.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "API docs updates only."
+  },
+  {
+    "id": "6.39.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes a redundant import in tests."
+  },
+  {
+    "id": "6.39.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Only improves guidance text for an undici dispatcher mismatch error."
+  },
+  {
+    "id": "6.39.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes handling of binary-format text/plan uploads so they are sent as raw uploads as intended."
+  },
+  {
+    "id": "6.39.1#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Duplicate of the fix treating text/plan with format binary as raw upload."
+  },
+  {
+    "id": "6.39.1#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen related internal update."
+  },
+  {
+    "id": "6.40.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "additional_tools",
+    "why": "Adds new audit log workload identity and an additional_tools response item that older versions simply don't type, and makes ActionSearch.query optional."
+  },
+  {
+    "id": "6.40.0#2",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "openai migrate",
+    "why": "The migrate CLI is removed, so invoking it no longer works."
+  },
+  {
+    "id": "6.41.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Amazon Bedrock Responses support",
+    "why": "New Bedrock Responses support users can call; it does not change code that doesn't use it."
+  },
+  {
+    "id": "6.42.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "responses.moderation",
+    "why": "Adds moderation options for responses and chat completions that older versions' types reject."
+  },
+  {
+    "id": "6.43.0#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what changed or how it affects users (possibly package.json main/types resolution)."
+  },
+  {
+    "id": "6.43.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Restores repo pnpm configuration."
+  },
+  {
+    "id": "6.43.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repository tooling converted to pnpm."
+  },
+  {
+    "id": "6.43.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repo sync with no described user-visible change."
+  },
+  {
+    "id": "6.43.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Default branch references updated in the repo."
+  },
+  {
+    "id": "6.43.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release automation change."
+  },
+  {
+    "id": "6.44.0#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Generic spec/config update with no stated user-facing change."
+  },
+  {
+    "id": "6.45.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "afterCompletion",
+    "why": "New hook option for runTools; older versions ignore or reject it only at type level, and unused code is unaffected."
+  },
+  {
+    "id": "6.45.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "call_id",
+    "why": "Realtime sideband call_id connections are new and older versions don't accept them."
+  },
+  {
+    "id": "6.45.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "EventEmitter",
+    "why": "The promise returned by emitted events now rejects on error, changing behavior for existing code that previously did not reject."
+  },
+  {
+    "id": "6.45.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "response input items helper",
+    "why": "New responses helper that doesn't exist in older versions."
+  },
+  {
+    "id": "6.45.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "response stream accumulator helper",
+    "why": "New responses stream accumulator helper that doesn't exist in older versions."
+  },
+  {
+    "id": "6.45.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops sending null for optional bodies, matching what the API expects."
+  },
+  {
+    "id": "6.45.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cleans up leaked stream abort listeners."
+  },
+  {
+    "id": "6.45.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the partial parser crashing or failing on leading whitespace chunks in structured outputs."
+  },
+  {
+    "id": "6.45.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Avoids parsing incomplete structured output, making streaming behave as documented."
+  },
+  {
+    "id": "6.45.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores output_text on streamed final responses, which the docs already expected."
+  },
+  {
+    "id": "6.45.0#11",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "workload identity access tokens",
+    "why": "Access tokens are now validated, so invalid tokens that were previously accepted now produce an error."
+  },
+  {
+    "id": "6.45.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes zod schema conversion to fully resolve definitions, matching intended behavior."
+  },
+  {
+    "id": "6.45.0#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Sanitizes extracted definition refs in zod schema output so previously broken schemas work."
+  },
+  {
+    "id": "6.45.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal codegen update with no observable change."
+  },
+  {
+    "id": "6.45.0#15",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Adds a documentation example."
+  },
+  {
+    "id": "6.45.0#16",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Adds a documentation example."
+  },
+  {
+    "id": "6.45.0#17",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation example change."
+  },
+  {
+    "id": "6.45.0#18",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification."
+  },
+  {
+    "id": "6.45.0#19",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification."
+  },
+  {
+    "id": "6.45.0#20",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification."
+  },
+  {
+    "id": "6.45.0#21",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes documentation links."
+  },
+  {
+    "id": "6.45.0#22",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes typos in an example."
+  },
+  {
+    "id": "6.45.0#23",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README typo fixes."
+  },
+  {
+    "id": "6.45.0#24",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc typo fix."
+  },
+  {
+    "id": "6.45.0#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build tooling change only."
+  },
+  {
+    "id": "6.46.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "gpt-5.6-sol",
+    "why": "Adds new model support; older versions accept model strings so it is silent."
+  },
+  {
+    "id": "6.46.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects assistant stream delta placement to the intended behavior."
+  },
+  {
+    "id": "6.46.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Normalizes missing tool call IDs, turning a failure into working behavior."
+  },
+  {
+    "id": "6.46.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency upgrade in examples only."
+  },
+  {
+    "id": "6.46.0#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Adds a documentation example."
+  },
+  {
+    "id": "6.46.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "6.46.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "6.47.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "async event iterators",
+    "why": "New async iterator capability that older versions lack, so using it fails there."
+  },
+  {
+    "id": "6.47.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "ResponseStream.fromReadableStream",
+    "why": "New method on ResponseStream that users can call; older versions simply lack it."
+  },
+  {
+    "id": "6.47.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "APIKeyListParams.owner_project_access",
+    "why": "New list parameter users can pass; old versions would ignore or type-reject it, but it is an optional addition."
+  },
+  {
+    "id": "6.47.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "runTools",
+    "why": "runTools callbacks now receive an additional context argument, changing what they are passed."
+  },
+  {
+    "id": "6.47.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "streaming file uploads",
+    "why": "Adds support for uploading files from streams, a new accepted input that older versions lacked."
+  },
+  {
+    "id": "6.47.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves readable stream deltas so assistants streams deliver data as expected."
+  },
+  {
+    "id": "6.47.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Avoids deep Zod types under Deno, a types-level cleanup accepting the same code."
+  },
+  {
+    "id": "6.47.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI tooling and Node version bump only."
+  },
+  {
+    "id": "6.47.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "stream finalization errors",
+    "why": "Streams now emit finalization errors that were previously not emitted, changing observable event behavior."
+  },
+  {
+    "id": "6.47.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Handles Azure content-filter stream chunks that previously caused errors, turning a failure into working behavior."
+  },
+  {
+    "id": "6.47.0#11",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "zod v4 mini schemas",
+    "why": "Adds support for Zod v4 mini schemas in the helpers, which older versions did not accept."
+  },
+  {
+    "id": "6.47.0#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "6.48.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "service_accounts api_keys endpoint",
+    "why": "New API resource methods for service account API keys that older versions do not have."
+  },
+  {
+    "id": "6.48.0#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' does not say what changed."
+  },
+  {
+    "id": "6.48.0#3",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' does not say what changed."
+  },
+  {
+    "id": "6.48.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "headers",
+    "why": "Header names are now normalized before appending, which can change how headers are merged and sent."
+  },
+  {
+    "id": "6.48.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test dependency refresh only."
+  },
+  {
+    "id": "6.49.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "prompt_cache_key, safety_identifier",
+    "why": "These params now accept null/None, which older versions rejected by type."
+  },
+  {
+    "id": "6.49.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "spend_limit",
+    "why": "New spend_limit admin API methods that older versions lack."
+  },
+  {
+    "id": "6.49.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "standard schema support",
+    "why": "Helpers now accept Standard Schema schemas, which older versions did not accept."
+  },
+  {
+    "id": "6.49.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "zod realtime function helper",
+    "why": "New helper for defining realtime functions with Zod that older versions lack."
+  },
+  {
+    "id": "6.49.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Workflow template CI configuration for the SDK's generator, not observable by users."
+  },
+  {
+    "id": "6.49.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "zod schema definitions",
+    "why": "Zod helpers now support schema definitions that older versions did not handle."
+  },
+  {
+    "id": "6.49.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Code scanning findings with no stated user-observable change."
+  },
+  {
+    "id": "6.49.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency alert updates with no user-observable change."
+  },
+  {
+    "id": "6.49.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "AzureOpenAI endpoint",
+    "why": "Trailing slashes in Azure endpoints are now normalized, changing the URLs requests are sent to."
+  },
+  {
+    "id": "6.49.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI runner selection has no user-observable effect."
+  },
+  {
+    "id": "6.49.0#11",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "runTools",
+    "why": "Replayed messages are now sanitized, so the same runTools call sends different message content."
+  },
+  {
+    "id": "6.49.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Handling audio completion markers in streams fixes a failure so streaming works as expected."
+  },
+  {
+    "id": "6.49.0#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Escaping schema definition refs fixes strict validation of zod schemas that should have worked."
+  },
+  {
+    "id": "6.49.0#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes type inference of parsed tool callback arguments; same code now types correctly."
+  },
+  {
+    "id": "6.49.0#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves schema types while escaping refs, a correction to a prior bug."
+  },
+  {
+    "id": "6.49.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repo language detection config only."
+  },
+  {
+    "id": "6.49.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test dependency refresh."
+  },
+  {
+    "id": "7.0.0#1",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "Node.js <22",
+    "why": "Older Node.js versions are no longer supported and the package requires Node.js 22."
+  },
+  {
+    "id": "7.0.0#2",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Duplicate of the breaking-change entry, which is captured in 7.0.0#1; not a separate change."
+  },
+  {
+    "id": "7.0.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.0.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.0.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.1.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "transcription model",
+    "why": "Adds new transcription model options that older versions' types may reject but the API accepts; entry is vague on specifics."
+  },
+  {
+    "id": "7.1.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen related internal update."
+  },
+  {
+    "id": "7.2.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "fast tier",
+    "why": "Adds a fast service tier option users can pass."
+  },
+  {
+    "id": "7.3.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "content provenance checks",
+    "why": "Adds new API surface for content provenance checks."
+  },
+  {
+    "id": "7.3.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repo setup tooling removal."
+  },
+  {
+    "id": "7.3.0#3",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "JSR",
+    "why": "Package is no longer published to JSR, so jsr: installs won't get new versions."
+  },
+  {
+    "id": "7.3.0#4",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation organization only."
+  },
+  {
+    "id": "7.3.0#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation removal only."
+  },
+  {
+    "id": "7.4.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "gpt-5.5",
+    "why": "Adds gpt-5.5 model and tool metadata fields users can pass."
+  },
+  {
+    "id": "7.4.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release PR automation fix."
+  },
+  {
+    "id": "7.4.0#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation examples only."
+  },
+  {
+    "id": "7.4.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.4.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.4.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.4.0#7",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "dotenv major bump; unclear whether it affects users of openai (likely only examples/dev usage)."
+  },
+  {
+    "id": "7.4.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem-tests only."
+  },
+  {
+    "id": "7.4.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem-tests only."
+  },
+  {
+    "id": "7.4.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release workflow change."
+  },
+  {
+    "id": "7.5.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Bedrock Runtime",
+    "why": "New Bedrock Runtime endpoint support users can call; older versions simply lack it."
+  },
+  {
+    "id": "7.5.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "gpt-5.6-cyber",
+    "why": "New model identifiers added to the types; older versions accept strings anyway."
+  },
+  {
+    "id": "7.5.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "gpt-5.6-cyber",
+    "why": "Duplicate entry: new model identifiers added; older versions accept strings anyway."
+  },
+  {
+    "id": "7.5.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "ServiceTier",
+    "why": "New exported ServiceTier and ImageDetail types users can reference."
+  },
+  {
+    "id": "7.5.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "WebSocket stream IDs",
+    "why": "New stream ID fields on WebSocket events; older versions' types reject them."
+  },
+  {
+    "id": "7.5.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "workload identity access token issued event",
+    "why": "New event type users can handle; older types don't include it."
+  },
+  {
+    "id": "7.5.0#7",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "videos",
+    "why": "Sora video APIs are now deprecated but still work."
+  },
+  {
+    "id": "7.5.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "ultrafast",
+    "why": "Adds Ultrafast tier, structured MCP and websocket errors, and separate websocket events, changing what users receive."
+  },
+  {
+    "id": "7.5.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Clarifies audio upload metadata requirements in documentation."
+  },
+  {
+    "id": "7.5.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes microphone leaks and deadlocks in audio helpers."
+  },
+  {
+    "id": "7.5.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Spawn errors now reject instead of going unhandled; turns a failure into proper error handling."
+  },
+  {
+    "id": "7.5.0#12",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "workload identity token exchange",
+    "why": "Token exchange now rejects redirects, so setups relying on redirects will fail."
+  },
+  {
+    "id": "7.5.0#13",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "workload identity token expiration",
+    "why": "Unsafe token expirations are now rejected with an error."
+  },
+  {
+    "id": "7.5.0#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Avoids a TypeError crash in toFile, turning an error into working behavior."
+  },
+  {
+    "id": "7.5.0#15",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README example fix only."
+  },
+  {
+    "id": "7.5.0#16",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "dangerouslyAllowBrowser",
+    "why": "Azure Entra token providers now honor explicit browser denial, changing behavior for existing configs."
+  },
+  {
+    "id": "7.5.0#17",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores the documented model-to-deployment mapping for images.edit."
+  },
+  {
+    "id": "7.5.0#18",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "AzureOpenAI",
+    "why": "API key is no longer sent across redirects, so redirected Azure requests behave differently."
+  },
+  {
+    "id": "7.5.0#19",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "deployment",
+    "why": "Deployment names with path traversal are now rejected, so previously accepted values fail."
+  },
+  {
+    "id": "7.5.0#20",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes signing of inherited query parameter names in the Bedrock client so requests work as intended."
+  },
+  {
+    "id": "7.5.0#21",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the parser and ChatCompletionStream handle custom tool calls, which previously errored or were not supported."
+  },
+  {
+    "id": "7.5.0#22",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an error on an empty JSON body without content-length into working behavior."
+  },
+  {
+    "id": "7.5.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor build script setup on Windows, not observable by SDK users."
+  },
+  {
+    "id": "7.5.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency and test fixture vulnerability remediation with no API change."
+  },
+  {
+    "id": "7.5.0#25",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects the response type for base64 embeddings to match actual behavior, a types-level fix."
+  },
+  {
+    "id": "7.5.0#26",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "AzureClientOptions",
+    "why": "Newly exported type that older versions do not export, so importing it fails on older versions."
+  },
+  {
+    "id": "7.5.0#27",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "openai/auth",
+    "why": "Workload identity helpers are now exported from openai/auth; importing them fails on older versions."
+  },
+  {
+    "id": "7.5.0#28",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI behavior for ecosystem tests only."
+  },
+  {
+    "id": "7.5.0#29",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Formatting of generated source files only."
+  },
+  {
+    "id": "7.5.0#30",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Hardens runTools against inherited names like toString so it errors or misbehaves no more; matches intended behavior."
+  },
+  {
+    "id": "7.5.0#31",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "defaultHeaders",
+    "why": "Setting a defaultHeaders value to null now removes the helper method header, which was previously still sent."
+  },
+  {
+    "id": "7.5.0#32",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Generates a valid JSON schema with items for Zod v3 any arrays, which previously produced an invalid schema."
+  },
+  {
+    "id": "7.5.0#33",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test isolation for Vercel ecosystem tests."
+  },
+  {
+    "id": "7.5.0#34",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes streamed Responses output text consistent and canonical, fixing incorrect accumulation."
+  },
+  {
+    "id": "7.5.0#35",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint configuration for generated headers."
+  },
+  {
+    "id": "7.5.0#36",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rules for the repository."
+  },
+  {
+    "id": "7.5.0#37",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Parses empty chat content when present, previously failing to parse it."
+  },
+  {
+    "id": "7.5.0#38",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Auto-parsing now recognizes a raw json_schema response format, as documented."
+  },
+  {
+    "id": "7.5.0#39",
+    "candidate": false,
+    "skip": "fix",
+    "why": "File batch helper options were dropped and are now passed through as documented."
+  },
+  {
+    "id": "7.5.0#40",
+    "candidate": false,
+    "skip": "fix",
+    "why": "toFile now keeps File-like metadata that was lost, matching expected behavior."
+  },
+  {
+    "id": "7.5.0#41",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Skill uploads now preserve file paths as expected, without buffering."
+  },
+  {
+    "id": "7.5.0#42",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Skills upload now preserves file paths as expected."
+  },
+  {
+    "id": "7.5.0#43",
+    "candidate": false,
+    "skip": "fix",
+    "why": "A retry-after-ms of zero now takes precedence as documented."
+  },
+  {
+    "id": "7.5.0#44",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a crash on prototype-named stream events into working behavior."
+  },
+  {
+    "id": "7.5.0#45",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "strict Structured Outputs schemas",
+    "why": "Schemas with prototype-manipulating keys are now rejected or sanitized, where previously they were accepted."
+  },
+  {
+    "id": "7.5.0#46",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix preventing prototype pollution in assistant stream deltas; documented behavior is unchanged."
+  },
+  {
+    "id": "7.5.0#47",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "realtime WebSocket connection URL override",
+    "why": "Adds the ability to override realtime WebSocket URLs; older versions ignore the option without error."
+  },
+  {
+    "id": "7.5.0#48",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "realtime Azure browser usage",
+    "why": "Azure realtime use in the browser is now enforced as denied (error), and credentials are redacted in output."
+  },
+  {
+    "id": "7.5.0#49",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix that stops Azure API key leaking across WebSocket redirects."
+  },
+  {
+    "id": "7.5.0#50",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a client crash on remote error payloads into working handling."
+  },
+  {
+    "id": "7.5.0#51",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only removes model updates from examples."
+  },
+  {
+    "id": "7.5.0#52",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "__proto__",
+    "why": "Zod v3 object schemas with a __proto__ property are now rejected with an error."
+  },
+  {
+    "id": "7.5.0#53",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes browser test dependencies."
+  },
+  {
+    "id": "7.5.0#54",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "OpenAIError",
+    "why": "Responses streams now reject with OpenAIError on an error event, so error handling written for the previous behavior may catch a different error."
+  },
+  {
+    "id": "7.5.0#55",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds validation of streaming event indices to prevent invalid array access."
+  },
+  {
+    "id": "7.5.0#56",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security hardening that bounds untrusted delta indices."
+  },
+  {
+    "id": "7.5.0#57",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Bedrock credentials",
+    "why": "Bedrock credentials are now sent only to the configured endpoint origin, so requests to other origins no longer carry them."
+  },
+  {
+    "id": "7.5.0#58",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "browser ecosystem API keys",
+    "why": "API keys are no longer placed in navigation URLs, so what is sent changes."
+  },
+  {
+    "id": "7.5.0#59",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix that stops Bedrock bearer credentials leaking across redirects."
+  },
+  {
+    "id": "7.5.0#60",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix preventing global Array.prototype pollution in chat streams."
+  },
+  {
+    "id": "7.5.0#61",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix preventing content-type header injection in multipart uploads."
+  },
+  {
+    "id": "7.5.0#62",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix preventing prototype pollution via snapshot IDs."
+  },
+  {
+    "id": "7.5.0#63",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix preventing prototype manipulation in streamed chat snapshots."
+  },
+  {
+    "id": "7.5.0#64",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix preventing filename/header injection in streaming uploads."
+  },
+  {
+    "id": "7.5.0#65",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement with no observable behavior change."
+  },
+  {
+    "id": "7.5.0#66",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement with no observable behavior change."
+  },
+  {
+    "id": "7.5.0#67",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "[DONE]",
+    "why": "SSE streams now finish immediately after [DONE] instead of reading further data."
+  },
+  {
+    "id": "7.5.0#68",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes parsing of mixed SSE line endings so streams that failed now work."
+  },
+  {
+    "id": "7.5.0#69",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Isolates AssistantStream lifecycles to fix incorrect state sharing between messages and tool calls."
+  },
+  {
+    "id": "7.5.0#70",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement to line decoding with no observable change in output."
+  },
+  {
+    "id": "7.5.0#71",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "Stream",
+    "why": "Iterating a buffered stream now throws mid-stream errors that were previously not surfaced."
+  },
+  {
+    "id": "7.5.0#72",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a listener leak so the ws adapters behave as expected."
+  },
+  {
+    "id": "7.5.0#73",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes corrupted literal payloads when escaping schema references so schemas match what users wrote."
+  },
+  {
+    "id": "7.5.0#74",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes null literals being lost in Zod v3 JSON schemas."
+  },
+  {
+    "id": "7.5.0#75",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes definition name collisions in generated schemas."
+  },
+  {
+    "id": "7.5.0#76",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "zodResponseFormat",
+    "why": "Zod v3 strict schemas with a non-object root are now rejected with an error instead of being accepted."
+  },
+  {
+    "id": "7.5.0#77",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Generated SDK attribution update with no user-observable effect."
+  },
+  {
+    "id": "7.5.0#78",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#79",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#80",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#81",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#82",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#83",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#84",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#85",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#86",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#87",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#88",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#89",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#90",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#91",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#92",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#93",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#94",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#95",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#96",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#97",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#98",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#99",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#100",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump for linting tooling."
+  },
+  {
+    "id": "7.5.0#101",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#102",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#103",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.5.0#104",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependabot configuration only."
+  },
+  {
+    "id": "7.5.0#105",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#106",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#107",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#108",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#109",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#110",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#111",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#112",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#113",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#114",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#115",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#116",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#117",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#118",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#119",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement, no user-observable change."
+  },
+  {
+    "id": "7.5.0#120",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#121",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#122",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#123",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#124",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#125",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#126",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#127",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#128",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#129",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#130",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#131",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#132",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#133",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#134",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#135",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#136",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#137",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#138",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#139",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#140",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#141",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#142",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#143",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#144",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#145",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#146",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#147",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#148",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#149",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#150",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#151",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#152",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#153",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#154",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#155",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#156",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#157",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#158",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#159",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#160",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#161",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#162",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#163",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#164",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#165",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#166",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#167",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#168",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#169",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#170",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#171",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#172",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#173",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#174",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#175",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#176",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#177",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#178",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#179",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#180",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#181",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#182",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#183",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#184",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#185",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#186",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#187",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#188",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#189",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#190",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#191",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#192",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#193",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#194",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#195",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#196",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#197",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#198",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#199",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#200",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#201",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#202",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#203",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#204",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#205",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#206",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#207",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#208",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#209",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#210",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#211",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#212",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#213",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#214",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#215",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#216",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#217",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#218",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#219",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#220",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#221",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#222",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#223",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#224",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#225",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#226",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#227",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#228",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#229",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#230",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#231",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#232",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#233",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#234",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#235",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#236",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#237",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#238",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#239",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#240",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#241",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#242",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#243",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#244",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement has no user-observable effect."
+  },
+  {
+    "id": "7.5.0#245",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#246",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#247",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#248",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#249",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#250",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#251",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#252",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#253",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#254",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#255",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#256",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#257",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#258",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#259",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#260",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#261",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#262",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#263",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#264",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#265",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#266",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#267",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#268",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#269",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#270",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#271",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#272",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#273",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#274",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#275",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#276",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#277",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#278",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#279",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#280",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#281",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#282",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#283",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule enablement with no observable change."
+  },
+  {
+    "id": "7.5.0#284",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes attribution comments from files, no behavior change."
+  },
+  {
+    "id": "7.5.0#285",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation of stream event unions only."
+  },
+  {
+    "id": "7.5.0#286",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation of SDK surfaces only."
+  },
+  {
+    "id": "7.5.0#287",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README link fixes only."
+  },
+  {
+    "id": "7.5.0#288",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#289",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#290",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#291",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.5.0#292",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests only."
+  },
+  {
+    "id": "7.5.0#293",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests only."
+  },
+  {
+    "id": "7.5.0#294",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests only."
+  },
+  {
+    "id": "7.5.0#295",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Bumps next in a dev/example dependency; no change for openai users."
+  },
+  {
+    "id": "7.5.0#296",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem-tests, not observable by users."
+  },
+  {
+    "id": "7.5.0#297",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency cooldown policy is a repo tooling change."
+  },
+  {
+    "id": "7.6.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "ChatCompletionChunk.obfuscation",
+    "why": "New field on chat completion chunk; older versions ignore it silently."
+  },
+  {
+    "id": "7.6.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "quantity_unit",
+    "why": "New project residency and usage quantity_unit fields that older versions simply don't type or expose."
+  },
+  {
+    "id": "7.6.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "realtime calls (WebRTC)",
+    "why": "New backend-mediated Realtime WebRTC call support; older versions lack the API so calling it fails."
+  },
+  {
+    "id": "7.6.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "X.509 workload token exchange",
+    "why": "New pinned X.509 workload auth option that older versions reject or lack."
+  },
+  {
+    "id": "7.6.0#5",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Attesting cross-module X.509 transport capabilities doesn't say what users observe."
+  },
+  {
+    "id": "7.6.0#6",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Hardening X.509 token lifecycle and tenant isolation doesn't say what behavior changed."
+  },
+  {
+    "id": "7.6.0#7",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "X.509 workload identity",
+    "why": "Integrates X.509 workload identity into clients, a new auth option older versions lack."
+  },
+  {
+    "id": "7.6.0#8",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "named data-residency endpoints",
+    "why": "New named data-residency endpoint option that older versions don't support."
+  },
+  {
+    "id": "7.6.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement with no observable output change."
+  },
+  {
+    "id": "7.6.0#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "assistants run-step tool callbacks",
+    "why": "Run steps with mismatched identity are now rejected with an error before tool callbacks, which previously ran."
+  },
+  {
+    "id": "7.6.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves recording outcomes on cancellation, aligning with expected behavior."
+  },
+  {
+    "id": "7.6.0#12",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "GCP metadata timeout",
+    "why": "An explicit zero timeout is now honored instead of being replaced by a default, changing behavior for existing configs."
+  },
+  {
+    "id": "7.6.0#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Handles malformed Azure IMDS responses gracefully instead of misbehaving."
+  },
+  {
+    "id": "7.6.0#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Handles malformed OAuth token responses gracefully."
+  },
+  {
+    "id": "7.6.0#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Streamed chat completion logprobs were double-counted, a bug; now match documented output."
+  },
+  {
+    "id": "7.6.0#16",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cancellation now honored during credential resolution, as expected."
+  },
+  {
+    "id": "7.6.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement in tee stream draining with the same output."
+  },
+  {
+    "id": "7.6.0#18",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Polling now honors abort signals as documented."
+  },
+  {
+    "id": "7.6.0#19",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Large streaming responses were broken or truncated; now preserved."
+  },
+  {
+    "id": "7.6.0#20",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Multipart array order is preserved, fixing incorrect ordering."
+  },
+  {
+    "id": "7.6.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI check publishing for the repo."
+  },
+  {
+    "id": "7.6.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI check publishing for the repo."
+  },
+  {
+    "id": "7.6.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes streaming examples, not library behavior."
+  },
+  {
+    "id": "7.6.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Affects Cloudflare tests and example proxies, not the published SDK."
+  },
+  {
+    "id": "7.6.0#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Affects Vercel ecosystem test/example APIs, not the SDK."
+  },
+  {
+    "id": "7.6.0#26",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "why": "SDK event streams are now bounded and streamed item identities are validated, so streams that previously worked can now error."
+  },
+  {
+    "id": "7.6.0#27",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "why": "SSE frames and NDJSON lines above a size limit are now rejected instead of buffered."
+  },
+  {
+    "id": "7.6.0#28",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Closes response streams on rejected Azure managed-identity auth; a resource cleanup fix."
+  },
+  {
+    "id": "7.6.0#29",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "why": "Bedrock region validation, query merging and upload error handling are stricter, so previously accepted input may now be rejected."
+  },
+  {
+    "id": "7.6.0#30",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "why": "Realtime WebSocket origin checks, worker guards and Azure credential handling are stricter and can now refuse previously accepted setups."
+  },
+  {
+    "id": "7.6.0#31",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves structured response-format integrity so requests match what the docs describe."
+  },
+  {
+    "id": "7.6.0#32",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what AssistantStream delta change users will observe."
+  },
+  {
+    "id": "7.6.0#33",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Streaming uploads no longer send the local path as the filename."
+  },
+  {
+    "id": "7.6.0#34",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what changes for users calling structured output."
+  },
+  {
+    "id": "7.6.0#35",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Structured JSON parse errors now have redacted contents, so error messages differ."
+  },
+  {
+    "id": "7.6.0#36",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what finalization snapshots are or what users observe."
+  },
+  {
+    "id": "7.6.0#37",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "GCP metadata authentication errors no longer include the response body."
+  },
+  {
+    "id": "7.6.0#38",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Errors for invalid Bedrock bearer credentials now redact the credential."
+  },
+  {
+    "id": "7.6.0#39",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Errors for invalid workload identity access tokens now redact the token."
+  },
+  {
+    "id": "7.6.0#40",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Malformed NDJSON stream errors now redact the offending content."
+  },
+  {
+    "id": "7.6.0#41",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Malformed Realtime WebSocket error causes are now redacted."
+  },
+  {
+    "id": "7.6.0#42",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Malformed SSE diagnostic payloads in errors are now redacted."
+  },
+  {
+    "id": "7.6.0#43",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Assistant delta diagnostics now redact sensitive content."
+  },
+  {
+    "id": "7.6.0#44",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Unsupported Responses stream event payloads are now redacted in errors."
+  },
+  {
+    "id": "7.6.0#45",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "why": "Malformed Realtime WebSocket event frames are now rejected."
+  },
+  {
+    "id": "7.6.0#46",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "SSE streams now require an exact completion sentinel, so lenient variants are no longer treated as the end."
+  },
+  {
+    "id": "7.6.0#47",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Changes the npm publishing process only."
+  },
+  {
+    "id": "7.6.0#48",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "logger",
+    "why": "Assistants stream errors now go through the configured logger instead of the default output, changing where errors are reported."
+  },
+  {
+    "id": "7.6.0#49",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI credential restriction has no effect on users of the package."
+  },
+  {
+    "id": "7.6.0#50",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Scoping Cloudflare ecosystem API key files doesn't say whether it affects the package or only ecosystem tests."
+  },
+  {
+    "id": "7.6.0#51",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Changes an example app's requests, not the library."
+  },
+  {
+    "id": "7.6.0#52",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "runTools",
+    "why": "Tool callbacks that previously still ran after cancellation are now stopped."
+  },
+  {
+    "id": "7.6.0#53",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "AssistantStream",
+    "why": "Sensitive assistant stream events are no longer retained, so code reading retained events may see different data."
+  },
+  {
+    "id": "7.6.0#54",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance change to waiter settling with no observable behavior change."
+  },
+  {
+    "id": "7.6.0#55",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance change to WebSocket waiter settling with no observable behavior change."
+  },
+  {
+    "id": "7.6.0#56",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserving validator bindings fixes helpers that should have worked with standard-schema validators."
+  },
+  {
+    "id": "7.6.0#57",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "Stream",
+    "why": "Named SSE provider error events are now rejected with an error instead of being handled otherwise."
+  },
+  {
+    "id": "7.6.0#58",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test portability change only."
+  },
+  {
+    "id": "7.6.0#59",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserving Blob files and multipart media types makes uploads behave as documented."
+  },
+  {
+    "id": "7.6.0#60",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "webhooks.verifySignature",
+    "why": "Signature verification now bounds its work, so oversized or excessive inputs may be rejected with an error."
+  },
+  {
+    "id": "7.6.0#61",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "OpenAIRealtimeWS",
+    "why": "Custom credential headers are now blocked on redirects, so redirected WebSocket connections that relied on them fail."
+  },
+  {
+    "id": "7.6.0#62",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "zodResponseFormat",
+    "why": "Zod schemas that aren't provably JSON-native are no longer supported for structured outputs and now error."
+  },
+  {
+    "id": "7.6.0#63",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "7.6.0#64",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation of supported image models only."
+  },
+  {
+    "id": "7.6.0#65",
+    "candidate": false,
+    "skip": "internal",
+    "why": "SDK generation metadata update."
+  },
+  {
+    "id": "7.6.0#66",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.6.0#67",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.6.0#68",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.6.0#69",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.6.0#70",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.6.0#71",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.6.0#72",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.6.0#73",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem-tests only."
+  },
+  {
+    "id": "7.6.0#74",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump, no user-observable change."
+  },
+  {
+    "id": "7.6.0#75",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repository custom-code budget policy, not user-facing."
+  },
+  {
+    "id": "7.6.0#76",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Agent guidance documentation only."
+  },
+  {
+    "id": "7.6.0#77",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Contributor/agent security guidance docs only."
+  },
+  {
+    "id": "7.6.0#78",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor moving embedding encoding into a helper, no observable change."
+  },
+  {
+    "id": "7.6.0#79",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of file processing wait into a helper."
+  },
+  {
+    "id": "7.6.0#80",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of vector store batch uploads into a helper."
+  },
+  {
+    "id": "7.6.0#81",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of vector store polling into a helper."
+  },
+  {
+    "id": "7.6.0#82",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of webhook signature checks into a helper."
+  },
+  {
+    "id": "7.6.0#83",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor sharing assistant run polling code."
+  },
+  {
+    "id": "7.7.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "call_id",
+    "why": "Function call output call IDs become optional, so code can now omit them; older versions' types rejected omission, but existing code still runs."
+  },
+  {
+    "id": "7.7.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes streaming honor cancellation as expected, fixing a bug."
+  },
+  {
+    "id": "7.8.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "compute_units",
+    "why": "New compute_units field on Responses and Chat Completions usage; older versions simply lack it."
+  },
+  {
+    "id": "7.8.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "User-Agent",
+    "why": "WebSocket connections now send a default User-Agent header and audit log events, changing what is sent without code changes."
+  },
+  {
+    "id": "7.8.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Clamps refresh buffer to token lifetime, fixing incorrect refresh behavior."
+  },
+  {
+    "id": "7.8.0#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Says 'secure first-class X.509 workload credentials' without stating what changed for users."
+  },
+  {
+    "id": "7.8.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency and release boundary hardening, not observable in API use."
+  },
+  {
+    "id": "7.8.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes WebSocket waiters settle instead of hanging when listeners throw."
+  },
+  {
+    "id": "7.8.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores native browser ESM imports that had broken."
+  },
+  {
+    "id": "7.8.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects multipart body detection to own properties only, a bug fix."
+  },
+  {
+    "id": "7.9.0#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'Update usage APIs and documentation' doesn't say what changed."
+  },
+  {
+    "id": "7.9.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Responses WebSocket",
+    "why": "Responses WebSockets no longer follow redirects, so setups relying on redirects now behave differently."
+  },
+  {
+    "id": "7.9.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CommonJS loading under browser export conditions, turning a failure into working behavior."
+  },
+  {
+    "id": "7.9.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Restores a repository maintenance review process."
+  },
+  {
+    "id": "7.9.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes Jest 28 CommonJS import resolution so the package works as documented."
+  },
+  {
+    "id": "7.9.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.9.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repository custom-code budget change with no user-observable effect."
+  },
+  {
+    "id": "7.10.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "gpt-6-astra",
+    "why": "Adds a new model and related features; older versions' types would reject new options."
+  },
+  {
+    "id": "7.10.0#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "7.12.1#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "GPT Image 2.5 models",
+    "why": "Adds new image models and options that older type definitions would reject."
+  },
+  {
+    "id": "7.12.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI regression test change."
+  },
+  {
+    "id": "7.13.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "API key expiration controls",
+    "why": "Adds new API key expiration options that older versions' types would reject."
+  },
+  {
+    "id": "7.14.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Live API",
+    "why": "Adds a new Live API surface not present in older versions."
+  },
+  {
+    "id": "7.14.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.14.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.14.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.14.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Tooling and fixture dependency updates."
+  },
+  {
+    "id": "7.15.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Agents API",
+    "why": "Adds a new Agents API that older versions lack."
+  },
+  {
+    "id": "7.16.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "WebSocket incoming event limits",
+    "why": "Adds a new per-iterator incoming event limit option older versions would reject."
+  },
+  {
+    "id": "7.16.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes handling of malformed WebSocket events and buffering so it works as intended instead of erroring."
+  },
+  {
+    "id": "7.16.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes abort subscription lifetime leak without changing documented behavior."
+  },
+  {
+    "id": "7.16.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.16.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.16.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.16.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.16.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.16.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.16.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.16.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.16.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in an ecosystem-tests directory, not observable by users."
+  },
+  {
+    "id": "7.16.0#13",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Bumps undici to a new major-adjacent version but doesn't say what changes for users."
+  },
+  {
+    "id": "7.16.0#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops callback credentials leaking across requests, which is what the docs already implied."
+  },
+  {
+    "id": "7.16.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance cleanup avoiding repeated normalization, no observable change."
+  },
+  {
+    "id": "7.16.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Linear-time trimming is a performance fix with the same output."
+  },
+  {
+    "id": "7.16.0#17",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Formats WebSocket error messages safely, turning a failure case into a working one."
+  },
+  {
+    "id": "7.16.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "7.16.0#19",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Discarding unread events when an iterator returns fixes cleanup behavior to what is expected."
+  },
+  {
+    "id": "7.16.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in a test fixture."
+  },
+  {
+    "id": "7.17.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "compaction progress events",
+    "why": "Adds new compaction progress events; older versions don't emit them and code ignoring them is unaffected."
+  },
+  {
+    "id": "7.17.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI retry change only."
+  },
+  {
+    "id": "7.17.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "chat runner abort reasons",
+    "why": "Aborting a chat runner now surfaces the original abort reason instead of a generic error, changing what callers observe."
+  },
+  {
+    "id": "7.17.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserving native error causes only adds information to errors that were already raised."
+  },
+  {
+    "id": "7.17.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "WebSocket constructors apiKey",
+    "why": "Function-based API keys passed to the Responses WebSocket constructors are now rejected with an error."
+  },
+  {
+    "id": "7.17.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "runTools",
+    "why": "Streaming runTools now rejects when a turn is unfinished, where previously it resolved."
+  },
+  {
+    "id": "7.17.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Emitting terminal SSE events lacking a trailing blank line makes streaming work as documented."
+  },
+  {
+    "id": "7.17.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "zod strict schemas",
+    "why": "Generated strict JSON schemas now omit an impossible optional branch, changing the schema sent."
+  },
+  {
+    "id": "7.17.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint tooling change."
+  },
+  {
+    "id": "7.17.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Example code only."
+  },
+  {
+    "id": "7.18.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "agent session model settings",
+    "why": "Adds new agent session model settings; code not using them is unaffected, and older versions' behavior is unchanged."
+  },
+  {
+    "id": "7.18.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "audio-mini models",
+    "why": "Adds new audio-mini model choices, which older versions' types reject."
+  },
+  {
+    "id": "7.18.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "managed Responses WebSocket sessions",
+    "why": "Adds managed Responses WebSocket sessions as a new callable feature."
+  },
+  {
+    "id": "7.18.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prompt-cache prewarming",
+    "why": "Adds prompt-cache prewarming as a new callable feature."
+  },
+  {
+    "id": "7.18.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "WebSocket results, header defaults",
+    "why": "WebSocket results are now validated and header defaults are preserved, changing what is accepted and sent."
+  },
+  {
+    "id": "7.18.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Clarifies SIP call ID usage, documentation only."
+  },
+  {
+    "id": "7.18.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only updates image request examples."
+  },
+  {
+    "id": "7.19.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "webhooks",
+    "why": "Adds new webhook endpoint management resources; older versions simply lack them."
+  },
+  {
+    "id": "7.19.0#2",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "connector_id",
+    "why": "MCP connector_id is deprecated but still works."
+  },
+  {
+    "id": "7.20.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "environment-variable vault credentials",
+    "why": "New credential type that older versions' types would reject."
+  },
+  {
+    "id": "7.20.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "external storage configuration",
+    "why": "Adds new external storage configuration management methods not present in older versions."
+  },
+  {
+    "id": "7.20.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "safety case retrieval",
+    "why": "Adds a new method to retrieve safety cases, absent in older versions."
+  },
+  {
+    "id": "7.20.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "safety warning and deactivation webhook events",
+    "why": "New webhook event types that older versions' types and parsing do not include."
+  },
+  {
+    "id": "7.20.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "SIP media security",
+    "why": "Adds a new field on incoming call events that older types lack."
+  },
+  {
+    "id": "7.20.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores request options being honored in legacy GET calls, as expected."
+  },
+  {
+    "id": "7.21.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "session environment reset events",
+    "why": "Adds new event types not present in older versions."
+  },
+  {
+    "id": "7.21.0#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Vague entry; does not say what model choices or request handling changed."
+  },
+  {
+    "id": "7.21.0#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only documents response management resources."
+  },
+  {
+    "id": "7.22.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "gpt-6-sol",
+    "why": "Adds new model identifiers that older types would reject."
+  },
+  {
+    "id": "7.23.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "GCP external storage",
+    "why": "Adds GCP as an external storage option that older types reject."
+  },
+  {
+    "id": "7.23.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "gpt-rosalind",
+    "why": "Adds a new model identifier that older types would reject."
+  },
+  {
+    "id": "7.23.0#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only documents the seed bounds."
+  },
+  {
+    "id": "7.24.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Agents credential and session options",
+    "why": "Adds new options that older types would reject."
+  },
+  {
+    "id": "7.24.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Cyber access programs",
+    "why": "Adds a new Responses option not accepted by older types."
+  },
+  {
+    "id": "7.24.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "gpt-6.1-sol",
+    "why": "Adds a new model identifier that older types would reject."
+  },
+  {
+    "id": "7.24.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Realtime Translation client secret",
+    "why": "Adds a new client secret creation method absent in older versions."
+  },
+  {
+    "id": "7.24.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Realtime translation WebSocket",
+    "why": "Adds a new Node translation WebSocket class absent in older versions."
+  },
+  {
+    "id": "7.24.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "incremental output snapshots",
+    "why": "Adds an opt-in WebSocket option that older types would reject."
+  },
+  {
+    "id": "7.24.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "baseURL",
+    "why": "Base URL query strings are now preserved when joining endpoints, changing requests sent for code that relied on the old behavior."
+  },
+  {
+    "id": "7.24.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.24.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.24.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.24.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.24.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.24.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.24.0#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a hang on fractional deadlines, turning a hang into working behavior."
+  },
+  {
+    "id": "7.24.0#15",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "live",
+    "why": "Queued writes with uncertain delivery are no longer replayed, which changes what is sent."
+  },
+  {
+    "id": "7.24.0#16",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves streamed logprobs and metadata that were supposed to be supported, matching documented behavior."
+  },
+  {
+    "id": "7.24.0#17",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Clarifies documentation of web search location defaults."
+  },
+  {
+    "id": "7.24.0#18",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents API error responses only."
+  },
+  {
+    "id": "7.24.0#19",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Clarifies Realtime modality array definitions in docs."
+  },
+  {
+    "id": "7.24.0#20",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Says bounds and a reference were corrected without saying what changed for users."
+  },
+  {
+    "id": "7.24.0#21",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents batch error responses."
+  },
+  {
+    "id": "7.24.0#22",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents files and uploads error responses."
+  },
+  {
+    "id": "7.24.0#23",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents fine-tuning and model errors."
+  },
+  {
+    "id": "7.24.0#24",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents Responses not-found errors."
+  },
+  {
+    "id": "7.24.0#25",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents stored chat completion errors."
+  },
+  {
+    "id": "7.24.0#26",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Contributor policy documentation."
+  },
+  {
+    "id": "7.25.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "computer use (beta agents)",
+    "why": "New computer use support for beta agents that older versions would reject."
+  },
+  {
+    "id": "7.26.0#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Change to beta Agents streams, a beta entry point."
+  },
+  {
+    "id": "7.26.0#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Typed output parsing for agent streams, part of the beta agents feature."
+  },
+  {
+    "id": "7.26.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "agent session trace listing",
+    "why": "New API to list agent session traces; absent in older versions."
+  },
+  {
+    "id": "7.26.0#4",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Binding typed functions to beta Agents tools."
+  },
+  {
+    "id": "7.26.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "detail: \"original\"",
+    "why": "Chat Completions image detail now accepts a value older types rejected."
+  },
+  {
+    "id": "7.26.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "evals.runs.cancel",
+    "why": "Cancel call now hits a different, corrected endpoint."
+  },
+  {
+    "id": "7.26.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.26.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.26.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.26.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.26.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.26.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev tooling update, not observable by users."
+  },
+  {
+    "id": "7.26.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test and benchmark tooling change only."
+  },
+  {
+    "id": "7.26.0#14",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Runtime dependency patch bump with no stated user-visible change."
+  },
+  {
+    "id": "7.26.0#15",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Dependency major bump of dotenv, but the entry doesn't say whether openai behavior changed."
+  },
+  {
+    "id": "7.26.0#16",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Dependency bump with no stated user-visible change."
+  },
+  {
+    "id": "7.26.0#17",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes WebSocket reconnects use refreshed credentials, which is the expected behavior."
+  },
+  {
+    "id": "7.26.0#18",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes lane ID reuse across WebSocket session replacements, restoring expected behavior."
+  },
+  {
+    "id": "7.26.0#19",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Retains WebRTC Live session transport types, but the entry doesn't say what changed for users."
+  },
+  {
+    "id": "7.27.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "agents",
+    "why": "Adds hosted file preparation and result artifact download to agents; older versions simply lack it."
+  },
+  {
+    "id": "7.28.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "custom voice creation",
+    "why": "Adds custom voice creation and agent session events, which users can call."
+  },
+  {
+    "id": "7.30.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Decisions",
+    "why": "Adds standalone Decisions support as a new callable API."
+  },
+  {
+    "id": "7.30.1#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "custom voice creation",
+    "why": "Corrects the custom voice creation parameters, so code using the 7.28.0 parameters may now be rejected."
+  },
+  {
+    "id": "7.30.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.30.1#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.30.1#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.30.1#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "7.30.1#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.30.1#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump of yargs."
+  },
+  {
+    "id": "7.30.1#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refreshes development and ecosystem dependencies only."
+  },
+  {
+    "id": "7.30.1#17",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "responses.parse",
+    "why": "Structured text is now parsed only in final message phases, so output_parsed on non-final messages changes without an error."
+  },
+  {
+    "id": "7.30.1#18",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "toFile",
+    "why": "Filenames inferred from URLs are now decoded, so uploaded filenames differ from before (e.g. percent-encoded names)."
+  },
+  {
+    "id": "7.31.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prewarmed hosted environments",
+    "why": "New API surface for prewarmed hosted environments; older versions just don't have it, though the API may reject the params."
+  },
+  {
+    "id": "7.32.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "agent environment suspension and expiration",
+    "why": "Adds new suspension and expiration options for agent environments that code not using them is unaffected by."
+  },
+  {
+    "id": "7.32.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump in ecosystem tests."
+  },
+  {
+    "id": "7.32.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "totalUsage dropping detailed token usage was a bug; code expecting the full usage now gets it."
+  },
+  {
+    "id": "7.32.0#4",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes a documentation link."
+  }
+]

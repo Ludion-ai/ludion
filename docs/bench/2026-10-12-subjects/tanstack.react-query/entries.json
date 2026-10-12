@@ -1,0 +1,178 @@
+[
+  {
+    "id": "5.100.3#1",
+    "version": "5.100.3",
+    "date": "2026-04-25T11:19:36.880Z",
+    "section": "Patch Changes",
+    "text": "-   fix(suspense): skip calling combine when queries would suspend ([#10576](https://github.com/TanStack/query/pull/10576))",
+    "refs": [
+      10576
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.100.3"
+  },
+  {
+    "id": "5.100.14#1",
+    "version": "5.100.14",
+    "date": "2026-05-23T17:16:15.371Z",
+    "section": "Patch Changes",
+    "text": "-   fix(react-query): do not go into optimistic fetching state when not subscribed ([#10759](https://github.com/TanStack/query/pull/10759))",
+    "refs": [
+      10759
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.100.14"
+  },
+  {
+    "id": "5.102.0#1",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Minor Changes",
+    "text": "-   [#10668](https://github.com/TanStack/query/pull/10668) [`e674826`](https://github.com/TanStack/query/commit/e6748265c86294704f6c872e6f435d9ec5a92b28) - react-query: update usePrefetchQuery and usePrefetchInfiniteQuery to use queryClient.query and queryClient.infiniteQuery",
+    "refs": [
+      10668
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#2",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11245](https://github.com/TanStack/query/pull/11245) [`37127db`](https://github.com/TanStack/query/commit/37127dbe479a4892dbbe28ac8ceabf8832b5f1a3) - revert: remove NoInfer from useQuery return types",
+    "refs": [
+      11245
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#3",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#10373](https://github.com/TanStack/query/pull/10373) [`6e3d521`](https://github.com/TanStack/query/commit/6e3d521fe54f78624e53c1c6f9cadd678504bee8) - fix(types): propagate generic type parameters to `useMutationState` select callback",
+    "refs": [
+      10373
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#4",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11224](https://github.com/TanStack/query/pull/11224) [`294d4e6`](https://github.com/TanStack/query/commit/294d4e62c4f7d674574a4903eef2a1bc3dd1413b) - Fix `queryOptions` and `infiniteQueryOptions` return types so exported inferred options can be emitted in declaration files without leaking internal data tag symbols.",
+    "refs": [
+      11224
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#5",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11147](https://github.com/TanStack/query/pull/11147) [`cb6c9d3`](https://github.com/TanStack/query/commit/cb6c9d3725db0fed94fb5133820e41b7c326d2ef) - Default `TData` of `UseInfiniteQueryOptions` and `UseSuspenseInfiniteQueryOptions` to `InfiniteData<TQueryFnData>` so it matches the hook generics.",
+    "refs": [
+      11147
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#6",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#8737](https://github.com/TanStack/query/pull/8737) [`2215bb0`](https://github.com/TanStack/query/commit/2215bb031139cdc8a84751b37a485c38ca9d2b6e) - fix: make mutation variables optional when `undefined extends TVariables`",
+    "refs": [
+      8737
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#7",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11221](https://github.com/TanStack/query/pull/11221) [`1ef4208`](https://github.com/TanStack/query/commit/1ef42087c9a266c2137d2ef645cbcc662f60ac93) - Remove experimental render-time prefetching and the `promise` property from query results.",
+    "refs": [
+      11221
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#8",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11228](https://github.com/TanStack/query/pull/11228) [`fb6c3fa`](https://github.com/TanStack/query/commit/fb6c3fabda4cb6b291cccc6651ed88a7db901915) - Avoid emitting a runtime import for React Query's type-only exports.",
+    "refs": [
+      11228
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#9",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11130](https://github.com/TanStack/query/pull/11130) [`8834267`](https://github.com/TanStack/query/commit/88342670eca6e4949416aab832b1f81cc7b881f8) - fix(react-query): don't show optimistic fetching for unsubscribed useQueries",
+    "refs": [
+      11130
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#10",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11233](https://github.com/TanStack/query/pull/11233) [`b866a95`](https://github.com/TanStack/query/commit/b866a95adde7e8465462526df5870ebc12340b36) - remove unused experimental_beforeQuery and experimental_afterQuery hooks",
+    "refs": [
+      11233
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.0#11",
+    "version": "5.102.0",
+    "date": "2026-08-22T18:56:06.716Z",
+    "section": "Patch Changes",
+    "text": "-   [#11144](https://github.com/TanStack/query/pull/11144) [`e546d03`](https://github.com/TanStack/query/commit/e546d03bef116c66a05dbf42ccfd70b6d8600a8f) - fix: remove placeholderData from suspense infinite query",
+    "refs": [
+      11144
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.0"
+  },
+  {
+    "id": "5.102.6#1",
+    "version": "5.102.6",
+    "date": "2026-08-26T18:36:03.762Z",
+    "section": "Patch Changes",
+    "text": "-   [#11305](https://github.com/TanStack/query/pull/11305) [`ac2b612`](https://github.com/TanStack/query/commit/ac2b61230ea35b90b177ba35dc030598bac9c9a6) - fix(react-query): throw falsy errors from `useQueries` and `useSuspenseQueries` to the error boundary",
+    "refs": [
+      11305
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.102.6"
+  },
+  {
+    "id": "5.103.3#1",
+    "version": "5.103.3",
+    "date": "2026-09-26T00:17:07.889Z",
+    "section": "Patch Changes",
+    "text": "- [#11647](https://github.com/TanStack/query/pull/11647) [`1c9693e`](https://github.com/TanStack/query/commit/1c9693eac75495a04ae4328a35818b1fdf264978) - fix(codemods): avoid copying unnecessary files from codemods project",
+    "refs": [
+      11647
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.103.3"
+  },
+  {
+    "id": "5.104.0#1",
+    "version": "5.104.0",
+    "date": "2026-09-26T03:56:26.747Z",
+    "section": "Minor Changes",
+    "text": "- [#11650](https://github.com/TanStack/query/pull/11650) [`5279b05`](https://github.com/TanStack/query/commit/5279b05211223dd719803ca22a9d1fa46c98638e) - Build projects with Vite 8",
+    "refs": [
+      11650
+    ],
+    "url": "https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.104.0"
+  }
+]

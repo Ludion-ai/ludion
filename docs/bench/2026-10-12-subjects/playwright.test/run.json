@@ -1,0 +1,17 @@
+{
+  "package": "@playwright/test",
+  "range": "*",
+  "since": "2026-04-15",
+  "repo": "microsoft/playwright",
+  "versions": [
+    "1.60.0",
+    "1.61.0",
+    "1.61.1",
+    "1.62.0",
+    "1.62.1",
+    "1.63.0",
+    "1.64.0"
+  ],
+  "missing": [],
+  "collected_at": "2026-10-12T02:33:58.106Z"
+}

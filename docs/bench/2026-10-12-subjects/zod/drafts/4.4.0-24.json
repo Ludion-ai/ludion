@@ -1,0 +1,14 @@
+{
+  "entry": "4.4.0#24",
+  "verdict": {
+    "id": "4.4.0#24",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.locales.fr",
+    "why": "French messages for issue origins now differ, changing error message output."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

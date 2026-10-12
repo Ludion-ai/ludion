@@ -1,0 +1,914 @@
+[
+  {
+    "id": "0.19.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "ai@^7",
+    "why": "The peer range now accepts AI SDK v7, which older agents versions reject with a peer-dependency conflict; the `onChatMessage` callback type also changed."
+  },
+  {
+    "id": "0.20.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "createMcpHandler",
+    "why": "Stored HTTP session IDs from older versions are now discarded and the client reconnects, and `createMcpHandler` gains SDK v2 support."
+  },
+  {
+    "id": "0.20.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Expired Browser Run sessions are now recycled after an HTTP 410 instead of erroring."
+  },
+  {
+    "id": "0.20.1#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "@modelcontextprotocol/server",
+    "why": "The exact-pinned MCP peer dependencies moved from the beta to stable 2.0.0, so installs pinned to the old beta conflict."
+  },
+  {
+    "id": "0.20.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes AI SDK v7 telemetry that was missing token counts, finish reasons and tool results."
+  },
+  {
+    "id": "0.21.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "agents/chat/transport",
+    "why": "`WebSocketChatTransport` is newly exported from the framework-neutral entry, which older versions don't provide."
+  },
+  {
+    "id": "0.21.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "agentTool",
+    "why": "`agentTool` now takes AI SDK flexible schemas, so custom schemas that don't type-check as `FlexibleSchema` now fail type-checking."
+  },
+  {
+    "id": "0.21.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "browser_screenshot",
+    "why": "Large base64 values returned outside the canonical screenshot shape are now redacted, and TanStack screenshot output is reduced to a summary."
+  },
+  {
+    "id": "0.21.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "retention",
+    "why": "`Agent.runWorkflow()` now passes Workflow `retention` through; older versions ignore it at runtime."
+  },
+  {
+    "id": "0.21.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "buildAgentUrl",
+    "why": "New `buildAgentPath()` and `buildAgentUrl()` helpers don't exist in older versions, so importing them fails."
+  },
+  {
+    "id": "0.21.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "routeSubAgentRequest",
+    "why": "Request bodies are streamed to sub-agents, so an unread upload is now cancelled instead of being drained by the parent."
+  },
+  {
+    "id": "0.21.0#7",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "response_format.schema",
+    "why": "Extraction schemas must now be sent as `response_format.json_schema`, so callers using the old field name need to rename it."
+  },
+  {
+    "id": "0.21.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "useAgentChat",
+    "why": "Observer error frames are now terminal and no longer rendered as assistant messages."
+  },
+  {
+    "id": "0.21.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Toolchain and dependency updates, plus new-project templates, with no change to the API."
+  },
+  {
+    "id": "0.21.0#10",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "createAISDKTelemetry",
+    "why": "`createAISDKTelemetry()` was removed in favor of `wrapAISDK()`."
+  },
+  {
+    "id": "0.21.0#11",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "BrowserConnector",
+    "why": "BrowserConnector now validates tool arguments and rejects JSON-stringified extraction schemas and wrong `cdp.send` session values."
+  },
+  {
+    "id": "0.21.0#12",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "TextStreamCallback",
+    "why": "Streamed text segments around tool calls are now joined with spacing, which changes output text."
+  },
+  {
+    "id": "0.22.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "chatRecovery",
+    "why": "Chat recovery now always runs, and `chatRecovery: false` silently gets the default configuration."
+  },
+  {
+    "id": "0.22.0#2",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "silent",
+    "symbol": "options.hibernate",
+    "why": "The `static options.hibernate` switch and in-memory connection mode were removed, so WebSockets always use hibernation."
+  },
+  {
+    "id": "0.22.0#3",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "throttle",
+    "why": "`useAgentChat` now throttles UI updates at 50ms by default, where it previously rendered every chunk."
+  },
+  {
+    "id": "0.22.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "schedule",
+    "why": "Scheduled callbacks now receive the parsed `Schedule` object as their second argument instead of the raw storage row with a string payload."
+  },
+  {
+    "id": "0.22.0#5",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "agents",
+    "why": "The published `agents` CLI binary was removed, so invoking it now fails instead of printing a placeholder message and exiting 0."
+  },
+  {
+    "id": "0.22.0#6",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes the `MCPClientManager` lifecycle capability, which is part of the experimental `agents/lifecycle` surface, and keeps the Agent MCP APIs intact."
+  },
+  {
+    "id": "0.22.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Routes async callable and streaming responses to the facet WebSocket frame that originated the RPC, which fixes misrouted responses."
+  },
+  {
+    "id": "0.22.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "SDK-created spans now carry extra instrumentation and agent identity attributes."
+  },
+  {
+    "id": "0.22.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a false error on long stream resumes by batching replayed chunks."
+  },
+  {
+    "id": "0.22.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects compaction overlay scoping and ordering to match intended branch behavior."
+  },
+  {
+    "id": "0.22.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes sub-agent WebSocket routing, ordering and error reporting."
+  },
+  {
+    "id": "0.22.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an Agent initialization failure on older runtimes into working behavior."
+  },
+  {
+    "id": "0.23.0#1",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "subAgent",
+    "why": "subAgent(), abortSubAgent(), deleteSubAgent(), hasSubAgent() and listSubAgents() are now @deprecated but still work, with this.dynamicAgents as the new surface."
+  },
+  {
+    "id": "0.23.0#2",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "getNextAlarm",
+    "why": "The pull-based alarm contribution model is removed (getNextAlarm/onAlarm on capabilities, LifecycleServices.alarms, AlarmContribution), so code using it fails."
+  },
+  {
+    "id": "0.23.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "RoutedAgents",
+    "why": "Adds RoutedAgents in the new agents/routing entry point, which older versions lack."
+  },
+  {
+    "id": "0.23.0#4",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "SessionManager",
+    "why": "The agents/experimental/memory/session and utils subpaths are removed (Session.create, SessionManager, Postgres providers), with replacements in agents/sessions and agents/context."
+  },
+  {
+    "id": "0.23.0#5",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "cleanupStreamBuffers",
+    "why": "cleanupStreamBuffers and STREAM_CLEANUP_DELAY_SECONDS are removed from agents/chat."
+  },
+  {
+    "id": "0.23.0#6",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "Scheduler.applyMemoryLimitPolicy",
+    "why": "Removes the memory-limit policy hooks (applyMemoryLimitPolicy, setLifecycleAlarmMemoryLimitStrikes, _cf_recoveryAlarmCallbacks), which fail for code that used them."
+  },
+  {
+    "id": "0.23.0#7",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "agents/voice",
+    "why": "Adds the agents/voice and agents/channels subpath exports, which older versions reject."
+  },
+  {
+    "id": "0.23.0#8",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "Lifecycle.broadcast",
+    "why": "WebSocket support moves out of Lifecycle into the WebSockets capability, so Lifecycle's getConnections/getConnection/broadcast and its WebSocket hooks are gone."
+  },
+  {
+    "id": "0.23.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Defines dispatch semantics for the job queue introduced in this same release, so there is no prior released behavior."
+  },
+  {
+    "id": "0.23.0#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "browser_execute",
+    "why": "The tool result sent to the model no longer includes the durable calls log."
+  },
+  {
+    "id": "0.23.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Moves chat recovery onto Tasks internally while preserving existing recovery behavior."
+  },
+  {
+    "id": "0.23.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Replatforms chat streams onto Streams with automatic migration and an unchanged wire protocol."
+  },
+  {
+    "id": "0.23.0#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes compaction summaries rendering structured tool outputs as [object Object]."
+  },
+  {
+    "id": "0.23.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Storage write-count optimizations on tables that were never released."
+  },
+  {
+    "id": "0.23.0#15",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds the experimental agents/streams entry point."
+  },
+  {
+    "id": "0.23.0#16",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only the experimental Sessions capability."
+  },
+  {
+    "id": "0.23.0#17",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes sub-agent connection state set in onConnect being lost for the first client message."
+  },
+  {
+    "id": "0.23.0#18",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "DEFAULT_CHAT_RECOVERY_MAX_WORK",
+    "why": "The default chat recovery work budget changes from 1000 to 10000, with the unit now a durable segment."
+  },
+  {
+    "id": "0.23.0#19",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only the experimental Sessions capability."
+  },
+  {
+    "id": "0.23.0#20",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds the experimental agents/tasks capability and experimental this.tasks."
+  },
+  {
+    "id": "0.24.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "useAgent transport",
+    "why": "Adds a transport option to useAgent and AgentClient, which older versions reject as a type error, and removes the experimental capnweb endpoint."
+  },
+  {
+    "id": "0.24.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Agent.queue",
+    "why": "Queued callbacks now run from the alarm loop and no longer see the enqueuing request's connection via getCurrentAgent(), and dequeue/getQueue methods became async."
+  },
+  {
+    "id": "0.24.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "State moves into a capability while Agent's public API and wire protocol are stated to be unchanged."
+  },
+  {
+    "id": "0.24.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Protocol state sync and connection flags move into WebSockets, with Agent's public methods and wire behaviour unchanged."
+  },
+  {
+    "id": "0.24.0#5",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "LifecycleUseOptions",
+    "why": "The `{ fallback: true }` option and LifecycleUseOptions are removed in favor of a `claims` declaration."
+  },
+  {
+    "id": "0.24.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves the fiber body's result when bookkeeping cleanup fails, instead of replacing it with a cleanup error."
+  },
+  {
+    "id": "0.24.0#7",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "ResumableStream.pendingCutoverId",
+    "why": "Adds a new property; older versions simply lack it, and the finalizePending change is a minor retry fix."
+  },
+  {
+    "id": "0.24.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump of valibot for a security advisory with no API change."
+  },
+  {
+    "id": "0.25.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "newUniqueId",
+    "why": "Async RPC on Agents addressed by raw IDs from newUniqueId()/idFromString() now fails the first call."
+  },
+  {
+    "id": "0.25.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects a failed agent-tool child being reported incorrectly after eviction."
+  },
+  {
+    "id": "0.25.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes duplicated or dropped agent-tool chunks on reconnect and recovery."
+  },
+  {
+    "id": "0.25.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "runAgentTool",
+    "why": "Adds the `eventDelivery: \"terminal\"` option to runAgentTool; older versions ignore the unknown option."
+  },
+  {
+    "id": "0.25.0#5",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "New experimental entry point agents/models/ai-sdk."
+  },
+  {
+    "id": "0.25.0#6",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "New experimental entry point agents/models/pi-ai."
+  },
+  {
+    "id": "0.25.0#7",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "New experimental entry point agents/harnesses/pi."
+  },
+  {
+    "id": "0.25.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes input being lost when approval arrives before input finishes streaming."
+  },
+  {
+    "id": "0.25.0#9",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "loadCdpSpec",
+    "why": "loadCdpSpec gains an optional sessionId argument; older versions ignore it."
+  },
+  {
+    "id": "0.25.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an unclear failure into a clear BrowserRenderingError when no WebSocket is returned."
+  },
+  {
+    "id": "0.25.0#11",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "CdpSession",
+    "why": "CdpConnection is the new name and CdpSession is kept as a deprecated alias."
+  },
+  {
+    "id": "0.25.0#12",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Persistent browser tools are backed by experimental Browser sessions."
+  },
+  {
+    "id": "0.25.0#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "send() now rejects promptly on a closed socket instead of waiting for the timeout."
+  },
+  {
+    "id": "0.25.0#14",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "cdp.spec",
+    "why": "cdp.spec() and loadCdpSpec() return richer output including parameters, return types, and type details."
+  },
+  {
+    "id": "0.25.0#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "useAgentChat now loads the new agent's history when the address changes, as expected."
+  },
+  {
+    "id": "0.25.0#16",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "onTurnEnd",
+    "why": "useAgentChat gains an onTurnEnd callback, and terminal chat frames now carry outcomes and user message IDs."
+  },
+  {
+    "id": "0.25.0#17",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "useAgentChat",
+    "why": "A WebSocket close before the done frame now sets error state instead of showing a truncated answer as complete."
+  },
+  {
+    "id": "0.25.0#18",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Compaction summaries echoed back by clients are no longer stored, and stored duplicates are hidden."
+  },
+  {
+    "id": "0.25.0#19",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "whenChanged: \"remind\"",
+    "why": "New context block option value that older versions don't recognize, and code not using it is unaffected."
+  },
+  {
+    "id": "0.25.0#20",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "sub-agent broadcast",
+    "why": "Broadcasts from sub-agents now make at most one root call and none without recipients, changing observable calls with the same code."
+  },
+  {
+    "id": "0.25.0#21",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a failure of a facet's first call after restart caused by syncing root-owned jobs, turning an error into working behavior."
+  },
+  {
+    "id": "0.25.0#22",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes WebSocket connections to deeply nested sub-agents that failed, making them work as documented."
+  },
+  {
+    "id": "0.25.0#23",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "useAgentChat",
+    "why": "The hook now replaces a scrambled assistant message with the server snapshot instead of keeping it until reload."
+  },
+  {
+    "id": "0.25.0#24",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onToolCall",
+    "why": "onToolCall now fires only after the stream ends and only for tool calls still waiting on the client, so timing and call set change."
+  },
+  {
+    "id": "0.25.0#25",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Props",
+    "why": "Interfaces are newly accepted as Props, which older versions rejected with a type error."
+  },
+  {
+    "id": "0.25.0#26",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "resolveToolMergeId",
+    "why": "resolveToolMergeId is deprecated in favour of reconcileMessages and still works."
+  },
+  {
+    "id": "0.25.0#27",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "ready",
+    "why": "ready now resolves only after state arrives, so code that ran at ready sees state defined instead of undefined."
+  },
+  {
+    "id": "0.25.0#28",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops reconnecting from erasing messages sent while disconnected, which is the expected behavior."
+  },
+  {
+    "id": "0.25.0#29",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Corrects the documented default and unit only, with no behavior change."
+  },
+  {
+    "id": "0.25.0#30",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "4000 + status",
+    "why": "Clients stop reconnecting after sub-agent rejection and terminal rejections use new close codes, changing observable close codes and reconnect behavior."
+  },
+  {
+    "id": "0.25.0#31",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes duplicated text on reconnect during a tool continuation."
+  },
+  {
+    "id": "0.25.0#32",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onChatResponse",
+    "why": "onChatResponse now fires with recovered: true for turns persisted just before a Durable Object reset, where it previously did not fire."
+  },
+  {
+    "id": "0.25.0#33",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops onFiberRecovered from being called for already finished work, which is the documented behavior."
+  },
+  {
+    "id": "0.25.0#34",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "session.mirror()",
+    "why": "New method that older versions lack and that only adds a call."
+  },
+  {
+    "id": "0.25.0#35",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes attachment references being lost so media is garbage-collected when a message is written back."
+  },
+  {
+    "id": "0.25.0#36",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization that reduces reads with no observable output change."
+  },
+  {
+    "id": "0.25.0#37",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "approved tool calls",
+    "why": "Approved tool calls that never ran are now settled so later turns no longer send them unresolved, changing what is sent to the model."
+  },
+  {
+    "id": "0.25.0#38",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes thread locking, queued follow-up retention and typing ordering during slow delivery."
+  },
+  {
+    "id": "0.25.0#39",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes recovery of an interrupted regeneration so it lands on its own branch."
+  },
+  {
+    "id": "0.25.0#40",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a thrown 'Maximum update depth exceeded' error during long streams."
+  },
+  {
+    "id": "0.25.0#41",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "storeTools",
+    "why": "With storeTools: true, oversized tool payloads are now recorded with base64 summarized rather than dropped."
+  },
+  {
+    "id": "0.25.0#42",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Vague hardening of recovery without saying what observably changes."
+  },
+  {
+    "id": "0.25.0#43",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "deleteSubAgent",
+    "why": "deleteSubAgent now also closes the sub-agent's direct client connections, a new side effect for the same call."
+  },
+  {
+    "id": "0.25.0#44",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects invalid tool outputs after truncation (issue #2014), turning broken results into working ones."
+  },
+  {
+    "id": "0.25.0#45",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes withX402Client enforce maxPaymentValue on the requirement actually signed, as the option already promises."
+  },
+  {
+    "id": "0.26.0#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Dependency bump of pi-durable and pi-ai with no stated user-visible change."
+  },
+  {
+    "id": "0.27.0#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "New experimental harnesses only."
+  },
+  {
+    "id": "0.27.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "agents/websearch",
+    "why": "New agents/websearch entry point with a web_search tool; older versions cannot resolve the import."
+  },
+  {
+    "id": "0.27.0#3",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "agents/channels",
+    "why": "The old agents/channels entry point was removed, so imports from it now fail."
+  },
+  {
+    "id": "0.27.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Summary list of bug fixes across several features."
+  },
+  {
+    "id": "0.27.0#5",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "AiSdkHarness is one of the new experimental harnesses."
+  },
+  {
+    "id": "0.27.0#6",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds Channels to the experimental channels entry point."
+  },
+  {
+    "id": "0.27.0#7",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "agents/channels",
+    "why": "Breaking removal of the agents/channels entry points, ChannelHost, composites and helpers; imports now fail."
+  },
+  {
+    "id": "0.27.0#8",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "ChannelGateway is added only under agents/experimental/channels."
+  },
+  {
+    "id": "0.27.0#9",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "WebChannelChatTransport lives under the experimental channels entry point."
+  },
+  {
+    "id": "0.27.0#10",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Web Channel and its client are new experimental entry points."
+  },
+  {
+    "id": "0.27.0#11",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "agents/websearch",
+    "why": "New agents/websearch entry point providing a web_search tool; older versions reject the import."
+  },
+  {
+    "id": "0.27.0#12",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Change only to the experimental AiSdkHarness."
+  },
+  {
+    "id": "0.27.0#13",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Fix only to the experimental AiSdkHarness."
+  },
+  {
+    "id": "0.27.0#14",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Change only to the experimental AiSdkHarness."
+  },
+  {
+    "id": "0.27.0#15",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "browserTool",
+    "why": "browserTool now sends its own tool description to the model, changing how the model uses it."
+  },
+  {
+    "id": "0.27.0#16",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "The tui command is a client for the experimental Web Channel."
+  },
+  {
+    "id": "0.27.0#17",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "New experimental container harness entry points."
+  },
+  {
+    "id": "0.27.0#18",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "removeServer",
+    "why": "removeServer() and removeMcpServer() now also delete the server's saved OAuth state from storage."
+  },
+  {
+    "id": "0.27.0#19",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "New experimental OpenCode harness and model entry points."
+  },
+  {
+    "id": "0.27.0#20",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes live Streams readers stalling when chunks arrive during processing."
+  },
+  {
+    "id": "0.27.0#21",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a 'no such table' error when two Streams instances share an object."
+  },
+  {
+    "id": "0.27.0#22",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a thrown 'Invalid job outcome' alarm error into a quiet end."
+  },
+  {
+    "id": "0.27.0#23",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "ThinkHarness is a new export from the experimental agents/harness/think entry point."
+  },
+  {
+    "id": "0.27.0#24",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "agents tui",
+    "why": "For URLs behind Cloudflare Access, the CLI now fetches a cloudflared token and sends it on the WebSocket upgrade, which it did not do before."
+  },
+  {
+    "id": "0.27.0#25",
+    "candidate": false,
+    "skip": "fix",
+    "why": "A URL with a #fragment used to make the client exit before connecting and now works."
+  },
+  {
+    "id": "0.27.0#26",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "useAgentChat",
+    "why": "After a mid-stream WebSocket drop, a cut-off assistant reply is now replaced with the server's copy, so the resulting message state differs."
+  },
+  {
+    "id": "0.27.0#27",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "WebChannelClient",
+    "why": "send() and listConversations() on a closed client now reject instead of hanging forever, and follow()/close() cancel pending reconnects, so code relying on the old behavior now sees errors."
+  },
+  {
+    "id": "0.27.0#28",
+    "candidate": false,
+    "skip": "fix",
+    "why": "paidTool now works with MCP SDK v2 servers and matches payment headers case-insensitively, turning a failure into working behavior."
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#125",
+  "verdict": {
+    "id": "5.0.0#125",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "webdriverio",
+    "why": "Headless Chrome under webdriverio now allows the GPU, changing launch behavior."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

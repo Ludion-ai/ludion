@@ -61,7 +61,10 @@ export function projectTools(allowEdits: boolean): string[] {
 /** Only what Claude Code needs to start and find its own sign-in; no tokens or other secrets from this shell. */
 const ENV_KEEP = ["PATH", "Path", "PATHEXT", "SystemRoot", "SYSTEMROOT", "windir", "ComSpec", "TEMP", "TMP", "HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "HOMEDRIVE", "HOMEPATH", "NUMBER_OF_PROCESSORS", "OS", "LANG"];
 export function runEnv(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
-  return Object.fromEntries(ENV_KEEP.filter((k) => env[k] !== undefined).map((k) => [k, env[k]]));
+  // In GitHub Actions (the nightly seed watch), Claude Code signs in with the ANTHROPIC_API_KEY secret; on a person's
+  // machine it uses its own sign-in, and a key in that shell stays out.
+  const keep = env.GITHUB_ACTIONS === "true" ? [...ENV_KEEP, "ANTHROPIC_API_KEY"] : ENV_KEEP;
+  return Object.fromEntries(keep.filter((k) => env[k] !== undefined).map((k) => [k, env[k]]));
 }
 
 const WEB_TOOLS = ["WebSearch", "WebFetch"];

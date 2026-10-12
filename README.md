@@ -15,7 +15,7 @@ npx ludion-ai sync
 /plugin install ludion@ludion
 ```
 
-A 47-second replay of one recorded run, without and with `sync`, is in [`docs/demo/sync-vitest.cast`](docs/demo/sync-vitest.cast) (`asciinema play docs/demo/sync-vitest.cast`; built from the recorded output by `docs/demo/make-cast.ts`).
+An 89-second replay of recorded runs is in [`docs/demo/sync-vitest.cast`](docs/demo/sync-vitest.cast) (`asciinema play docs/demo/sync-vitest.cast`). It shows one question answered without and with `sync`, then a lesson taught with `ludion teach` and written by `sync` in another project. It is built from recorded output by `docs/demo/make-cast.ts`, and [`docs/demo/README.md`](docs/demo/README.md) says what was recorded when and what was left out.
 
 ## What it measured
 
@@ -37,7 +37,18 @@ The whole gain came from changes a lesson covers; the others didn't move. One tr
 
 ## What it holds today
 
-30 lessons for vitest, wrangler, and the Cloudflare Agents SDK, plus one example lesson: the measured seeds, less one the harm check withheld (its wording made an answer worse), with two corrected by replacing lessons. All 30 were drafted by an agent, are labeled "drafted by an agent" wherever they appear, and are signed by the account that opened their pull request. Ludion holds some changes of some packages: a missing lesson is no evidence that nothing changed. From the next release of `ludion-ai`, `sync` also names the direct dependencies Ludion has no lessons for, and says where to ask for them.
+Lessons for vitest, wrangler, and the Cloudflare Agents SDK (the live list is on <https://ludion.ai>, and `/index/subjects.json` has the counts), plus one example lesson for Python. Every lesson but the example was drafted by an agent, is labeled "drafted by an agent" wherever it appears, and is signed by the GitHub account that opened its pull request.
+
+Ludion holds some changes of some packages: a missing lesson is no evidence that nothing changed. `ludion-ai` 0.1.3 and later `sync` name the direct dependencies Ludion has no lessons for, and say where to ask for them.
+
+## Teach one
+
+```sh
+npx ludion-ai teach draft.json            # checks it here, saves it to your ledger (~/.ludion)
+npx ludion-ai teach draft.json --public   # shows you the whole lesson, then opens a pull request with your own gh
+```
+
+When your assistant gets a change wrong, ask it to draft the lesson with the `ludion_teach` MCP tool; it returns the command to run. A draft can also be written by hand: it has the fields of a lesson file (see any file in [`lessons/`](lessons/) and [`lessons/lessons.schema.json`](lessons/lessons.schema.json)) without the id, author and dates, which `teach` sets. Its evidence is a test that passes on the new version and fails on the one before (it runs in Docker with the network off, on your machine if Docker is installed and in CI either way), or a quote from the source that states the fact. A draft with no evidence stays in your ledger, marked "unverified, yours only", and never reaches anyone else. Nothing is published unless you confirm at your own terminal.
 
 ## How a lesson works
 

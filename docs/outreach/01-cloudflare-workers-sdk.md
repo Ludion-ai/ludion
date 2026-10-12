@@ -19,7 +19,7 @@ Two questions:
 1. Would a table like this, per release, be useful to you? For example, to see which changes in a release assistants will get wrong, or to word changelog entries so they do.
 2. Would Cloudflare pay for that measurement, run on each release and on the models your users use? I'm asking before building it, to know whether it's worth building.
 
-All 30 current lessons were drafted by an agent and are labeled that way; if any of them says something about wrangler or the Agents SDK that you'd put differently, a pull request or an issue that says so is the fastest way to correct it.
+Every lesson for wrangler and the Agents SDK was drafted by an agent and is labeled that way; if any of them says something about wrangler or the Agents SDK that you'd put differently, a pull request or an issue that says so is the fastest way to correct it.
 
 Thank you for reading,
 <owner's name>

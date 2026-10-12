@@ -19,7 +19,7 @@ Two questions:
 1. Would a table like this, per release, be useful to you, for example to see which changes in a major assistants will get wrong before users hit them, or to shape the migration guide?
 2. Would VoidZero pay for that measurement, run on each release and on the models your users use? I'm asking before building it.
 
-All current lessons were drafted by an agent and are labeled that way. If one of them says something about Vitest that you'd put differently, an issue or a pull request is the fastest way to correct it.
+Every lesson for Vitest was drafted by an agent and is labeled that way. If one of them says something about Vitest that you'd put differently, an issue or a pull request is the fastest way to correct it.
 
 Thank you for reading,
 <owner's name>

@@ -57,7 +57,7 @@ const runner = newest ? (asTest(newest.evidence[0]!)?.runtime ?? "") : "";
               <a href={`/lessons/${newest.id}/`}><Claim text={newest.claim} /></a>
             </p>
             <p class="sign">
-              <span class="by"><span class="visually-hidden">{en.lesson.taughtBy}</span><span aria-hidden="true">—</span>&nbsp;{teacherHref(newest.teacher_id) ? <a href={teacherHref(newest.teacher_id)!}>@{newest.teacher}</a> : <span>@{newest.teacher}</span>}</span>
+              <span class="by"><span class="visually-hidden">{en.lesson.taughtBy}</span><span aria-hidden="true">—</span>&nbsp;{teacherHref(newest.teacher_id) ? <a href={teacherHref(newest.teacher_id)!}>@{newest.teacher}</a> : <span>@{newest.teacher}</span>}{newest.drafted_by === "agent" && <span class="drafted">{en.lesson.drafted}</span>}</span>
             </p>
             <p class="state">
               <span class="states">
@@ -98,6 +98,7 @@ const runner = newest ? (asTest(newest.evidence[0]!)?.runtime ?? "") : "";
                 teacherHref={teacherHref(l.teacher_id)}
                 verifiedBy={l.verified_by}
                 verifiedAt={l.verified_at}
+                drafted={l.drafted_by === "agent"}
               />
             </li>
           ))}
@@ -179,6 +180,10 @@ const runner = newest ? (asTest(newest.evidence[0]!)?.runtime ?? "") : "";
     line-height: 1.35;
     color: var(--ink);
     overflow-wrap: anywhere;
+  }
+  .drafted {
+    font-weight: 400;
+    color: var(--muted);
   }
   .by a {
     color: inherit;

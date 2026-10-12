@@ -1,9 +1,9 @@
 // Index shards: the active set split by subject. Only format 1 lessons, the ones sync can match to a project's
 // versions. Each lesson carries `models` when FreshBench measured which models already know the change
 // (docs/bench/models.json), so sync can leave out what the target model knows.
-import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Index, IndexEntry } from "@ludion/core";
+import { readModels } from "./models.ts";
 
 export type ModelVerdicts = Record<string, Record<string, "knows" | "misses">>;
 
@@ -15,8 +15,7 @@ export interface Shards {
 
 /** lesson id → model id → knows | misses, measured by FreshBench. Empty until a run writes it. */
 export function readModelVerdicts(root = join(process.cwd(), "../..")): ModelVerdicts {
-  const path = join(root, "docs", "bench", "models.json");
-  return existsSync(path) ? (JSON.parse(readFileSync(path, "utf8")) as { lessons: ModelVerdicts }).lessons : {};
+  return readModels(root)?.lessons ?? {};
 }
 
 export function shardsOf(index: Index, verdicts: ModelVerdicts = readModelVerdicts()): Shards {

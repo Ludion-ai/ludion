@@ -1,0 +1,83 @@
+---
+import Base from "../layouts/Base.astro";
+import { siteData } from "../build/data.ts";
+import { en } from "../strings/en.ts";
+
+const { config } = await siteData();
+const s = en.start;
+---
+
+<Base title={s.title} description={s.intro}>
+  <article class="wrap">
+    <h1>{s.heading}</h1>
+    <p class="intro">{s.intro}</p>
+
+    <section aria-labelledby="claude-code">
+      <h2 id="claude-code">{s.claudeCode}</h2>
+      <pre><code>/plugin marketplace add {config.org}/{config.repo}
+/plugin install ludion@ludion</code></pre>
+      <p>{s.claudeCodeBody}</p>
+    </section>
+
+    <section aria-labelledby="any">
+      <h2 id="any">{s.anyAssistant}</h2>
+      <pre><code>npx ludion sync</code></pre>
+      <p>{s.anyAssistantBody}</p>
+    </section>
+
+    <section aria-labelledby="mcp">
+      <h2 id="mcp">{s.mcp}</h2>
+      <pre><code>claude mcp add --transport http ludion {config.site}/mcp</code></pre>
+    </section>
+
+    <section aria-labelledby="teach">
+      <h2 id="teach">{s.teach}</h2>
+      <pre><code>npx ludion teach draft.json
+npx ludion teach draft.json --public</code></pre>
+      <p>{s.teachBody}</p>
+    </section>
+
+    <section aria-labelledby="privacy">
+      <h2 id="privacy">{s.privacy}</h2>
+      <p>{s.privacyBody}</p>
+    </section>
+  </article>
+</Base>
+
+<style>
+  article {
+    max-width: 46em;
+  }
+  h1 {
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+  .intro {
+    margin: 18px 0 40px;
+    font-size: clamp(18px, 2vw, 21px);
+    line-height: 1.45;
+  }
+  section {
+    padding: 24px 0 8px;
+    border-top: 1px solid var(--rule);
+  }
+  h2 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  pre {
+    margin: 0 0 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  p {
+    line-height: 1.55;
+  }
+</style>

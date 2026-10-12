@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { parseAddedLog } from "../src/build/git-info.ts";
+import { parseAddedLog, parseDeletedLog } from "../src/build/git-info.ts";
+import { modelTotals, type Models } from "../src/build/models.ts";
+import { reservedSubjects } from "../src/build/data.ts";
 import { teacherPages } from "../src/build/teacher-pages.ts";
 
 const R = "\x1e";
@@ -41,5 +43,43 @@ describe("teacherPages", () => {
 
   it("gives the page to no one when neither login came from the API", () => {
     expect(teacherPages(new Map([[1, "sam"], [2, "Sam"]]), new Set())).toEqual(new Map());
+  });
+});
+
+describe("parseDeletedLog", () => {
+  it("finds each retracted lesson's newest deletion, with the commit to read it from", () => {
+    const log = [
+      `${R}abc123${F}2026-10-12T03:00:00Z${F}Retract a lesson whose quote is gone (#51)`,
+      "",
+      "lessons/vitest/01K70000000000000000000004.json",
+      `${R}def456${F}2026-10-10T00:00:00Z${F}Retract (#40)`,
+      "lessons/vitest/01K70000000000000000000004.json",
+      "lessons/lessons.schema.json",
+    ].join("\n");
+    expect(parseDeletedLog(log)).toEqual({
+      "01K70000000000000000000004": { path: "lessons/vitest/01K70000000000000000000004.json", commit: "abc123", retracted_at: "2026-10-12T03:00:00Z", pr: 51 },
+    });
+  });
+});
+
+describe("reservedSubjects", () => {
+  it("names subjects that a top-level page would shadow", () => {
+    expect(reservedSubjects(["vitest", "models", "start", "vitest"])).toEqual(["models", "start"]);
+  });
+});
+
+describe("modelTotals", () => {
+  it("counts only measured lessons that are still active", () => {
+    const models: Models = {
+      measured_at: "2026-10-11",
+      bench: "docs/bench/x/",
+      method: "",
+      models: { a: { name: "A" }, b: { name: "B" } },
+      lessons: { L1: { a: "knows", b: "misses" }, L2: { a: "misses" }, GONE: { a: "knows", b: "knows" } },
+    };
+    expect(modelTotals(models, new Set(["L1", "L2", "L3"]))).toEqual([
+      { id: "a", name: "A", knows: 1, misses: 1 },
+      { id: "b", name: "B", knows: 0, misses: 1 },
+    ]);
   });
 });

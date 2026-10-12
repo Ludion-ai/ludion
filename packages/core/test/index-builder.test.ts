@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildIndex, resolveLogins, search, type Index } from "../src/index.ts";
-import { tokenize } from "../src/search.ts";
+import { stem, tokenize } from "../src/search.ts";
 import { example, fakeFetch, lesson } from "./helpers.ts";
 
 const opts = { org: "Ludion-ai", repo: "ludion", builtAt: new Date("2026-10-08T09:00:00.123Z") };
@@ -175,5 +175,15 @@ describe("search", () => {
     expect(tokenize("Python 3.12 removed distutils (PEP 632)")).toEqual(["python", "3.12", "removed", "distutils", "pep", "632"]);
     expect(search(index, "3.12")[0]?.id).toBe(ex.id);
     expect(search(index, "3.1")).toEqual([]);
+  });
+});
+
+describe("stem", () => {
+  it("maps -ies, -ied and -ie to -y, so plurals and past forms meet their word", () => {
+    for (const [a, b] of [["cookies", "cookie"], ["movies", "movie"], ["copied", "copy"], ["copies", "copy"], ["ties", "tie"], ["pies", "pie"]]) expect(stem(a!), a).toBe(stem(b!));
+    expect(stem("directories")).toBe("directory");
+    expect(stem("dependencies")).toBe("dependency");
+    expect(stem("ties")).toBe("tie");
+    expect(stem("changes")).toBe("change");
   });
 });

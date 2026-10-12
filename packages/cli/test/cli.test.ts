@@ -87,6 +87,20 @@ describe("select", () => {
     expect(s.kept[0]!.versions).toEqual(["5.0.3"]);
   });
 
+  it("puts silent changes first and additions last, whatever an addition's signal", () => {
+    const s = select(
+      [
+        lessonOf({ id: "added-silent", kind: "added", signal: "silent" }),
+        lessonOf({ id: "loud", kind: "removed", signal: "loud" }),
+        lessonOf({ id: "default-silent", kind: "default", signal: "silent" }),
+        lessonOf({ id: "renamed-silent", kind: "renamed", signal: "silent" }),
+      ],
+      installed({ vitest: ["5.0.3"] }),
+      undefined,
+    );
+    expect(s.kept.map((k) => k.lesson.id)).toEqual(["default-silent", "renamed-silent", "loud", "added-silent"]);
+  });
+
   it("leaves out what the target model is measured to know, and only that", () => {
     const l = lessonOf({ models: { "claude-opus-5-5": "knows", "claude-sonnet-5-5": "misses" } });
     expect(select([l], installed({ vitest: ["5.0.3"] }), "claude-opus-5-5")).toMatchObject({ kept: [], prunedForModel: [l] });
@@ -212,7 +226,7 @@ describe("ledger", () => {
     const lesson = toLesson(draft, undefined, new Date("2026-10-11T00:00:00Z"), "01K7Z000000000000000000002") as LessonV1;
     saveEntry({ lesson, taught_at: "2026-10-11T00:00:00Z", checks: { tests: "none", sources: "found" } });
     const [entry] = readLedger();
-    expect(ledgerLesson(entry!)).toMatchObject({ id: lesson.id, teacher: "you", claim: generateClaim(lesson), verified: "source on this machine", origin: "ledger" });
+    expect(ledgerLesson(entry!)).toMatchObject({ id: lesson.id, teacher: "you", claim: generateClaim(lesson), verified: "source on this machine", origin: "ledger", kind: lesson.kind });
     delete process.env.LUDION_HOME;
   });
 });
@@ -334,7 +348,7 @@ describe("sync --quiet (the session-start hook)", () => {
 describe("shards", () => {
   it("fetches only the shards of installed subjects, and skips format 0 lessons", async () => {
     const urls: string[] = [];
-    const entry = { id: "A", format: 1, subject: "vitest", version: ">=5.0.0", claim: "c", package: { ecosystem: "npm", name: "vitest" }, signal: "silent", evidence: [], teacher: "alice", teacher_id: 1, replaces: [], verified_by: "test", verified_at: "2026-10-11T00:00:00Z", pr: 1, url: "u" } as ShardLesson;
+    const entry = { id: "A", format: 1, subject: "vitest", version: ">=5.0.0", claim: "c", package: { ecosystem: "npm", name: "vitest" }, signal: "silent", kind: "added", evidence: [], teacher: "alice", teacher_id: 1, replaces: [], verified_by: "test", verified_at: "2026-10-11T00:00:00Z", pr: 1, url: "u" } as ShardLesson;
     const fake = async (u: string) => {
       urls.push(u);
       if (u.endsWith("/subjects.json")) return Response.json({ built_at: "t", subjects: { vitest: { lessons: 2 }, zod: { lessons: 1 } } });
@@ -343,7 +357,7 @@ describe("shards", () => {
     const { lessons } = await fetchLessons(installed({ vitest: ["5.0.3"] }), fake);
     expect(urls).toEqual(["https://ludion.ai/index/subjects.json", "https://ludion.ai/index/vitest.json"]);
     expect(lessons.map((l) => l.id)).toEqual(["A"]);
-    expect(shardLesson(entry)).toMatchObject({ teacher: "@alice", versions: ">=5.0.0", url: "https://ludion.ai/lessons/A" });
+    expect(shardLesson(entry)).toMatchObject({ teacher: "@alice", versions: ">=5.0.0", url: "https://ludion.ai/lessons/A", kind: "added" });
   });
 
   it("treats a site without shards as an error, not as no lessons", async () => {

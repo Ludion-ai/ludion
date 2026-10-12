@@ -40,7 +40,11 @@ export function generateClaim(l: Pick<LessonV1, "package" | "versions" | "kind" 
   }[l.kind];
   const parts = [head];
   if (l.detail) parts.push(sentence(l.detail));
-  if (l.signal === "silent") parts.push("Silent: code written for older versions still runs, without an error.");
+  // "Silent" misleads for an addition: it isn't something old code silently gets wrong. What the evidence shows (a
+  // test passing on the new version and failing on the old) is that older versions lack it, so the claim says that and
+  // no more. "Nothing changes for code that doesn't use it" would be false for an addition that brings a new default.
+  if (l.kind === "added") parts.push("Older versions don't have it.");
+  else if (l.signal === "silent") parts.push("Silent: code written for older versions still runs, without an error.");
   return parts.join(" ");
 }
 

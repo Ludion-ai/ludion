@@ -114,7 +114,8 @@ export function showLesson(lesson: LessonV1): string {
     }
     lines.push("");
   }
-  lines.push(`Signal: ${lesson.signal}. File: lessons/${lesson.subject}/${lesson.id}.json`);
+  // An addition's claim says nothing about its signal (generateClaim), so neither does this.
+  lines.push(`${lesson.kind === "added" ? "" : `Signal: ${lesson.signal}. `}File: lessons/${lesson.subject}/${lesson.id}.json`);
   return visible(lines.join("\n"));
 }
 

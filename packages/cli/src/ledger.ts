@@ -53,6 +53,7 @@ export function ledgerLesson(e: LedgerEntry): SyncLesson {
     versions: e.lesson.versions,
     claim: generateClaim(e.lesson),
     signal: e.lesson.signal,
+    kind: e.lesson.kind,
     teacher: "you",
     verified: passed ? `${e.checks.tests === "passed" ? "test" : "source"} on this machine` : `not verified: tests ${e.checks.tests}, sources ${e.checks.sources}`,
     verified_at: e.taught_at,

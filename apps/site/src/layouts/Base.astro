@@ -29,6 +29,7 @@ const canonicalUrl = new URL(path, config.site).href;
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonicalUrl} />}
     <meta name="color-scheme" content="light dark" />
+    <script is:inline src="/ga.js" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -50,6 +51,7 @@ const canonicalUrl = new URL(path, config.site).href;
         <p>
           {en.footer.license} <a href={`https://github.com/${config.org}/${config.repo}`}>{en.footer.github}</a>
         </p>
+        <p>{en.footer.analytics}</p>
       </div>
     </footer>
   </body>

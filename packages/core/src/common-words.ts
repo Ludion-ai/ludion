@@ -25,7 +25,7 @@ const ENGLISH =
   "example except exist expect experience expert explain express extra eye face fact factor fail fall false family famous " +
   "far farm fast father fault fear feature feel field fight figure fill film final find fine finger finish fire firm " +
   "first fish fit five fix flat floor fly focus follow food foot force foreign forget form former forward four free friend " +
-  "front full fun function future game garden gas general generation girl give glass global goal good government great " +
+  "front full fun function future game garden gas general generation girl give glass global go goal good government great " +
   "green ground group grow growth guarantee guess gun guy hair half hall hand handle hang happen happy hard hate head " +
   "health hear heart heat heavy help high history hit hold hole home hope horse hospital hot hotel hour house huge human " +
   "hundred hurt husband idea identify image imagine impact important improve include increase indeed indicate individual " +

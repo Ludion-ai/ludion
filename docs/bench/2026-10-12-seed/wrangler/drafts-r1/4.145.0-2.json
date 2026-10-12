@@ -1,0 +1,14 @@
+{
+  "entry": "4.145.0#2",
+  "verdict": {
+    "id": "4.145.0#2",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "WRANGLER_R2_SQL_AUTH_TOKEN",
+    "why": "The Basin SQL auth env var is now `WRANGLER_BASIN_SQL_AUTH_TOKEN`, so the old name is no longer used and the fallback token may be used instead."
+  },
+  "cost_usd": 0.053953100000000004,
+  "turns": 3,
+  "skip": "Effect of the renamed auth variable depends on whether the CLOUDFLARE_API_TOKEN fallback is set, and no offline test can exercise the auth path."
+}

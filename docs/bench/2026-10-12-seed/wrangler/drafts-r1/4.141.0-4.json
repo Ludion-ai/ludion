@@ -1,0 +1,33 @@
+{
+  "entry": "4.141.0#4",
+  "verdict": {
+    "id": "4.141.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "--log-level debug",
+    "why": "Debug output for failed proxied requests in `wrangler dev` now includes the error stack and cause chain."
+  },
+  "cost_usd": 0.0667214,
+  "turns": 6,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.141.0",
+    "kind": "behavior",
+    "symbol": "--log-level debug",
+    "signal": "silent",
+    "detail": "When a request proxied to the local Worker fails, --log-level debug now shows the underlying error stack and cause chain.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.141.0/packages/wrangler/CHANGELOG.md",
+          "quote": "When a request proxied to the local Worker fails, running with `--log-level debug` now shows the underlying error's stack and cause chain."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

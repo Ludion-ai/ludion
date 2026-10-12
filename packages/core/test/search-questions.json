@@ -1,0 +1,26 @@
+{
+  "01M4QH98JK8YPHSFDC1VX7HZJ7": [
+    "After upgrading the `agents` package to >=0.21.0, how should I handle plain-text error bodies that arrive as observer error frames in `useAgentChat`, now that they aren't merged into an assistant message?",
+    "Since bumping `agents` to 0.21.0 or later, my `useAgentChat` UI no longer shows an empty assistant message when the server returns a plain-text error, and no error is thrown. Why did this change?"
+  ],
+  "01M4QH98JRND3BARBYA0RGY08M": [
+    "After upgrading the `agents` package to >=0.23.0, how can I still get the durable calls log from `browser_execute` in front of the model, and where is it stored now?",
+    "I updated `agents` to 0.23.0 and my model seems to ignore the calls log from `browser_execute`, though nothing errors and my old code still runs. Why did that happen?"
+  ],
+  "01M4QH98JTQ4NMTCY1YD0NZ7TV": [
+    "In the `agents` package, what should I use in place of `CdpSession` now that it's deprecated, and how do I migrate my code to the new name?",
+    "I upgraded `agents` to 0.25.0 or later and my code that uses `CdpSession` still runs without any error or warning. Is that expected, or is something wrong with how I'm importing it?"
+  ],
+  "01M4QH98JVV4XPR9PVG1GAWKDV": [
+    "In the `agents` package, how do I use `loadCdpSpec` so my model can see the parameters and return types of a CDP method before calling it?",
+    "After upgrading `agents` to 0.25.0 or later, `loadCdpSpec` returns a different result than before, though my old code runs with no error. What changed?"
+  ],
+  "01M4QH98K262R2KMAZY9Z8219P": [
+    "After upgrading the `agents` package to >=0.27.0, how do I make `browserTool` use its own tool description instead of the generic codemode one?",
+    "I bumped `agents` to 0.27.0 and my `browserTool` code still runs with no errors, but the model seems to behave differently when calling it. Did something change in how `browserTool` describes itself?"
+  ],
+  "01M4QH98K3WT2TXMHZAPMQSCBF": [
+    "In the `agents` package, what exactly does `MCPClientManager.removeServer` delete in Durable Object storage after upgrading to 0.27.0 or later, and is it safe to call before re-adding a server?",
+    "After upgrading `agents` to >=0.27.0, my MCP server reconnects after I call `MCPClientManager.removeServer` and then add it again, but now it asks me to redo the OAuth authorization even though nothing errored. Why are the saved tokens gone?"
+  ]
+}

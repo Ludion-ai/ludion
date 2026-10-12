@@ -170,11 +170,17 @@ const ON_TOPIC: Record<string, [string, string]> = {
 };
 
 /** Keys of lessons that teach the same change, so a question about it may find either. */
+/**
+ * Questions for lessons the seed pipeline drafted (tools/seed/src/search.ts), keyed by lesson id: two per lesson, each
+ * found in the top 3 when generated. They can land before their lesson, like ON_TOPIC.
+ */
+const BY_ID = JSON.parse(readFileSync(join(import.meta.dirname, "search-questions.json"), "utf8")) as Record<string, [string, string]>;
+
 const SAME_CHANGE: [string, string][] = [["toHaveTextContent is strict", "exactly equal to the expected string"]];
 
 describe("search quality", () => {
   it("covers every active lesson with two on-topic questions", () => {
-    const covered = index.lessons.filter((l) => Object.keys(ON_TOPIC).some((key) => l.claim.includes(key)));
+    const covered = index.lessons.filter((l) => BY_ID[l.id] || Object.keys(ON_TOPIC).some((key) => l.claim.includes(key)));
     expect(covered.map((l) => l.id).sort()).toEqual(index.lessons.map((l) => l.id).sort());
   });
 
@@ -185,8 +191,8 @@ describe("search quality", () => {
     const offHits = findsSomething(OFF_TOPIC);
     const subjectHits = findsSomething(SUBJECT_ONLY);
 
-    const check = (q: string, key: string) => {
-      const want = index.lessons.find((l) => l.claim.includes(key))!;
+    const check = (q: string, key: string, byId = false) => {
+      const want = index.lessons.find((l) => (byId ? l.id === key : l.claim.includes(key)))!;
       const got = search(index, q, { k: 3 });
       // Listed pairs teach the same change, so either is the right answer (the design sample and a seed).
       const twins = SAME_CHANGE.flatMap(([a, b]) => (a === key ? [b] : b === key ? [a] : []));
@@ -194,7 +200,10 @@ describe("search quality", () => {
       return { q: short(q), ok: got.some(same), got: got.map((l) => l.claim.slice(0, 40)) };
     };
     // Questions can land before their lesson does (a lesson PR changes only lesson files): skip keys with no active lesson.
-    const onResults = Object.entries(ON_TOPIC).filter(([key]) => index.lessons.some((l) => l.claim.includes(key))).flatMap(([key, questions]) => questions.map((q) => check(q, key)));
+    const onResults = [
+      ...Object.entries(ON_TOPIC).filter(([key]) => index.lessons.some((l) => l.claim.includes(key))).flatMap(([key, questions]) => questions.map((q) => check(q, key))),
+      ...Object.entries(BY_ID).filter(([id]) => index.lessons.some((l) => l.id === id)).flatMap(([id, questions]) => questions.map((q) => check(q, id, true))),
+    ];
     const onHits = onResults.filter((r) => r.ok).length;
     const onRate = onHits / onResults.length;
     const mustResults = MUST_FIND.map(([q, key]) => check(q, key));

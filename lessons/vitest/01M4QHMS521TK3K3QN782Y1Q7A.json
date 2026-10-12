@@ -32,6 +32,12 @@
         "expect": "fail",
         "error": "FAIL: vitest.parseSpecifications is undefined; only experimental_parseSpecifications exists"
       }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/packages/vitest/src/node/core.ts",
+        "quote": "The \"experimental_parseSpecifications\" method is deprecated. Use \"parseSpecifications\" instead."
+      }
     }
   ],
   "author": "github:Ludion-ai",

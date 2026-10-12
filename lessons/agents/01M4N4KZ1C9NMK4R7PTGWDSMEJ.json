@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4N4KZ1C9NMK4R7PTGWDSMEJ",
+  "subject": "agents",
+  "package": {
+    "ecosystem": "npm",
+    "name": "agents"
+  },
+  "versions": ">=0.20.0",
+  "kind": "behavior",
+  "symbol": "createMcpHandler",
+  "signal": "silent",
+  "detail": "A function input to createMcpHandler is always treated as an SDK v2 factory, so concurrent Worker requests receive isolated server instances.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "agents": "0.20.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction typesWithImports(entry) {\n  const exp = pkg.exports[entry];\n  if (!exp) return null;\n  const file = path.join(root, exp.types);\n  let text = fs.readFileSync(file, \"utf8\");\n  for (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n    const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n    if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n  }\n  return text;\n}\nconst server = typesWithImports(\"./mcp/server\");\nconst mcp = typesWithImports(\"./mcp\");\nif (!mcp) {\n  console.error(\"ERROR: agents/mcp types are missing\");\n  process.exit(2);\n}\nconst checks = {\n  serverEntry: !!server && /createStatelessMcpHandler as createMcpHandler/.test(server),\n  v2Factory: !!server && /type StatelessMcpServerInput = McpServerFactory;/.test(server) && /McpServerFactory[\\s\\S]*?\\} from \"@modelcontextprotocol\\/server\";/.test(server),\n  factoryOverload: /declare function createMcpHandler\\$1\\(\\s*factory: McpServerFactory,/.test(mcp),\n  legacy: /declare function createLegacyMcpHandler\\(/.test(mcp)\n};\nif (Object.values(checks).every(Boolean)) {\n  console.log(\"OK: agents \" + pkg.version + \" createMcpHandler takes an McpServerFactory from @modelcontextprotocol/server; createLegacyMcpHandler exists\");\n  process.exit(0);\n}\nconst v1Only = /declare function createMcpHandler\\(\\s*server: McpServer \\| Server\\$?\\d*,/.test(mcp) && !/McpServerFactory/.test(mcp) && !server;\nif (v1Only) {\n  console.error(\"FAIL: agents \" + pkg.version + \" createMcpHandler accepts only an SDK v1 server (McpServer | Server); there is no factory overload\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected MCP handler types \" + JSON.stringify(checks));\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "agents": "0.19.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction typesWithImports(entry) {\n  const exp = pkg.exports[entry];\n  if (!exp) return null;\n  const file = path.join(root, exp.types);\n  let text = fs.readFileSync(file, \"utf8\");\n  for (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n    const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n    if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n  }\n  return text;\n}\nconst server = typesWithImports(\"./mcp/server\");\nconst mcp = typesWithImports(\"./mcp\");\nif (!mcp) {\n  console.error(\"ERROR: agents/mcp types are missing\");\n  process.exit(2);\n}\nconst checks = {\n  serverEntry: !!server && /createStatelessMcpHandler as createMcpHandler/.test(server),\n  v2Factory: !!server && /type StatelessMcpServerInput = McpServerFactory;/.test(server) && /McpServerFactory[\\s\\S]*?\\} from \"@modelcontextprotocol\\/server\";/.test(server),\n  factoryOverload: /declare function createMcpHandler\\$1\\(\\s*factory: McpServerFactory,/.test(mcp),\n  legacy: /declare function createLegacyMcpHandler\\(/.test(mcp)\n};\nif (Object.values(checks).every(Boolean)) {\n  console.log(\"OK: agents \" + pkg.version + \" createMcpHandler takes an McpServerFactory from @modelcontextprotocol/server; createLegacyMcpHandler exists\");\n  process.exit(0);\n}\nconst v1Only = /declare function createMcpHandler\\(\\s*server: McpServer \\| Server\\$?\\d*,/.test(mcp) && !/McpServerFactory/.test(mcp) && !server;\nif (v1Only) {\n  console.error(\"FAIL: agents \" + pkg.version + \" createMcpHandler accepts only an SDK v1 server (McpServer | Server); there is no factory overload\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected MCP handler types \" + JSON.stringify(checks));\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "createMcpHandler accepts only an SDK v1 server"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/docs/agents/mcp-servers.md",
+        "quote": "`createMcpHandler` requires a factory so concurrent Worker requests receive isolated server instances. A function input is always treated as an SDK v2 factory."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:27:34Z"
+}

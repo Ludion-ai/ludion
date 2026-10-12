@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4N6JH8SHRYQE5CPY9SN1QQJ",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "added",
+  "symbol": "--repeats",
+  "signal": "silent",
+  "detail": "It repeats every test regardless of the result, which is useful for hunting flaky tests.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/repeats\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"count.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { appendFileSync } from 'node:fs'\",\n  \"test('counted', () => { appendFileSync(new URL('./runs.txt', import.meta.url), 'x') })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--repeats\", \"2\"]);\nconsole.log(r.out);\nconst runsFile = path.join(dir, \"runs.txt\");\nconst runs = fs.existsSync(runsFile) ? fs.readFileSync(runsFile, \"utf8\").length : 0;\nif (runs === 3 && r.status === 0) {\n  console.log(\"PASS: --repeats 2 ran the test 3 times\");\n  process.exit(0);\n}\n// The symptoms of the old version: the CLI rejects --repeats, or the test runs only once.\nconst rejected = r.status !== 0 && runs === 0 && r.out.includes(\"Unknown option `--repeats`\");\nconst once = r.status === 0 && runs === 1;\nif (rejected || once) {\n  console.error(\"FAIL: --repeats 2 did not run the test 3 times (\" + (rejected ? \"unknown option\" : \"ran once\") + \")\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (ran \" + runs + \" times, exit \" + r.status + \")\");\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/repeats\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"count.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { appendFileSync } from 'node:fs'\",\n  \"test('counted', () => { appendFileSync(new URL('./runs.txt', import.meta.url), 'x') })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--repeats\", \"2\"]);\nconsole.log(r.out);\nconst runsFile = path.join(dir, \"runs.txt\");\nconst runs = fs.existsSync(runsFile) ? fs.readFileSync(runsFile, \"utf8\").length : 0;\nif (runs === 3 && r.status === 0) {\n  console.log(\"PASS: --repeats 2 ran the test 3 times\");\n  process.exit(0);\n}\n// The symptoms of the old version: the CLI rejects --repeats, or the test runs only once.\nconst rejected = r.status !== 0 && runs === 0 && r.out.includes(\"Unknown option `--repeats`\");\nconst once = r.status === 0 && runs === 1;\nif (rejected || once) {\n  console.error(\"FAIL: --repeats 2 did not run the test 3 times (\" + (rejected ? \"unknown option\" : \"ran once\") + \")\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (ran \" + runs + \" times, exit \" + r.status + \")\");\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: --repeats 2 did not run the test 3 times"
+      }
+    },
+    {
+      "source": {
+        "url": "https://vitest.dev/blog/vitest-5",
+        "quote": "The new --repeats CLI option repeats every test a given number of times regardless of the result, which is useful for hunting flaky tests."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T10:01:44Z"
+}

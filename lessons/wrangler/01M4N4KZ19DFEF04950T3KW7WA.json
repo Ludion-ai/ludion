@@ -1,0 +1,48 @@
+{
+  "format": 1,
+  "id": "01M4N4KZ19DFEF04950T3KW7WA",
+  "subject": "wrangler",
+  "package": {
+    "ecosystem": "npm",
+    "name": "wrangler"
+  },
+  "versions": ">=4.145.0",
+  "kind": "renamed",
+  "symbol": "WRANGLER_R2_SQL_AUTH_TOKEN",
+  "replacement": "WRANGLER_BASIN_SQL_AUTH_TOKEN",
+  "signal": "loud",
+  "detail": "Update any existing WRANGLER_R2_SQL_AUTH_TOKEN configuration to use the new name; the fallback to CLOUDFLARE_API_TOKEN remains available.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.145.0"
+        },
+        "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfunction wrangler(args, extraEnv, dropEnv) {\n  const env = Object.assign({}, process.env, { CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home }, extraEnv || {});\n  for (const k of dropEnv || []) delete env[k];\n  const r = spawnSync(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", ...args], { cwd: dir, encoding: \"utf8\", timeout: 40000, env });\n  const out = (String(r.stdout || \"\") + String(r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\n  return { status: r.status, out };\n}\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg, out) {\n  console.error(\"ERROR: \" + msg);\n  if (out) console.error(out.slice(-2000));\n  process.exit(2);\n}\nfunction write(name, content) {\n  fs.writeFileSync(path.join(dir, name), typeof content === \"string\" ? content : JSON.stringify(content, null, 2));\n}\nconst r = wrangler([\"r2\", \"sql\", \"query\", \"nowarehouse\", \"SELECT 1\"], { WRANGLER_R2_SQL_AUTH_TOKEN: \"dummy-token\" }, [\"CLOUDFLARE_API_TOKEN\", \"WRANGLER_BASIN_SQL_AUTH_TOKEN\"]);\nif (r.status !== 0 && r.out.includes(\"Missing WRANGLER_BASIN_SQL_AUTH_TOKEN environment variable\")) { console.log(\"OK: only WRANGLER_BASIN_SQL_AUTH_TOKEN is read; the old variable is ignored\"); process.exit(0); }\nif (r.status !== 0 && r.out.includes(\"Invalid warehouse name format\")) symptom(\"WRANGLER_R2_SQL_AUTH_TOKEN is still read as the SQL token\");\nbroken(\"unexpected output from wrangler r2 sql query\", r.out);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.144.0"
+        },
+        "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfunction wrangler(args, extraEnv, dropEnv) {\n  const env = Object.assign({}, process.env, { CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home }, extraEnv || {});\n  for (const k of dropEnv || []) delete env[k];\n  const r = spawnSync(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", ...args], { cwd: dir, encoding: \"utf8\", timeout: 40000, env });\n  const out = (String(r.stdout || \"\") + String(r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\n  return { status: r.status, out };\n}\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg, out) {\n  console.error(\"ERROR: \" + msg);\n  if (out) console.error(out.slice(-2000));\n  process.exit(2);\n}\nfunction write(name, content) {\n  fs.writeFileSync(path.join(dir, name), typeof content === \"string\" ? content : JSON.stringify(content, null, 2));\n}\nconst r = wrangler([\"r2\", \"sql\", \"query\", \"nowarehouse\", \"SELECT 1\"], { WRANGLER_R2_SQL_AUTH_TOKEN: \"dummy-token\" }, [\"CLOUDFLARE_API_TOKEN\", \"WRANGLER_BASIN_SQL_AUTH_TOKEN\"]);\nif (r.status !== 0 && r.out.includes(\"Missing WRANGLER_BASIN_SQL_AUTH_TOKEN environment variable\")) { console.log(\"OK: only WRANGLER_BASIN_SQL_AUTH_TOKEN is read; the old variable is ignored\"); process.exit(0); }\nif (r.status !== 0 && r.out.includes(\"Invalid warehouse name format\")) symptom(\"WRANGLER_R2_SQL_AUTH_TOKEN is still read as the SQL token\");\nbroken(\"unexpected output from wrangler r2 sql query\", r.out);\n",
+        "expect": "fail",
+        "error": "FAIL: WRANGLER_R2_SQL_AUTH_TOKEN is still read as the SQL token"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.148.0/packages/wrangler/CHANGELOG.md",
+        "quote": "The Basin SQL authentication environment variable is now `WRANGLER_BASIN_SQL_AUTH_TOKEN`. Update any existing `WRANGLER_R2_SQL_AUTH_TOKEN` configuration to use the new name. The fallback to `CLOUDFLARE_API_TOKEN` remains available."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:27:34Z"
+}

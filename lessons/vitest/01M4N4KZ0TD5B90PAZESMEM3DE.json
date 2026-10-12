@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4N4KZ0TD5B90PAZESMEM3DE",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "added",
+  "symbol": "-p",
+  "signal": "silent",
+  "detail": "It is a shorthand for the --project filter.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/projectp\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    projects: [\",\n  \"      { test: { name: 'alpha', include: ['alpha.test.mjs'] } },\",\n  \"      { test: { name: 'beta', include: ['beta.test.mjs'] } },\",\n  \"    ],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nfor (const name of [\"alpha\", \"beta\"]) {\n  write(name + \".test.mjs\", [\n    \"import { test } from 'vitest'\",\n    \"import { writeFileSync } from 'node:fs'\",\n    \"test('\" + name + \"', () => { writeFileSync(new URL('./\" + name + \".txt', import.meta.url), 'yes') })\",\n  ].join(\"\\n\") + \"\\n\");\n}\nconst r = vitest([\"run\", \"-p\", \"alpha\"]);\nconsole.log(r.out);\nconst alpha = fs.existsSync(path.join(dir, \"alpha.txt\"));\nconst beta = fs.existsSync(path.join(dir, \"beta.txt\"));\nif (r.status === 0 && alpha && !beta) {\n  console.log(\"PASS: -p alpha ran only the alpha project\");\n  process.exit(0);\n}\n// The symptoms of the old version: the CLI rejects -p, or it is ignored and both projects run.\nconst rejected = r.status !== 0 && !alpha && !beta && r.out.includes(\"Unknown option `-p`\");\nconst ignored = r.status === 0 && alpha && beta;\nif (rejected || ignored) {\n  console.error(\"FAIL: -p alpha did not run only the alpha project (\" + (rejected ? \"unknown option\" : \"both projects ran\") + \")\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (alpha ran: \" + alpha + \", beta ran: \" + beta + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/projectp\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    projects: [\",\n  \"      { test: { name: 'alpha', include: ['alpha.test.mjs'] } },\",\n  \"      { test: { name: 'beta', include: ['beta.test.mjs'] } },\",\n  \"    ],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nfor (const name of [\"alpha\", \"beta\"]) {\n  write(name + \".test.mjs\", [\n    \"import { test } from 'vitest'\",\n    \"import { writeFileSync } from 'node:fs'\",\n    \"test('\" + name + \"', () => { writeFileSync(new URL('./\" + name + \".txt', import.meta.url), 'yes') })\",\n  ].join(\"\\n\") + \"\\n\");\n}\nconst r = vitest([\"run\", \"-p\", \"alpha\"]);\nconsole.log(r.out);\nconst alpha = fs.existsSync(path.join(dir, \"alpha.txt\"));\nconst beta = fs.existsSync(path.join(dir, \"beta.txt\"));\nif (r.status === 0 && alpha && !beta) {\n  console.log(\"PASS: -p alpha ran only the alpha project\");\n  process.exit(0);\n}\n// The symptoms of the old version: the CLI rejects -p, or it is ignored and both projects run.\nconst rejected = r.status !== 0 && !alpha && !beta && r.out.includes(\"Unknown option `-p`\");\nconst ignored = r.status === 0 && alpha && beta;\nif (rejected || ignored) {\n  console.error(\"FAIL: -p alpha did not run only the alpha project (\" + (rejected ? \"unknown option\" : \"both projects ran\") + \")\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (alpha ran: \" + alpha + \", beta ran: \" + beta + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: -p alpha did not run only the alpha project"
+      }
+    },
+    {
+      "source": {
+        "url": "https://vitest.dev/blog/vitest-5",
+        "quote": "The --project filter is aware of the hierarchy, and it now has a -p shorthand:"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:27:34Z"
+}

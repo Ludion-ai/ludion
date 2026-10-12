@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4N4KZ0VRGCJDGCW1RP186XM",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "behavior",
+  "symbol": "vitest list",
+  "signal": "silent",
+  "detail": "It parses test files statically instead of running them to collect tests; pass --no-static-parse to run the files instead.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/list\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// The test file records when it is executed; static parsing must not execute it.\nwrite(\"a.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"writeFileSync(new URL('./executed.txt', import.meta.url), 'yes')\",\n  \"test('listed by name', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"list\"]);\nconsole.log(r.out);\nif (!r.out.includes(\"listed by name\")) {\n  console.error(\"ERROR: vitest list did not print the test (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (fs.existsSync(path.join(dir, \"executed.txt\"))) {\n  console.error(\"FAIL: vitest list ran the test file to collect tests instead of parsing it statically\");\n  process.exit(1);\n}\nconsole.log(\"PASS: vitest list printed the test without running the file\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/list\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// The test file records when it is executed; static parsing must not execute it.\nwrite(\"a.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"writeFileSync(new URL('./executed.txt', import.meta.url), 'yes')\",\n  \"test('listed by name', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"list\"]);\nconsole.log(r.out);\nif (!r.out.includes(\"listed by name\")) {\n  console.error(\"ERROR: vitest list did not print the test (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (fs.existsSync(path.join(dir, \"executed.txt\"))) {\n  console.error(\"FAIL: vitest list ran the test file to collect tests instead of parsing it statically\");\n  process.exit(1);\n}\nconsole.log(\"PASS: vitest list printed the test without running the file\");\n",
+        "expect": "fail",
+        "error": "FAIL: vitest list ran the test file to collect tests instead of parsing it statically"
+      }
+    },
+    {
+      "source": {
+        "url": "https://vitest.dev/guide/cli",
+        "quote": "Since Vitest 5, vitest list parses test files statically instead of running them to collect tests. Pass --no-static-parse to run the files instead."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:27:34Z"
+}

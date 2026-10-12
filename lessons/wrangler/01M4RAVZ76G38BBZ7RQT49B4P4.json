@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4RAVZ76G38BBZ7RQT49B4P4",
+  "subject": "wrangler",
+  "package": {
+    "ecosystem": "npm",
+    "name": "wrangler"
+  },
+  "versions": ">=4.129.1",
+  "kind": "behavior",
+  "symbol": "bundle size reporter",
+  "signal": "silent",
+  "detail": "The bundle size reporter now compares the uncompressed bundle size against the 64 MiB limit for its color-coded warnings, instead of gzip size against 3 MiB.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.129.1"
+        },
+        "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nconst a = src.indexOf(\"function printBundleSize(\");\nconst b = a < 0 ? -1 : src.indexOf(\"\\n}\\n\", a);\nconst k = b < 0 ? -1 : src.indexOf(\"ONE_KIB_BYTES = 1024;\", b);\nconst m = k < 0 ? -1 : src.indexOf(\"\\n\", src.indexOf(\"SIZE_BYTES = \", k));\nif (a < 0 || b < 0 || k < 0 || m < 0) broken(\"could not find printBundleSize in cli.js\");\nconst body = src.slice(a, b + 3);\nconst consts = src.slice(k, m + 1);\nconst lines = [];\nconst make = new Function(\"logger\", \"source_default\", \"var ONE_KIB_BYTES, MAX_GZIP_SIZE_BYTES, MAX_UNCOMPRESSED_SIZE_BYTES;\\n\" + consts + \"\\n\" + body + \"\\nreturn printBundleSize;\");\nconst color = (n) => (s) => \"[\" + n + \"]\" + s;\nconst print = make({ log: (s) => lines.push(s) }, { red: color(\"red\"), yellow: color(\"yellow\"), green: color(\"green\") });\nconst MIB = 1024 * 1024;\nprint({ size: 60 * MIB, gzipSize: 1 * MIB });\nconst out = lines.join(\"\\n\");\nif (!out.includes(\"Total Upload\")) broken(\"no report: \" + out);\nif (out.includes(\"[red]\")) { console.log(\"OK: 60 MiB uncompressed bundle reported red\"); process.exit(0); }\nif (out.includes(\"[green]\")) symptom(\"60 MiB uncompressed bundle with 1 MiB gzip is reported green\");\nbroken(\"unexpected output \" + out);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.129.0"
+        },
+        "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nconst a = src.indexOf(\"function printBundleSize(\");\nconst b = a < 0 ? -1 : src.indexOf(\"\\n}\\n\", a);\nconst k = b < 0 ? -1 : src.indexOf(\"ONE_KIB_BYTES = 1024;\", b);\nconst m = k < 0 ? -1 : src.indexOf(\"\\n\", src.indexOf(\"SIZE_BYTES = \", k));\nif (a < 0 || b < 0 || k < 0 || m < 0) broken(\"could not find printBundleSize in cli.js\");\nconst body = src.slice(a, b + 3);\nconst consts = src.slice(k, m + 1);\nconst lines = [];\nconst make = new Function(\"logger\", \"source_default\", \"var ONE_KIB_BYTES, MAX_GZIP_SIZE_BYTES, MAX_UNCOMPRESSED_SIZE_BYTES;\\n\" + consts + \"\\n\" + body + \"\\nreturn printBundleSize;\");\nconst color = (n) => (s) => \"[\" + n + \"]\" + s;\nconst print = make({ log: (s) => lines.push(s) }, { red: color(\"red\"), yellow: color(\"yellow\"), green: color(\"green\") });\nconst MIB = 1024 * 1024;\nprint({ size: 60 * MIB, gzipSize: 1 * MIB });\nconst out = lines.join(\"\\n\");\nif (!out.includes(\"Total Upload\")) broken(\"no report: \" + out);\nif (out.includes(\"[red]\")) { console.log(\"OK: 60 MiB uncompressed bundle reported red\"); process.exit(0); }\nif (out.includes(\"[green]\")) symptom(\"60 MiB uncompressed bundle with 1 MiB gzip is reported green\");\nbroken(\"unexpected output \" + out);\n",
+        "expect": "fail",
+        "error": "FAIL: 60 MiB uncompressed bundle with 1 MiB gzip is reported green"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.129.1/packages/wrangler/CHANGELOG.md",
+        "quote": "The bundle size reporter now compares the uncompressed bundle size against this 64 MiB limit for its color-coded warnings, instead of comparing gzip size against the old 3 MiB compressed limit."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T15:14:31Z"
+}

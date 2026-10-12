@@ -5,8 +5,9 @@
 //   node tools/seed/src/cli.ts triage <dir> [--model <id>]
 //   node tools/seed/src/cli.ts draft <dir> [--model <id>] [--kinds default,behavior,...] [--signal silent|loud] [--limit n]
 //   node tools/seed/src/cli.ts check <dir>
-//   node tools/seed/src/cli.ts review <dir> [--model <id>]
-//   node tools/seed/src/cli.ts revise <dir> --round <n>   the drafting agent fixes round n-1's review findings
+//   node tools/seed/src/cli.ts review <dir> [--model <id>]       opus by default; an unchanged draft keeps its review
+//   node tools/seed/src/cli.ts revise <dir> --round <n> [--scope check|findings]   fixes round n-1: check = local-check
+//     problems only, by the drafting model; findings (default) = review findings once, rules 1, 7, 8 by --content-model (opus)
 //   (check, review, and lessons take --round <n> to work on revised drafts)
 //   node tools/seed/src/cli.ts lessons <dir> --out <lessons folder>
 //   node tools/seed/src/cli.ts ci <dir> --pr <number>            CI's Docker results for the lessons' PR
@@ -67,7 +68,7 @@ async function triage(dir: string, model: string) {
 
 async function main(argv: string[]): Promise<number> {
   const [step, dir, ...rest] = argv;
-  const { values } = parseArgs({ args: rest, options: { package: { type: "string" }, range: { type: "string" }, model: { type: "string" }, kinds: { type: "string" }, limit: { type: "string" }, out: { type: "string" }, signal: { type: "string" }, since: { type: "string" }, pr: { type: "string" }, round: { type: "string" }, versions: { type: "string" } } });
+  const { values } = parseArgs({ args: rest, options: { package: { type: "string" }, range: { type: "string" }, model: { type: "string" }, kinds: { type: "string" }, limit: { type: "string" }, out: { type: "string" }, signal: { type: "string" }, since: { type: "string" }, pr: { type: "string" }, round: { type: "string" }, versions: { type: "string" }, scope: { type: "string" }, "content-model": { type: "string" } } });
   if (!step || !dir) {
     console.error("Usage: node tools/seed/src/cli.ts <collect|triage|draft|check|review|lessons|summary> <dir> [options]");
     return 2;

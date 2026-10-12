@@ -8,9 +8,9 @@ import { isLoss, JUDGE_PROMPT, lessonContext, MEASURED_MODELS, parseGrade, quest
 import type { Entry } from "./collect.ts";
 import { draftPrompt, prepare } from "./draft.ts";
 import { read, write, type RunInfo } from "./io.ts";
-import { agentIn, ask, extractJson, pool, WORK_MODEL } from "./llm.ts";
-import type { Finding } from "./review.ts";
-import { CACHE, fetchText, gh, registryDoc, REPO_ROOT, safeName, sfx, toSeedLesson, type CheckRecord, type DraftRecord } from "./steps.ts";
+import { agentIn, ask, CONTENT_MODEL, extractJson, pool, WORK_MODEL } from "./llm.ts";
+import { reviseRoute, type Finding } from "./review.ts";
+import { CACHE, fetchText, gh, keptEntries, registryDoc, REPO_ROOT, safeName, sfx, toSeedLesson, type CheckRecord, type DraftRecord } from "./steps.ts";
 
 export interface CiResult {
   id: string;
@@ -116,51 +116,73 @@ export async function bench(dir: string, lessonsDir: string): Promise<void> {
   console.log(`bench: ${out.length} lessons measured; harm-check losses to read: ${losses.map((l) => l.id).join(", ") || "none"}.`);
 }
 
+/** How the machine checks judge a draft, so the agent that fixes one knows what will pass (packages/core, lessonProblems). */
+export const CHECK_RULES = `How the checks work (they are the ones CI runs; a lesson can't pass until each problem is gone):
+- "doesn't name <symbol>": the whole symbol field, as one string (case, quotes, and backticks aside), must appear inside every quote. Quote another sentence from a file in sources/ that contains it, or make symbol shorter so the quote contains it, as long as symbol still names what the change is about.
+- "No evidence names <symbol>": the whole symbol must appear in a test's code or in a quote.
+- "The detail uses words no source quote contains": each listed word must come from a quote, or from package, versions, symbol, or replacement; test code doesn't count. Reword the detail with the quotes' own words, or leave the detail out.
+- "source: ...": the quote must be copied exactly from its file in sources/, with the url sources/sources.json gives for that file.
+- "schema: ...": fix the field the message names.`;
+
 /**
- * A review round: each lesson with review findings goes back to its drafting agent with the findings, which fixes it
- * or skips it. Lessons without findings carry over unchanged. Writes drafts-r<round>/; then run check and review with
- * the same --round.
+ * A revise round (docs/decisions.md, "Revising seed drafts"). Scope `check`: each lesson that failed the local checks
+ * goes back to the drafting model with those problems only. Scope `findings`: each lesson with review findings goes back
+ * once, to the content model if a finding is under rule 1, 7, or 8 and to the drafting model otherwise; local-check
+ * problems go with them. Lessons with nothing to fix, and lessons already kept for a PR, carry over unchanged. Writes
+ * drafts-r<round>/; then run check and review with the same --round.
  */
-export async function revise(dir: string, round: number, model = WORK_MODEL): Promise<void> {
+export async function revise(dir: string, round: number, o: { scope?: string; model?: string; contentModel?: string } = {}): Promise<void> {
   if (round < 1) throw new Error("revise needs --round 1 or more.");
+  const scope = o.scope ?? "findings";
+  if (scope !== "check" && scope !== "findings") throw new Error("--scope is check or findings.");
   const prev = sfx(round - 1);
   const run = read<RunInfo>(dir, "run.json");
   const entries = new Map(read<Entry[]>(dir, "entries.json").map((e) => [e.id, e]));
   const tags = new Map(read<{ version: string; tag: string }[]>(dir, "releases.json").map((r) => [r.version, r.tag]));
-  // Every drafted lesson of the last round: a local-check failure goes back to the agent like a review finding.
   const checks = read<CheckRecord[]>(dir, `check${prev}.json`);
   const reviews = new Map(read<{ entry: string; findings: Finding[]; error?: string }[]>(dir, `review${prev}.json`).map((r) => [r.entry, r]));
+  const kept = keptEntries(dir);
   const outDir = join(dir, `drafts${sfx(round)}`);
   mkdirSync(outDir, { recursive: true });
   const doc = await registryDoc(run.package);
-  let revised = 0;
+  const done: Record<string, { lessons: number; cost: number }> = {};
   await pool(checks, 3, async (c) => {
-    const old = read<DraftRecord>(join(dir, `drafts${prev}`), `${safeName(c.entry)}.json`);
-    const findings = [...c.problems.map((problem) => ({ rule: "check", problem })), ...(reviews.get(c.entry)?.findings ?? [])];
     if (existsSync(join(outDir, `${safeName(c.entry)}.json`))) return;
-    if (findings.length === 0) {
+    const old = read<DraftRecord>(join(dir, `drafts${prev}`), `${safeName(c.entry)}.json`);
+    const reviewed = reviews.get(c.entry)?.findings ?? [];
+    const route = kept.has(c.entry) ? "carry" : reviseRoute(c.problems, reviewed, scope);
+    if (route === "carry") {
       write(outDir, `${safeName(c.entry)}.json`, old);
       return;
     }
+    const model = route === "content" ? (o.contentModel ?? CONTENT_MODEL) : (o.model ?? WORK_MODEL);
+    const findings = [...c.problems.map((problem) => ({ rule: "check", problem })), ...(scope === "findings" ? reviewed : [])];
     const entry = entries.get(c.entry)!;
-    const record: DraftRecord = { entry: c.entry, verdict: old.verdict, cost_usd: 0, turns: 0 };
+    const record: DraftRecord = { entry: c.entry, verdict: old.verdict, cost_usd: 0, turns: 0, round, model };
     try {
       const prepared = await prepare({ run, entry, verdict: old.verdict, tag: tags.get(entry.version)!, all: Object.keys(doc.versions), directory: doc.repository?.directory, cache: CACHE, repoRoot: REPO_ROOT, gh, fetchText });
       writeFileSync(join(prepared.folder, "draft.json"), JSON.stringify(old.draft, null, 2));
       writeFileSync(join(prepared.folder, "REVIEW.md"), ["# These problems were found in draft.json (rule \"check\": the machine checks CI also runs; numbers: the reviewer's checklist)", "", ...findings.map((f) => `- (rule ${f.rule}) ${f.problem}`)].join("\n"));
       let work = "";
-      const prompt = `${draftPrompt(run.package, prepared)}\n\ndraft.json already holds your earlier draft, and REVIEW.md lists what a reviewer found wrong with it. Fix every finding you agree with and overwrite draft.json; if the change can't be taught truthfully in one lesson, replace it with {"skip": "<why>"}. If a finding asks to split a loud part from a silent part, keep the silent one.`;
-      const r = await agentIn(prepared.folder, prompt, model, { prepare: (w) => (work = w) });
+      const task =
+        scope === "check"
+          ? `draft.json already holds your earlier draft, and REVIEW.md lists what the machine checks found wrong with it. Fix each problem and overwrite draft.json. Change only what a fix needs and keep the rest as it is. If the lesson can't pass these checks and stay true, replace it with {"skip": "<why>"}.\n\n${CHECK_RULES}`
+          : `draft.json already holds your earlier draft, and REVIEW.md lists what a reviewer (and, under rule "check", the machine checks) found wrong with it. Fix every finding you agree with and overwrite draft.json; if the change can't be taught truthfully in one lesson, replace it with {"skip": "<why>"}. If a finding asks to split a loud part from a silent part, keep the silent one. Your fix must still pass the machine checks.\n\n${CHECK_RULES}`;
+      const r = await agentIn(prepared.folder, `${draftPrompt(run.package, prepared)}\n\n${task}`, model, { prepare: (w) => (work = w) });
       record.cost_usd = r.costUsd;
       record.turns = r.turns;
       const json = JSON.parse(readFileSync(join(work, "draft.json"), "utf8")) as Record<string, unknown>;
       if (typeof json.skip === "string") record.skip = json.skip;
       else record.draft = json;
-      revised++;
     } catch (err) {
       record.error = (err as Error).message;
     }
+    const d = (done[model] ??= { lessons: 0, cost: 0 });
+    d.lessons++;
+    d.cost += record.cost_usd;
     write(outDir, `${safeName(c.entry)}.json`, record);
+    console.log(`revise ${c.entry} (${model}): ${record.draft ? "revised" : record.skip ? `skipped (${record.skip})` : `error (${record.error})`}`);
   });
-  console.log(`revise (round ${round}): ${revised} lessons revised; run check and review with --round ${round}.`);
+  const by = Object.entries(done).map(([m, d]) => `${d.lessons} by ${m} ($${d.cost.toFixed(2)})`).join(", ");
+  console.log(`revise (round ${round}, scope ${scope}): ${by || "nothing to revise"}; run check and review with --round ${round}.`);
 }

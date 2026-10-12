@@ -39,6 +39,20 @@ ${JSON.stringify(lesson, null, 2).slice(0, 30000)}
 Answer with only a JSON array of findings, empty if there are none: [{"rule": "<number>", "problem": "<one sentence: what is wrong and what would fix it>"}]. Report only real problems you can point to in the text above, not style.`;
 }
 
+/** Findings about what the lesson says: more than the evidence (1), fields that don't match the entry (7), misleading (8). */
+export const CONTENT_RULES = new Set(["1", "7", "8"]);
+
+/**
+ * Who revises a lesson in a round (docs/decisions.md, "Revising seed drafts"). Scope `check`: only lessons that failed
+ * the local checks, by the drafting model. Scope `findings`: a lesson with a content finding goes to the content model,
+ * one with only other problems or findings to the drafting model. A lesson with nothing to fix carries over unchanged.
+ */
+export function reviseRoute(problems: string[], findings: Finding[], scope: "check" | "findings"): "carry" | "work" | "content" {
+  if (scope === "check") return problems.length ? "work" : "carry";
+  if (findings.some((f) => CONTENT_RULES.has(f.rule.replace(/\D/g, "")))) return "content";
+  return problems.length || findings.length ? "work" : "carry";
+}
+
 export function parseFindings(json: unknown): Finding[] {
   if (!Array.isArray(json)) throw new Error("Review answer is not an array.");
   return json.map((f) => ({ rule: String((f as Finding).rule ?? ""), problem: String((f as Finding).problem ?? "") })).filter((f) => f.problem);

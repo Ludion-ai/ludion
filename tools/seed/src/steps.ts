@@ -11,7 +11,7 @@ import { createSafeFetch } from "../../verify/src/safe-fetch.ts";
 import type { Entry } from "./collect.ts";
 import { draftPrompt, prepare } from "./draft.ts";
 import { read, write, type RunInfo } from "./io.ts";
-import { agentIn, ask, extractJson, pool, WORK_MODEL } from "./llm.ts";
+import { agentIn, ask, extractJson, pool, REVIEW_MODEL, WORK_MODEL } from "./llm.ts";
 import { reviewPrompt, parseFindings, type Finding } from "./review.ts";
 import { draftOrder, KINDS, type Kind, type Verdict } from "./triage.ts";
 
@@ -32,6 +32,9 @@ export interface DraftRecord {
   error?: string;
   cost_usd: number;
   turns: number;
+  /** For a revision: the round that made it and the model that did (older revisions didn't record these). */
+  round?: number;
+  model?: string;
 }
 
 export const safeName = (id: string) => id.replace("#", "-");
@@ -145,19 +148,55 @@ async function check(dir: string, round = 0) {
   console.log(`check: ${out.length} drafts, ${ok.length} pass every local check (${ok.filter((c) => c.label === "differential").length} differential). Docker tests run in CI.`);
 }
 
-/** A fresh-context reviewer reads every lesson that passed the local checks, with the review checklist. */
+export interface ReviewRecord {
+  entry: string;
+  findings: Finding[];
+  error?: string;
+  cost_usd?: number;
+  /** The reviewer. Files from before 2026-10-12 (later) got it added from the run notes (docs/bench/2026-10-12-seed/README.md). */
+  model?: string;
+  /** Set when the draft didn't change since that round, whose review by the same model is kept. */
+  reused_from?: number;
+}
+
+/** Entries already written as lessons for a PR (kept.json): later rounds leave them alone. */
+export function keptEntries(dir: string): Set<string> {
+  return new Set(existsSync(join(dir, "kept.json")) ? read<{ entry: string }[]>(dir, "kept.json").map((k) => k.entry) : []);
+}
+
+/**
+ * The earlier review that still holds for a draft: the previous round's, when the draft is unchanged and that review
+ * was made by the same model without an error. Reviewing an unchanged draft again would only reroll the reviewer.
+ */
+export function reusableReview(draft: unknown, prevDraft: unknown, prev: ReviewRecord | undefined, model: string): ReviewRecord | undefined {
+  if (!prev || prev.error || prev.model !== model || prevDraft === undefined) return undefined;
+  return JSON.stringify(draft) === JSON.stringify(prevDraft) ? prev : undefined;
+}
+
+/**
+ * A fresh-context reviewer reads every lesson that passed the local checks, with the review checklist, except lessons
+ * already kept for a PR. A draft unchanged since the previous round keeps that round's review by the same model.
+ */
 async function review(dir: string, model: string, round = 0) {
   const run = read<RunInfo>(dir, "run.json");
   const entries = new Map(read<Entry[]>(dir, "entries.json").map((e) => [e.id, e]));
-  const checked = read<CheckRecord[]>(dir, `check${sfx(round)}.json`).filter((c) => c.problems.length === 0);
-  const results = await pool(checked, 4, async (c) => {
+  const kept = keptEntries(dir);
+  const checked = read<CheckRecord[]>(dir, `check${sfx(round)}.json`).filter((c) => c.problems.length === 0 && !kept.has(c.entry));
+  const now = new Map(drafts(dir, round).map((d) => [d.entry, d.draft]));
+  const before = round > 0 ? new Map(drafts(dir, round - 1).map((d) => [d.entry, d.draft])) : new Map<string, unknown>();
+  const prev = round > 0 && existsSync(join(dir, `review${sfx(round - 1)}.json`)) ? new Map(read<ReviewRecord[]>(dir, `review${sfx(round - 1)}.json`).map((r) => [r.entry, r])) : new Map<string, ReviewRecord>();
+  const results = await pool(checked, 4, async (c): Promise<ReviewRecord> => {
+    const same = reusableReview(now.get(c.entry), before.get(c.entry), prev.get(c.entry), model);
+    if (same) return { entry: c.entry, findings: same.findings, cost_usd: 0, model, reused_from: same.reused_from ?? round - 1 };
     const r = await ask(reviewPrompt(run.package, c.lesson!, c.claim!, entries.get(c.entry)!.text), model, 3);
-    return { entry: c.entry, findings: parseFindings(extractJson(r.answer)), cost_usd: r.costUsd };
+    return { entry: c.entry, findings: parseFindings(extractJson(r.answer)), cost_usd: r.costUsd, model };
   });
-  const out = results.map((r, i) => (r instanceof Error ? { entry: checked[i]!.entry, error: r.message, findings: [] as Finding[] } : r));
+  const out: ReviewRecord[] = results.map((r, i) => (r instanceof Error ? { entry: checked[i]!.entry, error: r.message, findings: [], model } : r));
   write(dir, `review${sfx(round)}.json`, out);
   const n = out.reduce((s, r) => s + r.findings.length, 0);
-  console.log(`review: ${out.length} lessons, ${n} findings, ${out.filter((r) => r.findings.length === 0 && !("error" in r)).length} with none.`);
+  const reused = out.filter((r) => r.reused_from !== undefined).length;
+  const cost = out.reduce((s, r) => s + (r.cost_usd ?? 0), 0);
+  console.log(`review (${model}): ${out.length} lessons (${reused} unchanged, review kept), ${n} findings, ${out.filter((r) => r.findings.length === 0 && !r.error).length} with none, $${cost.toFixed(2)}.${kept.size ? ` ${kept.size} already kept for a PR left out.` : ""}`);
 }
 
 /** Write the lessons that passed the local checks and have no review finding, as files for a PR. */
@@ -186,8 +225,11 @@ export function isDuplicate(l: { versions: string; symbol: string }, others: { i
  * what the pipeline recovers of the hand-made seeds.
  */
 function lessons(dir: string, outDir: string, round = 0) {
-  const review = new Map(read<{ entry: string; findings: Finding[]; error?: string }[]>(dir, `review${sfx(round)}.json`).map((r) => [r.entry, r]));
-  const clean = read<CheckRecord[]>(dir, `check${sfx(round)}.json`).filter((c) => c.problems.length === 0 && review.get(c.entry) && !review.get(c.entry)!.error && review.get(c.entry)!.findings.length === 0);
+  const review = new Map(read<ReviewRecord[]>(dir, `review${sfx(round)}.json`).map((r) => [r.entry, r]));
+  // Lessons kept by an earlier run are in their own PR already: they stay in kept.json and aren't written again.
+  const earlier = existsSync(join(dir, "kept.json")) ? read<{ entry: string }[]>(dir, "kept.json") : [];
+  const already = new Set(earlier.map((k) => k.entry));
+  const clean = read<CheckRecord[]>(dir, `check${sfx(round)}.json`).filter((c) => c.problems.length === 0 && !already.has(c.entry) && review.get(c.entry) && !review.get(c.entry)!.error && review.get(c.entry)!.findings.length === 0);
   const main = mainLessons();
   const duplicates = clean.map((c) => ({ c, of: isDuplicate(c.lesson as LessonV1, main) })).filter((x) => x.of);
   const keep = clean.filter((c) => !duplicates.some((d) => d.c === c));
@@ -196,9 +238,9 @@ function lessons(dir: string, outDir: string, round = 0) {
     mkdirSync(folder, { recursive: true });
     writeFileSync(join(folder, `${c.lesson!.id}.json`), formatLesson(c.lesson!));
   }
-  write(dir, "kept.json", keep.map((c) => ({ entry: c.entry, id: c.lesson!.id, claim: c.claim, label: c.label })));
+  write(dir, "kept.json", [...earlier, ...keep.map((c) => ({ entry: c.entry, id: c.lesson!.id, claim: c.claim, label: c.label, round }))]);
   write(dir, "duplicates.json", duplicates.map((d) => ({ entry: d.c.entry, of: d.of, claim: d.c.claim })));
-  console.log(`lessons: wrote ${keep.length} to ${outDir}; ${duplicates.length} repeat a lesson on main.`);
+  console.log(`lessons: wrote ${keep.length} to ${outDir}; ${duplicates.length} repeat a lesson on main; ${earlier.length} kept earlier, not written again.`);
 }
 
 /** The counts this run measured, for docs/bench. */
@@ -208,17 +250,29 @@ function summary(dir: string) {
   const triage = existsSync(join(dir, "triage.json")) ? read<Verdict[]>(dir, "triage.json") : [];
   const ds = drafts(dir);
   // One row per review round that ran: round 0 is the first draft.
-  const rounds: Record<string, number>[] = [];
+  const rounds: Record<string, unknown>[] = [];
   for (let r = 0; existsSync(join(dir, `review${sfx(r)}.json`)); r++) {
     const checks = read<CheckRecord[]>(dir, `check${sfx(r)}.json`);
-    const reviews = read<{ findings: Finding[]; error?: string }[]>(dir, `review${sfx(r)}.json`);
+    const reviews = read<ReviewRecord[]>(dir, `review${sfx(r)}.json`);
+    // Revisions made in this round (records that say so; older rounds didn't record it), by model.
+    const revised = r > 0 ? drafts(dir, r).filter((d) => d.round === r) : [];
+    const byModel: Record<string, { lessons: number; cost_usd: number }> = {};
+    for (const d of revised) {
+      const m = (byModel[d.model ?? "unknown"] ??= { lessons: 0, cost_usd: 0 });
+      m.lessons++;
+      m.cost_usd = Number((m.cost_usd + d.cost_usd).toFixed(2));
+    }
     rounds.push({
       round: r,
       drafts: checks.length,
       local_checks_passed: checks.filter((c) => c.problems.length === 0).length,
       differential: checks.filter((c) => c.problems.length === 0 && c.label === "differential").length,
+      reviewed: reviews.length,
       review_findings: reviews.reduce((a, x) => a + x.findings.length, 0),
       reviewed_clean: reviews.filter((x) => !x.error && x.findings.length === 0).length,
+      ...(reviews.some((x) => x.reused_from !== undefined) ? { review_kept_unchanged: reviews.filter((x) => x.reused_from !== undefined).length } : {}),
+      review_cost_usd: Number(reviews.reduce((a, x) => a + (x.cost_usd ?? 0), 0).toFixed(2)),
+      ...(revised.length ? { revised_by_model: byModel } : {}),
     });
   }
   const ci = existsSync(join(dir, "ci.json")) ? read<{ rounds: { status: string }[][] }>(dir, "ci.json").rounds : [];
@@ -253,7 +307,7 @@ export async function run(step: string, dir: string, o: Record<string, string | 
   if (step === "draft") return draft(dir, o);
   const round = Number(o.round ?? 0);
   if (step === "check") return check(dir, round);
-  if (step === "review") return review(dir, o.model ?? WORK_MODEL, round);
+  if (step === "review") return review(dir, o.model ?? REVIEW_MODEL, round);
   if (step === "lessons") {
     if (!o.out) throw new Error("lessons needs --out <folder>.");
     return lessons(dir, o.out, round);
@@ -264,7 +318,7 @@ export async function run(step: string, dir: string, o: Record<string, string | 
     if (!o.pr) throw new Error("ci needs --pr <number>.");
     return later.ci(dir, o.pr);
   }
-  if (step === "revise") return later.revise(dir, round, o.model);
+  if (step === "revise") return later.revise(dir, round, { scope: o.scope, model: o.model, contentModel: o["content-model"] });
   if (step === "fix" || step === "bench") {
     if (!o.out) throw new Error(`${step} needs --out <the PR branch's lessons folder>.`);
     return step === "fix" ? later.fix(dir, o.out, o.model) : later.bench(dir, o.out);

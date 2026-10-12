@@ -40,17 +40,23 @@ The list (status in brackets):
 
 Heavy work one job at a time; Opus only for the review of protected PRs (one round); pipeline work on Sonnet; no per-lesson model FreshBench; no daily C batches; big files read through summaries; this file updated after each work item.
 
-### Open PRs and what waits for whom (2026-10-12, later)
+### Open PRs and what waits for whom (2026-10-12, latest)
 
-- **Owner's merge (protected, each with its review comment):** #62 (6 agents lessons, CI green), #75 (5 vitest lessons) and #76 (3 wrangler lessons) once their CI and review are in, #73 (nightly seed watch, reviewed twice; it also needs the `ANTHROPIC_API_KEY` repository secret, a secret value, to draft anything), #54 (issue form), #60 (consent sentence draft).
-- **Auto-merge when CI is green:** #74 (drafting agents get files only; found by #73's review).
-- Not mine: #67, #68, #69.
+- **Owner's merge (protected, each with its review comment):** #62 (6 agents lessons), #75 (5 vitest lessons), #76 (3 wrangler lessons), #73 (nightly seed watch; it also needs the `ANTHROPIC_API_KEY` repository secret, a secret value, to draft anything), #54 (issue form). CI is green on all of them.
+- **Docs only, not protected:** #60 (consent sentence draft; the license waits for the owner).
+- **Codex's (the owner's), protected:** #67, then #68, then #69 (a stack). Each gets one Opus review round, posted as a comment; the owner merges. #67 conflicts with main in `docs/decisions.md` only.
+
+### Who works on what (owner, 2026-10-12)
+
+Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pipeline (`tools/seed`), lessons, the site, publishing. A change that needs the other side's files is raised with the owner before it starts. Main conversation on Sonnet; Opus only for the pipeline's reviewer and content reviser and for protected-PR reviews.
 
 ### Next (in order)
 
-1. [done] Pipeline yield against the hand-made seeds (`docs/bench/2026-10-12-seed/README.md`): under the same reviewer the first drafts are close to the hand-made seeds; two Opus revise rounds brought agents to the hand-made level; one Sonnet revise round on wrangler moved nothing.
-2. **Owner's call (spending): who revises.** Opus revising works and costs more; Sonnet revising, once, didn't. Either allow Opus for `revise` only, or accept the lower yield. Until decided, no new subject. If Opus revising is allowed: `node tools/seed/src/cli.ts revise <dir> --round 1 --model claude-opus-5-5` on vitest and wrangler, then `check` and `review` with `--round 1`, `lessons --round 1`, a PR for what's new, then one new subject (`ai`, `zod`, or `tailwindcss`; zod and tailwindcss are partly drafted in `docs/bench/2026-10-12-subjects/`).
-3. Not started: the three outreach letters for subjects not yet measured; npm stage (after every CLI change is on main; #67 isn't mine).
+1. [done] Pipeline yield against the hand-made seeds (`docs/bench/2026-10-12-seed/README.md`).
+2. [decided by the owner] Who revises: machine-check problems back to the drafting model (Sonnet) first; then the Opus review; lessons with content findings (rules 1, 7, 8) to Opus, the rest to Sonnet, one round (`docs/decisions.md`, "Revising seed drafts"). Built in `tools/seed` (`revise --scope check|findings`, review reuse for unchanged drafts).
+3. Review #67, #68, #69 (Opus, one round each, one at a time), post the verdicts, give the owner the merge order. After the owner merges them: rebase this side's open work on main, bump the CLI (0.1.3: #53, #55 and #67 are not on npm yet; npm has 0.1.2 from `aa94ad9`) with the plugin pin, and stage it with `publish.yml`.
+4. vitest, then wrangler: the remaining drafts (not in #75 or #76) through step 2, one subject at a time, one PR per subject (protected). No new subject yet.
+5. Not started: the three outreach letters for subjects not yet measured.
 
 ### Where the running work lives (for resuming)
 

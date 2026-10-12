@@ -5,10 +5,17 @@ import { runAgent, type AgentRun, type RunOptions } from "../../bench/src/agent.
 export type { AgentRun };
 
 /**
- * The pipeline's default model for triage, drafting, revising, questions, and judging (docs/decisions.md, "Spending").
- * Opus is for reviewing protected pull requests, and for the model under test in a benchmark.
+ * The pipeline's default model for triage, drafting, mechanical fixes, questions, and judging (docs/decisions.md,
+ * "Spending"). Opus is for the per-lesson review, revising content findings, protected PR reviews, and the model under
+ * test in a benchmark.
  */
 export const WORK_MODEL = "claude-sonnet-5-5";
+
+/** The per-lesson reviewer: Opus, whose verdicts on the 30 hand-made seeds are the baseline (docs/decisions.md, "Revising seed drafts"). */
+export const REVIEW_MODEL = "claude-opus-5-5";
+
+/** The reviser for lessons with a content finding (review rules 1, 7, 8), one round only. */
+export const CONTENT_MODEL = "claude-opus-5-5";
 
 /** The first JSON value in a model's answer: a ```json block if there is one, else the outermost [..] or {..}. */
 export function extractJson(text: string): unknown {

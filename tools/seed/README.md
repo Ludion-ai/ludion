@@ -9,9 +9,11 @@ node tools/seed/src/cli.ts triage  $D                                         # 
 node tools/seed/src/cli.ts draft   $D --kinds default,behavior,deprecated,renamed,removed --signal silent
 node tools/seed/src/cli.ts check   $D                                         # schema, lessonProblems, quotes (no Docker)
 node tools/seed/src/cli.ts review  $D                                         # fresh-context opus, the seed checklist
-node tools/seed/src/cli.ts revise  $D --round 1                               # findings back to the drafting agent
-node tools/seed/src/cli.ts check   $D --round 1 && node tools/seed/src/cli.ts review $D --round 1
-node tools/seed/src/cli.ts lessons $D --round 1 --out lessons                 # files for the subject's PR
+node tools/seed/src/cli.ts revise  $D --round 1 --scope check                 # local-check problems only, back to the drafting model (sonnet)
+node tools/seed/src/cli.ts check   $D --round 1 && node tools/seed/src/cli.ts review $D --round 1   # unchanged drafts keep their review
+node tools/seed/src/cli.ts revise  $D --round 2                               # findings, once: rules 1, 7, 8 to opus, the rest to sonnet
+node tools/seed/src/cli.ts check   $D --round 2 && node tools/seed/src/cli.ts review $D --round 2
+node tools/seed/src/cli.ts lessons $D --round 2 --out lessons                 # files for the subject's PR (lessons kept earlier are left out)
 node tools/seed/src/cli.ts ci      $D --pr <n>                                # CI's Docker results for that PR
 node tools/seed/src/cli.ts fix     $D --out lessons                           # one repair round for CI failures
 node tools/seed/src/cli.ts bench   $D --out lessons                           # models labels and the harm check

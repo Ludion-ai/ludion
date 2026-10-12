@@ -1,0 +1,558 @@
+{
+  "label": "exp3-50",
+  "set": "B",
+  "condition": "project",
+  "context": null,
+  "model": "claude-opus-5-5",
+  "spentUsd": 6.991367399999998,
+  "skipped": [],
+  "answers": [
+    {
+      "id": "wrangler-4-122-0-2-b",
+      "answer": "No, probably not. This project has wrangler 4.148.0 installed. According to the project's Ludion lessons (`.ludion/lessons.md`), from wrangler 4.122.0 on, `nodejs_compat` is on by default for Workers with a `compatibility_date` of 2026-08-04 or later. To turn it off, you must remove any positive flags (`nodejs_compat`, `nodejs_compat_v2`) and add **both** `no_nodejs_compat` and `no_nodejs_compat_v2`. Adding only `no_nodejs_compat` can leave the v2 Node.js compatibility layer enabled. Nothing will error or warn you; the Worker simply keeps the Node.js APIs.\n\nI took this from the lessons file and didn't check it against the installed wrangler code or Cloudflare's changelog, so confirm it there before relying on it.",
+      "toolCalls": [],
+      "costUsd": 0.11860480000000001,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-111-0-0-b",
+      "answer": "Your wrangler (4.148.0) no longer accepts the `legacy_env` field. Service environments have been removed, so any config that contains `legacy_env` now fails validation with an error, even if it's set to `true` (`node_modules/wrangler/wrangler-dist/cli.js:20314`). The fix is to delete that line and change nothing else. Each `[env.<name>]` block is now always deployed as its own Worker called `<name>-<environment>`. That is exactly what `legacy_env = true` did, so removing the line won't change how anything deploys:\n\n```toml\nname = \"my-worker\"\nmain = \"src/index.ts\"\ncompatibility_date = \"2026-10-01\"\n# legacy_env = true   ← remove this line\n\n[env.staging]\n# deploys as \"my-worker-staging\"\n```\n\nYour lessons file doesn't mention this change; I confirmed it in the installed wrangler code. More detail is at https://developers.cloudflare.com/workers/wrangler/environments/.",
+      "toolCalls": [
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.1426578,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-124-0-4-b",
+      "answer": "Run `wrangler versions upload --latest`. In wrangler 4.148.0, `--latest` overrides the `compatibility_date` in your config with the newest compatibility date this installed Wrangler supports, and it prints a warning showing which date it used. That date is not today's calendar date. Since 4.124.0, \"latest\" is limited to what your installed Wrangler supports, so to move to newer dates you have to upgrade Wrangler. I confirmed this in the installed `wrangler-dist/cli.js`, where the code that decides the date is `args.latest ? DEFAULT_COMPAT_DATE : ...`. If you'd rather have repeatable builds, leave out `--latest` and set a fixed `compatibility_date` in your config, which also stops the warning.",
+      "toolCalls": [
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.1562368,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-121-0-6-b",
+      "answer": "Yes. The installed Wrangler 4.148.0 turns telemetry off when `DO_NOT_TRACK=1` is set, and that check comes before every other setting. In `node_modules/wrangler/wrangler-dist/cli.js:299266`, `resolveTelemetryStatus()` checks `DO_NOT_TRACK` first, so it overrides `WRANGLER_SEND_METRICS`, `send_metrics` in your Wrangler config, and any saved `wrangler telemetry` preference. The project's lessons file says this support was added in Wrangler 4.121.0, so older versions may ignore the variable.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.1419758,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-118-0-8-b",
+      "answer": "Setting `X_LOCAL_OBSERVABILITY=false` turns off local observability in `wrangler dev`. Since wrangler 4.118.0, `wrangler dev` records request traces and `console` logs from your Worker by default and shows them in the Observability tab of the Local Explorer. With the variable set to `false`, that recording stops and the tab gets no data.\n\nI checked this against your installed wrangler 4.148.0. In `node_modules/wrangler/wrangler-dist/cli.js:19875`, `X_LOCAL_OBSERVABILITY` is a true/false setting that defaults to `true`, so you have to set it to `false` yourself to turn this off. It's a separate setting from `X_LOCAL_EXPLORER`, which controls the Local Explorer as a whole.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.14763099999999998,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-121-0-7-b",
+      "answer": "With your installed wrangler (4.148.0), `wrangler d1 create <name> --jurisdiction <value>` takes three values:\n\n- `eu`: the European Union\n- `fedramp`: FedRAMP-compliant data centers\n- `us`: the United States\n\nThe `us` option is new in wrangler 4.121.0, so older versions only had `eu` and `fedramp`. I confirmed all three in the installed CLI's D1 code. If you set a jurisdiction, the CLI ignores any `--location` hint.",
+      "toolCalls": [
+        "Grep",
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.1686936,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-129-1-9-b",
+      "answer": "In the wrangler you have installed (4.148.0), the warning is based on the **uncompressed** bundle size, and the limit is **64 MiB**. In `node_modules/wrangler/wrangler-dist/cli.js:163194-163205`, `MAX_UNCOMPRESSED_SIZE_BYTES = 64 * 1024 * 1024`, and the \"Total Upload\" line is coloured using the raw `size`, not `gzipSize`. It turns yellow above 70% of 64 MiB (about 44.8 MiB) and red above 90% (about 57.6 MiB). The gzip figure on that same line is only for your information.\n\nOlder wrangler versions checked against a gzip-compressed limit instead, so older docs or answers may say \"compressed.\" Cloudflare checks the size again on its servers when you deploy, and that check can depend on your plan. If you're close to the limit, check the current Workers limits page for your plan.",
+      "toolCalls": [
+        "Grep",
+        "Read",
+        "Read"
+      ],
+      "costUsd": 0.1744938,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-141-0-10-b",
+      "answer": "On `wrangler deploy`, `--durable-objects-code-update-mode` (added in wrangler 4.141.0) sets how Durable Objects switch over to the newly deployed code. It takes one of two values:\n\n- **`immediate`**: no delay.\n- **`deferred <duration>`**: waits up to the given time, for example `--durable-objects-code-update-mode deferred 10m`. The duration must be between 0 and 24 hours, at most millisecond precision.\n\nIf you don't pass the flag, wrangler uses `durable_objects.code_update_strategy` from your config. If that isn't set either, it defaults to **deferred with a 5-minute (300 s) maximum delay**. So deploys on 4.141.0 or later may not switch running Durable Objects to new code right away, and nothing warns you about it.\n\nI confirmed the accepted values, limits, order of precedence and default in the installed wrangler 4.148.0 (`node_modules/wrangler/wrangler-dist/cli.js:215066-215138`). What \"deferred\" does on Cloudflare's side is my reading of the flag's name; the CLI code doesn't show it.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.17871620000000002,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-145-0-11-b",
+      "answer": "Both commands now live under the `wrangler basin` namespace. `wrangler r2 sql` is now `wrangler basin sql`, and `wrangler pipelines` is now `wrangler basin pipelines` (with subcommands like `setup`, `create`, `list`, `get`, `update`, `delete` and `streams`). The project's lessons file dates the `r2 sql` rename to wrangler 4.145.0. I confirmed both renames in the code of the installed wrangler 4.148.0. The old paths still work as hidden aliases, so existing scripts won't break. One related rename: the auth token environment variable `WRANGLER_R2_SQL_AUTH_TOKEN` is now `WRANGLER_BASIN_SQL_AUTH_TOKEN`.",
+      "toolCalls": [
+        "Grep",
+        "Glob",
+        "Grep"
+      ],
+      "costUsd": 0.1628562,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-116-0-16-b",
+      "answer": "Run `npx wrangler deploy --dry-run --outdir dist` to measure bundle size. It builds the Worker exactly as a deploy would, but uploads nothing. It prints the total and gzipped upload size, and writes the bundle to `dist/` so you can inspect it. Add `--metafile` if you want an esbuild breakdown of what's taking up space.\n\nTo measure startup time, run `npx wrangler check startup`. It bundles the Worker, runs its global-scope initialization locally, and writes a CPU profile (`worker-startup.cpuprofile` by default). Open that file in Chrome DevTools (Performance tab) or VS Code to see which top-level imports or code are slow.\n\nI answered from memory and didn't run either command here. The project's notes on wrangler 4.148.0 don't mention changes to these commands, but run `npx wrangler check startup --help` to confirm the flags on your installed version.",
+      "toolCalls": [],
+      "costUsd": 0.1184768,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-127-0-17-b",
+      "answer": "Yes. Wrangler 4.127.0 and later support `workflows[].concurrency.limit`, which sets the maximum number of instances of that Workflow that can run at the same time. I checked the installed wrangler 4.148.0, and its `config-schema.json` lists `concurrency: { limit: number }` on each workflow entry. For example:\n\n```jsonc\n\"workflows\": [\n  { \"name\": \"my-workflow\", \"binding\": \"MY_WORKFLOW\", \"class_name\": \"MyWorkflow\",\n    \"concurrency\": { \"limit\": 10 } }\n]\n```\n\nIt's separate from the workflow's `limits` object and from the Queues consumer setting `max_concurrency`.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.1426424,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-125-0-19-b",
+      "answer": "The `connect` handler lets a Worker take raw socket connections, not just HTTP requests. You export `connect(socket, env, ctx)` next to `fetch`, and it runs for each incoming connection. It was added in wrangler 4.125.0, so it's available in your installed 4.148.0.\n\nTo configure it, add a `connect` array to your wrangler config. Each entry needs a `protocol` and a `port`; `address` is optional and defaults to `127.0.0.1`:\n\n```jsonc\n{\n  \"connect\": [\n    { \"protocol\": \"tcp\", \"port\": 9000 }\n  ]\n}\n```\n\nI checked this against the config schema of your installed wrangler. That schema also accepts a `udp` entry, which adds optional `idle_timeout_ms` and `max_pending_bytes` settings. The project notes only say these listeners work during `wrangler dev`; I didn't confirm whether they apply to deployed Workers.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.15169939999999998,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-148-0-24-b",
+      "answer": "In wrangler 4.148.0 and later, setting a secret to `null` in the JSON you pass to `wrangler versions secret bulk` deletes that secret from the new Worker version the command creates. For example, `{\"OLD_KEY\": null, \"API_TOKEN\": \"abc\"}` removes `OLD_KEY` and sets `API_TOKEN`. This lets you add, update and remove secrets in one bulk operation. Older wrangler versions don't do this, and the change is silent, so check the version before relying on it.\n\nThis comes from the project's Ludion lessons file (`.ludion/lessons.md`), not the wrangler source. There's no `node_modules/wrangler` in this workspace, so I couldn't confirm it against the installed package or its changelog.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.1306528,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-113-0-21-b",
+      "answer": "I can't tell from the installed package alone whether Cloudflare still calls this \"beta\". What the code does show is that it's on by default. In wrangler 4.148.0, `deploy` provisions resources through a hidden flag, `--experimental-provision` (alias `--x-provision`), and that flag defaults to `true` (`node_modules/wrangler/wrangler-dist/cli.js:361358`). So you get automatic provisioning without opting in.\n\nThe code still describes the flag as \"Experimental: Enable automatic resource provisioning\", so it hasn't been formally declared finished. The project's lesson file confirms that since 4.113.0, provisioning also covers Queue, Dispatch Namespace and Flagship bindings, and you can leave out the resource name or ID. Cloudflare's docs and changelog would say whether it's still officially beta, and I didn't check them.",
+      "toolCalls": [
+        "Grep",
+        "Glob",
+        "Grep",
+        "Read",
+        "Grep"
+      ],
+      "costUsd": 0.18175880000000003,
+      "turns": 6,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "wrangler-4-117-0-20-b",
+      "answer": "Yes. They still work in `wrangler dev`, but only because wrangler rewrites the old paths to the new ones. Since wrangler 4.117.0 the test endpoints live under `/cdn-cgi/local/...`, so `/cdn-cgi/handler/scheduled` is now `/cdn-cgi/local/scheduled`. Your installed wrangler 4.148.0 has a rewrite table in `node_modules/wrangler/wrangler-dist/ProxyWorker.js:219`. It maps `/cdn-cgi/handler/*` and `/cdn-cgi/mf/scheduled` to the new `/cdn-cgi/local` paths, `/cdn-cgi/mf/stream` and `/cdn-cgi/mf/imagedelivery` to `/__cf_local/...`, and `/cdn-cgi/explorer` to `/cdn-cgi/local/explorer`. The project's lessons file says the Vite plugin rewrites them the same way, but I didn't check that.\n\nThe catch is that Miniflare itself doesn't keep the old paths. Your installed Miniflare (`5.20261006.0-alpha`) has no reference to `/cdn-cgi/handler` in its built code. If you run Miniflare directly instead of through wrangler, or a script calls it without the wrangler proxy, you need to switch to the `/cdn-cgi/local/...` paths.",
+      "toolCalls": [
+        "Grep",
+        "Grep",
+        "Grep",
+        "Grep",
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.1929852,
+      "turns": 7,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-27-0-0-b",
+      "answer": "No, Channels isn't stable. In the installed `agents` 0.27.0, it's only exported under an experimental path. The main import is `agents/experimental/channels`. Each channel type has its own subpath: `agents/experimental/channels/email`, `/slack`, `/telegram` and `/web`. The web channel also has `/web/client` and `/web/ai-sdk`. There's no non-experimental `agents/channels` export in `node_modules/agents/package.json`, so the API could still change between releases.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.1431866,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-25-0-3-b",
+      "answer": "An Agent needs to know its own name, and an ID from `idFromString()` doesn't carry one. Since agents 0.22, `Agent` extends `DurableObject` directly, using the PartyServer lifecycle code bundled at `agents/lifecycle`. It gets its name from `ctx.id.name`, which only exists when the stub was created by name. Stubs from `newUniqueId()` or `idFromString()`, and names over 1,024 bytes, don't have it. So when an RPC call reaches the Agent and it needs `this.name`, it throws the error at `node_modules/agents/dist/lifecycle-CFu6OV03.js:1097` (\"…could not determine its Durable Object name. Address it with idFromName() or getByName()…\").\n\n**Fix:** address the Agent by name. Use `getAgentByName(env.MyAgent, name)`, or `env.MyAgent.get(env.MyAgent.idFromName(name))`, or `env.MyAgent.getByName(name)`. If you only have a stored hex ID, store the name instead. If this happens in local dev even though you use names, update Wrangler/workerd and use a current `compatibility_date`.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.1605584,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-27-0-2-b",
+      "answer": "`npx agents tui <url>` starts a terminal chat client for an agent's conversation. You give it the conversation's Web Channel URL (`http(s)` or `ws(s)`), and you can chat with the agent from the terminal instead of a browser UI.\n\nThe command was added in `agents` 0.27.0, which is the version installed here. I confirmed it in the installed CLI (`node_modules/agents/dist/cli.js`): its help text lists `tui <url>` as \"Chat with an agent's Web Channel from the terminal\". The chat interface is built on the `pi-tui` terminal UI library.",
+      "toolCalls": [
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.17084080000000001,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-23-0-7-b",
+      "answer": "In `agents` 0.23.0 and later, use the `this.dynamicAgents` API on your Agent. `subAgent()` became `this.dynamicAgents.get(ChildClass, id)`. The other methods map the same way: `hasSubAgent()` → `.has()`, `listSubAgents()` → `.list()`, `abortSubAgent()` → `.abort()`, `deleteSubAgent()` → `.delete()`. The old methods still work because they now call `this.dynamicAgents` internally, so nothing breaks yet. They're marked `@deprecated` in the installed `agents` 0.27.0 (`node_modules/agents/dist/agent-routing-Bhdbvf7s.d.ts:5817`), so new code should use `dynamicAgents`.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.14963400000000002,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-24-0-6-b",
+      "answer": "In agents 0.27.0 (installed here), you pass `transport: \"capnweb\"` when you create the client: `new AgentClient({ agent: \"my-agent\", name: \"room-1\", host, transport: \"capnweb\" })`. The default is `\"cf-websocket\"`, a hibernating WebSocket where `call()` sends JSON `rpc` frames. With `\"capnweb\"`, the client adds `?__agents_transport=capnweb` to the WebSocket upgrade, and the host's callables are served as native Cap'n Web methods. Then `client.call(\"method\", args)` and `client.stub.method(args)` call them directly, an `RpcTarget` return value comes back as a live stub, a `ReadableStream` streams, and calls can be pipelined. On the server, a plain `Agent` answers its own decorated methods over the JSON wire. Methods that return an `RpcTarget` work only over capnweb; on the default wire they throw an error.\n\nThe capnweb transport is marked experimental, and the Durable Object can't hibernate while a capnweb connection is open, so expect higher duration costs. The same option exists on `useAgent({ transport: \"capnweb\" })` in React. I checked all of this against the installed `node_modules/agents/dist` type definitions (`client-*.d.ts`, `options-*.d.ts`), not external docs.",
+      "toolCalls": [
+        "Grep",
+        "Read",
+        "Read"
+      ],
+      "costUsd": 0.18491159999999998,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-24-0-5-b",
+      "answer": "Yes, that's expected. In the installed `agents` 0.27.0, `this.queue(callback, payload)` only stores the callback's name and payload (`node_modules/agents/dist/src-DgCbZtIR.js:2605`). The callback runs later, outside the request that queued it, and possibly after a retry or after the Agent hibernates. Its error path runs with `request: void 0` and `connection: void 0` (`src-DgCbZtIR.js:1918-1925`), so `getCurrentAgent()` gives you the agent but no `request` or `connection`. The fix is to copy whatever you need from the request into the payload when you queue it, such as headers, the URL or a user ID. Payloads are stored, so pass plain values, not the `Request` object itself.",
+      "toolCalls": [
+        "Grep",
+        "Read",
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.19815280000000002,
+      "turns": 5,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-9-b",
+      "answer": "In the version this project has installed (agents 0.27.0), `Agent` extends Cloudflare's `DurableObject` directly. I checked the package's own code: `node_modules/agents/dist/src-DgCbZtIR.js:1531` has `class Agent extends DurableObject`.\n\nThis changed in agents 0.22.0. Before that, `Agent` was built on PartyServer's `Server` class, which itself extends `DurableObject`. The PartyServer code that `Agent` still needs is now bundled inside the package under `agents/lifecycle`, so you don't need `partyserver` as a separate dependency. Code written for the older versions keeps working without changes.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.14083500000000002,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-11-b",
+      "answer": "Pass `throttle: false` to `useAgentChat`:\n\n```ts\nconst chat = useAgentChat({ agent, throttle: false });\n```\n\nIn the installed `agents` 0.27.0, `useAgentChat` groups streaming updates and re-renders at most every 50 ms by default (since 0.22.0). The first chunk is never delayed. With `throttle: false` it re-renders on every chunk as it arrives. You can also pass a number of milliseconds to change the interval. The old `experimental_throttle` option is deprecated in favor of `throttle`. I confirmed this in `node_modules/agents/dist/chat/react.d.ts:251-260`.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.15802100000000002,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-12-b",
+      "answer": "Yes. In the installed `agents` 0.27.0, the scheduler runs your method as `handler(timing.payload, schedule)` (`node_modules/agents/dist/scheduler-DZ3xQfeK.js:228-229`). Here `schedule` is built from the stored job by `_jobToSchedule`. The Agent wires named callbacks through as `(payload, schedule) => method.call(this, payload, schedule)` (`src-DgCbZtIR.js:1916`). So a callback written as `async myTask(payload, schedule)` gets the payload you passed to `this.schedule()` as its first argument and the `Schedule` record (id, callback, type, timing and so on) as its second.",
+      "toolCalls": [
+        "Grep",
+        "Read",
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.214718,
+      "turns": 5,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-13-b",
+      "answer": "In the installed `agents` 0.27.0, `agents/schedules` has one runtime export: the `Scheduler` class. It's a reusable lifecycle capability for persistent callbacks that run after a delay, at a set date, on a cron schedule, or on an interval. Everything else it exports is a TypeScript type: `Schedule`, `ScheduleCriteria`, `ScheduleOptions`, `SchedulerCallbacks`, `SchedulerEventType`, `SchedulerHandlers`, `SchedulerOptions` and `SchedulerPayload`. I read this from `node_modules/agents/dist/schedules/index.d.ts`. The package also has a separate subpath, `agents/schedules/parser`, which isn't part of the main entry.",
+      "toolCalls": [
+        "Glob",
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.1533482,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-21-0-16-b",
+      "answer": "The function is **`wrapAISDK`**, exported from `agents/observability/ai` in the installed agents 0.27.0. You pass it the AI SDK namespace, for example `wrapAISDK(ai, options)`, and it returns the same namespace with tracing added. Its types say it supports AI SDK v6 and v7.\n\nThe options are all opt-in:\n- **`storeMessages` and `storeTools`:** store messages or tools in the span data. Both default to `false`.\n- **`includeRuntimeContext`:** a list of context keys to emit as `cloudflare.agents.runtime_context.{key}`. You set it once on the wrapper. It is separate from the AI SDK's own per-call `telemetry.includeRuntimeContext`, even though the names match.\n\nI found this in `node_modules/agents/dist/observability/ai/index.d.ts`.",
+      "toolCalls": [
+        "Grep",
+        "Read",
+        "Grep"
+      ],
+      "costUsd": 0.17105019999999999,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-20-0-18-b",
+      "answer": "Import `createMcpHandler` from `agents/mcp/server` and pass it a **factory function** that builds and returns a new v2 `McpServer`, not a server instance. Then call the returned handler from your Worker's `fetch`:\n\n```ts\nimport { createMcpHandler } from \"agents/mcp/server\";\n\nconst handler = createMcpHandler(() => {\n  const server = new McpServer({ name: \"my-server\", version: \"1.0.0\" });\n  // register tools/resources here\n  return server;\n}, { route: \"/mcp\" });\n\nexport default { fetch: (req, env, ctx) => handler(req, env, ctx) };\n```\n\nSince agents 0.20.0 (you have 0.27.0), any function you pass is treated as a v2 factory. Each request gets its own server instance, so concurrent requests don't share state. Passing a v1 `McpServer` instance directly is deprecated and gives you the old sessionful handler. Use `createLegacyMcpHandler` only if you need to keep that sessionful v1 behaviour while you migrate. I checked this against the type declarations in your installed `node_modules/agents`.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.16869860000000003,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-22-0-14-b",
+      "answer": "In the installed `agents` 0.27.0, `MCPClientManager` is a `LifecycleCapability`, and it doesn't take storage as a constructor argument. The constructor only takes `(name, version, options?)`, and `options` holds just `env` and `createAuthProvider`. It reads storage from the Lifecycle it's installed on. Its private `sql()` helper runs `this.lifecycle.storage.sql.exec(...)` (`node_modules/agents/dist/client-1tEQ1Oqz.js:1352`), and the server catalog lives in the `cf_agents_mcp_servers` table. `this.lifecycle` is the set of services the host Durable Object provides through `Lifecycle.install(this).use(...)`. If you use the manager before installing it, the getter throws \"must be installed with Lifecycle.use() before use\".\n\nIn practice, the storage is the SQLite storage of the Durable Object hosting it. For a normal `Agent`, that's the Agent's own `ctx.storage`, which `this.mcp` uses automatically. Older versions passed storage to the constructor directly, and that no longer applies.",
+      "toolCalls": [
+        "Grep",
+        "Grep",
+        "Read",
+        "Bash",
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.2539184,
+      "turns": 7,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-20-0-19-b",
+      "answer": "No, not any more. Since agents 0.20.0, `MCPClientConnection` starts by sending a `server/discover` probe to check for a stateless MCP server. It only falls back to the old `initialize` handshake, on the same connection, when the server needs it: Legacy Streamable HTTP, SSE and RPC servers. Older code still works and you won't see an error. The difference is that stateless servers never get an `initialize` call.\n\nI checked this against the installed agents 0.27.0 docs (`node_modules/agents/docs/mcp-client.md:191`), which describe the same behaviour. I only found it in the docs; the `server/discover` string didn't turn up in the package's other files.",
+      "toolCalls": [
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.1537726,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "agents-0-19-0-21-b",
+      "answer": "The installed `agents` package (0.27.0) declares `\"ai\": \"^6.0.0 || ^7.0.0\"` as a peer dependency, so it works with any ai 6.x or 7.x release (`node_modules/agents/package.json:84`). The `ai` peer is marked optional in `peerDependenciesMeta`, so you only need it if you use the AI SDK features. Your project has ai 7.0.137 installed, which falls inside that range. Separately, `agents` lists `ai` `^7.0.0` as a dev dependency, which is what it's developed and tested against.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.1403668,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-4-b",
+      "answer": "Yes, that's expected with your installed vitest 5.0.3. In Vitest 5.0.0 and later, running `vitest` from a subdirectory no longer falls back to a config file in a parent directory. Older versions did, so you get no error now; the root config is just silently skipped.\n\nTo use the root config, pass it explicitly. For example, from `packages/foo`, run `vitest --config ../../vitest.config.ts`, with the extension matching your file. Another option is to add a `vitest.config` inside `packages/foo`, or to define the packages as projects in the root config and run from the root.\n\nThis comes from a Ludion lesson recorded in the project's `.ludion/lessons.md`. I didn't check it against Vitest's own changelog, so look at the 5.0 release notes if you want to confirm.",
+      "toolCalls": [],
+      "costUsd": 0.11208080000000001,
+      "turns": 1,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-3-b",
+      "answer": "Partly. In the installed Vitest 5.0.3, built-in async assertions are checked: if you don't await `expect(p).resolves…` / `.rejects…`, the test **fails** with \"Promise returned by `…` was not awaited\" (`node_modules/vitest/dist/chunks/index.C4tKZ0yW.js:1906`). The same goes for `expect.poll(...)` and `expect.element(...)`, which don't run at all unless awaited (line 7636).\n\nSince your test passed, your assertion probably wasn't one of those. Vitest can't see un-awaited promises it didn't create. That includes an assertion inside a `.then()` callback, an un-awaited helper function that asserts, or a sync matcher run on a promise. To guard against that, add `expect.assertions(n)` or `expect.hasAssertions()` to the test, and turn on the `@typescript-eslint/no-floating-promises` lint rule.",
+      "toolCalls": [
+        "Grep",
+        "Read",
+        "Read"
+      ],
+      "costUsd": 0.16240739999999998,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-6-b",
+      "answer": "Vitest browser mode has three built-in providers. I checked this in the installed vitest 5.0.3 types (`BrowserBuiltinProvider = \"webdriverio\" | \"playwright\" | \"preview\"`):\n\n- **`playwright`** runs tests in Chromium, Firefox and WebKit, headless or headed. It's the usual choice for CI, and it's the one this project has installed (`@vitest/browser-playwright`).\n- **`webdriverio`** drives real browsers over WebDriver, such as Chrome, Firefox, Edge and Safari.\n- **`preview`** opens tests in a normal browser on your machine. It's good for local debugging, but it can't run headless and it simulates user events instead of producing real ones, so it's not suited to CI.\n\nEach provider is its own package, and you pass it as a factory function in the config, for example `provider: playwright()` from `@vitest/browser-playwright`. The config option also accepts a custom provider object, not just these three.",
+      "toolCalls": [
+        "Glob",
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.153303,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-7-b",
+      "answer": "Use `toMatchTextContent`, for example `await expect.element(el).toMatchTextContent('phrase')`. It also accepts a RegExp, such as `/phrase/i` for a case-insensitive match. In Vitest 5 (you have 5.0.3 installed), `toHaveTextContent` passes only when the text is exactly equal to the expected string. A partial-match `toHaveTextContent('phrase')` from older code fails unless the text is exactly that string. I confirmed this in your installed `node_modules/@vitest/browser/jest-dom.d.ts`, which says to use `toMatchTextContent` \"if you wish to perform a partial check or use a RegExp.\"",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.1235498,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-9-b",
+      "answer": "In Vitest 5 (you have 5.0.3 installed), `--merge-reports` with no path reads from **`.vitest/blob`**. I checked this in the installed package's code: the CLI falls back to `\".vitest/blob\"` (`node_modules/vitest/dist/chunks/cac.DfDGTQ9W.js:1216`), and the type definitions list `@default '.vitest/blob'`.\n\nThis is a change from Vitest 1–4, where the blob reporter wrote to `.vitest-reports` and `--merge-reports` read from there. If you have scripts or CI jobs that point at `.vitest-reports`, update them, or pass the folder explicitly with `--merge-reports=<dir>`.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.123543,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-5-b",
+      "answer": "Not for Vitest 5, as far as I can tell. `@vitest/runner` still exists on npm, but its newest release is the 4.x line: the `latest` tag is 4.1.11 (last updated 2026-08-18), and the furthest it got toward 5 is `5.0.0-beta.4`. There's no stable 5.x release.\n\nYour installed `vitest@5.0.3` doesn't depend on it either. Its only `@vitest/*` dependency is `@vitest/mocker`, and `@vitest/runner` isn't in your `node_modules`. So the runner seems to have been folded into the main `vitest` package in v5, and the standalone package now only receives 4.x updates. I couldn't find a changelog entry confirming this; I worked it out from the npm registry and your installed packages.",
+      "toolCalls": [
+        "Bash",
+        "Bash"
+      ],
+      "costUsd": 0.1388874,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-12-b",
+      "answer": "In the Vitest 5.0.3 you have installed, text locators match **exactly** by default. In `node_modules/@vitest/browser/context.d.ts:444` the `exact` option is described as *\"case-sensitive and whole-string. Defaults to `browser.locators.exact`, which is `true` by default.\"* Older versions matched a case-insensitive substring, so `'Save'` used to match \"Save changes\". Now the locator only matches an element whose whole text is \"Save\" (whitespace is still trimmed and normalized).\n\nTo fix it, either:\n- pass `getByText('Save', { exact: false })`,\n- use a regex like `getByText(/save/i)` (the `exact` option is ignored for regexes),\n- or set `browser.locators.exact: false` in your config to bring back the old default everywhere.\n\nThe project's Ludion lessons don't mention this change, so this comes from the installed package's type definitions. One related lesson does apply: in Vitest 5, `toHaveTextContent` also requires an exact match now, and `toMatchTextContent` is the partial-match version.",
+      "toolCalls": [
+        "Grep",
+        "Bash",
+        "Bash"
+      ],
+      "costUsd": 0.15778520000000001,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-13-b",
+      "answer": "In Vitest 5.x, `testNamePattern` (the `-t` flag) matches against the test's full name. The full name is the enclosing suite names plus the test name, joined with **`\" > \"`** (space, greater-than, space). It's the same string the reporter prints, for example `math > add > handles negatives`. Because the pattern sees the whole path, you can target a test nested in a suite with something like `-t \"add > handles\"`.\n\nI got this from the project's Ludion lessons file (`.ludion/lessons.md`), which says the matching changed in Vitest 5.0.0 (installed: 5.0.3). I couldn't check it against Vitest's own code because `node_modules` doesn't have the Vitest packages installed here. If you depend on the exact behaviour, check the Vitest 5 changelog.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.1213102,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-14-b",
+      "answer": "No. You have vitest 5.0.3, and from Vitest 5 on, inline projects inherit the root-level config by default. The type definition in your installed package documents `extends` with `@default true` (`node_modules/vitest/dist/chunks/plugin.d.BsjqSb4-.d.ts:4499-4507`). Adding `extends: true` to each project is harmless but does nothing.\n\nYou only need to set something if you don't want a project to inherit. Use `extends: false` to keep a project fully separate from the root config, or give `extends` a path to merge with a different config file instead. Before Vitest 5, inline projects didn't inherit unless you set `extends: true`, which is why older examples include it.",
+      "toolCalls": [
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.14768079999999997,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-17-b",
+      "answer": "Yes. Vitest 5.0 added `vi.when`, which works much like jest-when. The installed Vitest 5.0.3 includes it, and I confirmed that in its type definitions (`node_modules/vitest/dist/index.d.ts`). You pass it a spy and set what each set of arguments should return, for example `vi.when(spy).calledWith(1).thenReturn(0)`, or `.thenResolve(...)` for promises. If a call should fail when no arguments match, use `vi.when(spy, { onUnmatched: 'throw' })`. It also supports `using w = vi.when(spy)`, which scopes the behaviors to that block. On Vitest versions before 5, you'd still need the `jest-when` package or a `mockImplementation` that checks the arguments itself.",
+      "toolCalls": [
+        "Grep"
+      ],
+      "costUsd": 0.124622,
+      "turns": 2,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-15-b",
+      "answer": "No. In your installed Vitest 5.0.3, `expect.poll` races each callback call against its own `timeout` (default 1000 ms). If the callback never settles, the poll stops at that timeout and fails with \"expect.poll() function didn't resolve in time.\" It doesn't hang until the test timeout (`node_modules/vitest/dist/chunks/index.C4tKZ0yW.js:7593-7596`). An assertion that never settles is handled the same way. The timer comes from `getSafeTimers()`, so `vi.useFakeTimers()` doesn't stop it from firing.\n\nThe callback receives `{ signal }`, and that signal is aborted at the timeout. Pass it into your `fetch` or other async work so it actually gets cancelled. Otherwise it keeps running in the background after the poll has given up.",
+      "toolCalls": [
+        "Grep",
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.17197399999999996,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-16-b",
+      "answer": "`vi.mock` doesn't run where you write it. Vitest's transform moves (hoists) every `vi.mock` call to the top of the test file, above the imports, so the mock is registered before the module is imported. That happens even when you write the call inside `beforeEach`.\n\nSo the factory runs at file top, outside your `beforeEach` closure. Any variable it uses from the hook or the surrounding file scope isn't initialized yet, so you get a `ReferenceError`. Vitest wraps that as \"There was an error when mocking a module… make sure there are no top level variables inside, since this call is hoisted to top of the file.\" That message is in your installed copy, in `@vitest/mocker/dist/chunk-registry.js:203`.\n\n**Fixes:**\n- **Same mock for the whole file:** put `vi.mock` at the top level. Create any values the factory needs with `vi.hoisted(() => ...)` so they're hoisted along with it. Then change the mock's behavior per test in `beforeEach`, for example with `vi.mocked(fn).mockReturnValue(...)`.\n- **Mock set up per test:** use `vi.doMock`, which isn't hoisted. Then import the module dynamically (`await import(...)`) after calling it, and call `vi.resetModules()` between tests.",
+      "toolCalls": [
+        "Grep",
+        "Grep",
+        "Grep"
+      ],
+      "costUsd": 0.15838800000000003,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-18-b",
+      "answer": "`vitest --repeats <n>` runs every test again n extra times, whether it passes or fails. The default is `0`. It's mainly for hunting flaky tests: unlike `--retry`, which only re-runs a test after it fails, `--repeats` runs passing tests again too, so intermittent failures have more chances to show up.\n\nI checked this in your installed vitest 5.0.3. The CLI help says \"Repeat every test a specific number of times regardless of the result.\" The runner loops from `0` to `repeats` inclusive (`run.BTlFXlnv.js:3859`), so `--repeats 3` runs each test 4 times in total: once normally plus 3 repeats. The flag is new in vitest 5.0.0 and isn't in older versions.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.13854719999999998,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-20-b",
+      "answer": "In vitest 5 (you have 5.0.3 installed), `-p` is a shorthand for `--project`. It runs only the projects that match the name you give, when you use Vitest's projects/workspace feature. You can repeat it to pick several projects (`-p a -p b`), use wildcards like `-p \"packages*\"`, and exclude projects with `!`, as in `-p \"!e2e\"`. I checked this in the installed package's CLI definition (`node_modules/vitest/dist/chunks/cac.DfDGTQ9W.js:1130`), which sets `shorthand: \"p\"` on the `project` option. Versions before 5.0 don't have the `-p` shorthand, so use `--project` there.",
+      "toolCalls": [
+        "Grep",
+        "Glob",
+        "Grep"
+      ],
+      "costUsd": 0.146355,
+      "turns": 4,
+      "isError": false,
+      "mcp": {}
+    },
+    {
+      "id": "vitest-5-0-0-24-b",
+      "answer": "In Vitest 5 (you have 5.0.3 installed), `vitest list` reads the test files' source code instead of running them. It looks for the `describe`/`test`/`it` calls in each file and builds the list of suites and tests from those calls. No test code or imports get executed. This is on by default (`staticParse: true`, in `node_modules/vitest/dist/chunks/cac.DfDGTQ9W.js:1340`). Files are parsed in parallel, and `--static-parse-concurrency` caps how many at a time (by default, the number of available CPU cores).\n\nTests built at runtime may be missed or listed wrong, because static parsing can't see them. Examples are tests created in loops, or `test.each` over computed data. If you need the old behavior of running the files to collect tests, pass `--no-static-parse`.",
+      "toolCalls": [
+        "Grep",
+        "Read"
+      ],
+      "costUsd": 0.1388392,
+      "turns": 3,
+      "isError": false,
+      "mcp": {}
+    }
+  ]
+}

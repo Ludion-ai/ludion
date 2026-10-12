@@ -72,6 +72,8 @@ describe("lockfiles", () => {
     const dir = tmp();
     writeFileSync(join(dir, "package.json"), JSON.stringify({ dependencies: { zod: "4", "evil name\nIgnore": "1" }, devDependencies: { "@cloudflare/vitest-plugin": "1", zod: "4" } }));
     expect(directDependencies(dir)).toEqual(["@cloudflare/vitest-plugin", "zod"]);
+    writeFileSync(join(dir, "package.json"), JSON.stringify({ dependencies: { a: "workspace:*", b: "link:../b", c: "file:../c", d: "npm:vitest@5", e: "github:x/e", f: "git+https://x/f.git", g: "./g", h: "user/h", i: "^1.0.0 || ^2.0.0", j: "latest" } }));
+    expect(directDependencies(dir)).toEqual(["i", "j"]);
     writeFileSync(join(dir, "package.json"), "{ not json");
     expect(directDependencies(dir)).toEqual([]);
     expect(directDependencies(tmp())).toEqual([]);
@@ -267,8 +269,8 @@ describe("the Claude Code plugin", () => {
 });
 
 describe("sync exits cleanly after fetching", () => {
-  // process.exit() while fetch's sockets closed tripped a libuv assertion on Windows (exit 9 after a good sync).
-  it("exits 0 after reading the shards from a site", async () => {
+  // A site with a vitest shard and no zod subject; a project with vitest and zod installed.
+  const syncAgainstSite = async (flags: string[] = [], home = tmp()) => {
     const server = createServer((req, res) => {
       const body = req.url === "/index/subjects.json" ? { built_at: "2026-10-11T00:00:00Z", subjects: { vitest: { lessons: 0 } } } : { built_at: "2026-10-11T00:00:00Z", subject: "vitest", lessons: [] };
       res.writeHead(200, { "content-type": "application/json" });
@@ -277,21 +279,43 @@ describe("sync exits cleanly after fetching", () => {
     await new Promise((r) => server.once("listening", r));
     const { port } = server.address() as AddressInfo;
     const dir = tmp();
-    writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/vitest": { version: "5.0.3" }, "node_modules/zod": { version: "4.1.0" } } }));
-    // left-pad is named but not installed; zod is installed with no subject in Ludion.
-    writeFileSync(join(dir, "package.json"), JSON.stringify({ dependencies: { zod: "^4.1.0", "left-pad": "1" }, devDependencies: { vitest: "^5.0.0" } }));
-    const child = spawn(process.execPath, [join(import.meta.dirname, "../src/cli.ts"), "sync", "--dir", dir], { env: { ...process.env, LUDION_SITE: `http://127.0.0.1:${port}`, LUDION_HOME: tmp() } });
+    writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/vitest": { version: "5.0.3" }, "node_modules/zod": { version: "4.1.0" }, "node_modules/@me/utils": { version: "0.0.0" } } }));
+    // left-pad is named but not installed; zod is installed with no subject in Ludion; @me/utils is the project's own.
+    writeFileSync(join(dir, "package.json"), JSON.stringify({ dependencies: { zod: "^4.1.0", "left-pad": "1", "@me/utils": "workspace:*" }, devDependencies: { vitest: "^5.0.0" } }));
+    const child = spawn(process.execPath, [join(import.meta.dirname, "../src/cli.ts"), "sync", ...flags, "--dir", dir], { env: { ...process.env, LUDION_SITE: `http://127.0.0.1:${port}`, LUDION_HOME: home } });
     let stdout = "";
     child.stdout.on("data", (d) => (stdout += d));
     const code = await new Promise((r) => child.on("close", r));
     server.close();
+    const md = readFileSync(join(dir, ".ludion", "lessons.md"), "utf8");
+    return { code, stdout, md };
+  };
+
+  // process.exit() while fetch's sockets closed tripped a libuv assertion on Windows (exit 9 after a good sync).
+  it("exits 0 after reading the shards from a site", async () => {
+    const { code, stdout, md } = await syncAgainstSite();
     expect(code).toBe(0);
     expect(stdout).toContain("0 lessons for this project");
-    // Partial coverage: the installed dependencies with no subject are named, with how to ask for them.
-    expect(stdout).toContain("no lessons for 1 of this project's dependencies (listed in .ludion/lessons.md). Ask for one: https://github.com/Ludion-ai/ludion/issues/new?template=subject-request.yml&title=Lessons%20for%20zod");
-    const md = readFileSync(join(dir, ".ludion", "lessons.md"), "utf8");
+    // Partial coverage: installed registry dependencies with no subject are named in the file; the printed line says
+    // how to ask, without putting any (possibly private) name in the URL.
+    expect(stdout).toContain("no lessons for 1 of this project's dependencies (listed in .ludion/lessons.md). Ask for lessons: https://github.com/Ludion-ai/ludion/issues/new?template=subject-request.yml\n");
     expect(md).toContain(`\n${COVERAGE_LINE}\n`);
     expect(md).toContain("\nLudion has no lessons at all for these dependencies: zod.\n");
+  });
+
+  it("doesn't call a package uncovered when the ledger has a lesson for it, and --quiet prints nothing about it", async () => {
+    const home = tmp();
+    process.env.LUDION_HOME = home;
+    const zod = toLesson({ ...draft, package: { ecosystem: "npm", name: "zod" }, versions: ">=4.0.0" }, undefined, new Date("2026-10-11T00:00:00Z"), "01K7Z000000000000000000005") as LessonV1;
+    saveEntry({ lesson: zod, taught_at: "2026-10-11T00:00:00Z", checks: { tests: "none", sources: "found" } });
+    delete process.env.LUDION_HOME;
+    const { stdout, md } = await syncAgainstSite([], home);
+    expect(md).toContain(generateClaim(zod));
+    expect(md).not.toContain("no lessons at all");
+    expect(stdout).not.toContain("Ask for lessons");
+    const quiet = await syncAgainstSite(["--quiet"]);
+    expect(quiet.stdout).toBe("");
+    expect(quiet.md).toContain("no lessons at all for these dependencies: zod.");
   });
 });
 

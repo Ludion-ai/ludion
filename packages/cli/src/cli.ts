@@ -7,7 +7,7 @@ import { createInterface } from "node:readline/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { ledgerLesson, readLedger, saveEntry } from "./ledger.ts";
-import { subjectFor, subjectRequestUrl } from "@ludion/core";
+import { SUBJECT_REQUEST_URL, subjectFor } from "@ludion/core";
 import { directDependencies, readInstalled } from "./lockfile.ts";
 import { select, type SyncLesson } from "./match.ts";
 import { openPullRequest } from "./publish.ts";
@@ -60,7 +60,9 @@ async function sync(argv: string[]): Promise<number> {
     : `${installed.npm.size} packages from ${installed.source}, node ${installed.node}`;
   // Installed direct dependencies with no subject in Ludion: named in lessons.md, so the assistant checks them
   // elsewhere, and printed with how to ask for them.
-  const uncovered = subjects && directDependencies(dir).filter((name) => installed.npm.has(name) && !subjects.has(subjectFor({ ecosystem: "npm", name })));
+  // A package with a lesson in the ledger isn't uncovered, even if the index has no subject for it.
+  const taught = new Set(ledger.map((l) => l.package.name));
+  const uncovered = subjects && directDependencies(dir).filter((name) => installed.npm.has(name) && !taught.has(name) && !subjects.has(subjectFor({ ecosystem: "npm", name })));
   const before = readLessonsFile(dir);
   const lessonsMd = renderLessons(selection, summary, new Date(), uncovered);
   const { written, skipped } = writeAndWire(dir, lessonsMd);
@@ -72,7 +74,7 @@ async function sync(argv: string[]): Promise<number> {
     console.log(`ludion sync updated .ludion/lessons.md after this session read CLAUDE.md. The current lessons:\n\n${lessonsMd}`);
   }
   say(`ludion: ${selection.kept.length} lesson${selection.kept.length === 1 ? "" : "s"} for this project${selection.prunedForModel.length ? ` (${selection.prunedForModel.length} left out: ${model} is measured to know them)` : ""}. Wrote ${written.join(", ")}.`);
-  if (uncovered?.length) say(`ludion: no lessons for ${uncovered.length} of this project's dependencies (listed in .ludion/lessons.md). Ask for one: ${subjectRequestUrl(uncovered)}`);
+  if (uncovered?.length) say(`ludion: no lessons for ${uncovered.length} of this project's dependencies (listed in .ludion/lessons.md). Ask for lessons: ${SUBJECT_REQUEST_URL}`);
   return failed && !values.quiet ? 1 : 0;
 }
 

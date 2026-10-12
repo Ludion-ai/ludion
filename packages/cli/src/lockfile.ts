@@ -98,16 +98,18 @@ function fromNodeModules(dir: string): Map<string, Set<string>> {
 }
 
 /**
- * The packages the project's own package.json depends on (dependencies and devDependencies), sorted. Only valid
- * package names: they end up in text an assistant reads.
+ * The registry packages the project's own package.json depends on (dependencies and devDependencies), sorted.
+ * Left out: workspace, link, file, git and URL specs (the project's own or private code, not a registry package),
+ * aliases (npm:), and invalid names, because the names end up in text an assistant reads.
  */
 export function directDependencies(dir: string): string[] {
   const pkgPath = join(dir, "package.json");
   if (!existsSync(pkgPath)) return [];
   try {
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as Record<string, unknown>;
-    const names = ["dependencies", "devDependencies"].flatMap((k) => (pkg[k] && typeof pkg[k] === "object" ? Object.keys(pkg[k] as object) : []));
-    return [...new Set(names.filter((n) => PACKAGE_NAME.test(n)))].sort();
+    const entries = ["dependencies", "devDependencies"].flatMap((k) => (pkg[k] && typeof pkg[k] === "object" ? Object.entries(pkg[k] as Record<string, unknown>) : []));
+    const registry = (spec: unknown) => typeof spec === "string" && !/^(workspace|link|file|portal|npm|git|git\+[a-z]+|github|https?):|^[./~]|\//.test(spec.trim());
+    return [...new Set(entries.filter(([n, spec]) => PACKAGE_NAME.test(n) && n.length <= 214 && registry(spec)).map(([n]) => n))].sort();
   } catch {
     return [];
   }

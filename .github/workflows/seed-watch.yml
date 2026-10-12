@@ -24,6 +24,9 @@ jobs:
   watch:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: read # to skip releases an earlier seed issue already names
     outputs:
       count: ${{ steps.find.outputs.count }}
     steps:
@@ -43,8 +46,16 @@ jobs:
         id: find
         env:
           SINCE: ${{ inputs.since }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           node tools/seed/src/watch.ts ${SINCE:+--since "$SINCE"} --json releases.json
+          # The window overlaps the night before, so drop releases an earlier seed issue already names ("Release: pkg@version").
+          gh issue list --repo "$GITHUB_REPOSITORY" --label seed-release --state all --limit 300 --json body --jq '.[].body' > seen.txt || : > seen.txt
+          jq -c '.[]' releases.json | while read -r r; do
+            key=$(jq -r '"\(.package)@\(.version)"' <<<"$r")
+            grep -qxF "Release: $key" seen.txt || echo "$r"
+          done | jq -s '.' > fresh.json
+          mv fresh.json releases.json
           echo "count=$(jq length releases.json)" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -92,16 +103,21 @@ jobs:
           jq -c '.[]' releases.json | while read -r r; do
             pkg=$(echo "$r" | jq -r .package); ver=$(echo "$r" | jq -r .version)
             dir="out/runs/$(echo "$pkg" | sed 's#^@##; s#/#.#')-$ver"
-            node tools/seed/src/cli.ts collect "$dir" --package "$pkg" --range "$ver"
-            node tools/seed/src/cli.ts triage "$dir"
-            node tools/seed/src/cli.ts draft "$dir" --kinds default,behavior,deprecated,renamed,removed --limit 10
-            node tools/seed/src/cli.ts check "$dir"
-            node tools/seed/src/cli.ts review "$dir"
-            node tools/seed/src/cli.ts lessons "$dir" --out out/lessons
-            node tools/seed/src/cli.ts summary "$dir"
+            # One release that fails (registry, gh, a step) must not lose the others: it is skipped with a warning.
+            (
+              set -e
+              node tools/seed/src/cli.ts collect "$dir" --package "$pkg" --range "$ver"
+              node tools/seed/src/cli.ts triage "$dir"
+              node tools/seed/src/cli.ts draft "$dir" --kinds default,behavior,deprecated,renamed,removed --limit 10
+              node tools/seed/src/cli.ts check "$dir"
+              node tools/seed/src/cli.ts review "$dir"
+              node tools/seed/src/cli.ts lessons "$dir" --out out/lessons
+              node tools/seed/src/cli.ts summary "$dir"
+            ) || echo "::warning::Drafting failed for $pkg $ver; skipped."
           done
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
         with:
           name: seed-drafts
           path: out/
@@ -122,13 +138,14 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          persist-credentials: false # the write token is used only for the push and the issue, not left on disk next to npm ci
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
           cache: npm
 
-      - run: npm ci
+      - run: npm ci --ignore-scripts
 
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         continue-on-error: true
@@ -150,13 +167,16 @@ jobs:
             subject=$(basename "$subject_dir")
             # Subject and file names are checked before they reach a path or a branch name.
             echo "$subject" | grep -Eq '^[a-z0-9][a-z0-9.-]{0,63}$' || { echo "Bad subject $subject"; continue; }
-            branch="seed/$subject-$(date -u +%Y%m%d)"
+            branch="seed/$subject-$(date -u +%Y%m%d)-$GITHUB_RUN_ID"
             git checkout -q -B "$branch" origin/main
             mkdir -p "lessons/$subject"
             for f in "$subject_dir"*.json; do
               name=$(basename "$f")
               echo "$name" | grep -Eq '^[0-9A-HJKMNP-TV-Z]{26}\.json$' || { echo "Bad file $name"; continue; }
               [ -e "lessons/$subject/$name" ] && continue
+              # The drafting job's artifact is not trusted: only what the pipeline itself writes goes in.
+              jq -e --arg s "$subject" '.format == 1 and .subject == $s and .drafted_by == "agent" and .author == "github:Ludion-ai" and .author_id == 292738933 and (has("replaces") | not)' "$f" > /dev/null \
+                || { echo "Unexpected fields in $name; left out."; continue; }
               cp "$f" "lessons/$subject/$name"
             done
             # Schema, canonical form, path, and sources against main's checker; no --run, so no lesson code runs.
@@ -169,10 +189,18 @@ jobs:
             git diff --cached --quiet && continue
             n=$(git diff --cached --name-only | wc -l)
             git commit -q -m "Teach $n new $subject lessons (drafted by an agent)"
-            git push -q origin "HEAD:refs/heads/$branch"
-            body=$(printf '%s\n\n%s\n\n%s\n' \
+            git push -q "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/$branch" || { echo "Push of $branch failed; $subject skipped."; continue; }
+            # "Release: pkg@version" lines are how the next night's watch knows these releases are already drafted.
+            releases=""
+            for r in drafts/runs/*/run.json; do
+              [ -e "$r" ] || continue
+              sub=$(jq -r '.package' "$r" | sed 's#^@##; s#/#.#' | tr 'A-Z' 'a-z')
+              [ "$sub" = "$subject" ] && releases="$releases$(jq -r '"Release: \(.package)@\(.range)"' "$r")"$'\n'
+            done
+            body=$(printf '%s\n\n%s\n\n%s\n\n%s' \
               "The seed watch drafted $n lessons for new $subject releases (drafted by an agent; each is signed by the account that opens the PR, so open it from @Ludion-ai)." \
               "Open the pull request: https://github.com/$GITHUB_REPOSITORY/compare/main...$branch?expand=1" \
-              "CI's verify runs their tests in Docker on the PR. Run a fresh-context review before merging (CLAUDE.md). Drafting run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
-            gh issue create --repo "$GITHUB_REPOSITORY" --title "Seed lessons for $subject ($(date -u +%Y-%m-%d))" --label seed-release --body "$body"
+              "CI's verify runs their tests in Docker on the PR. Run a fresh-context review before merging (CLAUDE.md). Drafting run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+              "$releases")
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Seed lessons for $subject ($(date -u +%Y-%m-%d))" --label seed-release --body "$body" || echo "Issue for $subject failed; the branch $branch is pushed."
           done

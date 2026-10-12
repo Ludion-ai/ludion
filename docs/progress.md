@@ -27,14 +27,23 @@ The list (status in brackets):
 
 1. [done, #51] Replace the two seeds prepared in #50 (`DO_NOT_TRACK`, `--durable-objects-code-update-mode`), checked against primary sources.
 2. [done, #53; issue form #54 waits for the owner] Say coverage is partial: `.ludion/lessons.md` and `ludion_ask` say Ludion holds some changes of some packages, that no lesson is no evidence of no change, and to check primary sources. Sync lists lockfile packages with no subject and one line on how to request one (issue URL with a template, label `subject-request`).
-3. [running] `tools/seed`: package + version range → changelog, releases, source diff → drafted candidates → kind (with the "does code that doesn't use it behave differently" check) → differential tests → Docker → FreshBench `models` → harm check → one PR per subject labeled "drafted by an agent". Run it on the 30 existing seeds and compare (candidates, kept, review findings, in `docs/bench/`). Then a nightly workflow that watches covered subjects' new releases and opens PRs (protected).
-4. [running: candidates collected and triaged on branch seed-pipeline] Two or more new subjects (target 6). Score 20 candidates on "AI writes it often" × release frequency × share of silent changes in the last 180 days; table in decisions. Each: FreshBench questions and keys from primary sources, seeds frozen, then B measurement and harm check. One seed PR per subject (protected).
+3. [built, branch `seed-pipeline`, no PR yet; yield numbers pending (next step 1)] `tools/seed`: package + version range → changelog, releases, source diff → drafted candidates → kind (with the "does code that doesn't use it behave differently" check) → differential tests → Docker → FreshBench `models` → harm check → one PR per subject labeled "drafted by an agent". Run it on the 30 existing seeds and compare (candidates, kept, review findings, in `docs/bench/`). Then a nightly workflow that watches covered subjects' new releases and opens PRs (protected).
+4. [paused: 20 candidates scored and 3 chosen, zod/tailwindcss partly drafted, ai not started; next step 2 does one subject only] Two or more new subjects (target 6). Score 20 candidates on "AI writes it often" × release frequency × share of silent changes in the last 180 days; table in decisions. Each: FreshBench questions and keys from primary sources, seeds frozen, then B measurement and harm check. One seed PR per subject (protected).
 5. [done, #55] Personal ledger: `ludion teach` accepts drafts without evidence, saved as `unverified`, shown in `lessons.md` as "unverified, yours only". `--public` still needs evidence.
-6. [harness ready on branch exp3-unrelated] Experiment 3: 0, 50 and 500 correct but unrelated lessons, B accuracy. A drop of 10 points or more at 500 → build skill delivery (`.agents/skills/ludion-{subject}/SKILL.md`); otherwise don't, and say why.
-7. [running daily since 2026-10-12] C tasks: one batch a day (method in `docs/bench/2026-10-11-done3/README.md`). If C's gain is 10+ points below B's (+27), build the check hook (PostToolUse on Edit/Write matching imports and symbols against installed-version lessons) and measure it on part of C; otherwise don't, and say why.
-8. [README and demo #58; letters not yet] Announcement tools: README rewritten (measured numbers only), a 90-second demo (asciinema or GIF), five maintainer letters drafted in `docs/outreach/` (two to company-backed libraries, with a per-subject table of changes current models get wrong silently, asking whether they would pay for measurement). The owner sends them.
+6. [done, #63: no drop, no skill delivery] Experiment 3: 0, 50 and 500 correct but unrelated lessons, B accuracy. A drop of 10 points or more at 500 → build skill delivery (`.agents/skills/ludion-{subject}/SKILL.md`); otherwise don't, and say why.
+7. [paused after 16 of 36 tasks (#61): daily batches stopped to save usage] C tasks: one batch a day (method in `docs/bench/2026-10-11-done3/README.md`). If C's gain is 10+ points below B's (+27), build the check hook (PostToolUse on Edit/Write matching imports and symbols against installed-version lessons) and measure it on part of C; otherwise don't, and say why.
+8. [README and demo #58 merged; two letters drafted on branch `outreach`, not pushed to a PR] Announcement tools: README rewritten (measured numbers only), a 90-second demo (asciinema or GIF), five maintainer letters drafted in `docs/outreach/` (two to company-backed libraries, with a per-subject table of changes current models get wrong silently, asking whether they would pay for measurement). The owner sends them.
 9. [done, #57] Check that `llms.txt` and the per-lesson static pages are in a shape web search picks up.
-10. [ ] License: the owner decides; only a draft consent sentence for the `teach --public` PR template goes in `docs/decisions.md`.
+10. [#60 open, docs only] License: the owner decides; only a draft consent sentence for the `teach --public` PR template goes in `docs/decisions.md`.
+
+### Spending rules (2026-10-12, in force; details in `docs/decisions.md`, "Spending")
+
+Heavy work one job at a time; Opus only for the review of protected PRs (one round); pipeline work on Sonnet; no per-lesson model FreshBench; no daily C batches; big files read through summaries; this file updated after each work item.
+
+### Next (in order)
+
+1. Pipeline yield for agents (#62) and wrangler against the hand-made seeds, in `docs/bench/2026-10-12-seed/README.md`: candidates → lessons that passed the checks → review findings. wrangler drafting is running on Sonnet (36 candidates left when it was switched; resume with `node tools/seed/src/cli.ts draft docs/bench/2026-10-12-seed/wrangler --kinds default,behavior,deprecated,renamed,removed --signal silent` from `C:/dev/ludion-wt-seed`).
+2. One new subject, only after reading the yield; if the yield is poor, fix the pipeline first.
 
 ### Where the running work lives (for resuming)
 

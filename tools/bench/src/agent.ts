@@ -71,11 +71,12 @@ const WEB_TOOLS = ["WebSearch", "WebFetch"];
 
 /**
  * The files condition (the seed pipeline's drafting agents, which read untrusted release notes, pull requests, and
- * package code): read, search, and edit files in the working folder, and nothing else. No shell, no web, no MCP. Reads
- * of the process's own environment and of system folders are denied, because in CI the run's environment holds the API key.
+ * package code): read, search, and edit files in the working folder, and nothing else. No shell, no web, no MCP.
+ * Nothing is pre-approved (an allow rule for Read would approve any path), so anything outside the folder is refused.
+ * Reads of the process's own environment and of system folders are also denied outright, as a second layer, because in
+ * CI the run's environment holds the API key.
  */
 export const FILE_TOOLS = ["Read", "Glob", "Grep", "Edit", "Write"];
-export const FILE_READ = ["Read", "Glob", "Grep"];
 export const FILE_DENY = ["Read(//proc/**)", "Read(//sys/**)", "Read(//etc/**)", "Read(//run/**)", "Read(//dev/**)"];
 
 /**
@@ -84,8 +85,9 @@ export const FILE_DENY = ["Read(//proc/**)", "Read(//sys/**)", "Read(//etc/**)",
  */
 export function claudeArgs(o: RunOptions, mcpConfigPath?: string): string[] {
   const tools = o.condition === "none" ? [] : o.condition === "project" ? ["default"] : o.condition === "files" ? FILE_TOOLS : WEB_TOOLS;
-  // files: edits aren't in the allow list, so they are accepted only inside the working folder (acceptEdits), never outside.
-  const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : o.condition === "project" ? projectTools(o.allowEdits === true) : o.condition === "files" ? FILE_READ : tools;
+  // files: nothing is pre-approved, so reads and edits are accepted only inside the working folder (acceptEdits for edits),
+  // and anything outside it is refused under -p, whatever the tool (Read, Glob, Grep, Edit, Write).
+  const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : o.condition === "project" ? projectTools(o.allowEdits === true) : o.condition === "files" ? [] : tools;
   const args = [
     "-p",
     "--output-format", "stream-json", "--verbose",

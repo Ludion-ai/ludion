@@ -102,8 +102,8 @@ describe("project condition", () => {
   it("gives the seed pipeline's drafting agents files only: no shell, no web, edits only inside their folder, no system reads", () => {
     const args = claudeArgs({ ...base, condition: "files", project: "/x" });
     expect(args[args.indexOf("--tools") + 1]).toBe("Read,Glob,Grep,Edit,Write");
-    // Edit and Write aren't allowed outright (that would allow any path); acceptEdits takes them inside the working folder.
-    expect(args[args.indexOf("--allowedTools") + 1]).toBe("Read,Glob,Grep");
+    // Nothing is pre-approved (an allow rule would cover any path); acceptEdits takes edits inside the working folder.
+    expect(args).not.toContain("--allowedTools");
     expect(args[args.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
     expect(args[args.indexOf("--disallowedTools") + 1]).toContain("Read(//proc/**)");
     expect(args.join(" ")).not.toMatch(/Bash|WebFetch|WebSearch/);

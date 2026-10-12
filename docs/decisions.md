@@ -4,6 +4,12 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Experiment 3: no skill delivery for now
+
+- Rule set in advance: build skill delivery (`.agents/skills/ludion-<subject>/SKILL.md`, loaded only when relevant) if 500 unrelated lessons in `lessons.md` drop B accuracy by 10 points or more.
+- Measured (`docs/bench/2026-10-12-exp3/`): 40/45 with 0 unrelated lessons, 41/45 with 50, 41/45 with 500. No drop, so it isn't built.
+- Two things to watch: cost (the 45 answers cost $5.76 with 0 and $23.11 with 500, from the longer context), and one answer at 500 that didn't use its own lesson. If a project's `lessons.md` gets long in practice, cost is the first reason to revisit this, before accuracy.
+
 ### 2026-10-12: Unverified lessons in the personal ledger
 
 - **`ludion teach` accepts a draft with no evidence** (no `evidence`, or an empty list) and saves it to the ledger as **unverified** (`"unverified": true` in the entry). People correct their assistants every day, mostly without a test or a quote at hand; refusing those corrections loses them.

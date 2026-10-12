@@ -44,7 +44,11 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 - **Owner's merge (protected, each with its review comment):** #62 (6 agents lessons), #75 (5 vitest lessons), #76 (3 wrangler lessons), #73 (nightly seed watch; it also needs the `ANTHROPIC_API_KEY` repository secret, a secret value, to draft anything), #54 (issue form). CI is green on all of them.
 - **Docs only, not protected:** #60 (consent sentence draft; the license waits for the owner).
-- **Codex's (the owner's), protected:** #67, then #68, then #69 (a stack). Each gets one Opus review round, posted as a comment; the owner merges. #67 conflicts with main in `docs/decisions.md` only.
+- **Codex's (the owner's), protected:** reviewed once each by Opus, verdicts posted. Merge order:
+  1. #67: changes requested. One blocking finding: one shard entry the CLI can't reproduce makes sync drop the whole index, and with `--quiet` the hook stays silent, so a subject stops updating (retractions included). Fix: drop the entry with a warning. Also conflicts with main in `docs/decisions.md`. Draft.
+  2. #68: approve. After #67's squash merge it needs `git rebase --onto origin/main 1ed1411 codex/runtime-task-acceptance`.
+  3. #69: changes requested. One blocking finding: a run started on a reduced budget (cap nearly reached) is still graded. Fix: start a run only when the full $2 allowance remains. Then rebase onto main after #68.
+  - Fixes are Codex's side. After the owner merges them: rebase this side's open work, bump the CLI to 0.1.3 with the plugin pin, stage it with `publish.yml`, and dispatch `reverify` (the review asks for it: lessons on main haven't run under #67's new Docker flags).
 
 ### Who works on what (owner, 2026-10-12)
 
@@ -54,8 +58,8 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 
 1. [done] Pipeline yield against the hand-made seeds (`docs/bench/2026-10-12-seed/README.md`).
 2. [decided by the owner] Who revises: machine-check problems back to the drafting model (Sonnet) first; then the Opus review; lessons with content findings (rules 1, 7, 8) to Opus, the rest to Sonnet, one round (`docs/decisions.md`, "Revising seed drafts"). Built in `tools/seed` (`revise --scope check|findings`, review reuse for unchanged drafts).
-3. Review #67, #68, #69 (Opus, one round each, one at a time), post the verdicts, give the owner the merge order. After the owner merges them: rebase this side's open work on main, bump the CLI (0.1.3: #53, #55 and #67 are not on npm yet; npm has 0.1.2 from `aa94ad9`) with the plugin pin, and stage it with `publish.yml`.
-4. vitest, then wrangler: the remaining drafts (not in #75 or #76) through step 2, one subject at a time, one PR per subject (protected). No new subject yet.
+3. [reviews done, see above] After the owner merges them: rebase this side's open work on main, bump the CLI (0.1.3: #53, #55 and #67 are not on npm yet; npm has 0.1.2 from `aa94ad9`) with the plugin pin, and stage it with `publish.yml`.
+4. [vitest running: round 1, machine checks, Sonnet] vitest, then wrangler: the remaining drafts (not in #75 or #76) through step 2, one subject at a time, one PR per subject (protected). No new subject yet. Run folder: the worktree `C:/dev/ludion-wt-revise` (branch `seed-vitest-revise`), log `C:/dev/ludion-seedwork/revise-vitest-r1.log`.
 5. Not started: the three outreach letters for subjects not yet measured.
 
 ### Where the running work lives (for resuming)

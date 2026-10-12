@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseAddedLog, parseDeletedLog } from "../src/build/git-info.ts";
 import { modelTotals, type Models } from "../src/build/models.ts";
 import { readWithheld, reservedSubjects } from "../src/build/data.ts";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { teacherPages } from "../src/build/teacher-pages.ts";
@@ -93,5 +93,14 @@ describe("readWithheld", () => {
     expect(readWithheld(root, "failing.json")).toEqual({ ids: new Set(["01K70000000000000000000004"]), checkedAt: "2026-10-12T04:40:00Z" });
     expect(readWithheld(root, "missing.json")).toEqual({ ids: new Set(), checkedAt: null });
     expect(readWithheld(root, undefined)).toEqual({ ids: new Set(), checkedAt: null });
+  });
+});
+
+describe("_headers", () => {
+  it("sends HSTS for a year on every static asset, without includeSubDomains or preload", () => {
+    const text = readFileSync(new URL("../public/_headers", import.meta.url), "utf8");
+    const all = text.split(/^\/index\.json$/m)[0]!;
+    expect(all.startsWith("/*\n")).toBe(true);
+    expect(all).toContain("  Strict-Transport-Security: max-age=31536000\n");
   });
 });

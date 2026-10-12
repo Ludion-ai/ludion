@@ -22,4 +22,3 @@ warning: in the working copy of '.ludion/lessons.md', LF will be replaced by CRL
       Tests  434 passed (434)
    Start at  19:31:12
    Duration  5.72s (transform 10.38s, setup 0ms, import 18.25s, tests 14.92s, environment 2ms)
-

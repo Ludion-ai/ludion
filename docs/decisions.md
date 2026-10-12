@@ -4,6 +4,16 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Partial coverage, said everywhere
+
+- **Every list of lessons says coverage is partial.** `.ludion/lessons.md` (after the data line) and `ludion_ask` (the line after its data line, and inside the no-match text) say: "Ludion holds some changes of some packages, not all of them. No lesson for something is no evidence that it didn't change: check primary sources too (changelogs, release notes, the installed package's code)." The text lives in `packages/core` (`COVERAGE_LINE`), so both say the same words. Why: a lessons file that reads as complete invites "nothing listed, so nothing changed", and Done 3 showed uncovered changes don't improve (8/15 → 8/15).
+- **Sync names the uncovered dependencies.** After fetching the index, sync takes the project's **direct** dependencies (`dependencies` and `devDependencies` in package.json) that are installed and have no subject in `/index/subjects.json`, and:
+  - lists them at the end of `lessons.md` ("Ludion has no lessons at all for these dependencies: …", at most 40 names, then "and N more"), so the assistant knows to check those elsewhere;
+  - prints one line with how to ask for them: an issue URL with the `subject-request.yml` form (label `subject-request`) and a title naming up to five of them. `--quiet` (the hook) prints nothing for it.
+  - Direct dependencies only, not the lockfile's hundreds of transitive packages: those aren't what the project's code calls. Only valid package names are kept, because they go into text an assistant reads. When the index can't be fetched, the list is left out (unknown, not empty).
+  - The list isn't a lesson line, so `--quiet`'s "lessons changed" check ignores it.
+- The number of `subject-request` issues is the first demand number Ludion gets.
+
 ### 2026-10-12: Publishing
 
 - **The package is `ludion-ai`** (see "The ludion CLI" below for why). 0.1.0 was published by hand from the owner's npm account `ludion`, approved with the owner's passkey. Every later version goes through `.github/workflows/publish.yml`.
@@ -278,8 +288,8 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
   - Input: `question` (1 to 8,000 characters), `subject?`, and `k?` (1 to 10, default 5). The description of `question`, exactly: "The user's question or the exact error message, in English. Include the library or tool name and its version if you know them."
   - Tool description, exactly: "Search lessons that people taught Ludion and machines verified by test, proof, or cited source. Use before answering questions about specific software behavior, APIs, versions, tools, or anything that may have changed recently. Each result names its teacher; cite them."
   - Annotations `readOnlyHint: true`, `openWorldHint: false`.
-  - Output: one block per lesson (`N. <claim>` / `   Taught by @<teacher>. Verified by <test|proof|source> on <YYYY-MM-DD>. Applies to <subject> <version>.` / `   <lesson URL>`), plus `structuredContent: {lessons: [{id, subject, version, claim, teacher, teacher_id, verified_by, verified_at, lesson_url}]}`.
-  - No match, exactly: "No lesson yet for this. If you know the answer and can show evidence (a test or a source with a quote), teach it with ludion_teach."
+  - Output: the data line, the coverage line (added 2026-10-12), then one block per lesson (`N. <claim>` / `   Taught by @<teacher>. Verified by <test|proof|source> on <YYYY-MM-DD>. Applies to <subject> <version>.` / `   <lesson URL>`), plus `structuredContent: {lessons: [{id, subject, version, claim, teacher, teacher_id, verified_by, verified_at, lesson_url}]}`.
+  - No match, exactly: "No lesson yet for this. <COVERAGE_LINE> If you know the answer and can show evidence (a test or a source with a quote), teach it with ludion_teach." (The coverage sentence was added 2026-10-12; see "Partial coverage, said everywhere".)
   - `ludion_teach` is not on main (it was in #13); v2 brings back a version that validates a draft and returns the `npx ludion-ai teach` command.
 - **Search** returns a lesson only on a strong match:
   - a strong word: an identifier, version number, flag, pseudo-class, a word in capitals or camelCase, or any word not on the common-word list;

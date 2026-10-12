@@ -7,7 +7,8 @@ import { createInterface } from "node:readline/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { ledgerLesson, readLedger, saveEntry } from "./ledger.ts";
-import { readInstalled } from "./lockfile.ts";
+import { subjectFor, subjectRequestUrl } from "@ludion/core";
+import { directDependencies, readInstalled } from "./lockfile.ts";
 import { select, type SyncLesson } from "./match.ts";
 import { openPullRequest } from "./publish.ts";
 import { lessonLines, readLessonsFile, renderLessons, writeAndWire } from "./render.ts";
@@ -35,10 +36,11 @@ async function sync(argv: string[]): Promise<number> {
   const installed = readInstalled(dir);
 
   let index: SyncLesson[] = [];
+  let subjects: Set<string> | undefined;
   let failed = false;
   if (!values.offline) {
     try {
-      index = (await fetchLessons(installed)).lessons;
+      ({ lessons: index, subjects } = await fetchLessons(installed));
     } catch (err) {
       // Without the index, a rewrite would drop every public lesson the project has, so an existing lessons file is
       // left as it is. Sync never blocks the session: with --quiet (the hook) it warns and exits 0.
@@ -56,8 +58,11 @@ async function sync(argv: string[]): Promise<number> {
   const summary = selection.kept.length
     ? [...new Set(selection.kept.map(({ lesson, versions }) => `${lesson.package.name} ${versions.join("/")}`))].join(", ")
     : `${installed.npm.size} packages from ${installed.source}, node ${installed.node}`;
+  // Installed direct dependencies with no subject in Ludion: named in lessons.md, so the assistant checks them
+  // elsewhere, and printed with how to ask for them.
+  const uncovered = subjects && directDependencies(dir).filter((name) => installed.npm.has(name) && !subjects.has(subjectFor({ ecosystem: "npm", name })));
   const before = readLessonsFile(dir);
-  const lessonsMd = renderLessons(selection, summary, new Date());
+  const lessonsMd = renderLessons(selection, summary, new Date(), uncovered);
   const { written, skipped } = writeAndWire(dir, lessonsMd);
   for (const s of skipped) console.error(`ludion: ${s}`);
   // A session-start hook runs after Claude Code has read CLAUDE.md, so a change written now reaches only the next
@@ -67,6 +72,7 @@ async function sync(argv: string[]): Promise<number> {
     console.log(`ludion sync updated .ludion/lessons.md after this session read CLAUDE.md. The current lessons:\n\n${lessonsMd}`);
   }
   say(`ludion: ${selection.kept.length} lesson${selection.kept.length === 1 ? "" : "s"} for this project${selection.prunedForModel.length ? ` (${selection.prunedForModel.length} left out: ${model} is measured to know them)` : ""}. Wrote ${written.join(", ")}.`);
+  if (uncovered?.length) say(`ludion: no lessons for ${uncovered.length} of this project's dependencies (listed in .ludion/lessons.md). Ask for one: ${subjectRequestUrl(uncovered)}`);
   return failed && !values.quiet ? 1 : 0;
 }
 

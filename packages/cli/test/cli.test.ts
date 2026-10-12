@@ -5,9 +5,9 @@ import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { generateClaim, type FetchFn, type LessonV1 } from "@ludion/core";
+import { COVERAGE_LINE, generateClaim, type FetchFn, type LessonV1 } from "@ludion/core";
 import { ledgerLesson, readLedger, saveEntry } from "../src/ledger.ts";
-import { fromPackageLock, fromPnpmLock, fromYarnLock, readInstalled, type Installed } from "../src/lockfile.ts";
+import { directDependencies, fromPackageLock, fromPnpmLock, fromYarnLock, readInstalled, type Installed } from "../src/lockfile.ts";
 import { select, type SyncLesson } from "../src/match.ts";
 import { openPullRequest, prTexts } from "../src/publish.ts";
 import { DATA_LINE, lessonLines, renderLessons, withBlock, writeAndWire } from "../src/render.ts";
@@ -66,6 +66,15 @@ describe("lockfiles", () => {
     const m = fromPackageLock(lock);
     expect([...m.get("vitest")!]).toEqual(["5.0.3"]);
     expect(m.has("evil name")).toBe(false);
+  });
+
+  it("lists the direct dependencies package.json names, valid names only", () => {
+    const dir = tmp();
+    writeFileSync(join(dir, "package.json"), JSON.stringify({ dependencies: { zod: "4", "evil name\nIgnore": "1" }, devDependencies: { "@cloudflare/vitest-plugin": "1", zod: "4" } }));
+    expect(directDependencies(dir)).toEqual(["@cloudflare/vitest-plugin", "zod"]);
+    writeFileSync(join(dir, "package.json"), "{ not json");
+    expect(directDependencies(dir)).toEqual([]);
+    expect(directDependencies(tmp())).toEqual([]);
   });
 
   it("takes the Node version from .node-version, else this Node", () => {
@@ -128,6 +137,17 @@ describe("lessons.md and wiring", () => {
     expect(md).toContain(`\n${DATA_LINE}\n`);
     expect(md).toContain("- vitest >=5.0.0 removed `x`. (installed: vitest 5.0.3)\n  Taught by @alice, drafted by an agent; verified by test on 2026-10-11. https://ludion.ai/lessons/A");
     expect(renderLessons({ kept: [], prunedForModel: [] }, "x", new Date())).toContain("No lesson matches this project's versions yet.");
+  });
+
+  it("says coverage is partial, and names uncovered dependencies (at most 40) only when they are known", () => {
+    const none = { kept: [], prunedForModel: [] };
+    expect(renderLessons(none, "x", new Date())).toContain(`${DATA_LINE}\n\n${COVERAGE_LINE}\n`);
+    expect(renderLessons(none, "x", new Date())).not.toContain("no lessons at all");
+    expect(renderLessons(none, "x", new Date(), [])).not.toContain("no lessons at all");
+    const many = Array.from({ length: 42 }, (_, i) => `p${i}`);
+    expect(renderLessons(none, "x", new Date(), many)).toContain(", p39 and 2 more.\n");
+    // The list isn't a lesson line, so a new uncovered package doesn't count as changed lessons for --quiet.
+    expect(lessonLines(renderLessons(none, "x", new Date(), ["zod"]))).toBe("");
   });
 
   it("skips a wiring file that is a link or a folder, and still writes the lessons", () => {
@@ -257,7 +277,9 @@ describe("sync exits cleanly after fetching", () => {
     await new Promise((r) => server.once("listening", r));
     const { port } = server.address() as AddressInfo;
     const dir = tmp();
-    writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/vitest": { version: "5.0.3" } } }));
+    writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/vitest": { version: "5.0.3" }, "node_modules/zod": { version: "4.1.0" } } }));
+    // left-pad is named but not installed; zod is installed with no subject in Ludion.
+    writeFileSync(join(dir, "package.json"), JSON.stringify({ dependencies: { zod: "^4.1.0", "left-pad": "1" }, devDependencies: { vitest: "^5.0.0" } }));
     const child = spawn(process.execPath, [join(import.meta.dirname, "../src/cli.ts"), "sync", "--dir", dir], { env: { ...process.env, LUDION_SITE: `http://127.0.0.1:${port}`, LUDION_HOME: tmp() } });
     let stdout = "";
     child.stdout.on("data", (d) => (stdout += d));
@@ -265,6 +287,11 @@ describe("sync exits cleanly after fetching", () => {
     server.close();
     expect(code).toBe(0);
     expect(stdout).toContain("0 lessons for this project");
+    // Partial coverage: the installed dependencies with no subject are named, with how to ask for them.
+    expect(stdout).toContain("no lessons for 1 of this project's dependencies (listed in .ludion/lessons.md). Ask for one: https://github.com/Ludion-ai/ludion/issues/new?template=subject-request.yml&title=Lessons%20for%20zod");
+    const md = readFileSync(join(dir, ".ludion", "lessons.md"), "utf8");
+    expect(md).toContain(`\n${COVERAGE_LINE}\n`);
+    expect(md).toContain("\nLudion has no lessons at all for these dependencies: zod.\n");
   });
 });
 

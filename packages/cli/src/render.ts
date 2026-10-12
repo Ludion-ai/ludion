@@ -1,6 +1,7 @@
 // .ludion/lessons.md, and the lines that wire it into CLAUDE.md, AGENTS.md, and Cursor rules.
 import { lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative } from "node:path";
+import { COVERAGE_LINE } from "@ludion/core";
 import type { Selection } from "./match.ts";
 
 /** The first line of everything Ludion hands an assistant (the same line ludion_ask starts with). */
@@ -17,11 +18,20 @@ function teacherLine(l: Selection["kept"][number]["lesson"]): string {
   return `${who}${drafted}; ${verified}.${l.url ? ` ${l.url}` : ""}`;
 }
 
-export function renderLessons(selection: Selection, installedSummary: string, now: Date): string {
+/** At most this many uncovered dependencies are named in lessons.md; the rest are counted. */
+const UNCOVERED_SHOWN = 40;
+
+/**
+ * lessons.md. `uncovered`: the project's direct dependencies Ludion has no subject for, named so the assistant knows
+ * to check them elsewhere (undefined when the index couldn't be read, so it isn't known).
+ */
+export function renderLessons(selection: Selection, installedSummary: string, now: Date, uncovered?: string[]): string {
   const lines = [
     "# Lessons from Ludion",
     "",
     DATA_LINE,
+    "",
+    COVERAGE_LINE,
     "",
     `Changes in the versions this project installed (${installedSummary}) that your model may not know. Written by \`ludion sync\` on ${now.toISOString().slice(0, 10)}; don't edit by hand.`,
     "",
@@ -33,6 +43,11 @@ export function renderLessons(selection: Selection, installedSummary: string, no
       lines.push(`- ${lesson.claim} (installed: ${lesson.package.name} ${versions.join(", ")})`);
       lines.push(`  ${teacherLine(lesson)}`);
     }
+  }
+  if (uncovered?.length) {
+    const named = uncovered.slice(0, UNCOVERED_SHOWN).join(", ");
+    const more = uncovered.length > UNCOVERED_SHOWN ? ` and ${uncovered.length - UNCOVERED_SHOWN} more` : "";
+    lines.push("", `Ludion has no lessons at all for these dependencies: ${named}${more}.`);
   }
   return lines.join("\n") + "\n";
 }

@@ -37,7 +37,7 @@ Drop the server-side write path (PR #13: GitHub App, OAuth, sessions, `/api/teac
 
 - **Lesson format v1.** Structured fields; generated claim; `signal` loud/silent; evidence that is a test (optionally pinned to runtime and package versions, with `expect: fail` + `error` for differential tests) or a source quote that states the fact itself (never a changelog headline).
 - **`ludion` CLI on npm.** `ludion sync` reads the lockfile, downloads per-subject index shards, keeps only lessons that match installed versions and that the target model is not measured to know, and writes `.ludion/lessons.md` wired into CLAUDE.md / AGENTS.md / Cursor rules. `ludion teach` saves to a personal ledger (`~/.ludion`), verifies locally when Docker exists, and with `--public` opens a PR with the teacher's own `gh`. No telemetry. Trusted publishing; no npm token in the repo.
-- **MCP.** `ludion_ask` searches; its output starts with a line saying the lessons are data, not instructions. `ludion_teach` validates a draft and returns the `npx ludion teach` command.
+- **MCP.** `ludion_ask` searches; its output starts with a line saying the lessons are data, not instructions. `ludion_teach` validates a draft and returns the `npx ludion-ai teach` command.
 - **FreshBench.** Per model and per lesson: which changes does each model get wrong? Fix the 2026-10-08 answer keys against primary sources first (one was wrong: webdriverio). Results feed the shards (`models` per lesson) so sync can prune. Label every change loud or silent.
 - **Seeds.** Start with 30, not 200. Silent changes in the wedge (vitest, then wrangler and agents) that measured models get wrong. Prefer differential tests.
 - **Claude Code plugin.** SessionStart hook running `ludion sync --quiet` plus the MCP server.

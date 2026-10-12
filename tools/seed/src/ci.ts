@@ -122,7 +122,7 @@ export const CHECK_RULES = `How the checks work (they are the ones CI runs; a le
 - "No evidence names <symbol>": the whole symbol must appear in a test's code or in a quote.
 - "The detail uses words no source quote contains": each listed word must come from a quote, or from package, versions, symbol, or replacement; test code doesn't count. Reword the detail with the quotes' own words, or leave the detail out.
 - "source: ...": the quote must be copied exactly from its file in sources/, with the url sources/sources.json gives for that file.
-- "schema: ...": fix the field the message names.`;
+- "schema: ...": fix the field the message names. evidence holds 1 to 3 pieces: the differential test pair and one quote.`;
 
 /**
  * A revise round (docs/decisions.md, "Revising seed drafts"). Scope `check`: each lesson that failed the local checks

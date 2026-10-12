@@ -1,0 +1,55 @@
+{
+  "entry": "4.113.0#4",
+  "verdict": {
+    "id": "4.113.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "queue_name",
+    "why": "Queue, Dispatch Namespace and Flagship bindings can now omit the name or ID and get auto-provisioned resources, so a deploy with them omitted now creates resources."
+  },
+  "cost_usd": 0.22053640000000002,
+  "turns": 11,
+  "round": 3,
+  "model": "claude-opus-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.113.0",
+    "kind": "behavior",
+    "symbol": "queue",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.113.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst os = require(\"os\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet wrangler;\ntry { wrangler = require(\"wrangler\"); } catch (e) { broken(\"cannot load wrangler: \" + e.message); }\nif (typeof wrangler.unstable_readConfig !== \"function\") broken(\"unstable_readConfig is not exported\");\nconst dir = fs.mkdtempSync(path.join(os.tmpdir(), \"q-\"));\nfs.writeFileSync(path.join(dir, \"index.js\"), \"export default { fetch() { return new Response('ok'); } };\\n\");\nconst cfg = path.join(dir, \"wrangler.json\");\nfs.writeFileSync(cfg, JSON.stringify({ name: \"demo\", main: \"index.js\", compatibility_date: \"2025-01-01\", queues: { producers: [{ binding: \"MY_QUEUE\" }] } }));\nlet config;\ntry {\n  config = wrangler.unstable_readConfig({ config: cfg }, { hideWarnings: true });\n} catch (e) {\n  const m = String(e && e.message);\n  if (/should have a string \"queue\" field/.test(m)) symptom(\"a queues.producers binding without a queue field is rejected by config validation\");\n  broken(\"unexpected error reading config: \" + m);\n}\nconst p = config && config.queues && config.queues.producers;\nif (!Array.isArray(p) || p.length !== 1 || p[0].binding !== \"MY_QUEUE\" || p[0].queue !== undefined) broken(\"unexpected producers: \" + JSON.stringify(p));\nconsole.log(\"OK: a queues.producers binding without a queue field is accepted\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.112.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst os = require(\"os\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet wrangler;\ntry { wrangler = require(\"wrangler\"); } catch (e) { broken(\"cannot load wrangler: \" + e.message); }\nif (typeof wrangler.unstable_readConfig !== \"function\") broken(\"unstable_readConfig is not exported\");\nconst dir = fs.mkdtempSync(path.join(os.tmpdir(), \"q-\"));\nfs.writeFileSync(path.join(dir, \"index.js\"), \"export default { fetch() { return new Response('ok'); } };\\n\");\nconst cfg = path.join(dir, \"wrangler.json\");\nfs.writeFileSync(cfg, JSON.stringify({ name: \"demo\", main: \"index.js\", compatibility_date: \"2025-01-01\", queues: { producers: [{ binding: \"MY_QUEUE\" }] } }));\nlet config;\ntry {\n  config = wrangler.unstable_readConfig({ config: cfg }, { hideWarnings: true });\n} catch (e) {\n  const m = String(e && e.message);\n  if (/should have a string \"queue\" field/.test(m)) symptom(\"a queues.producers binding without a queue field is rejected by config validation\");\n  broken(\"unexpected error reading config: \" + m);\n}\nconst p = config && config.queues && config.queues.producers;\nif (!Array.isArray(p) || p.length !== 1 || p[0].binding !== \"MY_QUEUE\" || p[0].queue !== undefined) broken(\"unexpected producers: \" + JSON.stringify(p));\nconsole.log(\"OK: a queues.producers binding without a queue field is accepted\");\n",
+          "expect": "fail",
+          "error": "FAIL: a queues.producers binding without a queue field is rejected by config validation"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.113.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Queue, Dispatch Namespace, and Flagship bindings\n\n  Deployments can now omit the resource name or ID for these bindings."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

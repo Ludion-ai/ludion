@@ -32,11 +32,77 @@
       "drafts": 55,
       "local_checks_passed": 33,
       "differential": 23,
+      "reviewed": 33,
       "review_findings": 92,
-      "reviewed_clean": 3
+      "reviewed_clean": 3,
+      "review_cost_usd": 1.01
+    },
+    {
+      "round": 1,
+      "drafts": 49,
+      "local_checks_passed": 35,
+      "differential": 22,
+      "reviewed": 35,
+      "review_findings": 110,
+      "reviewed_clean": 3,
+      "review_cost_usd": 1.07
+    },
+    {
+      "round": 2,
+      "drafts": 49,
+      "local_checks_passed": 49,
+      "differential": 34,
+      "reviewed": 46,
+      "review_findings": 127,
+      "reviewed_clean": 5,
+      "review_cost_usd": 2.81,
+      "revised_by_model": {
+        "claude-sonnet-5-5": {
+          "lessons": 14,
+          "cost_usd": 0.57
+        }
+      }
+    },
+    {
+      "round": 3,
+      "drafts": 46,
+      "local_checks_passed": 43,
+      "differential": 39,
+      "reviewed": 40,
+      "review_findings": 70,
+      "reviewed_clean": 11,
+      "review_kept_unchanged": 6,
+      "review_cost_usd": 2.34,
+      "revised_by_model": {
+        "claude-opus-5-5": {
+          "lessons": 39,
+          "cost_usd": 12.09
+        },
+        "claude-sonnet-5-5": {
+          "lessons": 2,
+          "cost_usd": 0.1
+        }
+      }
+    },
+    {
+      "round": 4,
+      "drafts": 46,
+      "local_checks_passed": 46,
+      "differential": 41,
+      "reviewed": 43,
+      "review_findings": 74,
+      "reviewed_clean": 11,
+      "review_kept_unchanged": 40,
+      "review_cost_usd": 0.18,
+      "revised_by_model": {
+        "claude-sonnet-5-5": {
+          "lessons": 3,
+          "cost_usd": 0.11
+        }
+      }
     }
   ],
-  "kept": 3,
-  "duplicates_of_main": 0,
+  "kept": 11,
+  "duplicates_of_main": 3,
   "ci": []
 }

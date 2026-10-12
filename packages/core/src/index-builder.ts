@@ -10,6 +10,11 @@ export interface BuildOptions {
   org: string;
   repo: string;
   builtAt?: Date;
+  /**
+   * Lessons to leave out although they are active: the ones failing the nightly reverify. Taken out after the active
+   * set is computed, so a failing lesson that corrects another never brings the corrected one back.
+   */
+  withhold?: ReadonlySet<string>;
 }
 
 export function storedLogin(author: string): string {
@@ -18,7 +23,7 @@ export function storedLogin(author: string): string {
 
 /** index.json from all lessons on main. Only the active set is included, newest first. */
 export function buildIndex(lessons: Lesson[], gitInfo: GitInfo, logins: Map<number, string>, options: BuildOptions): Index {
-  const active = activeSet(lessons);
+  const active = activeSet(lessons).filter((l) => !options.withhold?.has(l.id));
   // Fallback login per teacher: the one stored in their newest lesson.
   const fallback = new Map<number, { login: string; at: string }>();
   for (const l of active) {

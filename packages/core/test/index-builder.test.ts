@@ -6,6 +6,14 @@ import { example, fakeFetch, lesson } from "./helpers.ts";
 const opts = { org: "Ludion-ai", repo: "ludion", builtAt: new Date("2026-10-08T09:00:00.123Z") };
 
 describe("buildIndex", () => {
+  it("withholds failing lessons without bringing back the lessons they correct", () => {
+    const old = lesson();
+    const fix = lesson({ replaces: [old.id] });
+    const other = lesson();
+    const index = buildIndex([old, fix, other], {}, new Map(), { ...opts, withhold: new Set([fix.id]) });
+    expect(index.lessons.map((l) => l.id)).toEqual([other.id]);
+  });
+
   it("builds the entry shape from the spec, with teacher_id", () => {
     const ex = example();
     const index = buildIndex([ex], { [ex.id]: { verified_at: "2026-10-08T08:57:12Z", pr: 42 } }, new Map(), opts);

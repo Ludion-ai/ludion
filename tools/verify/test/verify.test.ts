@@ -30,6 +30,15 @@ const sourceOnly = (over: Partial<LessonV0> = {}): LessonV0 => ({
 });
 
 describe("verifyLesson", () => {
+  it("checks only the evidence for nightly reverify: format, path, and replaces were checked at merge", async () => {
+    const l = sourceOnly({ replaces: ["01K79999999999999999999999"] });
+    const messy = { path: `lessons/elsewhere/${l.id}.json`, text: JSON.stringify(l) };
+    expect((await verifyLesson(messy, ctx({ fetchFn: pageWith("a sentence on the page") }))).status).toBe("failed");
+    expect(await verifyLesson(messy, ctx({ fetchFn: pageWith("a sentence on the page"), evidenceOnly: true }))).toMatchObject({ status: "passed", reasons: [] });
+    expect((await verifyLesson(messy, ctx({ fetchFn: pageWith("gone"), evidenceOnly: true }))).reasons).toEqual([expect.stringMatching(/^evidence 1 \(source\):/)]);
+    expect(await verifyLesson({ path: messy.path, text: "{}" }, ctx({ evidenceOnly: true }))).toMatchObject({ status: "skipped" });
+  });
+
   it("passes the example", async () => {
     const r = await verifyLesson({ path: EXAMPLE_PATH, text: exampleText }, ctx());
     expect(r).toMatchObject({ status: "passed", id: example.id, reasons: [], labels: [] });

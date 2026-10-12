@@ -43,6 +43,7 @@ export const en = {
     copied: "Copied",
     corrects: "Corrects",
     correctedBy: "This lesson was corrected by",
+    failing: (date: string) => `This lesson failed its nightly check${date ? ` on ${date}` : ""}. Ludion stopped serving it until it passes its check again or is retracted.`,
     viewFile: "View the file on GitHub",
     pullRequest: (n: number) => `Pull request #${n}`,
     drafted: ", drafted by an agent",

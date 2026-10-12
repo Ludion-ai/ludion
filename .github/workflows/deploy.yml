@@ -6,6 +6,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      reverify_run:
+        description: "The reverify run whose failing list to use (reverify passes it; empty: the newest one with a list)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -20,6 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
+    permissions:
+      contents: read
+      # Reads the newest reverify run's failing list (an artifact), so failing lessons are withheld from the index.
+      actions: read
     steps:
       - name: Note when this job started
         run: echo "STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
@@ -37,12 +46,49 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
 
+      # Only reverify's own runs on main (scheduled or by hand) are trusted, never a pull request's: a PR can edit the
+      # workflow and upload any artifact. A run reverify passes in must be one of those and must have its list (fail
+      # closed); otherwise the newest trusted run with a list is used, and with none, nothing is withheld.
+      - name: Get the lessons failing reverify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVERIFY_RUN: ${{ inputs.reverify_run }}
+        run: |
+          # The runs API has the workflow file path (gh run view doesn't) and the repository the run's code came from.
+          trusted() {
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$1" \
+              --jq "(.event == \"schedule\" or .event == \"workflow_dispatch\") and .head_branch == \"main\" and .path == \".github/workflows/reverify.yml\" and .head_repository.full_name == \"$GITHUB_REPOSITORY\""
+          }
+          if [ -n "$REVERIFY_RUN" ]; then
+            case "$REVERIFY_RUN" in *[!0-9]*) echo "reverify_run must be a run id."; exit 1 ;; esac
+            [ "$(trusted "$REVERIFY_RUN")" = "true" ] || { echo "Run $REVERIFY_RUN is not a reverify run on main."; exit 1; }
+            gh run download "$REVERIFY_RUN" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify
+            exit 0
+          fi
+          # Listed first, so a failure to list stops the step instead of withholding nothing. Runs still going count
+          # too: their list is uploaded before they start a deploy.
+          runs=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow reverify.yml --branch main --limit 10 \
+            --json databaseId,event --jq '.[] | select(.event == "schedule" or .event == "workflow_dispatch") | .databaseId')
+          # Each check is assigned before it is tested, so an API error stops the step (bash -e) instead of quietly
+          # falling back to an older list. A run without a list is skipped; a list that exists must download.
+          for run in $runs; do
+            ok=$(trusted "$run")
+            [ "$ok" = "true" ] || continue
+            lists=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts" --jq '[.artifacts[] | select(.name == "reverify-failing" and .expired == false)] | length')
+            [ "$lists" -gt 0 ] || continue
+            gh run download "$run" --repo "$GITHUB_REPOSITORY" --name reverify-failing --dir .reverify
+            echo "Using the failing list from reverify run $run."
+            exit 0
+          done
+          echo "::warning::No reverify failing list found; nothing is withheld."
       # Build before testing: the Worker tests serve the built site through ASSETS.
       - name: Build
         run: npm run build
         env:
           # Read-only, this job only: looks up teachers' current logins by id (docs/decisions.md).
           GITHUB_READ_TOKEN: ${{ github.token }}
+          # Lessons failing the nightly reverify leave the index until they pass their check again or are retracted (docs/decisions.md).
+          LUDION_WITHHOLD: .reverify/failing.json
 
       - run: npm test
 

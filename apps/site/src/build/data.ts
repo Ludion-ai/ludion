@@ -1,7 +1,7 @@
 // Build-time data for every page. Runs in Node during `astro build` only; never shipped to the browser.
 import { execFileSync } from "node:child_process";
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { isAbsolute, join } from "node:path";
 import {
   buildIndex, RESERVED_SUBJECTS, resolveLogins, storedLogin, validateLesson, verifiedBy,
   type GitInfo, type Index, type Lesson, type VerifiedBy,
@@ -25,6 +25,8 @@ export interface LessonPage {
   /** Lessons this one corrects, and the lesson that corrects it, if any. */
   corrects: string[];
   correctedBy: string | null;
+  /** The date of the nightly check that found this lesson failing (it is withheld from the index), else null. */
+  failedCheckAt: string | null;
 }
 
 /** A retracted lesson: its file was deleted from main. Its page stays, struck through, so links keep working. */
@@ -120,6 +122,19 @@ export function reservedSubjects(subjects: Iterable<string>): string[] {
   return [...new Set(subjects)].filter((s) => RESERVED_SUBJECTS.has(s));
 }
 
+/**
+ * Lessons the nightly reverify found failing (LUDION_WITHHOLD: its failing.json, which deploy.yml downloads). They
+ * stay on main until a retraction merges, but leave the index, the shards, and search at once. Ids only; anything
+ * else in the file is ignored.
+ */
+export function readWithheld(root: string, path = process.env.LUDION_WITHHOLD): { ids: Set<string>; checkedAt: string | null } {
+  const file = path ? (isAbsolute(path) ? path : join(root, path)) : undefined;
+  if (!file || !existsSync(file)) return { ids: new Set(), checkedAt: null };
+  const parsed = JSON.parse(readFileSync(file, "utf8")) as { checked_at?: unknown; failing?: { id?: unknown }[] };
+  const ids = (parsed.failing ?? []).map((f) => f.id).filter((id): id is string => typeof id === "string" && /^[0-9A-HJKMNP-TV-Z]{26}$/.test(id));
+  return { ids: new Set(ids), checkedAt: typeof parsed.checked_at === "string" ? parsed.checked_at : null };
+}
+
 function gitInfo(root: string): GitInfo {
   if (git(root, "rev-parse", "--is-shallow-repository").trim() === "true") {
     console.log("[ludion] Shallow clone: fetching full history for verified_at and pr.");
@@ -152,7 +167,9 @@ async function load(): Promise<SiteData> {
 
   const clash = reservedSubjects(all.map((l) => l.subject));
   if (clash.length) throw new Error(`Subject ${clash.join(", ")} is also a top-level page of the site, so its subject page can't be built. Add a check for it in verify, or rename the page.`);
-  const index = buildIndex(all, info, resolved, config);
+  const withheld = samples ? { ids: new Set<string>(), checkedAt: null } : readWithheld(root);
+  if (withheld.ids.size) console.log(`[ludion] Withholding ${withheld.ids.size} lesson(s) failing the nightly reverify: ${[...withheld.ids].join(", ")}`);
+  const index = buildIndex(all, info, resolved, { ...config, withhold: withheld.ids });
   const json = JSON.stringify(index);
   if (json.length > SIZE_WARNING) console.warn(`[ludion] index.json is ${(json.length / 1048576).toFixed(1)} MB, above 5 MB. The Worker and the ask box load it whole.`);
 
@@ -167,6 +184,7 @@ async function load(): Promise<SiteData> {
       pr: info[lesson.id]?.pr ?? null,
       corrects: lesson.replaces ?? [],
       correctedBy: correctedBy.get(lesson.id) ?? null,
+      failedCheckAt: withheld.ids.has(lesson.id) ? (withheld.checkedAt ?? "") : null,
     }))
     .sort((a, b) => (a.verified_at < b.verified_at ? 1 : a.verified_at > b.verified_at ? -1 : 0));
 

@@ -23,6 +23,7 @@ const repo = `https://github.com/${config.org}/${config.repo}`;
 
 <Base title={`${claim} | Ludion`} description={claim}>
   <article class="lesson wrap">
+    {page.failedCheckAt !== null && <p class="banner" role="note">{en.lesson.failing(page.failedCheckAt ? formatDate(page.failedCheckAt) : "")}</p>}
     {
       page.correctedBy && (
         <p class="banner" role="note">

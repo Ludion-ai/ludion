@@ -3,7 +3,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import {
-  checkSource, formatLesson, generateClaim, lessonProblems, newId, subjectFor, validateLessonV1,
+  checkSource, fieldProblems, formatLesson, generateClaim, lessonProblems, newId, subjectFor, validateLessonV1, validateUnverified,
   type FetchFn, type LessonV1,
 } from "@ludion/core";
 import { interpretRun, runInDocker, type RunFn } from "../../../tools/verify/src/docker.ts";
@@ -57,6 +57,8 @@ export function toLesson(draft: Draft, who: Identity | undefined, now: Date, id 
 
 export interface CheckReport {
   problems: string[];
+  /** No evidence: saved to the ledger as unverified, shown only to its teacher, never published. */
+  unverified?: boolean;
   tests: string;
   sources: string;
 }
@@ -67,6 +69,12 @@ export function dockerAvailable(): boolean {
 
 /** Every check this machine can run. Problems block teaching; tests that can't run here are reported, not failed. */
 export async function check(lesson: LessonV1, opts: { fetchFn?: FetchFn; run?: RunFn; docker?: boolean } = {}): Promise<CheckReport> {
+  if (isUnverified(lesson)) {
+    // Every field but the evidence is checked as usual: the claim is still generated from them.
+    const u = validateUnverified(JSON.parse(formatLesson({ ...lesson, evidence: [] })));
+    if (!u.ok) return { problems: u.errors.map((e) => `${e.path}: ${e.message}`), tests: "none", sources: "none", unverified: true };
+    return { problems: fieldProblems(lesson), tests: "none", sources: "none", unverified: true };
+  }
   const problems: string[] = [];
   const v = validateLessonV1(JSON.parse(formatLesson(lesson)));
   if (!v.ok) return { problems: v.errors.map((e) => `${e.path}: ${e.message}`), tests: "not run", sources: "not checked" };
@@ -98,12 +106,18 @@ export async function check(lesson: LessonV1, opts: { fetchFn?: FetchFn; run?: R
   return { problems, tests: testsState, sources: sourcesState };
 }
 
+/** A draft with no evidence: it can be saved to the ledger as unverified, never taught in public. */
+export function isUnverified(draft: { evidence?: unknown }): boolean {
+  return !Array.isArray(draft.evidence) || draft.evidence.length === 0;
+}
+
 /** Control characters shown as \u{…}, so nothing in a draft can hide or rewrite lines on the terminal before the person confirms. */
 export const visible = (s: string): string => s.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202E\u2060-\u206F\uFEFF]/g, (c) => `\\u{${c.codePointAt(0)!.toString(16)}}`);
 
 /** The whole lesson as the teacher should see it before signing. */
 export function showLesson(lesson: LessonV1): string {
   const lines = [generateClaim(lesson), ""];
+  if (lesson.evidence.length === 0) lines.push("No evidence: saved to your ledger as unverified, shown only in your own projects.", "");
   if (lesson.replaces?.length) lines.push(`Replaces: ${lesson.replaces.join(", ")} (those lessons leave the index when this one is merged)`, "");
   for (const e of lesson.evidence) {
     if ("source" in e) lines.push(`Source: ${e.source.url}`, `  "${e.source.quote}"`);
@@ -120,5 +134,5 @@ export function showLesson(lesson: LessonV1): string {
 }
 
 export function ledgerEntry(lesson: LessonV1, report: CheckReport, now: Date): LedgerEntry {
-  return { lesson, taught_at: now.toISOString().replace(/\.\d{3}Z$/, "Z"), checks: { tests: report.tests, sources: report.sources } };
+  return { lesson, taught_at: now.toISOString().replace(/\.\d{3}Z$/, "Z"), checks: { tests: report.tests, sources: report.sources }, ...(report.unverified ? { unverified: true } : {}) };
 }

@@ -13,9 +13,14 @@ export interface LedgerEntry {
   taught_at: string;
   /** What this machine checked. tests: passed | failed | not run (why). sources: found | not found. */
   checks: { tests: string; sources: string };
+  /** Taught without evidence: shown only to its teacher, as "unverified, yours only"; --public refuses it. */
+  unverified?: boolean;
   /** Set by teach --public. */
   public?: { pr_url: string };
 }
+
+/** How sync labels a ledger lesson taught without evidence. */
+export const UNVERIFIED = "unverified, yours only";
 
 export function ludionHome(): string {
   return process.env.LUDION_HOME || join(homedir(), ".ludion");
@@ -46,6 +51,9 @@ export function readLedger(): LedgerEntry[] {
 
 /** A ledger entry as sync shows it. A lesson that is already public shows up from the index instead. */
 export function ledgerLesson(e: LedgerEntry): SyncLesson {
+  if (e.unverified || !e.lesson.evidence?.length) {
+    return { id: e.lesson.id, package: e.lesson.package, versions: e.lesson.versions, claim: generateClaim(e.lesson), signal: e.lesson.signal, kind: e.lesson.kind, teacher: "you", verified: UNVERIFIED, verified_at: e.taught_at, origin: "ledger" };
+  }
   const passed = e.checks.tests === "passed" || (e.checks.tests === "none" && e.checks.sources === "found");
   return {
     id: e.lesson.id,

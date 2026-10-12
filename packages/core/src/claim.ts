@@ -101,13 +101,7 @@ export function quotesMissingSymbol(l: LessonV1): string[] {
  * both run these. Empty when the lesson is fine.
  */
 export function lessonProblems(l: LessonV1): string[] {
-  const problems: string[] = [];
-  if (l.subject !== subjectFor(l.package)) problems.push(`The subject for package ${l.package.name} is ${subjectFor(l.package)}, not ${l.subject}.`);
-  if (RESERVED_SUBJECTS.has(l.subject)) problems.push(`The subject ${l.subject} is taken by a page of the site (ludion.ai/${l.subject}/). Lessons about a package with this name can't be taught yet; open an issue.`);
-  const range = semver.validRange(l.versions);
-  // A range that means every version (*, x, ||||) can't describe a change, and empty || alternatives are a typo.
-  // `<` before a letter (only x can be there) means nothing as a range, and it would put a tag-like `<x` into the claim.
-  if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions) || /<\s*[A-Za-z]/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
+  const problems = fieldProblems(l);
   const words = ungroundedWords(l);
   if (words.length) problems.push(`The detail uses words no source quote contains: ${words.join(", ")}. Use the quotes' own words, or leave the detail out.`);
   for (const quote of quotesMissingSymbol(l)) problems.push(`The quote "${quote.slice(0, 80)}" doesn't name ${l.symbol}. Quote a sentence that states the fact itself, not a headline.`);
@@ -115,5 +109,20 @@ export function lessonProblems(l: LessonV1): string[] {
   const symbol = normalize(l.symbol);
   const named = l.evidence.some((e) => normalize("test" in e ? e.test.code : e.source.quote).includes(symbol));
   if (!named) problems.push(`No evidence names ${l.symbol}: use it in a test's code or quote a sentence that names it.`);
+  return problems;
+}
+
+/**
+ * The problems of a lesson's own fields, whatever its evidence: the subject matches the package and isn't reserved,
+ * and `versions` is a real range. An unverified lesson (no evidence, in a teacher's ledger only) is checked with these.
+ */
+export function fieldProblems(l: LessonV1): string[] {
+  const problems: string[] = [];
+  if (l.subject !== subjectFor(l.package)) problems.push(`The subject for package ${l.package.name} is ${subjectFor(l.package)}, not ${l.subject}.`);
+  if (RESERVED_SUBJECTS.has(l.subject)) problems.push(`The subject ${l.subject} is taken by a page of the site (ludion.ai/${l.subject}/). Lessons about a package with this name can't be taught yet; open an issue.`);
+  const range = semver.validRange(l.versions);
+  // A range that means every version (*, x, ||||) can't describe a change, and empty || alternatives are a typo.
+  // `<` before a letter (only x can be there) means nothing as a range, and it would put a tag-like `<x` into the claim.
+  if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions) || /<\s*[A-Za-z]/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
   return problems;
 }

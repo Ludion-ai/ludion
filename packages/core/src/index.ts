@@ -1,7 +1,7 @@
 export type * from "./types.ts";
-export { lessonValidator, validateLesson, validateLessonV0, validateLessonV1, type FieldError, type LessonValidator, type ValidationResult } from "./schema.ts";
+export { lessonValidator, validateLesson, validateLessonV0, validateLessonV1, validateUnverified, type FieldError, type LessonValidator, type ValidationResult } from "./schema.ts";
 export { isV1 } from "./types.ts";
-export { claimOf, generateClaim, lessonProblems, quotesMissingSymbol, RESERVED_SUBJECTS, subjectFor, ungroundedWords, versionOf } from "./claim.ts";
+export { claimOf, fieldProblems, generateClaim, lessonProblems, quotesMissingSymbol, RESERVED_SUBJECTS, subjectFor, ungroundedWords, versionOf } from "./claim.ts";
 export type { AjvError, ValidateFn } from "./generated/validate-lesson.js";
 export { newId } from "./ulid.ts";
 export { formatLesson } from "./format.ts";

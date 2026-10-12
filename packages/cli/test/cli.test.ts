@@ -12,7 +12,7 @@ import { select, type SyncLesson } from "../src/match.ts";
 import { openPullRequest, prTexts } from "../src/publish.ts";
 import { DATA_LINE, lessonLines, renderLessons, withBlock, writeAndWire } from "../src/render.ts";
 import { fetchLessons, shardLesson, type ShardLesson } from "../src/shards.ts";
-import { check, showLesson, toLesson, type Draft } from "../src/teach.ts";
+import { check, ledgerEntry, showLesson, toLesson, type Draft } from "../src/teach.ts";
 
 const tmp = () => mkdtempSync(join(tmpdir(), "ludion-cli-"));
 const installed = (npm: Record<string, string[]>, node = "24.3.0"): Installed => ({ npm: new Map(Object.entries(npm).map(([k, v]) => [k, new Set(v)])), node, source: "test" });
@@ -229,6 +229,38 @@ describe("teach", () => {
     const run = async (spec: unknown) => (seen.push(spec), { kind: "done" as const, exitCode: 0, stdout: "", stderr: "", timedOut: false });
     expect(await check(withTest, { docker: true, run })).toMatchObject({ problems: [], tests: "passed" });
     expect(seen).toEqual([{ runtime: "node@24", code: "toHaveTextContent(x)", packages: { vitest: "5.0.3" } }]);
+  });
+
+  it("keeps a draft without evidence as unverified: fields checked, nothing fetched, shown as yours only", async () => {
+    const { evidence: _e, ...bare } = draft;
+    const l = toLesson({ ...bare, evidence: [], detail: "toHaveTextContent compares the whole text now" } as Draft, undefined, new Date("2026-10-12T00:00:00Z"), "01K7Z000000000000000000006");
+    const fetchFn: FetchFn = async () => {
+      throw new Error("an unverified lesson fetches nothing");
+    };
+    const report = await check(l, { fetchFn, docker: false });
+    expect(report).toEqual({ problems: [], tests: "none", sources: "none", unverified: true });
+    expect((await check({ ...l, versions: "*" }, { fetchFn, docker: false })).problems).toEqual([expect.stringContaining("is not a range")]);
+    expect(showLesson(l)).toContain("No evidence: saved to your ledger as unverified");
+    const entry = ledgerEntry(l, report, new Date("2026-10-12T00:00:00Z"));
+    expect(entry.unverified).toBe(true);
+    const shown = ledgerLesson(entry);
+    expect(shown.verified).toBe("unverified, yours only");
+    const md = renderLessons(select([shown], installed({ vitest: ["5.0.3"] }), undefined), "vitest 5.0.3", new Date());
+    expect(md).toContain("  Taught by you (in your ledger, not public); unverified, yours only.");
+  });
+
+  it("refuses --public for a draft without evidence, before asking gh anything", () => {
+    const home = tmp();
+    const file = join(tmp(), "draft.json");
+    const { evidence: _e, ...bare } = draft;
+    writeFileSync(file, JSON.stringify(bare));
+    const r = spawnSync(process.execPath, [join(import.meta.dirname, "../src/cli.ts"), "teach", file, "--public"], { encoding: "utf8", env: { ...process.env, LUDION_HOME: home, PATH: "" } });
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain("A public lesson needs evidence");
+    expect(existsSync(join(home, "ledger"))).toBe(false);
+    const saved = spawnSync(process.execPath, [join(import.meta.dirname, "../src/cli.ts"), "teach", file], { encoding: "utf8", env: { ...process.env, LUDION_HOME: home } });
+    expect(saved.status).toBe(0);
+    expect(saved.stdout).toContain("Saved to your ledger as unverified (no evidence)");
   });
 });
 

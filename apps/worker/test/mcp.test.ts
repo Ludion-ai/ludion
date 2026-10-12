@@ -253,6 +253,20 @@ describe("ludion_teach", () => {
     expect(ungrounded).toMatchObject({ isError: true, text: expect.stringContaining("no source quote contains: never") });
   });
 
+  it("accepts a draft with no evidence as unverified, for the user's own ledger only", async () => {
+    const { teach } = await import("../src/mcp/teach.ts");
+    const { evidence: _e, ...bare } = draft;
+    const r = teach({ ...bare, detail: "the junit reporter moved" });
+    expect(r.isError).toBe(false);
+    if (r.isError) return;
+    expect(r.text).toContain('marked "unverified, yours only", and it is never published');
+    const decoded = JSON.parse(atob(r.command.split(" ").at(-1)!.replace(/-/g, "+").replace(/_/g, "/")));
+    expect(decoded.evidence).toEqual([]);
+    // The fields are still checked.
+    expect(teach({ ...bare, signal: "quiet" })).toMatchObject({ isError: true, text: expect.stringContaining("/signal:") });
+    expect(teach({ ...bare, versions: "*" })).toMatchObject({ isError: true, text: expect.stringContaining("is not a range") });
+  });
+
   it("is listed next to ludion_ask, read-only", async () => {
     const list = await rpc("tools/list");
     const tool = list.body.result.tools.find((t: { name: string }) => t.name === "ludion_teach");

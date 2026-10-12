@@ -2,6 +2,7 @@
 import { lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative } from "node:path";
 import { COVERAGE_LINE } from "@ludion/core";
+import { UNVERIFIED } from "./ledger.ts";
 import type { Selection } from "./match.ts";
 
 /** The first line of everything Ludion hands an assistant (the same line ludion_ask starts with). */
@@ -14,7 +15,7 @@ function teacherLine(l: Selection["kept"][number]["lesson"]): string {
   const who = l.teacher === "you" ? "Taught by you (in your ledger, not public)" : `Taught by ${l.teacher}`;
   const drafted = l.drafted_by === "agent" ? ", drafted by an agent" : "";
   const label = l.verified === "differential" ? "tests across versions" : l.verified;
-  const verified = l.verified.startsWith("not verified") ? l.verified : `verified by ${label}${l.verified_at ? ` on ${l.verified_at.slice(0, 10)}` : ""}`;
+  const verified = l.verified.startsWith("not verified") || l.verified === UNVERIFIED ? l.verified : `verified by ${label}${l.verified_at ? ` on ${l.verified_at.slice(0, 10)}` : ""}`;
   return `${who}${drafted}; ${verified}.${l.url ? ` ${l.url}` : ""}`;
 }
 

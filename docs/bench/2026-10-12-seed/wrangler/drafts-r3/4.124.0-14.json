@@ -1,0 +1,56 @@
+{
+  "entry": "4.124.0#14",
+  "verdict": {
+    "id": "4.124.0#14",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "compliance_region",
+    "why": "Setting compliance_region or CLOUDFLARE_COMPLIANCE_REGION to FedRAMP High now selects a different container registry and API."
+  },
+  "cost_usd": 0.5749005999999999,
+  "turns": 14,
+  "round": 3,
+  "model": "claude-opus-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.124.0",
+    "kind": "behavior",
+    "symbol": "CLOUDFLARE_COMPLIANCE_REGION",
+    "signal": "silent",
+    "detail": "Wrangler now selects the FedRAMP registry from CLOUDFLARE_COMPLIANCE_REGION",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.124.0"
+          },
+          "code": "const http = require(\"http\");\nconst { spawn } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst seen = [];\nconst server = http.createServer((req, res) => {\n  seen.push(req.method + \" \" + req.url);\n  req.resume();\n  req.on(\"end\", () => {\n    res.setHeader(\"content-type\", \"application/json\");\n    res.end(JSON.stringify({ username: \"u\", password: \"p\" }));\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const cwd = fs.mkdtempSync(\"/tmp/w-\");\n  const child = spawn(\"node\", [\"/w/node_modules/wrangler/bin/wrangler.js\", \"containers\", \"registries\", \"credentials\", \"--push\"], {\n    cwd,\n    env: { ...process.env, CLOUDFLARE_COMPLIANCE_REGION: \"fedramp_high\", CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\", CLOUDFLARE_API_TOKEN: \"x\", CLOUDFLARE_ACCOUNT_ID: \"abc\", WRANGLER_SEND_METRICS: \"false\", WRANGLER_LOG_PATH: cwd, XDG_CONFIG_HOME: cwd, CI: \"1\" },\n  });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => (out += d));\n  child.stderr.on(\"data\", (d) => (out += d));\n  const timer = setTimeout(() => { child.kill(); }, 70000);\n  child.on(\"close\", () => {\n    clearTimeout(timer);\n    server.close();\n    const hit = seen.find((s) => s.includes(\"/registries/\"));\n    if (!hit) {\n      console.error(\"ERROR: no registry credentials request; seen=\" + JSON.stringify(seen) + \" out=\" + out.slice(0, 300));\n      process.exit(2);\n    }\n    if (hit.includes(\"/registries/registry.cloudflare.com/\")) {\n      console.error(\"FAIL: credentials requested for registry.cloudflare.com under CLOUDFLARE_COMPLIANCE_REGION=fedramp_high\");\n      process.exit(1);\n    }\n    if (!hit.includes(\"/registries/registry.fed.cloudflare.com/\")) {\n      console.error(\"ERROR: unexpected request: \" + hit);\n      process.exit(2);\n    }\n    console.log(\"ok: \" + hit);\n  });\n});\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.123.0"
+          },
+          "code": "const http = require(\"http\");\nconst { spawn } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst seen = [];\nconst server = http.createServer((req, res) => {\n  seen.push(req.method + \" \" + req.url);\n  req.resume();\n  req.on(\"end\", () => {\n    res.setHeader(\"content-type\", \"application/json\");\n    res.end(JSON.stringify({ username: \"u\", password: \"p\" }));\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const cwd = fs.mkdtempSync(\"/tmp/w-\");\n  const child = spawn(\"node\", [\"/w/node_modules/wrangler/bin/wrangler.js\", \"containers\", \"registries\", \"credentials\", \"--push\"], {\n    cwd,\n    env: { ...process.env, CLOUDFLARE_COMPLIANCE_REGION: \"fedramp_high\", CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\", CLOUDFLARE_API_TOKEN: \"x\", CLOUDFLARE_ACCOUNT_ID: \"abc\", WRANGLER_SEND_METRICS: \"false\", WRANGLER_LOG_PATH: cwd, XDG_CONFIG_HOME: cwd, CI: \"1\" },\n  });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => (out += d));\n  child.stderr.on(\"data\", (d) => (out += d));\n  const timer = setTimeout(() => { child.kill(); }, 70000);\n  child.on(\"close\", () => {\n    clearTimeout(timer);\n    server.close();\n    const hit = seen.find((s) => s.includes(\"/registries/\"));\n    if (!hit) {\n      console.error(\"ERROR: no registry credentials request; seen=\" + JSON.stringify(seen) + \" out=\" + out.slice(0, 300));\n      process.exit(2);\n    }\n    if (hit.includes(\"/registries/registry.cloudflare.com/\")) {\n      console.error(\"FAIL: credentials requested for registry.cloudflare.com under CLOUDFLARE_COMPLIANCE_REGION=fedramp_high\");\n      process.exit(1);\n    }\n    if (!hit.includes(\"/registries/registry.fed.cloudflare.com/\")) {\n      console.error(\"ERROR: unexpected request: \" + hit);\n      process.exit(2);\n    }\n    console.log(\"ok: \" + hit);\n  });\n});\n",
+          "expect": "fail",
+          "error": "FAIL: credentials requested for registry.cloudflare.com under CLOUDFLARE_COMPLIANCE_REGION=fedramp_high"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.124.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Container builds, pushes, deployments, image commands, and local development now select the corresponding production or staging FedRAMP registry and API from either `compliance_region` or `CLOUDFLARE_COMPLIANCE_REGION`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

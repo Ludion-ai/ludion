@@ -1,0 +1,56 @@
+{
+  "entry": "4.125.0#3",
+  "verdict": {
+    "id": "4.125.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler preview",
+    "why": "wrangler preview now creates a missing parent Worker (automatically in non-interactive mode) instead of failing."
+  },
+  "cost_usd": 0.7398984000000001,
+  "turns": 23,
+  "round": 3,
+  "model": "claude-opus-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.125.0",
+    "kind": "behavior",
+    "symbol": "wrangler preview",
+    "signal": "silent",
+    "detail": "wrangler preview, a private beta, creates the parent Worker automatically when the parent Worker doesn't exist yet",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.125.0"
+          },
+          "code": "const http = require(\"http\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst dir = fs.mkdtempSync(\"/tmp/pv-\");\nfs.writeFileSync(path.join(dir, \"index.js\"), \"export default { fetch() { return new Response('hi'); } };\\n\");\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"test-worker\", main: \"index.js\", compatibility_date: \"2025-01-01\", workers_dev: true }));\nconst base = \"/client/v4/accounts/acc123/workers/workers\";\nconst reqs = [];\nfunction send(res, status, body) { res.writeHead(status, { \"content-type\": \"application/json\" }); res.end(JSON.stringify(body)); }\nconst server = http.createServer((req, res) => {\n  let b = \"\";\n  req.on(\"data\", (c) => { b += c; });\n  req.on(\"end\", () => {\n    const u = req.url.split(\"?\")[0];\n    reqs.push({ m: req.method, u, b });\n    const now = new Date().toISOString();\n    if (req.method === \"GET\" && u === base + \"/test-worker/previews/test-preview\") return send(res, 404, { success: false, result: null, errors: [{ code: 10007, message: \"This Worker does not exist on your account.\" }], messages: [] });\n    if (req.method === \"POST\" && u === base) return send(res, 200, { success: true, result: { id: \"w1\", name: \"test-worker\" }, errors: [], messages: [] });\n    if (req.method === \"POST\" && u === base + \"/test-worker/previews\") return send(res, 200, { success: true, result: { id: \"p1\", name: \"test-preview\", slug: \"test-preview\", urls: [\"https://test-preview-test-worker.workers.dev\"], worker_name: \"test-worker\", created_on: now }, errors: [], messages: [] });\n    if (req.method === \"POST\" && u === base + \"/test-worker/previews/p1/deployments\") return send(res, 200, { success: true, result: { id: \"d1\", preview_id: \"p1\", preview_name: \"test-preview\", compatibility_date: \"2025-01-01\", env: {}, urls: [], created_on: now }, errors: [], messages: [] });\n    send(res, 404, { success: false, result: null, errors: [{ code: 9999, message: \"unmocked \" + req.method + \" \" + u }], messages: [] });\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const env = { ...process.env, CLOUDFLARE_API_TOKEN: \"test-token\", CLOUDFLARE_ACCOUNT_ID: \"acc123\", CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\", CI: \"true\", WRANGLER_SEND_METRICS: \"false\", HOME: \"/tmp\", NO_COLOR: \"1\" };\n  const child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"preview\", \"--name\", \"test-preview\"], { cwd: dir, env });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => { out += d; });\n  child.stderr.on(\"data\", (d) => { out += d; });\n  const timer = setTimeout(() => child.kill(\"SIGKILL\"), 80000);\n  child.on(\"close\", (code) => {\n    clearTimeout(timer);\n    server.close();\n    const created = reqs.filter((r) => r.m === \"POST\" && r.u === base);\n    if (code === 0 && created.length === 1) {\n      let body;\n      try { body = JSON.parse(created[0].b); } catch (e) { broken(\"create Worker body is not JSON: \" + created[0].b); }\n      if (body.name !== \"test-worker\") broken(\"created Worker has name \" + body.name);\n      if (!reqs.some((r) => r.m === \"POST\" && r.u === base + \"/test-worker/previews/p1/deployments\")) broken(\"no Preview deployment was created\");\n      console.log(\"OK: wrangler preview created the missing parent Worker, then the Preview\");\n      process.exit(0);\n    }\n    if (code !== 0 && created.length === 0 && out.includes(\"previews/test-preview\") && out.includes(\"10007\")) symptom(\"wrangler preview failed with an API error on the Preview endpoint instead of creating the missing parent Worker\");\n    broken(\"exit \" + code + \", \" + created.length + \" create-Worker requests; output: \" + out.slice(-1500));\n  });\n});\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.124.0"
+          },
+          "code": "const http = require(\"http\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst dir = fs.mkdtempSync(\"/tmp/pv-\");\nfs.writeFileSync(path.join(dir, \"index.js\"), \"export default { fetch() { return new Response('hi'); } };\\n\");\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"test-worker\", main: \"index.js\", compatibility_date: \"2025-01-01\", workers_dev: true }));\nconst base = \"/client/v4/accounts/acc123/workers/workers\";\nconst reqs = [];\nfunction send(res, status, body) { res.writeHead(status, { \"content-type\": \"application/json\" }); res.end(JSON.stringify(body)); }\nconst server = http.createServer((req, res) => {\n  let b = \"\";\n  req.on(\"data\", (c) => { b += c; });\n  req.on(\"end\", () => {\n    const u = req.url.split(\"?\")[0];\n    reqs.push({ m: req.method, u, b });\n    const now = new Date().toISOString();\n    if (req.method === \"GET\" && u === base + \"/test-worker/previews/test-preview\") return send(res, 404, { success: false, result: null, errors: [{ code: 10007, message: \"This Worker does not exist on your account.\" }], messages: [] });\n    if (req.method === \"POST\" && u === base) return send(res, 200, { success: true, result: { id: \"w1\", name: \"test-worker\" }, errors: [], messages: [] });\n    if (req.method === \"POST\" && u === base + \"/test-worker/previews\") return send(res, 200, { success: true, result: { id: \"p1\", name: \"test-preview\", slug: \"test-preview\", urls: [\"https://test-preview-test-worker.workers.dev\"], worker_name: \"test-worker\", created_on: now }, errors: [], messages: [] });\n    if (req.method === \"POST\" && u === base + \"/test-worker/previews/p1/deployments\") return send(res, 200, { success: true, result: { id: \"d1\", preview_id: \"p1\", preview_name: \"test-preview\", compatibility_date: \"2025-01-01\", env: {}, urls: [], created_on: now }, errors: [], messages: [] });\n    send(res, 404, { success: false, result: null, errors: [{ code: 9999, message: \"unmocked \" + req.method + \" \" + u }], messages: [] });\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const env = { ...process.env, CLOUDFLARE_API_TOKEN: \"test-token\", CLOUDFLARE_ACCOUNT_ID: \"acc123\", CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\", CI: \"true\", WRANGLER_SEND_METRICS: \"false\", HOME: \"/tmp\", NO_COLOR: \"1\" };\n  const child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"preview\", \"--name\", \"test-preview\"], { cwd: dir, env });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => { out += d; });\n  child.stderr.on(\"data\", (d) => { out += d; });\n  const timer = setTimeout(() => child.kill(\"SIGKILL\"), 80000);\n  child.on(\"close\", (code) => {\n    clearTimeout(timer);\n    server.close();\n    const created = reqs.filter((r) => r.m === \"POST\" && r.u === base);\n    if (code === 0 && created.length === 1) {\n      let body;\n      try { body = JSON.parse(created[0].b); } catch (e) { broken(\"create Worker body is not JSON: \" + created[0].b); }\n      if (body.name !== \"test-worker\") broken(\"created Worker has name \" + body.name);\n      if (!reqs.some((r) => r.m === \"POST\" && r.u === base + \"/test-worker/previews/p1/deployments\")) broken(\"no Preview deployment was created\");\n      console.log(\"OK: wrangler preview created the missing parent Worker, then the Preview\");\n      process.exit(0);\n    }\n    if (code !== 0 && created.length === 0 && out.includes(\"previews/test-preview\") && out.includes(\"10007\")) symptom(\"wrangler preview failed with an API error on the Preview endpoint instead of creating the missing parent Worker\");\n    broken(\"exit \" + code + \", \" + created.length + \" create-Worker requests; output: \" + out.slice(-1500));\n  });\n});\n",
+          "expect": "fail",
+          "error": "FAIL: wrangler preview failed with an API error on the Preview endpoint instead of creating the missing parent Worker"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.125.0/packages/wrangler/CHANGELOG.md",
+          "quote": "[private beta]: Create the parent Worker automatically when `wrangler preview` targets one that doesn't exist yet"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

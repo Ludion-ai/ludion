@@ -7,7 +7,7 @@ What was built, what the check showed, what was decided and why. Newest first. N
 | | Check | State |
 | - | - | - |
 | 1 | Single player: a lesson taught in project A shows up via `ludion sync` in project B, and Claude Code in B gets right the task it got wrong before | **shown**: 1/5 before, 5/5 after sync, 3/3 through the plugin hook (`docs/bench/2026-10-11-done1/`) |
-| 2 | Plumbing: `ludion teach --public` → merge → within five minutes `ludion sync` elsewhere writes it with the teacher's name, and `ludion_ask` returns it | `ludion-ai` 0.1.1 is on npm (npm refused the name `ludion`); waits for the owner's own `teach --public` |
+| 2 | Plumbing: `ludion teach --public` → merge → within five minutes `ludion sync` elsewhere writes it with the teacher's name, and `ludion_ask` returns it | **prepared, not run** (`docs/bench/2026-10-13-done2/`): the lesson (vitest 4.0 `vi.restoreAllMocks`) passed CI's Docker run on a closed draft PR (#90); the owner runs one `teach --public` line after approving `ludion-ai` 0.1.4 on npmjs.com (npm has 0.1.2) |
 | 3 | Value: FreshBench on the wedge, Claude Code with default tools in a project with the new version installed, with vs without `ludion sync`: +20 points | B questions on the frozen seeds: **36/45 vs 24/45 (+27)** (`docs/bench/2026-10-11-done3/`). C tasks: running, one trial per task over several days |
 
 ## Current work: batch mode (from 2026-10-12)
@@ -40,12 +40,19 @@ The list (status in brackets):
 
 Heavy work one job at a time; Opus only for the review of protected PRs (one round); pipeline work on Sonnet; no per-lesson model FreshBench; no daily C batches; big files read through summaries; this file updated after each work item.
 
+### What waits for the owner, in order (2026-10-13, latest)
+
+1. **npmjs.com, `ludion-ai`: approve 0.1.4, reject 0.1.3.** Both are staged. 0.1.4 (publish run 38315009051, from main at #92) is the one to approve: it has everything 0.1.3 has plus `User-Agent: ludion-ai/<version>` on the CLI's index requests, and the plugin's hook pin on main already says 0.1.4. 0.1.3 (run 38313330049) was staged an hour earlier, before the User-Agent request reached #89; it is not to be approved (`docs/decisions.md`, "Publishing"). In a terminal: `npm stage list ludion-ai`, then `npm stage approve <id of 0.1.4>` and `npm stage reject <id of 0.1.3>`, or the same on npmjs.com.
+2. **Done 2, one line** (after 1, with `git pull` done in `C:\dev\ludion`): `npx ludion-ai@0.1.4 teach C:\dev\ludion\docs\bench\2026-10-13-done2\draft.json --public`, answer `y`. Then `node docs/bench/2026-10-13-done2/measure.ts <pull request number>` in a second terminal, then merge that pull request with nothing else merged for ten minutes either side. The three checks by hand (sync elsewhere, teacher's name in `lessons.md`, `ludion_ask`) and how the five minutes are timed: `docs/bench/2026-10-13-done2/README.md`.
+3. **Protected PRs, merge order** (opened once a day, together; the first batch is opened with this update's PR): see the PR list below.
+4. **Not started, waiting for the owner's yes:** counting distinct clients of `/index/*.json` in the Worker (Analytics Engine; a daily-salted hash of the User-Agent, path and `CF-Connecting-IP`, no raw IP). It changes `wrangler.jsonc` (protected) and adds server-side counting next to the README's "no telemetry" (that line is about the CLI), so it is held until the owner confirms they want it.
+
 ### Open PRs and what waits for whom (2026-10-13, after the owner's merges)
 
 - **Merged by the owner on 2026-10-12 (UTC):** #62, #75, #76, #80, #84 (25 lessons), #73 (nightly seed watch), #54 (issue form). Production serves them since deploy run 38311678194 on `6dedffa`: `/index/subjects.json` lists agents 15, vitest 17, wrangler 23 active lessons. The deploys for the commits in between failed on purpose at "Make sure this is main's newest commit".
 - **#73 drafts nothing yet**: it needs the `ANTHROPIC_API_KEY` repository secret (a secret value, the owner's). Without it, the nightly run lists new releases in its artifact and stops.
 - **Waiting for Codex's fixes, then the owner's merge, in this order:** #67 (changes requested; also conflicts with main in `docs/decisions.md`), #68 (approve; rebase onto main after #67: `git rebase --onto origin/main 1ed1411 codex/runtime-task-acceptance`), #69 (changes requested; rebase after #68). Details in the review comments.
-- **After #67 to #69 are on main (this side):** rebase open work, bump the CLI to 0.1.3 with the plugin pin, run `publish.yml` (the owner approves the staged version on npmjs.com), and dispatch `reverify` (lessons on main haven't run under #67's Docker flags).
+- **After #67 to #69 are on main (this side):** rebase open work, bump the CLI to 0.1.5 with the plugin pin (0.1.3 was skipped and 0.1.4 carries the User-Agent), run `publish.yml` (the owner approves the staged version on npmjs.com), and dispatch `reverify` (lessons on main haven't run under #67's Docker flags).
 - **Not waiting on a merge tap:** #60 (consent sentence draft, docs only) waits for the owner's license decision.
 
 ### Who works on what (owner, 2026-10-12)
@@ -56,7 +63,7 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 
 1. [done] Pipeline yield against the hand-made seeds (`docs/bench/2026-10-12-seed/README.md`).
 2. [decided by the owner] Who revises: machine-check problems back to the drafting model (Sonnet) first; then the Opus review; lessons with content findings (rules 1, 7, 8) to Opus, the rest to Sonnet, one round (`docs/decisions.md`, "Revising seed drafts"). Built in `tools/seed` (`revise --scope check|findings`, review reuse for unchanged drafts).
-3. [reviews done, see above] After the owner merges them: rebase this side's open work on main, bump the CLI (0.1.3: #53, #55 and #67 are not on npm yet; npm has 0.1.2 from `aa94ad9`) with the plugin pin, and stage it with `publish.yml`.
+3. [reviews done, see above] After the owner merges them: rebase this side's open work on main, bump the CLI (0.1.3 and 0.1.4 carry #53, #55 and the User-Agent and are staged; #67 is not in them, so it goes out as 0.1.5) with the plugin pin, and stage it with `publish.yml`.
 4. [done] vitest and wrangler: the remaining drafts through step 2. No finding after it: vitest 5 of 23 reviewed (3 new, #80), wrangler 11 of 43 (8 new, #84); the rest repeat lessons on main. Counts and costs: `docs/bench/2026-10-12-seed/README.md`. Search questions: #82, #83. CI: #80 3 of 3; #84 8 of 8 after one `fix` round. Opus review of both (one round): #80 approve; #84 one lesson fixed (4.113.0#10 now says provisioning is generally available). Both wait for the owner's merge.
 5. Not started: the three outreach letters for subjects not yet measured.
 
@@ -68,6 +75,13 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 - C tasks: `bash C:/dev/ludion-seedwork/c-batch.sh <ids>` runs one day's tasks under both conditions (frozen seeds served from `C:/dev/ludion-freeze`); results land in `docs/bench/2026-10-11-done3/` of `C:/dev/ludion` and are committed in a docs PR.
 
 ## Log
+
+### 2026-10-13: 0.1.4 staged; a lesson retracted; Done 2 prepared
+
+- **npm**: 0.1.3 staged from #89, then the owner asked for a `User-Agent: ludion-ai/<version>` header in the same release; #89 had merged, so it went in #92 as 0.1.4, which is staged (run 38315009051, "has been staged with tag latest"). The built `dist/cli.js` was checked against a local server: it sent `UA=ludion-ai/0.1.4` on both index requests. Neither is approved yet; the owner approves 0.1.4 and rejects 0.1.3. After approval, `npx ludion-ai@0.1.4 sync` is run in a fresh folder against production and its output added here: not run yet.
+- **Retraction**: a fresh Opus review of wrangler 4.113.0#10 (rewritten after #84's review and merged unreviewed) said DROP: a label removal that reads as a behavior change. The file is deleted in a protected PR (opened with the batch); the rule from it (a rewrite after the one review round is reviewed again) is in `docs/decisions.md`. One of 25 pipeline lessons retracted (`docs/bench/2026-10-12-seed/README.md`).
+- **Done 2**: found on a draft PR that the required `test` check failed every lesson without search questions, which no teacher's PR can have: fixed in #91. Also found: vitest 4.0.0 needs vite 7.1.11 or older to run (`Unknown method: getBuiltins`), so the draft's tests pin it. CI's Docker run then passed both tests (`docs/bench/2026-10-13-done2/ci.json`). `measure.ts` was rehearsed on #80 and had two bugs, fixed.
+- **Announcement materials** (#93, held until 0.1.4 is approved): README, 89-second demo (act 2 is a recorded `teach` and a `sync` elsewhere), Show HN and X drafts, one letter per subject (two so far). A fresh Sonnet check matched every number to `docs/bench/` and found wording problems (tools were read-only, not "default"; lessons frozen, not today's; seeds drafted from the same keys that grade), now fixed.
 
 ### 2026-10-12: Published as ludion-ai; the v2 stack is on main
 

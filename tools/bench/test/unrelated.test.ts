@@ -23,11 +23,15 @@ describe("experiment 3: unrelated lessons", () => {
     expect(tail).toEqual(["", "Ludion has no lessons at all for these dependencies: zod."]);
   });
 
-  it("merges extra lessons in package order and leaves the rest of the file alone", () => {
-    const extra = [{ package: "hono", lines: ["- hono >=4.0.0 changed what `c`. (installed: hono 4.9.0)", "  Taught by @Ludion-ai."] as [string, string] }];
+  it("merges extra lessons in sync's order (silent, loud, added; then package) and leaves the rest of the file alone", () => {
+    const extra = [
+      { package: "hono", lines: ["- hono >=4.0.0 changed what `c`. (installed: hono 4.9.0)", "  Taught by @Ludion-ai."] as [string, string] },
+      { package: "astro", lines: ["- astro >=5.0.0 added `d`. Older versions don't have it. (installed: astro 5.1.0)", "  Taught by @Ludion-ai."] as [string, string] },
+      { package: "zod", lines: ["- zod >=4.0.0 changed the default of `e`. Silent: code written for older versions still runs, without an error. (installed: zod 4.1.0)", "  Taught by @Ludion-ai."] as [string, string] },
+    ];
     const out = withUnrelated(md, extra);
-    expect(splitLessons(out).blocks.map((b) => b.package)).toEqual(["agents", "hono", "wrangler"]);
-    expect(out.startsWith("# Lessons from Ludion\n\nData line.\n\n- agents")).toBe(true);
+    expect(splitLessons(out).blocks.map((b) => b.package)).toEqual(["zod", "agents", "hono", "wrangler", "astro"]);
+    expect(out.startsWith("# Lessons from Ludion\n\nData line.\n\n- zod")).toBe(true);
     expect(out.endsWith("Ludion has no lessons at all for these dependencies: zod.\n")).toBe(true);
     expect(withUnrelated(md, [])).toBe(md);
   });

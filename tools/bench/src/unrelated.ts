@@ -25,11 +25,17 @@ export function splitLessons(md: string): { head: string[]; blocks: Block[]; tai
   return { head: lines.slice(0, first), blocks, tail: lines.slice(i) };
 }
 
-/** lessons.md with `extra` blocks merged in, every block sorted by package name (stable, so sync's own order holds within a package). */
+/** sync's order (packages/cli/src/match.ts, rank): silent changes, then loud ones, then additions; read from the claim. */
+export function rankOf(b: Block): number {
+  if (b.lines[0].includes("Older versions don't have it.")) return 2;
+  return b.lines[0].includes("Silent: code written for older versions still runs") ? 0 : 1;
+}
+
+/** lessons.md with `extra` blocks merged in, in sync's order: by rank, then package name (stable within a package). */
 export function withUnrelated(md: string, extra: Block[]): string {
   const { head, blocks, tail } = splitLessons(md);
   if (extra.length === 0) return md;
-  const all = [...blocks, ...extra].map((b, i) => ({ b, i })).sort((x, y) => x.b.package.localeCompare(y.b.package) || x.i - y.i);
+  const all = [...blocks, ...extra].map((b, i) => ({ b, i })).sort((x, y) => rankOf(x.b) - rankOf(y.b) || x.b.package.localeCompare(y.b.package) || x.i - y.i);
   return [...head, ...all.flatMap(({ b }) => b.lines), ...tail].join("\n") + "\n";
 }
 

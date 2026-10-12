@@ -49,6 +49,22 @@ Reading it:
 - **Source-only lessons** (no test) among those that passed local checks: 9 of 24, 2 of 24, 10 of 33. Those get the weaker "source" label.
 - **Overlap with the hand-made seeds** is a lower bound: a lesson counts as a repeat only when versions match and the symbols are equal or one holds the other (`isDuplicate`).
 
+## Revising under the owner's rule (2026-10-12, later)
+
+The owner's decision (`docs/decisions.md`, "Revising seed drafts"): machine-check problems back to the drafting model (Sonnet) first; the per-lesson reviewer is Opus; lessons with a content finding (rules 1, 7, 8) go to Opus once, the rest to Sonnet. Lessons already in #75 and #76 are left out. A draft unchanged since the last round keeps that round's Opus review. From each subject's `summary.json`, `drafts-r*/`, `check-r*.json`, `review-r*.json`, and `kept.json`:
+
+| vitest round | what was revised, by whom ($) | drafts | pass local checks | reviewed (review kept) | findings | no finding | review $ |
+| - | - | - | - | - | - | - | - |
+| 0 (first draft, before) | | 34 | 24 | 24 | 54 | 6 (5 in #75, 1 repeats main) | 1.50 |
+| 1: machine checks | 10, Sonnet (0.47) | 34 | 34 | 29 (19) | 82 | 1 | 0.67 |
+| 2: findings, once | 26 with rule 1/7/8, Opus (5.41); 2 others, Sonnet (0.12); Opus skipped 6 | 28 | 23 | 18 (3) | 43 | 3 | 0.99 |
+| 3: machine checks again | 5, Sonnet (0.22): 4 had more than 3 pieces of evidence, 1 an ungrounded word | 28 | 28 | 23 (18) | 53 | 5 | 0.33 |
+
+- **vitest: 5 of the 23 lessons reviewed in the last round have no finding; 2 of them repeat a lesson on main, so 3 are new (#80).** With #75's 5, that is 8 of the 34 first drafts.
+- Round 1 fixed every machine-check failure (10 of 10 pass), but Opus found something in all 10 (28 findings).
+- Opus's revise round fixed content in some lessons and broke machine checks in 5, which round 3 repaired. The 6 skips all say the folder had no page to quote for the change (vitest has no CHANGELOG.md at the `v5.0.0` tag, at the package or the repo root, so its folders hold only docs files the PRs changed; 5 of the 6 had none). Quoting the GitHub release notes when there is no CHANGELOG.md would give those a page; not built yet.
+- Findings left after round 3 (53 on 18 lessons), by rule: 8: 17, 1: 12, 2: 12, 7: 8, 5: 3, 3: 1. No further Opus round, per the rule.
+
 ## Confounds
 
 - Drafting, reviser, and reviewer models differ across rows (table above); only the two baselines are like for like. Revise rounds: agents Opus twice; wrangler Sonnet once; vitest none.

@@ -13,13 +13,15 @@ export interface Installed {
   source: string;
 }
 
+const PACKAGE_NAME = /^(@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i;
+
 /**
  * Record one installed version. Lockfiles may come from anyone, and versions end up in text an assistant reads,
  * so only a clean semver version is kept (no spaces, quotes, or anything else).
  */
 function add(map: Map<string, Set<string>>, name: string, version: string): void {
   const v = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?/.exec(version.trim())?.[0];
-  if (!name || !v || !/^(@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i.test(name)) return;
+  if (!name || !v || !PACKAGE_NAME.test(name)) return;
   let set = map.get(name);
   if (!set) map.set(name, (set = new Set()));
   set.add(v);
@@ -93,6 +95,24 @@ function fromNodeModules(dir: string): Map<string, Set<string>> {
     if (existsSync(p)) add(map, name, (JSON.parse(readFileSync(p, "utf8")) as { version?: string }).version ?? "");
   }
   return map;
+}
+
+/**
+ * The registry packages the project's own package.json depends on (dependencies and devDependencies), sorted.
+ * Left out: workspace, link, file, git and URL specs (the project's own or private code, not a registry package),
+ * aliases (npm:), and invalid names, because the names end up in text an assistant reads.
+ */
+export function directDependencies(dir: string): string[] {
+  const pkgPath = join(dir, "package.json");
+  if (!existsSync(pkgPath)) return [];
+  try {
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as Record<string, unknown>;
+    const entries = ["dependencies", "devDependencies"].flatMap((k) => (pkg[k] && typeof pkg[k] === "object" ? Object.entries(pkg[k] as Record<string, unknown>) : []));
+    const registry = (spec: unknown) => typeof spec === "string" && !/^(workspace|link|file|portal|npm|git|git\+[a-z]+|github|https?):|^[./~]|\//.test(spec.trim());
+    return [...new Set(entries.filter(([n, spec]) => PACKAGE_NAME.test(n) && n.length <= 214 && registry(spec)).map(([n]) => n))].sort();
+  } catch {
+    return [];
+  }
 }
 
 function nodeVersion(dir: string): string {

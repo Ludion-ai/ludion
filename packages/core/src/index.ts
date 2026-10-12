@@ -11,3 +11,4 @@ export { buildIndex, storedLogin, type GitInfo, type BuildOptions } from "./inde
 export { resolveLogins, type FetchFn } from "./teachers.ts";
 export { checkSource, normalizeText, sourceUrlProblem, type SourceResult } from "./source-check.ts";
 export { asTest, isDifferential, pinInRange, verifiedBy } from "./label.ts";
+export { COVERAGE_LINE, SUBJECT_REQUEST_URL } from "./coverage.ts";

@@ -24,6 +24,14 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - **The seed criterion changes.** It was "changes measured models get wrong × silent". It is now: **verify every change in a release's changelog and teach it**, `default`, `behavior`, `deprecated` and `renamed` first, `added` last. FreshBench is no longer the gate that decides whether a change gets a lesson; it supplies the `models` labels that `sync` prunes with.
 - What this replaces: CLAUDE.md's seeds bullet ("silent changes in the wedge that measured models get wrong") described the first 30 seeds. Those stay; the next ones come from the pipeline (`tools/seed`).
 
+### 2026-10-12: Analytics
+
+- **Google Analytics 4** on the site (measurement ID `G-91CJFHRK88`), at the owner's request. Nothing in the CLI or the MCP server: the "No telemetry" on `/start` is about the CLI and stays true. The footer of every page says "This site uses Google Analytics."
+- **`apps/site/public/ga.js`**, loaded with `defer` from the base layout, so every page has it and the CSP needs no `'unsafe-inline'`. It sets the Consent Mode defaults, then adds `gtag.js`. It does nothing unless the host is `ludion.ai`: local builds, CI, and the end-to-end tests send no hits. So the home page's 60 KB JavaScript budget still measures only the site's own scripts; `gtag.js` is Google's and loads only in production.
+- **Consent Mode**: the EEA (the EU plus Iceland, Liechtenstein, and Norway), the UK, and Switzerland default to `analytics_storage: denied`, with no banner, so GA4 stores nothing there and gets only cookieless pings. Elsewhere `analytics_storage` is granted. The site shows no ads, so `ad_storage`, `ad_user_data`, and `ad_personalization` are denied everywhere.
+- **CSP**: only the origins Google lists for GA4 without Ads features (developers.google.com/tag-platform/security/guides/csp): `script-src https://www.googletagmanager.com`; `img-src https://www.googletagmanager.com https://*.google-analytics.com`; `connect-src https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com`. Nothing else was loosened.
+- This replaces v0's "no analytics beyond Cloudflare Web Analytics", which v2's CLAUDE.md doesn't carry.
+
 ### 2026-10-12: Publishing
 
 - **The package is `ludion-ai`** (see "The ludion CLI" below for why). 0.1.0 was published by hand from the owner's npm account `ludion`, approved with the owner's passkey. Every later version goes through `.github/workflows/publish.yml`.
@@ -318,7 +326,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
   - axe (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`) finds nothing on any page;
   - home JavaScript at most 60 KB gzipped;
   - targets that no test or workflow checks yet: Lighthouse accessibility at least 95, LCP at most 1.5 s on a mid-range phone over 4G, CLS at most 0.05. axe and the 60 KB budget are enforced (`e2e/`).
-- Headers (`apps/site/public/_headers`): CSP `default-src 'self'` (avatars from `avatars.githubusercontent.com`), `frame-ancestors 'none'`, `nosniff`, `strict-origin-when-cross-origin`, and a locked-down `Permissions-Policy`. Canonical links use the trailing slash.
+- Headers (`apps/site/public/_headers`): CSP `default-src 'self'` (avatars from `avatars.githubusercontent.com`; Google Analytics' origins, see "Analytics"), `frame-ancestors 'none'`, `nosniff`, `strict-origin-when-cross-origin`, and a locked-down `Permissions-Policy`. Canonical links use the trailing slash.
 
 ### Bench
 

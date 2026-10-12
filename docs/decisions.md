@@ -4,6 +4,13 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Private source artifacts and no-model replay
+
+- Capture the supported prepared/generated source profile and delivery context into private local artifacts, linked from rows by id/hash. Persist task/source/CLI/context identity to remove the missing-generated-helper ambiguity. Scope, exclusions, limits, privacy and measured checks are in `docs/bench/2026-10-12-artifacts/`.
+- Runtime replay validates file integrity, task definition and prepared base before Docker; it consumes captured candidate files rather than filling gaps in old `left` records. It does not rewrite historical C scores or authenticate the model provider's identity.
+- Make paid model measurement explicit through `--run-model`; reject malformed numeric bounds, unknown saved costs, duplicate trials and mixed/legacy resume identity before model launch. Keep charge attempts separate from grades and hold an exclusive same-label lock across the batch; unfinished/unknown attempts and stale locks require reconciliation. Pass the remaining aggregate allowance into the per-run cap and stop on missing actual cost or failed source capture. The current spending pause remains in force.
+- CI uses only repository-owned synthetic fixture artifacts, with no private delivery context. Keep this workflow change stacked on the pending runtime/security work until required Opus review and owner merge; no npm or production action follows from local validation.
+
 ### 2026-10-12: Optional C-task execution acceptance pilot
 
 - Add runtime acceptance for a bounded subset of C tasks before expanding lessons or introducing another delivery hook. Treat current regex grades as syntax observations, not execution proof. Pilot criteria, selected tasks, Docker boundaries and measured records are in `docs/bench/2026-10-12-runtime/`.

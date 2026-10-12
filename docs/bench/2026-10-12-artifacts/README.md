@@ -1,0 +1,35 @@
+# Source artifacts, runtime replay and measurement bounds — 2026-10-12
+
+Stacked on PR #68's optional execution acceptance, base `5c004331d0d589a5b2c97f64b72b33f25d1575a9`. No model benchmark is run by this change's checks; the existing spending pause and historical results stay unchanged.
+
+## Problem and resulting behavior
+
+The C runner previously saved only the files its regex grader read. A generated helper/config file could be missing, so reconstructing the actual solution for execution was uncertain. It also accepted malformed numeric spending limits, could resume into a changed measurement condition, and passed the full per-run allowance even when less remained in the aggregate cap.
+
+- Before a model starts, capture the prepared source profile and actual delivered lesson text, if sync is enabled. After completion, capture all supported source files, task definition hash, requested model label, trial, frozen harness SHA, CLI bytes hash, offline/site condition, source digests and delivery digest. Keep the original static verdict separately.
+- Artifacts default to the local `~/.ludion/bench-artifacts/`, outside the public score directory. `LUDION_BENCH_ARTIFACTS` or `--artifact-dir` deliberately overrides that location. New POSIX directories/files are private; Windows follows existing ACLs. Entries use exclusive temporary files and atomic rename. The score row contains an opaque artifact id/hash, not source or delivery text. Existing answer/log/`left` output behavior is unchanged; those outputs are not newly sanitized by this feature.
+- `bench-source-v1` explicitly includes supported text source/config files, excludes dependencies, lockfiles, generated output, credentials and assistant metadata, and bounds file/tree/text size. JSX/TSX and TOML/YAML are retained. An unsupported file, link, nonregular input, or excessive size prevents a successful capture rather than silently losing it. This is a supported source snapshot, not a disk/secret/environment backup.
+- Private artifacts may contain private delivered lessons. They are not automatically published. CI uploads only repository-owned synthetic fixture artifacts whose delivery text is null; real model artifacts are not on that path.
+- The no-model replay CLI requires the file's recorded SHA-256, validates bounded UTF-8 input and internal digests, verifies the task definition and expected prepared base, then runs only supported tasks through network-off Docker. Wrong task/base/integrity is unscored error before image pulling; unsupported tasks stay unsupported. Replay results identify both capture/evaluation harnesses and do not print private delivery text.
+- Hashes prove matching bytes relative to the supplied reference, not an authenticated model identity or honesty of an adversarial submitter. Capture stores the requested model label and original raw run log separately; it does not independently prove the provider resolved that label to an unchanged model. Runtime installation still uses the evaluator's trusted pinned package set, not captured node_modules or all transitive dependencies from the original run.
+
+## Spending and resume boundary
+
+Model runs now require explicit `--run-model`. Validate label, trial count and finite nonnegative aggregate cap before launching. Reject malformed/unknown saved costs and duplicate trials, and preserve legacy/mixed-condition summaries instead of mixing them into a new run. A new summary is format 2 and records the supported run identity and external prepared-cache source/instruction/lockfile digest. Use the complete cache produced by `projects.ts` for all benchmark templates; `--only` changes the selected tasks, not the frozen cache identity. Inherited assistant-state directories are refused. A legacy summary needs a new label rather than inventing missing provenance.
+
+A same-label exclusive lock is acquired before reading the ledger and retained throughout the batch, preventing concurrent budget use and last-writer charge loss. Existing/stale locks fail closed; confirm the previous process is stopped and reconcile pending charges before removing a lock. Charges live in an atomic attempt ledger, separately from graded rows. Persist pending state immediately before the model process can start, then persist its actual charge before grading. Known-cost failed/ungraded attempts still consume the cap. An unfinished/unknown-cost attempt, absent ledger, inconsistent saved total or unmatched grade pointer blocks resume until reconciled; it is never silently reset to zero. Sources use bounded fatal UTF-8 decoding with BOM preserved, so invalid bytes cannot be replaced and subsequently hashed as if they were the original code.
+
+Pass `min(per-run allowance, remaining aggregate allowance)` to the model process. If a completed process omits a valid actual final cost report, retain its diagnostic log as unscored and stop further model runs. This uses the provider's reported cost/per-run cap; it does not guarantee a request can never overshoot a provider's turn-level enforcement. A source-capture failure is recorded and stops later runs as well. No new account/payment or paid model rerun was used to test this behavior.
+
+## Reproduction
+
+Capture happens during future explicitly authorized C runs. Replay consumes the local id referenced in that run's row:
+
+```sh
+node tools/bench/src/runtime-tasks-cli.ts --artifact ~/.ludion/bench-artifacts/<id>.json --sha256 <recorded-file-hash> --out replay.json
+node tools/bench/src/runtime-tasks-cli.ts --self-check --artifact-dir /private/fixture-folder --out self-check.json
+```
+
+The self-check now saves, loads and validates each synthetic artifact before Docker evaluation. Correct/stale/misleading outcomes must still match the previous pilot. A separate CI smoke invokes the actual `--artifact --sha256` CLI on a saved positive fixture and verifies its Docker result/provenance. PR CI uploads the source fixtures and resulting rows, permitting byte-level linkage between the recorded hash and the executed candidate. Those results test the evaluator pipeline, not a new model-with/without-sync effect.
+
+Local checks: typecheck and build passed; 490 tests passed across 28 files. Boundary tests cover artifact integrity, UTF-8, source identity, failed/unknown charges and concurrent/stale locks. Raw logs are stored here. CI artifact/provenance will be recorded after inspecting them. Local Docker is unavailable; boundary tests or successful artifact saving are not substituted for actual execution. Workflow changes still require fresh Opus review and owner's merge; supplemental Codex review does not waive that requirement.

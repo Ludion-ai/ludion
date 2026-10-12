@@ -54,6 +54,12 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 ## Log
 
+### 2026-10-12: Source capture and runtime replay prepared
+
+- C runner now captures supported before/after sources and private delivery context outside the score directory, with provenance/integrity references in each new row. No-model CLI replays saved artifacts after verifying source/task/base hashes. Unsupported inputs no longer silently disappear from the snapshot.
+- Fixed numeric spending bounds, remaining per-run allowance and condition-safe resume; model measurement is opt-in, unknown reported costs and capture failure stop later runs. Historical results and the spending pause are preserved.
+- Worktree `C:/dev/ludion-wt-codex-artifacts`, branch `codex/bench-artifact-replay`, stacked on #68. Check details: `docs/bench/2026-10-12-artifacts/`. Required review/owner merge remain pending; no model benchmark, npm release or deployment was run.
+
 ### 2026-10-12: C-task runtime acceptance pilot checked
 
 - Added optional Docker-only execution acceptance for test selection and top-level mocking tasks. Require actual test participation and relevant assertion failures under implementation mutations; matching regexes or exit zero alone are insufficient.

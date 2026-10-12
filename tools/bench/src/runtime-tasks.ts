@@ -1,53 +1,17 @@
 // Optional execution acceptance for selected C tasks. Historical regex grades and model runs stay unchanged.
 // Candidate content is only read on the host; it executes solely through the network-off Docker runner.
-import { lstatSync, readFileSync, readdirSync } from "node:fs";
-import { extname, join } from "node:path";
+import { readFileSync } from "node:fs";
 import { runInDocker, type RunFn, type RunSpec } from "../../verify/src/docker.ts";
 import { checkoutArgs } from "./checkout-command.ts";
+import { checkedFiles, type ProjectFiles } from "./project-snapshot.ts";
+export { checkedFiles, snapshotProject, type ProjectFiles } from "./project-snapshot.ts";
 
 export const RUNTIME_TASKS = ["vitest-5-0-0-13-c", "vitest-5-0-0-16-c"] as const;
 export type RuntimeTaskId = typeof RUNTIME_TASKS[number];
-export type ProjectFiles = Record<string, string>;
 export interface RuntimeGrade {
   verdict: "passed" | "failed" | "unsupported" | "error";
   why: string;
   observations?: unknown;
-}
-const MAX_FILES = 64;
-const MAX_BYTES = 512 * 1024;
-const excluded = new Set(["node_modules", ".git", ".claude", ".ludion", ".cursor", "package-lock.json"]);
-const sourceExtensions = new Set([".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".json", ".jsonc"]);
-
-export function checkedFiles(files: ProjectFiles): ProjectFiles {
-  let bytes = 0;
-  if (Object.keys(files).length > MAX_FILES) throw new Error("Too many candidate files.");
-  for (const [path, text] of Object.entries(files)) {
-    if (!/^[A-Za-z0-9_.@/-]{1,240}$/.test(path) || path.split("/").some((p) => !p || p === "." || p === ".." || excluded.has(p)) || typeof text !== "string") throw new Error("Invalid candidate path or text.");
-    bytes += Buffer.byteLength(text);
-    if (bytes > MAX_BYTES) throw new Error("Candidate files are too large.");
-  }
-  return files;
-}
-
-/** A complete source snapshot, not a regex-only 'left' record. Dependencies come from the trusted harness. */
-export function snapshotProject(dir: string): ProjectFiles {
-  const files: ProjectFiles = Object.create(null);
-  let visited = 0;
-  const visit = (rel: string) => {
-    if (++visited > 256 || rel.split("/").length > 16) throw new Error("Candidate source tree is too large or too deep.");
-    const path = join(dir, rel);
-    const st = lstatSync(path);
-    if (st.isSymbolicLink()) throw new Error("Candidate snapshots must not contain symbolic links.");
-    if (st.isDirectory()) {
-      for (const name of readdirSync(path)) if (!excluded.has(name)) visit(rel ? `${rel}/${name}` : name);
-    } else if (st.isFile() && sourceExtensions.has(extname(path))) {
-      if (st.size > MAX_BYTES) throw new Error("Candidate file is too large.");
-      files[rel] = readFileSync(path, "utf8");
-      checkedFiles(files);
-    }
-  };
-  visit("");
-  return checkedFiles(files);
 }
 
 export function runtimeSpec(id: RuntimeTaskId, files: ProjectFiles, immutable: ProjectFiles): RunSpec {

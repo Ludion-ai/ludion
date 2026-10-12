@@ -1,6 +1,6 @@
 {
   "name": "ludion",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Tells Claude Code what changed in the versions your project installed: runs ludion sync when a session starts, and adds the Ludion MCP server (ludion_ask, ludion_teach).",
   "author": { "name": "Ludion", "url": "https://ludion.ai" },
   "homepage": "https://ludion.ai/start",

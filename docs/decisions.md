@@ -150,6 +150,7 @@ The batch work hit the plan's usage limit once. From now on:
   - `stage` (environment `npm`, `id-token: write`) downloads only the tarball and runs `npm stage publish`. It checks Node 22.14+ and npm 11.15+ first.
 - **Trusted publishing, staged**: npm trusts this repository's `publish.yml` in the `npm` environment (OIDC), so there is no npm token in the repo or in GitHub secrets. The trusted publisher allows only `npm stage publish`, not `npm publish`: a staged version goes out only after the owner approves it on npmjs.com. So a workflow run alone can never put a version on npm. Provenance is added automatically, because the repository is public.
 - The `npm` environment allows deployments from `main` only. After the first staged version is approved, the package's publishing access becomes "Require two-factor authentication and disallow tokens".
+- **0.1.3** (2026-10-13) carries what reached main after 0.1.2 and before Codex's #67 to #69: the partial-coverage text and the uncovered-dependency list (#53), drafts without evidence kept in the ledger as unverified (#55). The plugin's hook pin and `plugin.json` move to 0.1.3 in the same PR, as for 0.1.2. Between that merge and the owner's approval on npmjs.com, a plugin updated from main asks npx for a version that isn't there yet; the hook then fails loudly and syncs nothing. 0.1.4 follows once #67 to #69 are on main.
 
 ### 2026-10-11: Nightly reverify
 

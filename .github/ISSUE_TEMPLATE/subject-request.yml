@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        `ludion sync` lists the dependencies Ludion has no lessons for. Name one or more here; each request is counted when choosing the next subjects.
+        `ludion sync` lists the direct dependencies Ludion has no lessons for. Name one or more here; requests help decide which packages get lessons next. This issue is public: name only packages you are fine to name in public.
   - type: input
     id: packages
     attributes:

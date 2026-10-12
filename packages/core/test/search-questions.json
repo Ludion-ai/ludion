@@ -66,5 +66,37 @@
   "01M4R9CXCDQFXKQJH5V0S31NTB": [
     "After upgrading to vitest 5, where does the HTML reporter write its report, and how do I configure the `outputDir` option for it?",
     "I upgraded vitest to 5.0.0 and my HTML reporter output isn't in the folder it used to be, with no error shown. Why is index.html now appearing in `.vitest`?"
+  ],
+  "01M4RAVZ6AW3ZB9PASXP4454AY": [
+    "After upgrading wrangler to 4.113.0 or later, how do I tell what `wrangler deploy` expects me to do about bindings that haven't been provisioned yet?",
+    "My `wrangler deploy` output now says \"The following bindings need to be provisioned:\" and the \"Experimental:\" prefix on the resource provisioning header is gone, even though I didn't change my config. Did something change in wrangler 4.113.0?"
+  ],
+  "01M4RAVZ6G853RNZY4QB6F1G7X": [
+    "With wrangler 4.116.0 or later, how can I run `wrangler deploy` for a brand-new Worker from an AI agent without it automatically setting up a workers.dev account subdomain for me?",
+    "I updated wrangler past 4.116.0 and my first `wrangler deploy` run by a coding agent ended up registering a workers.dev subdomain derived from my project name, with no error or prompt. Why did that happen?"
+  ],
+  "01M4RAVZ72604WDVTB2P1JTMMD": [
+    "In wrangler 4.126.0 or later, how can I find out which mode a build was produced in from `.cloudflare/output/v0/config.json`?",
+    "After upgrading wrangler to 4.126.0, my existing scripts that read `.cloudflare/output/v0/config.json` still run with no errors, but the file seems to contain extra fields like account and compliance settings. What changed?"
+  ],
+  "01M4RAVZ76G38BBZ7RQT49B4P4": [
+    "After upgrading wrangler to 4.129.1 or later, how does the bundle size reporter decide when to show its color-coded warnings, and what limit does it compare against?",
+    "My wrangler bundle size reporter used to warn me when my Worker went over about 3 MiB gzipped, but since updating to wrangler 4.129.1+ it stays quiet for the same bundle with no error. Why did the warnings change?"
+  ],
+  "01M4RAVZ79Z20ZYK86PFYA726C": [
+    "After upgrading wrangler to 4.131.1 or later, how do I parse the deployed trigger output from `wrangler deploy` so my script handles the new `production:` prefix on custom domain lines?",
+    "Since updating wrangler past 4.131.1, my CI script that greps the deployed trigger output for custom domains no longer matches, and the lines now start with `production:`. Why did this change, and no error was thrown?"
+  ],
+  "01M4RAVZ7BYR42Z6KY16WPT12Q": [
+    "How do I get wrangler's `wrangler preview --json` to tell me what's wrong when my Worker has no Preview configuration, so my script can handle it programmatically?",
+    "After upgrading wrangler to 4.136.0 or later, my script that parses `wrangler preview --json` output behaves differently for a Worker without Preview config, with a structured error and a `suggested_config` field showing up. Why did the output change?"
+  ],
+  "01M4RAVZ7GWT4TNAG20EYZ2SFB": [
+    "How can I capture the claim details that wrangler's `--temporary` flag prints, in a script on wrangler 4.148.0 or newer?",
+    "After upgrading wrangler to 4.148.0, my script that pipes `wrangler --temporary` output into a file no longer gets the terms notice or claim details, and there's no error. What changed?"
+  ],
+  "01M4RAVZ7JRFR0Q9ZJ1F2VNWMW": [
+    "After upgrading wrangler to 4.148.0 or later, how do I get `wrangler types` to generate declarations for the built-in Text module patterns, and do I still need to list them in my Wrangler configuration?",
+    "I upgraded wrangler past 4.148.0 and noticed `wrangler types` now outputs Text module declarations I never added to my Wrangler config, with no error or warning. Why did the generated output change?"
   ]
 }

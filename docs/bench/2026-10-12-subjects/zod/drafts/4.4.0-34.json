@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#34",
+  "verdict": {
+    "id": "4.4.0#34",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "invalid_union options",
+    "why": "Invalid discriminator errors now include an extra options field, changing issue output."
+  },
+  "cost_usd": 0.2571732,
+  "turns": 9,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.discriminatedUnion invalid_union options",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst { z } = require(\"zod\");\nconst schema = z.discriminatedUnion(\"type\", [z.object({ type: z.literal(\"fruit\") }), z.object({ type: z.literal(\"vegetable\") })]);\nconst r = schema.safeParse({ type: \"hi\" });\nif (r.success || !r.error || !Array.isArray(r.error.issues)) broken(\"parse of a bad discriminator did not fail with issues\");\nconst issue = r.error.issues.find((i) => i.code === \"invalid_union\" && i.discriminator === \"type\");\nif (!issue) broken(\"no invalid_union issue with discriminator type: \" + JSON.stringify(r.error.issues));\nif (!(\"options\" in issue)) symptom(\"invalid_union issue for a bad discriminator has no options field\");\nconst got = Array.isArray(issue.options) ? issue.options.slice().sort().join(\",\") : String(issue.options);\nif (got !== \"fruit,vegetable\") broken(\"options was \" + JSON.stringify(issue.options));\nconsole.log(\"OK: invalid_union issue lists options \" + JSON.stringify(issue.options));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst { z } = require(\"zod\");\nconst schema = z.discriminatedUnion(\"type\", [z.object({ type: z.literal(\"fruit\") }), z.object({ type: z.literal(\"vegetable\") })]);\nconst r = schema.safeParse({ type: \"hi\" });\nif (r.success || !r.error || !Array.isArray(r.error.issues)) broken(\"parse of a bad discriminator did not fail with issues\");\nconst issue = r.error.issues.find((i) => i.code === \"invalid_union\" && i.discriminator === \"type\");\nif (!issue) broken(\"no invalid_union issue with discriminator type: \" + JSON.stringify(r.error.issues));\nif (!(\"options\" in issue)) symptom(\"invalid_union issue for a bad discriminator has no options field\");\nconst got = Array.isArray(issue.options) ? issue.options.slice().sort().join(\",\") : String(issue.options);\nif (got !== \"fruit,vegetable\") broken(\"options was \" + JSON.stringify(issue.options));\nconsole.log(\"OK: invalid_union issue lists options \" + JSON.stringify(issue.options));\n",
+          "expect": "fail",
+          "error": "FAIL: invalid_union issue for a bad discriminator has no options field"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

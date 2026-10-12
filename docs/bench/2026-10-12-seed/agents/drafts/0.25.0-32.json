@@ -1,0 +1,14 @@
+{
+  "entry": "0.25.0#32",
+  "verdict": {
+    "id": "0.25.0#32",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onChatResponse",
+    "why": "onChatResponse now fires with recovered: true for turns persisted just before a Durable Object reset, where it previously did not fire."
+  },
+  "cost_usd": 0.1645738,
+  "turns": 5,
+  "skip": "The replay of onChatResponse after a Durable Object reset is implemented in @cloudflare/think (think.ts); agents 0.25.0 only adds an optional recovered type field, so the behavior cannot be truthfully attributed to or tested on agents alone."
+}

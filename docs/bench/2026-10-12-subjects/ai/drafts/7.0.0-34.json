@@ -1,0 +1,14 @@
+{
+  "entry": "7.0.0#34",
+  "verdict": {
+    "id": "7.0.0#34",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "gateway",
+    "why": "Gateway errors are now retried, changing runtime behavior of existing calls."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

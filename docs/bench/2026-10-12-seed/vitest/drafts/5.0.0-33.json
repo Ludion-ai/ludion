@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#33",
+  "verdict": {
+    "id": "5.0.0#33",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "vi.mock",
+    "why": "An automock is now deserialized as an automock, which changes mock behavior when it passes between processes."
+  },
+  "cost_usd": 0.194244,
+  "turns": 7,
+  "skip": "The fix only affects vi.mock automocks serialized in browser mode (needs a real browser, not available offline), vitest itself never calls the changed fromJSON, and sources/ has no page to quote."
+}

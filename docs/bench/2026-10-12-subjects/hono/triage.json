@@ -1,0 +1,1420 @@
+[
+  {
+    "id": "4.12.13#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types-only fix so app.on with 9 or 10 handlers infers the response type correctly."
+  },
+  {
+    "id": "4.12.13#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "trailingSlash skip option",
+    "why": "New `skip` option for the trailing-slash middleware, which older versions ignore."
+  },
+  {
+    "id": "4.12.13#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "onCacheNotAvailable",
+    "why": "New cache middleware option, which older versions ignore."
+  },
+  {
+    "id": "4.12.13#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.14#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Invalid header names in the AWS Lambda adapter are now handled instead of causing an error."
+  },
+  {
+    "id": "4.12.15#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Single-line PEM keys now work in jwt where they previously failed."
+  },
+  {
+    "id": "4.12.15#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.17#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix for SVG attribute normalization on the root svg element."
+  },
+  {
+    "id": "4.12.17#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "defaultExtensionMap",
+    "why": "SSG now maps atom+xml and rss+xml content types to file extensions, changing generated output filenames."
+  },
+  {
+    "id": "4.12.17#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types fix: origin was meant to be optional in CORSOptions, and existing code is unaffected."
+  },
+  {
+    "id": "4.12.17#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types fix so middleware response types propagate through app.on overloads."
+  },
+  {
+    "id": "4.12.17#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.17#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.19#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change only."
+  },
+  {
+    "id": "4.12.19#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types fix making the serveStatic options parameter optional, as intended."
+  },
+  {
+    "id": "4.12.19#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "getCookie",
+    "why": "With duplicate cookie names, the first cookie is now returned instead of the previous one."
+  },
+  {
+    "id": "4.12.19#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Generic typing for verifyToken context only, accepting the same code."
+  },
+  {
+    "id": "4.12.19#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "cache",
+    "why": "Cache entries are now keyed by the configured vary headers, so cache hits and misses differ from before."
+  },
+  {
+    "id": "4.12.19#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "HonoRequest.bytes()",
+    "why": "New bytes() request method, which older versions lack and which would throw if called."
+  },
+  {
+    "id": "4.12.19#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stream abort handling, with a dependency upgrade to @hono/node-server v2."
+  },
+  {
+    "id": "4.12.19#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.20#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes route() so the mounted app's base path is preserved as expected."
+  },
+  {
+    "id": "4.12.20#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types fix widening jsx children to Child[], which accepts more code."
+  },
+  {
+    "id": "4.12.20#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.22#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test tooling update and cleanups, not observable by users."
+  },
+  {
+    "id": "4.12.22#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "mime",
+    "why": "Charset parameter in Content-Type now set per MIME type, changing output headers for existing code."
+  },
+  {
+    "id": "4.12.22#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "compress",
+    "why": "With the encoding option set, the middleware now respects Accept-Encoding, so responses differ for existing configs; arguably a fix but the old behavior ignored the header contrary to nothing documented here."
+  },
+  {
+    "id": "4.12.22#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Echoing the negotiated WebSocket subprotocol makes Deno adapter work as expected for subprotocol negotiation."
+  },
+  {
+    "id": "4.12.22#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "msgpack",
+    "why": "msgpack responses are now compressed by the compress middleware where they were not before."
+  },
+  {
+    "id": "4.12.22#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "New contributor acknowledgment, no change."
+  },
+  {
+    "id": "4.12.22#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "New contributor acknowledgment, no change."
+  },
+  {
+    "id": "4.12.22#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "New contributor acknowledgment, no change."
+  },
+  {
+    "id": "4.12.22#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "New contributor acknowledgment, no change."
+  },
+  {
+    "id": "4.12.23#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Normalizing all backslashes instead of only the first fixes an incomplete path normalization bug."
+  },
+  {
+    "id": "4.12.23#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Context",
+    "why": "The Context class is newly exported publicly; older versions simply lack the export."
+  },
+  {
+    "id": "4.12.23#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Contribution policy documentation only."
+  },
+  {
+    "id": "4.12.23#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "contentTypeFilter",
+    "why": "New compress option and COMPRESSIBLE_CONTENT_TYPE_REGEX re-export; unused code behaves the same."
+  },
+  {
+    "id": "4.12.23#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "IPv6 formatting bug fix so a single 0 group is no longer collapsed to '::'."
+  },
+  {
+    "id": "4.12.24#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Contribution policy documentation only."
+  },
+  {
+    "id": "4.12.24#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes a dev dependency's types."
+  },
+  {
+    "id": "4.12.24#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes the wording of an error message."
+  },
+  {
+    "id": "4.12.24#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test improvements only."
+  },
+  {
+    "id": "4.12.24#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect expansion of '::' to match correct IPv6 semantics."
+  },
+  {
+    "id": "4.12.24#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Config file cleanup, though typesVersions/jsr path gaps are build metadata with no stated user-visible change."
+  },
+  {
+    "id": "4.12.24#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test additions only."
+  },
+  {
+    "id": "4.12.24#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes rendering of the unspecified address to the correct '::' form."
+  },
+  {
+    "id": "4.12.26#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Type-only adjustment to satisfy Deno lib types."
+  },
+  {
+    "id": "4.12.26#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI publishing change."
+  },
+  {
+    "id": "4.12.26#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes unused dev configs."
+  },
+  {
+    "id": "4.12.26#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build script change only."
+  },
+  {
+    "id": "4.12.28#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Empty-string content is now served as found instead of treated as missing, which is the expected behavior."
+  },
+  {
+    "id": "4.12.28#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Migration doc correction only."
+  },
+  {
+    "id": "4.12.28#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only changes which build artifacts are published."
+  },
+  {
+    "id": "4.12.28#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Case-insensitive Content-Type matching fixes parsing and validation that should have worked per the HTTP spec."
+  },
+  {
+    "id": "4.12.28#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes a circular import between modules with no observable change."
+  },
+  {
+    "id": "4.12.28#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes WSContext.protocol report the subprotocol it should have."
+  },
+  {
+    "id": "4.12.28#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "4.12.28#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects V2 event detection so events are recognized correctly."
+  },
+  {
+    "id": "4.12.28#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc fix only."
+  },
+  {
+    "id": "4.12.28#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.28#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.28#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.29#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "hc headers",
+    "why": "Function-provided client headers are now merged with per-request headers instead of being replaced, so requests send different headers."
+  },
+  {
+    "id": "4.12.29#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test script fix."
+  },
+  {
+    "id": "4.12.29#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Lambda@Edge handler now resolves with the callback value as expected."
+  },
+  {
+    "id": "4.12.29#4",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc example only."
+  },
+  {
+    "id": "4.12.29#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test configuration only."
+  },
+  {
+    "id": "4.12.29#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Base64-encodes content-encoded bodies that were previously corrupted."
+  },
+  {
+    "id": "4.12.29#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Correctly treats encoded responses as binary, fixing corrupted output."
+  },
+  {
+    "id": "4.12.29#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects the JSONParsed type for arrays to match actual JSON output."
+  },
+  {
+    "id": "4.12.29#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Router now matches a route it should have matched."
+  },
+  {
+    "id": "4.12.29#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Handles If-None-Match: * as HTTP specifies."
+  },
+  {
+    "id": "4.12.29#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.29#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Contributor acknowledgement, no code change."
+  },
+  {
+    "id": "4.12.30#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Benchmark dependency bump."
+  },
+  {
+    "id": "4.12.30#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes unused benchmarks, which users cannot observe."
+  },
+  {
+    "id": "4.12.30#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Toolchain update to TypeScript 6 with no change to hono's behavior."
+  },
+  {
+    "id": "4.12.30#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Cache-Control",
+    "why": "Directives differing only in case are now deduplicated, so the emitted header differs without any error."
+  },
+  {
+    "id": "4.12.30#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "compress",
+    "why": "206 Partial Content responses that used to be compressed are now sent uncompressed."
+  },
+  {
+    "id": "4.12.30#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects URL param replacement so a param that prefixes another no longer gets the wrong value."
+  },
+  {
+    "id": "4.12.30#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Forwarding a stream body in query mode used to fail without duplex and now works."
+  },
+  {
+    "id": "4.12.31#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "4.12.31#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds a benchmark only."
+  },
+  {
+    "id": "4.12.31#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes a FIXME comment in a ts-expect-error, with no user-visible change."
+  },
+  {
+    "id": "4.12.31#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "parseBody() now reuses the cached formData instead of failing on an already-consumed body."
+  },
+  {
+    "id": "4.12.31#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a multipart boundary mismatch in cloneRawRequest that produced broken bodies."
+  },
+  {
+    "id": "4.12.31#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "A retry value of 0 is now emitted, as the retry option implies."
+  },
+  {
+    "id": "4.12.31#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Fixes a misspelled identifier in a type test."
+  },
+  {
+    "id": "4.12.32#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI reporting change."
+  },
+  {
+    "id": "4.12.32#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds API Gateway v2 authorizer types that were missing, so the types match the actual event shape."
+  },
+  {
+    "id": "4.12.32#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "SSE now emits an empty id field to reset Last-Event-ID, matching the SSE spec."
+  },
+  {
+    "id": "4.12.32#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test coverage only."
+  },
+  {
+    "id": "4.12.32#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "Object.create(null)",
+    "why": "Parsed query, header and param objects no longer have a prototype, so calls like obj.hasOwnProperty() now throw."
+  },
+  {
+    "id": "4.12.32#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "CSP callbacks leaked across headers, and are now scoped to their own header as intended."
+  },
+  {
+    "id": "4.12.33#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "getCookie",
+    "why": "Cookie header parsing now accepts names that were previously rejected and dropped."
+  },
+  {
+    "id": "4.12.33#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump."
+  },
+  {
+    "id": "4.12.33#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes useSyncExternalStore so it handles subscription and snapshot changes as expected."
+  },
+  {
+    "id": "4.12.33#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes undici in favor of global fetch, presumably in tests or tooling."
+  },
+  {
+    "id": "4.13.0#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance-only change with the same behavior."
+  },
+  {
+    "id": "4.13.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance-only change replacing regex tests with indexOf."
+  },
+  {
+    "id": "4.13.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Allocation optimization with no observable change."
+  },
+  {
+    "id": "4.13.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of an internal URL decoding helper for performance."
+  },
+  {
+    "id": "4.13.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lazy allocation of a private field is not observable."
+  },
+  {
+    "id": "4.13.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal body cache probing optimization."
+  },
+  {
+    "id": "4.13.0#7",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Accept-Query",
+    "why": "Header name list gains newly registered fields that older versions' types reject."
+  },
+  {
+    "id": "4.13.0#8",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "realm",
+    "why": "JWT and JWK middleware gain a `realm` option, which older versions' types reject."
+  },
+  {
+    "id": "4.13.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "RefObject",
+    "why": "`RefObject<T>` is now `{ current: T }` and `useRef()` needs an argument, so old typings fail to compile."
+  },
+  {
+    "id": "4.13.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an SSR throw into working behavior for array-returning components."
+  },
+  {
+    "id": "4.13.0#11",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "compress",
+    "why": "Compress middleware now adds a `Vary: Accept-Encoding` header to negotiated responses."
+  },
+  {
+    "id": "4.13.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance tweak to `fetch` internals."
+  },
+  {
+    "id": "4.13.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal iteration change for performance."
+  },
+  {
+    "id": "4.13.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Regex replaced with `indexOf` internally."
+  },
+  {
+    "id": "4.13.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Skips unneeded Headers allocation, no observable change."
+  },
+  {
+    "id": "4.13.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal refactor for performance."
+  },
+  {
+    "id": "4.13.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Benchmark tooling only."
+  },
+  {
+    "id": "4.13.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal field initializer change, later restored."
+  },
+  {
+    "id": "4.13.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lazy allocation of a private field."
+  },
+  {
+    "id": "4.13.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal allocation optimization."
+  },
+  {
+    "id": "4.13.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Benchmark stabilization only."
+  },
+  {
+    "id": "4.13.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Reverts an internal performance change."
+  },
+  {
+    "id": "4.13.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Reverts an internal performance change."
+  },
+  {
+    "id": "4.13.0#24",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "app.query",
+    "why": "New first-class QUERY method support that older versions lack and reject."
+  },
+  {
+    "id": "4.13.0#25",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "etag",
+    "why": "ETag middleware now handles conditional requests for QUERY, changing responses for existing QUERY routes."
+  },
+  {
+    "id": "4.13.0#26",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "allowMethods",
+    "why": "CORS default allowed methods now include QUERY when the option is unset."
+  },
+  {
+    "id": "4.13.0#27",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "cache",
+    "why": "Cache middleware now treats QUERY requests as cacheable, changing behavior for existing QUERY routes."
+  },
+  {
+    "id": "4.13.0#28",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "useRef",
+    "why": "New React-compatible overloads for jsx useRef are something users can call; older versions would give type errors for those overloads, but the call is an addition."
+  },
+  {
+    "id": "4.13.0#29",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "methodNotAllowed",
+    "why": "New middleware that older versions do not export, so importing it fails."
+  },
+  {
+    "id": "4.13.0#30",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "realm",
+    "why": "New realm option for jwt/jwk; older versions reject it as an unknown option in types."
+  },
+  {
+    "id": "4.13.0#31",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Syncing header type definitions with the IANA registry only widens types and accepts the same code."
+  },
+  {
+    "id": "4.13.0#32",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Allowing function components to return an array turns an error into working behavior."
+  },
+  {
+    "id": "4.13.0#33",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "UnsupportedPathError",
+    "why": "RegExpRouter now throws during route registration instead of later, so existing unsupported routes fail at startup."
+  },
+  {
+    "id": "4.13.0#34",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "compress",
+    "why": "Compressed responses now include Vary: Accept-Encoding, changing output headers for existing code."
+  },
+  {
+    "id": "4.13.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects trie-router slash counting to match intended routing behavior."
+  },
+  {
+    "id": "4.13.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a stream pipe error path so the writer lock is restored."
+  },
+  {
+    "id": "4.13.1#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes etag to skip unsafe methods and error responses as expected."
+  },
+  {
+    "id": "4.13.1#4",
+    "candidate": false,
+    "skip": "docs",
+    "why": "New contributor acknowledgement, not a code change."
+  },
+  {
+    "id": "4.13.1#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "New contributor acknowledgement, not a code change."
+  },
+  {
+    "id": "4.13.2#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "secureHeaders",
+    "why": "Disabled Permissions-Policy directives now output () instead of none, changing the header sent."
+  },
+  {
+    "id": "4.13.2#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Renders async children correctly instead of [object Promise]."
+  },
+  {
+    "id": "4.13.2#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect etag hashing for chunked responses."
+  },
+  {
+    "id": "4.13.2#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes client cookie serialization to work correctly."
+  },
+  {
+    "id": "4.13.2#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stabilizes etag digest across stream chunks, a bug fix."
+  },
+  {
+    "id": "4.13.2#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes trailing question mark stripping for optional params with regex quantifiers."
+  },
+  {
+    "id": "4.13.2#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization with no observable change."
+  },
+  {
+    "id": "4.13.2#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Falsy JSON bodies were dropped; sending them matches expected documented behavior."
+  },
+  {
+    "id": "4.13.2#9",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "permissionsPolicy",
+    "why": "New Permissions-Policy directive options that older versions reject in types."
+  },
+  {
+    "id": "4.13.3#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents URL corruption from $ replacement tokens."
+  },
+  {
+    "id": "4.13.3#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes etag copying of pending stream bytes."
+  },
+  {
+    "id": "4.13.3#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes etag skipping headers when filtering 304 responses."
+  },
+  {
+    "id": "4.13.3#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "cors",
+    "why": "Preflight OPTIONS responses now append Origin to Vary, changing headers sent."
+  },
+  {
+    "id": "4.13.3#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only adds a JSDoc example."
+  },
+  {
+    "id": "4.13.3#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes suffix wildcard routes match as documented."
+  },
+  {
+    "id": "4.13.3#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes wildcard routes matching more than they should."
+  },
+  {
+    "id": "4.13.3#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects CSRF validation so OPTIONS requests are not wrongly rejected."
+  },
+  {
+    "id": "4.13.3#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect IPv6 expansion of embedded IPv4 addresses."
+  },
+  {
+    "id": "4.13.3#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "prettyJSON",
+    "why": "Responses with +json content types are now pretty-printed, which they were not before."
+  },
+  {
+    "id": "4.13.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Handles params on unmatched requests instead of failing."
+  },
+  {
+    "id": "4.13.4#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Runs the ref cleanup that should already have run."
+  },
+  {
+    "id": "4.13.4#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes wildcard middleware association in the router."
+  },
+  {
+    "id": "4.13.4#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance refactor with no observable change."
+  },
+  {
+    "id": "4.13.4#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes If-None-Match parsing with whitespace."
+  },
+  {
+    "id": "4.13.4#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "hc",
+    "why": "The client now omits undefined header and cookie values instead of sending them."
+  },
+  {
+    "id": "4.13.4#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "hc",
+    "why": "Undefined entries in query arrays are now dropped from the request."
+  },
+  {
+    "id": "4.13.4#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "hc",
+    "why": "Undefined entries in form arrays are now dropped from the request."
+  },
+  {
+    "id": "4.13.4#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "$ws",
+    "why": "$ws() now applies a custom buildSearchParams and filters undefined queries, which changes the URL."
+  },
+  {
+    "id": "4.13.4#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes Accept matching handle standard wildcard media types."
+  },
+  {
+    "id": "4.13.4#11",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "hc",
+    "why": "The client no longer appends an empty '?' to the URL when the query is empty."
+  },
+  {
+    "id": "4.13.4#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a stale content length on cloned FormData."
+  },
+  {
+    "id": "4.13.4#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes cloning of requests with a cached JSON body."
+  },
+  {
+    "id": "4.13.4#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a failure on empty signed cookie values into working behavior."
+  },
+  {
+    "id": "4.13.4#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops abort listener errors from crashing abort()."
+  },
+  {
+    "id": "4.13.6#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a param value of 'index' being lost in $url() and $path()."
+  },
+  {
+    "id": "4.13.6#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what normalizing root WebSocket URLs changes."
+  },
+  {
+    "id": "4.13.6#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a type error for symbol keys on Context<any>."
+  },
+  {
+    "id": "4.13.6#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev tooling dependency bump."
+  },
+  {
+    "id": "4.13.6#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of handler iteration with no observable change."
+  },
+  {
+    "id": "4.13.8#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Typo fixes in comments and a docs link."
+  },
+  {
+    "id": "4.13.8#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization of jsx/dom lookups with the same output."
+  },
+  {
+    "id": "4.13.8#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Streaming now respects backpressure, so it behaves correctly rather than changing any API."
+  },
+  {
+    "id": "4.13.8#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Entries with q=0 mean 'not acceptable' per the HTTP spec, so skipping them fixes a matching bug."
+  },
+  {
+    "id": "4.13.8#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Accept parsing now treats the q parameter name case-insensitively, as the HTTP spec requires."
+  },
+  {
+    "id": "4.13.8#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects the clamping of a negative q value to match the spec."
+  },
+  {
+    "id": "4.13.8#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the media type being lost when a cached body is reused."
+  },
+  {
+    "id": "4.13.8#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc-only correction."
+  },
+  {
+    "id": "4.13.8#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization of reconciliation with no observable change."
+  },
+  {
+    "id": "4.13.9#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Suspense/ErrorBoundary replacement now works across newlines, which is the expected behavior."
+  },
+  {
+    "id": "4.13.9#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Media types and language tags are case-insensitive per the spec, so this is a matching bug fix."
+  },
+  {
+    "id": "4.13.9#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "An empty path segment should not match a param, which aligns LinearRouter with the other routers."
+  },
+  {
+    "id": "4.13.9#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a broken response into a working one for unparseable JSON bodies."
+  },
+  {
+    "id": "4.13.9#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "An invalid signature now yields the documented JwtTokenInvalid error instead of a different failure."
+  },
+  {
+    "id": "4.13.9#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Binary +xml archive types are now handled correctly as binary."
+  },
+  {
+    "id": "4.13.9#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Empty query parameters were being dropped, which was a bug."
+  },
+  {
+    "id": "4.13.9#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Content type detection is synced with aws-lambda to correct misdetection."
+  },
+  {
+    "id": "4.13.9#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an obscure failure into a descriptive error for malformed events."
+  },
+  {
+    "id": "4.13.10#1",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "hono/bun",
+    "why": "The section says adapters are now separate packages and this line is the old import being removed, so the old 'hono/bun' import path likely no longer resolves."
+  },
+  {
+    "id": "4.13.10#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repository package manager migration."
+  },
+  {
+    "id": "4.13.10#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repository scripts invoked through pnpm."
+  },
+  {
+    "id": "4.13.10#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Formatter swap in the repository tooling."
+  },
+  {
+    "id": "4.13.10#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency upgrade for tests."
+  },
+  {
+    "id": "4.13.10#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repository import-sorting tooling change."
+  },
+  {
+    "id": "4.13.10#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Linter swap is a development tooling change."
+  },
+  {
+    "id": "4.13.10#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Introducing Vite+ is build tooling."
+  },
+  {
+    "id": "4.13.10#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types now accept a Blob response body that already worked at runtime, so a type error becomes working code."
+  },
+  {
+    "id": "4.13.10#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build scripts were converted into plugins, which is build-only."
+  },
+  {
+    "id": "4.13.10#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only the editorconfig-checker config changed."
+  },
+  {
+    "id": "4.13.10#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "An empty CI step was removed."
+  },
+  {
+    "id": "4.13.10#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "4.13.10#14",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Adds the separate @hono/bun workspace package."
+  },
+  {
+    "id": "4.13.10#15",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "The change is to the @hono/bun package build output."
+  },
+  {
+    "id": "4.13.10#16",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "The adapters are added as separate workspace packages."
+  },
+  {
+    "id": "4.13.10#17",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Publishing the deno adapter to JSR is a separate package change."
+  },
+  {
+    "id": "4.13.10#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only tests were moved."
+  },
+  {
+    "id": "4.13.12#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects the bundled d.ts so internal types stay private and the self-referencing JSX.IntrinsicElements no longer causes errors."
+  },
+  {
+    "id": "4.13.12#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds a build type-check test."
+  },
+  {
+    "id": "4.13.12#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "The retainedHeader option now matches mixed-case header names, as header names are case-insensitive."
+  },
+  {
+    "id": "4.13.12#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Numeric gridGap values now get px like other numeric style properties, which fixes invalid CSS output."
+  },
+  {
+    "id": "4.13.12#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "some() now returns the Response from a short-circuiting middleware, as intended."
+  },
+  {
+    "id": "4.13.12#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency upgrade."
+  },
+  {
+    "id": "4.13.13#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "A lone removed code line from a migration example, with no description of the change."
+  },
+  {
+    "id": "4.13.13#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "4.13.13#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc comment fixes only."
+  },
+  {
+    "id": "4.13.13#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "JSX function components can now return JSXNode results without a type error."
+  },
+  {
+    "id": "4.13.13#5",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "app.mount",
+    "why": "app.mount still works but is now deprecated in favor of the new Mount Middleware."
+  }
+]

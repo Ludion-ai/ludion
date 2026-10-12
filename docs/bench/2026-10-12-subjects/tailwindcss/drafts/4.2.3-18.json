@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#18",
+  "verdict": {
+    "id": "4.2.3#18",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "-left-[9rem]",
+    "why": "Canonicalization now moves the minus sign inside arbitrary values."
+  },
+  "cost_usd": 0.5666092,
+  "turns": 22,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "-left-[9rem]",
+    "signal": "silent",
+    "detail": "Canonicalization moves the - sign inside the arbitrary value, -left-[9rem] to left-[-9rem]",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is not exported\");\n  const ds = await tw.__unstable__loadDesignSystem(\"@tailwind utilities;\\n\", { base: \"/tmp\" });\n  if (!ds || typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is not available\");\n  if (ds.candidatesToCss([\"-left-[9rem]\"])[0] == null) broken(\"-left-[9rem] does not compile\");\n  const out = ds.canonicalizeCandidates([\"-left-[9rem]\"]);\n  if (!Array.isArray(out) || out.length !== 1) broken(\"unexpected result \" + JSON.stringify(out));\n  if (out[0] === \"-left-[9rem]\") symptom(\"canonicalizeCandidates kept -left-[9rem] instead of left-[-9rem]\");\n  if (out[0] !== \"left-[-9rem]\") broken(\"canonicalizeCandidates gave \" + out[0]);\n  console.log(\"OK: -left-[9rem] canonicalizes to left-[-9rem]\");\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is not exported\");\n  const ds = await tw.__unstable__loadDesignSystem(\"@tailwind utilities;\\n\", { base: \"/tmp\" });\n  if (!ds || typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is not available\");\n  if (ds.candidatesToCss([\"-left-[9rem]\"])[0] == null) broken(\"-left-[9rem] does not compile\");\n  const out = ds.canonicalizeCandidates([\"-left-[9rem]\"]);\n  if (!Array.isArray(out) || out.length !== 1) broken(\"unexpected result \" + JSON.stringify(out));\n  if (out[0] === \"-left-[9rem]\") symptom(\"canonicalizeCandidates kept -left-[9rem] instead of left-[-9rem]\");\n  if (out[0] !== \"left-[-9rem]\") broken(\"canonicalizeCandidates gave \" + out[0]);\n  console.log(\"OK: -left-[9rem] canonicalizes to left-[-9rem]\");\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: canonicalizeCandidates kept -left-[9rem] instead of left-[-9rem]"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Canonicalization: move the `-` sign inside the arbitrary value `-left-[9rem]` → `left-[-9rem]`"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "package": "vitest",
+  "range": "5.0.0",
+  "versions": 1,
+  "entries": 140,
+  "triaged": 140,
+  "candidates": 71,
+  "candidates_by_kind": {
+    "default": 7,
+    "behavior": 36,
+    "deprecated": 1,
+    "renamed": 3,
+    "removed": 7,
+    "added": 17
+  },
+  "candidates_silent": 49,
+  "skipped_by_reason": {
+    "fix": 46,
+    "unclear": 3,
+    "internal": 20
+  },
+  "drafted": 34,
+  "draft_skipped": 5,
+  "draft_errors": 0,
+  "draft_cost_usd": 18.14,
+  "rounds": [
+    {
+      "round": 0,
+      "drafts": 34,
+      "local_checks_passed": 24,
+      "differential": 22,
+      "review_findings": 54,
+      "reviewed_clean": 6
+    }
+  ],
+  "kept": 5,
+  "duplicates_of_main": 1,
+  "ci": []
+}

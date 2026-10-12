@@ -1,0 +1,62 @@
+{
+  "entry": "0.21.0#8",
+  "verdict": {
+    "id": "0.21.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "useAgentChat",
+    "why": "Observer error frames are now terminal and no longer rendered as assistant messages."
+  },
+  "cost_usd": 1.1603684,
+  "turns": 33,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.21.0",
+    "kind": "behavior",
+    "symbol": "useAgentChat",
+    "signal": "silent",
+    "detail": "useAgentChat plain-text error bodies are no longer parsed as stream chunks or merged into an empty assistant message.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "@ai-sdk/react": "3.0.0",
+            "agents": "0.21.0",
+            "ai": "6.0.0",
+            "react": "19.2.1",
+            "react-test-renderer": "19.2.1"
+          },
+          "code": "globalThis.IS_REACT_ACT_ENVIRONMENT = true;\nconst { pathToFileURL } = require(\"url\");\nconst realError = console.error.bind(console);\nconsole.error = (...args) => {\n  if (typeof args[0] === \"string\" && args[0].includes(\"react-test-renderer is deprecated\")) return;\n  realError(...args);\n};\nconsole.warn = () => {};\nlet React, TestRenderer;\ntry {\n  React = require(\"react\");\n  TestRenderer = require(\"react-test-renderer\");\n} catch (e) {\n  realError(\"ERROR: cannot load react or react-test-renderer: \" + (e && e.message));\n  process.exit(2);\n}\nconst act = React.act || TestRenderer.act;\n\nclass FakeAgent extends EventTarget {\n  constructor() {\n    super();\n    this.agent = \"chat\";\n    this.name = \"lesson\";\n    this._pk = \"pk1\";\n    this.sent = [];\n  }\n  getHttpUrl() {\n    return \"http://localhost:3000/agents/chat/lesson?_pk=pk1\";\n  }\n  send(message) {\n    this.sent.push(message);\n  }\n}\n\n(async () => {\n  let useAgentChat;\n  try {\n    const file = require.resolve(\"agents/chat/react\");\n    ({ useAgentChat } = await import(pathToFileURL(file).href));\n  } catch (e) {\n    realError(\"ERROR: cannot load agents/chat/react: \" + (e && e.message));\n    process.exit(2);\n  }\n  if (typeof useAgentChat !== \"function\") {\n    realError(\"ERROR: useAgentChat is not exported from agents/chat/react\");\n    process.exit(2);\n  }\n\n  const agent = new FakeAgent();\n  let chat = null;\n  function App() {\n    chat = useAgentChat({ agent, getInitialMessages: null, messages: [], resume: false });\n    return null;\n  }\n  const frame = async (obj) => {\n    await act(async () => {\n      agent.dispatchEvent(new MessageEvent(\"message\", { data: JSON.stringify(obj) }));\n      await new Promise((r) => setTimeout(r, 50));\n    });\n  };\n\n  try {\n    await act(async () => {\n      TestRenderer.create(React.createElement(App));\n      await new Promise((r) => setTimeout(r, 50));\n    });\n  } catch (e) {\n    realError(\"ERROR: rendering useAgentChat failed: \" + (e && e.message));\n    process.exit(2);\n  }\n  if (!chat || !Array.isArray(chat.messages)) {\n    realError(\"ERROR: useAgentChat returned no messages array\");\n    process.exit(2);\n  }\n\n  // Control: a normal server-pushed stream frame does become an assistant message.\n  await frame({\n    type: \"cf_agent_use_chat_response\",\n    id: \"ok-turn\",\n    body: JSON.stringify({ type: \"start\", messageId: \"control-msg\" }),\n    done: true\n  });\n  const control = chat.messages.map((m) => m.id);\n  if (control.length !== 1 || control[0] !== \"control-msg\") {\n    realError(\"ERROR: control stream frame did not render one assistant message: \" + JSON.stringify(control));\n    process.exit(2);\n  }\n\n  // A plain-text error frame from the server for another turn.\n  await frame({\n    type: \"cf_agent_use_chat_response\",\n    id: \"err-turn\",\n    body: \"Network connection lost.\",\n    done: true,\n    error: true\n  });\n  const msgs = chat.messages;\n  if (msgs.length === 1 && msgs[0].id === \"control-msg\") {\n    console.log(\"OK: plain-text error frame did not add an assistant message (messages: 1)\");\n    process.exit(0);\n  }\n  if (msgs.length === 2 && msgs[1].role === \"assistant\" && msgs[1].parts.length === 0) {\n    realError(\"FAIL: plain-text error frame was merged into an empty assistant message\");\n    process.exit(1);\n  }\n  realError(\"ERROR: unexpected messages after error frame: \" + JSON.stringify(msgs));\n  process.exit(2);\n})().catch((e) => {\n  realError(\"ERROR: \" + (e && e.stack ? e.stack : e));\n  process.exit(2);\n});\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "@ai-sdk/react": "3.0.0",
+            "agents": "0.20.1",
+            "ai": "6.0.0",
+            "react": "19.2.1",
+            "react-test-renderer": "19.2.1"
+          },
+          "code": "globalThis.IS_REACT_ACT_ENVIRONMENT = true;\nconst { pathToFileURL } = require(\"url\");\nconst realError = console.error.bind(console);\nconsole.error = (...args) => {\n  if (typeof args[0] === \"string\" && args[0].includes(\"react-test-renderer is deprecated\")) return;\n  realError(...args);\n};\nconsole.warn = () => {};\nlet React, TestRenderer;\ntry {\n  React = require(\"react\");\n  TestRenderer = require(\"react-test-renderer\");\n} catch (e) {\n  realError(\"ERROR: cannot load react or react-test-renderer: \" + (e && e.message));\n  process.exit(2);\n}\nconst act = React.act || TestRenderer.act;\n\nclass FakeAgent extends EventTarget {\n  constructor() {\n    super();\n    this.agent = \"chat\";\n    this.name = \"lesson\";\n    this._pk = \"pk1\";\n    this.sent = [];\n  }\n  getHttpUrl() {\n    return \"http://localhost:3000/agents/chat/lesson?_pk=pk1\";\n  }\n  send(message) {\n    this.sent.push(message);\n  }\n}\n\n(async () => {\n  let useAgentChat;\n  try {\n    const file = require.resolve(\"agents/chat/react\");\n    ({ useAgentChat } = await import(pathToFileURL(file).href));\n  } catch (e) {\n    realError(\"ERROR: cannot load agents/chat/react: \" + (e && e.message));\n    process.exit(2);\n  }\n  if (typeof useAgentChat !== \"function\") {\n    realError(\"ERROR: useAgentChat is not exported from agents/chat/react\");\n    process.exit(2);\n  }\n\n  const agent = new FakeAgent();\n  let chat = null;\n  function App() {\n    chat = useAgentChat({ agent, getInitialMessages: null, messages: [], resume: false });\n    return null;\n  }\n  const frame = async (obj) => {\n    await act(async () => {\n      agent.dispatchEvent(new MessageEvent(\"message\", { data: JSON.stringify(obj) }));\n      await new Promise((r) => setTimeout(r, 50));\n    });\n  };\n\n  try {\n    await act(async () => {\n      TestRenderer.create(React.createElement(App));\n      await new Promise((r) => setTimeout(r, 50));\n    });\n  } catch (e) {\n    realError(\"ERROR: rendering useAgentChat failed: \" + (e && e.message));\n    process.exit(2);\n  }\n  if (!chat || !Array.isArray(chat.messages)) {\n    realError(\"ERROR: useAgentChat returned no messages array\");\n    process.exit(2);\n  }\n\n  // Control: a normal server-pushed stream frame does become an assistant message.\n  await frame({\n    type: \"cf_agent_use_chat_response\",\n    id: \"ok-turn\",\n    body: JSON.stringify({ type: \"start\", messageId: \"control-msg\" }),\n    done: true\n  });\n  const control = chat.messages.map((m) => m.id);\n  if (control.length !== 1 || control[0] !== \"control-msg\") {\n    realError(\"ERROR: control stream frame did not render one assistant message: \" + JSON.stringify(control));\n    process.exit(2);\n  }\n\n  // A plain-text error frame from the server for another turn.\n  await frame({\n    type: \"cf_agent_use_chat_response\",\n    id: \"err-turn\",\n    body: \"Network connection lost.\",\n    done: true,\n    error: true\n  });\n  const msgs = chat.messages;\n  if (msgs.length === 1 && msgs[0].id === \"control-msg\") {\n    console.log(\"OK: plain-text error frame did not add an assistant message (messages: 1)\");\n    process.exit(0);\n  }\n  if (msgs.length === 2 && msgs[1].role === \"assistant\" && msgs[1].parts.length === 0) {\n    realError(\"FAIL: plain-text error frame was merged into an empty assistant message\");\n    process.exit(1);\n  }\n  realError(\"ERROR: unexpected messages after error frame: \" + JSON.stringify(msgs));\n  process.exit(2);\n})().catch((e) => {\n  realError(\"ERROR: \" + (e && e.stack ? e.stack : e));\n  process.exit(2);\n});\n",
+          "expect": "fail",
+          "error": "FAIL: plain-text error frame was merged into an empty assistant message"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.21.0/packages/agents/CHANGELOG.md",
+          "quote": "Treat `useAgentChat` observer error frames as terminal responses.\n\n  Plain-text error bodies are no longer parsed as stream chunks or merged into an empty assistant message."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

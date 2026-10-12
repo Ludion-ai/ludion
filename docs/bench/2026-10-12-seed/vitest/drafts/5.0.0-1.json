@@ -1,0 +1,54 @@
+{
+  "entry": "5.0.0#1",
+  "verdict": {
+    "id": "5.0.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "loupe.inspect",
+    "why": "Value formatting in output and error messages now uses pretty-format, changing displayed text."
+  },
+  "cost_usd": 0.7113836000000002,
+  "turns": 21,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "behavior",
+    "symbol": "taskTitleValueFormatTruncate",
+    "signal": "silent",
+    "detail": "If an interpolated title value is too truncated, increase taskTitleValueFormatTruncate in your config file",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "5.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/titletruncate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// chaiConfig.truncateThreshold: 0 used to disable truncation of test.each title values.\nwrite(\"vitest.config.mjs\", \"export default { test: { chaiConfig: { truncateThreshold: 0 } } }\\n\");\nwrite(\"each.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ param: '0123456789'.repeat(5) }])('title $param', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const file of report.testResults || []) {\n  for (const a of file.assertionResults || []) titles.push(a.title);\n}\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length !== 1 || report.numPassedTests !== 1 || !titles[0].startsWith(\"title '0123456789\")) {\n  console.error(\"ERROR: unexpected report (titles \" + JSON.stringify(titles) + \", exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst full = \"0123456789\".repeat(5);\nconst title = titles[0];\nif (!title.includes(full) && title.includes(\"\\u2026\")) {\n  console.log(\"PASS: test.each title value is truncated despite chaiConfig.truncateThreshold 0: \" + title);\n  process.exit(0);\n}\nif (title.includes(full)) {\n  console.error(\"FAIL: chaiConfig.truncateThreshold 0 disabled truncation of the test.each title value\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected title \" + JSON.stringify(title));\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "4.1.11"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/titletruncate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// chaiConfig.truncateThreshold: 0 used to disable truncation of test.each title values.\nwrite(\"vitest.config.mjs\", \"export default { test: { chaiConfig: { truncateThreshold: 0 } } }\\n\");\nwrite(\"each.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ param: '0123456789'.repeat(5) }])('title $param', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const file of report.testResults || []) {\n  for (const a of file.assertionResults || []) titles.push(a.title);\n}\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length !== 1 || report.numPassedTests !== 1 || !titles[0].startsWith(\"title '0123456789\")) {\n  console.error(\"ERROR: unexpected report (titles \" + JSON.stringify(titles) + \", exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst full = \"0123456789\".repeat(5);\nconst title = titles[0];\nif (!title.includes(full) && title.includes(\"\\u2026\")) {\n  console.log(\"PASS: test.each title value is truncated despite chaiConfig.truncateThreshold 0: \" + title);\n  process.exit(0);\n}\nif (title.includes(full)) {\n  console.error(\"FAIL: chaiConfig.truncateThreshold 0 disabled truncation of the test.each title value\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected title \" + JSON.stringify(title));\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: chaiConfig.truncateThreshold 0 disabled truncation of the test.each title value"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/test.md",
+          "quote": "Vitest formats interpolated title values with its display formatter. If the value is too truncated, you can increase [taskTitleValueFormatTruncate](/config/tasktitlevalueformattruncate) in your config file."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "entry": "0.22.0#4",
+  "verdict": {
+    "id": "0.22.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "schedule",
+    "why": "Scheduled callbacks now receive the parsed `Schedule` object as their second argument instead of the raw storage row with a string payload."
+  },
+  "cost_usd": 0.35389260000000006,
+  "turns": 13,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.22.0",
+    "kind": "behavior",
+    "symbol": "Schedule",
+    "signal": "silent",
+    "detail": "Scheduled callbacks now receive the parsed Schedule object as their second argument, previously the raw storage row whose payload was an unparsed JSON string.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/CHANGELOG.md",
+          "quote": "Scheduled callbacks now receive the documented parsed `Schedule` object as their second argument (previously the raw storage row, whose `payload` was an unparsed JSON string)."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

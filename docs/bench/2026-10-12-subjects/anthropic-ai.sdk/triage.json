@@ -1,0 +1,2065 @@
+[
+  {
+    "id": "0.90.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "claude-opus-4-7",
+    "why": "Adds a new model, token budgets and user_profiles API that users can call; older versions accept the model string as an untyped string."
+  },
+  {
+    "id": "0.90.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Deleting a release CI workflow file is not observable by SDK users."
+  },
+  {
+    "id": "0.90.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removing a release-doctor CI workflow is not observable by SDK users."
+  },
+  {
+    "id": "0.91.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "beta.memory",
+    "why": "Adds a new public-beta Memory (CMA) API users can call."
+  },
+  {
+    "id": "0.91.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "AnthropicBedrockMantle",
+    "why": "The Bedrock mantle client now authenticates with a different auth header, changing what is sent."
+  },
+  {
+    "id": "0.91.0#3",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'Fix errors in api spec' does not say what changed for users."
+  },
+  {
+    "id": "0.91.0#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'Restore missing features' does not say which features."
+  },
+  {
+    "id": "0.91.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Bootstrap script improvement is dev tooling only."
+  },
+  {
+    "id": "0.91.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test tooling version bump."
+  },
+  {
+    "id": "0.91.1#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "memory",
+    "why": "Memory files are now written with restrictive file permissions instead of the previous mode, changing a side effect."
+  },
+  {
+    "id": "0.91.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Formatter tooling change."
+  },
+  {
+    "id": "0.92.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "beta.agents",
+    "why": "Managed Agents APIs were changed and extended, but the entry does not detail them; it at least adds callable surface."
+  },
+  {
+    "id": "0.92.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Headers can now be set via an environment variable, so an already-set env var may now change requests."
+  },
+  {
+    "id": "0.92.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Error events in Bedrock chunk frames now throw APIError instead of being mishandled, matching expected behavior."
+  },
+  {
+    "id": "0.92.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint/format tooling change."
+  },
+  {
+    "id": "0.92.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen-related update with no observable change."
+  },
+  {
+    "id": "0.93.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Workload Identity Federation",
+    "why": "Adds new authentication options (WIF, interactive OAuth, auth profiles) users can use; older versions simply lack them."
+  },
+  {
+    "id": "0.94.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "workspace",
+    "why": "Adds an option to target a workspace in OIDC federation token exchange."
+  },
+  {
+    "id": "0.95.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "beta.webhooks",
+    "why": "Adds Managed Agents multiagents, outcomes, webhooks and vault validation that users can call."
+  },
+  {
+    "id": "0.95.0#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Adjusting webhook configuration with no detail on what changed."
+  },
+  {
+    "id": "0.95.1#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "debug logs",
+    "why": "API-key headers are now redacted in debug log output, changing what is logged."
+  },
+  {
+    "id": "0.96.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "BetaManagedAgentsSearchResultBlock",
+    "why": "Adds new search result block types users can reference."
+  },
+  {
+    "id": "0.96.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "cache diagnostics",
+    "why": "Adds support for a new cache diagnostics beta feature."
+  },
+  {
+    "id": "0.96.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "zod/v4",
+    "why": "Only zod/v4 types are now used, so code relying on other zod types may now fail type checking."
+  },
+  {
+    "id": "0.96.0#4",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'Spec updates' does not say what changed."
+  },
+  {
+    "id": "0.97.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "sandbox helpers",
+    "why": "Adds self-hosted sandbox support and helpers in CMA that users can call; older versions simply lack it."
+  },
+  {
+    "id": "0.97.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build tooling upgrade for Node 26 compatibility with no change to SDK behavior."
+  },
+  {
+    "id": "0.97.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only import cleanup."
+  },
+  {
+    "id": "0.97.1#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what happens to unowned tool calls before or what users observe; SessionToolRunner behavior change is unspecified."
+  },
+  {
+    "id": "0.98.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "thinking-token-count beta",
+    "why": "Adds a beta feature giving estimated token counts in thinking block deltas when streaming; opt-in, so older code runs unchanged."
+  },
+  {
+    "id": "0.98.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes skills.versions.create to preserve directory prefixes in uploads, which is the expected behavior."
+  },
+  {
+    "id": "0.98.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Publishing pipeline change not observable by SDK users."
+  },
+  {
+    "id": "0.98.1#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Renames an example file only."
+  },
+  {
+    "id": "0.99.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "custom file size caps",
+    "why": "Adds ability to configure file size caps; code not using it is unaffected."
+  },
+  {
+    "id": "0.99.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes streaming accumulation dropping stop_details, which the message_delta already documented."
+  },
+  {
+    "id": "0.100.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "claude-opus-4-8",
+    "why": "Adds a new model, mid-conversation system blocks, and usage.output_tokens_details that users can use."
+  },
+  {
+    "id": "0.100.0#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation formatting only."
+  },
+  {
+    "id": "0.100.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes streaming to carry encrypted_content on beta compaction blocks, which was missing."
+  },
+  {
+    "id": "0.100.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lockfile dependency update."
+  },
+  {
+    "id": "0.101.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "middleware",
+    "why": "Adds client middleware support; code not using it is unaffected."
+  },
+  {
+    "id": "0.101.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Request timeout now applies to inner fetch only, correcting behavior of the new middleware feature released in the same version."
+  },
+  {
+    "id": "0.101.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes beta streaming accumulation dropping stop_details."
+  },
+  {
+    "id": "0.101.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes parsing of JSON numbers in scientific notation that previously failed."
+  },
+  {
+    "id": "0.101.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal artifact URL fix."
+  },
+  {
+    "id": "0.101.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal branch naming."
+  },
+  {
+    "id": "0.101.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal repo name update."
+  },
+  {
+    "id": "0.101.0#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Security reporting documentation change."
+  },
+  {
+    "id": "0.102.0#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Says only 'small updates' to Managed Agents types without specifying what changed."
+  },
+  {
+    "id": "0.102.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects ordering of the middleware relative to request signing so it works as intended."
+  },
+  {
+    "id": "0.103.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "claude-fable-5",
+    "why": "Adds new models claude-mythos-5 and claude-fable-5 plus server-side fallbacks on refusal; opt-in and older code is unaffected."
+  },
+  {
+    "id": "0.103.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "fallbacks middleware",
+    "why": "New client-side fallbacks middleware users can call; older versions simply lack it."
+  },
+  {
+    "id": "0.103.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "ctx.logger",
+    "why": "Adds ctx.logger to middleware context, a new callable."
+  },
+  {
+    "id": "0.103.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "middleware",
+    "why": "Third-party middleware ordering changed, so existing middleware may run in a different order."
+  },
+  {
+    "id": "0.104.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Managed Agents deployments",
+    "why": "Adds Managed Agents deployments and environment variable credentials; unset code unaffected, though env var credentials may alter behavior if already set."
+  },
+  {
+    "id": "0.104.1#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "frontier_llm",
+    "why": "New refusal category value that code switching over categories may not handle."
+  },
+  {
+    "id": "0.104.2#1",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "retired models",
+    "why": "Retired model identifiers removed from types, so code using them gets type errors."
+  },
+  {
+    "id": "0.105.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "code_execution_20260120",
+    "why": "New tool version that older SDK types reject."
+  },
+  {
+    "id": "0.105.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "partial tool json input",
+    "why": "Streaming now parses partial tool JSON lazily, changing when the parsed input is available."
+  },
+  {
+    "id": "0.105.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency bump of a build tool."
+  },
+  {
+    "id": "0.105.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal tooling change."
+  },
+  {
+    "id": "0.105.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "0.106.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "system.message",
+    "why": "New streaming event type; added, though exhaustive handlers may see a new event."
+  },
+  {
+    "id": "0.106.0#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Header handling change in helpers; effect on users is not stated."
+  },
+  {
+    "id": "0.106.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "refusal category",
+    "why": "New refusal category value added."
+  },
+  {
+    "id": "0.106.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "User Profile ID",
+    "why": "Adds support for sending a User Profile ID in request headers."
+  },
+  {
+    "id": "0.107.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "web_fetch_20260318",
+    "why": "New 20260318 web fetch tool versions that older SDK types reject."
+  },
+  {
+    "id": "0.107.0#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Agent toolset bug fix in a helper that is not a stable documented API."
+  },
+  {
+    "id": "0.107.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores a type that was accidentally dropped, matching earlier behavior."
+  },
+  {
+    "id": "0.107.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "count_tokens user profile ID",
+    "why": "Token counting now accepts user profile IDs."
+  },
+  {
+    "id": "0.107.0#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Description and example value updates only."
+  },
+  {
+    "id": "0.107.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README change only."
+  },
+  {
+    "id": "0.108.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "claude-sonnet-5",
+    "why": "New model supported."
+  },
+  {
+    "id": "0.108.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Agent toolset fix allowing absolute paths that resolve inside workdir, turning an error into working behavior."
+  },
+  {
+    "id": "0.108.0#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README formatting only."
+  },
+  {
+    "id": "0.109.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Managed Agents event delta streaming",
+    "why": "Adds Managed Agents streaming, overrides, reverse pagination, credential scoping, and webhook events."
+  },
+  {
+    "id": "0.109.1#1",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "why": "Nonfunctional types removed from the SDK; code importing them now gets a type error."
+  },
+  {
+    "id": "0.110.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "agent-memory-2026-07-22",
+    "why": "New beta header value users can pass; older versions' string-typed betas may accept it only if untyped, so it is an addition."
+  },
+  {
+    "id": "0.111.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "dreaming",
+    "why": "New dreaming API support that older versions lack."
+  },
+  {
+    "id": "0.111.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "evaluated_permission",
+    "why": "Session tool calls are now gated on evaluated_permission and idle is bounded by server stop_reason, changing existing behavior."
+  },
+  {
+    "id": "0.111.0#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Field description updates only."
+  },
+  {
+    "id": "0.111.0#4",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Model example update in docs only."
+  },
+  {
+    "id": "0.111.0#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Descriptions and examples only."
+  },
+  {
+    "id": "0.112.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "MCP Tunnels",
+    "why": "New MCP Tunnels API support that older versions lack."
+  },
+  {
+    "id": "0.112.2#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Docs updates only."
+  },
+  {
+    "id": "0.112.3#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Small docs updates."
+  },
+  {
+    "id": "0.112.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes AWS options and auth mode being lost across withOptions(), matching expected behavior."
+  },
+  {
+    "id": "0.112.4#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Small docs updates."
+  },
+  {
+    "id": "0.112.5#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "refusal category",
+    "why": "New refusal category value in API types that code may need to handle; older versions' types do not include it."
+  },
+  {
+    "id": "0.112.5#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen related update with no observable change."
+  },
+  {
+    "id": "0.113.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Managed Agents model effort",
+    "why": "New Managed Agents model effort, initial session events and threads delta streaming that older versions lack."
+  },
+  {
+    "id": "0.114.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "model_context_window_exceeded",
+    "why": "New stop reason value that code switching on stop_reason may need to handle."
+  },
+  {
+    "id": "0.115.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "claude-opus-5",
+    "why": "New model ID added to the SDK's model types."
+  },
+  {
+    "id": "0.115.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "tool_change",
+    "why": "New tool addition/removal blocks and tool_change events."
+  },
+  {
+    "id": "0.115.0#3",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "server-side fallbacks",
+    "why": "Adds a server-side fallbacks default option and expands fallback credit token types, changing behavior when unset."
+  },
+  {
+    "id": "0.115.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes abort listener leak after requests settle."
+  },
+  {
+    "id": "0.116.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "mid-conversation-tool-changes-2026-07-01",
+    "why": "New beta value users can pass."
+  },
+  {
+    "id": "0.116.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "advisor tool",
+    "why": "Adds session budgets, advisor tool, pinned inference location and skills auto-loading from GitHub that older versions lack."
+  },
+  {
+    "id": "0.116.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "bash timeout and abort error classes",
+    "why": "Bash timeout and abort errors are now matchable by class, which older versions lack."
+  },
+  {
+    "id": "0.116.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "User-Agent",
+    "why": "The User-Agent header sent now uses hardcoded strings instead of constructor names."
+  },
+  {
+    "id": "0.116.0#5",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "claude-opus-4-1",
+    "why": "Retired Claude Opus 4.1 models removed from the SDK types."
+  },
+  {
+    "id": "0.116.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Updates to descriptions only."
+  },
+  {
+    "id": "0.116.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation string updates only."
+  },
+  {
+    "id": "0.116.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump with no user-observable change."
+  },
+  {
+    "id": "0.116.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build tooling install source change."
+  },
+  {
+    "id": "0.116.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen related update with no stated observable change."
+  },
+  {
+    "id": "0.117.1#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI release workflow change."
+  },
+  {
+    "id": "0.117.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Preview build tagging is internal infrastructure."
+  },
+  {
+    "id": "0.118.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "files and memory stores",
+    "why": "Adds new capabilities to files and memory stores APIs; older versions simply lack them."
+  },
+  {
+    "id": "0.118.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "skills, files, user profiles",
+    "why": "Adds updates to skill, files, and user profiles APIs that users can call."
+  },
+  {
+    "id": "0.118.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "workspace ID response header helpers",
+    "why": "New client helpers for reading the workspace ID from response headers."
+  },
+  {
+    "id": "0.118.0#4",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "mid_conv_system",
+    "why": "The mid_conv_system content block type is removed, so code using it now fails type checking."
+  },
+  {
+    "id": "0.118.0#5",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Retry duration change in session-runner is not clearly an observable or documented behavior change."
+  },
+  {
+    "id": "0.118.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal zod dependency bump."
+  },
+  {
+    "id": "0.118.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes leftover test tooling references."
+  },
+  {
+    "id": "0.118.0#8",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "migrate CLI",
+    "why": "The shipped migrate CLI and v0.50 migration guide are no longer included, so running the command fails."
+  },
+  {
+    "id": "0.118.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation warning only."
+  },
+  {
+    "id": "0.119.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "computer use and browser use toolsets",
+    "why": "Adds new toolsets and promotes Files and Skills APIs to GA, so no beta header is needed."
+  },
+  {
+    "id": "0.120.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "managed agents web search config",
+    "why": "Adds web search config and self hosted sandbox memory options for managed agents."
+  },
+  {
+    "id": "0.120.0#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Workspace lockfile change in the repo."
+  },
+  {
+    "id": "0.121.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "updates",
+    "why": "New beta thinking display mode value that older versions' types reject."
+  },
+  {
+    "id": "0.121.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "anthropic-beta",
+    "why": "New anthropic-beta values are accepted that older versions' types reject."
+  },
+  {
+    "id": "0.121.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Organization API endpoints",
+    "why": "Adds new Organization API endpoint methods."
+  },
+  {
+    "id": "0.121.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Standard Schema",
+    "why": "Helpers newly accept Standard Schema objects, which older versions would reject."
+  },
+  {
+    "id": "0.121.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "pause_turn",
+    "why": "The tool runner now continues on pause_turn instead of stopping, changing existing runs."
+  },
+  {
+    "id": "0.121.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes published types referencing NodeJS.ProcessEnv, which broke type checking in some environments."
+  },
+  {
+    "id": "0.121.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "0.121.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Example boilerplate cleanup, no SDK change."
+  },
+  {
+    "id": "0.121.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI workflow change."
+  },
+  {
+    "id": "0.121.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen related update with no observable change."
+  },
+  {
+    "id": "0.121.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Workflow reformat."
+  },
+  {
+    "id": "0.121.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint check tightening in build tooling."
+  },
+  {
+    "id": "0.121.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Description clarifications only."
+  },
+  {
+    "id": "0.121.0#14",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Example updates only."
+  },
+  {
+    "id": "0.122.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "beta.files / beta.skills",
+    "why": "Beta files/skills namespaces now use GA shapes and drop dated beta header pins, so code written for old shapes can fail with type errors or different requests."
+  },
+  {
+    "id": "0.122.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects abort/timeout error classification to what is expected."
+  },
+  {
+    "id": "0.122.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "SSE parse errors now go to the configured logger as expected."
+  },
+  {
+    "id": "0.122.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Accumulator no longer breaks on unknown event types."
+  },
+  {
+    "id": "0.122.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Read tool now returns a view_range instead of erroring on large files."
+  },
+  {
+    "id": "0.122.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "skills upload",
+    "why": "A bare Blob upload to skills endpoints now gets a default filename, changing what is sent."
+  },
+  {
+    "id": "0.122.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "webhooks.unwrap",
+    "why": "unwrap() now requires headers, so calls omitting them now fail."
+  },
+  {
+    "id": "0.122.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen related update with no observable change."
+  },
+  {
+    "id": "0.122.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Pagination documentation clarification."
+  },
+  {
+    "id": "0.122.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents the minimum TypeScript version only."
+  },
+  {
+    "id": "0.123.0#1",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "relationship",
+    "why": "Beta user profile relationship field removed in favor of access_type, and external_user_onboarded_at added."
+  },
+  {
+    "id": "0.123.0#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "'manual updates' does not say what changed."
+  },
+  {
+    "id": "0.123.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "order_by",
+    "why": "Adds organization compliance settings and user-profile order_by; older versions simply lack them, and schema updates are unspecified."
+  },
+  {
+    "id": "0.123.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops credential file access from being pulled into non-Node bundles, making bundling work."
+  },
+  {
+    "id": "0.123.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen related update with no observable change."
+  },
+  {
+    "id": "0.123.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Changelog documentation only."
+  },
+  {
+    "id": "0.124.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "usage reports",
+    "why": "Adds Claude Tag category and user breakdowns to usage reports."
+  },
+  {
+    "id": "0.124.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "organization compliance settings state types",
+    "why": "New named types users can import; older versions simply lack them."
+  },
+  {
+    "id": "0.124.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "workspace_id",
+    "why": "New workspace ID parameter on more endpoints; older versions reject it as a type error."
+  },
+  {
+    "id": "0.124.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Repairs a broken merge of custom code in messages resources so they work as intended."
+  },
+  {
+    "id": "0.124.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "agent-toolset",
+    "why": "Files and directories created by the agent toolset now get owner-only permissions instead of the previous ones."
+  },
+  {
+    "id": "0.124.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Mock server spec and breaking-change detection tooling only."
+  },
+  {
+    "id": "0.124.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Codegen-related update with no stated user-visible change."
+  },
+  {
+    "id": "0.124.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test skip reason wording only."
+  },
+  {
+    "id": "0.124.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Doc string updates only."
+  },
+  {
+    "id": "0.125.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "auto mode tool permissions",
+    "why": "New auto permission mode for Managed Agents tools; older types reject it."
+  },
+  {
+    "id": "0.125.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "content_too_large",
+    "why": "New web_fetch tool error code that code handling error codes may now receive."
+  },
+  {
+    "id": "0.125.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "user-profiles-2026-09-04",
+    "why": "New beta value and external_user_details field that older types reject."
+  },
+  {
+    "id": "0.125.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "authorization_token",
+    "why": "Public GitHub repos can now be mounted without authorization_token, which older versions' types require."
+  },
+  {
+    "id": "0.125.0#5",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Removing an unused idempotency request option; unclear whether anyone could observe it."
+  },
+  {
+    "id": "0.125.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Corrects a field description only."
+  },
+  {
+    "id": "0.125.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Restores package version in release housekeeping."
+  },
+  {
+    "id": "0.125.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Stops stamping version into generated files; build-only."
+  },
+  {
+    "id": "0.125.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test marker files only."
+  },
+  {
+    "id": "0.126.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "auto mode tool permissions",
+    "why": "New auto permission mode for Managed Agents tools; older types reject it."
+  },
+  {
+    "id": "0.126.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "compaction",
+    "why": "New beta compaction parameter and signed compaction blocks that older versions reject."
+  },
+  {
+    "id": "0.126.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "workspace data-residency geo enum types",
+    "why": "New enum types for geo fields that older versions lack."
+  },
+  {
+    "id": "0.126.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "thinking_mismatch_allowed",
+    "why": "New input_transformations entries in beta responses; older code may see unknown values."
+  },
+  {
+    "id": "0.126.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "url_sources",
+    "why": "New web fetch tool option that older types reject."
+  },
+  {
+    "id": "0.126.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "workspace_id",
+    "why": "New workspace_id parameter on user profiles methods that older types reject."
+  },
+  {
+    "id": "0.126.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "model",
+    "why": "Usage iteration model is now nullable, so code assuming a string fails type checking."
+  },
+  {
+    "id": "0.126.0#8",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Unifies input transformation types but doesn't say what changes for users."
+  },
+  {
+    "id": "0.126.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Ignoring invalid Retry-After values and validating maxRetries turns bad-input errors into sane handling, matching expected behavior."
+  },
+  {
+    "id": "0.126.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Retrying connection errors in the async client is a bug fix making the client do what retry docs promise."
+  },
+  {
+    "id": "0.126.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Aborting now stops waiting on a retry, which is what abort is documented to do."
+  },
+  {
+    "id": "0.126.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Falling back to default backoff for out-of-range Retry-After fixes a bug in retry handling."
+  },
+  {
+    "id": "0.126.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Declaration file change to avoid a TS 5.7-only type accepts the same code."
+  },
+  {
+    "id": "0.126.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "sideEffects flag only affects bundle size, not observable behavior."
+  },
+  {
+    "id": "0.126.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Pure annotations only help tree-shaking and do not change behavior."
+  },
+  {
+    "id": "0.126.0#16",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "0.126.0#17",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation correction only."
+  },
+  {
+    "id": "0.126.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Sub-package tooling and tsconfig change, not observable to SDK users."
+  },
+  {
+    "id": "0.126.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repo tsconfig change with no effect on SDK users."
+  },
+  {
+    "id": "0.126.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build tooling pin."
+  },
+  {
+    "id": "0.126.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repo root tooling change, not the published package."
+  },
+  {
+    "id": "0.126.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Publish script and test runner tooling change."
+  },
+  {
+    "id": "0.126.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test mock server change."
+  },
+  {
+    "id": "0.126.0#24",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "0.126.0#25",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation of existing server behavior only."
+  },
+  {
+    "id": "0.126.0#26",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Typo fix in a deprecation message."
+  },
+  {
+    "id": "0.126.0#27",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation generation change only."
+  },
+  {
+    "id": "0.127.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "group.display_name",
+    "why": "Adds a new group field with display_name to rate limits and deprecates group_type; the addition is silent on older versions, and group_type still works."
+  },
+  {
+    "id": "0.127.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "compactBeforeNextTurn",
+    "why": "New tool runner method that older versions lack, so calling it there fails."
+  },
+  {
+    "id": "0.127.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops coercing a null compaction_delta content into the string \"null\", correcting a bug."
+  },
+  {
+    "id": "0.127.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Requests with a stream or iterator body are no longer retried, so code that relied on retries now gets the error on the first failure."
+  },
+  {
+    "id": "0.127.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "anthropic-beta",
+    "why": "The anthropic-beta header is now joined with a comma and no space, changing what is sent."
+  },
+  {
+    "id": "0.127.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "pagination exports",
+    "why": "Pagination exports on the client namespace become type-only, so runtime use of them now fails."
+  },
+  {
+    "id": "0.127.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes jest from tsconfig types, a build-config change with no user-visible effect."
+  },
+  {
+    "id": "0.127.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "middleware compaction fallback continuation",
+    "why": "The fallback continuation now echoes a streamed compaction summary, so the same call sends and returns something different."
+  },
+  {
+    "id": "0.127.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Keeping $defs when the root is a $ref makes transformJSONSchema produce valid schemas, fixing broken output."
+  },
+  {
+    "id": "0.127.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "A performance optimization that skips formatting when debug logging is off, with no observable change."
+  },
+  {
+    "id": "0.127.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI publishing change only."
+  },
+  {
+    "id": "0.127.0#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Adds descriptions for enum values and path parameters, documentation only."
+  },
+  {
+    "id": "0.127.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Clarifies descriptions, documentation only."
+  },
+  {
+    "id": "0.127.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Sub-packages are now built with a newer TypeScript, which users cannot observe."
+  },
+  {
+    "id": "0.127.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build toolchain upgrade with no user-visible effect."
+  },
+  {
+    "id": "0.127.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Keeps internal modules out of the published exports map; they were not a documented API."
+  },
+  {
+    "id": "0.127.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Re-exports pagination classes with a plain export list, with the same exports available."
+  },
+  {
+    "id": "0.127.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Shares one Simplify type util, an internal type cleanup."
+  },
+  {
+    "id": "0.127.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test framework switch, not user-visible."
+  },
+  {
+    "id": "0.128.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "claude-opus-5-5",
+    "why": "Adds a new model, inline tool definitions and MCP tool-list pinning (beta); older versions' types may reject the new fields, but code not using them is unaffected."
+  },
+  {
+    "id": "0.128.0#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Shares one evaluated_permission enum across Managed Agents events, but the entry doesn't say whether the accepted or returned values change."
+  },
+  {
+    "id": "0.128.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "addTools",
+    "why": "addTools() now takes effect immediately, so code that relied on the earlier timing behaves differently."
+  },
+  {
+    "id": "0.128.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "toolRunner compaction",
+    "why": "The tool runner's compaction request no longer includes reply-only params, so what is sent changes."
+  },
+  {
+    "id": "0.128.0#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "API reference descriptions only."
+  },
+  {
+    "id": "0.128.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "API reference descriptions only."
+  },
+  {
+    "id": "0.128.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "API reference descriptions only."
+  },
+  {
+    "id": "0.128.0#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "API reference descriptions only."
+  },
+  {
+    "id": "0.128.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Description simplification only."
+  },
+  {
+    "id": "0.128.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Field descriptions only."
+  },
+  {
+    "id": "0.128.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds tests only."
+  },
+  {
+    "id": "0.129.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "between_tools",
+    "why": "Adds a new thinking type that older versions' types reject, and code not using it is unaffected."
+  },
+  {
+    "id": "0.129.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "claude-sonnet-5-5",
+    "why": "New model ID added; older versions accept arbitrary model strings in types and the API accepts it."
+  },
+  {
+    "id": "0.129.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "ClientToolUnion",
+    "why": "New exported type users can reference; it is type-only and older versions simply lack it."
+  },
+  {
+    "id": "0.129.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "include_inherited",
+    "why": "New workspace rate limit parameter and response field, optional so existing code is unaffected."
+  },
+  {
+    "id": "0.129.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "events list filter types",
+    "why": "Adds typed event type values to the Managed Agents events list filter, which callers can now use."
+  },
+  {
+    "id": "0.129.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "diagnostics",
+    "why": "Cache diagnostics now GA as a field on Message and MessageCreateParams."
+  },
+  {
+    "id": "0.129.0#7",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "tool runner streaming tool calls",
+    "why": "Opt-in option to start tool calls while the reply streams; default behavior is unchanged."
+  },
+  {
+    "id": "0.129.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "X-Stainless-Timeout",
+    "why": "Client-level timeouts now also send the X-Stainless-Timeout header, changing what is sent."
+  },
+  {
+    "id": "0.129.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "uploads filename",
+    "why": "Upload filenames are now sent as given with no placeholder, changing what is sent for the same call."
+  },
+  {
+    "id": "0.129.0#10",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what the fallback hop behavior was before or whether it documented otherwise."
+  },
+  {
+    "id": "0.129.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Bundler tree-shaking change with no observable behavior."
+  },
+  {
+    "id": "0.129.0#12",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "partial tool input",
+    "why": "Partial tool input during streaming now shows every complete array item and holds back unfinished numbers, changing the parsed values."
+  },
+  {
+    "id": "0.129.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance refactor removing an internal layer."
+  },
+  {
+    "id": "0.129.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization of the tokenizer with same output."
+  },
+  {
+    "id": "0.129.0#15",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "betas",
+    "why": "The betas param is deprecated on GA models and completions methods but still works."
+  },
+  {
+    "id": "0.129.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Reorders known model IDs in types, accepting the same code."
+  },
+  {
+    "id": "0.129.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI runner selection."
+  },
+  {
+    "id": "0.129.0#18",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "0.129.0#19",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation wording only."
+  },
+  {
+    "id": "0.129.0#20",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Restores a doc notice."
+  },
+  {
+    "id": "0.129.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Moves internal constants around."
+  },
+  {
+    "id": "0.129.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test fixture change."
+  },
+  {
+    "id": "0.129.0#23",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "compaction control",
+    "why": "Client-side compaction control is removed, so code using it will fail."
+  },
+  {
+    "id": "0.129.0#24",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation comment change only."
+  },
+  {
+    "id": "0.129.0#25",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Contributor guide documentation."
+  },
+  {
+    "id": "0.130.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "stop_details",
+    "why": "Adds a refusal stop reason and stop_details to Managed Agents session idle events; new values that older types lack."
+  },
+  {
+    "id": "0.130.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Admin API analytics, spend limits, RBAC groups and roles",
+    "why": "Adds new callable Admin API resources; older versions simply lack them."
+  },
+  {
+    "id": "0.130.0#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Admin API per-user usage and cost reports",
+    "why": "Adds new per-user usage and cost report endpoints."
+  },
+  {
+    "id": "0.130.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Admin API Plugins and Plugin Marketplaces",
+    "why": "Adds new Plugins and Plugin Marketplaces resources to the Admin API."
+  },
+  {
+    "id": "0.130.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "Managed Agents session repository error types",
+    "why": "Adds new error types users can see and handle in session errors."
+  },
+  {
+    "id": "0.130.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "plugin org-wide installation setting removal",
+    "why": "Adds the ability to remove a plugin's org-wide installation setting."
+  },
+  {
+    "id": "0.130.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Tunnel.transport",
+    "why": "The create response now returns the one-time relay token and Tunnel has a new transport object."
+  },
+  {
+    "id": "0.130.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Organization API endpoints",
+    "why": "Organization API endpoints move from beta to GA, which can change how they are called."
+  },
+  {
+    "id": "0.130.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "memory store description, metadata, archived_at",
+    "why": "These fields become required in the types, so code that omits or treats them as optional can fail type checks."
+  },
+  {
+    "id": "0.130.0#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "admin plugin preference and marketplace fields",
+    "why": "Fields typed as enums instead of strings can break type checks for code that assigns arbitrary strings."
+  },
+  {
+    "id": "0.130.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Auto-paging now continues past empty pages as pagination is meant to work."
+  },
+  {
+    "id": "0.130.0#12",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool-runner",
+    "why": "The tool runner now sends only API fields for runnable tools, changing what is sent in requests."
+  },
+  {
+    "id": "0.130.0#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "The session tool runner now stops after an idle that ends the turn, as intended."
+  },
+  {
+    "id": "0.130.0#14",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "The entry only says MCP Tunnels types and descriptions were updated, without saying what changed."
+  },
+  {
+    "id": "0.130.0#15",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only removes placeholder enum descriptions from the docs."
+  },
+  {
+    "id": "0.130.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test fixture update."
+  },
+  {
+    "id": "0.131.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "list spend limits",
+    "why": "Adds a new endpoint for listing spend limits."
+  },
+  {
+    "id": "0.131.0#2",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "claude-sonnet-4-5",
+    "why": "Sonnet 4.5 is marked deprecated, which still works but now warns or is documented as deprecated."
+  },
+  {
+    "id": "0.132.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "claude-haiku-5-5",
+    "why": "Adds the claude-haiku-5-5 model and typed computer and browser toolset tool calls."
+  },
+  {
+    "id": "0.132.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "disabled (model capabilities thinking types)",
+    "why": "Adds a disabled option to the thinking types in model capabilities."
+  },
+  {
+    "id": "0.132.0#3",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "RBAC role name",
+    "why": "Adds display_name to RBAC roles and deprecates name, which still works."
+  },
+  {
+    "id": "0.132.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "include_default",
+    "why": "Adds a new include_default parameter to list workspaces."
+  },
+  {
+    "id": "0.132.0#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "models lifecycle stage fields and filter",
+    "why": "Adds lifecycle stage fields and a filter to /v1/models."
+  },
+  {
+    "id": "0.132.0#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "line",
+    "why": "Adds a new line field to model objects."
+  },
+  {
+    "id": "0.132.0#7",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "url_sources",
+    "why": "Adds url_sources to the Managed Agents web_fetch tool config."
+  },
+  {
+    "id": "0.132.0#8",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "model capabilities web search and code execution",
+    "why": "Adds web search and code execution support fields to model capabilities."
+  },
+  {
+    "id": "0.132.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "spendLimits.list",
+    "why": "Listing spend limits now sends the beta header by default, which changes what the same call sends; it is not a docs-promised fix."
+  },
+  {
+    "id": "0.132.0#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "JSONL stream iteration",
+    "why": "Iterating a JSONL stream a second time now throws, where previously code that did so did not error."
+  },
+  {
+    "id": "0.132.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a local memory tool edit being lost after a lost upload response, restoring expected behavior."
+  },
+  {
+    "id": "0.132.0#12",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "completions",
+    "why": "The Text Completions API is now marked deprecated but still works."
+  },
+  {
+    "id": "0.132.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation correction only."
+  },
+  {
+    "id": "0.132.0#14",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation correction only."
+  },
+  {
+    "id": "0.132.0#15",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation correction only."
+  },
+  {
+    "id": "0.132.0#16",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation example ID fixes only."
+  },
+  {
+    "id": "0.132.0#17",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation description update only."
+  },
+  {
+    "id": "0.132.0#18",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation description update only."
+  },
+  {
+    "id": "0.132.0#19",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation description update only."
+  },
+  {
+    "id": "0.132.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds a repository review instructions file; no user-observable change."
+  },
+  {
+    "id": "0.132.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal refactor of deprecated models handling with no stated observable change."
+  },
+  {
+    "id": "0.132.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "0.132.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "0.132.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "0.132.0#25",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation states the agent tools limit."
+  },
+  {
+    "id": "0.132.0#26",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Example documentation only."
+  },
+  {
+    "id": "0.132.1#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "path parameters",
+    "why": "Calls with an empty path parameter now throw before sending a request, where previously they were sent."
+  },
+  {
+    "id": "0.132.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI check only."
+  },
+  {
+    "id": "0.132.1#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI publish workflow change."
+  },
+  {
+    "id": "0.132.1#4",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation note about early access."
+  },
+  {
+    "id": "0.132.1#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Splits repository contributor rules documentation."
+  },
+  {
+    "id": "0.133.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "unified analytics metrics types",
+    "why": "Adds new types for Chat and Cowork analytics metrics; older code is unaffected."
+  },
+  {
+    "id": "0.133.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "workflows",
+    "why": "Adds workflows, multiagent configuration and thread status filtering to Managed Agents, which older versions reject as unknown types or params."
+  },
+  {
+    "id": "0.133.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removing a branch rule from CLAUDE.md is a repo-maintenance change that no SDK user can observe."
+  }
+]

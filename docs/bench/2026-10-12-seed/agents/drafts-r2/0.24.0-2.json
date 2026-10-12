@@ -1,0 +1,14 @@
+{
+  "entry": "0.24.0#2",
+  "verdict": {
+    "id": "0.24.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Agent.queue",
+    "why": "Queued callbacks now run from the alarm loop and no longer see the enqueuing request's connection via getCurrentAgent(), and dequeue/getQueue methods became async."
+  },
+  "cost_usd": 0.39079240000000004,
+  "turns": 14,
+  "skip": "Showing that queued callbacks lose getCurrentAgent() connection/request needs a running Durable Object alarm loop, which no offline Node test can reproduce reliably, and the reviewer rejected a source-only lesson."
+}

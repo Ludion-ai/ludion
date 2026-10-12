@@ -1,0 +1,54 @@
+{
+  "entry": "4.118.0#2",
+  "verdict": {
+    "id": "4.118.0#2",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "X_LOCAL_OBSERVABILITY",
+    "why": "Local observability capture is now on by default in dev instead of opt-in."
+  },
+  "cost_usd": 0.650992,
+  "turns": 23,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.118.0",
+    "kind": "default",
+    "symbol": "X_LOCAL_OBSERVABILITY",
+    "signal": "silent",
+    "detail": "wrangler dev now captures request traces and console logs out of the box; previously opt-in behind X_LOCAL_OBSERVABILITY=true",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.118.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nconst f = src.indexOf(\"function getBooleanEnvironmentVariableFactory(options) {\");\nconst fe = f < 0 ? -1 : src.indexOf(\"\\n}\\n\", f);\nconst i = src.indexOf(\"getLocalObservabilityEnabledFromEnv = getBooleanEnvironmentVariableFactory({\");\nconst ie = i < 0 ? -1 : src.indexOf(\"});\", i);\nif (f < 0 || fe < 0 || i < 0 || ie < 0) broken(\"could not find the X_LOCAL_OBSERVABILITY getter in cli.js\");\nif (!src.includes(\"unsafeObservability: getLocalObservabilityEnabledFromEnv()\")) broken(\"dev Miniflare options do not use the X_LOCAL_OBSERVABILITY getter\");\nconst get = new Function(\"UserError\", src.slice(f, fe + 3) + \"\\nconst \" + src.slice(i, ie + 3) + \"\\nreturn getLocalObservabilityEnabledFromEnv;\")(class extends Error {});\nprocess.env.X_LOCAL_OBSERVABILITY = \"false\";\nif (get() !== false) broken(\"X_LOCAL_OBSERVABILITY=false did not disable local observability\");\nprocess.env.X_LOCAL_OBSERVABILITY = \"true\";\nif (get() !== true) broken(\"X_LOCAL_OBSERVABILITY=true did not enable local observability\");\ndelete process.env.X_LOCAL_OBSERVABILITY;\nconst v = get();\nif (v === false) symptom(\"with X_LOCAL_OBSERVABILITY unset, wrangler dev passes unsafeObservability: false to Miniflare\");\nif (v !== true) broken(\"unexpected default \" + JSON.stringify(v));\nconsole.log(\"OK: with X_LOCAL_OBSERVABILITY unset, wrangler dev enables local observability capture\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.117.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nconst f = src.indexOf(\"function getBooleanEnvironmentVariableFactory(options) {\");\nconst fe = f < 0 ? -1 : src.indexOf(\"\\n}\\n\", f);\nconst i = src.indexOf(\"getLocalObservabilityEnabledFromEnv = getBooleanEnvironmentVariableFactory({\");\nconst ie = i < 0 ? -1 : src.indexOf(\"});\", i);\nif (f < 0 || fe < 0 || i < 0 || ie < 0) broken(\"could not find the X_LOCAL_OBSERVABILITY getter in cli.js\");\nif (!src.includes(\"unsafeObservability: getLocalObservabilityEnabledFromEnv()\")) broken(\"dev Miniflare options do not use the X_LOCAL_OBSERVABILITY getter\");\nconst get = new Function(\"UserError\", src.slice(f, fe + 3) + \"\\nconst \" + src.slice(i, ie + 3) + \"\\nreturn getLocalObservabilityEnabledFromEnv;\")(class extends Error {});\nprocess.env.X_LOCAL_OBSERVABILITY = \"false\";\nif (get() !== false) broken(\"X_LOCAL_OBSERVABILITY=false did not disable local observability\");\nprocess.env.X_LOCAL_OBSERVABILITY = \"true\";\nif (get() !== true) broken(\"X_LOCAL_OBSERVABILITY=true did not enable local observability\");\ndelete process.env.X_LOCAL_OBSERVABILITY;\nconst v = get();\nif (v === false) symptom(\"with X_LOCAL_OBSERVABILITY unset, wrangler dev passes unsafeObservability: false to Miniflare\");\nif (v !== true) broken(\"unexpected default \" + JSON.stringify(v));\nconsole.log(\"OK: with X_LOCAL_OBSERVABILITY unset, wrangler dev enables local observability capture\");\n",
+          "expect": "fail",
+          "error": "FAIL: with X_LOCAL_OBSERVABILITY unset, wrangler dev passes unsafeObservability: false to Miniflare"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.118.0/packages/wrangler/CHANGELOG.md",
+          "quote": "`wrangler dev` and the Vite plugin now capture request traces and console logs into the Local Explorer's Observability tab out of the box — previously this was opt-in behind `X_LOCAL_OBSERVABILITY=true`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

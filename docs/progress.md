@@ -42,8 +42,9 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 ### Next (in order)
 
-1. Pipeline yield for agents (#62) and wrangler against the hand-made seeds, in `docs/bench/2026-10-12-seed/README.md`: candidates → lessons that passed the checks → review findings. wrangler drafting is running on Sonnet (36 candidates left when it was switched; resume with `node tools/seed/src/cli.ts draft docs/bench/2026-10-12-seed/wrangler --kinds default,behavior,deprecated,renamed,removed --signal silent` from `C:/dev/ludion-wt-seed`).
-2. One new subject, only after reading the yield; if the yield is poor, fix the pipeline first.
+1. [done] Pipeline yield against the hand-made seeds: `docs/bench/2026-10-12-seed/README.md`. From the silent, non-addition changes drafted (32, 39, 56), 7, 6, and 3 end as lessons with no problem and no review finding left (agents with two revise rounds, vitest and wrangler with none); 6, 5, and 3 of them are new, the rest repeat a lesson on main. That is a low yield.
+2. Fix the pipeline before adding a subject, as the plan says for a poor yield. The failures are mostly mechanical, so the first thing to try, on one subject, is one `revise` round on the local-check failures before the reviewer (the drafting agents can't run the checker). Measure it on wrangler's 55 drafts (`node tools/seed/src/cli.ts revise docs/bench/2026-10-12-seed/wrangler --round 1`, then `check` and `review` with `--round 1`) and write the new counts in the same README. Then, if the yield is better, one new subject (`ai`, `zod`, or `tailwindcss`: zod and tailwindcss are partly drafted in `docs/bench/2026-10-12-subjects/`).
+3. Pipeline PR (`tools/seed`) to main; then PRs for the kept lessons: agents #62 is open (CI passed), vitest (5) and wrangler (3) after their checks, and the `seed-watch.yml` workflow (kept in `C:/dev/ludion-seedwork/seed-watch.yml`; protected, needs `tools/seed` on main first).
 
 ### Where the running work lives (for resuming)
 
@@ -100,3 +101,19 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 - CLAUDE.md replaced by the v2 spec; `.claude/rules/` deleted; their standing details moved to `docs/decisions.md`.
 - Closed #13 and #23; #19, #20, and #21 are folded into the v2 work (see `docs/decisions.md`).
 - Before v2, measured on 2026-10-08: FreshBench v0 A questions, 7% correct with no tools and 47% with web search; vitest's ten B questions, 40% with web search and 100% with lesson drafts in the context (`docs/bench/2026-10-08/`). Caveat: one answer key (WebdriverIO, `vitest-5-0-0-6`) is known to be wrong, and it is in both the A and B sets, so the 7%/47% overall, vitest's A scores, and the ten B scores all include it. It is to be fixed against primary sources and the scores recomputed. Experiment 1: `ludion_ask` called in 20/20 runs (`docs/experiments/e1/`).
+
+### 2026-10-12: Stopped at the usage limit (resume from here)
+
+- `seed-pipeline` branch (pushed, no PR yet): `tools/seed` (collect, triage, draft, check, review, revise, lessons, ci, fix, bench, watch, score, questions, calibrate), `.github/workflows/seed-watch.yml` (to split into its own protected PR), bench projects for zod, tailwindcss, ai. Run data in `docs/bench/2026-10-12-seed/` (agents: drafted, checked, reviewed, revise round 1 partly done; vitest and wrangler drafts partly done) and `docs/bench/2026-10-12-subjects/` (20 candidates triaged and scored; new subjects chosen: ai, tailwindcss, zod; their drafting just started).
+- Reviewer calibration on the 30 accepted seeds: `docs/bench/2026-10-12-seed/calibrate-hand-seeds.json`. Some findings may be real problems in lessons on main (rules 3 and 8); read them.
+- `exp3-unrelated` branch: harness and pool committed; the run was stopped early. Rerun `bash C:/dev/ludion-seedwork/exp3.sh` (it resumes per condition only when a condition's answers file is missing; delete a partial one first).
+- Background drafting was killed; the pipeline resumes from its files, but delete any `drafts/*.json` record whose `error` mentions a limit before rerunning `draft`.
+- Open: #54 (issue form, needs owner), #59, #60, #62 (C batch). Outreach drafts are in worktree `C:/dev/ludion-wt-outreach` (branch `outreach`, not pushed).
+- Next: finish drafts → check → review/revise → lessons → one PR per subject (needs-owner) → ci/fix → bench; summary numbers into `docs/bench/2026-10-12-seed/README.md`; experiment 3; C batch day 2; npm stage last.
+
+### 2026-10-12 (later): stopped at the usage limit again; resume here
+
+- Done since the last note: spending rules (PR "Write the spending rules and the next steps"), pipeline defaults to Sonnet, duplicate check against lessons on main (`lessons` step writes `duplicates.json`), new-subject drafting stopped (zod 25 and tailwindcss 15 drafted, ai none; kept in `docs/bench/2026-10-12-subjects/`), vitest reviewed once (round 0: 34 drafts, 24 passed the local checks, 54 review findings; no further rounds, per the rules).
+- wrangler drafting: 31 drafted and 1 skipped saved; 24 runs ended on the usage limit and their error records were removed. Resume: `node tools/seed/src/cli.ts draft docs/bench/2026-10-12-seed/wrangler --kinds default,behavior,deprecated,renamed,removed --signal silent`, then `check`, `review`, `lessons` (one round of `revise` at most) and `summary` on that folder.
+- Next step 1 is still open: write `docs/bench/2026-10-12-seed/README.md` comparing candidates → passed local checks → review findings → CI for agents (summary.json exists; PR #62 is the CI run, 6 of 6 passed Docker), vitest and wrangler, against the hand-made seeds (`calibrate-hand-seeds.json`: 46 findings on 30 accepted lessons; reviewer was Opus there). Models differed across runs (agents and vitest Opus, wrangler partly Sonnet); say so in the README.
+- Open PRs: #54 (issue form, owner), #60 (consent draft), #62 (6 agents lessons, owner; test re-run on the merged branch is pending in CI), #66 (outreach, auto-merge), the spending-rules docs PR (auto-merge). `seed-pipeline` has no PR yet.

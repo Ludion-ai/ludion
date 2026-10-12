@@ -1,0 +1,32 @@
+{
+  "entry": "4.126.0#4",
+  "verdict": {
+    "id": "4.126.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Local containers now automatically get Docker privileges for FUSE under certain Docker setups."
+  },
+  "cost_usd": 0.07532620000000001,
+  "turns": 6,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.126.0",
+    "kind": "behavior",
+    "symbol": "/dev/fuse",
+    "signal": "silent",
+    "detail": "Miniflare now automatically passes the Docker privileges needed for FUSE to local Durable Object containers with rootless Docker on Linux",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.126.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Miniflare now automatically passes the Docker privileges needed for FUSE to local Durable Object containers when using local rootless Docker on Linux with `/dev/fuse` available"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

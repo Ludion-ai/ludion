@@ -1,0 +1,1374 @@
+[
+  {
+    "id": "4.22.2#1",
+    "version": "4.22.2",
+    "date": "2026-05-11T18:50:00.007Z",
+    "section": "What s Changed",
+    "text": "* fix: restore >20 array parsing for `req.query` repeated keys ([`8d09bfe6`](https://github.com/expressjs/express/commit/8d09bfe6d88983da5c3e12cfdd54782c4dc675db))\n  * This also unifies array-cap behavior across notations. Indexed notation (`a[0]=...`) was historically capped at qs's default `arrayLimit` of 20 even in older qs versions; after this change it also allows up to 1000 items.",
+    "refs": [],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.2"
+  },
+  {
+    "id": "4.22.2#2",
+    "version": "4.22.2",
+    "date": "2026-05-11T18:50:00.007Z",
+    "section": "What s Changed",
+    "text": "* deps: qs@~6.15.1",
+    "refs": [],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.2"
+  },
+  {
+    "id": "4.22.2#3",
+    "version": "4.22.2",
+    "date": "2026-05-11T18:50:00.007Z",
+    "section": "What s Changed",
+    "text": "* deps: body-parser@~1.20.5",
+    "refs": [],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.2"
+  },
+  {
+    "id": "4.22.2#4",
+    "version": "4.22.2",
+    "date": "2026-05-11T18:50:00.007Z",
+    "section": "New Contributors",
+    "text": "* @suuuuuuminnnnnn made their first contribution in https://github.com/expressjs/express/pull/7021",
+    "refs": [
+      7021
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.2"
+  },
+  {
+    "id": "4.22.2#5",
+    "version": "4.22.2",
+    "date": "2026-05-11T18:50:00.007Z",
+    "section": "New Contributors",
+    "text": "* @SAY-5 made their first contribution in https://github.com/expressjs/express/pull/7181",
+    "refs": [
+      7181
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.2"
+  },
+  {
+    "id": "4.22.3#1",
+    "version": "4.22.3",
+    "date": "2026-09-14T06:46:38.631Z",
+    "section": "What s Changed",
+    "text": "* Update path-to-regexp to 0.1.13 to fix CVE-2026-4867 by @baryman in https://github.com/expressjs/express/pull/7135",
+    "refs": [
+      7135
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.3"
+  },
+  {
+    "id": "4.22.3#2",
+    "version": "4.22.3",
+    "date": "2026-09-14T06:46:38.631Z",
+    "section": "What s Changed",
+    "text": "* feat: allow conditional revalidation for QUERY requests (v4) by @Cherry in https://github.com/expressjs/express/pull/7377",
+    "refs": [
+      7377
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.3"
+  },
+  {
+    "id": "4.22.3#3",
+    "version": "4.22.3",
+    "date": "2026-09-14T06:46:38.631Z",
+    "section": "What s Changed",
+    "text": "* deps: qs@~6.16.0 by @lazerg in https://github.com/expressjs/express/pull/7440",
+    "refs": [
+      7440
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.3"
+  },
+  {
+    "id": "4.22.3#4",
+    "version": "4.22.3",
+    "date": "2026-09-14T06:46:38.631Z",
+    "section": "What s Changed",
+    "text": "* ci: add npm staged publication with dist-tag support by @UlisesGascon in https://github.com/expressjs/express/pull/7465",
+    "refs": [
+      7465
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.3"
+  },
+  {
+    "id": "4.22.3#5",
+    "version": "4.22.3",
+    "date": "2026-09-14T06:46:38.631Z",
+    "section": "What s Changed",
+    "text": "* 4.22.3 by @UlisesGascon in https://github.com/expressjs/express/pull/7466",
+    "refs": [
+      7466
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.3"
+  },
+  {
+    "id": "4.22.3#6",
+    "version": "4.22.3",
+    "date": "2026-09-14T06:46:38.631Z",
+    "section": "New Contributors",
+    "text": "* @baryman made their first contribution in https://github.com/expressjs/express/pull/7135",
+    "refs": [
+      7135
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.3"
+  },
+  {
+    "id": "4.22.3#7",
+    "version": "4.22.3",
+    "date": "2026-09-14T06:46:38.631Z",
+    "section": "New Contributors",
+    "text": "* @lazerg made their first contribution in https://github.com/expressjs/express/pull/7440",
+    "refs": [
+      7440
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v4.22.3"
+  },
+  {
+    "id": "5.3.0#1",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Bug fixes",
+    "text": "- Fixed HTTP header conflict between Content-Length and Transfer-Encoding in res.send - by [@YuryShkoda](https://github.com/YuryShkoda) in [#4893](https://github.com/expressjs/express/pull/4893)\n\n\n    Fixed the behavior of `res.send()` to prevent conflicts between `Content-Length` and `Transfer-Encoding` HTTP headers in responses. The `Content-Length` header in `res.send()` is now only added when a `Transfer-Encoding` header is not present, complying with the HTTP specification that states both headers should not coexist in the same response. ETag generation is unaffected by the presence of a `Transfer-Encoding` header - by [@cuishuang](https://github.com/cuishuang) in [#7459](https://github.com/expressjs/express/pull/7459)",
+    "refs": [
+      4893,
+      7459
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#2",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Bug fixes",
+    "text": "* Upgrade `qs` to `^6.16.0`, which fixes [CVE-2026-2391](https://www.cve.org/CVERecord?id=CVE-2026-2391) ([GHSA-w7fw-mjwx-w883](https://github.com/ljharb/qs/security/advisories/GHSA-w7fw-mjwx-w883)), [CVE-2026-82417](https://www.cve.org/CVERecord?id=CVE-2026-82417) ([GHSA-4mjr-xmp4-gh2g](https://github.com/advisories/GHSA-4mjr-xmp4-gh2g)) and [CVE-2026-82562](https://www.cve.org/CVERecord?id=CVE-2026-82562) ([GHSA-x5fp-wj9c-mxmx](https://github.com/advisories/GHSA-x5fp-wj9c-mxmx)): `arrayLimit` bypasses in comma parsing and a denial of service via an attacker-controlled `isBuffer` - by [@davetashner](https://github.com/davetashner) in [#7057](https://github.com/expressjs/express/pull/7057) and [#7478](https://github.com/expressjs/express/pull/7478), and [@cyphercodes](https://github.com/cyphercodes) in [#7305](https://github.com/expressjs/express/pull/7305)",
+    "refs": [
+      7057,
+      7478,
+      7305
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#3",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Bug fixes",
+    "text": "* Upgrade `proxy-addr` to `^2.0.8`, which fixes [CVE-2026-90711](https://www.cve.org/CVERecord?id=CVE-2026-90711) - by [@lazerg](https://github.com/lazerg) in [#7474](https://github.com/expressjs/express/pull/7474)",
+    "refs": [
+      7474
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#4",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Improvements",
+    "text": "* Allow conditional revalidation for QUERY requests. `req.fresh` previously only validated freshness for GET and HEAD requests, so QUERY responses never returned 304 despite a matching validator. Since QUERY is a safe, idempotent, and cacheable method that supports conditional requests, it is now included in the freshness check - by [@Cherry](https://github.com/Cherry) in [#7366](https://github.com/expressjs/express/pull/7366)\n\n    ```js\n    // QUERY /reports with If-None-Match: \"12345\"\n    app.query('/reports', (req, res) => {\n      res.set('ETag', '\"12345\"');\n      res.send(results); // now responds 304 Not Modified\n    });\n    ```",
+    "refs": [
+      7366
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#5",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Improvements",
+    "text": "* Improve HTML structure in `res.redirect()` responses when HTML format is accepted by adding `<!DOCTYPE html>`, `<title>`, and `<body>` tags for better browser compatibility - by [@Bernice55231](https://github.com/Bernice55231) in [#5167](https://github.com/expressjs/express/pull/5167)",
+    "refs": [
+      5167
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#6",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Improvements",
+    "text": "* When calling `app.render` with options set to null, the locals object is handled correctly, preventing unexpected errors and making the method behave the same as when options is omitted or an empty object is passed - by [AkaHarshit](https://github.com/AkaHarshit) in [#6903](https://github.com/expressjs/express/pull/6903)\n\n    ```js\n    app.render('index', null, callback); // now works as expected\n    ```",
+    "refs": [
+      6903
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#7",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Improvements",
+    "text": "* Upgrade `content-type` to `^2.0.0`, bringing a faster parser (~1.5x quicker `Content-Type` parsing/formatting in `res.send()`) along with a behavior change: `res.send()` now keeps any existing parameters when adding the charset and no longer throws on a `Content-Type` that fails to parse. `type-is` is upgraded to `^2.1.0` as part of the same change - by [@blakeembrey](https://github.com/blakeembrey) in [#7234](https://github.com/expressjs/express/pull/7234)\n\n    ```js\n    res.set('Content-Type', 'text/plain; foo=bar').send('hey');\n    // -> Content-Type: text/plain; foo=bar; charset=utf-8\n    ```",
+    "refs": [
+      7234
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#8",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Improvements",
+    "text": "* The default error handler now logs the full error object instead of only its stack trace, so nested details such as `Error.cause` and library-specific properties (e.g. Sequelize's `parent`/`original`) are no longer swallowed - by [@Nitin-Mohapatra](https://github.com/Nitin-Mohapatra) in [#6464](https://github.com/expressjs/express/pull/6464)",
+    "refs": [
+      6464
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#9",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Improvements",
+    "text": "* Upgrade `content-disposition` to `^2.0.1`, which changes the `Content-Disposition` header emitted by `res.download()`, `res.attachment()`, and `res.sendFile()`: file names that are valid HTTP tokens are no longer wrapped in quotes. This is equivalent per RFC 6266, but applications asserting on the exact header bytes should update their expectations - by [@blakeembrey](https://github.com/blakeembrey) in [#7233](https://github.com/expressjs/express/pull/7233)\n\n    ```js\n    res.attachment('user.html');\n    // before -> Content-Disposition: attachment; filename=\"user.html\"\n    // after  -> Content-Disposition: attachment; filename=user.html\n    ```",
+    "refs": [
+      7233
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#10",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Improvements",
+    "text": "* Upgrade `body-parser` to `^2.3.0`, which fixes [CVE-2026-12590](https://www.cve.org/CVERecord?id=CVE-2026-12590) ([GHSA-v422-hmwv-36x6](https://github.com/expressjs/body-parser/security/advisories/GHSA-v422-hmwv-36x6)): an invalid `limit` option value caused request body size enforcement to be silently disabled (fail-open), allowing a denial of service via arbitrarily large payloads. Invalid `limit` values now throw at parser initialization instead of being ignored - by [@Mayvis](https://github.com/Mayvis) in [#7390](https://github.com/expressjs/express/pull/7390)",
+    "refs": [
+      7390
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#11",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "Performance",
+    "text": "* Avoid duplicate Content-Type header processing in `res.send()` when sending string responses without an explicit Content-Type header - by [@bjohansebas](https://github.com/bjohansebas) in [#6991](https://github.com/expressjs/express/pull/6991)",
+    "refs": [
+      6991
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#12",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* 📝 add note to history by @ctcpip in https://github.com/expressjs/express/pull/6946",
+    "refs": [
+      6946
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#13",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: add @rxmarbles to triagers by @rxmarbles in https://github.com/expressjs/express/pull/6953",
+    "refs": [
+      6953
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#14",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: use global Security policy by @UlisesGascon in https://github.com/expressjs/express/pull/6570",
+    "refs": [
+      6570
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#15",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* doc: fix security.md link to point to security tab by @jonchurch in https://github.com/expressjs/express/pull/6976",
+    "refs": [
+      6976
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#16",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/download-artifact from 6.0.0 to 7.0.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/6961",
+    "refs": [
+      6961
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#17",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix: enhance req.acceptsCharsets method by @Abdel-Monaam-Aouini in https://github.com/expressjs/express/pull/6088",
+    "refs": [
+      6088
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#18",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/upload-artifact from 5.0.0 to 6.0.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/6965",
+    "refs": [
+      6965
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#19",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump github/codeql-action from 4.31.6 to 4.31.9 by @dependabot[bot] in https://github.com/expressjs/express/pull/6964",
+    "refs": [
+      6964
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#20",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix(deps): update version lib qs by @gabrieel1007 in https://github.com/expressjs/express/pull/6969",
+    "refs": [
+      6969
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#21",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/checkout from 6.0.0 to 6.0.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/6963",
+    "refs": [
+      6963
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#22",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/setup-node from 6.0.0 to 6.1.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/6962",
+    "refs": [
+      6962
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#23",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* nominate @krzysdz to triage team by @bjohansebas in https://github.com/expressjs/express/pull/6482",
+    "refs": [
+      6482
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#24",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* Polish HTML structure of the response in the res.redirect() function by @Bernice55231 in https://github.com/expressjs/express/pull/5167",
+    "refs": [
+      5167
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#25",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: fix JSDoc for req.accepts() return value and parameter format by @marcosmol204 in https://github.com/expressjs/express/pull/6936",
+    "refs": [
+      6936
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#26",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* test: added unit tests for utils.compileETag to cover valid and invalid inputs by @sukdev24 in https://github.com/expressjs/express/pull/6534",
+    "refs": [
+      6534
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#27",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* chore: remove benchmarks directory by @bjohansebas in https://github.com/expressjs/express/pull/6992",
+    "refs": [
+      6992
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#28",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* feat: do not modify the Content-Type twice when sending strings by @bjohansebas in https://github.com/expressjs/express/pull/6991",
+    "refs": [
+      6991
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#29",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* feat: Allow passing null or undefined as the value for options in app.render by @AkaHarshit in https://github.com/expressjs/express/pull/6903",
+    "refs": [
+      6903
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#30",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* test: add test for normalizeType fallback when mime lookup fails by @Ayoub-Mabrouk in https://github.com/expressjs/express/pull/6894",
+    "refs": [
+      6894
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#31",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix: search example to support Redis v4+ and Express 4/5 by @vinybrun in https://github.com/expressjs/express/pull/6274",
+    "refs": [
+      6274
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#32",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: Add @GroophyLifefor to the triage team by @bjohansebas in https://github.com/expressjs/express/pull/6995",
+    "refs": [
+      6995
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#33",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/checkout from 6.0.1 to 6.0.2 by @dependabot[bot] in https://github.com/expressjs/express/pull/7011",
+    "refs": [
+      7011
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#34",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/setup-node from 6.1.0 to 6.2.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7012",
+    "refs": [
+      7012
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#35",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump github/codeql-action from 4.31.9 to 4.32.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7013",
+    "refs": [
+      7013
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#36",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* Remove duplicate tests in res.location and res.jsonp by @GroophyLifefor in https://github.com/expressjs/express/pull/6996",
+    "refs": [
+      6996
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#37",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix: bump qs minimum to ^6.14.2 for CVE-2026-2391 by @davetashner in https://github.com/expressjs/express/pull/7057",
+    "refs": [
+      7057
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#38",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: fix README security policy by @pavan-sh in https://github.com/expressjs/express/pull/7029",
+    "refs": [
+      7029
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#39",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* include edge case tests for `res.type()` by @IshitaSingh0822 in https://github.com/expressjs/express/pull/7037",
+    "refs": [
+      7037
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#40",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump github/codeql-action from 4.32.0 to 4.32.4 by @dependabot[bot] in https://github.com/expressjs/express/pull/7072",
+    "refs": [
+      7072
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#41",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/download-artifact from 7.0.0 to 8.0.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7073",
+    "refs": [
+      7073
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#42",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/upload-artifact from 6.0.0 to 7.0.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7074",
+    "refs": [
+      7074
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#43",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: replace dummy with placeholder in example comments by @samtuckerdavis in https://github.com/expressjs/express/pull/7064",
+    "refs": [
+      7064
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#44",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: remove dead link from Readme by @ayushshukla1807 in https://github.com/expressjs/express/pull/7136",
+    "refs": [
+      7136
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#45",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix: update deprecated npm install docs URL in Readme.md by @Vansh1811 in https://github.com/expressjs/express/pull/7159",
+    "refs": [
+      7159
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#46",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/download-artifact from 8.0.0 to 8.0.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/7148",
+    "refs": [
+      7148
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#47",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/setup-node from 6.2.0 to 6.3.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7149",
+    "refs": [
+      7149
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#48",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump github/codeql-action from 4.32.4 to 4.35.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/7150",
+    "refs": [
+      7150
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#49",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fixed typo in history.md by @opensourcezeal in https://github.com/expressjs/express/pull/7191",
+    "refs": [
+      7191
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#50",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* chore: ensure safe config in the npmrc by @sheplu in https://github.com/expressjs/express/pull/7144",
+    "refs": [
+      7144
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#51",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* ci: build express with node.js v26 by @shivarm in https://github.com/expressjs/express/pull/7218",
+    "refs": [
+      7218
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#52",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/setup-node from 6.3.0 to 6.4.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7210",
+    "refs": [
+      7210
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#53",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/upload-artifact from 7.0.0 to 7.0.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/7211",
+    "refs": [
+      7211
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#54",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump github/codeql-action from 4.35.1 to 4.35.2 by @dependabot[bot] in https://github.com/expressjs/express/pull/7212",
+    "refs": [
+      7212
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#55",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix: bump qs minimum to 6.15.2 by @cyphercodes in https://github.com/expressjs/express/pull/7305",
+    "refs": [
+      7305
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#56",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* Upgrade `content-type` by @blakeembrey in https://github.com/expressjs/express/pull/7234",
+    "refs": [
+      7234
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#57",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* Improve error logging by logging full error object by @Nitin-Mohapatra in https://github.com/expressjs/express/pull/6464",
+    "refs": [
+      6464
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#58",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix: replace deprecated trimRight() with trimEnd() by @tejgokani in https://github.com/expressjs/express/pull/7265",
+    "refs": [
+      7265
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#59",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump github/codeql-action from 4.35.2 to 4.36.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7297",
+    "refs": [
+      7297
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#60",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* Upgrade `content-disposition` by @blakeembrey in https://github.com/expressjs/express/pull/7233",
+    "refs": [
+      7233
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#61",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix(res.send): add Content-Length header only if Transfer-Encoding is not present by @YuryShkoda in https://github.com/expressjs/express/pull/4893",
+    "refs": [
+      4893
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#62",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: use the new logo by @bjohansebas in https://github.com/expressjs/express/pull/7316",
+    "refs": [
+      7316
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#63",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/checkout from 6.0.2 to 7.0.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7345",
+    "refs": [
+      7345
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#64",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps-dev): bump morgan from 1.10.1 to 1.11.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7353",
+    "refs": [
+      7353
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#65",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* feat: allow conditional revalidation for QUERY requests by @Cherry in https://github.com/expressjs/express/pull/7366",
+    "refs": [
+      7366
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#66",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps-dev): bump hbs from 4.2.0 to 4.2.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/7152",
+    "refs": [
+      7152
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#67",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* deps: bump body-parser to ^2.3.0 to fix CVE-2026-12590 by @Mayvis in https://github.com/expressjs/express/pull/7390",
+    "refs": [
+      7390
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#68",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump actions/checkout from 7.0.0 to 7.0.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/7403",
+    "refs": [
+      7403
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#69",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs(res.location): clean up deprecated back string references by @spellsaif in https://github.com/expressjs/express/pull/7406",
+    "refs": [
+      7406
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#70",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump coverallsapp/github-action from 2.3.7 to 2.3.8 by @dependabot[bot] in https://github.com/expressjs/express/pull/7399",
+    "refs": [
+      7399
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#71",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump github/codeql-action/upload-sarif from 4.36.0 to 4.37.3 by @dependabot[bot] in https://github.com/expressjs/express/pull/7400",
+    "refs": [
+      7400
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#72",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* chore: group github actions updates by @Phillip9587 in https://github.com/expressjs/express/pull/7460",
+    "refs": [
+      7460
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#73",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps-dev): bump hbs from 4.2.1 to 4.3.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7450",
+    "refs": [
+      7450
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#74",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump the github-actions group with 5 updates by @dependabot[bot] in https://github.com/expressjs/express/pull/7462",
+    "refs": [
+      7462
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#75",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps-dev): bump morgan from 1.11.0 to 1.12.0 by @dependabot[bot] in https://github.com/expressjs/express/pull/7461",
+    "refs": [
+      7461
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#76",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: fix capitalization of GitHub Discussions in Readme by @Kimkoungsoo in https://github.com/expressjs/express/pull/7426",
+    "refs": [
+      7426
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#77",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* ci: add npm staged publication with dist-tag support by @UlisesGascon in https://github.com/expressjs/express/pull/7464",
+    "refs": [
+      7464
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#78",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* fix(res.send): preserve ETag generation with Transfer-Encoding by @cuishuang in https://github.com/expressjs/express/pull/7459",
+    "refs": [
+      7459
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#79",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* deps: proxy-addr@^2.0.8 by @lazerg in https://github.com/expressjs/express/pull/7474",
+    "refs": [
+      7474
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#80",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* deps: bump qs minimum to 6.16.0 by @davetashner in https://github.com/expressjs/express/pull/7478",
+    "refs": [
+      7478
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#81",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps-dev): bump morgan from 1.12.0 to 1.12.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/7493",
+    "refs": [
+      7493
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#82",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: add missing apostrophe in \"can\\u0027t\" (lib + example) by @haimingZZ in https://github.com/expressjs/express/pull/7483",
+    "refs": [
+      7483
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#83",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps-dev): bump hbs from 4.3.0 to 4.3.1 by @dependabot[bot] in https://github.com/expressjs/express/pull/7500",
+    "refs": [
+      7500
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#84",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* build(deps): bump the github-actions group with 3 updates by @dependabot[bot] in https://github.com/expressjs/express/pull/7499",
+    "refs": [
+      7499
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#85",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: fix pass-through typos by @whoalin1 in https://github.com/expressjs/express/pull/7509",
+    "refs": [
+      7509
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#86",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* docs: fix typos and a stale API reference in lib comments by @fmtappendf in https://github.com/expressjs/express/pull/7512",
+    "refs": [
+      7512
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#87",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "What s Changed",
+    "text": "* Release: 5.3.0 by @UlisesGascon in https://github.com/expressjs/express/pull/7468",
+    "refs": [
+      7468
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#88",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @rxmarbles made their first contribution in https://github.com/expressjs/express/pull/6953",
+    "refs": [
+      6953
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#89",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @gabrieel1007 made their first contribution in https://github.com/expressjs/express/pull/6969",
+    "refs": [
+      6969
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#90",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @Bernice55231 made their first contribution in https://github.com/expressjs/express/pull/5167",
+    "refs": [
+      5167
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#91",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @marcosmol204 made their first contribution in https://github.com/expressjs/express/pull/6936",
+    "refs": [
+      6936
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#92",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @sukdev24 made their first contribution in https://github.com/expressjs/express/pull/6534",
+    "refs": [
+      6534
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#93",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @AkaHarshit made their first contribution in https://github.com/expressjs/express/pull/6903",
+    "refs": [
+      6903
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#94",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @vinybrun made their first contribution in https://github.com/expressjs/express/pull/6274",
+    "refs": [
+      6274
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#95",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @GroophyLifefor made their first contribution in https://github.com/expressjs/express/pull/6996",
+    "refs": [
+      6996
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#96",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @davetashner made their first contribution in https://github.com/expressjs/express/pull/7057",
+    "refs": [
+      7057
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#97",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @pavan-sh made their first contribution in https://github.com/expressjs/express/pull/7029",
+    "refs": [
+      7029
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#98",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @IshitaSingh0822 made their first contribution in https://github.com/expressjs/express/pull/7037",
+    "refs": [
+      7037
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#99",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @samtuckerdavis made their first contribution in https://github.com/expressjs/express/pull/7064",
+    "refs": [
+      7064
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#100",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @ayushshukla1807 made their first contribution in https://github.com/expressjs/express/pull/7136",
+    "refs": [
+      7136
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#101",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @Vansh1811 made their first contribution in https://github.com/expressjs/express/pull/7159",
+    "refs": [
+      7159
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#102",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @opensourcezeal made their first contribution in https://github.com/expressjs/express/pull/7191",
+    "refs": [
+      7191
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#103",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @cyphercodes made their first contribution in https://github.com/expressjs/express/pull/7305",
+    "refs": [
+      7305
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#104",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @Nitin-Mohapatra made their first contribution in https://github.com/expressjs/express/pull/6464",
+    "refs": [
+      6464
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#105",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @tejgokani made their first contribution in https://github.com/expressjs/express/pull/7265",
+    "refs": [
+      7265
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#106",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @YuryShkoda made their first contribution in https://github.com/expressjs/express/pull/4893",
+    "refs": [
+      4893
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#107",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @Mayvis made their first contribution in https://github.com/expressjs/express/pull/7390",
+    "refs": [
+      7390
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#108",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @spellsaif made their first contribution in https://github.com/expressjs/express/pull/7406",
+    "refs": [
+      7406
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#109",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @Kimkoungsoo made their first contribution in https://github.com/expressjs/express/pull/7426",
+    "refs": [
+      7426
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#110",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @cuishuang made their first contribution in https://github.com/expressjs/express/pull/7459",
+    "refs": [
+      7459
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#111",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @haimingZZ made their first contribution in https://github.com/expressjs/express/pull/7483",
+    "refs": [
+      7483
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#112",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @whoalin1 made their first contribution in https://github.com/expressjs/express/pull/7509",
+    "refs": [
+      7509
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  },
+  {
+    "id": "5.3.0#113",
+    "version": "5.3.0",
+    "date": "2026-10-09T12:56:54.505Z",
+    "section": "New Contributors",
+    "text": "* @fmtappendf made their first contribution in https://github.com/expressjs/express/pull/7512",
+    "refs": [
+      7512
+    ],
+    "url": "https://github.com/expressjs/express/releases/tag/v5.3.0"
+  }
+]

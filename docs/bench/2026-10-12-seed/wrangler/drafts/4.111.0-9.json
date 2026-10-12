@@ -1,0 +1,54 @@
+{
+  "entry": "4.111.0#9",
+  "verdict": {
+    "id": "4.111.0#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler whoamio",
+    "why": "Unknown commands now print a 'Did you mean' suggestion in the error output."
+  },
+  "cost_usd": 0.3883956,
+  "turns": 13,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.111.0",
+    "kind": "behavior",
+    "symbol": "wrangler whoamio",
+    "signal": "silent",
+    "detail": "When an unknown command is entered, wrangler now suggests the closest matching command if one exists, for example Did you mean wrangler whoami.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.111.0"
+          },
+          "code": "const { spawnSync } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst r = spawnSync(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"whoamio\"], {\n  cwd: \"/tmp\", encoding: \"utf8\", timeout: 80000,\n  env: { ...process.env, HOME: \"/tmp\", CI: \"1\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", WRANGLER_SEND_METRICS: \"false\" }\n});\nif (r.error) broken(\"could not run wrangler: \" + r.error.message);\nconst out = ((r.stdout || \"\") + (r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\nif (!out.includes(\"Unknown argument: whoamio\")) broken(\"wrangler did not report the unknown command: \" + out.slice(0, 500));\nif (r.status === 0) broken(\"wrangler whoamio exited 0\");\nif (!out.includes('Did you mean \"wrangler whoami\"?')) symptom(\"wrangler whoamio prints no Did you mean suggestion\");\nconsole.log('OK: wrangler whoamio suggests Did you mean \"wrangler whoami\"?');\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.110.0"
+          },
+          "code": "const { spawnSync } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst r = spawnSync(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"whoamio\"], {\n  cwd: \"/tmp\", encoding: \"utf8\", timeout: 80000,\n  env: { ...process.env, HOME: \"/tmp\", CI: \"1\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", WRANGLER_SEND_METRICS: \"false\" }\n});\nif (r.error) broken(\"could not run wrangler: \" + r.error.message);\nconst out = ((r.stdout || \"\") + (r.stderr || \"\")).replace(/\\x1b\\[[0-9;]*m/g, \"\");\nif (!out.includes(\"Unknown argument: whoamio\")) broken(\"wrangler did not report the unknown command: \" + out.slice(0, 500));\nif (r.status === 0) broken(\"wrangler whoamio exited 0\");\nif (!out.includes('Did you mean \"wrangler whoami\"?')) symptom(\"wrangler whoamio prints no Did you mean suggestion\");\nconsole.log('OK: wrangler whoamio suggests Did you mean \"wrangler whoami\"?');\n",
+          "expect": "fail",
+          "error": "FAIL: wrangler whoamio prints no Did you mean suggestion"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.111.0/packages/wrangler/CHANGELOG.md",
+          "quote": "When an unknown command or subcommand is entered, wrangler now suggests the closest matching command if one exists within a reasonable edit distance. For example, running `wrangler whoamio` will display `Did you mean \"wrangler whoami\"?`"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

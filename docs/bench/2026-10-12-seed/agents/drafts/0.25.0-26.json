@@ -1,0 +1,56 @@
+{
+  "entry": "0.25.0#26",
+  "verdict": {
+    "id": "0.25.0#26",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "resolveToolMergeId",
+    "why": "resolveToolMergeId is deprecated in favour of reconcileMessages and still works."
+  },
+  "cost_usd": 0.7440618,
+  "turns": 27,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.25.0",
+    "kind": "behavior",
+    "symbol": "reconcileMessages",
+    "signal": "silent",
+    "detail": "reconcileMessages keeps tool outputs attached to the correct turn when a provider reuses a toolCallId.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.25.0",
+            "ai": "6.0.0"
+          },
+          "code": "(async () => {\n  let chat;\n  try {\n    chat = await import(\"/w/node_modules/agents/dist/chat/index.js\");\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.reconcileMessages !== \"function\") {\n    console.error(\"ERROR: reconcileMessages is not exported\");\n    process.exit(2);\n  }\n  const server = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"first\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"output-available\", input: { q: \"cats\" }, output: \"cats result\" }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"second\" }] }\n  ];\n  const incoming = [\n    server[0],\n    server[1],\n    server[2],\n    { id: \"a2\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"input-available\", input: { q: \"dogs\" } }] }\n  ];\n  const out = chat.reconcileMessages(incoming, server);\n  const last = out[out.length - 1];\n  const part = last && last.parts && last.parts[0];\n  if (out.length !== 4 || !part || part.toolCallId !== \"call_0\") {\n    console.error(\"ERROR: unexpected reconcileMessages result \" + JSON.stringify(out));\n    process.exit(2);\n  }\n  if (last.id === \"a2\" && part.state === \"input-available\" && !(\"output\" in part)) {\n    console.log(\"OK: the new turn's reused toolCallId call_0 stays pending; the earlier turn's output is not attached\");\n    process.exit(0);\n  }\n  if (part.state === \"output-available\" && part.output === \"cats result\") {\n    console.error(\"FAIL: a later turn reusing toolCallId call_0 got the earlier turn's tool output\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected last message \" + JSON.stringify(last));\n  process.exit(2);\n})();\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.24.0",
+            "ai": "6.0.0"
+          },
+          "code": "(async () => {\n  let chat;\n  try {\n    chat = await import(\"/w/node_modules/agents/dist/chat/index.js\");\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.reconcileMessages !== \"function\") {\n    console.error(\"ERROR: reconcileMessages is not exported\");\n    process.exit(2);\n  }\n  const server = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"first\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"output-available\", input: { q: \"cats\" }, output: \"cats result\" }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"second\" }] }\n  ];\n  const incoming = [\n    server[0],\n    server[1],\n    server[2],\n    { id: \"a2\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"input-available\", input: { q: \"dogs\" } }] }\n  ];\n  const out = chat.reconcileMessages(incoming, server);\n  const last = out[out.length - 1];\n  const part = last && last.parts && last.parts[0];\n  if (out.length !== 4 || !part || part.toolCallId !== \"call_0\") {\n    console.error(\"ERROR: unexpected reconcileMessages result \" + JSON.stringify(out));\n    process.exit(2);\n  }\n  if (last.id === \"a2\" && part.state === \"input-available\" && !(\"output\" in part)) {\n    console.log(\"OK: the new turn's reused toolCallId call_0 stays pending; the earlier turn's output is not attached\");\n    process.exit(0);\n  }\n  if (part.state === \"output-available\" && part.output === \"cats result\") {\n    console.error(\"FAIL: a later turn reusing toolCallId call_0 got the earlier turn's tool output\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected last message \" + JSON.stringify(last));\n  process.exit(2);\n})();\n",
+          "expect": "fail",
+          "error": "FAIL: a later turn reusing toolCallId call_0 got the earlier turn's tool output"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+          "quote": "Keep assistant messages and tool outputs attached to the correct turn when a provider reuses a `toolCallId`; `resolveToolMergeId` is deprecated in favour of `reconcileMessages`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

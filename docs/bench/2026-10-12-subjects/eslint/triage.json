@@ -1,0 +1,2122 @@
+[
+  {
+    "id": "9.39.5#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Handles an unavailable require cache, turning a failure into working behavior."
+  },
+  {
+    "id": "9.39.5#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Docs build change only."
+  },
+  {
+    "id": "9.39.5#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Adds an EOL notice to documentation."
+  },
+  {
+    "id": "9.39.5#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency update for release."
+  },
+  {
+    "id": "9.39.5#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release package.json bump."
+  },
+  {
+    "id": "9.39.5#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "9.39.5#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency override."
+  },
+  {
+    "id": "9.39.5#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Pins a build dependency."
+  },
+  {
+    "id": "9.39.5#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change."
+  },
+  {
+    "id": "9.39.5#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change."
+  },
+  {
+    "id": "10.2.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects code path analysis for generators to match intended behavior."
+  },
+  {
+    "id": "10.2.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes false positives in no-async-promise-executor, matching documented behavior."
+  },
+  {
+    "id": "10.2.1#3",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Only clarifies error message wording; no behavior change evident."
+  },
+  {
+    "id": "10.2.1#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency update by bot."
+  },
+  {
+    "id": "10.2.1#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Docs site build change."
+  },
+  {
+    "id": "10.2.1#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Docs site build change."
+  },
+  {
+    "id": "10.2.1#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Typo fixes in comments."
+  },
+  {
+    "id": "10.2.1#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.2.1#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.2.1#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "JSDoc fix."
+  },
+  {
+    "id": "10.2.1#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Rule documentation clarification."
+  },
+  {
+    "id": "10.2.1#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documents existing meta.docs.dialects."
+  },
+  {
+    "id": "10.2.1#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.2.1#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action bump."
+  },
+  {
+    "id": "10.2.1#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.2.1#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action update."
+  },
+  {
+    "id": "10.2.1#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.2.1#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes a stale test fixture."
+  },
+  {
+    "id": "10.2.1#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test cleanup."
+  },
+  {
+    "id": "10.2.1#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds test coverage only."
+  },
+  {
+    "id": "10.3.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "no-unused-private-class-members",
+    "why": "The rule now offers suggestions; older versions simply don't report them and nothing breaks."
+  },
+  {
+    "id": "10.3.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a crash when the require cache is unavailable into working behavior."
+  },
+  {
+    "id": "10.3.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes rule suggestions that produced wrong output in class bodies."
+  },
+  {
+    "id": "10.3.0#4",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Typo fixes in docs."
+  },
+  {
+    "id": "10.3.0#5",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.3.0#6",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change."
+  },
+  {
+    "id": "10.3.0#7",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Typo cleanup in comments."
+  },
+  {
+    "id": "10.3.0#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI workflow tweak."
+  },
+  {
+    "id": "10.3.0#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action bump."
+  },
+  {
+    "id": "10.3.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action update."
+  },
+  {
+    "id": "10.3.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action pin."
+  },
+  {
+    "id": "10.3.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds a CI workflow."
+  },
+  {
+    "id": "10.3.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.3.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.3.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.3.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.3.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev tooling TypeScript upgrade."
+  },
+  {
+    "id": "10.3.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action bump."
+  },
+  {
+    "id": "10.3.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.4.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "for-direction",
+    "why": "The rule now analyzes sequence expressions, so existing code can get new reports without any error."
+  },
+  {
+    "id": "10.4.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "includeIgnoreFile",
+    "why": "New function exported from eslint/config; older versions don't export it, so importing/calling it fails."
+  },
+  {
+    "id": "10.4.0#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Escaping DOT labels in code path debug output only affects a debugging aid, not normal usage."
+  },
+  {
+    "id": "10.4.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency version bump with no described user-observable change."
+  },
+  {
+    "id": "10.4.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes handling of non-array deprecated rule replacements, turning an error into working behavior."
+  },
+  {
+    "id": "10.4.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.4.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.4.0#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.4.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.4.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.4.0#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.4.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev tooling upgrade."
+  },
+  {
+    "id": "10.4.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change."
+  },
+  {
+    "id": "10.4.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.4.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Tests only."
+  },
+  {
+    "id": "10.4.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Tests only."
+  },
+  {
+    "id": "10.4.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test data update."
+  },
+  {
+    "id": "10.4.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI test removal."
+  },
+  {
+    "id": "10.4.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal dev script change."
+  },
+  {
+    "id": "10.4.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.4.0#21",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Refactor removing deprecated meta.language/meta.dialects internally; entry doesn't say whether plugin-facing behavior changed."
+  },
+  {
+    "id": "10.4.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor adding meta.defaultOptions to rules with no stated behavior change."
+  },
+  {
+    "id": "10.4.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test data update."
+  },
+  {
+    "id": "10.4.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.4.0#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Tests only."
+  },
+  {
+    "id": "10.4.0#26",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Tests only."
+  },
+  {
+    "id": "10.4.1#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency version bump with no described user-visible change."
+  },
+  {
+    "id": "10.4.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes failure propagation from delegated commands so errors are no longer swallowed, matching expected behavior."
+  },
+  {
+    "id": "10.4.1#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an invalid autofix output in prefer-arrow-callback."
+  },
+  {
+    "id": "10.4.1#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a false positive in a rule to match its documented behavior."
+  },
+  {
+    "id": "10.4.1#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds missing type declarations that should have existed, a fix to types."
+  },
+  {
+    "id": "10.4.1#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.4.1#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.4.1#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation site styling only."
+  },
+  {
+    "id": "10.4.1#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Docs build change only."
+  },
+  {
+    "id": "10.4.1#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.4.1#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "10.4.1#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.4.1#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.4.1#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test data update."
+  },
+  {
+    "id": "10.4.1#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI workflow permissions."
+  },
+  {
+    "id": "10.4.1#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test plugin update."
+  },
+  {
+    "id": "10.4.1#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Renovate config."
+  },
+  {
+    "id": "10.4.1#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.4.1#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test buffer setting."
+  },
+  {
+    "id": "10.4.1#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem PR settings."
+  },
+  {
+    "id": "10.4.1#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test plugin update."
+  },
+  {
+    "id": "10.4.1#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Unit test addition."
+  },
+  {
+    "id": "10.4.1#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem tests addition."
+  },
+  {
+    "id": "10.4.1#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal refactor to use a helper."
+  },
+  {
+    "id": "10.4.1#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Pins a dev dependency version."
+  },
+  {
+    "id": "10.4.1#26",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI alert change with no user-observable effect."
+  },
+  {
+    "id": "10.5.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "max-nested-callbacks",
+    "why": "Corrected stack tracking changes which callbacks are counted/reported, so the same config can report different results."
+  },
+  {
+    "id": "10.5.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "no-with",
+    "why": "Report location moves to the with keyword, changing output location and affecting disable comments/line-based suppressions."
+  },
+  {
+    "id": "10.5.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "max-lines-per-function",
+    "why": "Violations are now reported at the function head instead of the previous location."
+  },
+  {
+    "id": "10.5.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "max-nested-callbacks",
+    "why": "Violations are now reported at the function head instead of the previous location."
+  },
+  {
+    "id": "10.5.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "max-depth",
+    "why": "Violations are now reported on keywords, changing report locations."
+  },
+  {
+    "id": "10.5.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "max-depth",
+    "why": "Else-if chains are now counted differently, so the same code can yield different reports."
+  },
+  {
+    "id": "10.5.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "max-statements",
+    "why": "Error location moves to the function header, changing report locations."
+  },
+  {
+    "id": "10.5.0#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.5.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation of Node.js prerequisites only."
+  },
+  {
+    "id": "10.5.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.5.0#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "10.5.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test plugin update, not user-observable."
+  },
+  {
+    "id": "10.5.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal refactor of code path helper."
+  },
+  {
+    "id": "10.5.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal tooling script enhancement."
+  },
+  {
+    "id": "10.5.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Unit tests only."
+  },
+  {
+    "id": "10.5.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test change only."
+  },
+  {
+    "id": "10.5.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal refactor deduplicating a helper."
+  },
+  {
+    "id": "10.5.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test plugin update."
+  },
+  {
+    "id": "10.5.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.5.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev tooling update."
+  },
+  {
+    "id": "10.5.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Type tests run in CI only."
+  },
+  {
+    "id": "10.6.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "no-constant-binary-expression",
+    "why": "Rule now flags Symbol() and BigInt() constant comparisons that were previously not reported."
+  },
+  {
+    "id": "10.6.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "checkRelationalComparisons",
+    "why": "New rule option; older versions reject unknown options via schema validation."
+  },
+  {
+    "id": "10.6.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an invalid autofix, making output correct as documented."
+  },
+  {
+    "id": "10.6.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects false reports when Boolean is shadowed, matching documented rule behavior."
+  },
+  {
+    "id": "10.6.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops false positives on shadowed undefined in radix, which the docs already imply."
+  },
+  {
+    "id": "10.6.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops false positives on shadowed undefined in no-throw-literal."
+  },
+  {
+    "id": "10.6.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Suppresses an invalid suggestion that would produce broken code."
+  },
+  {
+    "id": "10.6.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops false positives on shadowed undefined in prefer-promise-reject-errors."
+  },
+  {
+    "id": "10.6.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes false positives for a shadowed Promise."
+  },
+  {
+    "id": "10.6.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores the previously documented report range for max-classes-per-file."
+  },
+  {
+    "id": "10.6.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects callback detection for IIFEs in max-nested-callbacks to match intended behavior."
+  },
+  {
+    "id": "10.6.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops reporting inner non-callbacks in max-nested-callbacks, matching the rule's documented purpose."
+  },
+  {
+    "id": "10.6.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.6.0#14",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.6.0#15",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.6.0#16",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Diagram documentation update."
+  },
+  {
+    "id": "10.6.0#17",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation guidance only."
+  },
+  {
+    "id": "10.6.0#18",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.6.0#19",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.6.0#20",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Grammar fix in docs."
+  },
+  {
+    "id": "10.6.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change only."
+  },
+  {
+    "id": "10.6.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.6.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "JSDoc type correction with no observable change."
+  },
+  {
+    "id": "10.6.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI job restructuring."
+  },
+  {
+    "id": "10.6.0#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test plugin update."
+  },
+  {
+    "id": "10.6.0#26",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.6.0#27",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.6.0#28",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.6.0#29",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency update for prettier, a dev tool."
+  },
+  {
+    "id": "10.6.0#30",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Updates ecosystem plugin test dependencies, not observable to users."
+  },
+  {
+    "id": "10.7.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "preserve-caught-error errorClassNames",
+    "why": "New rule option; older versions don't validate-reject it strictly enough to be loud unless schema rejects unknown options."
+  },
+  {
+    "id": "10.7.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "max-nested-callbacks",
+    "why": "Constructor callbacks (e.g. new Promise(...)) are now counted, so code that passed before may now be reported."
+  },
+  {
+    "id": "10.7.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "radix",
+    "why": "The rule now recognizes computed Number['parseInt'] access, so previously unreported calls may now be reported."
+  },
+  {
+    "id": "10.7.0#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "no-compare-neg-zero",
+    "why": "The rule now offers suggestions; existing config and code keep working."
+  },
+  {
+    "id": "10.7.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "radix",
+    "why": "Invalid signed numeric radix values such as +10 or -1 are now reported where they were not before."
+  },
+  {
+    "id": "10.7.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes ignoreClassesWithImplements apply to class expressions, as the option is meant to work."
+  },
+  {
+    "id": "10.7.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the autofix/suggestion placement of the cause so it produces correct code."
+  },
+  {
+    "id": "10.7.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes eqeqeq handling of static template literals to match the documented behavior."
+  },
+  {
+    "id": "10.7.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops the null option from reporting non-equality operators, matching its documentation."
+  },
+  {
+    "id": "10.7.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive for shadowed RegExp."
+  },
+  {
+    "id": "10.7.0#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive for shadowed RegExp."
+  },
+  {
+    "id": "10.7.0#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes autofix output so it is correct with sequence expressions."
+  },
+  {
+    "id": "10.7.0#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive for shadowed globals."
+  },
+  {
+    "id": "10.7.0#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive for shadowed NaN/Number."
+  },
+  {
+    "id": "10.7.0#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes false positives for spread arguments."
+  },
+  {
+    "id": "10.7.0#16",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.7.0#17",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation of migration codemods."
+  },
+  {
+    "id": "10.7.0#18",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.7.0#19",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Semver policy documentation."
+  },
+  {
+    "id": "10.7.0#20",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.7.0#21",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update."
+  },
+  {
+    "id": "10.7.0#22",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation glob typo correction."
+  },
+  {
+    "id": "10.7.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency version bump."
+  },
+  {
+    "id": "10.7.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release housekeeping commit for v9.39.5."
+  },
+  {
+    "id": "10.7.0#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Type-test annotation change with no user-visible effect."
+  },
+  {
+    "id": "10.7.0#26",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Renovate config change."
+  },
+  {
+    "id": "10.7.0#27",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.7.0#28",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update."
+  },
+  {
+    "id": "10.7.0#29",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Git blame ignore file update."
+  },
+  {
+    "id": "10.7.0#30",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.7.0#31",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.7.0#32",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.7.0#33",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change."
+  },
+  {
+    "id": "10.7.0#34",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.7.0#35",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.7.0#36",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of rule internals."
+  },
+  {
+    "id": "10.7.0#37",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update."
+  },
+  {
+    "id": "10.7.0#38",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI matrix change."
+  },
+  {
+    "id": "10.8.0#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "ConfigObject",
+    "why": "New type export from eslint/config; older versions reject importing it with a type error."
+  },
+  {
+    "id": "10.8.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes html formatter output to correctly escape reserved characters in rule ids."
+  },
+  {
+    "id": "10.8.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a crash in no-unreachable-loop into working behavior."
+  },
+  {
+    "id": "10.8.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an autofix producing broken code in prefer-object-spread."
+  },
+  {
+    "id": "10.8.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Performance fix for a quadratic-time regex with no behavior change."
+  },
+  {
+    "id": "10.8.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the documented ignore options apply to computed methods in class-methods-use-this."
+  },
+  {
+    "id": "10.8.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect handling of a parenthesized callee in preserve-caught-error."
+  },
+  {
+    "id": "10.8.0#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes a broken docs anchor link."
+  },
+  {
+    "id": "10.8.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification."
+  },
+  {
+    "id": "10.8.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Typo and grammar fixes in docs."
+  },
+  {
+    "id": "10.8.0#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation link replacement only."
+  },
+  {
+    "id": "10.8.0#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes docs anchor links only."
+  },
+  {
+    "id": "10.8.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation link replacement only."
+  },
+  {
+    "id": "10.8.0#14",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Corrects a documentation description."
+  },
+  {
+    "id": "10.8.0#15",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.8.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test dependency pin."
+  },
+  {
+    "id": "10.8.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "URL changes in comments only."
+  },
+  {
+    "id": "10.8.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.8.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.8.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency range bump with no stated user-visible change."
+  },
+  {
+    "id": "10.8.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test list update."
+  },
+  {
+    "id": "10.8.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#26",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#27",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#28",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#29",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#30",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Comment formatting only."
+  },
+  {
+    "id": "10.8.0#31",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Comment formatting only."
+  },
+  {
+    "id": "10.8.0#32",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Comment formatting only."
+  },
+  {
+    "id": "10.8.0#33",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.8.0#34",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI workflow permissions."
+  },
+  {
+    "id": "10.8.0#35",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "10.8.0#36",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Fixes a failing ecosystem test, with no user-visible change."
+  },
+  {
+    "id": "10.8.0#37",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Updates the ecosystem plugins used by the test suite."
+  },
+  {
+    "id": "10.8.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the no-unused-labels autofix so it no longer produces code with an ASI hazard."
+  },
+  {
+    "id": "10.8.1#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes false positives in getter-return and accessor-pairs so they match their documented behavior."
+  },
+  {
+    "id": "10.8.1#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops id-denylist from wrongly reporting meta-property names such as new.target."
+  },
+  {
+    "id": "10.8.1#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops id-match from wrongly reporting meta-property names."
+  },
+  {
+    "id": "10.8.1#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the no-unused-vars removeVar suggestion so it handles ASI hazards correctly."
+  },
+  {
+    "id": "10.8.1#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.8.1#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Adds missing backticks in documentation."
+  },
+  {
+    "id": "10.8.1#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.8.1#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.8.1#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.8.1#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action version bump."
+  },
+  {
+    "id": "10.8.1#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test fix only."
+  },
+  {
+    "id": "10.8.1#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds error locations to tests."
+  },
+  {
+    "id": "10.8.1#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.8.1#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Improves failure reporting in ecosystem tests."
+  },
+  {
+    "id": "10.8.1#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Updates ecosystem test plugins."
+  },
+  {
+    "id": "10.8.1#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Unpins a dev dependency."
+  },
+  {
+    "id": "10.8.1#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds allowScripts to the repository's package.json for its own tooling."
+  },
+  {
+    "id": "10.8.1#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI labeling change."
+  },
+  {
+    "id": "10.8.1#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action version bump."
+  },
+  {
+    "id": "10.8.1#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update."
+  },
+  {
+    "id": "10.8.1#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test fix only."
+  },
+  {
+    "id": "10.8.1#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Updates ecosystem test plugins."
+  },
+  {
+    "id": "10.8.1#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change adding error locations."
+  },
+  {
+    "id": "10.8.1#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change adding error locations."
+  },
+  {
+    "id": "10.8.1#26",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change adding error locations."
+  },
+  {
+    "id": "10.8.1#27",
+    "candidate": false,
+    "skip": "internal",
+    "why": "JSDoc comment fix with no observable change."
+  },
+  {
+    "id": "10.8.1#28",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change adding error locations."
+  },
+  {
+    "id": "10.8.1#29",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change adding error locations."
+  },
+  {
+    "id": "10.8.1#30",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change adding error locations."
+  },
+  {
+    "id": "10.8.1#31",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change adding error locations."
+  },
+  {
+    "id": "10.9.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "no-loss-of-precision",
+    "why": "The rule now reports numeric literals that underflow, which it previously ignored, so existing code may newly be flagged."
+  },
+  {
+    "id": "10.9.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "checkConditionalExpressions",
+    "why": "New option for no-unmodified-loop-condition; older versions reject unknown options per the rule schema, so it is loud on older versions, but code not using it behaves the same."
+  },
+  {
+    "id": "10.9.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents an unsafe no-var autofix, so the fix no longer breaks code."
+  },
+  {
+    "id": "10.9.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents an invalid no-var autofix when shadowed by a catch parameter."
+  },
+  {
+    "id": "10.9.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes prefer-template autofix producing invalid tagged template code."
+  },
+  {
+    "id": "10.9.0#6",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.9.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.9.0#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.9.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.9.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation link fixes only."
+  },
+  {
+    "id": "10.9.0#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation link updates only."
+  },
+  {
+    "id": "10.9.0#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.9.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.9.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action dependency bump."
+  },
+  {
+    "id": "10.9.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update."
+  },
+  {
+    "id": "10.9.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update."
+  },
+  {
+    "id": "10.9.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action version bump."
+  },
+  {
+    "id": "10.9.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump with no user-visible effect."
+  },
+  {
+    "id": "10.9.1#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive so the rule matches its documented behavior."
+  },
+  {
+    "id": "10.9.1#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.9.1#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update, not observable by users."
+  },
+  {
+    "id": "10.10.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "no-unexpected-multiline",
+    "why": "The rule now also checks regex literals with d and v flags, so code that passed before may now be reported."
+  },
+  {
+    "id": "10.10.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "new-cap",
+    "why": "The rule now checks Object.prototype property names, so calls that were previously accepted may now be reported."
+  },
+  {
+    "id": "10.10.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "no-extra-bind",
+    "why": "The rule now reports previously missed unnecessary bind calls involving class fields and static blocks."
+  },
+  {
+    "id": "10.10.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency upgrade of file-entry-cache with no described user-facing change."
+  },
+  {
+    "id": "10.10.0#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Debug logging format change, not meaningfully observable."
+  },
+  {
+    "id": "10.10.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes __proto__ in exported comments work as documented instead of misbehaving."
+  },
+  {
+    "id": "10.10.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an autofix that produced broken code when Object was shadowed."
+  },
+  {
+    "id": "10.10.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive with properties: false, matching documented behavior."
+  },
+  {
+    "id": "10.10.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive for static imports in no-unreachable."
+  },
+  {
+    "id": "10.10.0#10",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.10.0#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation only."
+  },
+  {
+    "id": "10.10.0#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation link update only."
+  },
+  {
+    "id": "10.10.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "10.10.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test configuration change."
+  },
+  {
+    "id": "10.10.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI test change."
+  },
+  {
+    "id": "10.10.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action version bump."
+  },
+  {
+    "id": "10.10.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update of eslint itself."
+  },
+  {
+    "id": "10.10.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update."
+  },
+  {
+    "id": "10.10.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "10.10.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action version bump."
+  },
+  {
+    "id": "10.10.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI test skip."
+  },
+  {
+    "id": "10.10.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test compatibility on Windows is not observable by users."
+  },
+  {
+    "id": "10.11.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "object-shorthand",
+    "why": "The ignoreConstructors option now also handles quoted properties, so previously unflagged or flagged code is reported differently."
+  },
+  {
+    "id": "10.11.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "no-unsafe-finally",
+    "why": "The rule now reports unsafe labeled continue, which it previously did not flag."
+  },
+  {
+    "id": "10.11.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "new-cap",
+    "why": "Built-ins are now exempt only when they reference the global, so shadowed names are now reported."
+  },
+  {
+    "id": "10.11.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Ignoring __proto__ properties avoids a false positive and aligns with correct behavior, since spreading would change semantics."
+  },
+  {
+    "id": "10.11.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Types and docs now match the already optional TimePass.parse."
+  },
+  {
+    "id": "10.11.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Not reporting __proto__ in object-shorthand fixes a false positive, since shorthand would change semantics."
+  },
+  {
+    "id": "10.11.0#7",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation note only."
+  },
+  {
+    "id": "10.11.0#8",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.11.0#9",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification only."
+  },
+  {
+    "id": "10.11.0#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance fast paths with no observable change."
+  },
+  {
+    "id": "10.11.0#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test update only."
+  },
+  {
+    "id": "10.11.0#12",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action dependency bump."
+  },
+  {
+    "id": "10.11.0#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test plugins update."
+  },
+  {
+    "id": "10.11.0#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI dependency bump."
+  },
+  {
+    "id": "10.11.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repository contributor file, not user-facing."
+  },
+  {
+    "id": "10.11.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Docs tooling upgrade only."
+  },
+  {
+    "id": "10.11.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem test plugins update."
+  },
+  {
+    "id": "10.11.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Added tests only."
+  },
+  {
+    "id": "10.12.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "new-cap",
+    "why": "Astral letters are now handled as letters, so capitalization checks give different results for such names."
+  },
+  {
+    "id": "10.12.0#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "SourceCode#getText()",
+    "why": "getText() now accepts tokens and comments as the node argument; older versions would not have handled these as intended."
+  },
+  {
+    "id": "10.12.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive in prefer-arrow-callback."
+  },
+  {
+    "id": "10.12.0#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects line counting in max-lines-per-function for lines with multiple comments."
+  },
+  {
+    "id": "10.12.0#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes astral letter handling in rules to match intended behavior."
+  },
+  {
+    "id": "10.12.0#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes an autofix that produced incorrect code for async function bases."
+  },
+  {
+    "id": "10.12.0#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Autofix output missing a space after `else` is a bug; the documented expectation is valid fixed code."
+  },
+  {
+    "id": "10.12.0#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects an incorrect `id-length` message for long private names to match the intended behavior."
+  },
+  {
+    "id": "10.12.0#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds support for `TSFunctionType` in `getFunctionHeadLoc`, which fixes a failure on valid input."
+  },
+  {
+    "id": "10.12.0#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a false positive in `no-loss-of-precision` for `0.e5`, which is a bug fix."
+  },
+  {
+    "id": "10.12.0#11",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.12.0#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Documentation clarification for `one-var`."
+  },
+  {
+    "id": "10.12.0#13",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README update only."
+  },
+  {
+    "id": "10.12.0#14",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Typo fix in documentation."
+  },
+  {
+    "id": "10.12.0#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update, not user-observable."
+  },
+  {
+    "id": "10.12.0#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action dependency bump."
+  },
+  {
+    "id": "10.12.0#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance caching with no observable behavior change."
+  },
+  {
+    "id": "10.12.0#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI change."
+  },
+  {
+    "id": "10.12.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "10.12.0#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "10.12.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "CI action dependency bump."
+  },
+  {
+    "id": "10.12.0#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "10.12.0#23",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Repo contributor file change, not part of eslint's behavior."
+  },
+  {
+    "id": "10.12.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency bump."
+  },
+  {
+    "id": "10.12.0#25",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Ecosystem plugin test update, not user-observable."
+  }
+]

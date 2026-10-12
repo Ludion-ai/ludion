@@ -1,0 +1,56 @@
+{
+  "entry": "0.23.0#18",
+  "verdict": {
+    "id": "0.23.0#18",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "DEFAULT_CHAT_RECOVERY_MAX_WORK",
+    "why": "The default chat recovery work budget changes from 1000 to 10000, with the unit now a durable segment."
+  },
+  "cost_usd": 0.5319708000000001,
+  "turns": 19,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.23.0",
+    "kind": "default",
+    "symbol": "DEFAULT_CHAT_RECOVERY_MAX_WORK",
+    "signal": "silent",
+    "detail": "DEFAULT_CHAT_RECOVERY_MAX_WORK moves from 1000 to 10000; the work budget unit is now the durable segment.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.23.0",
+            "ai": "7.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst file = \"/w/t.mjs\";\nfs.writeFileSync(file, [\n  'import * as chat from \"agents/chat\";',\n  'const viaUnset = chat.resolveChatRecoveryConfig(undefined).maxRecoveryWork;',\n  'const viaEmpty = chat.resolveChatRecoveryConfig({}).maxRecoveryWork;',\n  'console.log(JSON.stringify({ c: chat.DEFAULT_CHAT_RECOVERY_MAX_WORK, viaUnset, viaEmpty }));'\n].join(\"\\n\"));\nconst { spawnSync } = require(\"child_process\");\nconst r = spawnSync(process.execPath, [file], { encoding: \"utf8\", timeout: 60000 });\nif (r.status !== 0) {\n  console.error(\"ERROR: could not load agents/chat: \" + (r.stderr || \"\").slice(0, 400));\n  process.exit(2);\n}\nlet v;\ntry { v = JSON.parse(r.stdout.trim().split(\"\\n\").pop()); } catch (e) {\n  console.error(\"ERROR: unexpected output \" + r.stdout);\n  process.exit(2);\n}\nif (v.c === 10000 && v.viaUnset === 10000 && v.viaEmpty === 10000) {\n  console.log(\"OK: default maxRecoveryWork is 10000\");\n  process.exit(0);\n}\nif (v.c === 1000 && v.viaUnset === 1000 && v.viaEmpty === 1000) {\n  console.error(\"FAIL: default maxRecoveryWork is 1000, not 10000\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected values \" + JSON.stringify(v));\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.22.0",
+            "ai": "7.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst file = \"/w/t.mjs\";\nfs.writeFileSync(file, [\n  'import * as chat from \"agents/chat\";',\n  'const viaUnset = chat.resolveChatRecoveryConfig(undefined).maxRecoveryWork;',\n  'const viaEmpty = chat.resolveChatRecoveryConfig({}).maxRecoveryWork;',\n  'console.log(JSON.stringify({ c: chat.DEFAULT_CHAT_RECOVERY_MAX_WORK, viaUnset, viaEmpty }));'\n].join(\"\\n\"));\nconst { spawnSync } = require(\"child_process\");\nconst r = spawnSync(process.execPath, [file], { encoding: \"utf8\", timeout: 60000 });\nif (r.status !== 0) {\n  console.error(\"ERROR: could not load agents/chat: \" + (r.stderr || \"\").slice(0, 400));\n  process.exit(2);\n}\nlet v;\ntry { v = JSON.parse(r.stdout.trim().split(\"\\n\").pop()); } catch (e) {\n  console.error(\"ERROR: unexpected output \" + r.stdout);\n  process.exit(2);\n}\nif (v.c === 10000 && v.viaUnset === 10000 && v.viaEmpty === 10000) {\n  console.log(\"OK: default maxRecoveryWork is 10000\");\n  process.exit(0);\n}\nif (v.c === 1000 && v.viaUnset === 1000 && v.viaEmpty === 1000) {\n  console.error(\"FAIL: default maxRecoveryWork is 1000, not 10000\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected values \" + JSON.stringify(v));\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: default maxRecoveryWork is 1000, not 10000"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.23.0/packages/agents/CHANGELOG.md",
+          "quote": "The work budget's unit is now the durable segment, and `DEFAULT_CHAT_RECOVERY_MAX_WORK` moves from 1000 to 10000 to stay as generous as before for delta-heavy turns."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

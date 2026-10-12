@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#67",
+  "verdict": {
+    "id": "4.4.0#67",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.httpUrl",
+    "why": "httpUrl() now validates more strictly, so inputs it previously accepted can be rejected."
+  },
+  "cost_usd": 0.408588,
+  "turns": 22,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.httpUrl",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "const { z } = require(\"zod\");\nfunction symptom(m) { console.error(\"FAIL: \" + m); process.exit(1); }\nfunction broken(m) { console.error(\"ERROR: \" + m); process.exit(2); }\nconst s = z.httpUrl();\nif (!s.safeParse(\"https://example.com\").success) broken(\"z.httpUrl() rejected https://example.com\");\nconst bad = [\"http:example.com\", \"https:/www.google.com\"];\nconst accepted = bad.filter((u) => s.safeParse(u).success);\nif (accepted.length === bad.length) symptom(\"z.httpUrl() accepts http:example.com and https:/www.google.com\");\nif (accepted.length) broken(\"z.httpUrl() accepted only \" + accepted.join(\", \"));\nconsole.log(\"OK: z.httpUrl() rejects http:example.com and https:/www.google.com\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "const { z } = require(\"zod\");\nfunction symptom(m) { console.error(\"FAIL: \" + m); process.exit(1); }\nfunction broken(m) { console.error(\"ERROR: \" + m); process.exit(2); }\nconst s = z.httpUrl();\nif (!s.safeParse(\"https://example.com\").success) broken(\"z.httpUrl() rejected https://example.com\");\nconst bad = [\"http:example.com\", \"https:/www.google.com\"];\nconst accepted = bad.filter((u) => s.safeParse(u).success);\nif (accepted.length === bad.length) symptom(\"z.httpUrl() accepts http:example.com and https:/www.google.com\");\nif (accepted.length) broken(\"z.httpUrl() accepted only \" + accepted.join(\", \"));\nconsole.log(\"OK: z.httpUrl() rejects http:example.com and https:/www.google.com\");\n",
+          "expect": "fail",
+          "error": "FAIL: z.httpUrl() accepts http:example.com and https:/www.google.com"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

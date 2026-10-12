@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#45",
+  "verdict": {
+    "id": "4.4.0#45",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "default Map/Set",
+    "why": "Map and Set defaults are now cloned rather than shared, so mutating results no longer affects the default."
+  },
+  "cost_usd": 0.4112472,
+  "turns": 20,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "default Map Set",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet z;\ntry { z = require(\"zod\").z; } catch (e) { broken(\"cannot load zod: \" + e.message); }\nconst mapSchema = z.map(z.string(), z.number()).default(new Map());\nconst m1 = mapSchema.parse(undefined);\nif (!(m1 instanceof Map) || m1.size !== 0) broken(\"first parse did not return an empty Map\");\nm1.set(\"key\", 42);\nconst m2 = mapSchema.parse(undefined);\nif (!(m2 instanceof Map)) broken(\"second parse did not return a Map\");\nconst setSchema = z.set(z.string()).default(new Set());\nconst s1 = setSchema.parse(undefined);\nif (!(s1 instanceof Set) || s1.size !== 0) broken(\"first parse did not return an empty Set\");\ns1.add(\"item\");\nconst s2 = setSchema.parse(undefined);\nif (!(s2 instanceof Set)) broken(\"second parse did not return a Set\");\nif (m2.size !== 0 && s2.size !== 0) symptom(\"mutating a parse result of .default(new Map()) or .default(new Set()) changes later parses\");\nif (m2.size !== 0 || s2.size !== 0) broken(\"only one of the Map and Set defaults is shared\");\nconsole.log(\"OK: Map and Set defaults are copied on each parse\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet z;\ntry { z = require(\"zod\").z; } catch (e) { broken(\"cannot load zod: \" + e.message); }\nconst mapSchema = z.map(z.string(), z.number()).default(new Map());\nconst m1 = mapSchema.parse(undefined);\nif (!(m1 instanceof Map) || m1.size !== 0) broken(\"first parse did not return an empty Map\");\nm1.set(\"key\", 42);\nconst m2 = mapSchema.parse(undefined);\nif (!(m2 instanceof Map)) broken(\"second parse did not return a Map\");\nconst setSchema = z.set(z.string()).default(new Set());\nconst s1 = setSchema.parse(undefined);\nif (!(s1 instanceof Set) || s1.size !== 0) broken(\"first parse did not return an empty Set\");\ns1.add(\"item\");\nconst s2 = setSchema.parse(undefined);\nif (!(s2 instanceof Set)) broken(\"second parse did not return a Set\");\nif (m2.size !== 0 && s2.size !== 0) symptom(\"mutating a parse result of .default(new Map()) or .default(new Set()) changes later parses\");\nif (m2.size !== 0 || s2.size !== 0) broken(\"only one of the Map and Set defaults is shared\");\nconsole.log(\"OK: Map and Set defaults are copied on each parse\");\n",
+          "expect": "fail",
+          "error": "FAIL: mutating a parse result of .default(new Map()) or .default(new Set()) changes later parses"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "entry": "5.0.0#15",
+  "verdict": {
+    "id": "5.0.0#15",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "TestModule diagnostics workerId",
+    "why": "Ids are now 1-based instead of 0-based, which changes the values returned."
+  },
+  "cost_usd": 0.7509665999999999,
+  "turns": 22,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "behavior",
+    "symbol": "workerId",
+    "signal": "silent",
+    "detail": "workerId is an incremental number of the worker that ran this file; this will be 0 if file did not run yet",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "5.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/workerid\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  fs.writeFileSync(path.join(dir, file), text);\n}\nfunction vitest(args) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"vitest.config.mjs\", [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"export default {\",\n  \"  test: {\",\n  \"    reporters: ['default', {\",\n  \"      onTestRunEnd(testModules) {\",\n  \"        writeFileSync(new URL('./diag.json', import.meta.url), JSON.stringify(testModules.map(m => m.diagnostic().workerId)))\",\n  \"      },\",\n  \"    }],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"one.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('records worker id', () => { writeFileSync(new URL('./env.txt', import.meta.url), String(process.env.VITEST_WORKER_ID)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"]);\nconsole.log(r.out);\nconst envFile = path.join(dir, \"env.txt\");\nconst diagFile = path.join(dir, \"diag.json\");\nif (!fs.existsSync(envFile) || !fs.existsSync(diagFile)) {\n  console.error(\"ERROR: the test file or the reporter did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst envId = fs.readFileSync(envFile, \"utf8\");\nconst diag = JSON.parse(fs.readFileSync(diagFile, \"utf8\"));\nconsole.log(\"VITEST_WORKER_ID=\" + envId + \", diagnostic().workerId=\" + JSON.stringify(diag));\n// The symptom of the old behavior: the first worker got id 0.\nif (envId === \"0\") {\n  console.error(\"FAIL: VITEST_WORKER_ID of the first worker was 0, not 1\");\n  process.exit(1);\n}\nif (r.status === 0 && envId === \"1\" && diag.length === 1 && diag[0] === 1) {\n  console.log(\"PASS: the first worker has workerId 1\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result (VITEST_WORKER_ID=\" + envId + \", diagnostic \" + JSON.stringify(diag) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "4.1.11"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/workerid\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  fs.writeFileSync(path.join(dir, file), text);\n}\nfunction vitest(args) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"vitest.config.mjs\", [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"export default {\",\n  \"  test: {\",\n  \"    reporters: ['default', {\",\n  \"      onTestRunEnd(testModules) {\",\n  \"        writeFileSync(new URL('./diag.json', import.meta.url), JSON.stringify(testModules.map(m => m.diagnostic().workerId)))\",\n  \"      },\",\n  \"    }],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"one.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('records worker id', () => { writeFileSync(new URL('./env.txt', import.meta.url), String(process.env.VITEST_WORKER_ID)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"]);\nconsole.log(r.out);\nconst envFile = path.join(dir, \"env.txt\");\nconst diagFile = path.join(dir, \"diag.json\");\nif (!fs.existsSync(envFile) || !fs.existsSync(diagFile)) {\n  console.error(\"ERROR: the test file or the reporter did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst envId = fs.readFileSync(envFile, \"utf8\");\nconst diag = JSON.parse(fs.readFileSync(diagFile, \"utf8\"));\nconsole.log(\"VITEST_WORKER_ID=\" + envId + \", diagnostic().workerId=\" + JSON.stringify(diag));\n// The symptom of the old behavior: the first worker got id 0.\nif (envId === \"0\") {\n  console.error(\"FAIL: VITEST_WORKER_ID of the first worker was 0, not 1\");\n  process.exit(1);\n}\nif (r.status === 0 && envId === \"1\" && diag.length === 1 && diag[0] === 1) {\n  console.log(\"PASS: the first worker has workerId 1\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result (VITEST_WORKER_ID=\" + envId + \", diagnostic \" + JSON.stringify(diag) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: VITEST_WORKER_ID of the first worker was 0, not 1"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/advanced/test-module.md",
+          "quote": "Incremental number of the worker that ran this file. This number increases with each worker.\n   * If file did not run yet, this will be 0.\n   *\n   * **Warning**: Node.js tests and browser tests run in different pools and do not share `workerId`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

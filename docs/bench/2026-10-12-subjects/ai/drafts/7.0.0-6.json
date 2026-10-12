@@ -1,0 +1,54 @@
+{
+  "entry": "7.0.0#6",
+  "verdict": {
+    "id": "7.0.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "StepResult.response.messages",
+    "why": "Response messages in StepResult now contain only that step's messages instead of accumulated ones."
+  },
+  "cost_usd": 0.4903624,
+  "turns": 18,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "ai"
+    },
+    "versions": ">=7.0.0",
+    "kind": "behavior",
+    "symbol": "StepResult.response.messages",
+    "signal": "silent",
+    "detail": "StepResult response messages are limited to messages created in that step",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "ai": "7.0.0"
+          },
+          "code": "// checks StepResult.response.messages of the second step of a two-step generateText run\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  let ai;\n  try { ai = require(\"ai\"); } catch (e) {\n    const { pathToFileURL } = require(\"url\");\n    ai = await import(pathToFileURL(require.resolve(\"ai\")).href);\n  }\n  if (ai && !ai.generateText && ai.default) ai = ai.default;\n  const usage = { inputTokens: { total: 1, noCache: 1, cacheRead: 0, cacheWrite: 0 }, outputTokens: { total: 1, text: 1, reasoning: 0 } };\n  let calls = 0;\n  const model = {\n    specificationVersion: \"v3\", provider: \"mock\", modelId: \"mock\", supportedUrls: {},\n    async doGenerate() {\n      calls++;\n      const content = calls === 1\n        ? [{ type: \"tool-call\", toolCallId: \"c1\", toolName: \"echo\", input: JSON.stringify({ x: \"hi\" }) }]\n        : [{ type: \"text\", text: \"done\" }];\n      return { content, finishReason: { unified: calls === 1 ? \"tool-calls\" : \"stop\", raw: undefined }, usage, warnings: [] };\n    },\n    async doStream() { throw new Error(\"not used\"); },\n  };\n  const tools = { echo: { inputSchema: ai.jsonSchema({ type: \"object\", properties: { x: { type: \"string\" } }, required: [\"x\"] }), execute: async ({ x }) => \"echo \" + x } };\n  const r = await ai.generateText({ model, prompt: \"hi\", tools, stopWhen: ai.stepCountIs(5) });\n  if (r.steps.length !== 2) broken(\"expected 2 steps, got \" + r.steps.length);\n  const roles = r.steps[1].response.messages.map(m => m.role).join(\",\");\n  if (roles === \"assistant,tool,assistant\") symptom(\"second step response.messages also holds the first step's messages (\" + roles + \")\");\n  if (roles !== \"assistant\") broken(\"unexpected second step response.messages roles: \" + roles);\n  console.log(\"OK: second step response.messages holds only that step's message\");\n})().catch(e => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "ai": "6.0.303"
+          },
+          "code": "// checks StepResult.response.messages of the second step of a two-step generateText run\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  let ai;\n  try { ai = require(\"ai\"); } catch (e) {\n    const { pathToFileURL } = require(\"url\");\n    ai = await import(pathToFileURL(require.resolve(\"ai\")).href);\n  }\n  if (ai && !ai.generateText && ai.default) ai = ai.default;\n  const usage = { inputTokens: { total: 1, noCache: 1, cacheRead: 0, cacheWrite: 0 }, outputTokens: { total: 1, text: 1, reasoning: 0 } };\n  let calls = 0;\n  const model = {\n    specificationVersion: \"v3\", provider: \"mock\", modelId: \"mock\", supportedUrls: {},\n    async doGenerate() {\n      calls++;\n      const content = calls === 1\n        ? [{ type: \"tool-call\", toolCallId: \"c1\", toolName: \"echo\", input: JSON.stringify({ x: \"hi\" }) }]\n        : [{ type: \"text\", text: \"done\" }];\n      return { content, finishReason: { unified: calls === 1 ? \"tool-calls\" : \"stop\", raw: undefined }, usage, warnings: [] };\n    },\n    async doStream() { throw new Error(\"not used\"); },\n  };\n  const tools = { echo: { inputSchema: ai.jsonSchema({ type: \"object\", properties: { x: { type: \"string\" } }, required: [\"x\"] }), execute: async ({ x }) => \"echo \" + x } };\n  const r = await ai.generateText({ model, prompt: \"hi\", tools, stopWhen: ai.stepCountIs(5) });\n  if (r.steps.length !== 2) broken(\"expected 2 steps, got \" + r.steps.length);\n  const roles = r.steps[1].response.messages.map(m => m.role).join(\",\");\n  if (roles === \"assistant,tool,assistant\") symptom(\"second step response.messages also holds the first step's messages (\" + roles + \")\");\n  if (roles !== \"assistant\") broken(\"unexpected second step response.messages roles: \" + roles);\n  console.log(\"OK: second step response.messages holds only that step's message\");\n})().catch(e => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: second step response.messages also holds the first step's messages (assistant,tool,assistant)"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/vercel/ai/ai@7.0.0/packages/ai/CHANGELOG.md",
+          "quote": "fix(ai): limit response messages in StepResult to messages created in that step"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

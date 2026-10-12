@@ -39,4 +39,16 @@ The first attempt (three trials per task, both conditions in one batch) hit the 
 
 From here, one trial per task (`tasks-run.ts` now defaults to `--trials 1`), spread over several days. `tasks-run.ts` saves after every run, never saves a run that ended on an error other than its own turn or dollar limit, stops the batch at that error, and continues from where it stopped when the same command runs again. Run the same tasks under both conditions on the same day (`--only`), so a day's conditions match.
 
+### Daily batches
+
+One trial per task, both conditions on the same day, with the frozen seeds served locally as above (`C:/dev/ludion-freeze`, the site at `http://127.0.0.1:8791`, an empty ledger). The projects were prepared again with `tools/bench/src/projects.ts` (same pinned versions).
+
+| day | tasks run that day | without sync | with sync |
+| - | - | - | - |
+| 2026-10-11 (first attempt, kept) | 6 agents tasks | 6/6 | 6/6 |
+| 2026-10-12 | 6 agents tasks, 4 vitest tasks | 7/10 | 9/10 |
+| **so far** | **16 of 36** | **13/16** | **15/16** |
+
+20 tasks are left. The B-vs-C comparison (`docs/progress.md`, item 7) waits for all 36.
+
 Files: `questions.json`, `answers-B-*.json`, `grades-B-*.json`, `tasks-C-*.json`, `seeds.json`, `runs/` (answer and judge logs; C task logs).

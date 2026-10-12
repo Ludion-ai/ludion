@@ -29,8 +29,8 @@ Triage (every entry, one call per batch of up to 25) was Sonnet in all three. On
 | **kept: no problem and no finding left** | **7** | **6** | **3** | 30 |
 | of the kept, repeat a lesson on main | 1 | 1 | 0 | |
 | **new lessons written for a PR** | **6** | **5** | **3** | |
-| CI's Docker run on the PR | 6 of 6 passed (#62) | not yet a PR | not yet a PR | CI's `verify` passed in #36 |
-| independent protected-PR review | approve, 6 of 6 (#62) | | | |
+| CI's Docker run on the PR | 6 of 6 passed (#62) | 5 of 5 (#75); after revising, 3 of 3 (#80) | 3 of 3 (#76); after revising, 7 of 8 (#84), 8 of 8 after one `fix` round | CI's `verify` passed in #36 |
+| independent protected-PR review | approve, 6 of 6 (#62) | #75: 1 of 5 needed a fix (made); #80: approve, 3 of 3 | #76: approve, 3 of 3; #84: 1 of 8 needed a fix (made), 3 called low value | |
 | draft cost (drafting step only, $) | 19.83 | 18.14 | 19.21 | not measured |
 
 Reading it:

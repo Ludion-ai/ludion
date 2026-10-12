@@ -4,6 +4,21 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: The seed pipeline (`tools/seed`)
+
+- **What it does**, one step per command, each reading and writing JSON in one folder so any step can be rerun and a stopped run resumes:
+  1. `collect`: the package's stable versions in a range (or published since a date) from the npm registry, and each version's GitHub release notes, split into entries (top-level list items with their indented lines; "Updated dependencies" dropped).
+  2. `triage`: a model with no tools (Sonnet) sorts each entry: a lesson candidate with a first guess at kind and signal, or a skip with a reason (internal, a fix that makes the docs true, docs, experimental, another package, unclear). The prompt carries the added-vs-default check ("does code that doesn't use the new thing behave differently?").
+  3. `draft`: one agent per candidate (Sonnet by default; the agents and vitest runs and the first 20 wrangler drafts were Opus, before the spending rules), in a folder with the entry, the pull requests it links (description, files, diff), the pages it may quote with their URLs (the package's CHANGELOG.md section at the release tag, and docs files the PRs changed, all raw from GitHub), both published package versions, and lessons on main as examples. It can read and write in that folder only: no shell, nothing runs. It writes a format 1 draft with a differential test pair (same code, the release and the one before) and a quote, or skips with a reason. Order: default, behavior, deprecated, renamed, removed, then added; silent before loud.
+  4. `check`: every check this machine can run without Docker: the schema, `lessonProblems`, and the quote found on its page through the guarded fetch. The lesson is signed by @Ludion-ai (the account that opens seed PRs) with `drafted_by: "agent"`; the draft can't set id, author or time.
+  5. `review`: a fresh-context model with no tools (Opus for the agents and vitest runs; Sonnet by default since the spending rules) reviews each lesson against the seed checklist (`docs/decisions.md`, "Seed lessons") plus "the claim is true as an assistant would read it".
+  6. `revise`: each lesson with findings goes back to its drafting agent with them; it fixes or skips. Then `check` and `review` again (`--round`).
+  7. `lessons`: lessons with no problems and no findings are written as files for a PR, one PR per subject. One that repeats a lesson already on main (same versions, same or overlapping symbol) is listed as a duplicate and not written.
+  8. `ci` and `fix`: CI's `verify` runs the tests in Docker on the PR; `ci` reads its results, and `fix` gives each failure back to its agent once with CI's reasons.
+  9. `bench`: per kept lesson, a question and key written from the changelog entry and the primary source (never from the lesson's wording), each measured model answering once with no tools (the `models` labels), and the harm check (Opus with the lesson in context vs without; every loss is read by a person). **Paused** by the spending rules: new lessons get no `models` entry.
+- **Lesson code never runs on this machine.** The drafting agents can't run anything; tests run only in CI's Docker.
+- **The reviewer was calibrated** on the 30 accepted seeds on main (`calibrate.ts`): its finding rate on lessons people accepted is the baseline for reading the pipeline's counts.
+
 ### 2026-10-12: Choosing new subjects
 
 - **Rule** (from the owner's list): "AI writes it often" × release frequency × share of silent changes, over the last 180 days (since 2026-04-15). Measured per package by the seed pipeline's `collect` and `triage` on its GitHub release notes, and scored by `tools/seed/src/score.ts`:

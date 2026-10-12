@@ -3,8 +3,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
-  checkSource, formatLesson, generateClaim, lessonProblems, newId, subjectFor, validateLessonV1, verifiedBy,
-  type LessonV1,
+  activeSet, checkSource, formatLesson, generateClaim, isV1, lessonProblems, newId, subjectFor, validateLesson, validateLessonV1, verifiedBy,
+  type Lesson, type LessonV1,
 } from "@ludion/core";
 import semver from "semver";
 import { createSafeFetch } from "../../verify/src/safe-fetch.ts";
@@ -160,16 +160,44 @@ async function review(dir: string, model: string, round = 0) {
 }
 
 /** Write the lessons that passed the local checks and have no review finding, as files for a PR. */
+/** Active lessons on main (in this checkout) as [id, versions, symbol], for the duplicate check. */
+function mainLessons(): { id: string; versions: string; symbol: string }[] {
+  const root = join(REPO_ROOT, "lessons");
+  const all: Lesson[] = [];
+  for (const s of readdirSync(root, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+    for (const f of readdirSync(join(root, s.name)).filter((f) => f.endsWith(".json"))) {
+      const v = validateLesson(JSON.parse(readFileSync(join(root, s.name, f), "utf8")));
+      if (v.ok) all.push(v.lesson);
+    }
+  }
+  return activeSet(all).filter(isV1).map((l) => ({ id: l.id, versions: l.versions, symbol: l.symbol }));
+}
+
+/** Another lesson teaches the same change when it has the same versions and the symbols are equal or one holds the other. */
+export function isDuplicate(l: { versions: string; symbol: string }, others: { id: string; versions: string; symbol: string }[]): string | undefined {
+  const norm = (x: string) => x.toLowerCase();
+  return others.find((o) => o.versions === l.versions && (norm(o.symbol).includes(norm(l.symbol)) || norm(l.symbol).includes(norm(o.symbol))))?.id;
+}
+
+/**
+ * Write the lessons that passed the local checks and have no review finding, as files for a PR. A lesson that repeats
+ * one already on main (same versions, same or overlapping symbol) is not written and is listed as a duplicate: it shows
+ * what the pipeline recovers of the hand-made seeds.
+ */
 function lessons(dir: string, outDir: string, round = 0) {
   const review = new Map(read<{ entry: string; findings: Finding[]; error?: string }[]>(dir, `review${sfx(round)}.json`).map((r) => [r.entry, r]));
-  const keep = read<CheckRecord[]>(dir, `check${sfx(round)}.json`).filter((c) => c.problems.length === 0 && review.get(c.entry) && !review.get(c.entry)!.error && review.get(c.entry)!.findings.length === 0);
+  const clean = read<CheckRecord[]>(dir, `check${sfx(round)}.json`).filter((c) => c.problems.length === 0 && review.get(c.entry) && !review.get(c.entry)!.error && review.get(c.entry)!.findings.length === 0);
+  const main = mainLessons();
+  const duplicates = clean.map((c) => ({ c, of: isDuplicate(c.lesson as LessonV1, main) })).filter((x) => x.of);
+  const keep = clean.filter((c) => !duplicates.some((d) => d.c === c));
   for (const c of keep) {
     const folder = join(outDir, c.lesson!.subject);
     mkdirSync(folder, { recursive: true });
     writeFileSync(join(folder, `${c.lesson!.id}.json`), formatLesson(c.lesson!));
   }
   write(dir, "kept.json", keep.map((c) => ({ entry: c.entry, id: c.lesson!.id, claim: c.claim, label: c.label })));
-  console.log(`lessons: wrote ${keep.length} to ${outDir}.`);
+  write(dir, "duplicates.json", duplicates.map((d) => ({ entry: d.c.entry, of: d.of, claim: d.c.claim })));
+  console.log(`lessons: wrote ${keep.length} to ${outDir}; ${duplicates.length} repeat a lesson on main.`);
 }
 
 /** The counts this run measured, for docs/bench. */
@@ -213,6 +241,7 @@ function summary(dir: string) {
     draft_cost_usd: Number(ds.reduce((a, d) => a + d.cost_usd, 0).toFixed(2)),
     rounds,
     kept: kept.length,
+    duplicates_of_main: existsSync(join(dir, "duplicates.json")) ? read<unknown[]>(dir, "duplicates.json").length : 0,
     ci: ci.map((r) => ({ lessons: r.length, passed: r.filter((x) => x.status === "passed").length })),
   };
   write(dir, "summary.json", s);

@@ -4,7 +4,7 @@ import { githubRepo, splitEntries, tagCandidates, type Release } from "../src/co
 import { changelogSection, previousVersion } from "../src/draft.ts";
 import { extractJson, pool } from "../src/llm.ts";
 import { parseFindings } from "../src/review.ts";
-import { toSeedLesson } from "../src/steps.ts";
+import { isDuplicate, toSeedLesson } from "../src/steps.ts";
 import { batches, draftOrder, parseVerdicts, triagePrompt, type Verdict } from "../src/triage.ts";
 
 const release = (body: string): Release => ({ version: "4.121.0", date: "2026-09-01T00:00:00Z", tag: "wrangler@4.121.0", url: "https://github.com/o/r/releases/tag/wrangler@4.121.0", body });
@@ -84,6 +84,16 @@ describe("draft helpers", () => {
   it("sets id, author, and time itself, and labels the lesson as drafted by an agent", () => {
     const l = toSeedLesson({ id: "X", author: "github:mallory", author_id: 666, package: { ecosystem: "npm", name: "@scope/pkg" }, versions: ">=1.0.0", kind: "default", symbol: "x", signal: "silent", evidence: [] }, new Date("2026-10-12T00:00:00.123Z"), "01M4PW52QENBVDRGCZYF20J4T7");
     expect(l).toMatchObject({ id: "01M4PW52QENBVDRGCZYF20J4T7", subject: "scope.pkg", author: "github:Ludion-ai", author_id: 292738933, drafted_by: "agent", created_at: "2026-10-12T00:00:00Z" });
+  });
+});
+
+describe("duplicates of lessons on main", () => {
+  const main = [{ id: "A", versions: ">=0.23.0", symbol: "subAgent" }, { id: "B", versions: ">=4.121.0", symbol: "DO_NOT_TRACK" }];
+  it("matches the same versions with equal or overlapping symbols, case aside, and nothing else", () => {
+    expect(isDuplicate({ versions: ">=0.23.0", symbol: "subagent" }, main)).toBe("A");
+    expect(isDuplicate({ versions: ">=4.121.0", symbol: "DO_NOT_TRACK" }, main)).toBe("B");
+    expect(isDuplicate({ versions: ">=0.24.0", symbol: "subAgent" }, main)).toBeUndefined();
+    expect(isDuplicate({ versions: ">=0.23.0", symbol: "dynamicAgents" }, main)).toBeUndefined();
   });
 });
 

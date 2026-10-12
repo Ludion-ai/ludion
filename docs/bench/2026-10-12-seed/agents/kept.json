@@ -6,12 +6,6 @@
     "label": "differential"
   },
   {
-    "entry": "0.23.0#1",
-    "id": "01M4QH98JQ9MFB1YJRM5CP243T",
-    "claim": "agents >=0.23.0 deprecated `subAgent`; use `this.dynamicAgents.get` instead. subAgent is legacy and deprecated; it delegates to this.dynamicAgents.get and remains supported. Silent: code written for older versions still runs, without an error.",
-    "label": "differential"
-  },
-  {
     "entry": "0.23.0#10",
     "id": "01M4QH98JRND3BARBYA0RGY08M",
     "claim": "agents >=0.23.0 changed what `browser_execute` does. browser_execute no longer sends the durable calls log to the model; the persisted tool part keeps it for UIs and audit. Silent: code written for older versions still runs, without an error.",

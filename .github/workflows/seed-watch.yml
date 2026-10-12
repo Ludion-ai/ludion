@@ -50,7 +50,7 @@ jobs:
         run: |
           node tools/seed/src/watch.ts ${SINCE:+--since "$SINCE"} --json releases.json
           # The window overlaps the night before, so drop releases an earlier seed issue already names ("Release: pkg@version").
-          gh issue list --repo "$GITHUB_REPOSITORY" --label seed-release --state all --limit 300 --json body --jq '.[].body' > seen.txt || : > seen.txt
+          gh issue list --repo "$GITHUB_REPOSITORY" --label seed-release --state all --limit 300 --json body --jq '.[].body' | tr -d '\r' > seen.txt || : > seen.txt
           jq -c '.[]' releases.json | while read -r r; do
             key=$(jq -r '"\(.package)@\(.version)"' <<<"$r")
             grep -qxF "Release: $key" seen.txt || echo "$r"
@@ -104,23 +104,25 @@ jobs:
             pkg=$(echo "$r" | jq -r .package); ver=$(echo "$r" | jq -r .version)
             dir="out/runs/$(echo "$pkg" | sed 's#^@##; s#/#.#')-$ver"
             # One release that fails (registry, gh, a step) must not lose the others: it is skipped with a warning.
-            (
-              set -e
-              node tools/seed/src/cli.ts collect "$dir" --package "$pkg" --range "$ver"
-              node tools/seed/src/cli.ts triage "$dir"
-              node tools/seed/src/cli.ts draft "$dir" --kinds default,behavior,deprecated,renamed,removed --limit 10
-              node tools/seed/src/cli.ts check "$dir"
-              node tools/seed/src/cli.ts review "$dir"
-              node tools/seed/src/cli.ts lessons "$dir" --out out/lessons
-              node tools/seed/src/cli.ts summary "$dir"
-            ) || echo "::warning::Drafting failed for $pkg $ver; skipped."
+            # (set -e would be ignored on the left of ||, so the steps are chained with &&.)
+            { node tools/seed/src/cli.ts collect "$dir" --package "$pkg" --range "$ver" \
+              && node tools/seed/src/cli.ts triage "$dir" \
+              && node tools/seed/src/cli.ts draft "$dir" --kinds default,behavior,deprecated,renamed,removed --limit 10 \
+              && node tools/seed/src/cli.ts check "$dir" \
+              && node tools/seed/src/cli.ts review "$dir" \
+              && node tools/seed/src/cli.ts lessons "$dir" --out out/lessons \
+              && node tools/seed/src/cli.ts summary "$dir" > /dev/null; } \
+              || echo "::warning::Drafting failed for $pkg $ver; skipped."
           done
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: seed-drafts
-          path: out/
+          # Only what publish reads: the lessons that passed, and each run's release (no raw agent drafts, which are unreviewed).
+          path: |
+            out/lessons
+            out/runs/*/run.json
           if-no-files-found: ignore
           retention-days: 14
 
@@ -180,7 +182,7 @@ jobs:
               cp "$f" "lessons/$subject/$name"
             done
             # Schema, canonical form, path, and sources against main's checker; no --run, so no lesson code runs.
-            if ! npm run verify -- "lessons/$subject" > "verify-$subject.txt" 2>&1; then
+            if ! env -u GH_TOKEN npm run verify -- "lessons/$subject" > "verify-$subject.txt" 2>&1; then
               echo "Drafted lessons for $subject didn't pass the checks; not pushed."
               cat "verify-$subject.txt"
               continue

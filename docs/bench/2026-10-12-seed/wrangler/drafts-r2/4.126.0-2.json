@@ -1,0 +1,33 @@
+{
+  "entry": "4.126.0#2",
+  "verdict": {
+    "id": "4.126.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "events",
+    "why": "Email test harness results now include an `events` list of handler events."
+  },
+  "cost_usd": 0.07873310000000001,
+  "turns": 9,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.126.0",
+    "kind": "added",
+    "symbol": "events",
+    "signal": "silent",
+    "detail": "Email test harness results include a chronological list of handler events",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.126.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Include a chronological list of handler events in email test harness results, so programmatic local email tests can assert the order in which messages are received, forwarded, replied to, or rejected."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

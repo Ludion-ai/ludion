@@ -1,0 +1,56 @@
+{
+  "entry": "4.126.0#5",
+  "verdict": {
+    "id": "4.126.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "mode",
+    "why": "Build Output Specification config.json now includes a `mode` field."
+  },
+  "cost_usd": 0.036932599999999996,
+  "turns": 5,
+  "round": 2,
+  "model": "claude-sonnet-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.126.0",
+    "kind": "behavior",
+    "symbol": "config.json",
+    "signal": "silent",
+    "detail": "The mode a build was produced in is now written to config.json as a mode field, alongside the account and compliance settings.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.126.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\n  const m = /async function (writeSettingsConfig|writeRootConfig)\\(/.exec(src);\n  if (!m) broken(\"build output config writer not found in cli.js\");\n  const end = src.indexOf(\"\\n}\\n\", m.index);\n  if (end < 0) broken(\"could not find end of writer\");\n  const body = src.slice(m.index, end + 3);\n  const out = fs.mkdtempSync(\"/tmp/bo-\");\n  const cfgPath = path.join(out, \"config.json\");\n  const make = new Function(\"fs$1__namespace\", \"path2__default4__namespace\", \"path31__namespace\", \"getSettingsConfigPath\", \"getRootConfigPath\", body + \"\\nreturn \" + m[1] + \";\");\n  const stub = () => cfgPath;\n  const write = make(fs.promises, path, path, stub, stub);\n  await write(out, { type: \"settings\", accountId: \"acc-123\" }, \"staging\");\n  let got;\n  try { got = JSON.parse(fs.readFileSync(cfgPath, \"utf8\")); } catch (e) { broken(\"config.json not written: \" + e.message); }\n  if (got.accountId !== \"acc-123\") broken(\"settings not written: \" + JSON.stringify(got));\n  if (got.mode !== \"staging\") symptom(\"top-level config.json has no mode field\");\n  console.log(\"OK: config.json records mode \" + got.mode);\n})().catch((e) => broken(String(e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.125.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\n  const m = /async function (writeSettingsConfig|writeRootConfig)\\(/.exec(src);\n  if (!m) broken(\"build output config writer not found in cli.js\");\n  const end = src.indexOf(\"\\n}\\n\", m.index);\n  if (end < 0) broken(\"could not find end of writer\");\n  const body = src.slice(m.index, end + 3);\n  const out = fs.mkdtempSync(\"/tmp/bo-\");\n  const cfgPath = path.join(out, \"config.json\");\n  const make = new Function(\"fs$1__namespace\", \"path2__default4__namespace\", \"path31__namespace\", \"getSettingsConfigPath\", \"getRootConfigPath\", body + \"\\nreturn \" + m[1] + \";\");\n  const stub = () => cfgPath;\n  const write = make(fs.promises, path, path, stub, stub);\n  await write(out, { type: \"settings\", accountId: \"acc-123\" }, \"staging\");\n  let got;\n  try { got = JSON.parse(fs.readFileSync(cfgPath, \"utf8\")); } catch (e) { broken(\"config.json not written: \" + e.message); }\n  if (got.accountId !== \"acc-123\") broken(\"settings not written: \" + JSON.stringify(got));\n  if (got.mode !== \"staging\") symptom(\"top-level config.json has no mode field\");\n  console.log(\"OK: config.json records mode \" + got.mode);\n})().catch((e) => broken(String(e)));\n",
+          "expect": "fail",
+          "error": "FAIL: top-level config.json has no mode field"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.126.0/packages/wrangler/CHANGELOG.md",
+          "quote": "The mode a build was produced in is now written to `.cloudflare/output/v0/config.json` as a `mode` field, alongside the account and compliance settings."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

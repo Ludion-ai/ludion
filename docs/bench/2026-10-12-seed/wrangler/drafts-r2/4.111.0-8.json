@@ -1,0 +1,56 @@
+{
+  "entry": "4.111.0#8",
+  "verdict": {
+    "id": "4.111.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "--force",
+    "why": "After a successful pages deploy or project create with --force, wrangler now prints an extra notice."
+  },
+  "cost_usd": 0.052737099999999995,
+  "turns": 7,
+  "round": 2,
+  "model": "claude-sonnet-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.111.0",
+    "kind": "behavior",
+    "symbol": "--force",
+    "signal": "silent",
+    "detail": "When an AI agent opts out by passing --force to wrangler pages project create, Wrangler now prints a notice that --force only needs to be passed once",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.111.0"
+          },
+          "code": "const http = require(\"http\");\nconst fs = require(\"fs\");\nconst os = require(\"os\");\nconst path = require(\"path\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst ACCOUNT = \"0123456789abcdef0123456789abcdef\";\nlet created = false;\nconst server = http.createServer((req, res) => {\n  req.resume();\n  req.on(\"end\", () => {\n    res.setHeader(\"content-type\", \"application/json\");\n    if (req.method === \"POST\" && req.url.split(\"?\")[0].endsWith(\"/accounts/\" + ACCOUNT + \"/pages/projects\")) {\n      created = true;\n      res.end(JSON.stringify({ success: true, errors: [], messages: [], result: { name: \"demo-proj\", subdomain: \"demo-proj.pages.dev\" } }));\n      return;\n    }\n    res.end(JSON.stringify({ success: true, errors: [], messages: [], result: [] }));\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), \"pf-\"));\n  const env = Object.assign({}, process.env, {\n    CLOUDFLARE_API_TOKEN: \"test-token\",\n    CLOUDFLARE_ACCOUNT_ID: ACCOUNT,\n    CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\",\n    WRANGLER_SEND_METRICS: \"false\",\n    WRANGLER_SEND_ERROR_REPORTS: \"false\",\n    PI_CODING_AGENT: \"true\",\n    NO_COLOR: \"1\",\n  });\n  const child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"pages\", \"project\", \"create\", \"demo-proj\", \"--production-branch\", \"main\", \"--force\"], { cwd, env, stdio: [\"ignore\", \"pipe\", \"pipe\"] });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => (out += d));\n  child.stderr.on(\"data\", (d) => (out += d));\n  const timer = setTimeout(() => { child.kill(\"SIGKILL\"); broken(\"wrangler timed out: \" + out.slice(-500)); }, 80000);\n  child.on(\"close\", (code) => {\n    clearTimeout(timer);\n    server.close();\n    if (code !== 0 || !created || !out.includes(\"Successfully created the 'demo-proj' project\")) broken(\"project create did not succeed (exit \" + code + \"): \" + out.slice(-800));\n    if (!out.includes(\"This is the only time you need --force\")) symptom(\"no notice that --force is only needed once after a successful pages project create --force\");\n    console.log(\"OK: wrangler printed the one-time --force notice\");\n    process.exit(0);\n  });\n});\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.110.0"
+          },
+          "code": "const http = require(\"http\");\nconst fs = require(\"fs\");\nconst os = require(\"os\");\nconst path = require(\"path\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst ACCOUNT = \"0123456789abcdef0123456789abcdef\";\nlet created = false;\nconst server = http.createServer((req, res) => {\n  req.resume();\n  req.on(\"end\", () => {\n    res.setHeader(\"content-type\", \"application/json\");\n    if (req.method === \"POST\" && req.url.split(\"?\")[0].endsWith(\"/accounts/\" + ACCOUNT + \"/pages/projects\")) {\n      created = true;\n      res.end(JSON.stringify({ success: true, errors: [], messages: [], result: { name: \"demo-proj\", subdomain: \"demo-proj.pages.dev\" } }));\n      return;\n    }\n    res.end(JSON.stringify({ success: true, errors: [], messages: [], result: [] }));\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), \"pf-\"));\n  const env = Object.assign({}, process.env, {\n    CLOUDFLARE_API_TOKEN: \"test-token\",\n    CLOUDFLARE_ACCOUNT_ID: ACCOUNT,\n    CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\",\n    WRANGLER_SEND_METRICS: \"false\",\n    WRANGLER_SEND_ERROR_REPORTS: \"false\",\n    PI_CODING_AGENT: \"true\",\n    NO_COLOR: \"1\",\n  });\n  const child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"pages\", \"project\", \"create\", \"demo-proj\", \"--production-branch\", \"main\", \"--force\"], { cwd, env, stdio: [\"ignore\", \"pipe\", \"pipe\"] });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => (out += d));\n  child.stderr.on(\"data\", (d) => (out += d));\n  const timer = setTimeout(() => { child.kill(\"SIGKILL\"); broken(\"wrangler timed out: \" + out.slice(-500)); }, 80000);\n  child.on(\"close\", (code) => {\n    clearTimeout(timer);\n    server.close();\n    if (code !== 0 || !created || !out.includes(\"Successfully created the 'demo-proj' project\")) broken(\"project create did not succeed (exit \" + code + \"): \" + out.slice(-800));\n    if (!out.includes(\"This is the only time you need --force\")) symptom(\"no notice that --force is only needed once after a successful pages project create --force\");\n    console.log(\"OK: wrangler printed the one-time --force notice\");\n    process.exit(0);\n  });\n});\n",
+          "expect": "fail",
+          "error": "FAIL: no notice that --force is only needed once after a successful pages project create --force"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.111.0/packages/wrangler/CHANGELOG.md",
+          "quote": "When an AI agent opts out of the Pages-to-Workers delegation by passing `--force` to `wrangler pages deploy` or `wrangler pages project create`, Wrangler now prints a notice at the end of a successful command explaining that `--force` only needs to be passed once"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

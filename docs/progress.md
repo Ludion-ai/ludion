@@ -59,7 +59,7 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 1. [done] Pipeline yield against the hand-made seeds (`docs/bench/2026-10-12-seed/README.md`).
 2. [decided by the owner] Who revises: machine-check problems back to the drafting model (Sonnet) first; then the Opus review; lessons with content findings (rules 1, 7, 8) to Opus, the rest to Sonnet, one round (`docs/decisions.md`, "Revising seed drafts"). Built in `tools/seed` (`revise --scope check|findings`, review reuse for unchanged drafts).
 3. [reviews done, see above] After the owner merges them: rebase this side's open work on main, bump the CLI (0.1.3: #53, #55 and #67 are not on npm yet; npm has 0.1.2 from `aa94ad9`) with the plugin pin, and stage it with `publish.yml`.
-4. [vitest done: 3 new lessons in #80 (protected, review pending), counts in `docs/bench/2026-10-12-seed/README.md`; wrangler next] vitest, then wrangler: the remaining drafts (not in #75 or #76) through step 2, one subject at a time, one PR per subject (protected). No new subject yet. Run folder: the worktree `C:/dev/ludion-wt-revise`; logs `C:/dev/ludion-seedwork/revise-*.log`, `review-*.log`.
+4. [done] vitest and wrangler: the remaining drafts through step 2. No finding after it: vitest 5 of 23 reviewed (3 new, #80), wrangler 11 of 43 (8 new, #84); the rest repeat lessons on main. Counts and costs: `docs/bench/2026-10-12-seed/README.md`. Search questions: #82, #83. Next: one Opus review of #80 and #84 together.
 5. Not started: the three outreach letters for subjects not yet measured.
 
 ### Where the running work lives (for resuming)

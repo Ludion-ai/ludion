@@ -65,6 +65,22 @@ The owner's decision (`docs/decisions.md`, "Revising seed drafts"): machine-chec
 - Opus's revise round fixed content in some lessons and broke machine checks in 5, which round 3 repaired. The 6 skips all say the folder had no page to quote for the change (vitest has no CHANGELOG.md at the `v5.0.0` tag, at the package or the repo root, so its folders hold only docs files the PRs changed; 5 of the 6 had none). Quoting the GitHub release notes when there is no CHANGELOG.md would give those a page; not built yet.
 - Findings left after round 3 (53 on 18 lessons), by rule: 8: 17, 1: 12, 2: 12, 7: 8, 5: 3, 3: 1. No further Opus round, per the rule.
 
+wrangler started from round 1 (one Sonnet revise, Sonnet review). Its earlier reviews were all Sonnet, so the first Opus review kept none of them:
+
+| wrangler round | what was revised, by whom ($) | drafts | pass local checks | reviewed (review kept) | findings | no finding | review $ |
+| - | - | - | - | - | - | - | - |
+| 0 (first draft, Sonnet review) | | 55 | 33 | 33 | 92 | 3 (in #76) | 1.01 |
+| 1 (Sonnet revise, Sonnet review) | | 49 | 35 | 35 | 110 | 3 | 1.07 |
+| 2: machine checks, then Opus review | 14, Sonnet (0.57) | 49 | 49 | 46 (0) | 127 | 5 | 2.81 |
+| 3: findings, once | 39 with rule 1/7/8, Opus (12.09); 2 others, Sonnet (0.10); 3 skipped | 46 | 43 | 40 (6) | 70 | 11 | 2.34 |
+| 4: machine checks again | 3, Sonnet (0.11): 2 ungrounded detail words, 1 detail too long | 46 | 46 | 43 (40) | 74 | 11 | 0.18 |
+
+- **wrangler: 11 of the 43 lessons reviewed in the last round have no finding; 3 of them repeat a lesson on main, so 8 are new (#84), all with a differential pair.** With #76's 3, that is 11 of the 55 first drafts.
+- The Opus round took wrangler from 5 to 11 with no finding (Sonnet's round had gone from 3 to 3). The 3 that round 4 repaired all drew findings again.
+- Findings left after round 4 (74 on 32 lessons), by rule: 1: 23, 8: 20, 7: 10, 2: 9, 5: 6, 3: 3, 4: 2, 6: 1.
+- One lesson's detail ("now go to stderr") made an off-topic search question ("How do I write a for loop in Go?") find it; `go` became a common word (#83).
+- Cost of both subjects' revising under the rule: Opus revising $17.50, Opus reviews $7.32 (vitest 1.99, wrangler 5.33), Sonnet $1.59.
+
 ## Confounds
 
 - Drafting, reviser, and reviewer models differ across rows (table above); only the two baselines are like for like. Revise rounds: agents Opus twice; wrangler Sonnet once; vitest none.
@@ -73,6 +89,6 @@ The owner's decision (`docs/decisions.md`, "Revising seed drafts"): machine-chec
 
 ## What it says about the next step
 
-Not "the pipeline yields little" but "the model that revises matters, and the spending rules put Sonnet there". With Opus revising, two rounds brought agents to the hand-made seeds' level under the same reviewer; with Sonnet, one round on wrangler moved nothing. The cheap fixes left are mechanical failures the drafter can't see (quote doesn't name the symbol, detail not grounded: 27 and 13 problems) and a second Sonnet round, which this run doesn't show would help. Choosing between "Opus for revising only" and "accept the lower yield" is a spending decision (`docs/decisions.md`, "Spending"), so it is left to the owner; see `docs/progress.md`.
+Not "the pipeline yields little" but "the model that revises matters, and the spending rules put Sonnet there". With Opus revising, two rounds brought agents to the hand-made seeds' level under the same reviewer; with Sonnet, one round on wrangler moved nothing. The cheap fixes left are mechanical failures the drafter can't see (quote doesn't name the symbol, detail not grounded: 27 and 13 problems) and a second Sonnet round, which this run doesn't show would help. Choosing between "Opus for revising only" and "accept the lower yield" is a spending decision (`docs/decisions.md`, "Spending"), so it is left to the owner; see `docs/progress.md`. The owner chose Opus for content findings, once, after a Sonnet pass on machine checks; the results are in "Revising under the owner's rule" above.
 
 Files per subject: `run.json`, `entries.json`, `triage.json`, `drafts/`, `check.json`, `review.json` (agents and wrangler also `drafts-r*/`, `check-r*.json`, `review-r*.json`), `kept.json`, `duplicates.json`, `summary.json`. `calibrate-hand-seeds.json` (Opus) and `calibrate-hand-seeds-sonnet.json` (Sonnet): the reviewer on the 30 accepted lessons.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Experiment 3's pool of unrelated lessons: lesson lines about packages the B questions aren't about, built from the
-// seed pipeline's triage of 20 other packages (docs/bench/2026-10-12-subjects/). They are not verified lessons: each is
+// seed pipeline's triage of other packages (the candidate subjects scored on 2026-10-12) (docs/bench/2026-10-12-subjects/). They are not verified lessons: each is
 // a claim generated from a triaged changelog entry (package, first version, kind, symbol, signal), shown with the
 // same teacher line as a seed, so the agent sees a file shaped like a project with many covered dependencies.
 //   node tools/bench/src/unrelated-pool.ts <subjects dir> <out pool.json> [--exclude agents,vitest,wrangler]

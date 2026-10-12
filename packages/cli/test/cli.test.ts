@@ -102,6 +102,13 @@ describe("select", () => {
 });
 
 describe("lessons.md and wiring", () => {
+  it("never lets a detail start a line, so a > in it can't become a blockquote", () => {
+    const claim = generateClaim({ ...draft, detail: "> quoted, math > adds" });
+    const md = renderLessons({ kept: [{ lesson: lessonOf({ claim }), versions: ["5.0.3"] }], prunedForModel: [] }, "vitest 5.0.3", new Date());
+    expect(md).toContain("> quoted");
+    expect(md.split("\n").filter((line) => /^\s{0,3}>/.test(line))).toEqual([]);
+  });
+
   it("starts with the data line, names the teacher and the drafting agent, and says when nothing matches", () => {
     const md = renderLessons({ kept: [{ lesson: lessonOf({ claim: "vitest >=5.0.0 removed `x`.", drafted_by: "agent", url: "https://ludion.ai/lessons/A", verified_at: "2026-10-11T00:00:00Z" }), versions: ["5.0.3"] }], prunedForModel: [] }, "vitest 5.0.3", new Date("2026-10-11T00:00:00Z"));
     expect(md).toContain(`\n${DATA_LINE}\n`);

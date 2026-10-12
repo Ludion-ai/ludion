@@ -195,9 +195,9 @@
         {
           "not": {
             "type": "string",
-            "pattern": "\\|\\s*(?:[Ss][Uu][Dd][Oo]\\s+)?(?:[Ss][Hh]|[Bb][Aa][Ss][Hh]|[Zz][Ss][Hh]|[Dd][Aa][Ss][Hh]|[Pp][Yy][Tt][Hh][Oo][Nn]|[Pp][Yy][Tt][Hh][Oo][Nn]3|[Nn][Oo][Dd][Ee]|[Pp][Ee][Rr][Ll]|[Rr][Uu][Bb][Yy]|[Ii][Ee][Xx]|[Pp][Ww][Ss][Hh]|[Pp][Oo][Ww][Ee][Rr][Ss][Hh][Ee][Ll][Ll])\\b|\\b(?:[Cc][Uu][Rr][Ll]|[Ww][Gg][Ee][Tt])\\b[^|]*\\||\\b[Rr][Mm]\\s+-[A-Za-z]*(?:[Rr][A-Za-z]*[Ff]|[Ff][A-Za-z]*[Rr])|\\$\\("
+            "pattern": "\\|\\s*(?:[Ss][Uu][Dd][Oo]\\s+)?(?:[Ss][Hh]|[Bb][Aa][Ss][Hh]|[Zz][Ss][Hh]|[Dd][Aa][Ss][Hh]|[Pp][Yy][Tt][Hh][Oo][Nn]|[Pp][Yy][Tt][Hh][Oo][Nn]3|[Nn][Oo][Dd][Ee]|[Pp][Ee][Rr][Ll]|[Rr][Uu][Bb][Yy]|[Ii][Ee][Xx]|[Pp][Ww][Ss][Hh]|[Pp][Oo][Ww][Ee][Rr][Ss][Hh][Ee][Ll][Ll])\\b|\\b(?:[Cc][Uu][Rr][Ll]|[Ww][Gg][Ee][Tt])\\b[^|]*\\||\\b[Rr][Mm]\\s+-[A-Za-z]*(?:[Rr][A-Za-z]*[Ff]|[Ff][A-Za-z]*[Rr])|\\$\\(|>>|[0-9&]>|>[&|]|>\\s*[\"']?\\s*[~/$%.\\\\]|>\\s*[\"']?[A-Za-z]:[\\\\/]"
           },
-          "description": "No command lines."
+          "description": "No command lines or shell redirections."
         },
         {
           "not": {
@@ -208,8 +208,8 @@
         },
         {
           "type": "string",
-          "pattern": "^[\\x20-\\x3B=\\x3F-\\x5A\\x5C\\x5E\\x5F\\x61-\\x7E]*$",
-          "description": "Printable ASCII only, without backticks, angle brackets, or square brackets: lookalike characters would slip past the guards above, and markup would reach the generated claim."
+          "pattern": "^[\\x20-\\x3B=>\\x3F-\\x5A\\x5C\\x5E\\x5F\\x61-\\x7E]*$",
+          "description": "Printable ASCII only, without backticks, <, or square brackets: lookalike characters would slip past the guards above, and markup would reach the generated claim. A lone > is allowed (vitest names nested tests math > adds); it opens no tag, and claims already show ranges like >=5.0.0."
         },
         {
           "not": {

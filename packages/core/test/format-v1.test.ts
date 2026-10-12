@@ -104,6 +104,19 @@ describe("the format 1 schema", () => {
     }
   });
 
+  it("refuses shell redirection in the detail, but not a lone > between words", () => {
+    for (const detail of ["echo x >> logfile", "cmd > /etc/hosts", "toHaveTextContent 2>&1", "run it >&2", "save > ~/out", "cmd >| /etc/hosts", "cmd > '~/.bashrc'", "echo x > .bashrc", "cmd > ./x", "cmd > C:\\Windows\\x", "cmd >\\\\srv\\x", "a 5>3 b"]) {
+      expect(messages(lessonV1({ detail })), detail).toEqual([expect.stringContaining("command line")]);
+    }
+    // A > between words stays allowed, including the -t seed's own wording.
+    for (const detail of ["toHaveTextContent math > adds", "pip freeze > requirements.txt", "returns >= 0", "x => y", "a > b: c", "joined with ' > ', so -t 'math > adds' matches"]) expect(messages(lessonV1({ detail })), detail).toEqual([]);
+  });
+
+  it("allows a lone > in the detail (math > adds), but never <", () => {
+    expect(messages(lessonV1({ detail: "toHaveTextContent math > adds" }))).toEqual([]);
+    expect(messages(lessonV1({ detail: "toHaveTextContent < adds" }))).toEqual([expect.stringContaining("plain ASCII")]);
+  });
+
   it("refuses a protocol-relative link in the detail", () => {
     expect(messages(lessonV1({ detail: "see //evil.example/docs for toHaveTextContent" }))).toEqual([expect.stringContaining("Remove the link (//...)")]);
   });
@@ -128,7 +141,7 @@ describe("the format 1 schema", () => {
 describe("lessonProblems", () => {
   it("is empty for a good lesson, and names a range that isn't one", () => {
     expect(lessonProblems(lessonV1())).toEqual([]);
-    for (const versions of ["||||", "*", "x", ">=5.0.0 ||"]) {
+    for (const versions of ["||||", "*", "x", ">=5.0.0 ||", "<x >1.0.0", "< X"]) {
       expect(lessonProblems(lessonV1({ versions })), versions).toEqual([expect.stringContaining("is not a range of versions where the fact holds")]);
     }
   });

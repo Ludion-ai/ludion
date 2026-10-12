@@ -40,22 +40,13 @@ The list (status in brackets):
 
 Heavy work one job at a time; Opus only for the review of protected PRs (one round); pipeline work on Sonnet; no per-lesson model FreshBench; no daily C batches; big files read through summaries; this file updated after each work item.
 
-### Open PRs and what waits for whom (2026-10-13), in merge order
+### Open PRs and what waits for whom (2026-10-13, after the owner's merges)
 
-All protected; each has its Opus review comment; the owner merges.
-
-1. Lessons, independent of the Codex PRs (CI green on each; with all five on main, the search eval still passes: off-topic 20/20, subject-only 8/8, on-topic 133/138):
-   1. #62: 6 agents lessons.
-   2. #75: 5 vitest lessons.
-   3. #76: 3 wrangler lessons.
-   4. #80: 3 vitest lessons (after the Opus revise round).
-   5. #84: 8 wrangler lessons (after the Opus revise round; one fixed after its review).
-2. #73: nightly seed watch. It drafts only with the `ANTHROPIC_API_KEY` repository secret (a secret value, the owner's). Since #78 its per-lesson review step uses Opus, at most 10 lessons per release.
-3. #54: subject-request issue form.
-4. Codex's stack, after Codex's fixes: #67 (changes requested; also conflicts with main in `docs/decisions.md`), then #68 (approve; rebase onto main after #67: `git rebase --onto origin/main 1ed1411 codex/runtime-task-acceptance`), then #69 (changes requested; rebase after #68). Details in the review comments.
-5. After #67 to #69 are on main (this side): rebase open work, bump the CLI to 0.1.3 with the plugin pin, run `publish.yml` (the owner approves the staged version on npmjs.com), and dispatch `reverify` (lessons on main haven't run under #67's Docker flags).
-
-Not waiting on a merge tap: #60 (consent sentence draft, docs only) waits for the owner's license decision.
+- **Merged by the owner on 2026-10-12 (UTC):** #62, #75, #76, #80, #84 (25 lessons), #73 (nightly seed watch), #54 (issue form). Production serves them since deploy run 38311678194 on `6dedffa`: `/index/subjects.json` lists agents 15, vitest 17, wrangler 23 active lessons. The deploys for the commits in between failed on purpose at "Make sure this is main's newest commit".
+- **#73 drafts nothing yet**: it needs the `ANTHROPIC_API_KEY` repository secret (a secret value, the owner's). Without it, the nightly run lists new releases in its artifact and stops.
+- **Waiting for Codex's fixes, then the owner's merge, in this order:** #67 (changes requested; also conflicts with main in `docs/decisions.md`), #68 (approve; rebase onto main after #67: `git rebase --onto origin/main 1ed1411 codex/runtime-task-acceptance`), #69 (changes requested; rebase after #68). Details in the review comments.
+- **After #67 to #69 are on main (this side):** rebase open work, bump the CLI to 0.1.3 with the plugin pin, run `publish.yml` (the owner approves the staged version on npmjs.com), and dispatch `reverify` (lessons on main haven't run under #67's Docker flags).
+- **Not waiting on a merge tap:** #60 (consent sentence draft, docs only) waits for the owner's license decision.
 
 ### Who works on what (owner, 2026-10-12)
 

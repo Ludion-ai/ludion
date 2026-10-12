@@ -25,7 +25,7 @@ Triage (every entry, one call per batch of up to 25) was Sonnet in all three. On
 | of those, with a differential test pair | 15 | 22 | 23 | 29 of the 30 on main |
 | review findings, first draft (lessons reviewed) | 52 (24) | 54 (24) | 92 (33) | 46 (30) from the pipeline's reviewer on the accepted lessons, Opus; 12 from the original review of 31 |
 | reviewed with no finding, first draft | 4 | 6 | 3 | 10 of 30 |
-| after revising: reviewed with no finding | 7 of 20 (round 2) | | | |
+| after revising: reviewed with no finding | 9 of 19 (round 1), 7 of 20 (round 2) | | 3 of 35 (Sonnet, round 1) | |
 | **kept: no problem and no finding left** | **7** | **6** | **3** | 30 |
 | of the kept, repeat a lesson on main | 1 | 1 | 0 | |
 | **new lessons written for a PR** | **6** | **5** | **3** | |
@@ -35,21 +35,28 @@ Triage (every entry, one call per batch of up to 25) was Sonnet in all three. On
 
 Reading it:
 
-- **From the silent, non-addition changes drafted, 3 to 7 of 32 to 56 end as a lesson with nothing left to fix** (agents 7 of 32 after two revise rounds; vitest 6 of 39 and wrangler 3 of 56 after none). That is a low yield, and the revise rounds are the only thing that moved it: agents' reviewed-clean count went from 4 of 24 on the first draft to 7 of 20 after two rounds, and its local-check failures went from 4 of 28 to 0.
-- **The reviewer isn't easy on accepted lessons either.** The same Opus reviewer found a finding in 20 of the 30 hand-made seeds (46 findings), so "no finding" is a strict bar. It is a model's opinion, not proof. The one independent check of kept lessons, the protected-PR review of #62, approved all 6 and called two of them low-value (they change only what the model sees).
+- **Under the same reviewer, the pipeline's drafts are close to the hand-made seeds, and revising closes the rest.** "Reviewed with no finding" depends on the reviewer: Opus found nothing in 10 of the 30 hand-made seeds (33%), Sonnet in 3 of 30 (10%; `calibrate-hand-seeds.json` and `calibrate-hand-seeds-sonnet.json`). Against each reviewer's own baseline:
+
+  | reviewer | hand-made seeds | pipeline, first draft | pipeline, after revising |
+  | - | - | - | - |
+  | Opus | 10 of 30 clean, 46 findings | agents 4 of 24 clean, 52 findings; vitest 6 of 24, 54 | agents round 1: 9 of 19 clean, 21 findings; round 2: 7 of 20, 24 |
+  | Sonnet | 3 of 30 clean, 67 findings | wrangler 3 of 33 clean, 92 findings | wrangler round 1 (Sonnet reviser): 3 of 35 clean, 110 findings |
+
+  The hand-made seeds went through a person-and-agent fix cycle (12 problems) before they were measured here; the pipeline's first drafts didn't. With Opus revising, agents reached the hand-made seeds' clean rate (9 of 19 after round 1, 7 of 20 after round 2, against 10 of 30). With Sonnet revising, one round did nothing for wrangler (3 of 33 before, 3 of 35 after; its local-check passes went 33 of 55 to 35 of 49, with 6 drafts skipped by the reviser).
+- **The kept counts are small because of the bar and because revising was cut.** 7, 6, and 3 of the 32, 39, and 56 drafted ended with nothing left to fix (agents after two Opus rounds; vitest and wrangler after none). The one independent check of kept lessons, the protected-PR review of #62, approved all 6 and called two of them low-value (they change only what the model sees).
 - **Where drafts fail the local checks** (counts of problems, a draft can have several): `quote doesn't name the symbol` 3 / 9 / 15, `no evidence names the symbol` 2 / 9 / 10, `detail not grounded` 0 / 3 / 10, `schema` 1 / 0 / 0 (agents / vitest / wrangler). These are machine-checkable and the drafting agents can't run the checker (no shell, by design), so they find out only afterward.
-- **Where the reviewer finds problems** (rule numbers are the seed checklist in `docs/decisions.md`; first drafts): rule 1 (claim says more than the evidence) 11 / 12 / 24, rule 8 (would mislead an assistant) 11 / 15 / 22, rule 7 (kind, symbol, versions, or replacement don't match the entry) 11 / 9 / 11, rule 5 (no differential pair) 9 / 4 / 12. The hand-made seeds' findings by the same reviewer: 17, 7, 6, 3.
+- **Where the reviewer finds problems** (rule numbers are the seed checklist in `docs/decisions.md`; first drafts): rule 1 (claim says more than the evidence) 11 / 12 / 24, rule 8 (would mislead an assistant) 11 / 15 / 22, rule 7 (kind, symbol, versions, or replacement don't match the entry) 11 / 9 / 11, rule 5 (no differential pair) 9 / 4 / 12. The hand-made seeds' findings by the Opus reviewer: 17, 7, 6, 3.
 - **Source-only lessons** (no test) among those that passed local checks: 9 of 24, 2 of 24, 10 of 33. Those get the weaker "source" label.
 - **Overlap with the hand-made seeds** is a lower bound: a lesson counts as a repeat only when versions match and the symbols are equal or one holds the other (`isDuplicate`).
 
 ## Confounds
 
-- The reviewer differs: Opus for agents and vitest, Sonnet for wrangler. A Sonnet reviewer found more per lesson (92 on 33) than Opus did on agents (52 on 24) and on the hand-made seeds (46 on 30), so wrangler's lower yield mixes drafting model, reviewer, and a larger share of hard changes. It can't be split from this run.
-- Revise rounds were run only on agents.
+- Drafting, reviser, and reviewer models differ across rows (table above); only the two baselines are like for like. Revise rounds: agents Opus twice; wrangler Sonnet once; vitest none.
 - One run per subject. Hand-made seeds started from the 45 changes of the FreshBench set, chosen with a different filter (changes models got wrong), not from a whole range.
+- "No finding" is one model's opinion with a checklist, not proof; it was not compared with a person's review.
 
 ## What it says about the next step
 
-The yield is poor enough that adding subjects first would multiply review work. The failures are mostly mechanical (the quote doesn't name the symbol, the detail uses words the quote doesn't contain, a missing test pair) and the pipeline already feeds local-check failures back to the drafter in `revise`; running `revise` once by default, before the reviewer, is the cheapest change and is the next thing to measure, on one subject. See `docs/progress.md`.
+Not "the pipeline yields little" but "the model that revises matters, and the spending rules put Sonnet there". With Opus revising, two rounds brought agents to the hand-made seeds' level under the same reviewer; with Sonnet, one round on wrangler moved nothing. The cheap fixes left are mechanical failures the drafter can't see (quote doesn't name the symbol, detail not grounded: 27 and 13 problems) and a second Sonnet round, which this run doesn't show would help. Choosing between "Opus for revising only" and "accept the lower yield" is a spending decision (`docs/decisions.md`, "Spending"), so it is left to the owner; see `docs/progress.md`.
 
-Files per subject: `run.json`, `entries.json`, `triage.json`, `drafts/`, `check.json`, `review.json` (agents also `drafts-r1/`, `drafts-r2/`, `check-r*.json`, `review-r*.json`), `kept.json`, `duplicates.json`, `summary.json`. `calibrate-hand-seeds.json`: the reviewer on the 30 accepted lessons.
+Files per subject: `run.json`, `entries.json`, `triage.json`, `drafts/`, `check.json`, `review.json` (agents and wrangler also `drafts-r*/`, `check-r*.json`, `review-r*.json`), `kept.json`, `duplicates.json`, `summary.json`. `calibrate-hand-seeds.json` (Opus) and `calibrate-hand-seeds-sonnet.json` (Sonnet): the reviewer on the 30 accepted lessons.

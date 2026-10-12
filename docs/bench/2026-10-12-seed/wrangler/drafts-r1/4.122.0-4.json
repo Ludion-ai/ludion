@@ -1,0 +1,33 @@
+{
+  "entry": "4.122.0#4",
+  "verdict": {
+    "id": "4.122.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler setup",
+    "why": "Generated configs no longer include nodejs_compat for compatibility dates 2026-08-04 or later, and wrangler setup removes an existing flag."
+  },
+  "cost_usd": 0.08877329999999999,
+  "turns": 8,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.122.0",
+    "kind": "behavior",
+    "symbol": "nodejs_compat",
+    "signal": "silent",
+    "detail": "The flag nodejs_compat is now only added for earlier compatibility dates",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.122.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Adding the flag as well made the generated project fail to start with \"The compatibility flag nodejs_compat became the default as of 2026-08-04 so does not need to be specified anymore\", so the flag is now only added for earlier compatibility dates."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

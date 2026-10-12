@@ -54,6 +54,14 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - **Chosen: `ai` (Vercel AI SDK), `tailwindcss`, `zod`.** `ai` and `tailwindcss` are first and second. `@supabase/supabase-js` (third) is passed over for now: its changes are about a hosted service's client, so a test can't show them offline in Docker, and its lessons would be source-only; CLAUDE.md prefers differential tests. `zod` (fourth) is pure code and tests well. That makes six subjects with vitest, wrangler and agents.
 - Each new subject: lessons drafted by the pipeline for its current major (ai >=7.0.0, zod >=4.0.0, tailwindcss >=4.0.0), at most 25 silent, non-addition candidates first; FreshBench B questions written from the changelog entries alone (`tools/seed/src/questions.ts`) for every drafted change, kept or not, so the measurement has covered and uncovered changes; seeds frozen before measuring; then B with and without sync and the harm check, as for Done 3. One seed PR per subject (protected).
 
+### 2026-10-12: Nightly seed watch (`seed-watch.yml`)
+
+- **What**: every night (05:41 UTC) and by hand, `tools/seed/src/watch.ts` lists new stable releases (last 26 hours, or `since`) of the npm packages that format 1 lessons on main name. For each, the seed pipeline collects the release notes, triages, drafts at most 10 candidates (silent first), runs the local checks, reviews, and writes the lessons with no finding that don't repeat one on main. A branch `seed/<subject>-<date>` and an issue labeled `seed-release` follow, with the compare link: GitHub Actions can't open pull requests in this repository, and the PR has to be opened from @Ludion-ai (the account the lessons name as author) after a person has seen it.
+- **Three jobs, so untrusted text never meets a write token**: `watch` (read-only; registry only), `draft` (read-only token; reads release notes, pull requests, and package code; the drafting agents get no shell and run nothing; needs the `ANTHROPIC_API_KEY` secret and, without it, says so and stops), `publish` (`contents: write`, `issues: write`; reads the drafted JSON only, checks each subject and file name against a pattern, runs main's own `npm run verify` without `--run` so no lesson code runs, then pushes and opens the issue).
+- **CI still runs the tests**: the PR's `verify` runs them in Docker, as for any lesson. The seed-watch never runs lesson code.
+- **Owner's step**: adding the `ANTHROPIC_API_KEY` repository secret (a secret value, so it is the owner's). Until then the workflow only lists releases.
+- Protected path (`.github/`): the owner merges it.
+
 ### 2026-10-12: Spending (the usage limit)
 
 The batch work hit the plan's usage limit once. From now on:

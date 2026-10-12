@@ -97,6 +97,13 @@ describe("duplicates of lessons on main", () => {
   });
 });
 
+describe("what an agent draft can't set", () => {
+  it("drops replaces, so a draft can't retract a lesson on main", () => {
+    const l = toSeedLesson({ package: { ecosystem: "npm", name: "vitest" }, versions: ">=5.0.0", kind: "default", symbol: "x", signal: "silent", evidence: [], replaces: ["01M4N4KZ0P7MBRC476PA4MSKSX"] }, new Date("2026-10-12T00:00:00Z"), "01M4PW52QENBVDRGCZYF20J4T7");
+    expect(l.replaces).toBeUndefined();
+  });
+});
+
 describe("model answers", () => {
   it("takes the JSON out of an answer, fenced or not", () => {
     expect(extractJson('Here:\n```json\n[{"a": 1}]\n```')).toEqual([{ a: 1 }]);

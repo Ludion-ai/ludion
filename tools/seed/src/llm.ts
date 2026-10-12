@@ -57,5 +57,5 @@ export function ask(prompt: string, model: string, maxBudgetUsd = 2): Promise<Ag
  * It reads untrusted text (release notes, pull requests, package code), so it gets no way to run anything.
  */
 export function agentIn(folder: string, prompt: string, model: string, o: Partial<RunOptions> = {}): Promise<AgentRun> {
-  return runAgent(prompt, { condition: "project", project: folder, allowEdits: true, model, maxTurns: 60, maxBudgetUsd: 8, timeoutMs: 30 * 60_000, ...o });
+  return runAgent(prompt, { condition: "files", project: folder, model, maxTurns: 60, maxBudgetUsd: 8, timeoutMs: 30 * 60_000, ...o });
 }

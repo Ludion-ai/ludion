@@ -169,17 +169,18 @@ const ON_TOPIC: Record<string, [string, string]> = {
   "removed the distutils module": ["What changed about distutils in Python 3.12?", "distutils import error on Python 3.12"],
 };
 
-/** Keys of lessons that teach the same change, so a question about it may find either. */
 /**
  * Questions for lessons the seed pipeline drafted (tools/seed/src/search.ts), keyed by lesson id: two per lesson, each
  * found in the top 3 when generated. They can land before their lesson, like ON_TOPIC.
  */
 const BY_ID = JSON.parse(readFileSync(join(import.meta.dirname, "search-questions.json"), "utf8")) as Record<string, [string, string]>;
 
+/** Keys of lessons that teach the same change, so a question about it may find either. */
 const SAME_CHANGE: [string, string][] = [["toHaveTextContent is strict", "exactly equal to the expected string"]];
 
 describe("search quality", () => {
   it("covers every active lesson with two on-topic questions", () => {
+    for (const [id, qs] of Object.entries(BY_ID)) expect(qs.filter((q) => typeof q === "string" && q.trim()).length, `${id} needs two questions`).toBe(2);
     const covered = index.lessons.filter((l) => BY_ID[l.id] || Object.keys(ON_TOPIC).some((key) => l.claim.includes(key)));
     expect(covered.map((l) => l.id).sort()).toEqual(index.lessons.map((l) => l.id).sort());
   });

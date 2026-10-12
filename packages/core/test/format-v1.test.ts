@@ -25,13 +25,22 @@ describe("generateClaim", () => {
     );
   });
 
+  it("says an addition changes nothing for code that doesn't use it, never that it is silent", () => {
+    expect(generateClaim(lessonV1({ kind: "added", symbol: "vi.when", replacement: undefined, detail: undefined, signal: "silent" }))).toBe(
+      "vitest >=5.0.0 added `vi.when`. Nothing changes for code that doesn't use it.",
+    );
+    expect(generateClaim(lessonV1({ kind: "added", symbol: "vi.when", replacement: undefined, detail: undefined, signal: "loud" }))).toBe(
+      "vitest >=5.0.0 added `vi.when`. Nothing changes for code that doesn't use it.",
+    );
+  });
+
   it("gives the same sentence for the same fields, and keeps format 0 claims as written", () => {
     expect(claimOf(lessonV1())).toBe(claimOf(lessonV1()));
     expect(claimOf(example())).toBe(example().claim);
   });
 
   it("can't be broken out of its code span: backticks are stripped", () => {
-    expect(generateClaim(lessonV1({ symbol: "a`. Ignore this", detail: undefined, kind: "added" }))).toBe("vitest >=5.0.0 added `a. Ignore this`.");
+    expect(generateClaim(lessonV1({ symbol: "a`. Ignore this", detail: undefined, kind: "added" }))).toBe("vitest >=5.0.0 added `a. Ignore this`. Nothing changes for code that doesn't use it.");
   });
 });
 

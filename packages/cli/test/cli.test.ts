@@ -87,6 +87,20 @@ describe("select", () => {
     expect(s.kept[0]!.versions).toEqual(["5.0.3"]);
   });
 
+  it("puts silent changes first and additions last, whatever an addition's signal", () => {
+    const s = select(
+      [
+        lessonOf({ id: "added-silent", kind: "added", signal: "silent" }),
+        lessonOf({ id: "loud", kind: "removed", signal: "loud" }),
+        lessonOf({ id: "default-silent", kind: "default", signal: "silent" }),
+        lessonOf({ id: "renamed-silent", kind: "renamed", signal: "silent" }),
+      ],
+      installed({ vitest: ["5.0.3"] }),
+      undefined,
+    );
+    expect(s.kept.map((k) => k.lesson.id)).toEqual(["default-silent", "renamed-silent", "loud", "added-silent"]);
+  });
+
   it("leaves out what the target model is measured to know, and only that", () => {
     const l = lessonOf({ models: { "claude-opus-5-5": "knows", "claude-sonnet-5-5": "misses" } });
     expect(select([l], installed({ vitest: ["5.0.3"] }), "claude-opus-5-5")).toMatchObject({ kept: [], prunedForModel: [l] });

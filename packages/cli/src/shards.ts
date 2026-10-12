@@ -40,6 +40,7 @@ export function shardLesson(l: ShardLesson): SyncLesson | undefined {
     versions: l.version,
     claim: l.claim,
     signal: l.signal,
+    kind: l.kind,
     teacher: `@${l.teacher}`,
     verified: l.verified_by,
     verified_at: l.verified_at,

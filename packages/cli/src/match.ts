@@ -10,6 +10,7 @@ export interface SyncLesson {
   versions: string;
   claim: string;
   signal?: "loud" | "silent";
+  kind?: "removed" | "renamed" | "deprecated" | "added" | "default" | "behavior";
   /** "@login", or "you" for a lesson in the personal ledger. */
   teacher: string;
   /** How it was verified ("test", "differential", "source"), or why it isn't ("not verified: …"). */
@@ -49,6 +50,15 @@ export interface Selection {
   prunedForModel: SyncLesson[];
 }
 
+/**
+ * Silent changes first: an assistant can't find those out by running the code. Additions last: code that doesn't use
+ * them is unaffected, whatever their signal.
+ */
+export function rank(lesson: SyncLesson): number {
+  if (lesson.kind === "added") return 2;
+  return lesson.signal === "silent" ? 0 : 1;
+}
+
 export function select(lessons: SyncLesson[], installed: Installed, model: string | undefined): Selection {
   const kept: Selection["kept"] = [];
   const prunedForModel: SyncLesson[] = [];
@@ -61,7 +71,6 @@ export function select(lessons: SyncLesson[], installed: Installed, model: strin
     if (modelKnows(lesson, model)) prunedForModel.push(lesson);
     else kept.push({ lesson, versions });
   }
-  // Silent changes first: those are the ones an assistant can't find out about by running the code.
-  kept.sort((a, b) => Number(b.lesson.signal === "silent") - Number(a.lesson.signal === "silent") || a.lesson.package.name.localeCompare(b.lesson.package.name));
+  kept.sort((a, b) => rank(a.lesson) - rank(b.lesson) || a.lesson.package.name.localeCompare(b.lesson.package.name));
   return { kept, prunedForModel };
 }

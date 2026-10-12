@@ -40,7 +40,9 @@ export function generateClaim(l: Pick<LessonV1, "package" | "versions" | "kind" 
   }[l.kind];
   const parts = [head];
   if (l.detail) parts.push(sentence(l.detail));
-  if (l.signal === "silent") parts.push("Silent: code written for older versions still runs, without an error.");
+  // Something added breaks nothing that doesn't use it, so "silent" would mislead there: old code is untouched.
+  if (l.kind === "added") parts.push("Nothing changes for code that doesn't use it.");
+  else if (l.signal === "silent") parts.push("Silent: code written for older versions still runs, without an error.");
   return parts.join(" ");
 }
 

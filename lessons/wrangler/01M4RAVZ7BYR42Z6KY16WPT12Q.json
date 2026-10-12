@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4RAVZ7BYR42Z6KY16WPT12Q",
+  "subject": "wrangler",
+  "package": {
+    "ecosystem": "npm",
+    "name": "wrangler"
+  },
+  "versions": ">=4.136.0",
+  "kind": "behavior",
+  "symbol": "wrangler preview --json",
+  "signal": "silent",
+  "detail": "When a Worker is missing its Preview configuration, wrangler preview --json now returns a structured error and a suggested_config patch.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.136.0"
+        },
+        "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst dir = fs.mkdtempSync(\"/tmp/p-\");\nfs.mkdirSync(path.join(dir, \"src\"));\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"w\", main: \"src/index.js\", compatibility_date: \"2025-01-01\" }));\nfs.writeFileSync(path.join(dir, \"src/index.js\"), \"export default {};\");\nconst r = spawnSync(\"node\", [\"/w/node_modules/wrangler/bin/wrangler.js\", \"preview\", \"--name\", \"x\", \"--json\"], { cwd: dir, encoding: \"utf8\", timeout: 60000, env: Object.assign({}, process.env, { WRANGLER_SEND_METRICS: \"false\", CI: \"1\", HOME: dir, XDG_CONFIG_HOME: dir, CLOUDFLARE_API_TOKEN: \"x\", CLOUDFLARE_ACCOUNT_ID: \"a\".repeat(32) }) });\nif (r.error) broken(\"could not run wrangler: \" + r.error.message);\nif (r.status === 0) broken(\"wrangler preview exited 0\");\nconst all = (r.stdout || \"\") + \"\\n\" + (r.stderr || \"\");\nif (!/missing a `?previews`? block/.test(all)) broken(\"did not reach the missing previews block path: \" + all.slice(0, 500));\nlet out;\ntry { out = JSON.parse(r.stdout); } catch (e) { symptom(\"stdout is not structured JSON with an error\"); }\nif (typeof out.error !== \"string\" || !out.suggested_config || !out.suggested_config.previews) symptom(\"JSON has no error and suggested_config previews\");\nconsole.log(\"OK: \" + r.stdout.trim());\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.135.0"
+        },
+        "code": "const { spawnSync } = require(\"child_process\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst dir = fs.mkdtempSync(\"/tmp/p-\");\nfs.mkdirSync(path.join(dir, \"src\"));\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"w\", main: \"src/index.js\", compatibility_date: \"2025-01-01\" }));\nfs.writeFileSync(path.join(dir, \"src/index.js\"), \"export default {};\");\nconst r = spawnSync(\"node\", [\"/w/node_modules/wrangler/bin/wrangler.js\", \"preview\", \"--name\", \"x\", \"--json\"], { cwd: dir, encoding: \"utf8\", timeout: 60000, env: Object.assign({}, process.env, { WRANGLER_SEND_METRICS: \"false\", CI: \"1\", HOME: dir, XDG_CONFIG_HOME: dir, CLOUDFLARE_API_TOKEN: \"x\", CLOUDFLARE_ACCOUNT_ID: \"a\".repeat(32) }) });\nif (r.error) broken(\"could not run wrangler: \" + r.error.message);\nif (r.status === 0) broken(\"wrangler preview exited 0\");\nconst all = (r.stdout || \"\") + \"\\n\" + (r.stderr || \"\");\nif (!/missing a `?previews`? block/.test(all)) broken(\"did not reach the missing previews block path: \" + all.slice(0, 500));\nlet out;\ntry { out = JSON.parse(r.stdout); } catch (e) { symptom(\"stdout is not structured JSON with an error\"); }\nif (typeof out.error !== \"string\" || !out.suggested_config || !out.suggested_config.previews) symptom(\"JSON has no error and suggested_config previews\");\nconsole.log(\"OK: \" + r.stdout.trim());\n",
+        "expect": "fail",
+        "error": "FAIL: stdout is not structured JSON with an error"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.136.0/packages/wrangler/CHANGELOG.md",
+        "quote": "Return structured configuration errors from `wrangler preview --json`\n\n  When a Worker is missing its Preview configuration, JSON mode now returns an `error`, a `suggested_config` patch"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T15:14:31Z"
+}

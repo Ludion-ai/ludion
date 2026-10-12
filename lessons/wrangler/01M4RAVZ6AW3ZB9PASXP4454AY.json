@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4RAVZ6AW3ZB9PASXP4454AY",
+  "subject": "wrangler",
+  "package": {
+    "ecosystem": "npm",
+    "name": "wrangler"
+  },
+  "versions": ">=4.113.0",
+  "kind": "behavior",
+  "symbol": "deploy",
+  "signal": "silent",
+  "detail": "The deploy output now reads The following bindings need to be provisioned: and drops the Experimental: prefix from the resource provisioning header.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.113.0"
+        },
+        "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nconst lines = src.split(\"\\n\").filter((l) => l.includes(\"The following bindings need to be provisioned:\") && /=\\s*[`\"']/.test(l));\nif (lines.length !== 1) broken(\"expected one provisioning header in the wrangler deploy output code, found \" + lines.length);\nif (lines[0].includes(\"Experimental:\")) symptom(\"wrangler deploy provisioning header is prefixed with Experimental:\");\nif (!/=\\s*\"The following bindings need to be provisioned:\";/.test(lines[0])) broken(\"unexpected provisioning header: \" + lines[0].trim());\nconsole.log(\"OK: wrangler deploy prints The following bindings need to be provisioned: without a prefix\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.112.0"
+        },
+        "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nconst lines = src.split(\"\\n\").filter((l) => l.includes(\"The following bindings need to be provisioned:\") && /=\\s*[`\"']/.test(l));\nif (lines.length !== 1) broken(\"expected one provisioning header in the wrangler deploy output code, found \" + lines.length);\nif (lines[0].includes(\"Experimental:\")) symptom(\"wrangler deploy provisioning header is prefixed with Experimental:\");\nif (!/=\\s*\"The following bindings need to be provisioned:\";/.test(lines[0])) broken(\"unexpected provisioning header: \" + lines[0].trim());\nconsole.log(\"OK: wrangler deploy prints The following bindings need to be provisioned: without a prefix\");\n",
+        "expect": "fail",
+        "error": "FAIL: wrangler deploy provisioning header is prefixed with Experimental:"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.113.0/packages/wrangler/CHANGELOG.md",
+        "quote": "Drop the \"Experimental:\" prefix from the resource provisioning header now that automatic provisioning is generally available. The deploy output now reads `The following bindings need to be provisioned:`."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T15:14:31Z"
+}

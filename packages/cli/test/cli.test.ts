@@ -221,9 +221,9 @@ describe("the Claude Code plugin", () => {
   const json = (p: string) => JSON.parse(readFileSync(join(import.meta.dirname, "../../..", p), "utf8"));
 
   it("runs this CLI version, pinned, so a plugin install never runs whatever npm serves next", () => {
-    const { version } = json("packages/cli/package.json");
+    const { name, version } = json("packages/cli/package.json");
     const [hook] = json("plugin/hooks/hooks.json").hooks.SessionStart[0].hooks;
-    expect(hook.command).toBe(`npx -y ludion@${version} sync --quiet --dir "\${CLAUDE_PROJECT_DIR}"`);
+    expect(hook.command).toBe(`npx -y ${name}@${version} sync --quiet --dir "\${CLAUDE_PROJECT_DIR}"`);
   });
 
   it("adds the MCP server, and the marketplace points at the plugin folder", () => {

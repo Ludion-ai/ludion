@@ -231,12 +231,12 @@ describe("ludion_teach", () => {
     ],
   };
 
-  it("returns the npx ludion teach command for a valid draft, and the draft survives the round trip", async () => {
+  it("returns the npx ludion-ai teach command for a valid draft, and the draft survives the round trip", async () => {
     const { teach } = await import("../src/mcp/teach.ts");
     const r = teach(draft);
     expect(r.isError).toBe(false);
     if (r.isError) return;
-    expect(r.command).toMatch(/^npx ludion teach --draft [A-Za-z0-9_-]+$/);
+    expect(r.command).toMatch(/^npx ludion-ai teach --draft [A-Za-z0-9_-]+$/);
     const encoded = r.command.split(" ").at(-1)!;
     const decoded = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(encoded.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0))));
     expect(decoded).toEqual(draft);

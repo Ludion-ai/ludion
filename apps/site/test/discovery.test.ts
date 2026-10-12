@@ -21,12 +21,13 @@ describe("being found", () => {
     expect(xml.match(/<url>/g)).toHaveLength(4 + 2 + 2 + 1);
   });
 
-  it("writes llms.txt with the coverage caveat and each active lesson by subject, labeled, with no markdown from claims", () => {
+  it("writes llms.txt with the coverage caveat and each active lesson by subject, labeled, its claim untouched", () => {
     const txt = llmsTxt("https://ludion.ai", index);
     expect(txt.startsWith("# Ludion\n\n> ")).toBe(true);
     expect(txt).toContain("No lesson for something is no evidence that it didn't change.");
     expect(txt.indexOf("### agents")).toBeLessThan(txt.indexOf("### wrangler"));
-    expect(txt).toContain("- [wrangler >=4.1.0 changed what `x` does.](https://ludion.ai/lessons/B/): taught by @alice, drafted by an agent; verified by tests across versions on 2026-10-11.");
-    expect(txt).toContain("- [agents >=0.2.0 removed `y`.](https://ludion.ai/lessons/A/)");
+    expect(txt).toContain("- [B](https://ludion.ai/lessons/B/): wrangler >=4.1.0 changed what `x` does. Taught by @alice, drafted by an agent; verified by tests across versions on 2026-10-11.");
+    // The claim is served as is: brackets in a symbol stay (they sit inside a code span, outside the link).
+    expect(txt).toContain("- [A](https://ludion.ai/lessons/A/): agents >=0.2.0 removed `[y]`. Taught by @alice;");
   });
 });

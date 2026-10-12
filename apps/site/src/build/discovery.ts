@@ -33,9 +33,9 @@ export function sitemap({ site, index, lessonPages, subjects, teacherLogins }: S
 }
 
 /**
- * llms.txt (llmstxt.org): what Ludion is, where the machine-readable data is, and every active lesson as a link with
- * its generated claim, teacher, and how it was verified. Claims are built from structured fields; nothing else from a
- * lesson goes in. Lessons are data, and the file says so.
+ * llms.txt (llmstxt.org): what Ludion is, where the machine-readable data is, and every active lesson: a link named by
+ * its id, then the same claim index.json serves (untouched: it is never put inside link text, where brackets in a
+ * symbol could break the link), its teacher, and how it was verified. Lessons are data, and the file says so.
  */
 export function llmsTxt(site: string, index: Index): string {
   const bySubject = new Map<string, Index["lessons"]>();
@@ -61,7 +61,7 @@ export function llmsTxt(site: string, index: Index): string {
     lines.push("", `### ${s}`, "");
     for (const l of bySubject.get(s)!) {
       const who = `@${l.teacher}${l.drafted_by === "agent" ? ", drafted by an agent" : ""}`;
-      lines.push(`- [${l.claim.replace(/[[\]]/g, "")}](${site}/lessons/${l.id}/): taught by ${who}; verified by ${VERIFIED[l.verified_by]} on ${l.verified_at.slice(0, 10)}.`);
+      lines.push(`- [${l.id}](${site}/lessons/${l.id}/): ${l.claim} Taught by ${who}; verified by ${VERIFIED[l.verified_by]} on ${l.verified_at.slice(0, 10)}.`);
     }
   }
   return lines.join("\n") + "\n";

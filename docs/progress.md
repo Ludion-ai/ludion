@@ -54,10 +54,10 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 ## Log
 
-### 2026-10-12: C-task runtime acceptance pilot prepared
+### 2026-10-12: C-task runtime acceptance pilot checked
 
 - Added optional Docker-only execution acceptance for test selection and top-level mocking tasks. Require actual test participation and relevant assertion failures under implementation mutations; matching regexes or exit zero alone are insufficient.
-- New CLI checks fixtures or a complete saved project without invoking a model. Unsupported/infrastructure outcomes stay unscored, and historical C results are preserved. PR CI uploads the runtime fixture record; local Docker is unavailable.
+- New CLI checks fixtures or a complete saved project without invoking a model. Unsupported/infrastructure outcomes stay unscored, and historical C results are preserved. The real Linux Docker fixture outcomes match expectations; raw data/provenance and the static/runtime comparison are in the bench record. Local Docker is unavailable.
 - Worktree `C:/dev/ludion-wt-codex-runtime-eval`, branch `codex/runtime-task-acceptance`, stacked on PR #67's hardened runner. Acceptance details/check records: `docs/bench/2026-10-12-runtime/`. Required Opus review remains blocked, so this protected work stays draft for owner review.
 
 ### 2026-10-12: Security inspection continued in PR #67

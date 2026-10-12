@@ -31,7 +31,21 @@ The self-check uses the original correct/stale fixtures plus deliberately mislea
 
 For actual candidate grading, `--project` must be a complete project. Historical `left` records save only files read by the regex rules, so they are insufficient to reconstruct arbitrary helper/config changes. Do not backfill a missing original artifact with guesses and publish a runtime score.
 
-PR CI executes the fixture check and uploads `runtime-acceptance.json` as the `runtime-acceptance` artifact even on failure. Local Docker is unavailable on this PC: local typecheck and read-only boundary tests are not substituted for real execution. The actual result record will be added after inspecting that CI artifact.
+PR CI executes the fixture check and uploads `runtime-acceptance.json` as the `runtime-acceptance` artifact even on failure. Local Docker is unavailable on this PC: local typecheck and read-only boundary tests are not substituted for real execution.
+
+## Observed result
+
+`self-check.json` is the unmodified artifact from [CI run 38241296188](https://github.com/Ludion-ai/ludion/actions/runs/38241296188), source `b4d6f1c5e54e918c9542cf9d02ebe18f7c1a153c`. `provenance.json` records the source run/artifact and file hash. All 14 fixture outcomes match their specified expectations:
+
+| Fixture group | Cases | Old static verdict | Runtime result |
+| --- | ---: | --- | --- |
+| Original correct solutions | 4 | correct | all passed |
+| Original stale solutions | 4 | wrong | all failed |
+| Misleading/restricted candidates | 6 | all correct | all failed |
+
+The execution record reports Node 24.21.0, Vitest 5.0.3 and Vite 7.3.1. Correct task 16 solutions also detect each targeted implementation/message mutation through exactly the intended assertion. Rejection of the extra shell command is a supported-input boundary check; it is not evidence that the command was executed.
+
+Local `test.log` records 453 passing tests, including 19 runtime-boundary/parser cases; typecheck/build pass. Independent supplemental Codex review found the message-sensitivity, Docker-error-classification and unrestricted-script weaknesses; after their corrections it found no remaining blocker. Mandatory Opus review remains blocked. These are evaluator fixture and implementation results, not a new model-with/without-sync score.
 
 ## Review / release
 

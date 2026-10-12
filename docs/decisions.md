@@ -4,6 +4,13 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Unverified lessons in the personal ledger
+
+- **`ludion teach` accepts a draft with no evidence** (no `evidence`, or an empty list) and saves it to the ledger as **unverified** (`"unverified": true` in the entry). People correct their assistants every day, mostly without a test or a quote at hand; refusing those corrections loses them.
+- **Checked anyway**: every field but the evidence, against the format 1 schema (`validateUnverified` in `packages/core`, which drops only the evidence errors), and `fieldProblems` (subject, reserved names, range). Nothing is fetched and nothing runs. The detail's text guards still apply (schema); grounding and "the evidence names the symbol" can't, with no evidence.
+- **Shown only to its teacher**: sync writes it in their own projects as "Taught by you (in your ledger, not public); unverified, yours only." It never enters the index.
+- **`--public` still needs evidence**: with no evidence, `teach --public` stops before calling `gh` and says to add a test or a source. `ludion_teach` accepts such a draft too, returns the command with `"evidence": []`, and says it stays unverified in the user's ledger.
+
 ### 2026-10-12: Partial coverage, said everywhere
 
 - **Every list of lessons says coverage is partial.** `.ludion/lessons.md` (after the data line) and `ludion_ask` (the line after its data line, and inside the no-match text) say: "Ludion holds some changes of some packages, not all of them. No lesson for something is no evidence that it didn't change: check primary sources too (changelogs, release notes, the installed package's code)." The text lives in `packages/core` (`COVERAGE_LINE`), so both say the same words. Why: a lessons file that reads as complete invites "nothing listed, so nothing changed", and Done 3 showed uncovered changes don't improve (8/15 → 8/15).

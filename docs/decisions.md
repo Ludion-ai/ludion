@@ -4,6 +4,23 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Unverified lessons in the personal ledger
+
+- **`ludion teach` accepts a draft with no evidence** (no `evidence`, or an empty list) and saves it to the ledger as **unverified** (`"unverified": true` in the entry). People correct their assistants every day, mostly without a test or a quote at hand; refusing those corrections loses them.
+- **"No evidence" means no `evidence` key or an empty list** (`hasNoEvidence`). Evidence in any other shape is checked as evidence and gets the schema's error, never quietly dropped.
+- **Checked anyway** (`unverifiedProblems` in `packages/core`): every field but the evidence, against the format 1 schema (`validateUnverified`, which drops only the evidence errors); the subject, reserved names, and range; and **the detail stays grounded**, in the fields alone (package, versions, symbol, replacement), as for any lesson whose evidence grounds nothing. CLAUDE.md's grounding rule holds for every lesson, including a ledger one: an assistant can run `ludion teach` without `--public` (no confirmation), so ungrounded free text would be a way to put arbitrary sentences into every later session. Nothing is fetched and nothing runs.
+- **Shown only to its teacher**: sync writes it in their own projects as "Taught by you (in your ledger, not public); unverified, yours only." (with ", drafted by an agent" for `--drafted-by-agent`). It never enters the index: the schema needs at least one piece of evidence, so `verify` refuses it.
+- **`--public` still needs evidence**: with no evidence, `teach --public` stops before calling `gh` and says to add a test or a source. `ludion_teach` accepts such a draft too, returns the command with `"evidence": []`, and says it stays unverified in the user's ledger.
+
+### 2026-10-12: Being found (sitemap, llms.txt, robots.txt)
+
+- **Checked on production before this**: `/llms.txt` and `/sitemap.xml` answered 404, and `/robots.txt` held only Cloudflare's managed content-signal comments (no directives, no sitemap). Lesson pages already had a title (the claim), a meta description, and a canonical link.
+- **`/sitemap.xml`** (built with the site): home, `/start/`, `/models/`, `/lessons/`, every subject page, every lesson page (active, replaced, and tombstones, with `lastmod` from `verified_at` or the retraction date), and every teacher page at its canonical `/@login`.
+- **`/llms.txt`** (llmstxt.org): what Ludion is, that lessons are data, the partial-coverage sentence, where the data is (`/start/`, `/index.json`, the shards, `/models/`), and every active lesson by subject: a link named by the lesson's id, then the same claim `index.json` serves, untouched, its teacher, "drafted by an agent" where it applies, and how it was verified. The claim is never link text: a symbol like `workflows[].concurrency.limit` has brackets, and stripping them would change the fact.
+- **`/robots.txt`** in `apps/site/public`: allow all, and name the sitemap. Cloudflare's managed robots.txt, if on for the zone, adds its own lines to it.
+- `llms.txt`, `sitemap.xml`, and `robots.txt` joined `RESERVED_SUBJECTS`: a subject with one of those names would build a folder where the file must be.
+- Not done: structured data (JSON-LD) on lesson pages. Nothing measured says it matters yet.
+
 ### 2026-10-12: Partial coverage, said everywhere
 
 - **Every list of lessons says coverage is partial.** `.ludion/lessons.md` (after the data line) and `ludion_ask` (the line after its data line, and inside the no-match text) say: "Ludion holds some changes of some packages, not all of them. No lesson for something is no evidence that it didn't change: check primary sources too (changelogs, release notes, the installed package's code)." The text lives in `packages/core` (`COVERAGE_LINE`), so both say the same words. Why: a lessons file that reads as complete invites "nothing listed, so nothing changed", and Done 3 showed uncovered changes don't improve (8/15 → 8/15).
@@ -23,6 +40,14 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - **No teachers yet**: every lesson so far is an agent draft. The supply has to come from a machine; people sign (the PR) and correct (`teach`, `replaces`).
 - **The seed criterion changes.** It was "changes measured models get wrong × silent". It is now: **verify every change in a release's changelog and teach it**, `default`, `behavior`, `deprecated` and `renamed` first, `added` last. FreshBench is no longer the gate that decides whether a change gets a lesson; it supplies the `models` labels that `sync` prunes with.
 - What this replaces: CLAUDE.md's seeds bullet ("silent changes in the wedge that measured models get wrong") described the first 30 seeds. Those stay; the next ones come from the pipeline (`tools/seed`).
+
+### 2026-10-12: Analytics
+
+- **Google Analytics 4** on the site (measurement ID `G-91CJFHRK88`), at the owner's request. Nothing in the CLI or the MCP server: the "No telemetry" on `/start` is about the CLI and stays true. The footer of every page says "This site uses Google Analytics."
+- **`apps/site/public/ga.js`**, loaded with `defer` from the base layout, so every page has it and the CSP needs no `'unsafe-inline'`. It sets the Consent Mode defaults, then adds `gtag.js`. It does nothing unless the host is `ludion.ai`: local builds, CI, and the end-to-end tests send no hits. So the home page's 60 KB JavaScript budget still measures only the site's own scripts; `gtag.js` is Google's and loads only in production.
+- **Consent Mode**: the EEA (the EU plus Iceland, Liechtenstein, and Norway), the UK, and Switzerland default to `analytics_storage: denied`, with no banner, so GA4 stores nothing there and gets only cookieless pings. Elsewhere `analytics_storage` is granted. The site shows no ads, so `ad_storage`, `ad_user_data`, and `ad_personalization` are denied everywhere.
+- **CSP**: only the origins Google lists for GA4 without Ads features (developers.google.com/tag-platform/security/guides/csp): `script-src https://www.googletagmanager.com`; `img-src https://www.googletagmanager.com https://*.google-analytics.com`; `connect-src https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com`. Nothing else was loosened.
+- This replaces v0's "no analytics beyond Cloudflare Web Analytics", which v2's CLAUDE.md doesn't carry.
 
 ### 2026-10-12: Publishing
 
@@ -89,7 +114,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ### 2026-10-11: Site pages for v2
 
-- **`/<subject>/`** lists the subject's active lessons, newest first; every subject tag links to it. A subject can't be a top-level path of the site or the Worker (`RESERVED_SUBJECTS` in `packages/core`: lessons, teachers, index, start, models, mcp, api, auth, 404, the root files index.json, index.html and 404.html, and subjects, whose shard would be /index/subjects.json): `lessonProblems` refuses it, so `verify` and `ludion teach` do too, and the site build fails if one slips in.
+- **`/<subject>/`** lists the subject's active lessons, newest first; every subject tag links to it. A subject can't be a top-level path of the site or the Worker (`RESERVED_SUBJECTS` in `packages/core`: lessons, teachers, index, start, models, mcp, api, auth, 404, the root files index.json, index.html and 404.html, and subjects, whose shard would be /index/subjects.json; since 2026-10-12 also llms.txt, sitemap.xml, and robots.txt): `lessonProblems` refuses it, so `verify` and `ludion teach` do too, and the site build fails if one slips in.
 - **`/start/`**: the plugin, `npx ludion-ai sync`, the MCP server, teaching (ledger, then `--public`), and what leaves the machine. It names `npx ludion-ai`, so it ships with the CLI, after the npm publish.
 - **`/models/`** shows only what `docs/bench/models.json` holds: per model, how many measured, still-active lessons it knows and misses, and a per-lesson table, with the date and a link to the run's files. Until then it says only that no model has been measured. With data, it shows the run's own `method` text from `models.json` (never a fixed description), and "not measured" for a missing verdict. `models.json` carries `measured_at`, `bench` (the run's folder), `method`, `models` (id → display name), and `lessons` (lesson id → model id → knows | misses); the shards read `lessons`.
 - **Tombstones**: a lesson file deleted from main (a retraction) keeps its page at `/lessons/<id>/`. It says it was retracted and when (not that the fact is false: a source can vanish, or a teacher can withdraw it), shows what the lesson said, struck through, with its teacher (current login, looked up by id), seed label, and subject (linked only while the subject has active lessons), read from the commit before the deletion, and links the retraction's pull request and the file's history. Retracted lessons never enter the index or the shards.
@@ -318,7 +343,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
   - axe (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`) finds nothing on any page;
   - home JavaScript at most 60 KB gzipped;
   - targets that no test or workflow checks yet: Lighthouse accessibility at least 95, LCP at most 1.5 s on a mid-range phone over 4G, CLS at most 0.05. axe and the 60 KB budget are enforced (`e2e/`).
-- Headers (`apps/site/public/_headers`): CSP `default-src 'self'` (avatars from `avatars.githubusercontent.com`), `frame-ancestors 'none'`, `nosniff`, `strict-origin-when-cross-origin`, and a locked-down `Permissions-Policy`. Canonical links use the trailing slash.
+- Headers (`apps/site/public/_headers`): CSP `default-src 'self'` (avatars from `avatars.githubusercontent.com`; Google Analytics' origins, see "Analytics"), `frame-ancestors 'none'`, `nosniff`, `strict-origin-when-cross-origin`, and a locked-down `Permissions-Policy`. Canonical links use the trailing slash.
 
 ### Bench
 

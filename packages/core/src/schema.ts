@@ -129,6 +129,17 @@ export const validateLessonV1: LessonValidator = lessonValidator(generatedV1);
 /** Format 0, frozen (lessons/lessons-v0.schema.json): only for lessons already on main. */
 export const validateLessonV0: LessonValidator = lessonValidator(generatedV0);
 
+/**
+ * A format 1 lesson with no evidence: every field but the evidence must be valid. Such a lesson can only be an
+ * unverified entry in a teacher's own ledger; it is never published (`ludion teach --public` needs evidence).
+ */
+export const validateUnverified: LessonValidator = (data) => {
+  const v = validateLessonV1({ ...(data as object), evidence: [] });
+  if (v.ok) return v;
+  const errors = v.errors.filter((e) => e.path !== "/evidence" && !e.path.startsWith("/evidence/"));
+  return errors.length ? { ok: false, errors } : { ok: true, lesson: { ...(data as object), evidence: [] } as unknown as Lesson };
+};
+
 /** Any lesson file: format 1 when it says so, else format 0. */
 export const validateLesson: LessonValidator = (data) =>
   data !== null && typeof data === "object" && (data as { format?: unknown }).format !== undefined ? validateLessonV1(data) : validateLessonV0(data);

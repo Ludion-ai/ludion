@@ -13,7 +13,7 @@ import { select, type SyncLesson } from "./match.ts";
 import { openPullRequest } from "./publish.ts";
 import { lessonLines, readLessonsFile, renderLessons, writeAndWire } from "./render.ts";
 import { fetchLessons } from "./shards.ts";
-import { check, ghIdentity, ledgerEntry, readDraft, showLesson, toLesson } from "./teach.ts";
+import { check, ghIdentity, isUnverified, ledgerEntry, readDraft, showLesson, toLesson } from "./teach.ts";
 
 const HELP = `ludion: tells your coding assistant what changed in the versions your project installed.
 
@@ -24,7 +24,8 @@ const HELP = `ludion: tells your coding assistant what changed in the versions y
 
   ludion teach <draft.json | - | --draft <value>> [--public] [--drafted-by-agent]
       Check a lesson on this machine (tests run only in Docker) and save it to your ledger
-      (~/.ludion). --public shows you the whole lesson, asks you to confirm at the terminal, and opens
+      (~/.ludion). A draft without evidence is saved as unverified and reaches only your own projects.
+      --public needs evidence; it shows you the whole lesson, asks you to confirm at the terminal, and opens
       a pull request with your own gh.
 `;
 
@@ -99,6 +100,13 @@ async function teach(argv: string[]): Promise<number> {
   }
   const draft = readDraft(source);
   if (values["drafted-by-agent"]) draft.drafted_by = "agent";
+  if (isUnverified(draft)) {
+    if (values.public) {
+      console.error("A public lesson needs evidence: a test, or a source with a quote that names the symbol. Add one and teach again, or leave out --public to keep it in your ledger as unverified.");
+      return 1;
+    }
+    draft.evidence = [];
+  }
   // The teacher's GitHub account matters only for a public lesson; without --public, gh isn't called.
   const who = values.public ? ghIdentity() : undefined;
   const now = new Date();
@@ -114,7 +122,11 @@ async function teach(argv: string[]): Promise<number> {
   }
   const entry = ledgerEntry(lesson, report, now);
   const path = saveEntry(entry);
-  console.log(`Saved to your ledger: ${path}. \`ludion sync\` in any project that uses ${lesson.package.name} ${lesson.versions} now writes it.`);
+  console.log(
+    report.unverified
+      ? `Saved to your ledger as unverified (no evidence): ${path}. \`ludion sync\` writes it, marked "unverified, yours only", in your projects that use ${lesson.package.name} ${lesson.versions}. To teach it in public, add a test or a source and teach it again with --public.`
+      : `Saved to your ledger: ${path}. \`ludion sync\` in any project that uses ${lesson.package.name} ${lesson.versions} now writes it.`,
+  );
   if (!values.public) return 0;
 
   if (!who) {

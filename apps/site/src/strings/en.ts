@@ -115,6 +115,7 @@ export const en = {
       `${lessons} ${lessons === 1 ? "lesson" : "lessons"} from ${teachers} ${teachers === 1 ? "teacher" : "teachers"}.`,
     license: "Lessons are CC BY-SA 4.0. Code is Apache-2.0.",
     github: "GitHub",
+    analytics: "This site uses Google Analytics.",
   },
   notFound: {
     title: "No page here",

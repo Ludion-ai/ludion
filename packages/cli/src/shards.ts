@@ -53,7 +53,7 @@ export function shardLesson(l: ShardLesson): SyncLesson | undefined {
 /** Lessons from the shards of the subjects this project uses. Throws with a plain message when the site can't be reached. */
 export async function fetchLessons(installed: Installed, fetchFn: Fetch = timedFetch): Promise<{ lessons: SyncLesson[]; built_at: string | null }> {
   const res = await fetchFn(`${SITE}/index/subjects.json`);
-  if (res.status === 404) return { lessons: [], built_at: null };
+  // A 404 is an error too: a site without shards (an old deploy, a wrong LUDION_SITE) says nothing about which lessons hold.
   if (!res.ok) throw new Error(`${SITE}/index/subjects.json answered ${res.status}.`);
   const subjects = (await res.json()) as Subjects;
   const wanted = wantedSubjects(installed).filter((s) => subjects.subjects[s]);

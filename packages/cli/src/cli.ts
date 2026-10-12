@@ -35,12 +35,19 @@ async function sync(argv: string[]): Promise<number> {
   const installed = readInstalled(dir);
 
   let index: SyncLesson[] = [];
+  let failed = false;
   if (!values.offline) {
     try {
       index = (await fetchLessons(installed)).lessons;
     } catch (err) {
-      // A sync that can't reach the index still writes the ledger's lessons; it never blocks the session.
-      console.error(`ludion: could not fetch the index (${(err as Error).message}); using your ledger only.`);
+      // Without the index, a rewrite would drop every public lesson the project has, so an existing lessons file is
+      // left as it is. Sync never blocks the session: with --quiet (the hook) it warns and exits 0.
+      failed = true;
+      if (readLessonsFile(dir)) {
+        console.error(`ludion: could not fetch the index: ${(err as Error).message} Left .ludion/lessons.md as it was. Run ludion sync again later.`);
+        return values.quiet ? 0 : 1;
+      }
+      console.error(`ludion: could not fetch the index: ${(err as Error).message} Wrote only your ledger's lessons. Run ludion sync again later.`);
     }
   }
   const publicIds = new Set(index.map((l) => l.id));
@@ -60,7 +67,7 @@ async function sync(argv: string[]): Promise<number> {
     console.log(`ludion sync updated .ludion/lessons.md after this session read CLAUDE.md. The current lessons:\n\n${lessonsMd}`);
   }
   say(`ludion: ${selection.kept.length} lesson${selection.kept.length === 1 ? "" : "s"} for this project${selection.prunedForModel.length ? ` (${selection.prunedForModel.length} left out: ${model} is measured to know them)` : ""}. Wrote ${written.join(", ")}.`);
-  return 0;
+  return failed && !values.quiet ? 1 : 0;
 }
 
 async function confirm(question: string): Promise<boolean> {

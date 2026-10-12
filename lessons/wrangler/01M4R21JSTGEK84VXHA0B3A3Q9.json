@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4R21JSTGEK84VXHA0B3A3Q9",
+  "subject": "wrangler",
+  "package": {
+    "ecosystem": "npm",
+    "name": "wrangler"
+  },
+  "versions": ">=4.113.0",
+  "kind": "behavior",
+  "symbol": "wrangler dev",
+  "signal": "silent",
+  "detail": "wrangler dev started in a headless AI agent environment now prints the Local Explorer API URL and basic resource routes",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.113.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst dir = fs.mkdtempSync(\"/tmp/proj-\");\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"agent-hint\", main: \"index.js\", compatibility_date: \"2024-01-01\" }));\nfs.writeFileSync(path.join(dir, \"index.js\"), 'export default { fetch() { return new Response(\"hello-from-worker\"); } };');\nconst env = Object.assign({}, process.env, { CLAUDECODE: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\" });\nconst child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"dev\", \"--ip\", \"127.0.0.1\", \"--port\", \"8787\"], { cwd: dir, env, stdio: [\"ignore\", \"pipe\", \"pipe\"] });\nlet out = \"\";\nlet done = false;\nlet readyAt = 0;\nconst clean = () => out.replace(/\\x1b\\[[0-9;]*m/g, \"\");\nchild.stdout.on(\"data\", (d) => { out += d; });\nchild.stderr.on(\"data\", (d) => { out += d; });\nchild.on(\"exit\", (code) => { if (!done) { done = true; broken(\"wrangler dev exited early with code \" + code + \": \" + clean().slice(-2000)); } });\nfunction finish(fn) { if (done) return; done = true; clearInterval(timer); child.kill(\"SIGKILL\"); fn(); }\nconst start = Date.now();\nlet probing = false;\nconst timer = setInterval(async () => {\n  if (done) return;\n  if (!readyAt && !probing) {\n    probing = true;\n    try {\n      const res = await fetch(\"http://127.0.0.1:8787/\");\n      if ((await res.text()) === \"hello-from-worker\") readyAt = Date.now();\n    } catch {}\n    probing = false;\n  }\n  const text = clean();\n  const hint = text.match(/The Local Explorer API is available at (http:\\/\\/\\S+\\/cdn-cgi\\/explorer\\/api)/);\n  if (hint && text.includes(\"GET \" + hint[1] + \"/local/workers\")) {\n    finish(() => { console.log(\"OK: wrangler dev printed: \" + hint[0]); process.exit(0); });\n  } else if (readyAt && Date.now() - readyAt > 5000) {\n    finish(() => symptom(\"wrangler dev run by an AI agent without a TTY did not print the Local Explorer API URL\"));\n  } else if (Date.now() - start > 75000) {\n    finish(() => broken(\"wrangler dev did not serve the worker in time: \" + text.slice(-2000)));\n  }\n}, 250);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.112.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst dir = fs.mkdtempSync(\"/tmp/proj-\");\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"agent-hint\", main: \"index.js\", compatibility_date: \"2024-01-01\" }));\nfs.writeFileSync(path.join(dir, \"index.js\"), 'export default { fetch() { return new Response(\"hello-from-worker\"); } };');\nconst env = Object.assign({}, process.env, { CLAUDECODE: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\" });\nconst child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"dev\", \"--ip\", \"127.0.0.1\", \"--port\", \"8787\"], { cwd: dir, env, stdio: [\"ignore\", \"pipe\", \"pipe\"] });\nlet out = \"\";\nlet done = false;\nlet readyAt = 0;\nconst clean = () => out.replace(/\\x1b\\[[0-9;]*m/g, \"\");\nchild.stdout.on(\"data\", (d) => { out += d; });\nchild.stderr.on(\"data\", (d) => { out += d; });\nchild.on(\"exit\", (code) => { if (!done) { done = true; broken(\"wrangler dev exited early with code \" + code + \": \" + clean().slice(-2000)); } });\nfunction finish(fn) { if (done) return; done = true; clearInterval(timer); child.kill(\"SIGKILL\"); fn(); }\nconst start = Date.now();\nlet probing = false;\nconst timer = setInterval(async () => {\n  if (done) return;\n  if (!readyAt && !probing) {\n    probing = true;\n    try {\n      const res = await fetch(\"http://127.0.0.1:8787/\");\n      if ((await res.text()) === \"hello-from-worker\") readyAt = Date.now();\n    } catch {}\n    probing = false;\n  }\n  const text = clean();\n  const hint = text.match(/The Local Explorer API is available at (http:\\/\\/\\S+\\/cdn-cgi\\/explorer\\/api)/);\n  if (hint && text.includes(\"GET \" + hint[1] + \"/local/workers\")) {\n    finish(() => { console.log(\"OK: wrangler dev printed: \" + hint[0]); process.exit(0); });\n  } else if (readyAt && Date.now() - readyAt > 5000) {\n    finish(() => symptom(\"wrangler dev run by an AI agent without a TTY did not print the Local Explorer API URL\"));\n  } else if (Date.now() - start > 75000) {\n    finish(() => broken(\"wrangler dev did not serve the worker in time: \" + text.slice(-2000)));\n  }\n}, 250);\n",
+        "expect": "fail",
+        "error": "FAIL: wrangler dev run by an AI agent without a TTY did not print the Local Explorer API URL"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.113.0/packages/wrangler/CHANGELOG.md",
+        "quote": "When `wrangler dev` is started in a headless AI agent environment, Wrangler now prints the Local Explorer API URL and basic resource routes so agents can inspect local Workers and bindings without relying on the interactive UI."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T12:40:17Z"
+}

@@ -1,0 +1,42 @@
+{
+  "package": "wrangler",
+  "range": ">=4.111.0 <=4.148.0",
+  "versions": 47,
+  "entries": 288,
+  "triaged": 288,
+  "candidates": 107,
+  "candidates_by_kind": {
+    "default": 3,
+    "behavior": 52,
+    "deprecated": 0,
+    "renamed": 3,
+    "removed": 3,
+    "added": 46
+  },
+  "candidates_silent": 71,
+  "skipped_by_reason": {
+    "experimental": 39,
+    "internal": 60,
+    "fix": 74,
+    "docs": 4,
+    "unclear": 3,
+    "other-package": 1
+  },
+  "drafted": 55,
+  "draft_skipped": 1,
+  "draft_errors": 0,
+  "draft_cost_usd": 19.21,
+  "rounds": [
+    {
+      "round": 0,
+      "drafts": 55,
+      "local_checks_passed": 33,
+      "differential": 23,
+      "review_findings": 92,
+      "reviewed_clean": 3
+    }
+  ],
+  "kept": 3,
+  "duplicates_of_main": 0,
+  "ci": []
+}

@@ -33,6 +33,7 @@
       "reviewed_clean": 6
     }
   ],
-  "kept": 0,
+  "kept": 5,
+  "duplicates_of_main": 1,
   "ci": []
 }

@@ -1,0 +1,54 @@
+{
+  "entry": "4.141.0#4",
+  "verdict": {
+    "id": "4.141.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "--log-level debug",
+    "why": "Debug output for failed proxied requests in `wrangler dev` now includes the error stack and cause chain."
+  },
+  "cost_usd": 0.2342652,
+  "turns": 22,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.141.0",
+    "kind": "behavior",
+    "symbol": "--log-level debug",
+    "signal": "silent",
+    "detail": "When a request proxied to the local Worker fails, --log-level debug now shows the underlying error's stack and cause chain.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.141.0"
+          },
+          "code": "process.env.WRANGLER_LOG = \"debug\";\nfunction symptom(m) { console.error(\"FAIL: \" + m); process.exit(1); }\nfunction broken(m) { console.error(\"ERROR: \" + m); process.exit(2); }\nconst w = require(\"wrangler\");\nconst out = [];\nconst fmt = (x) => typeof x === \"string\" ? x : (x && x.stack) || JSON.stringify(x);\nconst real = { err: console.error, log: console.log };\nfor (const m of [\"log\", \"error\", \"warn\", \"debug\", \"info\"]) console[m] = (...a) => out.push(a.map(fmt).join(\" \"));\nconst D = w.unstable_DevEnv;\nif (!D) broken(\"no unstable_DevEnv export\");\nconst d = new D();\nd.on(\"error\", () => {});\nconst cause = new Error(\"Network connection lost.\");\ncause.stack = \"Error: Network connection lost.\\n    at fetch (ProxyWorker.ts:167:9)\";\ncause.cause = { name: \"TypeError\", message: \"socket hang up\" };\nd.handleErrorEvent({ type: \"error\", source: \"ProxyController\", reason: \"Error inside ProxyWorker\", cause, data: {} });\nconst all = out.join(\"\\n\");\nconsole.error = real.err; console.log = real.log;\nif (!all.includes(\"Error inside ProxyWorker\") || !all.includes(\"Network connection lost.\")) broken(\"proxy error was not logged: \" + all.slice(0, 300));\nif (!all.includes(\"at fetch (ProxyWorker.ts:167:9)\")) symptom(\"debug log of the failed proxied request has no error stack\");\nconsole.log(\"OK: debug log shows the stack of the failed proxied request\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.140.0"
+          },
+          "code": "process.env.WRANGLER_LOG = \"debug\";\nfunction symptom(m) { console.error(\"FAIL: \" + m); process.exit(1); }\nfunction broken(m) { console.error(\"ERROR: \" + m); process.exit(2); }\nconst w = require(\"wrangler\");\nconst out = [];\nconst fmt = (x) => typeof x === \"string\" ? x : (x && x.stack) || JSON.stringify(x);\nconst real = { err: console.error, log: console.log };\nfor (const m of [\"log\", \"error\", \"warn\", \"debug\", \"info\"]) console[m] = (...a) => out.push(a.map(fmt).join(\" \"));\nconst D = w.unstable_DevEnv;\nif (!D) broken(\"no unstable_DevEnv export\");\nconst d = new D();\nd.on(\"error\", () => {});\nconst cause = new Error(\"Network connection lost.\");\ncause.stack = \"Error: Network connection lost.\\n    at fetch (ProxyWorker.ts:167:9)\";\ncause.cause = { name: \"TypeError\", message: \"socket hang up\" };\nd.handleErrorEvent({ type: \"error\", source: \"ProxyController\", reason: \"Error inside ProxyWorker\", cause, data: {} });\nconst all = out.join(\"\\n\");\nconsole.error = real.err; console.log = real.log;\nif (!all.includes(\"Error inside ProxyWorker\") || !all.includes(\"Network connection lost.\")) broken(\"proxy error was not logged: \" + all.slice(0, 300));\nif (!all.includes(\"at fetch (ProxyWorker.ts:167:9)\")) symptom(\"debug log of the failed proxied request has no error stack\");\nconsole.log(\"OK: debug log shows the stack of the failed proxied request\");\n",
+          "expect": "fail",
+          "error": "FAIL: debug log of the failed proxied request has no error stack"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.141.0/packages/wrangler/CHANGELOG.md",
+          "quote": "When a request proxied to the local Worker fails, running with `--log-level debug` now shows the underlying error's stack and cause chain."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -51,7 +51,8 @@
       "reviewed_clean": 7
     }
   ],
-  "kept": 7,
+  "kept": 6,
+  "duplicates_of_main": 1,
   "ci": [
     {
       "lessons": 6,

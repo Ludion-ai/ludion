@@ -4,6 +4,13 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Optional C-task execution acceptance pilot
+
+- Add runtime acceptance for a bounded subset of C tasks before expanding lessons or introducing another delivery hook. Treat current regex grades as syntax observations, not execution proof. Pilot criteria, selected tasks, Docker boundaries and measured records are in `docs/bench/2026-10-12-runtime/`.
+- Keep historical C rows and the spending pause unchanged. The new explicit CLI invokes no model; it can check complete saved candidate projects, but a partial historical `left` snapshot cannot establish the generated program's runtime behavior. Unsupported tasks and infrastructure failures are not scored as wrong.
+- Execute candidate tests/npm scripts only in the existing network-off Docker runner; trust only the harness's pinned package set for installation. Require observed selection and mutation sensitivity, not just exit zero. This is a constrained evaluation pilot, not a security-proof or tamper-resistant submission grader.
+- Stack on the pending security PR because it relies on its Docker hardening. Leave draft until required fresh Opus review and owner merge; supplemental Codex review and CI do not waive that requirement.
+
 ### 2026-10-12: Security boundaries in sync, personal files, and the public MCP
 
 - Treat remote shards and local ledger JSON as untrusted input, reconstruct the structured lesson through the existing schema and grounding guards, and generate the assistant claim locally. Preserve compatibility with existing shards whose detail is embedded only in their generated claim. Accept canonical PR links only; invalid ledger entries are skipped, not interpolated into later sessions.

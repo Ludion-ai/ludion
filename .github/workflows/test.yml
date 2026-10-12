@@ -30,6 +30,14 @@ jobs:
       - run: npm test
       - name: Exercise the real Docker sandbox with own harmless probes
         run: node tools/sandbox-smoke.ts
+      - name: Check C-task runtime acceptance against correct, stale and misleading fixtures
+        run: node tools/bench/src/runtime-tasks-cli.ts --self-check --out runtime-acceptance.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: runtime-acceptance
+          path: runtime-acceptance.json
+          if-no-files-found: ignore
 
       # Playwright + axe on every page, light and dark, against the built site under wrangler dev.
       - name: Find the Playwright version

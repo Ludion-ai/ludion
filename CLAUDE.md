@@ -1,6 +1,6 @@
 # Ludion
 
-This file replaces `CLAUDE.md` and everything in `.claude/rules/`. Delete those rules files; this is the whole spec. Decide the details yourself and write them down in the repo as you go (`docs/decisions.md`).
+Decide the details yourself and write them down in the repo as you go (`docs/decisions.md`).
 
 ## What Ludion is
 

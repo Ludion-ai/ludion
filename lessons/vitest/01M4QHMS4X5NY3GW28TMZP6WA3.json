@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4QHMS4X5NY3GW28TMZP6WA3",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "behavior",
+  "symbol": "vi.fn",
+  "signal": "silent",
+  "detail": "Instances of a class passed to vi.fn keep the prototype chain of the class, so prototype methods stay available and instanceof checks against the class pass.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/classproto\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"dog.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"class Dog { speak() { return 'bark!' } }\",\n  \"test('dog', () => {\",\n  \"  const MockedDog = vi.fn(Dog)\",\n  \"  const dog = new MockedDog()\",\n  \"  const result = { speak: typeof dog.speak, isDog: dog instanceof Dog }\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify(result))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.speak === \"function\" && res.isDog === true) {\n  console.log(\"PASS: new (vi.fn(Dog))() has the prototype method speak and is instanceof Dog\");\n  process.exit(0);\n}\nif (res.speak === \"undefined\" && res.isDog === false) {\n  console.error(\"FAIL: new (vi.fn(Dog))() lacks the prototype method speak and is not instanceof Dog\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/classproto\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"dog.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"class Dog { speak() { return 'bark!' } }\",\n  \"test('dog', () => {\",\n  \"  const MockedDog = vi.fn(Dog)\",\n  \"  const dog = new MockedDog()\",\n  \"  const result = { speak: typeof dog.speak, isDog: dog instanceof Dog }\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify(result))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.speak === \"function\" && res.isDog === true) {\n  console.log(\"PASS: new (vi.fn(Dog))() has the prototype method speak and is instanceof Dog\");\n  process.exit(0);\n}\nif (res.speak === \"undefined\" && res.isDog === false) {\n  console.error(\"FAIL: new (vi.fn(Dog))() lacks the prototype method speak and is not instanceof Dog\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: new (vi.fn(Dog))() lacks the prototype method speak and is not instanceof Dog"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/mocking/classes.md",
+        "quote": "Instances keep the prototype chain of the class you pass to `vi.fn`, so prototype methods stay available on instances, both during and after construction, and instances pass `instanceof` checks against that class:"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T07:53:41Z"
+}

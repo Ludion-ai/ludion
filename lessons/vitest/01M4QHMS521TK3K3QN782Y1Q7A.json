@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4QHMS521TK3K3QN782Y1Q7A",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "renamed",
+  "symbol": "experimental_parseSpecifications",
+  "replacement": "parseSpecifications",
+  "signal": "silent",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/parsespecs\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => {})\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(dir, \"run.mjs\"), [\n  \"import { createVitest } from '/w/node_modules/vitest/dist/node.js'\",\n  \"const dir = '/w/parsespecs'\",\n  \"const vitest = await createVitest('test', { root: dir, config: false, watch: false })\",\n  \"const names = async (method) => {\",\n  \"  const spec = vitest.getRootProject().createSpecification(dir + '/math.test.mjs')\",\n  \"  const modules = await vitest[method]([spec])\",\n  \"  return [...modules[0].children.allTests()].map(t => t.fullName)\",\n  \"}\",\n  \"const result = { oldName: null, newType: typeof vitest.parseSpecifications, newName: null }\",\n  \"try { result.oldName = await names('experimental_parseSpecifications') } catch (e) { result.oldError = String(e) }\",\n  \"if (result.newType === 'function') {\",\n  \"  try { result.newName = await names('parseSpecifications') } catch (e) { result.newError = String(e) }\",\n  \"}\",\n  \"await vitest.close()\",\n  \"console.log('RESULT ' + JSON.stringify(result))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [path.join(dir, \"run.mjs\")], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(\"\\n\").find(l => l.startsWith(\"RESULT \"));\nif (!line) {\n  console.error(\"ERROR: script printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(line.slice(7));\nconst expected = JSON.stringify([\"math > adds\"]);\nif (JSON.stringify(res.oldName) !== expected) {\n  console.error(\"ERROR: experimental_parseSpecifications did not collect math > adds: \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.newType === \"undefined\") {\n  console.error(\"FAIL: vitest.parseSpecifications is undefined; only experimental_parseSpecifications exists\");\n  process.exit(1);\n}\nif (JSON.stringify(res.newName) === expected) {\n  console.log(\"PASS: parseSpecifications and experimental_parseSpecifications both collect math > adds\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/parsespecs\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => {})\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(dir, \"run.mjs\"), [\n  \"import { createVitest } from '/w/node_modules/vitest/dist/node.js'\",\n  \"const dir = '/w/parsespecs'\",\n  \"const vitest = await createVitest('test', { root: dir, config: false, watch: false })\",\n  \"const names = async (method) => {\",\n  \"  const spec = vitest.getRootProject().createSpecification(dir + '/math.test.mjs')\",\n  \"  const modules = await vitest[method]([spec])\",\n  \"  return [...modules[0].children.allTests()].map(t => t.fullName)\",\n  \"}\",\n  \"const result = { oldName: null, newType: typeof vitest.parseSpecifications, newName: null }\",\n  \"try { result.oldName = await names('experimental_parseSpecifications') } catch (e) { result.oldError = String(e) }\",\n  \"if (result.newType === 'function') {\",\n  \"  try { result.newName = await names('parseSpecifications') } catch (e) { result.newError = String(e) }\",\n  \"}\",\n  \"await vitest.close()\",\n  \"console.log('RESULT ' + JSON.stringify(result))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [path.join(dir, \"run.mjs\")], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(\"\\n\").find(l => l.startsWith(\"RESULT \"));\nif (!line) {\n  console.error(\"ERROR: script printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(line.slice(7));\nconst expected = JSON.stringify([\"math > adds\"]);\nif (JSON.stringify(res.oldName) !== expected) {\n  console.error(\"ERROR: experimental_parseSpecifications did not collect math > adds: \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.newType === \"undefined\") {\n  console.error(\"FAIL: vitest.parseSpecifications is undefined; only experimental_parseSpecifications exists\");\n  process.exit(1);\n}\nif (JSON.stringify(res.newName) === expected) {\n  console.log(\"PASS: parseSpecifications and experimental_parseSpecifications both collect math > adds\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: vitest.parseSpecifications is undefined; only experimental_parseSpecifications exists"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/packages/vitest/src/node/core.ts",
+        "quote": "The \"experimental_parseSpecifications\" method is deprecated. Use \"parseSpecifications\" instead."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T07:53:41Z"
+}

@@ -1,0 +1,50 @@
+{
+  "format": 1,
+  "id": "01M4PW52QF9V35BKFEZ0TV8SMC",
+  "subject": "wrangler",
+  "package": {
+    "ecosystem": "npm",
+    "name": "wrangler"
+  },
+  "versions": ">=4.141.0",
+  "kind": "default",
+  "symbol": "durable_objects.code_update_strategy",
+  "signal": "silent",
+  "detail": "When unset, the strategy defaults to deferred with a 5-minute maximum delay; configure mode and max_delay to set it.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.141.0"
+        },
+        "code": "// wrangler deploy with no durable_objects.code_update_strategy configured, against a local stand-in for the\n// Cloudflare API: which code update strategy does the upload carry?\nconst { spawn } = require(\"child_process\");\nconst http = require(\"http\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfs.writeFileSync(path.join(dir, \"index.js\"), 'export default { fetch() { return new Response(\"ok\"); } };\\n');\n// No durable_objects.code_update_strategy and no --durable-objects-code-update-mode: the default applies.\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"lesson-do\", main: \"index.js\", compatibility_date: \"2026-09-01\" }));\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg, out) {\n  console.error(\"ERROR: \" + msg);\n  if (out) console.error(out.slice(-3000));\n  process.exit(2);\n}\nconst requests = [];\nconst server = http.createServer((req, res) => {\n  const chunks = [];\n  req.on(\"data\", (c) => chunks.push(c));\n  req.on(\"end\", () => {\n    const body = Buffer.concat(chunks).toString(\"utf8\");\n    requests.push({ method: req.method, url: req.url, body });\n    const send = (status, json) => { res.writeHead(status, { \"content-type\": \"application/json\" }); res.end(JSON.stringify(json)); };\n    // The Worker doesn't exist yet: every lookup under it is not found, as the real API answers, so wrangler uploads the\n    // whole script with its metadata in one request.\n    if (req.method === \"GET\" && /\\/workers\\/(services|scripts)\\/lesson-do(\\/|$)/.test(req.url.split(\"?\")[0])) return send(404, { success: false, errors: [{ code: 10007, message: \"workers.api.error.script_not_found\" }], messages: [], result: null });\n    if (/\\/workers\\/subdomain$/.test(req.url)) return send(200, { success: true, errors: [], messages: [], result: { subdomain: \"lesson\" } });\n    const result = req.method === \"GET\" ? [] : { id: \"0123456789abcdef\", etag: \"x\", deployment_id: \"0123456789abcdef\", enabled: true, previews_enabled: false };\n    send(200, { success: true, errors: [], messages: [], result });\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const env = Object.assign({}, process.env, {\n    CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home,\n    CLOUDFLARE_API_TOKEN: \"lesson-token\", CLOUDFLARE_ACCOUNT_ID: \"0123456789abcdef0123456789abcdef\",\n    CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + server.address().port + \"/client/v4\",\n  });\n  const child = spawn(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"deploy\"], { cwd: dir, env });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => (out += d));\n  child.stderr.on(\"data\", (d) => (out += d));\n  const timer = setTimeout(() => child.kill(\"SIGKILL\"), 60000);\n  child.on(\"close\", () => {\n    clearTimeout(timer);\n    server.close();\n    out = out.replace(/\\x1b\\[[0-9;]*m/g, \"\");\n    const uploads = requests.filter((r) => r.method === \"PUT\" && /\\/workers\\/scripts\\/lesson-do$/.test(r.url.split(\"?\")[0]));\n    if (uploads.length === 0) broken(\"wrangler deploy never uploaded the Worker; requests: \" + requests.map((r) => r.method + \" \" + r.url).join(\", \"), out);\n    const meta = uploads[0].body;\n    if (!/\"code_update_strategy\"/.test(meta)) symptom(\"wrangler deploy sent no code_update_strategy when none was configured\");\n    if (!/\"code_update_strategy\":\\{\"mode\":\"deferred\",\"max_delay\":300\\}/.test(meta)) broken(\"unexpected code_update_strategy in the upload metadata\", meta.slice(0, 2000));\n    console.log(\"OK: with no durable_objects.code_update_strategy, wrangler deploy sends deferred with max_delay 300 (5 minutes)\");\n  });\n});\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "wrangler": "4.140.0"
+        },
+        "code": "// wrangler deploy with no durable_objects.code_update_strategy configured, against a local stand-in for the\n// Cloudflare API: which code update strategy does the upload carry?\nconst { spawn } = require(\"child_process\");\nconst http = require(\"http\");\nconst fs = require(\"fs\");\nconst path = require(\"path\");\nconst dir = \"/w/proj\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst home = fs.mkdtempSync(\"/tmp/home-\");\nfs.writeFileSync(path.join(dir, \"index.js\"), 'export default { fetch() { return new Response(\"ok\"); } };\\n');\n// No durable_objects.code_update_strategy and no --durable-objects-code-update-mode: the default applies.\nfs.writeFileSync(path.join(dir, \"wrangler.json\"), JSON.stringify({ name: \"lesson-do\", main: \"index.js\", compatibility_date: \"2026-09-01\" }));\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg, out) {\n  console.error(\"ERROR: \" + msg);\n  if (out) console.error(out.slice(-3000));\n  process.exit(2);\n}\nconst requests = [];\nconst server = http.createServer((req, res) => {\n  const chunks = [];\n  req.on(\"data\", (c) => chunks.push(c));\n  req.on(\"end\", () => {\n    const body = Buffer.concat(chunks).toString(\"utf8\");\n    requests.push({ method: req.method, url: req.url, body });\n    const send = (status, json) => { res.writeHead(status, { \"content-type\": \"application/json\" }); res.end(JSON.stringify(json)); };\n    // The Worker doesn't exist yet: every lookup under it is not found, as the real API answers, so wrangler uploads the\n    // whole script with its metadata in one request.\n    if (req.method === \"GET\" && /\\/workers\\/(services|scripts)\\/lesson-do(\\/|$)/.test(req.url.split(\"?\")[0])) return send(404, { success: false, errors: [{ code: 10007, message: \"workers.api.error.script_not_found\" }], messages: [], result: null });\n    if (/\\/workers\\/subdomain$/.test(req.url)) return send(200, { success: true, errors: [], messages: [], result: { subdomain: \"lesson\" } });\n    const result = req.method === \"GET\" ? [] : { id: \"0123456789abcdef\", etag: \"x\", deployment_id: \"0123456789abcdef\", enabled: true, previews_enabled: false };\n    send(200, { success: true, errors: [], messages: [], result });\n  });\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const env = Object.assign({}, process.env, {\n    CI: \"1\", WRANGLER_SEND_METRICS: \"false\", NO_COLOR: \"1\", FORCE_COLOR: \"0\", HOME: home,\n    CLOUDFLARE_API_TOKEN: \"lesson-token\", CLOUDFLARE_ACCOUNT_ID: \"0123456789abcdef0123456789abcdef\",\n    CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + server.address().port + \"/client/v4\",\n  });\n  const child = spawn(process.execPath, [\"--no-warnings\", \"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"deploy\"], { cwd: dir, env });\n  let out = \"\";\n  child.stdout.on(\"data\", (d) => (out += d));\n  child.stderr.on(\"data\", (d) => (out += d));\n  const timer = setTimeout(() => child.kill(\"SIGKILL\"), 60000);\n  child.on(\"close\", () => {\n    clearTimeout(timer);\n    server.close();\n    out = out.replace(/\\x1b\\[[0-9;]*m/g, \"\");\n    const uploads = requests.filter((r) => r.method === \"PUT\" && /\\/workers\\/scripts\\/lesson-do$/.test(r.url.split(\"?\")[0]));\n    if (uploads.length === 0) broken(\"wrangler deploy never uploaded the Worker; requests: \" + requests.map((r) => r.method + \" \" + r.url).join(\", \"), out);\n    const meta = uploads[0].body;\n    if (!/\"code_update_strategy\"/.test(meta)) symptom(\"wrangler deploy sent no code_update_strategy when none was configured\");\n    if (!/\"code_update_strategy\":\\{\"mode\":\"deferred\",\"max_delay\":300\\}/.test(meta)) broken(\"unexpected code_update_strategy in the upload metadata\", meta.slice(0, 2000));\n    console.log(\"OK: with no durable_objects.code_update_strategy, wrangler deploy sends deferred with max_delay 300 (5 minutes)\");\n  });\n});\n",
+        "expect": "fail",
+        "error": "FAIL: wrangler deploy sent no code_update_strategy when none was configured"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.148.0/packages/wrangler/CHANGELOG.md",
+        "quote": "Use `--durable-objects-code-update-mode deferred 30s` to set a maximum delay, or configure `durable_objects.code_update_strategy` with `mode` and `max_delay`. When unset, the strategy defaults to deferred with a 5-minute maximum delay;"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "replaces": [
+    "01M4N4KZ18NMAR1KJCK8XRKVYK"
+  ],
+  "created_at": "2026-10-12T01:38:06Z"
+}

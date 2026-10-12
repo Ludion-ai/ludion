@@ -40,15 +40,22 @@ The list (status in brackets):
 
 Heavy work one job at a time; Opus only for the review of protected PRs (one round); pipeline work on Sonnet; no per-lesson model FreshBench; no daily C batches; big files read through summaries; this file updated after each work item.
 
-### Open PRs and what waits for whom (2026-10-12, latest)
+### Open PRs and what waits for whom (2026-10-13), in merge order
 
-- **Owner's merge (protected, each with its review comment):** #62 (6 agents lessons), #75 (5 vitest lessons), #76 (3 wrangler lessons), #73 (nightly seed watch; it also needs the `ANTHROPIC_API_KEY` repository secret, a secret value, to draft anything), #54 (issue form). CI is green on all of them.
-- **Docs only, not protected:** #60 (consent sentence draft; the license waits for the owner).
-- **Codex's (the owner's), protected:** reviewed once each by Opus, verdicts posted. Merge order:
-  1. #67: changes requested. One blocking finding: one shard entry the CLI can't reproduce makes sync drop the whole index, and with `--quiet` the hook stays silent, so a subject stops updating (retractions included). Fix: drop the entry with a warning. Also conflicts with main in `docs/decisions.md`. Draft.
-  2. #68: approve. After #67's squash merge it needs `git rebase --onto origin/main 1ed1411 codex/runtime-task-acceptance`.
-  3. #69: changes requested. One blocking finding: a run started on a reduced budget (cap nearly reached) is still graded. Fix: start a run only when the full $2 allowance remains. Then rebase onto main after #68.
-  - Fixes are Codex's side. After the owner merges them: rebase this side's open work, bump the CLI to 0.1.3 with the plugin pin, stage it with `publish.yml`, and dispatch `reverify` (the review asks for it: lessons on main haven't run under #67's new Docker flags).
+All protected; each has its Opus review comment; the owner merges.
+
+1. Lessons, independent of the Codex PRs (CI green on each; with all five on main, the search eval still passes: off-topic 20/20, subject-only 8/8, on-topic 133/138):
+   1. #62: 6 agents lessons.
+   2. #75: 5 vitest lessons.
+   3. #76: 3 wrangler lessons.
+   4. #80: 3 vitest lessons (after the Opus revise round).
+   5. #84: 8 wrangler lessons (after the Opus revise round; one fixed after its review).
+2. #73: nightly seed watch. It drafts only with the `ANTHROPIC_API_KEY` repository secret (a secret value, the owner's). Since #78 its per-lesson review step uses Opus, at most 10 lessons per release.
+3. #54: subject-request issue form.
+4. Codex's stack, after Codex's fixes: #67 (changes requested; also conflicts with main in `docs/decisions.md`), then #68 (approve; rebase onto main after #67: `git rebase --onto origin/main 1ed1411 codex/runtime-task-acceptance`), then #69 (changes requested; rebase after #68). Details in the review comments.
+5. After #67 to #69 are on main (this side): rebase open work, bump the CLI to 0.1.3 with the plugin pin, run `publish.yml` (the owner approves the staged version on npmjs.com), and dispatch `reverify` (lessons on main haven't run under #67's Docker flags).
+
+Not waiting on a merge tap: #60 (consent sentence draft, docs only) waits for the owner's license decision.
 
 ### Who works on what (owner, 2026-10-12)
 

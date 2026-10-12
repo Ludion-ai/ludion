@@ -7,7 +7,8 @@
         "problem": "The detail says worker email logs are written under `.wrangler/tmp/email` in the project root without saying this applies only when the caller sets `defaultProjectTmpPath` (Wrangler and the Vite plugin do this automatically). Direct Miniflare users get no project-root logs, and the test only covers `getPlatformProxy` with a text email, so the detail should scope the claim to Wrangler and the Vite plugin."
       }
     ],
-    "cost_usd": 0.0360175
+    "cost_usd": 0.0360175,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.111.0#9",
@@ -29,7 +30,8 @@
         "problem": "The claim covers any unknown command or subcommand and any command within a 'reasonable edit distance', but the tests only run one top-level typo (`whoamio`). Either add a subcommand test such as `kv namespase`, or limit the claim to what was tested."
       }
     ],
-    "cost_usd": 0.031517500000000004
+    "cost_usd": 0.031517500000000004,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.112.0#7",
@@ -51,7 +53,8 @@
         "problem": "The symbol 'workers.dev' is a hostname rather than a Wrangler symbol such as the `workers_dev` config key or the `wrangler deploy` command, so the generated sentence 'changed what `workers.dev` does' does not match what the entry changed (a pre-upload subdomain check in deploy)."
       }
     ],
-    "cost_usd": 0.0434755
+    "cost_usd": 0.0434755,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.113.0#1",
@@ -73,12 +76,14 @@
         "problem": "kind 'added' with symbol `addresses` doesn't match the entry, whose change is 'Apply Email Routing `addresses` during Worker trigger deployment', which is deploy behavior. The kind and the 'added `addresses`' wording should reflect that behavior change, not a new config key."
       }
     ],
-    "cost_usd": 0.0478435
+    "cost_usd": 0.0478435,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.113.0#5",
     "findings": [],
-    "cost_usd": 0.0315055
+    "cost_usd": 0.0315055,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.113.0#7",
@@ -100,7 +105,8 @@
         "problem": "The quoted changelog line covers two changes, detection via user agent/binary and autoconfig detection via `nub.lock`, but the lesson's detail and tests cover only the first, so the quote does not match the one change claimed; quote only the relevant clause or split the lesson."
       }
     ],
-    "cost_usd": 0.0358635
+    "cost_usd": 0.0358635,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.115.0#3",
@@ -118,7 +124,8 @@
         "problem": "The claim that waits longer than 60 seconds fail fast is not exercised by either test, which only use a 503 with Retry-After: 2 on one command. Drop that clause or add a test with a Retry-After above 60."
       }
     ],
-    "cost_usd": 0.0398795
+    "cost_usd": 0.0398795,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.116.0#1",
@@ -132,7 +139,8 @@
         "problem": "The sentence \"changed what `workers.dev` does\" is vague and misleading. The change is that `wrangler deploy` now registers an account-level workers.dev subdomain, derived from the project name, instead of prompting the user. Reword the claim to say that and drop the claim about workers.dev itself."
       }
     ],
-    "cost_usd": 0.0427795
+    "cost_usd": 0.0427795,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.116.0#3",
@@ -142,7 +150,8 @@
         "problem": "The source quote opens with the changelog headline ('Graduate `wrangler check startup` from alpha and show bundle size and a local timing summary'), and the sentence that states the fact ('The command no longer prints an alpha warning.') does not name the symbol; quote only that sentence with the command named, for example 'wrangler check startup no longer prints an alpha warning'."
       }
     ],
-    "cost_usd": 0.0300295
+    "cost_usd": 0.0300295,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.117.0#2",
@@ -164,12 +173,14 @@
         "problem": "An assistant reading \"continue to use the old paths without issue\" could use the deprecated paths in new code, or assume this holds for Miniflare v5 used directly. The rewrite is only in `wrangler dev` and the Vite plugin, and the new `/cdn-cgi/local/*` paths are never given. State the new paths and the rewrite's scope."
       }
     ],
-    "cost_usd": 0.0278295
+    "cost_usd": 0.0278295,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.118.0#2",
     "findings": [],
-    "cost_usd": 0.0330975
+    "cost_usd": 0.0330975,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.120.0#1",
@@ -179,7 +190,8 @@
         "problem": "The claim says matches are returned \"in human-readable or JSON output\", but both tests only run with `--json` and check the top-level array. The human-readable output (and the no-match message) is never exercised, so drop that part of the claim or add a test that covers it."
       }
     ],
-    "cost_usd": 0.0354995
+    "cost_usd": 0.0354995,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.121.0#5",
@@ -205,7 +217,8 @@
         "problem": "The generated sentence says only that the command 'changed what it does' without saying what changed (secrets now patch the named Preview's latest deployment and create a new deployment, rather than patching Worker-level Previews settings), so an assistant cannot act on it."
       }
     ],
-    "cost_usd": 0.040933500000000005
+    "cost_usd": 0.040933500000000005,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.121.0#6",
@@ -219,7 +232,8 @@
         "problem": "The generated sentence \"changed what DO_NOT_TRACK does\" implies the variable already had an effect, when before 4.121.0 wrangler ignored it; the detail should say wrangler now honors DO_NOT_TRACK=1 as a telemetry opt-out, which it previously ignored."
       }
     ],
-    "cost_usd": 0.0285895
+    "cost_usd": 0.0285895,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.121.0#7",
@@ -229,7 +243,8 @@
         "problem": "The detail repeats the changelog's headline wording ('concise success summary') and never states the concrete fact, which is that the output now lists the Preview name, Preview URL, deployment ID and Deployment URL in place of the box-art settings summary; the detail should name those fields."
       }
     ],
-    "cost_usd": 0.0213975
+    "cost_usd": 0.0213975,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.122.0#1",
@@ -255,7 +270,8 @@
         "problem": "The claim is not scoped to compatibility dates on or after 2026-08-04 and treats 'specify both' as the general rule, which goes beyond what the evidence supports."
       }
     ],
-    "cost_usd": 0.0292475
+    "cost_usd": 0.0292475,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.122.0#4",
@@ -293,7 +309,8 @@
         "problem": "An assistant would read this as nodejs_compat behaving differently or no longer needing to be set generally, and might omit the flag for compatibility dates before 2026-08-04 where it is still required, or think adding it is harmless; it should state that the flag is redundant and errors at compatibility_date >= 2026-08-04 and still needed before."
       }
     ],
-    "cost_usd": 0.0230555
+    "cost_usd": 0.0230555,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.124.0#12",
@@ -311,7 +328,8 @@
         "problem": "The sentence 'changed the default of `compatibility date`' does not say what the new default is (a fixed date tied to the bundled workerd release, no longer today's date), and 'silent' suggests nothing matters. An assistant could wrongly assume the default is still the current date, or miss that newer compatibility flags are not enabled unless it sets the date explicitly. The claim should state the old and new defaults."
       }
     ],
-    "cost_usd": 0.036241499999999996
+    "cost_usd": 0.036241499999999996,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.124.0#8",
@@ -325,7 +343,8 @@
         "problem": "The detail and generated sentence say only what `--latest` used to do and never what it does from 4.124.0, so an assistant cannot tell the new behavior and might still assume the current date is written (or that the date is now a fixed value); state the new resolution (the release date of the bundled workerd) in the detail."
       }
     ],
-    "cost_usd": 0.0231055
+    "cost_usd": 0.0231055,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.125.0#3",
@@ -339,7 +358,8 @@
         "problem": "Saying Wrangler \"offers to create\" a parent Worker implies a prompt, but the entry says non-interactive environments (CI) create the Worker without asking, so an assistant could wrongly expect a confirmation step or no side effect; state the non-interactive behavior and note the feature is private beta."
       }
     ],
-    "cost_usd": 0.0231635
+    "cost_usd": 0.0231635,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#2",
@@ -365,7 +385,8 @@
         "problem": "The sentence 'wrangler added `events`' does not say where `events` lives (the result of the local email test harness call) or what the entries look like, so an assistant could write wrong code or look for `events` in the wrong place."
       }
     ],
-    "cost_usd": 0.0249795
+    "cost_usd": 0.0249795,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#4",
@@ -395,12 +416,14 @@
         "problem": "The generated sentence 'changed what Miniflare does' is vague and could lead an assistant to think general Miniflare behavior changed, when it only affects Docker privileges for local DO containers in specific environments."
       }
     ],
-    "cost_usd": 0.0195035
+    "cost_usd": 0.0195035,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#6",
     "findings": [],
-    "cost_usd": 0.0226795
+    "cost_usd": 0.0226795,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#7",
@@ -418,7 +441,8 @@
         "problem": "The generated sentence 'changed what `workers/pull_request_title` does' implies an existing annotation changed, when it is a new annotation, and with the unconditional wording it could lead an assistant to assume the annotation is always present on preview deployments."
       }
     ],
-    "cost_usd": 0.0278355
+    "cost_usd": 0.0278355,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.129.1#4",
@@ -436,7 +460,8 @@
         "problem": "The detail drops the changelog's 'for its color-coded warnings' scope and says only that the reporter 'compares against the 64 MiB limit', so an assistant could think wrangler now enforces or fails on a 64 MiB limit, or that the output format changed; it should say only the colored size warning thresholds changed."
       }
     ],
-    "cost_usd": 0.034007499999999996
+    "cost_usd": 0.034007499999999996,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.130.0#3",
@@ -474,7 +499,8 @@
         "problem": "The sentence omits that this happens only when run by an AI agent and only for new static projects, and that delegated deploys go to Workers rather than Pages, so an assistant could wrongly expect all new Pages projects to be created as Workers or could be unaware that its own agent-run deploy now lands on Workers; the grammar ('Now delegate') is also broken."
       }
     ],
-    "cost_usd": 0.0227935
+    "cost_usd": 0.0227935,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.131.1#1",
@@ -488,7 +514,8 @@
         "problem": "The detail drops the quoted trigger \"or enables its Preview URLs\" and the changelog's limit that stable redeploys don't repeat the note, so it reads as if every deploy that adds a custom domain, and deploy generally, behaves differently; scope it to the cases the entry names."
       }
     ],
-    "cost_usd": 0.024799500000000002
+    "cost_usd": 0.024799500000000002,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.131.1#2",
@@ -502,7 +529,8 @@
         "problem": "The sentence 'changed what WRANGLER_OUTPUT_FILE_PATH does' implies the env var's behavior changed, when only the label text inside the output changed, and it never gives the old and new strings (e.g. '[enabled]' to '[production: enabled]'), so an assistant can't tell what to update in code that parses these labels."
       }
     ],
-    "cost_usd": 0.0289475
+    "cost_usd": 0.0289475,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.134.0#2",
@@ -516,7 +544,8 @@
         "problem": "The generated sentence 'changed what `wrangler preview` does' implies the command's behavior changed, but only a help-text label changed (the command still works the same); an assistant could write wrong code from this, so reword it to say only the help label changed."
       }
     ],
-    "cost_usd": 0.0283215
+    "cost_usd": 0.0283215,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.135.0#2",
@@ -534,7 +563,8 @@
         "problem": "The claim says Flagship bindings use the local Miniflare store, but the tests only call `unstable_getMiniflareWorkerOptions` and check that no remoteProxyConnectionString is set. They never exercise a running local store or the Vite plugin, so the claim should be narrowed to what the tests show (the binding is not routed to the remote proxy by default)."
       }
     ],
-    "cost_usd": 0.0328095
+    "cost_usd": 0.0328095,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.137.0#3",
@@ -556,7 +586,8 @@
         "problem": "The claim and the changelog quote cover the general trigger, quoted-identifier, comment and keyword handling, but the tests only reach one case (a PostgreSQL dollar-quote string with a semicolon) and do not show the state machine itself; narrow the claim to the tested behavior or add tests."
       }
     ],
-    "cost_usd": 0.029795500000000003
+    "cost_usd": 0.029795500000000003,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.138.0#3",
@@ -594,7 +625,8 @@
         "problem": "The sentence 'Format validation errors with prettifyError() so...' reads as an instruction to the assistant to use prettifyError(), and 'changed what prettifyError does' misleads it into thinking a callable wrangler API changed, which could lead to wrong code."
       }
     ],
-    "cost_usd": 0.021623499999999997
+    "cost_usd": 0.021623499999999997,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.141.0#4",
@@ -608,7 +640,8 @@
         "problem": "The lesson has no tests, so there is no evidence that the same code passes on 4.141.0 and fails on the previous release with only the expected symptom (missing stack and cause in debug output); a differential pair should be added."
       }
     ],
-    "cost_usd": 0.0232755
+    "cost_usd": 0.0232755,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.148.0#5",
@@ -630,7 +663,8 @@
         "problem": "The entry also changes the output of bulk secret commands, which now separates created from deleted secrets, and changes how `wrangler secret bulk` retries behave. Code that never uses null deletion may therefore behave differently, so `added` is not the right kind."
       }
     ],
-    "cost_usd": 0.0395195
+    "cost_usd": 0.0395195,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.148.0#9",
@@ -644,6 +678,7 @@
         "problem": "The claim says Text module 'patterns' (plural), but the test only checks for `declare module \"*.txt\"`. The claim should be limited to what the test shows (the `*.txt` declaration), or the test should check the other default patterns."
       }
     ],
-    "cost_usd": 0.032405500000000004
+    "cost_usd": 0.032405500000000004,
+    "model": "claude-sonnet-5-5"
   }
 ]

@@ -3,8 +3,8 @@ import { isLoss, questionPrompt } from "../src/bench.ts";
 import { githubRepo, splitEntries, tagCandidates, type Release } from "../src/collect.ts";
 import { changelogSection, previousVersion } from "../src/draft.ts";
 import { extractJson, pool } from "../src/llm.ts";
-import { parseFindings } from "../src/review.ts";
-import { isDuplicate, toSeedLesson } from "../src/steps.ts";
+import { parseFindings, reviseRoute } from "../src/review.ts";
+import { isDuplicate, reusableReview, toSeedLesson } from "../src/steps.ts";
 import { batches, draftOrder, parseVerdicts, triagePrompt, type Verdict } from "../src/triage.ts";
 
 const release = (body: string): Release => ({ version: "4.121.0", date: "2026-09-01T00:00:00Z", tag: "wrangler@4.121.0", url: "https://github.com/o/r/releases/tag/wrangler@4.121.0", body });
@@ -94,6 +94,33 @@ describe("duplicates of lessons on main", () => {
     expect(isDuplicate({ versions: ">=4.121.0", symbol: "DO_NOT_TRACK" }, main)).toBe("B");
     expect(isDuplicate({ versions: ">=0.24.0", symbol: "subAgent" }, main)).toBeUndefined();
     expect(isDuplicate({ versions: ">=0.23.0", symbol: "dynamicAgents" }, main)).toBeUndefined();
+  });
+});
+
+describe("revising", () => {
+  const f = (rule: string) => ({ rule, problem: "p" });
+  it("sends only local-check failures back in the check scope", () => {
+    expect(reviseRoute(["The detail uses words no source quote contains: x."], [], "check")).toBe("work");
+    expect(reviseRoute([], [f("1")], "check")).toBe("carry");
+  });
+
+  it("sends content findings (rules 1, 7, 8) to the content model and the rest to the drafting model, once", () => {
+    expect(reviseRoute([], [f("2"), f("8")], "findings")).toBe("content");
+    expect(reviseRoute([], [f("rule 7")], "findings")).toBe("content");
+    expect(reviseRoute([], [f("5"), f("2")], "findings")).toBe("work");
+    expect(reviseRoute(["No evidence names x"], [], "findings")).toBe("work");
+    expect(reviseRoute([], [], "findings")).toBe("carry");
+  });
+
+  it("keeps a review only for an unchanged draft reviewed by the same model without an error", () => {
+    const d = { symbol: "x", detail: "y" };
+    const prev = { entry: "1.0.0#1", findings: [f("1")], model: "claude-opus-5-5" };
+    expect(reusableReview({ ...d }, d, prev, "claude-opus-5-5")).toBe(prev);
+    expect(reusableReview({ ...d, detail: "z" }, d, prev, "claude-opus-5-5")).toBeUndefined();
+    expect(reusableReview(d, d, prev, "claude-sonnet-5-5")).toBeUndefined();
+    expect(reusableReview(d, d, { ...prev, model: undefined }, "claude-opus-5-5")).toBeUndefined();
+    expect(reusableReview(d, d, { ...prev, error: "limit" }, "claude-opus-5-5")).toBeUndefined();
+    expect(reusableReview(d, undefined, prev, "claude-opus-5-5")).toBeUndefined();
   });
 });
 

@@ -15,7 +15,8 @@
         "problem": "The generated sentence says agents 'changed what `@cloudflare/codemode` does' and that old code 'still runs, without an error', which is false for skills/browser users, and the detail drops the quote's instruction to install Codemode explicitly; restate it as a change to agents' dependency on Codemode and include the explicit-install requirement for `agents/skills` and `agents/browser`."
       }
     ],
-    "cost_usd": 0.067803
+    "cost_usd": 0.067803,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.21.0#3",
@@ -37,7 +38,8 @@
         "problem": "The entry gives a replacement (return screenshots as `{ type: \"browser_screenshot\", mediaType, data }` or store binary output elsewhere), but the lesson has no replacement field, so an assistant is not told how to keep image data reaching the model."
       }
     ],
-    "cost_usd": 0.078835
+    "cost_usd": 0.078835,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.21.0#8",
@@ -47,7 +49,8 @@
         "problem": "The lesson has no tests, so nothing shows a differential pair where the same observer-error-frame code passes on 0.21.0 and fails on the prior release with the change's own symptom; add a test that sends a plain-text error frame and asserts it does not become an assistant message, failing on 0.20.x only with that symptom."
       }
     ],
-    "cost_usd": 0.039943
+    "cost_usd": 0.039943,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.22.0#1",
@@ -73,7 +76,8 @@
         "problem": "The tests only call the internal helper `resolveChatRecoveryConfig` from the dist file and never configure `AIChatAgent` or `Think` with `chatRecovery: false`, so the claim about what user code 'receives' goes beyond what the tests show; either test through the public `chatRecovery` option or narrow the claim."
       }
     ],
-    "cost_usd": 0.07733900000000002
+    "cost_usd": 0.07733900000000002,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.22.0#2",
@@ -83,7 +87,8 @@
         "problem": "The detail claims the in-memory connection mode is removed and WebSockets always use the Hibernation API, but the tests only check that `hibernate` is absent from DEFAULT_AGENT_STATIC_OPTIONS and Agent.options; either narrow the claim to the removed static switch or add a test showing that an Agent with `static options = { hibernate: false }` still uses hibernatable WebSockets on 0.22.0."
       }
     ],
-    "cost_usd": 0.081903
+    "cost_usd": 0.081903,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.22.0#4",
@@ -105,7 +110,8 @@
         "problem": "The rendered sentence says agents 'changed what `Schedule` does' and calls the change harmless, which could lead an assistant to keep JSON.parse on payload or to edit Schedule-type usage; it should say that a scheduled callback's second argument is now a parsed Schedule whose payload is already an object, so code must stop parsing it."
       }
     ],
-    "cost_usd": 0.052091
+    "cost_usd": 0.052091,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.22.0#8",
@@ -131,7 +137,8 @@
         "problem": "Saying the release 'changed' the scope version implies it used to report the package version, which could lead someone to write migration or comparison code for a value that never existed; describe it as newly added telemetry whose scope version is the string \"1\"."
       }
     ],
-    "cost_usd": 0.049371000000000005
+    "cost_usd": 0.049371000000000005,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.23.0#1",
@@ -141,12 +148,14 @@
         "problem": "The replacement `this.dynamicAgents.get` is not stated by the quote, which only says `subAgent()` is `@deprecated` in place, and the test's `/@deprecated[^\\n]*dynamicAgents/` check never confirms `.get` as the substitute. Fix this by quoting the entry text or JSDoc that maps `subAgent` to `this.dynamicAgents.get`, and by tightening the test to require `dynamicAgents.get`."
       }
     ],
-    "cost_usd": 0.069395
+    "cost_usd": 0.069395,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.23.0#10",
     "findings": [],
-    "cost_usd": 0.061015
+    "cost_usd": 0.061015,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.23.0#18",
@@ -164,7 +173,8 @@
         "problem": "Read as written, \"changed the default from 1000 to 10000\" suggests the recovery budget became ten times more generous, when the changelog says it stays \"as generous as before\" because the unit changed, and it never warns that a hand-set maxRecoveryWork (for example 1000) now counts segments rather than chunks; state that the effective budget is roughly unchanged and that custom values need rescaling."
       }
     ],
-    "cost_usd": 0.062219000000000003
+    "cost_usd": 0.062219000000000003,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.24.0#2",
@@ -186,17 +196,20 @@
         "problem": "The sentence \"changed what `getCurrentAgent` does\" reads as a general change to `getCurrentAgent` in every context, and it drops the quote's note that the agent is still available, which could lead an assistant to stop using `getCurrentAgent` in request handlers or to avoid it for the agent; restate it as applying only inside queued callbacks, where `agent` is still returned but `connection` and `request` are not."
       }
     ],
-    "cost_usd": 0.059063000000000004
+    "cost_usd": 0.059063000000000004,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#11",
     "findings": [],
-    "cost_usd": 0.054907
+    "cost_usd": 0.054907,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#14",
     "findings": [],
-    "cost_usd": 0.066707
+    "cost_usd": 0.066707,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#17",
@@ -206,7 +219,8 @@
         "problem": "The claim says `useAgentChat` enters the `error` state, but both tests only drive `WebSocketChatTransport.sendMessages` and check for an error chunk mentioning \"closed mid-stream\", so the evidence never reaches the hook's state; either add a test that renders `useAgentChat` and observes `status === \"error\"`, or narrow the detail to say the transport stream now ends with an error chunk."
       }
     ],
-    "cost_usd": 0.060439
+    "cost_usd": 0.060439,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#18",
@@ -224,7 +238,8 @@
         "problem": "The generated sentence \"changed what `compaction` does\" implies that compaction itself (`addCompaction` or summarization) behaves differently. What actually changed is that `appendMessage` ignores echoed compaction overlays, so the sentence should name `appendMessage` and say it drops echoed compaction-summary messages."
       }
     ],
-    "cost_usd": 0.069595
+    "cost_usd": 0.069595,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#20",
@@ -246,7 +261,8 @@
         "problem": "The generated sentence 'changed what `broadcast` does' suggests broadcast's observable semantics changed for all callers, when the entry describes an internal reduction in root calls from sub-agents. Reword it to say only sub-agent broadcasts now batch into at most one root call and skip it when no client would receive them, so assistants don't rewrite working broadcast code."
       }
     ],
-    "cost_usd": 0.044047
+    "cost_usd": 0.044047,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#23",
@@ -256,7 +272,8 @@
         "problem": "The claim covers both cross-tab and resumed messages, but the tests only feed one observed (cross-tab broadcast) stream through the internal `agents/chat` `broadcastTransition` reducer and never exercise the resumed-stream path or `useAgentChat` itself; either narrow the detail to the observed cross-tab stream finishing with a server snapshot, or add a test for the resumed case."
       }
     ],
-    "cost_usd": 0.063871
+    "cost_usd": 0.063871,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#24",
@@ -270,7 +287,8 @@
         "problem": "The symbol is a bare `onToolCall`, but the entry scopes the change to `useAgentChat`'s `onToolCall` callback, so the symbol and sentence should name `useAgentChat` (for example `useAgentChat onToolCall`) so it isn't applied to other onToolCall hooks."
       }
     ],
-    "cost_usd": 0.042239
+    "cost_usd": 0.042239,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#26",
@@ -288,7 +306,8 @@
         "problem": "The detail says in general that tool outputs stay attached to the correct turn when a toolCallId is reused, but the test checks only one case: a later turn's pending part with a reused id does not take an earlier output. Narrow the claim to the tested scenario or add tests for the other cases."
       }
     ],
-    "cost_usd": 0.08038300000000001
+    "cost_usd": 0.08038300000000001,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#41",
@@ -298,7 +317,8 @@
         "problem": "The claim says oversized tool payloads in general are now recorded, but the tests only cover one oversized tool result (not arguments) that is an object with mediaType image/png and base64 data; other oversized payloads, such as large plain text, may still be dropped, so the detail should be narrowed to oversized tool results whose base64 media data is replaced by a summary placeholder."
       }
     ],
-    "cost_usd": 0.061119
+    "cost_usd": 0.061119,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.25.0#43",
@@ -308,7 +328,8 @@
         "problem": "The evidence has only a changelog quote and no differential test pair, so nothing shows that closing the sub-agent's direct client connections in `deleteSubAgent` passes on 0.25.0 and fails with that symptom on the release before; add a test that opens a direct client connection, calls `deleteSubAgent`, and asserts the connection is closed and a late message does not recreate the sub-agent, run on both releases."
       }
     ],
-    "cost_usd": 0.036046999999999996
+    "cost_usd": 0.036046999999999996,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.27.0#15",
@@ -322,12 +343,14 @@
         "problem": "The detail says the description 'covers the cdp API, common CDP mistakes, and the run time limit', which reads as a complete list, but the entry says it also explains how to take a smaller screenshot over the 1 MB result limit; mark the list as partial or add the screenshot guidance."
       }
     ],
-    "cost_usd": 0.041935
+    "cost_usd": 0.041935,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.27.0#18",
     "findings": [],
-    "cost_usd": 0.072419
+    "cost_usd": 0.072419,
+    "model": "claude-opus-5-5"
   },
   {
     "entry": "0.27.0#26",
@@ -345,6 +368,7 @@
         "problem": "The detail drops the quote's statement that Think sends the copy, so an assistant would read the recovery as general behavior with AIChatAgent as an odd exception, and could rely on it with an AIChatAgent server where the reply stays truncated; say plainly that the recovery works only with Think and that AIChatAgent clients still keep the partial reply."
       }
     ],
-    "cost_usd": 0.043739
+    "cost_usd": 0.043739,
+    "model": "claude-opus-5-5"
   }
 ]

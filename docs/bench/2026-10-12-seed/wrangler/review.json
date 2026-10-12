@@ -11,7 +11,8 @@
         "problem": "The claim covers all 'emails sent by workers via Wrangler', but the test only sends a plain-text email through getPlatformProxy and checks only the email-text file, so it does not reach other email forms or other Wrangler entry points such as wrangler dev; the claim should be narrowed to match, or the tests broadened."
       }
     ],
-    "cost_usd": 0.0362235
+    "cost_usd": 0.0362235,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.111.0#8",
@@ -29,7 +30,8 @@
         "problem": "'changed what `--force` does' is wrong: the flag's behavior is unchanged and only an informational notice is printed after success, so the opening sentence could lead an assistant to think the flag's semantics changed; reword it and state the agent-only condition."
       }
     ],
-    "cost_usd": 0.0338275
+    "cost_usd": 0.0338275,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.111.0#9",
@@ -51,7 +53,8 @@
         "problem": "The detail drops the quote's limit that a suggestion appears only 'within a reasonable edit distance', and says 'unknown command' although the quote also covers subcommands. The tests only exercise one typo, so the claim should include the edit-distance limit and stay scoped to what was tested."
       }
     ],
-    "cost_usd": 0.0297235
+    "cost_usd": 0.0297235,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.113.0#1",
@@ -77,7 +80,8 @@
         "problem": "\"changed what `addresses` does\" implies `addresses` had a prior effect, when it was previously ignored, and \"silent\" omits that deploys can now create, update or delete Email Routing rules and may prompt or fail; this could lead an assistant to write deploy code or CI config that wrongly assumes it is safe."
       }
     ],
-    "cost_usd": 0.0432715
+    "cost_usd": 0.0432715,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.113.0#4",
@@ -95,12 +99,14 @@
         "problem": "The generated sentence \"wrangler >=4.113.0 added `Queue` ... Older versions don't have it\" would lead an assistant to think Queue bindings don't exist in older wrangler, when only omitting the name is new; the symbol and detail should be fixed so it reads correctly."
       }
     ],
-    "cost_usd": 0.0341055
+    "cost_usd": 0.0341055,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.113.0#5",
     "findings": [],
-    "cost_usd": 0.0316955
+    "cost_usd": 0.0316955,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.113.0#8",
@@ -118,7 +124,8 @@
         "problem": "The sentence says Steps configured with 'sensitive output' and names only `sensitive`, never the required form `{ sensitive: \"output\" }` in the `step.do` config. An assistant could write `sensitive: true` or put the option in the wrong place. State the exact option and value, and that this applies to local dev."
       }
     ],
-    "cost_usd": 0.0399535
+    "cost_usd": 0.0399535,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.115.0#3",
@@ -132,7 +139,8 @@
         "problem": "An assistant reading 'waits for that duration instead of the default backoff' would assume any Retry-After value is honoured, and could write wrong code or expectations for rate-limit handling when the value exceeds 60s, where wrangler fails immediately and surfaces the value instead."
       }
     ],
-    "cost_usd": 0.0434195
+    "cost_usd": 0.0434195,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.116.0#1",
@@ -146,12 +154,14 @@
         "problem": "The changelog entry describes two changes: the Worker name is derived from the project, and the workers.dev subdomain is registered automatically. The lesson covers only the subdomain, and its quote includes the name-derivation clause. The test sets an explicit name in wrangler.json, so name derivation is never exercised. Split it into separate lessons, or narrow the quote to the subdomain fact."
       }
     ],
-    "cost_usd": 0.043249499999999996
+    "cost_usd": 0.043249499999999996,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.116.0#3",
     "findings": [],
-    "cost_usd": 0.0310295
+    "cost_usd": 0.0310295,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.118.0#2",
@@ -161,7 +171,8 @@
         "problem": "The claim says wrangler dev now captures request traces and console logs, but the tests only check that the env-var getter returns true when unset and that its value is passed as unsafeObservability to Miniflare; they never show that traces or logs are captured, so the claim should be narrowed to local observability being enabled by default (or the tests should exercise capture)."
       }
     ],
-    "cost_usd": 0.0306835
+    "cost_usd": 0.0306835,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.121.0#6",
@@ -171,12 +182,14 @@
         "problem": "The claim says telemetry is disabled \"regardless of other telemetry settings\", but the tests only run `wrangler telemetry status` with no other setting (WRANGLER_SEND_METRICS is deleted, the config is fresh), so that scope is never exercised. Either add a test where another setting (e.g. WRANGLER_SEND_METRICS=true or telemetry enabled in config) is overridden by DO_NOT_TRACK=1, or narrow the claim to what the tests show."
       }
     ],
-    "cost_usd": 0.0282735
+    "cost_usd": 0.0282735,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.121.0#7",
     "findings": [],
-    "cost_usd": 0.020177499999999998
+    "cost_usd": 0.020177499999999998,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.122.0#4",
@@ -206,7 +219,8 @@
         "problem": "An assistant reading 'changed what nodejs_compat does' could wrongly drop nodejs_compat from configs with earlier compatibility dates, or think explicit use is now invalid, when the flag is still needed before 2026-08-04 and the claim only concerns generated configs."
       }
     ],
-    "cost_usd": 0.0399955
+    "cost_usd": 0.0399955,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.123.0#3",
@@ -224,7 +238,8 @@
         "problem": "The entry's behavior change is that Wrangler now offers to update installed skills after eligible commands (checked monthly), but the lesson describes only the opt-out variable; the detail should state the new prompt behavior and name the variable as the way to suppress it."
       }
     ],
-    "cost_usd": 0.025315499999999998
+    "cost_usd": 0.025315499999999998,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.124.0#13",
@@ -238,7 +253,8 @@
         "problem": "\"changed what `nodejs_compat` does\" and the vague \"treats ... the same\" would lead an assistant to think runtime Node.js compat behavior changed. The actual fact is that, with date-enabled Node.js compat, generated runtime types no longer declare conflicting `any` globals and Node.js globals come from `@types/node`; the lesson should say that."
       }
     ],
-    "cost_usd": 0.0243155
+    "cost_usd": 0.0243155,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.124.0#14",
@@ -256,7 +272,8 @@
         "problem": "The claim never says the FedRAMP registry is selected only when the value is the FedRAMP High region (`fedramp_high`). It also omits that the `compliance_region` config key triggers the same behavior. An assistant could read it as any value of `CLOUDFLARE_COMPLIANCE_REGION` switching registries. State the `fedramp_high` condition and mention the config key."
       }
     ],
-    "cost_usd": 0.0400315
+    "cost_usd": 0.0400315,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.125.0#3",
@@ -278,7 +295,8 @@
         "problem": "'Creates the parent Worker automatically' could lead an assistant to assume `wrangler preview` is generally available and never prompts, so it might skip deploying the Worker first or omit confirmation handling in interactive use. Reword to say Wrangler offers to create an empty parent Worker (private beta)."
       }
     ],
-    "cost_usd": 0.0239055
+    "cost_usd": 0.0239055,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#14",
@@ -296,7 +314,8 @@
         "problem": "\"changed what `skills` does\" reads as if a `skills` command or API changed behavior, which could lead an assistant to write or avoid code around a nonexistent `skills` feature; it should say that wrangler no longer prompts new users to install Cloudflare skills after commands, while still offering updates to previously installed skills."
       }
     ],
-    "cost_usd": 0.023239500000000003
+    "cost_usd": 0.023239500000000003,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#2",
@@ -314,7 +333,8 @@
         "problem": "The generated sentence says wrangler \"changed what `events` does\", but `events` is new and had no earlier behavior, and the bare symbol never says it is a property of the email() result, so an assistant could misread it as an existing API that was altered."
       }
     ],
-    "cost_usd": 0.0248615
+    "cost_usd": 0.0248615,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#4",
@@ -348,7 +368,8 @@
         "problem": "signal silent is asserted without evidence that older code runs unchanged; the claim that nothing fails is unverified, and the 'silent' wording is meaningless for an additive privilege change with no old-code failure."
       }
     ],
-    "cost_usd": 0.0205775
+    "cost_usd": 0.0205775,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.126.0#6",
@@ -362,7 +383,8 @@
         "problem": "The pair checks only for a helper function in the bundled cli.js source. The old run fails with 'no pull request detection', which is not the change's own symptom of the URL missing from the command output. The tests should run `wrangler preview` and fail on the missing URL line."
       }
     ],
-    "cost_usd": 0.0284755
+    "cost_usd": 0.0284755,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.130.0#2",
@@ -376,7 +398,8 @@
         "problem": "'Silent: code written for older versions still runs, without an error' is not shown by the tests, which only check that 'Delegating to' is printed. Delegation also replaces the Pages project creation with a Workers deploy, so the old code does not do the same thing; the tests would need to show the command completes without error, and the detail should say what it now does instead."
       }
     ],
-    "cost_usd": 0.0352055
+    "cost_usd": 0.0352055,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.131.1#4",
@@ -394,7 +417,8 @@
         "problem": "The generated sentence \"changed what `custom domain` does\" never says what changed (a replacement prompt is no longer shown for a domain already on the same Worker, while the prompt remains for domains on another Worker), so an assistant cannot tell what behavior to expect and may write wrong code."
       }
     ],
-    "cost_usd": 0.021665499999999997
+    "cost_usd": 0.021665499999999997,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.133.0#2",
@@ -416,7 +440,8 @@
         "problem": "signal 'silent' is asserted for CLI onboarding behavior with no code or test showing older-version code still runs without error; it should be backed by a run, or the lesson should not claim code-compat."
       }
     ],
-    "cost_usd": 0.0254335
+    "cost_usd": 0.0254335,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.134.0#2",
@@ -430,7 +455,8 @@
         "problem": "The generated sentence 'changed what `wrangler preview` does' suggests the command's functionality changed, when only the beta label in help text changed; an assistant could wrongly alter its code or advice, so the lesson should say it only changes the label text."
       }
     ],
-    "cost_usd": 0.0250475
+    "cost_usd": 0.0250475,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.136.2#4",
@@ -452,7 +478,8 @@
         "problem": "The claim is about \"Container image listings\" in general, but the tests only run the extracted `listImages2` helper in JSON mode with `digests=false`, using a regexp the test itself defines, so the scope is wider than the evidence."
       }
     ],
-    "cost_usd": 0.0342675
+    "cost_usd": 0.0342675,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.136.3#2",
@@ -478,7 +505,8 @@
         "problem": "The quote is the changelog headline ('Warn when ...') rather than a statement of the new behavior as a fact, and it gives no detail on what the warning says or when it is triggered."
       }
     ],
-    "cost_usd": 0.0187895
+    "cost_usd": 0.0187895,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.141.0#4",
@@ -492,7 +520,8 @@
         "problem": "The tests don't exercise the claimed behaviour: they call the internal `unstable_DevEnv.handleErrorEvent` with a synthetic error and set `WRANGLER_LOG=debug` instead of passing `--log-level debug` to a `wrangler dev` run with a really failing proxied request, so the differential pair doesn't show the stated change on the stated symbol."
       }
     ],
-    "cost_usd": 0.0290615
+    "cost_usd": 0.0290615,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.145.0#2",
@@ -510,7 +539,8 @@
         "problem": "The generated sentence 'code written for older versions still runs, without an error' could lead an assistant to leave `WRANGLER_R2_SQL_AUTH_TOKEN` in place and expect it to work. It also omits that `CLOUDFLARE_API_TOKEN` remains a fallback, so the real effect depends on whether that variable is set."
       }
     ],
-    "cost_usd": 0.0346295
+    "cost_usd": 0.0346295,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.148.0#12",
@@ -520,7 +550,8 @@
         "problem": "The sentence says only that `--temporary` 'changed what it does' and that old code 'still runs', and omits the action: scripts that read the claim URL or notices from stdout now get nothing and must read stderr, so an assistant could keep writing stdout-parsing code; state this in the detail."
       }
     ],
-    "cost_usd": 0.0306995
+    "cost_usd": 0.0306995,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.148.0#5",
@@ -550,7 +581,8 @@
         "problem": "The lesson bundles two changes: `null` deletes a secret, and the output distinguishes created from deleted. These should be separate lessons, each with its own evidence."
       }
     ],
-    "cost_usd": 0.0319355
+    "cost_usd": 0.0319355,
+    "model": "claude-sonnet-5-5"
   },
   {
     "entry": "4.148.0#9",
@@ -560,6 +592,7 @@
         "problem": "The claim covers Text, Data, and WebAssembly module patterns, but the test only checks for `declare module \"*.txt\"`, so Data and WebAssembly are untested; either add checks for those patterns (e.g. `*.bin`, `*.wasm`) or narrow the claim to the Text pattern."
       }
     ],
-    "cost_usd": 0.0271215
+    "cost_usd": 0.0271215,
+    "model": "claude-sonnet-5-5"
   }
 ]

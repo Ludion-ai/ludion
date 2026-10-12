@@ -10,7 +10,7 @@
   "kind": "behavior",
   "symbol": "deploy",
   "signal": "silent",
-  "detail": "The deploy output now reads The following bindings need to be provisioned: and drops the Experimental: prefix from the resource provisioning header.",
+  "detail": "Now that automatic provisioning is generally available, the provisioning header drops Experimental: and reads The following bindings need to be provisioned:",
   "evidence": [
     {
       "test": {

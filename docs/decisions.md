@@ -12,6 +12,15 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - **Shown only to its teacher**: sync writes it in their own projects as "Taught by you (in your ledger, not public); unverified, yours only." (with ", drafted by an agent" for `--drafted-by-agent`). It never enters the index: the schema needs at least one piece of evidence, so `verify` refuses it.
 - **`--public` still needs evidence**: with no evidence, `teach --public` stops before calling `gh` and says to add a test or a source. `ludion_teach` accepts such a draft too, returns the command with `"evidence": []`, and says it stays unverified in the user's ledger.
 
+### 2026-10-12: Draft consent sentence for `teach --public` (waiting for the owner)
+
+The license of lessons is the owner's decision (today: CC BY-SA 4.0, `LICENSE-LESSONS`; CC BY 4.0 has been proposed, because `sync` writes lessons into private repositories). Nothing here changes it. When the owner decides, `ludion teach --public` would show this sentence before its confirmation prompt and put it in the PR body, with `<LICENSE>` filled in:
+
+> I taught this lesson and I can share it. I license it under <LICENSE>. I agree that Ludion may publish it on ludion.ai, in its index and feeds, and in the files `ludion sync` writes into projects, and that anyone may use it under that license, including to train or evaluate AI models, with credit to my GitHub account.
+
+- Why each part: "I can share it" because a quote or test may come from somewhere else; the feed and `sync` are how every lesson is used; training and evaluation are named because a lesson is made to be read by models, and a teacher should not learn that afterwards.
+- Not decided here: whether the sentence is a checkbox in a PR template (`.github/`, protected) or only the CLI's prompt; CI can't verify a checkbox was read, while the CLI prompt already needs a person at a terminal.
+
 ### 2026-10-12: Partial coverage, said everywhere
 
 - **Every list of lessons says coverage is partial.** `.ludion/lessons.md` (after the data line) and `ludion_ask` (the line after its data line, and inside the no-match text) say: "Ludion holds some changes of some packages, not all of them. No lesson for something is no evidence that it didn't change: check primary sources too (changelogs, release notes, the installed package's code)." The text lives in `packages/core` (`COVERAGE_LINE`), so both say the same words. Why: a lessons file that reads as complete invites "nothing listed, so nothing changed", and Done 3 showed uncovered changes don't improve (8/15 → 8/15).

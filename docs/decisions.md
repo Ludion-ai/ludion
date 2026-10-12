@@ -12,6 +12,15 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - **Shown only to its teacher**: sync writes it in their own projects as "Taught by you (in your ledger, not public); unverified, yours only." (with ", drafted by an agent" for `--drafted-by-agent`). It never enters the index: the schema needs at least one piece of evidence, so `verify` refuses it.
 - **`--public` still needs evidence**: with no evidence, `teach --public` stops before calling `gh` and says to add a test or a source. `ludion_teach` accepts such a draft too, returns the command with `"evidence": []`, and says it stays unverified in the user's ledger.
 
+### 2026-10-12: Being found (sitemap, llms.txt, robots.txt)
+
+- **Checked on production before this**: `/llms.txt` and `/sitemap.xml` answered 404, and `/robots.txt` held only Cloudflare's managed content-signal comments (no directives, no sitemap). Lesson pages already had a title (the claim), a meta description, and a canonical link.
+- **`/sitemap.xml`** (built with the site): home, `/start/`, `/models/`, `/lessons/`, every subject page, every lesson page (active, replaced, and tombstones, with `lastmod` from `verified_at` or the retraction date), and every teacher page at its canonical `/@login`.
+- **`/llms.txt`** (llmstxt.org): what Ludion is, that lessons are data, the partial-coverage sentence, where the data is (`/start/`, `/index.json`, the shards, `/models/`), and every active lesson by subject as a link with its generated claim, teacher, "drafted by an agent" where it applies, and how it was verified. Only generated claims go in (square brackets stripped so a claim can't break the link).
+- **`/robots.txt`** in `apps/site/public`: allow all, and name the sitemap. Cloudflare's managed robots.txt, if on for the zone, adds its own lines to it.
+- `llms.txt`, `sitemap.xml`, and `robots.txt` joined `RESERVED_SUBJECTS`: a subject with one of those names would build a folder where the file must be.
+- Not done: structured data (JSON-LD) on lesson pages. Nothing measured says it matters yet.
+
 ### 2026-10-12: Partial coverage, said everywhere
 
 - **Every list of lessons says coverage is partial.** `.ludion/lessons.md` (after the data line) and `ludion_ask` (the line after its data line, and inside the no-match text) say: "Ludion holds some changes of some packages, not all of them. No lesson for something is no evidence that it didn't change: check primary sources too (changelogs, release notes, the installed package's code)." The text lives in `packages/core` (`COVERAGE_LINE`), so both say the same words. Why: a lessons file that reads as complete invites "nothing listed, so nothing changed", and Done 3 showed uncovered changes don't improve (8/15 → 8/15).

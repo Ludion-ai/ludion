@@ -10,7 +10,7 @@ import { isV1 } from "./types.ts";
  * Names a subject can't take: top-level paths of the site and the Worker (a subject gets a page at /<subject>/), files at
  * the site's root, and `subjects`, whose shard would be /index/subjects.json.
  */
-export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "404", "index.json", "index.html", "404.html", "subjects"]);
+export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "404", "index.json", "index.html", "404.html", "subjects", "llms.txt", "sitemap.xml", "robots.txt"]);
 
 /** The directory for a package: npm @scope/name → scope.name; anything else lowercased as is. */
 export function subjectFor(pkg: LessonV1["package"]): string {
@@ -126,6 +126,7 @@ export function fieldProblems(l: LessonV1): string[] {
   if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions) || /<\s*[A-Za-z]/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
   return problems;
 }
+
 /** A draft with no evidence: no `evidence` key, or an empty list. Anything else is checked as evidence. */
 export function hasNoEvidence(draft: { evidence?: unknown }): boolean {
   return draft.evidence === undefined || (Array.isArray(draft.evidence) && draft.evidence.length === 0);

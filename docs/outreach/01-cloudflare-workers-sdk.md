@@ -9,7 +9,7 @@ I run Ludion (https://ludion.ai), which tells AI coding assistants what changed 
 We measured how current models do on recent changes in both, and I thought you would want to see it.
 
 - With no tools, Claude Haiku, Sonnet and Opus 5.5 got 3 to 5 of 45 recent changes right per trial (wrangler 4.111 to 4.148, Agents SDK 0.19 to 0.27, and vitest 5.0).
-- Claude Code with its default tools, web search included, in a project with the new versions installed, got 24 of 45 right. With Ludion's lessons for the installed versions written into the project, it got 36 of 45. The whole gain was on changes a lesson covered.
+- Claude Code with its read-only tools (read, search, web search and fetch, and a few fixed commands such as `npm ls`), in a project with the new versions installed, got 24 of 45 right. With Ludion's lessons for the installed versions written into the project, it got 36 of 45. The whole gain was on changes a lesson covered.
 - The attached table lists the changes that make no noise: code written for the older version still runs, and does something different. Claude Code in the project got 5 of 11 such wrangler changes and 3 of 6 such Agents SDK changes wrong or didn't answer.
 
 Every number comes from files in https://github.com/Ludion-ai/ludion/tree/main/docs/bench (questions, answer keys checked against your changelogs and source, raw logs, and grades).

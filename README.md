@@ -8,7 +8,7 @@ A model learns once; software keeps changing. A change that makes noise (an erro
 npx ludion-ai sync
 ```
 
-`sync` reads the lockfile, fetches the lessons for the installed versions from <https://ludion.ai>, and writes `.ludion/lessons.md`, imported from `CLAUDE.md` (and named in `AGENTS.md` and a Cursor rule when the project has them). In Claude Code, the plugin runs it at the start of every session and adds the MCP server (`ludion_ask`):
+`sync` reads the lockfile, fetches the lessons for the installed versions from <https://ludion.ai>, and writes `.ludion/lessons.md`, imported from `CLAUDE.md` (and named in `AGENTS.md`, and written into a Cursor rule, when the project has them). In Claude Code, the plugin runs it at the start of every session and adds the MCP server (`ludion_ask`):
 
 ```
 /plugin marketplace add Ludion-ai/ludion
@@ -21,7 +21,7 @@ An 89-second replay of recorded runs is in [`docs/demo/sync-vitest.cast`](docs/d
 
 All numbers below come from runs whose files are in [`docs/bench/`](docs/bench/).
 
-**With vs without `ludion sync`** (2026-10-11, [`docs/bench/2026-10-11-done3/`](docs/bench/2026-10-11-done3/)). Claude Code (`claude-opus-5-5`) with its default tools, web search included, in projects with the new versions installed, answering 45 questions about changes in vitest 5.0, wrangler 4.111 to 4.148, and the Cloudflare Agents SDK 0.19 to 0.27. An opus judge graded each answer against an answer key checked against primary sources. The lessons were the 31 seeds frozen at commit `7d61ed1`, covering 30 of the 45 changes.
+**With vs without `ludion sync`** (2026-10-11, [`docs/bench/2026-10-11-done3/`](docs/bench/2026-10-11-done3/)). Claude Code (`claude-opus-5-5`) with its read-only tools (read, search, web search and fetch, and a few fixed commands such as `npm ls`), in projects with the new versions installed, answering 45 questions about changes in vitest 5.0, wrangler 4.111 to 4.148, and the Cloudflare Agents SDK 0.19 to 0.27. An opus judge graded each answer against an answer key checked against primary sources. The lessons were the 31 seeds frozen at commit `7d61ed1`, covering 30 of the 45 changes.
 
 | | without sync | with sync |
 | - | - | - |
@@ -31,13 +31,13 @@ All numbers below come from runs whose files are in [`docs/bench/`](docs/bench/)
 
 The whole gain came from changes a lesson covers; the others didn't move. One trial per question per condition. The coding-task half of this check (C tasks) is still being run, one batch a day.
 
-**A correction that survives** (2026-10-11, [`docs/bench/2026-10-11-done1/`](docs/bench/2026-10-11-done1/)). A vitest 5 lesson taught in one project reached another through `ludion sync`. Claude Code then did the task right 5 times out of 5, against 1 out of 5 before.
+**A correction that survives** (2026-10-11, [`docs/bench/2026-10-11-done1/`](docs/bench/2026-10-11-done1/)). A vitest 5 lesson taught in one project reached another through `ludion sync`. Claude Code then did the task right 5 times out of 5, against 1 out of 5 before (one task, and the agent had no shell).
 
 **What models know without tools** (2026-10-11, [`docs/bench/2026-10-11-models/`](docs/bench/2026-10-11-models/)). Claude Haiku, Sonnet, and Opus 5.5 each answered the same 45 changes twice with no tools: 3 to 5 right out of 45 per trial.
 
 ## What it holds today
 
-Lessons for vitest, wrangler, and the Cloudflare Agents SDK (the live list is on <https://ludion.ai>, and `/index/subjects.json` has the counts), plus one example lesson for Python. Every lesson but the example was drafted by an agent, is labeled "drafted by an agent" wherever it appears, and is signed by the GitHub account that opened its pull request.
+Lessons for vitest, wrangler, and the Cloudflare Agents SDK (the live list is on <https://ludion.ai>, and `/index/subjects.json` has the counts of the format 1 lessons), plus one example lesson for Python. Every lesson but the example was drafted by an agent, is labeled "drafted by an agent" wherever it appears, and is signed by the GitHub account that opened its pull request.
 
 Ludion holds some changes of some packages: a missing lesson is no evidence that nothing changed. `ludion-ai` 0.1.3 and later `sync` name the direct dependencies Ludion has no lessons for, and say where to ask for them.
 

@@ -60,7 +60,7 @@ const print = (text: string, perLine = 0.12) => {
 
 comment("Replay of recorded runs (docs/bench/2026-10-11-done3, question vitest-5-0-0-14-b): Claude Code with its default tools, in a project with vitest 5.0.3 installed.");
 type("grep vitest package.json");
-print('  "devDependencies": { "vitest": "5.0.3", "@vitest/browser-playwright": "5.0.3", "playwright": "1.64.0" }');
+print(readFileSync(join(here, "deps-output.txt"), "utf8").trimEnd());
 comment("Without Ludion:");
 type(`claude -p "${question}"`);
 t += 3;
@@ -83,10 +83,10 @@ type("npx ludion-ai teach draft.json");
 t += 1;
 print(readFileSync(join(here, "teach-output.txt"), "utf8").trimEnd(), 0.28);
 comment("Docker isn't installed on that machine, so the tests did not run there (the line above says so); CI runs them for a public lesson. The lesson is in the personal ledger now. Another project, with vitest 4.0.0 installed:");
-type("cd ../billing-service && npx ludion-ai sync");
+type("cd ../demo-project-b && npx ludion-ai sync");
 t += 1.5;
 print(readFileSync(join(here, "sync2-output.txt"), "utf8").trimEnd());
-type("grep restoreAllMocks .ludion/lessons.md");
+type("grep -A1 restoreAllMocks .ludion/lessons.md");
 print(readFileSync(join(here, "grep2-output.txt"), "utf8").trimEnd(), 0.2);
 comment("With --public, teach opens a pull request from your own GitHub account instead of stopping at the ledger (not shown here).");
 t += 3;

@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4R9CXC9WC30HGKMKW2DF1RX",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "default",
+  "symbol": "browser.locators.exact",
+  "signal": "loud",
+  "detail": "Locators match text exactly by default, requiring a full, case-sensitive match; individual locator calls can override this default via their own exact option.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/locexact\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(dir + \"/probe.mjs\", [\n  \"import { createVitest } from 'vitest/node'\",\n  \"const vitest = await createVitest('test', { root: '/w/locexact', config: false, watch: false })\",\n  \"const exact = vitest.config.browser.locators.exact\",\n  \"await vitest.close()\",\n  \"console.log('RESULT:' + JSON.stringify(exact))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [dir + \"/probe.mjs\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst m = out.match(/RESULT:(\\S+)/);\nif (!m) {\n  console.error(\"ERROR: probe printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst exact = JSON.parse(m[1]);\nif (exact === true) {\n  console.log(\"PASS: browser.locators.exact resolves to true when unset\");\n  process.exit(0);\n}\nif (exact === false) {\n  console.error(\"FAIL: browser.locators.exact resolves to false when unset\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected browser.locators.exact value \" + m[1]);\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/locexact\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(dir + \"/probe.mjs\", [\n  \"import { createVitest } from 'vitest/node'\",\n  \"const vitest = await createVitest('test', { root: '/w/locexact', config: false, watch: false })\",\n  \"const exact = vitest.config.browser.locators.exact\",\n  \"await vitest.close()\",\n  \"console.log('RESULT:' + JSON.stringify(exact))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [dir + \"/probe.mjs\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst m = out.match(/RESULT:(\\S+)/);\nif (!m) {\n  console.error(\"ERROR: probe printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst exact = JSON.parse(m[1]);\nif (exact === true) {\n  console.log(\"PASS: browser.locators.exact resolves to true when unset\");\n  process.exit(0);\n}\nif (exact === false) {\n  console.error(\"FAIL: browser.locators.exact resolves to false when unset\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected browser.locators.exact value \" + m[1]);\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: browser.locators.exact resolves to false when unset"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/browser/locators.md",
+        "quote": "## browser.locators.exact\n\n- **Type:** `boolean`\n- **Default:** `true`\n\nWhen set to `true`, [locators](/api/browser/locators) match text exactly by default, requiring a full, case-sensitive match. Individual locator calls can override this default via their own `exact` option."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T14:48:49Z"
+}

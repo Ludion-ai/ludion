@@ -18,12 +18,10 @@ for (const [name, text] of Object.entries(input.immutable)) {
   assert.equal(input.files[name], text, `${name} must remain unchanged for this focused task`);
 }
 const observations = [];
-const env = { ...process.env, PATH: `/w/node_modules/.bin:${process.env.PATH}`, CI: 'true', NO_COLOR: '1' };
-function execute(label, script) {
+const env = { ...process.env, CI: 'true', NO_COLOR: '1' };
+function execute(label, args = ['run', 'src/convert.test.js']) {
   const output = `/tmp/report-${observations.length}.json`;
-  const result = script
-    ? spawnSync('npm', ['run', script, '--', '--reporter=json', `--outputFile=${output}`, '--maxWorkers=1'], { cwd: root, env, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024 })
-    : spawnSync(process.execPath, ['/w/node_modules/vitest/vitest.mjs', 'run', 'src/convert.test.js', '--reporter=json', `--outputFile=${output}`, '--maxWorkers=1'], { cwd: root, env, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024 });
+  const result = spawnSync(process.execPath, ['/w/node_modules/vitest/vitest.mjs', ...args, '--reporter=json', `--outputFile=${output}`, '--maxWorkers=1'], { cwd: root, env, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024 });
   if (result.error) { console.error(`${label}: subprocess error: ${result.error.message}`); process.exit(2); }
   assert.ok(fs.existsSync(output), `${label}: no Vitest JSON report; ${result.stderr.slice(-1000)}`);
   const report = JSON.parse(fs.readFileSync(output, 'utf8'));
@@ -35,10 +33,14 @@ function execute(label, script) {
   return { status: result.status, passed, failed };
 }
 if (input.id === 'vitest-5-0-0-13-c') {
+  assert.ok(!Object.keys(input.files).some((name) => /(^|\/)(?:vite|vitest)\..*config\./.test(name)), 'Added configuration is unsupported for checkout selection');
+  const pkg = JSON.parse(input.files['package.json']);
+  assert.ok(!pkg.scripts['pretest:checkout'] && !pkg.scripts['posttest:checkout'], 'Checkout lifecycle hooks are unsupported');
+  const args = checkoutArgs(pkg.scripts['test:checkout']);
   const tests = path.join(root, 'src/cart.test.js');
   // The prompt explicitly requires selecting tests added to this suite later, and excluding wishlist's suite.
   fs.appendFileSync(tests, `\ndescribe('cart', () => { describe('checkout', () => { test('handles a future checkout case', () => { expect(checkout({ items: [{price: 4, qty: 2}] }).charged).toBe(8); }); }); });\n`);
-  const result = execute('checkout selection including a future case', 'test:checkout');
+  const result = execute('checkout selection including a future case', args);
   assert.equal(result.status, 0);
   assert.deepEqual(result.failed, []);
   assert.deepEqual(result.passed, [

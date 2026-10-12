@@ -46,8 +46,10 @@ async function main() {
     const correct = { ...baseline, ...task.examples.correct[0] };
     if (id.endsWith("13-c")) {
       const pkg = JSON.parse(correct["package.json"]!);
-      pkg.scripts["test:checkout"] += " --exclude=src/** --passWithNoTests";
+      pkg.scripts["test:checkout"] = pkg.scripts["test:checkout"].replace("cart > checkout", "cart > checkoutNEVER");
       await evaluate(id, "matching flags but zero executed tests", { ...correct, "package.json": JSON.stringify(pkg) }, "failed");
+      pkg.scripts["test:checkout"] += '; node -e "process.exit(0)"';
+      await evaluate(id, "extra shell command rejected before execution", { ...correct, "package.json": JSON.stringify(pkg) }, "failed");
     } else {
       const tests = correct["src/convert.test.js"]!;
       await evaluate(id, "skipped rejection test", { ...correct, "src/convert.test.js": tests.replace("test('rejects when the rates are unavailable'", "test.skip('rejects when the rates are unavailable'") }, "failed");

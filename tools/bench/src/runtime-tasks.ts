@@ -3,6 +3,7 @@
 import { lstatSync, readFileSync, readdirSync } from "node:fs";
 import { extname, join } from "node:path";
 import { runInDocker, type RunFn, type RunSpec } from "../../verify/src/docker.ts";
+import { checkoutArgs } from "./checkout-command.ts";
 
 export const RUNTIME_TASKS = ["vitest-5-0-0-13-c", "vitest-5-0-0-16-c"] as const;
 export type RuntimeTaskId = typeof RUNTIME_TASKS[number];
@@ -56,7 +57,7 @@ export function runtimeSpec(id: RuntimeTaskId, files: ProjectFiles, immutable: P
   return {
     runtime: "node@24",
     packages: { vitest: "5.0.3", vite: "7.3.1" },
-    code: `const input = ${JSON.stringify({ id, files, immutable })};\n${probe}`,
+    code: `const input = ${JSON.stringify({ id, files, immutable })};\nconst checkoutArgs = ${checkoutArgs.toString()};\n${probe}`,
   };
 }
 
@@ -68,7 +69,7 @@ export async function gradeRuntime(id: string, files: ProjectFiles, immutable: P
   const result = await run(spec);
   if (result.kind === "error") return { verdict: "error", why: result.reason };
   if (result.timedOut || result.exitCode === null) return { verdict: "error", why: "Sandbox execution did not finish; it was not scored." };
-  if (result.exitCode === 2) return { verdict: "error", why: "Sandbox subprocess could not finish; it was not scored." };
+  if ([2, 125, 126, 127].includes(result.exitCode)) return { verdict: "error", why: "Sandbox harness could not start or finish; it was not scored." };
   if (result.exitCode !== 0) return { verdict: "failed", why: (result.stderr || result.stdout).trim().slice(-2000) || "Runtime acceptance failed." };
   const line = result.stdout.split("\n").find((line) => line.startsWith("LUDION_ACCEPTANCE="));
   try {

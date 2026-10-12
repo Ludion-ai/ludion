@@ -99,6 +99,17 @@ describe("project condition", () => {
     expect(rw[rw.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
   });
 
+  it("gives the seed pipeline's drafting agents files only: no shell, no web, edits only inside their folder, no system reads", () => {
+    const args = claudeArgs({ ...base, condition: "files", project: "/x" });
+    expect(args[args.indexOf("--tools") + 1]).toBe("Read,Glob,Grep,Edit,Write");
+    // Edit and Write aren't allowed outright (that would allow any path); acceptEdits takes them inside the working folder.
+    expect(args[args.indexOf("--allowedTools") + 1]).toBe("Read,Glob,Grep");
+    expect(args[args.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
+    expect(args[args.indexOf("--disallowedTools") + 1]).toContain("Read(//proc/**)");
+    expect(args.join(" ")).not.toMatch(/Bash|WebFetch|WebSearch/);
+    expect(args).not.toContain("--mcp-config");
+  });
+
   it("keeps the prompt off the command line (it goes to stdin), so a long judge prompt can't exceed Windows' limit", () => {
     const args = claudeArgs({ model: "opus", maxTurns: 1, maxBudgetUsd: 1, condition: "none" });
     expect(args.slice(0, 2)).toEqual(["-p", "--output-format"]);

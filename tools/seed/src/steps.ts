@@ -97,7 +97,8 @@ export function drafts(dir: string, round = 0): DraftRecord[] {
 
 /** A draft as the lesson it would become: id, subject, author, and time are set here, never by the draft. */
 export function toSeedLesson(d: Record<string, unknown>, now: Date, id = newId(now.getTime())): LessonV1 {
-  const { id: _i, author: _a, author_id: _ai, created_at: _c, format: _f, subject: _s, ...fields } = d;
+  // An agent draft can't choose its own id, author, time, subject, or `replaces` (which would retract a lesson on main).
+  const { id: _i, author: _a, author_id: _ai, created_at: _c, format: _f, subject: _s, replaces: _r, ...fields } = d;
   const lesson = {
     format: 1,
     id,

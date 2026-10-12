@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 /** none: no tools. web: web search and fetch. ludion: web plus Ludion's MCP. project: Claude Code's default tools in a copy of a project with the packages installed. */
-export type Condition = "none" | "web" | "ludion" | "project";
+export type Condition = "none" | "web" | "ludion" | "project" | "files";
 
 export interface AgentRun {
   condition: Condition;
@@ -70,12 +70,22 @@ export function runEnv(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv 
 const WEB_TOOLS = ["WebSearch", "WebFetch"];
 
 /**
+ * The files condition (the seed pipeline's drafting agents, which read untrusted release notes, pull requests, and
+ * package code): read, search, and edit files in the working folder, and nothing else. No shell, no web, no MCP. Reads
+ * of the process's own environment and of system folders are denied, because in CI the run's environment holds the API key.
+ */
+export const FILE_TOOLS = ["Read", "Glob", "Grep", "Edit", "Write"];
+export const FILE_READ = ["Read", "Glob", "Grep"];
+export const FILE_DENY = ["Read(//proc/**)", "Read(//sys/**)", "Read(//etc/**)", "Read(//run/**)", "Read(//dev/**)"];
+
+/**
  * The command-line arguments for one condition. Exported for tests. The prompt goes to stdin, not here: a judge
  * prompt carries a whole answer, and Windows refuses command lines over 32,767 characters (spawn ENAMETOOLONG).
  */
 export function claudeArgs(o: RunOptions, mcpConfigPath?: string): string[] {
-  const tools = o.condition === "none" ? [] : o.condition === "project" ? ["default"] : WEB_TOOLS;
-  const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : o.condition === "project" ? projectTools(o.allowEdits === true) : tools;
+  const tools = o.condition === "none" ? [] : o.condition === "project" ? ["default"] : o.condition === "files" ? FILE_TOOLS : WEB_TOOLS;
+  // files: edits aren't in the allow list, so they are accepted only inside the working folder (acceptEdits), never outside.
+  const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : o.condition === "project" ? projectTools(o.allowEdits === true) : o.condition === "files" ? FILE_READ : tools;
   const args = [
     "-p",
     "--output-format", "stream-json", "--verbose",
@@ -89,7 +99,8 @@ export function claudeArgs(o: RunOptions, mcpConfigPath?: string): string[] {
     "--tools", tools.length ? tools.join(",") : "",
   ];
   if (allowed.length) args.push("--allowedTools", allowed.join(","));
-  if (o.condition === "project" && o.allowEdits) args.push("--permission-mode", "acceptEdits");
+  if ((o.condition === "project" && o.allowEdits) || o.condition === "files") args.push("--permission-mode", "acceptEdits");
+  if (o.condition === "files") args.push("--disallowedTools", FILE_DENY.join(","));
   if (mcpConfigPath) args.push("--mcp-config", mcpConfigPath);
   if (o.appendSystemPrompt) args.push("--append-system-prompt", o.appendSystemPrompt);
   return args;

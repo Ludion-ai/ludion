@@ -40,11 +40,17 @@ The list (status in brackets):
 
 Heavy work one job at a time; Opus only for the review of protected PRs (one round); pipeline work on Sonnet; no per-lesson model FreshBench; no daily C batches; big files read through summaries; this file updated after each work item.
 
+### Open PRs and what waits for whom (2026-10-12, later)
+
+- **Owner's merge (protected, each with its review comment):** #62 (6 agents lessons, CI green), #75 (5 vitest lessons) and #76 (3 wrangler lessons) once their CI and review are in, #73 (nightly seed watch, reviewed twice; it also needs the `ANTHROPIC_API_KEY` repository secret, a secret value, to draft anything), #54 (issue form), #60 (consent sentence draft).
+- **Auto-merge when CI is green:** #74 (drafting agents get files only; found by #73's review).
+- Not mine: #67, #68, #69.
+
 ### Next (in order)
 
-1. [done, PR "Add the seed pipeline"] Pipeline yield against the hand-made seeds: `docs/bench/2026-10-12-seed/README.md`. The result: under the same reviewer the pipeline's first drafts are close to the hand-made seeds (Sonnet reviewer: 3 of 30 hand-made and 3 of 33 wrangler drafts clean; Opus reviewer: 10 of 30 hand-made, 4 of 24 agents and 6 of 24 vitest drafts clean). Two Opus revise rounds brought agents to the hand-made level (9 of 19 clean after round 1); one Sonnet revise round on wrangler moved nothing (3 of 33 before, 3 of 35 after).
-2. **Owner's call (spending): who revises.** Opus revising works and costs more; Sonnet revising, once, didn't. Either allow Opus for `revise` only, or accept the lower yield and take the pipeline's lessons as they come. Until decided, no new subject: its yield would be the same low one. If Opus revising is allowed: run `revise --round 1` with `--model claude-opus-5-5` on vitest and wrangler (`node tools/seed/src/cli.ts revise <dir> --round 1 --model claude-opus-5-5`, then `check` and `review` with `--round 1`), then one new subject.
-3. Pipeline PR (`tools/seed`) to main; then PRs for the kept lessons: agents #62 is open (CI passed), vitest (5) and wrangler (3) after their checks, and the `seed-watch.yml` workflow (kept in `C:/dev/ludion-seedwork/seed-watch.yml`; protected, needs `tools/seed` on main first).
+1. [done] Pipeline yield against the hand-made seeds (`docs/bench/2026-10-12-seed/README.md`): under the same reviewer the first drafts are close to the hand-made seeds; two Opus revise rounds brought agents to the hand-made level; one Sonnet revise round on wrangler moved nothing.
+2. **Owner's call (spending): who revises.** Opus revising works and costs more; Sonnet revising, once, didn't. Either allow Opus for `revise` only, or accept the lower yield. Until decided, no new subject. If Opus revising is allowed: `node tools/seed/src/cli.ts revise <dir> --round 1 --model claude-opus-5-5` on vitest and wrangler, then `check` and `review` with `--round 1`, `lessons --round 1`, a PR for what's new, then one new subject (`ai`, `zod`, or `tailwindcss`; zod and tailwindcss are partly drafted in `docs/bench/2026-10-12-subjects/`).
+3. Not started: the three outreach letters for subjects not yet measured; npm stage (after every CLI change is on main; #67 isn't mine).
 
 ### Where the running work lives (for resuming)
 

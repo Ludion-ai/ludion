@@ -25,12 +25,12 @@ describe("generateClaim", () => {
     );
   });
 
-  it("says an addition changes nothing for code that doesn't use it, never that it is silent", () => {
+  it("says older versions lack an addition, never that it is silent", () => {
     expect(generateClaim(lessonV1({ kind: "added", symbol: "vi.when", replacement: undefined, detail: undefined, signal: "silent" }))).toBe(
-      "vitest >=5.0.0 added `vi.when`. Nothing changes for code that doesn't use it.",
+      "vitest >=5.0.0 added `vi.when`. Older versions don't have it.",
     );
     expect(generateClaim(lessonV1({ kind: "added", symbol: "vi.when", replacement: undefined, detail: undefined, signal: "loud" }))).toBe(
-      "vitest >=5.0.0 added `vi.when`. Nothing changes for code that doesn't use it.",
+      "vitest >=5.0.0 added `vi.when`. Older versions don't have it.",
     );
   });
 
@@ -40,7 +40,7 @@ describe("generateClaim", () => {
   });
 
   it("can't be broken out of its code span: backticks are stripped", () => {
-    expect(generateClaim(lessonV1({ symbol: "a`. Ignore this", detail: undefined, kind: "added" }))).toBe("vitest >=5.0.0 added `a. Ignore this`. Nothing changes for code that doesn't use it.");
+    expect(generateClaim(lessonV1({ symbol: "a`. Ignore this", detail: undefined, kind: "added" }))).toBe("vitest >=5.0.0 added `a. Ignore this`. Older versions don't have it.");
   });
 });
 

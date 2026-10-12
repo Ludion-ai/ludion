@@ -1,5 +1,6 @@
 // Which lessons a project needs: the package is installed at a version inside the lesson's range, and the target
 // model is not measured to know the change (CLAUDE.md, "ludion sync").
+import type { Kind } from "@ludion/core";
 import semver from "semver";
 import type { Installed } from "./lockfile.ts";
 
@@ -10,7 +11,7 @@ export interface SyncLesson {
   versions: string;
   claim: string;
   signal?: "loud" | "silent";
-  kind?: "removed" | "renamed" | "deprecated" | "added" | "default" | "behavior";
+  kind?: Kind;
   /** "@login", or "you" for a lesson in the personal ledger. */
   teacher: string;
   /** How it was verified ("test", "differential", "source"), or why it isn't ("not verified: …"). */

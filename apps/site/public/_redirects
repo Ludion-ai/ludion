@@ -1,0 +1,3 @@
+# /models became /bench (docs/decisions.md, "Bench page").
+/models /bench/ 301
+/models/ /bench/ 301

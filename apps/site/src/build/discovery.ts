@@ -13,15 +13,19 @@ export interface SitemapInput {
   lessonPages: { id: string; lastmod: string }[];
   subjects: string[];
   teacherLogins: string[];
+  /** The model pages under /bench/ (their ids). */
+  benchModels?: string[];
 }
 
-/** The sitemap: home, the fixed pages, every subject page, every lesson page, and every teacher page. */
-export function sitemap({ site, index, lessonPages, subjects, teacherLogins }: SitemapInput): string {
+/** The sitemap: home, the fixed pages, the bench pages, every subject page, every lesson page, and every teacher page. */
+export function sitemap({ site, index, lessonPages, subjects, teacherLogins, benchModels = [] }: SitemapInput): string {
   const day = (iso: string) => iso.slice(0, 10);
   const urls: { loc: string; lastmod?: string }[] = [
     { loc: `${site}/`, lastmod: day(index.built_at) },
     { loc: `${site}/start/` },
-    { loc: `${site}/models/` },
+    { loc: `${site}/bench/` },
+    { loc: `${site}/bench/method/` },
+    ...benchModels.map((m) => ({ loc: `${site}/bench/${encodeURIComponent(m)}/` })),
     { loc: `${site}/lessons/`, lastmod: day(index.built_at) },
     ...subjects.map((s) => ({ loc: `${site}/${encodeURIComponent(s)}/` })),
     ...lessonPages.map((p) => ({ loc: `${site}/lessons/${p.id}/`, lastmod: day(p.lastmod) })),
@@ -53,7 +57,7 @@ export function llmsTxt(site: string, index: Index): string {
     `- [Get started](${site}/start/): \`npx ludion-ai sync\` writes the lessons for a project's installed versions to .ludion/lessons.md; the MCP server at ${site}/mcp answers ludion_ask.`,
     `- [index.json](${site}/index.json): every active lesson, machine-readable.`,
     `- [subjects.json](${site}/index/subjects.json): subjects with lessons; each has a shard at ${site}/index/<subject>.json.`,
-    `- [Models](${site}/models/): which changes each measured model gets wrong.`,
+    `- [Bench](${site}/bench/): FreshBench results, which changes each measured model gets wrong, with and without ludion sync; the same as data at ${site}/bench.json.`,
     "",
     "## Lessons",
   ];

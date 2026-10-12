@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "astro build",
+    "build": "astro build && node scripts/og.ts",
     "dev": "astro dev",
     "build:samples": "node scripts/samples.ts build",
     "preview:samples": "node scripts/samples.ts preview"

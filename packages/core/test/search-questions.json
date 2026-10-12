@@ -22,5 +22,37 @@
   "01M4QH98K3WT2TXMHZAPMQSCBF": [
     "In the `agents` package, what exactly does `MCPClientManager.removeServer` delete in Durable Object storage after upgrading to 0.27.0 or later, and is it safe to call before re-adding a server?",
     "After upgrading `agents` to >=0.27.0, my MCP server reconnects after I call `MCPClientManager.removeServer` and then add it again, but now it asks me to redo the OAuth authorization even though nothing errored. Why are the saved tokens gone?"
+  ],
+  "01M4QHMS4JTBGD9PVWF1C97TRS": [
+    "In vitest 5, how do I make sure mock call history and `mockReturnValue` setups are reset between tests, and do I still need to set `clearMocks` in my config?",
+    "After upgrading vitest to 5.0, my tests that check `vi.fn()` call counts accumulated across tests (or setup done in `beforeAll`) now fail with no error or warning. Did the `clearMocks` default change?"
+  ],
+  "01M4QHMS4X5NY3GW28TMZP6WA3": [
+    "In vitest 5, how do I use `vi.fn` with a class so that instances keep the class's prototype methods and pass `instanceof` checks?",
+    "After upgrading vitest to 5.0.0, my tests that pass a class to `vi.fn` still run without errors, but the mocked instances now behave differently, with prototype methods available and `instanceof` returning true. What changed in `vi.fn`?"
+  ],
+  "01M4QHMS51FSEP1JQCQ2J07QKR": [
+    "After upgrading to vitest 5, how do I get the total run time from the `Duration` line in the test summary, since it now seems to show a phase breakdown?",
+    "I upgraded vitest to >=5.0.0 and the `Duration` line in the summary now shows percentages for each phase instead of what it showed before, with no error. Why did it change?"
+  ],
+  "01M4QHMS521TK3K3QN782Y1Q7A": [
+    "In vitest 5, how do I find test specifications programmatically using `parseSpecifications`, and is it still called `experimental_parseSpecifications`?",
+    "I upgraded vitest to 5.0.0 and my code calling `experimental_parseSpecifications` still runs with no error or warning. Is that expected, and should I be using something else now?"
+  ],
+  "01M4QHMS5808NYV99PPJCPVM3M": [
+    "In vitest 5, how do I set a different `attachmentsDir` for each project in my workspace config?",
+    "After upgrading to vitest 5.0.0, the `attachmentsDir` I set inside one project's config seems ignored and attachments land in a location based on the root config, but there's no error. Why is that happening?"
+  ],
+  "01M4R21JSTGEK84VXHA0B3A3Q9": [
+    "After upgrading wrangler to 4.113.0 or later, how can I find the Local Explorer API URL and resource routes when running `wrangler dev` inside a headless AI agent environment?",
+    "Since updating wrangler past 4.113.0, `wrangler dev` prints a Local Explorer API URL and a list of resource routes in my AI agent's output, even though I changed nothing. Why is this happening?"
+  ],
+  "01M4R21JSZMT0W3762B59RQ3TN": [
+    "After upgrading wrangler to 4.116.0 or later, how can I tell whether `wrangler check startup` is still treated as an alpha command, and do I need to change anything in my scripts that call it?",
+    "I upgraded wrangler past 4.116.0 and `wrangler check startup` no longer prints the alpha warning it used to, but my CI script still runs without errors. Did the command's behavior change?"
+  ],
+  "01M4R21JT5SE1DJRXBRZRKKDJ0": [
+    "After upgrading wrangler to 4.121.0 or later, how do I get the settings details that `wrangler preview` used to show in its box-art summary?",
+    "My script parses the output of `wrangler preview`, and since I updated wrangler past 4.121.0 it stopped finding the settings summary even though there's no error. What changed?"
   ]
 }

@@ -1,0 +1,49 @@
+{
+  "format": 1,
+  "id": "01M4N4KZ1D61K9AY6GHAPJ41T9",
+  "subject": "agents",
+  "package": {
+    "ecosystem": "npm",
+    "name": "agents"
+  },
+  "versions": ">=0.20.0",
+  "kind": "behavior",
+  "symbol": "MCPClientConnection",
+  "signal": "silent",
+  "detail": "MCPClientConnection probes for stateless MCP with server/discover, then falls back to the legacy initialize handshake on the same connection when needed.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "@modelcontextprotocol/client": "2.0.0-beta.5",
+          "agents": "0.20.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction distFiles() {\n  const dist = path.join(root, \"dist\");\n  return fs.readdirSync(dist).filter((f) => f.endsWith(\".js\")).map((f) => ({ file: f, src: fs.readFileSync(path.join(dist, f), \"utf8\") }));\n}\nconst conn = distFiles().find((f) => f.src.includes(\"var MCPClientConnection = class\"));\nif (!conn) {\n  console.error(\"ERROR: could not find MCPClientConnection in agents \" + pkg.version);\n  process.exit(2);\n}\nconst v2 = /import \\{[^}]*\\bClient\\b[^}]*\\} from \"@modelcontextprotocol\\/client\";/.test(conn.src);\nconst stateless = conn.src.includes('\"2026-07-28\"');\nif (!v2) {\n  if (/import \\{ Client \\} from \"@modelcontextprotocol\\/sdk\\/client\\/index\\.js\";/.test(conn.src)) {\n    console.error(\"FAIL: MCPClientConnection in agents \" + pkg.version + \" uses the SDK v1 Client, which never sends server/discover\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: MCPClientConnection imports an unexpected MCP client\");\n  process.exit(2);\n}\nconst croot = \"/w/node_modules/@modelcontextprotocol/client\";\nconst cpkg = JSON.parse(fs.readFileSync(path.join(croot, \"package.json\"), \"utf8\"));\nconst csrc = fs.readFileSync(path.join(croot, cpkg.exports[\".\"].import.default), \"utf8\");\nif (!stateless || !csrc.includes('method: \"server/discover\"')) {\n  console.error(\"ERROR: expected stateless 2026-07-28 handling and a server/discover probe (stateless=\" + stateless + \", client \" + cpkg.version + \")\");\n  process.exit(2);\n}\nconsole.log(\"OK: MCPClientConnection in agents \" + pkg.version + \" uses the v2 Client from @modelcontextprotocol/client \" + cpkg.version + \", which probes server/discover\");\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "@modelcontextprotocol/client": "2.0.0-beta.5",
+          "agents": "0.19.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nfunction distFiles() {\n  const dist = path.join(root, \"dist\");\n  return fs.readdirSync(dist).filter((f) => f.endsWith(\".js\")).map((f) => ({ file: f, src: fs.readFileSync(path.join(dist, f), \"utf8\") }));\n}\nconst conn = distFiles().find((f) => f.src.includes(\"var MCPClientConnection = class\"));\nif (!conn) {\n  console.error(\"ERROR: could not find MCPClientConnection in agents \" + pkg.version);\n  process.exit(2);\n}\nconst v2 = /import \\{[^}]*\\bClient\\b[^}]*\\} from \"@modelcontextprotocol\\/client\";/.test(conn.src);\nconst stateless = conn.src.includes('\"2026-07-28\"');\nif (!v2) {\n  if (/import \\{ Client \\} from \"@modelcontextprotocol\\/sdk\\/client\\/index\\.js\";/.test(conn.src)) {\n    console.error(\"FAIL: MCPClientConnection in agents \" + pkg.version + \" uses the SDK v1 Client, which never sends server/discover\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: MCPClientConnection imports an unexpected MCP client\");\n  process.exit(2);\n}\nconst croot = \"/w/node_modules/@modelcontextprotocol/client\";\nconst cpkg = JSON.parse(fs.readFileSync(path.join(croot, \"package.json\"), \"utf8\"));\nconst csrc = fs.readFileSync(path.join(croot, cpkg.exports[\".\"].import.default), \"utf8\");\nif (!stateless || !csrc.includes('method: \"server/discover\"')) {\n  console.error(\"ERROR: expected stateless 2026-07-28 handling and a server/discover probe (stateless=\" + stateless + \", client \" + cpkg.version + \")\");\n  process.exit(2);\n}\nconsole.log(\"OK: MCPClientConnection in agents \" + pkg.version + \" uses the v2 Client from @modelcontextprotocol/client \" + cpkg.version + \", which probes server/discover\");\n",
+        "expect": "fail",
+        "error": "uses the SDK v1 Client"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/packages/agents/CHANGELOG.md",
+        "quote": "`MCPClientConnection` now uses the exact-pinned `@modelcontextprotocol/client@2.0.0-beta.5`. It probes for stateless MCP with `server/discover`, then falls back to the legacy `initialize` handshake on the same connection when needed."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-11T09:27:34Z"
+}

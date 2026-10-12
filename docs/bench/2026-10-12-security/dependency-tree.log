@@ -1,0 +1,14 @@
+ludion-repo@ C:\dev\ludion-wt-codex-fixes
+├─┬ @cloudflare/vitest-plugin@1.4.0
+│ ├─┬ miniflare@5.20261006.1-alpha
+│ │ └── sharp@0.35.5
+│ └── wrangler@4.149.0 deduped
+├─┬ @ludion/site@0.0.0 -> .\apps\site
+│ └─┬ astro@7.3.6
+│   └── sharp@0.35.5 deduped
+├─┬ @ludion/worker@0.0.0 -> .\apps\worker
+│ ├── @modelcontextprotocol/client@2.2.0 overridden
+│ ├── @modelcontextprotocol/sdk@1.31.0 overridden
+│ └── agents@0.27.0
+└── wrangler@4.149.0
+

@@ -1,0 +1,38 @@
+{
+  "checked_at": "2026-10-12T10:32:51.722Z",
+  "node": "24.19.0",
+  "built_at": "2026-10-12T08:06:52Z",
+  "validated_public_lessons": 30,
+  "selected_lessons": 30,
+  "has_retirement_metadata": false,
+  "reads": [
+    {
+      "url": "https://ludion.ai/index/subjects.json",
+      "status": 200,
+      "bytes": 120,
+      "sha256": "18c784db08d5d0e08cd4f494472172fa387c3aff7b340fd28e21517e3a0095fc"
+    },
+    {
+      "url": "https://ludion.ai/index/agents.json",
+      "status": 200,
+      "bytes": 39237,
+      "sha256": "7ff8d85d7d71e177e3262aa4483e1e9753a367bc159a52148de018c2d556657b"
+    },
+    {
+      "url": "https://ludion.ai/index/vitest.json",
+      "status": 200,
+      "bytes": 52303,
+      "sha256": "7395f258015a83577d8ee57521c48c7f2c235d9abd3c83906e889b81a898c0f1"
+    },
+    {
+      "url": "https://ludion.ai/index/wrangler.json",
+      "status": 200,
+      "bytes": 64116,
+      "sha256": "207f3a0cbbacaefe0a36af474a73c8280830e8b5bef6fcb1a6e27ba3ee44eb37"
+    }
+  ],
+  "stdout": "ludion: 30 lessons for this project. Wrote .ludion/lessons.md, CLAUDE.md.\n",
+  "stderr": "",
+  "project_isolation": "C:/Users/haya0/Documents/Codex/2026-10-12/new-chat/work/ludion-security-live",
+  "no_lesson_code_executed": true
+}

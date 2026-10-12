@@ -28,6 +28,8 @@ jobs:
       # The design samples include a format 1 lesson, so this catches pages that only handle format 0.
       - run: npm run build:samples -w @ludion/site
       - run: npm test
+      - name: Exercise the real Docker sandbox with own harmless probes
+        run: node tools/sandbox-smoke.ts
 
       # Playwright + axe on every page, light and dark, against the built site under wrangler dev.
       - name: Find the Playwright version

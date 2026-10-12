@@ -54,6 +54,13 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 ## Log
 
+### 2026-10-12: Security inspection continued in PR #67
+
+- Added streamed byte limits ahead of public MCP parsing and shard JSON buffering; schema/grounding validation and claim regeneration at the remote reader; canonical ledger PR URLs; atomic, private ledger saves and damaged-entry handling.
+- Private ledger sync now protects generated files from default Git staging and refuses tracked files, including Windows case variants. Hardened Docker install/execution privileges and added own harmless Linux CI probes for actual sandbox behavior.
+- Updated dependencies to patched MCP peers and sharp through current Wrangler/test tooling. Clean install and audit, tests, E2E, minimum-Node tarball and current-public-data compatibility are recorded in `docs/bench/2026-10-12-security/`.
+- Supplemental Codex review exposed two boundary defects that were repaired and regression-tested. Mandatory Opus review remains BLOCKED; owner merge, npm release and production reflection are still pending. No paid benchmark or arbitrary lesson execution was started.
+
 ### 2026-10-12: Codex inspection fixes prepared for owner review
 
 - Sync now reads retirement ids even when a subject has no active lessons, suppresses retired ledger copies, and applies public/private corrections before matching installed versions. Offline/legacy public copies carry an unknown-status label; mixed manifest/shard builds abort.

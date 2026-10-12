@@ -75,7 +75,7 @@ async function sync(argv: string[]): Promise<number> {
   const uncovered = subjects && directDependencies(dir).filter((name) => installed.npm.has(name) && !taught.has(name) && !subjects.has(subjectFor({ ecosystem: "npm", name })));
   const before = readLessonsFile(dir);
   const lessonsMd = renderLessons(selection, summary, new Date(), uncovered);
-  const { written, skipped } = writeAndWire(dir, lessonsMd);
+  const { written, skipped } = writeAndWire(dir, lessonsMd, { privateLessons: selection.kept.some(({ lesson }) => lesson.origin === "ledger") });
   for (const s of skipped) console.error(`ludion: ${s}`);
   // A session-start hook runs after Claude Code has read CLAUDE.md, so a change written now reaches only the next
   // session; the hook's output reaches this one. So --quiet prints the lessons, and only when they changed.

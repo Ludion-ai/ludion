@@ -1,0 +1,62 @@
+
+> test:e2e
+> playwright test
+
+[WebServer] (node:64196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 7 workers
+
+  -  1 [chromium] › e2e\screenshots.spec.ts:12:1 › capture lesson, teacher, home, lessons, and 404 pages
+(node:63892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:50408) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58692) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62428) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Home JavaScript: 2 file(s), 3.5 KB gzipped
+  ok 5 [chromium] › e2e\water.spec.ts:114:1 › the home page's JavaScript stays within 60 KB gzipped (1.2s)
+  ok 7 [chromium] › e2e\a11y.spec.ts:28:1 › every page names its public URL as canonical (10.4s)
+Worst contrast over the water (dark):
+  claim: 16.44 (needs 3)
+  teacher: 18.59 (needs 4.5)
+  date: 7.65 (needs 4.5)
+  subject: 7.65 (needs 4.5)
+  log: 16.44 (needs 4.5)
+  log 2: 6.75 (needs 4.5)
+  log 3: 6.75 (needs 4.5)
+  log 4: 6.75 (needs 4.5)
+  log 5: 6.75 (needs 4.5)
+  log 6: 6.75 (needs 4.5)
+  log 7: 17.04 (needs 4.5)
+  log 8: 17.45 (needs 4.5)
+  caption: 7.74 (needs 4.5)
+  caption 2: 7.79 (needs 4.5)
+  ok 4 [chromium] › e2e\water.spec.ts:63:3 › text over the water keeps its contrast (dark) (29.1s)
+Worst contrast over the water (light):
+  claim: 15.57 (needs 3)
+  teacher: 16.01 (needs 4.5)
+  date: 5.71 (needs 4.5)
+  subject: 5.71 (needs 4.5)
+  log: 16.91 (needs 4.5)
+  log 2: 5.56 (needs 4.5)
+  log 3: 5.46 (needs 4.5)
+  log 4: 5.41 (needs 4.5)
+  log 5: 5.36 (needs 4.5)
+  log 6: 5.31 (needs 4.5)
+  log 7: 15.72 (needs 4.5)
+  log 8: 15.72 (needs 4.5)
+  caption: 6.03 (needs 4.5)
+  caption 2: 6.35 (needs 4.5)
+  ok 3 [chromium] › e2e\water.spec.ts:63:3 › text over the water keeps its contrast (light) (29.7s)
+  ok 2 [chromium] › e2e\a11y.spec.ts:12:5 › light theme › axe finds no violations on any page (32.3s)
+  ok 6 [chromium] › e2e\a11y.spec.ts:12:5 › dark theme › axe finds no violations on any page (32.4s)
+
+  1 skipped
+  6 passed (35.1s)

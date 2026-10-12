@@ -14,7 +14,7 @@ const newId = "01M4N6JH8SHRYQE5CPY9SN1QQK";
 const privateId = "01M4N6JH8SHRYQE5CPY9SN1QQM";
 const lesson = (id: string, extra: Partial<LessonV1> = {}): LessonV1 => ({
   format: 1, id, subject: "vitest", package: { ecosystem: "npm", name: "vitest" }, versions: ">=5.0.0",
-  kind: "removed", symbol: "oldOption", signal: "loud", evidence: [{ source: { url: "https://vitest.dev/guide/", quote: "The oldOption is removed from the package configuration." } }],
+  kind: "removed", symbol: "oldOption", signal: "loud", evidence: [{ source: { url: "https://vitest.dev/guide/", quote: `The ${extra.symbol ?? "oldOption"} is removed from the package configuration.` } }],
   author: "github:probe", author_id: 1, created_at: "2026-10-12T00:00:00Z", ...extra,
 });
 

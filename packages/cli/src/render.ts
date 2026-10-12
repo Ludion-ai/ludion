@@ -1,6 +1,7 @@
 // .ludion/lessons.md, and the lines that wire it into CLAUDE.md, AGENTS.md, and Cursor rules.
 import { lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative } from "node:path";
+import { spawnSync } from "node:child_process";
 import { COVERAGE_LINE, EVIDENCE_SCOPE, LESSON_DATA_LINE, evidenceLabel, type VerifiedBy } from "@ludion/core";
 import { UNVERIFIED } from "./ledger.ts";
 import type { Selection } from "./match.ts";
@@ -124,7 +125,7 @@ function readWiring(path: string, name: string): string {
  * with the lessons inline (Cursor rules can't include other files). A file that is a link or not a regular file is
  * skipped with a reason: sync runs at session start and must not fail the session over a project's layout.
  */
-export function writeAndWire(dir: string, lessonsMd: string): WireResult {
+export function writeAndWire(dir: string, lessonsMd: string, opts: { privateLessons?: boolean } = {}): WireResult {
   const written: string[] = [];
   const skipped: string[] = [];
   const step = (fn: () => string | undefined) => {
@@ -136,6 +137,33 @@ export function writeAndWire(dir: string, lessonsMd: string): WireResult {
       else throw err;
     }
   };
+
+  if (opts.privateLessons) {
+    const generated = [".ludion/lessons.md", ".cursor/rules/ludion.mdc"];
+    // A SessionStart hook must not place personal corrections into a file already queued for version control.
+    // Disable fsmonitor: reading a repository's index must not execute a repository-configured helper.
+    const git = spawnSync("git", ["-c", "core.fsmonitor=false", "-C", dir, "ls-files", "--", ...generated.map((p) => `:(icase,literal)${p}`)], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 2000 });
+    if (git.status === 0 && git.stdout.trim()) return { written, skipped: ["A generated lessons file is tracked by Git. Personal ledger lessons were not written; untrack the generated files before syncing private lessons."] };
+    let repository = false;
+    for (let p = realpathSync(dir); ; p = dirname(p)) {
+      if (lstatSync(join(p, ".git"), { throwIfNoEntry: false })) { repository = true; break; }
+      if (dirname(p) === p) break;
+    }
+    if ((git.status !== 0 && repository) || (git.error && (git.error as NodeJS.ErrnoException).code !== "ENOENT")) return { written, skipped: ["Could not check whether generated files are tracked. Personal ledger lessons were not written."] };
+    step(() => {
+      const text = readWiring(join(dir, ".gitignore"), ".gitignore");
+      const block = "# ludion: local personal lessons\n/.ludion/\n/.cursor/rules/ludion.mdc\n";
+      if (!text.endsWith(block)) safeWrite(dir, ".gitignore", `${text}${text && !text.endsWith("\n") ? "\n" : ""}${block}`);
+      return ".gitignore";
+    });
+    if (!written.includes(".gitignore")) return { written, skipped };
+    if (git.status === 0) {
+      for (const path of generated) {
+        const ignored = spawnSync("git", ["-c", "core.fsmonitor=false", "-C", dir, "check-ignore", "--quiet", "--", path], { stdio: "ignore", timeout: 2000 });
+        if (ignored.status !== 0) return { written, skipped: [...skipped, "Git does not ignore a generated lessons file. Personal ledger lessons were not written."] };
+      }
+    }
+  }
 
   step(() => (safeWrite(dir, join(".ludion", "lessons.md"), lessonsMd), ".ludion/lessons.md"));
   if (!written.includes(".ludion/lessons.md")) return { written, skipped };

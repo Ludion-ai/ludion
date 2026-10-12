@@ -7,6 +7,10 @@ const entry = (over: Partial<IndexEntry>): IndexEntry => ({
 });
 
 describe("shardsOf", () => {
+  it("treats constructor as a subject key instead of inheriting an object prototype", () => {
+    const index: Index = { version: 1, built_at: "t", teachers: {}, lessons: [entry({ id: "A", format: 1, subject: "constructor" })] };
+    expect(Object.values(shardsOf(index, {}).shards)[0]!.lessons[0]!.id).toBe("A");
+  });
   it("includes replaced, withheld and retracted ids even when no subject shard remains", () => {
     const index: Index = { version: 1, built_at: "t", teachers: {}, lessons: [entry({ id: "active" })] };
     const pages = ["active", "replaced", "withheld"].map((id) => ({ lesson: { id } }));

@@ -18,7 +18,7 @@ const root = mkdtempSync(join(tmpdir(), "ludion-tarball-smoke-"));
 const project = join(root, "project");
 mkdirSync(project);
 writeFileSync(join(project, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "node_modules/vitest": { version: "5.0.3" } } }));
-const lesson = { id: "01M4N6JH8SHRYQE5CPY9SN1QQJ", format: 1, subject: "vitest", package: { ecosystem: "npm", name: "vitest" }, version: ">=5.0.0", claim: "vitest >=5.0.0 added `exampleOption`.", kind: "added", signal: "loud", teacher: "probe", verified_by: "source", verified_at: "2026-10-12T00:00:00Z", replaces: [] };
+const lesson = { id: "01M4N6JH8SHRYQE5CPY9SN1QQJ", format: 1, subject: "vitest", package: { ecosystem: "npm", name: "vitest" }, version: ">=5.0.0", claim: "vitest >=5.0.0 added `exampleOption`. Older versions don't have it.", symbol: "exampleOption", kind: "added", signal: "loud", teacher: "probe", teacher_id: 1, evidence: [{ source: { url: "https://vitest.dev/guide/", quote: "The exampleOption is available in the package configuration." } }], verified_by: "source", verified_at: "2026-10-12T00:00:00Z", replaces: [] };
 const server = createServer((req, res) => {
   res.setHeader("content-type", "application/json");
   res.end(JSON.stringify(req.url === "/index/subjects.json" ? { built_at: "test", subjects: { vitest: { lessons: 1 } }, inactive_ids: [] } : { built_at: "test", subject: "vitest", lessons: [lesson] }));

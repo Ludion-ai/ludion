@@ -5,7 +5,7 @@ import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { COVERAGE_LINE, generateClaim, type FetchFn, type LessonV1 } from "@ludion/core";
+import { COVERAGE_LINE, buildIndex, generateClaim, type FetchFn, type LessonV1 } from "@ludion/core";
 import { ledgerLesson, readLedger, saveEntry } from "../src/ledger.ts";
 import { directDependencies, fromPackageLock, fromPnpmLock, fromYarnLock, readInstalled, type Installed } from "../src/lockfile.ts";
 import { select, type SyncLesson } from "../src/match.ts";
@@ -436,7 +436,8 @@ describe("sync --quiet (the session-start hook)", () => {
 describe("shards", () => {
   it("fetches only the shards of installed subjects, and skips format 0 lessons", async () => {
     const urls: string[] = [];
-    const entry = { id: "A", format: 1, subject: "vitest", version: ">=5.0.0", claim: "c", package: { ecosystem: "npm", name: "vitest" }, signal: "silent", kind: "added", evidence: [], teacher: "alice", teacher_id: 1, replaces: [], verified_by: "test", verified_at: "2026-10-11T00:00:00Z", pr: 1, url: "u" } as ShardLesson;
+    const l = toLesson(draft, { login: "alice", id: 1 }, new Date("2026-10-11T00:00:00Z"), "01M4N6JH8SHRYQE5CPY9SN1QQJ");
+    const entry = buildIndex([l], {}, new Map([[1, "alice"]]), { org: "Ludion-ai", repo: "ludion" }).lessons[0]! as ShardLesson;
     const fake = async (u: string) => {
       urls.push(u);
       if (u.endsWith("/subjects.json")) return Response.json({ built_at: "t", subjects: { vitest: { lessons: 2 }, zod: { lessons: 1 } } });
@@ -444,8 +445,8 @@ describe("shards", () => {
     };
     const { lessons } = await fetchLessons(installed({ vitest: ["5.0.3"] }), fake);
     expect(urls).toEqual(["https://ludion.ai/index/subjects.json", "https://ludion.ai/index/vitest.json"]);
-    expect(lessons.map((l) => l.id)).toEqual(["A"]);
-    expect(shardLesson(entry)).toMatchObject({ teacher: "@alice", versions: ">=5.0.0", url: "https://ludion.ai/lessons/A", kind: "added" });
+    expect(lessons.map((l) => l.id)).toEqual([l.id]);
+    expect(shardLesson(entry)).toMatchObject({ teacher: "@alice", versions: ">=5.0.0", url: `https://ludion.ai/lessons/${l.id}`, kind: "behavior" });
   });
 
   it("treats a site without shards as an error, not as no lessons", async () => {

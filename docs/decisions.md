@@ -4,6 +4,15 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-12: Security boundaries in sync, personal files, and the public MCP
+
+- Treat remote shards and local ledger JSON as untrusted input, reconstruct the structured lesson through the existing schema and grounding guards, and generate the assistant claim locally. Preserve compatibility with existing shards whose detail is embedded only in their generated claim. Accept canonical PR links only; invalid ledger entries are skipped, not interpolated into later sessions.
+- Private lessons must not enter default Git staging through generated files. Refuse writing them to tracked generated paths with case-insensitive literal matching; otherwise add and check local ignore rules before writing. Disable repository fsmonitor helpers in these Git reads. Do not automatically untrack files or rewrite history.
+- Bound actual bytes before parsing: MCP request bodies, index responses, and personal ledger entries. Use atomic, exclusively created ledger temporary files, with private POSIX permissions where supported. Bounds and reproduction measurements live in `docs/bench/2026-10-12-security/`.
+- Drop Docker capabilities and prohibit privilege gain in both install/run phases; use host UID/GID for plain runs as well as package runs where available. Test the actual Linux Docker paths with repository-owned harmless probes in PR CI, rather than interpreting an argument-array assertion as execution proof.
+- Pin patched MCP client/SDK peers with overrides and update Wrangler/test tooling for patched sharp. Advisory reachability, audit before/after, compatibility and implementation checks are recorded in the same bench directory. An advisory in the tree is not by itself proof of exploitation; a zero audit is not a security guarantee.
+- The protected PR remains draft: the mandatory Opus review is still blocked by the recorded usage limit. Supplemental Codex review fixes are not a substitute for that required review. Package/plugin release metadata remains unchanged until a separately approved npm release.
+
 ### 2026-10-12: Retirement-aware sync, evidence scope, and the CLI runtime
 
 - **Retirement is separate from active lessons.** `/index/subjects.json` carries `inactive_ids`: every replaced or withheld lesson still on main, plus every retraction tombstone, excluding active ids. It includes subjects with no remaining active shard. Sync excludes these ids from the personal ledger; it preserves `replaces` from both shards and ledger entries and computes the active set before version matching or model pruning. This replaces the rule that only duplicate active public ids were removed from the ledger, which let an old published copy resurrect after correction or withholding.

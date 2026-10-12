@@ -26,7 +26,7 @@ export function readModelVerdicts(root = join(process.cwd(), "../..")): ModelVer
 }
 
 export function shardsOf(index: Index, verdicts: ModelVerdicts = readModelVerdicts()): Shards {
-  const shards: Shards["shards"] = {};
+  const shards: Shards["shards"] = Object.create(null);
   for (const l of index.lessons) {
     if (l.format !== 1) continue;
     const shard = (shards[l.subject] ??= { built_at: index.built_at, subject: l.subject, lessons: [] });

@@ -1,0 +1,80 @@
+
+> build
+> npm run build --workspaces --if-present
+
+
+> ludion-ai@0.1.2 build
+> node build.ts
+
+Wrote dist/cli.js
+
+> @ludion/site@0.0.0 build
+> astro build
+
+19:31:11 [types] Generated 95ms
+19:31:11 [build] output: "static"
+19:31:11 [build] mode: "static"
+19:31:11 [build] directory: C:\dev\ludion-wt-codex-fixes\apps\site\dist\
+19:31:11 [build] Collecting build info...
+19:31:11 [build] ✓ Completed in 107ms.
+19:31:11 [build] Building static entrypoints...
+19:31:11 [vite] ✓ built in 202ms
+19:31:11 [vite] ✓ built in 13ms
+19:31:11 [build] Rearranging server assets...
+
+ generating static routes
+19:31:11   ├─ /404.html (+6ms)
+19:31:11   ├─ /index/subjects.json (+2ms)
+19:31:11   ├─ /index/wrangler.json (+2ms)
+19:31:11   ├─ /index/agents.json (+1ms)
+19:31:11   ├─ /index/vitest.json (+1ms)
+19:31:11   ├─ /index.json (+2ms)
+19:31:11   ├─ /lessons/01M4PW52QENBVDRGCZYF20J4T7/index.html (+3ms)
+19:31:11   ├─ /lessons/01M4PW52QF9V35BKFEZ0TV8SMC/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1C9NMK4R7PTGWDSMEJ/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1D61K9AY6GHAPJ41T9/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1EJW4GSZR1169785QP/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1FRQ1CBWQ19G26EXBA/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1G0Z3Q62FAYWHY3QS0/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1H5MK1KCKT59THQ707/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1J8367WF5VY4DJ5K23/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1K1H6JS3CN98ZW0J0J/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1M6BHM10NVQMT0YR3T/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ0P7MBRC476PA4MSKSX/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ0QT41TY27SW0E683RX/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ0R4N7P3H6AD5XEC931/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ0TD5B90PAZESMEM3DE/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ0VRGCJDGCW1RP186XM/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ0XWQDX60W9WFP7EH7Z/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N6JGXB0JAC338KRKN9RA0H/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N6JH8SHRYQE5CPY9SN1QQJ/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N6Y54270A8AKTMH9SVGV32/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ10489BJ56V6E9QCANX/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ113NYM02AVWFQH8V0R/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ12D93VCHVW7BD4SWS7/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ137QQ13JBMQBRZ2KBM/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ15H86C6AEETCVRHADC/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ162ZQ91VD7YRKVH916/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ17QMG6AE8C5GMA0PNR/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ18NMAR1KJCK8XRKVYK/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ19DFEF04950T3KW7WA/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N4KZ1BHR0T3J581NJ83YVV/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N60GGAXDCRBZWTCH2BDW6X/index.html (+1ms)
+19:31:11   ├─ /lessons/01M4N6JH32A6VDF5FJ7BTGEKVH/index.html (+1ms)
+19:31:11   ├─ /lessons/01K6ZQ4T9X0N8V2H7M3P5R1S6W/index.html (+1ms)
+19:31:11   ├─ /lessons/index.html (+2ms)
+19:31:11   ├─ /llms.txt (+2ms)
+19:31:11   ├─ /models/index.html (+2ms)
+19:31:11   ├─ /sitemap.xml (+2ms)
+19:31:11   ├─ /start/index.html (+1ms)
+19:31:11   ├─ /teachers/ludion-ai/index.html (+2ms)
+19:31:11   ├─ /wrangler/index.html (+1ms)
+19:31:11   ├─ /agents/index.html (+1ms)
+19:31:11   ├─ /vitest/index.html (+1ms)
+19:31:11   ├─ /python/index.html (+1ms)
+19:31:11   ├─ /index.html (+2ms)
+19:31:11 ✓ Completed in 568ms.
+
+19:31:11 [build] ✓ Completed in 898ms.
+19:31:11 [build] 43 page(s) built in 1.02s
+19:31:11 [build] Complete!

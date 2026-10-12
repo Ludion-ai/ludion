@@ -57,6 +57,7 @@ export function pullImages(runtimes: Iterable<string>): string[] {
 }
 
 const LIMITS = ["--memory", "512m", "--cpus", "1", "--pids-limit", "128"];
+const PRIVILEGE_LIMITS = ["--cap-drop", "ALL", "--security-opt", "no-new-privileges"];
 
 /** Run as the host user where there is one (Linux, macOS), so files written into the work folder can be cleaned up. */
 function userArgs(): string[] {
@@ -68,9 +69,9 @@ export function dockerArgs(runtime: string, name: string, workDir?: string): str
   const img = imageFor(runtime);
   if (!img) throw new Error(`Unknown runtime ${runtime}.`);
   const mount = workDir
-    ? [...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/tmp", "-e", "NODE_PATH=/w/node_modules", "-e", "PYTHONPATH=/w/site", "-e", "LUDION_PACKAGES=/w"]
+    ? ["-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/tmp", "-e", "NODE_PATH=/w/node_modules", "-e", "PYTHONPATH=/w/site", "-e", "LUDION_PACKAGES=/w"]
     : [];
-  return ["run", "--rm", "-i", "--name", name, "--network", "none", ...LIMITS, "--read-only", "--tmpfs", "/tmp", ...mount, img.image, ...img.command];
+  return ["run", "--rm", "-i", "--name", name, "--network", "none", ...LIMITS, ...PRIVILEGE_LIMITS, ...userArgs(), "--read-only", "--tmpfs", "/tmp", ...mount, img.image, ...img.command];
 }
 
 /** `docker run` arguments for installing a test's packages: network on, no install scripts, no lesson code. */
@@ -81,7 +82,7 @@ export function installArgs(runtime: string, workDir: string, packages: Record<s
     img.language === "node"
       ? ["npm", "install", "--ignore-scripts", "--no-audit", "--no-fund", "--loglevel=error"]
       : ["pip", "install", "--no-cache-dir", "--only-binary", ":all:", "--target", "/w/site", ...Object.entries(packages).map(([n, v]) => `${n}==${v}`)];
-  return ["run", "--rm", "--name", name, ...LIMITS, ...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/w/.home", "-e", "npm_config_cache=/w/.npm", img.image, ...install];
+  return ["run", "--rm", "--name", name, ...LIMITS, ...PRIVILEGE_LIMITS, ...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/w/.home", "-e", "npm_config_cache=/w/.npm", img.image, ...install];
 }
 
 function run(args: string[], stdin: string | undefined, timeoutMs: number, name?: string): Promise<RawRun> {

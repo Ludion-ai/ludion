@@ -1,0 +1,14 @@
+{
+  "entry": "7.0.0#176",
+  "verdict": {
+    "id": "7.0.0#176",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "sendReasoning",
+    "why": "With sendReasoning false, reasoning-start/end chunks are no longer emitted, changing the stream output for existing code."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

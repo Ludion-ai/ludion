@@ -1,0 +1,14 @@
+{
+  "entry": "7.0.0#7",
+  "verdict": {
+    "id": "7.0.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "callback event data",
+    "why": "Event data passed to callbacks has fields removed or refactored, so code reading them gets different values."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

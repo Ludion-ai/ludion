@@ -1,0 +1,54 @@
+{
+  "entry": "4.126.0#6",
+  "verdict": {
+    "id": "4.126.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler preview",
+    "why": "wrangler preview now attaches detected pull request annotations to deployments and shows the PR URL in output."
+  },
+  "cost_usd": 0.1777875,
+  "turns": 20,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.126.0",
+    "kind": "behavior",
+    "symbol": "wrangler preview",
+    "signal": "silent",
+    "detail": "When a pull request is detected, its URL is shown in the wrangler preview command output.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.126.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(m) { console.error(\"FAIL: \" + m); process.exit(1); }\nfunction broken(m) { console.error(\"ERROR: \" + m); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nif (src.indexOf(\"function getPullRequestMetadata(\") < 0) symptom(\"wrangler preview has no pull request detection from PULL_REQUEST_URL\");\nconst a = src.indexOf(\"function normalizeRepositoryUrl(\");\nconst b = src.indexOf(\"function resolveWorkerName(\");\nif (a < 0 || b < a) broken(\"could not locate helper functions\");\nconst fn = new Function(\"fs6\", \"childProcess\", \"shouldUseCIMetadataFallback\", src.slice(a, b) + \"\\nreturn getPullRequestMetadata;\")(fs, require(\"child_process\"), () => false);\nprocess.env.PULL_REQUEST_URL = \"https://github.com/acme/app/pull/42\";\nconst got = fn();\nif (!got || got.url !== \"https://github.com/acme/app/pull/42\") broken(\"unexpected result \" + JSON.stringify(got));\nconsole.log(\"OK: \" + got.url);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.125.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(m) { console.error(\"FAIL: \" + m); process.exit(1); }\nfunction broken(m) { console.error(\"ERROR: \" + m); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nif (src.indexOf(\"function getPullRequestMetadata(\") < 0) symptom(\"wrangler preview has no pull request detection from PULL_REQUEST_URL\");\nconst a = src.indexOf(\"function normalizeRepositoryUrl(\");\nconst b = src.indexOf(\"function resolveWorkerName(\");\nif (a < 0 || b < a) broken(\"could not locate helper functions\");\nconst fn = new Function(\"fs6\", \"childProcess\", \"shouldUseCIMetadataFallback\", src.slice(a, b) + \"\\nreturn getPullRequestMetadata;\")(fs, require(\"child_process\"), () => false);\nprocess.env.PULL_REQUEST_URL = \"https://github.com/acme/app/pull/42\";\nconst got = fn();\nif (!got || got.url !== \"https://github.com/acme/app/pull/42\") broken(\"unexpected result \" + JSON.stringify(got));\nconsole.log(\"OK: \" + got.url);\n",
+          "expect": "fail",
+          "error": "FAIL: wrangler preview has no pull request detection from PULL_REQUEST_URL"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.126.0/packages/wrangler/CHANGELOG.md",
+          "quote": "When a pull request is detected, its URL is now also shown in the `wrangler preview` command output."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

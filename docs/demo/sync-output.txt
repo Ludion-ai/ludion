@@ -1,0 +1,2 @@
+ludion: 9 lessons for this project. Wrote .ludion/lessons.md, CLAUDE.md.
+ludion: no lessons for 2 of this project's dependencies (listed in .ludion/lessons.md). Ask for lessons: https://github.com/Ludion-ai/ludion/issues/new?template=subject-request.yml

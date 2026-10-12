@@ -15,6 +15,8 @@ npx ludion-ai sync
 /plugin install ludion@ludion
 ```
 
+A 47-second replay of one recorded run, without and with `sync`, is in [`docs/demo/sync-vitest.cast`](docs/demo/sync-vitest.cast) (`asciinema play docs/demo/sync-vitest.cast`; built from the recorded output by `docs/demo/make-cast.ts`).
+
 ## What it measured
 
 All numbers below come from runs whose files are in [`docs/bench/`](docs/bench/).

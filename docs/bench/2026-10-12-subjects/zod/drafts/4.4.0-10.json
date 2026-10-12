@@ -8,7 +8,40 @@
     "symbol": "z.record",
     "why": "Non-enumerable properties are now skipped more consistently, changing which keys records process."
   },
-  "cost_usd": 0,
-  "turns": 1,
-  "error": "no draft.json (run ended with an error)"
+  "cost_usd": 0.33003620000000006,
+  "turns": 15,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.record",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "const { z } = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst schema = z.record(z.string(), z.string());\nif (schema.safeParse({ key: \"value\", bad: 123 }).success) broken(\"z.record accepted an enumerable non-string value\");\nconst input = { key: \"value\" };\nObject.defineProperty(input, \"hidden\", { value: 123, enumerable: false });\nconst r = schema.safeParse(input);\nif (!r.success) symptom(\"z.record rejected an object because of a non-enumerable property\");\nif (JSON.stringify(r.data) !== JSON.stringify({ key: \"value\" }) || Object.prototype.hasOwnProperty.call(r.data, \"hidden\")) broken(\"unexpected output \" + JSON.stringify(r.data));\nconsole.log(\"OK: z.record skips non-enumerable properties\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "const { z } = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst schema = z.record(z.string(), z.string());\nif (schema.safeParse({ key: \"value\", bad: 123 }).success) broken(\"z.record accepted an enumerable non-string value\");\nconst input = { key: \"value\" };\nObject.defineProperty(input, \"hidden\", { value: 123, enumerable: false });\nconst r = schema.safeParse(input);\nif (!r.success) symptom(\"z.record rejected an object because of a non-enumerable property\");\nif (JSON.stringify(r.data) !== JSON.stringify({ key: \"value\" }) || Object.prototype.hasOwnProperty.call(r.data, \"hidden\")) broken(\"unexpected output \" + JSON.stringify(r.data));\nconsole.log(\"OK: z.record skips non-enumerable properties\");\n",
+          "expect": "fail",
+          "error": "FAIL: z.record rejected an object because of a non-enumerable property"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
 }

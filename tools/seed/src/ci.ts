@@ -8,7 +8,7 @@ import { isLoss, JUDGE_PROMPT, lessonContext, MEASURED_MODELS, parseGrade, quest
 import type { Entry } from "./collect.ts";
 import { draftPrompt, prepare } from "./draft.ts";
 import { read, write, type RunInfo } from "./io.ts";
-import { agentIn, ask, extractJson, pool } from "./llm.ts";
+import { agentIn, ask, extractJson, pool, WORK_MODEL } from "./llm.ts";
 import type { Finding } from "./review.ts";
 import { CACHE, fetchText, gh, registryDoc, REPO_ROOT, safeName, sfx, toSeedLesson, type CheckRecord, type DraftRecord } from "./steps.ts";
 
@@ -50,7 +50,7 @@ export async function ci(dir: string, pr: string): Promise<void> {
  * One repair round for lessons whose tests didn't pass in CI: the drafting agent gets its draft back with CI's reasons
  * and fixes it or skips. A fixed lesson keeps its id and file in `out` (the PR branch's lessons folder).
  */
-export async function fix(dir: string, out: string, model = "claude-opus-5-5"): Promise<void> {
+export async function fix(dir: string, out: string, model = WORK_MODEL): Promise<void> {
   const run = read<RunInfo>(dir, "run.json");
   const entries = new Map(read<Entry[]>(dir, "entries.json").map((e) => [e.id, e]));
   const tags = new Map(read<{ version: string; tag: string }[]>(dir, "releases.json").map((r) => [r.version, r.tag]));
@@ -100,11 +100,11 @@ export async function bench(dir: string, lessonsDir: string): Promise<void> {
   await pool(final.filter((k) => !done.has(k.id)), 3, async (k) => {
     const lesson = JSON.parse(readFileSync(join(lessonsDir, run.package.replace(/^@/, "").replace("/", "."), `${k.id}.json`), "utf8"));
     const claim = generateClaim(lesson);
-    const q = extractJson((await ask(questionPrompt(lesson, entries.get(k.entry)!.text), "claude-opus-5-5", 1)).answer) as { question: string; answer: string; accept: string; reject: string };
+    const q = extractJson((await ask(questionPrompt(lesson, entries.get(k.entry)!.text), WORK_MODEL, 1)).answer) as { question: string; answer: string; accept: string; reject: string };
     const src = lesson.evidence.find((e: object) => "source" in e);
     const question = { id: k.id, library: run.package, change: k.entry, set: "B" as const, ...q, quote: src?.source.quote ?? "", url: src?.source.url ?? "" };
     const prompt = `${question.question}\n\nAnswer in a few sentences.`;
-    const grade = async (answer: string): Promise<Grade> => parseGrade((await ask(JUDGE_PROMPT(question, answer), "claude-opus-5-5", 0.5)).answer)?.grade ?? "unparsed";
+    const grade = async (answer: string): Promise<Grade> => parseGrade((await ask(JUDGE_PROMPT(question, answer), WORK_MODEL, 0.5)).answer)?.grade ?? "unparsed";
     const grades: Record<string, Grade> = {};
     for (const m of MEASURED_MODELS) grades[m] = await grade((await ask(prompt, m, 0.5)).answer);
     const withRun = await runAgent(prompt, { condition: "none", model: "claude-opus-5-5", maxTurns: 2, maxBudgetUsd: 0.5, appendSystemPrompt: lessonContext(claim) });
@@ -121,13 +121,14 @@ export async function bench(dir: string, lessonsDir: string): Promise<void> {
  * or skips it. Lessons without findings carry over unchanged. Writes drafts-r<round>/; then run check and review with
  * the same --round.
  */
-export async function revise(dir: string, round: number, model = "claude-opus-5-5"): Promise<void> {
+export async function revise(dir: string, round: number, model = WORK_MODEL): Promise<void> {
   if (round < 1) throw new Error("revise needs --round 1 or more.");
   const prev = sfx(round - 1);
   const run = read<RunInfo>(dir, "run.json");
   const entries = new Map(read<Entry[]>(dir, "entries.json").map((e) => [e.id, e]));
   const tags = new Map(read<{ version: string; tag: string }[]>(dir, "releases.json").map((r) => [r.version, r.tag]));
-  const checks = read<CheckRecord[]>(dir, `check${prev}.json`).filter((c) => c.problems.length === 0);
+  // Every drafted lesson of the last round: a local-check failure goes back to the agent like a review finding.
+  const checks = read<CheckRecord[]>(dir, `check${prev}.json`);
   const reviews = new Map(read<{ entry: string; findings: Finding[]; error?: string }[]>(dir, `review${prev}.json`).map((r) => [r.entry, r]));
   const outDir = join(dir, `drafts${sfx(round)}`);
   mkdirSync(outDir, { recursive: true });
@@ -135,7 +136,7 @@ export async function revise(dir: string, round: number, model = "claude-opus-5-
   let revised = 0;
   await pool(checks, 3, async (c) => {
     const old = read<DraftRecord>(join(dir, `drafts${prev}`), `${safeName(c.entry)}.json`);
-    const findings = reviews.get(c.entry)?.findings ?? [];
+    const findings = [...c.problems.map((problem) => ({ rule: "check", problem })), ...(reviews.get(c.entry)?.findings ?? [])];
     if (existsSync(join(outDir, `${safeName(c.entry)}.json`))) return;
     if (findings.length === 0) {
       write(outDir, `${safeName(c.entry)}.json`, old);
@@ -146,7 +147,7 @@ export async function revise(dir: string, round: number, model = "claude-opus-5-
     try {
       const prepared = await prepare({ run, entry, verdict: old.verdict, tag: tags.get(entry.version)!, all: Object.keys(doc.versions), directory: doc.repository?.directory, cache: CACHE, repoRoot: REPO_ROOT, gh, fetchText });
       writeFileSync(join(prepared.folder, "draft.json"), JSON.stringify(old.draft, null, 2));
-      writeFileSync(join(prepared.folder, "REVIEW.md"), ["# A reviewer found these problems in draft.json", "", ...findings.map((f) => `- (rule ${f.rule}) ${f.problem}`)].join("\n"));
+      writeFileSync(join(prepared.folder, "REVIEW.md"), ["# These problems were found in draft.json (rule \"check\": the machine checks CI also runs; numbers: the reviewer's checklist)", "", ...findings.map((f) => `- (rule ${f.rule}) ${f.problem}`)].join("\n"));
       let work = "";
       const prompt = `${draftPrompt(run.package, prepared)}\n\ndraft.json already holds your earlier draft, and REVIEW.md lists what a reviewer found wrong with it. Fix every finding you agree with and overwrite draft.json; if the change can't be taught truthfully in one lesson, replace it with {"skip": "<why>"}. If a finding asks to split a loud part from a silent part, keep the silent one.`;
       const r = await agentIn(prepared.folder, prompt, model, { prepare: (w) => (work = w) });

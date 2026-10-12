@@ -8,7 +8,40 @@
     "symbol": "z.httpUrl()",
     "why": "URLs like https:/example.com that were accepted are now rejected."
   },
-  "cost_usd": 0.18504720000000002,
-  "turns": 8,
-  "error": "no draft.json (run ended with an error)"
+  "cost_usd": 0.3842466,
+  "turns": 20,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.httpUrl",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet z;\ntry { z = require(\"zod\").z; } catch (e) { broken(\"cannot load zod: \" + e.message); }\nif (!z || typeof z.httpUrl !== \"function\") broken(\"z.httpUrl is not a function\");\nconst s = z.httpUrl();\nif (!s.safeParse(\"https://example.com\").success) broken(\"z.httpUrl() rejected https://example.com\");\nif (s.safeParse(\"ftp://example.com\").success) broken(\"z.httpUrl() accepted ftp://example.com\");\nif (s.safeParse(\"https:/example.com\").success) symptom(\"z.httpUrl() accepted https:/example.com\");\nconsole.log(\"OK: z.httpUrl() rejects https:/example.com\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet z;\ntry { z = require(\"zod\").z; } catch (e) { broken(\"cannot load zod: \" + e.message); }\nif (!z || typeof z.httpUrl !== \"function\") broken(\"z.httpUrl is not a function\");\nconst s = z.httpUrl();\nif (!s.safeParse(\"https://example.com\").success) broken(\"z.httpUrl() rejected https://example.com\");\nif (s.safeParse(\"ftp://example.com\").success) broken(\"z.httpUrl() accepted ftp://example.com\");\nif (s.safeParse(\"https:/example.com\").success) symptom(\"z.httpUrl() accepted https:/example.com\");\nconsole.log(\"OK: z.httpUrl() rejects https:/example.com\");\n",
+          "expect": "fail",
+          "error": "FAIL: z.httpUrl() accepted https:/example.com"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
 }

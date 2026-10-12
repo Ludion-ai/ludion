@@ -11,7 +11,7 @@ import { createSafeFetch } from "../../verify/src/safe-fetch.ts";
 import type { Entry } from "./collect.ts";
 import { draftPrompt, prepare } from "./draft.ts";
 import { read, write, type RunInfo } from "./io.ts";
-import { agentIn, ask, extractJson, pool } from "./llm.ts";
+import { agentIn, ask, extractJson, pool, WORK_MODEL } from "./llm.ts";
 import { reviewPrompt, parseFindings, type Finding } from "./review.ts";
 import { draftOrder, KINDS, type Kind, type Verdict } from "./triage.ts";
 
@@ -60,7 +60,7 @@ async function draft(dir: string, o: { model?: string; kinds?: string; limit?: s
     .slice(0, o.limit ? Number(o.limit) : undefined);
   const doc = await registryDoc(run.package);
   const all = Object.keys(doc.versions);
-  const model = o.model ?? "claude-opus-5-5";
+  const model = o.model ?? WORK_MODEL;
   console.log(`draft: ${todo.length} candidates with ${model}.`);
   let cost = 0;
   await pool(todo, 3, async (verdict) => {
@@ -178,8 +178,21 @@ function summary(dir: string) {
   const entries = read<Entry[]>(dir, "entries.json");
   const triage = existsSync(join(dir, "triage.json")) ? read<Verdict[]>(dir, "triage.json") : [];
   const ds = drafts(dir);
-  const checks = existsSync(join(dir, "check.json")) ? read<CheckRecord[]>(dir, "check.json") : [];
-  const reviews = existsSync(join(dir, "review.json")) ? read<{ findings: Finding[]; error?: string }[]>(dir, "review.json") : [];
+  // One row per review round that ran: round 0 is the first draft.
+  const rounds: Record<string, number>[] = [];
+  for (let r = 0; existsSync(join(dir, `review${sfx(r)}.json`)); r++) {
+    const checks = read<CheckRecord[]>(dir, `check${sfx(r)}.json`);
+    const reviews = read<{ findings: Finding[]; error?: string }[]>(dir, `review${sfx(r)}.json`);
+    rounds.push({
+      round: r,
+      drafts: checks.length,
+      local_checks_passed: checks.filter((c) => c.problems.length === 0).length,
+      differential: checks.filter((c) => c.problems.length === 0 && c.label === "differential").length,
+      review_findings: reviews.reduce((a, x) => a + x.findings.length, 0),
+      reviewed_clean: reviews.filter((x) => !x.error && x.findings.length === 0).length,
+    });
+  }
+  const ci = existsSync(join(dir, "ci.json")) ? read<{ rounds: { status: string }[][] }>(dir, "ci.json").rounds : [];
   const kept = existsSync(join(dir, "kept.json")) ? read<unknown[]>(dir, "kept.json") : [];
   const byKind = Object.fromEntries(KINDS.map((k) => [k, triage.filter((v) => v.candidate && v.kind === k).length]));
   const skips: Record<string, number> = {};
@@ -198,13 +211,9 @@ function summary(dir: string) {
     draft_skipped: ds.filter((d) => d.skip).length,
     draft_errors: ds.filter((d) => d.error).length,
     draft_cost_usd: Number(ds.reduce((a, d) => a + d.cost_usd, 0).toFixed(2)),
-    local_checks_passed: checks.filter((c) => c.problems.length === 0).length,
-    local_check_problems: checks.reduce((a, c) => a + c.problems.length, 0),
-    differential: checks.filter((c) => c.problems.length === 0 && c.label === "differential").length,
-    reviewed: reviews.length,
-    review_findings: reviews.reduce((a, r) => a + r.findings.length, 0),
-    reviewed_clean: reviews.filter((r) => !r.error && r.findings.length === 0).length,
+    rounds,
     kept: kept.length,
+    ci: ci.map((r) => ({ lessons: r.length, passed: r.filter((x) => x.status === "passed").length })),
   };
   write(dir, "summary.json", s);
   console.log(JSON.stringify(s, null, 2));
@@ -214,7 +223,7 @@ export async function run(step: string, dir: string, o: Record<string, string | 
   if (step === "draft") return draft(dir, o);
   const round = Number(o.round ?? 0);
   if (step === "check") return check(dir, round);
-  if (step === "review") return review(dir, o.model ?? "claude-opus-5-5", round);
+  if (step === "review") return review(dir, o.model ?? WORK_MODEL, round);
   if (step === "lessons") {
     if (!o.out) throw new Error("lessons needs --out <folder>.");
     return lessons(dir, o.out, round);

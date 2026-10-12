@@ -8,7 +8,40 @@
     "symbol": "junit",
     "why": "JUnit XML report output now includes unhandled errors."
   },
-  "cost_usd": 0,
-  "turns": 1,
-  "error": "no draft.json (run ended with an error)"
+  "cost_usd": 0.4889524,
+  "turns": 17,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "behavior",
+    "symbol": "--reporter=junit",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "5.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/junitunhandled\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"reject.test.mjs\"), [\n  \"import { it } from 'vitest'\",\n  \"it('passes but leaks a rejection', async () => {\",\n  \"  void Promise.reject(new Error('leaked rejection'))\",\n  \"  await new Promise(resolve => setTimeout(resolve, 50))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=junit\", \"--outputFile=junit.xml\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst file = path.join(dir, \"junit.xml\");\nif (!fs.existsSync(file)) {\n  console.error(\"ERROR: vitest wrote no JUnit report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst xml = fs.readFileSync(file, \"utf8\");\nconsole.log(xml);\nconst m = xml.match(/<testsuites\\b[^>]*\\berrors=\"(\\d+)\"/);\nif (!m) {\n  console.error(\"ERROR: no <testsuites> element with an errors attribute\");\n  process.exit(2);\n}\nif (r.status !== 1) {\n  console.error(\"ERROR: expected vitest to exit 1 for the unhandled rejection, got \" + r.status);\n  process.exit(2);\n}\nconst errors = Number(m[1]);\nconst hasErrorEl = /<error\\b/.test(xml) && xml.includes(\"leaked rejection\");\nif (errors >= 1 && hasErrorEl) {\n  console.log(\"PASS: JUnit report counts the unhandled rejection, errors=\" + errors);\n  process.exit(0);\n}\nif (errors === 0 && !hasErrorEl) {\n  console.error(\"FAIL: JUnit report has errors=0 and no <error> for the unhandled rejection although vitest exited 1\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected report (errors=\" + errors + \", error element \" + hasErrorEl + \")\");\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "4.1.11"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/junitunhandled\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"reject.test.mjs\"), [\n  \"import { it } from 'vitest'\",\n  \"it('passes but leaks a rejection', async () => {\",\n  \"  void Promise.reject(new Error('leaked rejection'))\",\n  \"  await new Promise(resolve => setTimeout(resolve, 50))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=junit\", \"--outputFile=junit.xml\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst file = path.join(dir, \"junit.xml\");\nif (!fs.existsSync(file)) {\n  console.error(\"ERROR: vitest wrote no JUnit report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst xml = fs.readFileSync(file, \"utf8\");\nconsole.log(xml);\nconst m = xml.match(/<testsuites\\b[^>]*\\berrors=\"(\\d+)\"/);\nif (!m) {\n  console.error(\"ERROR: no <testsuites> element with an errors attribute\");\n  process.exit(2);\n}\nif (r.status !== 1) {\n  console.error(\"ERROR: expected vitest to exit 1 for the unhandled rejection, got \" + r.status);\n  process.exit(2);\n}\nconst errors = Number(m[1]);\nconst hasErrorEl = /<error\\b/.test(xml) && xml.includes(\"leaked rejection\");\nif (errors >= 1 && hasErrorEl) {\n  console.log(\"PASS: JUnit report counts the unhandled rejection, errors=\" + errors);\n  process.exit(0);\n}\nif (errors === 0 && !hasErrorEl) {\n  console.error(\"FAIL: JUnit report has errors=0 and no <error> for the unhandled rejection although vitest exited 1\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected report (errors=\" + errors + \", error element \" + hasErrorEl + \")\");\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: JUnit report has errors=0 and no <error> for the unhandled rejection although vitest exited 1"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
 }

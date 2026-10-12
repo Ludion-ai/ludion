@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import type { Entry } from "./collect.ts";
 import { read, type RunInfo } from "./io.ts";
-import { ask, extractJson, pool } from "./llm.ts";
+import { ask, extractJson, pool, WORK_MODEL } from "./llm.ts";
 import { drafts } from "./steps.ts";
 
 export function entryQuestionPrompt(pkg: string, version: string, entry: string): string {
@@ -37,7 +37,7 @@ async function main() {
   const subject = run.package.replace(/^@/, "").replace("/", ".");
   const results = await pool(picked.filter((d) => !done.has(d.entry)), 4, async (d) => {
     const e = entries.get(d.entry)!;
-    const q = extractJson((await ask(entryQuestionPrompt(run.package, e.version, e.text), "claude-opus-5-5", 1)).answer) as Record<string, string>;
+    const q = extractJson((await ask(entryQuestionPrompt(run.package, e.version, e.text), WORK_MODEL, 1)).answer) as Record<string, string>;
     return { id: `${subject}-${d.entry.replace(/[.#]/g, "-")}-b`, library: subject, change: d.entry, set: "B", question: q.question, answer: q.answer, accept: q.accept, reject: q.reject, quote: q.quote ?? "", url: e.url };
   });
   const qs = [...prior, ...results.filter((r) => !(r instanceof Error))];

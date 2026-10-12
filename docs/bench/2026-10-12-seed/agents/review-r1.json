@@ -1,0 +1,191 @@
+[
+  {
+    "entry": "0.20.0#1",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail names only `agents/skills` as needing an explicit Codemode install, but the quote also names `agents/browser`, so the list reads as complete when it isn't; the tests also check only the 'not installed transitively' half, so either add `agents/browser` and a test for it, or drop the untested clause."
+      },
+      {
+        "rule": "3",
+        "problem": "signal is silent, but code written for <0.20.0 that imports `agents/skills` or `agents/browser`, or imports `@cloudflare/codemode` while relying on the transitive install, now fails with a module-not-found error, so that part is loud; mark it loud or narrow the claim to the part that really is silent."
+      },
+      {
+        "rule": "6",
+        "problem": "The lesson combines a silent part (MCP-only apps simply stop getting Codemode in node_modules) with a loud part (skills/browser imports now fail unless Codemode is installed explicitly); split them into two lessons."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says agents 'changed what `@cloudflare/codemode` does' and that old code 'still runs, without an error', which would lead an assistant to skip installing `@cloudflare/codemode` for `agents/skills` or `agents/browser` code; reword it as a dependency change (Codemode became an optional peer) and say that importers must install it explicitly."
+      }
+    ],
+    "cost_usd": 0.06970699999999999
+  },
+  {
+    "entry": "0.21.0#8",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The changelog limits this change to observer error frames (server-pushed frames for a turn the client isn't streaming), but the detail applies it to every `useAgentChat` plain-text error body; scope the claim to observer error frames, as the test does."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim also says error bodies are no longer 'parsed as stream chunks', but the tests only check that no empty assistant message is added (with `done: true` and `error: true`); drop that clause or add a test that observes the chunk-parsing difference."
+      }
+    ],
+    "cost_usd": 0.074103
+  },
+  {
+    "entry": "0.22.0#2",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The claim says code written for older versions 'still runs' but omits that the in-memory connection mode is also removed, so code that set `static options = { hibernate: false }` now has the setting silently ignored and its connections hibernate, which can lose in-memory per-connection state; the detail should say the setting is ignored and WebSockets always use the Hibernation API."
+      }
+    ],
+    "cost_usd": 0.075327
+  },
+  {
+    "entry": "0.22.0#4",
+    "findings": [
+      {
+        "rule": "3",
+        "problem": "signal is \"loud\", but old code written for the raw row often keeps running without an error: reading row-only columns returns undefined, and JSON.parse on a numeric payload still succeeds. Only some patterns throw, such as JSON.parse on an object or non-JSON string payload, so signal should be \"silent\", or the lesson must be limited to the case that actually throws."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests at all, so nothing shows that code passes on 0.22.0 and fails on the release before with this symptom; add a differential pair of tests that reads the callback's second argument."
+      },
+      {
+        "rule": "7",
+        "problem": "symbol is \"payload\", but the change is to what scheduled callbacks receive as their second argument (now a `Schedule` object instead of the raw storage row), so symbol should name the callback argument or `Schedule`, not the `payload` field."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence \"changed what `payload` does\" suggests the payload field's semantics changed, when the whole second argument changed type; an assistant could patch only payload handling and miss row fields that are gone, so the symbol and sentence should describe the changed callback argument."
+      }
+    ],
+    "cost_usd": 0.05455499999999999
+  },
+  {
+    "entry": "0.22.0#8",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests at all, so nothing shows code passing on 0.22.0 and failing on the release before; add a differential pair that reads instrumentation_scope.version on both releases."
+      },
+      {
+        "rule": "7",
+        "problem": "The changelog entry says the instrumentation was added in this release, so kind should be \"added\" rather than \"behavior\"; also, the only evidence is an AGENTS.md snapshot at 0.22.0, which does not show that 0.22.0 is the release that introduced it, so the versions start needs a pre-0.22.0 comparison to support it."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says agents 0.22.0 \"changed what instrumentation_scope.version does\" and that code for older versions still runs, which implies older versions emitted a different scope version (the package version); per the entry, older versions had no SDK instrumentation scope at all, so the lesson should say the instrumentation was added with a fixed scope version of \"1\"."
+      }
+    ],
+    "cost_usd": 0.044875
+  },
+  {
+    "entry": "0.23.0#1",
+    "findings": [],
+    "cost_usd": 0.057123
+  },
+  {
+    "entry": "0.23.0#10",
+    "findings": [],
+    "cost_usd": 0.058887
+  },
+  {
+    "entry": "0.23.0#18",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The claim presents a plain default bump from 1000 to 10000 but omits that the work budget's unit changed from credited chunks to durable segments, so an assistant could wrongly conclude recovery is now ten times more generous, or that an explicitly configured maxRecoveryWork keeps its old meaning; the detail should state the unit change and that explicit values are now counted in durable segments."
+      }
+    ],
+    "cost_usd": 0.059927
+  },
+  {
+    "entry": "0.24.0#2",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, only a changelog quote, so nothing shows that a queued callback reading getCurrentAgent().connection/request gets them on the release before 0.24.0 and loses them on 0.24.0; add a differential test pair whose old run fails only on that missing connection/request symptom."
+      }
+    ],
+    "cost_usd": 0.045023
+  },
+  {
+    "entry": "0.25.0#11",
+    "findings": [],
+    "cost_usd": 0.052319
+  },
+  {
+    "entry": "0.25.0#14",
+    "findings": [],
+    "cost_usd": 0.070867
+  },
+  {
+    "entry": "0.25.0#17",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so nothing shows that a WebSocket close before the `done` frame leaves `useAgentChat` in a completed state on 0.24.x and puts it in `error` on 0.25.0; add a differential test pair that passes on 0.25.0, fails on the release before it only on that symptom, and prints ERROR for any other failure."
+      }
+    ],
+    "cost_usd": 0.034307
+  },
+  {
+    "entry": "0.25.0#23",
+    "findings": [],
+    "cost_usd": 0.055703
+  },
+  {
+    "entry": "0.25.0#26",
+    "findings": [],
+    "cost_usd": 0.055907
+  },
+  {
+    "entry": "0.25.0#41",
+    "findings": [],
+    "cost_usd": 0.065427
+  },
+  {
+    "entry": "0.25.0#43",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, only a changelog quote, so nothing shows that deleteSubAgent closes direct client connections on 0.25.0 and not on the release before; add a differential pair where a late message after deleteSubAgent fails to recreate the sub-agent on 0.25.0 and does recreate it on the prior release."
+      }
+    ],
+    "cost_usd": 0.035186999999999996
+  },
+  {
+    "entry": "0.27.0#15",
+    "findings": [],
+    "cost_usd": 0.055483
+  },
+  {
+    "entry": "0.27.0#18",
+    "findings": [],
+    "cost_usd": 0.072819
+  },
+  {
+    "entry": "0.27.0#26",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The evidence holds only a changelog quote and no tests, so nothing shows code passing on 0.27.0 and failing on the release before it with the reconnect-replacement symptom; add a differential test pair that simulates a mid-stream WebSocket drop."
+      },
+      {
+        "rule": "1",
+        "problem": "\"changed what `useAgentChat` does\" states the change without limits, but the replacement only happens when the server sends its copy, and only Think does that; scope the claim to Think-backed agents."
+      },
+      {
+        "rule": "8",
+        "problem": "The detail separates \"AIChatAgent doesn't yet\" from what it modifies and puts it after the useAgentChat sentence, so an assistant could read it as AIChatAgent not replacing replies, or assume replacement works with any backend; rewrite it as \"useAgentChat replaces a cut-off reply after a mid-stream drop only when the server resends its copy (Think does; AIChatAgent doesn't yet, so no replacement happens there).\""
+      }
+    ],
+    "cost_usd": 0.049731000000000004
+  }
+]

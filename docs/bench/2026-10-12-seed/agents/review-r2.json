@@ -1,0 +1,211 @@
+[
+  {
+    "entry": "0.20.0#1",
+    "findings": [
+      {
+        "rule": "3",
+        "problem": "signal is silent, but the same changelog sentence says apps that import `agents/skills` or `agents/browser` must now install Codemode explicitly, so code written for 0.19.x that uses those entry points fails at import on 0.20.0; split that case into its own loud lesson and keep this one limited to MCP-only apps."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says 'code written for older versions still runs, without an error' without the `agents/skills`/`agents/browser` caveat, so an assistant would wrongly assume no `@cloudflare/codemode` install is needed; state that importing those entry points now requires adding the package."
+      },
+      {
+        "rule": "7",
+        "problem": "symbol `@cloudflare/codemode` makes the sentence read 'agents changed what @cloudflare/codemode does', but codemode's behavior didn't change, only agents' dependency on it (now an optional peer); use a symbol and wording that describe agents' peer-dependency declaration."
+      }
+    ],
+    "cost_usd": 0.065151
+  },
+  {
+    "entry": "0.21.0#3",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol is `browser_screenshot`, but that is only the name of the exempt output shape; the change and the tests are about how Browser Tools such as `browser_execute` turn their results into model output, so the symbol should name the affected tool or its model-output conversion (e.g. `browser_execute` / `toModelOutput`)."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says agents 0.21.0 'changed what `browser_screenshot` does', which suggests the screenshot shape itself changed, when in fact payloads in that shape are the ones left untouched; the sentence should name the tool whose non-canonical output is now redacted."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail says large base64 values 'returned' outside the shape are redacted, which reads as the tool's actual return value being changed, but the test only checks the model-facing output of `browser_execute` and confirms the original output is not mutated; the claim should be limited to the model-facing output of the tested tool."
+      }
+    ],
+    "cost_usd": 0.078123
+  },
+  {
+    "entry": "0.21.0#8",
+    "findings": [],
+    "cost_usd": 0.071291
+  },
+  {
+    "entry": "0.22.0#1",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The entry names a replacement for disabling recovery (return `{ continue: false }` from `onChatRecovery()`), but the lesson has no replacement field; add it."
+      },
+      {
+        "rule": "8",
+        "problem": "The claim only says compiled JS passing `false` gets the default config; it never says `false` is no longer supported and can no longer turn recovery off, so an assistant could keep writing `chatRecovery: false` expecting it to disable recovery. State that `false` is unsupported and recovery stays on, and point to `onChatRecovery()` returning `{ continue: false }`."
+      }
+    ],
+    "cost_usd": 0.063215
+  },
+  {
+    "entry": "0.22.0#2",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail says 'WebSockets always use the Hibernation API', but the quote limits this to 'Lifecycle WebSockets', and the tests only check that a `hibernate` key is missing from `DEFAULT_AGENT_STATIC_OPTIONS` and `Agent.options`; restore the 'Lifecycle' qualifier and drop or test the hibernation and in-memory-mode claims."
+      },
+      {
+        "rule": "1",
+        "problem": "The lesson claims code written for older versions still runs without error, but no test runs old code (for example a subclass declaring `static options = { hibernate: false }`) on 0.22.0; add a test showing such code loads and runs, or the silent signal is unsupported."
+      },
+      {
+        "rule": "8",
+        "problem": "Without the 'Lifecycle' qualifier, an assistant could assume every WebSocket the package touches is forced into hibernation, and it is not told that an existing `hibernate: false` is now silently ignored, so per-connection in-memory state no longer survives; say both explicitly."
+      }
+    ],
+    "cost_usd": 0.087339
+  },
+  {
+    "entry": "0.22.0#4",
+    "findings": [
+      {
+        "rule": "3",
+        "problem": "signal is \"silent\", but old code that did `JSON.parse(schedule.payload)` now calls JSON.parse on an object and throws a SyntaxError, so it does not always run without error; signal should not be \"silent\", or the claim must say that old parsing code throws while other code just sees different values."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests at all, so there is no differential pair showing the same callback code passing on 0.22.0 and failing on the previous release with the payload-type symptom; add that test pair."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence \"code written for older versions still runs, without an error\" tells an assistant that existing callbacks that JSON.parse the payload need no change, which leads to code that crashes; it should say callers must stop parsing `payload` and should treat the second argument as a parsed `Schedule`."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `Schedule` is a type, so \"changed what `Schedule` does\" misnames the change, which is to the second argument passed to scheduled callbacks (`this.schedule` / Scheduler callbacks); the symbol should name the callback argument of the scheduling API."
+      }
+    ],
+    "cost_usd": 0.051471
+  },
+  {
+    "entry": "0.23.0#1",
+    "findings": [],
+    "cost_usd": 0.056715
+  },
+  {
+    "entry": "0.23.0#10",
+    "findings": [],
+    "cost_usd": 0.058714999999999996
+  },
+  {
+    "entry": "0.23.0#18",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The lesson presents this as only a default bump, but the unit itself changed from credited chunks to durable segments, so an explicitly configured maxRecoveryWork now means something different; an assistant could wrongly pin 1000 to 'restore old behavior' or keep an old explicit value unchanged. The unit change should be stated as its own behavior-kind lesson, or the claim should warn that explicit values must be rescaled."
+      }
+    ],
+    "cost_usd": 0.058791
+  },
+  {
+    "entry": "0.25.0#11",
+    "findings": [],
+    "cost_usd": 0.054687
+  },
+  {
+    "entry": "0.25.0#14",
+    "findings": [],
+    "cost_usd": 0.067839
+  },
+  {
+    "entry": "0.25.0#17",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says `useAgentChat` enters the `error` state, but both tests only drive `WebSocketChatTransport` directly and check for an `error` chunk in its stream, so the hook's state is never observed; either add a test that renders `useAgentChat` and asserts its status becomes `error`, or narrow the claim to say the chat transport now ends an interrupted turn with an error chunk."
+      }
+    ],
+    "cost_usd": 0.06859900000000001
+  },
+  {
+    "entry": "0.25.0#23",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim is about the `useAgentChat` hook, but both tests only call the internal `broadcastTransition` export of `agents/chat` and never exercise `useAgentChat` itself, so the evidence doesn't reach the claim's scope; either add a test that drives the hook's cross-tab path, or narrow the claim to `broadcastTransition` and say it backs `useAgentChat`."
+      }
+    ],
+    "cost_usd": 0.061115
+  },
+  {
+    "entry": "0.25.0#24",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The entry and the tests scope the change to `useAgentChat`'s `onToolCall`, but the symbol is the bare `onToolCall`; it should be `useAgentChat` (onToolCall option) so it matches the entry."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence 'agents >=0.25.0 changed what `onToolCall` does' never mentions `useAgentChat`, so an assistant could apply it to the AI SDK's own `useChat` `onToolCall` (from @ai-sdk/react), which this change does not touch; the detail and symbol should name `useAgentChat`."
+      }
+    ],
+    "cost_usd": 0.07806300000000001
+  },
+  {
+    "entry": "0.25.0#26",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The test exits with ERROR unless `reconcileMessages` is declared, and the entry suggests that replacement arrived with this same change, so the 0.24.0 run probably prints ERROR rather than the expected FAIL; the fix is to require only `resolveToolMergeId` to exist and check for `reconcileMessages` only in the deprecation text."
+      }
+    ],
+    "cost_usd": 0.059791000000000004
+  },
+  {
+    "entry": "0.25.0#41",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail claims that any oversized tool payload containing base64 data is summarized, but both tests cover only one shape (an object with `mediaType: 'image/png'` and an 80KB `data` field) at one size, so the detail should be narrowed to media-typed `data` fields like the tested one, or tests should be added for other base64 shapes such as bare strings or other keys."
+      }
+    ],
+    "cost_usd": 0.068015
+  },
+  {
+    "entry": "0.25.0#43",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The evidence is only a changelog quote with no differential test pair, so nothing shows that deleteSubAgent closes direct client connections on 0.25.0 but not on the release before; add a test that passes on 0.25.0 and fails on the prior release only on that symptom."
+      }
+    ],
+    "cost_usd": 0.036191
+  },
+  {
+    "entry": "0.27.0#15",
+    "findings": [],
+    "cost_usd": 0.054083
+  },
+  {
+    "entry": "0.27.0#18",
+    "findings": [],
+    "cost_usd": 0.070871
+  },
+  {
+    "entry": "0.27.0#26",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, only a changelog quote, so there is no differential pair showing that useAgentChat replaces a cut-off reply on 0.27.0 and fails on the release before; add a test pair that passes on 0.27.0 and fails on the release before it with that symptom."
+      }
+    ],
+    "cost_usd": 0.041042999999999996
+  }
+]

@@ -1,0 +1,54 @@
+{
+  "entry": "4.3.1#25",
+  "verdict": {
+    "id": "4.3.1#25",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "m-1",
+    "why": "Generated CSS for spacing utilities like m-1 changes from calc(var(--spacing) * 1) to var(--spacing), altering output."
+  },
+  "cost_usd": 0.41368059999999995,
+  "turns": 17,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.3.1",
+    "kind": "behavior",
+    "symbol": "m-1",
+    "signal": "silent",
+    "detail": "Spacing utilities like m-1 generate var(--spacing) instead of calc(var(--spacing) * 1)",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.3.1"
+          },
+          "code": "const tw = (() => { try { return require(\"tailwindcss\"); } catch (e) { console.error(\"ERROR: cannot load tailwindcss: \" + e.message); process.exit(2); } })();\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const compiler = await tw.compile(\"@theme { --spacing: 0.25rem; }\\n@tailwind utilities;\");\n  const out = compiler.build([\"m-1\"]);\n  const m = /\\.m-1\\s*\\{\\s*margin:\\s*([^;}]+?)\\s*;?\\s*\\}/.exec(out);\n  if (!m) broken(\"no .m-1 rule in output: \" + out);\n  if (m[1] === \"calc(var(--spacing) * 1)\") symptom(\"m-1 generates margin: calc(var(--spacing) * 1)\");\n  if (m[1] !== \"var(--spacing)\") broken(\"m-1 generates margin: \" + m[1]);\n  console.log(\"OK: m-1 generates margin: var(--spacing)\");\n})().catch(e => broken(String(e && e.message)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.3.0"
+          },
+          "code": "const tw = (() => { try { return require(\"tailwindcss\"); } catch (e) { console.error(\"ERROR: cannot load tailwindcss: \" + e.message); process.exit(2); } })();\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const compiler = await tw.compile(\"@theme { --spacing: 0.25rem; }\\n@tailwind utilities;\");\n  const out = compiler.build([\"m-1\"]);\n  const m = /\\.m-1\\s*\\{\\s*margin:\\s*([^;}]+?)\\s*;?\\s*\\}/.exec(out);\n  if (!m) broken(\"no .m-1 rule in output: \" + out);\n  if (m[1] === \"calc(var(--spacing) * 1)\") symptom(\"m-1 generates margin: calc(var(--spacing) * 1)\");\n  if (m[1] !== \"var(--spacing)\") broken(\"m-1 generates margin: \" + m[1]);\n  console.log(\"OK: m-1 generates margin: var(--spacing)\");\n})().catch(e => broken(String(e && e.message)));\n",
+          "expect": "fail",
+          "error": "FAIL: m-1 generates margin: calc(var(--spacing) * 1)"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.3.1/CHANGELOG.md",
+          "quote": "Generate `var(--spacing)` instead of `calc(var(--spacing) * 1)` for spacing utilities like `m-1` and `left-1`"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

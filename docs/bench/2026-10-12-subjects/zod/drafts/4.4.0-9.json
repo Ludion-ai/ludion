@@ -8,7 +8,40 @@
     "symbol": "invalid_key",
     "why": "Key refinement failures in records now surface as structured invalid_key issues instead of the previous error shape."
   },
-  "cost_usd": 0,
-  "turns": 1,
-  "error": "no draft.json (run ended with an error)"
+  "cost_usd": 0.39574,
+  "turns": 16,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.record invalid_key",
+    "signal": "loud",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "const z = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst schema = z.record(z.enum([\"a\", \"b\"]).refine((k) => k === \"a\", \"key must be a\"), z.string());\nconst bad = schema.safeParse({ a: \"x\", b: \"y\" });\nif (bad.success) symptom(\"z.record with an enum key ignored the key refinement and accepted key b\");\nconst iss = bad.error.issues;\nif (iss.length !== 1 || iss[0].code !== \"invalid_key\" || iss[0].path.join() !== \"b\") broken(\"unexpected issues: \" + JSON.stringify(iss));\nconsole.log(\"OK: key refinement failure surfaced as invalid_key at path b\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "const z = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst schema = z.record(z.enum([\"a\", \"b\"]).refine((k) => k === \"a\", \"key must be a\"), z.string());\nconst bad = schema.safeParse({ a: \"x\", b: \"y\" });\nif (bad.success) symptom(\"z.record with an enum key ignored the key refinement and accepted key b\");\nconst iss = bad.error.issues;\nif (iss.length !== 1 || iss[0].code !== \"invalid_key\" || iss[0].path.join() !== \"b\") broken(\"unexpected issues: \" + JSON.stringify(iss));\nconsole.log(\"OK: key refinement failure surfaced as invalid_key at path b\");\n",
+          "expect": "fail",
+          "error": "FAIL: z.record with an enum key ignored the key refinement and accepted key b"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
 }

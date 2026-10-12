@@ -1,0 +1,61 @@
+{
+  "package": "agents",
+  "range": ">=0.19.0 <=0.27.0",
+  "versions": 10,
+  "entries": 131,
+  "triaged": 131,
+  "candidates": 64,
+  "candidates_by_kind": {
+    "default": 2,
+    "behavior": 31,
+    "deprecated": 3,
+    "renamed": 1,
+    "removed": 11,
+    "added": 16
+  },
+  "candidates_silent": 37,
+  "skipped_by_reason": {
+    "fix": 33,
+    "internal": 9,
+    "experimental": 22,
+    "docs": 1,
+    "unclear": 2
+  },
+  "drafted": 28,
+  "draft_skipped": 4,
+  "draft_errors": 0,
+  "draft_cost_usd": 19.83,
+  "rounds": [
+    {
+      "round": 0,
+      "drafts": 28,
+      "local_checks_passed": 24,
+      "differential": 15,
+      "review_findings": 52,
+      "reviewed_clean": 4
+    },
+    {
+      "round": 1,
+      "drafts": 23,
+      "local_checks_passed": 19,
+      "differential": 13,
+      "review_findings": 21,
+      "reviewed_clean": 9
+    },
+    {
+      "round": 2,
+      "drafts": 20,
+      "local_checks_passed": 20,
+      "differential": 17,
+      "review_findings": 24,
+      "reviewed_clean": 7
+    }
+  ],
+  "kept": 7,
+  "ci": [
+    {
+      "lessons": 6,
+      "passed": 6
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#7",
+  "verdict": {
+    "id": "4.2.3#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "scroll-py-*",
+    "why": "Canonicalization now collapses scroll-padding side utilities into shorthand."
+  },
+  "cost_usd": 0.5703803999999999,
+  "turns": 27,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "canonicalizeCandidates scroll-py-*",
+    "signal": "silent",
+    "detail": "canonicalizeCandidates collapses scroll-p{t,b}-* into scroll-py-*",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  const css = fs.readFileSync(\"/w/node_modules/tailwindcss/index.css\", \"utf8\");\n  const ds = await tw.__unstable__loadDesignSystem(css, { base: \"/tmp\" });\n  if (!ds || typeof ds.canonicalizeCandidates !== \"function\") broken(\"design system has no canonicalizeCandidates\");\n  const got = ds.canonicalizeCandidates([\"scroll-pt-4\", \"scroll-pb-4\"], { collapse: true }).join(\" \");\n  if (got === \"scroll-py-4\") { console.log(\"OK: scroll-pt-4 scroll-pb-4 canonicalizes to scroll-py-4\"); return; }\n  if (got === \"scroll-pt-4 scroll-pb-4\" || got === \"scroll-pb-4 scroll-pt-4\") symptom(\"canonicalizeCandidates does not collapse scroll-pt-4 scroll-pb-4 into scroll-py-4\");\n  broken(\"unexpected canonicalization: \" + got);\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  const css = fs.readFileSync(\"/w/node_modules/tailwindcss/index.css\", \"utf8\");\n  const ds = await tw.__unstable__loadDesignSystem(css, { base: \"/tmp\" });\n  if (!ds || typeof ds.canonicalizeCandidates !== \"function\") broken(\"design system has no canonicalizeCandidates\");\n  const got = ds.canonicalizeCandidates([\"scroll-pt-4\", \"scroll-pb-4\"], { collapse: true }).join(\" \");\n  if (got === \"scroll-py-4\") { console.log(\"OK: scroll-pt-4 scroll-pb-4 canonicalizes to scroll-py-4\"); return; }\n  if (got === \"scroll-pt-4 scroll-pb-4\" || got === \"scroll-pb-4 scroll-pt-4\") symptom(\"canonicalizeCandidates does not collapse scroll-pt-4 scroll-pb-4 into scroll-py-4\");\n  broken(\"unexpected canonicalization: \" + got);\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: canonicalizeCandidates does not collapse scroll-pt-4 scroll-pb-4 into scroll-py-4"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Canonicalization: collapse `scroll-p{t,b}-*` into `scroll-py-*`, `scroll-p{l,r}-*` into `scroll-px-*`, and `scroll-p{t,r,b,l}-*` into `scroll-p-*`"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

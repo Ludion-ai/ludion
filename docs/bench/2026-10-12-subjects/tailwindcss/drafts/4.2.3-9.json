@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#9",
+  "verdict": {
+    "id": "4.2.3#9",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "overscroll-*",
+    "why": "Canonicalization now collapses overscroll-x/y into overscroll-*."
+  },
+  "cost_usd": 0.6003782,
+  "turns": 27,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "overscroll-*",
+    "signal": "silent",
+    "detail": "Canonicalization collapses overscroll-{x,y}-* into overscroll-*",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst tw = require(\"tailwindcss\");\nconst root = \"/w/node_modules/tailwindcss\";\nasync function loadStylesheet(id, base) {\n  const file = id === \"tailwindcss\" ? path.join(root, \"index.css\") : path.resolve(base, id);\n  return { path: file, base: path.dirname(file), content: fs.readFileSync(file, \"utf8\") };\n}\n(async () => {\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const ds = await tw.__unstable__loadDesignSystem('@import \"tailwindcss\";', { base: root, loadStylesheet });\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const css = ds.candidatesToCss([\"overscroll-x-contain\", \"overscroll-y-contain\", \"overscroll-contain\"]);\n  if (css.some((c) => !c || !c.includes(\"overscroll-behavior\"))) broken(\"overscroll utilities did not compile: \" + JSON.stringify(css));\n  const got = ds.canonicalizeCandidates([\"overscroll-x-contain\", \"overscroll-y-contain\"]);\n  const s = JSON.stringify(got);\n  if (s === JSON.stringify([\"overscroll-contain\"])) { console.log(\"OK: overscroll-x-contain overscroll-y-contain canonicalize to overscroll-contain\"); return; }\n  if (got.length === 2 && got.includes(\"overscroll-x-contain\") && got.includes(\"overscroll-y-contain\")) symptom(\"overscroll-x-contain overscroll-y-contain are not collapsed into overscroll-contain\");\n  broken(\"unexpected canonicalization result \" + s);\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst tw = require(\"tailwindcss\");\nconst root = \"/w/node_modules/tailwindcss\";\nasync function loadStylesheet(id, base) {\n  const file = id === \"tailwindcss\" ? path.join(root, \"index.css\") : path.resolve(base, id);\n  return { path: file, base: path.dirname(file), content: fs.readFileSync(file, \"utf8\") };\n}\n(async () => {\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const ds = await tw.__unstable__loadDesignSystem('@import \"tailwindcss\";', { base: root, loadStylesheet });\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const css = ds.candidatesToCss([\"overscroll-x-contain\", \"overscroll-y-contain\", \"overscroll-contain\"]);\n  if (css.some((c) => !c || !c.includes(\"overscroll-behavior\"))) broken(\"overscroll utilities did not compile: \" + JSON.stringify(css));\n  const got = ds.canonicalizeCandidates([\"overscroll-x-contain\", \"overscroll-y-contain\"]);\n  const s = JSON.stringify(got);\n  if (s === JSON.stringify([\"overscroll-contain\"])) { console.log(\"OK: overscroll-x-contain overscroll-y-contain canonicalize to overscroll-contain\"); return; }\n  if (got.length === 2 && got.includes(\"overscroll-x-contain\") && got.includes(\"overscroll-y-contain\")) symptom(\"overscroll-x-contain overscroll-y-contain are not collapsed into overscroll-contain\");\n  broken(\"unexpected canonicalization result \" + s);\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: overscroll-x-contain overscroll-y-contain are not collapsed into overscroll-contain"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Canonicalization: collapse `overscroll-{x,y}-*` into `overscroll-*` ([#19842](https://github.com/tailwindlabs/tailwindcss/pull/19842))"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

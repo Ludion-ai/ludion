@@ -8,7 +8,40 @@
     "symbol": "globalThis",
     "why": "Global config is now shared through globalThis, so config set in one module instance now applies across mixed CJS/ESM instances."
   },
-  "cost_usd": 0,
-  "turns": 1,
-  "error": "no draft.json (run ended with an error)"
+  "cost_usd": 0.5103838,
+  "turns": 24,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.config",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "const path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const zc = require(\"zod\");\n  const esmPath = path.join(path.dirname(require.resolve(\"zod\")), \"index.js\");\n  const ze = await import(pathToFileURL(esmPath).href);\n  if (typeof zc.config !== \"function\" || typeof ze.config !== \"function\") broken(\"z.config not found\");\n  if (zc.string === ze.string) broken(\"CJS and ESM builds are the same instance\");\n  zc.config({ customError: () => \"custom-from-cjs\" });\n  const r = ze.string().safeParse(123);\n  if (r.success) broken(\"ESM z.string() accepted a number\");\n  const msg = r.error.issues[0].message;\n  if (msg !== \"custom-from-cjs\") symptom(\"z.config on the CJS instance did not reach the ESM instance\");\n  console.log(\"OK: z.config on the CJS instance applies to the ESM instance\");\n})().catch(e => broken(String(e && e.stack || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "const path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const zc = require(\"zod\");\n  const esmPath = path.join(path.dirname(require.resolve(\"zod\")), \"index.js\");\n  const ze = await import(pathToFileURL(esmPath).href);\n  if (typeof zc.config !== \"function\" || typeof ze.config !== \"function\") broken(\"z.config not found\");\n  if (zc.string === ze.string) broken(\"CJS and ESM builds are the same instance\");\n  zc.config({ customError: () => \"custom-from-cjs\" });\n  const r = ze.string().safeParse(123);\n  if (r.success) broken(\"ESM z.string() accepted a number\");\n  const msg = r.error.issues[0].message;\n  if (msg !== \"custom-from-cjs\") symptom(\"z.config on the CJS instance did not reach the ESM instance\");\n  console.log(\"OK: z.config on the CJS instance applies to the ESM instance\");\n})().catch(e => broken(String(e && e.stack || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: z.config on the CJS instance did not reach the ESM instance"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
 }

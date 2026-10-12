@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { COVERAGE_LINE, generateClaim, type FetchFn, type LessonV1 } from "@ludion/core";
 import { ledgerLesson, readLedger, saveEntry } from "../src/ledger.ts";
 import { directDependencies, fromPackageLock, fromPnpmLock, fromYarnLock, readInstalled, type Installed } from "../src/lockfile.ts";
@@ -446,6 +446,22 @@ describe("shards", () => {
     expect(urls).toEqual(["https://ludion.ai/index/subjects.json", "https://ludion.ai/index/vitest.json"]);
     expect(lessons.map((l) => l.id)).toEqual(["A"]);
     expect(shardLesson(entry)).toMatchObject({ teacher: "@alice", versions: ">=5.0.0", url: "https://ludion.ai/lessons/A", kind: "added" });
+  });
+
+  it("asks for the index as ludion-ai/<this package's version>, and sends no other header of its own", async () => {
+    const seen: (Headers | undefined)[] = [];
+    vi.stubGlobal("fetch", async (_u: string, init?: RequestInit) => {
+      seen.push(init?.headers ? new Headers(init.headers) : undefined);
+      return Response.json({ built_at: "t", subjects: { vitest: { lessons: 1 } }, subject: "vitest", lessons: [] });
+    });
+    try {
+      await fetchLessons(installed({ vitest: ["5.0.3"] }));
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    const { version } = JSON.parse(readFileSync(join(import.meta.dirname, "../package.json"), "utf8"));
+    expect(seen).toHaveLength(2);
+    for (const h of seen) expect([...h!.entries()]).toEqual([["user-agent", `ludion-ai/${version}`]]);
   });
 
   it("treats a site without shards as an error, not as no lessons", async () => {

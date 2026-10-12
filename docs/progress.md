@@ -42,8 +42,9 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 ### Next (in order)
 
-1. Pipeline yield for agents (#62) and wrangler against the hand-made seeds, in `docs/bench/2026-10-12-seed/README.md`: candidates → lessons that passed the checks → review findings. wrangler drafting is running on Sonnet (36 candidates left when it was switched; resume with `node tools/seed/src/cli.ts draft docs/bench/2026-10-12-seed/wrangler --kinds default,behavior,deprecated,renamed,removed --signal silent` from `C:/dev/ludion-wt-seed`).
-2. One new subject, only after reading the yield; if the yield is poor, fix the pipeline first.
+1. [done] Pipeline yield against the hand-made seeds: `docs/bench/2026-10-12-seed/README.md`. From the silent, non-addition changes drafted (32, 39, 56), 7, 6, and 3 end as lessons with no problem and no review finding left (agents with two revise rounds, vitest and wrangler with none); 6, 5, and 3 of them are new, the rest repeat a lesson on main. That is a low yield.
+2. Fix the pipeline before adding a subject, as the plan says for a poor yield. The failures are mostly mechanical, so the first thing to try, on one subject, is one `revise` round on the local-check failures before the reviewer (the drafting agents can't run the checker). Measure it on wrangler's 55 drafts (`node tools/seed/src/cli.ts revise docs/bench/2026-10-12-seed/wrangler --round 1`, then `check` and `review` with `--round 1`) and write the new counts in the same README. Then, if the yield is better, one new subject (`ai`, `zod`, or `tailwindcss`: zod and tailwindcss are partly drafted in `docs/bench/2026-10-12-subjects/`).
+3. Pipeline PR (`tools/seed`) to main; then PRs for the kept lessons: agents #62 is open (CI passed), vitest (5) and wrangler (3) after their checks, and the `seed-watch.yml` workflow (kept in `C:/dev/ludion-seedwork/seed-watch.yml`; protected, needs `tools/seed` on main first).
 
 ### Where the running work lives (for resuming)
 

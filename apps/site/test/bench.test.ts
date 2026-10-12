@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { benchJson, done3Misses, done3Table, readDone3, readSteps, wilson, withoutToolsTable, type Done3 } from "../src/build/bench.ts";
@@ -106,9 +106,18 @@ describe("models without a run", () => {
     const unmeasured = Object.keys(models.models).filter((id) => !done3.runs.some((r) => r.model === id));
     expect(unmeasured.length).toBeGreaterThan(0);
     for (const id of unmeasured) {
-      const row = new RegExp(`<tr[^>]*>\s*<th[^>]*>\s*<a href="/bench/${id}/"[^>]*>[^<]*</a>\s*</th>\s*<td[^>]*>Not measured</td>`).exec(html);
+      const row = new RegExp(String.raw`<tr[^>]*>\s*<th[^>]*>\s*<a href="/bench/${id}/"[^>]*>[^<]*</a>\s*</th>\s*<td[^>]*>Not measured</td>`).exec(html);
       expect(row, id).not.toBeNull();
     }
+  });
+});
+
+const cards = join(root, "apps/site/dist/bench/og");
+describe.skipIf(!existsSync(cards))("share cards", () => {
+  it("exist for every model page that names one", () => {
+    const pages = readdirSync(cards, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+    expect(pages.length).toBeGreaterThan(0);
+    for (const id of pages) expect(existsSync(join(cards, `${id}.png`)), id).toBe(true);
   });
 });
 

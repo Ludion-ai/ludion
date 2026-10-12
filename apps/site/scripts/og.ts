@@ -6,7 +6,6 @@ import { createReadStream, existsSync, readdirSync, statSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { extname, join, normalize, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 
 const TYPES: Record<string, string> = {
@@ -34,7 +33,7 @@ function serve(dir: string): Promise<Server> {
   return new Promise((ok) => server.listen(0, "127.0.0.1", () => ok(server)));
 }
 
-export async function makeCards(dist: string): Promise<string[]> {
+async function makeCards(dist: string): Promise<string[]> {
   const cards = join(dist, "bench", "og");
   const models = existsSync(cards) ? readdirSync(cards, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name) : [];
   if (!models.length) return [];
@@ -58,8 +57,11 @@ export async function makeCards(dist: string): Promise<string[]> {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const dist = process.argv[2] ?? (process.env.LUDION_SAMPLES === "1" ? "dist-samples" : "dist");
-  const written = await makeCards(dist);
-  console.log(`[ludion] Share cards: ${written.length ? written.join(", ") : "none (no /bench/og pages)"}`);
-}
+const dist = process.argv[2] ?? "dist";
+const written = await makeCards(dist);
+// Every card page must have its image: /bench/<model>/ names it in og:image, and the deploy runs no e2e to notice.
+const missing = existsSync(join(dist, "bench", "og"))
+  ? readdirSync(join(dist, "bench", "og"), { withFileTypes: true }).filter((d) => d.isDirectory() && !existsSync(join(dist, "bench", "og", `${d.name}.png`))).map((d) => d.name)
+  : [];
+if (missing.length) throw new Error(`No share card was written for ${missing.join(", ")}.`);
+console.log(`[ludion] Share cards: ${written.length ? written.join(", ") : "none (no /bench/og pages)"}`);

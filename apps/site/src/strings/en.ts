@@ -79,17 +79,18 @@ export const en = {
     title: "Bench | Ludion",
     heading: "Bench",
     intro:
-      "FreshBench asks coding assistants about changes in the versions a project installed, and a judge grades each answer against a key checked against primary sources. Each cell: answers graded correct out of questions, and the 95% Wilson interval.",
+      "FreshBench asks coding assistants about changes in the versions a project installed, and a judge grades each answer against a key checked against primary sources. Each cell is a count out of a total, with its 95% Wilson interval; each table says what it counts.",
     measured: (date: string) => `Measured on ${date}`,
     ago: (days: number) => (days <= 0 ? "today" : days === 1 ? "1 day ago" : `${days} days ago`),
     files: "The run's questions, answers, grades, and logs",
     method: "How it was measured",
     json: "This table as JSON",
     reproduce: "Run it again",
-    reproduceNote: "The part in brackets is the run with sync. Prepared projects come from tools/bench/src/projects.ts.",
+    reproduceNote: (dir: string) =>
+      `The parts in brackets are the run with sync. Its CLI and lessons are the ones frozen for the run, served from the repository at that commit, not today's ludion.ai. Setup: ${dir}/README.md.`,
     done3Heading: "In a project, with and without ludion sync",
-    done3Caption: (questions: number) =>
-      `FreshBench B questions (${questions}, one per change), asked to Claude Code in a project with the new versions installed.`,
+    done3Caption: (questions: number, frozenAt: string | null, seeds: number) =>
+      `FreshBench B questions (${questions}, one per change), asked to Claude Code in a project with the new versions installed. Each cell: answers graded correct out of questions.${frozenAt ? ` With sync, the project got the ${seeds} seed lessons frozen at commit ${frozenAt}.` : ""}`,
     withoutToolsHeading: "Without tools",
     withoutToolsCaption: (lessons: number) =>
       `FreshBench A questions for the ${lessons} measured lessons, each asked twice with no tools. A cell counts the lessons whose change the model answered right both times; ludion sync leaves those lessons out for that model.`,

@@ -69,6 +69,8 @@ export interface Done3 {
   questions: BenchQuestion[];
   /** Change id → the seed lesson that covered it at the frozen commit. */
   seeds: Record<string, string>;
+  /** The commit whose seeds and CLI the run with sync used (from the run's README), or null if it names none. */
+  frozenAt: string | null;
   runs: BenchRun[];
 }
 
@@ -116,7 +118,9 @@ export function readDone3(root: string, dir = DONE3_DIR): Done3 | null {
     });
   }
   const questions = readJson<BenchQuestion[]>(join(abs, "questions.json")).filter((q) => runs.some((r) => q.set === r.set));
-  return { dir, measuredAt, questions, seeds: readJson<Record<string, string>>(join(abs, "seeds.json")), runs };
+  const readme = existsSync(join(abs, "README.md")) ? readFileSync(join(abs, "README.md"), "utf8") : "";
+  const frozenAt = /frozen at commit `([0-9a-f]{7,40})`/.exec(readme)?.[1] ?? null;
+  return { dir, measuredAt, questions, seeds: readJson<Record<string, string>>(join(abs, "seeds.json")), frozenAt, runs };
 }
 
 /** 95% Wilson score interval for k successes out of n, as fractions. */
@@ -297,13 +301,14 @@ export function readRunLog(root: string, done3: Done3, run: BenchRun, questionId
 
 /**
  * The one-line command that reruns the Done 3 runs (tools/bench/src/projects.ts, then freshbench.ts run and judge).
- * The part in brackets is the run with sync.
+ * The part in brackets is the run with sync: it syncs from the site built at the frozen commit and served locally
+ * (LUDION_SITE), never from ludion.ai, whose lessons have changed since.
  */
 export function reproduceCommand(done3: Done3): string {
   const run = done3.runs[0]!;
   const q = `${done3.dir}/questions.json`;
   const label = run.label.replace(/-sync$/, "");
-  return `node tools/bench/src/projects.ts <projects> && node tools/bench/src/freshbench.ts run ${q} <out> ${label}[-sync] --set ${run.set} --condition ${run.condition} --projects <projects> --model ${run.model} [--sync packages/cli/dist/cli.js --ludion-home <empty dir>] && node tools/bench/src/freshbench.ts judge ${q} <out> ${label}[-sync]`;
+  return `node tools/bench/src/projects.ts <projects> && [LUDION_SITE=<site built at ${done3.frozenAt ?? "the frozen commit"}, served locally>] node tools/bench/src/freshbench.ts run ${q} <out> ${label}[-sync] --set ${run.set} --condition ${run.condition} --projects <projects> --model ${run.model} [--sync <cli built at ${done3.frozenAt ?? "the frozen commit"}> --ludion-home <empty dir>] && node tools/bench/src/freshbench.ts judge ${q} <out> ${label}[-sync]`;
 }
 
 /** What /bench.json serves: the two tables and where their numbers come from. */

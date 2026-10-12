@@ -57,7 +57,7 @@ export function llmsTxt(site: string, index: Index): string {
     `- [Get started](${site}/start/): \`npx ludion-ai sync\` writes the lessons for a project's installed versions to .ludion/lessons.md; the MCP server at ${site}/mcp answers ludion_ask.`,
     `- [index.json](${site}/index.json): every active lesson, machine-readable.`,
     `- [subjects.json](${site}/index/subjects.json): subjects with lessons; each has a shard at ${site}/index/<subject>.json.`,
-    `- [Bench](${site}/bench/): FreshBench results, which changes each measured model gets wrong, with and without ludion sync; the same as data at ${site}/bench.json.`,
+    `- [Bench](${site}/bench/): FreshBench results: which changes each measured model gets wrong, and under which conditions; the same as data at ${site}/bench.json.`,
     "",
     "## Lessons",
   ];

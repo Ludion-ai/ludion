@@ -34,14 +34,14 @@ const ids = models ? Object.keys(models.models) : [];
       done3 && (
         <section aria-labelledby="done3">
           <h2 id="done3">{b.done3Heading}</h2>
-          <p class="caption">{b.done3Caption(done3.questions.length)}</p>
+          <p class="caption">{b.done3Caption(done3.questions.length, done3.frozenAt, new Set(Object.values(done3.seeds)).size)}</p>
           <p class="meta">
             <Measured date={done3.measuredAt} /> <a href={`${repo}/tree/main/${done3.dir}`}>{b.files}</a>
           </p>
           <BenchTable table={t} labelledBy="done3" tools={b.tools} />
           <h3 id="reproduce">{b.reproduce}</h3>
           <pre tabindex="0" aria-labelledby="reproduce"><code>{reproduceCommand(done3)}</code></pre>
-          <p class="note">{b.reproduceNote}</p>
+          <p class="note">{b.reproduceNote(done3.dir)}</p>
         </section>
       )
     }

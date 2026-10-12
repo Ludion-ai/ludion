@@ -1,0 +1,33 @@
+{
+  "entry": "5.0.0#31",
+  "verdict": {
+    "id": "5.0.0#31",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "coverage.include",
+    "why": "The include/exclude globs were too eager and now match differently, which changes which files are covered."
+  },
+  "cost_usd": 0.4631588,
+  "turns": 15,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "behavior",
+    "symbol": "include",
+    "signal": "silent",
+    "detail": "Patterns match the path relative to the project root; an include pattern with no glob wildcard is treated as a directory and matches everything inside it.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/coverage.md",
+          "quote": "Patterns are matched against each file's path relative to the project root. A pattern with no glob wildcard is treated as a directory and matches everything inside it, so `include: ['src']` is equivalent to `include: ['src/**']`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

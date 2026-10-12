@@ -1,0 +1,47 @@
+{
+  "entry": "5.0.0#2",
+  "verdict": {
+    "id": "5.0.0#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "$ variable in test.for/each title",
+    "why": "String values in titles no longer have quotes, so generated test names change."
+  },
+  "cost_usd": 0.410854,
+  "turns": 13,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "behavior",
+    "symbol": "test.each $name",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "5.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/eachtitle\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"each.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ name: 'alice' }])('greets $name', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const f of report.testResults || []) for (const a of f.assertionResults || []) titles.push(a.title);\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length === 1 && titles[0] === \"greets alice\") {\n  console.log(\"PASS: test.each $name gave the title greets alice\");\n  process.exit(0);\n}\nif (titles.length === 1 && titles[0] === \"greets 'alice'\") {\n  console.error(\"FAIL: test.each $name kept quotes around the string: greets 'alice'\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected titles \" + JSON.stringify(titles) + \" (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "4.1.11"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/eachtitle\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"each.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ name: 'alice' }])('greets $name', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const f of report.testResults || []) for (const a of f.assertionResults || []) titles.push(a.title);\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length === 1 && titles[0] === \"greets alice\") {\n  console.log(\"PASS: test.each $name gave the title greets alice\");\n  process.exit(0);\n}\nif (titles.length === 1 && titles[0] === \"greets 'alice'\") {\n  console.error(\"FAIL: test.each $name kept quotes around the string: greets 'alice'\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected titles \" + JSON.stringify(titles) + \" (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: test.each $name kept quotes around the string: greets 'alice'"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

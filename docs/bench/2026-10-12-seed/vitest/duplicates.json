@@ -3,5 +3,10 @@
     "entry": "5.0.0#22",
     "of": "01M4N4KZ0QT41TY27SW0E683RX",
     "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration by default since Vitest 5.0. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#28",
+    "of": "01M4N4KZ0VRGCJDGCW1RP186XM",
+    "claim": "vitest >=5.0.0 changed the default of `vitest list`. Since Vitest 5, vitest list parses test files statically instead of running them to collect tests; pass --no-static-parse to run the files instead. Silent: code written for older versions still runs, without an error."
   }
 ]

@@ -54,5 +54,17 @@
   "01M4R21JT5SE1DJRXBRZRKKDJ0": [
     "After upgrading wrangler to 4.121.0 or later, how do I get the settings details that `wrangler preview` used to show in its box-art summary?",
     "My script parses the output of `wrangler preview`, and since I updated wrangler past 4.121.0 it stopped finding the settings summary even though there's no error. What changed?"
+  ],
+  "01M4R9CXC68AFY0FPPJZP9KPNE": [
+    "After upgrading to vitest 5, how do I configure inline `projects` in my vitest config so each project gets its own Vite server instead of sharing the parent's?",
+    "I upgraded vitest to 5.0.0 and my inline `projects` entries have no errors, but they seem to behave differently, as if they share the Vite server of the config that declares them. Why would that be?"
+  ],
+  "01M4R9CXC9WC30HGKMKW2DF1RX": [
+    "In vitest 5, how do I make `page.getByText()` in browser mode match substrings or ignore case again, now that `browser.locators.exact` defaults to exact matching?",
+    "After upgrading to vitest 5.0, my browser-mode tests using `page.getByText('submit')` no longer find a button labeled 'Submit Form' — why did the locator stop matching, and how do I fix it?"
+  ],
+  "01M4R9CXCDQFXKQJH5V0S31NTB": [
+    "After upgrading to vitest 5, where does the HTML reporter write its report, and how do I configure the `outputDir` option for it?",
+    "I upgraded vitest to 5.0.0 and my HTML reporter output isn't in the folder it used to be, with no error shown. Why is index.html now appearing in `.vitest`?"
   ]
 }

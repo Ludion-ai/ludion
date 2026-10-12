@@ -126,3 +126,18 @@ export function fieldProblems(l: LessonV1): string[] {
   if (range == null || range === "*" || /^\s*\|\||\|\|\s*(\|\||$)/.test(l.versions) || /<\s*[A-Za-z]/.test(l.versions)) problems.push(`versions "${l.versions}" is not a range of versions where the fact holds. Write one like >=5.0.0 or ^4.2.0.`);
   return problems;
 }
+/** A draft with no evidence: no `evidence` key, or an empty list. Anything else is checked as evidence. */
+export function hasNoEvidence(draft: { evidence?: unknown }): boolean {
+  return draft.evidence === undefined || (Array.isArray(draft.evidence) && draft.evidence.length === 0);
+}
+
+/**
+ * The problems of an unverified lesson (no evidence; a teacher's ledger only): its fields, and a detail grounded in the
+ * fields alone (package, versions, symbol, replacement), as for any lesson whose evidence grounds nothing.
+ */
+export function unverifiedProblems(l: LessonV1): string[] {
+  const problems = fieldProblems(l);
+  const words = ungroundedWords(l);
+  if (words.length) problems.push(`The detail uses words that aren't in the package, versions, symbol, or replacement: ${words.join(", ")}. Without evidence the detail can use only those; add a source to say more, or leave the detail out.`);
+  return problems;
+}

@@ -256,7 +256,7 @@ describe("ludion_teach", () => {
   it("accepts a draft with no evidence as unverified, for the user's own ledger only", async () => {
     const { teach } = await import("../src/mcp/teach.ts");
     const { evidence: _e, ...bare } = draft;
-    const r = teach({ ...bare, detail: "the junit reporter moved" });
+    const r = teach({ ...bare, detail: undefined });
     expect(r.isError).toBe(false);
     if (r.isError) return;
     expect(r.text).toContain('marked "unverified, yours only", and it is never published');
@@ -265,6 +265,9 @@ describe("ludion_teach", () => {
     // The fields are still checked.
     expect(teach({ ...bare, signal: "quiet" })).toMatchObject({ isError: true, text: expect.stringContaining("/signal:") });
     expect(teach({ ...bare, versions: "*" })).toMatchObject({ isError: true, text: expect.stringContaining("is not a range") });
+    // The detail is grounded in the fields alone, and evidence in the wrong shape gets the schema's error.
+    expect(teach({ ...bare, detail: "the junit reporter moved" })).toMatchObject({ isError: true, text: expect.stringContaining("aren't in the package, versions, symbol, or replacement") });
+    expect(teach({ ...bare, evidence: { source: {} } })).toMatchObject({ isError: true, text: expect.stringContaining("/evidence") });
   });
 
   it("is listed next to ludion_ask, read-only", async () => {

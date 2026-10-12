@@ -10,6 +10,32 @@ What was built, what the check showed, what was decided and why. Newest first. N
 | 2 | Plumbing: `ludion teach --public` → merge → within five minutes `ludion sync` elsewhere writes it with the teacher's name, and `ludion_ask` returns it | `ludion-ai` 0.1.1 is on npm (npm refused the name `ludion`); waits for the owner's own `teach --public` |
 | 3 | Value: FreshBench on the wedge, Claude Code with default tools in a project with the new version installed, with vs without `ludion sync`: +20 points | B questions on the frozen seeds: **36/45 vs 24/45 (+27)** (`docs/bench/2026-10-11-done3/`). C tasks: running, one trial per task over several days |
 
+## Current work: batch mode (from 2026-10-12)
+
+The owner asked for the list below to be worked through in order without stopping for confirmation, with one report at the end. After a `/clear`, resume here: "docs/progress.md の続きから".
+
+How the work runs:
+
+- Every PR gets its tests and a fresh-context review (subagent). An unprotected PR is merged by us once CI is green.
+- A protected PR (CLAUDE.md, `.github/`, `tools/verify/`, the schema, `lessons/`, `ludion.config.json`, `wrangler.jsonc`) is opened with its review posted as a comment and the `needs-owner` label, and the work moves on. Later work that depends on it is stacked on it.
+- npm: one `publish.yml` stage at the end, once every CLI change is on main.
+- Stop only for CLAUDE.md's "Stop and ask" items. Everything else is decided and written in `docs/decisions.md`.
+- If the usage limit is hit, write here how far the work got, then stop.
+- Every measured number goes in `docs/bench/`; no unmeasured number anywhere.
+
+The list (status in brackets):
+
+1. [done, #51] Replace the two seeds prepared in #50 (`DO_NOT_TRACK`, `--durable-objects-code-update-mode`), checked against primary sources.
+2. [ ] Say coverage is partial: `.ludion/lessons.md` and `ludion_ask` say Ludion holds some changes of some packages, that no lesson is no evidence of no change, and to check primary sources. Sync lists lockfile packages with no subject and one line on how to request one (issue URL with a template, label `subject-request`).
+3. [ ] `tools/seed`: package + version range → changelog, releases, source diff → drafted candidates → kind (with the "does code that doesn't use it behave differently" check) → differential tests → Docker → FreshBench `models` → harm check → one PR per subject labeled "drafted by an agent". Run it on the 30 existing seeds and compare (candidates, kept, review findings, in `docs/bench/`). Then a nightly workflow that watches covered subjects' new releases and opens PRs (protected).
+4. [ ] Two or more new subjects (target 6). Score 20 candidates on "AI writes it often" × release frequency × share of silent changes in the last 180 days; table in decisions. Each: FreshBench questions and keys from primary sources, seeds frozen, then B measurement and harm check. One seed PR per subject (protected).
+5. [ ] Personal ledger: `ludion teach` accepts drafts without evidence, saved as `unverified`, shown in `lessons.md` as "unverified, yours only". `--public` still needs evidence.
+6. [ ] Experiment 3: 0, 50 and 500 correct but unrelated lessons, B accuracy. A drop of 10 points or more at 500 → build skill delivery (`.agents/skills/ludion-{subject}/SKILL.md`); otherwise don't, and say why.
+7. [ ] C tasks: one batch a day (method in `docs/bench/2026-10-11-done3/README.md`). If C's gain is 10+ points below B's (+27), build the check hook (PostToolUse on Edit/Write matching imports and symbols against installed-version lessons) and measure it on part of C; otherwise don't, and say why.
+8. [ ] Announcement tools: README rewritten (measured numbers only), a 90-second demo (asciinema or GIF), five maintainer letters drafted in `docs/outreach/` (two to company-backed libraries, with a per-subject table of changes current models get wrong silently, asking whether they would pay for measurement). The owner sends them.
+9. [ ] Check that `llms.txt` and the per-lesson static pages are in a shape web search picks up.
+10. [ ] License: the owner decides; only a draft consent sentence for the `teach --public` PR template goes in `docs/decisions.md`.
+
 ## Log
 
 ### 2026-10-12: Published as ludion-ai; the v2 stack is on main

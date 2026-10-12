@@ -163,6 +163,16 @@
       "claude-haiku-5-5": "misses",
       "claude-sonnet-5-5": "misses",
       "claude-opus-5-5": "misses"
+    },
+    "01M4PW52QENBVDRGCZYF20J4T7": {
+      "claude-haiku-5-5": "misses",
+      "claude-sonnet-5-5": "misses",
+      "claude-opus-5-5": "misses"
+    },
+    "01M4PW52QF9V35BKFEZ0TV8SMC": {
+      "claude-haiku-5-5": "misses",
+      "claude-sonnet-5-5": "misses",
+      "claude-opus-5-5": "misses"
     }
   }
 }

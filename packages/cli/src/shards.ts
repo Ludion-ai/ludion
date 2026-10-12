@@ -9,6 +9,8 @@ export const SITE = process.env.LUDION_SITE || "https://ludion.ai";
 export interface Subjects {
   built_at: string;
   subjects: Record<string, { lessons: number }>;
+  /** Replaced, retracted, or withheld ids, including subjects with no active shard. */
+  inactive_ids?: string[];
 }
 
 /** A shard's lesson: the index entry plus, when FreshBench measured it, which models know the change. */
@@ -48,11 +50,12 @@ export function shardLesson(l: ShardLesson): SyncLesson | undefined {
     drafted_by: l.drafted_by,
     models: l.models,
     origin: "index",
+    replaces: l.replaces,
   };
 }
 
 /** Lessons from the shards of the subjects this project uses. Throws with a plain message when the site can't be reached. */
-export async function fetchLessons(installed: Installed, fetchFn: Fetch = timedFetch): Promise<{ lessons: SyncLesson[]; built_at: string | null; subjects: Set<string> }> {
+export async function fetchLessons(installed: Installed, fetchFn: Fetch = timedFetch): Promise<{ lessons: SyncLesson[]; built_at: string | null; subjects: Set<string>; inactiveIds: Set<string> | undefined }> {
   const res = await fetchFn(`${SITE}/index/subjects.json`);
   // A 404 is an error too: a site without shards (an old deploy, a wrong LUDION_SITE) says nothing about which lessons hold.
   if (!res.ok) throw new Error(`${SITE}/index/subjects.json answered ${res.status}.`);
@@ -62,9 +65,14 @@ export async function fetchLessons(installed: Installed, fetchFn: Fetch = timedF
     wanted.map(async (s) => {
       const r = await fetchFn(`${SITE}/index/${encodeURIComponent(s)}.json`);
       if (!r.ok) throw new Error(`${SITE}/index/${s}.json answered ${r.status}.`);
-      return (await r.json()) as Shard;
+      const shard = (await r.json()) as Shard;
+      if (shard.built_at !== subjects.built_at) throw new Error("The index changed during sync. Run ludion sync again to read one consistent build.");
+      return shard;
     }),
   );
   const lessons = shards.flatMap((s) => s.lessons.map(shardLesson).filter((l): l is SyncLesson => !!l));
-  return { lessons, built_at: subjects.built_at, subjects: new Set(Object.keys(subjects.subjects)) };
+  if (subjects.inactive_ids !== undefined && (!Array.isArray(subjects.inactive_ids) || subjects.inactive_ids.some((id) => typeof id !== "string"))) {
+    throw new Error("The index's inactive_ids must be a list of lesson ids.");
+  }
+  return { lessons, built_at: subjects.built_at, subjects: new Set(Object.keys(subjects.subjects)), inactiveIds: subjects.inactive_ids === undefined ? undefined : new Set(subjects.inactive_ids) };
 }

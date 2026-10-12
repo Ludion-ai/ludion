@@ -137,7 +137,7 @@ describe("lessons.md and wiring", () => {
   it("starts with the data line, names the teacher and the drafting agent, and says when nothing matches", () => {
     const md = renderLessons({ kept: [{ lesson: lessonOf({ claim: "vitest >=5.0.0 removed `x`.", drafted_by: "agent", url: "https://ludion.ai/lessons/A", verified_at: "2026-10-11T00:00:00Z" }), versions: ["5.0.3"] }], prunedForModel: [] }, "vitest 5.0.3", new Date("2026-10-11T00:00:00Z"));
     expect(md).toContain(`\n${DATA_LINE}\n`);
-    expect(md).toContain("- vitest >=5.0.0 removed `x`. (installed: vitest 5.0.3)\n  Taught by @alice, drafted by an agent; verified by test on 2026-10-11. https://ludion.ai/lessons/A");
+    expect(md).toContain("- vitest >=5.0.0 removed `x`. (installed: vitest 5.0.3)\n  Taught by @alice, drafted by an agent; evidence checked: test passed on 2026-10-11. https://ludion.ai/lessons/A");
     expect(renderLessons({ kept: [], prunedForModel: [] }, "x", new Date())).toContain("No lesson matches this project's versions yet.");
   });
 

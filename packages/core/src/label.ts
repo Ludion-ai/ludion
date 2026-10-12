@@ -40,7 +40,8 @@ function otherPins(test: Test, lesson: LessonV1): string {
 /**
  * A differential pair: the same code, on the same runtime with the same other pins, passes on a version of the
  * lesson's own package inside `versions` and fails as expected on a version outside it. Only the lesson's package
- * differs, so the difference is the change the lesson names. Only then does the label say "across versions".
+ * differs. This establishes a difference in the supplied test outcomes, not that its assertions establish the
+ * teacher's claimed change or silent signal. Only then does the evidence label say "across versions".
  */
 export function isDifferential(lesson: LessonV1): boolean {
   const tests = lesson.evidence.flatMap((e) => ("test" in e ? [e.test] : []));

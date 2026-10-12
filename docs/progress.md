@@ -54,6 +54,13 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 ## Log
 
+### 2026-10-12: Codex inspection fixes prepared for owner review
+
+- Sync now reads retirement ids even when a subject has no active lessons, suppresses retired ledger copies, and applies public/private corrections before matching installed versions. Offline/legacy public copies carry an unknown-status label; mixed manifest/shard builds abort.
+- The CLI minimum and bundle target now match undici: Node 22.19.0. PR and publish CI smoke-test the extracted npm tarball on that exact minimum.
+- CLI/MCP/site/index/llms.txt label evidence observations without claiming machine validation of the generated claim's semantics; public lesson reviewers must check kind, range, replacement and signal against primary sources or test assertions.
+- Check records: `docs/bench/2026-10-12-codex-fixes/`. Codex static review found no code blocker. **Required Opus review is BLOCKED**: the single invocation returned `usage_limit_reached` before generating model tokens. Leave the protected PR in draft and unmerged until the required review and owner's merge. npm and production are unchanged by these local checks; release still needs a new CLI version and owner's npm approval.
+
 ### 2026-10-12: Published as ludion-ai; the v2 stack is on main
 
 - npm refused the name `ludion` ("too similar to luxon"), so the CLI is `ludion-ai` (two bins, `ludion` and `ludion-ai`). 0.1.0 was published by hand with the owner's passkey. 0.1.1 (sync keeps the lessons file when the index can't be fetched, 404 included) was staged by `publish.yml` through trusted publishing, with no npm token and with provenance, and the owner approved it on npmjs.com.

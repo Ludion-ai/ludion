@@ -3,7 +3,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import {
-  checkSource, formatLesson, generateClaim, hasNoEvidence, lessonProblems, newId, subjectFor, unverifiedProblems, validateLessonV1, validateUnverified,
+  EVIDENCE_SCOPE, checkSource, formatLesson, generateClaim, hasNoEvidence, lessonProblems, newId, subjectFor, unverifiedProblems, validateLessonV1, validateUnverified,
   type FetchFn, type LessonV1,
 } from "@ludion/core";
 import { interpretRun, runInDocker, type RunFn } from "../../../tools/verify/src/docker.ts";
@@ -117,7 +117,7 @@ export const visible = (s: string): string => s.replace(/[\u0000-\u0008\u000B-\u
 
 /** The whole lesson as the teacher should see it before signing. */
 export function showLesson(lesson: LessonV1): string {
-  const lines = [generateClaim(lesson), ""];
+  const lines = [generateClaim(lesson), "", EVIDENCE_SCOPE, ""];
   if (lesson.evidence.length === 0) lines.push("No evidence: saved to your ledger as unverified, shown only in your own projects.", "");
   if (lesson.replaces?.length) lines.push(`Replaces: ${lesson.replaces.join(", ")} (those lessons leave the index when this one is merged)`, "");
   for (const e of lesson.evidence) {

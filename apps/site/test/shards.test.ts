@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
 import type { Index, IndexEntry } from "@ludion/core";
-import { shardsOf } from "../src/build/shards.ts";
+import { inactiveIds, shardsOf } from "../src/build/shards.ts";
 
 const entry = (over: Partial<IndexEntry>): IndexEntry => ({
   id: "A", subject: "vitest", claim: "c", evidence: [], teacher: "t", teacher_id: 1, replaces: [], verified_by: "test", verified_at: "2026-10-11T00:00:00Z", pr: 1, url: "u", ...over,
 });
 
 describe("shardsOf", () => {
+  it("includes replaced, withheld and retracted ids even when no subject shard remains", () => {
+    const index: Index = { version: 1, built_at: "t", teachers: {}, lessons: [entry({ id: "active" })] };
+    const pages = ["active", "replaced", "withheld"].map((id) => ({ lesson: { id } }));
+    expect(inactiveIds(index, pages as Parameters<typeof inactiveIds>[1], [{ id: "retracted" }, { id: "replaced" }])).toEqual(["replaced", "retracted", "withheld"]);
+  });
   it("splits format 1 lessons by subject, leaves format 0 out, and adds measured model verdicts", () => {
     const index: Index = {
       version: 1,

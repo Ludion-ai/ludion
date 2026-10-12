@@ -76,7 +76,7 @@ export interface IndexEntry {
   /** Lesson format: absent for format 0. */
   format?: 1;
   subject: string;
-  /** Where the fact holds: format 0's `version`, format 1's `versions`. */
+  /** The teacher's claimed range: format 0's `version`, format 1's `versions`. */
   version?: string;
   /** The sentence assistants read: format 0's claim, or format 1's generated claim. */
   claim: string;
@@ -92,6 +92,8 @@ export interface IndexEntry {
   replaces: string[];
   verified_by: VerifiedBy;
   verified_at: string;
+  /** Legacy verified_by/verified_at fields describe evidence checks, not semantic validation. */
+  verification_scope?: string;
   pr: number | null;
   url: string;
 }

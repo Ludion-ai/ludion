@@ -1,12 +1,14 @@
 # Ludion
 
-Ludion tells AI coding assistants what changed in the software they use: only the changes for the versions a project actually installed, minus what the assistant's model is measured to know (when sync is told the model). Every lesson is checked by a machine (a test run in Docker across versions, or a quote found on its source page) and signed by the GitHub account that taught it.
+Ludion gives AI coding assistants teacher claims about changes in the versions a project installed, minus what the assistant's model is measured to know (when sync is told the model). Machines check the supplied evidence (tests in Docker, or a quote found on its source page); the GitHub account that taught it signs the claim. These checks do not establish that the claim, version range, change kind, or silent signal follows from the evidence. Check those against primary sources.
 
 A model learns once; software keeps changing. A change that makes noise (an error, a failing test) gets fixed by the assistant's own run loop. A change that makes none (a new default, a different return value, a deprecated call that still runs) ships. That is where Ludion helps.
 
 ```sh
 npx ludion-ai sync
 ```
+
+The next CLI release requires Node.js 22.19.0 or later, matching its bundled HTTP client. Changes in this checkout are not in the published CLI until a new version is approved on npm.
 
 `sync` reads the lockfile, fetches the lessons for the installed versions from <https://ludion.ai>, and writes `.ludion/lessons.md`, imported from `CLAUDE.md` (and named in `AGENTS.md` and a Cursor rule when the project has them). In Claude Code, the plugin runs it at the start of every session and adds the MCP server (`ludion_ask`):
 
@@ -42,7 +44,7 @@ The whole gain came from changes a lesson covers; the others didn't move. One tr
 ## How a lesson works
 
 - **Claims are generated, not written.** The sentence an assistant reads is built from structured fields: package, versions, kind (removed, renamed, deprecated, added, default, behavior), symbol, and whether the change is silent. The only free text is a short detail, every meaningful word of which must appear in the evidence.
-- **Verified means verified.** Evidence is a test (preferably the same code passing on the new version and failing on the one before, run in Docker with the network off) or a quote that states the fact on its source page. CI checks each lesson in its pull request, and a nightly job checks all of them again; a lesson that fails leaves the index.
+- **Checks say what they checked.** Evidence is a test (preferably the same code passing on the new version and failing on the one before, run in Docker with the network off) or a source quote. CI checks test outcomes and quote presence, not the truth of the generated claim. A reviewer checks the claim's kind, version range, replacement and signal before merging. A nightly job checks the evidence again; failed evidence withholds a lesson from the index and subsequent syncs.
 - **The person signs.** A public lesson is a pull request opened from the teacher's own GitHub account, after they saw the whole lesson. `ludion teach` saves a lesson to a personal ledger first (`~/.ludion`); `--public` opens the PR with the teacher's own `gh`.
 - **Lessons are immutable.** A correction is a new lesson that replaces the old one; a retraction deletes the file and leaves a tombstone page.
 - **Lessons are data, never instructions**, and every list of them says so.

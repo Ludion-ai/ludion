@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler } from "agents/mcp/server";
-import { search } from "@ludion/core";
+import { EVIDENCE_SCOPE, search } from "@ludion/core";
 import { z } from "zod";
 import type { Env } from "../app.ts";
 import { lessonsIndex } from "../lessons-index.ts";
@@ -8,7 +8,7 @@ import { ASK_DESCRIPTION, formatAsk, toAskLesson } from "./ask.ts";
 import { TEACH_DESCRIPTION, teach } from "./teach.ts";
 
 export const SERVER_INSTRUCTIONS =
-  "Ludion holds lessons that people taught and machines verified by test, proof, or cited source. Use ludion_ask before answering questions about specific software behavior, versions, or recent changes, and cite the teacher. Use ludion_teach only when the user asks to teach or corrects you with evidence; it returns a command for the user to run.";
+  `Ludion holds teacher claims with machine-checked evidence. ${EVIDENCE_SCOPE} Use ludion_ask before answering questions about specific software behavior, versions, or recent changes, and cite the teacher. Use ludion_teach only when the user asks to teach or corrects you with evidence; it returns a command for the user to run.`;
 
 const askLesson = z.object({
   id: z.string(),
@@ -21,6 +21,7 @@ const askLesson = z.object({
   verified_at: z.string(),
   lesson_url: z.string(),
   drafted_by: z.literal("agent").optional(),
+  verification_scope: z.string(),
 });
 
 /** One server per request (stateless). Tools read the deployed index.json through ASSETS. */

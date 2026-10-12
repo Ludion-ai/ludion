@@ -52,7 +52,7 @@ export function readLedger(): LedgerEntry[] {
 /** A ledger entry as sync shows it. A lesson that is already public shows up from the index instead. */
 export function ledgerLesson(e: LedgerEntry): SyncLesson {
   if (e.unverified || !e.lesson.evidence?.length) {
-    return { id: e.lesson.id, package: e.lesson.package, versions: e.lesson.versions, claim: generateClaim(e.lesson), signal: e.lesson.signal, kind: e.lesson.kind, teacher: "you", verified: UNVERIFIED, verified_at: e.taught_at, drafted_by: e.lesson.drafted_by, origin: "ledger" };
+    return { id: e.lesson.id, package: e.lesson.package, versions: e.lesson.versions, claim: generateClaim(e.lesson), signal: e.lesson.signal, kind: e.lesson.kind, teacher: "you", verified: UNVERIFIED, verified_at: e.taught_at, drafted_by: e.lesson.drafted_by, origin: "ledger", replaces: e.lesson.replaces };
   }
   const passed = e.checks.tests === "passed" || (e.checks.tests === "none" && e.checks.sources === "found");
   return {
@@ -68,5 +68,6 @@ export function ledgerLesson(e: LedgerEntry): SyncLesson {
     url: e.public?.pr_url,
     drafted_by: e.lesson.drafted_by,
     origin: "ledger",
+    replaces: e.lesson.replaces,
   };
 }

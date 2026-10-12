@@ -45,3 +45,15 @@ jobs:
         if: steps.browsers.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
       - run: npm run test:e2e
+
+      - name: Pack the CLI for minimum-runtime checks
+        working-directory: packages/cli
+        run: |
+          archive=$(npm pack --pack-destination "$RUNNER_TEMP" --silent)
+          mkdir -p "$RUNNER_TEMP/ludion-cli"
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP/ludion-cli"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.19.0' # the CLI's declared minimum, including its bundled HTTP client
+      - name: Check the tarball on the minimum Node
+        run: node tools/cli-smoke.mjs "$RUNNER_TEMP/ludion-cli/package"

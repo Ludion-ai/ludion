@@ -1,7 +1,7 @@
 // ludion teach --public: open the pull request with the teacher's own gh, from their own account. Ludion never
 // holds a token: the PR author is whoever is signed in to gh, and CI checks that author_id is that account.
 import { execFileSync } from "node:child_process";
-import { formatLesson, generateClaim, type LessonV1 } from "@ludion/core";
+import { EVIDENCE_SCOPE, formatLesson, generateClaim, type LessonV1 } from "@ludion/core";
 import type { Identity } from "./teach.ts";
 
 export const UPSTREAM = process.env.LUDION_REPO || "Ludion-ai/ludion";
@@ -16,9 +16,12 @@ export function prTexts(lesson: LessonV1, who: Identity): { title: string; body:
     generateClaim(lesson),
     "",
     `Evidence: ${evidence.join(", ")}.`,
+    EVIDENCE_SCOPE,
     `Taught by @${who.login}${lesson.drafted_by === "agent" ? ", drafted by an agent" : ""}, opened with ludion teach --public.`,
     "",
     "What changes: one new lesson file. How to undo: delete the file (a retraction).",
+    "",
+    "Reviewer: before merging, check the claim's change kind, version range, replacement and signal against the cited source or test assertions. A passing evidence check alone does not establish those facts.",
   ].join("\n");
   return { title, body, message: `${title}\n\nTaught by @${who.login} (${who.id}).` };
 }

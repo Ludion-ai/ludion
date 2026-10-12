@@ -38,23 +38,32 @@ async function sync(argv: string[]): Promise<number> {
 
   let index: SyncLesson[] = [];
   let subjects: Set<string> | undefined;
+  let inactiveIds: Set<string> | undefined;
   let failed = false;
   if (!values.offline) {
     try {
-      ({ lessons: index, subjects } = await fetchLessons(installed));
+      ({ lessons: index, subjects, inactiveIds } = await fetchLessons(installed));
     } catch (err) {
       // Without the index, a rewrite would drop every public lesson the project has, so an existing lessons file is
       // left as it is. Sync never blocks the session: with --quiet (the hook) it warns and exits 0.
       failed = true;
       if (readLessonsFile(dir)) {
-        console.error(`ludion: could not fetch the index: ${(err as Error).message} Left .ludion/lessons.md as it was. Run ludion sync again later.`);
+        console.error(`ludion: could not fetch the index: ${(err as Error).message} Left .ludion/lessons.md as it was. Public lesson status is unknown; saved evidence labels are historical. Run ludion sync again later.`);
         return values.quiet ? 0 : 1;
       }
       console.error(`ludion: could not fetch the index: ${(err as Error).message} Wrote only your ledger's lessons. Run ludion sync again later.`);
     }
   }
   const publicIds = new Set(index.map((l) => l.id));
-  const ledger = readLedger().map(ledgerLesson).filter((l) => !publicIds.has(l.id));
+  const ledger = readLedger()
+    .filter((e) => !inactiveIds?.has(e.lesson.id))
+    .map((e) => {
+      const lesson = ledgerLesson(e);
+      // A pending public PR can still be used privately; an old/absent manifest cannot certify that it is active.
+      if (e.public && inactiveIds === undefined) lesson.verified = "not verified: public status unknown (offline or index without retirement metadata)";
+      return lesson;
+    })
+    .filter((l) => !publicIds.has(l.id));
   const selection = select([...index, ...ledger], installed, model);
   const summary = selection.kept.length
     ? [...new Set(selection.kept.map(({ lesson, versions }) => `${lesson.package.name} ${versions.join("/")}`))].join(", ")

@@ -1,0 +1,365 @@
+{
+  "checked_at": "2026-10-12T12:17:42.150Z",
+  "runtime": "node@24",
+  "packages": {
+    "vitest": "5.0.3",
+    "vite": "7.3.1"
+  },
+  "kind": "evaluator fixture validation, not model accuracy",
+  "rows": [
+    {
+      "id": "vitest-5-0-0-13-c",
+      "name": "correct fixture 1",
+      "expected": "passed",
+      "artifact": {
+        "id": "6d9c64c2-e104-4d51-80be-a544fa2bb236",
+        "sha256": "8c26c62971057f9cac390ed7759b4c66e994f31d208bf4da8bb4c42a6a542e46",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "passed",
+      "why": "Pinned-package execution and task acceptance checks passed.",
+      "observations": {
+        "id": "vitest-5-0-0-13-c",
+        "passed": true,
+        "versions": {
+          "node": "24.21.0",
+          "vitest": "5.0.3",
+          "vite": "7.3.1"
+        },
+        "observations": [
+          {
+            "label": "checkout selection including a future case",
+            "exit_code": 0,
+            "passed": [
+              "cart > checkout > charges the total",
+              "cart > checkout > handles a future checkout case",
+              "cart > checkout > rejects an empty cart"
+            ],
+            "failed": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "vitest-5-0-0-13-c",
+      "name": "correct fixture 2",
+      "expected": "passed",
+      "artifact": {
+        "id": "73c116a3-e746-4292-b99a-808728ad5091",
+        "sha256": "7b7721bdad7e16d6f332c7a128579bf4ff4cfe125e246c6a4dc38cf4ee0c1bce",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "passed",
+      "why": "Pinned-package execution and task acceptance checks passed.",
+      "observations": {
+        "id": "vitest-5-0-0-13-c",
+        "passed": true,
+        "versions": {
+          "node": "24.21.0",
+          "vitest": "5.0.3",
+          "vite": "7.3.1"
+        },
+        "observations": [
+          {
+            "label": "checkout selection including a future case",
+            "exit_code": 0,
+            "passed": [
+              "cart > checkout > charges the total",
+              "cart > checkout > handles a future checkout case",
+              "cart > checkout > rejects an empty cart"
+            ],
+            "failed": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "vitest-5-0-0-13-c",
+      "name": "wrong fixture 1",
+      "expected": "failed",
+      "artifact": {
+        "id": "e044ce1f-56e1-4b5e-a10e-48c441712a3f",
+        "sha256": "4d2f588d86c40be719a75c9547e20c523ace8ef77e8b3a2155e95e2244a0a225",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "wrong",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   'cart > checkout > charges the total',\n-   'cart > checkout > handles a future checkout case',\n-   'cart > checkout > rejects an empty cart'\n- ]\n\n    at [stdin]:79:10\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [],\n  expected: [\n    'cart > checkout > charges the total',\n    'cart > checkout > handles a future checkout case',\n    'cart > checkout > rejects an empty cart'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-13-c",
+      "name": "wrong fixture 2",
+      "expected": "failed",
+      "artifact": {
+        "id": "28561d5d-31b0-4546-8cd2-5df79545238f",
+        "sha256": "f3163afff979c485db55ab79ca3b94895657ee8b4232d36e66614b653c3c6ade",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "wrong",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   'cart > checkout > charges the total',\n-   'cart > checkout > handles a future checkout case',\n-   'cart > checkout > rejects an empty cart'\n- ]\n\n    at [stdin]:79:10\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [],\n  expected: [\n    'cart > checkout > charges the total',\n    'cart > checkout > handles a future checkout case',\n    'cart > checkout > rejects an empty cart'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-13-c",
+      "name": "wrong fixture 3",
+      "expected": "failed",
+      "artifact": {
+        "id": "7da511a1-8096-49f5-b8c2-a2fd183c43d3",
+        "sha256": "dba940b9bb92944dff4cb6fb33d0323b8193e137c5f214268835d870ac26dbad",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "wrong",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'cart > checkout > charges the total',\n-   'cart > checkout > handles a future checkout case',\n    'cart > checkout > rejects an empty cart'\n  ]\n\n    at [stdin]:79:10\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [\n    'cart > checkout > charges the total',\n    'cart > checkout > rejects an empty cart'\n  ],\n  expected: [\n    'cart > checkout > charges the total',\n    'cart > checkout > handles a future checkout case',\n    'cart > checkout > rejects an empty cart'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-13-c",
+      "name": "matching flags but zero executed tests",
+      "expected": "failed",
+      "artifact": {
+        "id": "f03d5746-a282-4771-b97b-da46db5661b7",
+        "sha256": "d734d0ef3724fe26a8f624849f454804186b2c955c88408300eba7b1b0190d41",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   'cart > checkout > charges the total',\n-   'cart > checkout > handles a future checkout case',\n-   'cart > checkout > rejects an empty cart'\n- ]\n\n    at [stdin]:79:10\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [],\n  expected: [\n    'cart > checkout > charges the total',\n    'cart > checkout > handles a future checkout case',\n    'cart > checkout > rejects an empty cart'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-13-c",
+      "name": "extra shell command rejected before execution",
+      "expected": "failed",
+      "artifact": {
+        "id": "9568d0af-ce61-490a-a140-b514bee4bffd",
+        "sha256": "61c600bebb283af7a8ad916aaf92b94d14b5a653476f3c453e28c0fd6d40ce23",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "failed",
+      "why": "[stdin]:16\n    else if (/[;&|<>]/.test(c)) throw new Error(\"Shell operators are unsupported.\");\n                                ^\n\nError: Shell operators are unsupported.\n    at checkoutArgs ([stdin]:16:39)\n    at [stdin]:72:16\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-16-c",
+      "name": "correct fixture 1",
+      "expected": "passed",
+      "artifact": {
+        "id": "2e6a9908-af0e-4e83-b9c0-45d3f599ee3c",
+        "sha256": "a3cfc1c089ffcf2e234aa407acb0d7a89860fe3e75e4342268a240dab2f840f2",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "passed",
+      "why": "Pinned-package execution and task acceptance checks passed.",
+      "observations": {
+        "id": "vitest-5-0-0-16-c",
+        "passed": true,
+        "versions": {
+          "node": "24.21.0",
+          "vitest": "5.0.3",
+          "vite": "7.3.1"
+        },
+        "observations": [
+          {
+            "label": "healthy implementation",
+            "exit_code": 0,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects unknown currencies",
+              "convert > rejects when the rates are unavailable"
+            ],
+            "failed": []
+          },
+          {
+            "label": "swallowed fetch failure",
+            "exit_code": 1,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects unknown currencies"
+            ],
+            "failed": [
+              "convert > rejects when the rates are unavailable"
+            ]
+          },
+          {
+            "label": "wrong availability error message",
+            "exit_code": 1,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects unknown currencies"
+            ],
+            "failed": [
+              "convert > rejects when the rates are unavailable"
+            ]
+          },
+          {
+            "label": "broken currency conversion",
+            "exit_code": 1,
+            "passed": [
+              "convert > rejects unknown currencies",
+              "convert > rejects when the rates are unavailable"
+            ],
+            "failed": [
+              "convert > converts with the current rate"
+            ]
+          },
+          {
+            "label": "broken unknown currency error",
+            "exit_code": 1,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects when the rates are unavailable"
+            ],
+            "failed": [
+              "convert > rejects unknown currencies"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "vitest-5-0-0-16-c",
+      "name": "correct fixture 2",
+      "expected": "passed",
+      "artifact": {
+        "id": "a6dade78-3712-4f3d-b8e2-28d0c95a3b6a",
+        "sha256": "464891517c4bcade300b513d85cbfc82f3e4efdbf6e8f403b6e4c8207a136100",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "passed",
+      "why": "Pinned-package execution and task acceptance checks passed.",
+      "observations": {
+        "id": "vitest-5-0-0-16-c",
+        "passed": true,
+        "versions": {
+          "node": "24.21.0",
+          "vitest": "5.0.3",
+          "vite": "7.3.1"
+        },
+        "observations": [
+          {
+            "label": "healthy implementation",
+            "exit_code": 0,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects unknown currencies",
+              "convert > rejects when fetchRates fails"
+            ],
+            "failed": []
+          },
+          {
+            "label": "swallowed fetch failure",
+            "exit_code": 1,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects unknown currencies"
+            ],
+            "failed": [
+              "convert > rejects when fetchRates fails"
+            ]
+          },
+          {
+            "label": "wrong availability error message",
+            "exit_code": 1,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects unknown currencies"
+            ],
+            "failed": [
+              "convert > rejects when fetchRates fails"
+            ]
+          },
+          {
+            "label": "broken currency conversion",
+            "exit_code": 1,
+            "passed": [
+              "convert > rejects unknown currencies",
+              "convert > rejects when fetchRates fails"
+            ],
+            "failed": [
+              "convert > converts with the current rate"
+            ]
+          },
+          {
+            "label": "broken unknown currency error",
+            "exit_code": 1,
+            "passed": [
+              "convert > converts with the current rate",
+              "convert > rejects when fetchRates fails"
+            ],
+            "failed": [
+              "convert > rejects unknown currencies"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "vitest-5-0-0-16-c",
+      "name": "wrong fixture 1",
+      "expected": "failed",
+      "artifact": {
+        "id": "8249ea59-4ce2-4c43-83b4-a1deb24c9423",
+        "sha256": "c6fc182c936139c2b843e7a0dadbf16e64d9dc3b109458f2466cc15afdec9d7e",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "wrong",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at [stdin]:87:10\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-16-c",
+      "name": "skipped rejection test",
+      "expected": "failed",
+      "artifact": {
+        "id": "5099ef43-a429-4fae-965d-46e19ae25608",
+        "sha256": "4a1dd29ac722e8dfe950ab9e5bc85195633fa51f59cd99e986c9675c23734aa1",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Keep both original tests and actually execute the new rejection test\n\n2 !== 3\n\n    at [stdin]:89:10\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 2,\n  expected: 3,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-16-c",
+      "name": "wrong expected error despite matching keywords",
+      "expected": "failed",
+      "artifact": {
+        "id": "9c712fd3-e1fa-4c74-8b7a-1824608f413f",
+        "sha256": "3e3038e3c596d4f78cffaaff14b081c27fb0e4148cad77540bbd9f8d902fbaa5",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at [stdin]:87:10\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-16-c",
+      "name": "unrelated passing assertion",
+      "expected": "failed",
+      "artifact": {
+        "id": "2741907b-8376-400b-b1d7-58ff2bfe3d71",
+        "sha256": "8b0ba08bcf33ee389be8cb97876d0ddb53337699c655747441489cb69351449f",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: swallowed fetch failure must be detected\n    at [stdin]:104:12\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 0,\n  expected: 0,\n  operator: 'notStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    },
+    {
+      "id": "vitest-5-0-0-16-c",
+      "name": "generic rejection without checking the required message",
+      "expected": "failed",
+      "artifact": {
+        "id": "b08deead-49c7-4553-8327-f1c874dbdb27",
+        "sha256": "b83d045d35404fce1111bca820b2844b9db3da783e2f3b183ca5f281390d6690",
+        "source_profile": "bench-source-v1"
+      },
+      "static_verdict": "correct",
+      "verdict": "failed",
+      "why": "node:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: wrong availability error message must be detected\n    at [stdin]:104:12\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_stdin:51:5\n    at Socket.<anonymous> (node:internal/process/execution:205:5)\n    at Socket.emit (node:events:526:24) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 0,\n  expected: 0,\n  operator: 'notStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0"
+    }
+  ]
+}

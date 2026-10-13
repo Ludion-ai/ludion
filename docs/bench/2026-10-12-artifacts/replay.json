@@ -1,0 +1,50 @@
+{
+  "checked_at": "2026-10-12T12:17:55.202Z",
+  "runtime": "node@24",
+  "packages": {
+    "vitest": "5.0.3",
+    "vite": "7.3.1"
+  },
+  "kind": "runtime project acceptance",
+  "rows": [
+    {
+      "id": "vitest-5-0-0-13-c",
+      "artifact_sha256": "8c26c62971057f9cac390ed7759b4c66e994f31d208bf4da8bb4c42a6a542e46",
+      "capture_harness_sha": "c8e2756d4f5e3da755212956b971f274f387764a",
+      "evaluation_harness_sha": "c8e2756d4f5e3da755212956b971f274f387764a",
+      "inputs_sha256": "9ef566a62991ffaac23446275f0331cade461b124bbfd8df093f7062ed13cb2a",
+      "candidate_sha256": "7185f5486a2ceb70e9e95f45dbbaa4a60170ec380213573cf4f1119add211e66",
+      "task_sha256": "7d7eb0e834e770127116952bd0d987e5e0686c8a6518d10742f2304121db122e",
+      "trial": 1,
+      "model": "fixture",
+      "sync": false,
+      "site": null,
+      "offline": false,
+      "sync_cli_sha256": null,
+      "delivery_sha256": null,
+      "verdict": "passed",
+      "why": "Pinned-package execution and task acceptance checks passed.",
+      "observations": {
+        "id": "vitest-5-0-0-13-c",
+        "passed": true,
+        "versions": {
+          "node": "24.21.0",
+          "vitest": "5.0.3",
+          "vite": "7.3.1"
+        },
+        "observations": [
+          {
+            "label": "checkout selection including a future case",
+            "exit_code": 0,
+            "passed": [
+              "cart > checkout > charges the total",
+              "cart > checkout > handles a future checkout case",
+              "cart > checkout > rejects an empty cart"
+            ],
+            "failed": []
+          }
+        ]
+      }
+    }
+  ]
+}

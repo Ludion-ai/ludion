@@ -51,7 +51,7 @@ The whole gain came from changes a lesson covers; the others didn't move. One tr
 
 - `lessons/`: one JSON file per lesson. `main` is the truth: only lessons on main are served.
 - `packages/core`: the schema, generated claims, search, source checks, and the index builder.
-- `packages/cli`: the `ludion-ai` CLI (`sync`, `teach`). No telemetry.
+- `packages/cli`: the `ludion-ai` CLI (`sync`, `teach`). No telemetry from the CLI; the Worker counts index downloads without storing IP addresses (`docs/decisions.md`, "Counting index requests").
 - `apps/site`, `apps/worker`: <https://ludion.ai>, `/index.json`, the per-subject shards, and `/mcp`.
 - `tools/verify`: CI's lesson checks; `tools/bench`: FreshBench.
 - `plugin/`: the Claude Code plugin.

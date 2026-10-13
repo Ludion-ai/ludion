@@ -108,7 +108,7 @@ export const en = {
       "When your assistant gets a change wrong, ask it to draft a lesson with ludion_teach, then run the command it gives you. ludion teach shows you the whole lesson, checks its sources, runs its tests only in Docker, and saves it to your ledger, so sync writes it in every project on your machine that installs a matching version. Add --public to open a pull request in your own name; CI checks it again, and a maintainer merges it.",
     privacy: "What leaves your machine",
     privacyBody:
-      "sync downloads the lesson lists for the packages in your lockfile, and nothing else. No telemetry. teach fetches the source pages it cites, and --public uses your own gh. Through the MCP server, ludion_ask sends your question to ludion.ai, and ludion_teach sends the draft.",
+      "sync downloads the lesson lists for the packages in your lockfile, and nothing else. The CLI sends no telemetry; its only extra is a User-Agent that names its version. ludion.ai counts those downloads, to know how many distinct clients use sync: for each one it stores the day, the file asked for, the CLI's version, and a key made from your IP address and User-Agent that is different every day, so it can't be followed from one day to the next. The address and the User-Agent themselves are not stored. teach fetches the source pages it cites, and --public uses your own gh. Through the MCP server, ludion_ask sends your question to ludion.ai, and ludion_teach sends the draft.",
   },
   footer: {
     count: (lessons: number, teachers: number) =>

@@ -76,6 +76,11 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 
 ## Log
 
+### 2026-10-13: Benchmark file-tool scope tightened
+
+- Found project-wide bare file-tool allow rules and the `default` tool surface. Replaced these with explicit tools and restricted directory checks; an editing run has no command/subagent tool, while the read-only prepared-project allowances remain.
+- Configuration checks, installed CLI boundary documentation and local suite passed (`docs/bench/2026-10-13-agent-boundary/`). No model measurement or actual credential/file-access probe was invoked; old results are unchanged. Stacked on #69, awaiting exact-head CI and protected-base owner merge.
+
 ### 2026-10-13: Security/runtime/artifact stack integrated and reviewed
 
 - Integrated main `f48ade4` into #67, then propagated it through #68 and #69; preserved CLI 0.1.4/User-Agent, pipeline changes, hardened shard reading and both histories. Restricted Actions API-key forwarding to explicit no-tool/folder-confined pipeline runs.

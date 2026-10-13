@@ -25,3 +25,12 @@ test("each model page names its share card, and the card is a 1200×630 PNG", as
     expect([png.width, png.height]).toEqual([1200, 630]);
   }
 });
+
+test("/bench never scrolls sideways, at any width the knowledge figure switches around", async ({ page }) => {
+  for (const width of [360, 390, 700, 761, 800, 900, 1010, 1024, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/bench/");
+    const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+    expect(scroll, `${width}px`).toBeLessThanOrEqual(client);
+  }
+});

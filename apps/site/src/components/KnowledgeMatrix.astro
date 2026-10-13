@@ -1,0 +1,310 @@
+---
+// Every model's knowledge in one figure: a row per model, a column per active lesson grouped by subject, a square in
+// each cell. Filled (--mark): the model knows the change without tools. Outline: it doesn't. Dotted: not measured.
+// The count of measured lessons it doesn't know sits at the row's end. Where the full figure can't fit with its
+// squares at their smallest (8 px), it is cut by subject instead: the counts first, then per subject a short row of
+// squares per model, so the models still line up. Which one shows depends on the figure's own width, computed here
+// from its columns. Squares are links out of the tab order and the accessibility tree (the lesson list has every
+// lesson as text); each model's count is said in one sentence.
+import { plain, type Knowledge } from "../build/knowledge.ts";
+import { en } from "../strings/en.ts";
+
+interface Props {
+  k: Knowledge;
+}
+const { k } = Astro.props;
+const b = en.bench;
+const kn = b.knowledge;
+const subjects = [...new Set(k.lessons.map((l) => l.subject))];
+const groups = subjects.map((s) => k.lessons.filter((l) => l.subject === s));
+const short = (name: string) => name.replace(/^Claude\s+/, "");
+// Columns the squares are sized by: each lesson, plus the room a short group keeps for its name (at least 4 wide).
+const cols = groups.reduce((t, g) => t + Math.max(g.length, 4), 0);
+const longest = Math.max(1, ...groups.map((g) => g.length));
+const tip = (l: (typeof k.lessons)[number], v: string) => `${plain(l.sentence)}\n${l.subject}/ · ${kn.tip[v]}${l.drafted ? ` · ${en.lesson.draftedAlone}` : ""}`;
+const first = (name: string) => short(name).replace(/\s.*$/, "");
+// The narrowest the full figure can be: every column at 8 px plus its 3 px gap, the names, the counts, the gaps.
+const minWidth = Math.ceil(cols * 11.5 + 120 + 112 + 48 + groups.length * 16 + 8);
+const switchCss = `.km{container:km / inline-size}.km-narrow{display:none}@container km (max-width:${minWidth}px){.km-wide{display:none}.km-narrow{display:block}}`;
+---
+
+<Fragment set:html={`<style>${switchCss}</style>`} />
+<div class="km">
+<div class="matrix km-wide" style={`--n:${cols};--groups:${groups.length}`}>
+  <div class="row head" aria-hidden="true">
+    <span />
+    <span class="groups">
+      {groups.map((g) => (
+        <span class="group" style={`--c:${g.length}`}>
+          <span class="subj">{g[0]!.subject}/</span>
+        </span>
+      ))}
+    </span>
+    <span class="count-head">{kn.countShort}</span>
+  </div>
+  {
+    k.strips.map((s, m) => (
+      <div class="row" style={`--delay:${m * 220}ms`}>
+        <p class="name">
+          <a href={`/bench/${s.model}/`}>{short(s.name)}</a>
+        </p>
+        <span class="groups" aria-hidden="true">
+          {groups.map((g, gi) => (
+            <span class="group" style={`--c:${g.length}`}>
+              <span class="subj">{g[0]!.subject}/</span>
+              {g.map((l, li) => {
+                const v = l.verdicts[s.model] ?? "none";
+                const i = groups.slice(0, gi).reduce((t, x) => t + x.length, 0) + li;
+                return (
+                  <a
+                    class:list={["sq", v]}
+                    href={`/lessons/${l.id}/`}
+                    tabindex="-1"
+                    style={`--i:${i}`}
+                    data-tip={tip(l, v)}
+                  />
+                );
+              })}
+            </span>
+          ))}
+        </span>
+        <p class="count">
+          <span class="big" aria-hidden="true">
+            {s.misses.correct}
+            <span class="of">/{s.misses.total}</span>
+          </span>
+          <span class="ci" aria-hidden="true">
+            {b.range(s.misses.low, s.misses.high)}
+          </span>
+          <span class="visually-hidden">
+            {kn.summary(s.name, s.misses.correct, s.misses.total, s.notMeasured)} {b.interval(b.percent(s.misses.low), b.percent(s.misses.high))}.
+          </span>
+        </p>
+      </div>
+    ))
+  }
+</div>
+
+<div class="narrow km-narrow" style={`--max:${longest}`}>
+  <div class="counts">
+    {
+      k.strips.map((s) => (
+        <a href={`/bench/${s.model}/`} aria-label={`${kn.summary(s.name, s.misses.correct, s.misses.total, s.notMeasured)} ${b.interval(b.percent(s.misses.low), b.percent(s.misses.high))}.`}>
+          <span class="who" aria-hidden="true">{short(s.name)}</span>
+          <span class="big" aria-hidden="true">
+            {s.misses.correct}
+            <span class="of">/{s.misses.total}</span>
+          </span>
+          <span class="ci" aria-hidden="true">{b.range(s.misses.low, s.misses.high)}</span>
+        </a>
+      ))
+    }
+  </div>
+  {
+    groups.map((g) => (
+      <div class="chunk" aria-hidden="true">
+        <p class="csubj">{g[0]!.subject}/</p>
+        {k.strips.map((s) => (
+          <div class="crow">
+            <span class="cwho">{first(s.name)}</span>
+            <span class="csq">
+              {g.map((l) => {
+                const v = l.verdicts[s.model] ?? "none";
+                return <a class:list={["sq", v]} href={`/lessons/${l.id}/`} tabindex="-1" data-tip={tip(l, v)} />;
+              })}
+            </span>
+          </div>
+        ))}
+      </div>
+    ))
+  }
+</div>
+
+</div>
+<style>
+  /* The squares fill the width left after the names and counts, never larger than 14 px. */
+  .matrix {
+    container-type: inline-size;
+    --g: 3px;
+    --gap: 16px;
+    --name: 7.5rem;
+    --tail: 7rem;
+    --s: clamp(8px, calc((100cqw - var(--name) - var(--tail) - 48px - var(--groups) * var(--gap)) / var(--n) - var(--g) - 0.5px), 14px);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: var(--name) 1fr var(--tail);
+    gap: 0 24px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .row.head {
+    border-top: 0;
+    padding: 0 0 8px;
+    align-items: end;
+  }
+  .name {
+    margin: 0;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .name a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .name a:hover {
+    text-decoration: underline;
+  }
+  .groups {
+    display: flex;
+    gap: var(--gap);
+  }
+  .group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--g);
+    /* Wide enough for its name, so the header lines up with the rows below. */
+    min-width: calc(4 * (var(--s) + var(--g)));
+    width: calc(var(--c) * (var(--s) + var(--g)) - var(--g));
+    align-content: flex-start;
+  }
+  .subj {
+    display: none;
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .head .subj {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule-strong);
+    width: 100%;
+  }
+  .count-head {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.3;
+  }
+  .sq {
+    display: block;
+    width: var(--s);
+    height: var(--s);
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1.5px solid var(--mark);
+    animation: light 0.3s ease-out calc(var(--delay, 0ms) + var(--i) * 12ms) both;
+  }
+  .sq.knows {
+    background: var(--mark);
+  }
+  .sq.none {
+    border: 1.5px dotted var(--checking-line);
+  }
+  .sq:hover {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+  @keyframes light {
+    from {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sq {
+      animation: none;
+    }
+  }
+  .count {
+    margin: 0;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .big {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .of {
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .ci {
+    margin-top: 4px;
+    font-family: var(--font-code);
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .narrow {
+    container-type: inline-size;
+    --g: 2px;
+    --s: clamp(7px, calc((100cqw - 4.2rem) / var(--max) - var(--g) - 0.5px), 13px);
+  }
+  .counts {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .counts a {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .counts a + a {
+    padding-left: 14px;
+    border-left: 1px solid var(--rule);
+  }
+  .who {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .counts .big {
+    font-size: 26px;
+  }
+  .counts .ci {
+    margin-top: 0;
+  }
+  .chunk {
+    padding: 14px 0 2px;
+  }
+  .csubj {
+    margin: 0 0 8px;
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .crow {
+    display: grid;
+    grid-template-columns: 4.2rem 1fr;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .cwho {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .csq {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--g);
+  }
+</style>

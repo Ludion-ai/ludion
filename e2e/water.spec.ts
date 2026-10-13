@@ -108,12 +108,19 @@ for (const { path, moments } of pages) {
       await page.clock.runFor(100);
 
       const coverage = await page.evaluate(() => {
-        const canvas = document.querySelector<HTMLCanvasElement>("canvas.water")!.getBoundingClientRect();
+        const el = document.querySelector<HTMLCanvasElement>("canvas.water")!;
+        const canvas = el.getBoundingClientRect();
         const pool = document.querySelector<HTMLElement>("[data-water]")!.getBoundingClientRect();
-        return { top: canvas.top, bottom: canvas.bottom, oldBottom: pool.top - 24 + Math.min(pool.height + 64, 760) };
+        const oldHeight = Math.min(pool.height + 64, 760);
+        return {
+          top: canvas.top, bottom: canvas.bottom, oldBottom: pool.top - 24 + oldHeight,
+          pixels: el.width * el.height,
+          maxPixels: canvas.width * oldHeight * Math.min(devicePixelRatio || 1,1.5) ** 2 + el.width + el.height,
+        };
       });
       expect(coverage.top, "water reaches the page top").toBeCloseTo(0, 0);
       expect(coverage.bottom, "water keeps its previous lower edge").toBeCloseTo(coverage.oldBottom, 0);
+      expect(coverage.pixels,"extended wave keeps the old raster-pixel budget").toBeLessThanOrEqual(coverage.maxPixels);
 
       // Let the text finish arriving (CSS animations run on real time), then record where every piece of text is.
       await page.waitForFunction(() => document.getAnimations().every((a) => a.playState === "finished" || a.playState === "idle"));

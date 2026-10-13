@@ -5,7 +5,8 @@
 // is where one ring starts, at --done seconds (the home replay) or data-water-at seconds. One pool per page.
 // The canvas never paints a background. In dark it only adds light (screen); in light it only tints (multiply).
 // So the page's own color always shows through and there is no band or seam to see.
-// 30 fps cap, paused off-screen or in a hidden tab, DPR capped at 1.5. Reduced motion: one still frame.
+// 30 fps cap, paused off-screen or in a hidden tab. Raster pixels never exceed the old pool at DPR 1.5.
+// Reduced motion: one still frame.
 // No WebGL2: the canvas is removed and the page stays plain design B.
 // Text contrast over the water is tested in e2e/water.spec.ts; don't raise the dark `peak` without re-running it.
 (() => {
@@ -113,11 +114,14 @@
 
   let dpr = 1, hitX = 260, surface = 44, poolStart = 0;
   const size = () => {
-    dpr = Math.min(devicePixelRatio || 1, 1.5);
     const pool = bottle.getBoundingClientRect();
     poolStart = pool.top + scrollY - 24;
     // The old canvas began 24 px above the pool and was capped at 760 px. Only extend its upper edge.
-    canvas.style.height = `${poolStart + Math.min(pool.height + 64, 760)}px`;
+    const oldHeight = Math.min(pool.height + 64, 760);
+    const height = poolStart + oldHeight;
+    canvas.style.height = `${height}px`;
+    // This is a soft background. Extending it must not multiply the number of shaded pixels per frame.
+    dpr = Math.min(devicePixelRatio || 1, 1.5) * Math.min(1, Math.sqrt(oldHeight / height));
     const r = canvas.getBoundingClientRect();
     canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);

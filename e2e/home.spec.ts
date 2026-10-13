@@ -44,6 +44,20 @@ test("without JavaScript, both recorded answers and setup remain available", asy
   await context.close();
 });
 
+test("switching recorded answers keeps the page position stable at each layout", async ({page}) => {
+  for (const width of [320,390,1280]) {
+    await page.setViewportSize({width,height:900});
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    const comparison = page.locator("[data-comparison]");
+    const before = await comparison.boundingBox();
+    await comparison.getByRole("button",{name:"Without sync",exact:true}).click();
+    const after = await comparison.boundingBox();
+    expect(after?.height,`${width}px comparison height`).toBeCloseTo(before!.height,0);
+    await expect(comparison.locator('[data-answer="with"]')).toBeHidden();
+  }
+});
+
 test("changing reduced motion stops and resumes the wave without reloading", async ({ page }) => {
   await page.clock.install();
   await page.emulateMedia({reducedMotion:"no-preference"});

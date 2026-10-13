@@ -2,6 +2,9 @@
 import { expect, test } from "@playwright/test";
 import { PNG } from "pngjs";
 
+// These checks inspect static geometry and URLs; live motion is checked by home/water tests.
+test.use({ reducedMotion: "reduce" });
+
 test("/models redirects to /bench", async ({ request }) => {
   for (const path of ["/models", "/models/"]) {
     const res = await request.get(path, { maxRedirects: 0 });

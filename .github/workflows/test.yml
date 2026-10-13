@@ -44,5 +44,33 @@ jobs:
       # The design samples include a format 1 lesson, so this catches pages that only handle format 0.
       - run: npm run build:samples -w @ludion/site
       - run: npm test
+      - name: Exercise the real Docker sandbox with own harmless probes
+        run: node tools/sandbox-smoke.ts
+      - name: Check C-task runtime acceptance against correct, stale and misleading fixtures
+        run: node tools/bench/src/runtime-tasks-cli.ts --self-check --artifact-dir "$RUNNER_TEMP/runtime-artifacts" --out runtime-acceptance.json
+      - name: Replay a saved source fixture through the actual no-model CLI
+        run: node tools/bench/src/replay-smoke.ts runtime-acceptance.json "$RUNNER_TEMP/runtime-artifacts" runtime-replay.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: runtime-acceptance
+          path: |
+            runtime-acceptance.json
+            runtime-replay.json
+            ${{ runner.temp }}/runtime-artifacts
+          if-no-files-found: ignore
+
       # Playwright + axe on every page, light and dark, against the built site under wrangler dev.
       - run: npm run test:e2e
+
+      - name: Pack the CLI for minimum-runtime checks
+        working-directory: packages/cli
+        run: |
+          archive=$(npm pack --pack-destination "$RUNNER_TEMP" --silent)
+          mkdir -p "$RUNNER_TEMP/ludion-cli"
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP/ludion-cli"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.19.0' # the CLI's declared minimum, including its bundled HTTP client
+      - name: Check the tarball on the minimum Node
+        run: node tools/cli-smoke.mjs "$RUNNER_TEMP/ludion-cli/package"

@@ -1,9 +1,9 @@
 // Every UI string. Japanese will be a translation of this file, not a refactor.
-import type { VerifiedBy } from "@ludion/core";
+import { EVIDENCE_SCOPE, type VerifiedBy } from "@ludion/core";
 export const en = {
   site: {
     name: "Ludion",
-    description: "Ludion is a public, writable AI model. People teach it, machines verify every lesson, and every assistant can use it.",
+    description: "Ludion holds teacher claims about software changes with machine-checked evidence for coding assistants.",
   },
   nav: {
     label: "Main",
@@ -18,9 +18,9 @@ export const en = {
     replayTitle: "How a lesson passes",
     checking: "Checking",
     replay: (by: VerifiedBy, date: string) =>
-      `A replay of how this lesson passed: ${by === "test" ? "CI ran its test" : by === "differential" ? "CI ran its tests on two versions" : by === "proof" ? "Lean checked its proof" : "its quote was found on the source page"}, and it was verified on ${date}.`,
+      `A replay of how its evidence passed: ${by === "test" ? "CI ran its test" : by === "differential" ? "CI ran its tests on two versions" : by === "proof" ? "Lean checked its proof" : "its quote was found on the source page"}, checked on ${date}.`,
     logTitle: (by: VerifiedBy, runner: string) => (by === "source" ? "Source check" : by === "proof" ? "Proof check (lean)" : `Test (${runner})`),
-    recent: "Recently verified",
+    recent: "Recently checked",
     seeLessons: "See all lessons",
   },
   lessons: {
@@ -30,7 +30,8 @@ export const en = {
     empty: "No lessons yet.",
   },
   lesson: {
-    verifiedBy: { test: "Verified by test", differential: "Verified across versions", proof: "Verified by proof", source: "Verified by source" },
+    verifiedBy: { test: "Test passed", differential: "Tests across versions", proof: "Proof checked", source: "Quote found" },
+    evidenceScope: EVIDENCE_SCOPE,
     on: (date: string) => `on ${date}`,
     appliesTo: (subject: string, version?: string | null) => `Applies to ${subject}${version ? ` ${version}` : ""}`,
     taughtBy: "Taught by",
@@ -50,7 +51,7 @@ export const en = {
     draftedAlone: "Drafted by an agent",
   },
   record: {
-    verified: "Verified",
+    verified: "Evidence checked",
     appliesTo: "Applies to",
     teacher: "Teacher",
     check: "Check it yourself",
@@ -232,7 +233,7 @@ export const en = {
   start: {
     title: "Start | Ludion",
     heading: "Start",
-    intro: "Ludion tells your coding assistant what changed in the versions your project installed. Each change is checked by a machine and signed by the person who taught it.",
+    intro: "Ludion gives your coding assistant teacher claims about changes in the versions your project installed. Machines check their evidence; the teacher signs the claim.",
     claudeCode: "In Claude Code",
     claudeCodeBody:
       "The plugin runs ludion sync at the start of every session and adds the Ludion MCP server (ludion_ask, ludion_teach).",

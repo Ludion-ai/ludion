@@ -175,3 +175,55 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 - wrangler drafting: 31 drafted and 1 skipped saved; 24 runs ended on the usage limit and their error records were removed. Resume: `node tools/seed/src/cli.ts draft docs/bench/2026-10-12-seed/wrangler --kinds default,behavior,deprecated,renamed,removed --signal silent`, then `check`, `review`, `lessons` (one round of `revise` at most) and `summary` on that folder.
 - Next step 1 is still open: write `docs/bench/2026-10-12-seed/README.md` comparing candidates → passed local checks → review findings → CI for agents (summary.json exists; PR #62 is the CI run, 6 of 6 passed Docker), vitest and wrangler, against the hand-made seeds (`calibrate-hand-seeds.json`: 46 findings on 30 accepted lessons; reviewer was Opus there). Models differed across runs (agents and vitest Opus, wrangler partly Sonnet); say so in the README.
 - Open PRs: #54 (issue form, owner), #60 (consent draft), #62 (6 agents lessons, owner; test re-run on the merged branch is pending in CI), #66 (outreach, auto-merge), the spending-rules docs PR (auto-merge). `seed-pipeline` has no PR yet.
+
+## Security and benchmark inspection
+
+These parallel inspection notes are kept separately so new main progress entries can be prepended without colliding with this audit. The cumulative owner-review change is PR #69. Exact source scopes and checks are in docs/bench/2026-10-13-integration/ and the PR; older blocked statuses below are superseded by the completed reviews.
+
+### 2026-10-13: One cumulative protected PR for owner merge
+
+- #69 now targets main and contains the reviewed #67/#68 source plus #98's agent-boundary correction, merged only into the feature branch after its checks passed. Earlier stacked PRs are superseded by this cumulative diff; main still requires the owner's merge.
+- Current main's already-merged lesson is retained. Blob comparison proves every protected file changed by this cumulative PR still matches the completed Opus source snapshot (`docs/bench/2026-10-13-integration/consolidation.json`). The later agent-boundary/E2E changes are unprotected and validated by tests/CI. Exact final-head checks are in #69; no production or npm action was performed.
+
+### 2026-10-13: Benchmark file-tool scope tightened
+
+- Found project-wide bare file-tool allow rules and the `default` tool surface. Replaced these with explicit tools and restricted directory checks; an editing run has no command/subagent tool, while the read-only prepared-project allowances remain.
+- Configuration checks, installed CLI boundary documentation and local suite passed (`docs/bench/2026-10-13-agent-boundary/`). No model measurement or actual credential/file-access probe was invoked; old results are unchanged. The correction is now included in cumulative #69; exact-head checks are in that PR and owner merge is still required.
+
+### 2026-10-13: Security/runtime/artifact stack integrated and reviewed
+
+- Integrated main `f48ade4` into #67, then propagated it through #68 and #69; preserved CLI 0.1.4/User-Agent, pipeline changes, hardened shard reading and both histories. Restricted Actions API-key forwarding to explicit no-tool/folder-confined pipeline runs.
+- Required fresh Opus review completed with no actionable blocker for each protected PR. Exact reviewed heads, scope and limitations are in `docs/bench/2026-10-13-integration/opus-review.*` and the PR comments; this supersedes the earlier blocked-review status below. Subsequent changes only fix an observed async E2E response-body race and record validation.
+- Integrated artifact-stack local typecheck/build/tests passed; records are in the same directory. Final exact-head CI is checked in the PRs. Owner merge remains required; no model benchmark, npm approval/publication or production action was performed by this work.
+
+### 2026-10-12: Source capture and runtime replay prepared
+
+- C runner now captures supported before/after sources and private delivery context outside the score directory, with provenance/integrity references in each new row. No-model CLI replays saved artifacts after verifying source/task/base hashes. Unsupported inputs no longer silently disappear from the snapshot.
+- Fixed numeric spending bounds, remaining per-run allowance and condition-safe resume; model measurement is opt-in, unknown reported costs and capture failure stop later runs. Historical results and the spending pause are preserved.
+- Worktree `C:/dev/ludion-wt-codex-artifacts`, branch `codex/bench-artifact-replay`, stacked on #68. Check details: `docs/bench/2026-10-12-artifacts/`: local tests and CI artifact linkage/replay passed. PR #69 is stacked on #68. Required review/owner merge remain pending; no model benchmark, npm release or deployment was run.
+
+### 2026-10-12: C-task runtime acceptance pilot checked
+
+- Added optional Docker-only execution acceptance for test selection and top-level mocking tasks. Require actual test participation and relevant assertion failures under implementation mutations; matching regexes or exit zero alone are insufficient.
+- New CLI checks fixtures or a complete saved project without invoking a model. Unsupported/infrastructure outcomes stay unscored, and historical C results are preserved. The real Linux Docker fixture outcomes match expectations; raw data/provenance and the static/runtime comparison are in the bench record. Local Docker is unavailable.
+- Worktree `C:/dev/ludion-wt-codex-runtime-eval`, branch `codex/runtime-task-acceptance`, stacked on PR #67's hardened runner. Acceptance details/check records: `docs/bench/2026-10-12-runtime/`. Required Opus review remains blocked, so this protected work stays draft for owner review.
+
+### 2026-10-12: Security inspection continued in PR #67
+
+- Added streamed byte limits ahead of public MCP parsing and shard JSON buffering; schema/grounding validation and claim regeneration at the remote reader; canonical ledger PR URLs; atomic, private ledger saves and damaged-entry handling.
+- Private ledger sync now protects generated files from default Git staging and refuses tracked files, including Windows case variants. Hardened Docker install/execution privileges and added own harmless Linux CI probes for actual sandbox behavior.
+- Updated dependencies to patched MCP peers and sharp through current Wrangler/test tooling. Clean install and audit, tests, E2E, minimum-Node tarball and current-public-data compatibility are recorded in `docs/bench/2026-10-12-security/`.
+- Supplemental Codex review exposed two boundary defects that were repaired and regression-tested. Mandatory Opus review remains BLOCKED; owner merge, npm release and production reflection are still pending. No paid benchmark or arbitrary lesson execution was started.
+
+### 2026-10-12: Codex inspection fixes prepared for owner review
+
+- Sync now reads retirement ids even when a subject has no active lessons, suppresses retired ledger copies, and applies public/private corrections before matching installed versions. Offline/legacy public copies carry an unknown-status label; mixed manifest/shard builds abort.
+- The CLI minimum and bundle target now match undici: Node 22.19.0. PR and publish CI smoke-test the extracted npm tarball on that exact minimum.
+- CLI/MCP/site/index/llms.txt label evidence observations without claiming machine validation of the generated claim's semantics; public lesson reviewers must check kind, range, replacement and signal against primary sources or test assertions.
+- Check records: `docs/bench/2026-10-12-codex-fixes/`. Codex static review found no code blocker. **Required Opus review is BLOCKED**: the single invocation returned `usage_limit_reached` before generating model tokens. Leave the protected PR in draft and unmerged until the required review and owner's merge. npm and production are unchanged by these local checks; release still needs a new CLI version and owner's npm approval.
+
+### 2026-10-13: Host executable selection and scalar source integrity
+
+Measured native Windows project-local Git shadowing with our installed Node copy and --version only. Host tools now resolve explicitly outside inspected/caller repositories and npm bins, including nested Git roots; Git -C sets the target cwd. Added boundary regression tests and rejected JSON-escaped unpaired surrogate source/delivery text. Local build/typecheck pass, 543 tests pass and one platform-specific test skips. Protected command helper fresh Opus review and latest hosted CI pending; no main merge or npm release performed.
+
+Fresh no-tools Opus review completed for command boundary snapshot 7cb1695bd0a6757e269a9707485af7de30efb1a1. First review identified a global dispatch shim compatibility regression; treated as merge-blocking and corrected, with a changed-parts-only follow-up at df510e9771f9d7ebce3a635e16a5ee8b814232b9. Verdicts and provider receipts are in `docs/bench/2026-10-13-command/`. All eight changed protected files match completed review snapshots by Git blob. Later editorial main b882a9ad9bdd17bfb896eb772540457cfa358ec3 merged cleanly without changing protected code. Windows typecheck and 543 tests pass; two POSIX tests skip. Hosted final-head CI remains the release gate; owner alone merges PR #69.

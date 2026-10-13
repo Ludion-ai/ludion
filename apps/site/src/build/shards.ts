@@ -3,9 +3,16 @@
 // (docs/bench/models.json), so sync can leave out what the target model knows.
 import { join } from "node:path";
 import type { Index, IndexEntry } from "@ludion/core";
+import type { LessonPage, Tombstone } from "./data.ts";
 import { readModels } from "./models.ts";
 
 export type ModelVerdicts = Record<string, Record<string, "knows" | "misses">>;
+
+/** Known inactive ids even when a subject lost its last active lesson. No lesson bodies are needed by sync. */
+export function inactiveIds(index: Index, pages: Pick<LessonPage, "lesson">[], tombstones: Pick<Tombstone, "id">[]): string[] {
+  const active = new Set(index.lessons.map((l) => l.id));
+  return [...new Set([...pages.map((p) => p.lesson.id), ...tombstones.map((t) => t.id)])].filter((id) => !active.has(id)).sort();
+}
 
 export interface Shards {
   built_at: string;
@@ -19,7 +26,7 @@ export function readModelVerdicts(root = join(process.cwd(), "../..")): ModelVer
 }
 
 export function shardsOf(index: Index, verdicts: ModelVerdicts = readModelVerdicts()): Shards {
-  const shards: Shards["shards"] = {};
+  const shards: Shards["shards"] = Object.create(null);
   for (const l of index.lessons) {
     if (l.format !== 1) continue;
     const shard = (shards[l.subject] ??= { built_at: index.built_at, subject: l.subject, lessons: [] });

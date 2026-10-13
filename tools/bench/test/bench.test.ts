@@ -90,13 +90,23 @@ describe("project condition", () => {
     }
   });
 
-  it("uses Claude Code's default tools, allows only the safe set, and accepts edits only when edits are allowed", () => {
+  it("exposes an explicit tool set and never exposes commands or subagents to an editing run", () => {
     const base = { model: "opus", maxTurns: 8, maxBudgetUsd: 1, condition: "project" as const };
     const ro = claudeArgs(base);
-    expect(ro[ro.indexOf("--tools") + 1]).toBe("default");
+    expect(ro[ro.indexOf("--tools") + 1]).toBe("Read,Glob,Grep,WebSearch,WebFetch,Bash");
     expect(ro).not.toContain("--permission-mode");
     const rw = claudeArgs({ ...base, allowEdits: true });
+    expect(rw[rw.indexOf("--tools") + 1]).toBe("Read,Glob,Grep,Edit,Write,WebSearch,WebFetch");
     expect(rw[rw.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
+  });
+
+  it.each([false, true])("does not pre-approve arbitrary file paths (allowEdits=%s)", (allowEdits) => {
+    const args = claudeArgs({ ...base, condition: "project", allowEdits });
+    const allowed = args[args.indexOf("--allowedTools") + 1]!.split(",");
+    expect(allowed.some((rule) => /^(Read|Glob|Grep|Edit|Write)(\(|$)/.test(rule))).toBe(false);
+    expect(args).toContain("--restricted");
+    expect(args[args.indexOf("--disallowedTools") + 1]).toContain("Read(//proc/**)");
+    expect(args).not.toContain("--add-dir");
   });
 
   it("gives the seed pipeline's drafting agents files only: no shell, no web, edits only inside their folder, no system reads", () => {
@@ -104,6 +114,7 @@ describe("project condition", () => {
     expect(args[args.indexOf("--tools") + 1]).toBe("Read,Glob,Grep,Edit,Write");
     // Nothing is pre-approved (an allow rule would cover any path); acceptEdits takes edits inside the working folder.
     expect(args).not.toContain("--allowedTools");
+    expect(args).toContain("--restricted");
     expect(args[args.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
     expect(args[args.indexOf("--disallowedTools") + 1]).toContain("Read(//proc/**)");
     expect(args.join(" ")).not.toMatch(/Bash|WebFetch|WebSearch/);
@@ -120,7 +131,9 @@ describe("project condition", () => {
     expect(env).toEqual({ PATH: "/bin", USERPROFILE: "C:/Users/x" });
     // An API key in a person's shell stays out; only GitHub Actions (the seed watch) passes it.
     expect(runEnv({ PATH: "/bin", ANTHROPIC_API_KEY: "k" })).toEqual({ PATH: "/bin" });
-    expect(runEnv({ PATH: "/bin", ANTHROPIC_API_KEY: "k", GITHUB_ACTIONS: "true", GH_TOKEN: "t" })).toEqual({ PATH: "/bin", ANTHROPIC_API_KEY: "k" });
+    const ci = { PATH: "/bin", ANTHROPIC_API_KEY: "sentinel", GITHUB_ACTIONS: "true", GH_TOKEN: "t" };
+    for (const condition of ["none", "files"] as const) expect(runEnv(ci, condition)).toEqual({ PATH: "/bin", ANTHROPIC_API_KEY: "sentinel" });
+    for (const condition of [undefined, "project", "web", "ludion"] as const) expect(runEnv(ci, condition)).toEqual({ PATH: "/bin" });
   });
 });
 describe("vitest-extends grader", () => {

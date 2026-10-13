@@ -1,5 +1,5 @@
+import { execTool } from "../../../../tools/verify/src/command.ts";
 // Build-time data for every page. Runs in Node during `astro build` only; never shipped to the browser.
-import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import {
@@ -90,7 +90,7 @@ function monogram(login: string, id: number): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="hsl(0 0% ${lightness}%)"/><text x="20" y="26.5" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="600" fill="#fff">${letter}</text></svg>`;
 return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
-const git = (cwd: string, ...args: string[]) => execFileSync("git", args, { cwd, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+const git = (cwd: string, ...args: string[]) => execTool("git", args, { cwd, maxBuffer: 256 * 1024 * 1024 });
 
 function readLessons(dir: string): Lesson[] {
   const lessons: Lesson[] = [];

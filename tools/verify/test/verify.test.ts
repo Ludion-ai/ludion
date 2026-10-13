@@ -217,7 +217,9 @@ describe("docker", () => {
   it("isolates the run as docs/decisions.md says: network off, read-only, limits", () => {
     expect(dockerArgs("python", "n")).toEqual([
       "run", "--rm", "-i", "--name", "n",
-      "--network", "none", "--memory", "512m", "--cpus", "1", "--pids-limit", "128", "--read-only", "--tmpfs", "/tmp",
+      "--network", "none", "--memory", "512m", "--cpus", "1", "--pids-limit", "128", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
+      ...(typeof process.getuid === "function" && typeof process.getgid === "function" ? ["--user", `${process.getuid()}:${process.getgid()}`] : []),
+      "--read-only", "--tmpfs", "/tmp",
       "python:3.14-slim", "python", "-",
     ]);
     expect(dockerArgs("bash", "n").slice(-3)).toEqual(["python:3.14-slim", "bash", "-s"]);
@@ -257,6 +259,8 @@ describe("docker, format 1", () => {
     const npm = installArgs("node@24", "/tmp/w", { vitest: "5.0.3" });
     expect(npm).not.toContain("--network");
     expect(npm).toContain("--ignore-scripts");
+    expect(npm).toContain("no-new-privileges");
+    expect(npm.slice(npm.indexOf("--cap-drop"), npm.indexOf("--cap-drop") + 2)).toEqual(["--cap-drop", "ALL"]);
     expect(npm).not.toContain("-i");
     const pip = installArgs("python@3.12", "/tmp/w", { requests: "2.32.0" });
     // Wheels only: no package build scripts run at install time either.

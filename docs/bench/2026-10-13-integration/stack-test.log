@@ -1,0 +1,26 @@
+
+> test
+> vitest run
+
+
+ RUN  v4.1.11 C:/dev/ludion-wt-codex-artifacts
+
+search eval: 0 of 68 active lessons have no on-topic questions yet
+Search quality over 68 lessons:
+  off-topic: 20/20 found nothing (needs all)
+  subject only: 8/8 found nothing (needs all)
+  on-topic: 133/138 found the right lesson in the top 3 (96%, needs 90%)
+    missed "How do I make a Vitest mock return different values depending on its arguments?": []
+    missed "Does Vitest have something like jest-when for argument-based mock results?": []
+    missed "How do I check that an element's text contains a phrase in Vitest browser mode?": ["vitest >=5.0.0 changed the default of `b"]
+    missed "Does wrangler deploy create my KV namespaces and queues automatically if they don't exist yet?": ["wrangler >=4.116.0 changed what `deploy`"]
+    missed "How do I use Cap'n Web RPC with AgentClient in the Cloudflare Agents SDK?": ["agents >=0.27.0 added `npx agents tui`. ","agents >=0.20.0 changed what `createMcpH"]
+  error messages and mixed Japanese: 12/12 found the right lesson (needs all)
+warning: in the working copy of '.LUDION/lessons.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/rules/LUDION.mdc', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.ludion/lessons.md', LF will be replaced by CRLF the next time Git touches it
+
+ Test Files  29 passed (29)
+      Tests  510 passed (510)
+   Start at  17:23:23
+   Duration  5.85s (transform 4.57s, setup 0ms, import 8.58s, tests 17.66s, environment 2ms)

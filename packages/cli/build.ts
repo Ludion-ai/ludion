@@ -6,7 +6,7 @@ await build({
   entryPoints: ["src/cli.ts"],
   bundle: true,
   platform: "node",
-  target: "node20",
+  target: "node22.19",
   format: "esm",
   outfile: "dist/cli.js",
   // Some bundled CommonJS dependencies call require(); give the ESM bundle one.

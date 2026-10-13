@@ -1,0 +1,11 @@
+{
+  "repository": "Ludion-ai/ludion",
+  "pull_request": 68,
+  "run_id": 38241296188,
+  "artifact_id": 11743325042,
+  "artifact_name": "runtime-acceptance",
+  "source_sha": "b4d6f1c5e54e918c9542cf9d02ebe18f7c1a153c",
+  "checked_at": "2026-10-12T11:20:02.6163287Z",
+  "sha256": "77b09774615fb64b3b3d3bbc25858cff4256fa618b584621d1bbf60e9aa6931c",
+  "kind": "evaluator fixture validation, not model accuracy"
+}

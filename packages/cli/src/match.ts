@@ -1,6 +1,6 @@
 // Which lessons a project needs: the package is installed at a version inside the lesson's range, and the target
 // model is not measured to know the change (CLAUDE.md, "ludion sync").
-import type { Kind } from "@ludion/core";
+import { activeSet, type Kind } from "@ludion/core";
 import semver from "semver";
 import type { Installed } from "./lockfile.ts";
 
@@ -23,6 +23,8 @@ export interface SyncLesson {
   models?: Record<string, "knows" | "misses">;
   /** Where it came from. */
   origin: "index" | "ledger";
+  /** Corrections suppress older lessons before version matching or model pruning. */
+  replaces?: string[];
 }
 
 const coerce = (v: string) => semver.coerce(v)?.version;
@@ -64,7 +66,7 @@ export function select(lessons: SyncLesson[], installed: Installed, model: strin
   const kept: Selection["kept"] = [];
   const prunedForModel: SyncLesson[] = [];
   const seen = new Set<string>();
-  for (const lesson of lessons) {
+  for (const lesson of activeSet(lessons)) {
     if (seen.has(lesson.id)) continue;
     seen.add(lesson.id);
     const versions = matchingVersions(lesson, installed);

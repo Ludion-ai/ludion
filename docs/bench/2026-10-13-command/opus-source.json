@@ -1,0 +1,20 @@
+{
+  "head": "7cb1695bd0a6757e269a9707485af7de30efb1a1",
+  "files": [
+    "tools/verify/src/command.ts",
+    "tools/verify/test/command.test.ts",
+    "packages/cli/src/publish.ts",
+    "packages/cli/src/render.ts",
+    "packages/cli/src/teach.ts",
+    "tools/bench/src/agent.ts",
+    "tools/bench/src/done1-hook.ts",
+    "tools/bench/src/runtime-tasks-cli.ts",
+    "tools/bench/src/tasks-run.ts",
+    "tools/seed/src/cli.ts",
+    "tools/seed/src/steps.ts",
+    "tools/verify/src/docker.ts",
+    "tools/verify/src/pr-cli.ts",
+    "apps/site/src/build/data.ts"
+  ],
+  "prompt_bytes": 42696
+}

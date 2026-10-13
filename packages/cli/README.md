@@ -1,6 +1,8 @@
 # ludion-ai
 
-Tells your coding assistant what changed in the versions your project installed: only the changes for those versions, minus what its model is measured to know. Every lesson is checked by a machine (a test in Docker, or a quote found on its source page) and signed by the person who taught it.
+Gives your coding assistant teacher claims about changes in the versions your project installed, minus what its model is measured to know. Machines check the supplied evidence (tests in Docker, or a quote found on its source page); the teacher signs the claim. These checks do not establish the claim, version range, change kind, or silent signal. Check them against primary sources.
+
+Requires Node.js 22.19.0 or later, matching the bundled HTTP client's supported runtime.
 
 ```sh
 npx ludion-ai sync

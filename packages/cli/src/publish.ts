@@ -1,7 +1,8 @@
 // ludion teach --public: open the pull request with the teacher's own gh, from their own account. Ludion never
 // holds a token: the PR author is whoever is signed in to gh, and CI checks that author_id is that account.
 import { execFileSync } from "node:child_process";
-import { formatLesson, generateClaim, type LessonV1 } from "@ludion/core";
+import { trustedCommand } from "../../../tools/verify/src/command.ts";
+import { EVIDENCE_SCOPE, formatLesson, generateClaim, type LessonV1 } from "@ludion/core";
 import type { Identity } from "./teach.ts";
 
 export const UPSTREAM = process.env.LUDION_REPO || "Ludion-ai/ludion";
@@ -11,7 +12,10 @@ export const CONSENT =
   "I taught this lesson and I can share it. I license it under CC BY 4.0. I agree that Ludion may publish it on ludion.ai, in its index and feeds, and in the files `ludion sync` writes into projects, and that anyone may use it under that license, including to train or evaluate AI models, with credit to my GitHub account.";
 
 export type Gh = (args: string[]) => string;
-export const gh: Gh = (args) => execFileSync("gh", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+export const gh: Gh = (args) => {
+  const command = trustedCommand("gh");
+  return execFileSync(command.file, args, { env: command.env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], windowsHide: true }).trim();
+};
 
 export function prTexts(lesson: LessonV1, who: Identity): { title: string; body: string; message: string } {
   const title = `Teach ${lesson.subject}: ${lesson.symbol}`.slice(0, 120);
@@ -20,11 +24,14 @@ export function prTexts(lesson: LessonV1, who: Identity): { title: string; body:
     generateClaim(lesson),
     "",
     `Evidence: ${evidence.join(", ")}.`,
+    EVIDENCE_SCOPE,
     `Taught by @${who.login}${lesson.drafted_by === "agent" ? ", drafted by an agent" : ""}, opened with ludion teach --public.`,
     "",
     `> ${CONSENT}`,
     "",
     "What changes: one new lesson file. How to undo: delete the file (a retraction).",
+    "",
+    "Reviewer: before merging, check the claim's change kind, version range, replacement and signal against the cited source or test assertions. A passing evidence check alone does not establish those facts.",
   ].join("\n");
   return { title, body, message: `${title}\n\nTaught by @${who.login} (${who.id}).` };
 }

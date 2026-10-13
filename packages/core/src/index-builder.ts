@@ -1,6 +1,7 @@
 import { activeSet } from "./active.ts";
 import { claimOf, versionOf } from "./claim.ts";
 import { verifiedBy } from "./label.ts";
+import { EVIDENCE_SCOPE } from "./evidence-scope.ts";
 import { isV1, type Index, type IndexEntry, type Lesson, type TeacherSummary } from "./types.ts";
 
 /** From `git log` of each lesson file: the commit that added it. Keyed by lesson id. */
@@ -57,6 +58,7 @@ export function buildIndex(lessons: Lesson[], gitInfo: GitInfo, logins: Map<numb
       replaces: l.replaces ?? [],
       verified_by: verifiedBy(l),
       verified_at: git?.verified_at ?? l.created_at,
+      verification_scope: EVIDENCE_SCOPE,
       pr: git?.pr ?? null,
       url: `https://github.com/${options.org}/${options.repo}/blob/main/lessons/${l.subject}/${l.id}.json`,
     };

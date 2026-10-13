@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildIndex, resolveLogins, search, type Index } from "../src/index.ts";
+import { EVIDENCE_SCOPE, buildIndex, resolveLogins, search, type Index } from "../src/index.ts";
 import { stem, tokenize } from "../src/search.ts";
 import { example, fakeFetch, lesson } from "./helpers.ts";
 
@@ -29,6 +29,7 @@ describe("buildIndex", () => {
       replaces: [],
       verified_by: "test",
       verified_at: "2026-10-08T08:57:12Z",
+      verification_scope: EVIDENCE_SCOPE,
       pr: 42,
       url: `https://github.com/Ludion-ai/ludion/blob/main/lessons/python/${ex.id}.json`,
     });

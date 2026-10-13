@@ -2,7 +2,8 @@
 // network off"). A test that pins package versions is run in two steps: first the packages are installed in a
 // container with the network on, install scripts off, and no lesson code; then the lesson code runs in a fresh
 // container with the network off, against those installed packages.
-import { spawn, spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
+import { spawnTool, trustedCommand } from "./command.ts";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -50,13 +51,14 @@ export function pullImages(runtimes: Iterable<string>): string[] {
   const failures: string[] = [];
   const images = new Set([...runtimes].map((r) => imageFor(r)?.image).filter((i): i is string => !!i));
   for (const image of images) {
-    const r = spawnSync("docker", ["pull", "--quiet", image], { stdio: ["ignore", "inherit", "inherit"] });
+    const r = spawnTool("docker", ["pull", "--quiet", image], { stdio: ["ignore", "inherit", "inherit"] });
     if (r.status !== 0) failures.push(`Could not pull ${image}${r.error ? ` (${r.error.message})` : ""}.`);
   }
   return failures;
 }
 
 const LIMITS = ["--memory", "512m", "--cpus", "1", "--pids-limit", "128"];
+const PRIVILEGE_LIMITS = ["--cap-drop", "ALL", "--security-opt", "no-new-privileges"];
 
 /** Run as the host user where there is one (Linux, macOS), so files written into the work folder can be cleaned up. */
 function userArgs(): string[] {
@@ -68,9 +70,9 @@ export function dockerArgs(runtime: string, name: string, workDir?: string): str
   const img = imageFor(runtime);
   if (!img) throw new Error(`Unknown runtime ${runtime}.`);
   const mount = workDir
-    ? [...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/tmp", "-e", "NODE_PATH=/w/node_modules", "-e", "PYTHONPATH=/w/site", "-e", "LUDION_PACKAGES=/w"]
+    ? ["-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/tmp", "-e", "NODE_PATH=/w/node_modules", "-e", "PYTHONPATH=/w/site", "-e", "LUDION_PACKAGES=/w"]
     : [];
-  return ["run", "--rm", "-i", "--name", name, "--network", "none", ...LIMITS, "--read-only", "--tmpfs", "/tmp", ...mount, img.image, ...img.command];
+  return ["run", "--rm", "-i", "--name", name, "--network", "none", ...LIMITS, ...PRIVILEGE_LIMITS, ...userArgs(), "--read-only", "--tmpfs", "/tmp", ...mount, img.image, ...img.command];
 }
 
 /** `docker run` arguments for installing a test's packages: network on, no install scripts, no lesson code. */
@@ -81,18 +83,21 @@ export function installArgs(runtime: string, workDir: string, packages: Record<s
     img.language === "node"
       ? ["npm", "install", "--ignore-scripts", "--no-audit", "--no-fund", "--loglevel=error"]
       : ["pip", "install", "--no-cache-dir", "--only-binary", ":all:", "--target", "/w/site", ...Object.entries(packages).map(([n, v]) => `${n}==${v}`)];
-  return ["run", "--rm", "--name", name, ...LIMITS, ...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/w/.home", "-e", "npm_config_cache=/w/.npm", img.image, ...install];
+  return ["run", "--rm", "--name", name, ...LIMITS, ...PRIVILEGE_LIMITS, ...userArgs(), "-v", `${workDir}:/w`, "-w", "/w", "-e", "HOME=/w/.home", "-e", "npm_config_cache=/w/.npm", img.image, ...install];
 }
 
 function run(args: string[], stdin: string | undefined, timeoutMs: number, name?: string): Promise<RawRun> {
+  let command;
+  try { command = trustedCommand("docker"); }
+  catch (error) { return Promise.resolve({ kind: "error", reason: (error as Error).message }); }
   return new Promise((resolve) => {
-    const child = spawn("docker", args, { stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn(command.file, args, { env: command.env, stdio: ["pipe", "pipe", "pipe"], windowsHide: true });
     let stdout = "";
     let stderr = "";
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;
-      if (name) spawn("docker", ["kill", name], { stdio: "ignore" });
+      if (name) spawn(command.file, ["kill", name], { env: command.env, stdio: "ignore", windowsHide: true });
       else child.kill();
     }, timeoutMs);
     child.stdout.on("data", (d: Buffer) => { if (stdout.length < 1_000_000) stdout += d; });

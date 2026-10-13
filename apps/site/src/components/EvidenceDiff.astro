@@ -1,7 +1,8 @@
 ---
-// A differential test at a glance: the versions it runs on, oldest first, and what CI requires of each: pass on one,
-// fail on the other with the error the lesson names. Read from the evidence itself (each test's packages, expect,
-// and error), so it says what is checked, not a result of its own.
+// A differential test at a glance (only for a lesson core's isDifferential calls one, so only under a "Verified
+// across versions" seal): the versions of the lesson's own package (or runtime) it runs on, oldest first, and what CI
+// requires of each: pass inside the lesson's range, fail outside it with output containing the error the lesson
+// names. Read from the evidence itself, so it says what is checked, not a result of its own.
 import semver from "semver";
 import { en } from "../strings/en.ts";
 
@@ -14,12 +15,14 @@ export interface Run {
 
 interface Props {
   runs: Run[];
+  /** The lesson's own package: the one whose version is the difference. */
+  pkg: { ecosystem: string; name: string };
 }
-const { runs } = Astro.props;
-const names = [...new Set(runs.flatMap((r) => Object.keys(r.packages ?? {})))];
-// The package whose version differs between the runs: the one the lesson is about.
-const varies = names.find((n) => new Set(runs.map((r) => r.packages?.[n])).size > 1);
-const version = (r: Run) => (varies ? (r.packages?.[varies] ?? "") : r.runtime);
+const { runs, pkg } = Astro.props;
+const runtime = pkg.ecosystem === "runtime";
+// The lesson's own pin on each run: the package's version, or for a runtime its release line (node@22 → 22).
+const version = (r: Run) => (runtime ? r.runtime.slice(r.runtime.indexOf("@") + 1) : (r.packages?.[pkg.name] ?? ""));
+const varies = pkg.name;
 const order = [...runs].sort((a, b) => {
   const x = semver.coerce(version(a));
   const y = semver.coerce(version(b));
@@ -35,8 +38,8 @@ const d = en.lesson.diff;
       order.map((r, i) => (
         <li class:list={[r.expect ?? "pass"]}>
           <span class="pkg">
-            {varies ?? r.runtime}
-            {varies && <b>{version(r)}</b>}
+            {varies}
+            <b>{version(r)}</b>
           </span>
           <span class="verdict">
             <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">

@@ -26,12 +26,16 @@ test("each model page names its share card, and the card is a 1200×630 PNG", as
   }
 });
 
-test("/bench, /lessons, and a lesson never scroll sideways, at any width their layouts switch around", async ({ page }) => {
-  for (const path of ["/bench/", "/lessons/", "/lessons/01M4T6BQ9DJH2BCV6Q28GH4HJ1/"]) {
+test("/bench, /lessons, and lesson pages never scroll sideways, at any width their layouts switch around", async ({ page, request }) => {
+  // The newest lesson, and the newest one verified across versions (its page draws the versions).
+  const index = (await (await request.get("/index.json")).json()) as { lessons: { id: string; verified_by: string }[] };
+  const lessons = [index.lessons[0], index.lessons.find((l) => l.verified_by === "differential")].filter((l) => l != null);
+  expect(lessons.length).toBeGreaterThan(0);
+  for (const path of ["/bench/", "/lessons/", ...lessons.map((l) => `/lessons/${l.id}/`)]) {
     for (const width of [360, 390, 700, 761, 800, 900, 1010, 1024, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       const res = await page.goto(path);
-      if (res?.status() === 404) break; // a lesson id that a later main no longer has
+      expect(res?.status(), path).toBe(200);
       const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
       expect(scroll, `${path} at ${width}px`).toBeLessThanOrEqual(client);
     }

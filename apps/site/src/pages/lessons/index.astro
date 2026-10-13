@@ -89,11 +89,11 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
             <p class="showing" aria-live="polite" data-count>{en.bench.list.showing(shown.length, shown.length)}</p>
           </div>
 
-          <ol class="days">
+          <ol class="groups">
             {groups.map((g) => (
-              <li class="day" data-day id={`s-${g.subject}`}>
-                <h3 class="date">
-                  <a href={`/${g.subject}/`} class="md">{g.subject}/</a>
+              <li class="group" data-group id={`s-${g.subject}`}>
+                <h3 class="gname">
+                  <a href={`/${g.subject}/`} class="gsubj">{g.subject}/</a>
                   <span class="n">{L.count(g.count)}</span>
                 </h3>
                 <ul class="list">
@@ -130,8 +130,8 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
   import { en } from "../../strings/en.ts";
   const tools = document.querySelector<HTMLElement>(".tools");
   if (tools) {
-    const rows = [...document.querySelectorAll<HTMLElement>(".days li[data-subject]")];
-    const days = [...document.querySelectorAll<HTMLElement>(".days [data-day]")];
+    const rows = [...document.querySelectorAll<HTMLElement>(".groups li[data-subject]")];
+    const groups = [...document.querySelectorAll<HTMLElement>(".groups [data-group]")];
     const count = tools.querySelector<HTMLElement>("[data-count]")!;
     const none = document.querySelector<HTMLElement>("[data-none]")!;
     const q = tools.querySelector<HTMLInputElement>('input[name="q"]')!;
@@ -151,7 +151,7 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
         row.hidden = !on;
         if (on) shown++;
       }
-      for (const d of days) d.hidden = !d.querySelector("li[data-subject]:not([hidden])");
+      for (const g of groups) g.hidden = !g.querySelector("li[data-subject]:not([hidden])");
       count.textContent = en.bench.list.showing(shown, rows.length);
       none.hidden = shown > 0;
     };
@@ -331,22 +331,22 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
     font-variant-numeric: tabular-nums;
   }
 
-  /* The timeline: the day on the left, its lessons on the right. */
-  .days {
+  /* The groups: the subject's name on the left, held while its lessons scroll by. */
+  .groups {
     list-style: none;
     margin: 0;
     padding: 0;
   }
-  .day {
+  .group {
     display: grid;
     grid-template-columns: 11rem minmax(0, 1fr);
     gap: 0 32px;
     padding-top: 28px;
   }
-  .day[hidden] {
+  .group[hidden] {
     display: none;
   }
-  .date {
+  .gname {
     margin: 0;
     padding-top: 24px;
     align-self: start;
@@ -356,11 +356,7 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
     flex-direction: column;
     gap: 2px;
   }
-  time {
-    display: flex;
-    flex-direction: column;
-  }
-  .md {
+  .gsubj {
     font-family: var(--font-code);
     font-variant-ligatures: none;
     font-size: 22px;
@@ -371,18 +367,17 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
     text-decoration: none;
     overflow-wrap: anywhere;
   }
-  a.md:hover {
+  a.gsubj:hover {
     text-decoration: underline;
   }
-  .y,
-  .date .n {
+  .gname .n {
     font-family: var(--font-code);
     font-variant-ligatures: none;
     font-size: 12px;
     font-weight: 400;
     color: var(--muted);
   }
-  .date .n {
+  .gname .n {
     margin-top: 8px;
   }
   .list {
@@ -398,10 +393,10 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
     color: var(--muted);
   }
   @media (max-width: 760px) {
-    .day {
+    .group {
       grid-template-columns: minmax(0, 1fr);
     }
-    .date {
+    .gname {
       position: static;
       flex-direction: row;
       align-items: baseline;
@@ -409,19 +404,8 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
       padding: 8px 0 4px;
       border-bottom: 2px solid var(--rule-strong);
     }
-    time {
-      flex-direction: row;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .md {
-      font-size: 22px;
-    }
-    .date .n {
+    .gname .n {
       margin: 0 0 0 auto;
-    }
-    .tools {
-      position: static;
     }
     .showing {
       margin-left: 0;

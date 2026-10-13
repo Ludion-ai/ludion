@@ -12,7 +12,7 @@ import { claimParts } from "../build/claim-parts.ts";
 import { claimSize } from "../build/claim-size.ts";
 import { siteData, type LessonPage } from "../build/data.ts";
 import { en, formatDate, testLabel } from "../strings/en.ts";
-import { asTest, claimOf, isV1, versionOf } from "@ludion/core";
+import { asTest, claimOf, isDifferential, isV1, versionOf } from "@ludion/core";
 
 // A lesson's page: every lesson on main, replaced ones included, so history stays visible. The claim is set in
 // three weights (headline, detail, and its closing sentence beside its mark), every word its own and in order.
@@ -32,7 +32,8 @@ const verdicts = models ? Object.entries(models.models).map(([id, m]) => ({ id, 
 const measured = verdicts.some((m) => m.v);
 const tests = lesson.evidence.map((e) => asTest(e)).filter((t) => t != null);
 const sources = lesson.evidence.filter((e) => "source" in e) as { source: { url: string; quote: string } }[];
-const differential = tests.length > 1 && tests.some((t) => t.expect === "fail") && tests.some((t) => t.expect !== "fail");
+// Drawn only for what core labels differential (same code and other pins, own package inside and outside the range).
+const differential = isV1(lesson) && isDifferential(lesson);
 const sameCode = differential && new Set(tests.map((t) => t.code)).size === 1;
 // One label for the shared test: the runtime, then each package with every version it runs on.
 const shared = () => {
@@ -131,7 +132,7 @@ const shared = () => {
 
     <section class="evidence" aria-labelledby="evidence">
       <h2 id="evidence">{en.lesson.evidence}</h2>
-      {differential && <EvidenceDiff runs={tests} />}
+      {differential && isV1(lesson) && <EvidenceDiff runs={tests} pkg={lesson.package} />}
       {sameCode ? <EvidenceRun runner={shared()} code={tests[0]!.code} label={en.lesson.sameTest(shared())} /> : tests.map((t) => <EvidenceRun runner={testLabel(t)} code={t.code} />)}
       {sources.map((e) => <EvidenceSource url={e.source.url} quote={e.source.quote} />)}
       {

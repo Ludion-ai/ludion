@@ -42,16 +42,17 @@ export const en = {
     taughtBy: "Taught by",
     evidence: "Evidence",
     diff: {
-      caption: "CI runs the same test on each version. A lesson is verified across versions only when it passes on one and fails on the other.",
+      caption:
+        "CI runs this test on each version, with nothing else changed between the runs. It must pass on the versions the lesson covers and fail on the older one, printing the error shown.",
       passes: "Must pass",
-      fails: "Must fail, with",
+      fails: "Must fail, printing",
     },
     sameTest: (runner: string) => `The test, on each version above (${runner})`,
     models: {
       heading: "Do the models know it?",
       none: "Not measured yet.",
       note: (date: string) => `Without tools, FreshBench, ${date}.`,
-      link: "Bench",
+      link: "All models on the bench",
     },
     test: (runner: string) => `Test (${runner})`,
     proof: "Proof (Lean)",

@@ -76,10 +76,15 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 
 ## Log
 
+### 2026-10-13: One cumulative protected PR for owner merge
+
+- #69 now targets main and contains the reviewed #67/#68 source plus #98's agent-boundary correction, merged only into the feature branch after its checks passed. Earlier stacked PRs are superseded by this cumulative diff; main still requires the owner's merge.
+- Current main's already-merged lesson is retained. Blob comparison proves every protected file changed by this cumulative PR still matches the completed Opus source snapshot (`docs/bench/2026-10-13-integration/consolidation.json`). The later agent-boundary/E2E changes are unprotected and validated by tests/CI. Exact final-head checks are in #69; no production or npm action was performed.
+
 ### 2026-10-13: Benchmark file-tool scope tightened
 
 - Found project-wide bare file-tool allow rules and the `default` tool surface. Replaced these with explicit tools and restricted directory checks; an editing run has no command/subagent tool, while the read-only prepared-project allowances remain.
-- Configuration checks, installed CLI boundary documentation and local suite passed (`docs/bench/2026-10-13-agent-boundary/`). No model measurement or actual credential/file-access probe was invoked; old results are unchanged. Stacked on #69, awaiting exact-head CI and protected-base owner merge.
+- Configuration checks, installed CLI boundary documentation and local suite passed (`docs/bench/2026-10-13-agent-boundary/`). No model measurement or actual credential/file-access probe was invoked; old results are unchanged. The correction is now included in cumulative #69; exact-head checks are in that PR and owner merge is still required.
 
 ### 2026-10-13: Security/runtime/artifact stack integrated and reviewed
 

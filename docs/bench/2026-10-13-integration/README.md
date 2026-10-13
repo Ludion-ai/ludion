@@ -15,3 +15,7 @@ Full integrated artifact stack: fresh install, typecheck and build passed, and 5
 ## Required review
 
 Fresh Opus review completed successfully for each protected PR at the exact integrated heads listed in `opus-review.json`, with no actionable blocker. Full verdict and scoped limitations are in `opus-review.md`. This supersedes the earlier blocked status. The earlier exploratory invocation ended without a verdict and was never counted as approval. After the frozen review package, changes only await the JavaScript response bodies in the E2E test and record validation; protected implementations are unchanged. Owner merge still remains required.
+
+## Consolidation
+
+#69 targets current main directly and contains the reviewed #67/#68 source plus #98, squashed only into the feature branch after its CI passed. `consolidation.json` proves ancestry of the earlier security/runtime heads and identical blobs for all protected files changed by the final PR relative to main. The subsequent agent-boundary/E2E changes are unprotected and judged by tests/CI. One owner merge remains; main and production were not merged/deployed by this work.

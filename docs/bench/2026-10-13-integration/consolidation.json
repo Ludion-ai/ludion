@@ -1,0 +1,37 @@
+{
+  "base_main": "3db2ac07af11d4931ea77b64218fa9e76688fc55",
+  "cumulative_source_head": "ac0db104742d727d64a1ae6a62c977a155dc451e",
+  "protected_source_reference": "709d9a407221a609822c7f98637aca01df63d48e",
+  "protected_changed_files": [
+    {
+      "path": ".github/workflows/publish.yml",
+      "reviewed_blob": "6e4ccef2b0c1c42bbc08c049701261371af08713",
+      "current_blob": "6e4ccef2b0c1c42bbc08c049701261371af08713"
+    },
+    {
+      "path": ".github/workflows/test.yml",
+      "reviewed_blob": "bd8327d38f7e1e55e91ac20569b051fed107f277",
+      "current_blob": "bd8327d38f7e1e55e91ac20569b051fed107f277"
+    },
+    {
+      "path": "CLAUDE.md",
+      "reviewed_blob": "b473b4720d9135593e7644cb69aee3d17341f884",
+      "current_blob": "b473b4720d9135593e7644cb69aee3d17341f884"
+    },
+    {
+      "path": "tools/verify/src/docker.ts",
+      "reviewed_blob": "e86d7fb0f917b859283d88bbd17a5c9389ad49bb",
+      "current_blob": "e86d7fb0f917b859283d88bbd17a5c9389ad49bb"
+    },
+    {
+      "path": "tools/verify/test/verify.test.ts",
+      "reviewed_blob": "4721ca77070aba5cad453bfe13c131a2aac31f70",
+      "current_blob": "4721ca77070aba5cad453bfe13c131a2aac31f70"
+    }
+  ],
+  "protected_implementations_match_review_snapshot": true,
+  "contains_pr67_head": true,
+  "contains_pr68_head": true,
+  "pr98_squashed_into_feature_branch": "ac0db104742d727d64a1ae6a62c977a155dc451e",
+  "no_main_merge_performed": true
+}

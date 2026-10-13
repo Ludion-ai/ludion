@@ -1,0 +1,222 @@
+---
+// Knowledge dates: per model, a dot per lesson at the day npm published the first version it is about
+// (docs/bench/release-dates.json). Filled: the model knows it; hollow: it doesn't; dotted: not measured. A model's
+// knowledge cutoff is drawn as a band only where its maker publishes one (the file's `cutoffs`, each with its source):
+// one band across the chart when every model's is the same month, else one in each row that has one.
+// Dots on near days pack into short stacks around their day, so none covers another. Long empty stretches of the axis
+// are cut short and drawn as a break (build/knowledge.ts, dateAxis). Wide screens get a row per
+// model with time running right; narrow ones a column per model with time running down.
+import { plain, type dateAxis } from "../build/knowledge.ts";
+import { en, formatDate } from "../strings/en.ts";
+
+interface Props {
+  axis: NonNullable<ReturnType<typeof dateAxis>>;
+  measuredAt: string;
+}
+const { axis, measuredAt } = Astro.props;
+const b = en.bench;
+const d = b.dates;
+const STEP = 11;
+
+/** Places dots along a line of `length` units: each at its day if free, else stacked up to `levels` deep, else moved a step aside. */
+function pack(xs: number[], length: number, levels: number) {
+  const placed: { p: number; lv: number }[] = [];
+  return xs.map((x) => {
+    const p0 = x * length;
+    for (let k = 0; ; k++) {
+      const p = p0 + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * STEP;
+      for (let lv = 0; lv < levels; lv++) {
+        if (placed.every((q) => Math.hypot(q.p - p, (q.lv - lv) * STEP) >= STEP - 0.5)) {
+          placed.push({ p, lv });
+          return { p, lv };
+        }
+      }
+    }
+  });
+}
+
+const cutoffs = new Set(axis.rows.map((r) => r.cutoff?.month ?? ""));
+const cutoff = cutoffs.size === 1 && axis.rows[0]?.cutoff ? axis.rows[0].cutoff : null;
+const short = (name: string) => name.replace(/^Claude\s+/, "");
+type Row = (typeof axis.rows)[number];
+// A tick names its year when it is the first, follows a cut in the axis, or is January.
+const withYear = (i: number) => i === 0 || axis.ticks[i]!.month.endsWith("-01") || axis.breaks.some((x) => x > axis.ticks[i - 1]!.x && x < axis.ticks[i]!.x);
+const label = (i: number) => (withYear(i) ? b.month(axis.ticks[i]!.month) : b.monthShort(axis.ticks[i]!.month));
+const tip = (dot: Row["dots"][number]) => `${plain(dot.lesson.sentence)}\n${dot.lesson.subject}/ · ${formatDate(dot.lesson.released!)} · ${b.knowledge.tip[dot.verdict ?? "none"]}${dot.lesson.drafted ? ` · ${en.lesson.draftedAlone}` : ""}`;
+
+// Wide: a row per model.
+const W = 1000;
+const L = 160;
+const R = 984;
+const TOP = 34;
+const LEVELS = 5;
+const ROW = LEVELS * STEP + 22;
+const px = (x: number) => L + x * (R - L);
+const rows = axis.rows.map((row, i) => {
+  const base = TOP + i * ROW + ROW - 14;
+  const spots = pack(row.dots.map((dot) => dot.x), R - L, LEVELS);
+  return { ...row, base, dots: row.dots.map((dot, j) => ({ ...dot, cx: L + spots[j]!.p, cy: base - spots[j]!.lv * STEP })) };
+});
+const BOTTOM = TOP + rows.length * ROW;
+const H = BOTTOM + 22;
+
+// Narrow: a column per model.
+const NW = 360;
+const NL = 40;
+const NTOP = 30;
+const NLEN = 640;
+const COL = (NW - NL) / Math.max(1, axis.rows.length);
+const NLEVELS = Math.max(1, Math.floor((COL - 10) / STEP));
+const py = (x: number) => NTOP + x * NLEN;
+const cols = axis.rows.map((row, i) => {
+  const left = NL + i * COL + 6;
+  const spots = pack(row.dots.map((dot) => dot.x), NLEN, NLEVELS);
+  return { ...row, left, dots: row.dots.map((dot, j) => ({ ...dot, cx: left + 5 + spots[j]!.lv * STEP, cy: NTOP + spots[j]!.p })) };
+});
+const NH = NTOP + NLEN + 26;
+---
+
+<div class="wide">
+  <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} aria-hidden="true">
+    {cutoff && <rect class="cutoff" x={px(cutoff.from)} width={px(cutoff.to) - px(cutoff.from)} y={TOP - 8} height={BOTTOM - TOP + 8} />}
+    {axis.ticks.map((t, i) => (
+      <g class="tick">
+        {t.line && <line x1={px(t.x)} x2={px(t.x)} y1={TOP - 8} y2={BOTTOM} />}
+        <text x={px(t.x) + 4} y={TOP - 14}>{label(i)}</text>
+      </g>
+    ))}
+    {rows.map((r) => (
+      <g>
+        {r.cutoff && !cutoff && <rect class="cutoff" x={px(r.cutoff.from)} width={px(r.cutoff.to) - px(r.cutoff.from)} y={r.base - ROW + 18} height={ROW - 8} />}
+        <line class="base" x1={L} x2={R} y1={r.base + 7} y2={r.base + 7} />
+        <text class="model" x="0" y={r.base + 4}>{r.name}</text>
+        {r.dots.map((dot) => (
+          <a href={`/lessons/${dot.lesson.id}/`} tabindex="-1" data-tip={tip(dot)}>
+            <circle class:list={["dot", dot.verdict ?? "none"]} cx={dot.cx} cy={dot.cy} r="4.25" />
+          </a>
+        ))}
+      </g>
+    ))}
+    {axis.breaks.map((x) => (
+      <g class="cut">
+        <rect x={px(x) - 5} width="10" y={TOP - 8} height={BOTTOM - TOP + 12} />
+        {rows.map((r) => (
+          <path d={`M${px(x) - 7} ${r.base + 11} l5 -8 M${px(x) + 2} ${r.base + 11} l5 -8`} />
+        ))}
+      </g>
+    ))}
+    <line class="measured" x1={px(axis.measured)} x2={px(axis.measured)} y1={TOP - 8} y2={BOTTOM + 4} />
+    <text x={px(axis.measured)} y={BOTTOM + 17} text-anchor="end">{d.measured}, {formatDate(measuredAt)}</text>
+    {cutoff && <text class="small" x={px(cutoff.from) + 4} y={TOP + 8}>{d.cutoff(b.month(cutoff.month))}</text>}
+  </svg>
+</div>
+
+<div class="narrow">
+  <svg viewBox={`0 0 ${NW} ${NH}`} aria-hidden="true">
+    {cutoff && <rect class="cutoff" x={NL} width={NW - NL} y={py(cutoff.from)} height={py(cutoff.to) - py(cutoff.from)} />}
+    {cutoff && <text class="small" x={NL + 6} y={py(cutoff.from) + 14}>{d.cutoff(b.month(cutoff.month))}</text>}
+    {axis.ticks.map((t, i) => (
+      <g class="tick">
+        {t.line && <line x1={0} x2={NW} y1={py(t.x)} y2={py(t.x)} />}
+        <text x={0} y={py(t.x) + 14}>{b.monthShort(t.month)}</text>
+        {withYear(i) && <text class="small" x={0} y={py(t.x) + 27}>{t.month.slice(0, 4)}</text>}
+      </g>
+    ))}
+    {cols.map((c) => (
+      <g>
+        {c.cutoff && !cutoff && <rect class="cutoff" x={c.left - 6} width={COL} y={py(c.cutoff.from)} height={py(c.cutoff.to) - py(c.cutoff.from)} />}
+        <text class="model" x={c.left} y={NTOP - 12}>{short(c.name)}</text>
+        {c.dots.map((dot) => (
+          <a href={`/lessons/${dot.lesson.id}/`} tabindex="-1" data-tip={tip(dot)}>
+            <circle class:list={["dot", dot.verdict ?? "none"]} cx={dot.cx} cy={dot.cy} r="4.25" />
+          </a>
+        ))}
+      </g>
+    ))}
+    {axis.breaks.map((x) => (
+      <g class="cut">
+        <rect x={NL} width={NW - NL} y={py(x) - 5} height="10" />
+        <path d={`M${NL} ${py(x) - 2} l${NW - NL} 0 M${NL} ${py(x) + 2} l${NW - NL} 0`} />
+      </g>
+    ))}
+    <line class="measured" x1={0} x2={NW} y1={py(axis.measured)} y2={py(axis.measured)} />
+    <text x={NW} y={py(axis.measured) + 16} text-anchor="end">{d.measured}, {formatDate(measuredAt)}</text>
+  </svg>
+</div>
+<p class="visually-hidden">
+  {d.span(axis.dated, formatDate(axis.first), formatDate(axis.last))} {axis.rows.map((r) => d.summary(r.name, r.cutoff ? b.month(r.cutoff.month) : null)).join("; ")}.
+</p>
+
+<style>
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-ui);
+    overflow: visible;
+  }
+  .narrow {
+    display: none;
+    max-width: 420px;
+  }
+  /* Below this the wide chart's labels would shrink past reading size. */
+  @media (max-width: 860px) {
+    .wide {
+      display: none;
+    }
+    .narrow {
+      display: block;
+    }
+  }
+  .tick line {
+    stroke: var(--rule);
+    stroke-width: 1;
+  }
+  text {
+    fill: var(--muted);
+    font-size: 12px;
+  }
+  .model {
+    fill: var(--ink);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .base {
+    stroke: var(--rule);
+  }
+  .cutoff {
+    fill: var(--paper-2);
+  }
+  .small {
+    font-size: 11px;
+  }
+  /* A cut in the axis: a stretch with nothing in it, shortened. */
+  .cut rect {
+    fill: var(--paper);
+  }
+  .cut path {
+    stroke: var(--muted);
+    stroke-width: 1.2;
+    fill: none;
+  }
+  .measured {
+    stroke: var(--muted);
+    stroke-dasharray: 3 3;
+  }
+  .dot {
+    stroke-width: 1.5;
+    fill: var(--paper);
+    stroke: var(--mark);
+  }
+  .dot.knows {
+    fill: var(--mark);
+  }
+  .dot.none {
+    stroke: var(--checking-line);
+    stroke-dasharray: 1.6 1.6;
+  }
+  a:hover .dot {
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+</style>

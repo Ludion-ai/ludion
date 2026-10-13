@@ -137,9 +137,27 @@ describe("the Worker around it", () => {
     expect(d.points).toHaveLength(0);
   });
 
+  it("answers a HEAD like a GET and doesn't count it", async () => {
+    const d = dataset();
+    const { res, done } = run(
+      { ASSETS: assets(() => Response.json({ ok: 1 })), INDEX_HITS: d.binding, ANALYTICS_SALT: SALT },
+      "/index/vitest.json",
+      { method: "HEAD", headers: { "CF-Connecting-IP": "203.0.113.7", "User-Agent": "ludion-ai/0.1.4" } },
+    );
+    expect((await res).status).toBe(200);
+    await done();
+    expect(d.points).toHaveLength(0);
+  });
+
+  it("gives a real 404 for a shard that doesn't exist, through the real Worker", async () => {
+    const res = await exports.default.fetch(new Request("https://ludion.ai/index/no-such-subject.json"));
+    expect(res.status).toBe(404);
+  });
+
   it("serves the real built shards through the real Worker", async () => {
     const subjects = await exports.default.fetch(new Request("https://ludion.ai/index/subjects.json"));
     expect(subjects.status).toBe(200);
+    expect(subjects.headers.get("Content-Type")).toContain("application/json");
     const names = Object.keys(((await subjects.json()) as { subjects: Record<string, unknown> }).subjects);
     expect(names.length).toBeGreaterThan(0);
     const shard = await exports.default.fetch(new Request(`https://ludion.ai/index/${names[0]}.json`));

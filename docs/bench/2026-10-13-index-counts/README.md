@@ -15,26 +15,26 @@ One data point per successful `GET` of a shard, as the Worker answers it:
 | `blob2` | the shard's path, e.g. `/index/vitest.json` (no query string) |
 | `blob3` | `ludion-ai/<version>` when the User-Agent is exactly that, otherwise `other` |
 
-The IP address, the User-Agent, and the secret are never written. The key changes every day (the day is in the HMAC input), so it can't be followed from one day to the next, and with the secret it can't be reversed by trying addresses, which would be easy for IPv4 without it.
+The IP address, the secret, and any User-Agent other than the CLI's are never written. Analytics Engine also stamps each point with the exact time. The key changes every day (the day is in the HMAC input), so **without the secret** it can't be followed from one day to the next and can't be reversed by trying addresses, which would be easy for IPv4 with a public salt. **With the secret**, anyone can compute a known address's key for any past day and try every IPv4 address for the CLI's User-Agent; the secret never changes. So set it and then don't keep the value anywhere: once it is gone, nobody can.
 
 ## What the numbers mean, and don't
 
 - A **client** is one (IP address, User-Agent) pair on one UTC day. Several people behind one office address with the same CLI version count once; one person whose address changes during the day (a phone, a VPN) counts more than once; CI runners that start on fresh addresses each run count once per run.
 - A **week** is the sum of the days (client-days). Because the key is rotated, Ludion can't tell whether Monday's client is Tuesday's. A true weekly distinct count needs a key that lasts a week, which is a stronger kind of tracking; that choice is the owner's (the PR that added this says so).
-- Browsers and tools other than the CLI (a person opening a shard, a crawler) land in `other`. Clients on `ludion-ai` 0.1.2 and earlier send no CLI User-Agent, so they are `other` too.
-- Analytics Engine samples by index, and the index is the key, so a client's rows are thinned together and the distinct count of keys should not be thinned (Cloudflare's documentation says an exact count is possible when grouping by the index; not yet checked against data here). The request counts use `SUM(_sample_interval)`.
+- Browsers and tools other than the CLI (a person opening a shard, a crawler) land in `other`. Clients on `ludion-ai` 0.1.3 and earlier send no CLI User-Agent, so they are `other` too (0.1.4 added it).
+- Analytics Engine samples by index, and the index is the key, so a client's rows are thinned together and the distinct count of keys should not be thinned (Cloudflare's documentation promises "an accurate count of the number of unique values of your index"; not yet checked against data here). The request counts use `SUM(_sample_interval)`.
 
 ## Running it
 
-`daily.sql` (distinct clients per day and CLI label) and `shards.sql` (requests per file per day) are the SQL; both look back seven days. `query.ts` runs both against the Analytics Engine SQL API and adds up the week:
+`daily.sql` (distinct clients per day and CLI label) and `shards.sql` (requests per file per day) are the SQL; both look back eight days, so the seven whole UTC days before today are complete. `query.ts` runs both against the Analytics Engine SQL API, drops the days that aren't whole (today, and the oldest partial one), and adds up those seven days:
 
 ```
 CLOUDFLARE_ACCOUNT_ID=<account id> CLOUDFLARE_API_TOKEN=<token> node docs/bench/2026-10-13-index-counts/query.ts
 ```
 
-The token needs "Account Analytics: Read" and stays in the environment. The same SQL can be pasted into the dashboard's Analytics Engine SQL page. `query.ts` was checked against a local stand-in for the API (the right path, the bearer token, the two SQL files sent as they are, the week summed), not against the real one: no data point existed when this was written.
+The token needs "Account Analytics: Read" and stays in the environment. `query.ts` was checked against a local stand-in for the API (the right path, the bearer token, the two SQL files sent as they are, the week summed), not against the real one: no data point existed when this was written.
 
 ## What the owner does to turn it on
 
-1. `npx wrangler secret put ANALYTICS_SALT` and paste a random string of at least 32 characters, e.g. the output of `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Until then the Worker answers shards exactly as before and writes nothing.
+1. `npx wrangler secret put ANALYTICS_SALT` and paste a random string of at least 32 characters, e.g. the output of `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`, then don't keep the value (clear the terminal, don't save it). Until it is set the Worker answers shards exactly as before and writes nothing.
 2. If the first deploy after the merge says Analytics Engine must be enabled for the account, enable it in the Cloudflare dashboard (the message says where) and run the deploy again. The old version stays live meanwhile. Cloudflare's documentation, as found when this was written, doesn't say whether that step exists for this account.

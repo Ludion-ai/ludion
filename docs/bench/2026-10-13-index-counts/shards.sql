@@ -5,7 +5,7 @@ SELECT
   blob2 AS path,
   SUM(_sample_interval) AS requests
 FROM ludion_index_hits
-WHERE timestamp > NOW() - INTERVAL '7' DAY
+WHERE timestamp > NOW() - INTERVAL '8' DAY
 GROUP BY day, path
 ORDER BY day, path
 FORMAT JSON

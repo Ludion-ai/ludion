@@ -24,11 +24,16 @@ async function run(file: string): Promise<Record<string, string | number>[]> {
   return (JSON.parse(text) as { data: Record<string, string | number>[] }).data;
 }
 
+// The SQL looks back eight days from now, so its oldest day is partial and today is still running: only the seven
+// whole UTC days before today are summed.
+const day = (back: number) => new Date(Date.now() - back * 86_400_000).toISOString().slice(0, 10);
+const whole = new Set(Array.from({ length: 7 }, (_, i) => day(i + 1)));
+
 const daily = await run("daily.sql");
-console.log("Distinct clients per day and CLI label (a client is one IP + User-Agent on one day):");
+console.log("Distinct clients per day and CLI label (a client is one IP + User-Agent on one day; the oldest and today's rows are partial):");
 console.table(daily);
 // Keys are rotated daily, so a week's number is client-days (the sum of the days), not people.
-const clientDays = daily.reduce((n, r) => n + Number(r.clients), 0);
-console.log(`Client-days over the rows above: ${clientDays}. This is not a count of people: the same machine on three days is three client-days.`);
+const clientDays = daily.filter((r) => whole.has(String(r.day))).reduce((n, r) => n + Number(r.clients), 0);
+console.log(`Client-days over the 7 whole days ${day(7)} to ${day(1)}: ${clientDays}. This is not a count of people: the same machine on three days is three client-days.`);
 console.log("\nRequests per file per day:");
 console.table(await run("shards.sql"));

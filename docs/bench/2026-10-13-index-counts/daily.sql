@@ -7,7 +7,7 @@ SELECT
   COUNT(DISTINCT index1) AS clients,
   SUM(_sample_interval) AS requests
 FROM ludion_index_hits
-WHERE timestamp > NOW() - INTERVAL '7' DAY
+WHERE timestamp > NOW() - INTERVAL '8' DAY
 GROUP BY day, client
 ORDER BY day, client
 FORMAT JSON

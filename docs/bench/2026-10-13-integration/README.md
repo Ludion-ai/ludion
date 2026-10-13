@@ -11,3 +11,7 @@ Fresh install, typecheck and build passed; 454 tests passed across 25 files. `np
 Integrated PR67 CI run [38368454975](https://github.com/Ludion-ai/ludion/actions/runs/38368454975) failed because the home JavaScript test ended while its async response listener still awaited a body. It could also compute an incomplete size. Capture each body promise synchronously, detach the listener after network idle, and await all captured bodies before measuring or ending the test. The focused local browser test passed, observing 2 script responses / 3.5 KB gzipped (local built site, not production). `e2e-size.log` records it. Do not reinterpret the earlier incomplete tally as the real bundle size. Final CI reruns the full suite.
 
 Full integrated artifact stack: fresh install, typecheck and build passed, and 510 tests passed across 29 files (`stack-*.log`). These are local checks; final CI heads and the completed required review are recorded separately in the PR comments.
+
+## Required review
+
+Fresh Opus review completed successfully for each protected PR at the exact integrated heads listed in `opus-review.json`, with no actionable blocker. Full verdict and scoped limitations are in `opus-review.md`. This supersedes the earlier blocked status. The earlier exploratory invocation ended without a verdict and was never counted as approval. After the frozen review package, changes only await the JavaScript response bodies in the E2E test and record validation; protected implementations are unchanged. Owner merge still remains required.

@@ -76,6 +76,12 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 
 ## Log
 
+### 2026-10-13: Security/runtime/artifact stack integrated and reviewed
+
+- Integrated main `f48ade4` into #67, then propagated it through #68 and #69; preserved CLI 0.1.4/User-Agent, pipeline changes, hardened shard reading and both histories. Restricted Actions API-key forwarding to explicit no-tool/folder-confined pipeline runs.
+- Required fresh Opus review completed with no actionable blocker for each protected PR. Exact reviewed heads, scope and limitations are in `docs/bench/2026-10-13-integration/opus-review.*` and the PR comments; this supersedes the earlier blocked-review status below. Subsequent changes only fix an observed async E2E response-body race and record validation.
+- Integrated artifact-stack local typecheck/build/tests passed; records are in the same directory. Final exact-head CI is checked in the PRs. Owner merge remains required; no model benchmark, npm approval/publication or production action was performed by this work.
+
 ### 2026-10-13: 0.1.4 staged; a lesson retracted; Done 2 prepared
 
 - **npm**: 0.1.3 staged from #89, then the owner asked for a `User-Agent: ludion-ai/<version>` header in the same release; #89 had merged, so it went in #92 as 0.1.4, which is staged (run 38315009051, "has been staged with tag latest"). The built `dist/cli.js` was checked against a local server: it sent `UA=ludion-ai/0.1.4` on both index requests. Neither is approved yet; the owner approves 0.1.4 and rejects 0.1.3. After approval, `npx ludion-ai@0.1.4 sync` is run in a fresh folder against production and its output added here: not run yet.

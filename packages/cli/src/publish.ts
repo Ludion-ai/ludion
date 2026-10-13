@@ -6,6 +6,10 @@ import type { Identity } from "./teach.ts";
 
 export const UPSTREAM = process.env.LUDION_REPO || "Ludion-ai/ludion";
 
+/** Shown before the confirmation and put in the pull request: the teacher's terms, in the teacher's name (docs/decisions.md, "License of lessons"). */
+export const CONSENT =
+  "I taught this lesson and I can share it. I license it under CC BY 4.0. I agree that Ludion may publish it on ludion.ai, in its index and feeds, and in the files `ludion sync` writes into projects, and that anyone may use it under that license, including to train or evaluate AI models, with credit to my GitHub account.";
+
 export type Gh = (args: string[]) => string;
 export const gh: Gh = (args) => execFileSync("gh", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 
@@ -17,6 +21,8 @@ export function prTexts(lesson: LessonV1, who: Identity): { title: string; body:
     "",
     `Evidence: ${evidence.join(", ")}.`,
     `Taught by @${who.login}${lesson.drafted_by === "agent" ? ", drafted by an agent" : ""}, opened with ludion teach --public.`,
+    "",
+    `> ${CONSENT}`,
     "",
     "What changes: one new lesson file. How to undo: delete the file (a retraction).",
   ].join("\n");

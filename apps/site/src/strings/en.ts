@@ -113,7 +113,7 @@ export const en = {
   footer: {
     count: (lessons: number, teachers: number) =>
       `${lessons} ${lessons === 1 ? "lesson" : "lessons"} from ${teachers} ${teachers === 1 ? "teacher" : "teachers"}.`,
-    license: "Lessons are CC BY-SA 4.0. Code is Apache-2.0.",
+    license: "Lessons are CC BY 4.0. Code is Apache-2.0.",
     github: "GitHub",
     analytics: "This site uses Google Analytics.",
   },

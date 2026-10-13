@@ -57,4 +57,4 @@ The whole gain came from changes a lesson covers; the others didn't move. One tr
 - `plugin/`: the Claude Code plugin.
 - `docs/decisions.md`: every decision and why; `docs/progress.md`: what was built and what the checks showed.
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Lessons: CC BY-SA 4.0 ([LICENSE-LESSONS](LICENSE-LESSONS)).
+Code: Apache-2.0 ([LICENSE](LICENSE)). Lessons: CC BY 4.0 ([LICENSE-LESSONS](LICENSE-LESSONS)).

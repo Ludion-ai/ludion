@@ -1,5 +1,5 @@
 // FreshBench per-model verdicts (docs/bench/models.json): which measured models already know each lesson's change.
-// The shards carry them so sync can prune; /models shows them. Nothing here is estimated: a lesson without a
+// The shards carry them so sync can prune; /bench shows them (build/bench.ts). Nothing here is estimated: a lesson without a
 // measurement has no entry.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -20,18 +20,4 @@ export interface Models {
 export function readModels(root: string): Models | null {
   const path = join(root, "docs", "bench", "models.json");
   return existsSync(path) ? (JSON.parse(readFileSync(path, "utf8")) as Models) : null;
-}
-
-/** Per model, over the lessons that are measured and still active: how many it knows and misses. */
-export function modelTotals(models: Models, active: Set<string>): { id: string; name: string; knows: number; misses: number }[] {
-  return Object.entries(models.models).map(([id, { name }]) => {
-    let knows = 0;
-    let misses = 0;
-    for (const [lesson, verdicts] of Object.entries(models.lessons)) {
-      if (!active.has(lesson)) continue;
-      if (verdicts[id] === "knows") knows++;
-      else if (verdicts[id] === "misses") misses++;
-    }
-    return { id, name, knows, misses };
-  });
 }

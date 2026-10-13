@@ -1,0 +1,2 @@
+- vitest >=4.0.0 changed what `vi.restoreAllMocks` does. vi.restoreAllMocks no longer resets the state of spies and only restores spies created manually with vi.spyOn. Silent: code written for older versions still runs, without an error. (installed: vitest 4.0.0)
+  Taught by you (in your ledger, not public), drafted by an agent; not verified: tests not run (Docker isn't installed here; CI runs them), sources found.

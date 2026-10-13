@@ -1,0 +1,28 @@
+{
+  "note": "CI on a draft pull request (#90, never merged, closed after this) holding the Done 2 draft as lessons/vitest/01M4S1P8CEVQV7EFKH2BNWXAPG.json, to see before the owner teaches it that its tests pass in CI's Docker run. The first two runs failed and were fixed: vitest 4.0.0 needs a vite from before 7.2 ('Unknown method: getBuiltins' with the newest 7.x), so both tests pin vite 7.1.11; and the search-eval test demanded search questions for every lesson, which no teacher's pull request can have (fixed in #91, docs/decisions.md \"Search eval\"). The last run is below.",
+  "pull_request": 90,
+  "last_runs": [
+    {
+      "workflow": "verify",
+      "run": 38316468070,
+      "conclusion": "success",
+      "jobs": [
+        "verify",
+        "label"
+      ]
+    },
+    {
+      "workflow": "test",
+      "run": 38316468198,
+      "conclusion": "success"
+    }
+  ],
+  "verify_results": [
+    {
+      "id": "01M4S1P8CEVQV7EFKH2BNWXAPG",
+      "status": "passed",
+      "file": "lessons/vitest/01M4S1P8CEVQV7EFKH2BNWXAPG.json",
+      "reasons": []
+    }
+  ]
+}

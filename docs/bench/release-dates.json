@@ -1,0 +1,57 @@
+{
+  "source": "https://registry.npmjs.org/<package>: the time each version was published",
+  "fetched_at": "2026-10-13",
+  "versions": {
+    "agents@0.20.0": "2026-07-27T17:57:41.571Z",
+    "agents@0.21.0": "2026-08-18T09:10:23.768Z",
+    "agents@0.22.0": "2026-08-27T13:29:27.638Z",
+    "agents@0.23.0": "2026-09-11T10:47:17.513Z",
+    "agents@0.24.0": "2026-09-18T12:25:49.784Z",
+    "agents@0.25.0": "2026-10-02T12:33:20.239Z",
+    "agents@0.27.0": "2026-10-07T13:31:40.213Z",
+    "vitest@4.0.0": "2025-10-22T14:09:46.450Z",
+    "vitest@5.0.0": "2026-09-03T12:24:30.312Z",
+    "wrangler@4.113.0": "2026-07-21T19:13:58.028Z",
+    "wrangler@4.116.0": "2026-07-30T16:31:19.682Z",
+    "wrangler@4.117.0": "2026-07-31T10:31:25.167Z",
+    "wrangler@4.118.0": "2026-07-31T13:29:34.825Z",
+    "wrangler@4.121.0": "2026-08-11T19:25:24.780Z",
+    "wrangler@4.122.0": "2026-08-12T14:22:46.343Z",
+    "wrangler@4.124.0": "2026-08-18T12:56:55.160Z",
+    "wrangler@4.125.0": "2026-08-20T17:39:00.731Z",
+    "wrangler@4.126.0": "2026-08-25T19:13:53.086Z",
+    "wrangler@4.127.0": "2026-08-27T08:17:24.186Z",
+    "wrangler@4.129.1": "2026-09-07T15:19:16.563Z",
+    "wrangler@4.131.1": "2026-09-11T14:01:47.833Z",
+    "wrangler@4.136.0": "2026-09-21T13:32:17.052Z",
+    "wrangler@4.141.0": "2026-09-25T19:24:52.755Z",
+    "wrangler@4.145.0": "2026-09-30T14:20:28.735Z",
+    "wrangler@4.148.0": "2026-10-06T18:33:23.820Z"
+  },
+  "cutoffs": {
+    "claude-haiku-5-5": {
+      "month": "2026-06",
+      "url": "https://platform.claude.com/docs/en/models/overview",
+      "row": "Reliable knowledge cutoff",
+      "checked_at": "2026-10-13",
+      "quote": "Reliable knowledge cutoff | Jun 2026",
+      "definition": "Reliable knowledge cutoff: The date through which the model's knowledge is most extensive and reliable."
+    },
+    "claude-sonnet-5-5": {
+      "month": "2026-06",
+      "url": "https://platform.claude.com/docs/en/models/overview",
+      "row": "Reliable knowledge cutoff",
+      "checked_at": "2026-10-13",
+      "quote": "Reliable knowledge cutoff | Jun 2026",
+      "definition": "Reliable knowledge cutoff: The date through which the model's knowledge is most extensive and reliable."
+    },
+    "claude-opus-5-5": {
+      "month": "2026-06",
+      "url": "https://platform.claude.com/docs/en/models/overview",
+      "row": "Reliable knowledge cutoff",
+      "checked_at": "2026-10-13",
+      "quote": "Reliable knowledge cutoff | Jun 2026",
+      "definition": "Reliable knowledge cutoff: The date through which the model's knowledge is most extensive and reliable."
+    }
+  }
+}

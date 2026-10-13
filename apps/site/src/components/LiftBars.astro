@@ -1,0 +1,192 @@
+---
+// Done 3 at a glance: per measured model, the share of questions answered right without and with ludion sync, as two
+// thick bars on a 0–100% scale with the 95% Wilson interval drawn as whiskers over each, and the difference in
+// percentage points beside them. Every number is the Done 3 table's "all" column (build/bench.ts).
+import type { Row, Table } from "../build/bench.ts";
+import { en } from "../strings/en.ts";
+
+interface Props {
+  table: Table;
+  /** Only this model. */
+  model?: string;
+  link?: boolean;
+}
+const { table, model, link = true } = Astro.props;
+const b = en.bench;
+type Measured = Extract<Row, { measured: true }>;
+const measured = table.rows.filter((r): r is Measured => r.measured && (!model || r.model === model));
+const models = [...new Set(measured.map((r) => r.model))].map((id) => {
+  const rows = measured.filter((r) => r.model === id);
+  const off = rows.find((r) => !r.sync);
+  const on = rows.find((r) => r.sync);
+  const share = (r: Measured) => r.cells.all!.correct / r.cells.all!.total;
+  const diff = off && on ? Math.round((share(on) - share(off)) * 100) : null;
+  return { id, name: rows[0]!.name, rows, diff };
+});
+const at = (x: number) => `${Math.round(x * 1000) / 10}%`;
+const label = (sync: boolean) => b.modelPage.missesIn(sync);
+---
+
+{
+  models.map((m) => (
+    <div class="model">
+      {!model && <p class="name">{link ? <a href={`/bench/${m.id}/`}>{m.name}</a> : m.name}</p>}
+      <div class="body">
+        <div class="bars">
+          {m.rows.map((r) => {
+            const x = r.cells.all!;
+            return (
+              <div class="row">
+                <p class="what">
+                  <span>{label(r.sync)}</span>
+                  <span class="frac">
+                    {x.correct}/{x.total}
+                  </span>
+                </p>
+                <div class="track" role="img" aria-label={b.lift.bar(label(r.sync), x.correct, x.total, b.percent(x.low), b.percent(x.high))}>
+                  <span class="bar" style={`width:${at(x.correct / x.total)}`} />
+                  <span class="ci" style={`left:${at(x.low)};width:${at(x.high - x.low)}`} />
+                </div>
+              </div>
+            );
+          })}
+          <p class="scale" aria-hidden="true">
+            <span>0%</span>
+            <span>50%</span>
+            <span>100%</span>
+          </p>
+        </div>
+        {m.diff !== null && (
+          <p class="diff">
+            <span class="big">
+              {m.diff > 0 ? "+" : m.diff < 0 ? "−" : "±"}
+              {Math.abs(m.diff)}
+            </span>
+            <span class="unit">{b.lift.points}</span>
+            <span class="visually-hidden">{b.lift.difference(label(false), label(true))}</span>
+          </p>
+        )}
+      </div>
+    </div>
+  ))
+}
+
+<style>
+  .model {
+    position: relative;
+    padding: 4px 0 8px;
+  }
+  .name {
+    margin: 0 0 10px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .name a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .name a:hover {
+    text-decoration: underline;
+  }
+  .body {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 40px;
+    align-items: center;
+  }
+  .bars {
+    min-width: 0;
+  }
+  .row + .row {
+    margin-top: 14px;
+  }
+  .what {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 6px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .frac {
+    color: var(--ink);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .track {
+    position: relative;
+    height: 30px;
+    background: var(--paper-2);
+    border-radius: 2px;
+  }
+  .bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--mark);
+    border-radius: 2px 0 0 2px;
+    transform-origin: left;
+    animation: grow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both;
+  }
+  /* The 95% interval: a whisker across the bar's end, capped both sides. */
+  .ci {
+    position: absolute;
+    top: 50%;
+    height: 14px;
+    margin-top: -7px;
+    border-left: 2px solid var(--ink);
+    border-right: 2px solid var(--ink);
+    box-sizing: border-box;
+    background: linear-gradient(var(--ink), var(--ink)) 0 50% / 100% 2px no-repeat;
+  }
+  @keyframes grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bar {
+      animation: none;
+    }
+  }
+  .scale {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .diff {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .diff .big {
+    font-size: 64px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .unit {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  @media (max-width: 640px) {
+    .body {
+      grid-template-columns: 1fr;
+    }
+    .diff {
+      order: -1;
+      flex-direction: row;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .diff .big {
+      font-size: 48px;
+    }
+  }
+</style>

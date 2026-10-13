@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseAddedLog, parseDeletedLog } from "../src/build/git-info.ts";
-import { modelTotals, type Models } from "../src/build/models.ts";
+import { withoutToolsTable } from "../src/build/bench.ts";
+import type { Models } from "../src/build/models.ts";
 import { readWithheld, reservedSubjects } from "../src/build/data.ts";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -71,7 +72,7 @@ describe("reservedSubjects", () => {
   });
 });
 
-describe("modelTotals", () => {
+describe("withoutToolsTable", () => {
   it("counts only measured lessons that are still active", () => {
     const models: Models = {
       measured_at: "2026-10-11",
@@ -80,9 +81,10 @@ describe("modelTotals", () => {
       models: { a: { name: "A" }, b: { name: "B" } },
       lessons: { L1: { a: "knows", b: "misses" }, L2: { a: "misses" }, GONE: { a: "knows", b: "knows" } },
     };
-    expect(modelTotals(models, new Set(["L1", "L2", "L3"]))).toEqual([
-      { id: "a", name: "A", knows: 1, misses: 1 },
-      { id: "b", name: "B", knows: 0, misses: 1 },
+    const rows = withoutToolsTable(models, new Map([["L1", "x"], ["L2", "x"], ["L3", "x"]])).rows;
+    expect(rows.map((r) => (r.measured ? [r.model, r.cells.all!.correct, r.cells.all!.total] : [r.model]))).toEqual([
+      ["a", 1, 2],
+      ["b", 0, 1],
     ]);
   });
 });

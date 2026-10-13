@@ -4,12 +4,12 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { COVERAGE_LINE, generateClaim, type FetchFn, type LessonV1 } from "@ludion/core";
 import { ledgerLesson, readLedger, saveEntry } from "../src/ledger.ts";
 import { directDependencies, fromPackageLock, fromPnpmLock, fromYarnLock, readInstalled, type Installed } from "../src/lockfile.ts";
 import { select, type SyncLesson } from "../src/match.ts";
-import { openPullRequest, prTexts } from "../src/publish.ts";
+import { CONSENT, openPullRequest, prTexts } from "../src/publish.ts";
 import { DATA_LINE, lessonLines, renderLessons, withBlock, writeAndWire } from "../src/render.ts";
 import { fetchLessons, shardLesson, type ShardLesson } from "../src/shards.ts";
 import { check, isUnverified, ledgerEntry, showLesson, toLesson, type Draft } from "../src/teach.ts";
@@ -448,6 +448,22 @@ describe("shards", () => {
     expect(shardLesson(entry)).toMatchObject({ teacher: "@alice", versions: ">=5.0.0", url: "https://ludion.ai/lessons/A", kind: "added" });
   });
 
+  it("asks for the index as ludion-ai/<this package's version>, and sends no other header of its own", async () => {
+    const seen: (Headers | undefined)[] = [];
+    vi.stubGlobal("fetch", async (_u: string, init?: RequestInit) => {
+      seen.push(init?.headers ? new Headers(init.headers) : undefined);
+      return Response.json({ built_at: "t", subjects: { vitest: { lessons: 1 } }, subject: "vitest", lessons: [] });
+    });
+    try {
+      await fetchLessons(installed({ vitest: ["5.0.3"] }));
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    const { version } = JSON.parse(readFileSync(join(import.meta.dirname, "../package.json"), "utf8"));
+    expect(seen).toHaveLength(2);
+    for (const h of seen) expect([...h!.entries()]).toEqual([["user-agent", `ludion-ai/${version}`]]);
+  });
+
   it("treats a site without shards as an error, not as no lessons", async () => {
     await expect(fetchLessons(installed({}), async () => new Response("", { status: 404 }))).rejects.toThrow("index/subjects.json answered 404");
   });
@@ -484,5 +500,12 @@ describe("teach --public", () => {
     expect(body).toContain(generateClaim(lesson()));
     expect(body).toContain("Taught by @bob");
     expect(body).toContain("How to undo: delete the file");
+  });
+
+  it("puts the teacher's license sentence in the PR, quoted, with the license the repo declares", () => {
+    const { body } = prTexts(lesson(), { login: "bob", id: 42 });
+    expect(body).toContain(`> ${CONSENT}`);
+    expect(CONSENT).toContain("CC BY 4.0");
+    expect(readFileSync(join(import.meta.dirname, "../../../LICENSE-LESSONS"), "utf8").trimStart()).toMatch(/^Attribution 4\.0 International\r?\n/);
   });
 });

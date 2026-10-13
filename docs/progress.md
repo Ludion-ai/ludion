@@ -7,7 +7,7 @@ What was built, what the check showed, what was decided and why. Newest first. N
 | | Check | State |
 | - | - | - |
 | 1 | Single player: a lesson taught in project A shows up via `ludion sync` in project B, and Claude Code in B gets right the task it got wrong before | **shown**: 1/5 before, 5/5 after sync, 3/3 through the plugin hook (`docs/bench/2026-10-11-done1/`) |
-| 2 | Plumbing: `ludion teach --public` → merge → within five minutes `ludion sync` elsewhere writes it with the teacher's name, and `ludion_ask` returns it | **prepared, not run** (`docs/bench/2026-10-13-done2/`): the lesson (vitest 4.0 `vi.restoreAllMocks`) passed CI's Docker run on a closed draft PR (#90); the owner runs one `teach --public` line after approving `ludion-ai` 0.1.4 on npmjs.com (npm has 0.1.2) |
+| 2 | Plumbing: `ludion teach --public` → merge → within five minutes `ludion sync` elsewhere writes it with the teacher's name, and `ludion_ask` returns it | **shown** (2026-10-13, `docs/bench/2026-10-13-done2/result.json`): #97 (vitest 4.0 `vi.restoreAllMocks`, `teach --public` by `Ludion-ai`) merged at 08:40:22 UTC; the site listed it after 67 s, `ludion sync` wrote it with `Taught by @Ludion-ai` after 74 s, `ludion_ask` returned it after 75 s (limit 300 s); one lesson, one run |
 | 3 | Value: FreshBench on the wedge, Claude Code with default tools in a project with the new version installed, with vs without `ludion sync`: +20 points | B questions on the frozen seeds: **36/45 vs 24/45 (+27)** (`docs/bench/2026-10-11-done3/`). C tasks: running, one trial per task over several days |
 
 ## Current work: batch mode (from 2026-10-12)
@@ -42,8 +42,8 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 ### What waits for the owner, in order (2026-10-13, latest)
 
-1. **npmjs.com, `ludion-ai`: approve 0.1.4, reject 0.1.3.** Both are staged. 0.1.4 (publish run 38315009051, from main at #92) is the one to approve: it has everything 0.1.3 has plus `User-Agent: ludion-ai/<version>` on the CLI's index requests, and the plugin's hook pin on main already says 0.1.4. 0.1.3 (run 38313330049) was staged an hour earlier, before the User-Agent request reached #89; it is not to be approved (`docs/decisions.md`, "Publishing"). In a terminal: `npm stage list ludion-ai`, then `npm stage approve <id of 0.1.4>` and `npm stage reject <id of 0.1.3>`, or the same on npmjs.com.
-2. **Done 2, one line** (after 1, with `git pull` done in `C:\dev\ludion`): `npx ludion-ai@0.1.4 teach C:\dev\ludion\docs\bench\2026-10-13-done2\draft.json --public`, answer `y`. Then `node docs/bench/2026-10-13-done2/measure.ts <pull request number>` in a second terminal, then merge that pull request with nothing else merged for ten minutes either side. The three checks by hand (sync elsewhere, teacher's name in `lessons.md`, `ludion_ask`) and how the five minutes are timed: `docs/bench/2026-10-13-done2/README.md`.
+1. ~~npmjs.com, `ludion-ai`: approve 0.1.4, reject 0.1.3.~~ **Done** (checked 2026-10-13): `latest` is 0.1.4, and 0.1.3 is deprecated ("Use 0.1.4 or later"). `npx ludion-ai@0.1.4 sync` in an empty folder against production exited 0 (`docs/bench/2026-10-13-done2/sync-production-0.1.4.txt`).
+2. ~~Done 2, one line~~ **Done, passed** (2026-10-13): the owner ran `teach --public` from their own terminal (an agent's attempt stops at the confirmation, as designed), #97 merged; the three times and the three checks by hand are in `docs/bench/2026-10-13-done2/result.json`.
 3. **Protected PRs, merge order** (opened once a day, together; the first batch is opened with this update's PR): see the PR list below.
 4. **Not started, waiting for the owner's yes:** counting distinct clients of `/index/*.json` in the Worker (Analytics Engine; a daily-salted hash of the User-Agent, path and `CF-Connecting-IP`, no raw IP). It changes `wrangler.jsonc` (protected) and adds server-side counting next to the README's "no telemetry" (that line is about the CLI), so it is held until the owner confirms they want it.
 
@@ -75,6 +75,13 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 - C tasks: `bash C:/dev/ludion-seedwork/c-batch.sh <ids>` runs one day's tasks under both conditions (frozen seeds served from `C:/dev/ludion-freeze`); results land in `docs/bench/2026-10-11-done3/` of `C:/dev/ludion` and are committed in a docs PR.
 
 ## Log
+
+### 2026-10-13 (later): 0.1.4 is on npm; Done 2 passed
+
+- **npm**: the owner approved 0.1.4 (`latest`) and 0.1.3 is deprecated ("Use 0.1.4 or later"). `npx ludion-ai@0.1.4 sync` in an empty folder against production exited 0 and wrote `.ludion/lessons.md` and `CLAUDE.md` (`docs/bench/2026-10-13-done2/sync-production-0.1.4.txt`). The `User-Agent` the CLI now sends was checked on the built CLI against a local server (#92); nothing in the Worker reads it yet.
+- **Done 2: passed.** Taught by `Ludion-ai` with `ludion-ai@0.1.4 teach --public` (#97, opened 08:34 UTC), `verify` and `test` green, a fresh Opus review said APPROVE (comment on #97; it ran no lesson code), merged 08:40:22 UTC. From the merge, in seconds: `/index/vitest.json` lists the lesson at 67, `ludion sync` in a copy of the fixture project writes it with `Taught by @Ludion-ai` at 74 (second attempt), `ludion_ask` returns it at 75; the limit is 300. `author_id` is the PR account's id. The three checks by hand (sync in another folder, the teacher's name in `lessons.md`, `ludion_ask`) gave the same. One lesson, one run: the five minutes is shown for this path on this day, not a distribution.
+- **A guard that worked**: run by an agent, `teach --public` stopped at "Teaching in public needs you at a terminal to confirm"; the owner ran the same line themselves. No way around it was tried.
+- **A gotcha**: `npx ludion-ai@0.1.4 ...` started inside a checkout without `npm install` fails with "'ludion' is not recognized" (npx picks the workspace's own package); run it from another folder. Now in the Done 2 README.
 
 ### 2026-10-13: One cumulative protected PR for owner merge
 

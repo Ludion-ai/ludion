@@ -81,10 +81,6 @@ wrangler started from round 1 (one Sonnet revise, Sonnet review). Its earlier re
 - One lesson's detail ("now go to stderr") made an off-topic search question ("How do I write a for loop in Go?") find it; `go` became a common word (#83).
 - Cost of both subjects' revising under the rule: Opus revising $17.50, Opus reviews $7.32 (vitest 1.99, wrangler 5.33), Sonnet $1.59.
 
-## After the merge: one lesson retracted (2026-10-13)
-
-Of the 11 lessons in #80 and #84, one was rewritten after its Opus review and merged without a second one: wrangler 4.113.0#10. A fresh Opus review of it said DROP (a label removal only, with a claim that leads an assistant to think provisioning was experimental before 4.113.0). So of the 25 pipeline lessons on main (#62, #75, #76, #80, #84), one was retracted, and the reviews of the PRs did not catch it because no reviewer read its final text. See `docs/decisions.md`, "A fix made after a review is reviewed again".
-
 ## Confounds
 
 - Drafting, reviser, and reviewer models differ across rows (table above); only the two baselines are like for like. Revise rounds: agents Opus twice; wrangler Sonnet once; vitest none.

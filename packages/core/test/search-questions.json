@@ -67,6 +67,10 @@
     "After upgrading to vitest 5, where does the HTML reporter write its report, and how do I configure the `outputDir` option for it?",
     "I upgraded vitest to 5.0.0 and my HTML reporter output isn't in the folder it used to be, with no error shown. Why is index.html now appearing in `.vitest`?"
   ],
+  "01M4RAVZ6AW3ZB9PASXP4454AY": [
+    "After upgrading wrangler to 4.113.0 or later, how do I tell what `wrangler deploy` expects me to do about bindings that haven't been provisioned yet?",
+    "My `wrangler deploy` output now says \"The following bindings need to be provisioned:\" and the \"Experimental:\" prefix on the resource provisioning header is gone, even though I didn't change my config. Did something change in wrangler 4.113.0?"
+  ],
   "01M4RAVZ6G853RNZY4QB6F1G7X": [
     "With wrangler 4.116.0 or later, how can I run `wrangler deploy` for a brand-new Worker from an AI agent without it automatically setting up a workers.dev account subdomain for me?",
     "I updated wrangler past 4.116.0 and my first `wrangler deploy` run by a coding agent ended up registering a workers.dev subdomain derived from my project name, with no error or prompt. Why did that happen?"

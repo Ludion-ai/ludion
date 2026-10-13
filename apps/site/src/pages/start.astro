@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import Pool from "../components/Pool.astro";
 import { siteData } from "../build/data.ts";
 import { en } from "../strings/en.ts";
 
@@ -12,6 +13,7 @@ const s = en.start;
     <h1>{s.heading}</h1>
     <p class="intro">{s.intro}</p>
 
+    <Pool>
     <section aria-labelledby="claude-code">
       <h2 id="claude-code">{s.claudeCode}</h2>
       <pre><code>/plugin marketplace add {config.org}/{config.repo}
@@ -41,6 +43,7 @@ npx ludion-ai teach draft.json --public</code></pre>
       <h2 id="privacy">{s.privacy}</h2>
       <p>{s.privacyBody}</p>
     </section>
+    </Pool>
   </article>
 </Base>
 
@@ -61,6 +64,9 @@ npx ludion-ai teach draft.json --public</code></pre>
   section {
     padding: 24px 0 8px;
     border-top: 1px solid var(--rule);
+  }
+  section:first-of-type {
+    border-top: 0;
   }
   h2 {
     font-size: 17px;

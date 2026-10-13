@@ -1,4 +1,5 @@
 ---
+import Pool from "../components/Pool.astro";
 import Base from "../layouts/Base.astro";
 import LessonCard from "../components/LessonCard.astro";
 import { siteData } from "../build/data.ts";
@@ -22,6 +23,7 @@ const lessons = index.lessons.filter((l) => l.subject === subject);
       <h1>{subject}/</h1>
       <p class="summary">{en.subject.summary(lessons.length)}</p>
     </header>
+    <Pool>
     <ul class="list">
       {
         lessons.map((l) => (
@@ -43,6 +45,7 @@ const lessons = index.lessons.filter((l) => l.subject === subject);
         ))
       }
     </ul>
+    </Pool>
   </div>
 </Base>
 

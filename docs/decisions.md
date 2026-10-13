@@ -241,6 +241,14 @@ The batch work hit the plan's usage limit once. From now on:
 - **`/bench.json`**: both tables as data, with the interval's definition and links to the run folders.
 - **Share cards** (the build fails if a card page has no image; a test checks the built files too): `/bench/og/<model>/` is a bare 1200×630 page with the model's table only (measured in a project if it was, else the without-tools table with "Not measured in a project yet"). After `astro build`, `apps/site/scripts/og.ts` serves `dist` on 127.0.0.1 and screenshots each card with Playwright's Chromium into `dist/bench/og/<model>.png`, next to the rest of the build; `/bench/<model>/` names it in `og:image` and `twitter:card` (`summary_large_image`). So `npm run build` needs Chromium: `test.yml` installs it before the build (it was installed after, for e2e only), and `deploy.yml` installs it before its build step.
 
+### 2026-10-13: Water on every page
+
+- **Why**: the owner asked for the home page's water on the other pages too (lessons, bench, and the rest).
+- **One script, marked by the page**: `scripts/water.js` now draws under whatever the page marks: `[data-water]` is the pool (the canvas goes in it, behind its content), `[data-water-surface]` is the element whose top edge is the surface, and `[data-water-hit]`, if there is one, is where a single ring starts (at the home replay's `--done`, or the pool's `data-water-at`). One pool per page. Base loads the script and `water.css` everywhere; a page without a pool runs nothing. The home replay is marked the same way and looks as before.
+- **Where**: `components/Pool.astro` is a 2 px rule with the pool under it. `/bench` and `/lessons` put their top tiles in it (the ring starts at the first figure); a lesson page puts its evidence in it (the ring starts under the seal); subject and teacher pages put their list in it; `/start` and a model's bench page put everything under the heading in it. The method page and the run logs are documents to read and keep the plain rule.
+- **Cost**: the canvas never grows past 760 px tall, so a long list keeps the water near its surface and the GPU work stays the same as on the home page; it still pauses off-screen and in hidden tabs, caps at 30 fps and DPR 1.5, and shows one still frame under reduced motion.
+- **Contrast**: `e2e/water.spec.ts` now measures every piece of text in a page's pool against the water, on the home page (12 s), `/bench/`, `/lessons/`, and a differential lesson page (6 s each), light and dark. Text on its own panel (the seal, a code block) is left out, since the panel, not the water, is behind it. Every page passes with room (the lowest is 5.3:1 in light, against 4.5). Tables' fixed first column paints the page color only below 1100 px, where it can scroll under it; on a wide screen it would have covered the water.
+
 ### 2026-10-13: The lesson pages, set like the bench
 
 - **Why**: the owner asked for better lessons pages after the bench redesign. `/lessons` was 57 claims in one column at 26 px, each with the same signature line under it, and it scrolled sideways on a phone; a lesson page set its whole claim as one heading and printed a differential test's code twice.
@@ -492,7 +500,7 @@ These describe the system as built through 2026-10-08 and stay true unless a v2 
 ### Site
 
 - Astro, static. All UI strings live in `apps/site/src/strings/en.ts`.
-- Design B: black and white with no hue; Schibsted Grotesk and JetBrains Mono (ligatures off). The verified seal names its evidence (`exit 0`, `proved`, `quote found`). The home page has a water surface (WebGL2; reduced motion shows one still frame). Tokens live in `apps/site/src/styles/tokens.css`.
+- Design B: black and white with no hue; Schibsted Grotesk and JetBrains Mono (ligatures off). The verified seal names its evidence (`exit 0`, `proved`, `quote found`). Every page with a pool has a water surface under its top rule (WebGL2; reduced motion shows one still frame); see "Water on every page". Tokens live in `apps/site/src/styles/tokens.css`.
 - Design changes are checked against the sample lessons in `apps/site/samples/`, built only with `LUDION_SAMPLES=1` into `dist-samples`. They are never deployed: the build refuses that flag in Cloudflare.
 - Budgets:
   - WCAG 2.2 AA in both themes;

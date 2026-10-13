@@ -102,6 +102,11 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 - **Built** (one PR, protected because it changes `.github/workflows/`): `/bench/` (the Done 3 table, a row per model and condition, each cell correct out of questions with its 95% Wilson interval; Haiku 5.5 and Sonnet 5.5 shown as not measured; the without-tools table and per-lesson verdicts from `/models/`), `/bench/<model>/` (questions it didn't get right, each with the change's lesson), 90 run pages with the session logs, `/bench/method/` (`docs/bench/README.md` plus a cost table), `/bench.json`, and a 1200×630 share card per model, screenshotted at build time. `/models` redirects to `/bench/`. Decisions: `docs/decisions.md`, "The bench page".
 - **Checked**: every cell recounted from the grades files in a test, and the totals match the Done 3 README (24/45 without sync, 36/45 with); costs match the per-item `costUsd` sums ($5.27 and $5.79). `npm test` and `npm run test:e2e` pass locally, axe included in light and dark, with the new pages; the redirect answers 301; each card is a 1200×630 PNG. Pages looked at in a browser at 1280 and 390 wide, light and dark: on the phone the tables scroll sideways with the model column fixed, and the page itself doesn't (a hidden label inside the table had widened it; fixed).
 
+### 2026-10-13: Water on every page
+
+- **Built** (`apps/site`, `e2e`): the home page's water, generalized: `/bench`, `/lessons`, lesson pages, subject and teacher pages, `/start`, and the model pages each have a pool under a 2 px rule. Decisions: `docs/decisions.md`, "Water on every page".
+- **Checked**: `npm test` (451), `npm run test:e2e` (15: axe in light and dark; the width test; and text contrast over the water on four pages in light and dark, lowest 5.3:1). Screenshots of each page's first screen, light and dark: `docs/site/2026-10-13-water/`.
+
 ### 2026-10-13: `/lessons` and the lesson pages redrawn
 
 - **Built** (`apps/site` and an e2e test): claims set in parts, a two-column list row everywhere lessons are listed, `/lessons` with subject tiles, search, filters, and subject groups, and lesson pages with the models' verdicts and a differential test drawn as its versions. Decisions: `docs/decisions.md`, "The lesson pages, set like the bench".

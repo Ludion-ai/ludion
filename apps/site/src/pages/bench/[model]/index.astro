@@ -2,6 +2,7 @@
 // One model on FreshBench: its rows of the /bench tables, every Done 3 question it didn't get right (each linked to
 // the change's lesson and to the run's log), and the lessons it misses without tools (models.json).
 import Base from "../../../layouts/Base.astro";
+import Pool from "../../../components/Pool.astro";
 import BenchTable from "../../../components/BenchTable.astro";
 import KnowledgeStrip from "../../../components/KnowledgeStrip.astro";
 import LiftBars from "../../../components/LiftBars.astro";
@@ -43,6 +44,7 @@ const modelRuns = done3?.runs.filter((r) => r.model === model).sort((x, y) => Nu
     <p class="up"><a href="/bench/">{p.back}</a></p>
     <h1>{name}</h1>
 
+    <Pool>
     <section aria-labelledby="done3">
       <h2 id="done3">{b.done3Heading}</h2>
       {
@@ -150,6 +152,7 @@ const modelRuns = done3?.runs.filter((r) => r.model === model).sort((x, y) => Nu
         </section>
       )
     }
+    </Pool>
   </article>
   <Tip />
 </Base>
@@ -168,6 +171,15 @@ const modelRuns = done3?.runs.filter((r) => r.model === model).sort((x, y) => Nu
     margin-top: 40px;
     padding-top: 24px;
     border-top: 1px solid var(--rule);
+  }
+  section:first-of-type {
+    border-top: 0;
+  }
+  :global(.pool) {
+    margin-top: 32px;
+  }
+  :global(.pool) > section:first-of-type {
+    margin-top: 0;
   }
   h2 {
     font-size: 21px;
@@ -241,6 +253,10 @@ const modelRuns = done3?.runs.filter((r) => r.model === model).sort((x, y) => Nu
   .every .first {
     position: sticky;
     left: 0;
-    background: var(--paper);
+  }
+  @media (max-width: 1100px) {
+    .every .first {
+      background: var(--paper);
+    }
   }
 </style>

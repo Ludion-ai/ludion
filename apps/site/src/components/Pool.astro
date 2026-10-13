@@ -1,0 +1,21 @@
+---
+// A pool of water under a page's top rule (scripts/water.js): its top edge is a 2 px rule, which becomes the water's
+// surface once WebGL2 runs, with light moving under it. Without WebGL2 it stays the rule. One per page.
+interface Props {
+  /** Extra classes for the pool's own box. */
+  class?: string;
+  /** Seconds after load when a ring starts at the [data-water-hit] element, if the page marks one. */
+  at?: number;
+}
+const { class: cls, at } = Astro.props;
+---
+
+<div class:list={["pool", cls]} data-water data-water-surface data-water-at={at}>
+  <slot />
+</div>
+
+<style>
+  .pool {
+    border-top: 2px solid var(--rule-strong);
+  }
+</style>

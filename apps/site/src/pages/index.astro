@@ -2,7 +2,7 @@
 import { asTest } from "@ludion/core";
 // Home: the promise, then a replay of how the newest real lesson passed. Its check prints line by line; when
 // exit 0 prints, the seal turns from "Checking" to verified. A replay with its date, never shown as live.
-// The rule above the replay is a water surface (src/scripts/water.js, WebGL2, home only): the lesson waits below it,
+// The rule above the replay is a water surface (src/scripts/water.js, WebGL2): the lesson waits below it,
 // out of focus, and reaches the surface as the seal turns. Without WebGL2 the rule stays a plain 2 px line.
 // Under reduced motion everything shows its final state.
 import Base from "../layouts/Base.astro";
@@ -13,7 +13,6 @@ import SubjectTag from "../components/SubjectTag.astro";
 import { claimSize } from "../build/claim-size.ts";
 import { siteData } from "../build/data.ts";
 import { en, formatDate } from "../strings/en.ts";
-import "../styles/water.css";
 
 const { index, teacherHref } = await siteData();
 const [newest, ...rest] = index.lessons;
@@ -49,9 +48,9 @@ const runner = newest ? (asTest(newest.evidence[0]!)?.runtime ?? "") : "";
 
   {
     newest && (
-      <section class="replay wrap" aria-labelledby="replay" style={`--done:${done}`}>
+      <section class="replay wrap" aria-labelledby="replay" style={`--done:${done}`} data-water>
         <h2 id="replay" class="visually-hidden">{en.home.replayTitle}</h2>
-        <div class="grid">
+        <div class="grid" data-water-surface>
           <article class="lesson">
             <p class:list={["claim", "text", claimSize(newest.claim)]}>
               <a href={`/lessons/${newest.id}/`}><Claim text={newest.claim} /></a>
@@ -64,7 +63,7 @@ const runner = newest ? (asTest(newest.evidence[0]!)?.runtime ?? "") : "";
                 <span class="was" aria-hidden="true">
                   <StatusChip status="checking" label={en.home.checking} size="large" />
                 </span>
-                <span class="now">
+                <span class="now" data-water-hit>
                   <StatusChip status="verified" label={en.lesson.verifiedBy[newest.verified_by]} by={newest.verified_by} size="large" />
                 </span>
               </span>
@@ -110,9 +109,6 @@ const runner = newest ? (asTest(newest.evidence[0]!)?.runtime ?? "") : "";
   }
 </Base>
 
-<script>
-  import "../scripts/water.js";
-</script>
 
 <style>
   .hero {

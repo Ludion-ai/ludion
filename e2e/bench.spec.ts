@@ -27,6 +27,8 @@ test("each model page names its share card, and the card is a 1200×630 PNG", as
 });
 
 test("/bench, /lessons, and lesson pages never scroll sideways, at any width their layouts switch around", async ({ page, request }) => {
+  // About thirty page loads, each now drawing water (WebGL in software on CI): more than the default 30 s.
+  test.setTimeout(180_000);
   // The newest lesson, and the newest one verified across versions (its page draws the versions).
   const index = (await (await request.get("/index.json")).json()) as { lessons: { id: string; verified_by: string }[] };
   const lessons = [index.lessons[0], index.lessons.find((l) => l.verified_by === "differential")].filter((l) => l != null);

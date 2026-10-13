@@ -7,6 +7,7 @@ import SubjectTag from "./SubjectTag.astro";
 import EvidenceDiff from "./EvidenceDiff.astro";
 import EvidenceRun from "./EvidenceRun.astro";
 import Mark from "./Mark.astro";
+import Pool from "./Pool.astro";
 import EvidenceSource from "./EvidenceSource.astro";
 import { claimParts } from "../build/claim-parts.ts";
 import { claimSize } from "../build/claim-size.ts";
@@ -91,7 +92,7 @@ const shared = () => {
           drafted={isV1(lesson) && lesson.drafted_by === "agent"}
         />
       </div>
-      <aside class="result" aria-label={en.lesson.verifiedBy[page.verified_by]}>
+      <aside class="result" aria-label={en.lesson.verifiedBy[page.verified_by]} data-water-hit>
         <StatusChip status="verified" label={en.lesson.verifiedBy[page.verified_by]} by={page.verified_by} size="large" />
         <dl>
           <div><dt>{en.record.verified}</dt><dd><time datetime={page.verified_at}>{formatDate(page.verified_at)}</time></dd></div>
@@ -130,6 +131,7 @@ const shared = () => {
       </aside>
     </div>
 
+    <Pool at={0.6}>
     <section class="evidence" aria-labelledby="evidence">
       <h2 id="evidence">{en.lesson.evidence}</h2>
       {differential && isV1(lesson) && <EvidenceDiff runs={tests} pkg={lesson.package} />}
@@ -150,6 +152,7 @@ const shared = () => {
         )
       }
     </section>
+    </Pool>
   </article>
 </Base>
 
@@ -160,7 +163,6 @@ const shared = () => {
     gap: 56px;
     align-items: start;
     padding-bottom: 56px;
-    border-bottom: 2px solid var(--rule-strong);
   }
   @media (max-width: 900px) {
     .top {

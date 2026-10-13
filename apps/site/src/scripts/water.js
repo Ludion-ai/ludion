@@ -1,12 +1,16 @@
-// The water surface under the home replay's top rule. One WebGL2 fragment shader, black and white (~3 KB gzipped).
+// A water surface under a page's top rule. One WebGL2 fragment shader, black and white (~3 KB gzipped).
+// The page marks it: [data-water] is the pool (the canvas goes in it, behind its content); [data-water-surface] is
+// the element whose top edge is the surface (the pool itself if it carries the attribute); [data-water-hit], if any,
+// is where one ring starts, at --done seconds (the home replay) or data-water-at seconds. One pool per page.
 // The canvas never paints a background. In dark it only adds light (screen); in light it only tints (multiply).
 // So the page's own color always shows through and there is no band or seam to see.
 // 30 fps cap, paused off-screen or in a hidden tab, DPR capped at 1.5. Reduced motion: one still frame.
 // No WebGL2: the canvas is removed and the page stays plain design B.
 // Text contrast over the water is tested in e2e/water.spec.ts; don't raise the dark `peak` without re-running it.
 (() => {
-  const bottle = document.querySelector(".replay");
+  const bottle = document.querySelector("[data-water]");
   if (!bottle) return;
+  const surfaceEl = bottle.matches("[data-water-surface]") ? bottle : (bottle.querySelector("[data-water-surface]") ?? bottle);
   const canvas = document.createElement("canvas");
   canvas.className = "water";
   canvas.setAttribute("aria-hidden", "true");
@@ -100,7 +104,9 @@
   };
   const darkQ = matchMedia("(prefers-color-scheme: dark)");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const hitAt = parseFloat(getComputedStyle(bottle).getPropertyValue("--done")) || 2.4;   // when the seal flips
+  // When the ring starts: the home replay's seal flip (--done), or the pool's data-water-at; no ring without a hit.
+  const hitEl = document.querySelector("[data-water-hit]");
+  const hitAt = hitEl ? (parseFloat(getComputedStyle(bottle).getPropertyValue("--done")) || parseFloat(bottle.dataset.waterAt ?? "") || 0.6) : null;
 
   let dpr = 1, hitX = 260, surface = 44;
   const size = () => {
@@ -108,17 +114,15 @@
     const r = canvas.getBoundingClientRect();
     canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);
-    const grid = bottle.querySelector(".grid");
-    if (grid) surface = grid.getBoundingClientRect().top - canvas.getBoundingClientRect().top + 1;
-    const seal = bottle.querySelector(".now");
-    if (seal) { const s = seal.getBoundingClientRect(); hitX = s.left - canvas.getBoundingClientRect().left + s.width / 2; }
+    surface = surfaceEl.getBoundingClientRect().top - canvas.getBoundingClientRect().top + 1;
+    if (hitEl) { const s = hitEl.getBoundingClientRect(); hitX = s.left - canvas.getBoundingClientRect().left + s.width / 2; }
   };
   const draw = (t) => {
     const dark = darkQ.matches, th = themes[dark ? "dark" : "light"];
     canvas.style.mixBlendMode = dark ? "screen" : "multiply";
     gl.uniform2f(U("uRes"), canvas.width, canvas.height); gl.uniform1f(U("uDpr"), dpr);
     gl.uniform1f(U("uTime"), t); gl.uniform1f(U("uSurface"), surface); gl.uniform1f(U("uDark"), dark ? 1 : 0);
-    gl.uniform1f(U("uHit"), reduce ? -1 : t - hitAt); gl.uniform1f(U("uHitX"), hitX);
+    gl.uniform1f(U("uHit"), reduce || hitAt == null ? -1 : t - hitAt); gl.uniform1f(U("uHitX"), hitX);
     gl.uniform3fv(U("uLight"), rgb(th.light)); gl.uniform3fv(U("uLine"), rgb(th.line)); gl.uniform3fv(U("uTint"), rgb(th.tint));
     gl.uniform1f(U("uCaustic"), th.caustic); gl.uniform1f(U("uBody"), th.body); gl.uniform1f(U("uPeak"), th.peak);
     gl.drawArrays(gl.TRIANGLES, 0, 3);

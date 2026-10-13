@@ -2,7 +2,9 @@
 
 CLAUDE.md, "Done when" 2: `ludion teach --public` from one environment → merge → within five minutes, `ludion sync` in another environment writes the lesson with the teacher's name, and `ludion_ask` returns it.
 
-**Not run yet.** This folder prepares it; the result goes in `result.json` (written by `measure.ts`) and in `docs/progress.md`.
+**Run on 2026-10-13: passed** (`result.json`, written by `measure.ts`; the log is in `docs/progress.md`). The owner answered `y` to `ludion-ai@0.1.4 teach --public` as `Ludion-ai`, which opened #97 at 08:34 UTC; CI went green (`verify`, `test`), a fresh Opus review said APPROVE (comment on #97), and it was merged at 08:40:22 UTC. From that merge: `/index/vitest.json` listed the lesson after 67 s, `ludion sync` wrote it with `Taught by @Ludion-ai` after 74 s (second attempt), `ludion_ask` returned it after 75 s; the limit is 300 s. The three checks by hand (same machine, a copy of `project/`, empty `LUDION_HOME`, `ludion-ai@0.1.4` from npm) gave the same: see `by_hand` in `result.json`. One observation: the first `teach` attempt, run by an agent, stopped at "Teaching in public needs you at a terminal to confirm", as designed; the owner ran it from their own terminal.
+
+What was learned about running it: `npx ludion-ai@0.1.4 ...` started from a checkout of the repo without `npm install` fails with "'ludion' is not recognized" (npx picks the workspace's own `ludion-ai` package, whose bin isn't linked there); start it from another folder. `sync-production-0.1.4.txt` is a separate check: `npx ludion-ai@0.1.4 sync` in an empty folder against production, with a hand-written lockfile (agents 0.20.0, vitest 5.0.0, wrangler 4.113.0, left-pad), after the npm release.
 
 ## The lesson
 

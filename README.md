@@ -10,20 +10,20 @@ npx ludion-ai sync
 
 The next CLI release requires Node.js 22.19.0 or later, matching its bundled HTTP client. Changes in this checkout are not in the published CLI until a new version is approved on npm.
 
-`sync` reads the lockfile, fetches the lessons for the installed versions from <https://ludion.ai>, and writes `.ludion/lessons.md`, imported from `CLAUDE.md` (and named in `AGENTS.md` and a Cursor rule when the project has them). In Claude Code, the plugin runs it at the start of every session and adds the MCP server (`ludion_ask`):
+`sync` reads the lockfile, fetches the lessons for the installed versions from <https://ludion.ai>, and writes `.ludion/lessons.md`, imported from `CLAUDE.md` (and named in `AGENTS.md`, and written into a Cursor rule, when the project has them). In Claude Code, the plugin runs it at the start of every session and adds the MCP server (`ludion_ask`):
 
 ```
 /plugin marketplace add Ludion-ai/ludion
 /plugin install ludion@ludion
 ```
 
-A 47-second replay of one recorded run, without and with `sync`, is in [`docs/demo/sync-vitest.cast`](docs/demo/sync-vitest.cast) (`asciinema play docs/demo/sync-vitest.cast`; built from the recorded output by `docs/demo/make-cast.ts`).
+An 89-second replay of recorded runs is in [`docs/demo/sync-vitest.cast`](docs/demo/sync-vitest.cast) (`asciinema play docs/demo/sync-vitest.cast`). It shows one question answered without and with `sync`, then a lesson taught with `ludion teach` and written by `sync` in another project. It is built from recorded output by `docs/demo/make-cast.ts`, and [`docs/demo/README.md`](docs/demo/README.md) says what was recorded when and what was left out.
 
 ## What it measured
 
 All numbers below come from runs whose files are in [`docs/bench/`](docs/bench/).
 
-**With vs without `ludion sync`** (2026-10-11, [`docs/bench/2026-10-11-done3/`](docs/bench/2026-10-11-done3/)). Claude Code (`claude-opus-5-5`) with its default tools, web search included, in projects with the new versions installed, answering 45 questions about changes in vitest 5.0, wrangler 4.111 to 4.148, and the Cloudflare Agents SDK 0.19 to 0.27. An opus judge graded each answer against an answer key checked against primary sources. The lessons were the 31 seeds frozen at commit `7d61ed1`, covering 30 of the 45 changes.
+**With vs without `ludion sync`** (2026-10-11, [`docs/bench/2026-10-11-done3/`](docs/bench/2026-10-11-done3/)). Claude Code (`claude-opus-5-5`) with its read-only tools (read, search, web search and fetch, and a few fixed commands such as `npm ls`), in projects with the new versions installed, answering 45 questions about changes in vitest 5.0, wrangler 4.111 to 4.148, and the Cloudflare Agents SDK 0.19 to 0.27. An opus judge graded each answer against an answer key checked against primary sources. The lessons were the 31 seeds frozen at commit `7d61ed1`, covering 30 of the 45 changes.
 
 | | without sync | with sync |
 | - | - | - |
@@ -33,13 +33,24 @@ All numbers below come from runs whose files are in [`docs/bench/`](docs/bench/)
 
 The whole gain came from changes a lesson covers; the others didn't move. One trial per question per condition. The coding-task half of this check (C tasks) is still being run, one batch a day.
 
-**A correction that survives** (2026-10-11, [`docs/bench/2026-10-11-done1/`](docs/bench/2026-10-11-done1/)). A vitest 5 lesson taught in one project reached another through `ludion sync`. Claude Code then did the task right 5 times out of 5, against 1 out of 5 before.
+**A correction that survives** (2026-10-11, [`docs/bench/2026-10-11-done1/`](docs/bench/2026-10-11-done1/)). A vitest 5 lesson taught in one project reached another through `ludion sync`. Claude Code then did the task right 5 times out of 5, against 1 out of 5 before (one task, and the agent had no shell).
 
 **What models know without tools** (2026-10-11, [`docs/bench/2026-10-11-models/`](docs/bench/2026-10-11-models/)). Claude Haiku, Sonnet, and Opus 5.5 each answered the same 45 changes twice with no tools: 3 to 5 right out of 45 per trial.
 
 ## What it holds today
 
-30 lessons for vitest, wrangler, and the Cloudflare Agents SDK, plus one example lesson: the measured seeds, less one the harm check withheld (its wording made an answer worse), with two corrected by replacing lessons. All 30 were drafted by an agent, are labeled "drafted by an agent" wherever they appear, and are signed by the account that opened their pull request. Ludion holds some changes of some packages: a missing lesson is no evidence that nothing changed. From the next release of `ludion-ai`, `sync` also names the direct dependencies Ludion has no lessons for, and says where to ask for them.
+Lessons for vitest, wrangler, and the Cloudflare Agents SDK (the live list is on <https://ludion.ai>, and `/index/subjects.json` has the counts of the format 1 lessons), plus one example lesson for Python. Every lesson but the example was drafted by an agent, is labeled "drafted by an agent" wherever it appears, and is signed by the GitHub account that opened its pull request.
+
+Ludion holds some changes of some packages: a missing lesson is no evidence that nothing changed. `ludion-ai` 0.1.3 and later `sync` name the direct dependencies Ludion has no lessons for, and say where to ask for them.
+
+## Teach one
+
+```sh
+npx ludion-ai teach draft.json            # checks it here, saves it to your ledger (~/.ludion)
+npx ludion-ai teach draft.json --public   # shows you the whole lesson, then opens a pull request with your own gh
+```
+
+When your assistant gets a change wrong, ask it to draft the lesson with the `ludion_teach` MCP tool; it returns the command to run. A draft can also be written by hand: it has the fields of a lesson file (see any file in [`lessons/`](lessons/) and [`lessons/lessons.schema.json`](lessons/lessons.schema.json)) without the id, author and dates, which `teach` sets. Its evidence is a test that passes on the new version and fails on the one before (it runs in Docker with the network off, on your machine if Docker is installed and in CI either way), or a quote from the source that states the fact. A draft with no evidence stays in your ledger, marked "unverified, yours only", and never reaches anyone else. Nothing is published unless you confirm at your own terminal.
 
 ## How a lesson works
 
@@ -59,4 +70,4 @@ The whole gain came from changes a lesson covers; the others didn't move. One tr
 - `plugin/`: the Claude Code plugin.
 - `docs/decisions.md`: every decision and why; `docs/progress.md`: what was built and what the checks showed.
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Lessons: CC BY-SA 4.0 ([LICENSE-LESSONS](LICENSE-LESSONS)).
+Code: Apache-2.0 ([LICENSE](LICENSE)). Lessons: CC BY 4.0 ([LICENSE-LESSONS](LICENSE-LESSONS)).

@@ -10,7 +10,7 @@ import { ledgerLesson, readLedger, saveEntry } from "./ledger.ts";
 import { SUBJECT_REQUEST_URL, subjectFor } from "@ludion/core";
 import { directDependencies, readInstalled } from "./lockfile.ts";
 import { select, type SyncLesson } from "./match.ts";
-import { openPullRequest } from "./publish.ts";
+import { CONSENT, openPullRequest } from "./publish.ts";
 import { lessonLines, readLessonsFile, renderLessons, writeAndWire } from "./render.ts";
 import { fetchLessons } from "./shards.ts";
 import { check, ghIdentity, isUnverified, ledgerEntry, readDraft, showLesson, toLesson } from "./teach.ts";
@@ -147,7 +147,8 @@ async function teach(argv: string[]): Promise<number> {
     console.error("Teaching in public needs you at a terminal to confirm. Run this command yourself; it stays in your ledger until then.");
     return 1;
   }
-  const ok = await confirm(`\nOpen a pull request to make this lesson public, signed as @${who.login}? [y/N] `);
+  console.log(`\n${CONSENT}`);
+  const ok = await confirm(`\nOpen a pull request to make this lesson public, with the sentence above, signed as @${who.login}? [y/N] `);
   if (!ok) {
     console.log("Not published. It stays in your ledger.");
     return 0;

@@ -19,3 +19,7 @@ Fresh Opus review completed successfully for each protected PR at the exact inte
 ## Consolidation
 
 #69 targets current main directly and contains the reviewed #67/#68 source plus #98, squashed only into the feature branch after its CI passed. `consolidation.json` proves ancestry of the earlier security/runtime heads and identical blobs for all protected files changed by the final PR relative to main. The subsequent agent-boundary/E2E changes are unprotected and judged by tests/CI. One owner merge remains; main and production were not merged/deployed by this work.
+
+## Later main integration
+
+Main advanced to `a4acda02b35c1441d6defaf212f5cace48572102` with the owner's lesson-license consent, benchmark pages and announcement materials. Preserve these upstream changes and histories. Compose CI with Chromium installation before the share-card build, retaining the existing Docker/artifact/minimum-Node checks. Local typecheck/build passed, including share-card generation; 524 tests passed across 30 files (`latest-*.log`). The new workflow composition receives its own bounded fresh review; prior protected implementations are not re-reviewed. Final exact-head CI remains required.

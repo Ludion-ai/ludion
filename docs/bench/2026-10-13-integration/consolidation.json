@@ -87,5 +87,16 @@
     ],
     "conflict_resolution": "Retain latest upstream Done2/npm record and all existing security/runtime notes.",
     "implementation_changes": false
+  },
+  "announcement_bench_integration": {
+    "main": "a4acda02b35c1441d6defaf212f5cace48572102",
+    "conflicts": [
+      ".github/workflows/test.yml",
+      "README.md",
+      "docs/decisions.md",
+      "docs/progress.md"
+    ],
+    "resolution": "Chromium before build; retain Docker/artifact/minimum-Node checks; retain README runtime/evidence qualifiers and all histories.",
+    "review_scope": "New workflow composition only; prior protected verdicts remain scoped to their exact snapshots."
   }
 }

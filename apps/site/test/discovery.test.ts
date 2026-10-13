@@ -13,12 +13,14 @@ const index: Index = {
 
 describe("being found", () => {
   it("lists every page in the sitemap, teacher pages at their canonical /@login, with XML escaped", () => {
-    const xml = sitemap({ site: "https://ludion.ai", index, lessonPages: [{ id: "A", lastmod: "2026-10-11T03:00:00Z" }, { id: "T", lastmod: "2026-10-12T05:00:00Z" }], subjects: ["agents", "a&b"], teacherLogins: ["alice"] });
+    const xml = sitemap({ site: "https://ludion.ai", index, lessonPages: [{ id: "A", lastmod: "2026-10-11T03:00:00Z" }, { id: "T", lastmod: "2026-10-12T05:00:00Z" }], subjects: ["agents", "a&b"], teacherLogins: ["alice"], benchModels: ["claude-opus-5-5"] });
+    expect(xml).toContain("<loc>https://ludion.ai/bench/claude-opus-5-5/</loc>");
     expect(xml).toContain("<url><loc>https://ludion.ai/lessons/A/</loc><lastmod>2026-10-11</lastmod></url>");
     expect(xml).toContain("<loc>https://ludion.ai/lessons/T/</loc>");
     expect(xml).toContain("<loc>https://ludion.ai/a%26b/</loc>");
     expect(xml).toContain("<loc>https://ludion.ai/@alice</loc>");
-    expect(xml.match(/<url>/g)).toHaveLength(4 + 2 + 2 + 1);
+    // Home, start, bench, bench/method, lessons; one bench model; two subjects; two lessons; one teacher.
+    expect(xml.match(/<url>/g)).toHaveLength(5 + 1 + 2 + 2 + 1);
   });
 
   it("writes llms.txt with the coverage caveat and each active lesson by subject, labeled, its claim untouched", () => {

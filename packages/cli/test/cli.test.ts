@@ -9,7 +9,7 @@ import { COVERAGE_LINE, buildIndex, generateClaim, type FetchFn, type LessonV1 }
 import { ledgerLesson, readLedger, saveEntry } from "../src/ledger.ts";
 import { directDependencies, fromPackageLock, fromPnpmLock, fromYarnLock, readInstalled, type Installed } from "../src/lockfile.ts";
 import { select, type SyncLesson } from "../src/match.ts";
-import { openPullRequest, prTexts } from "../src/publish.ts";
+import { CONSENT, openPullRequest, prTexts } from "../src/publish.ts";
 import { DATA_LINE, lessonLines, renderLessons, withBlock, writeAndWire } from "../src/render.ts";
 import { fetchLessons, shardLesson, type ShardLesson } from "../src/shards.ts";
 import { check, isUnverified, ledgerEntry, showLesson, toLesson, type Draft } from "../src/teach.ts";
@@ -501,5 +501,12 @@ describe("teach --public", () => {
     expect(body).toContain(generateClaim(lesson()));
     expect(body).toContain("Taught by @bob");
     expect(body).toContain("How to undo: delete the file");
+  });
+
+  it("puts the teacher's license sentence in the PR, quoted, with the license the repo declares", () => {
+    const { body } = prTexts(lesson(), { login: "bob", id: 42 });
+    expect(body).toContain(`> ${CONSENT}`);
+    expect(CONSENT).toContain("CC BY 4.0");
+    expect(readFileSync(join(import.meta.dirname, "../../../LICENSE-LESSONS"), "utf8").trimStart()).toMatch(/^Attribution 4\.0 International\r?\n/);
   });
 });

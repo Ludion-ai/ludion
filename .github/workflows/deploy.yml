@@ -81,6 +81,10 @@ jobs:
             exit 0
           done
           echo "::warning::No reverify failing list found; nothing is withheld."
+      # The build screenshots the /bench share cards with Playwright's Chromium (apps/site/scripts/og.ts).
+      - name: Install Chromium for the share cards
+        run: npx playwright install --with-deps chromium
+
       # Build before testing: the Worker tests serve the built site through ASSETS.
       - name: Build
         run: npm run build

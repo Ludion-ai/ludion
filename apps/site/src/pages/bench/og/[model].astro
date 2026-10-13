@@ -1,0 +1,97 @@
+---
+// The share card's source: one model's FreshBench rows and nothing else, laid out at 1200×630.
+// scripts/og.ts screenshots it after the build into /bench/og/<model>.png, which /bench/<model>/ names as og:image.
+import "../../../styles/global.css";
+import BenchTable from "../../../components/BenchTable.astro";
+import Wordmark from "../../../components/Wordmark.astro";
+import { benchModels, done3Table, withoutToolsTable } from "../../../build/bench.ts";
+import { siteData } from "../../../build/data.ts";
+import { en, formatDate } from "../../../strings/en.ts";
+
+export async function getStaticPaths() {
+  const { done3, models } = await siteData();
+  return benchModels(done3, models).map((m) => ({ params: { model: m.id }, props: { name: m.name } }));
+}
+
+const { model } = Astro.params as { model: string };
+const { name } = Astro.props as { name: string };
+const { done3, models, index, config } = await siteData();
+const b = en.bench;
+const t = done3Table(done3, models);
+const measured = t.rows.some((r) => r.model === model && r.measured);
+const w = withoutToolsTable(models, new Map(index.lessons.map((l) => [l.id, l.subject])));
+const date = measured ? done3!.measuredAt : models?.measured_at;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1200" />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={new URL(`/bench/og/${model}/`, config.site).href} />
+    <meta name="color-scheme" content="light" />
+    <title>{b.card.title(name)}</title>
+  </head>
+  <body>
+    <div class="card">
+      <header>
+        <Wordmark height={34} />
+        <span class="where">ludion.ai/bench</span>
+      </header>
+      <h1>{name}</h1>
+      <p class="caption" id="card-table">
+        {measured ? `${b.done3Heading}. ${b.tools}.` : `${b.withoutToolsHeading}. ${b.cardNotMeasured}`}
+      </p>
+      {
+        measured ? (
+          <BenchTable table={t} labelledBy="card-table" tools={b.tools} model={model} link={false} size="card" />
+        ) : (
+          <BenchTable table={w} labelledBy="card-table" tools={b.noTools} model={model} link={false} size="card" />
+        )
+      }
+      {date && <p class="date">{b.measured(formatDate(date))}. {measured ? b.cardNote.done3 : b.cardNote.withoutTools}</p>}
+    </div>
+  </body>
+</html>
+
+<style>
+  body {
+    min-height: 0;
+  }
+  .card {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    padding: 44px 56px 0;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 26px;
+  }
+  .where {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: 54px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+  .caption {
+    margin: 10px 0 22px;
+    font-size: 22px;
+    color: var(--muted);
+  }
+  .date {
+    margin: auto 0 36px;
+    font-size: 18px;
+    color: var(--muted);
+  }
+</style>

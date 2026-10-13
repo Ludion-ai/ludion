@@ -79,7 +79,7 @@ export const en = {
     title: "Bench | Ludion",
     heading: "Bench",
     intro:
-      "FreshBench asks coding assistants about changes in the versions a project installed, and a judge grades each answer against a key checked against primary sources. Each cell is a count out of a total, with its 95% Wilson interval; each table says what it counts.",
+      "FreshBench asks coding assistants about changes in the versions a project installed, and a judge grades each answer against a key checked against primary sources. Every count comes with its 95% Wilson interval, and each part of this page says what it counts.",
     measured: (date: string) => `Measured on ${date}`,
     ago: (days: number) => (days <= 0 ? "today" : days === 1 ? "1 day ago" : `${days} days ago`),
     files: "The run's questions, answers, grades, and logs",
@@ -106,11 +106,7 @@ export const en = {
     percent: (x: number) => `${Math.round(x * 100)}%`,
     range: (low: number, high: number) => `${Math.round(low * 100)}–${Math.round(high * 100)}%`,
     none: "No model has been measured yet.",
-    perLesson: "Per lesson, without tools",
-    lesson: "Lesson",
-    verdict: { knows: "knows", misses: "misses" } as Record<string, string>,
     notMeasuredCell: "not measured",
-    models: "Models",
     modelPage: {
       title: (name: string) => `${name} on FreshBench | Ludion`,
       description: (name: string) => `What ${name} got wrong on FreshBench, question by question.`,
@@ -170,11 +166,56 @@ export const en = {
     card: {
       title: (name: string) => `${name}: FreshBench card`,
     },
-    cardNote: {
-      done3: "Correct answers out of questions, with 95% Wilson intervals.",
-      withoutTools: "Lessons whose change it answered right twice, out of lessons measured, with 95% Wilson intervals.",
+    knowledge: {
+      heading: "What each model knows, lesson by lesson",
+      caption: (lessons: number) =>
+        `One square per lesson (${lessons}). Filled: the model answered the change right both times, with no tools. Empty: it didn't. Dotted: not measured yet.`,
+      legend: { knows: "knows", misses: "doesn't know", none: "not measured" },
+      count: "measured lessons it doesn't know",
+      notMeasured: (n: number) => (n === 1 ? "1 lesson not measured" : `${n} lessons not measured`),
+      summary: (name: string, misses: number, measured: number, none: number) =>
+        `${name} doesn't know ${misses} of ${measured} measured lessons; ${none} not measured.`,
+      tip: { knows: "knows", misses: "doesn't know", none: "not measured" } as Record<string, string>,
+      cardNote: (none: number) =>
+        `A square per lesson. Filled: it answered the change right twice, with no tools. Empty: it didn't.${none ? " Dotted: not measured yet." : ""}`,
     },
-    cardNotMeasured: "Not measured in a project yet.",
+    lift: {
+      heading: "In a project, with and without ludion sync",
+      share: "answered right",
+      points: "points",
+      difference: (from: string, to: string) => `Difference between ${from} and ${to}, in percentage points.`,
+      bar: (label: string, correct: number, total: number, low: string, high: string) =>
+        `${label}: ${correct} of ${total} answered right, 95% interval ${low} to ${high}.`,
+      notMeasured: (names: string) => `Not measured in a project: ${names}.`,
+      bySubject: "By subject",
+    },
+    dates: {
+      heading: "Knowledge dates",
+      caption:
+        "Each dot is a lesson, placed on the day npm published the first version it is about. Filled: the model knows it. Hollow: it doesn't. Dotted: not measured.",
+      cutoff: (month: string) => `Reliable knowledge cutoff, ${month}`,
+      cutoffSource: "Cutoffs as Anthropic's model overview publishes them",
+      measured: "Measured",
+      notNpm: (n: number) => (n === 1 ? "1 lesson isn't about an npm package and has no date here." : `${n} lessons aren't about an npm package and have no date here.`),
+      unfetched: (n: number) => (n === 1 ? "1 lesson is for a version whose date hasn't been fetched yet." : `${n} lessons are for versions whose dates haven't been fetched yet.`),
+      source: "Publish dates from the npm registry",
+      summary: (name: string, cutoff: string | null) => `${name}${cutoff ? `, reliable knowledge cutoff ${cutoff}` : ""}`,
+    },
+    list: {
+      heading: "Every lesson",
+      subject: "Subject",
+      kind: "Kind",
+      silentOnly: "Silent only",
+      all: "All",
+      showing: (n: number, of: number) => `${n} of ${of}`,
+      silent: "silent",
+      silentTitle: "Silent: code written for older versions still runs, without an error.",
+      verdict: (name: string, v: string) => `${name}: ${v}`,
+    },
+    kind: { added: "added", removed: "removed", renamed: "renamed", deprecated: "deprecated", default: "default", behavior: "behavior" } as Record<string, string>,
+    methodDetails: "How this was measured, and how to run it again",
+    month: (ym: string) => new Date(`${ym}-01T00:00:00Z`).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" }),
+    monthShort: (ym: string) => new Date(`${ym}-01T00:00:00Z`).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }),
   },
   start: {
     title: "Start | Ludion",

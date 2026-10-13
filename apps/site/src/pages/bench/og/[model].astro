@@ -1,10 +1,11 @@
 ---
-// The share card's source: one model's FreshBench rows and nothing else, laid out at 1200×630.
+// The share card's source: one model's knowledge strip and its count, nothing else, laid out at 1200×630.
 // scripts/og.ts screenshots it after the build into /bench/og/<model>.png, which /bench/<model>/ names as og:image.
 import "../../../styles/global.css";
-import BenchTable from "../../../components/BenchTable.astro";
+import KnowledgeStrip from "../../../components/KnowledgeStrip.astro";
 import Wordmark from "../../../components/Wordmark.astro";
-import { benchModels, done3Table, withoutToolsTable } from "../../../build/bench.ts";
+import { benchModels } from "../../../build/bench.ts";
+import { knowledge } from "../../../build/knowledge.ts";
 import { siteData } from "../../../build/data.ts";
 import { en, formatDate } from "../../../strings/en.ts";
 
@@ -15,12 +16,10 @@ export async function getStaticPaths() {
 
 const { model } = Astro.params as { model: string };
 const { name } = Astro.props as { name: string };
-const { done3, models, index, config } = await siteData();
+const { models, index, config, releaseDates } = await siteData();
 const b = en.bench;
-const t = done3Table(done3, models);
-const measured = t.rows.some((r) => r.model === model && r.measured);
-const w = withoutToolsTable(models, new Map(index.lessons.map((l) => [l.id, l.subject])));
-const date = measured ? done3!.measuredAt : models?.measured_at;
+const k = knowledge(index, models, releaseDates);
+const strip = k.strips.find((s) => s.model === model);
 ---
 
 <!doctype html>
@@ -40,17 +39,14 @@ const date = measured ? done3!.measuredAt : models?.measured_at;
         <span class="where">ludion.ai/bench</span>
       </header>
       <h1>{name}</h1>
-      <p class="caption" id="card-table">
-        {measured ? `${b.done3Heading}. ${b.tools}.` : `${b.withoutToolsHeading}. ${b.cardNotMeasured}`}
-      </p>
+      {strip ? <KnowledgeStrip strip={strip} lessons={k.lessons} link={false} size="card" /> : <p class="none">{b.notMeasured}</p>}
       {
-        measured ? (
-          <BenchTable table={t} labelledBy="card-table" tools={b.tools} model={model} link={false} size="card" />
-        ) : (
-          <BenchTable table={w} labelledBy="card-table" tools={b.noTools} model={model} link={false} size="card" />
+        k.measuredAt && (
+          <p class="date">
+            {b.knowledge.cardNote(strip?.notMeasured ?? 0)} {b.measured(formatDate(k.measuredAt))}.
+          </p>
         )
       }
-      {date && <p class="date">{b.measured(formatDate(date))}. {measured ? b.cardNote.done3 : b.cardNote.withoutTools}</p>}
     </div>
   </body>
 </html>
@@ -72,7 +68,7 @@ const date = measured ? done3!.measuredAt : models?.measured_at;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 26px;
+    margin-bottom: 22px;
   }
   .where {
     font-size: 22px;
@@ -80,18 +76,18 @@ const date = measured ? done3!.measuredAt : models?.measured_at;
     color: var(--muted);
   }
   h1 {
-    font-size: 54px;
+    font-size: 40px;
     font-weight: 800;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.03em;
+    margin-bottom: 6px;
   }
-  .caption {
-    margin: 10px 0 22px;
-    font-size: 22px;
+  .none {
+    font-size: 30px;
     color: var(--muted);
   }
   .date {
-    margin: auto 0 36px;
-    font-size: 18px;
+    margin: auto 0 34px;
+    font-size: 19px;
     color: var(--muted);
   }
 </style>

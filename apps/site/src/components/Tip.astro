@@ -1,0 +1,56 @@
+---
+// One tooltip for the page's data marks: any element with data-tip shows its text beside it on hover. The marks are
+// links (a click opens the lesson) and are left out of the tab order and the accessibility tree; the same lessons are
+// listed as text on the page, so the tip is only a shortcut for the pointer.
+---
+
+<div class="tip" role="presentation" hidden></div>
+
+<script>
+  const tip = document.querySelector<HTMLElement>(".tip")!;
+  let current: Element | null = null;
+  const show = (el: HTMLElement) => {
+    current = el;
+    tip.textContent = el.dataset.tip ?? "";
+    tip.hidden = false;
+    const r = el.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const h = tip.offsetHeight;
+    const left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), document.documentElement.clientWidth - w - 8);
+    const top = r.top - h - 8 >= 8 ? r.top - h - 8 : r.bottom + 8;
+    tip.style.transform = `translate(${Math.round(left)}px, ${Math.round(top)}px)`;
+  };
+  const hide = () => {
+    current = null;
+    tip.hidden = true;
+  };
+  document.addEventListener("pointerover", (e) => {
+    const el = (e.target as Element).closest<HTMLElement>("[data-tip]");
+    if (el && el !== current) show(el);
+    else if (!el && current) hide();
+  });
+  document.addEventListener("scroll", hide, { passive: true });
+  document.addEventListener("keydown", (e) => e.key === "Escape" && hide());
+</script>
+
+<style>
+  .tip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    max-width: min(26em, calc(100vw - 16px));
+    padding: 8px 10px;
+    border-radius: 3px;
+    background: var(--log-bg);
+    color: var(--log-fg);
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-line;
+    pointer-events: none;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 0.18);
+  }
+  .tip[hidden] {
+    display: none;
+  }
+</style>

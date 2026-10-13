@@ -1,0 +1,16 @@
+{
+  "entry": "5.0.0#15",
+  "verdict": {
+    "id": "5.0.0#15",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "TestModule diagnostics workerId",
+    "why": "Ids are now 1-based instead of 0-based, which changes the values returned."
+  },
+  "cost_usd": 0.159756,
+  "turns": 9,
+  "round": 2,
+  "model": "claude-opus-5-5",
+  "skip": "The only quotable source documents the new diagnostic().workerId field and never says ids became 1-based or mentions VITEST_WORKER_ID, so no quote or detail can truthfully state the behavior change."
+}

@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#29",
+  "verdict": {
+    "id": "4.4.0#29",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.object / z.tuple optionality",
+    "why": "Aligning object and tuple optionality handling changes what inputs are accepted or the inferred types for existing schemas."
+  },
+  "cost_usd": 0.39451859999999994,
+  "turns": 18,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.tuple",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "const { z } = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet out;\ntry { out = z.tuple([z.string(), z.string().default(\"bravo\")]).parse([\"alpha\"]); }\ncatch (e) { broken(\"parse threw: \" + e.message); }\nif (!Array.isArray(out)) broken(\"parse returned \" + JSON.stringify(out));\nif (out.length === 1 && out[0] === \"alpha\") symptom(\"z.tuple ignored the default of the missing trailing element, parse returned only alpha\");\nif (out.length !== 2 || out[0] !== \"alpha\" || out[1] !== \"bravo\") broken(\"unexpected output \" + JSON.stringify(out));\nconsole.log(\"OK: z.tuple applied the default of the missing trailing element: \" + JSON.stringify(out));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "const { z } = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet out;\ntry { out = z.tuple([z.string(), z.string().default(\"bravo\")]).parse([\"alpha\"]); }\ncatch (e) { broken(\"parse threw: \" + e.message); }\nif (!Array.isArray(out)) broken(\"parse returned \" + JSON.stringify(out));\nif (out.length === 1 && out[0] === \"alpha\") symptom(\"z.tuple ignored the default of the missing trailing element, parse returned only alpha\");\nif (out.length !== 2 || out[0] !== \"alpha\" || out[1] !== \"bravo\") broken(\"unexpected output \" + JSON.stringify(out));\nconsole.log(\"OK: z.tuple applied the default of the missing trailing element: \" + JSON.stringify(out));\n",
+          "expect": "fail",
+          "error": "FAIL: z.tuple ignored the default of the missing trailing element, parse returned only alpha"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "entry": "4.130.0#3",
+  "verdict": {
+    "id": "4.130.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler pages deploy",
+    "why": "When run by an AI agent, new static Pages projects are now delegated to Workers even if the account already has Pages projects."
+  },
+  "cost_usd": 0.0297114,
+  "turns": 5,
+  "round": 4,
+  "model": "claude-sonnet-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.130.0",
+    "kind": "behavior",
+    "symbol": "wrangler pages deploy",
+    "signal": "silent",
+    "detail": "When run by an AI agent, now delegate a brand-new static Pages project to a Workers static-assets deploy even when the account already has other Pages projects",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.130.0/packages/wrangler/CHANGELOG.md",
+          "quote": "When run by an AI agent, `wrangler pages deploy` and `wrangler pages project create` now delegate a brand-new static Pages project to a Workers static-assets deploy even when the account already has other Pages projects."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,6 +1,7 @@
 // The public index, one shard per subject: GET <site>/index/subjects.json, then <site>/index/<subject>.json for the
 // subjects a project has installed. Built with the site from lessons on main, so it is what main says.
 import { subjectFor, type IndexEntry } from "@ludion/core";
+import pkg from "../package.json" with { type: "json" };
 import type { Installed } from "./lockfile.ts";
 import type { SyncLesson } from "./match.ts";
 import { checkedShardLesson } from "./shard-check.ts";
@@ -27,7 +28,9 @@ type Fetch = (url: string) => Promise<Response>;
 
 /** Every index request gives up after this long: sync runs at session start and must never stall it. */
 const FETCH_TIMEOUT_MS = 5000;
-const timedFetch: Fetch = (u) => fetch(u, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+/** Says which CLI asks, and nothing else about who: the index is public and the CLI sends no identifier of its own. */
+export const USER_AGENT = `ludion-ai/${pkg.version}`;
+const timedFetch: Fetch = (u) => fetch(u, { headers: { "User-Agent": USER_AGENT }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
 export const MAX_INDEX_BYTES = 4 * 1024 * 1024;
 const object = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
 

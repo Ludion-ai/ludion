@@ -1,0 +1,38 @@
+[
+  {
+    "entry": "0.21.0#8",
+    "id": "01M4QH98JK8YPHSFDC1VX7HZJ7",
+    "claim": "agents >=0.21.0 changed what `useAgentChat` does. Plain-text error bodies in useAgentChat observer error frames are no longer merged into an empty assistant message. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "0.23.0#10",
+    "id": "01M4QH98JRND3BARBYA0RGY08M",
+    "claim": "agents >=0.23.0 changed what `browser_execute` does. browser_execute no longer sends the durable calls log to the model; the persisted tool part keeps it for UIs and audit. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "0.25.0#11",
+    "id": "01M4QH98JTQ4NMTCY1YD0NZ7TV",
+    "claim": "agents >=0.25.0 deprecated `CdpSession`; use `CdpConnection` instead. CdpSession is retained as a deprecated alias of the CdpConnection name. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "0.25.0#14",
+    "id": "01M4QH98JVV4XPR9PVG1GAWKDV",
+    "claim": "agents >=0.25.0 changed what `loadCdpSpec` does. loadCdpSpec now includes command parameters and return types, so a model can see how to call a CDP method. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "0.27.0#15",
+    "id": "01M4QH98K262R2KMAZY9Z8219P",
+    "claim": "agents >=0.27.0 changed what `browserTool` does. browserTool now has its own tool description instead of codemode's generic one. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "0.27.0#18",
+    "id": "01M4QH98K3WT2TXMHZAPMQSCBF",
+    "claim": "agents >=0.27.0 changed what `MCPClientManager.removeServer` does. MCPClientManager.removeServer now clears the server's saved OAuth state from Durable Object storage, including tokens and client information. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  }
+]

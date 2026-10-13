@@ -1,0 +1,684 @@
+[
+  {
+    "entry": "4.111.0#4",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail says worker email logs are written under `.wrangler/tmp/email` in the project root without saying this applies only when the caller sets `defaultProjectTmpPath` (Wrangler and the Vite plugin do this automatically). Direct Miniflare users get no project-root logs, and the test only covers `getPlatformProxy` with a text email, so the detail should scope the claim to Wrangler and the Vite plugin."
+      }
+    ],
+    "cost_usd": 0.0360175,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.111.0#9",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol `wrangler whoami` is not what changed: `whoami` behaves the same, and the change is the typo-suggestion handling for unknown commands and subcommands. The symbol should name that behavior or the command parser, and `whoami` should appear only as the example."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says the release 'changed what `wrangler whoami` does', which is false and could mislead an assistant about a working command. It should say that mistyped commands now print a 'Did you mean' suggestion."
+      },
+      {
+        "rule": "3",
+        "problem": "'Silent: code written for older versions still runs' does not fit the evidence. The tested typo command fails with 'Unknown argument' and a non-zero exit on both versions, and only the extra suggestion text is new. The signal and the sentence should not imply that previously working code is affected."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim covers any unknown command or subcommand and any command within a 'reasonable edit distance', but the tests only run one top-level typo (`whoamio`). Either add a subcommand test such as `kv namespase`, or limit the claim to what was tested."
+      }
+    ],
+    "cost_usd": 0.031517500000000004,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.112.0#7",
+    "findings": [
+      {
+        "rule": "3",
+        "problem": "signal is 'silent' but the test shows the new version stops a first deploy on an account with no workers.dev subdomain with a non-zero exit and a registration message, so the observable change is a failure (previously the API error 10063), not code that 'still runs without an error'; the signal and its generated sentence must be corrected."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim says Wrangler 'prompts you to register one', but the test runs with CI=true and only checks that the process exits with a 'register a workers.dev subdomain' message before any upload; the interactive prompt and registration flow are never exercised, so the claim should be limited to what was tested."
+      },
+      {
+        "rule": "8",
+        "problem": "An assistant would read 'changed what workers.dev does' and 'prompts you to register one' as a deploy that now continues after a prompt, which would mislead it for non-interactive or CI deploys where the deploy halts; the claim should say what actually happens and that it applies only to new Workers with no account subdomain."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol 'workers.dev' is a hostname rather than a Wrangler symbol such as the `workers_dev` config key or the `wrangler deploy` command, so the generated sentence 'changed what `workers.dev` does' does not match what the entry changed (a pre-upload subdomain check in deploy)."
+      }
+    ],
+    "cost_usd": 0.0434755,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.113.0#1",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim names only `wrangler triggers deploy`, but the quoted entry says reconciliation also runs for `wrangler deploy` and `@cloudflare/deploy-helpers` clients. The tests only cover an additive plan on `triggers deploy`, so the 'reconciles' wording reaches further than the evidence: updates, deletes, conflicts and the non-interactive failure are untested. Scope the claim to what was tested, or add tests for those cases."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'Older versions don't have it' reads as though the `addresses` config key is new. The entry only says deployment now applies `addresses`, so the key may already have existed. An assistant could wrongly conclude that `wrangler deploy` ignores it, or that it can't be written for older versions. The claim should say deploy now applies the existing top-level `addresses` config, or the key's introduction should be shown by evidence."
+      },
+      {
+        "rule": "8",
+        "problem": "The claim leaves out that non-interactive (CI) runs with destructive plans (deletes or updates) fail without modifying rules, and that destructive changes prompt in interactive mode. An assistant writing CI deploy code from this lesson could write a pipeline that fails on deploy."
+      },
+      {
+        "rule": "7",
+        "problem": "kind 'added' with symbol `addresses` doesn't match the entry, whose change is 'Apply Email Routing `addresses` during Worker trigger deployment', which is deploy behavior. The kind and the 'added `addresses`' wording should reflect that behavior change, not a new config key."
+      }
+    ],
+    "cost_usd": 0.0478435,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.113.0#5",
+    "findings": [],
+    "cost_usd": 0.0315055,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.113.0#7",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The only test runs `wrangler init` with both a nub user agent and a nub binary present, so it supports only that command's package-manager choice. The claim 'detects nub from its npm_config_user_agent and an installed nub binary' reads as general and does not say the scope is `wrangler init`, nor which of the two signals triggers detection; narrow the claim to what the test shows or add tests."
+      },
+      {
+        "rule": "7",
+        "problem": "`npm_config_user_agent` is an environment variable that wrangler reads, not a wrangler symbol whose behavior changed; the symbol should name the wrangler feature or command (for example package-manager detection or `wrangler init`) that changed."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'wrangler changed what `npm_config_user_agent` does' is wrong, since wrangler does not control that variable. It could lead an assistant to think wrangler sets or redefines it, or that detection of other user agents changed; it should say wrangler now recognizes nub when choosing a package manager."
+      },
+      {
+        "rule": "6",
+        "problem": "The quoted changelog line covers two changes, detection via user agent/binary and autoconfig detection via `nub.lock`, but the lesson's detail and tests cover only the first, so the quote does not match the one change claimed; quote only the relevant clause or split the lesson."
+      }
+    ],
+    "cost_usd": 0.0358635,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.115.0#3",
+    "findings": [
+      {
+        "rule": "6",
+        "problem": "The lesson bundles two changes: waiting for Retry-After instead of the default backoff (silent), and failing fast when the wait exceeds 60 seconds (a new error where older versions kept retrying). Split the fail-fast part into its own lesson."
+      },
+      {
+        "rule": "3",
+        "problem": "signal: silent is stated for the whole lesson, but the 60-second fail-fast clause describes code that now fails where it used to be retried, so that part is loud."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim that waits longer than 60 seconds fail fast is not exercised by either test, which only use a 503 with Retry-After: 2 on one command. Drop that clause or add a test with a Retry-After above 60."
+      }
+    ],
+    "cost_usd": 0.0398795,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.116.0#1",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol `workers.dev` is a domain name, not the code symbol that changed. The behavior is in `wrangler deploy` (the first-deploy subdomain registration), so the symbol should name that command."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence \"changed what `workers.dev` does\" is vague and misleading. The change is that `wrangler deploy` now registers an account-level workers.dev subdomain, derived from the project name, instead of prompting the user. Reword the claim to say that and drop the claim about workers.dev itself."
+      }
+    ],
+    "cost_usd": 0.0427795,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.116.0#3",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The source quote opens with the changelog headline ('Graduate `wrangler check startup` from alpha and show bundle size and a local timing summary'), and the sentence that states the fact ('The command no longer prints an alpha warning.') does not name the symbol; quote only that sentence with the command named, for example 'wrangler check startup no longer prints an alpha warning'."
+      }
+    ],
+    "cost_usd": 0.0300295,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.117.0#2",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says \"the old paths\" work without issue but never names them. The changelog lists specific rewrites (handler/scheduled, handler/email, explorer/*, mf/scheduled, mf/stream/*, mf/imagedelivery/*), and the claim reads as covering every old `/cdn-cgi/*` path. Name the paths the changelog lists and limit the claim to them and to `wrangler dev` and the Vite plugin."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote says \"the old paths\" and \"the new ones\" without stating them, so the fact itself (`/cdn-cgi/handler/scheduled` etc. rewritten to `/cdn-cgi/local/*` or `/__cf_local/*`) is missing. The quote should name the actual paths, not point to a list elsewhere in the entry."
+      },
+      {
+        "rule": "5",
+        "problem": "The change is that old code keeps working, so the same code cannot pass on 4.117.0 and fail on the prior release. The lesson shows no differential test pair and the claim cannot be shown by one; it should be dropped, or restated as a testable change such as the new paths only existing from 4.117.0."
+      },
+      {
+        "rule": "8",
+        "problem": "An assistant reading \"continue to use the old paths without issue\" could use the deprecated paths in new code, or assume this holds for Miniflare v5 used directly. The rewrite is only in `wrangler dev` and the Vite plugin, and the new `/cdn-cgi/local/*` paths are never given. State the new paths and the rewrite's scope."
+      }
+    ],
+    "cost_usd": 0.0278295,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.118.0#2",
+    "findings": [],
+    "cost_usd": 0.0330975,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.120.0#1",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says matches are returned \"in human-readable or JSON output\", but both tests only run with `--json` and check the top-level array. The human-readable output (and the no-match message) is never exercised, so drop that part of the claim or add a test that covers it."
+      }
+    ],
+    "cost_usd": 0.0354995,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.121.0#5",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The only quote is about `wrangler preview secret list` (masked output from the latest deployment), so it names a different symbol than the lesson's `wrangler preview secret`, and it does not state the put/PATCH-target change the tests exercise."
+      },
+      {
+        "rule": "6",
+        "problem": "The changelog bundles several changes: secret changes now PATCH the Preview's latest deployment, `list` prints masked names, and `bulk` deletes on `null`. The lesson covers them all under one vague symbol and should be split into one lesson per change."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim that `wrangler preview secret` 'changed what it does' reaches the whole command family, but the tests only cover `preview secret put`; nothing tests `list`, `bulk`, or `delete`."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `wrangler preview secret` matches neither the quoted `wrangler preview secret list` nor the tested `wrangler preview secret put`, so the symbol, quote, and test do not line up; each should name the one subcommand the lesson is about."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says only that the command 'changed what it does' without saying what changed (secrets now patch the named Preview's latest deployment and create a new deployment, rather than patching Worker-level Previews settings), so an assistant cannot act on it."
+      }
+    ],
+    "cost_usd": 0.040933500000000005,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.121.0#6",
+    "findings": [
+      {
+        "rule": "4",
+        "problem": "Code that doesn't set DO_NOT_TRACK behaves identically on the new version, and the entry describes newly honoring an env var that previously did nothing, so kind should be \"added\" rather than \"behavior\"."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence \"changed what DO_NOT_TRACK does\" implies the variable already had an effect, when before 4.121.0 wrangler ignored it; the detail should say wrangler now honors DO_NOT_TRACK=1 as a telemetry opt-out, which it previously ignored."
+      }
+    ],
+    "cost_usd": 0.0285895,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.121.0#7",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The detail repeats the changelog's headline wording ('concise success summary') and never states the concrete fact, which is that the output now lists the Preview name, Preview URL, deployment ID and Deployment URL in place of the box-art settings summary; the detail should name those fields."
+      }
+    ],
+    "cost_usd": 0.0213975,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.122.0#1",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote is a how-to instruction ('To keep Node.js compatibility switched off... specify both') rather than the fact that changed, namely that wrangler now resolves nodejs_compat and nodejs_compat_v2 from the compatibility date (default on as of 2026-08-04); it should quote that sentence and name the flag."
+      },
+      {
+        "rule": "7",
+        "problem": "The claim 'changed what no_nodejs_compat does' and the symbol no_nodejs_compat misdescribe the entry: no_nodejs_compat is only honored as an opt-out, while the change is that nodejs_compat/nodejs_compat_v2 are now detected by default from the compatibility date, so the symbol and kind should reflect that default change."
+      },
+      {
+        "rule": "4",
+        "problem": "Workers that never use any no_nodejs_compat flag but have a compatibility date of 2026-08-04 or later now get Node.js polyfills and no empty process.env substitution, so this is a default change rather than something tied to the no_nodejs_compat feature."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence says only 'a newer compatibility date' and never states the 2026-08-04 threshold or that nodejs_compat is now on by default, so an assistant would not know when or why both opt-out flags are needed and could write wrong config for earlier dates or wrongly assume Node.js compat is off without a flag."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim is not scoped to compatibility dates on or after 2026-08-04 and treats 'specify both' as the general rule, which goes beyond what the evidence supports."
+      }
+    ],
+    "cost_usd": 0.0292475,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.122.0#4",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote is the changelog's explanation of the earlier failure and does not state the fact itself; it should quote the sentence that generated configurations now add nodejs_compat only for compatibility dates before 2026-08-04, and the detail should name where this happens (create-cloudflare / wrangler setup)."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim drops the scope: this applies only to configs generated by `create-cloudflare` and `wrangler setup`, and the lesson omits the 2026-08-04 date threshold; it reads as a general change to wrangler's handling of the flag."
+      },
+      {
+        "rule": "4",
+        "problem": "The change alters what generated projects contain (flag omitted, and removed from existing wrangler.json(c) by `wrangler setup`), so it is a behavior change for tooling, but the sentence 'changed what nodejs_compat does' wrongly implies the runtime semantics of the flag changed."
+      },
+      {
+        "rule": "3",
+        "problem": "signal: silent is misleading: the lesson's own quote describes a failure to start when the flag is specified with a date at or after 2026-08-04, so hand-written code that adds the flag with such a date errors; 'code written for older versions still runs' is not established by the evidence."
+      },
+      {
+        "rule": "5",
+        "problem": "No tests/differential pair are present in the lesson: nothing shows the same code passing on 4.122.0 and failing on the prior release with only the change's own symptom, and the behavior (generated output of create-cloudflare/wrangler setup) is not demonstrated."
+      },
+      {
+        "rule": "6",
+        "problem": "The entry bundles several changes (not adding the flag for new dates, create-cloudflare removing it, wrangler setup removing it from existing config, still installing @types/node) and the lesson merges them into one vague statement; split or narrow to one."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol nodejs_compat is a config flag rather than the changed feature, and versions >=4.122.0 is unverified against the entry; the actual change lives in create-cloudflare and `wrangler setup`, and the stated detail does not match the removal behavior described in the entry."
+      },
+      {
+        "rule": "8",
+        "problem": "An assistant would read this as nodejs_compat behaving differently or no longer needing to be set generally, and might omit the flag for compatibility dates before 2026-08-04 where it is still required, or think adding it is harmless; it should state that the flag is redundant and errors at compatibility_date >= 2026-08-04 and still needed before."
+      }
+    ],
+    "cost_usd": 0.0230555,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.124.0#12",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The only quote, 'When no compatibility date was set, Wrangler, C3 and the Vitest pool all defaulted to the current date.', states the old behavior rather than the change (the default is now a fixed date, the release date of the bundled workerd). It also never names the real symbol `compatibility_date`. Quote the sentence 'The default is now fixed at the release date of the `workerd` version that ships with each release'."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol is 'compatibility date' (prose), but the config key the entry and the tests use is `compatibility_date`; the symbol should be that exact identifier."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'changed the default of `compatibility date`' does not say what the new default is (a fixed date tied to the bundled workerd release, no longer today's date), and 'silent' suggests nothing matters. An assistant could wrongly assume the default is still the current date, or miss that newer compatibility flags are not enabled unless it sets the date explicitly. The claim should state the old and new defaults."
+      }
+    ],
+    "cost_usd": 0.036241499999999996,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.124.0#8",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote only states the old behavior (\"resolved the compatibility date to the current date\") and never the new fact, that `--latest` now resolves to the latest compatibility date supported by the installed workerd; quote the sentence \"These now resolve to the latest compatibility date supported by this version of Wrangler...\" as well."
+      },
+      {
+        "rule": "8",
+        "problem": "The detail and generated sentence say only what `--latest` used to do and never what it does from 4.124.0, so an assistant cannot tell the new behavior and might still assume the current date is written (or that the date is now a fixed value); state the new resolution (the release date of the bundled workerd) in the detail."
+      }
+    ],
+    "cost_usd": 0.0231055,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.125.0#3",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim drops the condition that this applies only when the parent Worker doesn't already exist, so \"changed what `wrangler preview` does\" reads as a general change; add that scope to the detail and the quote."
+      },
+      {
+        "rule": "8",
+        "problem": "Saying Wrangler \"offers to create\" a parent Worker implies a prompt, but the entry says non-interactive environments (CI) create the Worker without asking, so an assistant could wrongly expect a confirmation step or no side effect; state the non-interactive behavior and note the feature is private beta."
+      }
+    ],
+    "cost_usd": 0.0231635,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.126.0#2",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote is a changelog headline sentence that never names the `events` symbol (the `result.events` property returned by the worker's `email()` call); quote the fact that names that property."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so there is no differential pair showing the same code passing on 4.126.0 and failing on the previous release with only the expected symptom (`result.events` being undefined)."
+      },
+      {
+        "rule": "4",
+        "problem": "Adding a new `events` field to the email harness result changes the output for code that never uses the feature, such as an exact `toEqual` or snapshot on the whole result, so `added` may be wrong and `behavior` may fit better."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `events` is a bare, generic name; it should be the qualified property on the email result (for example `result.events` from `getWorker().email()`) so it matches what the entry describes."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'wrangler added `events`' does not say where `events` lives (the result of the local email test harness call) or what the entries look like, so an assistant could write wrong code or look for `events` in the wrong place."
+      }
+    ],
+    "cost_usd": 0.0249795,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.126.0#4",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim is stated without the conditions the quote limits it to (local Durable Object containers; rootless Docker on Linux with /dev/fuse, or a Docker engine on macOS/WSL); it should say it only applies to local container development in those environments."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote describes what Miniflare passes to containers but never says the fact in terms of a changed prior behavior, and the lesson sentence itself says only 'changed what Miniflare does' without stating the fact (Docker FUSE privileges are now passed automatically to local DO containers)."
+      },
+      {
+        "rule": "3",
+        "problem": "Nothing in the evidence shows older code still runs without error on the new version; the signal 'silent' is asserted without a test or quote showing code written for older versions behaves the same without failing."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so there is no differential pair showing the same code passes on 4.126.0 and fails on the prior release with only the change's own symptom (and a FUSE-dependent container would need Docker/Linux /dev/fuse, which is unverified)."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol 'Miniflare' is a broad class name rather than the specific changed behavior (container Docker privileges/FUSE); also versions '>=4.126.0' is unverified as the release that made the change since the changelog quote comes from the 4.126.0 file without confirming the entry first appears there."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence 'changed what Miniflare does' is vague and could lead an assistant to think general Miniflare behavior changed, when it only affects Docker privileges for local DO containers in specific environments."
+      }
+    ],
+    "cost_usd": 0.0195035,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.126.0#6",
+    "findings": [],
+    "cost_usd": 0.0226795,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.126.0#7",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says wrangler preview 'now attaches the title' unconditionally, but the changelog says this is best effort, only detected on GitHub Actions, GitLab CI or via a `PULL_REQUEST_TITLE` fallback, and nothing changes if no title is found; the detail should state those conditions."
+      },
+      {
+        "rule": "1",
+        "problem": "The tests only check that the strings `workers/pull_request_title` and `PULL_REQUEST_TITLE` appear in the bundled cli.js, so they don't reach the claimed behavior of attaching the annotation to a deployment in any CI environment."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence 'changed what `workers/pull_request_title` does' implies an existing annotation changed, when it is a new annotation, and with the unconditional wording it could lead an assistant to assume the annotation is always present on preview deployments."
+      }
+    ],
+    "cost_usd": 0.0278355,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.129.1#4",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote and the lesson name 'bundle size reporter', a descriptive phrase and not a symbol in the code; the real function the test extracts is `printBundleSize`, so the symbol should be that."
+      },
+      {
+        "rule": "7",
+        "problem": "The `symbol` field is the prose phrase 'bundle size reporter' and not an identifier such as `printBundleSize`, so it does not match what the evidence code actually exercises."
+      },
+      {
+        "rule": "8",
+        "problem": "The detail drops the changelog's 'for its color-coded warnings' scope and says only that the reporter 'compares against the 64 MiB limit', so an assistant could think wrangler now enforces or fails on a 64 MiB limit, or that the output format changed; it should say only the colored size warning thresholds changed."
+      }
+    ],
+    "cost_usd": 0.034007499999999996,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.130.0#3",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim drops the conditions in the entry: it applies only when run by an AI agent and only to brand-new static projects, and the sentence never says it is agent-only, so it reads as applying to every `wrangler pages deploy` run; state the agent-only scope."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote is the changelog's own summary sentence, and it names two commands, while the lesson's symbol covers only one; it also omits the key condition 'When run by an AI agent', so the fact is not fully stated; quote the sentence that includes the agent condition and the per-project gate."
+      },
+      {
+        "rule": "3",
+        "problem": "signal 'silent' is doubtful: delegating a deploy to a Workers static-assets deploy changes what is created and may fail or prompt differently, and no evidence shows old code still runs without error on the new version; the lesson has no test showing this."
+      },
+      {
+        "rule": "4",
+        "problem": "The behavior is limited to agent-run, new-project cases, but the sentence is written as a general change of `wrangler pages deploy`; the scope must be stated, otherwise code not using the feature (non-agent runs, existing projects) would be read as changed."
+      },
+      {
+        "rule": "5",
+        "problem": "The evidence has no tests at all: there is no differential pair showing the same code behaving one way on 4.130.0 and the other way on the prior release, with the old run failing only on the change's own symptom."
+      },
+      {
+        "rule": "6",
+        "problem": "The entry bundles several changes (the per-project gate widening, the cached-name/account-matching rule, and the account-switch behavior, plus `pages project create`); the lesson should cover only one change, and the extra commands/parts belong in separate lessons."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol is only `wrangler pages deploy` while the quote and entry also cover `wrangler pages project create`; also the detail is a fragment ('Now delegate...') that misses the agent condition, and versions starts at 4.130.0 without evidence that this release introduced the widening (it says 'widen', implying an earlier delegation existed in a previous version)."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence omits that this happens only when run by an AI agent and only for new static projects, and that delegated deploys go to Workers rather than Pages, so an assistant could wrongly expect all new Pages projects to be created as Workers or could be unaware that its own agent-run deploy now lands on Workers; the grammar ('Now delegate') is also broken."
+      }
+    ],
+    "cost_usd": 0.0227935,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.131.1#1",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The sentence \"wrangler >=4.131.1 changed what `deploy` does\" suggests deploy's behavior or provisioning changed, when the only change is an informational note printed in specific cases; it should say that deploy prints a DNS/TLS provisioning-delay note and that nothing else about deploy changed."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail drops the quoted trigger \"or enables its Preview URLs\" and the changelog's limit that stable redeploys don't repeat the note, so it reads as if every deploy that adds a custom domain, and deploy generally, behaves differently; scope it to the cases the entry names."
+      }
+    ],
+    "cost_usd": 0.024799500000000002,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.131.1#2",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim covers both deployed trigger output and WRANGLER_OUTPUT_FILE_PATH, but the tests only call the extracted renderRoute function and never check what is written to the output file; narrow the claim to the rendered route label or test the file contents."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'changed what WRANGLER_OUTPUT_FILE_PATH does' implies the env var's behavior changed, when only the label text inside the output changed, and it never gives the old and new strings (e.g. '[enabled]' to '[production: enabled]'), so an assistant can't tell what to update in code that parses these labels."
+      }
+    ],
+    "cost_usd": 0.0289475,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.134.0#2",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says Preview commands (plural) are labeled open beta in help output, but the test only checks the single `wrangler preview` line in top-level `wrangler --help`, not the subcommands' own help; narrow the claim to that listing line or test the subcommands."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence 'changed what `wrangler preview` does' implies the command's behavior changed, but only a help-text label changed (the command still works the same); an assistant could write wrong code from this, so reword it to say only the help label changed."
+      }
+    ],
+    "cost_usd": 0.0283215,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.135.0#2",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The sentence \"changed the default of `remote`\" reads as if the `remote` default changed for all bindings, but only Flagship bindings changed; it should say `remote` on Flagship bindings (e.g. symbol `flagship`, or `remote` scoped to flagship)."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `remote` is a generic option shared by many binding types, so it does not identify the changed Flagship behavior; the symbol should name the Flagship binding config (e.g. `flagship[].remote`)."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim says Flagship bindings use the local Miniflare store, but the tests only call `unstable_getMiniflareWorkerOptions` and check that no remoteProxyConnectionString is set. They never exercise a running local store or the Vite plugin, so the claim should be narrowed to what the tests show (the binding is not routed to the remote proxy by default)."
+      }
+    ],
+    "cost_usd": 0.0328095,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.137.0#3",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote never names a code symbol (`D1 SQL` is not one) and only restates the changelog's mechanism, not the concrete fact that SQL previously kept as one statement, such as PostgreSQL dollar-quoted text containing `;`, is now split at the semicolon; name the real symbol (e.g. `unstable_splitSqlQuery` or `wrangler d1 execute`) and state the observable change."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `D1 SQL` is a vague label rather than the API the evidence exercises (`unstable_splitSqlQuery`, used by D1 file execution), so the symbol does not match the entry or the tests."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence \"changed what `D1 SQL` does ... uses SQLite's statement-completion state machine\" gives an assistant no usable guidance: it does not say which SQL now splits differently (e.g. non-SQLite syntax like dollar quotes now splits at inner semicolons), so it cannot tell whether existing SQL files are affected."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim and the changelog quote cover the general trigger, quoted-identifier, comment and keyword handling, but the tests only reach one case (a PostgreSQL dollar-quote string with a semicolon) and do not show the state machine itself; narrow the claim to the tested behavior or add tests."
+      }
+    ],
+    "cost_usd": 0.029795500000000003,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.138.0#3",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote is a changelog headline-style description of an internal implementation ('Format validation errors with Zod's built-in prettifyError() helper'), not a statement of the observable fact; it should state what output changed (e.g. the error message format and property paths) rather than the mechanism."
+      },
+      {
+        "rule": "2",
+        "problem": "The symbol `prettifyError` is Zod's helper, not a wrangler API or symbol that users call or that wrangler exposes, so it does not name the symbol whose behavior changed for wrangler users; the symbol should be the user-visible thing affected (e.g. wrangler config validation error output)."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim names Miniflare, Wrangler, the Vite plugin, and the Vitest plugin as if consistent output applies across all of them, but the evidence is only a changelog line and no tests show each of these tools changed; the claim should be limited to what was verified."
+      },
+      {
+        "rule": "3",
+        "problem": "signal 'silent' is asserted without evidence; the change only alters error message text, and the lesson doesn't show that code written for the older version runs unchanged (e.g. code or tooling that parses the old error message text could break)."
+      },
+      {
+        "rule": "4",
+        "problem": "The change alters validation error output for code that never uses any 'prettifyError' feature, so it is a behavior change for all users, but the lesson doesn't establish what the old vs. new output actually is, leaving the behavior unspecified."
+      },
+      {
+        "rule": "5",
+        "problem": "No tests are provided: there is no differential pair showing the same code passing on 4.138.0 and failing on the previous release with only the change's own symptom (differing error text)."
+      },
+      {
+        "rule": "7",
+        "problem": "The versions field '>=4.138.0' is not verified against the entry as the first release containing the change, and the symbol 'prettifyError' doesn't match what a wrangler user would reference; the generated sentence 'changed what prettifyError does' is false since wrangler's own API of that name was not changed."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'Format validation errors with prettifyError() so...' reads as an instruction to the assistant to use prettifyError(), and 'changed what prettifyError does' misleads it into thinking a callable wrangler API changed, which could lead to wrong code."
+      }
+    ],
+    "cost_usd": 0.021623499999999997,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.141.0#4",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says `--log-level debug` changed generally, but the evidence covers only failed proxied requests in `wrangler dev`; the detail and quote should name `wrangler dev` so the scope is not read as every command that takes the flag."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so there is no evidence that the same code passes on 4.141.0 and fails on the previous release with only the expected symptom (missing stack and cause in debug output); a differential pair should be added."
+      }
+    ],
+    "cost_usd": 0.0232755,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.148.0#5",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "kind is `added` and symbol is the command `wrangler versions secret bulk`, but the command already existed (the 4.147.0 test runs it and gets a PATCH). What changed is that a `null` value now deletes a secret, so the symbol and kind should describe that (for example kind `behavior`, with the null-deletion input as the symbol), not the addition of the command."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says the command was added in 4.148.0 and 'Older versions don't have it', which is false. An assistant could wrongly avoid `wrangler versions secret bulk` on older versions, or misread what 4.148.0 changed. It should say that `null` values delete secrets only from 4.148.0 on."
+      },
+      {
+        "rule": "1",
+        "problem": "'Older versions don't have it' goes beyond the evidence. The 4.147.0 test shows the command exists there, and only null-as-deletion is missing, so the claim should be limited to that."
+      },
+      {
+        "rule": "4",
+        "problem": "The entry also changes the output of bulk secret commands, which now separates created from deleted secrets, and changes how `wrangler secret bulk` retries behave. Code that never uses null deletion may therefore behave differently, so `added` is not the right kind."
+      }
+    ],
+    "cost_usd": 0.0395195,
+    "model": "claude-sonnet-5-5"
+  },
+  {
+    "entry": "4.148.0#9",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The detail says only 'built-in Text module patterns', but the quoted changelog sentence says 'Text, Data, and WebAssembly'. The detail should name all three, or the quote and tests should be narrowed to match."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim says Text module 'patterns' (plural), but the test only checks for `declare module \"*.txt\"`. The claim should be limited to what the test shows (the `*.txt` declaration), or the test should check the other default patterns."
+      }
+    ],
+    "cost_usd": 0.032405500000000004,
+    "model": "claude-sonnet-5-5"
+  }
+]

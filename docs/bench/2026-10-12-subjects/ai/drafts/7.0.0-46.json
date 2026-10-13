@@ -1,0 +1,54 @@
+{
+  "entry": "7.0.0#46",
+  "verdict": {
+    "id": "7.0.0#46",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "telemetry.enable",
+    "why": "Telemetry is now enabled by default, so unchanged code starts emitting telemetry."
+  },
+  "cost_usd": 0.9867834000000002,
+  "turns": 32,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "ai"
+    },
+    "versions": ">=7.0.0",
+    "kind": "default",
+    "symbol": "telemetry",
+    "signal": "silent",
+    "detail": "telemetry is enabled by default",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "ai": "7.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst esm = `\nimport dc from \"node:diagnostics_channel\";\nimport { generateText } from \"ai\";\nlet spans = 0;\ndc.tracingChannel(\"ai:telemetry\").subscribe({ start() { spans++; }, end() {}, asyncStart() {}, asyncEnd() {}, error() {} });\nconst span = new Proxy({}, { get: (t, p) => (p === \"then\" ? undefined : () => span) });\nconst tracer = {\n  startActiveSpan(...args) { spans++; return args[args.length - 1](span); },\n  startSpan() { spans++; return span; },\n};\nlet modelCalls = 0;\nconst model = {\n  specificationVersion: \"v3\", provider: \"mock\", modelId: \"mock\", supportedUrls: {},\n  doGenerate: async () => { modelCalls++; throw new Error(\"MOCK_MODEL_ERROR\"); },\n  doStream: async () => { modelCalls++; throw new Error(\"MOCK_MODEL_ERROR\"); },\n};\nasync function count(telemetry) {\n  spans = 0; modelCalls = 0;\n  try { await generateText({ model, prompt: \"hi\", maxRetries: 0, experimental_telemetry: telemetry }); } catch (e) {}\n  return { spans, modelCalls };\n}\nconst enabled = await count({ isEnabled: true, functionId: \"t\", tracer });\nconst unset = await count({ functionId: \"t\", tracer });\nconsole.log(JSON.stringify({ enabled, unset }));\n`;\nfs.writeFileSync(\"/w/t.mjs\", esm);\nconst { execFileSync } = require(\"child_process\");\nlet out;\ntry { out = execFileSync(process.execPath, [\"/w/t.mjs\"], { encoding: \"utf8\", timeout: 60000 }); }\ncatch (e) { broken(\"running generateText failed: \" + String(e.stderr || e.message).slice(0, 300)); }\nlet r;\ntry { r = JSON.parse(out.trim().split(\"\\n\").pop()); } catch (e) { broken(\"unexpected output: \" + out.slice(0, 300)); }\nif (r.enabled.modelCalls < 1 || r.unset.modelCalls < 1) broken(\"the mock model was not called: \" + JSON.stringify(r));\nif (r.enabled.spans < 1) broken(\"no telemetry spans seen even with isEnabled: true: \" + JSON.stringify(r));\nif (r.unset.spans < 1) symptom(\"generateText recorded no telemetry spans when isEnabled was not set\");\nconsole.log(\"OK: generateText records telemetry spans when isEnabled is not set\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "ai": "6.0.303"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst esm = `\nimport dc from \"node:diagnostics_channel\";\nimport { generateText } from \"ai\";\nlet spans = 0;\ndc.tracingChannel(\"ai:telemetry\").subscribe({ start() { spans++; }, end() {}, asyncStart() {}, asyncEnd() {}, error() {} });\nconst span = new Proxy({}, { get: (t, p) => (p === \"then\" ? undefined : () => span) });\nconst tracer = {\n  startActiveSpan(...args) { spans++; return args[args.length - 1](span); },\n  startSpan() { spans++; return span; },\n};\nlet modelCalls = 0;\nconst model = {\n  specificationVersion: \"v3\", provider: \"mock\", modelId: \"mock\", supportedUrls: {},\n  doGenerate: async () => { modelCalls++; throw new Error(\"MOCK_MODEL_ERROR\"); },\n  doStream: async () => { modelCalls++; throw new Error(\"MOCK_MODEL_ERROR\"); },\n};\nasync function count(telemetry) {\n  spans = 0; modelCalls = 0;\n  try { await generateText({ model, prompt: \"hi\", maxRetries: 0, experimental_telemetry: telemetry }); } catch (e) {}\n  return { spans, modelCalls };\n}\nconst enabled = await count({ isEnabled: true, functionId: \"t\", tracer });\nconst unset = await count({ functionId: \"t\", tracer });\nconsole.log(JSON.stringify({ enabled, unset }));\n`;\nfs.writeFileSync(\"/w/t.mjs\", esm);\nconst { execFileSync } = require(\"child_process\");\nlet out;\ntry { out = execFileSync(process.execPath, [\"/w/t.mjs\"], { encoding: \"utf8\", timeout: 60000 }); }\ncatch (e) { broken(\"running generateText failed: \" + String(e.stderr || e.message).slice(0, 300)); }\nlet r;\ntry { r = JSON.parse(out.trim().split(\"\\n\").pop()); } catch (e) { broken(\"unexpected output: \" + out.slice(0, 300)); }\nif (r.enabled.modelCalls < 1 || r.unset.modelCalls < 1) broken(\"the mock model was not called: \" + JSON.stringify(r));\nif (r.enabled.spans < 1) broken(\"no telemetry spans seen even with isEnabled: true: \" + JSON.stringify(r));\nif (r.unset.spans < 1) symptom(\"generateText recorded no telemetry spans when isEnabled was not set\");\nconsole.log(\"OK: generateText records telemetry spans when isEnabled is not set\");\n",
+          "expect": "fail",
+          "error": "FAIL: generateText recorded no telemetry spans when isEnabled was not set"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/vercel/ai/ai@7.0.0/packages/ai/CHANGELOG.md",
+          "quote": "feat(ai): enable:true for telemetry by default"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

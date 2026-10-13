@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#19",
+  "verdict": {
+    "id": "4.2.3#19",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "ml-[calc(-1*var(--width))]",
+    "why": "Canonicalization now moves the negative sign outside arbitrary values."
+  },
+  "cost_usd": 0.6899184000000002,
+  "turns": 31,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "ml-[calc(-1*var(--width))]",
+    "signal": "silent",
+    "detail": "Canonicalization moves the sign outside the arbitrary value",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  let tw;\n  try { tw = require(\"tailwindcss\"); } catch (e) { broken(\"cannot load tailwindcss: \" + e.message); }\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const dir = path.dirname(require.resolve(\"tailwindcss/package.json\"));\n  let ds;\n  try {\n    ds = await tw.__unstable__loadDesignSystem('@import \"tailwindcss\";', {\n      base: dir,\n      loadStylesheet: async (id) => {\n        if (id !== \"tailwindcss\") broken(\"unexpected stylesheet \" + id);\n        const file = path.join(dir, \"index.css\");\n        return { path: file, base: dir, content: fs.readFileSync(file, \"utf8\") };\n      },\n    });\n  } catch (e) { broken(\"loadDesignSystem failed: \" + e.message); }\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const input = \"ml-[calc(-1*var(--width))]\";\n  const out = ds.canonicalizeCandidates([input]);\n  if (!Array.isArray(out) || out.length !== 1 || typeof out[0] !== \"string\") broken(\"unexpected result \" + JSON.stringify(out));\n  if (out[0] === \"-ml-(--width)\") { console.log(\"OK: ml-[calc(-1*var(--width))] canonicalizes to -ml-(--width)\"); return; }\n  if (!out[0].startsWith(\"-\")) symptom(\"canonicalizeCandidates kept the - sign inside the arbitrary value of ml-[calc(-1*var(--width))]\");\n  broken(\"ml-[calc(-1*var(--width))] canonicalized to \" + out[0]);\n})().catch((e) => broken(String(e && e.message)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  let tw;\n  try { tw = require(\"tailwindcss\"); } catch (e) { broken(\"cannot load tailwindcss: \" + e.message); }\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const dir = path.dirname(require.resolve(\"tailwindcss/package.json\"));\n  let ds;\n  try {\n    ds = await tw.__unstable__loadDesignSystem('@import \"tailwindcss\";', {\n      base: dir,\n      loadStylesheet: async (id) => {\n        if (id !== \"tailwindcss\") broken(\"unexpected stylesheet \" + id);\n        const file = path.join(dir, \"index.css\");\n        return { path: file, base: dir, content: fs.readFileSync(file, \"utf8\") };\n      },\n    });\n  } catch (e) { broken(\"loadDesignSystem failed: \" + e.message); }\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const input = \"ml-[calc(-1*var(--width))]\";\n  const out = ds.canonicalizeCandidates([input]);\n  if (!Array.isArray(out) || out.length !== 1 || typeof out[0] !== \"string\") broken(\"unexpected result \" + JSON.stringify(out));\n  if (out[0] === \"-ml-(--width)\") { console.log(\"OK: ml-[calc(-1*var(--width))] canonicalizes to -ml-(--width)\"); return; }\n  if (!out[0].startsWith(\"-\")) symptom(\"canonicalizeCandidates kept the - sign inside the arbitrary value of ml-[calc(-1*var(--width))]\");\n  broken(\"ml-[calc(-1*var(--width))] canonicalized to \" + out[0]);\n})().catch((e) => broken(String(e && e.message)));\n",
+          "expect": "fail",
+          "error": "FAIL: canonicalizeCandidates kept the - sign inside the arbitrary value of ml-[calc(-1*var(--width))]"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Canonicalization: move the `-` sign outside the arbitrary value `ml-[calc(-1*var(--width))]` → `-ml-(--width)`"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

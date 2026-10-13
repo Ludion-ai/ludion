@@ -1,0 +1,47 @@
+{
+  "entry": "5.0.0#60",
+  "verdict": {
+    "id": "5.0.0#60",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tags",
+    "why": "Test tags options now overwrite inherited suite options instead of merging, changing how existing tests resolve options."
+  },
+  "cost_usd": 0.44522600000000007,
+  "turns": 14,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "behavior",
+    "symbol": "tags",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "5.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/tagtimeout\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"vitest.config.mjs\"),\n  \"export default { test: { tags: [{ name: 'slow', timeout: 10000 }] } }\\n\");\nfs.writeFileSync(path.join(dir, \"slow.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('suite', { timeout: 500 }, () => {\",\n  \"  test('waits', { tags: ['slow'] }, async () => { await new Promise(r => setTimeout(r, 1500)) })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst results = (report.testResults || []).flatMap(f => f.assertionResults || []);\nconst t = results.find(a => a.title === \"waits\");\nif (!t) {\n  console.error(\"ERROR: test waits not found in report\");\n  process.exit(2);\n}\nconst msgs = (t.failureMessages || []).join(\"\\n\");\nconsole.log(\"status \" + t.status + \"; \" + msgs);\nif (t.status === \"passed\" && r.status === 0) {\n  console.log(\"PASS: tag timeout 10000 overrode suite timeout 500\");\n  process.exit(0);\n}\nif (t.status === \"failed\" && /timed out in 500ms/i.test(msgs)) {\n  console.error(\"FAIL: suite timeout 500 overrode the tag timeout 10000 and the test timed out\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (status \" + t.status + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "4.1.11"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/tagtimeout\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"vitest.config.mjs\"),\n  \"export default { test: { tags: [{ name: 'slow', timeout: 10000 }] } }\\n\");\nfs.writeFileSync(path.join(dir, \"slow.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('suite', { timeout: 500 }, () => {\",\n  \"  test('waits', { tags: ['slow'] }, async () => { await new Promise(r => setTimeout(r, 1500)) })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst results = (report.testResults || []).flatMap(f => f.assertionResults || []);\nconst t = results.find(a => a.title === \"waits\");\nif (!t) {\n  console.error(\"ERROR: test waits not found in report\");\n  process.exit(2);\n}\nconst msgs = (t.failureMessages || []).join(\"\\n\");\nconsole.log(\"status \" + t.status + \"; \" + msgs);\nif (t.status === \"passed\" && r.status === 0) {\n  console.log(\"PASS: tag timeout 10000 overrode suite timeout 500\");\n  process.exit(0);\n}\nif (t.status === \"failed\" && /timed out in 500ms/i.test(msgs)) {\n  console.error(\"FAIL: suite timeout 500 overrode the tag timeout 10000 and the test timed out\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (status \" + t.status + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: suite timeout 500 overrode the tag timeout 10000 and the test timed out"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

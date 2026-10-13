@@ -1,0 +1,55 @@
+{
+  "entry": "0.25.0#26",
+  "verdict": {
+    "id": "0.25.0#26",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "resolveToolMergeId",
+    "why": "resolveToolMergeId is deprecated in favour of reconcileMessages and still works."
+  },
+  "cost_usd": 0.4588054000000001,
+  "turns": 17,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.25.0",
+    "kind": "deprecated",
+    "symbol": "resolveToolMergeId",
+    "replacement": "reconcileMessages",
+    "signal": "silent",
+    "detail": "resolveToolMergeId is deprecated in favour of reconcileMessages.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.25.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nlet pkg, text;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\n  text = fs.readFileSync(path.join(root, pkg.exports[\"./chat\"].types), \"utf8\");\n} catch (e) {\n  console.error(\"ERROR: cannot read agents/chat types: \" + e.message);\n  process.exit(2);\n}\nconst m = text.match(/\\/\\*\\*((?:(?!\\*\\/)[\\s\\S])*)\\*\\/\\s*declare function resolveToolMergeId\\(/);\nif (!m || !/declare function reconcileMessages\\(/.test(text)) {\n  console.error(\"ERROR: resolveToolMergeId or reconcileMessages declaration not found in agents \" + pkg.version);\n  process.exit(2);\n}\nconst doc = m[1];\nif (/@deprecated[\\s\\S]*reconcileMessages/.test(doc)) {\n  console.log(\"OK: agents \" + pkg.version + \" marks resolveToolMergeId @deprecated in favour of reconcileMessages\");\n  process.exit(0);\n}\nif (!/@deprecated/.test(doc)) {\n  console.error(\"FAIL: resolveToolMergeId is not marked @deprecated\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected resolveToolMergeId doc: \" + doc);\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.24.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nlet pkg, text;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\n  text = fs.readFileSync(path.join(root, pkg.exports[\"./chat\"].types), \"utf8\");\n} catch (e) {\n  console.error(\"ERROR: cannot read agents/chat types: \" + e.message);\n  process.exit(2);\n}\nconst m = text.match(/\\/\\*\\*((?:(?!\\*\\/)[\\s\\S])*)\\*\\/\\s*declare function resolveToolMergeId\\(/);\nif (!m || !/declare function reconcileMessages\\(/.test(text)) {\n  console.error(\"ERROR: resolveToolMergeId or reconcileMessages declaration not found in agents \" + pkg.version);\n  process.exit(2);\n}\nconst doc = m[1];\nif (/@deprecated[\\s\\S]*reconcileMessages/.test(doc)) {\n  console.log(\"OK: agents \" + pkg.version + \" marks resolveToolMergeId @deprecated in favour of reconcileMessages\");\n  process.exit(0);\n}\nif (!/@deprecated/.test(doc)) {\n  console.error(\"FAIL: resolveToolMergeId is not marked @deprecated\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected resolveToolMergeId doc: \" + doc);\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: resolveToolMergeId is not marked @deprecated"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+          "quote": "`resolveToolMergeId` is deprecated in favour of `reconcileMessages`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

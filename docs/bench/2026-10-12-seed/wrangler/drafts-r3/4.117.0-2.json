@@ -1,0 +1,57 @@
+{
+  "entry": "4.117.0#2",
+  "verdict": {
+    "id": "4.117.0#2",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "/cdn-cgi/handler/scheduled",
+    "why": "Local testing endpoints moved to /cdn-cgi/local/* and /__cf_local/*, but the old paths are still rewritten and keep working."
+  },
+  "cost_usd": 0.4533536,
+  "turns": 19,
+  "round": 3,
+  "model": "claude-opus-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.117.0",
+    "kind": "renamed",
+    "symbol": "/cdn-cgi/handler/email",
+    "replacement": "/cdn-cgi/local/email",
+    "signal": "silent",
+    "detail": "New path is /cdn-cgi/local/email; wrangler dev now transparently rewrite the old /cdn-cgi/handler/email path to the new one.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.117.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet src;\ntry { src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/ProxyWorker.js\", \"utf8\"); } catch (e) { broken(\"cannot read ProxyWorker.js: \" + e.message); }\nconst a = src.indexOf(\"var LEGACY_PATH_REWRITES\");\nconst f = src.indexOf(\"function rewriteLegacyMiniflarePath(\");\nif (a < 0 && f < 0) symptom(\"wrangler dev does not rewrite /cdn-cgi/handler/email to /cdn-cgi/local/email\");\nconst b = f < 0 ? -1 : src.indexOf(\"\\n}\\n\", f);\nif (a < 0 || f < 0 || b < 0) broken(\"could not find the legacy path rewrite in ProxyWorker.js\");\nlet rewrite;\ntry { rewrite = new Function(src.slice(a, f) + src.slice(f, b + 3) + \"\\nreturn rewriteLegacyMiniflarePath;\")(); } catch (e) { broken(\"could not load rewrite: \" + e.message); }\nconst got = rewrite(\"/cdn-cgi/handler/email\");\nif (got !== \"/cdn-cgi/local/email\") broken(\"rewrite of /cdn-cgi/handler/email gave \" + got);\nconst same = rewrite(\"/cdn-cgi/local/email\");\nif (same !== \"/cdn-cgi/local/email\") broken(\"rewrite changed /cdn-cgi/local/email to \" + same);\nconsole.log(\"OK: /cdn-cgi/handler/email is rewritten to /cdn-cgi/local/email\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.116.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet src;\ntry { src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/ProxyWorker.js\", \"utf8\"); } catch (e) { broken(\"cannot read ProxyWorker.js: \" + e.message); }\nconst a = src.indexOf(\"var LEGACY_PATH_REWRITES\");\nconst f = src.indexOf(\"function rewriteLegacyMiniflarePath(\");\nif (a < 0 && f < 0) symptom(\"wrangler dev does not rewrite /cdn-cgi/handler/email to /cdn-cgi/local/email\");\nconst b = f < 0 ? -1 : src.indexOf(\"\\n}\\n\", f);\nif (a < 0 || f < 0 || b < 0) broken(\"could not find the legacy path rewrite in ProxyWorker.js\");\nlet rewrite;\ntry { rewrite = new Function(src.slice(a, f) + src.slice(f, b + 3) + \"\\nreturn rewriteLegacyMiniflarePath;\")(); } catch (e) { broken(\"could not load rewrite: \" + e.message); }\nconst got = rewrite(\"/cdn-cgi/handler/email\");\nif (got !== \"/cdn-cgi/local/email\") broken(\"rewrite of /cdn-cgi/handler/email gave \" + got);\nconst same = rewrite(\"/cdn-cgi/local/email\");\nif (same !== \"/cdn-cgi/local/email\") broken(\"rewrite changed /cdn-cgi/local/email to \" + same);\nconsole.log(\"OK: /cdn-cgi/handler/email is rewritten to /cdn-cgi/local/email\");\n",
+          "expect": "fail",
+          "error": "FAIL: wrangler dev does not rewrite /cdn-cgi/handler/email to /cdn-cgi/local/email"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.117.0/packages/wrangler/CHANGELOG.md",
+          "quote": "`wrangler dev` and the Vite plugin now transparently rewrite the old paths to the new ones, meaning you can continue to use the old paths without issue. These are the new paths: - `/cdn-cgi/handler/scheduled` → `/cdn-cgi/local/scheduled` - `/cdn-cgi/handler/email` → `/cdn-cgi/local/email`"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,0 +1,53 @@
+[
+  {
+    "entry": "5.0.0#19",
+    "id": "01M4QHMS4JTBGD9PVWF1C97TRS",
+    "claim": "vitest >=5.0.0 changed the default of `clearMocks`. clearMocks default is true: Vitest automatically calls vi.clearAllMocks before each test. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "5.0.0#35",
+    "id": "01M4QHMS4X5NY3GW28TMZP6WA3",
+    "claim": "vitest >=5.0.0 changed what `vi.fn` does. Instances of a class passed to vi.fn keep the prototype chain of the class, so prototype methods stay available and instanceof checks against the class pass. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "5.0.0#46",
+    "id": "01M4QHMS51FSEP1JQCQ2J07QKR",
+    "claim": "vitest >=5.0.0 changed what `Duration` does. The Duration line of the summary breaks the run down into phases as percentages of tracked time. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "5.0.0#47",
+    "id": "01M4QHMS521TK3K3QN782Y1Q7A",
+    "claim": "vitest >=5.0.0 renamed `experimental_parseSpecifications` to `parseSpecifications`. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "5.0.0#63",
+    "id": "01M4QHMS5808NYV99PPJCPVM3M",
+    "claim": "vitest >=5.0.0 changed what `attachmentsDir` does. attachmentsDir is resolved relative to the root Vitest config; it cannot be configured per project. Silent: code written for older versions still runs, without an error.",
+    "label": "differential"
+  },
+  {
+    "entry": "5.0.0#27",
+    "id": "01M4R9CXC68AFY0FPPJZP9KPNE",
+    "claim": "vitest >=5.0.0 changed what `projects` does. Inline projects that don't modify the Vite config reuse the Vite server of the config that declares them. Silent: code written for older versions still runs, without an error.",
+    "label": "differential",
+    "round": 3
+  },
+  {
+    "entry": "5.0.0#30",
+    "id": "01M4R9CXC9WC30HGKMKW2DF1RX",
+    "claim": "vitest >=5.0.0 changed the default of `browser.locators.exact`. Locators match text exactly by default, requiring a full, case-sensitive match; individual locator calls can override this default via their own exact option.",
+    "label": "differential",
+    "round": 3
+  },
+  {
+    "entry": "5.0.0#37",
+    "id": "01M4R9CXCDQFXKQJH5V0S31NTB",
+    "claim": "vitest >=5.0.0 changed the default of `HTML reporter`. HTML reporter outputDir option default value is .vitest; the report entry is written to .vitest/index.html. Silent: code written for older versions still runs, without an error.",
+    "label": "test",
+    "round": 3
+  }
+]

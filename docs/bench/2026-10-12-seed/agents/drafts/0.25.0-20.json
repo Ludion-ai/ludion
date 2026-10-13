@@ -1,0 +1,33 @@
+{
+  "entry": "0.25.0#20",
+  "verdict": {
+    "id": "0.25.0#20",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "sub-agent broadcast",
+    "why": "Broadcasts from sub-agents now make at most one root call and none without recipients, changing observable calls with the same code."
+  },
+  "cost_usd": 0.3018842,
+  "turns": 9,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.25.0",
+    "kind": "behavior",
+    "symbol": "broadcast",
+    "signal": "silent",
+    "detail": "Sub-agent broadcasts make at most one root call, and none when no client would receive them.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+          "quote": "Sub-agent broadcasts make at most one root call, and none when no client would receive them."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

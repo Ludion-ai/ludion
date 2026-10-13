@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#4",
+  "verdict": {
+    "id": "4.4.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.cuid()",
+    "why": "The JSON Schema pattern emitted for CUID is now tighter, changing generated output."
+  },
+  "cost_usd": 0.32904980000000006,
+  "turns": 14,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.cuid()",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet z;\ntry { z = require(\"zod\").z; } catch (e) { broken(\"cannot load zod: \" + e.message); }\nconst schema = z.cuid();\nif (!schema.safeParse(\"cjld2cjxh0000qzrmn831i7rn\").success) broken(\"a 25-character CUID v1 was rejected\");\nif (schema.safeParse(\"dabcdef\").success) broken(\"a string not starting with c was accepted\");\nif (schema.safeParse(\"cabcde\").success) broken(\"a 6-character string was accepted\");\nconst short = \"cabcdef\";\nif (!schema.safeParse(short).success) symptom(\"z.cuid() rejects the 7-character string \" + short);\nconsole.log(\"OK: z.cuid() accepts the 7-character string \" + short);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet z;\ntry { z = require(\"zod\").z; } catch (e) { broken(\"cannot load zod: \" + e.message); }\nconst schema = z.cuid();\nif (!schema.safeParse(\"cjld2cjxh0000qzrmn831i7rn\").success) broken(\"a 25-character CUID v1 was rejected\");\nif (schema.safeParse(\"dabcdef\").success) broken(\"a string not starting with c was accepted\");\nif (schema.safeParse(\"cabcde\").success) broken(\"a 6-character string was accepted\");\nconst short = \"cabcdef\";\nif (!schema.safeParse(short).success) symptom(\"z.cuid() rejects the 7-character string \" + short);\nconsole.log(\"OK: z.cuid() accepts the 7-character string \" + short);\n",
+          "expect": "fail",
+          "error": "FAIL: z.cuid() rejects the 7-character string cabcdef"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

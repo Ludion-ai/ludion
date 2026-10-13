@@ -1,0 +1,56 @@
+{
+  "entry": "4.136.2#4",
+  "verdict": {
+    "id": "4.136.2#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler containers images list",
+    "why": "Valid sha256-prefixed tags are now shown and kept distinct from synthetic digest entries."
+  },
+  "cost_usd": 0.0381554,
+  "turns": 5,
+  "round": 2,
+  "model": "claude-sonnet-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.136.2",
+    "kind": "behavior",
+    "symbol": "sha256-release",
+    "signal": "silent",
+    "detail": "Container image listings now distinguish valid OCI tags such as sha256-release from synthetic digest entries.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.136.2"
+          },
+          "code": "// wrangler containers images list\nconst fs = require(\"fs\");\nfunction symptom(m){console.error(\"FAIL: \"+m);process.exit(1);}\nfunction broken(m){console.error(\"ERROR: \"+m);process.exit(2);}\n(async()=>{\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\",\"utf8\");\nconst a = src.indexOf(\"async function listImages2(responses, digests = false, json2 = false)\");\nif (a<0) broken(\"listImages2 not found\");\nconst b = src.indexOf(\"\\n}\\n\", a);\nif (b<0) broken(\"end of listImages2 not found\");\nconst fn = src.slice(a, b+3);\nlet pre = \"\";\nconst m = src.indexOf(\"function isValidImageTag2(value)\");\nif (m>=0) pre = 'const imageTagRegexp = new RegExp(\"^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$\");\\n' + src.slice(m, src.indexOf(\"\\n}\\n\", m)+3);\nconst out=[];\nconst logger2={log:(s)=>out.push(String(s))};\nconst run = new Function(\"logger2\", pre+fn+\"\\nreturn listImages2;\")(logger2);\nawait run([{name:\"one\",tags:[\"hundred\",\"sha256-release\",\"sha256:239a0dfhasdfui235\"]}], false, true);\nlet res;\ntry{res=JSON.parse(out.join(\"\\n\"));}catch(e){broken(\"bad output \"+out.join(\"\\n\"));}\nconst tags=(res[0]&&res[0].tags)||[];\nif(!tags.includes(\"hundred\")) broken(\"missing hundred\");\nif(tags.includes(\"sha256:239a0dfhasdfui235\")) broken(\"digest entry shown\");\nif(!tags.includes(\"sha256-release\")) symptom(\"valid tag sha256-release is hidden from the image listing\");\nconsole.log(\"OK\");\n})().catch(e=>broken(String(e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.136.1"
+          },
+          "code": "// wrangler containers images list\nconst fs = require(\"fs\");\nfunction symptom(m){console.error(\"FAIL: \"+m);process.exit(1);}\nfunction broken(m){console.error(\"ERROR: \"+m);process.exit(2);}\n(async()=>{\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\",\"utf8\");\nconst a = src.indexOf(\"async function listImages2(responses, digests = false, json2 = false)\");\nif (a<0) broken(\"listImages2 not found\");\nconst b = src.indexOf(\"\\n}\\n\", a);\nif (b<0) broken(\"end of listImages2 not found\");\nconst fn = src.slice(a, b+3);\nlet pre = \"\";\nconst m = src.indexOf(\"function isValidImageTag2(value)\");\nif (m>=0) pre = 'const imageTagRegexp = new RegExp(\"^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$\");\\n' + src.slice(m, src.indexOf(\"\\n}\\n\", m)+3);\nconst out=[];\nconst logger2={log:(s)=>out.push(String(s))};\nconst run = new Function(\"logger2\", pre+fn+\"\\nreturn listImages2;\")(logger2);\nawait run([{name:\"one\",tags:[\"hundred\",\"sha256-release\",\"sha256:239a0dfhasdfui235\"]}], false, true);\nlet res;\ntry{res=JSON.parse(out.join(\"\\n\"));}catch(e){broken(\"bad output \"+out.join(\"\\n\"));}\nconst tags=(res[0]&&res[0].tags)||[];\nif(!tags.includes(\"hundred\")) broken(\"missing hundred\");\nif(tags.includes(\"sha256:239a0dfhasdfui235\")) broken(\"digest entry shown\");\nif(!tags.includes(\"sha256-release\")) symptom(\"valid tag sha256-release is hidden from the image listing\");\nconsole.log(\"OK\");\n})().catch(e=>broken(String(e)));\n",
+          "expect": "fail",
+          "error": "FAIL: valid tag sha256-release is hidden from the image listing"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.136.2/packages/wrangler/CHANGELOG.md",
+          "quote": "Container image listings now distinguish valid OCI tags such as `sha256-release` from synthetic digest entries such as `sha256:<digest>`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

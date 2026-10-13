@@ -1,0 +1,33 @@
+{
+  "entry": "4.124.0#8",
+  "verdict": {
+    "id": "4.124.0#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "--latest",
+    "why": "`--latest` now resolves to the workerd-supported date rather than the current date, so the written compatibility date differs."
+  },
+  "cost_usd": 0.097578,
+  "turns": 10,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.124.0",
+    "kind": "behavior",
+    "symbol": "--latest",
+    "signal": "silent",
+    "detail": "Before 4.124.0, wrangler deploy --latest resolved the compatibility date to the current date",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.124.0/packages/wrangler/CHANGELOG.md",
+          "quote": "`wrangler deploy --latest` and `wrangler versions upload --latest` resolved the compatibility date to the current date"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

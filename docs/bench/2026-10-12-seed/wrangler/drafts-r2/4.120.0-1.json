@@ -1,0 +1,54 @@
+{
+  "entry": "4.120.0#1",
+  "verdict": {
+    "id": "4.120.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler containers instances --search",
+    "why": "The search now covers every page and returns exact ID or name matches, with the JSON output as a top-level array."
+  },
+  "cost_usd": 0.069738,
+  "turns": 6,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.120.0",
+    "kind": "added",
+    "symbol": "--search",
+    "signal": "loud",
+    "detail": "wrangler containers instances --search now searches every page and returns exact matches in human-readable or JSON output.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.120.0"
+          },
+          "code": "const http = require(\"http\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst APP = \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\";\nconst A = \"11111111-1111-1111-1111-111111111111\";\nconst B = \"22222222-2222-2222-2222-222222222222\";\nfunction inst(id) { return { id, location: \"iad01\", app_version: 1, created_at: \"2025-06-01T10:00:00Z\" }; }\nlet requests = 0;\nconst server = http.createServer((req, res) => {\n  const url = new URL(req.url, \"http://x\");\n  res.setHeader(\"content-type\", \"application/json\");\n  if (!url.pathname.endsWith(\"/dash/applications/\" + APP + \"/instances\")) {\n    res.statusCode = 404;\n    res.end(JSON.stringify({ success: false, result: null, errors: [{ code: 1, message: \"unexpected \" + url.pathname }], messages: [] }));\n    return;\n  }\n  requests++;\n  const second = url.searchParams.get(\"page_token\") === \"next-page\";\n  res.end(JSON.stringify({ success: true, result: { instances: [inst(second ? B : A)], durable_objects: [] }, result_info: second ? { per_page: 1 } : { per_page: 1, next_page_token: \"next-page\" }, errors: [], messages: [] }));\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const env = Object.assign({}, process.env, { CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\", CLOUDFLARE_API_TOKEN: \"test-token\", CLOUDFLARE_ACCOUNT_ID: \"0123456789abcdef0123456789abcdef\", WRANGLER_SEND_METRICS: \"false\", CI: \"true\", NO_COLOR: \"1\" });\n  const child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"containers\", \"instances\", APP, \"--search\", B, \"--json\", \"--per-page\", \"1\"], { cwd: \"/tmp\", env });\n  let out = \"\", err = \"\";\n  child.stdout.on(\"data\", (d) => { out += d; });\n  child.stderr.on(\"data\", (d) => { err += d; });\n  const timer = setTimeout(() => { child.kill(\"SIGKILL\"); broken(\"wrangler timed out\"); }, 80000);\n  child.on(\"close\", (code) => {\n    clearTimeout(timer);\n    server.close();\n    const all = out + err;\n    if (code !== 0) {\n      if (/Unknown arguments?:.*search/.test(all)) symptom(\"wrangler containers instances rejects --search\");\n      broken(\"wrangler exited \" + code + \": \" + all.slice(-500));\n    }\n    let data;\n    try { data = JSON.parse(out.slice(out.indexOf(\"[\"))); } catch (e) { broken(\"stdout is not JSON: \" + out.slice(-500)); }\n    if (!Array.isArray(data)) broken(\"JSON output is not a top-level array\");\n    if (requests !== 2) broken(\"expected 2 page requests, got \" + requests);\n    if (data.length !== 1 || data[0].id !== B) broken(\"unexpected search result: \" + JSON.stringify(data));\n    console.log(\"OK: --search found the instance on the second page as a top-level JSON array\");\n  });\n});\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.119.0"
+          },
+          "code": "const http = require(\"http\");\nconst { spawn } = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst APP = \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\";\nconst A = \"11111111-1111-1111-1111-111111111111\";\nconst B = \"22222222-2222-2222-2222-222222222222\";\nfunction inst(id) { return { id, location: \"iad01\", app_version: 1, created_at: \"2025-06-01T10:00:00Z\" }; }\nlet requests = 0;\nconst server = http.createServer((req, res) => {\n  const url = new URL(req.url, \"http://x\");\n  res.setHeader(\"content-type\", \"application/json\");\n  if (!url.pathname.endsWith(\"/dash/applications/\" + APP + \"/instances\")) {\n    res.statusCode = 404;\n    res.end(JSON.stringify({ success: false, result: null, errors: [{ code: 1, message: \"unexpected \" + url.pathname }], messages: [] }));\n    return;\n  }\n  requests++;\n  const second = url.searchParams.get(\"page_token\") === \"next-page\";\n  res.end(JSON.stringify({ success: true, result: { instances: [inst(second ? B : A)], durable_objects: [] }, result_info: second ? { per_page: 1 } : { per_page: 1, next_page_token: \"next-page\" }, errors: [], messages: [] }));\n});\nserver.listen(0, \"127.0.0.1\", () => {\n  const port = server.address().port;\n  const env = Object.assign({}, process.env, { CLOUDFLARE_API_BASE_URL: \"http://127.0.0.1:\" + port + \"/client/v4\", CLOUDFLARE_API_TOKEN: \"test-token\", CLOUDFLARE_ACCOUNT_ID: \"0123456789abcdef0123456789abcdef\", WRANGLER_SEND_METRICS: \"false\", CI: \"true\", NO_COLOR: \"1\" });\n  const child = spawn(process.execPath, [\"/w/node_modules/wrangler/bin/wrangler.js\", \"containers\", \"instances\", APP, \"--search\", B, \"--json\", \"--per-page\", \"1\"], { cwd: \"/tmp\", env });\n  let out = \"\", err = \"\";\n  child.stdout.on(\"data\", (d) => { out += d; });\n  child.stderr.on(\"data\", (d) => { err += d; });\n  const timer = setTimeout(() => { child.kill(\"SIGKILL\"); broken(\"wrangler timed out\"); }, 80000);\n  child.on(\"close\", (code) => {\n    clearTimeout(timer);\n    server.close();\n    const all = out + err;\n    if (code !== 0) {\n      if (/Unknown arguments?:.*search/.test(all)) symptom(\"wrangler containers instances rejects --search\");\n      broken(\"wrangler exited \" + code + \": \" + all.slice(-500));\n    }\n    let data;\n    try { data = JSON.parse(out.slice(out.indexOf(\"[\"))); } catch (e) { broken(\"stdout is not JSON: \" + out.slice(-500)); }\n    if (!Array.isArray(data)) broken(\"JSON output is not a top-level array\");\n    if (requests !== 2) broken(\"expected 2 page requests, got \" + requests);\n    if (data.length !== 1 || data[0].id !== B) broken(\"unexpected search result: \" + JSON.stringify(data));\n    console.log(\"OK: --search found the instance on the second page as a top-level JSON array\");\n  });\n});\n",
+          "expect": "fail",
+          "error": "FAIL: wrangler containers instances rejects --search"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.120.0/packages/wrangler/CHANGELOG.md",
+          "quote": "`wrangler containers instances <application_id> --search <instance_id_or_name>` now searches every page and returns exact matches in human-readable or JSON output."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

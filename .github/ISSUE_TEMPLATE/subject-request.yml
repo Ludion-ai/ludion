@@ -1,0 +1,32 @@
+name: Lessons for a package
+description: Ask Ludion to cover a package it has no lessons for yet.
+title: "Lessons for "
+labels: ["subject-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        `ludion sync` lists the direct dependencies Ludion has no lessons for. Name one or more here; requests help decide which packages get lessons next. This issue is public: name only packages you are fine to name in public.
+  - type: input
+    id: packages
+    attributes:
+      label: Packages
+      description: npm package names, comma-separated.
+      placeholder: zod, drizzle-orm
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Installed versions
+      description: The versions your project uses (from the lockfile), if you know them.
+      placeholder: zod 4.1.0
+    validations:
+      required: false
+  - type: textarea
+    id: changes
+    attributes:
+      label: A change your assistant got wrong (optional)
+      description: The version, what the assistant wrote, and what is right now. A link to the changelog entry helps.
+    validations:
+      required: false

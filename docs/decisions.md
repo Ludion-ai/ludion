@@ -4,6 +4,11 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-13: Confine benchmark file tools and remove hidden execution tools
+
+- Replace project `default` tools with an explicit list; editing runs have no command/subagent tool. File tools are available within the work folder but are not globally pre-approved. Restricted mode ignores project/user settings and confines file tools to working directories; retain scoped acceptEdits and system-read denies.
+- Preserve the existing read-only prepared-project command allowances, and record this as a changed future measurement condition rather than revising old scores. Configuration evidence, CLI help and checks: `docs/bench/2026-10-13-agent-boundary/`. No actual host-file leak or adversarial model probe is claimed.
+
 ### 2026-10-13: Integrate current main and scope CI model credentials
 
 - Preserve current main releases, pipeline changes and histories when resolving the security stack conflicts. Keep User-Agent and byte/schema defenses together.

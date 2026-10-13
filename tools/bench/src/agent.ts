@@ -5,7 +5,7 @@ import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-/** none: no tools. web: web search and fetch. ludion: web plus Ludion's MCP. project: Claude Code's default tools in a copy of a project with the packages installed. */
+/** none: no tools. web: web search/fetch. ludion: web plus MCP. project: explicit tools in a prepared project copy. */
 export type Condition = "none" | "web" | "ludion" | "project" | "files";
 
 export interface AgentRun {
@@ -53,9 +53,11 @@ export interface RunOptions {
  * - with edits (for tasks): read, search, edit, use the web, and no Bash at all; the harness runs the tests afterwards.
  */
 export function projectTools(allowEdits: boolean): string[] {
-  const read = ["Read", "Glob", "Grep", "WebSearch", "WebFetch"];
+  // These are pre-approval rules, not the available tool list. Bare file-tool rules cover arbitrary paths.
+  // Leave file access to restricted mode's working-directory checks and edits to scoped acceptEdits.
+  const read = ["WebSearch", "WebFetch"];
   return allowEdits
-    ? [...read, "Edit", "Write"]
+    ? read
     : [...read, "Bash(npm test)", "Bash(npm ls:*)", "Bash(npm view:*)", "Bash(npx vitest run)", "Bash(npx wrangler --version)", "Bash(ls:*)"];
 }
 /** Only what Claude Code needs to start and find its own sign-in; no tokens or other secrets from this shell. */
@@ -86,7 +88,8 @@ export const FILE_DENY = ["Read(//proc/**)", "Read(//sys/**)", "Read(//etc/**)",
  * prompt carries a whole answer, and Windows refuses command lines over 32,767 characters (spawn ENAMETOOLONG).
  */
 export function claudeArgs(o: RunOptions, mcpConfigPath?: string): string[] {
-  const tools = o.condition === "none" ? [] : o.condition === "project" ? ["default"] : o.condition === "files" ? FILE_TOOLS : WEB_TOOLS;
+  const project = o.allowEdits ? [...FILE_TOOLS, ...WEB_TOOLS] : ["Read", "Glob", "Grep", ...WEB_TOOLS, "Bash"];
+  const tools = o.condition === "none" ? [] : o.condition === "project" ? project : o.condition === "files" ? FILE_TOOLS : WEB_TOOLS;
   // files: nothing is pre-approved, so reads and edits are accepted only inside the working folder (acceptEdits for edits),
   // and anything outside it is refused under -p, whatever the tool (Read, Glob, Grep, Edit, Write).
   const allowed = o.condition === "ludion" ? [...WEB_TOOLS, "mcp__ludion__ludion_ask"] : o.condition === "project" ? projectTools(o.allowEdits === true) : o.condition === "files" ? [] : tools;
@@ -104,7 +107,7 @@ export function claudeArgs(o: RunOptions, mcpConfigPath?: string): string[] {
   ];
   if (allowed.length) args.push("--allowedTools", allowed.join(","));
   if ((o.condition === "project" && o.allowEdits) || o.condition === "files") args.push("--permission-mode", "acceptEdits");
-  if (o.condition === "files") args.push("--disallowedTools", FILE_DENY.join(","));
+  if (o.condition === "files" || o.condition === "project") args.push("--restricted", "--disallowedTools", FILE_DENY.join(","));
   if (mcpConfigPath) args.push("--mcp-config", mcpConfigPath);
   if (o.appendSystemPrompt) args.push("--append-system-prompt", o.appendSystemPrompt);
   return args;

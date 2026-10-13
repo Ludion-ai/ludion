@@ -1,0 +1,35 @@
+{
+  "kind": "pure argument construction; no model or candidate code invoked",
+  "before": {
+    "project_edit": {
+      "available": "default",
+      "preapproved": "Read,Glob,Grep,WebSearch,WebFetch,Edit,Write",
+      "restricted": false,
+      "permission_mode": "acceptEdits",
+      "denied": null
+    }
+  },
+  "after": {
+    "project_edit": {
+      "available": "Read,Glob,Grep,Edit,Write,WebSearch,WebFetch",
+      "preapproved": "WebSearch,WebFetch",
+      "restricted": true,
+      "permission_mode": "acceptEdits",
+      "denied": "Read(//proc/**),Read(//sys/**),Read(//etc/**),Read(//run/**),Read(//dev/**)"
+    },
+    "project_read": {
+      "available": "Read,Glob,Grep,WebSearch,WebFetch,Bash",
+      "preapproved": "WebSearch,WebFetch,Bash(npm test),Bash(npm ls:*),Bash(npm view:*),Bash(npx vitest run),Bash(npx wrangler --version),Bash(ls:*)",
+      "restricted": true,
+      "permission_mode": null,
+      "denied": "Read(//proc/**),Read(//sys/**),Read(//etc/**),Read(//run/**),Read(//dev/**)"
+    },
+    "files": {
+      "available": "Read,Glob,Grep,Edit,Write",
+      "preapproved": null,
+      "restricted": true,
+      "permission_mode": "acceptEdits",
+      "denied": "Read(//proc/**),Read(//sys/**),Read(//etc/**),Read(//run/**),Read(//dev/**)"
+    }
+  }
+}

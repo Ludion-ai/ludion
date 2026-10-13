@@ -4,9 +4,11 @@ import { en } from "../strings/en.ts";
 interface Props {
   runner: string;
   code: string;
+  /** In place of "Test (runner)". */
+  label?: string;
 }
 const { runner, code } = Astro.props;
-const label = runner === "lean" ? en.lesson.proof : en.lesson.test(runner);
+const label = Astro.props.label ?? (runner === "lean" ? en.lesson.proof : en.lesson.test(runner));
 ---
 
 <figure class="run">

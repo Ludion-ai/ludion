@@ -1,8 +1,15 @@
 ---
-// A lesson in a list: one row of the readout. The claim, the teacher's signature with the seal, the subject.
+// A lesson in a list: one row of the readout. On the left, the claim in two weights: the generated headline, then
+// its detail. On the right, the record in small type: the subject and versions, the kind, a muted speaker if the
+// change is silent, and the teacher's signature with the seal (its word kept for screen readers and on hover). The
+// claim's closing sentence ("Silent: …", "Older versions don't have it.") is said by the mark and its title here and
+// in full on the lesson page; every other word is the claim's own, in order (build/claim-parts.ts).
+import Claim from "./Claim.astro";
+import Mark from "./Mark.astro";
 import Signature from "./Signature.astro";
 import SubjectTag from "./SubjectTag.astro";
-import Claim from "./Claim.astro";
+import { claimParts } from "../build/claim-parts.ts";
+import { en } from "../strings/en.ts";
 import type { VerifiedBy } from "@ludion/core";
 
 interface Props {
@@ -10,6 +17,7 @@ interface Props {
   claim: string;
   subject: string;
   version?: string | null;
+  kind?: string | null;
   teacher: string;
   teacherId: number;
   teacherHref: string | null;
@@ -18,47 +26,116 @@ interface Props {
   /** On the teacher's own page every row is theirs, so the "— @login" line is left out. */
   hideTeacher?: boolean;
   drafted?: boolean;
+  /** Leave the subject out (a list already grouped by it). */
+  hideSubject?: boolean;
 }
-const { hideTeacher = false, ...p } = Astro.props;
+const { hideTeacher = false, hideSubject = false, ...p } = Astro.props;
+const parts = claimParts(p.claim);
 ---
 
 <article class="row">
-  <p class="claim text"><a href={`/lessons/${p.id}/`}><Claim text={p.claim} /></a></p>
-  <div class="under">
-    <Signature teacher={p.teacher} teacherId={p.teacherId} teacherHref={p.teacherHref} verifiedBy={p.verifiedBy} verifiedAt={p.verifiedAt} name={!hideTeacher} drafted={p.drafted} />
-    <SubjectTag subject={p.subject} version={p.version} />
+  <a class="claim" href={`/lessons/${p.id}/`}>
+    <span class="head"><Claim text={parts.head} /></span>
+    {
+      parts.detail && (
+        <>
+          {" "}
+          <span class="detail">
+            <Claim text={parts.detail} />
+          </span>
+        </>
+      )
+    }
+    {parts.tail && <span class="visually-hidden"> {parts.tail.text}</span>}
+  </a>
+  <div class="record">
+    <p class="what">
+      {hideSubject ? p.version && <code class="ver">{p.version}</code> : <SubjectTag subject={p.subject} version={p.version} />}
+      {p.kind && <span class="kind">{en.bench.kind[p.kind] ?? p.kind}</span>}
+      {parts.tail?.kind === "silent" && (
+        <span class="silent" title={parts.tail.text}>
+          <Mark kind="silent" label />
+        </span>
+      )}
+    </p>
+    <Signature teacher={p.teacher} teacherId={p.teacherId} teacherHref={p.teacherHref} verifiedBy={p.verifiedBy} verifiedAt={p.verifiedAt} name={!hideTeacher} drafted={p.drafted} compact />
   </div>
 </article>
 
 <style>
   .row {
-    padding: 28px 0 30px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: 10px 40px;
+    align-items: start;
+    padding: 22px 0;
     border-top: 1px solid var(--rule);
   }
-  .text {
-    font-size: 26px;
-    line-height: 1.22;
-    margin: 0 0 16px;
-    max-width: 30em;
-  }
-  .text a {
+  .claim {
     color: inherit;
     text-decoration: none;
+    overflow-wrap: anywhere;
+    max-width: 44em;
   }
-  .text a:hover {
+  .head {
+    display: block;
+    font-size: 19px;
+    font-weight: 650;
+    line-height: 1.3;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+  }
+  .claim:hover .head,
+  .claim:focus-visible .head {
     text-decoration: underline;
     text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
   }
-  .under {
+  .detail {
+    display: block;
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .record {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 3px;
+  }
+  .what {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px 24px;
+    gap: 6px 12px;
+    margin: 0;
   }
-  @media (max-width: 640px) {
-    .text {
-      font-size: 21px;
+  .ver {
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--paper-2);
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .kind {
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 2px 7px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+  }
+  .silent :global(.words) {
+    font-size: 12px;
+  }
+  @media (max-width: 860px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .head {
+      font-size: 18px;
     }
   }
 </style>

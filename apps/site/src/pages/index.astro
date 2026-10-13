@@ -93,6 +93,7 @@ const runner = newest ? (asTest(newest.evidence[0]!)?.runtime ?? "") : "";
                 claim={l.claim}
                 subject={l.subject}
                 version={l.version}
+              kind={(l as { kind?: string }).kind}
                 teacher={l.teacher}
                 teacherId={l.teacher_id}
                 teacherHref={teacherHref(l.teacher_id)}

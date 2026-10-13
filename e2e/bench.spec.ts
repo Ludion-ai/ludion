@@ -26,11 +26,14 @@ test("each model page names its share card, and the card is a 1200×630 PNG", as
   }
 });
 
-test("/bench never scrolls sideways, at any width the knowledge figure switches around", async ({ page }) => {
-  for (const width of [360, 390, 700, 761, 800, 900, 1010, 1024, 1280]) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/bench/");
-    const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
-    expect(scroll, `${width}px`).toBeLessThanOrEqual(client);
+test("/bench, /lessons, and a lesson never scroll sideways, at any width their layouts switch around", async ({ page }) => {
+  for (const path of ["/bench/", "/lessons/", "/lessons/01M4T6BQ9DJH2BCV6Q28GH4HJ1/"]) {
+    for (const width of [360, 390, 700, 761, 800, 900, 1010, 1024, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      const res = await page.goto(path);
+      if (res?.status() === 404) break; // a lesson id that a later main no longer has
+      const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+      expect(scroll, `${path} at ${width}px`).toBeLessThanOrEqual(client);
+    }
   }
 });

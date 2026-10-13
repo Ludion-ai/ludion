@@ -26,8 +26,14 @@ export const en = {
   lessons: {
     title: "Lessons",
     intro: (shown: number, total: number) =>
-      shown < total ? `The newest ${shown} of ${total} lessons.` : total === 1 ? "1 lesson." : `${total} lessons, newest first.`,
+      shown < total ? `The newest ${shown} of ${total} lessons, by subject.` : total === 1 ? "1 lesson." : `${total} lessons, by subject, newest first.`,
     empty: "No lessons yet.",
+    description: "Every lesson on Ludion: a change in a package version, verified by a machine and signed by its teacher.",
+    newest: (date: string) => `newest ${date}`,
+    count: (n: number) => (n === 1 ? "1 lesson" : `${n} lessons`),
+    search: "Search the lessons",
+    searchPlaceholder: "Search: a symbol, a flag, a package",
+    noMatch: "No lesson matches.",
   },
   lesson: {
     verifiedBy: { test: "Verified by test", differential: "Verified across versions", proof: "Verified by proof", source: "Verified by source" },
@@ -35,6 +41,18 @@ export const en = {
     appliesTo: (subject: string, version?: string | null) => `Applies to ${subject}${version ? ` ${version}` : ""}`,
     taughtBy: "Taught by",
     evidence: "Evidence",
+    diff: {
+      caption: "CI runs the same test on each version. A lesson is verified across versions only when it passes on one and fails on the other.",
+      passes: "Must pass",
+      fails: "Must fail, with",
+    },
+    sameTest: (runner: string) => `The test, on each version above (${runner})`,
+    models: {
+      heading: "Do the models know it?",
+      none: "Not measured yet.",
+      note: (date: string) => `Without tools, FreshBench, ${date}.`,
+      link: "Bench",
+    },
     test: (runner: string) => `Test (${runner})`,
     proof: "Proof (Lean)",
     mark: { test: "exit 0", differential: "pass / fail", proof: "proved", source: "quote found" },

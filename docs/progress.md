@@ -32,9 +32,9 @@ The list (status in brackets):
 5. [done, #55] Personal ledger: `ludion teach` accepts drafts without evidence, saved as `unverified`, shown in `lessons.md` as "unverified, yours only". `--public` still needs evidence.
 6. [done, #63: no drop, no skill delivery] Experiment 3: 0, 50 and 500 correct but unrelated lessons, B accuracy. A drop of 10 points or more at 500 → build skill delivery (`.agents/skills/ludion-{subject}/SKILL.md`); otherwise don't, and say why.
 7. [paused after 16 of 36 tasks (#61): daily batches stopped to save usage] C tasks: one batch a day (method in `docs/bench/2026-10-11-done3/README.md`). If C's gain is 10+ points below B's (+27), build the check hook (PostToolUse on Edit/Write matching imports and symbols against installed-version lessons) and measure it on part of C; otherwise don't, and say why.
-8. [README, 89-second demo, Show HN and X drafts, two letters: in PR "announce-materials" (2026-10-13)] Announcement tools: README (measured numbers only), an 89-second demo (`docs/demo/sync-vitest.cast`), one maintainer letter per subject, two so far (Cloudflare for wrangler and the Agents SDK together, and Vitest; each with a per-subject table of changes current models get wrong silently, asking whether they would pay for measurement), a Show HN post and one X post. The owner sends and posts them. More letters wait for the owner's discussion and for the subject to be measured.
+8. [done, #93 merged 2026-10-13: README, 89-second demo, Show HN and X drafts, two letters; nothing posted or sent] Announcement tools: README (measured numbers only), an 89-second demo (`docs/demo/sync-vitest.cast`), one maintainer letter per subject, two so far (Cloudflare for wrangler and the Agents SDK together, and Vitest; each with a per-subject table of changes current models get wrong silently, asking whether they would pay for measurement), a Show HN post and one X post. The owner sends and posts them. More letters wait for the owner's discussion and for the subject to be measured.
 9. [done, #57] Check that `llms.txt` and the per-lesson static pages are in a shape web search picks up.
-10. [#60 open, docs only] License: the owner decides; only a draft consent sentence for the `teach --public` PR template goes in `docs/decisions.md`.
+10. [done, #100] License: the owner decided on 2026-10-13 that lessons are CC BY 4.0 (code stays Apache-2.0). `LICENSE-LESSONS`, the README, the CLI's README and the site footer say so; `teach --public` shows the teacher's sentence before its prompt and quotes it in the PR (in the next release of the CLI). #60 closed.
 
 ### Spending rules (2026-10-12, in force; details in `docs/decisions.md`, "Spending")
 
@@ -44,16 +44,16 @@ Heavy work one job at a time; Opus only for the review of protected PRs (one rou
 
 1. ~~npmjs.com, `ludion-ai`: approve 0.1.4, reject 0.1.3.~~ **Done** (checked 2026-10-13): `latest` is 0.1.4, and 0.1.3 is deprecated ("Use 0.1.4 or later"). `npx ludion-ai@0.1.4 sync` in an empty folder against production exited 0 (`docs/bench/2026-10-13-done2/sync-production-0.1.4.txt`).
 2. ~~Done 2, one line~~ **Done, passed** (2026-10-13): the owner ran `teach --public` from their own terminal (an agent's attempt stops at the confirmation, as designed), #97 merged; the three times and the three checks by hand are in `docs/bench/2026-10-13-done2/result.json`.
-3. **Protected PRs, merge order** (opened once a day, together; the first batch is opened with this update's PR): see the PR list below.
-4. **Not started, waiting for the owner's yes:** counting distinct clients of `/index/*.json` in the Worker (Analytics Engine; a daily-salted hash of the User-Agent, path and `CF-Connecting-IP`, no raw IP). It changes `wrangler.jsonc` (protected) and adds server-side counting next to the README's "no telemetry" (that line is about the CLI), so it is held until the owner confirms they want it.
+3. **Protected PRs, merge order** (2026-10-13): **#94** (retracts wrangler 4.113.0#10; users stop getting that lesson), then **#101** (Analytics Engine counting of `/index/*.json`; see 4), then Codex's **#69** (after its fixes; it will need a rebase over #100 and #101). #96 (`/bench`) was merged by the owner.
+4. **After #101 is merged: the Worker secret.** `npx wrangler secret put ANALYTICS_SALT` with at least 32 random characters (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`). Until it is set the Worker counts nothing. If the deploy after the merge says Analytics Engine must be enabled for the account, enable it where the message says. What is stored, what the numbers mean and don't, and the SQL: `docs/bench/2026-10-13-index-counts/`.
+5. **Next npm release, 0.1.5** (CLI + `plugin.json` + the hook's pin): carries the consent sentence (#100) and, when it lands, #69. I stage it with `publish.yml`; the owner approves it on npmjs.com (passkey). Until then `teach --public` shows no sentence. Whether to stage it now or wait for #69 is the owner's call; the default is to wait, to ask for one approval instead of two.
 
 ### Open PRs and what waits for whom (2026-10-13, after the owner's merges)
 
 - **Merged by the owner on 2026-10-12 (UTC):** #62, #75, #76, #80, #84 (25 lessons), #73 (nightly seed watch), #54 (issue form). Production serves them since deploy run 38311678194 on `6dedffa`: `/index/subjects.json` lists agents 15, vitest 17, wrangler 23 active lessons. The deploys for the commits in between failed on purpose at "Make sure this is main's newest commit".
 - **#73 drafts nothing yet**: it needs the `ANTHROPIC_API_KEY` repository secret (a secret value, the owner's). Without it, the nightly run lists new releases in its artifact and stops.
-- **Waiting for Codex's fixes, then the owner's merge, in this order:** #67 (changes requested; also conflicts with main in `docs/decisions.md`), #68 (approve; rebase onto main after #67: `git rebase --onto origin/main 1ed1411 codex/runtime-task-acceptance`), #69 (changes requested; rebase after #68). Details in the review comments.
-- **After #67 to #69 are on main (this side):** rebase open work, bump the CLI to 0.1.5 with the plugin pin (0.1.3 was skipped and 0.1.4 carries the User-Agent), run `publish.yml` (the owner approves the staged version on npmjs.com), and dispatch `reverify` (lessons on main haven't run under #67's Docker flags).
-- **Not waiting on a merge tap:** #60 (consent sentence draft, docs only) waits for the owner's license decision.
+- **Waiting for Codex, then the owner's merge:** #67 and #68 were closed unmerged by Codex; **#69** is now the one open PR ("Harden sync privacy and benchmark verification", `needs-owner`). It touches the CLI, the Worker and the site strings, so it needs a rebase over #100 and #101.
+- **After #69 is on main (this side):** rebase open work, bump the CLI to 0.1.5 with the plugin pin (0.1.3 was skipped and 0.1.4 carries the User-Agent), run `publish.yml` (the owner approves the staged version on npmjs.com), and dispatch `reverify` (lessons on main haven't run under #67's Docker flags).
 
 ### Who works on what (owner, 2026-10-12)
 
@@ -75,6 +75,13 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 - C tasks: `bash C:/dev/ludion-seedwork/c-batch.sh <ids>` runs one day's tasks under both conditions (frozen seeds served from `C:/dev/ludion-freeze`); results land in `docs/bench/2026-10-11-done3/` of `C:/dev/ludion` and are committed in a docs PR.
 
 ## Log
+
+### 2026-10-13 (evening): lessons are CC BY 4.0; Analytics Engine counting opened; #93 merged
+
+- **License** (#100, merged): the owner decided CC BY 4.0 for lessons; I applied it to lessons only and kept code Apache-2.0 (a Creative Commons license is not for software; the decision named "the license" of lessons, which is what #60 was waiting on). Every lesson on main was taught by one account, so no one else's agreement was needed. `teach --public` prints the teacher's sentence before the prompt and quotes it in the PR; that is in the CLI on main and ships with the next release.
+- **Analytics Engine** (**#101**, protected, `needs-owner`, Opus review below it): counts requests for `/index/*.json`; written only once the owner sets `ANALYTICS_SALT`. Three deviations from the request, each explained in `docs/decisions.md`, "Counting index requests": an HMAC under a secret instead of a public daily salt, the path as its own field instead of inside the hash, and "weekly" meaning client-days because the key rotates daily. `/start` and the README say what the server counts. No numbers yet.
+- **#93 merged** after 0.1.4 reached npm. Nothing is posted or sent; the maintainer letters 03 to 05 are still set aside for the owner's discussion. #96 (`/bench`) was merged by the owner.
+- **Codex**: #67 and #68 closed unmerged; #69 is the one open PR.
 
 ### 2026-10-13 (later): 0.1.4 is on npm; Done 2 passed
 

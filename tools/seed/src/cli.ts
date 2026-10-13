@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execTool } from "../../verify/src/command.ts";
 // The seed pipeline (docs/decisions.md, "The seed pipeline"). Each step reads and writes JSON in one folder, so a
 // step can be rerun, and a stopped run resumes where it stopped.
 //   node tools/seed/src/cli.ts collect <dir> --package <name> --range "<semver range>" [--since <ISO date>]
@@ -14,7 +15,6 @@
 //   node tools/seed/src/cli.ts fix <dir> --out <lessons folder>   one repair round for lessons CI failed
 //   node tools/seed/src/cli.ts bench <dir> --out <lessons folder> FreshBench labels and the harm check
 //   node tools/seed/src/cli.ts summary <dir>
-import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
@@ -23,7 +23,7 @@ import { read, write, type RunInfo } from "./io.ts";
 import { ask, extractJson, pool } from "./llm.ts";
 import { batches, parseVerdicts, triagePrompt, type Verdict } from "./triage.ts";
 
-const gh = (args: string[]) => execFileSync("gh", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
+const gh = (args: string[]) => execTool("gh", args, { maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
 async function collect(dir: string, pkg: string, range: string, since?: string) {
   mkdirSync(dir, { recursive: true });
   const reg = await registry(pkg, range, fetch, since);

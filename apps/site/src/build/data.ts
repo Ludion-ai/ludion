@@ -1,5 +1,5 @@
+import { execTool } from "../../../../tools/verify/src/command.ts";
 // Build-time data for every page. Runs in Node during `astro build` only; never shipped to the browser.
-import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import {
@@ -8,6 +8,7 @@ import {
 } from "@ludion/core";
 import { ADDED_LOG_FORMAT, DELETED_LOG_FORMAT, parseAddedLog, parseDeletedLog } from "./git-info.ts";
 import { readDone3, type Done3 } from "./bench.ts";
+import { readReleaseDates, type ReleaseDates } from "./knowledge.ts";
 import { readModels, type Models } from "./models.ts";
 import { teacherPages } from "./teacher-pages.ts";
 
@@ -51,6 +52,8 @@ export interface SiteData {
   models: Models | null;
   /** The official Done 3 FreshBench run (docs/bench/2026-10-11-done3/), or null if its files aren't there. */
   done3: Done3 | null;
+  /** When npm published each lesson's first version, and the models' published cutoffs (docs/bench/release-dates.json). */
+  releaseDates: ReleaseDates | null;
   /** index.json: the active set. */
   index: Index;
   /** Every lesson on main, replaced ones included, newest verified first. */
@@ -87,7 +90,7 @@ function monogram(login: string, id: number): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="hsl(0 0% ${lightness}%)"/><text x="20" y="26.5" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="600" fill="#fff">${letter}</text></svg>`;
 return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
-const git = (cwd: string, ...args: string[]) => execFileSync("git", args, { cwd, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+const git = (cwd: string, ...args: string[]) => execTool("git", args, { cwd, maxBuffer: 256 * 1024 * 1024 });
 
 function readLessons(dir: string): Lesson[] {
   const lessons: Lesson[] = [];
@@ -204,6 +207,7 @@ async function load(): Promise<SiteData> {
     tombstones: deleted.map((t) => (t.lesson ? { ...t, teacher: resolved.get(t.lesson.author_id) ?? logins.get(t.lesson.author_id) ?? storedLogin(t.lesson.author) } : t)),
     models: readModels(root),
     done3: readDone3(root),
+    releaseDates: readReleaseDates(root),
     index,
     pages,
     teacherPages: owners,

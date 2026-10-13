@@ -16,7 +16,7 @@ export function checkedFiles(files: ProjectFiles): ProjectFiles {
   let bytes = 0;
   if (Object.keys(files).length > MAX_FILES) throw new Error("Too many candidate files.");
   for (const [path, text] of Object.entries(files)) {
-    if (!/^[A-Za-z0-9_.@/-]{1,240}$/.test(path) || path.split("/").some((p) => !p || p === "." || p === ".." || excludedName(p)) || !extensions.has(extname(path)) || typeof text !== "string") throw new Error("Invalid or unsupported candidate path or text.");
+    if (!/^[A-Za-z0-9_.@/-]{1,240}$/.test(path) || path.split("/").some((p) => !p || p === "." || p === ".." || excludedName(p)) || !extensions.has(extname(path)) || typeof text !== "string" || !text.isWellFormed()) throw new Error("Invalid or unsupported candidate path or text.");
     bytes += Buffer.byteLength(text);
     if (bytes > MAX_BYTES) throw new Error("Candidate files are too large.");
   }

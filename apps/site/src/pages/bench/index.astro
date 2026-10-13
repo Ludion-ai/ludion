@@ -1,84 +1,136 @@
 ---
-// FreshBench results. Every number comes from docs/bench (build/bench.ts): the Done 3 run's grades and models.json.
-// This page took over /models (which redirects here, public/_redirects).
+// FreshBench results. Every number comes from docs/bench (build/bench.ts, build/knowledge.ts): models.json for what
+// each model knows without tools, the Done 3 run's grades, and release-dates.json for when each change came out.
+// The page shows "doesn't know" as empty squares and puts the words one click away; the tables and the method are
+// folded at the end. It took over /models (which redirects here, public/_redirects).
 import Base from "../../layouts/Base.astro";
 import BenchTable from "../../components/BenchTable.astro";
+import KnowledgeDates from "../../components/KnowledgeDates.astro";
+import KnowledgeStrip from "../../components/KnowledgeStrip.astro";
+import LessonList from "../../components/LessonList.astro";
+import LiftBars from "../../components/LiftBars.astro";
 import Measured from "../../components/Measured.astro";
+import Tip from "../../components/Tip.astro";
 import { done3Table, reproduceCommand, withoutToolsTable } from "../../build/bench.ts";
+import { dateAxis, knowledge } from "../../build/knowledge.ts";
 import { siteData } from "../../build/data.ts";
 import { en } from "../../strings/en.ts";
 
-const { done3, models, index, config } = await siteData();
+const { done3, models, index, config, releaseDates } = await siteData();
 const b = en.bench;
 const repo = `https://github.com/${config.org}/${config.repo}`;
-const active = new Map(index.lessons.map((l) => [l.id, l]));
 const subjectOf = new Map(index.lessons.map((l) => [l.id, l.subject]));
 const t = done3Table(done3, models);
 const w = withoutToolsTable(models, subjectOf);
-const perLesson = models ? Object.keys(models.lessons).filter((id) => active.has(id)).map((id) => ({ lesson: active.get(id)!, verdicts: models.lessons[id]! })) : [];
-const ids = models ? Object.keys(models.models) : [];
+const k = knowledge(index, models, releaseDates);
+const axis = dateAxis(k, releaseDates);
+const unmeasured = t.rows.filter((r) => !r.measured).map((r) => r.name);
+const measuredLessons = k.lessons.filter((l) => Object.values(l.verdicts).some((v) => v)).length;
+const cutoffSource = axis?.rows.find((r) => r.cutoff)?.cutoff?.url;
 ---
 
 <Base title={b.title} description={b.intro}>
   <article class="wrap">
     <h1>{b.heading}</h1>
     <p class="intro">{b.intro}</p>
-    <p class="links">
-      <a href="/bench/method/">{b.method}</a>
-      <a href="/bench.json">{b.json}</a>
-    </p>
 
     {!done3 && !models && <p>{b.none}</p>}
 
     {
+      models && (
+        <section aria-labelledby="knowledge">
+          <h2 id="knowledge">{b.knowledge.heading}</h2>
+          <p class="caption">{b.knowledge.caption(k.lessons.length)}</p>
+          <p class="meta">
+            <Measured date={models.measured_at} /> <a href={`${repo}/tree/main/${models.bench}`}>{b.files}</a>
+          </p>
+          <p class="legend" aria-hidden="true">
+            <span><i class="key knows" />{b.knowledge.tip.knows}</span>
+            <span><i class="key misses" />{b.knowledge.tip.misses}</span>
+            <span><i class="key none" />{b.knowledge.tip.none}</span>
+          </p>
+          <div class="strips">
+            {k.strips.map((s, i) => <KnowledgeStrip strip={s} lessons={k.lessons} delay={i * 260} />)}
+          </div>
+        </section>
+      )
+    }
+
+    {
       done3 && (
         <section aria-labelledby="done3">
-          <h2 id="done3">{b.done3Heading}</h2>
+          <h2 id="done3">{b.lift.heading}</h2>
           <p class="caption">{b.done3Caption(done3.questions.length, done3.frozenAt, new Set(Object.values(done3.seeds)).size)}</p>
           <p class="meta">
             <Measured date={done3.measuredAt} /> <a href={`${repo}/tree/main/${done3.dir}`}>{b.files}</a>
           </p>
-          <BenchTable table={t} labelledBy="done3" tools={b.tools} />
-          <h3 id="reproduce">{b.reproduce}</h3>
-          <pre tabindex="0" aria-labelledby="reproduce"><code>{reproduceCommand(done3)}</code></pre>
-          <p class="note">{b.reproduceNote(done3.dir)}</p>
+          <LiftBars table={t} />
+          {unmeasured.length > 0 && <p class="note">{b.lift.notMeasured(unmeasured.join(", "))}</p>}
+          <details>
+            <summary id="by-subject">{b.lift.bySubject}</summary>
+            <BenchTable table={t} labelledBy="by-subject" tools={b.tools} />
+          </details>
+        </section>
+      )
+    }
+
+    {
+      axis && (
+        <section aria-labelledby="dates">
+          <h2 id="dates">{b.dates.heading}</h2>
+          <p class="caption">{b.dates.caption}</p>
+          <KnowledgeDates axis={axis} measuredAt={k.measuredAt!} />
+          <p class="note">
+            <a href={`${repo}/blob/main/docs/bench/release-dates.json`}>{b.dates.source}</a>
+            {cutoffSource && (
+              <>
+                {" · "}
+                <a href={cutoffSource}>{b.dates.cutoffSource}</a>
+              </>
+            )}
+            {axis.notNpm > 0 && <> · {b.dates.notNpm(axis.notNpm)}</>}
+            {axis.unfetched > 0 && <> · {b.dates.unfetched(axis.unfetched)}</>}
+          </p>
         </section>
       )
     }
 
     {
       models && (
-        <section aria-labelledby="without-tools">
-          <h2 id="without-tools">{b.withoutToolsHeading}</h2>
-          <p class="caption">{b.withoutToolsCaption(perLesson.length)}</p>
-          <p class="meta">
-            <Measured date={models.measured_at} /> <a href={`${repo}/tree/main/${models.bench}`}>{b.files}</a>
-          </p>
-          <BenchTable table={w} labelledBy="without-tools" tools={b.noTools} />
-
-          <h3 id="per-lesson">{b.perLesson}</h3>
-          <div class="scroll" role="region" aria-labelledby="per-lesson" tabindex="0">
-            <table class="lessons">
-              <thead>
-                <tr>
-                  <th scope="col" class="first">{b.lesson}</th>
-                  {ids.map((id) => <th scope="col"><a href={`/bench/${id}/`}>{models.models[id]!.name}</a></th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {perLesson.map(({ lesson, verdicts }) => (
-                  <tr>
-                    <th scope="row" class="first"><a href={`/lessons/${lesson.id}/`}>{lesson.claim}</a></th>
-                    {ids.map((id) => <td>{verdicts[id] ? b.verdict[verdicts[id]!] : b.notMeasuredCell}</td>)}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <section aria-labelledby="every">
+          <h2 id="every">{b.list.heading}</h2>
+          <LessonList k={k} labelledBy="every" />
         </section>
       )
     }
+
+    <details class="method">
+      <summary>{b.methodDetails}</summary>
+      <p class="links">
+        <a href="/bench/method/">{b.method}</a>
+        <a href="/bench.json">{b.json}</a>
+      </p>
+      {
+        done3 && (
+          <>
+            <h3 id="reproduce">{b.reproduce}</h3>
+            <pre tabindex="0" aria-labelledby="reproduce"><code>{reproduceCommand(done3)}</code></pre>
+            <p class="note">{b.reproduceNote(done3.dir)}</p>
+          </>
+        )
+      }
+      {
+        models && (
+          <>
+            <h3 id="without-tools">{b.withoutToolsHeading}</h3>
+            <p class="caption">{b.withoutToolsCaption(measuredLessons)}</p>
+            <BenchTable table={w} labelledBy="without-tools" tools={b.noTools} />
+          </>
+        )
+      }
+    </details>
   </article>
+  <Tip />
 </Base>
 
 <style>
@@ -97,13 +149,13 @@ const ids = models ? Object.keys(models.models) : [];
     display: flex;
     flex-wrap: wrap;
     gap: 4px 24px;
-    margin: 0 0 8px;
+    margin: 16px 0 8px;
     font-size: 15px;
   }
   section {
-    margin-top: 40px;
+    margin-top: 44px;
     padding-top: 24px;
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--rule-strong);
   }
   h2 {
     font-size: 21px;
@@ -126,11 +178,61 @@ const ids = models ? Object.keys(models.models) : [];
     margin: 0 0 20px;
   }
   .note {
-    margin-top: 8px;
+    margin-top: 12px;
+  }
+  .meta a,
+  .note a {
+    color: var(--ink);
   }
   .meta a {
-    color: var(--ink);
     margin-left: 4px;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin: 0 0 4px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .legend .key {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1.5px solid var(--mark);
+  }
+  .legend .knows {
+    background: var(--mark);
+  }
+  .legend .none {
+    border-style: dotted;
+    border-color: var(--checking-line);
+  }
+  details {
+    margin-top: 18px;
+  }
+  summary {
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  details.method {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule-strong);
+  }
+  details.method > summary {
+    font-size: 17px;
+    font-weight: 700;
   }
   pre {
     margin: 0;
@@ -142,47 +244,5 @@ const ids = models ? Object.keys(models.models) : [];
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     line-height: 1.6;
-  }
-  .scroll {
-    overflow-x: auto;
-  }
-  .lessons {
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 14px;
-  }
-  .lessons th,
-  .lessons td {
-    text-align: left;
-    padding: 8px 16px 8px 0;
-    border-top: 1px solid var(--rule);
-    vertical-align: top;
-  }
-  .lessons thead th {
-    border-top: 0;
-    color: var(--muted);
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .lessons thead a {
-    color: inherit;
-  }
-  .lessons td {
-    white-space: nowrap;
-  }
-  .lessons tbody th {
-    font-weight: 500;
-    min-width: 18em;
-    max-width: 40em;
-  }
-  .lessons .first {
-    position: sticky;
-    left: 0;
-    background: var(--paper);
-  }
-  @media (max-width: 640px) {
-    .lessons tbody th {
-      min-width: 13em;
-    }
   }
 </style>

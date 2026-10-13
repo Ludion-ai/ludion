@@ -1,7 +1,7 @@
+import { execTool } from "../../verify/src/command.ts";
 // Explicit runtime grading only. Never invokes a model or rewrites historical scores.
 // --self-check --out file | --task id --project complete-project-folder --out file
 // --artifact private-snapshot.json --sha256 hash-from-run-record --out file
-import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
@@ -45,7 +45,8 @@ async function main() {
   }
   const errors = pullImages(["node@24"]);
   if (errors.length) { rows.push({ verdict: "error", why: errors.join("\n") }); save(); process.exitCode = 1; return; }
-  const harnessSha = execFileSync("git", ["-C", fileURLToPath(new URL("../../../", import.meta.url)), "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  const repo = fileURLToPath(new URL("../../../", import.meta.url));
+  const harnessSha = execTool("git", ["-C", repo, "rev-parse", "HEAD"], { cwd: repo }).trim();
   const fixtureArtifacts = values["self-check"] ? values["artifact-dir"] ?? mkdtempSync(join(tmpdir(), "ludion-fixture-artifacts-")) : undefined;
   const evaluate = async (id: string, name: string, files: ProjectFiles, expected?: string) => {
     const { task, baseline, immutable } = fixture(id);

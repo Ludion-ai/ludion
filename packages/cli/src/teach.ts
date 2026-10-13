@@ -1,6 +1,6 @@
 // ludion teach: turn a draft into a lesson, check it on this machine, and save it to the personal ledger.
 // Tests run only in Docker with the network off, and only when Docker is installed (CLAUDE.md).
-import { spawnSync } from "node:child_process";
+import { spawnTool } from "../../../tools/verify/src/command.ts";
 import { existsSync, readFileSync } from "node:fs";
 import {
   EVIDENCE_SCOPE, checkSource, formatLesson, generateClaim, hasNoEvidence, lessonProblems, newId, subjectFor, unverifiedProblems, validateLessonV1, validateUnverified,
@@ -33,7 +33,7 @@ export function readDraft(arg: string): Draft {
 
 /** The teacher's GitHub account from their own gh, or undefined when gh is missing or signed out. */
 export function ghIdentity(): Identity | undefined {
-  const r = spawnSync("gh", ["api", "user", "--jq", "[.login, .id] | @tsv"], { encoding: "utf8" });
+  const r = spawnTool("gh", ["api", "user", "--jq", "[.login, .id] | @tsv"]);
   if (r.status !== 0) return undefined;
   const [login, id] = r.stdout.trim().split("\t");
   return login && Number(id) > 0 ? { login, id: Number(id) } : undefined;
@@ -64,7 +64,7 @@ export interface CheckReport {
 }
 
 export function dockerAvailable(): boolean {
-  return spawnSync("docker", ["version", "--format", "{{.Server.Version}}"], { encoding: "utf8" }).status === 0;
+  return spawnTool("docker", ["version", "--format", "{{.Server.Version}}"]).status === 0;
 }
 
 /** Every check this machine can run. Problems block teaching; tests that can't run here are reported, not failed. */

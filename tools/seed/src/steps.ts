@@ -1,5 +1,5 @@
+import { execTool } from "../../verify/src/command.ts";
 // The pipeline's later steps: draft, check, review, lessons, summary (see cli.ts for the commands).
-import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
@@ -18,7 +18,7 @@ import { draftOrder, KINDS, type Kind, type Verdict } from "./triage.ts";
 export const REPO_ROOT = resolve(import.meta.dirname, "../../..");
 /** Package copies and agent folders live outside the repo: they are large and rebuilt on demand. */
 export const CACHE = process.env.LUDION_SEED_CACHE || resolve(REPO_ROOT, "..", "ludion-seedwork");
-export const gh = (args: string[]) => execFileSync("gh", args, { encoding: "utf8", maxBuffer: 256 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
+export const gh = (args: string[]) => execTool("gh", args, { maxBuffer: 256 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
 
 /** The account that opens seed PRs signs them (CLAUDE.md, "Attribution is identity"). */
 export const SEED_AUTHOR = { login: "Ludion-ai", id: 292738933 };

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { boundedText, filesHash, makeArtifact, readArtifact, saveArtifact, taskHash, validateArtifact } from "../src/bench-artifacts.ts";
+import { boundedText, canonicalJson, filesHash, hashText, makeArtifact, readArtifact, saveArtifact, taskHash, validateArtifact } from "../src/bench-artifacts.ts";
 import { snapshotProject } from "../src/project-snapshot.ts";
 import { gradeArtifact } from "../src/runtime-replay.ts";
 import { loadRuleTasks } from "../src/rule-tasks.ts";
@@ -63,6 +63,28 @@ describe("source artifact integrity and replay", () => {
     expect(() => snapshotProject(dir)).toThrow();
     writeFileSync(join(dir, "bad.js"), Buffer.from([0xef, 0xbb, 0xbf, 0x61]));
     expect(snapshotProject(dir)["bad.js"]).toBe("\ufeffa");
+  });
+  it("rejects JSON-escaped lone surrogates even when the artifact file and source digests match", () => {
+    const dir = mkdtempSync(join(tmpdir(), "ludion-escaped-unicode-"));
+    const path = join(dir, "artifact.json");
+    for (const escaped of ['"\\ud800"', '"\\udc00"']) {
+      const input = artifact();
+      input.candidate_files["src/helper.js"] = JSON.parse(escaped);
+      input.candidate_sha256 = hashText(canonicalJson(input.candidate_files));
+      const json = JSON.stringify(input);
+      writeFileSync(path, json);
+      expect(() => readArtifact(path, hashText(json))).toThrow("Invalid or unsupported candidate");
+    }
+    const input = artifact();
+    input.candidate_files["src/helper.js"] = '// valid UTF-8: 🧭 and �\n';
+    input.candidate_sha256 = filesHash(input.candidate_files);
+    const ref = saveArtifact(input, dir);
+    expect(readArtifact(join(dir, `${ref.id}.json`), ref.sha256).candidate_files["src/helper.js"]).toBe(input.candidate_files["src/helper.js"]);
+  });
+  it("rejects nonrepresentable delivery text rather than hashing its UTF-8 replacement", () => {
+    const input = makeArtifact({ ...artifact(), sync: true, site: "https://example.invalid", sync_cli_sha256: "c".repeat(64) }, "valid delivery");
+    input.delivery = { text: JSON.parse('"\\ud800"'), sha256: hashText(JSON.parse('"\\ud800"')) };
+    expect(() => validateArtifact(input)).toThrow("Invalid artifact delivery context");
   });
   it("hashes task/source keys canonically, independent of insertion order", () => {
     expect(filesHash({ "b.js": "b", "a.js": "a" })).toBe(filesHash({ "a.js": "a", "b.js": "b" }));

@@ -1,8 +1,9 @@
+import { execTool } from "../../verify/src/command.ts";
 // Runs the C tasks (tools/bench/tasks-c) under the realistic condition: Claude Code with edits and no shell in a copy of
 // the prepared project plus the task's files, with or without `ludion sync` first. Usage:
 //   node tools/bench/src/tasks-run.ts <projects cache> <out dir> <label> --run-model [--trials 1] [--model opus] [--only id,id]
 //     [--sync <ludion cli.js> [--site <url>] [--ludion-home <dir>] [--offline]] [--cap-usd 40]
-import { execFileSync, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -42,8 +43,8 @@ async function main() {
   const { trials, cap } = runBounds(label, values.trials!, values["cap-usd"]!, values["run-model"] === true);
   const site = values.sync ? values.site ?? process.env.LUDION_SITE ?? "https://ludion.ai" : null;
   const repo = fileURLToPath(new URL("../../../", import.meta.url));
-  const harnessSha = execFileSync("git", ["-C", repo, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-  const dirty = execFileSync("git", ["-c", "core.fsmonitor=false", "-C", repo, "status", "--porcelain", "--", "tools/bench", "tools/verify/src", "packages/core/src", ".node-version", "package.json", "package-lock.json"], { encoding: "utf8" });
+  const harnessSha = execTool("git", ["-C", repo, "rev-parse", "HEAD"], { cwd: repo }).trim();
+  const dirty = execTool("git", ["-c", "core.fsmonitor=false", "-C", repo, "status", "--porcelain", "--", "tools/bench", "tools/verify/src", "packages/core/src", ".node-version", "package.json", "package-lock.json"], { cwd: repo });
   if (dirty.trim()) throw new Error("Commit the measurement harness before starting a model run.");
   if (values.offline && !values.sync) throw new Error("--offline requires --sync.");
   const cliHash = values.sync ? hashText(boundedText(values.sync)) : null;

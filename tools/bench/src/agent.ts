@@ -4,6 +4,7 @@ import { spawn } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { trustedCommand } from "../../verify/src/command.ts";
 
 /** none: no tools. web: web search/fetch. ludion: web plus MCP. project: explicit tools in a prepared project copy. */
 export type Condition = "none" | "web" | "ludion" | "project" | "files";
@@ -148,6 +149,7 @@ export function runAgent(prompt: string, o: RunOptions): Promise<AgentRun> {
   mkdirSync(work);
   if (o.project) cpSync(o.project, work, { recursive: true });
   if (o.claudeMd) writeFileSync(join(work, "CLAUDE.md"), o.claudeMd + "\n");
+  const command = trustedCommand("claude", work, runEnv(process.env, o.condition));
   o.prepare?.(work);
   let mcpConfigPath: string | undefined;
   if (o.condition === "ludion") {
@@ -155,7 +157,7 @@ export function runAgent(prompt: string, o: RunOptions): Promise<AgentRun> {
     writeFileSync(mcpConfigPath, JSON.stringify({ mcpServers: { ludion: { type: "http", url: o.ludionUrl ?? "https://ludion.ai/mcp" } } }));
   }
   return new Promise((resolve, reject) => {
-    const child = spawn("claude", claudeArgs(o, mcpConfigPath), { cwd: work, stdio: ["pipe", "pipe", "pipe"], windowsHide: true, env: runEnv(process.env, o.condition) });
+    const child = spawn(command.file, claudeArgs(o, mcpConfigPath), { cwd: work, stdio: ["pipe", "pipe", "pipe"], windowsHide: true, env: command.env });
     child.stdin.on("error", () => {});
     child.stdin.end(prompt);
     // A run that hangs (seen under rate limiting) is killed and counted as an error, so the batch moves on.

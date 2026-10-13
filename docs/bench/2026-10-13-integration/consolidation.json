@@ -102,7 +102,7 @@
   "current_protected_coverage": {
     "base_main": "2ed9e22acee094c89dc28286ed2569e6f79ee792",
     "source_head": "4640be1a27d9f681b7aa180babe30cdb4743b87e",
-    "all_changed_protected_files_match_a_completed_review": true,
+    "all_changed_protected_files_match_a_completed_review": false,
     "files": [
       {
         "path": ".github/workflows/publish.yml",
@@ -135,5 +135,15 @@
         "current_blob": "4721ca77070aba5cad453bfe13c131a2aac31f70"
       }
     ]
+  },
+  "later_bench_visual_integration": {
+    "main": "2ed9e22acee094c89dc28286ed2569e6f79ee792",
+    "conflict_resolution": "Retain main journal unchanged, append prior audit journal in its own section to avoid repeated prepend collisions.",
+    "protected_workflow_changed": false
+  },
+  "pending_command_review": {
+    "scope": "new host executable helper and callsite migrations",
+    "reason": "native Windows cwd lookup",
+    "completed": false
   }
 }

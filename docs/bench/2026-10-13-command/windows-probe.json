@@ -1,0 +1,9 @@
+{
+  "platform": "win32",
+  "node": "v24.19.0",
+  "payload": "Own installed Node executable copied as git.exe; --version only, no candidate code or credentials",
+  "before": "v24.19.0",
+  "flag_only": "v24.19.0",
+  "after": "git version 2.55.0.windows.5",
+  "absolute_file": "C:\\Program Files\\Git\\cmd\\git.exe"
+}

@@ -56,7 +56,7 @@ export function validateArtifact(raw: unknown): BenchArtifact {
   const base = checkedFiles(raw.base_files as ProjectFiles);
   const candidate = checkedFiles(raw.candidate_files as ProjectFiles);
   if (raw.base_sha256 !== filesHash(base) || raw.candidate_sha256 !== filesHash(candidate)) throw new Error("Artifact source digest mismatch.");
-  if (raw.delivery !== null && (!object(raw.delivery) || typeof raw.delivery.text !== "string" || Buffer.byteLength(raw.delivery.text) > 512 * 1024 || raw.delivery.sha256 !== hashText(raw.delivery.text))) throw new Error("Invalid artifact delivery context.");
+  if (raw.delivery !== null && (!object(raw.delivery) || typeof raw.delivery.text !== "string" || !raw.delivery.text.isWellFormed() || Buffer.byteLength(raw.delivery.text) > 512 * 1024 || raw.delivery.sha256 !== hashText(raw.delivery.text))) throw new Error("Invalid artifact delivery context.");
   if (raw.sync !== (raw.delivery !== null) || (!raw.sync && raw.site !== null)) throw new Error("Artifact delivery condition mismatch.");
   if (!digest(raw.inputs_sha256)) throw new Error("Artifact prepared input identity is missing.");
   if (typeof raw.offline !== "boolean" || (!raw.sync && raw.offline) || (raw.sync ? !digest(raw.sync_cli_sha256) : raw.sync_cli_sha256 !== null)) throw new Error("Artifact CLI delivery identity is missing or inconsistent.");

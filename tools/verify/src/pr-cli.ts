@@ -1,7 +1,7 @@
 #!/usr/bin/env node
+import { execTool } from "./command.ts";
 // npm run verify:pr -- [--json <path>]
 // Run by verify.yml on every pull request. Reads the PR from $GITHUB_EVENT_PATH.
-import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { validateLesson, type Lesson } from "@ludion/core";
@@ -13,7 +13,7 @@ import { createSafeFetch } from "./safe-fetch.ts";
 import { runtimesIn } from "./files.ts";
 import type { LessonFile } from "./verify.ts";
 
-const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+const git = (...args: string[]) => execTool("git", args, { maxBuffer: 64 * 1024 * 1024 });
 
 /** main's lessons in either format (format 0 files stay valid), for the replaces check. */
 function baseLessons(baseRef: string): Lesson[] {

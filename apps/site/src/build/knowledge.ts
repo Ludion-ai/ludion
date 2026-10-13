@@ -85,13 +85,23 @@ export function firstSentence(claim: string): string {
 /** A claim sentence as plain text, for a tooltip: code spans lose their backticks. */
 export const plain = (text: string) => text.replace(/`/g, "");
 
+/** The lowest version a range admits, or null when it isn't a semver range (format 0 allows any text, e.g. "edition 2021"). */
+function lowest(range: string | undefined): string | null {
+  if (!range || semver.validRange(range) == null) return null;
+  try {
+    return semver.minVersion(range)?.version ?? null;
+  } catch {
+    return null;
+  }
+}
+
 type Entry = Index["lessons"][number] & { version?: string; kind?: string; signal?: "loud" | "silent"; package?: { ecosystem: string; name: string }; drafted_by?: string };
 
 /** Every active lesson in subject order, then by version, with each model's verdict from models.json. */
 export function knowledge(index: Index, models: Models | null, dates: ReleaseDates | null): Knowledge {
   const ids = Object.keys(models?.models ?? {});
   const lessons = (index.lessons as Entry[]).map((l): KnownLesson & { min: string | null } => {
-    const min = l.version ? (semver.minVersion(l.version)?.version ?? null) : null;
+    const min = lowest(l.version);
     const at = l.package?.ecosystem === "npm" && min ? dates?.versions[`${l.package.name}@${min}`] : undefined;
     return {
       id: l.id,

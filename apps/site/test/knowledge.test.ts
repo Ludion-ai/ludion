@@ -53,6 +53,11 @@ describe("the knowledge strips", () => {
     ]);
   });
 
+  it("take a version that isn't a semver range as undated, not an error", () => {
+    const k = knowledge({ ...index, lessons: [entry("E", "x", "edition 2021"), entry("N", "x", "")] }, only, { ...dates, versions: { "x@2021.0.0": "2026-01-01T00:00:00Z" } });
+    expect(k.lessons.map((l) => l.released)).toEqual([null, null]);
+  });
+
   it("are all not measured before any run", () => {
     const k = knowledge(index, { ...only, lessons: {} }, null);
     expect(k.strips.map((s) => [s.misses.total, s.notMeasured])).toEqual([

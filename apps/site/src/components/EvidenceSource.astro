@@ -42,6 +42,8 @@ const host = new URL(url).host;
     font-weight: 500;
     color: var(--ink);
     letter-spacing: -0.012em;
+    /* A quote can hold a long name or env variable (WRANGLER_R2_SQL_AUTH_TOKEN) wider than a phone. */
+    overflow-wrap: anywhere;
   }
   .where {
     margin: 10px 0 0;

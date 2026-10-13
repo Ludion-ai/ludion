@@ -54,7 +54,12 @@ const label = Astro.props.label ?? (runner === "lean" ? en.lesson.proof : en.les
     font-weight: 700;
     color: var(--ink);
   }
+  /* A pin can be one long word (@modelcontextprotocol/client@2.0.0-beta.5), wider than a phone. */
+  figcaption > span {
+    overflow-wrap: anywhere;
+  }
   .copy {
+    flex-shrink: 0;
     font: inherit;
     font-size: 13px;
     color: var(--ink);

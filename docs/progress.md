@@ -83,6 +83,11 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 - **#93 merged** after 0.1.4 reached npm. Nothing is posted or sent; the maintainer letters 03 to 05 are still set aside for the owner's discussion. #96 (`/bench`) was merged by the owner.
 - **Codex**: #67 and #68 closed unmerged; #69 is the one open PR.
 
+### 2026-10-13 (night): UI bugs fixed, every page down to 320 px
+
+- **Found** (the owner reported UI bugs; every page swept at seven widths from 320 to 1600 px, light and dark, by a script that flags sideways scroll and any element wider than its box): on `/bench`, the subject headings of "Every lesson" sat in the version column, so "Haiku 5.5 Sonnet 5.5 Opus 5.5" ran over the first claim, and on a phone the rows were squeezed beside the heading with the version chip under the kind tag. On phones, long dotted names in claims widened the page (a lesson page was 433 px wide at 390), and at 320 px the large seal, source quotes, and one test caption did too. Decisions: `docs/decisions.md`, "Every page down to 320 px".
+- **Checked**: the same sweep after the fix (eight widths from 320 to 1600 px) finds nothing but the differential drawing's arrow, which sits in the gap between its two boxes on purpose. New e2e tests: no sideways scroll on any page at 320 and 390 px; `/bench` subject headings span their rows with the model names over the marks. On main's build the sweep had found what each one checks for (pages up to 433 px wide on a 390 px screen; headings 104 px wide in a 1200 px list), and the heading test fails with the old selector put back. `npm test` (451) and `npm run test:e2e` (17, axe in light and dark included) pass. Screenshots before and after: `docs/site/2026-10-13-ui-fixes/`.
+
 ### 2026-10-13 (later): 0.1.4 is on npm; Done 2 passed
 
 - **npm**: the owner approved 0.1.4 (`latest`) and 0.1.3 is deprecated ("Use 0.1.4 or later"). `npx ludion-ai@0.1.4 sync` in an empty folder against production exited 0 and wrote `.ludion/lessons.md` and `CLAUDE.md` (`docs/bench/2026-10-13-done2/sync-production-0.1.4.txt`). The `User-Agent` the CLI now sends was checked on the built CLI against a local server (#92); nothing in the Worker reads it yet.

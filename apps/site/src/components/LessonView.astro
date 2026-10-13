@@ -280,10 +280,10 @@ const shared = () => {
     border-top: 2px solid var(--rule-strong);
     padding-top: 18px;
   }
-  /* The large seal fits a 360 px screen. */
+  /* The large seal fits a 360 px screen on one line; narrower, its word takes two (StatusChip). */
   @media (max-width: 400px) {
     .result :global(.seal.large) {
-      height: 34px;
+      min-height: 34px;
       font-size: 13px;
     }
   }
@@ -332,6 +332,7 @@ const shared = () => {
     font-size: 18px;
     font-weight: 500;
     letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
   }
   /* The lessons this one corrects: struck through, since they no longer hold. */
   .corrected a {
@@ -348,6 +349,7 @@ const shared = () => {
     border: 1.5px dashed var(--checking-line);
     border-radius: 3px;
     color: var(--checking-fg);
+    overflow-wrap: anywhere;
   }
   .banner a {
     color: inherit;

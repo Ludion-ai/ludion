@@ -251,7 +251,8 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     margin: 0;
     padding: 0;
   }
-  li {
+  /* A row. Only the list's own items: a subject group is an li too, and must stay a block. */
+  .list > li {
     display: grid;
     grid-template-columns: 6.5rem minmax(0, 1fr) auto calc(var(--models, 3) * 4.4rem);
     gap: 4px 18px;
@@ -260,7 +261,7 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     border-bottom: 1px solid var(--rule);
     position: relative; /* holds its visually hidden words */
   }
-  li[hidden] {
+  .list > li[hidden] {
     display: none;
   }
   .chip {
@@ -335,17 +336,14 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     .ghead .who {
       display: none;
     }
-    li {
+    .list > li {
       grid-template-columns: auto minmax(0, 1fr);
       gap: 8px 12px;
       padding: 14px 0;
     }
-    /* A long symbol may break on a phone rather than widen the page. */
+    /* A long word may break on a phone rather than widen the page. */
     .claim {
       overflow-wrap: anywhere;
-    }
-    .claim :global(.nb) {
-      white-space: normal;
     }
     .claim {
       grid-column: 1 / -1;

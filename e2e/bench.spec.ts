@@ -26,6 +26,30 @@ test("each model page names its share card, and the card is a 1200×630 PNG", as
   }
 });
 
+test("/bench's lesson list: each subject's heading spans its rows, with the model names over their marks", async ({ page }) => {
+  // A subject group is an li too; when the rows' grid reached it, the heading sat in the version column and the
+  // model names ran over the first claim.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/bench/");
+  const groups = await page.evaluate(() =>
+    [...document.querySelectorAll("li.group[data-group]")].map((g) => {
+      const box = (el: Element) => {
+        const r = el.getBoundingClientRect();
+        return { left: r.left, right: r.right };
+      };
+      const part = (selector: string) => box(g.querySelector(selector)!);
+      return { group: box(g), head: part(".ghead"), who: part(".ghead .who"), marks: part(".marks") };
+    }),
+  );
+  expect(groups.length).toBeGreaterThan(0);
+  for (const g of groups) {
+    expect(g.head.left).toBeCloseTo(g.group.left, 0);
+    expect(g.head.right).toBeCloseTo(g.group.right, 0);
+    expect(g.who.left).toBeCloseTo(g.marks.left, 0);
+    expect(g.who.right).toBeCloseTo(g.marks.right, 0);
+  }
+});
+
 test("/bench, /lessons, and lesson pages never scroll sideways, at any width their layouts switch around", async ({ page, request }) => {
   // About thirty page loads, each now drawing water (WebGL in software on CI): more than the default 30 s.
   test.setTimeout(180_000);

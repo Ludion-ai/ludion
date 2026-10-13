@@ -23,13 +23,8 @@ jobs:
 
       - run: npm ci
       - run: npm run typecheck
-      # Build first: the Worker tests run in workerd and serve apps/site/dist through ASSETS.
-      - run: npm run build
-      # The design samples include a format 1 lesson, so this catches pages that only handle format 0.
-      - run: npm run build:samples -w @ludion/site
-      - run: npm test
-
-      # Playwright + axe on every page, light and dark, against the built site under wrangler dev.
+      # Chromium before the build: the site's build screenshots the /bench share cards (apps/site/scripts/og.ts),
+      # and the e2e checks below use it too.
       - name: Find the Playwright version
         id: playwright
         run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
@@ -44,4 +39,10 @@ jobs:
       - name: Install Chromium's system dependencies
         if: steps.browsers.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
+      # Build first: the Worker tests run in workerd and serve apps/site/dist through ASSETS.
+      - run: npm run build
+      # The design samples include a format 1 lesson, so this catches pages that only handle format 0.
+      - run: npm run build:samples -w @ludion/site
+      - run: npm test
+      # Playwright + axe on every page, light and dark, against the built site under wrangler dev.
       - run: npm run test:e2e

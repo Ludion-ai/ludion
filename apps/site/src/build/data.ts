@@ -7,6 +7,7 @@ import {
   type GitInfo, type Index, type Lesson, type VerifiedBy,
 } from "@ludion/core";
 import { ADDED_LOG_FORMAT, DELETED_LOG_FORMAT, parseAddedLog, parseDeletedLog } from "./git-info.ts";
+import { readDone3, type Done3 } from "./bench.ts";
 import { readModels, type Models } from "./models.ts";
 import { teacherPages } from "./teacher-pages.ts";
 
@@ -42,10 +43,14 @@ export interface Tombstone {
 
 export interface SiteData {
   config: Config;
+  /** The repository's root folder: /bench reads run logs from docs/bench under it. */
+  root: string;
   /** Retracted lessons, newest retraction first. */
   tombstones: Tombstone[];
   /** FreshBench per-model verdicts (docs/bench/models.json), or null before the first run. */
   models: Models | null;
+  /** The official Done 3 FreshBench run (docs/bench/2026-10-11-done3/), or null if its files aren't there. */
+  done3: Done3 | null;
   /** index.json: the active set. */
   index: Index;
   /** Every lesson on main, replaced ones included, newest verified first. */
@@ -195,8 +200,10 @@ async function load(): Promise<SiteData> {
 
   return {
     config,
+    root,
     tombstones: deleted.map((t) => (t.lesson ? { ...t, teacher: resolved.get(t.lesson.author_id) ?? logins.get(t.lesson.author_id) ?? storedLogin(t.lesson.author) } : t)),
     models: readModels(root),
+    done3: readDone3(root),
     index,
     pages,
     teacherPages: owners,

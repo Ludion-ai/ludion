@@ -190,7 +190,7 @@ export const en = {
     dates: {
       heading: "Knowledge dates",
       caption:
-        "Each dot is a lesson, placed on the day npm published the first version it is about. Filled: the model knows it. Hollow: it doesn't. Dotted: not measured. The gray band is a model's reliable knowledge cutoff, where its maker publishes one.",
+        "Each dot is a lesson, placed on the day npm published the first version it is about. Filled: the model knows it. Hollow: it doesn't. Dotted: not measured. The gray band is a model's reliable knowledge cutoff, where its maker publishes one. A break in the axis is a stretch with nothing in it, shortened.",
       cutoff: (month: string) => `Reliable knowledge cutoff, ${month}`,
       cutoffSource: "Cutoffs as Anthropic's model overview publishes them",
       measured: "Measured",

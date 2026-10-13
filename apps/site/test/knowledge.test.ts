@@ -75,6 +75,23 @@ describe("the knowledge strips", () => {
   });
 });
 
+describe("the knowledge dates axis", () => {
+  it("cuts a long empty stretch short, keeps dates in order, and labels every stretch with a month", () => {
+    const index = { version: 1, built_at: "", teachers: {}, lessons: [entry("OLD", "x", ">=1.0.0"), entry("A", "x", ">=2.0.0"), entry("B", "x", ">=2.1.0")] } as Index;
+    const file = { ...dates, versions: { "x@1.0.0": "2025-10-22T00:00:00Z", "x@2.0.0": "2026-09-01T00:00:00Z", "x@2.1.0": "2026-09-20T00:00:00Z" }, cutoffs: {} };
+    const k = knowledge(index, { ...models, measured_at: "2026-10-11", models: { m: { name: "M" } }, lessons: {} }, file);
+    const axis = dateAxis(k, file)!;
+    expect(axis.breaks).toHaveLength(1);
+    const xs = axis.rows[0]!.dots.map((d) => d.x);
+    expect([...xs].sort((p, q) => p - q)).toEqual(xs);
+    // Full scale after the cut: the 19 days between A and B are wider than the 314 days before the cut.
+    expect(xs[2]! - xs[1]!).toBeGreaterThan(xs[1]! - xs[0]!);
+    expect(axis.ticks.every((t) => t.x >= 0 && t.x <= 1)).toBe(true);
+    expect(axis.ticks.filter((t) => t.x < axis.breaks[0]!).map((t) => t.month)).toEqual(["2025-10"]);
+    expect(axis.measured).toBeLessThanOrEqual(1);
+  });
+});
+
 describe("--mark", () => {
   // WCAG relative luminance and contrast ratio.
   const lum = (hex: string) => {

@@ -98,7 +98,7 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 ### 2026-10-13: `/bench` redrawn: knowledge strips, bars, dates
 
 - **Built** (on top of the `/bench` PR, `apps/site` only plus `docs/bench/release-dates.json`): a knowledge strip per model (a square per lesson: knows, doesn't, not measured), Done 3 as two bars with interval whiskers and the difference, the knowledge dates chart, the lesson list with filters, the method folded at the end, and share cards with only the strip and the count. Decisions: `docs/decisions.md`, "The bench page's look".
-- **Measured** (from the files): without tools, Haiku 5.5 doesn't know 27 of 29 measured lessons, Sonnet 5.5 and Opus 5.5 28 of 29; 27 of the 56 active lessons aren't measured yet. Every npm lesson's first version came out on Jul 21, 2026 or later (`release-dates.json`), after the Jun 2026 cutoff Anthropic publishes for all three.
+- **Measured** (from the files): without tools, Haiku 5.5 doesn't know 27 of 29 measured lessons, Sonnet 5.5 and Opus 5.5 28 of 29; 28 of the 57 active lessons aren't measured yet. In `release-dates.json`, every npm lesson's first version but one came out on Jul 21, 2026 or later, after the Jun 2026 cutoff Anthropic publishes for all three; the one before it is the taught `vi.restoreAllMocks` lesson (vitest 4.0.0, Oct 22, 2025), not measured yet.
 - **Checked**: `npm test` (new `knowledge.test.ts`: squares recounted from models.json, dates matched to the file, cutoffs only with a source) and `npm run test:e2e` (axe in light and dark) pass locally; screenshots at 1280 and 390, light and dark; hover, click, and filters tried in a browser.
 
 ### 2026-10-12: Published as ludion-ai; the v2 stack is on main

@@ -133,19 +133,48 @@ export interface Dot {
   x: number;
 }
 
+/** A stretch of the date axis with no dot, cutoff, or measuring day in it longer than this many days is cut short. */
+export const GAP_DAYS = 45;
+/** How many days' width a cut stretch keeps. */
+const CUT_WIDTH = 14;
+
 /**
  * The knowledge dates: an axis from the earliest cutoff month (or first release) to the measuring day, and for each
- * model a dot per dated lesson, in date order.
+ * model a dot per dated lesson, in date order. Long empty stretches are cut short (`breaks`, drawn as a break in the
+ * axis) so that one old lesson doesn't squeeze the rest into a corner; no month tick falls inside a cut.
  */
 export function dateAxis(k: Knowledge, dates: ReleaseDates | null) {
   const dated = k.lessons.filter((l) => l.released).sort((a, b) => a.released!.localeCompare(b.released!));
   if (!dated.length || !k.measuredAt) return null;
-  const cutoffs = k.models.map((m) => dates?.cutoffs[m.id]).filter((c) => c != null);
-  const starts = [...dated.map((l) => dayOf(l.released!)), ...cutoffs.map((c) => dayOf(`${c.month}-01`))];
-  const from = Math.min(...starts) - 6;
-  const to = Math.max(dayOf(k.measuredAt), ...dated.map((l) => dayOf(l.released!))) + 4;
-  const x = (date: string) => (dayOf(date) - from) / (to - from);
   const lastDay = (month: string) => new Date(Date.UTC(+month.slice(0, 4), +month.slice(5, 7), 0)).toISOString().slice(0, 10);
+  const cutoffs = k.models.map((m) => dates?.cutoffs[m.id]).filter((c) => c != null);
+  // Days the axis must show at full scale: each dot, each cutoff month's ends, the measuring day.
+  const marks = [...new Set([...dated.map((l) => dayOf(l.released!)), ...cutoffs.flatMap((c) => [dayOf(`${c.month}-01`), dayOf(lastDay(c.month))]), dayOf(k.measuredAt)])].sort((a, b) => a - b);
+  const from = marks[0]! - 6;
+  const to = marks.at(-1)! + 4;
+  // Piecewise: [day, position in days] at each mark, with long gaps between marks shortened.
+  const knots: [number, number][] = [[from, 0]];
+  const breaks: number[] = [];
+  let pos = 6;
+  knots.push([marks[0]!, pos]);
+  for (let i = 1; i < marks.length; i++) {
+    const gap = marks[i]! - marks[i - 1]!;
+    if (gap > GAP_DAYS) {
+      breaks.push(pos + CUT_WIDTH / 2);
+      pos += CUT_WIDTH;
+    } else pos += gap;
+    knots.push([marks[i]!, pos]);
+  }
+  knots.push([to, pos + 4]);
+  const length = pos + 4;
+  const at = (day: number) => {
+    const j = Math.max(1, knots.findIndex(([d]) => d >= day));
+    const [d0, p0] = knots[j - 1]!;
+    const [d1, p1] = knots[j] ?? knots.at(-1)!;
+    return (d1 === d0 ? p0 : p0 + ((day - d0) / (d1 - d0)) * (p1 - p0)) / length;
+  };
+  const isCut = (day: number) => marks.some((m, i) => i > 0 && m - marks[i - 1]! > GAP_DAYS && day > marks[i - 1]! && day < m);
+  const x = (date: string) => at(dayOf(date));
   const rows = k.models.map((m) => {
     const c = dates?.cutoffs[m.id];
     return {
@@ -156,15 +185,26 @@ export function dateAxis(k: Knowledge, dates: ReleaseDates | null) {
       cutoff: c ? { from: x(`${c.month}-01`), to: x(lastDay(c.month)), month: c.month, url: c.url } : null,
     };
   });
-  const ticks: { x: number; month: string }[] = [];
+  const ticks: { x: number; month: string; line: boolean }[] = [];
   const first = new Date(from * 86_400_000);
   for (let d = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 1)); d.getTime() / 86_400_000 <= to; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))) {
-    ticks.push({ x: (d.getTime() / 86_400_000 - from) / (to - from), month: d.toISOString().slice(0, 7) });
+    const day = d.getTime() / 86_400_000;
+    if (!isCut(day)) ticks.push({ x: at(day), month: d.toISOString().slice(0, 7), line: true });
   }
+  // A stretch between cuts with no month start in it gets a label at its first mark instead (no line), so every dot
+  // has a month to read it against.
+  const edges = [0, ...breaks.map((p) => p / length), 1];
+  for (let i = 0; i + 1 < edges.length; i++) {
+    if (ticks.some((t) => t.x > edges[i]! && t.x < edges[i + 1]!)) continue;
+    const day = marks.find((m) => at(m) > edges[i]! && at(m) < edges[i + 1]!);
+    if (day != null) ticks.push({ x: at(day), month: new Date(day * 86_400_000).toISOString().slice(0, 7), line: false });
+  }
+  ticks.sort((p, q) => p.x - q.x);
   const undated = k.lessons.filter((l) => !l.released);
   return {
     rows,
     ticks,
+    breaks: breaks.map((p) => p / length),
     measured: x(k.measuredAt),
     /** The dated lessons' first and last day, for the chart's words. */
     first: dated[0]!.released!,

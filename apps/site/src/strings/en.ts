@@ -170,7 +170,6 @@ export const en = {
       heading: "What each model knows, lesson by lesson",
       caption: (lessons: number) =>
         `One square per lesson (${lessons}). Filled: the model answered the change right both times, with no tools. Empty: it didn't. Dotted: not measured yet.`,
-      legend: { knows: "knows", misses: "doesn't know", none: "not measured" },
       count: "measured lessons it doesn't know",
       notMeasured: (n: number) => (n === 1 ? "1 lesson not measured" : `${n} lessons not measured`),
       summary: (name: string, misses: number, measured: number, none: number) =>
@@ -181,7 +180,6 @@ export const en = {
     },
     lift: {
       heading: "In a project, with and without ludion sync",
-      share: "answered right",
       points: "points",
       difference: (from: string, to: string) => `Difference between ${from} and ${to}, in percentage points.`,
       bar: (label: string, correct: number, total: number, low: string, high: string) =>
@@ -192,13 +190,14 @@ export const en = {
     dates: {
       heading: "Knowledge dates",
       caption:
-        "Each dot is a lesson, placed on the day npm published the first version it is about. Filled: the model knows it. Hollow: it doesn't. Dotted: not measured.",
+        "Each dot is a lesson, placed on the day npm published the first version it is about. Filled: the model knows it. Hollow: it doesn't. Dotted: not measured. The gray band is a model's reliable knowledge cutoff, where its maker publishes one.",
       cutoff: (month: string) => `Reliable knowledge cutoff, ${month}`,
       cutoffSource: "Cutoffs as Anthropic's model overview publishes them",
       measured: "Measured",
       notNpm: (n: number) => (n === 1 ? "1 lesson isn't about an npm package and has no date here." : `${n} lessons aren't about an npm package and have no date here.`),
       unfetched: (n: number) => (n === 1 ? "1 lesson is for a version whose date hasn't been fetched yet." : `${n} lessons are for versions whose dates haven't been fetched yet.`),
       source: "Publish dates from the npm registry",
+      span: (n: number, first: string, last: string) => `${n} lessons are dated, from ${first} to ${last}.`,
       summary: (name: string, cutoff: string | null) => `${name}${cutoff ? `, reliable knowledge cutoff ${cutoff}` : ""}`,
     },
     list: {

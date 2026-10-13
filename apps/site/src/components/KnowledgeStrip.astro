@@ -4,7 +4,7 @@
 // one hover or click away (each square shows its claim and opens its lesson). Beside it, the count of measured lessons
 // it doesn't know, with that share's 95% interval. Screen readers get one sentence instead of the squares; the
 // lesson list below the strips has every lesson as text.
-import type { KnownLesson, Strip } from "../build/knowledge.ts";
+import { plain, type KnownLesson, type Strip } from "../build/knowledge.ts";
 import { en } from "../strings/en.ts";
 
 interface Props {
@@ -23,9 +23,13 @@ const k = b.knowledge;
 const state = (l: KnownLesson) => l.verdicts[strip.model] ?? "none";
 const groups = [...new Set(lessons.map((l) => l.subject))].map((s) => lessons.filter((l) => l.subject === s));
 let i = 0;
+// The card is a fixed 1200×630: its squares shrink so the longest subject fits on one row and every subject's row
+// fits under the count (about 974 px across after the subject names, about 220 px down).
+const longest = Math.max(1, ...groups.map((g) => g.length));
+const cardSize = Math.max(8, Math.min(32, Math.floor(974 / longest) - 5, Math.floor(220 / Math.max(1, groups.length)) - 9));
 ---
 
-<div class:list={["strip", size]} style={`--delay:${delay}ms`}>
+<div class:list={["strip", size]} style={`--delay:${delay}ms${size === "card" ? `;--s:${cardSize}px` : ""}`}>
   <div class="head">
     <p class="name">{link ? <a href={`/bench/${strip.model}/`}>{strip.name}</a> : strip.name}</p>
     <p class="count" aria-hidden="true">
@@ -50,7 +54,7 @@ let i = 0;
               href={`/lessons/${l.id}/`}
               tabindex="-1"
               style={`--i:${i++}`}
-              data-tip={`${l.sentence}\n${l.subject}/ · ${k.tip[state(l)]}`}
+              data-tip={`${plain(l.sentence)}\n${l.subject}/ · ${k.tip[state(l)]}${l.drafted ? ` · ${en.lesson.draftedAlone}` : ""}`}
             />
           ))}
         </span>
@@ -198,7 +202,6 @@ let i = 0;
   }
 
   .card {
-    --s: 32px;
     grid-template-columns: 1fr;
     border-top: 0;
     padding: 0;

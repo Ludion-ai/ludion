@@ -19,7 +19,8 @@ export interface ReleaseDates {
   /** "<package>@<version>" → when npm published it (ISO). */
   versions: Record<string, string>;
   /** Model id → its published knowledge cutoff (YYYY-MM) and where it is published. */
-  cutoffs: Record<string, { month: string; url: string; row: string; checked_at: string }>;
+  /** The page's row as it reads there (`quote`) and its definition of the term, so it can be checked offline. */
+  cutoffs: Record<string, { month: string; url: string; row: string; quote: string; definition: string; checked_at: string }>;
 }
 
 export function readReleaseDates(root: string): ReleaseDates | null {
@@ -34,6 +35,14 @@ export interface KnownLesson {
   versions: string;
   kind: string | null;
   signal: "loud" | "silent" | null;
+  /**
+   * Shown as silent: the signal is silent and the lesson isn't an addition. The claim says "Silent: code written for
+   * older versions still runs" only then (generateClaim); for an addition the evidence shows only that older versions
+   * lack it.
+   */
+  silent: boolean;
+  /** Drafted by an agent (a seed lesson), labeled wherever it appears. */
+  drafted: boolean;
   /** The claim's first sentence. */
   sentence: string;
   /** When npm published the lowest version the range admits (YYYY-MM-DD), if it is an npm package and known. */
@@ -59,17 +68,24 @@ export interface Knowledge {
   measuredAt: string | null;
 }
 
-/** The first sentence of a claim: up to the first ". " outside a code span. */
+/**
+ * The first sentence of a claim: up to the first period outside a code span that ends the text or is followed by a
+ * space, unless it ends an abbreviation ("e.g. this" goes on). A generated claim's detail may start with a symbol in
+ * lower case, so what follows the space isn't checked.
+ */
 export function firstSentence(claim: string): string {
   let code = false;
   for (let i = 0; i < claim.length; i++) {
     if (claim[i] === "`") code = !code;
-    else if (!code && claim[i] === "." && (i + 1 === claim.length || claim[i + 1] === " ")) return claim.slice(0, i + 1);
+    else if (!code && claim[i] === "." && (i + 1 === claim.length || claim[i + 1] === " ") && !/\b(e\.g|i\.e|vs|cf)$/i.test(claim.slice(0, i))) return claim.slice(0, i + 1);
   }
   return claim;
 }
 
-type Entry = Index["lessons"][number] & { version?: string; kind?: string; signal?: "loud" | "silent"; package?: { ecosystem: string; name: string } };
+/** A claim sentence as plain text, for a tooltip: code spans lose their backticks. */
+export const plain = (text: string) => text.replace(/`/g, "");
+
+type Entry = Index["lessons"][number] & { version?: string; kind?: string; signal?: "loud" | "silent"; package?: { ecosystem: string; name: string }; drafted_by?: string };
 
 /** Every active lesson in subject order, then by version, with each model's verdict from models.json. */
 export function knowledge(index: Index, models: Models | null, dates: ReleaseDates | null): Knowledge {
@@ -83,6 +99,8 @@ export function knowledge(index: Index, models: Models | null, dates: ReleaseDat
       versions: l.version ?? "",
       kind: l.kind ?? null,
       signal: l.signal ?? null,
+      silent: l.signal === "silent" && l.kind !== "added",
+      drafted: l.drafted_by === "agent",
       sentence: firstSentence(l.claim),
       released: at ? at.slice(0, 10) : null,
       npm: l.package?.ecosystem === "npm",
@@ -144,5 +162,15 @@ export function dateAxis(k: Knowledge, dates: ReleaseDates | null) {
     ticks.push({ x: (d.getTime() / 86_400_000 - from) / (to - from), month: d.toISOString().slice(0, 7) });
   }
   const undated = k.lessons.filter((l) => !l.released);
-  return { rows, ticks, measured: x(k.measuredAt), notNpm: undated.filter((l) => !l.npm).length, unfetched: undated.filter((l) => l.npm).length };
+  return {
+    rows,
+    ticks,
+    measured: x(k.measuredAt),
+    /** The dated lessons' first and last day, for the chart's words. */
+    first: dated[0]!.released!,
+    last: dated.at(-1)!.released!,
+    dated: dated.length,
+    notNpm: undated.filter((l) => !l.npm).length,
+    unfetched: undated.filter((l) => l.npm).length,
+  };
 }

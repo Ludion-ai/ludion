@@ -45,9 +45,9 @@ const cutoffSource = axis?.rows.find((r) => r.cutoff)?.cutoff?.url;
             <Measured date={models.measured_at} /> <a href={`${repo}/tree/main/${models.bench}`}>{b.files}</a>
           </p>
           <p class="legend" aria-hidden="true">
-            <span><i class="key knows" />{b.knowledge.legend.knows}</span>
-            <span><i class="key misses" />{b.knowledge.legend.misses}</span>
-            <span><i class="key none" />{b.knowledge.legend.none}</span>
+            <span><i class="key knows" />{b.knowledge.tip.knows}</span>
+            <span><i class="key misses" />{b.knowledge.tip.misses}</span>
+            <span><i class="key none" />{b.knowledge.tip.none}</span>
           </p>
           <div class="strips">
             {k.strips.map((s, i) => <KnowledgeStrip strip={s} lessons={k.lessons} delay={i * 260} />)}
@@ -79,7 +79,7 @@ const cutoffSource = axis?.rows.find((r) => r.cutoff)?.cutoff?.url;
         <section aria-labelledby="dates">
           <h2 id="dates">{b.dates.heading}</h2>
           <p class="caption">{b.dates.caption}</p>
-          <KnowledgeDates axis={axis} labelledBy="dates" measuredAt={k.measuredAt!} />
+          <KnowledgeDates axis={axis} measuredAt={k.measuredAt!} />
           <p class="note">
             <a href={`${repo}/blob/main/docs/bench/release-dates.json`}>{b.dates.source}</a>
             {cutoffSource && (

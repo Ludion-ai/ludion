@@ -32,7 +32,7 @@ function wanted(): Map<string, Set<string>> {
 const previous = existsSync(out) ? (JSON.parse(readFileSync(out, "utf8")) as { cutoffs?: unknown }) : {};
 const versions: Record<string, string> = {};
 for (const [name, mins] of [...wanted()].sort(([a], [b]) => a.localeCompare(b))) {
-  const res = await fetch(`https://registry.npmjs.org/${encodeURIComponent(name).replace("%40", "@")}`, { headers: { "User-Agent": "ludion-site/release-dates" } });
+  const res = await fetch(`https://registry.npmjs.org/${encodeURIComponent(name).replace("%40", "@")}`, { headers: { "User-Agent": "ludion-site/release-dates" }, signal: AbortSignal.timeout(60_000) });
   if (!res.ok) throw new Error(`registry.npmjs.org/${name}: HTTP ${res.status}`);
   const time = ((await res.json()) as { time?: Record<string, string> }).time ?? {};
   for (const v of [...mins].sort(semver.compare)) {

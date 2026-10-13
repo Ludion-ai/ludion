@@ -1,7 +1,9 @@
 ---
-// Every active lesson as one line: subject, the versions it holds for, its kind, a mark if it is silent, the claim's
-// first sentence (a link to the lesson), and at the right each model's verdict without tools: a filled dot if it
-// knows, a ring if it doesn't, a dotted ring if not measured (the marks of the knowledge dates). Filters by subject, kind, and silent hide rows; without JavaScript every row shows.
+// Every active lesson as one line: subject, the versions it holds for, its kind, a mark if it is silent (never on an
+// addition, whose claim doesn't say so), "Drafted by an agent" on seed lessons, the claim's first sentence (a link to
+// the lesson), and at the right each model's verdict without tools: a filled dot if it knows, a ring if it doesn't, a
+// dotted ring if not measured (the marks of the knowledge dates). Filters by subject, kind, and silent hide rows;
+// without JavaScript every row shows.
 import type { Knowledge } from "../build/knowledge.ts";
 import Claim from "./Claim.astro";
 import { en } from "../strings/en.ts";
@@ -43,16 +45,17 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
 <ol class="list" aria-labelledby={labelledBy} style={`--models:${k.models.length}`}>
   {
     k.lessons.map((x) => (
-      <li data-subject={x.subject} data-kind={x.kind ?? ""} data-signal={x.signal ?? ""}>
+      <li data-subject={x.subject} data-kind={x.kind ?? ""} data-silent={x.silent ? "1" : ""}>
         <span class="meta">
           <span class="subject">{x.subject}/</span>
           {x.versions && <code class="chip">{x.versions}</code>}
           {x.kind && <span class="kind">{b.kind[x.kind] ?? x.kind}</span>}
-          {x.signal === "silent" && (
+          {x.silent && (
             <span class="silent" title={l.silentTitle}>
               {l.silent}
             </span>
           )}
+          {x.drafted && <span class="drafted">{en.lesson.draftedAlone}</span>}
         </span>
         <a class="claim" href={`/lessons/${x.id}/`}>
           <Claim text={x.sentence} />
@@ -88,7 +91,7 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
       const silent = form.has("silent");
       let shown = 0;
       for (const row of rows) {
-        const on = (!subject || row.dataset.subject === subject) && (!kind || row.dataset.kind === kind) && (!silent || row.dataset.signal === "silent");
+        const on = (!subject || row.dataset.subject === subject) && (!kind || row.dataset.kind === kind) && (!silent || row.dataset.silent === "1");
         row.hidden = !on;
         if (on) shown++;
       }
@@ -220,8 +223,12 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     color: var(--ink);
     white-space: nowrap;
   }
-  .kind {
+  .kind,
+  .drafted {
     color: var(--muted);
+  }
+  .drafted {
+    font-size: 12px;
   }
   .silent {
     font-size: 11px;

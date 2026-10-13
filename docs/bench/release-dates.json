@@ -30,21 +30,27 @@
   "cutoffs": {
     "claude-haiku-5-5": {
       "month": "2026-06",
-      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "url": "https://platform.claude.com/docs/en/models/overview",
       "row": "Reliable knowledge cutoff",
-      "checked_at": "2026-10-13"
+      "checked_at": "2026-10-13",
+      "quote": "Reliable knowledge cutoff | Jun 2026",
+      "definition": "Reliable knowledge cutoff: The date through which the model's knowledge is most extensive and reliable."
     },
     "claude-sonnet-5-5": {
       "month": "2026-06",
-      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "url": "https://platform.claude.com/docs/en/models/overview",
       "row": "Reliable knowledge cutoff",
-      "checked_at": "2026-10-13"
+      "checked_at": "2026-10-13",
+      "quote": "Reliable knowledge cutoff | Jun 2026",
+      "definition": "Reliable knowledge cutoff: The date through which the model's knowledge is most extensive and reliable."
     },
     "claude-opus-5-5": {
       "month": "2026-06",
-      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "url": "https://platform.claude.com/docs/en/models/overview",
       "row": "Reliable knowledge cutoff",
-      "checked_at": "2026-10-13"
+      "checked_at": "2026-10-13",
+      "quote": "Reliable knowledge cutoff | Jun 2026",
+      "definition": "Reliable knowledge cutoff: The date through which the model's knowledge is most extensive and reliable."
     }
   }
 }

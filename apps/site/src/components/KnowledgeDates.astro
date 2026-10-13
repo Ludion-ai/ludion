@@ -1,18 +1,18 @@
 ---
 // Knowledge dates: per model, a dot per lesson at the day npm published the first version it is about
 // (docs/bench/release-dates.json). Filled: the model knows it; hollow: it doesn't; dotted: not measured. A model's
-// knowledge cutoff is drawn as a band only where its maker publishes one (the file's `cutoffs`, each with its source).
+// knowledge cutoff is drawn as a band only where its maker publishes one (the file's `cutoffs`, each with its source):
+// one band across the chart when every model's is the same month, else one in each row that has one.
 // Dots on near days pack into short stacks around their day, so none covers another. Wide screens get a row per
 // model with time running right; narrow ones a column per model with time running down.
-import type { dateAxis } from "../build/knowledge.ts";
+import { plain, type dateAxis } from "../build/knowledge.ts";
 import { en, formatDate } from "../strings/en.ts";
 
 interface Props {
   axis: NonNullable<ReturnType<typeof dateAxis>>;
-  labelledBy: string;
   measuredAt: string;
 }
-const { axis, labelledBy, measuredAt } = Astro.props;
+const { axis, measuredAt } = Astro.props;
 const b = en.bench;
 const d = b.dates;
 const STEP = 11;
@@ -38,7 +38,7 @@ const cutoffs = new Set(axis.rows.map((r) => r.cutoff?.month ?? ""));
 const cutoff = cutoffs.size === 1 && axis.rows[0]?.cutoff ? axis.rows[0].cutoff : null;
 const short = (name: string) => name.replace(/^Claude\s+/, "");
 type Row = (typeof axis.rows)[number];
-const tip = (dot: Row["dots"][number]) => `${dot.lesson.sentence}\n${dot.lesson.subject}/ · ${formatDate(dot.lesson.released!)} · ${b.knowledge.tip[dot.verdict ?? "none"]}`;
+const tip = (dot: Row["dots"][number]) => `${plain(dot.lesson.sentence)}\n${dot.lesson.subject}/ · ${formatDate(dot.lesson.released!)} · ${b.knowledge.tip[dot.verdict ?? "none"]}${dot.lesson.drafted ? ` · ${en.lesson.draftedAlone}` : ""}`;
 
 // Wide: a row per model.
 const W = 1000;
@@ -62,7 +62,7 @@ const NL = 40;
 const NTOP = 30;
 const NLEN = 640;
 const COL = (NW - NL) / Math.max(1, axis.rows.length);
-const NLEVELS = Math.floor((COL - 10) / STEP);
+const NLEVELS = Math.max(1, Math.floor((COL - 10) / STEP));
 const py = (x: number) => NTOP + x * NLEN;
 const cols = axis.rows.map((row, i) => {
   const left = NL + i * COL + 6;
@@ -72,7 +72,7 @@ const cols = axis.rows.map((row, i) => {
 const NH = NTOP + NLEN + 26;
 ---
 
-<div class="scroll wide" role="region" aria-labelledby={labelledBy} tabindex="0">
+<div class="wide">
   <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} aria-hidden="true">
     {cutoff && <rect class="cutoff" x={px(cutoff.from)} width={px(cutoff.to) - px(cutoff.from)} y={TOP - 8} height={BOTTOM - TOP + 8} />}
     {axis.ticks.map((t, i) => (
@@ -83,6 +83,7 @@ const NH = NTOP + NLEN + 26;
     ))}
     {rows.map((r) => (
       <g>
+        {r.cutoff && !cutoff && <rect class="cutoff" x={px(r.cutoff.from)} width={px(r.cutoff.to) - px(r.cutoff.from)} y={r.base - ROW + 18} height={ROW - 8} />}
         <line class="base" x1={L} x2={R} y1={r.base + 7} y2={r.base + 7} />
         <text class="model" x="0" y={r.base + 4}>{r.name}</text>
         {r.dots.map((dot) => (
@@ -110,6 +111,7 @@ const NH = NTOP + NLEN + 26;
     ))}
     {cols.map((c) => (
       <g>
+        {c.cutoff && !cutoff && <rect class="cutoff" x={c.left - 6} width={COL} y={py(c.cutoff.from)} height={py(c.cutoff.to) - py(c.cutoff.from)} />}
         <text class="model" x={c.left} y={NTOP - 12}>{short(c.name)}</text>
         {c.dots.map((dot) => (
           <a href={`/lessons/${dot.lesson.id}/`} tabindex="-1" data-tip={tip(dot)}>
@@ -123,14 +125,10 @@ const NH = NTOP + NLEN + 26;
   </svg>
 </div>
 <p class="visually-hidden">
-  {axis.rows.map((r) => d.summary(r.name, r.cutoff ? b.month(r.cutoff.month) : null)).join("; ")}.
+  {d.span(axis.dated, formatDate(axis.first), formatDate(axis.last))} {axis.rows.map((r) => d.summary(r.name, r.cutoff ? b.month(r.cutoff.month) : null)).join("; ")}.
 </p>
 
 <style>
-  .scroll {
-    position: relative;
-    overflow-x: auto;
-  }
   svg {
     display: block;
     width: 100%;
@@ -140,8 +138,10 @@ const NH = NTOP + NLEN + 26;
   }
   .narrow {
     display: none;
+    max-width: 420px;
   }
-  @media (max-width: 640px) {
+  /* Below this the wide chart's labels would shrink past reading size. */
+  @media (max-width: 860px) {
     .wide {
       display: none;
     }

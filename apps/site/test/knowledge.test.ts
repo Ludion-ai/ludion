@@ -21,6 +21,8 @@ describe("firstSentence", () => {
     expect(firstSentence("wrangler >=4.1.0 changed what `x. y` does. Now it doesn't.")).toBe("wrangler >=4.1.0 changed what `x. y` does.");
     expect(firstSentence("vitest >=5.0.0 added `vi.when`.")).toBe("vitest >=5.0.0 added `vi.when`.");
     expect(firstSentence("No period")).toBe("No period");
+    expect(firstSentence("agents >=0.22.0 changed the default of `throttle`. useAgentChat now coalesces.")).toBe("agents >=0.22.0 changed the default of `throttle`.");
+    expect(firstSentence("Python 3.12 removed it, e.g. from the stdlib. Use this.")).toBe("Python 3.12 removed it, e.g. from the stdlib.");
   });
 });
 
@@ -40,6 +42,15 @@ describe("the knowledge strips", () => {
       { model: "b", name: "Model B", misses: expect.objectContaining({ correct: 1, total: 1 }), knows: 0, notMeasured: 2 },
     ]);
     expect(k.lessons.find((l) => l.id === "L2")!.verdicts).toEqual({ a: "misses", b: null });
+  });
+
+  it("mark a lesson silent only when its claim says so (never an addition), and label agent drafts", () => {
+    const k = knowledge({ ...index, lessons: [entry("S", "x", ">=1.0.0", { drafted_by: "agent" }), entry("A", "x", ">=1.1.0", { kind: "added" }), entry("L", "x", ">=1.2.0", { signal: "loud" })] }, only, null);
+    expect(k.lessons.map((l) => [l.id, l.silent, l.drafted])).toEqual([
+      ["S", true, true],
+      ["A", false, false],
+      ["L", false, false],
+    ]);
   });
 
   it("are all not measured before any run", () => {
@@ -64,6 +75,26 @@ describe("the knowledge strips", () => {
   });
 });
 
+describe("--mark", () => {
+  // WCAG relative luminance and contrast ratio.
+  const lum = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+  };
+  const ratio = (a: string, b: string) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  const css = readFileSync(join(root, "apps/site/src/styles/tokens.css"), "utf8");
+  const dark = css.slice(css.indexOf("prefers-color-scheme: dark"));
+  const token = (block: string, name: string) => new RegExp(String.raw`--${name}:\s*(#[0-9a-f]{6})`).exec(block)![1]!;
+
+  it.each([
+    ["light", css],
+    ["dark", dark],
+  ])("stands out from the page and its panels in %s (3:1 for marks), as does not measured", (_, block) => {
+    for (const bg of ["paper", "paper-2"]) expect(ratio(token(block, "mark"), token(block, bg)), bg).toBeGreaterThanOrEqual(3);
+    expect(ratio(token(block, "checking-line"), token(block, "paper"))).toBeGreaterThanOrEqual(3);
+  });
+});
+
 describe("docs/bench/release-dates.json", () => {
   it("has a registry time for each version, and a cutoff only with its published source", () => {
     for (const [key, at] of Object.entries(dates.versions)) {
@@ -74,7 +105,8 @@ describe("docs/bench/release-dates.json", () => {
       expect(models.models[model], model).toBeDefined();
       expect(c.month).toMatch(/^\d{4}-\d{2}$/);
       expect(c.url).toMatch(/^https:\/\/(platform\.claude\.com|docs\.claude\.com|www\.anthropic\.com)\//);
-      expect(c.row).toBeTruthy();
+      expect(c.quote.startsWith(`${c.row} | `)).toBe(true);
+      expect(c.definition.startsWith(`${c.row}: `)).toBe(true);
     }
   });
 

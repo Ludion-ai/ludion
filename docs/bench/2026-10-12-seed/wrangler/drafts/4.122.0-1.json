@@ -1,0 +1,33 @@
+{
+  "entry": "4.122.0#1",
+  "verdict": {
+    "id": "4.122.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "nodejs_compat",
+    "why": "Node.js compatibility is now detected from the compatibility date (2026-08-04+) without the flag, changing bundler polyfills and process.env handling."
+  },
+  "cost_usd": 0.2200217,
+  "turns": 13,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.122.0",
+    "kind": "behavior",
+    "symbol": "no_nodejs_compat no_nodejs_compat_v2",
+    "signal": "silent",
+    "detail": "To keep Node.js compatibility switched off on a newer compatibility date, specify both no_nodejs_compat and no_nodejs_compat_v2",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.122.0/packages/wrangler/CHANGELOG.md",
+          "quote": "To keep Node.js compatibility switched off on a newer compatibility date, specify both `no_nodejs_compat` and `no_nodejs_compat_v2`, since each flag has its own default."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

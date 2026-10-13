@@ -1,0 +1,57 @@
+{
+  "rounds": [
+    [
+      {
+        "id": "01M4RAVZ6AW3ZB9PASXP4454AY",
+        "entry": "4.113.0#10",
+        "status": "passed",
+        "reasons": []
+      },
+      {
+        "id": "01M4RAVZ6G853RNZY4QB6F1G7X",
+        "entry": "4.116.0#1",
+        "status": "passed",
+        "reasons": []
+      },
+      {
+        "id": "01M4RAVZ72604WDVTB2P1JTMMD",
+        "entry": "4.126.0#5",
+        "status": "passed",
+        "reasons": []
+      },
+      {
+        "id": "01M4RAVZ76G38BBZ7RQT49B4P4",
+        "entry": "4.129.1#4",
+        "status": "passed",
+        "reasons": []
+      },
+      {
+        "id": "01M4RAVZ79Z20ZYK86PFYA726C",
+        "entry": "4.131.1#2",
+        "status": "passed",
+        "reasons": []
+      },
+      {
+        "id": "01M4RAVZ7BYR42Z6KY16WPT12Q",
+        "entry": "4.136.0#5",
+        "status": "failed",
+        "reasons": [
+          "evidence 2 (node@24 wrangler@4.135.0): The test failed, but its output does not contain \"FAIL: stdout is not structured JSON with an error\". It must fail for the reason the lesson names.\nERROR: did not reach the missing previews block path: \n\u001b[32mIf you think this is a bug then please create an issue at https://github.com/cloudflare/workers-sdk/issues/new/choose\u001b[0m\n\n\u001b[33m▲ \u001b[43;33m[\u001b[43;30mWARNING\u001b[43;33m]\u001b[0m \u001b[1mA fetch request failed, likely due to a connectivity issue.\u001b[0m\n\n  \n  Common causes:\n    - No internet connection or network connectivity problems\n    - Firewall or VPN blocking the request\n    - Network proxy configuration issues\n  \n  Please check your network connection and try again.\n\n\n\u001b[31m✘ \u001b[41;31m[\u001b[41;97mERROR\u001b[4",
+          "evidence 1 (node@24 wrangler@4.136.0): The test exited with code 2, so the fact did not hold.\nERROR: did not reach the missing previews block path: \n\u001b[32mIf you think this is a bug then please create an issue at https://github.com/cloudflare/workers-sdk/issues/new/choose\u001b[0m\n\n\u001b[33m▲ \u001b[43;33m[\u001b[43;30mWARNING\u001b[43;33m]\u001b[0m \u001b[1mA fetch request failed, likely due to a connectivity issue.\u001b[0m\n\n  \n  Common causes:\n    - No internet connection or network connectivity problems\n    - Firewall or VPN blocking the request\n    - Network proxy configuration issues\n  \n  Please check your network connection and try again.\n\n\n\u001b[31m✘ \u001b[41;31m[\u001b[41;97mERROR\u001b[4"
+        ]
+      },
+      {
+        "id": "01M4RAVZ7GWT4TNAG20EYZ2SFB",
+        "entry": "4.148.0#12",
+        "status": "passed",
+        "reasons": []
+      },
+      {
+        "id": "01M4RAVZ7JRFR0Q9ZJ1F2VNWMW",
+        "entry": "4.148.0#9",
+        "status": "passed",
+        "reasons": []
+      }
+    ]
+  ]
+}

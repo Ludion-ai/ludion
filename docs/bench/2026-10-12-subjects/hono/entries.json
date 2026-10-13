@@ -1,0 +1,2441 @@
+[
+  {
+    "id": "4.12.13#1",
+    "version": "4.12.13",
+    "date": "2026-04-15T05:27:10.333Z",
+    "section": "What s Changed",
+    "text": "* fix(types): infer response type from last handler in app.on 9-/10-handler overloads by @T4ko0522 in https://github.com/honojs/hono/pull/4865",
+    "refs": [
+      4865
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.13"
+  },
+  {
+    "id": "4.12.13#2",
+    "version": "4.12.13",
+    "date": "2026-04-15T05:27:10.333Z",
+    "section": "What s Changed",
+    "text": "* feat(trailing-slash): add `skip` option by @yusukebe in https://github.com/honojs/hono/pull/4862",
+    "refs": [
+      4862
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.13"
+  },
+  {
+    "id": "4.12.13#3",
+    "version": "4.12.13",
+    "date": "2026-04-15T05:27:10.333Z",
+    "section": "What s Changed",
+    "text": "* feat(cache): add `onCacheNotAvailable` option by @yusukebe in https://github.com/honojs/hono/pull/4876",
+    "refs": [
+      4876
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.13"
+  },
+  {
+    "id": "4.12.13#4",
+    "version": "4.12.13",
+    "date": "2026-04-15T05:27:10.333Z",
+    "section": "New Contributors",
+    "text": "* @T4ko0522 made their first contribution in https://github.com/honojs/hono/pull/4865",
+    "refs": [
+      4865
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.13"
+  },
+  {
+    "id": "4.12.14#1",
+    "version": "4.12.14",
+    "date": "2026-04-15T06:13:54.430Z",
+    "section": "Other changes",
+    "text": "- fix(aws-lambda): handle invalid header names in request processing (#4883)  fa2c74fe",
+    "refs": [
+      4883
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.14"
+  },
+  {
+    "id": "4.12.15#1",
+    "version": "4.12.15",
+    "date": "2026-04-24T06:51:10.290Z",
+    "section": "What s Changed",
+    "text": "* fix(jwt): support single-line PEM keys by @hiendv in https://github.com/honojs/hono/pull/4889",
+    "refs": [
+      4889
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.15"
+  },
+  {
+    "id": "4.12.15#2",
+    "version": "4.12.15",
+    "date": "2026-04-24T06:51:10.290Z",
+    "section": "New Contributors",
+    "text": "* @hiendv made their first contribution in https://github.com/honojs/hono/pull/4889",
+    "refs": [
+      4889
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.15"
+  },
+  {
+    "id": "4.12.17#1",
+    "version": "4.12.17",
+    "date": "2026-05-05T09:30:51.600Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx): normalize SVG attributes on the <svg> root element by @kfly8 in https://github.com/honojs/hono/pull/4893",
+    "refs": [
+      4893
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.17"
+  },
+  {
+    "id": "4.12.17#2",
+    "version": "4.12.17",
+    "date": "2026-05-05T09:30:51.600Z",
+    "section": "What s Changed",
+    "text": "* fix(ssg): add `atom+xml` and `rss+xml` to `defaultExtensionMap` by @yuintei in https://github.com/honojs/hono/pull/4899",
+    "refs": [
+      4899
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.17"
+  },
+  {
+    "id": "4.12.17#3",
+    "version": "4.12.17",
+    "date": "2026-05-05T09:30:51.600Z",
+    "section": "What s Changed",
+    "text": "* fix(cors): make origin optional in CORSOptions by @truffle-dev in https://github.com/honojs/hono/pull/4905",
+    "refs": [
+      4905
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.17"
+  },
+  {
+    "id": "4.12.17#4",
+    "version": "4.12.17",
+    "date": "2026-05-05T09:30:51.600Z",
+    "section": "What s Changed",
+    "text": "* fix(types): propagate middleware response types to app.on overloads by @T4ko0522 in https://github.com/honojs/hono/pull/4906",
+    "refs": [
+      4906
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.17"
+  },
+  {
+    "id": "4.12.17#5",
+    "version": "4.12.17",
+    "date": "2026-05-05T09:30:51.600Z",
+    "section": "New Contributors",
+    "text": "* @kfly8 made their first contribution in https://github.com/honojs/hono/pull/4893",
+    "refs": [
+      4893
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.17"
+  },
+  {
+    "id": "4.12.17#6",
+    "version": "4.12.17",
+    "date": "2026-05-05T09:30:51.600Z",
+    "section": "New Contributors",
+    "text": "* @truffle-dev made their first contribution in https://github.com/honojs/hono/pull/4905",
+    "refs": [
+      4905
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.17"
+  },
+  {
+    "id": "4.12.19#1",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "What s Changed",
+    "text": "* ci: pin GitHub Actions to SHAs by @yusukebe in https://github.com/honojs/hono/pull/4932",
+    "refs": [
+      4932
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.19#2",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "What s Changed",
+    "text": "* fix(serveStatic): make options parameter optional in all adapters by @mixelburg in https://github.com/honojs/hono/pull/4934",
+    "refs": [
+      4934
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.19#3",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "What s Changed",
+    "text": "* fix(cookie): return the first cookie when there are multiple cookies with the same name by @usualoma in https://github.com/honojs/hono/pull/4922",
+    "refs": [
+      4922
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.19#4",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "What s Changed",
+    "text": "* feat(bearer-auth): make bearerAuth generic for typed context in verifyToken by @justinnais in https://github.com/honojs/hono/pull/4913",
+    "refs": [
+      4913
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.19#5",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "What s Changed",
+    "text": "* feat(cache): key cache entries by configured vary headers by @usualoma in https://github.com/honojs/hono/pull/4915",
+    "refs": [
+      4915
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.19#6",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "What s Changed",
+    "text": "* feat(request): add `bytes()` by @yusukebe in https://github.com/honojs/hono/pull/4921",
+    "refs": [
+      4921
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.19#7",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "What s Changed",
+    "text": "* fix(stream): upgrade `@hono/node-server` to v2 and fix abort handling by @yusukebe in https://github.com/honojs/hono/pull/4940",
+    "refs": [
+      4940
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.19#8",
+    "version": "4.12.19",
+    "date": "2026-05-16T10:16:56.558Z",
+    "section": "New Contributors",
+    "text": "* @justinnais made their first contribution in https://github.com/honojs/hono/pull/4913",
+    "refs": [
+      4913
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.19"
+  },
+  {
+    "id": "4.12.20#1",
+    "version": "4.12.20",
+    "date": "2026-05-19T10:41:17.493Z",
+    "section": "What s Changed",
+    "text": "* fix(route): preserve the base path of the mounted route() app by @usualoma in https://github.com/honojs/hono/pull/4942",
+    "refs": [
+      4942
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.20"
+  },
+  {
+    "id": "4.12.20#2",
+    "version": "4.12.20",
+    "date": "2026-05-19T10:41:17.493Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx): widen jsx and jsxFn children to Child[] by @ashunar0 in https://github.com/honojs/hono/pull/4947",
+    "refs": [
+      4947
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.20"
+  },
+  {
+    "id": "4.12.20#3",
+    "version": "4.12.20",
+    "date": "2026-05-19T10:41:17.493Z",
+    "section": "New Contributors",
+    "text": "* @ashunar0 made their first contribution in https://github.com/honojs/hono/pull/4947",
+    "refs": [
+      4947
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.20"
+  },
+  {
+    "id": "4.12.22#1",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "What s Changed",
+    "text": "* chore: update vitest to v4 and cleanups by @BlankParticle in https://github.com/honojs/hono/pull/4952",
+    "refs": [
+      4952
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#2",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "What s Changed",
+    "text": "* fix(mime): specify charset parameter per MIME type instead of mechanical detection by @renatograsso10 in https://github.com/honojs/hono/pull/4912",
+    "refs": [
+      4912
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#3",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "What s Changed",
+    "text": "* fix(compress): respect Accept-Encoding when encoding option is set by @LeSingh1 in https://github.com/honojs/hono/pull/4951",
+    "refs": [
+      4951
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#4",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "What s Changed",
+    "text": "* fix(deno): echo negotiated WebSocket subprotocol in upgrade response by @ATOM00blue in https://github.com/honojs/hono/pull/4955",
+    "refs": [
+      4955
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#5",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "What s Changed",
+    "text": "* feat: add msgpack as a compressible content type by @na-trium-144 in https://github.com/honojs/hono/pull/4957",
+    "refs": [
+      4957
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#6",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "New Contributors",
+    "text": "* @renatograsso10 made their first contribution in https://github.com/honojs/hono/pull/4912",
+    "refs": [
+      4912
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#7",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "New Contributors",
+    "text": "* @LeSingh1 made their first contribution in https://github.com/honojs/hono/pull/4951",
+    "refs": [
+      4951
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#8",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "New Contributors",
+    "text": "* @ATOM00blue made their first contribution in https://github.com/honojs/hono/pull/4955",
+    "refs": [
+      4955
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.22#9",
+    "version": "4.12.22",
+    "date": "2026-05-22T09:15:53.204Z",
+    "section": "New Contributors",
+    "text": "* @na-trium-144 made their first contribution in https://github.com/honojs/hono/pull/4957",
+    "refs": [
+      4957
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.22"
+  },
+  {
+    "id": "4.12.23#1",
+    "version": "4.12.23",
+    "date": "2026-05-25T01:59:47.698Z",
+    "section": "What s Changed",
+    "text": "* fix(serve-static): normalize all backslashes in file paths, not just the first in https://github.com/honojs/hono/pull/4962",
+    "refs": [
+      4962
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.23"
+  },
+  {
+    "id": "4.12.23#2",
+    "version": "4.12.23",
+    "date": "2026-05-25T01:59:47.698Z",
+    "section": "What s Changed",
+    "text": "* feat(context): export the Context class publicly by @BlankParticle in https://github.com/honojs/hono/pull/4543",
+    "refs": [
+      4543
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.23"
+  },
+  {
+    "id": "4.12.23#3",
+    "version": "4.12.23",
+    "date": "2026-05-25T01:59:47.698Z",
+    "section": "What s Changed",
+    "text": "* docs(contribution): add AI Usage Policy by @yusukebe in https://github.com/honojs/hono/pull/4970",
+    "refs": [
+      4970
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.23"
+  },
+  {
+    "id": "4.12.23#4",
+    "version": "4.12.23",
+    "date": "2026-05-25T01:59:47.698Z",
+    "section": "What s Changed",
+    "text": "* feat(compress): add contentTypeFilter option and `COMPRESSIBLE_CONTENT_TYPE_REGEX` re-export by @na-trium-144 in https://github.com/honojs/hono/pull/4961",
+    "refs": [
+      4961
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.23"
+  },
+  {
+    "id": "4.12.23#5",
+    "version": "4.12.23",
+    "date": "2026-05-25T01:59:47.698Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/ipaddr): do not compress a single 0 group to `::` by @yusukebe in https://github.com/honojs/hono/pull/4971",
+    "refs": [
+      4971
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.23"
+  },
+  {
+    "id": "4.12.24#1",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* docs(contribution): simplifyAI Usage Policy by @yusukebe in https://github.com/honojs/hono/pull/4972",
+    "refs": [
+      4972
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.24#2",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* chore: remove @types/glob by @rtritto in https://github.com/honojs/hono/pull/4978",
+    "refs": [
+      4978
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.24#3",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* fix(bearer-auth): mention verifyToken in missing-options error message by @tan7vir in https://github.com/honojs/hono/pull/4987",
+    "refs": [
+      4987
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.24#4",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* refactor(language): Test/improve tests on languages middleware by @iNeoO in https://github.com/honojs/hono/pull/4980",
+    "refs": [
+      4980
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.24#5",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/ipaddr): expand \"::\" to eight zero groups by @youcefzemmar in https://github.com/honojs/hono/pull/4973",
+    "refs": [
+      4973
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.24#6",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* fix: clean up config files trailing comma, stale excludes, typesVersions gaps, jsr paths by @Mohammad-Faiz-Cloud-Engineer in https://github.com/honojs/hono/pull/4982",
+    "refs": [
+      4982
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.24#7",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* refactor(timing): Test/add test for middleware timing by @iNeoO in https://github.com/honojs/hono/pull/4991",
+    "refs": [
+      4991
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.24#8",
+    "version": "4.12.24",
+    "date": "2026-06-08T11:16:06.860Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/ipaddr): render the unspecified address binary as \"::\" by @sarathfrancis90 in https://github.com/honojs/hono/pull/4998",
+    "refs": [
+      4998
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.24"
+  },
+  {
+    "id": "4.12.26#1",
+    "version": "4.12.26",
+    "date": "2026-06-18T02:18:42.144Z",
+    "section": "What s Changed",
+    "text": "* fix(lambda-edge): satisfy Deno lib types for Content-Length body encoding by @yusukebe in https://github.com/honojs/hono/pull/5013",
+    "refs": [
+      5013
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.26"
+  },
+  {
+    "id": "4.12.26#2",
+    "version": "4.12.26",
+    "date": "2026-06-18T02:18:42.144Z",
+    "section": "What s Changed",
+    "text": "* ci: publish to npm from CI with OIDC trusted publishing by @yusukebe in https://github.com/honojs/hono/pull/5028",
+    "refs": [
+      5028
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.26"
+  },
+  {
+    "id": "4.12.26#3",
+    "version": "4.12.26",
+    "date": "2026-06-18T02:18:42.144Z",
+    "section": "What s Changed",
+    "text": "* chore: remove unused devcontainer and gitpod configs by @yusukebe in https://github.com/honojs/hono/pull/5029",
+    "refs": [
+      5029
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.26"
+  },
+  {
+    "id": "4.12.26#4",
+    "version": "4.12.26",
+    "date": "2026-06-18T02:18:42.144Z",
+    "section": "What s Changed",
+    "text": "* chore: replace arg and glob with Bun native APIs in build script by @yusukebe in https://github.com/honojs/hono/pull/5030",
+    "refs": [
+      5030
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.26"
+  },
+  {
+    "id": "4.12.28#1",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* fix(serve-static): treat empty string content as found by @yusukebe in https://github.com/honojs/hono/pull/5062",
+    "refs": [
+      5062
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#2",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* docs(MIGRATION): fix req.raw.headers reference (property, not method) by @EduardF1 in https://github.com/honojs/hono/pull/5047",
+    "refs": [
+      5047
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#3",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* chore: don't publish `*.tsbuildinfo` by @yusukebe in https://github.com/honojs/hono/pull/5066",
+    "refs": [
+      5066
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#4",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/body,validator): normalize Content-Type media type for case-insensitive matching by @yusukebe in https://github.com/honojs/hono/pull/5067",
+    "refs": [
+      5067
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#5",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* fix: avoid circular dependency between body.ts and request.ts by @usualoma in https://github.com/honojs/hono/pull/5071",
+    "refs": [
+      5071
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#6",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* fix(bun): report the requested subprotocol on WSContext.protocol by @greymoth-jp in https://github.com/honojs/hono/pull/5059",
+    "refs": [
+      5059
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#7",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* chore: bump `devDependencies` by @yusukebe in https://github.com/honojs/hono/pull/5085",
+    "refs": [
+      5085
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#8",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* fix(aws-lambda): detect V2 events by request context, not rawPath alone by @VihaanAgarwal in https://github.com/honojs/hono/pull/5033",
+    "refs": [
+      5033
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#9",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "What s Changed",
+    "text": "* docs(context-storage): fix JSDoc by @yusukebe in https://github.com/honojs/hono/pull/5086",
+    "refs": [
+      5086
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#10",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "New Contributors",
+    "text": "* @EduardF1 made their first contribution in https://github.com/honojs/hono/pull/5047",
+    "refs": [
+      5047
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#11",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "New Contributors",
+    "text": "* @greymoth-jp made their first contribution in https://github.com/honojs/hono/pull/5059",
+    "refs": [
+      5059
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.28#12",
+    "version": "4.12.28",
+    "date": "2026-07-06T10:07:44.332Z",
+    "section": "New Contributors",
+    "text": "* @VihaanAgarwal made their first contribution in https://github.com/honojs/hono/pull/5033",
+    "refs": [
+      5033
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.28"
+  },
+  {
+    "id": "4.12.29#1",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* fix(client): merge function headers with per-request headers by @yusukebe in https://github.com/honojs/hono/pull/5092",
+    "refs": [
+      5092
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#2",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* chore: fix no-op tsc in test script by @yusukebe in https://github.com/honojs/hono/pull/5093",
+    "refs": [
+      5093
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#3",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* fix(lambda-edge): resolve the handler with the value passed to the callback by @yusukebe in https://github.com/honojs/hono/pull/5094",
+    "refs": [
+      5094
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#4",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* docs(language): add JSDoc @example to languageDetector by @codebybilal18 in https://github.com/honojs/hono/pull/5081",
+    "refs": [
+      5081
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#5",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* test(workerd): add `compatibilityDate` by @yusukebe in https://github.com/honojs/hono/pull/5100",
+    "refs": [
+      5100
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#6",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* fix(lambda-edge): base64 encode content-encoded response bodies by @yusukebe in https://github.com/honojs/hono/pull/5099",
+    "refs": [
+      5099
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#7",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* fix(aws-lambda): treat any non-identity content-encoding as binary by @yusukebe in https://github.com/honojs/hono/pull/5101",
+    "refs": [
+      5101
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#8",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* fix(types): strip extra properties from array types in JSONParsed by @Arman-Luthra in https://github.com/honojs/hono/pull/5103",
+    "refs": [
+      5103
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#9",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* fix(trie-router): match empty wildcard remainder after regexp param by @usualoma in https://github.com/honojs/hono/pull/5102",
+    "refs": [
+      5102
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#10",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): treat If-None-Match: `*` as a match by @yusukebe in https://github.com/honojs/hono/pull/5084",
+    "refs": [
+      5084
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#11",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "New Contributors",
+    "text": "* @codebybilal18 made their first contribution in https://github.com/honojs/hono/pull/5081",
+    "refs": [
+      5081
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.29#12",
+    "version": "4.12.29",
+    "date": "2026-07-10T09:33:20.054Z",
+    "section": "New Contributors",
+    "text": "* @Arman-Luthra made their first contribution in https://github.com/honojs/hono/pull/5103",
+    "refs": [
+      5103
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.29"
+  },
+  {
+    "id": "4.12.30#1",
+    "version": "4.12.30",
+    "date": "2026-07-13T00:35:49.419Z",
+    "section": "What s Changed",
+    "text": "* chore(benchmark/routers): bump deps in https://github.com/honojs/hono/pull/5107",
+    "refs": [
+      5107
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.30"
+  },
+  {
+    "id": "4.12.30#2",
+    "version": "4.12.30",
+    "date": "2026-07-13T00:35:49.419Z",
+    "section": "What s Changed",
+    "text": "* chore(benchmark): remove not used benchmarks in https://github.com/honojs/hono/pull/5108",
+    "refs": [
+      5108
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.30"
+  },
+  {
+    "id": "4.12.30#3",
+    "version": "4.12.30",
+    "date": "2026-07-13T00:35:49.419Z",
+    "section": "What s Changed",
+    "text": "* chore: update to ts6 in prep for ts7 in https://github.com/honojs/hono/pull/5104",
+    "refs": [
+      5104
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.30"
+  },
+  {
+    "id": "4.12.30#4",
+    "version": "4.12.30",
+    "date": "2026-07-13T00:35:49.419Z",
+    "section": "What s Changed",
+    "text": "* fix(cache): deduplicate Cache-Control directives case-insensitively in https://github.com/honojs/hono/pull/5025",
+    "refs": [
+      5025
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.30"
+  },
+  {
+    "id": "4.12.30#5",
+    "version": "4.12.30",
+    "date": "2026-07-13T00:35:49.419Z",
+    "section": "What s Changed",
+    "text": "* fix(compress): do not compress 206 Partial Content responses in https://github.com/honojs/hono/pull/5020",
+    "refs": [
+      5020
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.30"
+  },
+  {
+    "id": "4.12.30#6",
+    "version": "4.12.30",
+    "date": "2026-07-13T00:35:49.419Z",
+    "section": "What s Changed",
+    "text": "* fix(client): replaceUrlParam should not match a param that prefixes another in https://github.com/honojs/hono/pull/5096",
+    "refs": [
+      5096
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.30"
+  },
+  {
+    "id": "4.12.30#7",
+    "version": "4.12.30",
+    "date": "2026-07-13T00:35:49.419Z",
+    "section": "What s Changed",
+    "text": "* fix(method-override): set duplex when forwarding a stream body in query mode in https://github.com/honojs/hono/pull/5110",
+    "refs": [
+      5110
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.30"
+  },
+  {
+    "id": "4.12.31#1",
+    "version": "4.12.31",
+    "date": "2026-07-18T23:16:05.588Z",
+    "section": "What s Changed",
+    "text": "* test(context): assert case-insensitive header names in response helpers by @yusukebe in https://github.com/honojs/hono/pull/5116",
+    "refs": [
+      5116
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.31"
+  },
+  {
+    "id": "4.12.31#2",
+    "version": "4.12.31",
+    "date": "2026-07-18T23:16:05.588Z",
+    "section": "What s Changed",
+    "text": "* chore(benchmark): add app.fetch() overhead benchmark by @yusukebe in https://github.com/honojs/hono/pull/5117",
+    "refs": [
+      5117
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.31"
+  },
+  {
+    "id": "4.12.31#3",
+    "version": "4.12.31",
+    "date": "2026-07-18T23:16:05.588Z",
+    "section": "What s Changed",
+    "text": "* refactor(aws-lambada): remove FIXME in `@ts-expect-error` by @yusukebe in https://github.com/honojs/hono/pull/5130",
+    "refs": [
+      5130
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.31"
+  },
+  {
+    "id": "4.12.31#4",
+    "version": "4.12.31",
+    "date": "2026-07-18T23:16:05.588Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/body): reuse cached formData in `parseBody()` by @yusukebe in https://github.com/honojs/hono/pull/5131",
+    "refs": [
+      5131
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.31"
+  },
+  {
+    "id": "4.12.31#5",
+    "version": "4.12.31",
+    "date": "2026-07-18T23:16:05.588Z",
+    "section": "What s Changed",
+    "text": "* fix(request): fix multipart boundary mismatch in `cloneRawRequest` by @yusukebe in https://github.com/honojs/hono/pull/5133",
+    "refs": [
+      5133
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.31"
+  },
+  {
+    "id": "4.12.31#6",
+    "version": "4.12.31",
+    "date": "2026-07-18T23:16:05.588Z",
+    "section": "What s Changed",
+    "text": "* fix(sse): emit retry feild when retry is `0` by @yusukebe in https://github.com/honojs/hono/pull/5135",
+    "refs": [
+      5135
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.31"
+  },
+  {
+    "id": "4.12.31#7",
+    "version": "4.12.31",
+    "date": "2026-07-18T23:16:05.588Z",
+    "section": "What s Changed",
+    "text": "* test(validator): fix misspelled identifier in transform type test by @yusukebe in https://github.com/honojs/hono/pull/5136",
+    "refs": [
+      5136
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.31"
+  },
+  {
+    "id": "4.12.32#1",
+    "version": "4.12.32",
+    "date": "2026-07-24T08:55:53.101Z",
+    "section": "What s Changed",
+    "text": "* ci: enable reports for type & bundle size check in https://github.com/honojs/hono/pull/5148",
+    "refs": [
+      5148
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.32"
+  },
+  {
+    "id": "4.12.32#2",
+    "version": "4.12.32",
+    "date": "2026-07-24T08:55:53.101Z",
+    "section": "What s Changed",
+    "text": "* fix(aws-lambda): add jwt and lambda authorizer types for API Gateway v2 in https://github.com/honojs/hono/pull/5142",
+    "refs": [
+      5142
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.32"
+  },
+  {
+    "id": "4.12.32#3",
+    "version": "4.12.32",
+    "date": "2026-07-24T08:55:53.101Z",
+    "section": "What s Changed",
+    "text": "* fix(sse): emit empty id field to reset Last-Event-ID in https://github.com/honojs/hono/pull/5138",
+    "refs": [
+      5138
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.32"
+  },
+  {
+    "id": "4.12.32#4",
+    "version": "4.12.32",
+    "date": "2026-07-24T08:55:53.101Z",
+    "section": "What s Changed",
+    "text": "* test(cloudflare-workers): add coverage for onClose, onError, send, and close in Cloudflare Workers websocket adapter in https://github.com/honojs/hono/pull/5145",
+    "refs": [
+      5145
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.32"
+  },
+  {
+    "id": "4.12.32#5",
+    "version": "4.12.32",
+    "date": "2026-07-24T08:55:53.101Z",
+    "section": "What s Changed",
+    "text": "* fix: use `Object.create(null)` when parsing query, headers, and params in https://github.com/honojs/hono/pull/5161",
+    "refs": [
+      5161
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.32"
+  },
+  {
+    "id": "4.12.32#6",
+    "version": "4.12.32",
+    "date": "2026-07-24T08:55:53.101Z",
+    "section": "What s Changed",
+    "text": "* fix(secure-headers): keep CSP callbacks scoped to their header in https://github.com/honojs/hono/pull/5147",
+    "refs": [
+      5147
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.32"
+  },
+  {
+    "id": "4.12.33#1",
+    "version": "4.12.33",
+    "date": "2026-07-31T10:42:41.417Z",
+    "section": "What s Changed",
+    "text": "* fix(cookie): relax name validation when parsing Cookie header in https://github.com/honojs/hono/pull/5164",
+    "refs": [
+      5164
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.33"
+  },
+  {
+    "id": "4.12.33#2",
+    "version": "4.12.33",
+    "date": "2026-07-31T10:42:41.417Z",
+    "section": "What s Changed",
+    "text": "* chore: bump `@hono/node-server` in https://github.com/honojs/hono/pull/5167",
+    "refs": [
+      5167
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.33"
+  },
+  {
+    "id": "4.12.33#3",
+    "version": "4.12.33",
+    "date": "2026-07-31T10:42:41.417Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx): handle useSyncExternalStore subscription and snapshot changes in https://github.com/honojs/hono/pull/5166",
+    "refs": [
+      5166
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.33"
+  },
+  {
+    "id": "4.12.33#4",
+    "version": "4.12.33",
+    "date": "2026-07-31T10:42:41.417Z",
+    "section": "What s Changed",
+    "text": "* chore: remove undici in favor of global fetch in https://github.com/honojs/hono/pull/5168",
+    "refs": [
+      5168
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.12.33"
+  },
+  {
+    "id": "4.13.0#1",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Performance improvements",
+    "text": "- perf(context): iterate the header record with `for..in` https://github.com/honojs/hono/pull/5118",
+    "refs": [
+      5118
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#2",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Performance improvements",
+    "text": "- perf(url): replace regex tests with `indexOf` https://github.com/honojs/hono/pull/5121",
+    "refs": [
+      5121
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#3",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Performance improvements",
+    "text": "- perf(context): skip `Headers` creation when there are no headers to merge https://github.com/honojs/hono/pull/5122",
+    "refs": [
+      5122
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#4",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Performance improvements",
+    "text": "- perf(urls): refactor `tryDecodeURIComponent` https://github.com/honojs/hono/pull/5158",
+    "refs": [
+      5158
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#5",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Performance improvements",
+    "text": "- perf(request): allocate `#validatedData` lazily https://github.com/honojs/hono/pull/5175",
+    "refs": [
+      5175
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#6",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Performance improvements",
+    "text": "- perf(request): probe the body cache without allocating https://github.com/honojs/hono/pull/5176",
+    "refs": [
+      5176
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#7",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Other improvements",
+    "text": "- `hono/utils/headers` has been synced with the IANA HTTP Field Name Registry, adding newly registered fields such as `Accept-Query`. Thanks @akahoshi1421!",
+    "refs": [],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#8",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Other improvements",
+    "text": "- The JWT and JWK middleware now accept a `realm` option for the `WWW-Authenticate` challenge on `401` responses, and challenge values are properly escaped. Thanks @arhxam!",
+    "refs": [],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#9",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Other improvements",
+    "text": "- JSX: `useRef` and `RefObject` are now aligned with React 19. Note that this is a type-level change — `RefObject<T>` is now `{ current: T }`, so type a nullable ref as `RefObject<T | null>`, and pass `useRef(undefined)` instead of `useRef()`. Thanks @ashunar0!",
+    "refs": [],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#10",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Other improvements",
+    "text": "- JSX: a function component can now return an array of children without throwing during server-side rendering. Thanks @natsuki-engr!",
+    "refs": [],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#11",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "Other improvements",
+    "text": "- The Compress Middleware now sets `Vary: Accept-Encoding` on negotiated responses. Thanks @arhxam!",
+    "refs": [],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#12",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(hono-base): avoid rest parameter in `fetch` by @yusukebe in https://github.com/honojs/hono/pull/5113",
+    "refs": [
+      5113
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#13",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(context): iterate the header record with for..in by @yusukebe in https://github.com/honojs/hono/pull/5118",
+    "refs": [
+      5118
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#14",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(url/request): replace regex tests with `indexOf` by @yusukebe in https://github.com/honojs/hono/pull/5121",
+    "refs": [
+      5121
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#15",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(context): skip Headers creation when there are no headers to merge by @yusukebe in https://github.com/honojs/hono/pull/5122",
+    "refs": [
+      5122
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#16",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(urls): refactor `tryDecodeURIComponent` by @yusukebe in https://github.com/honojs/hono/pull/5158",
+    "refs": [
+      5158
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#17",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* chore(benchmarks): correct src path on Windows, add json and middleware cases by @kibertoad in https://github.com/honojs/hono/pull/5173",
+    "refs": [
+      5173
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#18",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(context): drop the throwaway `env` field initializer by @kibertoad in https://github.com/honojs/hono/pull/5174",
+    "refs": [
+      5174
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#19",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(request): allocate `#validatedData` lazily by @kibertoad in https://github.com/honojs/hono/pull/5175",
+    "refs": [
+      5175
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#20",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(request): probe the body cache without allocating by @kibertoad in https://github.com/honojs/hono/pull/5176",
+    "refs": [
+      5176
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#21",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* chore(benchmarks): stabilize measurements by forcing mitata batching by @yusukebe in https://github.com/honojs/hono/pull/5183",
+    "refs": [
+      5183
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#22",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(hono-base): restore the rest parameter in `fetch` by @yusukebe in https://github.com/honojs/hono/pull/5184",
+    "refs": [
+      5184
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#23",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* perf(context): restore the `env` field initializer by @yusukebe in https://github.com/honojs/hono/pull/5186",
+    "refs": [
+      5186
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#24",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat: add first-class QUERY method support by @shellhaki in https://github.com/honojs/hono/pull/5070",
+    "refs": [
+      5070
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#25",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(etag): support conditional requests for the QUERY method by @Cherry in https://github.com/honojs/hono/pull/5111",
+    "refs": [
+      5111
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#26",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(cors): allow QUERY by default as a first-class method by @usualoma in https://github.com/honojs/hono/pull/5115",
+    "refs": [
+      5115
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#27",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(cache): add first-class support for QUERY requests by @usualoma in https://github.com/honojs/hono/pull/5119",
+    "refs": [
+      5119
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#28",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(jsx): add React-compatible overloads to useRef by @ashunar0 in https://github.com/honojs/hono/pull/5063",
+    "refs": [
+      5063
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#29",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(middleware): add method-not-allowed middleware by @usualoma in https://github.com/honojs/hono/pull/5132",
+    "refs": [
+      5132
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#30",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(jwt,jwk): add a configurable WWW-Authenticate realm by @arhxam in https://github.com/honojs/hono/pull/5141",
+    "refs": [
+      5141
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#31",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(utils/headers): sync HTTP field types with the IANA registry by @akahoshi1421 in https://github.com/honojs/hono/pull/5153",
+    "refs": [
+      5153
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#32",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* fix(jsx): allow a function component to return an array by @natsuki-engr in https://github.com/honojs/hono/pull/5179",
+    "refs": [
+      5179
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#33",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* feat(reg-exp-router): throw UnsupportedPathError during route registration by @usualoma in https://github.com/honojs/hono/pull/5171",
+    "refs": [
+      5171
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.0#34",
+    "version": "4.13.0",
+    "date": "2026-08-03T21:54:20.997Z",
+    "section": "All changes",
+    "text": "* fix(compress): set Vary: Accept-Encoding on negotiated responses by @arhxam in https://github.com/honojs/hono/pull/5137",
+    "refs": [
+      5137
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.0"
+  },
+  {
+    "id": "4.13.1#1",
+    "version": "4.13.1",
+    "date": "2026-08-07T06:45:13.705Z",
+    "section": "What s Changed",
+    "text": "* fix(trie-router): count every slash a pattern consumes by @Jaybhade in https://github.com/honojs/hono/pull/5189",
+    "refs": [
+      5189
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.1"
+  },
+  {
+    "id": "4.13.1#2",
+    "version": "4.13.1",
+    "date": "2026-08-07T06:45:13.705Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/stream): re-acquire writer lock when pipe() throws by @Sriharsha-dev369 in https://github.com/honojs/hono/pull/4988",
+    "refs": [
+      4988
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.1"
+  },
+  {
+    "id": "4.13.1#3",
+    "version": "4.13.1",
+    "date": "2026-08-07T06:45:13.705Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): skip unsafe methods or error responses on non-* case by @na-trium-144 in https://github.com/honojs/hono/pull/5196",
+    "refs": [
+      5196
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.1"
+  },
+  {
+    "id": "4.13.1#4",
+    "version": "4.13.1",
+    "date": "2026-08-07T06:45:13.705Z",
+    "section": "New Contributors",
+    "text": "* @Jaybhade made their first contribution in https://github.com/honojs/hono/pull/5189",
+    "refs": [
+      5189
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.1"
+  },
+  {
+    "id": "4.13.1#5",
+    "version": "4.13.1",
+    "date": "2026-08-07T06:45:13.705Z",
+    "section": "New Contributors",
+    "text": "* @Sriharsha-dev369 made their first contribution in https://github.com/honojs/hono/pull/4988",
+    "refs": [
+      4988
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.1"
+  },
+  {
+    "id": "4.13.2#1",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* fix(secure-headers): output standard empty parentheses () instead of none for disabled Permissions-Policy directives in https://github.com/honojs/hono/pull/5197",
+    "refs": [
+      5197
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#2",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx): render async children of document metadata tags instead of [object Promise] in https://github.com/honojs/hono/pull/5204",
+    "refs": [
+      5204
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#3",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): resolve incorrect incremental hashing for chunked responses in https://github.com/honojs/hono/pull/5199",
+    "refs": [
+      5199
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#4",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* fix(client): serialize multiple cookies correctly in https://github.com/honojs/hono/pull/5202",
+    "refs": [
+      5202
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#5",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): stabilize digest across stream chunks in https://github.com/honojs/hono/pull/5205",
+    "refs": [
+      5205
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#6",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* fix(url): strip trailing question mark correctly for optional params with regex quantifiers in https://github.com/honojs/hono/pull/5209",
+    "refs": [
+      5209
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#7",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* perf(cors): pre-join static array header options during initialization in https://github.com/honojs/hono/pull/5210",
+    "refs": [
+      5210
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#8",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* fix(client): send falsy JSON bodies in https://github.com/honojs/hono/pull/5215",
+    "refs": [
+      5215
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.2#9",
+    "version": "4.13.2",
+    "date": "2026-08-13T11:55:37.169Z",
+    "section": "What s Changed",
+    "text": "* feat(secure-headers): add missing W3C Permissions-Policy directives in https://github.com/honojs/hono/pull/5214",
+    "refs": [
+      5214
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.2"
+  },
+  {
+    "id": "4.13.3#1",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(client): prevent URL corruption when replaceUrlParam contains $ replacement tokens in https://github.com/honojs/hono/pull/5227",
+    "refs": [
+      5227
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#2",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): copy pending stream bytes in https://github.com/honojs/hono/pull/5239",
+    "refs": [
+      5239
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#3",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): avoid skipping headers when filtering 304 response headers in https://github.com/honojs/hono/pull/5234",
+    "refs": [
+      5234
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#4",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(cors): append Origin to Vary header on OPTIONS preflight in https://github.com/honojs/hono/pull/5235",
+    "refs": [
+      5235
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#5",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* docs(context): add custom headers append option example to Context JSDoc in https://github.com/honojs/hono/pull/5248",
+    "refs": [
+      5248
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#6",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(trie-router): match suffix wildcard routes in https://github.com/honojs/hono/pull/5236",
+    "refs": [
+      5236
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#7",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(pattern-router/linear-router): prevent prefix overmatch on wildcard routes in https://github.com/honojs/hono/pull/5252",
+    "refs": [
+      5252
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#8",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(csrf): exempt OPTIONS request from CSRF validation in https://github.com/honojs/hono/pull/5250",
+    "refs": [
+      5250
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#9",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/ipaddr): avoid truncation on embedded IPv4 addresses in expand IPv6 in https://github.com/honojs/hono/pull/5247",
+    "refs": [
+      5247
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.3#10",
+    "version": "4.13.3",
+    "date": "2026-08-18T10:56:09.752Z",
+    "section": "What s Changed",
+    "text": "* feat(pretty-json): support structured JSON content-types (+json) in https://github.com/honojs/hono/pull/5226",
+    "refs": [
+      5226
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.3"
+  },
+  {
+    "id": "4.13.4#1",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(request): handle params on unmatched requests in https://github.com/honojs/hono/pull/5268",
+    "refs": [
+      5268
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#2",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx/dom): execute previous ref cleanup when ref prop changes on re-render  in https://github.com/honojs/hono/pull/5264",
+    "refs": [
+      5264
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#3",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(reg-exp-router): associate wildcard middleware with matching routes in https://github.com/honojs/hono/pull/5266",
+    "refs": [
+      5266
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#4",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* perf(router): share null object creation in https://github.com/honojs/hono/pull/5267",
+    "refs": [
+      5267
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#5",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): match If-None-Match tags with optional whitespace before the comma in https://github.com/honojs/hono/pull/5222",
+    "refs": [
+      5222
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#6",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(client): skip undefined header and cookie values in https://github.com/honojs/hono/pull/5244",
+    "refs": [
+      5244
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#7",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(client): skip an undefined entry inside a query array in https://github.com/honojs/hono/pull/5272",
+    "refs": [
+      5272
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#8",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(client): skip an undefined entry inside a form array in https://github.com/honojs/hono/pull/5280",
+    "refs": [
+      5280
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#9",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(client): support custom buildSearchParams and filter undefined query in $ws() bin https://github.com/honojs/hono/pull/5256",
+    "refs": [
+      5256
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#10",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(accepts): support wildcard media types and specificity ordering in defaultMatch in https://github.com/honojs/hono/pull/5255",
+    "refs": [
+      5255
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#11",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(client): omit empty query delimiter in https://github.com/honojs/hono/pull/5283",
+    "refs": [
+      5283
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#12",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(request): drop stale content length for cloned FormData in https://github.com/honojs/hono/pull/5282",
+    "refs": [
+      5282
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#13",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(request): serialize cached JSON body in cloneRawRequest in https://github.com/honojs/hono/pull/5288",
+    "refs": [
+      5288
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#14",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(cookie): allow parsing signed cookies with empty string values in https://github.com/honojs/hono/pull/5246",
+    "refs": [
+      5246
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.4#15",
+    "version": "4.13.4",
+    "date": "2026-08-24T08:48:08.642Z",
+    "section": "What s Changed",
+    "text": "* fix(utils/stream): do not let abort listeners crash abort() in https://github.com/honojs/hono/pull/5274",
+    "refs": [
+      5274
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.4"
+  },
+  {
+    "id": "4.13.6#1",
+    "version": "4.13.6",
+    "date": "2026-09-04T19:08:02.889Z",
+    "section": "What s Changed",
+    "text": "* fix(client): keep a param value of \"index\" in $url() and $path() in https://github.com/honojs/hono/pull/5297",
+    "refs": [
+      5297
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.6"
+  },
+  {
+    "id": "4.13.6#2",
+    "version": "4.13.6",
+    "date": "2026-09-04T19:08:02.889Z",
+    "section": "What s Changed",
+    "text": "* fix(client): normalize root WebSocket URLs in https://github.com/honojs/hono/pull/5291",
+    "refs": [
+      5291
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.6"
+  },
+  {
+    "id": "4.13.6#3",
+    "version": "4.13.6",
+    "date": "2026-09-04T19:08:02.889Z",
+    "section": "What s Changed",
+    "text": "* fix(types): allow symbol keys in Context<any> get and set fallbacks in https://github.com/honojs/hono/pull/5300",
+    "refs": [
+      5300
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.6"
+  },
+  {
+    "id": "4.13.6#4",
+    "version": "4.13.6",
+    "date": "2026-09-04T19:08:02.889Z",
+    "section": "What s Changed",
+    "text": "* chore: bump `editorconfig-checker` in https://github.com/honojs/hono/pull/5336",
+    "refs": [
+      5336
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.6"
+  },
+  {
+    "id": "4.13.6#5",
+    "version": "4.13.6",
+    "date": "2026-09-04T19:08:02.889Z",
+    "section": "What s Changed",
+    "text": "* refactor(on-handler): use forEach for consistent handler iteration in https://github.com/honojs/hono/pull/5326",
+    "refs": [
+      5326
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.6"
+  },
+  {
+    "id": "4.13.8#1",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* docs: fix typos in code comments and link third-party middleware section in https://github.com/honojs/hono/pull/5343",
+    "refs": [
+      5343
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#2",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* perf(jsx/dom): reduce lookup work for large keyed updates in https://github.com/honojs/hono/pull/5340",
+    "refs": [
+      5340
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#3",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* fix(aws-lambda): respect backpressure when streaming the response body in https://github.com/honojs/hono/pull/5351",
+    "refs": [
+      5351
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#4",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* fix(accepts, language): skip accept entries with quality 0 when matching in https://github.com/honojs/hono/pull/5311",
+    "refs": [
+      5311
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#5",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* fix(accept): treat the q parameter name as case-insensitive in https://github.com/honojs/hono/pull/5349",
+    "refs": [
+      5349
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#6",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* fix(accept): clamp a negative q to 0, not 1 in https://github.com/honojs/hono/pull/5357",
+    "refs": [
+      5357
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#7",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* fix(request): keep the request media type when reusing a cached body in https://github.com/honojs/hono/pull/5366",
+    "refs": [
+      5366
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#8",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* docs(combine): fix except() JSDoc param and add missing @returns in https://github.com/honojs/hono/pull/5346",
+    "refs": [
+      5346
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.8#9",
+    "version": "4.13.8",
+    "date": "2026-09-15T07:31:34.010Z",
+    "section": "What s Changed",
+    "text": "* perf(jsx/dom): optimize matching-head child lookup during reconciliation in https://github.com/honojs/hono/pull/5329",
+    "refs": [
+      5329
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.8"
+  },
+  {
+    "id": "4.13.9#1",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx): replace Suspense and ErrorBoundary content across newlines in https://github.com/honojs/hono/pull/5380",
+    "refs": [
+      5380
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#2",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(accepts): match media types and language tags case-insensitively in https://github.com/honojs/hono/pull/5376",
+    "refs": [
+      5376
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#3",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(linear-router): don't match an empty path segment as a param in https://github.com/honojs/hono/pull/5373",
+    "refs": [
+      5373
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#4",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(pretty-json): don't break responses with unparseable JSON bodies in https://github.com/honojs/hono/pull/5377",
+    "refs": [
+      5377
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#5",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(jwt): throw JwtTokenInvalid when the signature is not valid base64url in https://github.com/honojs/hono/pull/5379",
+    "refs": [
+      5379
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#6",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(aws-lambda): treat binary +xml archive media types as binary in https://github.com/honojs/hono/pull/5424",
+    "refs": [
+      5424
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#7",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(aws-lambda): preserve empty query parameters in https://github.com/honojs/hono/pull/5292",
+    "refs": [
+      5292
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#8",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(lambda-edge): sync content type detection with aws-lambda in https://github.com/honojs/hono/pull/5426",
+    "refs": [
+      5426
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.9#9",
+    "version": "4.13.9",
+    "date": "2026-09-24T01:32:02.438Z",
+    "section": "What s Changed",
+    "text": "* fix(lambda-edge): fail with a descriptive error on a malformed event in https://github.com/honojs/hono/pull/5358",
+    "refs": [
+      5358
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.9"
+  },
+  {
+    "id": "4.13.10#1",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "Adapters are now separate packages",
+    "text": "- import { serveStatic } from 'hono/bun'",
+    "refs": [],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#2",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore: migrate the package manager from bun to pnpm in https://github.com/honojs/hono/pull/5433",
+    "refs": [
+      5433
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#3",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore(package.json): invoke package scripts through pnpm instead of bun in https://github.com/honojs/hono/pull/5434",
+    "refs": [
+      5434
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#4",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore: replace prettier with oxfmt in https://github.com/honojs/hono/pull/5435",
+    "refs": [
+      5435
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#5",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore(deps): upgrade vitest to 5.0.1 in https://github.com/honojs/hono/pull/5437",
+    "refs": [
+      5437
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#6",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore: let oxfmt sort imports instead of eslint in https://github.com/honojs/hono/pull/5442",
+    "refs": [
+      5442
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#7",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore: replace eslint with oxlint in https://github.com/honojs/hono/pull/5443",
+    "refs": [
+      5443
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#8",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore: introduce Vite+ in https://github.com/honojs/hono/pull/5444",
+    "refs": [
+      5444
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#9",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* fix(types): allow returning a Blob as a response body in https://github.com/honojs/hono/pull/5446",
+    "refs": [
+      5446
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#10",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore: convert build scripts into plugins in https://github.com/honojs/hono/pull/5448",
+    "refs": [
+      5448
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#11",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore: stop editorconfig-checker from checking Markdown indent size in https://github.com/honojs/hono/pull/5455",
+    "refs": [
+      5455
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#12",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* ci: remove empty step left in `cr.yml` by the pnpm migration in https://github.com/honojs/hono/pull/5456",
+    "refs": [
+      5456
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#13",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore(deps): upgrade vite-plus to `1.0.0-rc.1` in https://github.com/honojs/hono/pull/5459",
+    "refs": [
+      5459
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#14",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* feat(adapters): add @hono/bun as a workspace package in https://github.com/honojs/hono/pull/5447",
+    "refs": [
+      5447
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#15",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* chore(adapters/bun): ship ESM only in https://github.com/honojs/hono/pull/5462",
+    "refs": [
+      5462
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#16",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* feat(adapters): add the seven adapters as workspace packages in https://github.com/honojs/hono/pull/5463",
+    "refs": [
+      5463
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#17",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* feat(adapters/deno): publish to JSR in https://github.com/honojs/hono/pull/5465",
+    "refs": [
+      5465
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.10#18",
+    "version": "4.13.10",
+    "date": "2026-09-28T08:24:32.197Z",
+    "section": "What s Changed",
+    "text": "* test: move adapter runtime tests into `adapters/*` in https://github.com/honojs/hono/pull/5466",
+    "refs": [
+      5466
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.10"
+  },
+  {
+    "id": "4.13.12#1",
+    "version": "4.13.12",
+    "date": "2026-09-30T09:43:03.233Z",
+    "section": "What s Changed",
+    "text": "* fix(build): keep internal types private in bundled d.ts and avoid a self-referencing JSX.IntrinsicElements in https://github.com/honojs/hono/pull/5485",
+    "refs": [
+      5485
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.12"
+  },
+  {
+    "id": "4.13.12#2",
+    "version": "4.13.12",
+    "date": "2026-09-30T09:43:03.233Z",
+    "section": "What s Changed",
+    "text": "* test(build): type-check the bundled declarations from a consumer project in https://github.com/honojs/hono/pull/5486",
+    "refs": [
+      5486
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.12"
+  },
+  {
+    "id": "4.13.12#3",
+    "version": "4.13.12",
+    "date": "2026-09-30T09:43:03.233Z",
+    "section": "What s Changed",
+    "text": "* fix(etag): correctly match mixed-case header name in retainedHeader option in https://github.com/honojs/hono/pull/5475",
+    "refs": [
+      5475
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.12"
+  },
+  {
+    "id": "4.13.12#4",
+    "version": "4.13.12",
+    "date": "2026-09-30T09:43:03.233Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx): add px to numeric gridGap, gridRowGap and gridColumnGap in https://github.com/honojs/hono/pull/5487",
+    "refs": [
+      5487
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.12"
+  },
+  {
+    "id": "4.13.12#5",
+    "version": "4.13.12",
+    "date": "2026-09-30T09:43:03.233Z",
+    "section": "What s Changed",
+    "text": "* fix(combine): return a Response from a short-circuiting middleware in some() in https://github.com/honojs/hono/pull/5391",
+    "refs": [
+      5391
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.12"
+  },
+  {
+    "id": "4.13.12#6",
+    "version": "4.13.12",
+    "date": "2026-09-30T09:43:03.233Z",
+    "section": "What s Changed",
+    "text": "* chore(deps): upgrade vite-plus to 1.0.0 in https://github.com/honojs/hono/pull/5464",
+    "refs": [
+      5464
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.12"
+  },
+  {
+    "id": "4.13.13#1",
+    "version": "4.13.13",
+    "date": "2026-10-04T03:53:48.117Z",
+    "section": "Mount Middleware",
+    "text": "- app.mount('/itty-router', ittyRouter.handle)",
+    "refs": [],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.13"
+  },
+  {
+    "id": "4.13.13#2",
+    "version": "4.13.13",
+    "date": "2026-10-04T03:53:48.117Z",
+    "section": "What s Changed",
+    "text": "* test(client): simulate network error for undefined route in parseResponse test in https://github.com/honojs/hono/pull/5439",
+    "refs": [
+      5439
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.13"
+  },
+  {
+    "id": "4.13.13#3",
+    "version": "4.13.13",
+    "date": "2026-10-04T03:53:48.117Z",
+    "section": "What s Changed",
+    "text": "* docs(request): fix jsdoc comments for some getters in https://github.com/honojs/hono/pull/5445",
+    "refs": [
+      5445
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.13"
+  },
+  {
+    "id": "4.13.13#4",
+    "version": "4.13.13",
+    "date": "2026-10-04T03:53:48.117Z",
+    "section": "What s Changed",
+    "text": "* fix(jsx): allow JSXNode function component results in https://github.com/honojs/hono/pull/5476",
+    "refs": [
+      5476
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.13"
+  },
+  {
+    "id": "4.13.13#5",
+    "version": "4.13.13",
+    "date": "2026-10-04T03:53:48.117Z",
+    "section": "What s Changed",
+    "text": "* feat(mount): introduce Mount Middleware and deprecate `app.mount` in https://github.com/honojs/hono/pull/5221",
+    "refs": [
+      5221
+    ],
+    "url": "https://github.com/honojs/hono/releases/tag/v4.13.13"
+  }
+]

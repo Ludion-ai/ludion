@@ -1,0 +1,14 @@
+{
+  "entry": "7.0.0#109",
+  "verdict": {
+    "id": "7.0.0#109",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool-result file URLs",
+    "why": "File URLs in tool results are now downloaded, changing what is sent to the model."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

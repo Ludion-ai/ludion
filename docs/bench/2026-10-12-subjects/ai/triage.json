@@ -1,0 +1,4500 @@
+[
+  {
+    "id": "5.0.179#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only adds a README hint about AI Gateway."
+  },
+  {
+    "id": "5.0.180#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release process change with no user-observable effect."
+  },
+  {
+    "id": "5.0.181#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Import handling cleanup with no observable change."
+  },
+  {
+    "id": "5.0.181#2",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Security fix scoped to the mcp package, not ai."
+  },
+  {
+    "id": "5.0.184#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "allowSystemInMessages",
+    "why": "Existing calls that include system messages in prompt or messages now emit a warning by default, and a new option controls it."
+  },
+  {
+    "id": "5.0.188#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes a README image URL."
+  },
+  {
+    "id": "5.0.198#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security hardening against malicious chunk IDs, with no change for normal usage."
+  },
+  {
+    "id": "5.0.199#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Output.array",
+    "why": "Array output now returns schema-transformed values (transforms, defaults, coercions) instead of the raw model output."
+  },
+  {
+    "id": "5.0.200#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Closes bypasses of the SSRF guard so it blocks private addresses as intended."
+  },
+  {
+    "id": "5.0.200#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prototype pollution hardening with no change for normal usage."
+  },
+  {
+    "id": "5.0.200#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "The documented default onError already returned the generic message, and the code now matches the docs."
+  },
+  {
+    "id": "5.0.204#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a socket leak by cancelling response bodies on early rejection."
+  },
+  {
+    "id": "5.0.213#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Validation of assistant messages with empty parts now succeeds instead of erroring."
+  },
+  {
+    "id": "5.0.213#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes tool results being enqueued after the stream has closed on error."
+  },
+  {
+    "id": "5.0.216#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects callback ordering for non-streaming tool calls."
+  },
+  {
+    "id": "5.0.217#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes chat onFinish handling in overlapping-request edge cases."
+  },
+  {
+    "id": "5.0.217#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "UI message chunks with extra fields are now accepted instead of rejected."
+  },
+  {
+    "id": "5.0.217#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "abortSignal",
+    "why": "Cancelling during tool execution now propagates the abort reason, which changes what callers observe."
+  },
+  {
+    "id": "5.0.217#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "activeTools is documented to restrict tools, and the code now enforces that."
+  },
+  {
+    "id": "5.0.219#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance bound on media-type sniffing with the same results."
+  },
+  {
+    "id": "5.0.219#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "pipeUIMessageStreamToResponse",
+    "why": "Response piping helpers now return promises so stream errors can be caught, and uncaught errors may surface as unhandled rejections."
+  },
+  {
+    "id": "5.0.222#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "The warning information banner now goes to stderr instead of stdout."
+  },
+  {
+    "id": "5.0.223#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix that closes DNS rebinding in validated downloads."
+  },
+  {
+    "id": "5.0.223#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes provider metadata being dropped from empty text deltas."
+  },
+  {
+    "id": "5.0.227#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Skips redundant re-validation of terminal tool parts, with no intended change for valid input."
+  },
+  {
+    "id": "5.0.231#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stopping resumed streams after cancellation and avoiding stale updates makes cancellation work as expected."
+  },
+  {
+    "id": "5.0.232#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Telemetry spans now end correctly once on failure, fixing a bug."
+  },
+  {
+    "id": "5.0.233#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "resumeStream no longer duplicating the previous assistant message is a bug fix."
+  },
+  {
+    "id": "5.0.234#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserving reasoning part IDs fixes incorrect processing."
+  },
+  {
+    "id": "5.0.236#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onFinish",
+    "why": "Errors thrown in chat onFinish callbacks, previously swallowed, now propagate, changing behavior of existing code."
+  },
+  {
+    "id": "5.0.236#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "status",
+    "why": "Chat status stays 'submitted' longer, until content begins streaming, so code keyed on status sees different values."
+  },
+  {
+    "id": "5.0.237#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization that preserves snapshot semantics."
+  },
+  {
+    "id": "5.0.237#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a declaration emit error, turning a failure into working behavior."
+  },
+  {
+    "id": "5.0.241#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "streamObject",
+    "why": "Result promises now reject when the provider stream errors, so code awaiting them may now throw."
+  },
+  {
+    "id": "5.0.241#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "ignoreIncompleteToolCalls",
+    "why": "Preliminary tool outputs are now filtered with this option enabled, changing the converted messages."
+  },
+  {
+    "id": "5.0.241#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Tools are no longer automatically executed when the finish reason is unsafe, changing existing runs."
+  },
+  {
+    "id": "5.0.242#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Mock models now return configured results in order, matching expected behavior."
+  },
+  {
+    "id": "5.0.243#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Callback exceptions no longer terminate the stream or mask provider errors, which turns a failure into working behavior."
+  },
+  {
+    "id": "5.0.245#1",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "createTestServer",
+    "why": "createTestServer and TestResponseController are no longer re-exported, so existing imports fail and must come from @ai-sdk/test-server/with-vitest."
+  },
+  {
+    "id": "5.0.248#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "embedMany",
+    "why": "OpenAI and Azure embedding requests are now split by a UTF-8 byte budget, changing what is sent."
+  },
+  {
+    "id": "5.0.249#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds operation-level outcomes to UI message stream end callbacks; older versions simply ignore the extra data."
+  },
+  {
+    "id": "5.0.250#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Persisted typed tool calls are validated against current schemas, and incompatible ones now load as dynamic tool parts."
+  },
+  {
+    "id": "5.0.250#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Transient network errors while reading response bodies are now marked retryable, so retry behavior changes."
+  },
+  {
+    "id": "5.0.252#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "smoothStream",
+    "why": "smoothStream now skips delays while the document is hidden, changing timing."
+  },
+  {
+    "id": "5.0.253#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Manual continuations with undefined properties in JSON tool outputs previously errored and now work."
+  },
+  {
+    "id": "5.0.255#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Empty image results are now retried and retryability is classified differently, changing generation behavior."
+  },
+  {
+    "id": "5.0.255#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Text data URLs are decoded in Node.js, fixing incorrect behavior."
+  },
+  {
+    "id": "5.0.259#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "why": "Embedding model responses with no embeddings are now rejected with an error instead of being accepted."
+  },
+  {
+    "id": "5.0.260#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Provider metadata is now preserved when simulating text streams, which fixes a loss of data."
+  },
+  {
+    "id": "5.0.261#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents unhandled rejections when UI message stream reading stops early."
+  },
+  {
+    "id": "5.0.264#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "It doesn't say what changed for users or which file URI inputs are affected."
+  },
+  {
+    "id": "5.0.264#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes a duplicated content-type header, which is a bug fix."
+  },
+  {
+    "id": "5.0.264#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes callback ordering so the documented sequence holds."
+  },
+  {
+    "id": "5.0.265#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule change with no observable effect."
+  },
+  {
+    "id": "5.0.265#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes validation that was dropping parsed values."
+  },
+  {
+    "id": "5.0.268#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Response streams are now cancelled when the client disconnects, where before they kept running."
+  },
+  {
+    "id": "5.0.268#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resumption after a disconnect so it works as intended."
+  },
+  {
+    "id": "5.0.269#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "smoothStream",
+    "why": "smoothStream chunks now carry provider metadata that was previously lost."
+  },
+  {
+    "id": "5.0.270#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes partial tool input being lost on stream resumption."
+  },
+  {
+    "id": "5.0.270#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds optional SSE heartbeats for idle UI message streams, which older versions simply ignore."
+  },
+  {
+    "id": "5.0.270#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "prepareReconnectToStreamRequest",
+    "why": "Default reconnect URLs now encode the chat ID, and `.` or `..` IDs are rejected before fetching."
+  },
+  {
+    "id": "5.0.270#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes edge-case failures with prototype-named tools and providers."
+  },
+  {
+    "id": "5.0.270#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect automatic resumption in an edge case."
+  },
+  {
+    "id": "5.0.271#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores the intended DNS validation and connection pinning when fetch is wrapped."
+  },
+  {
+    "id": "5.0.272#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "isDynamicToolUIPart",
+    "why": "Newly exported function, which older versions don't export, so importing it fails."
+  },
+  {
+    "id": "5.0.273#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix that stops persisted output being exposed."
+  },
+  {
+    "id": "5.0.273#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix that stops persisted output being exposed."
+  },
+  {
+    "id": "5.0.273#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes duplicate slashes in reconnect URLs."
+  },
+  {
+    "id": "6.0.166#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "sendReasoning false is meant to omit reasoning, and this makes it do so."
+  },
+  {
+    "id": "6.0.169#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a validation error for terminal tool parts with an unregistered schema into working behavior."
+  },
+  {
+    "id": "6.0.169#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release and provenance trigger only."
+  },
+  {
+    "id": "6.0.170#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "allowSystemInMessages",
+    "why": "System messages in prompt or messages now trigger a warning by default, and the new option controls it."
+  },
+  {
+    "id": "6.0.171#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "callOptionsSchema was already documented as a runtime schema, and this makes it enforced."
+  },
+  {
+    "id": "6.0.171#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Import cleanup with no observable change."
+  },
+  {
+    "id": "6.0.171#3",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "The change is to the MCP package, not ai."
+  },
+  {
+    "id": "6.0.173#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "dynamic tool parts",
+    "why": "Dynamic tool parts from MCP now carry the server name, changing the emitted part output."
+  },
+  {
+    "id": "6.0.176#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "toolMetadata",
+    "why": "New toolMetadata option for tool-specific metadata; older versions would not reject it at runtime."
+  },
+  {
+    "id": "6.0.178#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only updates a pinned OpenTelemetry dependency version."
+  },
+  {
+    "id": "6.0.180#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "gateway errors",
+    "why": "Gateway errors are now retried where they previously were not, changing request behavior."
+  },
+  {
+    "id": "6.0.180#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README hero animation URL fix only."
+  },
+  {
+    "id": "6.0.182#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool-result file URLs",
+    "why": "Tool-result file URLs are now downloaded, changing what is sent to the model."
+  },
+  {
+    "id": "6.0.184#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Missing embedding warnings now default to an empty array instead of undefined, fixing an inconsistency."
+  },
+  {
+    "id": "6.0.188#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "ToolLoopAgent allowSystemInMessages",
+    "why": "New option on ToolLoopAgent; older versions ignore the unknown option, so system messages remain rejected."
+  },
+  {
+    "id": "6.0.189#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "UIMessagePart input",
+    "why": "input becomes optional on input-streaming parts, so code that assumes it is present can now fail type checking."
+  },
+  {
+    "id": "6.0.193#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops erroring on output-error parts in validateUIMessages, turning a failure into working behavior."
+  },
+  {
+    "id": "6.0.199#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what the approval guard changes for users."
+  },
+  {
+    "id": "6.0.200#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "NoOutputGeneratedError",
+    "why": "streamText result promises now reject when the stream produces no output, where they previously resolved with an empty step."
+  },
+  {
+    "id": "6.0.200#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Hardening against prototype pollution with no intended observable change for normal use."
+  },
+  {
+    "id": "6.0.201#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Output.array",
+    "why": "Array output now returns schema-transformed values instead of raw model output."
+  },
+  {
+    "id": "6.0.202#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "experimental_toolApprovalSecret",
+    "why": "Replayed tool approvals are now re-validated against the schema and approval requirement, and forged or invalid ones are rejected."
+  },
+  {
+    "id": "6.0.203#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "validateDownloadUrl",
+    "why": "Download helpers now block more hostnames and address ranges and reject unsafe redirects that were previously fetched."
+  },
+  {
+    "id": "6.0.203#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Prototype pollution hardening with no intended observable change for normal use."
+  },
+  {
+    "id": "6.0.203#3",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "onError",
+    "why": "The default onError now returns 'An error occurred.' instead of raw error details; the documented default is unchanged but actual behavior differs for code relying on the old output."
+  },
+  {
+    "id": "6.0.207#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Cancels response bodies on early rejection to avoid socket leaks, with no change to the API results."
+  },
+  {
+    "id": "6.0.208#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes fixJson handling of partial unicode escapes that previously failed."
+  },
+  {
+    "id": "6.0.208#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool output undefined",
+    "why": "Undefined tool output is now serialized as null in UI message chunks."
+  },
+  {
+    "id": "6.0.209#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes telemetry attributes valid OTLP, fixing ingestion errors."
+  },
+  {
+    "id": "6.0.210#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Publishing dist tag change only."
+  },
+  {
+    "id": "6.0.213#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "generateAudio",
+    "why": "New first-class generateAudio call option for video generation."
+  },
+  {
+    "id": "6.0.215#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "pruneMessages now removes approval responses it was meant to prune, matching its intended behavior."
+  },
+  {
+    "id": "6.0.217#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "frameImages, inputReferences",
+    "why": "New video generation call options; older versions would ignore them rather than reject."
+  },
+  {
+    "id": "6.0.218#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "maxRetries",
+    "why": "New MCP option for retrying failed tool calls; unused code is unaffected, and older versions silently ignore it."
+  },
+  {
+    "id": "6.0.220#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "toResponseMessages",
+    "why": "Tool results in response messages are now ordered by tool call order, changing output order."
+  },
+  {
+    "id": "6.0.220#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects stray leading whitespace in streamed output of extractJsonMiddleware, which is what the middleware is meant to do."
+  },
+  {
+    "id": "6.0.221#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "isDynamicToolUIPart",
+    "why": "Newly exported function; importing it from older versions fails."
+  },
+  {
+    "id": "6.0.221#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops emitting an empty assistant message, which was a bug."
+  },
+  {
+    "id": "6.0.221#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes timeout.stepMs actually abort stalled steps in streamText, as documented and as generateText does."
+  },
+  {
+    "id": "6.0.221#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateText",
+    "why": "Array output now returns validated elements, changing the returned value."
+  },
+  {
+    "id": "6.0.221#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds missing tool input on tool results for provider-executed dynamic tools, correcting an omission."
+  },
+  {
+    "id": "6.0.221#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool execution denial message",
+    "why": "The default denial message text changes, which code or prompts relying on the old string would observe."
+  },
+  {
+    "id": "6.0.221#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves signed approval metadata that should not have been lost."
+  },
+  {
+    "id": "6.0.221#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "timeout.stepMs, timeout.chunkMs",
+    "why": "Abort reason is now a TimeoutError DOMException, so code checking the reason sees a different value."
+  },
+  {
+    "id": "6.0.222#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "inputReferences",
+    "why": "Video inputs are now accepted in inputReferences; older versions would not support them, with no documented error."
+  },
+  {
+    "id": "6.0.226#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "validateUIMessages",
+    "why": "Assistant UI messages with empty parts are now accepted instead of rejected."
+  },
+  {
+    "id": "6.0.226#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents results being enqueued after the stream has closed, which was an error condition."
+  },
+  {
+    "id": "6.0.227#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes onFinish handling in an overlapping-request race so it behaves as documented."
+  },
+  {
+    "id": "6.0.230#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onInputStart, onInputAvailable",
+    "why": "Non-streaming tool calls now invoke onInputStart before onInputAvailable, where it was previously not called."
+  },
+  {
+    "id": "6.0.231#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Tolerates unknown fields in UI message chunks instead of failing, turning an error into working behavior."
+  },
+  {
+    "id": "6.0.231#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "abortSignal",
+    "why": "Abort reasons are now propagated when cancelled during tool execution, changing what tools and callers observe."
+  },
+  {
+    "id": "6.0.231#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes activeTools exclude tools from parsing and execution, as documented."
+  },
+  {
+    "id": "6.0.232#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves provider options that were being dropped when merging tool messages."
+  },
+  {
+    "id": "6.0.233#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes MP4 audio detection so transcription works, turning a failure into working behavior."
+  },
+  {
+    "id": "6.0.233#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes tool parts being lost when tool call IDs repeat across steps."
+  },
+  {
+    "id": "6.0.234#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance bound on media-type sniffing with no observable change in results."
+  },
+  {
+    "id": "6.0.234#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "pipeUIMessageStreamToResponse",
+    "why": "Piping functions now return promises, so callers can await or catch errors that were previously not surfaced."
+  },
+  {
+    "id": "6.0.237#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "provider-executed tool calls",
+    "why": "Invalid provider-executed tool calls no longer produce a synthesized client tool error, changing output."
+  },
+  {
+    "id": "6.0.238#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "validated downloads",
+    "why": "Downloads resolving to private/internal addresses via DNS aliases or rebinding are now blocked, which errors for code that previously worked."
+  },
+  {
+    "id": "6.0.238#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prepareStep",
+    "why": "New ability to override model call settings per prepareStep invocation; older versions would ignore the extra fields without error."
+  },
+  {
+    "id": "6.0.238#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "streamText",
+    "why": "Provider metadata from empty text deltas is now preserved, changing streamed output."
+  },
+  {
+    "id": "6.0.243#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Skipping redundant re-validation of terminal parts is not observable to users."
+  },
+  {
+    "id": "6.0.244#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "regenerate",
+    "why": "Regenerating a response now keeps preceding assistant messages that were previously dropped, changing the message list."
+  },
+  {
+    "id": "6.0.248#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "aspectRatio: 'adaptive'",
+    "why": "New 'adaptive' value for generateVideo aspectRatio that older versions reject at the type level."
+  },
+  {
+    "id": "6.0.249#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resumed chat streams not stopping on cancellation and stale updates, which is the expected behavior."
+  },
+  {
+    "id": "6.0.250#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes telemetry spans ending twice on failure, a bug fix."
+  },
+  {
+    "id": "6.0.250#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resumeStream wrongly copying the previous assistant message, a bug fix."
+  },
+  {
+    "id": "6.0.252#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Loosens a type so providers without reranking satisfy Provider, turning a type error into working code."
+  },
+  {
+    "id": "6.0.252#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onFinish",
+    "why": "Errors thrown by Chat onFinish now propagate to the initiating request instead of being swallowed, changing behavior of existing code."
+  },
+  {
+    "id": "6.0.253#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves reasoning block IDs that were being lost, a bug fix."
+  },
+  {
+    "id": "6.0.255#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "status",
+    "why": "Chat status stays 'submitted' until content streams, where it previously changed earlier."
+  },
+  {
+    "id": "6.0.255#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization with snapshots preserved, no observable change."
+  },
+  {
+    "id": "6.0.255#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes declaration emit errors, turning an error into working behavior."
+  },
+  {
+    "id": "6.0.260#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "streamObject",
+    "why": "Result promises now reject and completion is reported as failed on provider stream errors, changing behavior of existing code."
+  },
+  {
+    "id": "6.0.260#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes ignoreIncompleteToolCalls filter preliminary tool outputs as the option implies."
+  },
+  {
+    "id": "6.0.260#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "finishReason",
+    "why": "Tools are no longer automatically executed after an unsafe finish reason, which previously ran."
+  },
+  {
+    "id": "6.0.261#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes mock behavior to return configured results in order, matching intent."
+  },
+  {
+    "id": "6.0.262#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onChunk",
+    "why": "Exceptions in onChunk/onError no longer terminate the stream or mask provider errors."
+  },
+  {
+    "id": "6.0.264#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents duplicate text and reasoning part ids, a bug fix."
+  },
+  {
+    "id": "6.0.266#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateText",
+    "why": "Approved turns with invalid revalidated tool input now continue with a model-visible tool error instead of failing."
+  },
+  {
+    "id": "6.0.266#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Memory retention cleanup not observable by users."
+  },
+  {
+    "id": "6.0.270#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "output-denied",
+    "why": "Chats now continue automatically after tool approval denials, where they previously did not."
+  },
+  {
+    "id": "6.0.270#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes cancellation handling of a stitchable stream before an inner stream is registered, a bug fix."
+  },
+  {
+    "id": "6.0.271#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "validateUIMessages",
+    "why": "Persisted typed tool calls are now validated against current schemas and incompatible ones load as dynamic tool parts instead of static typed ones."
+  },
+  {
+    "id": "6.0.271#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "onFinish",
+    "why": "Adds operation-level outcomes to UI message stream end callbacks; older versions simply ignore the extra field."
+  },
+  {
+    "id": "6.0.272#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "ToolChoiceViolationError",
+    "why": "generateText now rejects responses violating a required or selected toolChoice with a new error, where it previously returned them."
+  },
+  {
+    "id": "6.0.272#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Allows tool approval secrets in ToolLoopAgent settings and prepareCall, fixing a restriction."
+  },
+  {
+    "id": "6.0.273#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "streamText",
+    "why": "Exposes parsed structured output in streamText end callbacks, a new callable field; older versions ignore it."
+  },
+  {
+    "id": "6.0.274#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves approval descriptors in UI message streams, restoring expected data."
+  },
+  {
+    "id": "6.0.276#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves provider metadata from empty smooth stream deltas, a bug fix."
+  },
+  {
+    "id": "6.0.276#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Skips smoothStream delays while the document is hidden, a bug fix for timer throttling."
+  },
+  {
+    "id": "6.0.279#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Text data URLs now decode correctly in Node.js, a bug fix."
+  },
+  {
+    "id": "6.0.280#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes atob call so it works on Cloudflare Workers instead of erroring."
+  },
+  {
+    "id": "6.0.280#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateImage",
+    "why": "Unclassified empty image results are now retried and retry accounting and retryability classification change."
+  },
+  {
+    "id": "6.0.284#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Rejecting embedding responses with no embeddings fixes invalid results from being returned silently."
+  },
+  {
+    "id": "6.0.284#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Rejects invalid reranking provider indices, a bug fix for invalid data."
+  },
+  {
+    "id": "6.0.286#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves provider metadata when simulating text streams, a bug fix."
+  },
+  {
+    "id": "6.0.286#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Streamed step results now report the prepareStep model as documented."
+  },
+  {
+    "id": "6.0.286#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents unhandled rejections when reading stops early, a bug fix."
+  },
+  {
+    "id": "6.0.286#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves tool calls required by pending approvals, a bug fix."
+  },
+  {
+    "id": "6.0.286#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cancels attachment downloads on abort or timeout, matching expected abort behavior."
+  },
+  {
+    "id": "6.0.286#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Streams null and empty string partial outputs that were previously dropped, a bug fix."
+  },
+  {
+    "id": "6.0.286#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Structured output now streams from the final tool-loop step as expected, a bug fix."
+  },
+  {
+    "id": "6.0.287#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves provider metadata when converting failed tool calls, a bug fix."
+  },
+  {
+    "id": "6.0.289#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preliminary tool outputs no longer wrongly complete chats, a bug fix."
+  },
+  {
+    "id": "6.0.289#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves opaque file URI strings for provider serialization, a bug fix."
+  },
+  {
+    "id": "6.0.289#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents duplicate content-type headers in chat transport requests, a bug fix."
+  },
+  {
+    "id": "6.0.289#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes streamed tool input callbacks fire in the expected order."
+  },
+  {
+    "id": "6.0.290#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes Google embedMany batching for more than 100 values so it works as documented."
+  },
+  {
+    "id": "6.0.290#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resuming tool approvals that come from earlier messages."
+  },
+  {
+    "id": "6.0.290#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes execution of manually approved inputs produced by schema transforms."
+  },
+  {
+    "id": "6.0.290#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule change with no user-visible effect."
+  },
+  {
+    "id": "6.0.290#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes UI message validation dropping parsed metadata and data values."
+  },
+  {
+    "id": "6.0.293#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes media types being lost on tool result file URLs and makes MIME matching exact."
+  },
+  {
+    "id": "6.0.294#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes response streams not being cancelled when a client disconnects."
+  },
+  {
+    "id": "6.0.295#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resuming active UI message parts after a disconnect."
+  },
+  {
+    "id": "6.0.296#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns an error into working behavior for agent UI streams that take original messages."
+  },
+  {
+    "id": "6.0.296#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes tool metadata being dropped from tool output chunks."
+  },
+  {
+    "id": "6.0.296#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes smoothStream dropping provider metadata on the corresponding chunks."
+  },
+  {
+    "id": "6.0.297#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes hydrated partial tool input being lost across stream resumptions."
+  },
+  {
+    "id": "6.0.297#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds optional SSE heartbeats for idle UI message streams; the option is off unless set, and older versions would ignore it at runtime."
+  },
+  {
+    "id": "6.0.297#3",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Clarifies documentation only; runtime behavior is unchanged."
+  },
+  {
+    "id": "6.0.297#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "prepareReconnectToStreamRequest",
+    "why": "Default reconnection URLs now encode chat IDs and reject '.' and '..', so the request sent for the same ID differs."
+  },
+  {
+    "id": "6.0.297#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes inherited prototype names resolving as tools or providers and breaking image metadata aggregation."
+  },
+  {
+    "id": "6.0.297#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes automatic chat resumption being triggered wrongly after completed tool output."
+  },
+  {
+    "id": "6.0.298#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores the documented DNS validation and pinning protection when global fetch is wrapped."
+  },
+  {
+    "id": "6.0.302#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes provider-reported total tokens being lost in raw usage."
+  },
+  {
+    "id": "6.0.302#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the latest error not being published after repeated failed resume attempts."
+  },
+  {
+    "id": "6.0.302#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes unavailable tools exposing persisted output to models."
+  },
+  {
+    "id": "6.0.302#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes duplicate slashes in chat reconnect URLs."
+  },
+  {
+    "id": "6.0.303#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes global type conflicts across SDK versions."
+  },
+  {
+    "id": "6.0.303#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes stopping a chat without waiting for stream cleanup."
+  },
+  {
+    "id": "6.0.303#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix discarding unrelated message state when resuming streams, restoring intended behavior."
+  },
+  {
+    "id": "7.0.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "experimental_context",
+    "why": "Type changed from unknown to generic, so code relying on the old type may now produce type errors."
+  },
+  {
+    "id": "7.0.0#2",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "ToolResultOutput media part",
+    "why": "The deprecated media part type is removed, so using it now fails type checks or errors."
+  },
+  {
+    "id": "7.0.0#3",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "experimental_telemetry",
+    "why": "experimental_telemetry becomes stable telemetry, so the old option name is no longer accepted."
+  },
+  {
+    "id": "7.0.0#4",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "TelemetryIntegration",
+    "why": "*TelemetryIntegration names become *Telemetry, so old type names no longer exist."
+  },
+  {
+    "id": "7.0.0#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "prepareStep",
+    "why": "Message overrides from prepareStep now carry forward across steps, changing what later steps receive."
+  },
+  {
+    "id": "7.0.0#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "StepResult.response.messages",
+    "why": "Response messages in StepResult now contain only that step's messages instead of accumulated ones."
+  },
+  {
+    "id": "7.0.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "callback event data",
+    "why": "Event data passed to callbacks has fields removed or refactored, so code reading them gets different values."
+  },
+  {
+    "id": "7.0.0#8",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Adds a custom content type to the provider spec, with no stated change for ai users."
+  },
+  {
+    "id": "7.0.0#9",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "provider skills upload",
+    "why": "Adds the ability to upload provider skills; older versions simply lack it."
+  },
+  {
+    "id": "7.0.0#10",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "experimental_customProvider",
+    "why": "The export is removed, so using it now fails."
+  },
+  {
+    "id": "7.0.0#11",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "stepCountIs",
+    "why": "stepCountIs is renamed to isStepCount, so the old name no longer exists."
+  },
+  {
+    "id": "7.0.0#12",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Renames only experimental low-level stream primitives."
+  },
+  {
+    "id": "7.0.0#13",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "require()",
+    "why": "CommonJS exports are removed, so require() of ai now fails."
+  },
+  {
+    "id": "7.0.0#14",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "ToolCallOptions",
+    "why": "The deprecated export is removed in favor of ToolExecutionOptions."
+  },
+  {
+    "id": "7.0.0#15",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "event data telemetry",
+    "why": "Telemetry data is removed from user-facing event data, so code reading it gets undefined."
+  },
+  {
+    "id": "7.0.0#16",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "provider references",
+    "why": "Adds provider references and file uploads; older versions lack them."
+  },
+  {
+    "id": "7.0.0#17",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "reasoning",
+    "why": "Adds a top-level reasoning parameter to generateText and streamText; older versions ignore or lack it."
+  },
+  {
+    "id": "7.0.0#18",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "image part type",
+    "why": "File part data is now tagged with a type and the image part type is removed, breaking old message shapes."
+  },
+  {
+    "id": "7.0.0#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of tool callback invocation with chunk forwarding order, not clearly observable."
+  },
+  {
+    "id": "7.0.0#20",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "experimental_context",
+    "why": "experimental_context is renamed to context, so the old name is no longer accepted."
+  },
+  {
+    "id": "7.0.0#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Marks the start of the v7 pre-release with no user-observable change."
+  },
+  {
+    "id": "7.0.0#22",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "ToolResultOutput file parts",
+    "why": "Tool result file part types are aligned with message file parts, so the old shapes are rejected."
+  },
+  {
+    "id": "7.0.0#23",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "isToolOrDynamicToolUIPart",
+    "why": "The deprecated function is removed, so calling it now fails."
+  },
+  {
+    "id": "7.0.0#24",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Simplifies internal creation of unified telemetry with no stated user-visible change."
+  },
+  {
+    "id": "7.0.0#25",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "@ai-sdk/otel",
+    "why": "New package providing OpenTelemetry support; older versions simply lack it and nothing breaks."
+  },
+  {
+    "id": "7.0.0#26",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "streamText",
+    "why": "Tool execution is now delayed until the model call finishes, changing timing of tool side effects without errors."
+  },
+  {
+    "id": "7.0.0#27",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "experimental_telemetry",
+    "why": "OTel is decoupled from core functions, so telemetry code written for the old version may no longer emit spans without the new package."
+  },
+  {
+    "id": "7.0.0#28",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "allowSystemInMessages",
+    "why": "System messages in messages or prompt are now rejected by default, so existing code throws an error."
+  },
+  {
+    "id": "7.0.0#29",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "ToolLoopAgent allowSystemInMessages",
+    "why": "New option on ToolLoopAgent that older versions reject as a type error."
+  },
+  {
+    "id": "7.0.0#30",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateObject",
+    "why": "OTel is decoupled from generateObject/streamObject, so telemetry behavior changes without errors."
+  },
+  {
+    "id": "7.0.0#31",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "Tool.sensitiveContext",
+    "why": "Renamed to telemetry.includeToolsContext and now opt-in, so the old property is rejected by types."
+  },
+  {
+    "id": "7.0.0#32",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only adds a hint to provider READMEs."
+  },
+  {
+    "id": "7.0.0#33",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "fullStream",
+    "why": "fullStream on the streamText result is deprecated in favor of stream but still works."
+  },
+  {
+    "id": "7.0.0#34",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "gateway",
+    "why": "Gateway errors are now retried, changing runtime behavior of existing calls."
+  },
+  {
+    "id": "7.0.0#35",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "onStepFinish",
+    "why": "Renamed to onStepEnd, so the old callback name is no longer accepted."
+  },
+  {
+    "id": "7.0.0#36",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes a README image URL."
+  },
+  {
+    "id": "7.0.0#37",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Says doStream should reflect transformed values but not what changes for users."
+  },
+  {
+    "id": "7.0.0#38",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "onObjectStepFinish",
+    "why": "Renamed to onObjectStepEnd, so the old name is no longer accepted."
+  },
+  {
+    "id": "7.0.0#39",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Cleanup of telemetry event data without saying what changed."
+  },
+  {
+    "id": "7.0.0#40",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "finalStep",
+    "why": "Result properties that moved to finalStep are deprecated but still work."
+  },
+  {
+    "id": "7.0.0#41",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "context",
+    "why": "context was renamed to runtimeContext, so code using the old name breaks."
+  },
+  {
+    "id": "7.0.0#42",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds experimental callbacks for embed."
+  },
+  {
+    "id": "7.0.0#43",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Renames an experimental export."
+  },
+  {
+    "id": "7.0.0#44",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "logWarnings",
+    "why": "logWarnings is now available for general use; older versions just lack the export."
+  },
+  {
+    "id": "7.0.0#45",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "onFinish",
+    "why": "Renamed to onEnd, so the old callback name is no longer accepted."
+  },
+  {
+    "id": "7.0.0#46",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "telemetry.enable",
+    "why": "Telemetry is now enabled by default, so unchanged code starts emitting telemetry."
+  },
+  {
+    "id": "7.0.0#47",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "streamModelCall",
+    "why": "New function for streaming text generation that older versions do not export."
+  },
+  {
+    "id": "7.0.0#48",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "usage",
+    "why": "usage now reports total across all steps instead of the final step, and totalUsage is deprecated."
+  },
+  {
+    "id": "7.0.0#49",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "addToolApprovalResponse",
+    "why": "Adds an optional ChatRequestOptions argument that older versions reject as a type error."
+  },
+  {
+    "id": "7.0.0#50",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "toolNeedsApproval",
+    "why": "Option renamed to toolApproval; old name is no longer accepted (type error)."
+  },
+  {
+    "id": "7.0.0#51",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "instructions",
+    "why": "New instructions option, with system deprecated; older versions would ignore or accept unknown option without error at runtime."
+  },
+  {
+    "id": "7.0.0#52",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "onChunk",
+    "why": "Streaming chunks are now emitted through onChunk callback, which changes what the callback receives; as described it adds chunk emission via the callback."
+  },
+  {
+    "id": "7.0.0#53",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "contextSchema",
+    "why": "Tool context is now validated at runtime and invalid context throws TypeValidationError."
+  },
+  {
+    "id": "7.0.0#54",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only exposes an experimental_ helper extracted from internal code."
+  },
+  {
+    "id": "7.0.0#55",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prepareStep",
+    "why": "prepareStep now accepts/returns instructions; older versions would not apply it without erroring."
+  },
+  {
+    "id": "7.0.0#56",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization with no observable change."
+  },
+  {
+    "id": "7.0.0#57",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "CallSettings",
+    "why": "CallSettings type split into LanguageModelCallOptions and RequestOptions; old type name no longer available."
+  },
+  {
+    "id": "7.0.0#58",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Enforces callOptionsSchema that was already documented as a runtime schema."
+  },
+  {
+    "id": "7.0.0#59",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "isDynamicToolUIPart",
+    "why": "New export from ai; importing it fails on older versions."
+  },
+  {
+    "id": "7.0.0#60",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "toUIMessageStreamResponse",
+    "why": "Result methods are deprecated but still work, with new standalone helpers toUIMessageStream, toTextStream."
+  },
+  {
+    "id": "7.0.0#61",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "experimental_prepareStep",
+    "why": "Deprecated option removed from generateText; use prepareStep."
+  },
+  {
+    "id": "7.0.0#62",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what changed in the callbacks for users."
+  },
+  {
+    "id": "7.0.0#63",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "timeBetweenOutputTokensMs",
+    "why": "New stats field added; older versions simply lack it."
+  },
+  {
+    "id": "7.0.0#64",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "request",
+    "why": "Request and response bodies are now excluded from results by default, so code reading them gets undefined."
+  },
+  {
+    "id": "7.0.0#65",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a validation error for unregistered tool parts into working behavior."
+  },
+  {
+    "id": "7.0.0#66",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "Output.array",
+    "why": "Array output now returns schema-transformed values instead of raw model output."
+  },
+  {
+    "id": "7.0.0#67",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Security fix making download enforce SSRF protection as intended."
+  },
+  {
+    "id": "7.0.0#68",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes stepMs timeout work as documented and matching generateText."
+  },
+  {
+    "id": "7.0.0#69",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "integrations",
+    "why": "Multiple integrations can now be registered; older versions would not error but only handle one."
+  },
+  {
+    "id": "7.0.0#70",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves an existing setting across retries as intended."
+  },
+  {
+    "id": "7.0.0#71",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "sensitiveContext",
+    "why": "New Tool property; older versions ignore it silently."
+  },
+  {
+    "id": "7.0.0#72",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what the approval guard changes for users."
+  },
+  {
+    "id": "7.0.0#73",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "ExtractLiteralUnion",
+    "why": "Exported type removed; importing it now fails."
+  },
+  {
+    "id": "7.0.0#74",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes getMediaTypeFromUrl honor its documented string return type."
+  },
+  {
+    "id": "7.0.0#75",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what the global telemetry registration or local integration behavior was for users."
+  },
+  {
+    "id": "7.0.0#76",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "hasToolCall",
+    "why": "hasToolCall now accepts several tools; older versions just didn't offer this, and code not using it is unaffected."
+  },
+  {
+    "id": "7.0.0#77",
+    "candidate": false,
+    "skip": "fix",
+    "why": "validateUIMessages rejected valid persisted messages; now accepts them as expected, turning an error into working behavior."
+  },
+  {
+    "id": "7.0.0#78",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "finalStep",
+    "why": "New finalStep property on text generation results."
+  },
+  {
+    "id": "7.0.0#79",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "telemetry.tracer",
+    "why": "The otel Tracer API is removed from telemetry settings, so passing it now gives a type error."
+  },
+  {
+    "id": "7.0.0#80",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "telemetry model attributes",
+    "why": "Model attributes emitted in telemetry are now flattened, changing the recorded output."
+  },
+  {
+    "id": "7.0.0#81",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "tool execution events",
+    "why": "Tool execution events were renamed, so code using the old event names breaks; the exact names are not given."
+  },
+  {
+    "id": "7.0.0#82",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateText array output",
+    "why": "Array output elements are now returned validated, changing the return value."
+  },
+  {
+    "id": "7.0.0#83",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "opentelemetry",
+    "why": "OpenTelemetry support moved to a new package, so the old ai imports or config no longer work."
+  },
+  {
+    "id": "7.0.0#84",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what the harness specification adds or changes for users."
+  },
+  {
+    "id": "7.0.0#85",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "telemetry.metadata",
+    "why": "The metadata field is removed from telemetry settings, so passing it now gives a type error."
+  },
+  {
+    "id": "7.0.0#86",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Adds a missing tool input on provider-executed dynamic tool results, which the docs already implied."
+  },
+  {
+    "id": "7.0.0#87",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "silent",
+    "symbol": "onChunk",
+    "why": "The onChunk telemetry event is removed, so listeners for it are likely no longer called, without an error."
+  },
+  {
+    "id": "7.0.0#88",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "sensitiveRuntimeContext",
+    "why": "New option that older versions reject as an unknown option in typed code."
+  },
+  {
+    "id": "7.0.0#89",
+    "candidate": false,
+    "skip": "fix",
+    "why": "onChunk now receives all stream text parts, which matches what it was documented to do."
+  },
+  {
+    "id": "7.0.0#90",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what template check or 'kind' param is affected for users."
+  },
+  {
+    "id": "7.0.0#91",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "tool description",
+    "why": "Tool descriptions can now take more flexible forms, which older versions would reject; the exact forms are not given."
+  },
+  {
+    "id": "7.0.0#92",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Provider-level type definitions realigned with no user-visible change."
+  },
+  {
+    "id": "7.0.0#93",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "LanguageModelUsage",
+    "why": "Deprecated LanguageModelUsage properties are removed, so code reading them now fails type checks."
+  },
+  {
+    "id": "7.0.0#94",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "ai-sdk-agent",
+    "why": "Outgoing agent requests now carry an extra ai-sdk-agent user-agent segment."
+  },
+  {
+    "id": "7.0.0#95",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "experimental lifecycle callbacks",
+    "why": "Experimental lifecycle callbacks became stable, likely under new names; the old names may no longer work, and the exact names are not given."
+  },
+  {
+    "id": "7.0.0#96",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Better type inference only, accepting the same code."
+  },
+  {
+    "id": "7.0.0#97",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only moves sandbox to an experimental status."
+  },
+  {
+    "id": "7.0.0#98",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds experimental callbacks for rerank only."
+  },
+  {
+    "id": "7.0.0#99",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release process trigger with no observable change."
+  },
+  {
+    "id": "7.0.0#100",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only refactor removing delays."
+  },
+  {
+    "id": "7.0.0#101",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects the helper to handle providerExecuted approvals as intended."
+  },
+  {
+    "id": "7.0.0#102",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "core-event types",
+    "why": "Event types were renamed, so imports of the old type names fail type checking."
+  },
+  {
+    "id": "7.0.0#103",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Types moved to provider-utils and ai imports them from there; no observable change for ai users."
+  },
+  {
+    "id": "7.0.0#104",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "providerMetadata",
+    "why": "Result provider metadata is now passed across the stream, changing stream output."
+  },
+  {
+    "id": "7.0.0#105",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Exposes an Experimental_ type."
+  },
+  {
+    "id": "7.0.0#106",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds performance statistics users can read; older code is unaffected."
+  },
+  {
+    "id": "7.0.0#107",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "response messages",
+    "why": "Invalid JSON tool inputs are now omitted from response messages instead of being passed."
+  },
+  {
+    "id": "7.0.0#108",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Option is experimental_refineToolInput."
+  },
+  {
+    "id": "7.0.0#109",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool-result file URLs",
+    "why": "File URLs in tool results are now downloaded, changing what is sent to the model."
+  },
+  {
+    "id": "7.0.0#110",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "The default tool execution denial message text changed."
+  },
+  {
+    "id": "7.0.0#111",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Release notification tooling, not observable in ai."
+  },
+  {
+    "id": "7.0.0#112",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Anthropic provider fix, a different package from ai."
+  },
+  {
+    "id": "7.0.0#113",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "isLoopFinished",
+    "why": "New stop condition helper that older versions do not export."
+  },
+  {
+    "id": "7.0.0#114",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "OutputInterface",
+    "why": "The export was removed, so importing it now fails."
+  },
+  {
+    "id": "7.0.0#115",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "timeout.toolMs",
+    "why": "New timeout option older versions reject as a type error."
+  },
+  {
+    "id": "7.0.0#116",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what changed for users."
+  },
+  {
+    "id": "7.0.0#117",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves stack traces on async errors, a bug fix."
+  },
+  {
+    "id": "7.0.0#118",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal refactor of executeTool parameters."
+  },
+  {
+    "id": "7.0.0#119",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes fixJson crash or misparse on partial unicode escapes."
+  },
+  {
+    "id": "7.0.0#120",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects time-to-first-output measurement to match its intended meaning."
+  },
+  {
+    "id": "7.0.0#121",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "includeRawChunks",
+    "why": "Option moved to include.rawChunks; the old name is no longer accepted."
+  },
+  {
+    "id": "7.0.0#122",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds deprecated aliases for AI SDK 6 tool call lifecycle callbacks; older code keeps working."
+  },
+  {
+    "id": "7.0.0#123",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "tool approval functions",
+    "why": "Approval functions can now access runtime context; existing code is unaffected."
+  },
+  {
+    "id": "7.0.0#124",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds a ModelCall start/end event users can observe; existing code is unaffected."
+  },
+  {
+    "id": "7.0.0#125",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Introduces an internal Arrayable type with no observable change."
+  },
+  {
+    "id": "7.0.0#126",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "approval reason",
+    "why": "Adds a reason to automatic tool approvals; code not using it is unaffected, and older versions simply lack it."
+  },
+  {
+    "id": "7.0.0#127",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "needsApproval",
+    "why": "Tool approval functions may now return undefined, which older versions' types reject."
+  },
+  {
+    "id": "7.0.0#128",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Telemetry no longer depends on the onChunk callback, with no stated user-visible change."
+  },
+  {
+    "id": "7.0.0#129",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Change is to the openai-compatible provider package, not ai."
+  },
+  {
+    "id": "7.0.0#130",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "Node.js 22+",
+    "why": "Node versions below 22 are no longer supported, so installs or runs on them can fail."
+  },
+  {
+    "id": "7.0.0#131",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what observable change wrapping the model call in telemetry context has."
+  },
+  {
+    "id": "7.0.0#132",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "NoOutputGeneratedError",
+    "why": "streamText result promises now reject when the stream produces no output, where they previously resolved with an empty step."
+  },
+  {
+    "id": "7.0.0#133",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "experimental_generateImage",
+    "why": "Deprecated experimental generateImage exports are removed, so imports now fail."
+  },
+  {
+    "id": "7.0.0#134",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "experimental_output",
+    "why": "The deprecated alias is removed in favor of output."
+  },
+  {
+    "id": "7.0.0#135",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "HttpChatTransport",
+    "why": "The custom User-Agent header is no longer sent with requests."
+  },
+  {
+    "id": "7.0.0#136",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "onRerankFinish",
+    "why": "Rerank telemetry finish callback is renamed to onRerankEnd; the old name's former form is not stated but is presumably a finish-style callback."
+  },
+  {
+    "id": "7.0.0#137",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "rerank",
+    "why": "rerank() now accepts plain string model IDs, which older versions reject."
+  },
+  {
+    "id": "7.0.0#138",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what changes on dynamic tool parts for users."
+  },
+  {
+    "id": "7.0.0#139",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "responseMessages",
+    "why": "New property on GenerateTextResult and StreamTextResult that older versions lack."
+  },
+  {
+    "id": "7.0.0#140",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only triggers a canary release."
+  },
+  {
+    "id": "7.0.0#141",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say how decoupling otel from embed functions changes behavior for users."
+  },
+  {
+    "id": "7.0.0#142",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Change is to getErrorMessage in the provider package."
+  },
+  {
+    "id": "7.0.0#143",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "onFinish",
+    "why": "The telemetry onFinish callback is renamed to onEnd, so code using the old name would likely no longer be called."
+  },
+  {
+    "id": "7.0.0#144",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say which usage attributes were added or where."
+  },
+  {
+    "id": "7.0.0#145",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds experimental callbacks only."
+  },
+  {
+    "id": "7.0.0#146",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "toolTimeouts",
+    "why": "New option for per-tool timeout overrides that older versions don't accept."
+  },
+  {
+    "id": "7.0.0#147",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "UIMessagePart",
+    "why": "input becomes optional on input-streaming parts, so code assuming it is defined can now fail type checks."
+  },
+  {
+    "id": "7.0.0#148",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "toolNeedsApproval",
+    "why": "New option that older versions don't accept."
+  },
+  {
+    "id": "7.0.0#149",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds experimental Realtime API entry points only."
+  },
+  {
+    "id": "7.0.0#150",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Defaults missing embedding warnings to an empty array, fixing undefined where docs expect an array."
+  },
+  {
+    "id": "7.0.0#151",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "customProvider",
+    "why": "Adds file and skill upload support to customProvider and createProviderRegistry; older versions simply lack it."
+  },
+  {
+    "id": "7.0.0#152",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool execution duration",
+    "why": "Measured tool execution duration now covers only actual execution, so reported values change for the same code."
+  },
+  {
+    "id": "7.0.0#153",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "uploadFile",
+    "why": "uploadFile and uploadSkill now accept a provider instance as shorthand, which older versions reject."
+  },
+  {
+    "id": "7.0.0#154",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "OTEL response attributes",
+    "why": "Telemetry response attributes now include generated files, so emitted output changes for existing code."
+  },
+  {
+    "id": "7.0.0#155",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops re-validating tool input for output-error parts, which previously failed validation unexpectedly."
+  },
+  {
+    "id": "7.0.0#156",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "sensitiveRuntimeContext",
+    "why": "Renamed to telemetry.includeRuntimeContext and made opt-in, so old setting no longer takes effect and runtime context is not included."
+  },
+  {
+    "id": "7.0.0#157",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "toolMetadata",
+    "why": "New toolMetadata option on tools that older versions would not accept type-wise."
+  },
+  {
+    "id": "7.0.0#158",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "StepResult.request.messages",
+    "why": "Adds request.messages to StepResult, a new property absent in older versions."
+  },
+  {
+    "id": "7.0.0#159",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds spawnCommand to Experimental_Sandbox, an experimental interface."
+  },
+  {
+    "id": "7.0.0#160",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test mock fix only."
+  },
+  {
+    "id": "7.0.0#161",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Import handling cleanup with no observable change."
+  },
+  {
+    "id": "7.0.0#162",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "silent",
+    "symbol": "onStart event stopWhen",
+    "why": "stopWhen is no longer in the onStart event, so code reading it gets undefined without an error."
+  },
+  {
+    "id": "7.0.0#163",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "onEmbedFinish",
+    "why": "onEmbedFinish is renamed to onEmbedEnd."
+  },
+  {
+    "id": "7.0.0#164",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Splits an internal helper function, not a documented user-facing API."
+  },
+  {
+    "id": "7.0.0#165",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "events",
+    "why": "Event payloads no longer carry some data, so code reading removed fields silently gets undefined."
+  },
+  {
+    "id": "7.0.0#166",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "validateDownloadUrl",
+    "why": "Downloads of URLs with trailing-dot hosts, embedded-IPv4 IPv6, newly blocked ranges, or unsafe redirects are now rejected."
+  },
+  {
+    "id": "7.0.0#167",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "experimental_generateSpeech",
+    "why": "generateSpeech and SpeechResult are promoted to stable exports, so the stable names are now available and the old experimental names are replaced."
+  },
+  {
+    "id": "7.0.0#168",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "experimental_transcribe",
+    "why": "transcribe is promoted to stable, with deprecated experimental aliases that still work."
+  },
+  {
+    "id": "7.0.0#169",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "step performance metrics",
+    "why": "Adds explicit token throughput fields to step performance metrics, which older versions lack."
+  },
+  {
+    "id": "7.0.0#170",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Hardens against prototype pollution from stream part IDs, a security fix."
+  },
+  {
+    "id": "7.0.0#171",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Tracing channels for parent-child context is not specific enough to tell what users observe."
+  },
+  {
+    "id": "7.0.0#172",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "CallSettings.timeout",
+    "why": "timeout is removed from CallSettings, so passing it now causes a type error."
+  },
+  {
+    "id": "7.0.0#173",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Sandbox shell execution abstraction is not described well enough to tell what is callable or whether it is experimental."
+  },
+  {
+    "id": "7.0.0#174",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only triggers a beta release."
+  },
+  {
+    "id": "7.0.0#175",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "include",
+    "why": "An option becomes stable (no longer experimental-prefixed), so the stable name is new and older versions would reject it."
+  },
+  {
+    "id": "7.0.0#176",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "sendReasoning",
+    "why": "With sendReasoning false, reasoning-start/end chunks are no longer emitted, changing the stream output for existing code."
+  },
+  {
+    "id": "7.0.0#177",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds support for automatic tool approval in UI messages; older versions would not error on code not using it."
+  },
+  {
+    "id": "7.0.0#178",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only the Experimental_Sandbox abstraction."
+  },
+  {
+    "id": "7.0.0#179",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prepareStep",
+    "why": "prepareStep now receives initial and response messages, a new callable addition."
+  },
+  {
+    "id": "7.0.0#180",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "why": "Adds a generic tool approval function that older versions do not support."
+  },
+  {
+    "id": "7.0.0#181",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "TelemetrySettings",
+    "why": "The type TelemetrySettings is renamed to TelemetryOptions, so the old name fails type checking."
+  },
+  {
+    "id": "7.0.0#182",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes support for tools with optional context so they work as expected instead of erroring."
+  },
+  {
+    "id": "7.0.0#183",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say which accumulative properties changed or how."
+  },
+  {
+    "id": "7.0.0#184",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "onAbort",
+    "why": "Introduces a new onAbort hook that older versions don't accept."
+  },
+  {
+    "id": "7.0.0#185",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "toolsContext",
+    "why": "Tool context is separated from context, changing what existing code passes and receives."
+  },
+  {
+    "id": "7.0.0#186",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "timeout",
+    "why": "Step/chunk timeout aborts now carry a TimeoutError reason, which changes the observable signal.reason."
+  },
+  {
+    "id": "7.0.0#187",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "An undefined tool output is now serialized as null in UI message chunks."
+  },
+  {
+    "id": "7.0.0#188",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Adds a diagnostics channel that publishes event data; code not using it is unaffected."
+  },
+  {
+    "id": "7.0.0#189",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "experimental_toolApprovalSecret",
+    "why": "Replayed tool approvals are now re-validated (signature, input schema, policy), so forged or invalid approvals are rejected."
+  },
+  {
+    "id": "7.0.0#190",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "toolOrder",
+    "why": "New toolOrder option that older versions don't recognize."
+  },
+  {
+    "id": "7.0.0#191",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint tooling change only."
+  },
+  {
+    "id": "7.0.0#192",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "silent",
+    "symbol": "experimental_activeTools",
+    "why": "The deprecated option is removed; passing it is now ignored, though type checking may also flag it."
+  },
+  {
+    "id": "7.0.0#193",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "rerank",
+    "why": "Rerank no longer is coupled to otel, changing its telemetry behavior."
+  },
+  {
+    "id": "7.0.0#194",
+    "candidate": false,
+    "skip": "docs",
+    "why": "README updates only."
+  },
+  {
+    "id": "7.0.0#195",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes the default onError return the generic message the documentation already specified."
+  },
+  {
+    "id": "7.0.0#196",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Hardening against prototype pollution, with no change to behavior of valid code."
+  },
+  {
+    "id": "7.0.0#197",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "generateAudio",
+    "why": "Adds a first-class generateAudio call option for video generation that older versions don't support."
+  },
+  {
+    "id": "7.0.0#198",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Instructions",
+    "why": "Introduces a new Instructions type that older versions don't export."
+  },
+  {
+    "id": "7.0.0#199",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "The change is in provider-utils download handling, a socket leak fix."
+  },
+  {
+    "id": "7.0.0#200",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes editor auto-complete on provider registry and custom provider, with no runtime change."
+  },
+  {
+    "id": "7.0.0#201",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "Sandbox.executeCommand",
+    "why": "Sandbox.executeCommand is now Sandbox.runCommand, so calls to the old name fail."
+  },
+  {
+    "id": "7.0.0#202",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Simplifies the mergeAbortSignals internals with no observable change."
+  },
+  {
+    "id": "7.0.0#203",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prepareStep",
+    "why": "prepareStep can now return a sandbox override per step; older versions would ignore it silently."
+  },
+  {
+    "id": "7.0.0#204",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "The change is to the mcp package, not ai."
+  },
+  {
+    "id": "7.0.0#205",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "include.requestMessage",
+    "why": "New opt-in include option for step request message storage; older versions ignore the unknown option."
+  },
+  {
+    "id": "7.0.0#206",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "experimental_onToolExecutionStart",
+    "why": "onToolExecutionStart and onToolExecutionEnd move from experimental to stable names, so code using the experimental names may no longer work."
+  },
+  {
+    "id": "7.0.0#207",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "ToolCallRepairFunction",
+    "why": "ToolCallRepairFunction, parseToolCall and events now use instructions in place of the old field, so code using the old name breaks."
+  },
+  {
+    "id": "7.0.0#208",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "automatic tool approval",
+    "why": "Adds automatic tool approval, which older versions would ignore."
+  },
+  {
+    "id": "7.0.0#209",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes providerExecuted approvals being sent to the model twice, which is a bug fix."
+  },
+  {
+    "id": "7.0.0#210",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "WorkflowAgent",
+    "why": "WorkflowAgent now applies tool.toModelOutput to tool results, where before it was ignored and results were serialized as text or json."
+  },
+  {
+    "id": "7.0.0#211",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "WorkflowAgent",
+    "why": "WorkflowAgent now re-validates approved tool calls (schema, HMAC signature, policy), so forged or invalid approvals are rejected."
+  },
+  {
+    "id": "7.0.0#212",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "loud",
+    "symbol": "image-*",
+    "why": "image-* tool output types are folded into the file-* types, so code using the image-* types breaks."
+  },
+  {
+    "id": "7.0.0#213",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "onFinish",
+    "why": "The UI message stream onFinish callback is now onEnd, so an old onFinish is no longer called."
+  },
+  {
+    "id": "7.0.0#214",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "devtools",
+    "why": "Adds a new devtools integration for telemetry, which older versions lack."
+  },
+  {
+    "id": "7.0.5#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes pruneMessages prune approval responses along with their requests, as it was meant to."
+  },
+  {
+    "id": "7.0.6#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds types for already-deprecated aliases with no runtime change."
+  },
+  {
+    "id": "7.0.7#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops convertToModelMessages emitting an empty assistant message, which was a bug."
+  },
+  {
+    "id": "7.0.8#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "frameImages",
+    "why": "Adds frameImages and inputReferences call options for video generation; older versions ignore them."
+  },
+  {
+    "id": "7.0.10#1",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "The change is to the mcp package, not ai."
+  },
+  {
+    "id": "7.0.11#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes React Native/Hermes builds that failed, turning an error into working behavior."
+  },
+  {
+    "id": "7.0.12#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool results order",
+    "why": "Tool results in response messages are now sorted by tool call order, which changes the output order."
+  },
+  {
+    "id": "7.0.12#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes extractJsonMiddleware wrongly keeping leading whitespace in streamed text."
+  },
+  {
+    "id": "7.0.14#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds experimental streaming transcription support."
+  },
+  {
+    "id": "7.0.16#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what was lost or changed when approval responses were recorded."
+  },
+  {
+    "id": "7.0.19#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "fingerprintTools, detectToolDrift",
+    "why": "New callable functions; older versions simply lack them and unchanged code behaves the same."
+  },
+  {
+    "id": "7.0.19#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Doesn't say what signature or behavior changes for users when approvals become responded."
+  },
+  {
+    "id": "7.0.19#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "getOwn",
+    "why": "Tool names or approval ids matching inherited properties like constructor now resolve to no such tool/unconfigured instead of a prototype value."
+  },
+  {
+    "id": "7.0.19#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "inputReferences",
+    "why": "Video reference inputs are newly accepted in inputReferences; older versions would reject them."
+  },
+  {
+    "id": "7.0.20#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes compressed streams flush incrementally, as streaming is documented to behave."
+  },
+  {
+    "id": "7.0.20#2",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "experimental_repairToolCall",
+    "why": "Stable repairToolCall replaces the experimental name, which still works as a deprecated alias."
+  },
+  {
+    "id": "7.0.21#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal import consistency with no observable change."
+  },
+  {
+    "id": "7.0.22#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "cartesia",
+    "why": "New Cartesia provider for speech and transcription; existing code is unaffected."
+  },
+  {
+    "id": "7.0.23#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "embedMany",
+    "why": "embedMany now runs inside a tracing channel context, which changes observable tracing output."
+  },
+  {
+    "id": "7.0.25#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental_streamTranscribe."
+  },
+  {
+    "id": "7.0.25#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only an error message for experimental_streamTranscribe."
+  },
+  {
+    "id": "7.0.26#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Orphaned tool calls after approvals are now grouped under the parent span, changing tracing output."
+  },
+  {
+    "id": "7.0.27#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a validation error on empty-parts assistant messages into working behavior."
+  },
+  {
+    "id": "7.0.27#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental_streamTranscribe."
+  },
+  {
+    "id": "7.0.28#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes onFinish handling in an overlapping-request edge case to match expected behavior."
+  },
+  {
+    "id": "7.0.31#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Emits the correct denied output state for client-rejected approvals, as intended."
+  },
+  {
+    "id": "7.0.31#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onInputStart",
+    "why": "Callback order changed for non-streaming tool calls, so onInputStart now fires before onInputAvailable."
+  },
+  {
+    "id": "7.0.32#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Corrects documentation of the onToolCall result."
+  },
+  {
+    "id": "7.0.32#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "UI message chunk validation now accepts unknown fields instead of rejecting them."
+  },
+  {
+    "id": "7.0.32#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Abort reasons are now propagated when generation is cancelled during tool execution."
+  },
+  {
+    "id": "7.0.33#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes MP4 audio transcription work where detection previously failed."
+  },
+  {
+    "id": "7.0.33#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes tool parts being lost when tool call IDs repeat across steps."
+  },
+  {
+    "id": "7.0.33#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Provider options are now preserved when consecutive tool messages are combined, changing what is sent."
+  },
+  {
+    "id": "7.0.35#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "pipeUIMessageStreamToResponse",
+    "why": "Piping functions now return promises so callers can catch stream errors, changing their return value."
+  },
+  {
+    "id": "7.0.35#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "New per-step first content timeout option for streaming generations; existing code is unaffected."
+  },
+  {
+    "id": "7.0.36#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only changes the signing of `experimental_toolApprovalSecret`, and old signatures still verify."
+  },
+  {
+    "id": "7.0.38#1",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "It doesn't say what users now see for invalid provider-executed tool calls, or whether the old behavior was a bug."
+  },
+  {
+    "id": "7.0.38#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds a new experimental speech translation spec and `experimental_streamTranslate`."
+  },
+  {
+    "id": "7.0.39#1",
+    "candidate": true,
+    "kind": "renamed",
+    "signal": "silent",
+    "symbol": "experimental_repairText",
+    "why": "`repairText` is now stable, and the old `experimental_repairText` still works as a deprecated alias."
+  },
+  {
+    "id": "7.0.40#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "It only deprecates an `Experimental_`-prefixed type."
+  },
+  {
+    "id": "7.0.41#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "The warning banner now goes to stderr instead of stdout, which changes what output consumers see."
+  },
+  {
+    "id": "7.0.42#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "It closes a DNS rebinding bypass so validated downloads block private addresses as intended."
+  },
+  {
+    "id": "7.0.42#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prepareStep",
+    "why": "`prepareStep` can now override model call settings per step, and older versions would ignore the extra settings at runtime."
+  },
+  {
+    "id": "7.0.42#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes validated Node.js downloads that failed when the connector requested a single DNS address."
+  },
+  {
+    "id": "7.0.42#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "streamText",
+    "why": "`streamText` now keeps provider metadata from empty text deltas, which was previously dropped."
+  },
+  {
+    "id": "7.0.43#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds `experimental_toolCaller` routing."
+  },
+  {
+    "id": "7.0.44#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects telemetry attribution for calls that resolve to a different response model."
+  },
+  {
+    "id": "7.0.45#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds `experimental_toolCallers` support to `streamText`."
+  },
+  {
+    "id": "7.0.45#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds experimental tool caller support to `ToolLoopAgent`."
+  },
+  {
+    "id": "7.0.45#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateText",
+    "why": "`generateText` now emits a warning when given the streaming-only `firstChunkMs` or `chunkMs` timeouts."
+  },
+  {
+    "id": "7.0.50#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only the experimental video model interface and `experimental_generateVideo`."
+  },
+  {
+    "id": "7.0.50#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Simplifies configuration for the experimental code-mode tool callers."
+  },
+  {
+    "id": "7.0.52#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops needless re-validation of terminal UI message parts, which could fail for already-completed tool outputs."
+  },
+  {
+    "id": "7.0.54#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "prepareCall",
+    "why": "`ToolLoopAgent` `prepareCall` can now read and override `reasoning`."
+  },
+  {
+    "id": "7.0.54#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "defaultInstructionsMiddleware",
+    "why": "This is a new export that older versions lack, so importing it fails."
+  },
+  {
+    "id": "7.0.54#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Regenerating a response now keeps the preceding assistant messages, which fixes a bug."
+  },
+  {
+    "id": "7.0.55#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "why": "New batch APIs that older versions don't have, so calling them fails."
+  },
+  {
+    "id": "7.0.56#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Provider metadata is now exposed on language-model-call end callbacks and telemetry spans, and older versions simply don't provide it."
+  },
+  {
+    "id": "7.0.56#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "It only affects retries in `generateVideo`, which is experimental."
+  },
+  {
+    "id": "7.0.56#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resumed chat streams that kept running after cancellation and applied stale updates."
+  },
+  {
+    "id": "7.0.58#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "ToolLoopAgent",
+    "why": "Timeouts configured in agent settings were previously ignored and are now applied, changing runtime behavior of existing code."
+  },
+  {
+    "id": "7.0.58#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "aspectRatio: 'adaptive'",
+    "why": "New 'adaptive' value accepted on generateVideo aspectRatio; it is a type-level widening and older versions would only fail type checks, but older runtime passes it through, so treat as silent."
+  },
+  {
+    "id": "7.0.58#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Bundle size tree-shaking of internal imports has no observable API change."
+  },
+  {
+    "id": "7.0.62#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "Completion APIs custom body types",
+    "why": "Adds typed custom bodies to Completion APIs; older versions would reject the new typed usage at type level."
+  },
+  {
+    "id": "7.0.63#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "reasoning UI parts",
+    "why": "Reasoning UI parts now carry the block IDs from UI message streams, changing the resulting message data."
+  },
+  {
+    "id": "7.0.63#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a type assignment error so providers without reranking support work as Provider."
+  },
+  {
+    "id": "7.0.65#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization of cloning with snapshots preserved; no observable change."
+  },
+  {
+    "id": "7.0.65#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves definitions that should have been kept when wrapping array output schemas, a bug fix."
+  },
+  {
+    "id": "7.0.65#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onFinish",
+    "why": "Errors thrown in Chat onFinish now propagate to the initiating request instead of being swallowed."
+  },
+  {
+    "id": "7.0.66#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "status",
+    "why": "Chat status stays 'submitted' longer, until content begins streaming, so code relying on 'streaming' timing behaves differently."
+  },
+  {
+    "id": "7.0.66#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a declaration emit error, turning a failure into working behavior."
+  },
+  {
+    "id": "7.0.70#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects multi-step loop stopping for client tool approval to the intended behavior."
+  },
+  {
+    "id": "7.0.70#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "streamObject",
+    "why": "Result promises now reject and completion is reported as failed when the provider stream errors, where previously they did not."
+  },
+  {
+    "id": "7.0.70#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes ignoreIncompleteToolCalls filter preliminary outputs as the option is meant to."
+  },
+  {
+    "id": "7.0.70#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "finishReason",
+    "why": "Tools are no longer automatically executed when a model call ends with an unsafe finish reason."
+  },
+  {
+    "id": "7.0.70#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Clears stale partial parts on retry, fixing incorrect duplicated state."
+  },
+  {
+    "id": "7.0.71#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "onChunk",
+    "why": "Exceptions in onChunk and onError callbacks no longer terminate the stream or mask provider errors."
+  },
+  {
+    "id": "7.0.76#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents duplicate part ids, a bug fix."
+  },
+  {
+    "id": "7.0.76#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Allows nullish metadata schemas that previously errored for branded IDs, turning a type error into working code."
+  },
+  {
+    "id": "7.0.78#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateText",
+    "why": "Approved turns with invalid revalidated tool input now continue with a model-visible tool error instead of the previous handling."
+  },
+  {
+    "id": "7.0.79#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes lost active parts when merged UI streams finish a step."
+  },
+  {
+    "id": "7.0.79#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental_startTextBatch and its webhookUrl option."
+  },
+  {
+    "id": "7.0.79#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes structured output parse when finishReason is omitted, turning a failure into working behavior."
+  },
+  {
+    "id": "7.0.82#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "approval.requestReason",
+    "why": "Adds an optional reason to manual tool approval statuses and UI messages; older versions would ignore it rather than error."
+  },
+  {
+    "id": "7.0.83#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool call validation",
+    "why": "Persisted typed tool calls are now validated against current schemas and incompatible ones load as dynamic tool parts instead of static typed parts."
+  },
+  {
+    "id": "7.0.83#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "output-denied",
+    "why": "Chats now auto-continue after tool approval denials reach output-denied, where previously they stopped."
+  },
+  {
+    "id": "7.0.83#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "onEnd",
+    "why": "UI message stream end callbacks now receive operation-level outcomes, a new field callers can use."
+  },
+  {
+    "id": "7.0.83#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes cancellation handling of a stitchable stream before an inner stream is registered, an internal edge-case bug."
+  },
+  {
+    "id": "7.0.84#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "streamText",
+    "why": "Parsed structured output is now exposed in streamText end callbacks as a new callable value."
+  },
+  {
+    "id": "7.0.84#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes settings and prepareCall to accept tool approval secrets as intended, turning a rejection into working behavior."
+  },
+  {
+    "id": "7.0.84#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes smoothStream crashing or misbehaving with stateful and empty-match regexes."
+  },
+  {
+    "id": "7.0.85#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "canonical hashes",
+    "why": "Hash output changes for arrays containing undefined elements, so existing hashes may differ."
+  },
+  {
+    "id": "7.0.85#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects Gateway image-generation cost reporting to the total across split requests."
+  },
+  {
+    "id": "7.0.85#3",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Change is to the Anthropic provider package, not ai."
+  },
+  {
+    "id": "7.0.85#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "image generation calls",
+    "why": "Exposes individual image generation calls, a new accessible value."
+  },
+  {
+    "id": "7.0.86#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "WorkflowAgent",
+    "why": "Adds signed tool approval support to WorkflowAgent."
+  },
+  {
+    "id": "7.0.87#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes approval descriptors being dropped in UI message streams."
+  },
+  {
+    "id": "7.0.88#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "generateText",
+    "why": "generateText now rejects responses violating required tool choices, which previously were accepted."
+  },
+  {
+    "id": "7.0.88#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Says tool calling was added to 'batch' without identifying what API or whether it is in ai."
+  },
+  {
+    "id": "7.0.89#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "uploadFile",
+    "why": "Adds new file operations and result fields (byteSize, createdAt, expiresAt), and uploadFile now forwards abortSignal/headers."
+  },
+  {
+    "id": "7.0.91#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "streamRetries",
+    "why": "Adds configurable recovery for mid-stream provider errors via streamRetries and StreamTextOnErrorRetryCallback."
+  },
+  {
+    "id": "7.0.92#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves provider metadata that was being lost from empty smoothStream deltas."
+  },
+  {
+    "id": "7.0.92#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Surfaces fallback errors where empty HTTP response bodies previously gave no useful error."
+  },
+  {
+    "id": "7.0.92#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "smoothStream",
+    "why": "smoothStream now skips delays while the document is hidden, changing timing for existing code."
+  },
+  {
+    "id": "7.0.92#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "onAbort",
+    "why": "streamText onAbort callbacks now receive call ID and abort reason."
+  },
+  {
+    "id": "7.0.93#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "sendMessage",
+    "why": "Replacing a message with sendMessage now uses a new message ID instead of the old one."
+  },
+  {
+    "id": "7.0.93#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes tool part titles being dropped during UI message validation."
+  },
+  {
+    "id": "7.0.93#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes provider metadata being lost when converting failed tool calls."
+  },
+  {
+    "id": "7.0.93#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "minItems",
+    "why": "Array outputs now support minItems and maxItems constraints."
+  },
+  {
+    "id": "7.0.93#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Only adds already supported callbacks to a type definition."
+  },
+  {
+    "id": "7.0.93#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Decoding text data URLs in Node.js makes ai do what it was meant to; it fixes a bug."
+  },
+  {
+    "id": "7.0.93#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "embedMany",
+    "why": "Embedding responses with a mismatched count are now rejected with an error instead of being accepted."
+  },
+  {
+    "id": "7.0.93#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves diagnostics that were lost on failed image generation; a bug fix."
+  },
+  {
+    "id": "7.0.93#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a crash in environments where AbortSignal is not a constructor."
+  },
+  {
+    "id": "7.0.94#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "batch",
+    "why": "Adds support for per-request models in batch; older versions would not use it, but it adds no loud rejection."
+  },
+  {
+    "id": "7.0.94#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "streamText",
+    "why": "streamText now enforces tool choices that were previously not enforced, changing behavior of existing calls."
+  },
+  {
+    "id": "7.0.94#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "generateImage",
+    "why": "Empty image results are now retried, and Google prompt blocks are treated as terminal, changing retry behavior."
+  },
+  {
+    "id": "7.0.95#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Rejecting empty embedding responses surfaces an error for an invalid result; a bug-fix hardening."
+  },
+  {
+    "id": "7.0.96#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "batch",
+    "why": "Adds batch cancel and list APIs."
+  },
+  {
+    "id": "7.0.96#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes atob call for Cloudflare Workers compatibility, turning a crash into working behavior."
+  },
+  {
+    "id": "7.0.97#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents unhandled rejections in video webhook handling; a bug fix."
+  },
+  {
+    "id": "7.0.97#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "batch",
+    "why": "Adds batch cancel and list APIs."
+  },
+  {
+    "id": "7.0.98#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "batch",
+    "why": "Unsupported batch request types are now rejected with an error."
+  },
+  {
+    "id": "7.0.98#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "embed",
+    "why": "Adds runtime context attribution to embed, embedMany and rerank."
+  },
+  {
+    "id": "7.0.98#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "batch",
+    "why": "Adds image generation requests in batches."
+  },
+  {
+    "id": "7.0.98#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Rejects invalid provider indices in reranking; a bug-fix hardening against bad data."
+  },
+  {
+    "id": "7.0.98#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "validateUIMessages now accepts inferred tools, turning an error into working behavior."
+  },
+  {
+    "id": "7.0.98#6",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "UIMessage",
+    "why": "Adds a stable UI message type and type guard for tool output errors."
+  },
+  {
+    "id": "7.0.99#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "InvalidArgumentError",
+    "why": "Utility input validation now throws InvalidArgumentError, so code catching the previous error type may behave differently."
+  },
+  {
+    "id": "7.0.100#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "why": "Exposes typed AI SDK errors for UI transport and completion failures."
+  },
+  {
+    "id": "7.0.101#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes serialization of tool output JSON values; a bug fix."
+  },
+  {
+    "id": "7.0.102#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only experimental client-delegated Live conversations."
+  },
+  {
+    "id": "7.0.102#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds an experimental OpenAI Live provider via openai.experimental_realtime."
+  },
+  {
+    "id": "7.0.102#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Settles automatically denied tool calls in UI streams; a bug fix."
+  },
+  {
+    "id": "7.0.102#4",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only to experimental realtime WebSocket error reporting."
+  },
+  {
+    "id": "7.0.102#5",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "loud",
+    "symbol": "autoContinueTools",
+    "why": "Removes the autoContinueTools option and Live tool-result aliases, and sendTextMessage/addToolOutput now reject continuous sessions."
+  },
+  {
+    "id": "7.0.103#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "code-mode",
+    "why": "Adds mid-conversation tool discovery/updates for code-mode, which is new and does not affect code that doesn't use it."
+  },
+  {
+    "id": "7.0.103#2",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "rawInput",
+    "why": "rawInput in output-error UI message parts is deprecated but still works."
+  },
+  {
+    "id": "7.0.103#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores the documented DNS validation and connection pinning protection when global fetch is wrapped."
+  },
+  {
+    "id": "7.0.103#4",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Adds experimental_evaluate and an experimental evaluation specification."
+  },
+  {
+    "id": "7.0.104#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only extends the experimental evaluation feature with model aliases and registry resolution."
+  },
+  {
+    "id": "7.0.104#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Reports abnormal realtime WebSocket close diagnostics through onError, which was not previously surfaced."
+  },
+  {
+    "id": "7.0.104#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "tool search",
+    "why": "Adds support for tool search with direct tool calling; older versions simply lack it."
+  },
+  {
+    "id": "7.0.104#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "tool search tool",
+    "why": "Adds a native tool search tool that older versions do not export, so using it fails there."
+  },
+  {
+    "id": "7.0.105#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only how experimental evaluation model IDs are resolved."
+  },
+  {
+    "id": "7.0.106#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves provider metadata when simulating text streams, which is the expected behavior."
+  },
+  {
+    "id": "7.0.106#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects the model reported in streamed step results to match the prepareStep model."
+  },
+  {
+    "id": "7.0.106#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents unhandled rejections when UI message stream reading stops early."
+  },
+  {
+    "id": "7.0.106#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves prototype-named properties in serialized tool outputs that were previously lost."
+  },
+  {
+    "id": "7.0.106#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Closes telemetry spans when provider response streams fail."
+  },
+  {
+    "id": "7.0.106#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Uses the prepareStep-selected model for response metadata fallbacks as documented."
+  },
+  {
+    "id": "7.0.106#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves tool calls needed by retained pending approvals, fixing broken behavior."
+  },
+  {
+    "id": "7.0.106#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Skips input-available callbacks for invalid streamed tool calls, where they should not fire."
+  },
+  {
+    "id": "7.0.106#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cancels attachment downloads on abort or timeout, matching expected abort semantics."
+  },
+  {
+    "id": "7.0.106#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes JSON fence stripping before trailing whitespace in streamed output."
+  },
+  {
+    "id": "7.0.106#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes streaming of null and empty string JSON partial outputs."
+  },
+  {
+    "id": "7.0.106#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents onEnd from firing after aborting a multi-step text stream."
+  },
+  {
+    "id": "7.0.106#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes structured output stream from the final tool-loop step as expected."
+  },
+  {
+    "id": "7.0.107#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "wrapProvider now preserves provider file and skill upload APIs that it dropped."
+  },
+  {
+    "id": "7.0.107#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves query parameters in chat reconnect URLs, which were wrongly dropped."
+  },
+  {
+    "id": "7.0.107#3",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "It says WorkflowAgent supports deferred tool discovery but not whether that is new or a repair, or what users would observe."
+  },
+  {
+    "id": "7.0.107#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preliminary tool outputs no longer wrongly complete a chat, which is the documented behavior."
+  },
+  {
+    "id": "7.0.107#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes lost audio format metadata so output matches what is documented."
+  },
+  {
+    "id": "7.0.107#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Input callbacks now get the tool-specific context they were documented to receive."
+  },
+  {
+    "id": "7.0.107#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Polling timeouts now apply to in-flight requests as documented."
+  },
+  {
+    "id": "7.0.107#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes dropped Set-Cookie headers in Node stream responses."
+  },
+  {
+    "id": "7.0.107#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes duplicated content-type headers in chat transport requests."
+  },
+  {
+    "id": "7.0.107#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect decoding of base64 text data URLs with a declared charset."
+  },
+  {
+    "id": "7.0.108#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Tools governed by tool callers should never have run directly, so this enforces intended behavior."
+  },
+  {
+    "id": "7.0.108#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cancellation now stops pending tool-call repairs, as expected."
+  },
+  {
+    "id": "7.0.108#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes file data being lost when adapting v3 language models."
+  },
+  {
+    "id": "7.0.108#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "streamText now respects toolChoice as documented."
+  },
+  {
+    "id": "7.0.109#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes loading and cancel state for replacement completion requests."
+  },
+  {
+    "id": "7.0.109#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes overlapping text blocks being lost in reasoning extraction streams."
+  },
+  {
+    "id": "7.0.109#3",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "The change is to the harness package, aligning it with ToolLoopAgent."
+  },
+  {
+    "id": "7.0.111#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Only affects experimental_evaluate."
+  },
+  {
+    "id": "7.0.111#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Generated files from URL-backed outputs now carry the real base64 and bytes they were documented to expose."
+  },
+  {
+    "id": "7.0.112#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removing reasoning now also removes reasoning file parts, as it should."
+  },
+  {
+    "id": "7.0.112#2",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "onFinish",
+    "why": "UI message stream end callbacks now report consumer cancellation, which older versions did not expose; older versions ignore it silently."
+  },
+  {
+    "id": "7.0.112#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes opaque file URI strings being altered during provider serialization."
+  },
+  {
+    "id": "7.0.112#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Validation now keeps parsed metadata and data values instead of losing them."
+  },
+  {
+    "id": "7.0.113#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Completed streamed tool input callbacks now reach repaired tools as expected."
+  },
+  {
+    "id": "7.0.113#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Video models from legacy fallback providers were being lost and are now preserved."
+  },
+  {
+    "id": "7.0.113#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes Google embedMany calls with more than 100 values, which previously failed or misaligned content."
+  },
+  {
+    "id": "7.0.113#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Tool approvals from earlier messages can now be resumed, fixing a failing case."
+  },
+  {
+    "id": "7.0.113#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes manually approved tool inputs from schema transforms execute, turning a failure into working behavior."
+  },
+  {
+    "id": "7.0.113#6",
+    "candidate": true,
+    "kind": "default",
+    "signal": "silent",
+    "symbol": "Gemini 3.8 TTS speech",
+    "why": "Newer and custom Google speech model IDs now default to structured speech format, changing what is sent, while Gemini 2.5 and 3.1 keep the legacy format; empty transcripts are now rejected."
+  },
+  {
+    "id": "7.0.113#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Restores message history for direct transport stream callbacks, which is the expected behavior."
+  },
+  {
+    "id": "7.0.113#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Lint rule change with no user-observable effect."
+  },
+  {
+    "id": "7.0.114#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "telemetry allowlists",
+    "why": "Tracing-channel context is now filtered by telemetry allowlists, so previously included data may no longer appear."
+  },
+  {
+    "id": "7.0.114#2",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Only clarifies code comments about allowSystemInMessages, no behavior change."
+  },
+  {
+    "id": "7.0.116#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build target change to ES2022 with no API change for users."
+  },
+  {
+    "id": "7.0.116#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tagged file URLs",
+    "why": "Opaque URI strings are now preserved and unsupported URL MIME subtypes are no longer forwarded to providers, changing what is sent."
+  },
+  {
+    "id": "7.0.119#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cancelling response streams on client disconnect is a bug fix to expected behavior."
+  },
+  {
+    "id": "7.0.119#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Prevents unhandled rejections in non-Node runtimes, turning an error into working behavior."
+  },
+  {
+    "id": "7.0.119#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "input",
+    "why": "Static tool input errors are now stored in the current input field rather than elsewhere, so code reading the old field sees different values."
+  },
+  {
+    "id": "7.0.119#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "image model file and mask input capability",
+    "why": "Adds capability declarations for image models, and capability lookups and middleware overrides can now resolve to unknown; older versions would not know of these."
+  },
+  {
+    "id": "7.0.120#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves tool metadata from output chunks that was being lost, matching expected behavior."
+  },
+  {
+    "id": "7.0.120#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resuming after a disconnect to continue active UI message parts as intended."
+  },
+  {
+    "id": "7.0.122#1",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Clarification only; runtime behavior is stated as unchanged."
+  },
+  {
+    "id": "7.0.122#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "loud",
+    "symbol": "prepareReconnectToStreamRequest",
+    "why": "Default reconnection URLs now encode chat IDs and reject '.' and '..' IDs before fetching, which previously worked."
+  },
+  {
+    "id": "7.0.123#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "SSE heartbeat",
+    "why": "Adds optional SSE heartbeats to keep idle UI message streams open; older versions ignore the unknown option."
+  },
+  {
+    "id": "7.0.123#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "pruneMessages",
+    "why": "Retaining zero trailing messages now prunes all tool content, which changes the output of the same call."
+  },
+  {
+    "id": "7.0.123#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Build tooling migration from tsup to tsdown."
+  },
+  {
+    "id": "7.0.123#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves partial reasoning tags at part end, correcting lost text."
+  },
+  {
+    "id": "7.0.123#5",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tool approvals",
+    "why": "Pending tool approvals superseded by user messages are now ignored, where they were previously acted on."
+  },
+  {
+    "id": "7.0.124#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "telemetry for speech generation and transcription",
+    "why": "Adds telemetry to speech generation and transcription plus provider usage propagation; older versions ignore it."
+  },
+  {
+    "id": "7.0.126#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "addToolOutput",
+    "why": "Calling addToolOutput now clears tool approvals, changing resulting state."
+  },
+  {
+    "id": "7.0.127#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "search()",
+    "why": "Adds a search() callback in tool search to select and rank eligible deferred tools; older versions ignore it."
+  },
+  {
+    "id": "7.0.127#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Cancels merged UI message streams when the consumer disconnects, which is the expected behavior."
+  },
+  {
+    "id": "7.0.127#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a rejection of valid approval inputs into working behavior."
+  },
+  {
+    "id": "7.0.127#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "maxResults",
+    "why": "New option for tool search; older versions ignore it at runtime and code that doesn't use it is unaffected."
+  },
+  {
+    "id": "7.0.128#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix restoring approval state on stream resume."
+  },
+  {
+    "id": "7.0.128#2",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Rename of `evaluate` to `decide` with no indication of which API it belongs to or whether it is stable."
+  },
+  {
+    "id": "7.0.128#3",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "WorkflowAgent belongs to the workflow package, not ai itself."
+  },
+  {
+    "id": "7.0.128#4",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "extractReasoningMiddleware",
+    "why": "New delimiter option on an existing middleware; older versions ignore it and existing calls are unchanged."
+  },
+  {
+    "id": "7.0.128#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Silent audio now returns an empty transcript instead of failing."
+  },
+  {
+    "id": "7.0.128#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "InvalidResponseDataError",
+    "why": "A different error class is thrown; existing catch blocks for Error still work but behave differently when checking the type."
+  },
+  {
+    "id": "7.0.129#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Deprecation warnings are now emitted with stable codes and deduplicated, changing what existing code logs."
+  },
+  {
+    "id": "7.0.129#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix preserving provider-reported total tokens in raw usage."
+  },
+  {
+    "id": "7.0.129#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "reasoning",
+    "why": "Existing Bedrock Nova 2 `xhigh` calls now send `high` and Fireworks calls return new warnings, in addition to the new `max` level."
+  },
+  {
+    "id": "7.0.129#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix for error reporting after failed resume attempts."
+  },
+  {
+    "id": "7.0.129#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix preserving provider options from approval-only tool messages."
+  },
+  {
+    "id": "7.0.129#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix recognizing WebKit network errors."
+  },
+  {
+    "id": "7.0.129#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix preventing unavailable tools from exposing persisted output."
+  },
+  {
+    "id": "7.0.129#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix avoiding duplicate slashes in reconnect URLs."
+  },
+  {
+    "id": "7.0.129#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "TypeScript toolchain upgrade with no user-observable change."
+  },
+  {
+    "id": "7.0.129#10",
+    "candidate": false,
+    "skip": "other-package",
+    "why": "Change is to the harness package."
+  },
+  {
+    "id": "7.0.130#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix so abort rejects pending promises and cancels the stream rather than hanging."
+  },
+  {
+    "id": "7.0.130#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Concerns decision providers, which are experimental."
+  },
+  {
+    "id": "7.0.132#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "onUIMessageStepEnd",
+    "why": "New callback option; older versions ignore it and existing code is unaffected."
+  },
+  {
+    "id": "7.0.133#1",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Changes only the experimental decision state."
+  },
+  {
+    "id": "7.0.134#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix so async sendAutomaticallyWhen failures are propagated rather than lost."
+  },
+  {
+    "id": "7.0.134#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix preserving provider-executed tool calls on stream resume."
+  },
+  {
+    "id": "7.0.135#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Bug fix preventing duplicate continuation requests."
+  },
+  {
+    "id": "7.0.135#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "stopWhen",
+    "why": "A tool loop that hits the default step limit now logs a warning, so existing code produces new output."
+  },
+  {
+    "id": "7.0.135#3",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "dimensions",
+    "why": "Adds a top-level 'dimensions' setting to embedding functions; code that doesn't use it is unaffected, and older versions would not reject it."
+  },
+  {
+    "id": "7.0.135#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stopping a chat stream now waits for cleanup, which corrects the stop behavior without changing documented usage."
+  },
+  {
+    "id": "7.0.135#5",
+    "candidate": true,
+    "kind": "added",
+    "signal": "loud",
+    "symbol": "WebSocketChatTransport",
+    "why": "Adds a new persistent WebSocket chat transport that users can call; older versions lack it and fail on import. The exported name is a guess, as the entry doesn't give it."
+  },
+  {
+    "id": "7.0.136#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "chunkMs",
+    "why": "chunkMs and firstChunkMs now stop when the model response ends and retries get fresh budgets, so streams with long local tools no longer time out. This changes behavior for existing timeout settings."
+  },
+  {
+    "id": "7.0.137#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Resumed streams now discard unrelated message state, which fixes incorrect results when reading them."
+  }
+]

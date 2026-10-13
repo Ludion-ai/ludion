@@ -99,6 +99,17 @@ describe("project condition", () => {
     expect(rw[rw.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
   });
 
+  it("gives the seed pipeline's drafting agents files only: no shell, no web, edits only inside their folder, no system reads", () => {
+    const args = claudeArgs({ ...base, condition: "files", project: "/x" });
+    expect(args[args.indexOf("--tools") + 1]).toBe("Read,Glob,Grep,Edit,Write");
+    // Nothing is pre-approved (an allow rule would cover any path); acceptEdits takes edits inside the working folder.
+    expect(args).not.toContain("--allowedTools");
+    expect(args[args.indexOf("--permission-mode") + 1]).toBe("acceptEdits");
+    expect(args[args.indexOf("--disallowedTools") + 1]).toContain("Read(//proc/**)");
+    expect(args.join(" ")).not.toMatch(/Bash|WebFetch|WebSearch/);
+    expect(args).not.toContain("--mcp-config");
+  });
+
   it("keeps the prompt off the command line (it goes to stdin), so a long judge prompt can't exceed Windows' limit", () => {
     const args = claudeArgs({ model: "opus", maxTurns: 1, maxBudgetUsd: 1, condition: "none" });
     expect(args.slice(0, 2)).toEqual(["-p", "--output-format"]);
@@ -107,6 +118,11 @@ describe("project condition", () => {
   it("passes no tokens or other secrets from this shell to the run", () => {
     const env = runEnv({ PATH: "/bin", USERPROFILE: "C:/Users/x", GH_TOKEN: "ghp_secret", CLOUDFLARE_API_TOKEN: "cf", NPM_TOKEN: "npm" });
     expect(env).toEqual({ PATH: "/bin", USERPROFILE: "C:/Users/x" });
+    // An API key in a person's shell stays out; only GitHub Actions (the seed watch) passes it.
+    expect(runEnv({ PATH: "/bin", ANTHROPIC_API_KEY: "k" })).toEqual({ PATH: "/bin" });
+    const ci = { PATH: "/bin", ANTHROPIC_API_KEY: "sentinel", GITHUB_ACTIONS: "true", GH_TOKEN: "t" };
+    for (const condition of ["none", "files"] as const) expect(runEnv(ci, condition)).toEqual({ PATH: "/bin", ANTHROPIC_API_KEY: "sentinel" });
+    for (const condition of [undefined, "project", "web", "ludion"] as const) expect(runEnv(ci, condition)).toEqual({ PATH: "/bin" });
   });
 });
 describe("vitest-extends grader", () => {

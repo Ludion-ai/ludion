@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#36",
+  "verdict": {
+    "id": "4.4.0#36",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "fromJSONSchema",
+    "why": "fromJSONSchema now applies description and default metadata, so resulting schemas differ."
+  },
+  "cost_usd": 0.4217642000000001,
+  "turns": 21,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "fromJSONSchema",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "const z = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nif (typeof z.fromJSONSchema !== \"function\") broken(\"z.fromJSONSchema is not a function\");\nlet schema;\ntry {\n  schema = z.fromJSONSchema({ enum: [\"red\", \"green\", \"blue\"], description: \"A color value\", default: \"red\" });\n} catch (e) { broken(\"fromJSONSchema threw: \" + e.message); }\nconst ok = schema.safeParse(\"green\");\nif (!ok.success || ok.data !== \"green\") broken(\"enum schema did not accept green\");\nif (schema.safeParse(\"purple\").success) broken(\"enum schema accepted purple\");\nconst u = schema.safeParse(undefined);\nconst desc = schema.description;\nif (!u.success && desc === undefined) symptom(\"fromJSONSchema ignores description and default on an enum schema\");\nif (!u.success || u.data !== \"red\") broken(\"parse(undefined) gave \" + JSON.stringify(u));\nif (desc !== \"A color value\") broken(\"description is \" + desc);\nconsole.log(\"OK: fromJSONSchema applies description and default on an enum schema\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "const z = require(\"zod\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nif (typeof z.fromJSONSchema !== \"function\") broken(\"z.fromJSONSchema is not a function\");\nlet schema;\ntry {\n  schema = z.fromJSONSchema({ enum: [\"red\", \"green\", \"blue\"], description: \"A color value\", default: \"red\" });\n} catch (e) { broken(\"fromJSONSchema threw: \" + e.message); }\nconst ok = schema.safeParse(\"green\");\nif (!ok.success || ok.data !== \"green\") broken(\"enum schema did not accept green\");\nif (schema.safeParse(\"purple\").success) broken(\"enum schema accepted purple\");\nconst u = schema.safeParse(undefined);\nconst desc = schema.description;\nif (!u.success && desc === undefined) symptom(\"fromJSONSchema ignores description and default on an enum schema\");\nif (!u.success || u.data !== \"red\") broken(\"parse(undefined) gave \" + JSON.stringify(u));\nif (desc !== \"A color value\") broken(\"description is \" + desc);\nconsole.log(\"OK: fromJSONSchema applies description and default on an enum schema\");\n",
+          "expect": "fail",
+          "error": "FAIL: fromJSONSchema ignores description and default on an enum schema"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

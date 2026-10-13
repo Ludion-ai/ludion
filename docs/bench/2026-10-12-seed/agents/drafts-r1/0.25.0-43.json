@@ -1,0 +1,33 @@
+{
+  "entry": "0.25.0#43",
+  "verdict": {
+    "id": "0.25.0#43",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "deleteSubAgent",
+    "why": "deleteSubAgent now also closes the sub-agent's direct client connections, a new side effect for the same call."
+  },
+  "cost_usd": 0.24676640000000005,
+  "turns": 10,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.25.0",
+    "kind": "behavior",
+    "symbol": "deleteSubAgent",
+    "signal": "silent",
+    "detail": "deleteSubAgent now closes the sub-agent's direct client connections, so late messages can't recreate it.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+          "quote": "`deleteSubAgent` now closes the sub-agent's direct client connections, so late messages can't recreate it"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

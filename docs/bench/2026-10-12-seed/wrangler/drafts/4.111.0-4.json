@@ -1,0 +1,54 @@
+{
+  "entry": "4.111.0#4",
+  "verdict": {
+    "id": "4.111.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "defaultProjectTmpPath",
+    "why": "Email logs are now also written to .wrangler/tmp/email in the project root, with no code change needed."
+  },
+  "cost_usd": 0.6150620000000001,
+  "turns": 17,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.111.0",
+    "kind": "behavior",
+    "symbol": ".wrangler/tmp/email",
+    "signal": "silent",
+    "detail": "Logs for emails sent by workers via Wrangler are also written to .wrangler/tmp/email in the project root.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.111.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nsetTimeout(() => broken(\"timed out\"), 80000).unref();\nprocess.env.WRANGLER_SEND_METRICS = \"false\";\nconst proj = \"/tmp/proj\";\nfs.mkdirSync(proj, { recursive: true });\nfs.writeFileSync(path.join(proj, \"wrangler.json\"), JSON.stringify({ name: \"mail\", compatibility_date: \"2025-03-17\", send_email: [{ name: \"SEND_EMAIL\" }] }));\nprocess.chdir(proj);\nconst marker = \"ludion-email-body-\" + Date.now();\nfunction find(dir, depth) {\n  let out = [];\n  let entries;\n  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return out; }\n  for (const e of entries) {\n    const p = path.join(dir, e.name);\n    if (e.isDirectory() && depth > 0) out = out.concat(find(p, depth - 1));\n    else if (e.isFile() && p.endsWith(\".txt\") && p.includes(\"email-text\")) {\n      try { if (fs.readFileSync(p, \"utf8\") === marker) out.push(p); } catch {}\n    }\n  }\n  return out;\n}\n(async () => {\n  const { getPlatformProxy } = require(\"wrangler\");\n  const proxy = await getPlatformProxy({ configPath: path.join(proj, \"wrangler.json\"), persist: false });\n  try {\n    await proxy.env.SEND_EMAIL.send({ from: \"sender@example.com\", to: \"recipient@example.com\", subject: \"Hi\", text: marker });\n  } catch (e) { broken(\"send failed: \" + e.message); }\n  const inProject = find(path.join(proj, \".wrangler\", \"tmp\", \"email\"), 4);\n  const inSystem = find(\"/tmp\", 5).filter((p) => !p.startsWith(proj + path.sep));\n  await proxy.dispose();\n  if (inSystem.length === 0) broken(\"email text file not found in the system temp directory either\");\n  if (inProject.length === 0) symptom(\"sent email text was not written under .wrangler/tmp/email in the project root\");\n  console.log(\"OK: email text written to \" + inProject[0]);\n  process.exit(0);\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.110.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nsetTimeout(() => broken(\"timed out\"), 80000).unref();\nprocess.env.WRANGLER_SEND_METRICS = \"false\";\nconst proj = \"/tmp/proj\";\nfs.mkdirSync(proj, { recursive: true });\nfs.writeFileSync(path.join(proj, \"wrangler.json\"), JSON.stringify({ name: \"mail\", compatibility_date: \"2025-03-17\", send_email: [{ name: \"SEND_EMAIL\" }] }));\nprocess.chdir(proj);\nconst marker = \"ludion-email-body-\" + Date.now();\nfunction find(dir, depth) {\n  let out = [];\n  let entries;\n  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return out; }\n  for (const e of entries) {\n    const p = path.join(dir, e.name);\n    if (e.isDirectory() && depth > 0) out = out.concat(find(p, depth - 1));\n    else if (e.isFile() && p.endsWith(\".txt\") && p.includes(\"email-text\")) {\n      try { if (fs.readFileSync(p, \"utf8\") === marker) out.push(p); } catch {}\n    }\n  }\n  return out;\n}\n(async () => {\n  const { getPlatformProxy } = require(\"wrangler\");\n  const proxy = await getPlatformProxy({ configPath: path.join(proj, \"wrangler.json\"), persist: false });\n  try {\n    await proxy.env.SEND_EMAIL.send({ from: \"sender@example.com\", to: \"recipient@example.com\", subject: \"Hi\", text: marker });\n  } catch (e) { broken(\"send failed: \" + e.message); }\n  const inProject = find(path.join(proj, \".wrangler\", \"tmp\", \"email\"), 4);\n  const inSystem = find(\"/tmp\", 5).filter((p) => !p.startsWith(proj + path.sep));\n  await proxy.dispose();\n  if (inSystem.length === 0) broken(\"email text file not found in the system temp directory either\");\n  if (inProject.length === 0) symptom(\"sent email text was not written under .wrangler/tmp/email in the project root\");\n  console.log(\"OK: email text written to \" + inProject[0]);\n  process.exit(0);\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: sent email text was not written under .wrangler/tmp/email in the project root"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.111.0/packages/wrangler/CHANGELOG.md",
+          "quote": "logs for emails sent by workers are also written to a local temp directory defined by the calling process, e.g for an simple text email sent via Wrangler this is `.wrangler/tmp/email/<session>/email-text/<message-uuid>.txt` (and related files) in the project root."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

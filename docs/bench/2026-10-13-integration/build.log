@@ -1,0 +1,105 @@
+
+> build
+> npm run build --workspaces --if-present
+
+
+> ludion-ai@0.1.4 build
+> node build.ts
+
+Wrote dist/cli.js
+
+> @ludion/site@0.0.0 build
+> astro build
+
+17:13:54 [types] Generated 103ms
+17:13:54 [build] output: "static"
+17:13:54 [build] mode: "static"
+17:13:54 [build] directory: C:\Users\haya0\Documents\Codex\2026-10-12\new-chat\work\main-integration\apps\site\dist\
+17:13:54 [build] Collecting build info...
+17:13:54 [build] ✓ Completed in 117ms.
+17:13:54 [build] Building static entrypoints...
+17:13:54 [vite] ✓ built in 201ms
+17:13:54 [vite] ✓ built in 14ms
+17:13:54 [build] Rearranging server assets...
+
+ generating static routes
+17:13:55   ├─ /404.html (+7ms)
+17:13:55   ├─ /index/subjects.json (+2ms)
+17:13:55   ├─ /index/wrangler.json (+2ms)
+17:13:55   ├─ /index/vitest.json (+1ms)
+17:13:55   ├─ /index/agents.json (+1ms)
+17:13:55   ├─ /index.json (+3ms)
+17:13:55   ├─ /lessons/01M4RAVZ6AW3ZB9PASXP4454AY/index.html (+3ms)
+17:13:55   ├─ /lessons/01M4RAVZ6G853RNZY4QB6F1G7X/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4RAVZ72604WDVTB2P1JTMMD/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4RAVZ76G38BBZ7RQT49B4P4/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4RAVZ79Z20ZYK86PFYA726C/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4RAVZ7BYR42Z6KY16WPT12Q/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4RAVZ7GWT4TNAG20EYZ2SFB/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4RAVZ7JRFR0Q9ZJ1F2VNWMW/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4R9CXC68AFY0FPPJZP9KPNE/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4R9CXC9WC30HGKMKW2DF1RX/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4R9CXCDQFXKQJH5V0S31NTB/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4R21JSTGEK84VXHA0B3A3Q9/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4R21JSZMT0W3762B59RQ3TN/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4R21JT5SE1DJRXBRZRKKDJ0/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QHMS4JTBGD9PVWF1C97TRS/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QHMS4X5NY3GW28TMZP6WA3/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QHMS51FSEP1JQCQ2J07QKR/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QHMS521TK3K3QN782Y1Q7A/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QHMS5808NYV99PPJCPVM3M/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QH98JK8YPHSFDC1VX7HZJ7/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QH98JRND3BARBYA0RGY08M/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QH98JTQ4NMTCY1YD0NZ7TV/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QH98JVV4XPR9PVG1GAWKDV/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QH98K262R2KMAZY9Z8219P/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4QH98K3WT2TXMHZAPMQSCBF/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4PW52QENBVDRGCZYF20J4T7/index.html (+2ms)
+17:13:55   ├─ /lessons/01M4PW52QF9V35BKFEZ0TV8SMC/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1C9NMK4R7PTGWDSMEJ/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1D61K9AY6GHAPJ41T9/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1EJW4GSZR1169785QP/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1FRQ1CBWQ19G26EXBA/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1G0Z3Q62FAYWHY3QS0/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1H5MK1KCKT59THQ707/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1J8367WF5VY4DJ5K23/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1K1H6JS3CN98ZW0J0J/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1M6BHM10NVQMT0YR3T/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ0P7MBRC476PA4MSKSX/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ0QT41TY27SW0E683RX/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ0R4N7P3H6AD5XEC931/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ0TD5B90PAZESMEM3DE/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ0VRGCJDGCW1RP186XM/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ0XWQDX60W9WFP7EH7Z/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N6JGXB0JAC338KRKN9RA0H/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N6JH8SHRYQE5CPY9SN1QQJ/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N6Y54270A8AKTMH9SVGV32/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ10489BJ56V6E9QCANX/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ113NYM02AVWFQH8V0R/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ12D93VCHVW7BD4SWS7/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ137QQ13JBMQBRZ2KBM/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ15H86C6AEETCVRHADC/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ162ZQ91VD7YRKVH916/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ17QMG6AE8C5GMA0PNR/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ18NMAR1KJCK8XRKVYK/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ19DFEF04950T3KW7WA/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N4KZ1BHR0T3J581NJ83YVV/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N60GGAXDCRBZWTCH2BDW6X/index.html (+1ms)
+17:13:55   ├─ /lessons/01M4N6JH32A6VDF5FJ7BTGEKVH/index.html (+5ms)
+17:13:55   ├─ /lessons/01K6ZQ4T9X0N8V2H7M3P5R1S6W/index.html (+1ms)
+17:13:55   ├─ /lessons/index.html (+3ms)
+17:13:55   ├─ /llms.txt (+2ms)
+17:13:55   ├─ /models/index.html (+2ms)
+17:13:55   ├─ /sitemap.xml (+1ms)
+17:13:55   ├─ /start/index.html (+2ms)
+17:13:55   ├─ /teachers/ludion-ai/index.html (+2ms)
+17:13:55   ├─ /wrangler/index.html (+1ms)
+17:13:55   ├─ /vitest/index.html (+1ms)
+17:13:55   ├─ /agents/index.html (+1ms)
+17:13:55   ├─ /python/index.html (+1ms)
+17:13:55   ├─ /index.html (+2ms)
+17:13:55 ✓ Completed in 750ms.
+
+17:13:55 [build] ✓ Completed in 1.13s.
+17:13:55 [build] 68 page(s) built in 1.25s
+17:13:55 [build] Complete!

@@ -1,0 +1,54 @@
+{
+  "entry": "0.20.0#1",
+  "verdict": {
+    "id": "0.20.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "createMcpHandler",
+    "why": "Stored HTTP session IDs from older versions are now discarded and the client reconnects, and `createMcpHandler` gains SDK v2 support."
+  },
+  "cost_usd": 0.20400039999999997,
+  "turns": 6,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.20.0",
+    "kind": "behavior",
+    "symbol": "@cloudflare/codemode",
+    "signal": "silent",
+    "detail": "MCP-only applications no longer install @cloudflare/codemode transitively; applications that import agents/skills install Codemode explicitly.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.20.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst nm = \"/w/node_modules\";\nlet pkg;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(nm, \"agents\", \"package.json\"), \"utf8\"));\n} catch (e) {\n  console.error(\"ERROR: agents is not installed: \" + e.message);\n  process.exit(2);\n}\nif (fs.existsSync(path.join(nm, \"@cloudflare\", \"codemode\", \"package.json\"))) {\n  console.error(\"FAIL: installing agents alone also installed @cloudflare/codemode transitively\");\n  process.exit(1);\n}\nconsole.log(\"OK: installing agents \" + pkg.version + \" alone did not install @cloudflare/codemode\");\nprocess.exit(0);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.19.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst nm = \"/w/node_modules\";\nlet pkg;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(nm, \"agents\", \"package.json\"), \"utf8\"));\n} catch (e) {\n  console.error(\"ERROR: agents is not installed: \" + e.message);\n  process.exit(2);\n}\nif (fs.existsSync(path.join(nm, \"@cloudflare\", \"codemode\", \"package.json\"))) {\n  console.error(\"FAIL: installing agents alone also installed @cloudflare/codemode transitively\");\n  process.exit(1);\n}\nconsole.log(\"OK: installing agents \" + pkg.version + \" alone did not install @cloudflare/codemode\");\nprocess.exit(0);\n",
+          "expect": "fail",
+          "error": "FAIL: installing agents alone also installed @cloudflare/codemode transitively"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.20.0/packages/agents/CHANGELOG.md",
+          "quote": "`@cloudflare/codemode` is now an optional peer. Applications that import `agents/skills` or `agents/browser` install Codemode explicitly; MCP-only applications no longer install it transitively."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

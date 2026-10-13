@@ -1,0 +1,206 @@
+[
+  {
+    "package": "ai",
+    "weekly_downloads": 30798367,
+    "releases": 359,
+    "entries": 656,
+    "candidates": 295,
+    "silent_changes": 127,
+    "silent_share": 0.194,
+    "score": 0.635
+  },
+  {
+    "package": "tailwindcss",
+    "weekly_downloads": 136230978,
+    "releases": 6,
+    "entries": 97,
+    "candidates": 38,
+    "silent_changes": 26,
+    "silent_share": 0.268,
+    "score": 0.315
+  },
+  {
+    "package": "@supabase/supabase-js",
+    "weekly_downloads": 30723462,
+    "releases": 42,
+    "entries": 218,
+    "candidates": 53,
+    "silent_changes": 32,
+    "silent_share": 0.147,
+    "score": 0.308
+  },
+  {
+    "package": "zod",
+    "weekly_downloads": 341697718,
+    "releases": 16,
+    "entries": 488,
+    "candidates": 137,
+    "silent_changes": 76,
+    "silent_share": 0.156,
+    "score": 0.28
+  },
+  {
+    "package": "@sveltejs/kit",
+    "weekly_downloads": 3248293,
+    "releases": 27,
+    "entries": 458,
+    "candidates": 174,
+    "silent_changes": 77,
+    "silent_share": 0.168,
+    "score": 0.271
+  },
+  {
+    "package": "hono",
+    "weekly_downloads": 74173194,
+    "releases": 36,
+    "entries": 223,
+    "candidates": 40,
+    "silent_changes": 24,
+    "silent_share": 0.108,
+    "score": 0.228
+  },
+  {
+    "package": "@anthropic-ai/sdk",
+    "weekly_downloads": 46456539,
+    "releases": 59,
+    "entries": 301,
+    "candidates": 130,
+    "silent_changes": 29,
+    "silent_share": 0.096,
+    "score": 0.224
+  },
+  {
+    "package": "stripe",
+    "weekly_downloads": 23860701,
+    "releases": 16,
+    "entries": 44,
+    "candidates": 23,
+    "silent_changes": 6,
+    "silent_share": 0.136,
+    "score": 0.211
+  },
+  {
+    "package": "astro",
+    "weekly_downloads": 7219474,
+    "releases": 63,
+    "entries": 429,
+    "candidates": 72,
+    "silent_changes": 34,
+    "silent_share": 0.079,
+    "score": 0.167
+  },
+  {
+    "package": "openai",
+    "weekly_downloads": 43233974,
+    "releases": 48,
+    "entries": 688,
+    "candidates": 163,
+    "silent_changes": 48,
+    "silent_share": 0.07,
+    "score": 0.155
+  },
+  {
+    "package": "@playwright/test",
+    "weekly_downloads": 75674770,
+    "releases": 7,
+    "entries": 107,
+    "candidates": 67,
+    "silent_changes": 13,
+    "silent_share": 0.121,
+    "score": 0.147
+  },
+  {
+    "package": "next",
+    "weekly_downloads": 67261197,
+    "releases": 30,
+    "entries": 2679,
+    "candidates": 237,
+    "silent_changes": 155,
+    "silent_share": 0.058,
+    "score": 0.116
+  },
+  {
+    "package": "eslint",
+    "weekly_downloads": 161560021,
+    "releases": 15,
+    "entries": 344,
+    "candidates": 28,
+    "silent_changes": 20,
+    "silent_share": 0.058,
+    "score": 0.098
+  },
+  {
+    "package": "nuxt",
+    "weekly_downloads": 2352805,
+    "releases": 18,
+    "entries": 1373,
+    "candidates": 184,
+    "silent_changes": 91,
+    "silent_share": 0.066,
+    "score": 0.092
+  },
+  {
+    "package": "express",
+    "weekly_downloads": 143994672,
+    "releases": 3,
+    "entries": 125,
+    "candidates": 13,
+    "silent_changes": 12,
+    "silent_share": 0.096,
+    "score": 0.081
+  },
+  {
+    "package": "vite",
+    "weekly_downloads": 195883741,
+    "releases": 30,
+    "entries": 64,
+    "candidates": 3,
+    "silent_changes": 2,
+    "silent_share": 0.031,
+    "score": 0.066
+  },
+  {
+    "package": "drizzle-orm",
+    "weekly_downloads": 27765699,
+    "releases": 2,
+    "entries": 1,
+    "candidates": 0,
+    "silent_changes": 0,
+    "silent_share": 0,
+    "unmeasured": "1 entries in 2 release notes on GitHub; the changelog is kept elsewhere or in another format",
+    "score": 0
+  },
+  {
+    "package": "prisma",
+    "weekly_downloads": 19186626,
+    "releases": 4,
+    "entries": 0,
+    "candidates": 0,
+    "silent_changes": 0,
+    "silent_share": 0,
+    "unmeasured": "0 entries in 0 release notes on GitHub; the changelog is kept elsewhere or in another format",
+    "score": 0
+  },
+  {
+    "package": "react-router",
+    "weekly_downloads": 57103384,
+    "releases": 20,
+    "entries": 0,
+    "candidates": 0,
+    "silent_changes": 0,
+    "silent_share": 0,
+    "unmeasured": "0 entries in 19 release notes on GitHub; the changelog is kept elsewhere or in another format",
+    "score": 0
+  },
+  {
+    "package": "@tanstack/react-query",
+    "weekly_downloads": 65874058,
+    "releases": 38,
+    "entries": 16,
+    "candidates": 7,
+    "silent_changes": 4,
+    "silent_share": 0.25,
+    "unmeasured": "16 entries in 36 release notes on GitHub; the changelog is kept elsewhere or in another format",
+    "score": 0
+  }
+]

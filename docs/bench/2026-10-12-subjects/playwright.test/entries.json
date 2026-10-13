@@ -1,0 +1,985 @@
+[
+  {
+    "id": "1.60.0#1",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Aria snapshots",
+    "text": "- [expect(page).toMatchAriaSnapshot()](https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-match-aria-snapshot) now works on a [Page](https://playwright.dev/docs/api/class-page), in addition to a [Locator](https://playwright.dev/docs/api/class-locator) — equivalent to asserting against `page.locator('body')`.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#2",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Aria snapshots",
+    "text": "- New `boxes` option on [locator.ariaSnapshot()](https://playwright.dev/docs/api/class-locator#locator-aria-snapshot) / [page.ariaSnapshot()](https://playwright.dev/docs/api/class-page#page-aria-snapshot) appends each element's bounding box as `[box=x,y,width,height]`, useful for AI consumption.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#3",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Browser Context and Page",
+    "text": "- Event [browser.on('context')](https://playwright.dev/docs/api/class-browser#browser-event-context) — fired when a new context is created on the browser.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#4",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Browser Context and Page",
+    "text": "- [BrowserContext](https://playwright.dev/docs/api/class-browsercontext) now mirrors lifecycle events from its pages: [browserContext.on('download')](https://playwright.dev/docs/api/class-browsercontext#browser-context-event-download), [browserContext.on('frameattached')](https://playwright.dev/docs/api/class-browsercontext#browser-context-event-frame-attached), [browserContext.on('framedetached')](https://playwright.dev/docs/api/class-browsercontext#browser-context-event-frame-detached), [browserContext.on('framenavigated')](https://playwright.dev/docs/api/class-browsercontext#browser-context-event-frame-navigated), [browserContext.on('pageclose')](https://playwright.dev/docs/api/class-browsercontext#browser-context-event-page-close), [browserContext.on('pageload')](https://playwright.dev/docs/api/class-browsercontext#browser-context-event-page-load).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#5",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Locators and Assertions",
+    "text": "- New option `description` in [page.getByRole()](https://playwright.dev/docs/api/class-page#page-get-by-role) / [locator.getByRole()](https://playwright.dev/docs/api/class-locator#locator-get-by-role) / [frame.getByRole()](https://playwright.dev/docs/api/class-frame#frame-get-by-role) / [frameLocator.getByRole()](https://playwright.dev/docs/api/class-framelocator#frame-locator-get-by-role) for matching the [accessible description](https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-description).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#6",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Locators and Assertions",
+    "text": "- New option `pseudo` in [expect(locator).toHaveCSS()](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-css) reads computed styles from `::before` or `::after`.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#7",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Locators and Assertions",
+    "text": "- New option `style` in [locator.highlight()](https://playwright.dev/docs/api/class-locator#locator-highlight) applies extra inline CSS to the highlight overlay, plus new [page.hideHighlight()](https://playwright.dev/docs/api/class-page#page-hide-highlight) to clear all highlights.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#8",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Network",
+    "text": "- [webSocketRoute.protocols()](https://playwright.dev/docs/api/class-websocketroute#web-socket-route-protocols) returns the WebSocket subprotocols requested by the page.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#9",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Network",
+    "text": "- New option `noDefaults` in [browserType.connectOverCDP()](https://playwright.dev/docs/api/class-browsertype#browser-type-connect-over-cdp) disables Playwright's default overrides on the default context (download behavior, focus emulation, media emulation), so attaching to a user's daily-driver browser doesn't disturb its state.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#10",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Errors and Reporting",
+    "text": "- New [webError.location()](https://playwright.dev/docs/api/class-weberror#web-error-location) mirrors [consoleMessage.location()](https://playwright.dev/docs/api/class-consolemessage#console-message-location).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#11",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Errors and Reporting",
+    "text": "- [consoleMessage.location()](https://playwright.dev/docs/api/class-consolemessage#console-message-location) now exposes `line` / `column` properties (`lineNumber` / `columnNumber` are deprecated).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#12",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Errors and Reporting",
+    "text": "- New [testInfoError.errorContext](https://playwright.dev/docs/api/class-testinfoerror#test-info-error-error-context) surfaces additional diagnostic context, such as the aria snapshot of the receiver at the time of an `expect(...)` matcher failure.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#13",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Errors and Reporting",
+    "text": "- [reporter.onError()](https://playwright.dev/docs/api/class-reporter#reporter-on-error) now receives a `workerInfo` argument with details about the worker for fixture teardown errors.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#14",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Test runner",
+    "text": "- New `{testFileBaseName}` token in [testProject.snapshotPathTemplate](https://playwright.dev/docs/api/class-testproject#test-project-snapshot-path-template) — file name without extension.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#15",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Test runner",
+    "text": "- Test runner now errors when a config tries to override a non-option fixture, and rejects `workers: 0` or negative values.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#16",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Other improvements",
+    "text": "- HTML reporter:\n  - `npx playwright show-report` accepts `.zip` files directly — no need to unzip first.\n  - Steps that contain attachments inside nested children show an indicator on the parent step.\n  - The `repeatEachIndex` is shown in the test header when non-zero.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#17",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Other improvements",
+    "text": "- Trace Viewer adds a pretty-print toggle for JSON / form request and response bodies in the network details panel.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#18",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Breaking Changes",
+    "text": "- Removed long-deprecated APIs:\n  - `Locator.ariaRef()` — use the standard [locator.ariaSnapshot()](https://playwright.dev/docs/api/class-locator#locator-aria-snapshot) pipeline.\n  - `handle` option on `BrowserContext.exposeBinding` and `Page.exposeBinding`.\n  - `logger` option on `BrowserType.connect` and `BrowserType.connectOverCDP` — use [tracing](https://playwright.dev/docs/trace-viewer) instead.\n  - Context options `videosPath` / `videoSize` — use `recordVideo` instead.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#19",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Browser Versions",
+    "text": "- Chromium 148.0.7778.96",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#20",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Browser Versions",
+    "text": "- Mozilla Firefox 150.0.2",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#21",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Browser Versions",
+    "text": "- WebKit 26.4",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#22",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Browser Versions",
+    "text": "- Google Chrome 147",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.60.0#23",
+    "version": "1.60.0",
+    "date": "2026-05-11T19:09:45.394Z",
+    "section": "Browser Versions",
+    "text": "- Microsoft Edge 147",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.60.0"
+  },
+  {
+    "id": "1.61.0#1",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Network",
+    "text": "- [apiResponse.securityDetails()](https://playwright.dev/docs/api/class-apiresponse#api-response-security-details) and [apiResponse.serverAddr()](https://playwright.dev/docs/api/class-apiresponse#api-response-server-addr) mirror the browser-side [response.securityDetails()](https://playwright.dev/docs/api/class-response#response-security-details) and [response.serverAddr()](https://playwright.dev/docs/api/class-response#response-server-addr).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#2",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser and Screencast",
+    "text": "- New option `artifactsDir` in [browserType.connectOverCDP()](https://playwright.dev/docs/api/class-browsertype#browser-type-connect-over-cdp) controls where artifacts such as traces and downloads are stored when attached to an existing browser.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#3",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser and Screencast",
+    "text": "- New option `cursor` in [screencast.showActions()](https://playwright.dev/docs/api/class-screencast#screencast-show-actions) controls the cursor decoration rendered for pointer actions.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#4",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser and Screencast",
+    "text": "- The `onFrame` callback in [screencast.start()](https://playwright.dev/docs/api/class-screencast#screencast-start) now receives a `timestamp` of when the frame was presented by the browser.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#5",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Test runner",
+    "text": "- The [testOptions.video](https://playwright.dev/docs/api/class-testoptions#test-options-video) option now supports the same set of modes as `trace`: new `'on-all-retries'`, `'retain-on-first-failure'` and `'retain-on-failure-and-retries'` values. See the [video modes table](https://playwright.dev/docs/test-use-options#video-modes) for which runs are recorded and kept in each mode.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#6",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Test runner",
+    "text": "- Supported `expect.soft.poll(...)`.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#7",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Test runner",
+    "text": "- New [fullConfig.argv](https://playwright.dev/docs/api/class-fullconfig#full-config-argv) — a snapshot of `process.argv` from the runner process, handy for reading custom arguments passed after the `--` separator.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#8",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Test runner",
+    "text": "- New [fullConfig.failOnFlakyTests](https://playwright.dev/docs/api/class-fullconfig#full-config-fail-on-flaky-tests) mirrors the config option, so reporters can explain why a flaky run failed.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#9",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Test runner",
+    "text": "- [testInfo.errors](https://playwright.dev/docs/api/class-testinfo#test-info-errors) now lists each sub-error of an `AggregateError` as a separate entry.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#10",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Test runner",
+    "text": "- New `-G` command line shorthand for `--grep-invert`.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#11",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Other improvements",
+    "text": "- Playwright now supports Ubuntu 26.04.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#12",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Other improvements",
+    "text": "- HAR and trace recordings now include WebSocket requests.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#13",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser Versions",
+    "text": "- Chromium 149.0.7827.55",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#14",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser Versions",
+    "text": "- Mozilla Firefox 151.0",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#15",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser Versions",
+    "text": "- WebKit 26.5",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#16",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser Versions",
+    "text": "- Google Chrome 149",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.0#17",
+    "version": "1.61.0",
+    "date": "2026-06-15T10:06:35.237Z",
+    "section": "Browser Versions",
+    "text": "- Microsoft Edge 149",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.0"
+  },
+  {
+    "id": "1.61.1#1",
+    "version": "1.61.1",
+    "date": "2026-06-23T19:49:12.825Z",
+    "section": "Bug Fixes",
+    "text": "- #41365 [Bug]: Expect.Extend matcher with same name as default matcher in same expect instance overrides default matchers implementation to custom matcher",
+    "refs": [
+      41365
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.1"
+  },
+  {
+    "id": "1.61.1#2",
+    "version": "1.61.1",
+    "date": "2026-06-23T19:49:12.825Z",
+    "section": "Bug Fixes",
+    "text": "- #41351 [Bug]: Playwright UI mode: apiRequestContext._wrapApiCall reports unexpected number of bytes (same test passes in headed mode)",
+    "refs": [
+      41351
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.1"
+  },
+  {
+    "id": "1.61.1#3",
+    "version": "1.61.1",
+    "date": "2026-06-23T19:49:12.825Z",
+    "section": "Bug Fixes",
+    "text": "- #41360 [Bug]: Trace viewer: message times in websockets are downscaled by 1000",
+    "refs": [
+      41360
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.1"
+  },
+  {
+    "id": "1.61.1#4",
+    "version": "1.61.1",
+    "date": "2026-06-23T19:49:12.825Z",
+    "section": "Bug Fixes",
+    "text": "- #41311 [Bug]: [Regression]: Sync loader throws \"context.conditions?.includes is not a function\" on Node 22.15",
+    "refs": [
+      41311
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.1"
+  },
+  {
+    "id": "1.61.1#5",
+    "version": "1.61.1",
+    "date": "2026-06-23T19:49:12.825Z",
+    "section": "Bug Fixes",
+    "text": "- #41371 [Regression]: Sync ESM loader (registerHooks) fails to resolve extensionless .ts subpath imports across pnpm workspace symlinks",
+    "refs": [
+      41371
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.61.1"
+  },
+  {
+    "id": "1.62.0#1",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Browser and Context",
+    "text": "- New option [`credentials`](https://playwright.dev/docs/api/class-browsercontext#browser-context-storage-state-option-credentials) includes the context's virtual WebAuthn [Credentials](https://playwright.dev/docs/api/class-credentials) (passkeys) in the storage state, so they can be persisted and re-seeded into later contexts.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#2",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Actions",
+    "text": "- New `scroll` option (`\"auto\"` | `\"none\"`) on actions to opt out of Playwright's automatic scroll-into-view.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#3",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Network",
+    "text": "- New [apiResponse.timing()](https://playwright.dev/docs/api/class-apiresponse#api-response-timing) returns resource timing information for an API response.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#4",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Evaluation",
+    "text": "- New [locator.waitForFunction()](https://playwright.dev/docs/api/class-locator#locator-wait-for-function) waits until a function — called with the matching element — returns a truthy value.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#5",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Evaluation",
+    "text": "- [page.evaluate()](https://playwright.dev/docs/api/class-page#page-evaluate) and related methods now accept functions as evaluate arguments.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#6",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Evaluation",
+    "text": "- [page.addInitScript()](https://playwright.dev/docs/api/class-page#page-add-init-script) / [browserContext.addInitScript()](https://playwright.dev/docs/api/class-browsercontext#browser-context-add-init-script) now accept functions as init-script arguments.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#7",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Command line MCP",
+    "text": "- Playwright now bundles the [Playwright MCP](https://playwright.dev/docs/getting-started-mcp) server and [`playwright-cli`](https://playwright.dev/docs/getting-started-cli), runnable via `npx playwright mcp` and `npx playwright cli`.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#8",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Reporters",
+    "text": "- The HTML report's **Merge files** grouping — previously only a UI toggle — can now be enabled from the config with the new `mergeFiles` reporter option:",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#9",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Announcements",
+    "text": "* ⚠️ Debian 11 is not supported anymore.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#10",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Browser Versions",
+    "text": "- Chromium 151.0.7922.34",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#11",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Browser Versions",
+    "text": "- Mozilla Firefox 153.0",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#12",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Browser Versions",
+    "text": "- WebKit 26.5",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#13",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Browser Versions",
+    "text": "- Google Chrome 151",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.0#14",
+    "version": "1.62.0",
+    "date": "2026-07-24T21:57:02.325Z",
+    "section": "Browser Versions",
+    "text": "- Microsoft Edge 151",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.0"
+  },
+  {
+    "id": "1.62.1#1",
+    "version": "1.62.1",
+    "date": "2026-07-30T16:36:55.324Z",
+    "section": "Bug Fixes",
+    "text": "- #41989 [Regression]: tsconfig \"extends\" bare specifier isn't resolved via node_modules walk-up like tsc (fatal since 1.62)",
+    "refs": [
+      41989
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.1"
+  },
+  {
+    "id": "1.62.1#2",
+    "version": "1.62.1",
+    "date": "2026-07-30T16:36:55.324Z",
+    "section": "Bug Fixes",
+    "text": "- #41998 [Regression]: directory-form tsconfig project references (\"path\": \"../pkg\") fail to resolve (fatal since 1.62)",
+    "refs": [
+      41998
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.1"
+  },
+  {
+    "id": "1.62.1#3",
+    "version": "1.62.1",
+    "date": "2026-07-30T16:36:55.324Z",
+    "section": "Bug Fixes",
+    "text": "- #41985 Accessibility snapshot drops button name when text is nested inside spans with aria-hidden SVG",
+    "refs": [
+      41985
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.1"
+  },
+  {
+    "id": "1.62.1#4",
+    "version": "1.62.1",
+    "date": "2026-07-30T16:36:55.324Z",
+    "section": "Bug Fixes",
+    "text": "- #42000 [Regression]: page.evaluate() arg of a branded primitive type (string & { brand }) no longer type-checks since 1.62",
+    "refs": [
+      42000
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.1"
+  },
+  {
+    "id": "1.62.1#5",
+    "version": "1.62.1",
+    "date": "2026-07-30T16:36:55.324Z",
+    "section": "Bug Fixes",
+    "text": "- #42013 [BUG]Image-type actionable elements are not presented in the snapshot.",
+    "refs": [
+      42013
+    ],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.62.1"
+  },
+  {
+    "id": "1.63.0#1",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser and Context",
+    "text": "- [`httpCredentials`](https://playwright.dev/docs/api/class-browser#browser-new-context-option-http-credentials) now also accepts an array of credentials. The first entry matching the request origin is used, and entries without an origin match any request.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#2",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser and Context",
+    "text": "- New option [`opfs`](https://playwright.dev/docs/api/class-browsercontext#browser-context-storage-state-option-opfs) includes the [origin private file system](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API/Origin_private_file_system) in the storage state, so it can be persisted and restored into later contexts.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#3",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser and Context",
+    "text": "- New events [page.on('dialogclosed')](https://playwright.dev/docs/api/class-page#page-event-dialog-closed) and [browserContext.on('dialogclosed')](https://playwright.dev/docs/api/class-browsercontext#browser-context-event-dialog-closed) are emitted when a JavaScript dialog is accepted, dismissed or closed by the user.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#4",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Locators",
+    "text": "- New [locator.ariaSnapshotJSON()](https://playwright.dev/docs/api/class-locator#locator-aria-snapshot-json) and [page.ariaSnapshotJSON()](https://playwright.dev/docs/api/class-page#page-aria-snapshot-json) return the aria snapshot as a JSON value instead of YAML markup, with `mode`, `depth` and `boxes` options.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#5",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Locators",
+    "text": "- [apiRequestContext.get()](https://playwright.dev/docs/api/class-apirequestcontext#api-request-context-get) and other request methods accept a type argument that types the response `json()`:",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#6",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Test runner",
+    "text": "- New standalone [testOptions.reducedMotion](https://playwright.dev/docs/api/class-testoptions#test-options-reduced-motion), [testOptions.forcedColors](https://playwright.dev/docs/api/class-testoptions#test-options-forced-colors) and [testOptions.contrast](https://playwright.dev/docs/api/class-testoptions#test-options-contrast) options.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#7",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Test runner",
+    "text": "- New `--add-reporter` command line option appends a reporter on top of the ones configured in `playwright.config`, instead of replacing them like `--reporter` does.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#8",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Test runner",
+    "text": "- New `omitTags` option for the `list`, `line`, `dot`, `github` and `junit` reporters suppresses the tags that are automatically appended to test titles.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#9",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Command line",
+    "text": "- `npx playwright install --no-remove` keeps the browsers of other Playwright installations instead of removing them.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#10",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Command line",
+    "text": "- `npx playwright codegen --http-credentials` records against pages behind HTTP authentication.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#11",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Miscellaneous",
+    "text": "- New built-in [`perfetto`](https://playwright.dev/docs/test-reporters#perfetto-reporter) reporter writes a Trace Event Format file for the [Perfetto UI](https://ui.perfetto.dev) or `chrome://tracing`, rendering the test run as a timeline with a lane per worker.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#12",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Miscellaneous",
+    "text": "- The HTML report renders a duration waterfall next to test steps.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#13",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Announcements",
+    "text": "* ⚠️ The experimental `@playwright/experimental-ct-react`, `@playwright/experimental-ct-react17` and `@playwright/experimental-ct-vue` packages will no longer be updated. Follow the [migration guide](https://playwright.dev/docs/test-components#migration-from-the-experimental-packages) to move to the stories model introduced in 1.62. Story ids passed to [fixtures.mount()](https://playwright.dev/docs/api/class-fixtures#fixtures-mount) can now be typed through the generated `Stories` registry.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#14",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Announcements",
+    "text": "* ⚠️ Ubuntu 20.04 is not supported anymore.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#15",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Announcements",
+    "text": "* 🐧 On Linux arm64, Playwright now downloads the [Chrome for Testing](https://developer.chrome.com/blog/chrome-for-testing) build of Chromium, the same build used on all other platforms.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#16",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser Versions",
+    "text": "- Chromium 153.0.8010.12",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#17",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser Versions",
+    "text": "- Mozilla Firefox 155.0",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#18",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser Versions",
+    "text": "- WebKit 26.6",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#19",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser Versions",
+    "text": "- Google Chrome 153",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.63.0#20",
+    "version": "1.63.0",
+    "date": "2026-09-04T22:44:00.304Z",
+    "section": "Browser Versions",
+    "text": "- Microsoft Edge 153",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+  },
+  {
+    "id": "1.64.0#1",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Better videos",
+    "text": "- New `fps` option in [testOptions.video](https://playwright.dev/docs/api/class-testoptions#test-options-video), [`recordVideo`](https://playwright.dev/docs/api/class-browser#browser-new-context-option-record-video) and\n  [screencast.start()](https://playwright.dev/docs/api/class-screencast#screencast-start). Firefox and WebKit currently capture up to 25 frames per second.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#2",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Better videos",
+    "text": "- New [`style`](https://playwright.dev/docs/api/class-screencast#screencast-show-actions-option-style) option takes CSS declarations for the `point` marker, the target\n  `highlight` and the action `title`. It replaces the `fontSize` option, which is now deprecated.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#3",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Better videos",
+    "text": "- The cursor stays visible at the last action point, survives navigations and travels along a natural, eased path.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#4",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Better videos",
+    "text": "- Videos are encoded with VP9 instead of VP8, which takes less CPU and produces smaller files of the same or better\n  quality.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#5",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Better videos",
+    "text": "- All video options are also available in [Playwright MCP](https://playwright.dev/docs/getting-started-mcp) and [`playwright-cli`](https://playwright.dev/docs/getting-started-cli).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#6",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Test runner",
+    "text": "- New [testProject.default](https://playwright.dev/docs/api/class-testproject#test-project-default) option keeps a project in the config without running it by default. You can configure every browser you care about, and let a plain `npx playwright test` run just your favourite one:\n  \n  ```js\n  // playwright.config.ts\n  import { defineConfig, devices } from '@playwright/test';\n  \n  export default defineConfig({\n    projects: [\n      { name: 'chromium', use: devices['Desktop Chrome'] },\n      { name: 'firefox', use: devices['Desktop Firefox'], default: false },\n      { name: 'webkit', use: devices['Desktop Safari'], default: false },\n    ],\n  });\n  ```\n  \n  ```bash\n  npx playwright test                     # runs chromium only\n  npx playwright test --project=firefox   # runs firefox\n  npx playwright test --project=\"*\"       # runs all three, for example on CI\n  ```",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#7",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Test runner",
+    "text": "- New `--shuffle` command line option schedules tests in a random order, which helps to find tests that accidentally depend on each other.\n  \n  ```bash\n  npx playwright test --shuffle\n  # Running 42 tests using 4 workers, shuffle seed 271828182\n  # ...\n  \n  # Pass the seed to reproduce the same order.\n  npx playwright test --shuffle 271828182\n  ```",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#8",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Test runner",
+    "text": "- New `lock` option in [test.describe.configure()](https://playwright.dev/docs/api/class-test#test-describe-configure) adds [test locks](https://playwright.dev/docs/test-parallel#test-locks) to all tests in a file or a group:\n  \n  ```js\n  test.describe.configure({ lock: 'user-settings' });\n  ```",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#9",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Test runner",
+    "text": "- New `type` option of `toHaveScreenshot` in [testConfig.expect](https://playwright.dev/docs/api/class-testconfig#test-config-expect) stores all unnamed screenshots as WebP:\n  \n  ```js\n  // playwright.config.ts\n  export default defineConfig({\n    expect: {\n      toHaveScreenshot: { type: 'webp' },\n    },\n  });\n  ```",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#10",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "New APIs",
+    "text": "- New [page.getByRef()](https://playwright.dev/docs/api/class-page#page-get-by-ref) locates an element by its aria ref, such as `e2`, reported by [page.ariaSnapshot()](https://playwright.dev/docs/api/class-page#page-aria-snapshot) in the `'ai'` mode.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#11",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "New APIs",
+    "text": "- New option [`includeShadow`](https://playwright.dev/docs/api/class-page#page-content-option-include-shadow) in [page.content()](https://playwright.dev/docs/api/class-page#page-content) and [frame.content()](https://playwright.dev/docs/api/class-frame#frame-content) serializes open shadow roots as [declarative shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#12",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "New APIs",
+    "text": "- New option [`signCount`](https://playwright.dev/docs/api/class-credentials#credentials-create-option-sign-count) sets the initial signature counter of a virtual credential. [credentials.create()](https://playwright.dev/docs/api/class-credentials#credentials-create) and [credentials.get()](https://playwright.dev/docs/api/class-credentials#credentials-get) return the current `signCount`, and it is saved and restored together with the credentials in the storage state.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#13",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "New APIs",
+    "text": "- New [fullConfig.filteredProjects](https://playwright.dev/docs/api/class-fullconfig#full-config-filtered-projects) lists the projects that were selected to run after applying the `--project` filter. It is available in global setup and reporters.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#14",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "New APIs",
+    "text": "- New [apiRequestContext.addCookies()](https://playwright.dev/docs/api/class-apirequestcontext#api-request-context-add-cookies), [apiRequestContext.cookies()](https://playwright.dev/docs/api/class-apirequestcontext#api-request-context-cookies) and [apiRequestContext.clearCookies()](https://playwright.dev/docs/api/class-apirequestcontext#api-request-context-clear-cookies) manage cookies of a request context, mirroring the [BrowserContext](https://playwright.dev/docs/api/class-browsercontext) methods:\n  \n  ```js\n  await request.addCookies([{ name: 'session-id', value: '42', url: 'https://example.com' }]);\n  console.log(await request.cookies('https://example.com'));\n  await request.clearCookies({ name: 'session-id' });\n  ```",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#15",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Breaking changes",
+    "text": "- `screen` property is now forwarded from the [device descriptors](https://playwright.dev/docs/emulation#devices). If you use `...devices['Desktop Chrome']` and alike, `window.screen` and media queries now see the emulated screen size. You can opt-out by explicitly setting `screen` to `undefined`:\n  \n  ```js\n  // playwright.config.ts\n  export default defineConfig({\n    use: {\n      ...devices['Desktop Chrome'],\n      screen: undefined,\n    },\n  });\n  ```",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#16",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Breaking changes",
+    "text": "- JSX in your test files now follows your `tsconfig.json`. Playwright compiles JSX in test files according to the `jsx`, `jsxFactory`, `jsxFragmentFactory` and `jsxImportSource` [tsconfig options](https://playwright.dev/docs/test-typescript#tsconfig-jsx-options), and defaults to the automatic runtime from `react/jsx-runtime`.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#17",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Breaking changes",
+    "text": "- `--update-snapshots=missing` now passes the test run. Tests that only create missing snapshots now pass in the `'missing'` mode of [testConfig.updateSnapshots](https://playwright.dev/docs/api/class-testconfig#test-config-update-snapshots), so that CI can generate new snapshots and verify the existing ones in a single run. The mode used when the option is not specified is now called `'default'` and behaves as before: missing snapshots are written and the test fails.",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#18",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Breaking changes",
+    "text": "- Elements inside hidden iframes are considered hidden. Elements inside an iframe that is not visible, for example with `visibility: hidden`, are now considered hidden by actions, [locator.isVisible()](https://playwright.dev/docs/api/class-locator#locator-is-visible) and [expect(locator).toBeVisible()](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-visible).",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#19",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Browser Versions",
+    "text": "- Chromium 156.0.8078.4",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#20",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Browser Versions",
+    "text": "- Mozilla Firefox 157.0",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#21",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Browser Versions",
+    "text": "- WebKit 27.2",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#22",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Browser Versions",
+    "text": "- Google Chrome 155",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  },
+  {
+    "id": "1.64.0#23",
+    "version": "1.64.0",
+    "date": "2026-10-07T20:44:27.702Z",
+    "section": "Browser Versions",
+    "text": "- Microsoft Edge 155",
+    "refs": [],
+    "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+  }
+]

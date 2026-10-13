@@ -1,0 +1,55 @@
+{
+  "entry": "0.23.0#1",
+  "verdict": {
+    "id": "0.23.0#1",
+    "candidate": true,
+    "kind": "deprecated",
+    "signal": "silent",
+    "symbol": "subAgent",
+    "why": "subAgent(), abortSubAgent(), deleteSubAgent(), hasSubAgent() and listSubAgents() are now @deprecated but still work, with this.dynamicAgents as the new surface."
+  },
+  "cost_usd": 0.3659326,
+  "turns": 11,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.23.0",
+    "kind": "deprecated",
+    "symbol": "subAgent",
+    "replacement": "this.dynamicAgents.get",
+    "signal": "silent",
+    "detail": "subAgent is legacy and deprecated; it delegates to this.dynamicAgents.get and remains supported",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.23.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst exp = pkg.exports && pkg.exports[\".\"];\nif (!exp || !exp.types) {\n  console.error(\"ERROR: agents root types entry is missing\");\n  process.exit(2);\n}\nconst file = path.join(root, exp.types);\nlet text = fs.readFileSync(file, \"utf8\");\nfor (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n  const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n  if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n}\nconst re = /\\/\\*\\*((?:(?!\\*\\/)[\\s\\S])*)\\*\\/\\s*\\n\\s*subAgent<T extends Agent>\\(/;\nconst m = text.match(re);\nif (!m) {\n  console.error(\"ERROR: agents \" + pkg.version + \" Agent.subAgent declaration with JSDoc not found\");\n  process.exit(2);\n}\nconst doc = m[1];\nif (/@deprecated[^\\n]*dynamicAgents\\.get\\b/.test(doc)) {\n  console.log(\"OK: agents \" + pkg.version + \" Agent.subAgent is @deprecated in favor of this.dynamicAgents.get\");\n  process.exit(0);\n}\nif (!/@deprecated/.test(doc)) {\n  console.error(\"FAIL: agents \" + pkg.version + \" Agent.subAgent is not marked @deprecated\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: subAgent is @deprecated but does not point to dynamicAgents.get\");\nprocess.exit(2);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.22.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst exp = pkg.exports && pkg.exports[\".\"];\nif (!exp || !exp.types) {\n  console.error(\"ERROR: agents root types entry is missing\");\n  process.exit(2);\n}\nconst file = path.join(root, exp.types);\nlet text = fs.readFileSync(file, \"utf8\");\nfor (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n  const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n  if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n}\nconst re = /\\/\\*\\*((?:(?!\\*\\/)[\\s\\S])*)\\*\\/\\s*\\n\\s*subAgent<T extends Agent>\\(/;\nconst m = text.match(re);\nif (!m) {\n  console.error(\"ERROR: agents \" + pkg.version + \" Agent.subAgent declaration with JSDoc not found\");\n  process.exit(2);\n}\nconst doc = m[1];\nif (/@deprecated[^\\n]*dynamicAgents\\.get\\b/.test(doc)) {\n  console.log(\"OK: agents \" + pkg.version + \" Agent.subAgent is @deprecated in favor of this.dynamicAgents.get\");\n  process.exit(0);\n}\nif (!/@deprecated/.test(doc)) {\n  console.error(\"FAIL: agents \" + pkg.version + \" Agent.subAgent is not marked @deprecated\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: subAgent is @deprecated but does not point to dynamicAgents.get\");\nprocess.exit(2);\n",
+          "expect": "fail",
+          "error": "FAIL: agents 0.22.0 Agent.subAgent is not marked @deprecated"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.23.0/docs/agents/sub-agents.md",
+          "quote": "The legacy method names delegate to it and remain supported:\n\n| Legacy (deprecated)              | Capability                             |\n| -------------------------------- | -------------------------------------- |\n| `this.subAgent(Cls, name)`       | `this.dynamicAgents.get(Cls, name)`    |"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

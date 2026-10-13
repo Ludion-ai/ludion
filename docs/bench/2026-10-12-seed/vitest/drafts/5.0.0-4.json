@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#4",
+  "verdict": {
+    "id": "5.0.0#4",
+    "candidate": true,
+    "kind": "removed",
+    "signal": "silent",
+    "symbol": "sequential",
+    "why": "Option removed in favor of concurrent; likely ignored or erroring, but it's unclear, so silent is the safer guess."
+  },
+  "cost_usd": 0.27242200000000005,
+  "turns": 9,
+  "skip": "No file in sources/ has a sentence that names sequential and says it was removed or is now ignored (the migration guide that does is not provided), so no valid quote can ground the lesson."
+}

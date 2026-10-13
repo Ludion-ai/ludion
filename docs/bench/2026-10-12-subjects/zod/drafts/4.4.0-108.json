@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#108",
+  "verdict": {
+    "id": "4.4.0#108",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.locales.it",
+    "why": "Italian locale error message text changed, altering output of existing code."
+  },
+  "cost_usd": 0.32433779999999995,
+  "turns": 17,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.locales.it",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst { z } = require(\"zod\");\nz.config(z.locales.it());\nconst r = z.string().email().safeParse(\"not-an-email\");\nif (r.success) broken(\"invalid email was accepted\");\nconst msg = r.error.issues[0] && r.error.issues[0].message;\nif (typeof msg !== \"string\") broken(\"no issue message\");\nif (msg.startsWith(\"Invalid \")) symptom(\"z.locales.it invalid_format message is untranslated English\");\nif (!msg.startsWith(\"Input non valido: \")) broken(\"unexpected message: \" + msg);\nconsole.log(\"OK: z.locales.it invalid_format message is Italian: \" + msg);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst { z } = require(\"zod\");\nz.config(z.locales.it());\nconst r = z.string().email().safeParse(\"not-an-email\");\nif (r.success) broken(\"invalid email was accepted\");\nconst msg = r.error.issues[0] && r.error.issues[0].message;\nif (typeof msg !== \"string\") broken(\"no issue message\");\nif (msg.startsWith(\"Invalid \")) symptom(\"z.locales.it invalid_format message is untranslated English\");\nif (!msg.startsWith(\"Input non valido: \")) broken(\"unexpected message: \" + msg);\nconsole.log(\"OK: z.locales.it invalid_format message is Italian: \" + msg);\n",
+          "expect": "fail",
+          "error": "FAIL: z.locales.it invalid_format message is untranslated English"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

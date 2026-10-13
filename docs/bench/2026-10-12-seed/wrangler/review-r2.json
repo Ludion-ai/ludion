@@ -1,0 +1,827 @@
+[
+  {
+    "entry": "4.111.0#4",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail says logs for all emails sent by workers go to .wrangler/tmp/email, but the tests only cover one plain-text email sent through getPlatformProxy; narrow the claim to that case, or add tests for wrangler dev and non-text emails."
+      },
+      {
+        "rule": "8",
+        "problem": "The detail drops the actual path from the changelog and ends on the fragment \"e.g for a simple text email sent via Wrangler\", so an assistant would expect files directly in .wrangler/tmp/email; state the real layout `.wrangler/tmp/email/<session>/email-text/<message-uuid>.txt` and that the system temp copy is still written."
+      }
+    ],
+    "cost_usd": 0.070755,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.111.0#8",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The generated sentence says wrangler 4.111.0 \"changed what `--force` does\", but `--force` still does the same thing and only an extra informational notice is printed after success; the detail should say the flag's behavior is unchanged and only a one-time notice was added to the output, so assistants don't think they need to adjust how they use `--force`."
+      }
+    ],
+    "cost_usd": 0.066047,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.111.0#9",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol is `wrangler whoami`, but the entry and quote describe how wrangler handles unknown commands and subcommands, and `whoami` is only the example suggestion target; set the symbol to the unknown-command handling (e.g. wrangler's unknown command/subcommand error output) instead."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says wrangler >=4.111.0 \"changed what `wrangler whoami` does\", which tells an assistant the `whoami` command itself behaves differently when it does not; it should say that mistyped or unknown commands now print a `Did you mean ...?` suggestion."
+      }
+    ],
+    "cost_usd": 0.053255,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.112.0#7",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol `workers.dev` is a domain, not an API surface, so the sentence reads \"changed what `workers.dev` does\"; the changed symbol is the `wrangler deploy` command, and the symbol should be set to that."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote never names the changed command (`wrangler deploy`); quote the part of the entry that ties the check to deploying a brand-new Worker, so the quote names the symbol."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim says Wrangler \"prompts you to register one\", but the tests run only with CI=true, where deploy exits non-zero with a registration message; either test the interactive prompt or limit the claim to what was observed (the subdomain check before upload, then a registration message)."
+      },
+      {
+        "rule": "8",
+        "problem": "An assistant would read \"prompts you to register one\" as meaning non-interactive or CI deploys will pause for input, when the test shows they fail with a message; the detail should say that non-interactive deploys stop with an error telling you to register a subdomain."
+      }
+    ],
+    "cost_usd": 0.08319499999999999,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.113.0#1",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The entry's headline 'Apply Email Routing `addresses` during Worker trigger deployment' shows `addresses` was already a config key and 4.113.0 only changed what deploy does with it, so kind should be `behavior` rather than `added`."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence 'added `addresses` … Older versions don't have it' is wrong if older wrangler already accepted the key; it should instead say that deploys before 4.113.0 ignored `addresses` when setting up Email Routing rules."
+      },
+      {
+        "rule": "4",
+        "problem": "Projects that already had `addresses` in their config, and never touched any new feature, now have their Email Routing rules changed on `wrangler deploy` and `wrangler triggers deploy`, so this is a behavior change for existing code and kind cannot be `added`."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail says deploy 'reconciles' the rules, which covers updates, deletions and conflicts, but the tests only cover one purely additive plan for `wrangler triggers deploy`; narrow the claim to creating rules for listed addresses, or add tests for the update and delete cases."
+      },
+      {
+        "rule": "8",
+        "problem": "The claim leaves out that in non-interactive runs such as CI a destructive plan now makes the deploy fail without changing any rules, so an assistant could set up a CI deploy that unexpectedly breaks; state this, ideally as a separate lesson with signal `loud`."
+      }
+    ],
+    "cost_usd": 0.095847,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.113.0#10",
+    "findings": [],
+    "cost_usd": 0.056570999999999996,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.113.0#4",
+    "findings": [
+      {
+        "rule": "3",
+        "problem": "signal is \"loud\", but code written for the older version (Queue bindings with an explicit queue name) still runs unchanged on 4.113.0; only the new omitted-name form fails on old versions, so signal should be \"silent\"."
+      },
+      {
+        "rule": "7",
+        "problem": "symbol \"Queue\" is not the symbol that changed; the change is that the `queue` field of a `queues.producers[]` binding became optional, so symbol should name that field (for example `queues.producers[].queue`)."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail claims deployments can omit the name for \"Queue bindings\", but the tests only check that `unstable_readConfig` accepts a producer binding without `queue`; they exercise neither consumers nor deployment or provisioning, so the claim should be narrowed to producer bindings passing config validation, or tests should be added that reach deploy."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence \"wrangler >=4.113.0 added `Queue` ... Older versions don't have it\" reads as though Queue bindings did not exist before 4.113.0, which would mislead an assistant; it should say the producer `queue` name became optional, with automatic provisioning on deploy."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote opens with the changelog headline (\"Expand automatic resource provisioning to Queue, Dispatch Namespace, and Flagship bindings\") and never names the `queue` field; it should quote only the factual sentence and the field it concerns."
+      }
+    ],
+    "cost_usd": 0.06250700000000001,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.113.0#7",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says wrangler generally \"detects nub\", but both tests only show that `wrangler init` hands off to `nub create cloudflare` when given a nub user agent and a nub binary; either narrow the detail to the `wrangler init` / create-cloudflare delegation or add tests for other places that use package-manager detection."
+      },
+      {
+        "rule": "8",
+        "problem": "The rendered sentence \"changed what `npm_config_user_agent` does\" suggests the environment variable itself, or how wrangler treats every user agent, changed, when only nub user agents are now recognised; reword it to say wrangler now recognises a nub `npm_config_user_agent` and uses nub instead of falling back to npm."
+      }
+    ],
+    "cost_usd": 0.062319,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.113.0#8",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim is that output is redacted in local Workflows, but neither test checks for `[REDACTED]` in step logs or step-output responses; the tests only check that `step.do` accepts the `sensitive: \"output\"` config, so add an assertion on the redacted step output or narrow the claim."
+      },
+      {
+        "rule": "5",
+        "problem": "The pair tests whether the config is accepted, not whether output is redacted, and the changelog says production already supported the option, so 4.112.0 local dev most likely ignored it rather than rejecting it with a \"sensitive\" error; the pair should differ on the actual symptom, which is plaintext versus `[REDACTED]` in the step-output response."
+      },
+      {
+        "rule": "3",
+        "problem": "Code using `sensitive: \"output\"` that ran before still runs on 4.113.0 without error; only its logged and returned step output changes to `[REDACTED]`, so signal should be silent, not loud."
+      },
+      {
+        "rule": "7",
+        "problem": "The entry adds local-dev redaction for an existing step option rather than a new symbol, so kind should be behavior and symbol should name the step config `sensitive: \"output\"` on `step.do`, not a bare `sensitive`."
+      },
+      {
+        "rule": "8",
+        "problem": "\"Older versions don't have it\" suggests `sensitive: \"output\"` is unavailable before 4.113.0 and could make an assistant avoid it, when only local-dev redaction changed; the sentence should also say that values go to `[REDACTED]` only in logs and step-output responses, that downstream steps still get the real value, and that errors are never redacted."
+      }
+    ],
+    "cost_usd": 0.076295,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.115.0#3",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail says waits longer than 60 seconds fail fast, but neither test uses a Retry-After over 60 seconds (both send Retry-After: 2 on a single 503 for GET /zones), so that part is unsupported; drop the 60-second clause or add a differential test that covers it."
+      },
+      {
+        "rule": "6",
+        "problem": "The 60-second fail-fast is a separate, loud change: a command that used to retry and succeed with backoff now errors when the server sends Retry-After over 60s. Bundling it with the silent wait-for-Retry-After change under signal: silent mixes the two, so split it into its own lesson with its own signal and tests."
+      }
+    ],
+    "cost_usd": 0.087303,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.116.0#1",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The symbol `workers.dev` makes the generated sentence say wrangler 'changed what `workers.dev` does', which reads as a change to the workers.dev service; the change is in `wrangler deploy` (what the tests exercise), so the symbol should be `wrangler deploy`, keeping workers.dev subdomain registration in the detail."
+      }
+    ],
+    "cost_usd": 0.095791,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.117.0#2",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests at all, so there is no differential pair showing an old path such as `/cdn-cgi/handler/scheduled` working on 4.117.0 (rewritten to `/cdn-cgi/local/scheduled`) and the new path failing on the release before; add that pair."
+      },
+      {
+        "rule": "1",
+        "problem": "\"the old paths\" is unbounded and reads as every `/cdn-cgi/*` path, while the entry lists six specific mappings and no test confirms even one; name the specific paths that were tested."
+      },
+      {
+        "rule": "7",
+        "problem": "The entry's actual change is that local testing endpoints moved to `/cdn-cgi/local/*` and `/__cf_local/*` (e.g. `/cdn-cgi/handler/scheduled` → `/cdn-cgi/local/scheduled`), but the symbol is just `wrangler dev` and the replacement field is missing; set the symbol to the endpoint path(s) and the replacement to the new path(s)."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote never says which paths are old or new, so it does not state the fact about any concrete symbol; quote the mapping lines (e.g. `/cdn-cgi/handler/scheduled` → `/cdn-cgi/local/scheduled`) instead."
+      },
+      {
+        "rule": "8",
+        "problem": "An assistant reading \"rewrite the old paths to the new ones\" learns neither the new paths nor that `/cdn-cgi/mf/scheduled` is deprecated, and \"without issue\" invites it to keep writing old or deprecated paths; state the new paths, say that the old ones are only rewritten for compatibility, and note the deprecation."
+      }
+    ],
+    "cost_usd": 0.057143,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.118.0#2",
+    "findings": [],
+    "cost_usd": 0.059811,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.120.0#1",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail claims exact matches by ID or name in both human-readable and JSON output, but the tests only check one instance found by exact ID in JSON output; they never test name matching, human-readable output, or exactness (no partial-match decoy), so the claim should be narrowed to what was tested or tests for those cases should be added."
+      },
+      {
+        "rule": "8",
+        "problem": "The symbol is a bare `--search` with no command, so an assistant could assume the flag works on other wrangler commands; the symbol should be scoped to `wrangler containers instances --search`."
+      }
+    ],
+    "cost_usd": 0.071263,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.121.0#5",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote describes `wrangler preview secret list` reading from the latest deployment and masking values, but the tested fact is that `secret put` now patches the Preview's latest deployment instead of the Worker's Previews settings; quote the sentence \"Wrangler now updates Worker Preview secrets by patching the named Preview's latest deployment instead of patching the Worker's Previews settings.\" instead."
+      },
+      {
+        "rule": "1",
+        "problem": "The symbol `wrangler preview secret` claims a change across the whole command group, including list, bulk, and delete, but the tests only exercise `wrangler preview secret put`; narrow the symbol to `wrangler preview secret put`, or add tests for the other subcommands."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol (`wrangler preview secret`), the quote (`wrangler preview secret list`), and the tested command (`wrangler preview secret put`) name three different things; make the symbol and the quote both refer to the `put` write-path change the tests verify."
+      },
+      {
+        "rule": "6",
+        "problem": "The entry contains three distinct changes: the write target moved to the latest deployment, `list` now reads from the deployment with masked values, and `bulk` now deletes on `null`; the lesson's broad symbol and `list` quote mix them, so limit it to the write-path change and put the others in separate lessons."
+      }
+    ],
+    "cost_usd": 0.085143,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.121.0#6",
+    "findings": [],
+    "cost_usd": 0.051615,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.122.0#1",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so nothing shows the same config behaving differently on 4.122.0 than on the release before; add a differential pair, for example a compat date of 2026-08-04 or later with only `no_nodejs_compat`, whose old run fails only on the Node.js-compat symptom."
+      },
+      {
+        "rule": "1",
+        "problem": "\"a newer compatibility date\" has no stated boundary, while the entry says the defaults start at compatibility date `2026-08-04`; the claim and detail should name that date."
+      },
+      {
+        "rule": "8",
+        "problem": "\"changed what `no_nodejs_compat` does\" hides the actual change: on compatibility date 2026-08-04 or later, wrangler now treats Node.js compatibility as on even when no flag is listed, so bundling and `process.env` handling change. An assistant reading only this sentence would miss that, so the claim should describe the new default and present the two-flag opt-out as how to turn it off."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `no_nodejs_compat` and the \"changed what it does\" wording don't match the entry, which says wrangler now resolves `nodejs_compat`/`nodejs_compat_v2` from the compatibility date; the symbol should be the default being resolved (`nodejs_compat` with `compatibility_date`), and kind `default` fits better."
+      }
+    ],
+    "cost_usd": 0.058919,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.122.0#4",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so there is no differential pair showing the behavior on 4.122.0 versus the release before; add a test that runs `wrangler setup` with today's date and checks that `nodejs_compat` is absent from the generated config on 4.122.0 and present on the prior release."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol is `nodejs_compat`, but the change is in what `wrangler setup` writes to the generated configuration, not in the flag itself; set the symbol to `wrangler setup`, or to its config-generation behavior."
+      },
+      {
+        "rule": "2",
+        "problem": "The quoted sentence never names `wrangler setup` (the changelog attributes it jointly to `create-cloudflare` and `wrangler setup`), so it doesn't identify which wrangler symbol changed; quote the sentence that says `wrangler setup` writes today's date and adds the flag only for earlier compatibility dates."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail \"is now only added for earlier compatibility dates\" gives no scope, so it reads as a general rule about the flag, while the evidence covers only configurations generated by `wrangler setup`; limit the claim to configs written by `wrangler setup`."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence \"changed what `nodejs_compat` does\" is false, because the flag's runtime meaning is unchanged; it could lead an assistant to think nodejs_compat behaves differently, and it also leaves out that `wrangler setup` now overwrites an existing wrangler.json(c)'s compatibility_date and removes a `nodejs_compat` flag it finds there. Reword it to describe the `wrangler setup` behavior, including the removal."
+      }
+    ],
+    "cost_usd": 0.056923,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.123.0#3",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "`WRANGLER_NO_SKILLS_UPDATE_PROMPTS` is a new environment variable introduced with the skills update prompts, so kind \"behavior\" (rendered as \"changed what `WRANGLER_NO_SKILLS_UPDATE_PROMPTS` does\") misstates the entry; kind should be \"added\", and the automatic update prompts themselves belong in a separate behavior lesson."
+      },
+      {
+        "rule": "8",
+        "problem": "\"changed what `WRANGLER_NO_SKILLS_UPDATE_PROMPTS` does\" implies the variable existed before 4.123.0 with different semantics, which would lead an assistant to think it works on older versions; the sentence should say the variable was added in 4.123.0."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail says the variable suppresses \"prompts\" without scope, but the entry only covers prompts to update Cloudflare agent skills installed by Wrangler, and only when set to `true`; the detail should say \"setting WRANGLER_NO_SKILLS_UPDATE_PROMPTS=true suppresses the agent-skills update prompts\"."
+      },
+      {
+        "rule": "8",
+        "problem": "As written, an assistant could set this variable expecting it to suppress all Wrangler interactive prompts (or set it to a value other than `true`), so the claim should name the exact value and limit it to skills update prompts."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson contains no differential tests, so nothing shows that setting the variable suppresses the prompt on 4.123.0 and that the prompt or variable is absent on the release before; add a test pair whose old run fails only on that symptom."
+      }
+    ],
+    "cost_usd": 0.054471000000000006,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.124.0#12",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote only describes the old behavior (\"defaulted to the current date\"), not the change itself; it should quote \"The default is now fixed at the release date of the `workerd` version that ships with each release\" and name the `compatibility_date` setting."
+      },
+      {
+        "rule": "8",
+        "problem": "The claim says only that the default \"changed\" and never says what it changed to, so an assistant could still assume an unset compatibility_date means today's date and that new runtime behavior is enabled; the claim should say that with no compatibility_date set, wrangler >=4.124.0 uses a fixed date (the bundled workerd release date) instead of the current date."
+      }
+    ],
+    "cost_usd": 0.075615,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.124.0#13",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so there is no differential pair showing that `wrangler types` output differs between 4.124.0 and the previous release for a date-enabled Node.js compat config; add a test pair that checks the generated types, for example the absence of `any` global declarations."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `nodejs_compat` is wrong because the change is in runtime type generation (`wrangler types`) for projects whose Node.js compatibility comes from a compatibility date, not the explicit flag, which is unchanged; set the symbol to `wrangler types`."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence says wrangler 'changed what `nodejs_compat` does', which suggests the flag or its runtime behavior changed, and it omits the actual effect (generated types no longer emit `any` Node.js globals that override `@types/node`); reword it to state that `wrangler types` no longer generates conflicting `any` globals when Node.js compat is enabled by the compatibility date."
+      }
+    ],
+    "cost_usd": 0.043290999999999996,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.124.0#14",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail says Wrangler now uses the FedRAMP High registry generally (the entry covers builds, pushes, deployments, image commands, dev, staging, and the `compliance_region` config), but the tests only show `containers registries credentials` accepting `registry.fed.cloudflare.com` with the `CLOUDFLARE_COMPLIANCE_REGION=fedramp_high` env var; narrow the claim to what was tested or add tests for the other paths."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote is the changelog headline and names no real symbol; quote the body sentence that names `compliance_region` / `CLOUDFLARE_COMPLIANCE_REGION` and states the registry selection."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol \"FedRAMP High\" is a marketing name, not a config key, env var, or command; use `CLOUDFLARE_COMPLIANCE_REGION` (and/or `compliance_region`) as the entry and quote do."
+      },
+      {
+        "rule": "8",
+        "problem": "\"changed what `FedRAMP High` does\" points the assistant at a nonexistent symbol and never says how the region is selected (`compliance_region` / `CLOUDFLARE_COMPLIANCE_REGION=fedramp_high`), so a reader cannot apply it correctly; rewrite it around the real setting and the registry it now selects."
+      },
+      {
+        "rule": "6",
+        "problem": "The evidence shows a loud change (old wrangler rejects `registry.fed.cloudflare.com` with an error, new accepts it), but the lesson asserts a silent registry switch for existing code that no test exercises; split these into a loud lesson backed by this test and a silent lesson with its own evidence, or drop the silent claim."
+      }
+    ],
+    "cost_usd": 0.07120699999999999,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.124.0#8",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The detail and generated sentence give the old behavior (resolving to the current date) right after 'changed', so an assistant would read it as what `--latest` does now; the detail should say that on >=4.124.0 `--latest` resolves to the newest compatibility date supported by the bundled workerd, not today's date."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote describes the pre-change behavior instead of the change itself; it should quote 'These now resolve to the latest compatibility date supported by this version of Wrangler, which is the release date of the `workerd` it ships with' alongside the sentence naming the `--latest` commands."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so there is no differential pair showing the resolved compatibility date differs between 4.124.0 and the release before; add a test that runs on both versions and checks the written date."
+      }
+    ],
+    "cost_usd": 0.040891,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.125.0#3",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests at all, so there is no differential pair showing `wrangler preview` against a non-existent parent Worker creating it on 4.125.0 and failing with the raw Preview-endpoint API error on the release before; add that pair, with the old run asserting only that specific error."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail drops the trigger condition, so it reads as if every `wrangler preview` now creates an empty parent Worker; scope it to 'when the target parent Worker has never been deployed / does not exist', and note that the feature is a private beta."
+      },
+      {
+        "rule": "8",
+        "problem": "Saying Wrangler 'offers to' create the Worker suggests an interactive prompt, so an assistant could expect CI runs to block or fail, when in non-interactive environments Wrangler creates a real Worker without asking (with deploy's workers.dev/Preview URL settings but no routes or cron triggers); state the non-interactive auto-creation and what the created Worker includes."
+      }
+    ],
+    "cost_usd": 0.046863,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.126.0#2",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, only a changelog quote, so nothing shows that `result.events` exists on 4.126.0 and is absent on the release before; add a differential pair that calls `server.getWorker().email(...)` and asserts on `result.events`, passing on 4.126.0 and failing on the prior release only because `events` is missing."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote never names the symbol `events`; it only says 'a chronological list of handler events', so it should cite the changelog example line `expect(result.events).toEqual([...])` or otherwise name `events` explicitly."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol is a bare `events`, but the entry places it on the result of `server.getWorker().email(...)`, so the symbol should be qualified (e.g. `email() result.events`) to match the entry."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'wrangler >=4.126.0 added `events`' does not say where the property lives, so an assistant could look for `events` on the wrong object; the claim should state that it is the `events` array on the result returned by `server.getWorker().email(...)` in the email test harness."
+      }
+    ],
+    "cost_usd": 0.043894999999999997,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.126.0#4",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests at all, only a changelog quote, so nothing shows the change on 4.126.0 or its absence on 4.125.x; add a differential pair, such as a local Durable Object container that mounts FUSE, which passes on 4.126.0 and fails on the prior release with the FUSE permission error."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim \"changed what `Miniflare` does\" covers all of Miniflare, but the evidence covers only auto-granting FUSE Docker privileges to local Durable Object containers on rootless Docker on Linux with /dev/fuse, or on macOS/WSL VM-based engines; narrow the claim to that scope."
+      },
+      {
+        "rule": "8",
+        "problem": "An assistant reading \"changed what `Miniflare` does\" would not learn what changed and might suspect a change to Miniflare's API or general behavior; state the specific change (FUSE privileges now passed automatically to local DO containers under the listed Docker setups) so no one rewrites unrelated Miniflare code."
+      }
+    ],
+    "cost_usd": 0.044283,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.126.0#5",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol is the bare filename `config.json`, but the entry and the quote name `.cloudflare/output/v0/config.json` and its new `mode` field; set the symbol to the Build Output Specification path (or `mode` in that file)."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says wrangler 'changed what `config.json` does' and drops the `.cloudflare/output/v0/` path, so an assistant could read it as a change to some other config.json (for example the project's wrangler config); restore the full path in the detail and say a `mode` field is added to the build output's top-level config.json."
+      },
+      {
+        "rule": "1",
+        "problem": "The tests only call an internal writer pulled out of cli.js and pass it the hand-picked value \"staging\" as a guessed third argument, so they never show that a real build writes its actual mode; either narrow the claim to what the tests show or add a test that runs a build and reads the `mode` field from `.cloudflare/output/v0/config.json`."
+      }
+    ],
+    "cost_usd": 0.067963,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.126.0#6",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, only a changelog quote, so there is no differential pair showing the PR URL appearing in `wrangler preview` output on 4.126.0 and not on the release before; add a test that runs `wrangler preview` with a detected PR (e.g. `PULL_REQUEST_URL` set) on both versions and asserts the URL is printed only on the new one."
+      }
+    ],
+    "cost_usd": 0.040147,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.126.0#7",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail says `wrangler preview` attaches the PR title unconditionally, but the entry says this is best effort and only works for GitHub Actions, GitLab CI, or the `PULL_REQUEST_TITLE` fallback, and the tests only grep cli.js for two strings without showing an annotation is attached; the claim should state these conditions and say the evidence shows only that the code is present."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `workers/pull_request_title` is the new annotation key, not something whose behavior changed; the thing that changed is the `wrangler preview` command, so the symbol should be `wrangler preview`."
+      },
+      {
+        "rule": "8",
+        "problem": "The rendered sentence says wrangler 4.126.0 'changed what `workers/pull_request_title` does', which implies the annotation existed before and works differently now, when it did not exist before 4.126.0; the sentence should say `wrangler preview` now adds this annotation when a PR title can be detected."
+      }
+    ],
+    "cost_usd": 0.05981499999999999,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.128.0#4",
+    "findings": [
+      {
+        "rule": "4",
+        "problem": "Code that doesn't read the new size fields behaves exactly the same on 4.128.0 (the change only adds a `bundle_size` field to the structured deploy record), so kind should be `added`, not `behavior`."
+      },
+      {
+        "rule": "7",
+        "problem": "The entry and quote describe an addition (\"Include exact raw and gzip-compressed ... sizes\"), which matches kind `added` rather than `behavior`; the symbol could also name the new field, e.g. the `bundle_size` (`raw_bytes`/`gzip_bytes`) field of the `deploy` output record."
+      },
+      {
+        "rule": "1",
+        "problem": "The tests only exercise `deploy --dry-run` written to WRANGLER_OUTPUT_FILE_PATH, but the claim covers structured deploy output in general, including real deploys; either narrow the detail to the dry-run output file or add evidence for a real deploy."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says wrangler \"changed what `deploy` does\", which suggests deploy itself behaves differently, when only a new field was added to the structured output record; rewording it as an added `bundle_size` field with `raw_bytes`/`gzip_bytes` would tell an assistant what to read."
+      }
+    ],
+    "cost_usd": 0.061391,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.129.1#4",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The detail drops the quote's qualifier 'for its color-coded warnings', so an assistant could read it as wrangler now enforcing or allowing bundles up to 64 MiB depending on version, when only the warning color changed (the limit itself changed server-side); add that qualifier to the detail."
+      }
+    ],
+    "cost_usd": 0.067971,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.130.0#3",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim drops the entry's condition 'When run by an AI agent' (and the quote is cut to leave it out), so it covers every `wrangler pages deploy` invocation when the evidence only covers agent-run ones; restore the AI-agent condition in both the detail and the quote."
+      },
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests at all, so there is no differential pair showing the new behavior on 4.130.0 and the old behavior on the prior release; add a pair (or drop the lesson if agent-run delegation can't be tested)."
+      },
+      {
+        "rule": "8",
+        "problem": "An assistant reading 'wrangler pages deploy ... now delegate[s] a brand-new static Pages project to a Workers static-assets deploy' would expect any new-project Pages deploy to land on Workers. It also wouldn't know that delegation already existed for accounts with no Pages projects and that only the per-account gate was widened. State that this applies only to agent-run commands and that the gate moved from per-account to per-project."
+      }
+    ],
+    "cost_usd": 0.047035,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.131.1#1",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, only a changelog quote, so there is no differential pair showing the note appears on 4.131.1 and not on the release before; add a pair that deploys with a newly added custom domain and checks for the provisioning note."
+      },
+      {
+        "rule": "7",
+        "problem": "The entry describes adding a new note (\"Add a provisioning delay note\") that appears only when a deploy adds a custom domain or enables its Preview URLs, and deploys without that change behave the same, so kind should be \"added\" rather than \"behavior\"."
+      }
+    ],
+    "cost_usd": 0.042731,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.131.1#2",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The tests only call the internal renderRoute function, which produces the deploy console trigger labels; nothing checks what is written to the WRANGLER_OUTPUT_FILE_PATH file, so the claim about that file goes beyond the evidence. Add a test that reads the output file, or drop the output-file scope from the claim."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol is WRANGLER_OUTPUT_FILE_PATH, but the tested and changed code is the custom-domain route label rendering (renderRoute / deployed trigger output), and the environment variable itself does not change. Use the label rendering, or the deploy trigger output, as the symbol."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says wrangler \"changed what `WRANGLER_OUTPUT_FILE_PATH` does\", which suggests the environment variable or file mechanism behaves differently, and it never gives the concrete strings. State that custom-domain labels changed from \"[enabled]\"/\"[disabled]\" to \"[production: enabled]\"/\"[production: disabled]\" so anyone parsing that output updates their matching correctly."
+      }
+    ],
+    "cost_usd": 0.062935,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.134.0#2",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The sentence says wrangler >=4.134.0 'changed what `wrangler preview` does', but the entry and tests show only a help-text label change; the command itself behaves the same, so an assistant would wrongly expect a functional change. The claim should be reworded or the lesson dropped as having no effect on code."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail says 'Preview commands' (plural) are labeled open beta in help output, but the tests only check the single top-level `wrangler --help` line containing 'wrangler preview'; narrow the claim to that line or add tests covering the subcommands' help."
+      }
+    ],
+    "cost_usd": 0.051431000000000004,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.135.0#2",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The detail says Flagship bindings 'use the local Miniflare store by default' without saying this applies only to local development (wrangler dev / Vite plugin), so an assistant could believe deployed Workers no longer read production flags; it should be scoped to local development, and could note that the local store starts empty unless seeded with `wrangler flagship flags pull`."
+      }
+    ],
+    "cost_usd": 0.05759499999999999,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.136.0#5",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol is `suggested_config`, but that is a new output field, not the thing that changed; the changed surface is the `wrangler preview --json` command, so the symbol should be `wrangler preview --json` (with suggested_config mentioned in the detail)."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says wrangler 'changed what `suggested_config` does' and only mentions 'JSON mode' without naming `wrangler preview`, which implies suggested_config existed before and leaves an assistant unable to tell which command is affected; the detail should name `wrangler preview --json`, say suggested_config is newly returned, and note that this is a private-beta command."
+      },
+      {
+        "rule": "5",
+        "problem": "The old run reports the expected FAIL whenever stdout is not valid JSON, so it can't tell the real symptom apart from an unrelated failure in 4.135.0 (for example the `preview` command or `--json` flag not existing, or an auth/network error with the fake token); the test should first confirm that the old run reached the missing-Preview-config path, such as by matching that error in the unstructured output, and otherwise call broken() so it prints ERROR."
+      }
+    ],
+    "cost_usd": 0.070275,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.136.1#1",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol \"placeholder replacement guidance\" is a phrase from the changelog, not a command, flag or API; it should name the thing a user invokes, `wrangler preview`, and the generated sentence should change accordingly."
+      },
+      {
+        "rule": "1",
+        "problem": "The tests only regex-match internal variable names (`conversionMessages`, `missingPreviewsConfigParagraphs`) in the bundled cli.js and never run `wrangler preview`, so they can't support the claim about where the guidance is displayed; either run the command and check the output order, or narrow the claim to what the tests show."
+      },
+      {
+        "rule": "8",
+        "problem": "\"changed what `placeholder replacement guidance` does\" reads as if a programmable feature changed, but the change only moves human-readable CLI text (and JSON output is unchanged), so the claim should say plainly that only the position of a terminal message moved and nothing a script or config relies on changed."
+      }
+    ],
+    "cost_usd": 0.058075,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.136.2#2",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote is the whole changelog bullet, which bundles three changes (image listing, tag validation, and GC-failure reporting), and it never names the command; quote only the tag-validation fact and name `wrangler containers images delete`."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol \"validate tags before deletion\" is a paraphrase of the changelog, not a symbol; it should be the command the tests exercise, `wrangler containers images delete`."
+      },
+      {
+        "rule": "3",
+        "problem": "signal is \"silent\", but the tests show that a malformed reference such as `app:tag:extra`, which older versions passed on to the API, now fails up front with \"Expected IMAGE:TAG\"; code relying on the old behavior now errors, so signal should be \"loud\"."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence (\"changed what `validate tags before deletion` does. Validate tags before deletion. Silent...\") tells an assistant nothing usable and wrongly says nothing will error; it should state that `wrangler containers images delete` now rejects references that are not of the form IMAGE:TAG (e.g. `app:tag:extra`) with an \"Expected IMAGE:TAG\" error before making any request."
+      },
+      {
+        "rule": "1",
+        "problem": "The detail \"Validate tags before deletion\" implies a general validation scheme, but the tests reach only one malformed form (an extra `:tag` segment); scope the claim to what was tested or add tests for the other cases it implies."
+      }
+    ],
+    "cost_usd": 0.063411,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.136.2#4",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol `sha256-release` is an example tag value from the entry, not the changed API; it should name what changed, such as `wrangler containers images list`, which is what the test exercises through `listImages`."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence 'changed what `sha256-release` does' presents a user-chosen tag string as if it were a wrangler API, so an assistant would misread the change; once the symbol is the `containers images list` command, the sentence should say the listing now shows `sha256-`-prefixed OCI tags and still hides `sha256:<digest>` entries."
+      },
+      {
+        "rule": "5",
+        "problem": "The test does not run wrangler's real code: it hard-codes its own `imageTagRegexp` and splices it in front of the extracted `isValidImageTag2`, so the pass on 4.136.2 depends partly on the test's regex; it should use the regex definition shipped in cli.js or call the command through wrangler's public interface."
+      }
+    ],
+    "cost_usd": 0.060219,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.137.0#3",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote does not name a symbol: it says only 'splitting D1 SQL files' and never mentions `unstable_splitSqlQuery` or `wrangler d1 execute --file`, and it does not state the tested fact that PostgreSQL `$tag$` dollar quotes no longer protect semicolons. Quote or cite text that names the API and states that fact."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol \"D1 SQL\" is not a real symbol, and it does not match what the tests exercise (`unstable_splitSqlQuery`). Set the symbol to the actual function or command, such as `unstable_splitSqlQuery` or `wrangler d1 execute --file`."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim covers all D1 SQL splitting, but the tests only check one case: dollar-quoted strings. The entry's trigger, quoted-identifier, comment and keyword changes are untested, so narrow the claim to dollar-quote handling or add tests for the other cases."
+      },
+      {
+        "rule": "8",
+        "problem": "'changed what `D1 SQL` does' plus 'still runs, without an error' would not tell an assistant that SQL files using `$tag$...$tag$` bodies are now split at the inner semicolons into broken statements; state that concrete consequence so the assistant avoids dollar quoting in D1 SQL files."
+      }
+    ],
+    "cost_usd": 0.061966999999999994,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.138.0#3",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so nothing shows that wrangler 4.138.0 formats validation errors differently from the release before; add a differential pair that triggers a config validation error and checks for the new prettifyError-style message and property path on 4.138.0, failing on the prior release."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol is `prettifyError`, but that is Zod's helper, not a wrangler API, and its behavior did not change; the change is in wrangler's validation error output, so the symbol should name what wrangler exposes (for example, config validation error messages)."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'wrangler >=4.138.0 changed what `prettifyError` does' is false, and the imperative 'Format validation errors with prettifyError()' reads as advice to call prettifyError in user code; it should say that wrangler's validation error messages and property paths now use Zod's prettifyError format."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim covers Miniflare, the Vite plugin and the Vitest plugin, but this is a wrangler lesson and no evidence or test reaches those packages; limit the claim to wrangler's own validation error output."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote is a changelog summary that names the formatting helper but not what changed in the observable output (message text or path format); it should state the concrete change in wrangler's error messages and name the affected wrangler surface."
+      }
+    ],
+    "cost_usd": 0.047355,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.141.0#4",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, only a changelog quote, so nothing shows that `wrangler dev --log-level debug` prints the stack and cause chain of a failed proxied request on 4.141.0 but not on the release before; add a differential pair whose old run fails only because that stack/cause output is missing."
+      }
+    ],
+    "cost_usd": 0.033211000000000004,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.148.0#12",
+    "findings": [],
+    "cost_usd": 0.055663,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.148.0#5",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol is the whole `wrangler versions secret bulk` command, but the entry and the quote only add null-value deletion support to an existing command; set the symbol to the null-value-in-JSON-input deletion (e.g. `wrangler versions secret bulk` JSON `null` value) so the fields match the change."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence says wrangler >=4.148.0 \"added `wrangler versions secret bulk`\", which would lead an assistant to think the command doesn't exist before 4.148.0 and avoid it; reword it to say that 4.148.0 added deleting secrets by setting their value to null in the command's JSON input."
+      },
+      {
+        "rule": "1",
+        "problem": "\"Older versions don't have it\" claims the command is absent before 4.148.0, but the 4.147.0 test shows the command runs and sends a PATCH, with only OLD_KEY not sent as a null deletion; limit the claim to older versions not treating null values as deletions."
+      }
+    ],
+    "cost_usd": 0.074167,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "4.148.0#9",
+    "findings": [],
+    "cost_usd": 0.055563,
+    "model": "claude-opus-5-5"
+  }
+]

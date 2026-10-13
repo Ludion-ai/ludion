@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#51",
+  "verdict": {
+    "id": "4.4.0#51",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.locales.ka",
+    "why": "The Georgian locale's word for 'string' changed, so error message text differs."
+  },
+  "cost_usd": 0.5262524,
+  "turns": 23,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.locales.ka",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst z = require(\"zod\");\nif (!z.locales || typeof z.locales.ka !== \"function\") broken(\"z.locales.ka is missing\");\nz.config(z.locales.ka());\nconst r = z.string().safeParse(123);\nif (r.success) broken(\"z.string() accepted a number\");\nconst msg = r.error.issues[0].message;\nif (msg.includes(\"\\u10E1\\u10E2\\u10E0\\u10D8\\u10DC\\u10D2\\u10D8\")) symptom(\"z.locales.ka names the expected type with the old word for string\");\nif (!msg.includes(\"\\u10D5\\u10D4\\u10DA\\u10D8\")) broken(\"unexpected message: \" + JSON.stringify(msg));\nconsole.log(\"OK: z.locales.ka names the expected type with the new word for string\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst z = require(\"zod\");\nif (!z.locales || typeof z.locales.ka !== \"function\") broken(\"z.locales.ka is missing\");\nz.config(z.locales.ka());\nconst r = z.string().safeParse(123);\nif (r.success) broken(\"z.string() accepted a number\");\nconst msg = r.error.issues[0].message;\nif (msg.includes(\"\\u10E1\\u10E2\\u10E0\\u10D8\\u10DC\\u10D2\\u10D8\")) symptom(\"z.locales.ka names the expected type with the old word for string\");\nif (!msg.includes(\"\\u10D5\\u10D4\\u10DA\\u10D8\")) broken(\"unexpected message: \" + JSON.stringify(msg));\nconsole.log(\"OK: z.locales.ka names the expected type with the new word for string\");\n",
+          "expect": "fail",
+          "error": "FAIL: z.locales.ka names the expected type with the old word for string"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "entry": "7.0.0#94",
+  "verdict": {
+    "id": "7.0.0#94",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "ai-sdk-agent",
+    "why": "Outgoing agent requests now carry an extra ai-sdk-agent user-agent segment."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

@@ -1,0 +1,56 @@
+{
+  "entry": "4.122.0#4",
+  "verdict": {
+    "id": "4.122.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler setup",
+    "why": "Generated configs no longer include nodejs_compat for compatibility dates 2026-08-04 or later, and wrangler setup removes an existing flag."
+  },
+  "cost_usd": 0.5850704,
+  "turns": 16,
+  "round": 3,
+  "model": "claude-opus-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.122.0",
+    "kind": "behavior",
+    "symbol": "wrangler setup",
+    "signal": "silent",
+    "detail": "wrangler setup writes today's date over the date of a wrangler.json(c) already in the project, so a nodejs_compat it finds there is removed",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.122.0"
+          },
+          "code": "const fs = require('fs'), path = require('path'), os = require('os');\nfunction symptom(m) { console.error('FAIL: ' + m); process.exit(1); }\nfunction broken(m) { console.error('ERROR: ' + m); process.exit(2); }\n(async () => {\n  const src = fs.readFileSync('/w/node_modules/wrangler/wrangler-dist/cli.js', 'utf8');\n  const body = (start) => { if (start < 0) return null; const e = src.indexOf('\\n}\\n', start); return e < 0 ? null : src.slice(start, e + 3); };\n  const s = src.indexOf('async function saveWranglerJsonc(');\n  const save = body(s);\n  const ens = body(s < 0 ? -1 : Math.max(src.lastIndexOf('function ensureNodejsCompatIsEnabled(', s), src.lastIndexOf('function ensureNodejsCompatIsInConfig(', s)));\n  if (!save || !ens) broken('could not find the wrangler setup config writer in cli.js');\n  const ensName = ens.match(/^function (\\w+)\\(/)[1];\n  const isDef = body(src.indexOf('function isNodejsCompatDefaultOn(')) || '';\n  const dm = src.match(/NODEJS_COMPAT_DEFAULT_ON_DATE = \"([0-9-]+)\"/);\n  const make = new Function('fs$1', 'path31', 'parseJSONC', 'getDirWranglerJsonConfigPath', 'NODEJS_COMPAT_DEFAULT_ON_DATE', isDef + ens + save + '\\nreturn { ensure: ' + ensName + ', save: saveWranglerJsonc };');\n  const getDir = (d) => { for (const f of ['wrangler.jsonc', 'wrangler.json']) { const p = path.resolve(d, f); if (fs.existsSync(p)) return p; } return undefined; };\n  const w = make(fs.promises, path, (t) => JSON.parse(t), getDir, dm ? dm[1] : undefined);\n  async function run(existingDate, newDate) {\n    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'setup-'));\n    fs.writeFileSync(path.join(dir, 'wrangler.jsonc'), JSON.stringify({ name: 'app', compatibility_date: existingDate, compatibility_flags: ['nodejs_compat'] }));\n    await w.save(dir, w.ensure({ name: 'app', compatibility_date: newDate }));\n    return JSON.parse(fs.readFileSync(path.join(dir, 'wrangler.jsonc'), 'utf8'));\n  }\n  const early = await run('2024-01-01', '2025-01-01');\n  if (early.compatibility_date !== '2025-01-01' || !(early.compatibility_flags || []).includes('nodejs_compat')) broken('config for 2025-01-01 is ' + JSON.stringify(early));\n  const late = await run('2025-01-01', '2026-08-12');\n  if (late.compatibility_date !== '2026-08-12') broken('compatibility_date was not written: ' + JSON.stringify(late));\n  if ((late.compatibility_flags || []).includes('nodejs_compat')) symptom('wrangler setup kept nodejs_compat next to compatibility_date 2026-08-12');\n  console.log('OK: wrangler setup removed nodejs_compat from the existing wrangler.jsonc: ' + JSON.stringify(late));\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.121.0"
+          },
+          "code": "const fs = require('fs'), path = require('path'), os = require('os');\nfunction symptom(m) { console.error('FAIL: ' + m); process.exit(1); }\nfunction broken(m) { console.error('ERROR: ' + m); process.exit(2); }\n(async () => {\n  const src = fs.readFileSync('/w/node_modules/wrangler/wrangler-dist/cli.js', 'utf8');\n  const body = (start) => { if (start < 0) return null; const e = src.indexOf('\\n}\\n', start); return e < 0 ? null : src.slice(start, e + 3); };\n  const s = src.indexOf('async function saveWranglerJsonc(');\n  const save = body(s);\n  const ens = body(s < 0 ? -1 : Math.max(src.lastIndexOf('function ensureNodejsCompatIsEnabled(', s), src.lastIndexOf('function ensureNodejsCompatIsInConfig(', s)));\n  if (!save || !ens) broken('could not find the wrangler setup config writer in cli.js');\n  const ensName = ens.match(/^function (\\w+)\\(/)[1];\n  const isDef = body(src.indexOf('function isNodejsCompatDefaultOn(')) || '';\n  const dm = src.match(/NODEJS_COMPAT_DEFAULT_ON_DATE = \"([0-9-]+)\"/);\n  const make = new Function('fs$1', 'path31', 'parseJSONC', 'getDirWranglerJsonConfigPath', 'NODEJS_COMPAT_DEFAULT_ON_DATE', isDef + ens + save + '\\nreturn { ensure: ' + ensName + ', save: saveWranglerJsonc };');\n  const getDir = (d) => { for (const f of ['wrangler.jsonc', 'wrangler.json']) { const p = path.resolve(d, f); if (fs.existsSync(p)) return p; } return undefined; };\n  const w = make(fs.promises, path, (t) => JSON.parse(t), getDir, dm ? dm[1] : undefined);\n  async function run(existingDate, newDate) {\n    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'setup-'));\n    fs.writeFileSync(path.join(dir, 'wrangler.jsonc'), JSON.stringify({ name: 'app', compatibility_date: existingDate, compatibility_flags: ['nodejs_compat'] }));\n    await w.save(dir, w.ensure({ name: 'app', compatibility_date: newDate }));\n    return JSON.parse(fs.readFileSync(path.join(dir, 'wrangler.jsonc'), 'utf8'));\n  }\n  const early = await run('2024-01-01', '2025-01-01');\n  if (early.compatibility_date !== '2025-01-01' || !(early.compatibility_flags || []).includes('nodejs_compat')) broken('config for 2025-01-01 is ' + JSON.stringify(early));\n  const late = await run('2025-01-01', '2026-08-12');\n  if (late.compatibility_date !== '2026-08-12') broken('compatibility_date was not written: ' + JSON.stringify(late));\n  if ((late.compatibility_flags || []).includes('nodejs_compat')) symptom('wrangler setup kept nodejs_compat next to compatibility_date 2026-08-12');\n  console.log('OK: wrangler setup removed nodejs_compat from the existing wrangler.jsonc: ' + JSON.stringify(late));\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: wrangler setup kept nodejs_compat next to compatibility_date 2026-08-12"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.122.0/packages/wrangler/CHANGELOG.md",
+          "quote": "`wrangler setup` does the same for a `wrangler.json(c)` that is already in the project: it writes today's date over whatever date that configuration was written for, so a `nodejs_compat` it finds there is removed as part of writing the file."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

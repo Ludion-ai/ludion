@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#1",
+  "verdict": {
+    "id": "4.2.3#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "tracking-*",
+    "why": "Canonicalization output now prefers non-negative tracking utilities, changing suggested output."
+  },
+  "cost_usd": 0.6698874,
+  "turns": 30,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "tracking-*",
+    "signal": "silent",
+    "detail": "Canonicalization prefers non-negative tracking-* utilities, e.g. -tracking-tighter to tracking-wider",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "const { __unstable__loadDesignSystem } = require(\"tailwindcss\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst css = \"@theme { --tracking-tighter: -0.05em; --tracking-tight: -0.025em; --tracking-normal: 0em; --tracking-wide: 0.025em; --tracking-wider: 0.05em; --tracking-widest: 0.1em; }\\n@tailwind utilities;\";\n(async () => {\n  let ds;\n  try { ds = await __unstable__loadDesignSystem(css, { base: \"/tmp\" }); } catch (e) { broken(\"loadDesignSystem threw: \" + e.message); }\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"no canonicalizeCandidates\");\n  const out = ds.candidatesToCss([\"-tracking-tighter\", \"tracking-wider\"]);\n  if (!out[0] || !out[1] || !out[0].includes(\"letter-spacing\") || !out[1].includes(\"letter-spacing\")) broken(\"unexpected tracking CSS: \" + JSON.stringify(out));\n  const got = ds.canonicalizeCandidates([\"-tracking-tighter\"]);\n  if (!Array.isArray(got) || got.length !== 1) broken(\"unexpected result \" + JSON.stringify(got));\n  if ([\"-tracking-tighter\", \"tracking-[0.05em]\", \"-tracking-[-0.05em]\"].includes(got[0])) symptom(\"canonicalizeCandidates did not turn -tracking-tighter into tracking-wider\");\n  if (got[0] !== \"tracking-wider\") broken(\"unexpected canonical form \" + got[0]);\n  console.log(\"OK: -tracking-tighter canonicalizes to tracking-wider\");\n})().catch(e => broken(String((e && e.message) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "const { __unstable__loadDesignSystem } = require(\"tailwindcss\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst css = \"@theme { --tracking-tighter: -0.05em; --tracking-tight: -0.025em; --tracking-normal: 0em; --tracking-wide: 0.025em; --tracking-wider: 0.05em; --tracking-widest: 0.1em; }\\n@tailwind utilities;\";\n(async () => {\n  let ds;\n  try { ds = await __unstable__loadDesignSystem(css, { base: \"/tmp\" }); } catch (e) { broken(\"loadDesignSystem threw: \" + e.message); }\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"no canonicalizeCandidates\");\n  const out = ds.candidatesToCss([\"-tracking-tighter\", \"tracking-wider\"]);\n  if (!out[0] || !out[1] || !out[0].includes(\"letter-spacing\") || !out[1].includes(\"letter-spacing\")) broken(\"unexpected tracking CSS: \" + JSON.stringify(out));\n  const got = ds.canonicalizeCandidates([\"-tracking-tighter\"]);\n  if (!Array.isArray(got) || got.length !== 1) broken(\"unexpected result \" + JSON.stringify(got));\n  if ([\"-tracking-tighter\", \"tracking-[0.05em]\", \"-tracking-[-0.05em]\"].includes(got[0])) symptom(\"canonicalizeCandidates did not turn -tracking-tighter into tracking-wider\");\n  if (got[0] !== \"tracking-wider\") broken(\"unexpected canonical form \" + got[0]);\n  console.log(\"OK: -tracking-tighter canonicalizes to tracking-wider\");\n})().catch(e => broken(String((e && e.message) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: canonicalizeCandidates did not turn -tracking-tighter into tracking-wider"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Canonicalization: improve canonicalizations for `tracking-*` utilities by preferring non-negative utilities (e.g. `-tracking-tighter` → `tracking-wider`)"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

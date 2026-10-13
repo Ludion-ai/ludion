@@ -1,0 +1,16 @@
+[
+  {
+    "version": "0.45.3",
+    "date": "2026-09-21T10:06:39.969Z",
+    "tag": "0.45.3",
+    "url": "https://github.com/drizzle-team/drizzle-orm/releases/tag/0.45.3",
+    "body": "## New Netlify DB Driver\n\n> Note: The Netlify DB driver is developed and maintained by the Netlify team.\n\n**Installation:**\n```bash\nnpm i @netlify/db\n```\n\n**Usage example:**\n```typescript\nimport { drizzle } from 'drizzle-orm/netlify-db';\n\n// reads NETLIFY_DB_URL and NETLIFY_DB_DRIVER env vars\nconst db = drizzle();\n\nconst result = await db.execute('select 1');\n```\n\n```typescript\nimport { drizzle } from 'drizzle-orm/netlify-db';\n\nconst db = drizzle(process.env.DATABASE_URL);\n\nconst result = await db.execute('select 1');\n```\n\n```typescript\nimport { drizzle } from 'drizzle-orm/netlify-db';\n\n// Explicit client — consumer controls the driver\nconst db = drizzle({ client: netlifyDbClient });\n\nconst result = await db.execute('select 1');\n```\n"
+  },
+  {
+    "version": "0.45.4",
+    "date": "2026-10-08T10:50:41.953Z",
+    "tag": "0.45.4",
+    "url": "https://github.com/drizzle-team/drizzle-orm/releases/tag/0.45.4",
+    "body": "- Fixed `postgres-js` not using prepared queries on explicit `.prepare(name)`"
+  }
+]

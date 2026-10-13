@@ -1,0 +1,54 @@
+{
+  "entry": "0.21.0#3",
+  "verdict": {
+    "id": "0.21.0#3",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "browser_screenshot",
+    "why": "Large base64 values returned outside the canonical screenshot shape are now redacted, and TanStack screenshot output is reduced to a summary."
+  },
+  "cost_usd": 1.1281123000000002,
+  "turns": 34,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.21.0",
+    "kind": "behavior",
+    "symbol": "browser_screenshot",
+    "signal": "silent",
+    "detail": "Large base64 values returned outside the canonical browser_screenshot shape are now redacted.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.21.0"
+          },
+          "code": "const fs = require('fs');\nconst mod = require('module');\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\n// Stand-ins only for modules plain Node cannot load here (Workers runtime, optional peers).\nconst STUBS = {\n  'cloudflare:workers': 'export class DurableObject {} export class RpcTarget {}',\n  '@cloudflare/codemode': 'export class CodemodeConnector { constructor() {} } export class DynamicWorkerExecutor { constructor() {} } export const truncateResult = (v) => v; export function createCodemodeRuntime() { return { tool: () => ({ description: `stub`, execute: async () => null }) }; }',\n  'ai': 'export const tool = (t) => t;',\n  'zod': 'const p = new Proxy(function () {}, { get: (t, k) => k === `then` ? undefined : p, apply: () => p }); export const z = p;',\n  '@cfworker/json-schema': 'export class Validator { validate() { return { valid: true, errors: [] }; } }'\n};\nconst ALWAYS = new Set(['cloudflare:workers', '@cloudflare/codemode']);\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (Object.prototype.hasOwnProperty.call(STUBS, specifier)) {\n      if (!ALWAYS.has(specifier)) {\n        try { return next(specifier, context); } catch {}\n      }\n      return { url: 'stub:' + specifier, format: 'module', shortCircuit: true };\n    }\n    return next(specifier, context);\n  },\n  load(url, context, next) {\n    if (url.startsWith('stub:')) {\n      return { format: 'module', source: STUBS[url.slice(5)], shortCircuit: true };\n    }\n    return next(url, context);\n  }\n});\nfs.writeFileSync('/w/entry.mjs', 'export * from `agents/browser/ai`;\\n'.replace(/`/g, String.fromCharCode(39)));\n(async () => {\n  console.warn = () => {};\n  console.debug = () => {};\n  let ai;\n  try {\n    ai = await import('file:///w/entry.mjs');\n  } catch (e) {\n    console.error('ERROR: cannot load agents/browser/ai: ' + e.message);\n    process.exit(2);\n  }\n  if (typeof ai.createBrowserRuntime !== 'function') {\n    console.error('ERROR: createBrowserRuntime is missing');\n    process.exit(2);\n  }\n  const ctx = { storage: {}, exports: {}, facets: { get: () => ({}) } };\n  const { tools } = ai.createBrowserRuntime({ ctx, cdpUrl: 'http://127.0.0.1:9/', loader: {}, quickActions: false });\n  const tool = tools.browser_execute;\n  if (!tool) {\n    console.error('ERROR: browser_execute tool is missing');\n    process.exit(2);\n  }\n  const big = 'A'.repeat(8192);\n  const output = { status: 'completed', result: { title: 'Example', image: 'data:image/png;base64,' + big } };\n  // Without a toModelOutput hook the AI SDK hands the raw output to the model.\n  const modelOutput = typeof tool.toModelOutput === 'function'\n    ? await tool.toModelOutput({ output })\n    : { type: 'json', value: output };\n  const text = JSON.stringify(modelOutput);\n  if (text.includes(big)) {\n    console.error('FAIL: browser_execute passes a large base64 data URL outside the browser_screenshot shape to the model unredacted');\n    process.exit(1);\n  }\n  if (!text.includes('base64 image/png data omitted') || !text.includes('Example')) {\n    console.error('ERROR: unexpected model output ' + text.slice(0, 300));\n    process.exit(2);\n  }\n  if (output.result.image !== 'data:image/png;base64,' + big) {\n    console.error('ERROR: original output was mutated');\n    process.exit(2);\n  }\n  console.log('OK: model output is ' + text);\n  process.exit(0);\n})().catch((e) => {\n  console.error('ERROR: ' + (e && e.message));\n  process.exit(2);\n});\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.20.1"
+          },
+          "code": "const fs = require('fs');\nconst mod = require('module');\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\n// Stand-ins only for modules plain Node cannot load here (Workers runtime, optional peers).\nconst STUBS = {\n  'cloudflare:workers': 'export class DurableObject {} export class RpcTarget {}',\n  '@cloudflare/codemode': 'export class CodemodeConnector { constructor() {} } export class DynamicWorkerExecutor { constructor() {} } export const truncateResult = (v) => v; export function createCodemodeRuntime() { return { tool: () => ({ description: `stub`, execute: async () => null }) }; }',\n  'ai': 'export const tool = (t) => t;',\n  'zod': 'const p = new Proxy(function () {}, { get: (t, k) => k === `then` ? undefined : p, apply: () => p }); export const z = p;',\n  '@cfworker/json-schema': 'export class Validator { validate() { return { valid: true, errors: [] }; } }'\n};\nconst ALWAYS = new Set(['cloudflare:workers', '@cloudflare/codemode']);\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (Object.prototype.hasOwnProperty.call(STUBS, specifier)) {\n      if (!ALWAYS.has(specifier)) {\n        try { return next(specifier, context); } catch {}\n      }\n      return { url: 'stub:' + specifier, format: 'module', shortCircuit: true };\n    }\n    return next(specifier, context);\n  },\n  load(url, context, next) {\n    if (url.startsWith('stub:')) {\n      return { format: 'module', source: STUBS[url.slice(5)], shortCircuit: true };\n    }\n    return next(url, context);\n  }\n});\nfs.writeFileSync('/w/entry.mjs', 'export * from `agents/browser/ai`;\\n'.replace(/`/g, String.fromCharCode(39)));\n(async () => {\n  console.warn = () => {};\n  console.debug = () => {};\n  let ai;\n  try {\n    ai = await import('file:///w/entry.mjs');\n  } catch (e) {\n    console.error('ERROR: cannot load agents/browser/ai: ' + e.message);\n    process.exit(2);\n  }\n  if (typeof ai.createBrowserRuntime !== 'function') {\n    console.error('ERROR: createBrowserRuntime is missing');\n    process.exit(2);\n  }\n  const ctx = { storage: {}, exports: {}, facets: { get: () => ({}) } };\n  const { tools } = ai.createBrowserRuntime({ ctx, cdpUrl: 'http://127.0.0.1:9/', loader: {}, quickActions: false });\n  const tool = tools.browser_execute;\n  if (!tool) {\n    console.error('ERROR: browser_execute tool is missing');\n    process.exit(2);\n  }\n  const big = 'A'.repeat(8192);\n  const output = { status: 'completed', result: { title: 'Example', image: 'data:image/png;base64,' + big } };\n  // Without a toModelOutput hook the AI SDK hands the raw output to the model.\n  const modelOutput = typeof tool.toModelOutput === 'function'\n    ? await tool.toModelOutput({ output })\n    : { type: 'json', value: output };\n  const text = JSON.stringify(modelOutput);\n  if (text.includes(big)) {\n    console.error('FAIL: browser_execute passes a large base64 data URL outside the browser_screenshot shape to the model unredacted');\n    process.exit(1);\n  }\n  if (!text.includes('base64 image/png data omitted') || !text.includes('Example')) {\n    console.error('ERROR: unexpected model output ' + text.slice(0, 300));\n    process.exit(2);\n  }\n  if (output.result.image !== 'data:image/png;base64,' + big) {\n    console.error('ERROR: original output was mutated');\n    process.exit(2);\n  }\n  console.log('OK: model output is ' + text);\n  process.exit(0);\n})().catch((e) => {\n  console.error('ERROR: ' + (e && e.message));\n  process.exit(2);\n});\n",
+          "expect": "fail",
+          "error": "FAIL: browser_execute passes a large base64 data URL outside the browser_screenshot shape to the model unredacted"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.21.0/packages/agents/CHANGELOG.md",
+          "quote": "Large base64 values returned outside the canonical `{ type: \"browser_screenshot\", mediaType, data }` shape are now redacted."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

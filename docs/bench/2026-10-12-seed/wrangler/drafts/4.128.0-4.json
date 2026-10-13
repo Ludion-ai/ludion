@@ -1,0 +1,54 @@
+{
+  "entry": "4.128.0#4",
+  "verdict": {
+    "id": "4.128.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "deploy",
+    "why": "Structured `deploy` and `version-upload` output now includes raw and gzip bundle sizes."
+  },
+  "cost_usd": 0.2049708,
+  "turns": 16,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.128.0",
+    "kind": "behavior",
+    "symbol": "deploy WRANGLER_OUTPUT_FILE_PATH",
+    "signal": "silent",
+    "detail": "Structured deploy output includes raw and gzip-compressed Worker bundle sizes.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.128.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst cp = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nfs.mkdirSync(\"/tmp/proj\", { recursive: true });\nfs.writeFileSync(\"/tmp/proj/index.js\", \"export default { fetch() { return new Response('hello'); } };\\n\");\nfs.writeFileSync(\"/tmp/proj/wrangler.toml\", 'name = \"t\"\\nmain = \"index.js\"\\ncompatibility_date = \"2025-01-01\"\\n');\nconst out = \"/tmp/proj/out.ndjson\";\nconst r = cp.spawnSync(\"node\", [\"/w/node_modules/wrangler/bin/wrangler.js\", \"deploy\", \"--dry-run\", \"--outdir\", \"dist\"], { cwd: \"/tmp/proj\", encoding: \"utf8\", timeout: 80000, env: Object.assign({}, process.env, { WRANGLER_OUTPUT_FILE_PATH: out, WRANGLER_SEND_METRICS: \"false\", CI: \"true\" }) });\nif (r.status !== 0 || !fs.existsSync(out)) broken(\"dry-run deploy failed: \" + r.status + \" \" + (r.stderr || \"\").slice(0, 300));\nconst recs = fs.readFileSync(out, \"utf8\").split(\"\\n\").filter(Boolean).map((l) => JSON.parse(l));\nconst dep = recs.find((x) => x.type === \"deploy\");\nif (!dep) broken(\"no deploy record in output\");\nif (!dep.bundle_size) symptom(\"deploy output record has no bundle_size\");\nif (!(dep.bundle_size.raw_bytes > 0) || !(dep.bundle_size.gzip_bytes > 0)) broken(\"bad bundle_size \" + JSON.stringify(dep.bundle_size));\nconsole.log(\"OK: bundle_size \" + JSON.stringify(dep.bundle_size));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.127.1"
+          },
+          "code": "const fs = require(\"fs\");\nconst cp = require(\"child_process\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nfs.mkdirSync(\"/tmp/proj\", { recursive: true });\nfs.writeFileSync(\"/tmp/proj/index.js\", \"export default { fetch() { return new Response('hello'); } };\\n\");\nfs.writeFileSync(\"/tmp/proj/wrangler.toml\", 'name = \"t\"\\nmain = \"index.js\"\\ncompatibility_date = \"2025-01-01\"\\n');\nconst out = \"/tmp/proj/out.ndjson\";\nconst r = cp.spawnSync(\"node\", [\"/w/node_modules/wrangler/bin/wrangler.js\", \"deploy\", \"--dry-run\", \"--outdir\", \"dist\"], { cwd: \"/tmp/proj\", encoding: \"utf8\", timeout: 80000, env: Object.assign({}, process.env, { WRANGLER_OUTPUT_FILE_PATH: out, WRANGLER_SEND_METRICS: \"false\", CI: \"true\" }) });\nif (r.status !== 0 || !fs.existsSync(out)) broken(\"dry-run deploy failed: \" + r.status + \" \" + (r.stderr || \"\").slice(0, 300));\nconst recs = fs.readFileSync(out, \"utf8\").split(\"\\n\").filter(Boolean).map((l) => JSON.parse(l));\nconst dep = recs.find((x) => x.type === \"deploy\");\nif (!dep) broken(\"no deploy record in output\");\nif (!dep.bundle_size) symptom(\"deploy output record has no bundle_size\");\nif (!(dep.bundle_size.raw_bytes > 0) || !(dep.bundle_size.gzip_bytes > 0)) broken(\"bad bundle_size \" + JSON.stringify(dep.bundle_size));\nconsole.log(\"OK: bundle_size \" + JSON.stringify(dep.bundle_size));\n",
+          "expect": "fail",
+          "error": "FAIL: deploy output record has no bundle_size"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.128.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Include exact raw and gzip-compressed Worker bundle sizes in structured `deploy` and `version-upload` output."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

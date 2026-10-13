@@ -1,0 +1,33 @@
+{
+  "entry": "4.124.0#13",
+  "verdict": {
+    "id": "4.124.0#13",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler types",
+    "why": "Generated runtime types no longer include conflicting Node.js globals when nodejs compat is enabled via compatibility date."
+  },
+  "cost_usd": 0.1354303,
+  "turns": 11,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.124.0",
+    "kind": "behavior",
+    "symbol": "nodejs_compat",
+    "signal": "silent",
+    "detail": "Runtime type generation treats Node.js compatibility enabled by a compatibility date the same as an explicit nodejs_compat flag.",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.124.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Runtime type generation now treats Node.js compatibility enabled by a compatibility date the same way as an explicit `nodejs_compat` flag."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

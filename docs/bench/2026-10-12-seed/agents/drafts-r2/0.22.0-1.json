@@ -1,0 +1,56 @@
+{
+  "entry": "0.22.0#1",
+  "verdict": {
+    "id": "0.22.0#1",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "chatRecovery",
+    "why": "Chat recovery now always runs, and `chatRecovery: false` silently gets the default configuration."
+  },
+  "cost_usd": 0.1660622,
+  "turns": 7,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.22.0",
+    "kind": "behavior",
+    "symbol": "chatRecovery",
+    "signal": "silent",
+    "detail": "Previously compiled JavaScript that still supplies chatRecovery false receives the default recovery configuration",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.22.0",
+            "ai": "7.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst file = \"/w/node_modules/agents/dist/chat/index.js\";\nconst pkg = JSON.parse(fs.readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\"));\n(async () => {\n  let m;\n  try {\n    m = await import(file);\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  const resolve = m.resolveChatRecoveryConfig;\n  if (typeof resolve !== \"function\") {\n    console.error(\"ERROR: resolveChatRecoveryConfig is not exported\");\n    process.exit(2);\n  }\n  const off = resolve(false);\n  const on = resolve(true);\n  if (!off || typeof off !== \"object\" || typeof on.maxAttempts !== \"number\") {\n    console.error(\"ERROR: unexpected resolved config \" + JSON.stringify(off));\n    process.exit(2);\n  }\n  if (off.enabled === false) {\n    console.error(\"FAIL: agents \" + pkg.version + \" chatRecovery false resolves to enabled: false, so durable recovery is disabled\");\n    process.exit(1);\n  }\n  if (JSON.stringify(off) === JSON.stringify(on) && !(\"enabled\" in off)) {\n    console.log(\"OK: agents \" + pkg.version + \" chatRecovery false resolves to the default recovery configuration \" + JSON.stringify(off));\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected configs false=\" + JSON.stringify(off) + \" true=\" + JSON.stringify(on));\n  process.exit(2);\n})();\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.21.0",
+            "ai": "7.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst file = \"/w/node_modules/agents/dist/chat/index.js\";\nconst pkg = JSON.parse(fs.readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\"));\n(async () => {\n  let m;\n  try {\n    m = await import(file);\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  const resolve = m.resolveChatRecoveryConfig;\n  if (typeof resolve !== \"function\") {\n    console.error(\"ERROR: resolveChatRecoveryConfig is not exported\");\n    process.exit(2);\n  }\n  const off = resolve(false);\n  const on = resolve(true);\n  if (!off || typeof off !== \"object\" || typeof on.maxAttempts !== \"number\") {\n    console.error(\"ERROR: unexpected resolved config \" + JSON.stringify(off));\n    process.exit(2);\n  }\n  if (off.enabled === false) {\n    console.error(\"FAIL: agents \" + pkg.version + \" chatRecovery false resolves to enabled: false, so durable recovery is disabled\");\n    process.exit(1);\n  }\n  if (JSON.stringify(off) === JSON.stringify(on) && !(\"enabled\" in off)) {\n    console.log(\"OK: agents \" + pkg.version + \" chatRecovery false resolves to the default recovery configuration \" + JSON.stringify(off));\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected configs false=\" + JSON.stringify(off) + \" true=\" + JSON.stringify(on));\n  process.exit(2);\n})();\n",
+          "expect": "fail",
+          "error": "FAIL: agents 0.21.0 chatRecovery false resolves to enabled: false, so durable recovery is disabled"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/CHANGELOG.md",
+          "quote": "`chatRecovery` accepts `true` or a configuration object; `false` is no longer supported. Previously compiled JavaScript that still supplies `false` safely receives the default recovery configuration."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

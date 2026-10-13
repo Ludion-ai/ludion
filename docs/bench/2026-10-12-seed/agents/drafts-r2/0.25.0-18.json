@@ -1,0 +1,13 @@
+{
+  "entry": "0.25.0#18",
+  "verdict": {
+    "id": "0.25.0#18",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Compaction summaries echoed back by clients are no longer stored, and stored duplicates are hidden."
+  },
+  "cost_usd": 0.17093260000000002,
+  "turns": 6,
+  "skip": "The only quotable source is the changelog headline, which names no API symbol (such as appendMessage) and states no checkable fact sentence, so no valid quote can ground the lesson."
+}

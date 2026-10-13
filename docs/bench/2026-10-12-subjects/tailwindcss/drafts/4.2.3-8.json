@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#8",
+  "verdict": {
+    "id": "4.2.3#8",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "overflow-*",
+    "why": "Canonicalization now collapses overflow-x/y into overflow-*."
+  },
+  "cost_usd": 0.717552,
+  "turns": 32,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "canonicalizeCandidates overflow-x-hidden overflow-y-hidden",
+    "signal": "silent",
+    "detail": "canonicalizeCandidates collapses overflow-x-hidden overflow-y-hidden into overflow-hidden",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const file = \"/w/node_modules/tailwindcss/index.css\";\n  const ds = await tw.__unstable__loadDesignSystem('@import \"tailwindcss\";', {\n    base: \"/tmp\",\n    loadStylesheet: async (id, base) => {\n      if (id !== \"tailwindcss\") broken(\"unexpected stylesheet \" + id);\n      return { path: file, base: \"/w/node_modules/tailwindcss\", content: fs.readFileSync(file, \"utf8\") };\n    },\n  });\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const ctl = ds.canonicalizeCandidates([\"mt-1\", \"mb-1\"], { collapse: true });\n  if (JSON.stringify(ctl) !== JSON.stringify([\"my-1\"])) broken(\"control mt-1 mb-1 gave \" + JSON.stringify(ctl));\n  const got = ds.canonicalizeCandidates([\"overflow-x-hidden\", \"overflow-y-hidden\"], { collapse: true });\n  if (JSON.stringify(got) === JSON.stringify([\"overflow-hidden\"])) { console.log(\"OK: overflow-x-hidden overflow-y-hidden collapse into overflow-hidden\"); return; }\n  if (got.length === 2 && got.includes(\"overflow-x-hidden\") && got.includes(\"overflow-y-hidden\")) symptom(\"overflow-x-hidden overflow-y-hidden are not collapsed into overflow-hidden\");\n  broken(\"unexpected result \" + JSON.stringify(got));\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const file = \"/w/node_modules/tailwindcss/index.css\";\n  const ds = await tw.__unstable__loadDesignSystem('@import \"tailwindcss\";', {\n    base: \"/tmp\",\n    loadStylesheet: async (id, base) => {\n      if (id !== \"tailwindcss\") broken(\"unexpected stylesheet \" + id);\n      return { path: file, base: \"/w/node_modules/tailwindcss\", content: fs.readFileSync(file, \"utf8\") };\n    },\n  });\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const ctl = ds.canonicalizeCandidates([\"mt-1\", \"mb-1\"], { collapse: true });\n  if (JSON.stringify(ctl) !== JSON.stringify([\"my-1\"])) broken(\"control mt-1 mb-1 gave \" + JSON.stringify(ctl));\n  const got = ds.canonicalizeCandidates([\"overflow-x-hidden\", \"overflow-y-hidden\"], { collapse: true });\n  if (JSON.stringify(got) === JSON.stringify([\"overflow-hidden\"])) { console.log(\"OK: overflow-x-hidden overflow-y-hidden collapse into overflow-hidden\"); return; }\n  if (got.length === 2 && got.includes(\"overflow-x-hidden\") && got.includes(\"overflow-y-hidden\")) symptom(\"overflow-x-hidden overflow-y-hidden are not collapsed into overflow-hidden\");\n  broken(\"unexpected result \" + JSON.stringify(got));\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: overflow-x-hidden overflow-y-hidden are not collapsed into overflow-hidden"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Canonicalization: collapse `overflow-{x,y}-*` into `overflow-*` ([#19842](https://github.com/tailwindlabs/tailwindcss/pull/19842))"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

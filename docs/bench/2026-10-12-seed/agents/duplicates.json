@@ -1,0 +1,7 @@
+[
+  {
+    "entry": "0.23.0#1",
+    "of": "01M4N4KZ1H5MK1KCKT59THQ707",
+    "claim": "agents >=0.23.0 deprecated `subAgent`; use `this.dynamicAgents.get` instead. subAgent is legacy and deprecated; it delegates to this.dynamicAgents.get and remains supported. Silent: code written for older versions still runs, without an error."
+  }
+]

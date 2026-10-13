@@ -1,0 +1,33 @@
+{
+  "entry": "4.136.3#2",
+  "verdict": {
+    "id": "4.136.3#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler preview",
+    "why": "The command now prints a new warning when only non-custom-domain URLs are returned."
+  },
+  "cost_usd": 0.0712485,
+  "turns": 5,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.136.3",
+    "kind": "behavior",
+    "symbol": "wrangler preview",
+    "signal": "silent",
+    "detail": "wrangler preview warns when it returns only non-custom-domain URLs even though custom-domain Preview URLs are configured",
+    "evidence": [
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.136.3/packages/wrangler/CHANGELOG.md",
+          "quote": "Warn when `wrangler preview` returns only non-custom-domain URLs even though custom-domain Preview URLs are configured."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

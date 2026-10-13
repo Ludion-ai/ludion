@@ -1,0 +1,54 @@
+{
+  "entry": "4.113.0#4",
+  "verdict": {
+    "id": "4.113.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "queue_name",
+    "why": "Queue, Dispatch Namespace and Flagship bindings can now omit the name or ID and get auto-provisioned resources, so a deploy with them omitted now creates resources."
+  },
+  "cost_usd": 0.5756498000000001,
+  "turns": 21,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.113.0",
+    "kind": "added",
+    "symbol": "Queue",
+    "signal": "loud",
+    "detail": "Queue bindings can now omit the resource name.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.113.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet wrangler;\ntry { wrangler = require(\"wrangler\"); } catch (e) { broken(\"cannot load wrangler: \" + e.message); }\nif (typeof wrangler.unstable_readConfig !== \"function\") broken(\"unstable_readConfig is not exported\");\nconst dir = fs.mkdtempSync(\"/tmp/q-\");\nfs.writeFileSync(dir + \"/index.js\", \"export default { fetch() { return new Response('ok'); } };\\n\");\nconst cfg = dir + \"/wrangler.json\";\nfs.writeFileSync(cfg, JSON.stringify({ name: \"demo\", main: \"index.js\", compatibility_date: \"2025-01-01\", queues: { producers: [{ binding: \"MY_QUEUE\" }] } }));\nlet config;\ntry {\n  config = wrangler.unstable_readConfig({ config: cfg }, { hideWarnings: true });\n} catch (e) {\n  const m = String(e && e.message);\n  if (/should have a string \"queue\" field/.test(m)) symptom(\"a Queue producer binding without a queue name is rejected by config validation\");\n  broken(\"unexpected error reading config: \" + m);\n}\nconst p = config && config.queues && config.queues.producers;\nif (!Array.isArray(p) || p.length !== 1 || p[0].binding !== \"MY_QUEUE\" || p[0].queue !== undefined) broken(\"unexpected producers: \" + JSON.stringify(p));\nconsole.log(\"OK: a Queue producer binding without a queue name is accepted\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.112.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nlet wrangler;\ntry { wrangler = require(\"wrangler\"); } catch (e) { broken(\"cannot load wrangler: \" + e.message); }\nif (typeof wrangler.unstable_readConfig !== \"function\") broken(\"unstable_readConfig is not exported\");\nconst dir = fs.mkdtempSync(\"/tmp/q-\");\nfs.writeFileSync(dir + \"/index.js\", \"export default { fetch() { return new Response('ok'); } };\\n\");\nconst cfg = dir + \"/wrangler.json\";\nfs.writeFileSync(cfg, JSON.stringify({ name: \"demo\", main: \"index.js\", compatibility_date: \"2025-01-01\", queues: { producers: [{ binding: \"MY_QUEUE\" }] } }));\nlet config;\ntry {\n  config = wrangler.unstable_readConfig({ config: cfg }, { hideWarnings: true });\n} catch (e) {\n  const m = String(e && e.message);\n  if (/should have a string \"queue\" field/.test(m)) symptom(\"a Queue producer binding without a queue name is rejected by config validation\");\n  broken(\"unexpected error reading config: \" + m);\n}\nconst p = config && config.queues && config.queues.producers;\nif (!Array.isArray(p) || p.length !== 1 || p[0].binding !== \"MY_QUEUE\" || p[0].queue !== undefined) broken(\"unexpected producers: \" + JSON.stringify(p));\nconsole.log(\"OK: a Queue producer binding without a queue name is accepted\");\n",
+          "expect": "fail",
+          "error": "FAIL: a Queue producer binding without a queue name is rejected by config validation"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.113.0/packages/wrangler/CHANGELOG.md",
+          "quote": "Expand automatic resource provisioning to Queue, Dispatch Namespace, and Flagship bindings\n\n  Deployments can now omit the resource name or ID for these bindings."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "entry": "5.0.0#125",
+  "verdict": {
+    "id": "5.0.0#125",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "webdriverio",
+    "why": "Headless Chrome under webdriverio now allows the GPU, changing launch behavior."
+  },
+  "cost_usd": 0.11234859999999999,
+  "turns": 4,
+  "skip": "The change is in @vitest/browser-webdriverio, not the vitest package itself, sources/ has no quotable page, and showing it needs a real headless Chrome launch that can't run offline."
+}

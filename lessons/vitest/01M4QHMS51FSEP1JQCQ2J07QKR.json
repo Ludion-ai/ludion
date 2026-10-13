@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4QHMS51FSEP1JQCQ2J07QKR",
+  "subject": "vitest",
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=5.0.0",
+  "kind": "behavior",
+  "symbol": "Duration",
+  "signal": "silent",
+  "detail": "The Duration line of the summary breaks the run down into phases as percentages of tracked time.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "5.0.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/durationpct\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"sum.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('adds', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=default\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(/\\r?\\n/).find((l) => /^\\s*Duration\\s+\\S+\\s+\\(.*\\)\\s*$/.test(l));\nif (r.status !== 0 || !line) {\n  console.error(\"ERROR: no Duration summary line with a breakdown (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst parts = line.slice(line.indexOf(\"(\") + 1, line.lastIndexOf(\")\")).split(\",\").map((s) => s.trim());\nconsole.log(\"breakdown: \" + JSON.stringify(parts));\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+%$/.test(p))) {\n  console.log(\"PASS: the Duration breakdown is reported as percentages\");\n  process.exit(0);\n}\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+(\\.\\d+)?(ms|s|m)$/.test(p))) {\n  console.error(\"FAIL: the Duration breakdown is reported as times, not percentages\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Duration line: \" + line.trim());\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/durationpct\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"sum.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('adds', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=default\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(/\\r?\\n/).find((l) => /^\\s*Duration\\s+\\S+\\s+\\(.*\\)\\s*$/.test(l));\nif (r.status !== 0 || !line) {\n  console.error(\"ERROR: no Duration summary line with a breakdown (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst parts = line.slice(line.indexOf(\"(\") + 1, line.lastIndexOf(\")\")).split(\",\").map((s) => s.trim());\nconsole.log(\"breakdown: \" + JSON.stringify(parts));\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+%$/.test(p))) {\n  console.log(\"PASS: the Duration breakdown is reported as percentages\");\n  process.exit(0);\n}\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+(\\.\\d+)?(ms|s|m)$/.test(p))) {\n  console.error(\"FAIL: the Duration breakdown is reported as times, not percentages\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Duration line: \" + line.trim());\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: the Duration breakdown is reported as times, not percentages"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/improving-performance.md",
+        "quote": "The `Duration` line of the summary breaks the run down into phases, as percentages of all tracked time:"
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T07:53:41Z"
+}

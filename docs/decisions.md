@@ -4,6 +4,86 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 
 ## v2 decisions
 
+### 2026-10-13: Integrate current main and scope CI model credentials
+
+- Preserve current main releases, pipeline changes and histories when resolving the security stack conflicts. Keep User-Agent and byte/schema defenses together.
+- Supply the Actions model API key only to explicit no-tool and folder-confined pipeline conditions. Project/web/ludion measurement and unspecified callers do not inherit it. This closes a conditional credential exposure configuration; no actual leak was observed. Check records: `docs/bench/2026-10-13-integration/`.
+
+### 2026-10-12: The seed pipeline (`tools/seed`)
+
+- **What it does**, one step per command, each reading and writing JSON in one folder so any step can be rerun and a stopped run resumes:
+  1. `collect`: the package's stable versions in a range (or published since a date) from the npm registry, and each version's GitHub release notes, split into entries (top-level list items with their indented lines; "Updated dependencies" dropped).
+  2. `triage`: a model with no tools (Sonnet) sorts each entry: a lesson candidate with a first guess at kind and signal, or a skip with a reason (internal, a fix that makes the docs true, docs, experimental, another package, unclear). The prompt carries the added-vs-default check ("does code that doesn't use the new thing behave differently?").
+  3. `draft`: one agent per candidate (Sonnet by default; the agents and vitest runs and the first 20 wrangler drafts were Opus, before the spending rules), in a folder with the entry, the pull requests it links (description, files, diff), the pages it may quote with their URLs (the package's CHANGELOG.md section at the release tag, and docs files the PRs changed, all raw from GitHub), both published package versions, and lessons on main as examples. It can read and write in that folder only: no shell, nothing runs. It writes a format 1 draft with a differential test pair (same code, the release and the one before) and a quote, or skips with a reason. Order: default, behavior, deprecated, renamed, removed, then added; silent before loud.
+  4. `check`: every check this machine can run without Docker: the schema, `lessonProblems`, and the quote found on its page through the guarded fetch. The lesson is signed by @Ludion-ai (the account that opens seed PRs) with `drafted_by: "agent"`; the draft can't set id, author or time.
+  5. `review`: a fresh-context model with no tools (Opus; wrangler's first two rounds were Sonnet, under the spending rules, before the owner fixed the reviewer as Opus) reviews each lesson against the seed checklist (`docs/decisions.md`, "Seed lessons") plus "the claim is true as an assistant would read it".
+  6. `revise`: first the local-check problems alone go back to the drafting model (`--scope check`); after the review, the findings go back once, to Opus for content findings (`--scope findings`; see "Revising seed drafts"). The agent fixes or skips. Then `check` and `review` again (`--round`).
+  7. `lessons`: lessons with no problems and no findings are written as files for a PR, one PR per subject. One that repeats a lesson already on main (same versions, same or overlapping symbol) is listed as a duplicate and not written.
+  8. `ci` and `fix`: CI's `verify` runs the tests in Docker on the PR; `ci` reads its results, and `fix` gives each failure back to its agent once with CI's reasons.
+  9. `bench`: per kept lesson, a question and key written from the changelog entry and the primary source (never from the lesson's wording), each measured model answering once with no tools (the `models` labels), and the harm check (Opus with the lesson in context vs without; every loss is read by a person). **Paused** by the spending rules: new lessons get no `models` entry.
+- **Lesson code never runs on this machine.** The drafting agents can't run anything; tests run only in CI's Docker.
+- **The reviewer was calibrated** on the 30 accepted seeds on main (`calibrate.ts`): its finding rate on lessons people accepted is the baseline for reading the pipeline's counts.
+
+### 2026-10-12: Revising seed drafts: machine-check fixes first, then Opus for content, once
+
+The owner's decision on who revises (a spending question that `docs/bench/2026-10-12-seed/README.md` left open):
+
+- **Machine-check problems go back to the drafting model first** (Sonnet, `revise --scope check`): a quote that doesn't name the symbol, no evidence that names it, a detail with words no quote holds, a quote not found on its page, a schema error. The agent gets only those, with how each check judges (`CHECK_RULES` in `tools/seed/src/ci.ts`), and is asked to change nothing else. These failures are mechanical, and the drafting agents can't run the checker (no shell), so they learn of them only afterwards; that doesn't need a stronger model.
+- **Then the review, by Opus, always** (`REVIEW_MODEL`): the hand-made seeds' baseline (10 of 30 with no finding) was measured with Opus, so a pipeline count compares only under the same reviewer. A draft unchanged since the previous round keeps that round's review by the same model (`reusableReview`): reviewing it again would only reroll the reviewer until it passes. Review files now record their reviewer (`model`); the earlier files got it added from the run notes (agents and vitest Opus, wrangler Sonnet).
+- **Only content findings go to Opus** (`CONTENT_MODEL`, `revise --scope findings`): a lesson with a finding under checklist rule 1 (says more than the evidence), 7 (kind, symbol, versions, or replacement don't match the entry), or 8 (would mislead an assistant) is revised by Opus, with all its findings. A lesson with only other findings (rules 2 to 6) or only local-check problems goes to Sonnet. **One round**, then `check` and `review` again, and what is clean is written for a PR. Why Opus here: with Opus revising, agents reached the hand-made seeds' clean rate; one Sonnet round on wrangler moved nothing.
+- **Machine-check problems the Opus round brings in go back to Sonnet once more** (`revise --scope check` again), then the Opus review of what changed. The Opus round stays one. Why: in vitest, Opus's revisions broke the local checks in 5 of 28 (4 gave more than 3 pieces of evidence), which is the drafting model's kind of fix. The drafting rules and `CHECK_RULES` now say evidence holds at most 3 pieces.
+- **Drafting and triage stay Sonnet.**
+- **Lessons already kept for a PR** (`kept.json`) are left out of later rounds and never written twice; `lessons` adds the new ones to `kept.json` with their round.
+- Replaces, in "Spending": revising on Sonnet, and the per-lesson review on Sonnet.
+
+### 2026-10-12: Who works on what
+
+- At the owner's request: Codex works on security, audits, and the benchmark (`tools/bench`, FreshBench, the C tasks); Claude Code on the seed pipeline (`tools/seed`), lessons, the site, and publishing (npm, the plugin). When a change needs files the other side is changing, the owner hears about it before the work starts. `docs/decisions.md` and `docs/progress.md` are shared, and each side adds its own sections.
+
+### 2026-10-12: Choosing new subjects
+
+- **Rule** (from the owner's list): "AI writes it often" × release frequency × share of silent changes, over the last 180 days (since 2026-04-15). Measured per package by the seed pipeline's `collect` and `triage` on its GitHub release notes, and scored by `tools/seed/src/score.ts`:
+  - "AI writes it often" has no direct measure; npm's weekly downloads (the week before 2026-10-12) stand in for it.
+  - release frequency: stable releases published in the window.
+  - silent share: triaged entries that are silent changes and not additions, over all entries.
+  - Downloads and releases are heavy-tailed, so each is taken as log10(1 + x); each factor is divided by the largest among the candidates, and the three are multiplied.
+- **The 20 candidates and their scores** are in `docs/bench/2026-10-12-subjects/scores.json` (table below, generated from it). Four couldn't be scored: their GitHub release notes hold too few entries to read (drizzle-orm, prisma, react-router, @tanstack/react-query keep their changelogs elsewhere or in another format).
+
+| package | weekly downloads | stable releases | entries | silent changes | silent share | score |
+| - | - | - | - | - | - | - |
+| ai | 30,798,367 | 359 | 656 | 127 | 0.194 | 0.635 |
+| tailwindcss | 136,230,978 | 6 | 97 | 26 | 0.268 | 0.315 |
+| @supabase/supabase-js | 30,723,462 | 42 | 218 | 32 | 0.147 | 0.308 |
+| zod | 341,697,718 | 16 | 488 | 76 | 0.156 | 0.28 |
+| @sveltejs/kit | 3,248,293 | 27 | 458 | 77 | 0.168 | 0.271 |
+| hono | 74,173,194 | 36 | 223 | 24 | 0.108 | 0.228 |
+| @anthropic-ai/sdk | 46,456,539 | 59 | 301 | 29 | 0.096 | 0.224 |
+| stripe | 23,860,701 | 16 | 44 | 6 | 0.136 | 0.211 |
+| astro | 7,219,474 | 63 | 429 | 34 | 0.079 | 0.167 |
+| openai | 43,233,974 | 48 | 688 | 48 | 0.07 | 0.155 |
+| @playwright/test | 75,674,770 | 7 | 107 | 13 | 0.121 | 0.147 |
+| next | 67,261,197 | 30 | 2679 | 155 | 0.058 | 0.116 |
+| eslint | 161,560,021 | 15 | 344 | 20 | 0.058 | 0.098 |
+| nuxt | 2,352,805 | 18 | 1373 | 91 | 0.066 | 0.092 |
+| express | 143,994,672 | 3 | 125 | 12 | 0.096 | 0.081 |
+| vite | 195,883,741 | 30 | 64 | 2 | 0.031 | 0.066 |
+| drizzle-orm | 27,765,699 | 2 | 1 | 0 | 0 | not scored |
+| prisma | 19,186,626 | 4 | 0 | 0 | 0 | not scored |
+| react-router | 57,103,384 | 20 | 0 | 0 | 0 | not scored |
+| @tanstack/react-query | 65,874,058 | 38 | 16 | 4 | 0.25 | not scored |
+
+- **Chosen: `ai` (Vercel AI SDK), `tailwindcss`, `zod`.** `ai` and `tailwindcss` are first and second. `@supabase/supabase-js` (third) is passed over for now: its changes are about a hosted service's client, so a test can't show them offline in Docker, and its lessons would be source-only; CLAUDE.md prefers differential tests. `zod` (fourth) is pure code and tests well. That makes six subjects with vitest, wrangler and agents.
+- Each new subject: lessons drafted by the pipeline for its current major (ai >=7.0.0, zod >=4.0.0, tailwindcss >=4.0.0), at most 25 silent, non-addition candidates first; FreshBench B questions written from the changelog entries alone (`tools/seed/src/questions.ts`) for every drafted change, kept or not, so the measurement has covered and uncovered changes; seeds frozen before measuring; then B with and without sync and the harm check, as for Done 3. One seed PR per subject (protected).
+
+### 2026-10-12: Nightly seed watch (`seed-watch.yml`)
+
+- **What**: every night (05:41 UTC) and by hand, `tools/seed/src/watch.ts` lists new stable releases (last 26 hours, or `since`) of the npm packages that format 1 lessons on main name. For each, the seed pipeline collects the release notes, triages, drafts at most 10 candidates (silent first), runs the local checks, reviews, and writes the lessons with no finding that don't repeat one on main. A branch `seed/<subject>-<date>` and an issue labeled `seed-release` follow, with the compare link: GitHub Actions can't open pull requests in this repository, and the PR has to be opened from @Ludion-ai (the account the lessons name as author) after a person has seen it.
+- **Three jobs, so untrusted text never meets a write token**: `watch` (read-only; registry only), `draft` (read-only token; reads release notes, pull requests, and package code; the drafting agents get no shell and run nothing; needs the `ANTHROPIC_API_KEY` secret and, without it, says so and stops), `publish` (`contents: write`, `issues: write`; reads the drafted JSON only, checks each subject and file name against a pattern, runs main's own `npm run verify` without `--run` so no lesson code runs, then pushes and opens the issue).
+- **CI still runs the tests**: the PR's `verify` runs them in Docker, as for any lesson. The seed-watch never runs lesson code.
+- **Hardening from the review** (the drafting agents read untrusted text): they get files only (`files` condition in `tools/bench/src/agent.ts`, #74: Read/Glob/Grep/Edit/Write, no shell, no web, nothing pre-approved, so reads, searches, and edits outside their folder are refused, probed with Claude Code on Windows; reads of `/proc` and system folders are also denied outright); a draft can't set `replaces`; `publish` takes only artifact files whose fields are what the pipeline writes (`format` 1, the subject's directory, `drafted_by: agent`, author @Ludion-ai with its id, no `replaces`), runs `npm ci --ignore-scripts` with no credentials left on disk, and pushes with the token only for the push. One release failing doesn't lose the others (the artifact is uploaded even then). Branch names carry the run id. A release already named by an earlier seed issue (`Release: pkg@version` lines) is skipped, so the overlapping window doesn't draft it twice. The issue lists every release drafted for that subject in the run, kept or not, so one that failed or kept nothing isn't retried either; a release whose run produced no issue at all can be drafted again once. The artifact holds only the passed lessons and each run's `run.json`, not the agents' raw drafts (the repository is public, so anyone can download an artifact), and `verify` runs without the write token.
+- **Owner's step**: adding the `ANTHROPIC_API_KEY` repository secret (a secret value, so it is the owner's). Until then the workflow only lists releases.
+- Protected path (`.github/`): the owner merges it.
+
 ### 2026-10-12: Optional C-task execution acceptance pilot
 
 - Add runtime acceptance for a bounded subset of C tasks before expanding lessons or introducing another delivery hook. Treat current regex grades as syntax observations, not execution proof. Pilot criteria, selected tasks, Docker boundaries and measured records are in `docs/bench/2026-10-12-runtime/`.
@@ -34,7 +114,7 @@ The batch work hit the plan's usage limit once. From now on:
 
 - **Heavy work one job at a time.** No heavy jobs side by side in the background (drafting, benchmark runs). Light checks may run while one heavy job does.
 - **Review.** A fresh-context review is for protected PRs only (`lessons/`, CLAUDE.md, `.github/`, `tools/verify/`, the schema, `ludion.config.json`, `wrangler.jsonc`), one round, by Opus. A second round only if the first found something that had to stop the merge, and then only the changed parts. Other PRs are judged by tests and CI. (Replaces the review of every PR used on 2026-10-12.)
-- **Models for the pipeline.** Triage, drafting, revising, writing questions, and the benchmark judge use Sonnet (`WORK_MODEL` in `tools/seed/src/llm.ts`); the per-lesson review step does too. Opus is for protected-PR reviews and for being the model under test. What was already run on Opus stays as measured: the agents run and the first 20 wrangler drafts are Opus drafts reviewed by Opus; vitest drafts are Opus; the rest of wrangler is Sonnet. A comparison of yields across them has that confound, and says so.
+- **Models for the pipeline.** Triage, drafting, machine-check fixes, writing questions, and the benchmark judge use Sonnet (`WORK_MODEL` in `tools/seed/src/llm.ts`). The per-lesson review and the one round of revising content findings use Opus (changed later on 2026-10-12, see "Revising seed drafts"; before, both were Sonnet). Opus is also for protected-PR reviews and for being the model under test. What was already run on Opus stays as measured: the agents run and the first 20 wrangler drafts are Opus drafts reviewed by Opus; vitest drafts are Opus; the rest of wrangler is Sonnet. A comparison of yields across them has that confound, and says so.
 - **No per-lesson model FreshBench for now.** All three measured models miss nearly every change (3 to 5 of 45 per trial, `docs/bench/2026-10-11-models/`), so pruning by `models` removes almost nothing. New lessons get no `models` entry (the site shows "not measured"); the verdicts already in `docs/bench/models.json` stay. A weekly batched measurement is to be decided later.
 - **No daily C batches.** 16 of 36 tasks are done (`docs/bench/2026-10-11-done3/`). The check-hook rule (item 7 of the work list) needs all 36, so it is undecided, not decided by the 16.
 - **Big files are never read whole** (bench JSON, logs): a script prints the summary and only that is read.
@@ -99,6 +179,8 @@ The batch work hit the plan's usage limit once. From now on:
   - `stage` (environment `npm`, `id-token: write`) downloads only the tarball and runs `npm stage publish`. It checks Node 22.14+ and npm 11.15+ first.
 - **Trusted publishing, staged**: npm trusts this repository's `publish.yml` in the `npm` environment (OIDC), so there is no npm token in the repo or in GitHub secrets. The trusted publisher allows only `npm stage publish`, not `npm publish`: a staged version goes out only after the owner approves it on npmjs.com. So a workflow run alone can never put a version on npm. Provenance is added automatically, because the repository is public.
 - The `npm` environment allows deployments from `main` only. After the first staged version is approved, the package's publishing access becomes "Require two-factor authentication and disallow tokens".
+- **0.1.3 was staged and then skipped; 0.1.4 carries a User-Agent** (2026-10-13). 0.1.3 carries what reached main after 0.1.2 and before Codex's #67 to #69: the partial-coverage text and the uncovered-dependency list (#53), drafts without evidence kept in the ledger as unverified (#55). It was staged by `publish.yml` from #89, with the plugin's hook pin and `plugin.json` moving in the same PR, as for 0.1.2. The owner then asked for one more change in that release, and #89 had already merged, so it went in a new PR and the version moved to 0.1.4 (the CLI, `plugin.json` and the hook pin together). Staging a second 0.1.3 would have put two tarballs under one number on npmjs.com, with the owner one click from approving the one without the change; so the staged 0.1.3 is rejected, not approved. Between a merge that moves the hook pin and the owner's approval on npmjs.com, a plugin updated from main asks npx for a version that isn't there yet; the hook then fails loudly and syncs nothing. Codex's #67 to #69, when they land, are 0.1.5.
+- **`User-Agent: ludion-ai/<version>`** on the CLI's two index requests (`sync`, `timedFetch` in `packages/cli/src/shards.ts`), taken from the package's own `package.json`. It names the CLI and its version and nothing else: no identifier, no project data, no machine data. It is the only header the CLI sets itself. `teach`'s source fetches (a different fetch, the guarded one) are unchanged.
 
 ### 2026-10-11: Nightly reverify
 
@@ -152,7 +234,7 @@ The batch work hit the plan's usage limit once. From now on:
 - They're signed by @Ludion-ai, the account that opens their PRs, with `drafted_by: "agent"`. One PR for all of them: `verify` ran 9 agents seeds in about 4 minutes and 12 wrangler seeds in about 3.5 (two installs each), well inside its timeout, and the search eval's threshold is global, so it holds only with all of them. They merge only after the site pages that label them.
 - **Evidence**: differential pairs whose passing pin is the first release in range and whose failing pin is the release before. Same code on both, and the old run prints its error only on the change's own symptom (anything else exits with `ERROR:`). The `toHaveTextContent` test pins vitest and `@vitest/browser` together, so it's labeled "test". `queue()` is source-only: its tests could check only internal names, which would have let the label say more than the evidence. Each also has a source quote naming the symbol. Many agents and wrangler tests read the installed package (exports, types, `--help`, dry runs) rather than start workerd.
 - **A lone `>` is allowed in a detail.** Without it, the `-t` seed couldn't name the ` > ` separator, and in the value preview Claude Code guessed spaces, the old behavior. It opens no tag, and every claim already shows `>=`. `<` stays refused.
-- **Search eval**: each seed has two on-topic questions, its FreshBench A and B questions. Questions can land before their lesson (a lesson PR changes only lesson files), so keys with no active lesson are skipped. Lessons listed in `SAME_CHANGE` teach the same change, so a question may find either (the design sample and the `toHaveTextContent` seed). Words ending in -ies, -ied, or -ie (longer than four letters) stem to -y, so directories meets directory and cookies meets cookie. "configure" joined the common words: it let "How do I configure nginx as a reverse proxy?" find wrangler lessons. With the 30 seeds that go to main: off-topic 20/20 find nothing, on-topic 82/86 (95%) (84/88 with all 31, before the harm check withheld one). The misses are vague questions that never name the symbol ("make a mock return different values depending on its arguments"); `ludion_ask` is keyword search, and sync doesn't search.
+- **Search eval**: each seed has two on-topic questions, its FreshBench A and B questions. Questions can land before their lesson (a lesson PR changes only lesson files), so keys with no active lesson are skipped. Lessons listed in `SAME_CHANGE` teach the same change, so a question may find either (the design sample and the `toHaveTextContent` seed). Words ending in -ies, -ied, or -ie (longer than four letters) stem to -y, so directories meets directory and cookies meets cookie. "configure" joined the common words: it let "How do I configure nginx as a reverse proxy?" find wrangler lessons. "go" joined them on 2026-10-13: with a wrangler lesson whose detail says messages "now go to stderr", "How do I write a for loop in Go?" found it. With the 30 seeds that go to main: off-topic 20/20 find nothing, on-topic 82/86 (95%) (84/88 with all 31, before the harm check withheld one). The misses are vague questions that never name the symbol ("make a mock return different values depending on its arguments"); `ludion_ask` is keyword search, and sync doesn't search. **Changed 2026-10-13:** a lesson with no questions no longer fails the eval; the test lists those lessons and fails only on a question entry that doesn't hold two questions. Why: `test` is a required check, a teacher's pull request changes one lesson file whose id exists only once `ludion teach` has run, so no questions can land first, and the old rule would have turned red on every `teach --public` PR (found while checking Done 2 on a draft PR). The seed pipeline still writes questions for its lessons, and the lessons that have them are held to the 90% rate as before.
 
 ### 2026-10-11: Site pages for v2
 

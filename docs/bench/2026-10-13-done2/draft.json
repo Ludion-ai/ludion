@@ -1,0 +1,43 @@
+{
+  "package": {
+    "ecosystem": "npm",
+    "name": "vitest"
+  },
+  "versions": ">=4.0.0",
+  "kind": "behavior",
+  "symbol": "vi.restoreAllMocks",
+  "signal": "silent",
+  "detail": "vi.restoreAllMocks no longer resets the state of spies and only restores spies created manually with vi.spyOn",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "4.0.0",
+          "vite": "7.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/restoreall\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"restore.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('restoreAllMocks', () => {\",\n  \"  const fn = vi.fn()\",\n  \"  fn()\",\n  \"  fn()\",\n  \"  vi.restoreAllMocks()\",\n  \"  writeFileSync(new URL('./calls.txt', import.meta.url), String(fn.mock.calls.length))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst callsFile = path.join(dir, \"calls.txt\");\nif (r.status !== 0 || !fs.existsSync(callsFile)) {\n  console.error((r.stdout || \"\").slice(-1500) + (r.stderr || \"\").slice(-1500) + (r.error ? String(r.error) : \"\"));\n  console.error(\"ERROR: vitest run did not complete (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst calls = fs.readFileSync(callsFile, \"utf8\").trim();\nif (calls === \"2\") {\n  console.log(\"PASS: vi.restoreAllMocks left the call history of a vi.fn() mock alone\");\n  process.exit(0);\n}\nif (calls === \"0\") {\n  console.error(\"FAIL: vi.restoreAllMocks cleared the call history of a vi.fn() mock\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected mock call count \" + calls);\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "vitest": "3.2.4",
+          "vite": "7.1.11"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/restoreall\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"restore.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('restoreAllMocks', () => {\",\n  \"  const fn = vi.fn()\",\n  \"  fn()\",\n  \"  fn()\",\n  \"  vi.restoreAllMocks()\",\n  \"  writeFileSync(new URL('./calls.txt', import.meta.url), String(fn.mock.calls.length))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst callsFile = path.join(dir, \"calls.txt\");\nif (r.status !== 0 || !fs.existsSync(callsFile)) {\n  console.error((r.stdout || \"\").slice(-1500) + (r.stderr || \"\").slice(-1500) + (r.error ? String(r.error) : \"\"));\n  console.error(\"ERROR: vitest run did not complete (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst calls = fs.readFileSync(callsFile, \"utf8\").trim();\nif (calls === \"2\") {\n  console.log(\"PASS: vi.restoreAllMocks left the call history of a vi.fn() mock alone\");\n  process.exit(0);\n}\nif (calls === \"0\") {\n  console.error(\"FAIL: vi.restoreAllMocks cleared the call history of a vi.fn() mock\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected mock call count \" + calls);\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: vi.restoreAllMocks cleared the call history of a vi.fn() mock"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v4.0.0/docs/guide/migration.md",
+        "quote": "`vi.restoreAllMocks` no longer resets the state of spies and only restores spies created manually with `vi.spyOn`, automocks are no longer affected by this function"
+      }
+    }
+  ],
+  "drafted_by": "agent"
+}

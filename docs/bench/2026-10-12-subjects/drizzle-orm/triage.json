@@ -1,0 +1,8 @@
+[
+  {
+    "id": "0.45.4#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes postgres-js use prepared queries on explicit .prepare(name), which is what the documented API already promised."
+  }
+]

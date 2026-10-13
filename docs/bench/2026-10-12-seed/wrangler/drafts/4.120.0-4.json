@@ -1,0 +1,14 @@
+{
+  "entry": "4.120.0#4",
+  "verdict": {
+    "id": "4.120.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "__router-worker__",
+    "why": "Vite plugin router, asset and proxy workers are no longer captured, so a trace's root is now the user Worker."
+  },
+  "cost_usd": 0.144178,
+  "turns": 5,
+  "skip": "The change is internal to miniflare (batched trace-store writes, latency only) and @cloudflare/vite-plugin (router worker capture), so wrangler shows no checkable behavior difference."
+}

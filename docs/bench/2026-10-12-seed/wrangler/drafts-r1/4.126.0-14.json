@@ -1,0 +1,13 @@
+{
+  "entry": "4.126.0#14",
+  "verdict": {
+    "id": "4.126.0#14",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "why": "Wrangler no longer prompts new users to install Cloudflare skills after commands complete."
+  },
+  "cost_usd": 0.059629499999999995,
+  "turns": 7,
+  "skip": "The change is an interactive post-command prompt with no named flag, command or config symbol, and it cannot be checked offline by a differential test."
+}

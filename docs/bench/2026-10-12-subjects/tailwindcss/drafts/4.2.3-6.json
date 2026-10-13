@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#6",
+  "verdict": {
+    "id": "4.2.3#6",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "scroll-my-*",
+    "why": "Canonicalization now collapses scroll-margin side utilities into shorthand."
+  },
+  "cost_usd": 0.5809064,
+  "turns": 22,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "scroll-my",
+    "signal": "silent",
+    "detail": "Canonicalization collapses scroll-m{t,b}-* into scroll-my-*",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const dir = path.dirname(require.resolve(\"tailwindcss/package.json\"));\n  const css = fs.readFileSync(path.join(dir, \"index.css\"), \"utf8\");\n  const ds = await tw.__unstable__loadDesignSystem(css, { base: dir });\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const opts = { collapse: true, logicalToPhysical: true };\n  const ctl = ds.canonicalizeCandidates([\"mt-1\", \"mb-1\"], opts);\n  if (JSON.stringify(ctl) !== JSON.stringify([\"my-1\"])) broken(\"control mt-1 mb-1 gave \" + JSON.stringify(ctl));\n  const got = ds.canonicalizeCandidates([\"scroll-mt-1\", \"scroll-mb-1\"], opts);\n  if (JSON.stringify(got) === JSON.stringify([\"scroll-my-1\"])) {\n    console.log(\"OK: scroll-mt-1 scroll-mb-1 collapse into scroll-my-1\");\n    process.exit(0);\n  }\n  if (got.length === 2 && got.includes(\"scroll-mt-1\") && got.includes(\"scroll-mb-1\")) symptom(\"scroll-mt-1 scroll-mb-1 are not collapsed into scroll-my-1\");\n  broken(\"unexpected result \" + JSON.stringify(got));\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const tw = require(\"tailwindcss\");\n  if (typeof tw.__unstable__loadDesignSystem !== \"function\") broken(\"__unstable__loadDesignSystem is missing\");\n  const dir = path.dirname(require.resolve(\"tailwindcss/package.json\"));\n  const css = fs.readFileSync(path.join(dir, \"index.css\"), \"utf8\");\n  const ds = await tw.__unstable__loadDesignSystem(css, { base: dir });\n  if (typeof ds.canonicalizeCandidates !== \"function\") broken(\"canonicalizeCandidates is missing\");\n  const opts = { collapse: true, logicalToPhysical: true };\n  const ctl = ds.canonicalizeCandidates([\"mt-1\", \"mb-1\"], opts);\n  if (JSON.stringify(ctl) !== JSON.stringify([\"my-1\"])) broken(\"control mt-1 mb-1 gave \" + JSON.stringify(ctl));\n  const got = ds.canonicalizeCandidates([\"scroll-mt-1\", \"scroll-mb-1\"], opts);\n  if (JSON.stringify(got) === JSON.stringify([\"scroll-my-1\"])) {\n    console.log(\"OK: scroll-mt-1 scroll-mb-1 collapse into scroll-my-1\");\n    process.exit(0);\n  }\n  if (got.length === 2 && got.includes(\"scroll-mt-1\") && got.includes(\"scroll-mb-1\")) symptom(\"scroll-mt-1 scroll-mb-1 are not collapsed into scroll-my-1\");\n  broken(\"unexpected result \" + JSON.stringify(got));\n})().catch((e) => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: scroll-mt-1 scroll-mb-1 are not collapsed into scroll-my-1"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Canonicalization: collapse `scroll-m{t,b}-*` into `scroll-my-*`, `scroll-m{l,r}-*` into `scroll-mx-*`, and `scroll-m{t,r,b,l}-*` into `scroll-m-*`"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

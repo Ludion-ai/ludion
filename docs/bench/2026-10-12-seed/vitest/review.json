@@ -1,0 +1,380 @@
+[
+  {
+    "entry": "5.0.0#1",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail tells readers to increase taskTitleValueFormatTruncate, but neither test sets or exercises that option; the tests only show that chaiConfig.truncateThreshold: 0 no longer disables test.each title truncation, so the claim should be limited to that or a test using taskTitleValueFormatTruncate should be added."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote is current docs saying titles use 'its display formatter' and that the option can be increased; it never states the change the lesson relies on (that chaiConfig.truncateThreshold no longer controls title truncation), so a quote stating that fact is needed."
+      },
+      {
+        "rule": "7",
+        "problem": "The entry is about replacing loupe.inspect with pretty-format for formatting, and the tested symptom is chaiConfig.truncateThreshold being ignored, yet the symbol is taskTitleValueFormatTruncate, which neither the entry nor the tests mention; the symbol should be the one whose behavior changed (chaiConfig.truncateThreshold / test.each title formatting)."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'changed what taskTitleValueFormatTruncate does' implies the option existed and worked differently before 5.0.0, and never tells the assistant that chaiConfig.truncateThreshold: 0 stopped disabling title truncation; it should say that truncateThreshold no longer applies to interpolated titles and that taskTitleValueFormatTruncate controls this from 5.0.0."
+      }
+    ],
+    "cost_usd": 0.078531,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#108",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says `coverage.exclude` changed in general, but the tests only show one thing: a negation glob in `test.include` (`!something`) is no longer inherited into the coverage exclude; the claim should be narrowed to that."
+      },
+      {
+        "rule": "2",
+        "problem": "The lesson has no quote, so nothing from the changelog backs the claim; add one that names `coverage.exclude` and states the fact (it no longer inherits negation globs from `test.include`), not just the entry headline."
+      },
+      {
+        "rule": "8",
+        "problem": "\"changed what `coverage.exclude` does\" gives an assistant no usable fact and suggests the option's own patterns now work differently; it should say that negation globs in `test.include` no longer leak into `coverage.exclude`, so files that were wrongly excluded from coverage before 5.0.0 are now included."
+      }
+    ],
+    "cost_usd": 0.078659,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#11",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The lesson has no tests, so there is no differential pair showing that a substring match passes on the release before 5.0.0 and fails with the strictness error on 5.0.0; add that pair."
+      },
+      {
+        "rule": "7",
+        "problem": "The changelog entry adds `toMatchTextContent` as the alternative for non-strict matching, but the lesson has no replacement field; set the replacement to `toMatchTextContent`."
+      },
+      {
+        "rule": "7",
+        "problem": "The only evidence for `>=5.0.0` is the v5.0.0 docs, which show the matcher is strict in 5.0.0 but not that 5.0.0 was the first strict release; confirm the first release containing commit 18f30 (for example a 5.0.0 prerelease) and start versions there."
+      }
+    ],
+    "cost_usd": 0.042523000000000005,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#111",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says vitest 5.0.0 \"changed what `--reporter=junit` does\" in general, but the evidence only shows one narrow change: unhandled errors (e.g. a leaked rejection) now appear as an `<error>` element and are counted in the `<testsuites errors=…>` attribute. The claim should be narrowed to that specific change."
+      },
+      {
+        "rule": "2",
+        "problem": "The evidence has no quote at all, so nothing ties the claim to the changelog entry. Add a quote that states the fact itself (unhandled errors are now included in the JUnit XML report) and names `--reporter=junit`."
+      },
+      {
+        "rule": "8",
+        "problem": "\"Changed what --reporter=junit does\" doesn't tell an assistant what changed, so it can't adjust code such as CI parsers that read the `errors` count. It could also lead them to assume other JUnit output changed. The sentence should state that unhandled errors now produce `<error>` entries and raise the `errors` count."
+      }
+    ],
+    "cost_usd": 0.063791,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#15",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The quote is the doc comment for the new TestModule diagnostic field ('incremental number… 0 if file did not run yet'), so it never states the change itself, that worker ids now start at 1 instead of 0; quote a source that says ids became 1-based."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence an assistant reads never says ids now start at 1, and its only number is '0 if file did not run yet', so it could lead someone to keep treating 0 as the first worker; state that the first worker's id is now 1 (was 0) and name which id this means."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol is a bare `workerId` and the quote is about `TestModule.diagnostic().workerId`, but the differential symptom the test checks is `process.env.VITEST_WORKER_ID`; name the exact symbol the evidence covers, or split the lesson by symbol."
+      },
+      {
+        "rule": "5",
+        "problem": "The old run fails only on the VITEST_WORKER_ID check and never checks `diagnostic().workerId`, which the entry says was newly exposed and may not exist on 4.1.11; the pair proves nothing about the quoted diagnostic field, so make the expected failure test the lesson's own symbol."
+      },
+      {
+        "rule": "6",
+        "problem": "The entry has two changes: exposing `concurrencyId`/`workerId` on diagnostics (added) and making the id 1-based (behavior); the lesson mixes them, quoting the docs for the new field while claiming a behavior change, so they should be separate lessons."
+      }
+    ],
+    "cost_usd": 0.080819,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#19",
+    "findings": [],
+    "cost_usd": 0.052555000000000004,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#2",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The lesson has no quote at all, so nothing states the fact (that string values substituted into a `$` variable in a test.for/test.each title no longer get quotes) or names the symbol; add a quote that states this and names test.each/test.for."
+      },
+      {
+        "rule": "7",
+        "problem": "The symbol `test.each $name` treats a user-chosen property key (`name`) as the API, but the entry says the change is to the `$` variable interpolation for any key in test.for/test.each titles; the symbol should name the `$` title interpolation of test.each/test.for."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence only says vitest 'changed what `test.each $name` does', without saying that string values are no longer wrapped in quotes in the title (`greets alice`, not `greets 'alice'`). An assistant reading it cannot tell how titles, `-t` filters, or snapshot names keyed on titles should now be written, and may read it as applying only to a `$name` key; state the actual change."
+      }
+    ],
+    "cost_usd": 0.062799,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#22",
+    "findings": [],
+    "cost_usd": 0.058115,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#27",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The detail says the config file is executed \"once\", but the test passes for any count from 1 to 2 and only tries three inline `extends: true` projects; state only what was observed (fewer executions than once per project), or tighten the test to assert exactly 1."
+      },
+      {
+        "rule": "1",
+        "problem": "The changelog entry limits sharing to inline projects, but the claim says \"projects\" in general, which reaches file-based and glob projects the test never covers; scope the claim to inline projects defined in the `projects` array."
+      },
+      {
+        "rule": "2",
+        "problem": "The quote names no symbol (not `projects` and not the option documented at sharedviteserver.md), and its condition \"when projects share a server\" is never explained; quote the doc sentence that names the option and says when sharing applies."
+      },
+      {
+        "rule": "7",
+        "problem": "kind \"default\" with symbol `projects` does not match the entry or the quote: no default value of `projects` changed; the change is in how inline projects are loaded. Use kind \"behavior\", or if the docs page defines a shared-server option whose default turned on, use that option as the symbol."
+      },
+      {
+        "rule": "8",
+        "problem": "\"vitest >=5.0.0 changed the default of `projects`\" would lead an assistant to think the `projects` option has a new default value, and it never warns that side effects in the config file now run fewer times. Reword it as a behavior change: inline projects share one Vite server, so the root config file runs once, not once per project."
+      }
+    ],
+    "cost_usd": 0.070959,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#3",
+    "findings": [
+      {
+        "rule": "5",
+        "problem": "The changelog gives the old default as `.vitest-attachements/` (misspelled), but the test only checks `.vitest-attachments`, so on 4.1.11 the attachment lands in a directory the test never lists and the run prints 'ERROR: attachment not found in either directory' instead of the expected FAIL; the test should check `.vitest-attachements` (and its FAIL message should name that directory)."
+      }
+    ],
+    "cost_usd": 0.055654999999999996,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#30",
+    "findings": [
+      {
+        "rule": "3",
+        "problem": "signal is \"silent\", but code written for the old non-exact default (e.g. getByText('Hello') matching 'Hello world') now fails to find the element and errors, so it does not run unchanged; set signal to loud, or split the silent mis-match case into its own lesson."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence 'code written for older versions still runs, without an error' would lead an assistant to keep substring-style locator queries that now fail; it should say partial-text locators no longer match unless `exact: false` is passed or `browser.locators.exact` is set to false."
+      }
+    ],
+    "cost_usd": 0.054643,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#31",
+    "findings": [
+      {
+        "rule": "7",
+        "problem": "The symbol is given as bare `include`, but the changelog entry and the evidence file (docs/config/coverage.md) are about `coverage.include` (and `coverage.exclude`); the symbol should be `coverage.include`."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence \"vitest >=5.0.0 changed what `include` does\" reads as the top-level test-file `include` option, so an assistant could wrongly change test-discovery globs; it should name `coverage.include` explicitly."
+      },
+      {
+        "rule": "5",
+        "problem": "The evidence has only a docs quote and no tests, so there is no differential pair that passes on the first release in range and fails on the one before; add tests where the old run fails only on the over-eager match symptom."
+      },
+      {
+        "rule": "7",
+        "problem": "The only evidence is the v5.0.0 docs describing current behavior, which does not show 5.0.0 is the release that made the change (the text could predate it); versions must be tied to the release containing commit edacb0fd4, confirmed by a differential test."
+      },
+      {
+        "rule": "1",
+        "problem": "The claim says behavior \"changed\" and states the rules as new, but the evidence only describes how matching works now, not what it did before; either show the old behavior or limit the claim to what the fix (glob over-eagerness) demonstrably changed."
+      }
+    ],
+    "cost_usd": 0.049323000000000006,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#32",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says vitest changed what `toThrow` does in general, but the tests only cover `toThrow('')` with an empty-string argument; narrow the claim to the empty-string case."
+      },
+      {
+        "rule": "2",
+        "problem": "The lesson has no quote at all, so nothing states the fact or names the symbol; add a quote saying that `toThrow('')` now passes for any thrown error, such as one with message 'boom', where 4.1.11 failed it."
+      },
+      {
+        "rule": "8",
+        "problem": "\"changed what `toThrow` does\" gives an assistant nothing usable and suggests every `toThrow` call behaves differently; state the concrete change: on >=5.0.0, `toThrow('')` matches any thrown error instead of failing when the message is non-empty."
+      }
+    ],
+    "cost_usd": 0.061835,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#35",
+    "findings": [],
+    "cost_usd": 0.055619,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#44",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The lesson has no quote: its only source is the changelog headline \"Promote fsModuleCache to a top-level option\", so no quote states the fact (that `test.fsModuleCache` and `fsModuleCachePath` are now top-level while `experimental.fsModuleCache` still works). Add a quote from the docs or the commit/PR that states this and names the symbol."
+      }
+    ],
+    "cost_usd": 0.072683,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#45",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says vitest >=5.0.0 'changed what `test.each` does', but the tests only show that non-ASCII `$key` placeholders in `test.each` titles are now interpolated; narrow the claim to title placeholder interpolation for non-ASCII keys."
+      },
+      {
+        "rule": "2",
+        "problem": "The evidence has no quote, so nothing states the fact or names `test.each`; add a quote saying that `test.each` (and `test.for`) now replace `$name` title placeholders that contain non-ASCII characters."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence never says what changed, so an assistant could think `test.each` call semantics, arguments or execution changed in general; state that only non-ASCII `$placeholder` substitution in test titles changed, and that test bodies and ASCII placeholders behave as before."
+      }
+    ],
+    "cost_usd": 0.060695,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#46",
+    "findings": [],
+    "cost_usd": 0.052726999999999996,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#47",
+    "findings": [],
+    "cost_usd": 0.064115,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#48",
+    "findings": [
+      {
+        "rule": "3",
+        "problem": "signal is \"silent\", but no test checks that `experimental_clearCache` still exists or works on 5.0.0 (the 5.0.0 test records `old` but never asserts it), so it is unproven that older code still runs; add a 5.0.0 test calling `v.experimental_clearCache()`, or mark it loud if that call fails."
+      },
+      {
+        "rule": "1",
+        "problem": "The sentence claims code for older versions \"still runs, without an error\", which goes beyond the evidence: the tests only show `clearCache` is new in 5.0.0, so drop the claim or add a test that proves it."
+      },
+      {
+        "rule": "7",
+        "problem": "kind \"renamed\" means the old name is gone, which contradicts signal \"silent\"; if `experimental_clearCache` is still present, use kind \"added\" with symbol `clearCache`, and if it was removed, keep \"renamed\" with signal \"loud\" and supporting evidence."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence says the method was renamed and also that old code keeps working, so an assistant could keep using `experimental_clearCache` when it may have been removed; settle which is true and state only that."
+      }
+    ],
+    "cost_usd": 0.060735,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#60",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The lesson has no quote in its evidence, so nothing states the fact or names the symbol; add a quote saying that options set on a test's `tags` (e.g. `timeout`) now override options inherited from the enclosing `describe` suite."
+      },
+      {
+        "rule": "1",
+        "problem": "\"changed what `tags` does\" claims a change to the whole `tags` feature, but the tests only show that a tag's `timeout` now beats an inherited suite `timeout`; narrow the claim to tag options taking precedence over inherited suite options, as tested."
+      },
+      {
+        "rule": "8",
+        "problem": "The sentence never says what changed or in which direction, so an assistant can't tell that on >=5.0.0 a tag's options (e.g. `timeout`) override a parent `describe`'s options, where before the suite option won; state that precedence explicitly."
+      }
+    ],
+    "cost_usd": 0.066119,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#63",
+    "findings": [],
+    "cost_usd": 0.059734999999999996,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#64",
+    "findings": [
+      {
+        "rule": "8",
+        "problem": "The sentence \"changed what `__esModule` does\" doesn't tell an assistant what changed, and it could suggest truthy `__esModule` modules behave differently too; it should say that since 5.0.0 a CommonJS dependency with a falsy `__esModule` (e.g. `false`) is no longer given ESM interop, so its namespace exposes `default` (module.exports) instead of the named keys, while truthy `__esModule` is unchanged."
+      }
+    ],
+    "cost_usd": 0.079779,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#77",
+    "findings": [
+      {
+        "rule": "1",
+        "problem": "The claim says vitest changed what `--includeTaskLocation` does as a whole, but the tests only check the test name printed by the verbose reporter; narrow it to say that reporter test names now show only the line number, not `line:column`."
+      },
+      {
+        "rule": "8",
+        "problem": "\"Changed what `--includeTaskLocation` does\" never says what changed, so an assistant could wrongly assume the option's location data (for example `task.location`, including its column) was removed or altered; state the actual change, that the column is no longer printed in test names."
+      }
+    ],
+    "cost_usd": 0.054763000000000006,
+    "model": "claude-opus-5-5"
+  },
+  {
+    "entry": "5.0.0#84",
+    "findings": [
+      {
+        "rule": "2",
+        "problem": "The lesson has no quote, so nothing states the fact itself and names the symbol; add one such as \"When a globalSetup teardown function throws, `vitest run` now exits with code 1 instead of 0.\""
+      },
+      {
+        "rule": "1",
+        "problem": "\"changed what `globalSetup` does\" implies a broad change to globalSetup, but the tests only show that the process exit code becomes 1 when its teardown throws; narrow the claim to that."
+      },
+      {
+        "rule": "8",
+        "problem": "The generated sentence never says what changed, so an assistant can't act on it and might wrongly change globalSetup setup code; state that a throwing globalSetup teardown now fails the run with a non-zero exit, even when all tests pass."
+      }
+    ],
+    "cost_usd": 0.06251899999999999,
+    "model": "claude-opus-5-5"
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "entry": "0.25.0#37",
+  "verdict": {
+    "id": "0.25.0#37",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "approved tool calls",
+    "why": "Approved tool calls that never ran are now settled so later turns no longer send them unresolved, changing what is sent to the model."
+  },
+  "cost_usd": 0.7632169999999999,
+  "turns": 26,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.25.0",
+    "kind": "added",
+    "symbol": "repairInterruptedToolParts repairApprovalResponded",
+    "signal": "silent",
+    "detail": "repairInterruptedToolParts with repairApprovalResponded settles approved tool calls that never ran once the conversation moves past them.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.25.0",
+            "ai": "6.0.0"
+          },
+          "code": "const { pathToFileURL } = require(\"url\");\n(async () => {\n  let chat;\n  try {\n    chat = await import(pathToFileURL(require.resolve(\"agents/chat\")).href);\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.repairInterruptedToolParts !== \"function\") {\n    console.error(\"ERROR: repairInterruptedToolParts is not exported\");\n    process.exit(2);\n  }\n  const messages = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"deploy\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-deploy\", toolCallId: \"tc1\", state: \"approval-responded\", input: { env: \"prod\" }, approval: { id: \"ap1\", approved: true } }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"thanks\" }] }\n  ];\n  let result;\n  try {\n    result = chat.repairInterruptedToolParts(messages, {\n      repairPart: (p) => ({ ...p, state: \"output-error\", errorText: \"did not run\" }),\n      repairApprovalResponded: true\n    });\n  } catch (e) {\n    console.error(\"ERROR: repairInterruptedToolParts threw: \" + e.message);\n    process.exit(2);\n  }\n  const part = result && result.messages && result.messages[1] && result.messages[1].parts[0];\n  if (!part) {\n    console.error(\"ERROR: unexpected result \" + JSON.stringify(result));\n    process.exit(2);\n  }\n  if (part.state === \"output-error\" && result.removedToolCalls === 1) {\n    console.log(\"OK: approved tool call that never ran was settled as output-error\");\n    process.exit(0);\n  }\n  if (part.state === \"approval-responded\" && result.removedToolCalls === 0) {\n    console.error(\"FAIL: approved tool call that never ran stays approval-responded after a later message\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected part state \" + part.state + \" removedToolCalls \" + result.removedToolCalls);\n  process.exit(2);\n})();\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.24.0",
+            "ai": "6.0.0"
+          },
+          "code": "const { pathToFileURL } = require(\"url\");\n(async () => {\n  let chat;\n  try {\n    chat = await import(pathToFileURL(require.resolve(\"agents/chat\")).href);\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.repairInterruptedToolParts !== \"function\") {\n    console.error(\"ERROR: repairInterruptedToolParts is not exported\");\n    process.exit(2);\n  }\n  const messages = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"deploy\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-deploy\", toolCallId: \"tc1\", state: \"approval-responded\", input: { env: \"prod\" }, approval: { id: \"ap1\", approved: true } }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"thanks\" }] }\n  ];\n  let result;\n  try {\n    result = chat.repairInterruptedToolParts(messages, {\n      repairPart: (p) => ({ ...p, state: \"output-error\", errorText: \"did not run\" }),\n      repairApprovalResponded: true\n    });\n  } catch (e) {\n    console.error(\"ERROR: repairInterruptedToolParts threw: \" + e.message);\n    process.exit(2);\n  }\n  const part = result && result.messages && result.messages[1] && result.messages[1].parts[0];\n  if (!part) {\n    console.error(\"ERROR: unexpected result \" + JSON.stringify(result));\n    process.exit(2);\n  }\n  if (part.state === \"output-error\" && result.removedToolCalls === 1) {\n    console.log(\"OK: approved tool call that never ran was settled as output-error\");\n    process.exit(0);\n  }\n  if (part.state === \"approval-responded\" && result.removedToolCalls === 0) {\n    console.error(\"FAIL: approved tool call that never ran stays approval-responded after a later message\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected part state \" + part.state + \" removedToolCalls \" + result.removedToolCalls);\n  process.exit(2);\n})();\n",
+          "expect": "fail",
+          "error": "FAIL: approved tool call that never ran stays approval-responded after a later message"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+          "quote": "Settle approved tool calls that never ran once the conversation moves past them, so later turns don't send unresolved tool calls"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

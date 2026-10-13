@@ -1,0 +1,16 @@
+{
+  "package": "tailwindcss",
+  "range": "*",
+  "since": "2026-04-15",
+  "repo": "tailwindlabs/tailwindcss",
+  "versions": [
+    "4.2.3",
+    "4.2.4",
+    "4.3.0",
+    "4.3.1",
+    "4.3.2",
+    "4.3.3"
+  ],
+  "missing": [],
+  "collected_at": "2026-10-12T02:27:01.331Z"
+}

@@ -1,0 +1,14 @@
+{
+  "entry": "7.0.0#80",
+  "verdict": {
+    "id": "7.0.0#80",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "telemetry model attributes",
+    "why": "Model attributes emitted in telemetry are now flattened, changing the recorded output."
+  },
+  "cost_usd": 0,
+  "turns": 1,
+  "error": "no draft.json (run ended with an error)"
+}

@@ -1,0 +1,54 @@
+{
+  "entry": "0.25.0#41",
+  "verdict": {
+    "id": "0.25.0#41",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "storeTools",
+    "why": "With storeTools: true, oversized tool payloads are now recorded with base64 summarized rather than dropped."
+  },
+  "cost_usd": 0.8440449999999999,
+  "turns": 23,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "agents"
+    },
+    "versions": ">=0.25.0",
+    "kind": "behavior",
+    "symbol": "storeTools",
+    "signal": "silent",
+    "detail": "With storeTools true, oversized tool payloads are recorded with base64 data summarized instead of being dropped.",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.25.0"
+          },
+          "code": "const path = require('path');\nconst { pathToFileURL } = require('url');\nconst mod = require('module');\nconst root = '/w/node_modules/agents';\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\nconst spans = [];\nglobalThis.__tracing = {\n  startActiveSpan(name, run) {\n    const span = { name, attributes: {}, ended: false };\n    spans.push(span);\n    return run({ isTraced: true, setAttribute(k, v) { span.attributes[k] = v; }, end() { span.ended = true; } });\n  }\n};\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (specifier === 'cloudflare:workers') return { url: 'data:text/javascript,export const tracing = globalThis.__tracing;', shortCircuit: true };\n    return next(specifier, context);\n  }\n});\n(async () => {\n  let wrapAISDK;\n  try {\n    ({ wrapAISDK } = await import(pathToFileURL(path.join(root, 'dist/observability/ai/index.js')).href));\n  } catch (e) {\n    console.error('ERROR: cannot load agents/observability/ai: ' + e.message);\n    process.exit(2);\n  }\n  const output = { type: 'browser_screenshot', mediaType: 'image/png', data: 'iVBORw0K'.repeat(10000) };\n  const ai = {\n    generateText: async (params) => {\n      const r = await params.tools.run.execute({ ok: true }, { toolCallId: 'c1' });\n      if (r !== output) throw new Error('tool result was changed');\n      return { finishReason: 'stop' };\n    }\n  };\n  await wrapAISDK(ai, { storeTools: true }).generateText({ prompt: 'go', tools: { run: { execute: async () => output } } });\n  const span = spans.find((s) => s.attributes['gen_ai.operation.name'] === 'execute_tool');\n  if (!span || !span.ended) {\n    console.error('ERROR: no finished execute_tool span; spans=' + JSON.stringify(spans.map((s) => s.name)));\n    process.exit(2);\n  }\n  if (span.attributes['gen_ai.tool.call.arguments'] !== JSON.stringify({ ok: true })) {\n    console.error('ERROR: small tool arguments were not recorded');\n    process.exit(2);\n  }\n  const result = span.attributes['gen_ai.tool.call.result'];\n  if (result === undefined) {\n    console.error('FAIL: oversized tool result was dropped from the trace with storeTools: true');\n    process.exit(1);\n  }\n  let parsed;\n  try { parsed = JSON.parse(result); } catch { console.error('ERROR: result attribute is not JSON'); process.exit(2); }\n  if (parsed.type === 'browser_screenshot' && parsed.mediaType === 'image/png' && typeof parsed.data === 'string' && parsed.data.startsWith('[base64 image/png data omitted: 80') && parsed.data.length < 200) {\n    console.log('OK: oversized tool result recorded with base64 summarized: ' + parsed.data);\n    process.exit(0);\n  }\n  console.error('ERROR: unexpected result attribute ' + result.slice(0, 200));\n  process.exit(2);\n})().catch((e) => { console.error('ERROR: ' + ((e && e.stack) || e)); process.exit(2); });\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "agents": "0.24.0"
+          },
+          "code": "const path = require('path');\nconst { pathToFileURL } = require('url');\nconst mod = require('module');\nconst root = '/w/node_modules/agents';\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\nconst spans = [];\nglobalThis.__tracing = {\n  startActiveSpan(name, run) {\n    const span = { name, attributes: {}, ended: false };\n    spans.push(span);\n    return run({ isTraced: true, setAttribute(k, v) { span.attributes[k] = v; }, end() { span.ended = true; } });\n  }\n};\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (specifier === 'cloudflare:workers') return { url: 'data:text/javascript,export const tracing = globalThis.__tracing;', shortCircuit: true };\n    return next(specifier, context);\n  }\n});\n(async () => {\n  let wrapAISDK;\n  try {\n    ({ wrapAISDK } = await import(pathToFileURL(path.join(root, 'dist/observability/ai/index.js')).href));\n  } catch (e) {\n    console.error('ERROR: cannot load agents/observability/ai: ' + e.message);\n    process.exit(2);\n  }\n  const output = { type: 'browser_screenshot', mediaType: 'image/png', data: 'iVBORw0K'.repeat(10000) };\n  const ai = {\n    generateText: async (params) => {\n      const r = await params.tools.run.execute({ ok: true }, { toolCallId: 'c1' });\n      if (r !== output) throw new Error('tool result was changed');\n      return { finishReason: 'stop' };\n    }\n  };\n  await wrapAISDK(ai, { storeTools: true }).generateText({ prompt: 'go', tools: { run: { execute: async () => output } } });\n  const span = spans.find((s) => s.attributes['gen_ai.operation.name'] === 'execute_tool');\n  if (!span || !span.ended) {\n    console.error('ERROR: no finished execute_tool span; spans=' + JSON.stringify(spans.map((s) => s.name)));\n    process.exit(2);\n  }\n  if (span.attributes['gen_ai.tool.call.arguments'] !== JSON.stringify({ ok: true })) {\n    console.error('ERROR: small tool arguments were not recorded');\n    process.exit(2);\n  }\n  const result = span.attributes['gen_ai.tool.call.result'];\n  if (result === undefined) {\n    console.error('FAIL: oversized tool result was dropped from the trace with storeTools: true');\n    process.exit(1);\n  }\n  let parsed;\n  try { parsed = JSON.parse(result); } catch { console.error('ERROR: result attribute is not JSON'); process.exit(2); }\n  if (parsed.type === 'browser_screenshot' && parsed.mediaType === 'image/png' && typeof parsed.data === 'string' && parsed.data.startsWith('[base64 image/png data omitted: 80') && parsed.data.length < 200) {\n    console.log('OK: oversized tool result recorded with base64 summarized: ' + parsed.data);\n    process.exit(0);\n  }\n  console.error('ERROR: unexpected result attribute ' + result.slice(0, 200));\n  process.exit(2);\n})().catch((e) => { console.error('ERROR: ' + ((e && e.stack) || e)); process.exit(2); });\n",
+          "expect": "fail",
+          "error": "FAIL: oversized tool result was dropped from the trace with storeTools: true"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+          "quote": "With `storeTools: true`, oversized tool payloads are recorded with base64 data summarized instead of being dropped."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

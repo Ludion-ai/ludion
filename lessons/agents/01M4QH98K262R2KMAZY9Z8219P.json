@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "01M4QH98K262R2KMAZY9Z8219P",
+  "subject": "agents",
+  "package": {
+    "ecosystem": "npm",
+    "name": "agents"
+  },
+  "versions": ">=0.27.0",
+  "kind": "behavior",
+  "symbol": "browserTool",
+  "signal": "silent",
+  "detail": "browserTool now has its own tool description instead of codemode's generic one.",
+  "evidence": [
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "agents": "0.27.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nlet pkg, entry, core;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\n  const exp = pkg.exports[\"./browser/ai-sdk\"];\n  const entryFile = path.join(root, exp.import || exp.default);\n  entry = fs.readFileSync(entryFile, \"utf8\");\n  const m = entry.match(/createBrowserToolCore[^}]*\\} from \"(\\.\\.?\\/[^\"]+)\"/);\n  if (!/function browserTool\\(/.test(entry) || !m) throw new Error(\"browserTool or its core import not found\");\n  core = fs.readFileSync(path.join(path.dirname(entryFile), m[1]), \"utf8\");\n} catch (e) {\n  console.error(\"ERROR: cannot load agents/browser/ai-sdk: \" + e.message);\n  process.exit(2);\n}\nconst start = core.indexOf(\"function createBrowserToolCore(\");\nif (start < 0) {\n  console.error(\"ERROR: createBrowserToolCore not found\");\n  process.exit(2);\n}\nconst body = core.slice(start, start + 6000);\nconst ownIntro = body.includes(\"Run JavaScript that drives a persistent Chrome browser over the Chrome DevTools Protocol (CDP).\");\nconst timeoutRule = body.includes(\"Each run times out after\");\nconst ownDescription = /\\.tool\\(\\{\\s*description\\s*\\}\\)/.test(body);\nconst genericWithHints = /\\.tool\\(\\{\\s*connectorHints:/.test(body);\nif (ownIntro && timeoutRule && ownDescription && !genericWithHints) {\n  console.log(\"OK: agents \" + pkg.version + \" browserTool passes its own description (cdp API, run time limit) to codemode\");\n  process.exit(0);\n}\nif (genericWithHints && !ownIntro && !ownDescription) {\n  console.error(\"FAIL: agents \" + pkg.version + \" browserTool uses codemode's generic description with only a cdp connector hint\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected browserTool core \" + JSON.stringify({ ownIntro, timeoutRule, ownDescription, genericWithHints }));\nprocess.exit(2);\n",
+        "expect": "pass"
+      }
+    },
+    {
+      "test": {
+        "runtime": "node@24",
+        "packages": {
+          "agents": "0.26.0"
+        },
+        "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nlet pkg, entry, core;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\n  const exp = pkg.exports[\"./browser/ai-sdk\"];\n  const entryFile = path.join(root, exp.import || exp.default);\n  entry = fs.readFileSync(entryFile, \"utf8\");\n  const m = entry.match(/createBrowserToolCore[^}]*\\} from \"(\\.\\.?\\/[^\"]+)\"/);\n  if (!/function browserTool\\(/.test(entry) || !m) throw new Error(\"browserTool or its core import not found\");\n  core = fs.readFileSync(path.join(path.dirname(entryFile), m[1]), \"utf8\");\n} catch (e) {\n  console.error(\"ERROR: cannot load agents/browser/ai-sdk: \" + e.message);\n  process.exit(2);\n}\nconst start = core.indexOf(\"function createBrowserToolCore(\");\nif (start < 0) {\n  console.error(\"ERROR: createBrowserToolCore not found\");\n  process.exit(2);\n}\nconst body = core.slice(start, start + 6000);\nconst ownIntro = body.includes(\"Run JavaScript that drives a persistent Chrome browser over the Chrome DevTools Protocol (CDP).\");\nconst timeoutRule = body.includes(\"Each run times out after\");\nconst ownDescription = /\\.tool\\(\\{\\s*description\\s*\\}\\)/.test(body);\nconst genericWithHints = /\\.tool\\(\\{\\s*connectorHints:/.test(body);\nif (ownIntro && timeoutRule && ownDescription && !genericWithHints) {\n  console.log(\"OK: agents \" + pkg.version + \" browserTool passes its own description (cdp API, run time limit) to codemode\");\n  process.exit(0);\n}\nif (genericWithHints && !ownIntro && !ownDescription) {\n  console.error(\"FAIL: agents \" + pkg.version + \" browserTool uses codemode's generic description with only a cdp connector hint\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected browserTool core \" + JSON.stringify({ ownIntro, timeoutRule, ownDescription, genericWithHints }));\nprocess.exit(2);\n",
+        "expect": "fail",
+        "error": "FAIL: agents 0.26.0 browserTool uses codemode's generic description with only a cdp connector hint"
+      }
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/packages/agents/CHANGELOG.md",
+        "quote": "`browserTool` now has its own tool description instead of codemode's generic one. It covers the `cdp` API, common CDP mistakes, and the run time limit, so the model no longer runs `codemode.search` first."
+      }
+    }
+  ],
+  "author": "github:Ludion-ai",
+  "author_id": 292738933,
+  "drafted_by": "agent",
+  "created_at": "2026-10-12T07:47:23Z"
+}

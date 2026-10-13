@@ -1,0 +1,54 @@
+{
+  "entry": "4.2.3#10",
+  "verdict": {
+    "id": "4.2.3#10",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "--placeholder-color",
+    "why": "placeholder-* utilities now read a different theme variable, so existing theme configs behave differently."
+  },
+  "cost_usd": 0.33027480000000004,
+  "turns": 16,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "tailwindcss"
+    },
+    "versions": ">=4.2.3",
+    "kind": "behavior",
+    "symbol": "--placeholder-color",
+    "signal": "silent",
+    "detail": "placeholder-* utilities read from --placeholder-color instead of --background-color",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.3"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const { compile } = require(\"tailwindcss\");\n  const c = await compile(\"@theme { --placeholder-color-brand: #123456; --background-color-brand: #abcdef; }\\n@tailwind utilities;\");\n  const css = c.build([\"placeholder-brand\"]);\n  if (!css.includes(\"::placeholder\")) broken(\"no ::placeholder rule for placeholder-brand: \" + css);\n  if (css.includes(\"--background-color-brand\") && !css.includes(\"--placeholder-color-brand\")) symptom(\"placeholder-brand reads --background-color-brand instead of --placeholder-color-brand\");\n  if (!/color:\\s*var\\(--placeholder-color-brand\\)/.test(css)) broken(\"unexpected output: \" + css);\n  console.log(\"OK: placeholder-brand uses --placeholder-color-brand\");\n})().catch(e => broken(String((e && e.stack) || e)));\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "tailwindcss": "4.2.2"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\n(async () => {\n  const { compile } = require(\"tailwindcss\");\n  const c = await compile(\"@theme { --placeholder-color-brand: #123456; --background-color-brand: #abcdef; }\\n@tailwind utilities;\");\n  const css = c.build([\"placeholder-brand\"]);\n  if (!css.includes(\"::placeholder\")) broken(\"no ::placeholder rule for placeholder-brand: \" + css);\n  if (css.includes(\"--background-color-brand\") && !css.includes(\"--placeholder-color-brand\")) symptom(\"placeholder-brand reads --background-color-brand instead of --placeholder-color-brand\");\n  if (!/color:\\s*var\\(--placeholder-color-brand\\)/.test(css)) broken(\"unexpected output: \" + css);\n  console.log(\"OK: placeholder-brand uses --placeholder-color-brand\");\n})().catch(e => broken(String((e && e.stack) || e)));\n",
+          "expect": "fail",
+          "error": "FAIL: placeholder-brand reads --background-color-brand instead of --placeholder-color-brand"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/tailwindlabs/tailwindcss/v4.2.3/CHANGELOG.md",
+          "quote": "Read from `--placeholder-color` instead of `--background-color` for `placeholder-*` utilities"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

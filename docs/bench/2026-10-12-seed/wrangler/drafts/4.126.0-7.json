@@ -1,0 +1,54 @@
+{
+  "entry": "4.126.0#7",
+  "verdict": {
+    "id": "4.126.0#7",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "workers/pull_request_title",
+    "why": "`wrangler preview` deployments now automatically get an extra pull request title annotation without any config change."
+  },
+  "cost_usd": 0.1662017,
+  "turns": 14,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.126.0",
+    "kind": "behavior",
+    "symbol": "workers/pull_request_title PULL_REQUEST_TITLE",
+    "signal": "silent",
+    "detail": "wrangler preview now attaches the detected pull request title as the workers/pull_request_title annotation; best effort",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.126.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(m){console.error(\"FAIL: \"+m);process.exit(1);}\nfunction broken(m){console.error(\"ERROR: \"+m);process.exit(2);}\nlet src;\ntry{src=fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\",\"utf8\");}catch(e){broken(\"cannot read cli.js\");}\nif(!src.includes(\"workers/pull_request_number\"))broken(\"pull request number annotation not found\");\nif(!src.includes(\"PULL_REQUEST_NUMBER\"))broken(\"PULL_REQUEST_NUMBER detection not found\");\nif(!src.includes(\"workers/pull_request_title\")||!src.includes(\"PULL_REQUEST_TITLE\"))symptom(\"wrangler preview does not attach a workers/pull_request_title annotation from PULL_REQUEST_TITLE\");\nconsole.log(\"OK: pull request title annotation present\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.125.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(m){console.error(\"FAIL: \"+m);process.exit(1);}\nfunction broken(m){console.error(\"ERROR: \"+m);process.exit(2);}\nlet src;\ntry{src=fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\",\"utf8\");}catch(e){broken(\"cannot read cli.js\");}\nif(!src.includes(\"workers/pull_request_number\"))broken(\"pull request number annotation not found\");\nif(!src.includes(\"PULL_REQUEST_NUMBER\"))broken(\"PULL_REQUEST_NUMBER detection not found\");\nif(!src.includes(\"workers/pull_request_title\")||!src.includes(\"PULL_REQUEST_TITLE\"))symptom(\"wrangler preview does not attach a workers/pull_request_title annotation from PULL_REQUEST_TITLE\");\nconsole.log(\"OK: pull request title annotation present\");\n",
+          "expect": "fail",
+          "error": "FAIL: wrangler preview does not attach a workers/pull_request_title annotation from PULL_REQUEST_TITLE"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.126.0/packages/wrangler/CHANGELOG.md",
+          "quote": "`wrangler preview` now also detects the title of the pull/merge request associated with the current CI run (GitHub Actions and GitLab CI, plus a generic `PULL_REQUEST_TITLE` fallback) and attaches it to the preview deployment as the `workers/pull_request_title` annotation"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

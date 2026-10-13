@@ -1,0 +1,1671 @@
+[
+  {
+    "entry": "5.0.0#1",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG73CBPNZ6EBSTKEXK5J",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "taskTitleValueFormatTruncate",
+      "signal": "silent",
+      "detail": "If an interpolated title value is too truncated, increase taskTitleValueFormatTruncate in your config file",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/titletruncate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// chaiConfig.truncateThreshold: 0 used to disable truncation of test.each title values.\nwrite(\"vitest.config.mjs\", \"export default { test: { chaiConfig: { truncateThreshold: 0 } } }\\n\");\nwrite(\"each.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ param: '0123456789'.repeat(5) }])('title $param', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const file of report.testResults || []) {\n  for (const a of file.assertionResults || []) titles.push(a.title);\n}\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length !== 1 || report.numPassedTests !== 1 || !titles[0].startsWith(\"title '0123456789\")) {\n  console.error(\"ERROR: unexpected report (titles \" + JSON.stringify(titles) + \", exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst full = \"0123456789\".repeat(5);\nconst title = titles[0];\nif (!title.includes(full) && title.includes(\"\\u2026\")) {\n  console.log(\"PASS: test.each title value is truncated despite chaiConfig.truncateThreshold 0: \" + title);\n  process.exit(0);\n}\nif (title.includes(full)) {\n  console.error(\"FAIL: chaiConfig.truncateThreshold 0 disabled truncation of the test.each title value\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected title \" + JSON.stringify(title));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/titletruncate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\n// chaiConfig.truncateThreshold: 0 used to disable truncation of test.each title values.\nwrite(\"vitest.config.mjs\", \"export default { test: { chaiConfig: { truncateThreshold: 0 } } }\\n\");\nwrite(\"each.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ param: '0123456789'.repeat(5) }])('title $param', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const file of report.testResults || []) {\n  for (const a of file.assertionResults || []) titles.push(a.title);\n}\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length !== 1 || report.numPassedTests !== 1 || !titles[0].startsWith(\"title '0123456789\")) {\n  console.error(\"ERROR: unexpected report (titles \" + JSON.stringify(titles) + \", exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst full = \"0123456789\".repeat(5);\nconst title = titles[0];\nif (!title.includes(full) && title.includes(\"\\u2026\")) {\n  console.log(\"PASS: test.each title value is truncated despite chaiConfig.truncateThreshold 0: \" + title);\n  process.exit(0);\n}\nif (title.includes(full)) {\n  console.error(\"FAIL: chaiConfig.truncateThreshold 0 disabled truncation of the test.each title value\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected title \" + JSON.stringify(title));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: chaiConfig.truncateThreshold 0 disabled truncation of the test.each title value"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/test.md",
+            "quote": "Vitest formats interpolated title values with its display formatter. If the value is too truncated, you can increase [taskTitleValueFormatTruncate](/config/tasktitlevalueformattruncate) in your config file."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `taskTitleValueFormatTruncate` does. If an interpolated title value is too truncated, increase taskTitleValueFormatTruncate in your config file. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#108",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG74K0AKNFXR44PT6592",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "coverage.exclude",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/covexclude\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nconst outFile = path.join(dir, \"included.json\");\n// A custom coverage provider built on vitest/node's BaseCoverageProvider: it reports\n// whether src/component.js passes coverage.include minus coverage.exclude.\nwrite(\"provider.mjs\", [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"export default {\",\n  \"  async getProvider() {\",\n  \"    const { BaseCoverageProvider } = await import('vitest/node')\",\n  \"    class Probe extends BaseCoverageProvider {\",\n  \"      name = 'custom'\",\n  \"      initialize(ctx) { this.version = ctx.version; this._initialize(ctx) }\",\n  \"      resolveOptions() { return this.options }\",\n  \"      async clean() {}\",\n  \"      onAfterSuiteRun() {}\",\n  \"      async generateCoverage() { return {} }\",\n  \"      async reportCoverage() {\",\n  \"        const root = this.ctx.config.root\",\n  \"        writeFileSync(\" + JSON.stringify(outFile) + \", JSON.stringify({ component: this.isIncluded(root + '/src/component.js') }))\",\n  \"      }\",\n  \"    }\",\n  \"    return new Probe()\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    include: ['**/*.test.mjs', '!something'],\",\n  \"    coverage: { enabled: true, provider: 'custom', customProviderModule: './provider.mjs', include: ['src/**'] },\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"src/component.js\", \"export const one = 1\\n\");\nwrite(\"math.test.mjs\", \"import { test, expect } from 'vitest'\\ntest('one', () => { expect(1).toBe(1) })\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nif (!fs.existsSync(outFile)) {\n  console.error(\"ERROR: the coverage provider never reported (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst result = JSON.parse(fs.readFileSync(outFile, \"utf8\"));\nconsole.log(\"result \" + JSON.stringify(result));\nif (result.component === true) {\n  console.log(\"PASS: src/component.js is covered; coverage.exclude ignores the negation glob !something from test.include\");\n  process.exit(0);\n}\nif (result.component === false) {\n  console.error(\"FAIL: coverage.exclude inherited !something from test.include and excluded src/component.js\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(result));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/covexclude\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nconst outFile = path.join(dir, \"included.json\");\n// A custom coverage provider built on vitest/node's BaseCoverageProvider: it reports\n// whether src/component.js passes coverage.include minus coverage.exclude.\nwrite(\"provider.mjs\", [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"export default {\",\n  \"  async getProvider() {\",\n  \"    const { BaseCoverageProvider } = await import('vitest/node')\",\n  \"    class Probe extends BaseCoverageProvider {\",\n  \"      name = 'custom'\",\n  \"      initialize(ctx) { this.version = ctx.version; this._initialize(ctx) }\",\n  \"      resolveOptions() { return this.options }\",\n  \"      async clean() {}\",\n  \"      onAfterSuiteRun() {}\",\n  \"      async generateCoverage() { return {} }\",\n  \"      async reportCoverage() {\",\n  \"        const root = this.ctx.config.root\",\n  \"        writeFileSync(\" + JSON.stringify(outFile) + \", JSON.stringify({ component: this.isIncluded(root + '/src/component.js') }))\",\n  \"      }\",\n  \"    }\",\n  \"    return new Probe()\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    include: ['**/*.test.mjs', '!something'],\",\n  \"    coverage: { enabled: true, provider: 'custom', customProviderModule: './provider.mjs', include: ['src/**'] },\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"src/component.js\", \"export const one = 1\\n\");\nwrite(\"math.test.mjs\", \"import { test, expect } from 'vitest'\\ntest('one', () => { expect(1).toBe(1) })\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nif (!fs.existsSync(outFile)) {\n  console.error(\"ERROR: the coverage provider never reported (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst result = JSON.parse(fs.readFileSync(outFile, \"utf8\"));\nconsole.log(\"result \" + JSON.stringify(result));\nif (result.component === true) {\n  console.log(\"PASS: src/component.js is covered; coverage.exclude ignores the negation glob !something from test.include\");\n  process.exit(0);\n}\nif (result.component === false) {\n  console.error(\"FAIL: coverage.exclude inherited !something from test.include and excluded src/component.js\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(result));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: coverage.exclude inherited !something from test.include and excluded src/component.js"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `coverage.exclude` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#11",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG750A3AFZNW1T927HMG",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "toHaveTextContent",
+      "signal": "loud",
+      "detail": "toHaveTextContent validates that element text matches the provided string exactly",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/browser/assertions.md",
+            "quote": "function toHaveTextContent(\n  text: string | number,\n  options?: { normalizeWhitespace: boolean }\n): Promise<void>\n```\n\nThis matcher allows you to validate that an element's text matches provided string exactly."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "vitest >=5.0.0 changed what `toHaveTextContent` does. toHaveTextContent validates that element text matches the provided string exactly."
+  },
+  {
+    "entry": "5.0.0#111",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG76F0EKHKZARX2VS19W",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "--reporter=junit",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/junitunhandled\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"reject.test.mjs\"), [\n  \"import { it } from 'vitest'\",\n  \"it('passes but leaks a rejection', async () => {\",\n  \"  void Promise.reject(new Error('leaked rejection'))\",\n  \"  await new Promise(resolve => setTimeout(resolve, 50))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=junit\", \"--outputFile=junit.xml\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst file = path.join(dir, \"junit.xml\");\nif (!fs.existsSync(file)) {\n  console.error(\"ERROR: vitest wrote no JUnit report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst xml = fs.readFileSync(file, \"utf8\");\nconsole.log(xml);\nconst m = xml.match(/<testsuites\\b[^>]*\\berrors=\"(\\d+)\"/);\nif (!m) {\n  console.error(\"ERROR: no <testsuites> element with an errors attribute\");\n  process.exit(2);\n}\nif (r.status !== 1) {\n  console.error(\"ERROR: expected vitest to exit 1 for the unhandled rejection, got \" + r.status);\n  process.exit(2);\n}\nconst errors = Number(m[1]);\nconst hasErrorEl = /<error\\b/.test(xml) && xml.includes(\"leaked rejection\");\nif (errors >= 1 && hasErrorEl) {\n  console.log(\"PASS: JUnit report counts the unhandled rejection, errors=\" + errors);\n  process.exit(0);\n}\nif (errors === 0 && !hasErrorEl) {\n  console.error(\"FAIL: JUnit report has errors=0 and no <error> for the unhandled rejection although vitest exited 1\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected report (errors=\" + errors + \", error element \" + hasErrorEl + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/junitunhandled\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"reject.test.mjs\"), [\n  \"import { it } from 'vitest'\",\n  \"it('passes but leaks a rejection', async () => {\",\n  \"  void Promise.reject(new Error('leaked rejection'))\",\n  \"  await new Promise(resolve => setTimeout(resolve, 50))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=junit\", \"--outputFile=junit.xml\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst file = path.join(dir, \"junit.xml\");\nif (!fs.existsSync(file)) {\n  console.error(\"ERROR: vitest wrote no JUnit report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst xml = fs.readFileSync(file, \"utf8\");\nconsole.log(xml);\nconst m = xml.match(/<testsuites\\b[^>]*\\berrors=\"(\\d+)\"/);\nif (!m) {\n  console.error(\"ERROR: no <testsuites> element with an errors attribute\");\n  process.exit(2);\n}\nif (r.status !== 1) {\n  console.error(\"ERROR: expected vitest to exit 1 for the unhandled rejection, got \" + r.status);\n  process.exit(2);\n}\nconst errors = Number(m[1]);\nconst hasErrorEl = /<error\\b/.test(xml) && xml.includes(\"leaked rejection\");\nif (errors >= 1 && hasErrorEl) {\n  console.log(\"PASS: JUnit report counts the unhandled rejection, errors=\" + errors);\n  process.exit(0);\n}\nif (errors === 0 && !hasErrorEl) {\n  console.error(\"FAIL: JUnit report has errors=0 and no <error> for the unhandled rejection although vitest exited 1\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected report (errors=\" + errors + \", error element \" + hasErrorEl + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: JUnit report has errors=0 and no <error> for the unhandled rejection although vitest exited 1"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `--reporter=junit` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#12",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG77WEEZECM49P2S1HMX",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "--config",
+      "signal": "silent",
+      "detail": "When no --config option is provided, Vitest looks for the config file in the project root; if no config file is found, Vitest runs without one.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst parent = \"/w/ancestorcfg\";\nconst sub = path.join(parent, \"sub\");\nfs.rmSync(parent, { recursive: true, force: true });\nfs.mkdirSync(sub, { recursive: true });\nconst marker = path.join(parent, \"config-loaded.txt\");\n// A config file in the parent directory that records when vitest loads it.\nfs.writeFileSync(path.join(parent, \"vitest.config.mjs\"), [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"writeFileSync(\" + JSON.stringify(marker) + \", 'yes')\",\n  \"export default {}\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(sub, \"a.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('a', () => { writeFileSync(new URL('./ran.txt', import.meta.url), 'yes') })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: sub,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst ran = fs.existsSync(path.join(sub, \"ran.txt\"));\nconst loaded = fs.existsSync(marker);\nif (!ran || r.status !== 0) {\n  console.error(\"ERROR: vitest did not run the test in sub (exit \" + r.status + \", ran \" + ran + \")\");\n  process.exit(2);\n}\n// The symptom of the old behavior: the parent directory's config file was loaded.\nif (loaded) {\n  console.error(\"FAIL: vitest run in sub loaded vitest.config.mjs from the parent directory\");\n  process.exit(1);\n}\nconsole.log(\"PASS: vitest run in sub did not load vitest.config.mjs from the parent directory\");\nprocess.exit(0);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst parent = \"/w/ancestorcfg\";\nconst sub = path.join(parent, \"sub\");\nfs.rmSync(parent, { recursive: true, force: true });\nfs.mkdirSync(sub, { recursive: true });\nconst marker = path.join(parent, \"config-loaded.txt\");\n// A config file in the parent directory that records when vitest loads it.\nfs.writeFileSync(path.join(parent, \"vitest.config.mjs\"), [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"writeFileSync(\" + JSON.stringify(marker) + \", 'yes')\",\n  \"export default {}\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(sub, \"a.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('a', () => { writeFileSync(new URL('./ran.txt', import.meta.url), 'yes') })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: sub,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst ran = fs.existsSync(path.join(sub, \"ran.txt\"));\nconst loaded = fs.existsSync(marker);\nif (!ran || r.status !== 0) {\n  console.error(\"ERROR: vitest did not run the test in sub (exit \" + r.status + \", ran \" + ran + \")\");\n  process.exit(2);\n}\n// The symptom of the old behavior: the parent directory's config file was loaded.\nif (loaded) {\n  console.error(\"FAIL: vitest run in sub loaded vitest.config.mjs from the parent directory\");\n  process.exit(1);\n}\nconsole.log(\"PASS: vitest run in sub did not load vitest.config.mjs from the parent directory\");\nprocess.exit(0);\n",
+            "expect": "fail",
+            "error": "FAIL: vitest run in sub loaded vitest.config.mjs from the parent directory"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/index.md",
+            "quote": "When an explicit `--config` option is not provided, Vitest looks for `vitest.config.{ts,mts,cts,js,mjs,cjs}` first and `vite.config.{ts,mts,cts,js,mjs,cjs}` second in the project [`root`](/config/root). If no config file is found, Vitest will run without one."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `--config` does. When no --config option is provided, Vitest looks for the config file in the project root; if no config file is found, Vitest runs without one. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#14",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG78K9VEHZD9K15M06W2",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "window.innerWidth",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "happy-dom": "20.0.0",
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/winmutate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"win.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('innerWidth', () => {\",\n  \"  const before = window.matchMedia('(max-width: 100px)').matches\",\n  \"  window.innerWidth = 50\",\n  \"  const after = window.matchMedia('(max-width: 100px)').matches\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ before, after, width: window.innerWidth }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--environment=happy-dom\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.before !== false || res.width !== 50) {\n  console.error(\"ERROR: unexpected result \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.after === true) {\n  console.log(\"PASS: window.innerWidth = 50 made matchMedia('(max-width: 100px)') match\");\n  process.exit(0);\n}\nconsole.error(\"FAIL: window.innerWidth = 50 did not reach happy-dom; matchMedia('(max-width: 100px)') still does not match\");\nprocess.exit(1);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "happy-dom": "20.0.0",
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/winmutate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"win.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('innerWidth', () => {\",\n  \"  const before = window.matchMedia('(max-width: 100px)').matches\",\n  \"  window.innerWidth = 50\",\n  \"  const after = window.matchMedia('(max-width: 100px)').matches\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ before, after, width: window.innerWidth }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--environment=happy-dom\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.before !== false || res.width !== 50) {\n  console.error(\"ERROR: unexpected result \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.after === true) {\n  console.log(\"PASS: window.innerWidth = 50 made matchMedia('(max-width: 100px)') match\");\n  process.exit(0);\n}\nconsole.error(\"FAIL: window.innerWidth = 50 did not reach happy-dom; matchMedia('(max-width: 100px)') still does not match\");\nprocess.exit(1);\n",
+            "expect": "fail",
+            "error": "FAIL: window.innerWidth = 50 did not reach happy-dom; matchMedia('(max-width: 100px)') still does not match"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `window.innerWidth` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#15",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG79V6N9M25RNN6ERN6M",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "workerId",
+      "signal": "silent",
+      "detail": "workerId is an incremental number of the worker that ran this file; this will be 0 if file did not run yet",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/workerid\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  fs.writeFileSync(path.join(dir, file), text);\n}\nfunction vitest(args) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"vitest.config.mjs\", [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"export default {\",\n  \"  test: {\",\n  \"    reporters: ['default', {\",\n  \"      onTestRunEnd(testModules) {\",\n  \"        writeFileSync(new URL('./diag.json', import.meta.url), JSON.stringify(testModules.map(m => m.diagnostic().workerId)))\",\n  \"      },\",\n  \"    }],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"one.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('records worker id', () => { writeFileSync(new URL('./env.txt', import.meta.url), String(process.env.VITEST_WORKER_ID)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"]);\nconsole.log(r.out);\nconst envFile = path.join(dir, \"env.txt\");\nconst diagFile = path.join(dir, \"diag.json\");\nif (!fs.existsSync(envFile) || !fs.existsSync(diagFile)) {\n  console.error(\"ERROR: the test file or the reporter did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst envId = fs.readFileSync(envFile, \"utf8\");\nconst diag = JSON.parse(fs.readFileSync(diagFile, \"utf8\"));\nconsole.log(\"VITEST_WORKER_ID=\" + envId + \", diagnostic().workerId=\" + JSON.stringify(diag));\n// The symptom of the old behavior: the first worker got id 0.\nif (envId === \"0\") {\n  console.error(\"FAIL: VITEST_WORKER_ID of the first worker was 0, not 1\");\n  process.exit(1);\n}\nif (r.status === 0 && envId === \"1\" && diag.length === 1 && diag[0] === 1) {\n  console.log(\"PASS: the first worker has workerId 1\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result (VITEST_WORKER_ID=\" + envId + \", diagnostic \" + JSON.stringify(diag) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/workerid\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  fs.writeFileSync(path.join(dir, file), text);\n}\nfunction vitest(args) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"vitest.config.mjs\", [\n  \"import { writeFileSync } from 'node:fs'\",\n  \"export default {\",\n  \"  test: {\",\n  \"    reporters: ['default', {\",\n  \"      onTestRunEnd(testModules) {\",\n  \"        writeFileSync(new URL('./diag.json', import.meta.url), JSON.stringify(testModules.map(m => m.diagnostic().workerId)))\",\n  \"      },\",\n  \"    }],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"one.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('records worker id', () => { writeFileSync(new URL('./env.txt', import.meta.url), String(process.env.VITEST_WORKER_ID)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\"]);\nconsole.log(r.out);\nconst envFile = path.join(dir, \"env.txt\");\nconst diagFile = path.join(dir, \"diag.json\");\nif (!fs.existsSync(envFile) || !fs.existsSync(diagFile)) {\n  console.error(\"ERROR: the test file or the reporter did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst envId = fs.readFileSync(envFile, \"utf8\");\nconst diag = JSON.parse(fs.readFileSync(diagFile, \"utf8\"));\nconsole.log(\"VITEST_WORKER_ID=\" + envId + \", diagnostic().workerId=\" + JSON.stringify(diag));\n// The symptom of the old behavior: the first worker got id 0.\nif (envId === \"0\") {\n  console.error(\"FAIL: VITEST_WORKER_ID of the first worker was 0, not 1\");\n  process.exit(1);\n}\nif (r.status === 0 && envId === \"1\" && diag.length === 1 && diag[0] === 1) {\n  console.log(\"PASS: the first worker has workerId 1\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result (VITEST_WORKER_ID=\" + envId + \", diagnostic \" + JSON.stringify(diag) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: VITEST_WORKER_ID of the first worker was 0, not 1"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/advanced/test-module.md",
+            "quote": "Incremental number of the worker that ran this file. This number increases with each worker.\n   * If file did not run yet, this will be 0.\n   *\n   * **Warning**: Node.js tests and browser tests run in different pools and do not share `workerId`."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `workerId` does. workerId is an incremental number of the worker that ran this file; this will be 0 if file did not run yet. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#17",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7ABP9ZD9MVMCZA1ZGD",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "Temporal",
+      "signal": "silent",
+      "detail": "Temporal is faked when it is available on the global object.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/temporal\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), JSON.stringify({ type: \"module\" }));\n// A minimal global Temporal (Now + Instant), as a polyfill or Node.js >= 26 would provide.\nfs.writeFileSync(path.join(dir, \"temporal.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"const realNow = Date.now\",\n  \"globalThis.Temporal = {\",\n  \"  Now: { instant: () => ({ epochMilliseconds: realNow() }), timeZoneId: () => 'UTC' },\",\n  \"  Instant: { fromEpochNanoseconds: (ns) => ({ epochMilliseconds: Number(ns / 1000000n) }) },\",\n  \"}\",\n  \"test('temporal', () => {\",\n  \"  vi.useFakeTimers()\",\n  \"  vi.setSystemTime(1000)\",\n  \"  const temporal = Temporal.Now.instant().epochMilliseconds\",\n  \"  const date = Date.now()\",\n  \"  vi.useRealTimers()\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ temporal, date }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.date !== 1000) {\n  console.error(\"ERROR: fake Date.now() returned \" + res.date + \", expected 1000\");\n  process.exit(2);\n}\nif (res.temporal === 1000) {\n  console.log(\"PASS: Temporal.Now.instant() follows the fake clock (1000)\");\n  process.exit(0);\n}\nif (typeof res.temporal === \"number\" && Math.abs(res.temporal - Date.now()) < 120000) {\n  console.error(\"FAIL: Temporal.Now.instant() returned the real time under vi.useFakeTimers()\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Temporal value \" + res.temporal);\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/temporal\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), JSON.stringify({ type: \"module\" }));\n// A minimal global Temporal (Now + Instant), as a polyfill or Node.js >= 26 would provide.\nfs.writeFileSync(path.join(dir, \"temporal.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"const realNow = Date.now\",\n  \"globalThis.Temporal = {\",\n  \"  Now: { instant: () => ({ epochMilliseconds: realNow() }), timeZoneId: () => 'UTC' },\",\n  \"  Instant: { fromEpochNanoseconds: (ns) => ({ epochMilliseconds: Number(ns / 1000000n) }) },\",\n  \"}\",\n  \"test('temporal', () => {\",\n  \"  vi.useFakeTimers()\",\n  \"  vi.setSystemTime(1000)\",\n  \"  const temporal = Temporal.Now.instant().epochMilliseconds\",\n  \"  const date = Date.now()\",\n  \"  vi.useRealTimers()\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ temporal, date }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.date !== 1000) {\n  console.error(\"ERROR: fake Date.now() returned \" + res.date + \", expected 1000\");\n  process.exit(2);\n}\nif (res.temporal === 1000) {\n  console.log(\"PASS: Temporal.Now.instant() follows the fake clock (1000)\");\n  process.exit(0);\n}\nif (typeof res.temporal === \"number\" && Math.abs(res.temporal - Date.now()) < 120000) {\n  console.error(\"FAIL: Temporal.Now.instant() returned the real time under vi.useFakeTimers()\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Temporal value \" + res.temporal);\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: Temporal.Now.instant() returned the real time under vi.useFakeTimers()"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/faketimers.md",
+            "quote": "`Temporal` is only faked when it is available on the global object: natively (Node.js >= 26 by default, behind `--harmony-temporal` on older versions, and supporting browsers) or through a globally installed polyfill such as `import 'temporal-polyfill/global'`."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `Temporal` does. Temporal is faked when it is available on the global object. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#19",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7B1PQSCN31EA29QBMK",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": "clearMocks",
+      "signal": "silent",
+      "detail": "clearMocks default is true: Vitest automatically calls vi.clearAllMocks before each test.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/clearmocks\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"mock.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"const fn = vi.fn()\",\n  \"test('first', () => { fn(); fn() })\",\n  \"test('second', () => { writeFileSync(new URL('./calls.txt', import.meta.url), String(fn.mock.calls.length)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst callsFile = path.join(dir, \"calls.txt\");\nif (r.status !== 0 || !fs.existsSync(callsFile)) {\n  console.error(\"ERROR: vitest run did not complete (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst calls = fs.readFileSync(callsFile, \"utf8\").trim();\nif (calls === \"0\") {\n  console.log(\"PASS: mock history was cleared before the second test\");\n  process.exit(0);\n}\nif (calls === \"2\") {\n  console.error(\"FAIL: mock calls from the first test were still recorded in the second test\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected mock call count \" + calls);\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/clearmocks\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"mock.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"const fn = vi.fn()\",\n  \"test('first', () => { fn(); fn() })\",\n  \"test('second', () => { writeFileSync(new URL('./calls.txt', import.meta.url), String(fn.mock.calls.length)) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst callsFile = path.join(dir, \"calls.txt\");\nif (r.status !== 0 || !fs.existsSync(callsFile)) {\n  console.error(\"ERROR: vitest run did not complete (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst calls = fs.readFileSync(callsFile, \"utf8\").trim();\nif (calls === \"0\") {\n  console.log(\"PASS: mock history was cleared before the second test\");\n  process.exit(0);\n}\nif (calls === \"2\") {\n  console.error(\"FAIL: mock calls from the first test were still recorded in the second test\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected mock call count \" + calls);\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: mock calls from the first test were still recorded in the second test"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/clearmocks.md",
+            "quote": "clearMocks\n\n- **Type:** `boolean`\n- **Default:** `true`\n\nShould Vitest automatically call [`vi.clearAllMocks()`](/api/vi#vi-clearallmocks) before each test."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed the default of `clearMocks`. clearMocks default is true: Vitest automatically calls vi.clearAllMocks before each test. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#2",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7CHPW0574XYG015CGT",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "test.each $name",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/eachtitle\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"each.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ name: 'alice' }])('greets $name', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const f of report.testResults || []) for (const a of f.assertionResults || []) titles.push(a.title);\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length === 1 && titles[0] === \"greets alice\") {\n  console.log(\"PASS: test.each $name gave the title greets alice\");\n  process.exit(0);\n}\nif (titles.length === 1 && titles[0] === \"greets 'alice'\") {\n  console.error(\"FAIL: test.each $name kept quotes around the string: greets 'alice'\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected titles \" + JSON.stringify(titles) + \" (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/eachtitle\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"each.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"test.each([{ name: 'alice' }])('greets $name', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = [];\nfor (const f of report.testResults || []) for (const a of f.assertionResults || []) titles.push(a.title);\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (titles.length === 1 && titles[0] === \"greets alice\") {\n  console.log(\"PASS: test.each $name gave the title greets alice\");\n  process.exit(0);\n}\nif (titles.length === 1 && titles[0] === \"greets 'alice'\") {\n  console.error(\"FAIL: test.each $name kept quotes around the string: greets 'alice'\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected titles \" + JSON.stringify(titles) + \" (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: test.each $name kept quotes around the string: greets 'alice'"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `test.each $name` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#22",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7DVDZ2JMRJ3D8C9D26",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": "extends",
+      "signal": "silent",
+      "detail": "Projects defined with an inline configuration inherit options from the root-level configuration by default since Vitest 5.0.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/inlineextends\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  fs.writeFileSync(path.join(dir, file), text);\n}\n\n// Root config: a setup file, and one inline project with no extends option.\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    setupFiles: ['./setup.mjs'],\",\n  \"    projects: [\",\n  \"      { test: { name: 'unit', include: ['*.test.mjs'] } },\",\n  \"    ],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"setup.mjs\", \"globalThis.__ROOT_SETUP__ = 'yes'\\n\");\nwrite(\"probe.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('probe', () => {\",\n  \"  writeFileSync(new URL('./seen.txt', import.meta.url), String(globalThis.__ROOT_SETUP__))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\n\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst seenFile = path.join(dir, \"seen.txt\");\nif (!fs.existsSync(seenFile)) {\n  console.error(\"ERROR: the probe test did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst seen = fs.readFileSync(seenFile, \"utf8\");\nif (seen === \"yes\" && r.status === 0) {\n  console.log(\"PASS: the inline project ran the root setupFiles\");\n  process.exit(0);\n}\n// The symptom of the old behavior: the inline project ignored the root config.\nif (seen === \"undefined\" && r.status === 0) {\n  console.error(\"FAIL: the inline project without extends did not inherit the root setupFiles\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (seen \" + JSON.stringify(seen) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/inlineextends\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  fs.writeFileSync(path.join(dir, file), text);\n}\n\n// Root config: a setup file, and one inline project with no extends option.\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    setupFiles: ['./setup.mjs'],\",\n  \"    projects: [\",\n  \"      { test: { name: 'unit', include: ['*.test.mjs'] } },\",\n  \"    ],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"setup.mjs\", \"globalThis.__ROOT_SETUP__ = 'yes'\\n\");\nwrite(\"probe.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('probe', () => {\",\n  \"  writeFileSync(new URL('./seen.txt', import.meta.url), String(globalThis.__ROOT_SETUP__))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\n\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst seenFile = path.join(dir, \"seen.txt\");\nif (!fs.existsSync(seenFile)) {\n  console.error(\"ERROR: the probe test did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst seen = fs.readFileSync(seenFile, \"utf8\");\nif (seen === \"yes\" && r.status === 0) {\n  console.log(\"PASS: the inline project ran the root setupFiles\");\n  process.exit(0);\n}\n// The symptom of the old behavior: the inline project ignored the root config.\nif (seen === \"undefined\" && r.status === 0) {\n  console.error(\"FAIL: the inline project without extends did not inherit the root setupFiles\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (seen \" + JSON.stringify(seen) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: the inline project without extends did not inherit the root setupFiles"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/projects.md",
+            "quote": "Projects defined with an inline configuration inherit all options from the root-level configuration. This is controlled by the `extends` option, which is enabled by default since Vitest 5.0:"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration by default since Vitest 5.0. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#23",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7EXEFBSP2559P9E5SS",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "vi.setSystemTime",
+      "signal": "silent",
+      "detail": "vi.setSystemTime can mock Date and Temporal time.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/temporalmock\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\n// Node 24 has no native Temporal, so install a minimal stand-in (Now and Instant only).\nfs.writeFileSync(path.join(dir, \"temporal-stub.mjs\"), [\n  \"if (typeof globalThis.Temporal === 'undefined') {\",\n  \"  const realNow = Date.now.bind(Date)\",\n  \"  class Instant {\",\n  \"    constructor(ns) { this.epochNanoseconds = ns }\",\n  \"    get epochMilliseconds() { return Number(this.epochNanoseconds / 1000000n) }\",\n  \"    static fromEpochNanoseconds(ns) { return new Instant(ns) }\",\n  \"  }\",\n  \"  globalThis.Temporal = {\",\n  \"    Instant,\",\n  \"    Now: {\",\n  \"      instant() { return Instant.fromEpochNanoseconds(BigInt(realNow()) * 1000000n) },\",\n  \"      timeZoneId() { return 'UTC' },\",\n  \"    },\",\n  \"  }\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(dir, \"now.test.mjs\"), [\n  \"import './temporal-stub.mjs'\",\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('setSystemTime without fake timers', () => {\",\n  \"  const fakeBefore = vi.isFakeTimers()\",\n  \"  vi.setSystemTime(0)\",\n  \"  const dateMs = Date.now()\",\n  \"  const temporalMs = Temporal.Now.instant().epochMilliseconds\",\n  \"  vi.useRealTimers()\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ fakeBefore, dateMs, temporalMs }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\", NODE_OPTIONS: \"--import=file://\" + dir + \"/temporal-stub.mjs\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.fakeBefore !== false || res.dateMs !== 0) {\n  console.error(\"ERROR: unexpected setup (fake timers \" + res.fakeBefore + \", Date.now() \" + res.dateMs + \")\");\n  process.exit(2);\n}\nif (res.temporalMs === 0) {\n  console.log(\"PASS: vi.setSystemTime(0) without fake timers mocked Temporal.Now.instant()\");\n  process.exit(0);\n}\nif (typeof res.temporalMs === \"number\" && res.temporalMs > 1e12) {\n  console.error(\"FAIL: Temporal.Now.instant() returned the real time after vi.setSystemTime(0) without fake timers\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Temporal.Now.instant().epochMilliseconds \" + res.temporalMs);\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/temporalmock\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\n// Node 24 has no native Temporal, so install a minimal stand-in (Now and Instant only).\nfs.writeFileSync(path.join(dir, \"temporal-stub.mjs\"), [\n  \"if (typeof globalThis.Temporal === 'undefined') {\",\n  \"  const realNow = Date.now.bind(Date)\",\n  \"  class Instant {\",\n  \"    constructor(ns) { this.epochNanoseconds = ns }\",\n  \"    get epochMilliseconds() { return Number(this.epochNanoseconds / 1000000n) }\",\n  \"    static fromEpochNanoseconds(ns) { return new Instant(ns) }\",\n  \"  }\",\n  \"  globalThis.Temporal = {\",\n  \"    Instant,\",\n  \"    Now: {\",\n  \"      instant() { return Instant.fromEpochNanoseconds(BigInt(realNow()) * 1000000n) },\",\n  \"      timeZoneId() { return 'UTC' },\",\n  \"    },\",\n  \"  }\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(dir, \"now.test.mjs\"), [\n  \"import './temporal-stub.mjs'\",\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"test('setSystemTime without fake timers', () => {\",\n  \"  const fakeBefore = vi.isFakeTimers()\",\n  \"  vi.setSystemTime(0)\",\n  \"  const dateMs = Date.now()\",\n  \"  const temporalMs = Temporal.Now.instant().epochMilliseconds\",\n  \"  vi.useRealTimers()\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ fakeBefore, dateMs, temporalMs }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\", NODE_OPTIONS: \"--import=file://\" + dir + \"/temporal-stub.mjs\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.fakeBefore !== false || res.dateMs !== 0) {\n  console.error(\"ERROR: unexpected setup (fake timers \" + res.fakeBefore + \", Date.now() \" + res.dateMs + \")\");\n  process.exit(2);\n}\nif (res.temporalMs === 0) {\n  console.log(\"PASS: vi.setSystemTime(0) without fake timers mocked Temporal.Now.instant()\");\n  process.exit(0);\n}\nif (typeof res.temporalMs === \"number\" && res.temporalMs > 1e12) {\n  console.error(\"FAIL: Temporal.Now.instant() returned the real time after vi.setSystemTime(0) without fake timers\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Temporal.Now.instant().epochMilliseconds \" + res.temporalMs);\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: Temporal.Now.instant() returned the real time after vi.setSystemTime(0) without fake timers"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/mocking.md",
+            "quote": "To mock `Date` and `Temporal`'s time, you can use `vi.setSystemTime` helper function."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `vi.setSystemTime` does. vi.setSystemTime can mock Date and Temporal time. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#27",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7F314ANH9KXKTJKKEW",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": "projects",
+      "signal": "silent",
+      "detail": "When projects share a server, the declaring config file is executed once instead of once per project.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/sharedvite\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst countFile = path.join(dir, \"config-runs.txt\");\nfs.writeFileSync(path.join(dir, \"a.test.mjs\"), \"import { test, expect } from 'vitest'\\ntest('ok', () => { expect(1).toBe(1) })\\n\");\n// the config file records every time it is executed\nfs.writeFileSync(path.join(dir, \"vitest.config.mjs\"), [\n  \"import { appendFileSync } from 'node:fs'\",\n  \"import { defineConfig } from 'vitest/config'\",\n  \"appendFileSync(\" + JSON.stringify(countFile) + \", 'run\\\\n')\",\n  \"export default defineConfig({\",\n  \"  test: {\",\n  \"    projects: [\",\n  \"      { extends: true, test: { name: 'one' } },\",\n  \"      { extends: true, test: { name: 'two' } },\",\n  \"      { extends: true, test: { name: 'three' } },\",\n  \"    ],\",\n  \"  },\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest run exited \" + r.status);\n  process.exit(2);\n}\nconst runs = fs.existsSync(countFile) ? fs.readFileSync(countFile, \"utf8\").split(\"\\n\").filter(Boolean).length : 0;\nconsole.log(\"config file executed \" + runs + \" time(s) for 3 inline projects\");\nif (runs >= 1 && runs < 3) {\n  console.log(\"PASS: the config file was not executed once per inline project\");\n  process.exit(0);\n}\nif (runs >= 4) {\n  console.error(\"FAIL: the config file was executed once per inline project\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected execution count \" + runs);\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/sharedvite\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nconst countFile = path.join(dir, \"config-runs.txt\");\nfs.writeFileSync(path.join(dir, \"a.test.mjs\"), \"import { test, expect } from 'vitest'\\ntest('ok', () => { expect(1).toBe(1) })\\n\");\n// the config file records every time it is executed\nfs.writeFileSync(path.join(dir, \"vitest.config.mjs\"), [\n  \"import { appendFileSync } from 'node:fs'\",\n  \"import { defineConfig } from 'vitest/config'\",\n  \"appendFileSync(\" + JSON.stringify(countFile) + \", 'run\\\\n')\",\n  \"export default defineConfig({\",\n  \"  test: {\",\n  \"    projects: [\",\n  \"      { extends: true, test: { name: 'one' } },\",\n  \"      { extends: true, test: { name: 'two' } },\",\n  \"      { extends: true, test: { name: 'three' } },\",\n  \"    ],\",\n  \"  },\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest run exited \" + r.status);\n  process.exit(2);\n}\nconst runs = fs.existsSync(countFile) ? fs.readFileSync(countFile, \"utf8\").split(\"\\n\").filter(Boolean).length : 0;\nconsole.log(\"config file executed \" + runs + \" time(s) for 3 inline projects\");\nif (runs >= 1 && runs < 3) {\n  console.log(\"PASS: the config file was not executed once per inline project\");\n  process.exit(0);\n}\nif (runs >= 4) {\n  console.error(\"FAIL: the config file was executed once per inline project\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected execution count \" + runs);\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: the config file was executed once per inline project"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/sharedviteserver.md",
+            "quote": "When projects share a server, the declaring config file is executed once instead of once per project."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:45Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed the default of `projects`. When projects share a server, the declaring config file is executed once instead of once per project. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#28",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7G1SMMNZ4ETEK6JSJX",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": "--no-static-parse",
+      "signal": "silent",
+      "detail": "vitest list parses test files statically instead of running them to collect tests; pass --no-static-parse to run the files instead.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/listparse\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"writeFileSync(new URL('./executed.txt', import.meta.url), 'yes')\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => {})\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"list\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nif (!/math > adds/.test(out)) {\n  console.error(\"ERROR: vitest list did not print math > adds (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst executed = fs.existsSync(path.join(dir, \"executed.txt\"));\nif (!executed) {\n  console.log(\"PASS: vitest list collected math > adds without running the test file\");\n  process.exit(0);\n}\nconsole.error(\"FAIL: vitest list ran the test file's top-level code to collect tests\");\nprocess.exit(1);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/listparse\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"writeFileSync(new URL('./executed.txt', import.meta.url), 'yes')\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => {})\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"list\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nif (!/math > adds/.test(out)) {\n  console.error(\"ERROR: vitest list did not print math > adds (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst executed = fs.existsSync(path.join(dir, \"executed.txt\"));\nif (!executed) {\n  console.log(\"PASS: vitest list collected math > adds without running the test file\");\n  process.exit(0);\n}\nconsole.error(\"FAIL: vitest list ran the test file's top-level code to collect tests\");\nprocess.exit(1);\n",
+            "expect": "fail",
+            "error": "FAIL: vitest list ran the test file's top-level code to collect tests"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/cli.md",
+            "quote": "Since Vitest 5, `vitest list` [parses test files](/api/advanced/vitest#parsespecifications) statically instead of running them to collect tests. Pass `--no-static-parse` to run the files instead."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed the default of `--no-static-parse`. vitest list parses test files statically instead of running them to collect tests; pass --no-static-parse to run the files instead. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#3",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7H11ZXAQ807KXV30B5",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": "attachmentsDir",
+      "signal": "silent",
+      "detail": "Attachments from context.annotate are stored in .vitest/attachments by default",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/attachdir\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"data.txt\"), \"hello\\n\");\nfs.writeFileSync(path.join(dir, \"note.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"test('note', async ({ annotate }) => {\",\n  \"  await annotate('see data', 'notice', { path: 'data.txt' })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nfunction list(sub) {\n  try { return fs.readdirSync(path.join(dir, sub)); } catch { return []; }\n}\nconst newFiles = list(\".vitest/attachments\");\nconst oldFiles = list(\".vitest-attachments\");\nconsole.log(\"in .vitest/attachments: \" + JSON.stringify(newFiles) + \", in .vitest-attachments: \" + JSON.stringify(oldFiles));\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest run failed (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (newFiles.length === 1 && oldFiles.length === 0) {\n  console.log(\"PASS: with attachmentsDir unset, the attachment was copied into .vitest/attachments\");\n  process.exit(0);\n}\nif (oldFiles.length === 1 && newFiles.length === 0) {\n  console.error(\"FAIL: with attachmentsDir unset, the attachment was copied into .vitest-attachments, not .vitest/attachments\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: attachment not found in either directory\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/attachdir\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"data.txt\"), \"hello\\n\");\nfs.writeFileSync(path.join(dir, \"note.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"test('note', async ({ annotate }) => {\",\n  \"  await annotate('see data', 'notice', { path: 'data.txt' })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nfunction list(sub) {\n  try { return fs.readdirSync(path.join(dir, sub)); } catch { return []; }\n}\nconst newFiles = list(\".vitest/attachments\");\nconst oldFiles = list(\".vitest-attachments\");\nconsole.log(\"in .vitest/attachments: \" + JSON.stringify(newFiles) + \", in .vitest-attachments: \" + JSON.stringify(oldFiles));\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest run failed (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (newFiles.length === 1 && oldFiles.length === 0) {\n  console.log(\"PASS: with attachmentsDir unset, the attachment was copied into .vitest/attachments\");\n  process.exit(0);\n}\nif (oldFiles.length === 1 && newFiles.length === 0) {\n  console.error(\"FAIL: with attachmentsDir unset, the attachment was copied into .vitest-attachments, not .vitest/attachments\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: attachment not found in either directory\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: with attachmentsDir unset, the attachment was copied into .vitest-attachments, not .vitest/attachments"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/cli-generated.md",
+            "quote": "- **Config:** [attachmentsDir](/config/attachmentsdir)\n\nThe directory where attachments from `context.annotate` are stored in (default: `.vitest/attachments`)"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed the default of `attachmentsDir`. Attachments from context.annotate are stored in .vitest/attachments by default. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#30",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7JEXQEJ0EEF8FHZN6Z",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": "browser.locators.exact",
+      "signal": "silent",
+      "detail": "The browser.locators.exact default is true: locators match the text exactly by default.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/locexact\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(dir + \"/probe.mjs\", [\n  \"import { createVitest } from 'vitest/node'\",\n  \"const vitest = await createVitest('test', { root: '/w/locexact', config: false, watch: false })\",\n  \"const exact = vitest.config.browser.locators.exact\",\n  \"await vitest.close()\",\n  \"console.log('RESULT:' + JSON.stringify(exact))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [dir + \"/probe.mjs\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst m = out.match(/RESULT:(\\S+)/);\nif (!m) {\n  console.error(\"ERROR: probe printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst exact = JSON.parse(m[1]);\nif (exact === true) {\n  console.log(\"PASS: browser.locators.exact resolves to true when unset\");\n  process.exit(0);\n}\nif (exact === false) {\n  console.error(\"FAIL: browser.locators.exact resolves to false when unset\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected browser.locators.exact value \" + m[1]);\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/locexact\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(dir + \"/probe.mjs\", [\n  \"import { createVitest } from 'vitest/node'\",\n  \"const vitest = await createVitest('test', { root: '/w/locexact', config: false, watch: false })\",\n  \"const exact = vitest.config.browser.locators.exact\",\n  \"await vitest.close()\",\n  \"console.log('RESULT:' + JSON.stringify(exact))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [dir + \"/probe.mjs\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst m = out.match(/RESULT:(\\S+)/);\nif (!m) {\n  console.error(\"ERROR: probe printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst exact = JSON.parse(m[1]);\nif (exact === true) {\n  console.log(\"PASS: browser.locators.exact resolves to true when unset\");\n  process.exit(0);\n}\nif (exact === false) {\n  console.error(\"FAIL: browser.locators.exact resolves to false when unset\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected browser.locators.exact value \" + m[1]);\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: browser.locators.exact resolves to false when unset"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/cli-generated.md",
+            "quote": "[browser.locators.exact](/config/browser/locators#locators-exact)\n\nShould locators match the text exactly by default (default: `true`)"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed the default of `browser.locators.exact`. The browser.locators.exact default is true: locators match the text exactly by default. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#31",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7KQBQTBB3KHBRDH533",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "include",
+      "signal": "silent",
+      "detail": "Patterns match the path relative to the project root; an include pattern with no glob wildcard is treated as a directory and matches everything inside it.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/coverage.md",
+            "quote": "Patterns are matched against each file's path relative to the project root. A pattern with no glob wildcard is treated as a directory and matches everything inside it, so `include: ['src']` is equivalent to `include: ['src/**']`."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "vitest >=5.0.0 changed what `include` does. Patterns match the path relative to the project root; an include pattern with no glob wildcard is treated as a directory and matches everything inside it. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#32",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7MAS147H75M9XHVKQV",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "toThrow",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/tothrowempty\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"throw.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('empty string', () => {\",\n  \"  expect(() => { throw new Error('boom') }).toThrow('')\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst counts = \"total \" + report.numTotalTests + \", passed \" + report.numPassedTests + \", failed \" + report.numFailedTests;\nconsole.log(counts);\nif (report.numTotalTests === 1 && report.numPassedTests === 1 && r.status === 0) {\n  console.log(\"PASS: toThrow('') passed for an error with message boom\");\n  process.exit(0);\n}\nif (report.numTotalTests === 1 && report.numFailedTests === 1) {\n  console.error(\"FAIL: toThrow('') failed for an error with message boom\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (\" + counts + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/tothrowempty\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"throw.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('empty string', () => {\",\n  \"  expect(() => { throw new Error('boom') }).toThrow('')\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst counts = \"total \" + report.numTotalTests + \", passed \" + report.numPassedTests + \", failed \" + report.numFailedTests;\nconsole.log(counts);\nif (report.numTotalTests === 1 && report.numPassedTests === 1 && r.status === 0) {\n  console.log(\"PASS: toThrow('') passed for an error with message boom\");\n  process.exit(0);\n}\nif (report.numTotalTests === 1 && report.numFailedTests === 1) {\n  console.error(\"FAIL: toThrow('') failed for an error with message boom\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (\" + counts + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: toThrow('') failed for an error with message boom"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `toThrow` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#34",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7NTQ72A84QGDJT0XHG",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": ".vitest/json/output.json",
+      "signal": "silent",
+      "detail": "By default the json report is written to .vitest/json/output.json.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/jsondefault\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('adds', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst reportFile = path.join(dir, \".vitest\", \"json\", \"output.json\");\nif (fs.existsSync(reportFile)) {\n  let report;\n  try { report = JSON.parse(fs.readFileSync(reportFile, \"utf8\")); } catch (e) {\n    console.error(\"ERROR: .vitest/json/output.json is not valid JSON\");\n    process.exit(2);\n  }\n  if (r.status === 0 && report.numPassedTests === 1) {\n    console.log(\"PASS: --reporter=json wrote .vitest/json/output.json by default\");\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected report (exit \" + r.status + \", passed \" + report.numPassedTests + \")\");\n  process.exit(2);\n}\n// The symptom of the old behavior: the run passed and the JSON report went to stdout, not to a file.\nif (r.status === 0 && /\"numPassedTests\":1/.test(r.stdout || \"\")) {\n  console.error(\"FAIL: --reporter=json printed the report to stdout and wrote no .vitest/json/output.json\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/jsondefault\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('adds', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst reportFile = path.join(dir, \".vitest\", \"json\", \"output.json\");\nif (fs.existsSync(reportFile)) {\n  let report;\n  try { report = JSON.parse(fs.readFileSync(reportFile, \"utf8\")); } catch (e) {\n    console.error(\"ERROR: .vitest/json/output.json is not valid JSON\");\n    process.exit(2);\n  }\n  if (r.status === 0 && report.numPassedTests === 1) {\n    console.log(\"PASS: --reporter=json wrote .vitest/json/output.json by default\");\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected report (exit \" + r.status + \", passed \" + report.numPassedTests + \")\");\n  process.exit(2);\n}\n// The symptom of the old behavior: the run passed and the JSON report went to stdout, not to a file.\nif (r.status === 0 && /\"numPassedTests\":1/.test(r.stdout || \"\")) {\n  console.error(\"FAIL: --reporter=json printed the report to stdout and wrote no .vitest/json/output.json\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: --reporter=json printed the report to stdout and wrote no .vitest/json/output.json"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/reporters.md",
+            "quote": "Generates a report of the test results in a JSON format compatible with Jest's `--json` option. By default it is written to `.vitest/json/output.json`."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed the default of `.vitest/json/output.json`. By default the json report is written to .vitest/json/output.json. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#35",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7P1C16Q31EY40MMA3C",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "vi.fn",
+      "signal": "silent",
+      "detail": "Instances of a class passed to vi.fn keep the prototype chain of the class, so prototype methods stay available and instanceof checks against the class pass.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/classproto\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"dog.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"class Dog { speak() { return 'bark!' } }\",\n  \"test('dog', () => {\",\n  \"  const MockedDog = vi.fn(Dog)\",\n  \"  const dog = new MockedDog()\",\n  \"  const result = { speak: typeof dog.speak, isDog: dog instanceof Dog }\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify(result))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.speak === \"function\" && res.isDog === true) {\n  console.log(\"PASS: new (vi.fn(Dog))() has the prototype method speak and is instanceof Dog\");\n  process.exit(0);\n}\nif (res.speak === \"undefined\" && res.isDog === false) {\n  console.error(\"FAIL: new (vi.fn(Dog))() lacks the prototype method speak and is not instanceof Dog\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/classproto\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"dog.test.mjs\"), [\n  \"import { test, vi } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"class Dog { speak() { return 'bark!' } }\",\n  \"test('dog', () => {\",\n  \"  const MockedDog = vi.fn(Dog)\",\n  \"  const dog = new MockedDog()\",\n  \"  const result = { speak: typeof dog.speak, isDog: dog instanceof Dog }\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify(result))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file wrote no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(JSON.stringify(res));\nif (res.speak === \"function\" && res.isDog === true) {\n  console.log(\"PASS: new (vi.fn(Dog))() has the prototype method speak and is instanceof Dog\");\n  process.exit(0);\n}\nif (res.speak === \"undefined\" && res.isDog === false) {\n  console.error(\"FAIL: new (vi.fn(Dog))() lacks the prototype method speak and is not instanceof Dog\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: new (vi.fn(Dog))() lacks the prototype method speak and is not instanceof Dog"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/mocking/classes.md",
+            "quote": "Instances keep the prototype chain of the class you pass to `vi.fn`, so prototype methods stay available on instances, both during and after construction, and instances pass `instanceof` checks against that class:"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `vi.fn` does. Instances of a class passed to vi.fn keep the prototype chain of the class, so prototype methods stay available and instanceof checks against the class pass. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#37",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7Q6HVX8WJG0QGFR9S4",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "default",
+      "symbol": "outputDir",
+      "signal": "silent",
+      "detail": "By default outputDir is .vitest, and the report entry is written to outputDir/index.html",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "@vitest/ui": "5.0.0",
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/htmlreport\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), \"{}\\n\");\nfs.writeFileSync(path.join(dir, \"basic.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('ok', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=html\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 70000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst newEntry = fs.existsSync(path.join(dir, \".vitest\", \"index.html\"));\nconst oldEntry = fs.existsSync(path.join(dir, \"html\", \"index.html\"));\nconsole.log(\"exit \" + r.status + \", .vitest/index.html \" + newEntry + \", html/index.html \" + oldEntry);\nif (newEntry && !oldEntry) {\n  console.log(\"PASS: --reporter=html wrote its report entry to .vitest/index.html\");\n  process.exit(0);\n}\nif (oldEntry && !newEntry) {\n  console.error(\"FAIL: --reporter=html wrote its report entry to html/index.html, not .vitest/index.html\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: no single html report entry found (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "@vitest/ui": "4.1.11",
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/htmlreport\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), \"{}\\n\");\nfs.writeFileSync(path.join(dir, \"basic.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('ok', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=html\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 70000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst newEntry = fs.existsSync(path.join(dir, \".vitest\", \"index.html\"));\nconst oldEntry = fs.existsSync(path.join(dir, \"html\", \"index.html\"));\nconsole.log(\"exit \" + r.status + \", .vitest/index.html \" + newEntry + \", html/index.html \" + oldEntry);\nif (newEntry && !oldEntry) {\n  console.log(\"PASS: --reporter=html wrote its report entry to .vitest/index.html\");\n  process.exit(0);\n}\nif (oldEntry && !newEntry) {\n  console.error(\"FAIL: --reporter=html wrote its report entry to html/index.html, not .vitest/index.html\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: no single html report entry found (exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: --reporter=html wrote its report entry to html/index.html, not .vitest/index.html"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/reporters.md",
+            "quote": "The report entry is written to `<outputDir>/index.html` and the UI assets files live under `<outputDir>/ui/`. By default `outputDir` is `.vitest`, the shared Vitest artifact directory"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "test",
+    "claim": "vitest >=5.0.0 changed the default of `outputDir`. By default outputDir is .vitest, and the report entry is written to outputDir/index.html. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#44",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7RR7VTXC9BNPBSNTNY",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "renamed",
+      "symbol": "experimental.fsModuleCache",
+      "replacement": "fsModuleCache",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/fscache\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\nfunction filesIn(d) {\n  if (!fs.existsSync(d)) return 0;\n  return fs.readdirSync(d, { recursive: true }).filter((f) => fs.statSync(path.join(d, f)).isFile()).length;\n}\n\nwrite(\"helper.mjs\", \"export const add = (a, b) => a + b\\n\");\nwrite(\"math.test.mjs\", [\n  \"import { test, expect } from 'vitest'\",\n  \"import { add } from './helper.mjs'\",\n  \"test('adds', () => { expect(add(1, 2)).toBe(3) })\",\n].join(\"\\n\") + \"\\n\");\n\n// Run 1: the old name, experimental.fsModuleCache, must persist the cache on both versions.\nconst oldCache = path.join(dir, \"cache-old\");\nwrite(\"old.config.mjs\", \"export default { test: { experimental: { fsModuleCache: true, fsModuleCachePath: \" + JSON.stringify(oldCache) + \" } } }\\n\");\nconst r1 = vitest([\"run\", \"--config\", \"old.config.mjs\"]);\nconsole.log(r1.out);\nif (r1.status !== 0 || filesIn(oldCache) === 0) {\n  console.error(\"ERROR: experimental.fsModuleCache run failed or wrote no cache (exit \" + r1.status + \")\");\n  process.exit(2);\n}\n\n// Run 2: the same settings under the top-level fsModuleCache option.\nconst newCache = path.join(dir, \"cache-new\");\nwrite(\"new.config.mjs\", \"export default { test: { fsModuleCache: true, fsModuleCachePath: \" + JSON.stringify(newCache) + \" } }\\n\");\nconst r2 = vitest([\"run\", \"--config\", \"new.config.mjs\"]);\nconsole.log(r2.out);\nif (r2.status !== 0) {\n  console.error(\"ERROR: top-level fsModuleCache run exited \" + r2.status);\n  process.exit(2);\n}\nconst n = filesIn(newCache);\nif (n > 0) {\n  console.log(\"PASS: top-level fsModuleCache: true wrote \" + n + \" cache files to fsModuleCachePath\");\n  process.exit(0);\n}\nconsole.error(\"FAIL: top-level fsModuleCache: true was ignored and no module cache was written\");\nprocess.exit(1);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/fscache\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 40000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\nfunction filesIn(d) {\n  if (!fs.existsSync(d)) return 0;\n  return fs.readdirSync(d, { recursive: true }).filter((f) => fs.statSync(path.join(d, f)).isFile()).length;\n}\n\nwrite(\"helper.mjs\", \"export const add = (a, b) => a + b\\n\");\nwrite(\"math.test.mjs\", [\n  \"import { test, expect } from 'vitest'\",\n  \"import { add } from './helper.mjs'\",\n  \"test('adds', () => { expect(add(1, 2)).toBe(3) })\",\n].join(\"\\n\") + \"\\n\");\n\n// Run 1: the old name, experimental.fsModuleCache, must persist the cache on both versions.\nconst oldCache = path.join(dir, \"cache-old\");\nwrite(\"old.config.mjs\", \"export default { test: { experimental: { fsModuleCache: true, fsModuleCachePath: \" + JSON.stringify(oldCache) + \" } } }\\n\");\nconst r1 = vitest([\"run\", \"--config\", \"old.config.mjs\"]);\nconsole.log(r1.out);\nif (r1.status !== 0 || filesIn(oldCache) === 0) {\n  console.error(\"ERROR: experimental.fsModuleCache run failed or wrote no cache (exit \" + r1.status + \")\");\n  process.exit(2);\n}\n\n// Run 2: the same settings under the top-level fsModuleCache option.\nconst newCache = path.join(dir, \"cache-new\");\nwrite(\"new.config.mjs\", \"export default { test: { fsModuleCache: true, fsModuleCachePath: \" + JSON.stringify(newCache) + \" } }\\n\");\nconst r2 = vitest([\"run\", \"--config\", \"new.config.mjs\"]);\nconsole.log(r2.out);\nif (r2.status !== 0) {\n  console.error(\"ERROR: top-level fsModuleCache run exited \" + r2.status);\n  process.exit(2);\n}\nconst n = filesIn(newCache);\nif (n > 0) {\n  console.log(\"PASS: top-level fsModuleCache: true wrote \" + n + \" cache files to fsModuleCachePath\");\n  process.exit(0);\n}\nconsole.error(\"FAIL: top-level fsModuleCache: true was ignored and no module cache was written\");\nprocess.exit(1);\n",
+            "expect": "fail",
+            "error": "FAIL: top-level fsModuleCache: true was ignored and no module cache was written"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 renamed `experimental.fsModuleCache` to `fsModuleCache`. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#45",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7S47VK72XW1X8N56TK",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "test.each",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/eachunicode\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"each.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test.each([{ ω: 1 }, { ω: 2 }])('value is $ω', ({ ω }) => {\",\n  \"  expect(ω).toBeGreaterThan(0)\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = (report.testResults || []).flatMap((f) => (f.assertionResults || []).map((a) => a.title));\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (r.status === 0 && JSON.stringify(titles) === JSON.stringify([\"value is 1\", \"value is 2\"])) {\n  console.log(\"PASS: the $ω placeholder was replaced by each row's value\");\n  process.exit(0);\n}\nif (r.status === 0 && titles.length === 2 && titles.every((t) => t === \"value is $ω\")) {\n  console.error(\"FAIL: test.each left the non-ASCII placeholder unreplaced in the test title\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (titles \" + JSON.stringify(titles) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/eachunicode\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"each.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test.each([{ ω: 1 }, { ω: 2 }])('value is $ω', ({ ω }) => {\",\n  \"  expect(ω).toBeGreaterThan(0)\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst titles = (report.testResults || []).flatMap((f) => (f.assertionResults || []).map((a) => a.title));\nconsole.log(\"titles: \" + JSON.stringify(titles));\nif (r.status === 0 && JSON.stringify(titles) === JSON.stringify([\"value is 1\", \"value is 2\"])) {\n  console.log(\"PASS: the $ω placeholder was replaced by each row's value\");\n  process.exit(0);\n}\nif (r.status === 0 && titles.length === 2 && titles.every((t) => t === \"value is $ω\")) {\n  console.error(\"FAIL: test.each left the non-ASCII placeholder unreplaced in the test title\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (titles \" + JSON.stringify(titles) + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: test.each left the non-ASCII placeholder unreplaced in the test title"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `test.each` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#46",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7T2S2672CZYS3XX80Y",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "Duration",
+      "signal": "silent",
+      "detail": "The Duration line of the summary breaks the run down into phases as percentages of tracked time.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/durationpct\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"sum.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('adds', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=default\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(/\\r?\\n/).find((l) => /^\\s*Duration\\s+\\S+\\s+\\(.*\\)\\s*$/.test(l));\nif (r.status !== 0 || !line) {\n  console.error(\"ERROR: no Duration summary line with a breakdown (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst parts = line.slice(line.indexOf(\"(\") + 1, line.lastIndexOf(\")\")).split(\",\").map((s) => s.trim());\nconsole.log(\"breakdown: \" + JSON.stringify(parts));\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+%$/.test(p))) {\n  console.log(\"PASS: the Duration breakdown is reported as percentages\");\n  process.exit(0);\n}\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+(\\.\\d+)?(ms|s|m)$/.test(p))) {\n  console.error(\"FAIL: the Duration breakdown is reported as times, not percentages\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Duration line: \" + line.trim());\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/durationpct\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"sum.test.mjs\"), [\n  \"import { test, expect } from 'vitest'\",\n  \"test('adds', () => { expect(1 + 1).toBe(2) })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=default\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(/\\r?\\n/).find((l) => /^\\s*Duration\\s+\\S+\\s+\\(.*\\)\\s*$/.test(l));\nif (r.status !== 0 || !line) {\n  console.error(\"ERROR: no Duration summary line with a breakdown (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst parts = line.slice(line.indexOf(\"(\") + 1, line.lastIndexOf(\")\")).split(\",\").map((s) => s.trim());\nconsole.log(\"breakdown: \" + JSON.stringify(parts));\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+%$/.test(p))) {\n  console.log(\"PASS: the Duration breakdown is reported as percentages\");\n  process.exit(0);\n}\nif (parts.length > 0 && parts.every((p) => /^[a-z]+ \\d+(\\.\\d+)?(ms|s|m)$/.test(p))) {\n  console.error(\"FAIL: the Duration breakdown is reported as times, not percentages\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected Duration line: \" + line.trim());\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: the Duration breakdown is reported as times, not percentages"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/improving-performance.md",
+            "quote": "The `Duration` line of the summary breaks the run down into phases, as percentages of all tracked time:"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `Duration` does. The Duration line of the summary breaks the run down into phases as percentages of tracked time. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#47",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7VRFDDT3WYH6FZDA2H",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "renamed",
+      "symbol": "experimental_parseSpecifications",
+      "replacement": "parseSpecifications",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/parsespecs\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => {})\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(dir, \"run.mjs\"), [\n  \"import { createVitest } from '/w/node_modules/vitest/dist/node.js'\",\n  \"const dir = '/w/parsespecs'\",\n  \"const vitest = await createVitest('test', { root: dir, config: false, watch: false })\",\n  \"const names = async (method) => {\",\n  \"  const spec = vitest.getRootProject().createSpecification(dir + '/math.test.mjs')\",\n  \"  const modules = await vitest[method]([spec])\",\n  \"  return [...modules[0].children.allTests()].map(t => t.fullName)\",\n  \"}\",\n  \"const result = { oldName: null, newType: typeof vitest.parseSpecifications, newName: null }\",\n  \"try { result.oldName = await names('experimental_parseSpecifications') } catch (e) { result.oldError = String(e) }\",\n  \"if (result.newType === 'function') {\",\n  \"  try { result.newName = await names('parseSpecifications') } catch (e) { result.newError = String(e) }\",\n  \"}\",\n  \"await vitest.close()\",\n  \"console.log('RESULT ' + JSON.stringify(result))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [path.join(dir, \"run.mjs\")], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(\"\\n\").find(l => l.startsWith(\"RESULT \"));\nif (!line) {\n  console.error(\"ERROR: script printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(line.slice(7));\nconst expected = JSON.stringify([\"math > adds\"]);\nif (JSON.stringify(res.oldName) !== expected) {\n  console.error(\"ERROR: experimental_parseSpecifications did not collect math > adds: \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.newType === \"undefined\") {\n  console.error(\"FAIL: vitest.parseSpecifications is undefined; only experimental_parseSpecifications exists\");\n  process.exit(1);\n}\nif (JSON.stringify(res.newName) === expected) {\n  console.log(\"PASS: parseSpecifications and experimental_parseSpecifications both collect math > adds\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/parsespecs\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"math.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('math', () => {\",\n  \"  test('adds', () => {})\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nfs.writeFileSync(path.join(dir, \"run.mjs\"), [\n  \"import { createVitest } from '/w/node_modules/vitest/dist/node.js'\",\n  \"const dir = '/w/parsespecs'\",\n  \"const vitest = await createVitest('test', { root: dir, config: false, watch: false })\",\n  \"const names = async (method) => {\",\n  \"  const spec = vitest.getRootProject().createSpecification(dir + '/math.test.mjs')\",\n  \"  const modules = await vitest[method]([spec])\",\n  \"  return [...modules[0].children.allTests()].map(t => t.fullName)\",\n  \"}\",\n  \"const result = { oldName: null, newType: typeof vitest.parseSpecifications, newName: null }\",\n  \"try { result.oldName = await names('experimental_parseSpecifications') } catch (e) { result.oldError = String(e) }\",\n  \"if (result.newType === 'function') {\",\n  \"  try { result.newName = await names('parseSpecifications') } catch (e) { result.newError = String(e) }\",\n  \"}\",\n  \"await vitest.close()\",\n  \"console.log('RESULT ' + JSON.stringify(result))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [path.join(dir, \"run.mjs\")], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst line = out.split(\"\\n\").find(l => l.startsWith(\"RESULT \"));\nif (!line) {\n  console.error(\"ERROR: script printed no result (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(line.slice(7));\nconst expected = JSON.stringify([\"math > adds\"]);\nif (JSON.stringify(res.oldName) !== expected) {\n  console.error(\"ERROR: experimental_parseSpecifications did not collect math > adds: \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.newType === \"undefined\") {\n  console.error(\"FAIL: vitest.parseSpecifications is undefined; only experimental_parseSpecifications exists\");\n  process.exit(1);\n}\nif (JSON.stringify(res.newName) === expected) {\n  console.log(\"PASS: parseSpecifications and experimental_parseSpecifications both collect math > adds\");\n  process.exit(0);\n}\nconsole.error(\"ERROR: unexpected result \" + JSON.stringify(res));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: vitest.parseSpecifications is undefined; only experimental_parseSpecifications exists"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 renamed `experimental_parseSpecifications` to `parseSpecifications`. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#48",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7WTJ553R48T42YM69X",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "renamed",
+      "symbol": "experimental_clearCache",
+      "replacement": "clearCache",
+      "signal": "silent",
+      "detail": "The experimental experimental_clearCache method is available as clearCache since Vitest 5.0.0.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/clearcache\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), JSON.stringify({ name: \"cc\", type: \"module\" }));\nfs.writeFileSync(path.join(dir, \"check.mjs\"), [\n  \"import { createVitest } from '/w/node_modules/vitest/dist/node.js'\",\n  \"const v = await createVitest('test', { watch: false, root: \" + JSON.stringify(dir) + \", config: false })\",\n  \"const r = { clearCache: typeof v.clearCache, old: typeof v.experimental_clearCache }\",\n  \"if (typeof v.clearCache === 'function') {\",\n  \"  try { await v.clearCache(); r.called = 'ok' } catch (e) { r.called = 'threw: ' + e.message }\",\n  \"}\",\n  \"await v.close()\",\n  \"console.log('RESULT ' + JSON.stringify(r))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst p = cp.spawnSync(process.execPath, [path.join(dir, \"check.mjs\")], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (p.stdout || \"\") + (p.stderr || \"\") + (p.error ? String(p.error) : \"\");\nconsole.log(out);\nconst m = out.match(/RESULT (\\{.*\\})/);\nif (!m) {\n  console.error(\"ERROR: createVitest check did not finish (exit \" + p.status + \")\");\n  process.exit(2);\n}\nconst r = JSON.parse(m[1]);\nif (r.clearCache === \"function\" && r.called === \"ok\") {\n  console.log(\"PASS: vitest.clearCache() resolved\");\n  process.exit(0);\n}\nif (r.clearCache === \"undefined\" && r.old === \"function\") {\n  console.error(\"FAIL: vitest.clearCache is undefined, only experimental_clearCache exists\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + m[1]);\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/clearcache\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"package.json\"), JSON.stringify({ name: \"cc\", type: \"module\" }));\nfs.writeFileSync(path.join(dir, \"check.mjs\"), [\n  \"import { createVitest } from '/w/node_modules/vitest/dist/node.js'\",\n  \"const v = await createVitest('test', { watch: false, root: \" + JSON.stringify(dir) + \", config: false })\",\n  \"const r = { clearCache: typeof v.clearCache, old: typeof v.experimental_clearCache }\",\n  \"if (typeof v.clearCache === 'function') {\",\n  \"  try { await v.clearCache(); r.called = 'ok' } catch (e) { r.called = 'threw: ' + e.message }\",\n  \"}\",\n  \"await v.close()\",\n  \"console.log('RESULT ' + JSON.stringify(r))\",\n  \"process.exit(0)\",\n].join(\"\\n\") + \"\\n\");\nconst p = cp.spawnSync(process.execPath, [path.join(dir, \"check.mjs\")], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (p.stdout || \"\") + (p.stderr || \"\") + (p.error ? String(p.error) : \"\");\nconsole.log(out);\nconst m = out.match(/RESULT (\\{.*\\})/);\nif (!m) {\n  console.error(\"ERROR: createVitest check did not finish (exit \" + p.status + \")\");\n  process.exit(2);\n}\nconst r = JSON.parse(m[1]);\nif (r.clearCache === \"function\" && r.called === \"ok\") {\n  console.log(\"PASS: vitest.clearCache() resolved\");\n  process.exit(0);\n}\nif (r.clearCache === \"undefined\" && r.old === \"function\") {\n  console.error(\"FAIL: vitest.clearCache is undefined, only experimental_clearCache exists\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result \" + m[1]);\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: vitest.clearCache is undefined, only experimental_clearCache exists"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/advanced/vitest.md",
+            "quote": "This was available since Vitest 4.0.11 as experimental `experimental_clearCache` method."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 renamed `experimental_clearCache` to `clearCache`. The experimental experimental_clearCache method is available as clearCache since Vitest 5.0.0. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#5",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7X0XSZZGNVZB0EC2KW",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "Locator",
+      "signal": "loud",
+      "detail": "Vitest automatically serializes a Locator argument passed to a command.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/browser/locators.md",
+            "quote": "Vitest automatically serializes any `Locator` argument passed to a command, so calling `serialize()` explicitly is rarely necessary."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "vitest >=5.0.0 changed what `Locator` does. Vitest automatically serializes a Locator argument passed to a command."
+  },
+  {
+    "entry": "5.0.0#53",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7YTRW1TZ62J6D4C3BD",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "added",
+      "symbol": "autoUpdate",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "@vitest/coverage-v8": "5.0.0",
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/autoupdate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nconst callsFile = path.join(dir, \"calls.jsonl\");\nwrite(\"src/sum.mjs\", \"export function sum(a, b) {\\n  return a + b\\n}\\n\");\nwrite(\"test/sum.test.mjs\", [\n  \"import { test, expect } from 'vitest'\",\n  \"import { sum } from '../src/sum.mjs'\",\n  \"test('sum', () => { expect(sum(1, 2)).toBe(3) })\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"vitest.config.mjs\", [\n  \"import { appendFileSync } from 'node:fs'\",\n  \"import { defineConfig } from 'vitest/config'\",\n  \"export default defineConfig({\",\n  \"  test: {\",\n  \"    coverage: {\",\n  \"      enabled: true,\",\n  \"      provider: 'v8',\",\n  \"      include: ['src/**'],\",\n  \"      reporter: ['text'],\",\n  \"      thresholds: {\",\n  \"        lines: 10,\",\n  \"        autoUpdate: (...args) => {\",\n  \"          appendFileSync(\" + JSON.stringify(callsFile) + \", JSON.stringify({ count: args.length, newThreshold: args[0], previousThreshold: args[1] === undefined ? 'undefined' : args[1] }) + '\\\\n')\",\n  \"          return Math.floor(args[0])\",\n  \"        },\",\n  \"      },\",\n  \"    },\",\n  \"  },\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 70000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nif (!fs.existsSync(callsFile)) {\n  console.error(\"ERROR: autoUpdate function was never called (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst calls = fs.readFileSync(callsFile, \"utf8\").trim().split(\"\\n\").map((l) => JSON.parse(l));\nconsole.log(\"autoUpdate calls: \" + JSON.stringify(calls));\nif (calls.length !== 1 || calls[0].newThreshold !== 100) {\n  console.error(\"ERROR: expected one autoUpdate call for lines 100, got \" + JSON.stringify(calls));\n  process.exit(2);\n}\nconst c = calls[0];\nif (c.count === 2 && c.previousThreshold === 10) {\n  console.log(\"PASS: autoUpdate received (100, 10): new and previous threshold\");\n  process.exit(0);\n}\nif (c.count === 1 && c.previousThreshold === \"undefined\") {\n  console.error(\"FAIL: autoUpdate received only the new threshold, no previous threshold\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected autoUpdate call \" + JSON.stringify(c));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "@vitest/coverage-v8": "4.1.11",
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/autoupdate\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nconst callsFile = path.join(dir, \"calls.jsonl\");\nwrite(\"src/sum.mjs\", \"export function sum(a, b) {\\n  return a + b\\n}\\n\");\nwrite(\"test/sum.test.mjs\", [\n  \"import { test, expect } from 'vitest'\",\n  \"import { sum } from '../src/sum.mjs'\",\n  \"test('sum', () => { expect(sum(1, 2)).toBe(3) })\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"vitest.config.mjs\", [\n  \"import { appendFileSync } from 'node:fs'\",\n  \"import { defineConfig } from 'vitest/config'\",\n  \"export default defineConfig({\",\n  \"  test: {\",\n  \"    coverage: {\",\n  \"      enabled: true,\",\n  \"      provider: 'v8',\",\n  \"      include: ['src/**'],\",\n  \"      reporter: ['text'],\",\n  \"      thresholds: {\",\n  \"        lines: 10,\",\n  \"        autoUpdate: (...args) => {\",\n  \"          appendFileSync(\" + JSON.stringify(callsFile) + \", JSON.stringify({ count: args.length, newThreshold: args[0], previousThreshold: args[1] === undefined ? 'undefined' : args[1] }) + '\\\\n')\",\n  \"          return Math.floor(args[0])\",\n  \"        },\",\n  \"      },\",\n  \"    },\",\n  \"  },\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 70000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nif (!fs.existsSync(callsFile)) {\n  console.error(\"ERROR: autoUpdate function was never called (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst calls = fs.readFileSync(callsFile, \"utf8\").trim().split(\"\\n\").map((l) => JSON.parse(l));\nconsole.log(\"autoUpdate calls: \" + JSON.stringify(calls));\nif (calls.length !== 1 || calls[0].newThreshold !== 100) {\n  console.error(\"ERROR: expected one autoUpdate call for lines 100, got \" + JSON.stringify(calls));\n  process.exit(2);\n}\nconst c = calls[0];\nif (c.count === 2 && c.previousThreshold === 10) {\n  console.log(\"PASS: autoUpdate received (100, 10): new and previous threshold\");\n  process.exit(0);\n}\nif (c.count === 1 && c.previousThreshold === \"undefined\") {\n  console.error(\"FAIL: autoUpdate received only the new threshold, no previous threshold\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected autoUpdate call \" + JSON.stringify(c));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: autoUpdate received only the new threshold, no previous threshold"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/coverage.md",
+            "quote": "autoUpdate: (newThreshold, previousThreshold) => {"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "test",
+    "claim": "vitest >=5.0.0 added `autoUpdate`. Older versions don't have it."
+  },
+  {
+    "entry": "5.0.0#59",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG7Z4JEZJND8A7D4HC23",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "sequence.concurrent",
+      "signal": "silent",
+      "detail": "Set concurrent to false to opt out of concurrency inherited from sequence.concurrent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/seqconc\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"order.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"import { appendFileSync } from 'node:fs'\",\n  \"const delay = (ms) => new Promise((r) => setTimeout(r, ms))\",\n  \"const log = (s) => appendFileSync(new URL('./order.txt', import.meta.url), s)\",\n  \"test('slow', { concurrent: false }, async () => { await delay(400); log('slow,') })\",\n  \"test('fast', { concurrent: false }, async () => { await delay(20); log('fast,') })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--sequence.concurrent\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst orderFile = path.join(dir, \"order.txt\");\nif (r.status !== 0 || !fs.existsSync(orderFile)) {\n  console.error(\"ERROR: vitest run did not pass or wrote no order (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst order = fs.readFileSync(orderFile, \"utf8\");\nconsole.log(\"completion order: \" + order);\nif (order === \"slow,fast,\") {\n  console.log(\"PASS: tests with concurrent: false ran one after another under --sequence.concurrent\");\n  process.exit(0);\n}\nif (order === \"fast,slow,\") {\n  console.error(\"FAIL: tests with concurrent: false still ran concurrently under --sequence.concurrent\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected completion order \" + JSON.stringify(order));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/seqconc\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"order.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"import { appendFileSync } from 'node:fs'\",\n  \"const delay = (ms) => new Promise((r) => setTimeout(r, ms))\",\n  \"const log = (s) => appendFileSync(new URL('./order.txt', import.meta.url), s)\",\n  \"test('slow', { concurrent: false }, async () => { await delay(400); log('slow,') })\",\n  \"test('fast', { concurrent: false }, async () => { await delay(20); log('fast,') })\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--sequence.concurrent\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst orderFile = path.join(dir, \"order.txt\");\nif (r.status !== 0 || !fs.existsSync(orderFile)) {\n  console.error(\"ERROR: vitest run did not pass or wrote no order (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst order = fs.readFileSync(orderFile, \"utf8\");\nconsole.log(\"completion order: \" + order);\nif (order === \"slow,fast,\") {\n  console.log(\"PASS: tests with concurrent: false ran one after another under --sequence.concurrent\");\n  process.exit(0);\n}\nif (order === \"fast,slow,\") {\n  console.error(\"FAIL: tests with concurrent: false still ran concurrently under --sequence.concurrent\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected completion order \" + JSON.stringify(order));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: tests with concurrent: false still ran concurrently under --sequence.concurrent"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/api/test.md",
+            "quote": "Set `concurrent` to `false` to opt out of concurrency inherited from [`describe.concurrent`](/api/describe#describe-concurrent) or [`sequence.concurrent`](/config/sequence#sequence-concurrent):"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `sequence.concurrent` does. Set concurrent to false to opt out of concurrency inherited from sequence.concurrent. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#60",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG802CCQTZRAWF342ATT",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "tags",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/tagtimeout\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"vitest.config.mjs\"),\n  \"export default { test: { tags: [{ name: 'slow', timeout: 10000 }] } }\\n\");\nfs.writeFileSync(path.join(dir, \"slow.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('suite', { timeout: 500 }, () => {\",\n  \"  test('waits', { tags: ['slow'] }, async () => { await new Promise(r => setTimeout(r, 1500)) })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst results = (report.testResults || []).flatMap(f => f.assertionResults || []);\nconst t = results.find(a => a.title === \"waits\");\nif (!t) {\n  console.error(\"ERROR: test waits not found in report\");\n  process.exit(2);\n}\nconst msgs = (t.failureMessages || []).join(\"\\n\");\nconsole.log(\"status \" + t.status + \"; \" + msgs);\nif (t.status === \"passed\" && r.status === 0) {\n  console.log(\"PASS: tag timeout 10000 overrode suite timeout 500\");\n  process.exit(0);\n}\nif (t.status === \"failed\" && /timed out in 500ms/i.test(msgs)) {\n  console.error(\"FAIL: suite timeout 500 overrode the tag timeout 10000 and the test timed out\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (status \" + t.status + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/tagtimeout\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"vitest.config.mjs\"),\n  \"export default { test: { tags: [{ name: 'slow', timeout: 10000 }] } }\\n\");\nfs.writeFileSync(path.join(dir, \"slow.test.mjs\"), [\n  \"import { describe, test } from 'vitest'\",\n  \"describe('suite', { timeout: 500 }, () => {\",\n  \"  test('waits', { tags: ['slow'] }, async () => { await new Promise(r => setTimeout(r, 1500)) })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=json\", \"--outputFile=report.json\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst results = (report.testResults || []).flatMap(f => f.assertionResults || []);\nconst t = results.find(a => a.title === \"waits\");\nif (!t) {\n  console.error(\"ERROR: test waits not found in report\");\n  process.exit(2);\n}\nconst msgs = (t.failureMessages || []).join(\"\\n\");\nconsole.log(\"status \" + t.status + \"; \" + msgs);\nif (t.status === \"passed\" && r.status === 0) {\n  console.log(\"PASS: tag timeout 10000 overrode suite timeout 500\");\n  process.exit(0);\n}\nif (t.status === \"failed\" && /timed out in 500ms/i.test(msgs)) {\n  console.error(\"FAIL: suite timeout 500 overrode the tag timeout 10000 and the test timed out\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (status \" + t.status + \", exit \" + r.status + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: suite timeout 500 overrode the tag timeout 10000 and the test timed out"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `tags` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#63",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG81889PK8ME0PB6YF1A",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "attachmentsDir",
+      "signal": "silent",
+      "detail": "attachmentsDir is resolved relative to the root Vitest config; it cannot be configured per project.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/attroot\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction listFiles(d) {\n  if (!fs.existsSync(d)) return [];\n  return fs.readdirSync(d, { recursive: true }).filter(f => fs.statSync(path.join(d, f)).isFile());\n}\n\nwrite(\"vitest.config.mjs\", \"export default { test: { attachmentsDir: 'root-att', projects: ['./packages/a'] } }\\n\");\nwrite(\"packages/a/vitest.config.mjs\", \"export default { test: { attachmentsDir: 'proj-att', include: ['*.test.mjs'] } }\\n\");\nwrite(\"packages/a/hello.txt\", \"HELLO\");\nwrite(\"packages/a/basic.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"test('hello', async ({ annotate }) => {\",\n  \"  await annotate('hello annotation', { path: './hello.txt' })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\n\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\n\nconst rootFiles = listFiles(path.join(dir, \"root-att\"));\nconst projFiles = listFiles(path.join(dir, \"packages/a/proj-att\"));\nconst state = \"root-att files: \" + rootFiles.length + \", packages/a/proj-att files: \" + projFiles.length + \", exit \" + r.status;\nconsole.log(state);\nif (r.status === 0 && rootFiles.length === 1 && projFiles.length === 0) {\n  console.log(\"PASS: the project's attachment was stored in the root attachmentsDir\");\n  process.exit(0);\n}\nif (r.status === 0 && rootFiles.length === 0 && projFiles.length === 1) {\n  console.error(\"FAIL: the project's attachment was stored in the project-level attachmentsDir, not the root one\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (\" + state + \")\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/attroot\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction listFiles(d) {\n  if (!fs.existsSync(d)) return [];\n  return fs.readdirSync(d, { recursive: true }).filter(f => fs.statSync(path.join(d, f)).isFile());\n}\n\nwrite(\"vitest.config.mjs\", \"export default { test: { attachmentsDir: 'root-att', projects: ['./packages/a'] } }\\n\");\nwrite(\"packages/a/vitest.config.mjs\", \"export default { test: { attachmentsDir: 'proj-att', include: ['*.test.mjs'] } }\\n\");\nwrite(\"packages/a/hello.txt\", \"HELLO\");\nwrite(\"packages/a/basic.test.mjs\", [\n  \"import { test } from 'vitest'\",\n  \"test('hello', async ({ annotate }) => {\",\n  \"  await annotate('hello annotation', { path: './hello.txt' })\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\n\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\n\nconst rootFiles = listFiles(path.join(dir, \"root-att\"));\nconst projFiles = listFiles(path.join(dir, \"packages/a/proj-att\"));\nconst state = \"root-att files: \" + rootFiles.length + \", packages/a/proj-att files: \" + projFiles.length + \", exit \" + r.status;\nconsole.log(state);\nif (r.status === 0 && rootFiles.length === 1 && projFiles.length === 0) {\n  console.log(\"PASS: the project's attachment was stored in the root attachmentsDir\");\n  process.exit(0);\n}\nif (r.status === 0 && rootFiles.length === 0 && projFiles.length === 1) {\n  console.error(\"FAIL: the project's attachment was stored in the project-level attachmentsDir, not the root one\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected result (\" + state + \")\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: the project's attachment was stored in the project-level attachmentsDir, not the root one"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/config/attachmentsdir.md",
+            "quote": "This option is resolved relative to the root Vitest config. When using [`projects`](/guide/projects), all projects share the same `attachmentsDir`; it cannot be configured per project."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `attachmentsDir` does. attachmentsDir is resolved relative to the root Vitest config; it cannot be configured per project. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#64",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG82JPBFNAFXD3EQXH8Y",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "__esModule",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/interop\";\nconst dep = \"/w/node_modules/esmodule-false-dep\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.mkdirSync(dep, { recursive: true });\nfs.writeFileSync(path.join(dep, \"package.json\"), JSON.stringify({ name: \"esmodule-false-dep\", version: \"1.0.0\", type: \"commonjs\", main: \"index.js\" }));\n// A CommonJS dependency that sets __esModule to a falsy value\nfs.writeFileSync(path.join(dep, \"index.js\"), \"exports.__esModule = false\\nexports.test = 'hello'\\n\");\nfs.writeFileSync(path.join(dir, \"package.json\"), JSON.stringify({ name: \"interop\", private: true, type: \"module\" }));\nfs.writeFileSync(path.join(dir, \"interop.test.js\"), [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"import * as ns from 'esmodule-false-dep'\",\n  \"test('interop', () => {\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ keys: Object.keys(ns), test: ns.test, defaultTest: ns.default && ns.default.test }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(\"namespace keys: \" + JSON.stringify(res.keys));\nif (res.test !== \"hello\" || res.defaultTest !== \"hello\") {\n  console.error(\"ERROR: unexpected import result \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.keys.includes(\"default\")) {\n  console.log(\"PASS: with __esModule = false the namespace keeps a default key holding module.exports\");\n  process.exit(0);\n}\nif (res.keys.includes(\"__esModule\") && res.keys.includes(\"test\")) {\n  console.error(\"FAIL: __esModule = false still triggered interop; the namespace has no default key\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected namespace keys \" + JSON.stringify(res.keys));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/interop\";\nconst dep = \"/w/node_modules/esmodule-false-dep\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.mkdirSync(dep, { recursive: true });\nfs.writeFileSync(path.join(dep, \"package.json\"), JSON.stringify({ name: \"esmodule-false-dep\", version: \"1.0.0\", type: \"commonjs\", main: \"index.js\" }));\n// A CommonJS dependency that sets __esModule to a falsy value\nfs.writeFileSync(path.join(dep, \"index.js\"), \"exports.__esModule = false\\nexports.test = 'hello'\\n\");\nfs.writeFileSync(path.join(dir, \"package.json\"), JSON.stringify({ name: \"interop\", private: true, type: \"module\" }));\nfs.writeFileSync(path.join(dir, \"interop.test.js\"), [\n  \"import { test } from 'vitest'\",\n  \"import { writeFileSync } from 'node:fs'\",\n  \"import * as ns from 'esmodule-false-dep'\",\n  \"test('interop', () => {\",\n  \"  writeFileSync(new URL('./result.json', import.meta.url), JSON.stringify({ keys: Object.keys(ns), test: ns.test, defaultTest: ns.default && ns.default.test }))\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconsole.log((r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\"));\nconst resultFile = path.join(dir, \"result.json\");\nif (!fs.existsSync(resultFile)) {\n  console.error(\"ERROR: the test file did not run (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst res = JSON.parse(fs.readFileSync(resultFile, \"utf8\"));\nconsole.log(\"namespace keys: \" + JSON.stringify(res.keys));\nif (res.test !== \"hello\" || res.defaultTest !== \"hello\") {\n  console.error(\"ERROR: unexpected import result \" + JSON.stringify(res));\n  process.exit(2);\n}\nif (res.keys.includes(\"default\")) {\n  console.log(\"PASS: with __esModule = false the namespace keeps a default key holding module.exports\");\n  process.exit(0);\n}\nif (res.keys.includes(\"__esModule\") && res.keys.includes(\"test\")) {\n  console.error(\"FAIL: __esModule = false still triggered interop; the namespace has no default key\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected namespace keys \" + JSON.stringify(res.keys));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: __esModule = false still triggered interop; the namespace has no default key"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `__esModule` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#77",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG832E4ZJGSVN1F0WMXD",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "--includeTaskLocation",
+      "signal": "silent",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/taskloc\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"loc.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"\",\n  \"test('adds', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=verbose\", \"--includeTaskLocation\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst m = out.match(/loc\\.test\\.mjs:(\\d+)(:\\d+)? > adds/);\nif (!m || m[1] !== \"3\") {\n  console.error(\"ERROR: no location loc.test.mjs:3 for test adds in output (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (m[2]) {\n  console.error(\"FAIL: --includeTaskLocation printed the column after the line number\");\n  process.exit(1);\n}\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest exited \" + r.status);\n  process.exit(2);\n}\nconsole.log(\"PASS: --includeTaskLocation printed only the line: \" + m[0]);\nprocess.exit(0);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/taskloc\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfs.writeFileSync(path.join(dir, \"loc.test.mjs\"), [\n  \"import { test } from 'vitest'\",\n  \"\",\n  \"test('adds', () => {})\",\n].join(\"\\n\") + \"\\n\");\nconst r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", \"run\", \"--reporter=verbose\", \"--includeTaskLocation\"], {\n  cwd: dir,\n  encoding: \"utf8\",\n  env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n  timeout: 60000,\n});\nconst out = (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\");\nconsole.log(out);\nconst m = out.match(/loc\\.test\\.mjs:(\\d+)(:\\d+)? > adds/);\nif (!m || m[1] !== \"3\") {\n  console.error(\"ERROR: no location loc.test.mjs:3 for test adds in output (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (m[2]) {\n  console.error(\"FAIL: --includeTaskLocation printed the column after the line number\");\n  process.exit(1);\n}\nif (r.status !== 0) {\n  console.error(\"ERROR: vitest exited \" + r.status);\n  process.exit(2);\n}\nconsole.log(\"PASS: --includeTaskLocation printed only the line: \" + m[0]);\nprocess.exit(0);\n",
+            "expect": "fail",
+            "error": "FAIL: --includeTaskLocation printed the column after the line number"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/vitest-dev/vitest/v5.0.0/docs/guide/reporters.md",
+            "quote": "An example with `--includeTaskLocation`:\n\n```bash\n✓ __tests__/file1.test.ts:2 > first test file > 2 + 2 should equal 4 1ms"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `--includeTaskLocation` does. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "5.0.0#84",
+    "lesson": {
+      "format": 1,
+      "id": "01M4R8TG84R9XPZ16Q69K5NCCK",
+      "subject": "vitest",
+      "package": {
+        "ecosystem": "npm",
+        "name": "vitest"
+      },
+      "versions": ">=5.0.0",
+      "kind": "behavior",
+      "symbol": "globalSetup",
+      "signal": "loud",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "5.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/teardownexit\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"globalSetup.mjs\", [\n  \"export default function () {\",\n  \"  return () => {\",\n  \"    throw new Error('teardown error')\",\n  \"  }\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    globalSetup: ['./globalSetup.mjs'],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"example.test.mjs\", [\n  \"import { expect, test } from 'vitest'\",\n  \"test('example test', () => {\",\n  \"  expect(1 + 1).toBe(2)\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst counts = \"total \" + report.numTotalTests + \", passed \" + report.numPassedTests + \", failed \" + report.numFailedTests;\nconsole.log(counts);\nif (report.numTotalTests !== 1 || report.numPassedTests !== 1) {\n  console.error(\"ERROR: the test did not pass (\" + counts + \", exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (!r.out.includes(\"teardown error\")) {\n  console.error(\"ERROR: the globalSetup teardown error was not reported (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (r.status === 1) {\n  console.log(\"PASS: vitest run exited 1 when the globalSetup teardown threw\");\n  process.exit(0);\n}\nif (r.status === 0) {\n  console.error(\"FAIL: vitest run exited 0 although the globalSetup teardown threw\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected exit code \" + r.status);\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "vitest": "4.1.11"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst cp = require(\"child_process\");\nconst dir = \"/w/teardownexit\";\nfs.rmSync(dir, { recursive: true, force: true });\nfs.mkdirSync(dir, { recursive: true });\nfunction write(file, text) {\n  const p = path.join(dir, file);\n  fs.mkdirSync(path.dirname(p), { recursive: true });\n  fs.writeFileSync(p, text);\n}\nfunction vitest(args, cwd) {\n  const r = cp.spawnSync(process.execPath, [\"/w/node_modules/vitest/vitest.mjs\", ...args], {\n    cwd: cwd || dir,\n    encoding: \"utf8\",\n    env: { ...process.env, NO_COLOR: \"1\", CI: \"1\" },\n    timeout: 60000,\n  });\n  return { status: r.status, out: (r.stdout || \"\") + (r.stderr || \"\") + (r.error ? String(r.error) : \"\") };\n}\n\nwrite(\"globalSetup.mjs\", [\n  \"export default function () {\",\n  \"  return () => {\",\n  \"    throw new Error('teardown error')\",\n  \"  }\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"vitest.config.mjs\", [\n  \"export default {\",\n  \"  test: {\",\n  \"    globalSetup: ['./globalSetup.mjs'],\",\n  \"  },\",\n  \"}\",\n].join(\"\\n\") + \"\\n\");\nwrite(\"example.test.mjs\", [\n  \"import { expect, test } from 'vitest'\",\n  \"test('example test', () => {\",\n  \"  expect(1 + 1).toBe(2)\",\n  \"})\",\n].join(\"\\n\") + \"\\n\");\nconst r = vitest([\"run\", \"--reporter=json\", \"--outputFile=report.json\"]);\nconsole.log(r.out);\nconst reportFile = path.join(dir, \"report.json\");\nif (!fs.existsSync(reportFile)) {\n  console.error(\"ERROR: vitest wrote no JSON report (exit \" + r.status + \")\");\n  process.exit(2);\n}\nconst report = JSON.parse(fs.readFileSync(reportFile, \"utf8\"));\nconst counts = \"total \" + report.numTotalTests + \", passed \" + report.numPassedTests + \", failed \" + report.numFailedTests;\nconsole.log(counts);\nif (report.numTotalTests !== 1 || report.numPassedTests !== 1) {\n  console.error(\"ERROR: the test did not pass (\" + counts + \", exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (!r.out.includes(\"teardown error\")) {\n  console.error(\"ERROR: the globalSetup teardown error was not reported (exit \" + r.status + \")\");\n  process.exit(2);\n}\nif (r.status === 1) {\n  console.log(\"PASS: vitest run exited 1 when the globalSetup teardown threw\");\n  process.exit(0);\n}\nif (r.status === 0) {\n  console.error(\"FAIL: vitest run exited 0 although the globalSetup teardown threw\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected exit code \" + r.status);\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: vitest run exited 0 although the globalSetup teardown threw"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T14:38:46Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "vitest >=5.0.0 changed what `globalSetup` does."
+  }
+]

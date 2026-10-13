@@ -1,0 +1,96 @@
+{
+  "package": "vitest",
+  "range": "5.0.0",
+  "versions": 1,
+  "entries": 140,
+  "triaged": 140,
+  "candidates": 71,
+  "candidates_by_kind": {
+    "default": 7,
+    "behavior": 36,
+    "deprecated": 1,
+    "renamed": 3,
+    "removed": 7,
+    "added": 17
+  },
+  "candidates_silent": 49,
+  "skipped_by_reason": {
+    "fix": 46,
+    "unclear": 3,
+    "internal": 20
+  },
+  "drafted": 34,
+  "draft_skipped": 5,
+  "draft_errors": 0,
+  "draft_cost_usd": 18.14,
+  "rounds": [
+    {
+      "round": 0,
+      "drafts": 34,
+      "local_checks_passed": 24,
+      "differential": 22,
+      "reviewed": 24,
+      "review_findings": 54,
+      "reviewed_clean": 6,
+      "review_cost_usd": 1.5
+    },
+    {
+      "round": 1,
+      "drafts": 34,
+      "local_checks_passed": 34,
+      "differential": 29,
+      "reviewed": 29,
+      "review_findings": 82,
+      "reviewed_clean": 1,
+      "review_kept_unchanged": 19,
+      "review_cost_usd": 0.67,
+      "revised_by_model": {
+        "claude-sonnet-5-5": {
+          "lessons": 10,
+          "cost_usd": 0.47
+        }
+      }
+    },
+    {
+      "round": 2,
+      "drafts": 28,
+      "local_checks_passed": 23,
+      "differential": 19,
+      "reviewed": 18,
+      "review_findings": 43,
+      "reviewed_clean": 3,
+      "review_kept_unchanged": 3,
+      "review_cost_usd": 0.99,
+      "revised_by_model": {
+        "claude-opus-5-5": {
+          "lessons": 26,
+          "cost_usd": 5.41
+        },
+        "claude-sonnet-5-5": {
+          "lessons": 2,
+          "cost_usd": 0.12
+        }
+      }
+    },
+    {
+      "round": 3,
+      "drafts": 28,
+      "local_checks_passed": 28,
+      "differential": 24,
+      "reviewed": 23,
+      "review_findings": 53,
+      "reviewed_clean": 5,
+      "review_kept_unchanged": 18,
+      "review_cost_usd": 0.33,
+      "revised_by_model": {
+        "claude-sonnet-5-5": {
+          "lessons": 5,
+          "cost_usd": 0.22
+        }
+      }
+    }
+  ],
+  "kept": 8,
+  "duplicates_of_main": 2,
+  "ci": []
+}

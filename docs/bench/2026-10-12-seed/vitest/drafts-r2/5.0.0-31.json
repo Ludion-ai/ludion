@@ -1,0 +1,49 @@
+{
+  "entry": "5.0.0#31",
+  "verdict": {
+    "id": "5.0.0#31",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "coverage.include",
+    "why": "The include/exclude globs were too eager and now match differently, which changes which files are covered."
+  },
+  "cost_usd": 0.7636978000000002,
+  "turns": 23,
+  "round": 2,
+  "model": "claude-opus-5-5",
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "vitest"
+    },
+    "versions": ">=5.0.0",
+    "kind": "behavior",
+    "symbol": "coverage.include",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "5.0.0"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nconst root = \"/w/covinclude\";\nfs.rmSync(root, { recursive: true, force: true });\nfs.mkdirSync(path.join(root, \"src\"), { recursive: true });\nfs.writeFileSync(path.join(root, \"src\", \"a.js\"), \"export const a = 1\\n\");\nfs.writeFileSync(path.join(root, \"src-file-in-root.js\"), \"export const b = 2\\n\");\n// A minimal custom coverage provider built on vitest's public BaseCoverageProvider.\nfs.writeFileSync(path.join(root, \"provider.mjs\"), [\n  \"const Base = globalThis.__ludionBaseCoverageProvider\",\n  \"class Provider extends Base {\",\n  \"  name = 'custom'\",\n  \"  initialize(ctx) { this.version = ctx.version; this._initialize(ctx) }\",\n  \"  resolveOptions() { return this.options }\",\n  \"  async clean() {}\",\n  \"  onAfterSuiteRun() {}\",\n  \"  async reportCoverage() {}\",\n  \"}\",\n  \"export default { getProvider() { return new Provider() } }\",\n].join(\"\\n\") + \"\\n\");\nsetTimeout(() => { console.error(\"ERROR: timed out\"); process.exit(2); }, 80000).unref();\n(async () => {\n  let inDir, sibling;\n  try {\n    const node = await import(pathToFileURL(\"/w/node_modules/vitest/dist/node.js\").href);\n    globalThis.__ludionBaseCoverageProvider = node.BaseCoverageProvider;\n    const vitest = await node.createVitest(\"test\", {\n      root,\n      config: false,\n      watch: false,\n      include: [\"dont-match-anything\"],\n      coverage: {\n        enabled: true,\n        provider: \"custom\",\n        customProviderModule: path.join(root, \"provider.mjs\"),\n        include: [\"src\"],\n      },\n    });\n    await vitest.initCoverageProvider();\n    const provider = vitest.coverageProvider;\n    if (!provider || typeof provider.isIncluded !== \"function\") {\n      console.error(\"ERROR: custom coverage provider was not created\");\n      process.exit(2);\n    }\n    inDir = provider.isIncluded(path.join(root, \"src\", \"a.js\"));\n    sibling = provider.isIncluded(path.join(root, \"src-file-in-root.js\"));\n    await vitest.close();\n  } catch (e) {\n    console.error(\"ERROR: \" + (e && e.stack || e));\n    process.exit(2);\n  }\n  console.log(\"coverage.include ['src']: src/a.js included=\" + inDir + \", src-file-in-root.js included=\" + sibling);\n  if (inDir !== true) {\n    console.error(\"ERROR: src/a.js was not included\");\n    process.exit(2);\n  }\n  if (sibling === false) {\n    console.log(\"PASS: coverage.include ['src'] matches only files inside the src directory\");\n    process.exit(0);\n  }\n  if (sibling === true) {\n    console.error(\"FAIL: coverage.include ['src'] also included src-file-in-root.js outside the src directory\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected isIncluded result \" + sibling);\n  process.exit(2);\n})();\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "vitest": "4.1.11"
+          },
+          "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nconst root = \"/w/covinclude\";\nfs.rmSync(root, { recursive: true, force: true });\nfs.mkdirSync(path.join(root, \"src\"), { recursive: true });\nfs.writeFileSync(path.join(root, \"src\", \"a.js\"), \"export const a = 1\\n\");\nfs.writeFileSync(path.join(root, \"src-file-in-root.js\"), \"export const b = 2\\n\");\n// A minimal custom coverage provider built on vitest's public BaseCoverageProvider.\nfs.writeFileSync(path.join(root, \"provider.mjs\"), [\n  \"const Base = globalThis.__ludionBaseCoverageProvider\",\n  \"class Provider extends Base {\",\n  \"  name = 'custom'\",\n  \"  initialize(ctx) { this.version = ctx.version; this._initialize(ctx) }\",\n  \"  resolveOptions() { return this.options }\",\n  \"  async clean() {}\",\n  \"  onAfterSuiteRun() {}\",\n  \"  async reportCoverage() {}\",\n  \"}\",\n  \"export default { getProvider() { return new Provider() } }\",\n].join(\"\\n\") + \"\\n\");\nsetTimeout(() => { console.error(\"ERROR: timed out\"); process.exit(2); }, 80000).unref();\n(async () => {\n  let inDir, sibling;\n  try {\n    const node = await import(pathToFileURL(\"/w/node_modules/vitest/dist/node.js\").href);\n    globalThis.__ludionBaseCoverageProvider = node.BaseCoverageProvider;\n    const vitest = await node.createVitest(\"test\", {\n      root,\n      config: false,\n      watch: false,\n      include: [\"dont-match-anything\"],\n      coverage: {\n        enabled: true,\n        provider: \"custom\",\n        customProviderModule: path.join(root, \"provider.mjs\"),\n        include: [\"src\"],\n      },\n    });\n    await vitest.initCoverageProvider();\n    const provider = vitest.coverageProvider;\n    if (!provider || typeof provider.isIncluded !== \"function\") {\n      console.error(\"ERROR: custom coverage provider was not created\");\n      process.exit(2);\n    }\n    inDir = provider.isIncluded(path.join(root, \"src\", \"a.js\"));\n    sibling = provider.isIncluded(path.join(root, \"src-file-in-root.js\"));\n    await vitest.close();\n  } catch (e) {\n    console.error(\"ERROR: \" + (e && e.stack || e));\n    process.exit(2);\n  }\n  console.log(\"coverage.include ['src']: src/a.js included=\" + inDir + \", src-file-in-root.js included=\" + sibling);\n  if (inDir !== true) {\n    console.error(\"ERROR: src/a.js was not included\");\n    process.exit(2);\n  }\n  if (sibling === false) {\n    console.log(\"PASS: coverage.include ['src'] matches only files inside the src directory\");\n    process.exit(0);\n  }\n  if (sibling === true) {\n    console.error(\"FAIL: coverage.include ['src'] also included src-file-in-root.js outside the src directory\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected isIncluded result \" + sibling);\n  process.exit(2);\n})();\n",
+          "expect": "fail",
+          "error": "FAIL: coverage.include ['src'] also included src-file-in-root.js outside the src directory"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

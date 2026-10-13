@@ -1,0 +1,16 @@
+{
+  "entry": "5.0.0#32",
+  "verdict": {
+    "id": "5.0.0#32",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "toThrow",
+    "why": "toThrow(\"\") behavior is reverted, so the same assertion gives a different result."
+  },
+  "cost_usd": 0.13003900000000002,
+  "turns": 9,
+  "round": 2,
+  "model": "claude-opus-5-5",
+  "skip": "sources/ has no quotable page, so the lesson cannot have a quote or a detail narrowing it to toThrow('') with an empty string, and a bare toThrow symbol overstates the change."
+}

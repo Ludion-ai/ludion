@@ -1,0 +1,54 @@
+{
+  "entry": "4.122.0#4",
+  "verdict": {
+    "id": "4.122.0#4",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "wrangler setup",
+    "why": "Generated configs no longer include nodejs_compat for compatibility dates 2026-08-04 or later, and wrangler setup removes an existing flag."
+  },
+  "cost_usd": 0.3064367,
+  "turns": 22,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "wrangler"
+    },
+    "versions": ">=4.122.0",
+    "kind": "behavior",
+    "symbol": "nodejs_compat",
+    "signal": "silent",
+    "detail": "wrangler setup writes today's date as the compatibility_date, and from 2026-08-04 that already enables nodejs_compat",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.122.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nlet a = src.indexOf(\"function ensureNodejsCompatIsEnabled(\");\nif (a < 0) a = src.indexOf(\"function ensureNodejsCompatIsInConfig(\");\nif (a < 0) broken(\"generated-config helper not found\");\nconst b = src.indexOf(\"\\n}\\n\", a);\nif (b < 0) broken(\"end of helper not found\");\nconst name = /function (\\w+)\\(/.exec(src.slice(a, a + 80))[1];\nconst pre = 'const NODEJS_COMPAT_DEFAULT_ON_DATE = \"2026-08-04\";\\nfunction isNodejsCompatDefaultOn(d) { return d !== void 0 && d >= NODEJS_COMPAT_DEFAULT_ON_DATE; }\\n';\nlet fn;\ntry { fn = new Function(pre + src.slice(a, b + 3) + \"\\nreturn \" + name + \";\")(); } catch (e) { broken(\"cannot load helper: \" + e.message); }\nconst early = fn({ name: \"w\", compatibility_date: \"2026-08-01\" });\nif (!(early.compatibility_flags || []).includes(\"nodejs_compat\")) broken(\"early date did not get nodejs_compat\");\nconst late = fn({ name: \"w\", compatibility_date: \"2026-08-12\" });\nif ((late.compatibility_flags || []).includes(\"nodejs_compat\")) symptom(\"generated config for 2026-08-12 still adds nodejs_compat\");\nconsole.log(\"OK: no nodejs_compat added for 2026-08-12\");\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "wrangler": "4.121.0"
+          },
+          "code": "const fs = require(\"fs\");\nfunction symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst src = fs.readFileSync(\"/w/node_modules/wrangler/wrangler-dist/cli.js\", \"utf8\");\nlet a = src.indexOf(\"function ensureNodejsCompatIsEnabled(\");\nif (a < 0) a = src.indexOf(\"function ensureNodejsCompatIsInConfig(\");\nif (a < 0) broken(\"generated-config helper not found\");\nconst b = src.indexOf(\"\\n}\\n\", a);\nif (b < 0) broken(\"end of helper not found\");\nconst name = /function (\\w+)\\(/.exec(src.slice(a, a + 80))[1];\nconst pre = 'const NODEJS_COMPAT_DEFAULT_ON_DATE = \"2026-08-04\";\\nfunction isNodejsCompatDefaultOn(d) { return d !== void 0 && d >= NODEJS_COMPAT_DEFAULT_ON_DATE; }\\n';\nlet fn;\ntry { fn = new Function(pre + src.slice(a, b + 3) + \"\\nreturn \" + name + \";\")(); } catch (e) { broken(\"cannot load helper: \" + e.message); }\nconst early = fn({ name: \"w\", compatibility_date: \"2026-08-01\" });\nif (!(early.compatibility_flags || []).includes(\"nodejs_compat\")) broken(\"early date did not get nodejs_compat\");\nconst late = fn({ name: \"w\", compatibility_date: \"2026-08-12\" });\nif ((late.compatibility_flags || []).includes(\"nodejs_compat\")) symptom(\"generated config for 2026-08-12 still adds nodejs_compat\");\nconsole.log(\"OK: no nodejs_compat added for 2026-08-12\");\n",
+          "expect": "fail",
+          "error": "FAIL: generated config for 2026-08-12 still adds nodejs_compat"
+        }
+      },
+      {
+        "source": {
+          "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/wrangler@4.122.0/packages/wrangler/CHANGELOG.md",
+          "quote": "`create-cloudflare` and `wrangler setup` write today's date as the `compatibility_date`, and from `2026-08-04` that already enables `nodejs_compat`."
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

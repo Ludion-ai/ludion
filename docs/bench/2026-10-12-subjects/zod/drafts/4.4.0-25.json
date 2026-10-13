@@ -1,0 +1,47 @@
+{
+  "entry": "4.4.0#25",
+  "verdict": {
+    "id": "4.4.0#25",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "z.locales.it",
+    "why": "Italian validation messages changed, altering error message output."
+  },
+  "cost_usd": 0.3258492,
+  "turns": 17,
+  "draft": {
+    "package": {
+      "ecosystem": "npm",
+      "name": "zod"
+    },
+    "versions": ">=4.4.0",
+    "kind": "behavior",
+    "symbol": "z.locales.it",
+    "signal": "silent",
+    "evidence": [
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.4.0"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst { z } = require(\"zod\");\nif (!z.locales || typeof z.locales.it !== \"function\") broken(\"z.locales.it is not available\");\nz.config(z.locales.it());\nconst r = z.string().email().safeParse(\"not-an-email\");\nif (r.success) broken(\"invalid email was accepted\");\nconst msg = r.error.issues[0].message;\nif (/^Invalid /.test(msg)) symptom(\"z.locales.it gives an English message for an invalid email\");\nif (!msg.startsWith(\"Input non valido:\")) broken(\"unexpected message: \" + msg);\nconsole.log(\"OK: \" + msg);\n",
+          "expect": "pass"
+        }
+      },
+      {
+        "test": {
+          "runtime": "node@24",
+          "packages": {
+            "zod": "4.3.6"
+          },
+          "code": "function symptom(msg) { console.error(\"FAIL: \" + msg); process.exit(1); }\nfunction broken(msg) { console.error(\"ERROR: \" + msg); process.exit(2); }\nconst { z } = require(\"zod\");\nif (!z.locales || typeof z.locales.it !== \"function\") broken(\"z.locales.it is not available\");\nz.config(z.locales.it());\nconst r = z.string().email().safeParse(\"not-an-email\");\nif (r.success) broken(\"invalid email was accepted\");\nconst msg = r.error.issues[0].message;\nif (/^Invalid /.test(msg)) symptom(\"z.locales.it gives an English message for an invalid email\");\nif (!msg.startsWith(\"Input non valido:\")) broken(\"unexpected message: \" + msg);\nconsole.log(\"OK: \" + msg);\n",
+          "expect": "fail",
+          "error": "FAIL: z.locales.it gives an English message for an invalid email"
+        }
+      }
+    ],
+    "drafted_by": "agent"
+  }
+}

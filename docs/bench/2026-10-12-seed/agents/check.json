@@ -1,0 +1,1323 @@
+[
+  {
+    "entry": "0.20.0#1",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7BT7NTNMKM1DSEJDAV6",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.20.0",
+      "kind": "behavior",
+      "symbol": "@cloudflare/codemode",
+      "signal": "silent",
+      "detail": "@cloudflare/codemode is now an optional peer; MCP-only applications no longer install it transitively.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.20.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst nm = \"/w/node_modules\";\nlet pkg;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(nm, \"agents\", \"package.json\"), \"utf8\"));\n} catch (e) {\n  console.error(\"ERROR: agents is not installed: \" + e.message);\n  process.exit(2);\n}\nif (fs.existsSync(path.join(nm, \"@cloudflare\", \"codemode\", \"package.json\"))) {\n  console.error(\"FAIL: installing agents alone also installed @cloudflare/codemode transitively\");\n  process.exit(1);\n}\nconsole.log(\"OK: installing agents \" + pkg.version + \" alone did not install @cloudflare/codemode\");\nprocess.exit(0);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.19.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst nm = \"/w/node_modules\";\nlet pkg;\ntry {\n  pkg = JSON.parse(fs.readFileSync(path.join(nm, \"agents\", \"package.json\"), \"utf8\"));\n} catch (e) {\n  console.error(\"ERROR: agents is not installed: \" + e.message);\n  process.exit(2);\n}\nif (fs.existsSync(path.join(nm, \"@cloudflare\", \"codemode\", \"package.json\"))) {\n  console.error(\"FAIL: installing agents alone also installed @cloudflare/codemode transitively\");\n  process.exit(1);\n}\nconsole.log(\"OK: installing agents \" + pkg.version + \" alone did not install @cloudflare/codemode\");\nprocess.exit(0);\n",
+            "expect": "fail",
+            "error": "FAIL: installing agents alone also installed @cloudflare/codemode transitively"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.20.0/packages/agents/CHANGELOG.md",
+            "quote": "`@cloudflare/codemode` is now an optional peer. Applications that import `agents/skills` or `agents/browser` install Codemode explicitly; MCP-only applications no longer install it transitively."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.20.0 changed what `@cloudflare/codemode` does. @cloudflare/codemode is now an optional peer; MCP-only applications no longer install it transitively. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.21.0#3",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7BV2GHHP6X3Y49YCSXD",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.21.0",
+      "kind": "behavior",
+      "symbol": "browser_screenshot",
+      "signal": "silent",
+      "detail": "Large base64 values returned outside the canonical browser_screenshot shape are now redacted.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.21.0"
+            },
+            "code": "const fs = require('fs');\nconst mod = require('module');\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\n// Stand-ins only for modules plain Node cannot load here (Workers runtime, optional peers).\nconst STUBS = {\n  'cloudflare:workers': 'export class DurableObject {} export class RpcTarget {}',\n  '@cloudflare/codemode': 'export class CodemodeConnector { constructor() {} } export class DynamicWorkerExecutor { constructor() {} } export const truncateResult = (v) => v; export function createCodemodeRuntime() { return { tool: () => ({ description: `stub`, execute: async () => null }) }; }',\n  'ai': 'export const tool = (t) => t;',\n  'zod': 'const p = new Proxy(function () {}, { get: (t, k) => k === `then` ? undefined : p, apply: () => p }); export const z = p;',\n  '@cfworker/json-schema': 'export class Validator { validate() { return { valid: true, errors: [] }; } }'\n};\nconst ALWAYS = new Set(['cloudflare:workers', '@cloudflare/codemode']);\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (Object.prototype.hasOwnProperty.call(STUBS, specifier)) {\n      if (!ALWAYS.has(specifier)) {\n        try { return next(specifier, context); } catch {}\n      }\n      return { url: 'stub:' + specifier, format: 'module', shortCircuit: true };\n    }\n    return next(specifier, context);\n  },\n  load(url, context, next) {\n    if (url.startsWith('stub:')) {\n      return { format: 'module', source: STUBS[url.slice(5)], shortCircuit: true };\n    }\n    return next(url, context);\n  }\n});\nfs.writeFileSync('/w/entry.mjs', 'export * from `agents/browser/ai`;\\n'.replace(/`/g, String.fromCharCode(39)));\n(async () => {\n  console.warn = () => {};\n  console.debug = () => {};\n  let ai;\n  try {\n    ai = await import('file:///w/entry.mjs');\n  } catch (e) {\n    console.error('ERROR: cannot load agents/browser/ai: ' + e.message);\n    process.exit(2);\n  }\n  if (typeof ai.createBrowserRuntime !== 'function') {\n    console.error('ERROR: createBrowserRuntime is missing');\n    process.exit(2);\n  }\n  const ctx = { storage: {}, exports: {}, facets: { get: () => ({}) } };\n  const { tools } = ai.createBrowserRuntime({ ctx, cdpUrl: 'http://127.0.0.1:9/', loader: {}, quickActions: false });\n  const tool = tools.browser_execute;\n  if (!tool) {\n    console.error('ERROR: browser_execute tool is missing');\n    process.exit(2);\n  }\n  const big = 'A'.repeat(8192);\n  const output = { status: 'completed', result: { title: 'Example', image: 'data:image/png;base64,' + big } };\n  // Without a toModelOutput hook the AI SDK hands the raw output to the model.\n  const modelOutput = typeof tool.toModelOutput === 'function'\n    ? await tool.toModelOutput({ output })\n    : { type: 'json', value: output };\n  const text = JSON.stringify(modelOutput);\n  if (text.includes(big)) {\n    console.error('FAIL: browser_execute passes a large base64 data URL outside the browser_screenshot shape to the model unredacted');\n    process.exit(1);\n  }\n  if (!text.includes('base64 image/png data omitted') || !text.includes('Example')) {\n    console.error('ERROR: unexpected model output ' + text.slice(0, 300));\n    process.exit(2);\n  }\n  if (output.result.image !== 'data:image/png;base64,' + big) {\n    console.error('ERROR: original output was mutated');\n    process.exit(2);\n  }\n  console.log('OK: model output is ' + text);\n  process.exit(0);\n})().catch((e) => {\n  console.error('ERROR: ' + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.20.1"
+            },
+            "code": "const fs = require('fs');\nconst mod = require('module');\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\n// Stand-ins only for modules plain Node cannot load here (Workers runtime, optional peers).\nconst STUBS = {\n  'cloudflare:workers': 'export class DurableObject {} export class RpcTarget {}',\n  '@cloudflare/codemode': 'export class CodemodeConnector { constructor() {} } export class DynamicWorkerExecutor { constructor() {} } export const truncateResult = (v) => v; export function createCodemodeRuntime() { return { tool: () => ({ description: `stub`, execute: async () => null }) }; }',\n  'ai': 'export const tool = (t) => t;',\n  'zod': 'const p = new Proxy(function () {}, { get: (t, k) => k === `then` ? undefined : p, apply: () => p }); export const z = p;',\n  '@cfworker/json-schema': 'export class Validator { validate() { return { valid: true, errors: [] }; } }'\n};\nconst ALWAYS = new Set(['cloudflare:workers', '@cloudflare/codemode']);\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (Object.prototype.hasOwnProperty.call(STUBS, specifier)) {\n      if (!ALWAYS.has(specifier)) {\n        try { return next(specifier, context); } catch {}\n      }\n      return { url: 'stub:' + specifier, format: 'module', shortCircuit: true };\n    }\n    return next(specifier, context);\n  },\n  load(url, context, next) {\n    if (url.startsWith('stub:')) {\n      return { format: 'module', source: STUBS[url.slice(5)], shortCircuit: true };\n    }\n    return next(url, context);\n  }\n});\nfs.writeFileSync('/w/entry.mjs', 'export * from `agents/browser/ai`;\\n'.replace(/`/g, String.fromCharCode(39)));\n(async () => {\n  console.warn = () => {};\n  console.debug = () => {};\n  let ai;\n  try {\n    ai = await import('file:///w/entry.mjs');\n  } catch (e) {\n    console.error('ERROR: cannot load agents/browser/ai: ' + e.message);\n    process.exit(2);\n  }\n  if (typeof ai.createBrowserRuntime !== 'function') {\n    console.error('ERROR: createBrowserRuntime is missing');\n    process.exit(2);\n  }\n  const ctx = { storage: {}, exports: {}, facets: { get: () => ({}) } };\n  const { tools } = ai.createBrowserRuntime({ ctx, cdpUrl: 'http://127.0.0.1:9/', loader: {}, quickActions: false });\n  const tool = tools.browser_execute;\n  if (!tool) {\n    console.error('ERROR: browser_execute tool is missing');\n    process.exit(2);\n  }\n  const big = 'A'.repeat(8192);\n  const output = { status: 'completed', result: { title: 'Example', image: 'data:image/png;base64,' + big } };\n  // Without a toModelOutput hook the AI SDK hands the raw output to the model.\n  const modelOutput = typeof tool.toModelOutput === 'function'\n    ? await tool.toModelOutput({ output })\n    : { type: 'json', value: output };\n  const text = JSON.stringify(modelOutput);\n  if (text.includes(big)) {\n    console.error('FAIL: browser_execute passes a large base64 data URL outside the browser_screenshot shape to the model unredacted');\n    process.exit(1);\n  }\n  if (!text.includes('base64 image/png data omitted') || !text.includes('Example')) {\n    console.error('ERROR: unexpected model output ' + text.slice(0, 300));\n    process.exit(2);\n  }\n  if (output.result.image !== 'data:image/png;base64,' + big) {\n    console.error('ERROR: original output was mutated');\n    process.exit(2);\n  }\n  console.log('OK: model output is ' + text);\n  process.exit(0);\n})().catch((e) => {\n  console.error('ERROR: ' + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: browser_execute passes a large base64 data URL outside the browser_screenshot shape to the model unredacted"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.21.0/packages/agents/CHANGELOG.md",
+            "quote": "Large base64 values returned outside the canonical `{ type: \"browser_screenshot\", mediaType, data }` shape are now redacted."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.21.0 changed what `browser_screenshot` does. Large base64 values returned outside the canonical browser_screenshot shape are now redacted. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.21.0#6",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7BW5MV0AVY2DAC07S0Q",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.21.0",
+      "kind": "behavior",
+      "symbol": "routeSubAgentRequest",
+      "signal": "silent",
+      "detail": "routeSubAgentRequest now passes req.body through as a stream.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.21.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst root = \"/w/node_modules/agents\";\nconst file = root + \"/dist/sub-routing.js\";\nif (!fs.existsSync(file)) { console.error(\"ERROR: dist/sub-routing.js missing\"); process.exit(2); }\nconst NativeRequest = globalThis.Request;\nglobalThis.Request = class extends NativeRequest {\n  constructor(input, init) { super(input, init && init.body ? { ...init, duplex: \"half\" } : init); }\n};\n(async () => {\n  const { routeSubAgentRequest } = await import(require(\"url\").pathToFileURL(file).href);\n  if (typeof routeSubAgentRequest !== \"function\") { console.error(\"ERROR: routeSubAgentRequest not exported\"); process.exit(2); }\n  const total = 8;\n  let pulled = 0;\n  const upload = new ReadableStream({\n    pull(c) { if (pulled >= total) { c.close(); return; } pulled++; c.enqueue(new Uint8Array(1024)); }\n  }, { highWaterMark: 0 });\n  const req = new Request(\"http://example.com/sub/child-agent/c1/upload\", { method: \"POST\", body: upload });\n  let pulledAtDispatch = -1, forwarded = null;\n  const parent = { fetch: async (r) => { pulledAtDispatch = pulled; forwarded = r; return new Response(\"ok\"); } };\n  const res = await routeSubAgentRequest(req, parent);\n  if (!forwarded || res.status !== 200) { console.error(\"ERROR: parent.fetch not called (status \" + res.status + \")\"); process.exit(2); }\n  if (!forwarded.body) { console.error(\"ERROR: forwarded request has no body\"); process.exit(2); }\n  if (pulledAtDispatch === 0) {\n    const got = (await forwarded.arrayBuffer()).byteLength;\n    if (got !== total * 1024) { console.error(\"ERROR: forwarded body has \" + got + \" bytes\"); process.exit(2); }\n    console.log(\"OK: routeSubAgentRequest forwarded req.body as an unread stream; \" + got + \" bytes read later by the child\");\n    process.exit(0);\n  }\n  if (pulledAtDispatch === total) {\n    console.error(\"FAIL: routeSubAgentRequest read the whole request body (\" + pulledAtDispatch + \" of \" + total + \" chunks) before dispatching\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected chunks pulled before dispatch: \" + pulledAtDispatch);\n  process.exit(2);\n})().catch((e) => { console.error(\"ERROR: \" + ((e && e.stack) || e)); process.exit(2); });\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.20.1"
+            },
+            "code": "const fs = require(\"fs\");\nconst root = \"/w/node_modules/agents\";\nconst file = root + \"/dist/sub-routing.js\";\nif (!fs.existsSync(file)) { console.error(\"ERROR: dist/sub-routing.js missing\"); process.exit(2); }\nconst NativeRequest = globalThis.Request;\nglobalThis.Request = class extends NativeRequest {\n  constructor(input, init) { super(input, init && init.body ? { ...init, duplex: \"half\" } : init); }\n};\n(async () => {\n  const { routeSubAgentRequest } = await import(require(\"url\").pathToFileURL(file).href);\n  if (typeof routeSubAgentRequest !== \"function\") { console.error(\"ERROR: routeSubAgentRequest not exported\"); process.exit(2); }\n  const total = 8;\n  let pulled = 0;\n  const upload = new ReadableStream({\n    pull(c) { if (pulled >= total) { c.close(); return; } pulled++; c.enqueue(new Uint8Array(1024)); }\n  }, { highWaterMark: 0 });\n  const req = new Request(\"http://example.com/sub/child-agent/c1/upload\", { method: \"POST\", body: upload });\n  let pulledAtDispatch = -1, forwarded = null;\n  const parent = { fetch: async (r) => { pulledAtDispatch = pulled; forwarded = r; return new Response(\"ok\"); } };\n  const res = await routeSubAgentRequest(req, parent);\n  if (!forwarded || res.status !== 200) { console.error(\"ERROR: parent.fetch not called (status \" + res.status + \")\"); process.exit(2); }\n  if (!forwarded.body) { console.error(\"ERROR: forwarded request has no body\"); process.exit(2); }\n  if (pulledAtDispatch === 0) {\n    const got = (await forwarded.arrayBuffer()).byteLength;\n    if (got !== total * 1024) { console.error(\"ERROR: forwarded body has \" + got + \" bytes\"); process.exit(2); }\n    console.log(\"OK: routeSubAgentRequest forwarded req.body as an unread stream; \" + got + \" bytes read later by the child\");\n    process.exit(0);\n  }\n  if (pulledAtDispatch === total) {\n    console.error(\"FAIL: routeSubAgentRequest read the whole request body (\" + pulledAtDispatch + \" of \" + total + \" chunks) before dispatching\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected chunks pulled before dispatch: \" + pulledAtDispatch);\n  process.exit(2);\n})().catch((e) => { console.error(\"ERROR: \" + ((e && e.stack) || e)); process.exit(2); });\n",
+            "expect": "fail",
+            "error": "FAIL: routeSubAgentRequest read the whole request body (8 of 8 chunks) before dispatching"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.21.0/packages/agents/CHANGELOG.md",
+            "quote": "Both call sites now pass `req.body` through as a stream."
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.21.0/packages/agents/CHANGELOG.md",
+            "quote": "`Agent._cf_forwardToFacet` and `routeSubAgentRequest` both did `forwardInit.body = await req.arrayBuffer()` before dispatching to a child facet, materialising the entire request body in the parent's isolate."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [
+      "schema: /evidence Give 1 to 3 pieces of evidence: a test or a source."
+    ]
+  },
+  {
+    "entry": "0.21.0#8",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7BXWCQKXHGC7T1V3SZJ",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.21.0",
+      "kind": "behavior",
+      "symbol": "useAgentChat",
+      "signal": "silent",
+      "detail": "useAgentChat observer error frames are terminal; plain-text error bodies are no longer parsed as stream chunks or merged into an empty assistant message.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.21.0/packages/agents/CHANGELOG.md",
+            "quote": "Treat `useAgentChat` observer error frames as terminal responses.\n\n  Plain-text error bodies are no longer parsed as stream chunks or merged into an empty assistant message."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.21.0 changed what `useAgentChat` does. useAgentChat observer error frames are terminal; plain-text error bodies are no longer parsed as stream chunks or merged into an empty assistant message. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.22.0#1",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7BY1EVQ7KQB2FZ76ATA",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.22.0",
+      "kind": "behavior",
+      "symbol": "chatRecovery",
+      "signal": "silent",
+      "detail": "chatRecovery false is no longer supported; previously compiled JavaScript that still supplies false safely receives the default recovery configuration.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.22.0",
+              "ai": "7.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst file = \"/w/node_modules/agents/dist/chat/index.js\";\nconst pkg = JSON.parse(fs.readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\"));\n(async () => {\n  let m;\n  try {\n    m = await import(file);\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  const resolve = m.resolveChatRecoveryConfig;\n  if (typeof resolve !== \"function\") {\n    console.error(\"ERROR: resolveChatRecoveryConfig is not exported\");\n    process.exit(2);\n  }\n  const off = resolve(false);\n  const on = resolve(true);\n  if (!off || typeof off !== \"object\" || typeof on.maxAttempts !== \"number\") {\n    console.error(\"ERROR: unexpected resolved config \" + JSON.stringify(off));\n    process.exit(2);\n  }\n  if (off.enabled === false) {\n    console.error(\"FAIL: agents \" + pkg.version + \" chatRecovery false resolves to enabled: false, so durable recovery is disabled\");\n    process.exit(1);\n  }\n  if (JSON.stringify(off) === JSON.stringify(on) && !(\"enabled\" in off)) {\n    console.log(\"OK: agents \" + pkg.version + \" chatRecovery false resolves to the default recovery configuration \" + JSON.stringify(off));\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected configs false=\" + JSON.stringify(off) + \" true=\" + JSON.stringify(on));\n  process.exit(2);\n})();\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.21.0",
+              "ai": "7.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst file = \"/w/node_modules/agents/dist/chat/index.js\";\nconst pkg = JSON.parse(fs.readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\"));\n(async () => {\n  let m;\n  try {\n    m = await import(file);\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  const resolve = m.resolveChatRecoveryConfig;\n  if (typeof resolve !== \"function\") {\n    console.error(\"ERROR: resolveChatRecoveryConfig is not exported\");\n    process.exit(2);\n  }\n  const off = resolve(false);\n  const on = resolve(true);\n  if (!off || typeof off !== \"object\" || typeof on.maxAttempts !== \"number\") {\n    console.error(\"ERROR: unexpected resolved config \" + JSON.stringify(off));\n    process.exit(2);\n  }\n  if (off.enabled === false) {\n    console.error(\"FAIL: agents \" + pkg.version + \" chatRecovery false resolves to enabled: false, so durable recovery is disabled\");\n    process.exit(1);\n  }\n  if (JSON.stringify(off) === JSON.stringify(on) && !(\"enabled\" in off)) {\n    console.log(\"OK: agents \" + pkg.version + \" chatRecovery false resolves to the default recovery configuration \" + JSON.stringify(off));\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected configs false=\" + JSON.stringify(off) + \" true=\" + JSON.stringify(on));\n  process.exit(2);\n})();\n",
+            "expect": "fail",
+            "error": "FAIL: agents 0.21.0 chatRecovery false resolves to enabled: false, so durable recovery is disabled"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/CHANGELOG.md",
+            "quote": "`chatRecovery` accepts `true` or a configuration object; `false` is no longer supported. Previously compiled JavaScript that still supplies `false` safely receives the default recovery configuration."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.22.0 changed what `chatRecovery` does. chatRecovery false is no longer supported; previously compiled JavaScript that still supplies false safely receives the default recovery configuration. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.22.0#2",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7BZ9P9ZP5PJBHCTARZ3",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.22.0",
+      "kind": "removed",
+      "symbol": "options.hibernate",
+      "signal": "silent",
+      "detail": "The static options.hibernate switch and in-memory connection mode are removed; WebSockets always use Cloudflare's Hibernation API.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.22.0"
+            },
+            "code": "const mod = require('module');\nconst { pathToFileURL } = require('url');\nconst STUBS = {\n  'cloudflare:workers': 'export class DurableObject { constructor(ctx, env) { this.ctx = ctx; this.env = env; } }; export class WorkerEntrypoint { constructor(ctx, env) { this.ctx = ctx; this.env = env; } }; export class WorkflowEntrypoint { constructor(ctx, env) { this.ctx = ctx; this.env = env; } }; export class RpcTarget {}; export class RpcStub {}; export const exports = {}; export const env = {}; export const tracing = undefined; export function waitUntil() {};',\n  'cloudflare:email': 'export class EmailMessage {};'\n};\nconst PEER_NAMES = ['z', 'Client', 'SSEClientTransport', 'SdkHttpError', 'StreamableHTTPClientTransport', 'CfWorkerJsonSchemaValidator', 'JSONRPCMessageSchema', 'isJSONRPCErrorResponse', 'isJSONRPCResultResponse', 'isJSONRPCRequest', 'isJSONRPCNotification', 'isInitializeRequest', 'ElicitRequestSchema', 'InitializeRequestSchema', 'SUPPORTED_PROTOCOL_VERSIONS', 'McpServer', 'Server', 'WebStandardStreamableHTTPServerTransport', 'createMcpHandler', 'hostHeaderValidationResponse', 'isLegacyRequest', 'localhostAllowedHostnames', 'localhostAllowedOrigins', 'originValidationResponse', 'asSchema', 'tool', 'jsonSchema'];\nconst PEER_STUB = 'const h = { get(t, k) { if (k === \"then\" || typeof k === \"symbol\") return undefined; if (k === \"prototype\") return {}; return p; }, apply() { return p; }, construct() { return p; } }; const p = new Proxy(function () {}, h); ' + PEER_NAMES.map((n) => 'export const ' + n + ' = p;').join(' ');\nconst PEER_PREFIXES = ['zod', 'ai', '@modelcontextprotocol/'];\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is not available');\n  process.exit(2);\n}\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (STUBS[specifier]) return { url: 'stub:' + specifier, format: 'module', shortCircuit: true };\n    try {\n      return next(specifier, context);\n    } catch (e) {\n      if (PEER_PREFIXES.some((p) => specifier === p || (p.endsWith('/') && specifier.startsWith(p)))) return { url: 'peer:' + specifier, format: 'module', shortCircuit: true };\n      throw e;\n    }\n  },\n  load(url, context, next) {\n    if (url.startsWith('stub:')) return { format: 'module', source: STUBS[url.slice(5)], shortCircuit: true };\n    if (url.startsWith('peer:')) return { format: 'module', source: PEER_STUB, shortCircuit: true };\n    return next(url, context);\n  }\n});\n(async () => {\n  let m;\n  try {\n    m = await import(pathToFileURL(require.resolve('agents')).href);\n  } catch (e) {\n    console.error('ERROR: cannot load agents: ' + (e && e.message));\n    process.exit(2);\n  }\n  const defaults = m.DEFAULT_AGENT_STATIC_OPTIONS;\n  if (!defaults || typeof defaults !== 'object' || typeof m.Agent !== 'function') {\n    console.error('ERROR: DEFAULT_AGENT_STATIC_OPTIONS or Agent export is missing');\n    process.exit(2);\n  }\n  if (!('sendIdentityOnConnect' in defaults)) {\n    console.error('ERROR: unexpected default options ' + JSON.stringify(Object.keys(defaults)));\n    process.exit(2);\n  }\n  const base = m.Agent.options || {};\n  if ('hibernate' in defaults || 'hibernate' in base) {\n    console.error('FAIL: agents still has a static options.hibernate switch (default hibernate=' + defaults.hibernate + ', Agent.options.hibernate=' + base.hibernate + ')');\n    process.exit(1);\n  }\n  console.log('OK: no static options.hibernate switch; default static options are ' + Object.keys(defaults).join(', '));\n  process.exit(0);\n})().catch((e) => {\n  console.error('ERROR: ' + (e && e.stack));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.21.0"
+            },
+            "code": "const mod = require('module');\nconst { pathToFileURL } = require('url');\nconst STUBS = {\n  'cloudflare:workers': 'export class DurableObject { constructor(ctx, env) { this.ctx = ctx; this.env = env; } }; export class WorkerEntrypoint { constructor(ctx, env) { this.ctx = ctx; this.env = env; } }; export class WorkflowEntrypoint { constructor(ctx, env) { this.ctx = ctx; this.env = env; } }; export class RpcTarget {}; export class RpcStub {}; export const exports = {}; export const env = {}; export const tracing = undefined; export function waitUntil() {};',\n  'cloudflare:email': 'export class EmailMessage {};'\n};\nconst PEER_NAMES = ['z', 'Client', 'SSEClientTransport', 'SdkHttpError', 'StreamableHTTPClientTransport', 'CfWorkerJsonSchemaValidator', 'JSONRPCMessageSchema', 'isJSONRPCErrorResponse', 'isJSONRPCResultResponse', 'isJSONRPCRequest', 'isJSONRPCNotification', 'isInitializeRequest', 'ElicitRequestSchema', 'InitializeRequestSchema', 'SUPPORTED_PROTOCOL_VERSIONS', 'McpServer', 'Server', 'WebStandardStreamableHTTPServerTransport', 'createMcpHandler', 'hostHeaderValidationResponse', 'isLegacyRequest', 'localhostAllowedHostnames', 'localhostAllowedOrigins', 'originValidationResponse', 'asSchema', 'tool', 'jsonSchema'];\nconst PEER_STUB = 'const h = { get(t, k) { if (k === \"then\" || typeof k === \"symbol\") return undefined; if (k === \"prototype\") return {}; return p; }, apply() { return p; }, construct() { return p; } }; const p = new Proxy(function () {}, h); ' + PEER_NAMES.map((n) => 'export const ' + n + ' = p;').join(' ');\nconst PEER_PREFIXES = ['zod', 'ai', '@modelcontextprotocol/'];\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is not available');\n  process.exit(2);\n}\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (STUBS[specifier]) return { url: 'stub:' + specifier, format: 'module', shortCircuit: true };\n    try {\n      return next(specifier, context);\n    } catch (e) {\n      if (PEER_PREFIXES.some((p) => specifier === p || (p.endsWith('/') && specifier.startsWith(p)))) return { url: 'peer:' + specifier, format: 'module', shortCircuit: true };\n      throw e;\n    }\n  },\n  load(url, context, next) {\n    if (url.startsWith('stub:')) return { format: 'module', source: STUBS[url.slice(5)], shortCircuit: true };\n    if (url.startsWith('peer:')) return { format: 'module', source: PEER_STUB, shortCircuit: true };\n    return next(url, context);\n  }\n});\n(async () => {\n  let m;\n  try {\n    m = await import(pathToFileURL(require.resolve('agents')).href);\n  } catch (e) {\n    console.error('ERROR: cannot load agents: ' + (e && e.message));\n    process.exit(2);\n  }\n  const defaults = m.DEFAULT_AGENT_STATIC_OPTIONS;\n  if (!defaults || typeof defaults !== 'object' || typeof m.Agent !== 'function') {\n    console.error('ERROR: DEFAULT_AGENT_STATIC_OPTIONS or Agent export is missing');\n    process.exit(2);\n  }\n  if (!('sendIdentityOnConnect' in defaults)) {\n    console.error('ERROR: unexpected default options ' + JSON.stringify(Object.keys(defaults)));\n    process.exit(2);\n  }\n  const base = m.Agent.options || {};\n  if ('hibernate' in defaults || 'hibernate' in base) {\n    console.error('FAIL: agents still has a static options.hibernate switch (default hibernate=' + defaults.hibernate + ', Agent.options.hibernate=' + base.hibernate + ')');\n    process.exit(1);\n  }\n  console.log('OK: no static options.hibernate switch; default static options are ' + Object.keys(defaults).join(', '));\n  process.exit(0);\n})().catch((e) => {\n  console.error('ERROR: ' + (e && e.stack));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: agents still has a static options.hibernate switch (default hibernate=true, Agent.options.hibernate=true)"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/CHANGELOG.md",
+            "quote": "Lifecycle WebSockets always use Cloudflare's Hibernation API; the `static options.hibernate` switch and in-memory connection mode are removed."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.22.0 removed `options.hibernate`. The static options.hibernate switch and in-memory connection mode are removed; WebSockets always use Cloudflare's Hibernation API. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.22.0#3",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C00CJJTBT926Q8WY7B",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.22.0",
+      "kind": "default",
+      "symbol": "useAgentChat throttle",
+      "signal": "silent",
+      "detail": "useAgentChat now coalesces updates every 50ms.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.22.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst os = require(\"os\");\nconst path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nconst mod = require(\"module\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = require(path.join(root, \"package.json\"));\nif (typeof mod.registerHooks !== \"function\") {\n  console.error(\"ERROR: module.registerHooks is unavailable\");\n  process.exit(2);\n}\nconst stubs = {\n  react: \"export function useRef(v){return {current:v}}\\nexport function useMemo(f){return f()}\\nexport function useCallback(f){return f}\\nexport function useEffect(){}\\nexport function useState(v){return [typeof v==='function'?v():v,()=>{}]}\\nexport function use(){throw new Error('use() called')}\\n\",\n  \"@ai-sdk/react\": \"export function useChat(o){globalThis.__chatOptions=o;throw new Error('STOP_AFTER_USECHAT')}\\n\",\n  ai: \"export function getToolName(p){return p.toolName}\\nexport function isToolUIPart(){return false}\\n\",\n  nanoid: \"export function nanoid(){return 'id'+Math.random().toString(36).slice(2)}\\n\"\n};\nconst stubDir = fs.mkdtempSync(path.join(os.tmpdir(), \"agents-stubs-\"));\nconst stubUrls = {};\nfor (const [name, source] of Object.entries(stubs)) {\n  const file = path.join(stubDir, name.replace(/[@\\/]/g, \"_\") + \".mjs\");\n  fs.writeFileSync(file, source);\n  stubUrls[name] = pathToFileURL(file).href;\n}\nmod.registerHooks({\n  resolve(spec, ctx, next) {\n    if (Object.prototype.hasOwnProperty.call(stubUrls, spec)) return { url: stubUrls[spec], format: \"module\", shortCircuit: true };\n    return next(spec, ctx);\n  }\n});\n(async () => {\n  const entry = pkg.exports[\"./chat/react\"];\n  if (!entry) {\n    console.error(\"ERROR: agents/chat/react export is missing\");\n    process.exit(2);\n  }\n  const m = await import(pathToFileURL(path.join(root, entry.import)).href);\n  if (typeof m.useAgentChat !== \"function\") {\n    console.error(\"ERROR: useAgentChat is not exported\");\n    process.exit(2);\n  }\n  const agent = {\n    agent: \"chat\", name: \"room\", _pk: \"pk\",\n    getHttpUrl() { return null; },\n    addEventListener() {}, removeEventListener() {}, send() {}\n  };\n  globalThis.__chatOptions = undefined;\n  try {\n    m.useAgentChat({ agent, getInitialMessages: null });\n  } catch (e) {\n    if (e.message !== \"STOP_AFTER_USECHAT\") {\n      console.error(\"ERROR: useAgentChat threw before useChat: \" + e.message);\n      process.exit(2);\n    }\n  }\n  const o = globalThis.__chatOptions;\n  if (!o) {\n    console.error(\"ERROR: useChat was not called\");\n    process.exit(2);\n  }\n  const t = o.throttle ?? o.experimental_throttle;\n  if (t === 50) {\n    console.log(\"OK: agents \" + pkg.version + \" useAgentChat passes a 50ms throttle to useChat by default\");\n    process.exit(0);\n  }\n  if (t === undefined) {\n    console.error(\"FAIL: useAgentChat passes no throttle to useChat by default\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected default throttle \" + JSON.stringify(t));\n  process.exit(2);\n})().catch((e) => {\n  console.error(\"ERROR: \" + (e && e.stack || e));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.21.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst os = require(\"os\");\nconst path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nconst mod = require(\"module\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = require(path.join(root, \"package.json\"));\nif (typeof mod.registerHooks !== \"function\") {\n  console.error(\"ERROR: module.registerHooks is unavailable\");\n  process.exit(2);\n}\nconst stubs = {\n  react: \"export function useRef(v){return {current:v}}\\nexport function useMemo(f){return f()}\\nexport function useCallback(f){return f}\\nexport function useEffect(){}\\nexport function useState(v){return [typeof v==='function'?v():v,()=>{}]}\\nexport function use(){throw new Error('use() called')}\\n\",\n  \"@ai-sdk/react\": \"export function useChat(o){globalThis.__chatOptions=o;throw new Error('STOP_AFTER_USECHAT')}\\n\",\n  ai: \"export function getToolName(p){return p.toolName}\\nexport function isToolUIPart(){return false}\\n\",\n  nanoid: \"export function nanoid(){return 'id'+Math.random().toString(36).slice(2)}\\n\"\n};\nconst stubDir = fs.mkdtempSync(path.join(os.tmpdir(), \"agents-stubs-\"));\nconst stubUrls = {};\nfor (const [name, source] of Object.entries(stubs)) {\n  const file = path.join(stubDir, name.replace(/[@\\/]/g, \"_\") + \".mjs\");\n  fs.writeFileSync(file, source);\n  stubUrls[name] = pathToFileURL(file).href;\n}\nmod.registerHooks({\n  resolve(spec, ctx, next) {\n    if (Object.prototype.hasOwnProperty.call(stubUrls, spec)) return { url: stubUrls[spec], format: \"module\", shortCircuit: true };\n    return next(spec, ctx);\n  }\n});\n(async () => {\n  const entry = pkg.exports[\"./chat/react\"];\n  if (!entry) {\n    console.error(\"ERROR: agents/chat/react export is missing\");\n    process.exit(2);\n  }\n  const m = await import(pathToFileURL(path.join(root, entry.import)).href);\n  if (typeof m.useAgentChat !== \"function\") {\n    console.error(\"ERROR: useAgentChat is not exported\");\n    process.exit(2);\n  }\n  const agent = {\n    agent: \"chat\", name: \"room\", _pk: \"pk\",\n    getHttpUrl() { return null; },\n    addEventListener() {}, removeEventListener() {}, send() {}\n  };\n  globalThis.__chatOptions = undefined;\n  try {\n    m.useAgentChat({ agent, getInitialMessages: null });\n  } catch (e) {\n    if (e.message !== \"STOP_AFTER_USECHAT\") {\n      console.error(\"ERROR: useAgentChat threw before useChat: \" + e.message);\n      process.exit(2);\n    }\n  }\n  const o = globalThis.__chatOptions;\n  if (!o) {\n    console.error(\"ERROR: useChat was not called\");\n    process.exit(2);\n  }\n  const t = o.throttle ?? o.experimental_throttle;\n  if (t === 50) {\n    console.log(\"OK: agents \" + pkg.version + \" useAgentChat passes a 50ms throttle to useChat by default\");\n    process.exit(0);\n  }\n  if (t === undefined) {\n    console.error(\"FAIL: useAgentChat passes no throttle to useChat by default\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected default throttle \" + JSON.stringify(t));\n  process.exit(2);\n})().catch((e) => {\n  console.error(\"ERROR: \" + (e && e.stack || e));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: useAgentChat passes no throttle to useChat by default"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/CHANGELOG.md",
+            "quote": "`useAgentChat` now coalesces those updates every 50ms, which removes about 78%"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [
+      "The quote \"`useAgentChat` now coalesces those updates every 50ms, which removes about 78%\" doesn't name useAgentChat throttle. Quote a sentence that states the fact itself, not a headline.",
+      "No evidence names useAgentChat throttle: use it in a test's code or quote a sentence that names it."
+    ],
+    "label": "differential",
+    "claim": "agents >=0.22.0 changed the default of `useAgentChat throttle`. useAgentChat now coalesces updates every 50ms. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.22.0#4",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C1B6814J4PMQ692XXK",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.22.0",
+      "kind": "behavior",
+      "symbol": "Schedule",
+      "signal": "silent",
+      "detail": "Scheduled callbacks now receive the parsed Schedule object as their second argument, previously the raw storage row whose payload was an unparsed JSON string.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/CHANGELOG.md",
+            "quote": "Scheduled callbacks now receive the documented parsed `Schedule` object as their second argument (previously the raw storage row, whose `payload` was an unparsed JSON string)."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.22.0 changed what `Schedule` does. Scheduled callbacks now receive the parsed Schedule object as their second argument, previously the raw storage row whose payload was an unparsed JSON string. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.22.0#8",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C2Y3Y9NYXBCXJDEF6G",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.22.0",
+      "kind": "behavior",
+      "symbol": "instrumentation_scope.version",
+      "signal": "silent",
+      "detail": "Telemetry instrumentation_scope.version is hardcoded to 1; it is not the package version.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.22.0/packages/agents/AGENTS.md",
+            "quote": "- **Telemetry has an independent schema version** — `instrumentation_scope.version` is hardcoded to `\"1\"`; it is not the package version."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.22.0 changed what `instrumentation_scope.version` does. Telemetry instrumentation_scope.version is hardcoded to 1; it is not the package version. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.23.0#1",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C33MAXS73PVTPK3YXW",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.23.0",
+      "kind": "deprecated",
+      "symbol": "subAgent",
+      "replacement": "this.dynamicAgents.get",
+      "signal": "silent",
+      "detail": "subAgent is deprecated in place, not removed, unchanged in behavior; now delegates to the same capability",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.23.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst exp = pkg.exports && pkg.exports[\".\"];\nif (!exp || !exp.types) {\n  console.error(\"ERROR: agents root types entry is missing\");\n  process.exit(2);\n}\nconst file = path.join(root, exp.types);\nlet text = fs.readFileSync(file, \"utf8\");\nfor (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n  const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n  if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n}\nconst re = /\\/\\*\\*((?:(?!\\*\\/)[\\s\\S])*)\\*\\/\\s*\\n\\s*subAgent<T extends Agent>\\(/;\nconst m = text.match(re);\nif (!m) {\n  console.error(\"ERROR: agents \" + pkg.version + \" Agent.subAgent declaration with JSDoc not found\");\n  process.exit(2);\n}\nconst doc = m[1];\nif (/@deprecated[^\\n]*dynamicAgents/.test(doc)) {\n  console.log(\"OK: agents \" + pkg.version + \" Agent.subAgent is @deprecated in favor of this.dynamicAgents\");\n  process.exit(0);\n}\nif (!/@deprecated/.test(doc)) {\n  console.error(\"FAIL: agents \" + pkg.version + \" Agent.subAgent is not marked @deprecated\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected subAgent deprecation text\");\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.22.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst exp = pkg.exports && pkg.exports[\".\"];\nif (!exp || !exp.types) {\n  console.error(\"ERROR: agents root types entry is missing\");\n  process.exit(2);\n}\nconst file = path.join(root, exp.types);\nlet text = fs.readFileSync(file, \"utf8\");\nfor (const m of text.matchAll(/from \"(\\.\\.?\\/[^\"]+)\\.js\"/g)) {\n  const dep = path.join(path.dirname(file), m[1] + \".d.ts\");\n  if (fs.existsSync(dep)) text += \"\\n\" + fs.readFileSync(dep, \"utf8\");\n}\nconst re = /\\/\\*\\*((?:(?!\\*\\/)[\\s\\S])*)\\*\\/\\s*\\n\\s*subAgent<T extends Agent>\\(/;\nconst m = text.match(re);\nif (!m) {\n  console.error(\"ERROR: agents \" + pkg.version + \" Agent.subAgent declaration with JSDoc not found\");\n  process.exit(2);\n}\nconst doc = m[1];\nif (/@deprecated[^\\n]*dynamicAgents/.test(doc)) {\n  console.log(\"OK: agents \" + pkg.version + \" Agent.subAgent is @deprecated in favor of this.dynamicAgents\");\n  process.exit(0);\n}\nif (!/@deprecated/.test(doc)) {\n  console.error(\"FAIL: agents \" + pkg.version + \" Agent.subAgent is not marked @deprecated\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected subAgent deprecation text\");\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: agents 0.22.0 Agent.subAgent is not marked @deprecated"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.23.0/packages/agents/CHANGELOG.md",
+            "quote": "`subAgent()` / `abortSubAgent()` / `deleteSubAgent()` / `hasSubAgent()` / `listSubAgents()` are unchanged in behavior and now delegate to the same capability — `@deprecated` in place, not removed."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.23.0 deprecated `subAgent`; use `this.dynamicAgents.get` instead. subAgent is deprecated in place, not removed, unchanged in behavior; now delegates to the same capability. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.23.0#10",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C4HVTP31YH9EYRDGQ7",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.23.0",
+      "kind": "behavior",
+      "symbol": "browser_execute",
+      "signal": "silent",
+      "detail": "browser_execute no longer sends the durable calls log to the model; the persisted tool part keeps it for UIs and audit.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.23.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst os = require(\"os\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst exp = pkg.exports && pkg.exports[\"./browser/ai\"];\nif (!exp || !exp.import) {\n  console.error(\"ERROR: agents \" + pkg.version + \" has no ./browser/ai export\");\n  process.exit(2);\n}\nlet src = fs.readFileSync(path.join(root, exp.import), \"utf8\");\n// Stub the peer/internal imports so only the shipped browser_execute tool code runs.\nsrc = src.replace(/^import[^\\r\\n]*/gm, \"\");\nconst stubs = `\nconst chain = new Proxy(function () {}, { get: (t, k) => (k === \"then\" ? undefined : chain), apply: () => chain });\nconst z = chain;\nconst tool = (def) => def;\nconst __DO_NOT_USE_WILL_BREAK__agentContext = { getStore: () => undefined };\nclass BrowserConnector { constructor() {} }\nclass DurableBrowserSessionStore { constructor() {} }\nclass DynamicWorkerExecutor { constructor() {} }\nconst browserLinks = chain, browserScrape = chain, browserMarkdown = chain, browserContent = chain, browserExtract = chain;\nconst truncateResult = (v) => v;\nconst createCodemodeRuntime = () => ({ tool: () => ({ description: \"stub\" }) });\n`;\nconst file = path.join(os.tmpdir(), \"ludion-browser-ai-\" + process.pid + \".mjs\");\nfs.writeFileSync(file, stubs + src);\nconsole.warn = () => {};\nconsole.debug = () => {};\nimport(require(\"url\").pathToFileURL(file).href).then(async (mod) => {\n  if (typeof mod.createBrowserRuntime !== \"function\") {\n    console.error(\"ERROR: createBrowserRuntime missing\");\n    process.exit(2);\n  }\n  const { tools } = mod.createBrowserRuntime({ ctx: {}, cdpUrl: \"ws://127.0.0.1:1\", quickActions: false });\n  const t = tools && tools.browser_execute;\n  if (!t || typeof t.toModelOutput !== \"function\") {\n    console.error(\"ERROR: browser_execute has no toModelOutput\");\n    process.exit(2);\n  }\n  const output = {\n    status: \"completed\",\n    executionId: \"exec-1\",\n    result: \"ok\",\n    calls: [{ connector: \"cdp\", method: \"send\", args: [\"Page.navigate\"], result: { frameId: \"f1\" } }]\n  };\n  const out = await t.toModelOutput({ toolCallId: \"tc-1\", input: { code: \"x\" }, output });\n  if (!out || out.type !== \"json\" || !out.value || out.value.result !== \"ok\" || out.value.status !== \"completed\") {\n    console.error(\"ERROR: unexpected model output \" + JSON.stringify(out));\n    process.exit(2);\n  }\n  if (!Array.isArray(output.calls) || output.calls.length !== 1) {\n    console.error(\"ERROR: persisted output was mutated\");\n    process.exit(2);\n  }\n  if (\"calls\" in out.value) {\n    console.error(\"FAIL: browser_execute model output still includes the calls log\");\n    process.exit(1);\n  }\n  console.log(\"OK: agents \" + pkg.version + \" browser_execute model output omits calls: \" + JSON.stringify(out.value));\n  process.exit(0);\n}).catch((e) => {\n  console.error(\"ERROR: \" + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.22.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst os = require(\"os\");\nconst root = \"/w/node_modules/agents\";\nconst pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\nconst exp = pkg.exports && pkg.exports[\"./browser/ai\"];\nif (!exp || !exp.import) {\n  console.error(\"ERROR: agents \" + pkg.version + \" has no ./browser/ai export\");\n  process.exit(2);\n}\nlet src = fs.readFileSync(path.join(root, exp.import), \"utf8\");\n// Stub the peer/internal imports so only the shipped browser_execute tool code runs.\nsrc = src.replace(/^import[^\\r\\n]*/gm, \"\");\nconst stubs = `\nconst chain = new Proxy(function () {}, { get: (t, k) => (k === \"then\" ? undefined : chain), apply: () => chain });\nconst z = chain;\nconst tool = (def) => def;\nconst __DO_NOT_USE_WILL_BREAK__agentContext = { getStore: () => undefined };\nclass BrowserConnector { constructor() {} }\nclass DurableBrowserSessionStore { constructor() {} }\nclass DynamicWorkerExecutor { constructor() {} }\nconst browserLinks = chain, browserScrape = chain, browserMarkdown = chain, browserContent = chain, browserExtract = chain;\nconst truncateResult = (v) => v;\nconst createCodemodeRuntime = () => ({ tool: () => ({ description: \"stub\" }) });\n`;\nconst file = path.join(os.tmpdir(), \"ludion-browser-ai-\" + process.pid + \".mjs\");\nfs.writeFileSync(file, stubs + src);\nconsole.warn = () => {};\nconsole.debug = () => {};\nimport(require(\"url\").pathToFileURL(file).href).then(async (mod) => {\n  if (typeof mod.createBrowserRuntime !== \"function\") {\n    console.error(\"ERROR: createBrowserRuntime missing\");\n    process.exit(2);\n  }\n  const { tools } = mod.createBrowserRuntime({ ctx: {}, cdpUrl: \"ws://127.0.0.1:1\", quickActions: false });\n  const t = tools && tools.browser_execute;\n  if (!t || typeof t.toModelOutput !== \"function\") {\n    console.error(\"ERROR: browser_execute has no toModelOutput\");\n    process.exit(2);\n  }\n  const output = {\n    status: \"completed\",\n    executionId: \"exec-1\",\n    result: \"ok\",\n    calls: [{ connector: \"cdp\", method: \"send\", args: [\"Page.navigate\"], result: { frameId: \"f1\" } }]\n  };\n  const out = await t.toModelOutput({ toolCallId: \"tc-1\", input: { code: \"x\" }, output });\n  if (!out || out.type !== \"json\" || !out.value || out.value.result !== \"ok\" || out.value.status !== \"completed\") {\n    console.error(\"ERROR: unexpected model output \" + JSON.stringify(out));\n    process.exit(2);\n  }\n  if (!Array.isArray(output.calls) || output.calls.length !== 1) {\n    console.error(\"ERROR: persisted output was mutated\");\n    process.exit(2);\n  }\n  if (\"calls\" in out.value) {\n    console.error(\"FAIL: browser_execute model output still includes the calls log\");\n    process.exit(1);\n  }\n  console.log(\"OK: agents \" + pkg.version + \" browser_execute model output omits calls: \" + JSON.stringify(out.value));\n  process.exit(0);\n}).catch((e) => {\n  console.error(\"ERROR: \" + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: browser_execute model output still includes the calls log"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.23.0/packages/agents/CHANGELOG.md",
+            "quote": "`browser_execute` no longer sends the durable `calls` log to the model. The persisted tool part keeps it for UIs and audit, matching the Code Mode tool's own projection."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.23.0 changed what `browser_execute` does. browser_execute no longer sends the durable calls log to the model; the persisted tool part keeps it for UIs and audit. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.23.0#18",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C5R7K8AMTGMXSBBGD6",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.23.0",
+      "kind": "default",
+      "symbol": "DEFAULT_CHAT_RECOVERY_MAX_WORK",
+      "signal": "silent",
+      "detail": "DEFAULT_CHAT_RECOVERY_MAX_WORK moves from 1000 to 10000; the work budget unit is now the durable segment.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.23.0",
+              "ai": "7.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst file = \"/w/t.mjs\";\nfs.writeFileSync(file, [\n  'import * as chat from \"agents/chat\";',\n  'const viaUnset = chat.resolveChatRecoveryConfig(undefined).maxRecoveryWork;',\n  'const viaEmpty = chat.resolveChatRecoveryConfig({}).maxRecoveryWork;',\n  'console.log(JSON.stringify({ c: chat.DEFAULT_CHAT_RECOVERY_MAX_WORK, viaUnset, viaEmpty }));'\n].join(\"\\n\"));\nconst { spawnSync } = require(\"child_process\");\nconst r = spawnSync(process.execPath, [file], { encoding: \"utf8\", timeout: 60000 });\nif (r.status !== 0) {\n  console.error(\"ERROR: could not load agents/chat: \" + (r.stderr || \"\").slice(0, 400));\n  process.exit(2);\n}\nlet v;\ntry { v = JSON.parse(r.stdout.trim().split(\"\\n\").pop()); } catch (e) {\n  console.error(\"ERROR: unexpected output \" + r.stdout);\n  process.exit(2);\n}\nif (v.c === 10000 && v.viaUnset === 10000 && v.viaEmpty === 10000) {\n  console.log(\"OK: default maxRecoveryWork is 10000\");\n  process.exit(0);\n}\nif (v.c === 1000 && v.viaUnset === 1000 && v.viaEmpty === 1000) {\n  console.error(\"FAIL: default maxRecoveryWork is 1000, not 10000\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected values \" + JSON.stringify(v));\nprocess.exit(2);\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.22.0",
+              "ai": "7.0.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst file = \"/w/t.mjs\";\nfs.writeFileSync(file, [\n  'import * as chat from \"agents/chat\";',\n  'const viaUnset = chat.resolveChatRecoveryConfig(undefined).maxRecoveryWork;',\n  'const viaEmpty = chat.resolveChatRecoveryConfig({}).maxRecoveryWork;',\n  'console.log(JSON.stringify({ c: chat.DEFAULT_CHAT_RECOVERY_MAX_WORK, viaUnset, viaEmpty }));'\n].join(\"\\n\"));\nconst { spawnSync } = require(\"child_process\");\nconst r = spawnSync(process.execPath, [file], { encoding: \"utf8\", timeout: 60000 });\nif (r.status !== 0) {\n  console.error(\"ERROR: could not load agents/chat: \" + (r.stderr || \"\").slice(0, 400));\n  process.exit(2);\n}\nlet v;\ntry { v = JSON.parse(r.stdout.trim().split(\"\\n\").pop()); } catch (e) {\n  console.error(\"ERROR: unexpected output \" + r.stdout);\n  process.exit(2);\n}\nif (v.c === 10000 && v.viaUnset === 10000 && v.viaEmpty === 10000) {\n  console.log(\"OK: default maxRecoveryWork is 10000\");\n  process.exit(0);\n}\nif (v.c === 1000 && v.viaUnset === 1000 && v.viaEmpty === 1000) {\n  console.error(\"FAIL: default maxRecoveryWork is 1000, not 10000\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected values \" + JSON.stringify(v));\nprocess.exit(2);\n",
+            "expect": "fail",
+            "error": "FAIL: default maxRecoveryWork is 1000, not 10000"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.23.0/packages/agents/CHANGELOG.md",
+            "quote": "The work budget's unit is now the durable segment, and `DEFAULT_CHAT_RECOVERY_MAX_WORK` moves from 1000 to 10000 to stay as generous as before for delta-heavy turns."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.23.0 changed the default of `DEFAULT_CHAT_RECOVERY_MAX_WORK`. DEFAULT_CHAT_RECOVERY_MAX_WORK moves from 1000 to 10000; the work budget unit is now the durable segment. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.24.0#2",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C6ZNYD9A3VNPJXAENR",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.24.0",
+      "kind": "behavior",
+      "symbol": "getCurrentAgent",
+      "signal": "silent",
+      "detail": "Queued callbacks run from the alarm loop in a fresh invocation, so getCurrentAgent no longer sees the enqueuing request's connection or request.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.24.0/packages/agents/CHANGELOG.md",
+            "quote": "Queued callbacks run from the alarm loop in a fresh invocation, so they no longer see the enqueuing request's `connection` or `request` through `getCurrentAgent()` (the agent itself is still available)."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.24.0 changed what `getCurrentAgent` does. Queued callbacks run from the alarm loop in a fresh invocation, so getCurrentAgent no longer sees the enqueuing request's connection or request. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#11",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C7S6KCK048C7AZEM4R",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "deprecated",
+      "symbol": "CdpSession",
+      "replacement": "CdpConnection",
+      "signal": "silent",
+      "detail": "CdpSession is retained as a deprecated alias of the CdpConnection name.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\n// @cloudflare/codemode is an optional peer of agents/browser; stub it only if it is absent.\nconst stubDir = \"/w/node_modules/@cloudflare/codemode\";\nif (!fs.existsSync(path.join(stubDir, \"package.json\"))) {\n  fs.mkdirSync(stubDir, { recursive: true });\n  fs.writeFileSync(path.join(stubDir, \"package.json\"), JSON.stringify({ name: \"@cloudflare/codemode\", version: \"0.0.0\", type: \"module\", exports: { \".\": \"./index.js\" } }));\n  fs.writeFileSync(path.join(stubDir, \"index.js\"), \"export class CodemodeConnector { constructor() {} }\\nexport class CodemodeRuntime { constructor() {} }\\n\");\n}\nfs.writeFileSync(\"/w/check.mjs\", \"export default await import('agents/browser');\\n\");\nimport(\"/w/check.mjs\").then((m) => {\n  const mod = m.default;\n  const version = JSON.parse(fs.readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\")).version;\n  if (typeof mod.CdpSession !== \"function\") {\n    console.error(\"ERROR: agents/browser does not export a CdpSession class\");\n    process.exit(2);\n  }\n  if (mod.CdpConnection === undefined) {\n    console.error(\"FAIL: agents/browser exports no CdpConnection; CdpSession is the only name (agents \" + version + \")\");\n    process.exit(1);\n  }\n  if (mod.CdpConnection !== mod.CdpSession) {\n    console.error(\"ERROR: CdpSession is not an alias of CdpConnection\");\n    process.exit(2);\n  }\n  console.log(\"OK: agents \" + version + \" CdpSession === CdpConnection\");\n  process.exit(0);\n}).catch((e) => {\n  console.error(\"ERROR: import failed: \" + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\n// @cloudflare/codemode is an optional peer of agents/browser; stub it only if it is absent.\nconst stubDir = \"/w/node_modules/@cloudflare/codemode\";\nif (!fs.existsSync(path.join(stubDir, \"package.json\"))) {\n  fs.mkdirSync(stubDir, { recursive: true });\n  fs.writeFileSync(path.join(stubDir, \"package.json\"), JSON.stringify({ name: \"@cloudflare/codemode\", version: \"0.0.0\", type: \"module\", exports: { \".\": \"./index.js\" } }));\n  fs.writeFileSync(path.join(stubDir, \"index.js\"), \"export class CodemodeConnector { constructor() {} }\\nexport class CodemodeRuntime { constructor() {} }\\n\");\n}\nfs.writeFileSync(\"/w/check.mjs\", \"export default await import('agents/browser');\\n\");\nimport(\"/w/check.mjs\").then((m) => {\n  const mod = m.default;\n  const version = JSON.parse(fs.readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\")).version;\n  if (typeof mod.CdpSession !== \"function\") {\n    console.error(\"ERROR: agents/browser does not export a CdpSession class\");\n    process.exit(2);\n  }\n  if (mod.CdpConnection === undefined) {\n    console.error(\"FAIL: agents/browser exports no CdpConnection; CdpSession is the only name (agents \" + version + \")\");\n    process.exit(1);\n  }\n  if (mod.CdpConnection !== mod.CdpSession) {\n    console.error(\"ERROR: CdpSession is not an alias of CdpConnection\");\n    process.exit(2);\n  }\n  console.log(\"OK: agents \" + version + \" CdpSession === CdpConnection\");\n  process.exit(0);\n}).catch((e) => {\n  console.error(\"ERROR: import failed: \" + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: agents/browser exports no CdpConnection"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "Add Browser Run hostname guardrails, close and activity callbacks, and the `CdpConnection` name while retaining `CdpSession` as a deprecated alias."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.25.0 deprecated `CdpSession`; use `CdpConnection` instead. CdpSession is retained as a deprecated alias of the CdpConnection name. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#14",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C8X66F5XFAVTPHYVTY",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "loadCdpSpec",
+      "signal": "silent",
+      "detail": "loadCdpSpec now includes command parameters and return types, so a model can see how to call a CDP method.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst W = \"/w\";\nconst nm = path.join(W, \"node_modules\");\n// @cloudflare/codemode is an optional peer that loadCdpSpec does not use; stub it only if absent.\nconst cm = path.join(nm, \"@cloudflare\", \"codemode\");\nif (!fs.existsSync(path.join(cm, \"package.json\"))) {\n  fs.mkdirSync(cm, { recursive: true });\n  fs.writeFileSync(path.join(cm, \"package.json\"), JSON.stringify({ name: \"@cloudflare/codemode\", type: \"module\", main: \"index.js\" }));\n  fs.writeFileSync(path.join(cm, \"index.js\"), \"export class CodemodeConnector {}\\nexport class CodemodeRuntime {}\\n\");\n}\nconst protocol = {\n  domains: [{\n    domain: \"Page\",\n    description: \"Page domain\",\n    types: [{ id: \"FrameId\", type: \"string\", description: \"Frame id\" }],\n    commands: [{\n      name: \"navigate\",\n      description: \"Navigates current page to the given URL.\",\n      parameters: [\n        { name: \"url\", type: \"string\", description: \"URL to navigate the page to.\" },\n        { name: \"frameId\", $ref: \"FrameId\", optional: true }\n      ],\n      returns: [{ name: \"frameId\", $ref: \"FrameId\" }]\n    }],\n    events: []\n  }]\n};\nconst json = (body) => new Response(JSON.stringify(body), { status: 200, headers: { \"content-type\": \"application/json\" } });\nconst browser = {\n  async fetch(url, init) {\n    const u = String(url);\n    if (init && init.method === \"POST\") return json({ sessionId: \"s1\" });\n    if (init && init.method === \"DELETE\") return new Response(\"\", { status: 200 });\n    if (u.endsWith(\"/json/protocol\")) return json(protocol);\n    return new Response(\"not found\", { status: 404 });\n  }\n};\nconst entry = path.join(W, \"loadspec.mjs\");\nfs.writeFileSync(entry, \"export * from 'agents/browser';\\n\");\nconst ver = JSON.parse(fs.readFileSync(path.join(nm, \"agents\", \"package.json\"), \"utf8\")).version;\n(async () => {\n  let mod;\n  try {\n    mod = await import(require(\"url\").pathToFileURL(entry).href);\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/browser: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof mod.loadCdpSpec !== \"function\") {\n    console.error(\"ERROR: loadCdpSpec is not exported\");\n    process.exit(2);\n  }\n  let spec;\n  try {\n    spec = await mod.loadCdpSpec({ browser });\n  } catch (e) {\n    console.error(\"ERROR: loadCdpSpec threw: \" + e.message);\n    process.exit(2);\n  }\n  const page = spec && spec.domains && spec.domains.find((d) => d.name === \"Page\");\n  const cmd = page && page.commands.find((c) => c.method === \"Page.navigate\");\n  if (!cmd) {\n    console.error(\"ERROR: Page.navigate missing from spec \" + JSON.stringify(spec));\n    process.exit(2);\n  }\n  const params = cmd.parameters;\n  const returns = cmd.returns;\n  if (params === undefined && returns === undefined) {\n    console.error(\"FAIL: loadCdpSpec drops command parameters and returns (agents \" + ver + \")\");\n    process.exit(1);\n  }\n  const url = Array.isArray(params) && params.find((p) => p.name === \"url\");\n  const ret = Array.isArray(returns) && returns.find((r) => r.name === \"frameId\");\n  if (url && url.type === \"string\" && ret && ret.$ref === \"Page.FrameId\") {\n    console.log(\"OK: agents \" + ver + \" loadCdpSpec keeps Page.navigate parameters and returns: \" + JSON.stringify({ parameters: params.map((p) => p.name), returns: returns.map((r) => r.$ref) }));\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected command shape \" + JSON.stringify(cmd));\n  process.exit(2);\n})();\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst W = \"/w\";\nconst nm = path.join(W, \"node_modules\");\n// @cloudflare/codemode is an optional peer that loadCdpSpec does not use; stub it only if absent.\nconst cm = path.join(nm, \"@cloudflare\", \"codemode\");\nif (!fs.existsSync(path.join(cm, \"package.json\"))) {\n  fs.mkdirSync(cm, { recursive: true });\n  fs.writeFileSync(path.join(cm, \"package.json\"), JSON.stringify({ name: \"@cloudflare/codemode\", type: \"module\", main: \"index.js\" }));\n  fs.writeFileSync(path.join(cm, \"index.js\"), \"export class CodemodeConnector {}\\nexport class CodemodeRuntime {}\\n\");\n}\nconst protocol = {\n  domains: [{\n    domain: \"Page\",\n    description: \"Page domain\",\n    types: [{ id: \"FrameId\", type: \"string\", description: \"Frame id\" }],\n    commands: [{\n      name: \"navigate\",\n      description: \"Navigates current page to the given URL.\",\n      parameters: [\n        { name: \"url\", type: \"string\", description: \"URL to navigate the page to.\" },\n        { name: \"frameId\", $ref: \"FrameId\", optional: true }\n      ],\n      returns: [{ name: \"frameId\", $ref: \"FrameId\" }]\n    }],\n    events: []\n  }]\n};\nconst json = (body) => new Response(JSON.stringify(body), { status: 200, headers: { \"content-type\": \"application/json\" } });\nconst browser = {\n  async fetch(url, init) {\n    const u = String(url);\n    if (init && init.method === \"POST\") return json({ sessionId: \"s1\" });\n    if (init && init.method === \"DELETE\") return new Response(\"\", { status: 200 });\n    if (u.endsWith(\"/json/protocol\")) return json(protocol);\n    return new Response(\"not found\", { status: 404 });\n  }\n};\nconst entry = path.join(W, \"loadspec.mjs\");\nfs.writeFileSync(entry, \"export * from 'agents/browser';\\n\");\nconst ver = JSON.parse(fs.readFileSync(path.join(nm, \"agents\", \"package.json\"), \"utf8\")).version;\n(async () => {\n  let mod;\n  try {\n    mod = await import(require(\"url\").pathToFileURL(entry).href);\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/browser: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof mod.loadCdpSpec !== \"function\") {\n    console.error(\"ERROR: loadCdpSpec is not exported\");\n    process.exit(2);\n  }\n  let spec;\n  try {\n    spec = await mod.loadCdpSpec({ browser });\n  } catch (e) {\n    console.error(\"ERROR: loadCdpSpec threw: \" + e.message);\n    process.exit(2);\n  }\n  const page = spec && spec.domains && spec.domains.find((d) => d.name === \"Page\");\n  const cmd = page && page.commands.find((c) => c.method === \"Page.navigate\");\n  if (!cmd) {\n    console.error(\"ERROR: Page.navigate missing from spec \" + JSON.stringify(spec));\n    process.exit(2);\n  }\n  const params = cmd.parameters;\n  const returns = cmd.returns;\n  if (params === undefined && returns === undefined) {\n    console.error(\"FAIL: loadCdpSpec drops command parameters and returns (agents \" + ver + \")\");\n    process.exit(1);\n  }\n  const url = Array.isArray(params) && params.find((p) => p.name === \"url\");\n  const ret = Array.isArray(returns) && returns.find((r) => r.name === \"frameId\");\n  if (url && url.type === \"string\" && ret && ret.$ref === \"Page.FrameId\") {\n    console.log(\"OK: agents \" + ver + \" loadCdpSpec keeps Page.navigate parameters and returns: \" + JSON.stringify({ parameters: params.map((p) => p.name), returns: returns.map((r) => r.$ref) }));\n    process.exit(0);\n  }\n  console.error(\"ERROR: unexpected command shape \" + JSON.stringify(cmd));\n  process.exit(2);\n})();\n",
+            "expect": "fail",
+            "error": "FAIL: loadCdpSpec drops command parameters and returns"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "`cdp.spec()` and `loadCdpSpec()` now include command parameters, return types, and type details, so a model can see how to call a CDP method."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.25.0 changed what `loadCdpSpec` does. loadCdpSpec now includes command parameters and return types, so a model can see how to call a CDP method. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#17",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7C9791SP86CD2WJGWNT",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "useAgentChat",
+      "signal": "silent",
+      "detail": "A WebSocket close before the final done frame now puts useAgentChat in the error state instead of showing a truncated answer as complete.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst file = \"/w/ludion-test.mjs\";\nfs.writeFileSync(file, `\nimport { WebSocketChatTransport } from \"agents/chat/transport\";\nconst target = new EventTarget();\nconst sent = [];\nconst agent = {\n  send: (d) => { sent.push(JSON.parse(d)); },\n  addEventListener: target.addEventListener.bind(target),\n  removeEventListener: target.removeEventListener.bind(target)\n};\nconst transport = new WebSocketChatTransport({ agent });\nconst stream = await transport.sendMessages({\n  chatId: \"c1\",\n  messages: [{ id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"hi\" }] }],\n  trigger: \"submit-message\",\n  messageId: undefined,\n  abortSignal: undefined\n});\nconst req = sent.find((m) => m.type === \"cf_agent_use_chat_request\");\nif (!req) { console.error(\"ERROR: no chat request was sent\"); process.exit(2); }\nconst frame = (body) => new MessageEvent(\"message\", { data: JSON.stringify({ type: \"cf_agent_use_chat_response\", id: req.id, body, done: false }) });\ntarget.dispatchEvent(frame(JSON.stringify({ type: \"start\", messageId: \"a1\" })));\ntarget.dispatchEvent(frame(JSON.stringify({ type: \"text-start\", id: \"t1\" })));\ntarget.dispatchEvent(frame(JSON.stringify({ type: \"text-delta\", id: \"t1\", delta: \"Hel\" })));\ntarget.dispatchEvent(new Event(\"close\"));\nconst chunks = [];\nconst reader = stream.getReader();\nconst timer = setTimeout(() => { console.error(\"ERROR: stream did not end after close\"); process.exit(2); }, 5000);\nfor (;;) {\n  const r = await reader.read();\n  if (r.done) break;\n  chunks.push(r.value);\n}\nclearTimeout(timer);\nconst types = chunks.map((c) => c.type);\nif (!types.includes(\"text-delta\")) { console.error(\"ERROR: received chunks missing: \" + JSON.stringify(types)); process.exit(2); }\nconst err = chunks.find((c) => c.type === \"error\");\nif (err && /closed mid-stream/.test(err.errorText)) {\n  console.log(\"OK: stream delivers received chunks, then an error chunk: \" + err.errorText);\n  process.exit(0);\n}\nif (!err) {\n  console.error(\"FAIL: a socket close before done ended the chat stream cleanly with no error chunk\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected error chunk \" + JSON.stringify(err));\nprocess.exit(2);\n`);\nimport(file).catch((e) => { console.error(\"ERROR: \" + ((e && e.stack) || e)); process.exit(2); });\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst file = \"/w/ludion-test.mjs\";\nfs.writeFileSync(file, `\nimport { WebSocketChatTransport } from \"agents/chat/transport\";\nconst target = new EventTarget();\nconst sent = [];\nconst agent = {\n  send: (d) => { sent.push(JSON.parse(d)); },\n  addEventListener: target.addEventListener.bind(target),\n  removeEventListener: target.removeEventListener.bind(target)\n};\nconst transport = new WebSocketChatTransport({ agent });\nconst stream = await transport.sendMessages({\n  chatId: \"c1\",\n  messages: [{ id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"hi\" }] }],\n  trigger: \"submit-message\",\n  messageId: undefined,\n  abortSignal: undefined\n});\nconst req = sent.find((m) => m.type === \"cf_agent_use_chat_request\");\nif (!req) { console.error(\"ERROR: no chat request was sent\"); process.exit(2); }\nconst frame = (body) => new MessageEvent(\"message\", { data: JSON.stringify({ type: \"cf_agent_use_chat_response\", id: req.id, body, done: false }) });\ntarget.dispatchEvent(frame(JSON.stringify({ type: \"start\", messageId: \"a1\" })));\ntarget.dispatchEvent(frame(JSON.stringify({ type: \"text-start\", id: \"t1\" })));\ntarget.dispatchEvent(frame(JSON.stringify({ type: \"text-delta\", id: \"t1\", delta: \"Hel\" })));\ntarget.dispatchEvent(new Event(\"close\"));\nconst chunks = [];\nconst reader = stream.getReader();\nconst timer = setTimeout(() => { console.error(\"ERROR: stream did not end after close\"); process.exit(2); }, 5000);\nfor (;;) {\n  const r = await reader.read();\n  if (r.done) break;\n  chunks.push(r.value);\n}\nclearTimeout(timer);\nconst types = chunks.map((c) => c.type);\nif (!types.includes(\"text-delta\")) { console.error(\"ERROR: received chunks missing: \" + JSON.stringify(types)); process.exit(2); }\nconst err = chunks.find((c) => c.type === \"error\");\nif (err && /closed mid-stream/.test(err.errorText)) {\n  console.log(\"OK: stream delivers received chunks, then an error chunk: \" + err.errorText);\n  process.exit(0);\n}\nif (!err) {\n  console.error(\"FAIL: a socket close before done ended the chat stream cleanly with no error chunk\");\n  process.exit(1);\n}\nconsole.error(\"ERROR: unexpected error chunk \" + JSON.stringify(err));\nprocess.exit(2);\n`);\nimport(file).catch((e) => { console.error(\"ERROR: \" + ((e && e.stack) || e)); process.exit(2); });\n",
+            "expect": "fail",
+            "error": "FAIL: a socket close before done ended the chat stream cleanly with no error chunk"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "A WebSocket close before the final `done` frame now puts `useAgentChat` in the `error` state instead of showing a truncated answer as complete"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.25.0 changed what `useAgentChat` does. A WebSocket close before the final done frame now puts useAgentChat in the error state instead of showing a truncated answer as complete. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#18",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CAF2FR7BEGPZATXND4",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "compaction",
+      "signal": "silent",
+      "detail": "Agents stop storing compaction summaries that clients echo back.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nlet DatabaseSync;\ntry {\n  ({ DatabaseSync } = require(\"node:sqlite\"));\n} catch (e) {\n  console.error(\"ERROR: node:sqlite unavailable: \" + e.message);\n  process.exit(2);\n}\nconst root = \"/w/node_modules/agents\";\n(async () => {\n  const pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\n  const mod = await import(pathToFileURL(path.join(root, \"dist/sessions/index.js\")).href);\n  const db = new DatabaseSync(\":memory:\");\n  const kv = new Map();\n  const storage = {\n    sql: {\n      exec(query, ...params) {\n        const stmt = db.prepare(query);\n        if (stmt.columns().length > 0) {\n          const out = stmt.all(...params).map((r) => ({ ...r }));\n          out.rowsWritten = 0;\n          return out;\n        }\n        const info = stmt.run(...params);\n        const out = [];\n        out.rowsWritten = Number(info.changes);\n        return out;\n      }\n    },\n    transactionSync(fn) {\n      db.exec(\"SAVEPOINT t\");\n      try {\n        const r = fn();\n        db.exec(\"RELEASE t\");\n        return r;\n      } catch (e) {\n        db.exec(\"ROLLBACK TO t\");\n        db.exec(\"RELEASE t\");\n        throw e;\n      }\n    },\n    async get(k) { return kv.get(k); },\n    async put(k, v) { kv.set(k, v); }\n  };\n  let started;\n  const services = { storage, events: { emit() {} }, ready: () => started };\n  class TestSessions extends mod.Sessions {\n    get lifecycle() { return services; }\n  }\n  const sessions = new TestSessions();\n  started = sessions.onStart();\n  await started;\n  const s = sessions.session(\"s1\");\n  const msg = (id, role, text) => ({ id, role, parts: [{ type: \"text\", text }] });\n  await s.appendMessage(msg(\"m1\", \"user\", \"hello\"));\n  await s.appendMessage(msg(\"m2\", \"assistant\", \"hi there\"));\n  await s.appendMessage(msg(\"m3\", \"user\", \"more\"));\n  await s.addCompaction(\"summary of m1 and m2\", \"m1\", \"m2\");\n  const before = await s.getHistory();\n  const overlay = before.find((m) => mod.isCompactionMessage(m));\n  if (!overlay) {\n    console.error(\"ERROR: no compaction overlay in history: \" + JSON.stringify(before.map((m) => m.id)));\n    process.exit(2);\n  }\n  // A client posts its transcript back, echoing the overlay.\n  await s.appendMessage(overlay);\n  await s.appendMessage(msg(\"m4\", \"user\", \"next turn\"));\n  const ids = (await s.getHistory()).map((m) => m.id);\n  const copies = ids.filter((id) => id === overlay.id).length;\n  if (copies === 1 && ids[ids.length - 1] === \"m4\") {\n    console.log(\"OK: agents \" + pkg.version + \" did not store echoed overlay; history \" + JSON.stringify(ids));\n    process.exit(0);\n  }\n  if (copies > 1) {\n    console.error(\"FAIL: echoed compaction overlay was stored and repeats in getHistory\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected history \" + JSON.stringify(ids));\n  process.exit(2);\n})().catch((e) => {\n  console.error(\"ERROR: \" + ((e && e.stack) || e));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0"
+            },
+            "code": "const fs = require(\"fs\");\nconst path = require(\"path\");\nconst { pathToFileURL } = require(\"url\");\nlet DatabaseSync;\ntry {\n  ({ DatabaseSync } = require(\"node:sqlite\"));\n} catch (e) {\n  console.error(\"ERROR: node:sqlite unavailable: \" + e.message);\n  process.exit(2);\n}\nconst root = \"/w/node_modules/agents\";\n(async () => {\n  const pkg = JSON.parse(fs.readFileSync(path.join(root, \"package.json\"), \"utf8\"));\n  const mod = await import(pathToFileURL(path.join(root, \"dist/sessions/index.js\")).href);\n  const db = new DatabaseSync(\":memory:\");\n  const kv = new Map();\n  const storage = {\n    sql: {\n      exec(query, ...params) {\n        const stmt = db.prepare(query);\n        if (stmt.columns().length > 0) {\n          const out = stmt.all(...params).map((r) => ({ ...r }));\n          out.rowsWritten = 0;\n          return out;\n        }\n        const info = stmt.run(...params);\n        const out = [];\n        out.rowsWritten = Number(info.changes);\n        return out;\n      }\n    },\n    transactionSync(fn) {\n      db.exec(\"SAVEPOINT t\");\n      try {\n        const r = fn();\n        db.exec(\"RELEASE t\");\n        return r;\n      } catch (e) {\n        db.exec(\"ROLLBACK TO t\");\n        db.exec(\"RELEASE t\");\n        throw e;\n      }\n    },\n    async get(k) { return kv.get(k); },\n    async put(k, v) { kv.set(k, v); }\n  };\n  let started;\n  const services = { storage, events: { emit() {} }, ready: () => started };\n  class TestSessions extends mod.Sessions {\n    get lifecycle() { return services; }\n  }\n  const sessions = new TestSessions();\n  started = sessions.onStart();\n  await started;\n  const s = sessions.session(\"s1\");\n  const msg = (id, role, text) => ({ id, role, parts: [{ type: \"text\", text }] });\n  await s.appendMessage(msg(\"m1\", \"user\", \"hello\"));\n  await s.appendMessage(msg(\"m2\", \"assistant\", \"hi there\"));\n  await s.appendMessage(msg(\"m3\", \"user\", \"more\"));\n  await s.addCompaction(\"summary of m1 and m2\", \"m1\", \"m2\");\n  const before = await s.getHistory();\n  const overlay = before.find((m) => mod.isCompactionMessage(m));\n  if (!overlay) {\n    console.error(\"ERROR: no compaction overlay in history: \" + JSON.stringify(before.map((m) => m.id)));\n    process.exit(2);\n  }\n  // A client posts its transcript back, echoing the overlay.\n  await s.appendMessage(overlay);\n  await s.appendMessage(msg(\"m4\", \"user\", \"next turn\"));\n  const ids = (await s.getHistory()).map((m) => m.id);\n  const copies = ids.filter((id) => id === overlay.id).length;\n  if (copies === 1 && ids[ids.length - 1] === \"m4\") {\n    console.log(\"OK: agents \" + pkg.version + \" did not store echoed overlay; history \" + JSON.stringify(ids));\n    process.exit(0);\n  }\n  if (copies > 1) {\n    console.error(\"FAIL: echoed compaction overlay was stored and repeats in getHistory\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected history \" + JSON.stringify(ids));\n  process.exit(2);\n})().catch((e) => {\n  console.error(\"ERROR: \" + ((e && e.stack) || e));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: echoed compaction overlay was stored and repeats in getHistory"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "Stop storing compaction summaries that clients echo back, and hide duplicates already stored"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.25.0 changed what `compaction` does. Agents stop storing compaction summaries that clients echo back. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#20",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CBQSZP2X4MKMT6GGHY",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "broadcast",
+      "signal": "silent",
+      "detail": "Sub-agent broadcasts make at most one root call, and none when no client would receive them.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "Sub-agent broadcasts make at most one root call, and none when no client would receive them."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.25.0 changed what `broadcast` does. Sub-agent broadcasts make at most one root call, and none when no client would receive them. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#23",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CCP5KK9NVTZ4VQ69MK",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "useAgentChat",
+      "signal": "silent",
+      "detail": "useAgentChat lets the server snapshot repair a scrambled cross-tab or resumed assistant message instead of keeping it until reload.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0",
+              "ai": "6.0.0"
+            },
+            "code": "(() => {\n  let chat;\n  try {\n    chat = require(\"agents/chat\");\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  const step = chat.broadcastTransition;\n  if (typeof step !== \"function\") {\n    console.error(\"ERROR: agents/chat has no broadcastTransition export\");\n    process.exit(2);\n  }\n  // An observed stream whose two copies of the reply interleaved.\n  let state = { status: \"idle\" };\n  const chunks = [\n    { type: \"start\", messageId: \"a1\" },\n    { type: \"text-start\", id: \"t1\" },\n    ...[\"You\", \" can\", \"You\", \" see\", \" can\", \" see\"].map((delta) => ({ type: \"text-delta\", id: \"t1\", delta }))\n  ];\n  for (const chunkData of chunks) {\n    state = step(state, { type: \"response\", streamId: \"s1\", messageId: \"tmp\", chunkData }).state;\n  }\n  if (state.status !== \"observing\") {\n    console.error(\"ERROR: expected observing state, got \" + state.status);\n    process.exit(2);\n  }\n  // The server's clean snapshot arrives, then done.\n  const snapshot = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"Hi\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"text\", text: \"You can see\" }] }\n  ];\n  const done = step(state, { type: \"response\", streamId: \"s1\", messageId: \"tmp\", done: true });\n  if (typeof done.messagesUpdate !== \"function\") {\n    console.error(\"ERROR: done produced no messagesUpdate\");\n    process.exit(2);\n  }\n  const after = done.messagesUpdate(snapshot);\n  const text = after\n    .filter((m) => m.role === \"assistant\")\n    .flatMap((m) => m.parts)\n    .filter((p) => p.type === \"text\")\n    .map((p) => p.text)\n    .join(\"\");\n  if (text === \"You can see\") {\n    console.log(\"OK: the server snapshot text is kept after done: \" + JSON.stringify(text));\n    process.exit(0);\n  }\n  if (text === \"You canYou see can see\") {\n    console.error(\"FAIL: done merged the scrambled observed text over the server snapshot\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected assistant text \" + JSON.stringify(text));\n  process.exit(2);\n})();\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0",
+              "ai": "6.0.0"
+            },
+            "code": "(() => {\n  let chat;\n  try {\n    chat = require(\"agents/chat\");\n  } catch (e) {\n    console.error(\"ERROR: cannot import agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  const step = chat.broadcastTransition;\n  if (typeof step !== \"function\") {\n    console.error(\"ERROR: agents/chat has no broadcastTransition export\");\n    process.exit(2);\n  }\n  // An observed stream whose two copies of the reply interleaved.\n  let state = { status: \"idle\" };\n  const chunks = [\n    { type: \"start\", messageId: \"a1\" },\n    { type: \"text-start\", id: \"t1\" },\n    ...[\"You\", \" can\", \"You\", \" see\", \" can\", \" see\"].map((delta) => ({ type: \"text-delta\", id: \"t1\", delta }))\n  ];\n  for (const chunkData of chunks) {\n    state = step(state, { type: \"response\", streamId: \"s1\", messageId: \"tmp\", chunkData }).state;\n  }\n  if (state.status !== \"observing\") {\n    console.error(\"ERROR: expected observing state, got \" + state.status);\n    process.exit(2);\n  }\n  // The server's clean snapshot arrives, then done.\n  const snapshot = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"Hi\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"text\", text: \"You can see\" }] }\n  ];\n  const done = step(state, { type: \"response\", streamId: \"s1\", messageId: \"tmp\", done: true });\n  if (typeof done.messagesUpdate !== \"function\") {\n    console.error(\"ERROR: done produced no messagesUpdate\");\n    process.exit(2);\n  }\n  const after = done.messagesUpdate(snapshot);\n  const text = after\n    .filter((m) => m.role === \"assistant\")\n    .flatMap((m) => m.parts)\n    .filter((p) => p.type === \"text\")\n    .map((p) => p.text)\n    .join(\"\");\n  if (text === \"You can see\") {\n    console.log(\"OK: the server snapshot text is kept after done: \" + JSON.stringify(text));\n    process.exit(0);\n  }\n  if (text === \"You canYou see can see\") {\n    console.error(\"FAIL: done merged the scrambled observed text over the server snapshot\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected assistant text \" + JSON.stringify(text));\n  process.exit(2);\n})();\n",
+            "expect": "fail",
+            "error": "FAIL: done merged the scrambled observed text over the server snapshot"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "`useAgentChat` lets the server snapshot repair a scrambled cross-tab or resumed assistant message instead of keeping it until reload."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.25.0 changed what `useAgentChat` does. useAgentChat lets the server snapshot repair a scrambled cross-tab or resumed assistant message instead of keeping it until reload. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#24",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CDYK4MZ72B18RM03ZP",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "onToolCall",
+      "signal": "silent",
+      "detail": "onToolCall fires once the response stream ends, for each tool call still waiting for a result; a server tool never reaches onToolCall.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/docs/agents/chat-agents.md",
+            "quote": "`onToolCall` fires once the response stream ends, for each tool call that is still waiting for a result. A server tool runs and resolves in the same stream, so it never reaches `onToolCall`."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.25.0 changed what `onToolCall` does. onToolCall fires once the response stream ends, for each tool call still waiting for a result; a server tool never reaches onToolCall. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#26",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CER9P72Y8JHFSS8AK9",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "reconcileMessages",
+      "signal": "silent",
+      "detail": "reconcileMessages keeps tool outputs attached to the correct turn when a provider reuses a toolCallId.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0",
+              "ai": "6.0.0"
+            },
+            "code": "(async () => {\n  let chat;\n  try {\n    chat = await import(\"/w/node_modules/agents/dist/chat/index.js\");\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.reconcileMessages !== \"function\") {\n    console.error(\"ERROR: reconcileMessages is not exported\");\n    process.exit(2);\n  }\n  const server = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"first\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"output-available\", input: { q: \"cats\" }, output: \"cats result\" }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"second\" }] }\n  ];\n  const incoming = [\n    server[0],\n    server[1],\n    server[2],\n    { id: \"a2\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"input-available\", input: { q: \"dogs\" } }] }\n  ];\n  const out = chat.reconcileMessages(incoming, server);\n  const last = out[out.length - 1];\n  const part = last && last.parts && last.parts[0];\n  if (out.length !== 4 || !part || part.toolCallId !== \"call_0\") {\n    console.error(\"ERROR: unexpected reconcileMessages result \" + JSON.stringify(out));\n    process.exit(2);\n  }\n  if (last.id === \"a2\" && part.state === \"input-available\" && !(\"output\" in part)) {\n    console.log(\"OK: the new turn's reused toolCallId call_0 stays pending; the earlier turn's output is not attached\");\n    process.exit(0);\n  }\n  if (part.state === \"output-available\" && part.output === \"cats result\") {\n    console.error(\"FAIL: a later turn reusing toolCallId call_0 got the earlier turn's tool output\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected last message \" + JSON.stringify(last));\n  process.exit(2);\n})();\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0",
+              "ai": "6.0.0"
+            },
+            "code": "(async () => {\n  let chat;\n  try {\n    chat = await import(\"/w/node_modules/agents/dist/chat/index.js\");\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.reconcileMessages !== \"function\") {\n    console.error(\"ERROR: reconcileMessages is not exported\");\n    process.exit(2);\n  }\n  const server = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"first\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"output-available\", input: { q: \"cats\" }, output: \"cats result\" }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"second\" }] }\n  ];\n  const incoming = [\n    server[0],\n    server[1],\n    server[2],\n    { id: \"a2\", role: \"assistant\", parts: [{ type: \"tool-search\", toolCallId: \"call_0\", state: \"input-available\", input: { q: \"dogs\" } }] }\n  ];\n  const out = chat.reconcileMessages(incoming, server);\n  const last = out[out.length - 1];\n  const part = last && last.parts && last.parts[0];\n  if (out.length !== 4 || !part || part.toolCallId !== \"call_0\") {\n    console.error(\"ERROR: unexpected reconcileMessages result \" + JSON.stringify(out));\n    process.exit(2);\n  }\n  if (last.id === \"a2\" && part.state === \"input-available\" && !(\"output\" in part)) {\n    console.log(\"OK: the new turn's reused toolCallId call_0 stays pending; the earlier turn's output is not attached\");\n    process.exit(0);\n  }\n  if (part.state === \"output-available\" && part.output === \"cats result\") {\n    console.error(\"FAIL: a later turn reusing toolCallId call_0 got the earlier turn's tool output\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected last message \" + JSON.stringify(last));\n  process.exit(2);\n})();\n",
+            "expect": "fail",
+            "error": "FAIL: a later turn reusing toolCallId call_0 got the earlier turn's tool output"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "Keep assistant messages and tool outputs attached to the correct turn when a provider reuses a `toolCallId`; `resolveToolMergeId` is deprecated in favour of `reconcileMessages`."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.25.0 changed what `reconcileMessages` does. reconcileMessages keeps tool outputs attached to the correct turn when a provider reuses a toolCallId. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#27",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CFY8ZN6R0X4WP5N6EH",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "AgentClient ready",
+      "signal": "silent",
+      "detail": "AgentClient resolves ready only after the agent's state arrives, so state is no longer briefly undefined.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0"
+            },
+            "code": "const { AgentClient } = require(\"agents/client\");\nconst version = JSON.parse(require(\"fs\").readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\")).version;\nclass FakeWS extends EventTarget {\n  constructor(url) {\n    super();\n    this.url = url;\n    this.readyState = 0;\n    this.binaryType = \"blob\";\n    this.protocol = \"\";\n    this.extensions = \"\";\n    this.bufferedAmount = 0;\n    const msg = (data) => this.dispatchEvent(new MessageEvent(\"message\", { data: JSON.stringify(data) }));\n    setTimeout(() => {\n      this.readyState = 1;\n      this.dispatchEvent(new Event(\"open\"));\n      setTimeout(() => {\n        msg({ type: \"cf_agent_identity\", name: \"default\", agent: \"counter\", stateFollows: true });\n        setTimeout(() => msg({ type: \"cf_agent_state\", state: { count: 7 } }), 20);\n      }, 10);\n    }, 10);\n  }\n  send() {}\n  close() { this.readyState = 3; }\n}\nFakeWS.CONNECTING = 0;\nFakeWS.OPEN = 1;\nFakeWS.CLOSING = 2;\nFakeWS.CLOSED = 3;\nlet client;\ntry {\n  client = new AgentClient({ agent: \"counter\", host: \"localhost:8787\", WebSocket: FakeWS });\n} catch (e) {\n  console.error(\"ERROR: AgentClient constructor threw: \" + e.message);\n  process.exit(2);\n}\nconst timer = setTimeout(() => {\n  console.error(\"ERROR: ready did not resolve within 5s\");\n  process.exit(2);\n}, 5000);\nclient.ready.then(() => {\n  clearTimeout(timer);\n  const s = client.state;\n  if (s && s.count === 7) {\n    console.log(\"OK: agents \" + version + \" AgentClient ready resolved with state \" + JSON.stringify(s));\n    process.exit(0);\n  }\n  if (s === undefined) {\n    console.error(\"FAIL: AgentClient ready resolved before the state frame; state was undefined\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected state at ready: \" + JSON.stringify(s));\n  process.exit(2);\n}, (e) => {\n  console.error(\"ERROR: ready rejected: \" + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0"
+            },
+            "code": "const { AgentClient } = require(\"agents/client\");\nconst version = JSON.parse(require(\"fs\").readFileSync(\"/w/node_modules/agents/package.json\", \"utf8\")).version;\nclass FakeWS extends EventTarget {\n  constructor(url) {\n    super();\n    this.url = url;\n    this.readyState = 0;\n    this.binaryType = \"blob\";\n    this.protocol = \"\";\n    this.extensions = \"\";\n    this.bufferedAmount = 0;\n    const msg = (data) => this.dispatchEvent(new MessageEvent(\"message\", { data: JSON.stringify(data) }));\n    setTimeout(() => {\n      this.readyState = 1;\n      this.dispatchEvent(new Event(\"open\"));\n      setTimeout(() => {\n        msg({ type: \"cf_agent_identity\", name: \"default\", agent: \"counter\", stateFollows: true });\n        setTimeout(() => msg({ type: \"cf_agent_state\", state: { count: 7 } }), 20);\n      }, 10);\n    }, 10);\n  }\n  send() {}\n  close() { this.readyState = 3; }\n}\nFakeWS.CONNECTING = 0;\nFakeWS.OPEN = 1;\nFakeWS.CLOSING = 2;\nFakeWS.CLOSED = 3;\nlet client;\ntry {\n  client = new AgentClient({ agent: \"counter\", host: \"localhost:8787\", WebSocket: FakeWS });\n} catch (e) {\n  console.error(\"ERROR: AgentClient constructor threw: \" + e.message);\n  process.exit(2);\n}\nconst timer = setTimeout(() => {\n  console.error(\"ERROR: ready did not resolve within 5s\");\n  process.exit(2);\n}, 5000);\nclient.ready.then(() => {\n  clearTimeout(timer);\n  const s = client.state;\n  if (s && s.count === 7) {\n    console.log(\"OK: agents \" + version + \" AgentClient ready resolved with state \" + JSON.stringify(s));\n    process.exit(0);\n  }\n  if (s === undefined) {\n    console.error(\"FAIL: AgentClient ready resolved before the state frame; state was undefined\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected state at ready: \" + JSON.stringify(s));\n  process.exit(2);\n}, (e) => {\n  console.error(\"ERROR: ready rejected: \" + (e && e.message));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: AgentClient ready resolved before the state frame; state was undefined"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "`useAgent` and `AgentClient` resolve `ready` only after the agent's state arrives, so `state` is no longer briefly `undefined`"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [
+      "The quote \"`useAgent` and `AgentClient` resolve `ready` only after the agent's state arrive\" doesn't name AgentClient ready. Quote a sentence that states the fact itself, not a headline."
+    ],
+    "label": "differential",
+    "claim": "agents >=0.25.0 changed what `AgentClient ready` does. AgentClient resolves ready only after the agent's state arrives, so state is no longer briefly undefined. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#37",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CGWHPEX373QZXZQ9F8",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "added",
+      "symbol": "repairInterruptedToolParts repairApprovalResponded",
+      "signal": "silent",
+      "detail": "repairInterruptedToolParts with repairApprovalResponded settles approved tool calls that never ran once the conversation moves past them.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0",
+              "ai": "6.0.0"
+            },
+            "code": "const { pathToFileURL } = require(\"url\");\n(async () => {\n  let chat;\n  try {\n    chat = await import(pathToFileURL(require.resolve(\"agents/chat\")).href);\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.repairInterruptedToolParts !== \"function\") {\n    console.error(\"ERROR: repairInterruptedToolParts is not exported\");\n    process.exit(2);\n  }\n  const messages = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"deploy\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-deploy\", toolCallId: \"tc1\", state: \"approval-responded\", input: { env: \"prod\" }, approval: { id: \"ap1\", approved: true } }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"thanks\" }] }\n  ];\n  let result;\n  try {\n    result = chat.repairInterruptedToolParts(messages, {\n      repairPart: (p) => ({ ...p, state: \"output-error\", errorText: \"did not run\" }),\n      repairApprovalResponded: true\n    });\n  } catch (e) {\n    console.error(\"ERROR: repairInterruptedToolParts threw: \" + e.message);\n    process.exit(2);\n  }\n  const part = result && result.messages && result.messages[1] && result.messages[1].parts[0];\n  if (!part) {\n    console.error(\"ERROR: unexpected result \" + JSON.stringify(result));\n    process.exit(2);\n  }\n  if (part.state === \"output-error\" && result.removedToolCalls === 1) {\n    console.log(\"OK: approved tool call that never ran was settled as output-error\");\n    process.exit(0);\n  }\n  if (part.state === \"approval-responded\" && result.removedToolCalls === 0) {\n    console.error(\"FAIL: approved tool call that never ran stays approval-responded after a later message\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected part state \" + part.state + \" removedToolCalls \" + result.removedToolCalls);\n  process.exit(2);\n})();\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0",
+              "ai": "6.0.0"
+            },
+            "code": "const { pathToFileURL } = require(\"url\");\n(async () => {\n  let chat;\n  try {\n    chat = await import(pathToFileURL(require.resolve(\"agents/chat\")).href);\n  } catch (e) {\n    console.error(\"ERROR: cannot load agents/chat: \" + e.message);\n    process.exit(2);\n  }\n  if (typeof chat.repairInterruptedToolParts !== \"function\") {\n    console.error(\"ERROR: repairInterruptedToolParts is not exported\");\n    process.exit(2);\n  }\n  const messages = [\n    { id: \"u1\", role: \"user\", parts: [{ type: \"text\", text: \"deploy\" }] },\n    { id: \"a1\", role: \"assistant\", parts: [{ type: \"tool-deploy\", toolCallId: \"tc1\", state: \"approval-responded\", input: { env: \"prod\" }, approval: { id: \"ap1\", approved: true } }] },\n    { id: \"u2\", role: \"user\", parts: [{ type: \"text\", text: \"thanks\" }] }\n  ];\n  let result;\n  try {\n    result = chat.repairInterruptedToolParts(messages, {\n      repairPart: (p) => ({ ...p, state: \"output-error\", errorText: \"did not run\" }),\n      repairApprovalResponded: true\n    });\n  } catch (e) {\n    console.error(\"ERROR: repairInterruptedToolParts threw: \" + e.message);\n    process.exit(2);\n  }\n  const part = result && result.messages && result.messages[1] && result.messages[1].parts[0];\n  if (!part) {\n    console.error(\"ERROR: unexpected result \" + JSON.stringify(result));\n    process.exit(2);\n  }\n  if (part.state === \"output-error\" && result.removedToolCalls === 1) {\n    console.log(\"OK: approved tool call that never ran was settled as output-error\");\n    process.exit(0);\n  }\n  if (part.state === \"approval-responded\" && result.removedToolCalls === 0) {\n    console.error(\"FAIL: approved tool call that never ran stays approval-responded after a later message\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: unexpected part state \" + part.state + \" removedToolCalls \" + result.removedToolCalls);\n  process.exit(2);\n})();\n",
+            "expect": "fail",
+            "error": "FAIL: approved tool call that never ran stays approval-responded after a later message"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "Settle approved tool calls that never ran once the conversation moves past them, so later turns don't send unresolved tool calls"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [
+      "The quote \"Settle approved tool calls that never ran once the conversation moves past them,\" doesn't name repairInterruptedToolParts repairApprovalResponded. Quote a sentence that states the fact itself, not a headline.",
+      "No evidence names repairInterruptedToolParts repairApprovalResponded: use it in a test's code or quote a sentence that names it."
+    ],
+    "label": "differential",
+    "claim": "agents >=0.25.0 added `repairInterruptedToolParts repairApprovalResponded`. repairInterruptedToolParts with repairApprovalResponded settles approved tool calls that never ran once the conversation moves past them. Older versions don't have it."
+  },
+  {
+    "entry": "0.25.0#41",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CHAY189JKXZV65CZK1",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "storeTools",
+      "signal": "silent",
+      "detail": "With storeTools true, oversized tool payloads are recorded with base64 data summarized instead of being dropped.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.25.0"
+            },
+            "code": "const path = require('path');\nconst { pathToFileURL } = require('url');\nconst mod = require('module');\nconst root = '/w/node_modules/agents';\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\nconst spans = [];\nglobalThis.__tracing = {\n  startActiveSpan(name, run) {\n    const span = { name, attributes: {}, ended: false };\n    spans.push(span);\n    return run({ isTraced: true, setAttribute(k, v) { span.attributes[k] = v; }, end() { span.ended = true; } });\n  }\n};\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (specifier === 'cloudflare:workers') return { url: 'data:text/javascript,export const tracing = globalThis.__tracing;', shortCircuit: true };\n    return next(specifier, context);\n  }\n});\n(async () => {\n  let wrapAISDK;\n  try {\n    ({ wrapAISDK } = await import(pathToFileURL(path.join(root, 'dist/observability/ai/index.js')).href));\n  } catch (e) {\n    console.error('ERROR: cannot load agents/observability/ai: ' + e.message);\n    process.exit(2);\n  }\n  const output = { type: 'browser_screenshot', mediaType: 'image/png', data: 'iVBORw0K'.repeat(10000) };\n  const ai = {\n    generateText: async (params) => {\n      const r = await params.tools.run.execute({ ok: true }, { toolCallId: 'c1' });\n      if (r !== output) throw new Error('tool result was changed');\n      return { finishReason: 'stop' };\n    }\n  };\n  await wrapAISDK(ai, { storeTools: true }).generateText({ prompt: 'go', tools: { run: { execute: async () => output } } });\n  const span = spans.find((s) => s.attributes['gen_ai.operation.name'] === 'execute_tool');\n  if (!span || !span.ended) {\n    console.error('ERROR: no finished execute_tool span; spans=' + JSON.stringify(spans.map((s) => s.name)));\n    process.exit(2);\n  }\n  if (span.attributes['gen_ai.tool.call.arguments'] !== JSON.stringify({ ok: true })) {\n    console.error('ERROR: small tool arguments were not recorded');\n    process.exit(2);\n  }\n  const result = span.attributes['gen_ai.tool.call.result'];\n  if (result === undefined) {\n    console.error('FAIL: oversized tool result was dropped from the trace with storeTools: true');\n    process.exit(1);\n  }\n  let parsed;\n  try { parsed = JSON.parse(result); } catch { console.error('ERROR: result attribute is not JSON'); process.exit(2); }\n  if (parsed.type === 'browser_screenshot' && parsed.mediaType === 'image/png' && typeof parsed.data === 'string' && parsed.data.startsWith('[base64 image/png data omitted: 80') && parsed.data.length < 200) {\n    console.log('OK: oversized tool result recorded with base64 summarized: ' + parsed.data);\n    process.exit(0);\n  }\n  console.error('ERROR: unexpected result attribute ' + result.slice(0, 200));\n  process.exit(2);\n})().catch((e) => { console.error('ERROR: ' + ((e && e.stack) || e)); process.exit(2); });\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.24.0"
+            },
+            "code": "const path = require('path');\nconst { pathToFileURL } = require('url');\nconst mod = require('module');\nconst root = '/w/node_modules/agents';\nif (typeof mod.registerHooks !== 'function') {\n  console.error('ERROR: module.registerHooks is unavailable');\n  process.exit(2);\n}\nconst spans = [];\nglobalThis.__tracing = {\n  startActiveSpan(name, run) {\n    const span = { name, attributes: {}, ended: false };\n    spans.push(span);\n    return run({ isTraced: true, setAttribute(k, v) { span.attributes[k] = v; }, end() { span.ended = true; } });\n  }\n};\nmod.registerHooks({\n  resolve(specifier, context, next) {\n    if (specifier === 'cloudflare:workers') return { url: 'data:text/javascript,export const tracing = globalThis.__tracing;', shortCircuit: true };\n    return next(specifier, context);\n  }\n});\n(async () => {\n  let wrapAISDK;\n  try {\n    ({ wrapAISDK } = await import(pathToFileURL(path.join(root, 'dist/observability/ai/index.js')).href));\n  } catch (e) {\n    console.error('ERROR: cannot load agents/observability/ai: ' + e.message);\n    process.exit(2);\n  }\n  const output = { type: 'browser_screenshot', mediaType: 'image/png', data: 'iVBORw0K'.repeat(10000) };\n  const ai = {\n    generateText: async (params) => {\n      const r = await params.tools.run.execute({ ok: true }, { toolCallId: 'c1' });\n      if (r !== output) throw new Error('tool result was changed');\n      return { finishReason: 'stop' };\n    }\n  };\n  await wrapAISDK(ai, { storeTools: true }).generateText({ prompt: 'go', tools: { run: { execute: async () => output } } });\n  const span = spans.find((s) => s.attributes['gen_ai.operation.name'] === 'execute_tool');\n  if (!span || !span.ended) {\n    console.error('ERROR: no finished execute_tool span; spans=' + JSON.stringify(spans.map((s) => s.name)));\n    process.exit(2);\n  }\n  if (span.attributes['gen_ai.tool.call.arguments'] !== JSON.stringify({ ok: true })) {\n    console.error('ERROR: small tool arguments were not recorded');\n    process.exit(2);\n  }\n  const result = span.attributes['gen_ai.tool.call.result'];\n  if (result === undefined) {\n    console.error('FAIL: oversized tool result was dropped from the trace with storeTools: true');\n    process.exit(1);\n  }\n  let parsed;\n  try { parsed = JSON.parse(result); } catch { console.error('ERROR: result attribute is not JSON'); process.exit(2); }\n  if (parsed.type === 'browser_screenshot' && parsed.mediaType === 'image/png' && typeof parsed.data === 'string' && parsed.data.startsWith('[base64 image/png data omitted: 80') && parsed.data.length < 200) {\n    console.log('OK: oversized tool result recorded with base64 summarized: ' + parsed.data);\n    process.exit(0);\n  }\n  console.error('ERROR: unexpected result attribute ' + result.slice(0, 200));\n  process.exit(2);\n})().catch((e) => { console.error('ERROR: ' + ((e && e.stack) || e)); process.exit(2); });\n",
+            "expect": "fail",
+            "error": "FAIL: oversized tool result was dropped from the trace with storeTools: true"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "With `storeTools: true`, oversized tool payloads are recorded with base64 data summarized instead of being dropped."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.25.0 changed what `storeTools` does. With storeTools true, oversized tool payloads are recorded with base64 data summarized instead of being dropped. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.25.0#43",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CJYEAPZ5Z3TJVBSYX3",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.25.0",
+      "kind": "behavior",
+      "symbol": "deleteSubAgent",
+      "signal": "silent",
+      "detail": "deleteSubAgent now closes the sub-agent's direct client connections, so late messages can't recreate it.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.25.0/packages/agents/CHANGELOG.md",
+            "quote": "`deleteSubAgent` now closes the sub-agent's direct client connections, so late messages can't recreate it"
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.25.0 changed what `deleteSubAgent` does. deleteSubAgent now closes the sub-agent's direct client connections, so late messages can't recreate it. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.27.0#15",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CKNBSJ8YQGK1VJ40EC",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.27.0",
+      "kind": "behavior",
+      "symbol": "browserTool",
+      "signal": "silent",
+      "detail": "browserTool now has its own tool description instead of codemode's generic one; it covers the cdp API, common CDP mistakes, and the run time limit.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/packages/agents/CHANGELOG.md",
+            "quote": "`browserTool` now has its own tool description instead of codemode's generic one. It covers the `cdp` API, common CDP mistakes, and the run time limit, so the model no longer runs `codemode.search` first."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.27.0 changed what `browserTool` does. browserTool now has its own tool description instead of codemode's generic one; it covers the cdp API, common CDP mistakes, and the run time limit. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.27.0#18",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CM0J4QGSF276JCN617",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.27.0",
+      "kind": "behavior",
+      "symbol": "MCPClientManager.removeServer",
+      "signal": "silent",
+      "detail": "MCPClientManager.removeServer now clears the server's saved OAuth state from Durable Object storage, including tokens and client information.",
+      "evidence": [
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.27.0"
+            },
+            "code": "const { DatabaseSync } = require(\"node:sqlite\");\nconst { pathToFileURL } = require(\"node:url\");\nconst db = new DatabaseSync(\":memory:\");\ndb.exec(\"CREATE TABLE cf_agents_mcp_servers (id TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, server_url TEXT NOT NULL, callback_url TEXT NOT NULL, client_id TEXT, auth_url TEXT, server_options TEXT)\");\nconst kv = new Map();\nconst storage = {\n  sql: {\n    exec(query, ...bindings) {\n      const stmt = db.prepare(query);\n      return /^\\s*select/i.test(query) ? stmt.all(...bindings) : (stmt.run(...bindings), []);\n    }\n  },\n  async get(key) { return kv.get(key); },\n  async put(key, value) {\n    if (typeof key === \"object\") for (const [k, v] of Object.entries(key)) kv.set(k, v);\n    else kv.set(key, value);\n  },\n  async delete(keys) {\n    const list = Array.isArray(keys) ? keys : [keys];\n    let n = 0;\n    for (const k of list) if (kv.delete(k)) n++;\n    return Array.isArray(keys) ? n : n > 0;\n  },\n  async list({ prefix = \"\" } = {}) {\n    return new Map([...kv].filter(([k]) => k.startsWith(prefix)).sort(([a], [b]) => (a < b ? -1 : 1)));\n  }\n};\n(async () => {\n  const { MCPClientManager } = await import(pathToFileURL(require.resolve(\"agents/mcp/client\")).href);\n  class TestManager extends MCPClientManager {\n    get lifecycle() { return { storage }; }\n  }\n  const insert = db.prepare(\"INSERT INTO cf_agents_mcp_servers (id, name, server_url, callback_url, client_id) VALUES (?, ?, ?, ?, ?)\");\n  insert.run(\"s1\", \"one\", \"https://one.example/mcp\", \"https://agent.example/callback\", \"c1\");\n  insert.run(\"s2\", \"two\", \"https://two.example/mcp\", \"https://agent.example/callback\", \"c2\");\n  const s1Keys = [\"/test-client/s1/c1/tokens\", \"/test-client/s1/old-client/client_info/\", \"/test-client/s1/oauth_discovery\"];\n  const s2Keys = [\"/test-client/s2/c2/tokens\", \"/test-client/s2/oauth_discovery\"];\n  for (const k of [...s1Keys, ...s2Keys]) kv.set(k, { saved: k });\n  const manager = new TestManager(\"test-client\", \"1.0.0\");\n  try {\n    await manager.removeServer(\"s1\");\n  } catch (e) {\n    console.error(\"ERROR: removeServer threw: \" + (e && e.stack || e));\n    process.exit(2);\n  }\n  const rows = db.prepare(\"SELECT id FROM cf_agents_mcp_servers ORDER BY id\").all().map((r) => r.id);\n  if (rows.join(\",\") !== \"s2\") {\n    console.error(\"ERROR: unexpected server rows after removeServer: \" + JSON.stringify(rows));\n    process.exit(2);\n  }\n  if (s2Keys.some((k) => !kv.has(k))) {\n    console.error(\"ERROR: other server's OAuth keys were touched: \" + JSON.stringify([...kv.keys()]));\n    process.exit(2);\n  }\n  const left = s1Keys.filter((k) => kv.has(k));\n  if (left.length === 0) {\n    console.log(\"OK: removeServer cleared the removed server's saved OAuth keys and kept the other server's\");\n    process.exit(0);\n  }\n  if (left.length === s1Keys.length) {\n    console.error(\"FAIL: removeServer left the removed server's saved OAuth keys in storage\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: removeServer cleared only some OAuth keys: \" + JSON.stringify(left));\n  process.exit(2);\n})().catch((e) => {\n  console.error(\"ERROR: \" + (e && e.stack || e));\n  process.exit(2);\n});\n",
+            "expect": "pass"
+          }
+        },
+        {
+          "test": {
+            "runtime": "node@24",
+            "packages": {
+              "agents": "0.26.0"
+            },
+            "code": "const { DatabaseSync } = require(\"node:sqlite\");\nconst { pathToFileURL } = require(\"node:url\");\nconst db = new DatabaseSync(\":memory:\");\ndb.exec(\"CREATE TABLE cf_agents_mcp_servers (id TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, server_url TEXT NOT NULL, callback_url TEXT NOT NULL, client_id TEXT, auth_url TEXT, server_options TEXT)\");\nconst kv = new Map();\nconst storage = {\n  sql: {\n    exec(query, ...bindings) {\n      const stmt = db.prepare(query);\n      return /^\\s*select/i.test(query) ? stmt.all(...bindings) : (stmt.run(...bindings), []);\n    }\n  },\n  async get(key) { return kv.get(key); },\n  async put(key, value) {\n    if (typeof key === \"object\") for (const [k, v] of Object.entries(key)) kv.set(k, v);\n    else kv.set(key, value);\n  },\n  async delete(keys) {\n    const list = Array.isArray(keys) ? keys : [keys];\n    let n = 0;\n    for (const k of list) if (kv.delete(k)) n++;\n    return Array.isArray(keys) ? n : n > 0;\n  },\n  async list({ prefix = \"\" } = {}) {\n    return new Map([...kv].filter(([k]) => k.startsWith(prefix)).sort(([a], [b]) => (a < b ? -1 : 1)));\n  }\n};\n(async () => {\n  const { MCPClientManager } = await import(pathToFileURL(require.resolve(\"agents/mcp/client\")).href);\n  class TestManager extends MCPClientManager {\n    get lifecycle() { return { storage }; }\n  }\n  const insert = db.prepare(\"INSERT INTO cf_agents_mcp_servers (id, name, server_url, callback_url, client_id) VALUES (?, ?, ?, ?, ?)\");\n  insert.run(\"s1\", \"one\", \"https://one.example/mcp\", \"https://agent.example/callback\", \"c1\");\n  insert.run(\"s2\", \"two\", \"https://two.example/mcp\", \"https://agent.example/callback\", \"c2\");\n  const s1Keys = [\"/test-client/s1/c1/tokens\", \"/test-client/s1/old-client/client_info/\", \"/test-client/s1/oauth_discovery\"];\n  const s2Keys = [\"/test-client/s2/c2/tokens\", \"/test-client/s2/oauth_discovery\"];\n  for (const k of [...s1Keys, ...s2Keys]) kv.set(k, { saved: k });\n  const manager = new TestManager(\"test-client\", \"1.0.0\");\n  try {\n    await manager.removeServer(\"s1\");\n  } catch (e) {\n    console.error(\"ERROR: removeServer threw: \" + (e && e.stack || e));\n    process.exit(2);\n  }\n  const rows = db.prepare(\"SELECT id FROM cf_agents_mcp_servers ORDER BY id\").all().map((r) => r.id);\n  if (rows.join(\",\") !== \"s2\") {\n    console.error(\"ERROR: unexpected server rows after removeServer: \" + JSON.stringify(rows));\n    process.exit(2);\n  }\n  if (s2Keys.some((k) => !kv.has(k))) {\n    console.error(\"ERROR: other server's OAuth keys were touched: \" + JSON.stringify([...kv.keys()]));\n    process.exit(2);\n  }\n  const left = s1Keys.filter((k) => kv.has(k));\n  if (left.length === 0) {\n    console.log(\"OK: removeServer cleared the removed server's saved OAuth keys and kept the other server's\");\n    process.exit(0);\n  }\n  if (left.length === s1Keys.length) {\n    console.error(\"FAIL: removeServer left the removed server's saved OAuth keys in storage\");\n    process.exit(1);\n  }\n  console.error(\"ERROR: removeServer cleared only some OAuth keys: \" + JSON.stringify(left));\n  process.exit(2);\n})().catch((e) => {\n  console.error(\"ERROR: \" + (e && e.stack || e));\n  process.exit(2);\n});\n",
+            "expect": "fail",
+            "error": "FAIL: removeServer left the removed server's saved OAuth keys in storage"
+          }
+        },
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/packages/agents/CHANGELOG.md",
+            "quote": "`MCPClientManager.removeServer()` (and `Agent.removeMcpServer()`) now clears the server's saved OAuth state from Durable Object storage: tokens and client information (including those under earlier client IDs), verifiers, pending states and discovery state."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "differential",
+    "claim": "agents >=0.27.0 changed what `MCPClientManager.removeServer` does. MCPClientManager.removeServer now clears the server's saved OAuth state from Durable Object storage, including tokens and client information. Silent: code written for older versions still runs, without an error."
+  },
+  {
+    "entry": "0.27.0#26",
+    "lesson": {
+      "format": 1,
+      "id": "01M4PZQ7CNSC28EHN425490YX5",
+      "subject": "agents",
+      "package": {
+        "ecosystem": "npm",
+        "name": "agents"
+      },
+      "versions": ">=0.27.0",
+      "kind": "behavior",
+      "symbol": "useAgentChat",
+      "signal": "silent",
+      "detail": "useAgentChat replaces a cut-off assistant reply with the server's copy after the WebSocket drops mid-stream; AIChatAgent doesn't send that copy yet.",
+      "evidence": [
+        {
+          "source": {
+            "url": "https://raw.githubusercontent.com/cloudflare/agents/agents@0.27.0/packages/agents/CHANGELOG.md",
+            "quote": "`useAgentChat` replaces a cut-off assistant reply with the server's copy after the WebSocket drops mid-stream. Think sends that copy on reconnect; AIChatAgent doesn't yet."
+          }
+        }
+      ],
+      "author": "github:Ludion-ai",
+      "author_id": 292738933,
+      "drafted_by": "agent",
+      "created_at": "2026-10-12T02:40:27Z"
+    },
+    "problems": [],
+    "label": "source",
+    "claim": "agents >=0.27.0 changed what `useAgentChat` does. useAgentChat replaces a cut-off assistant reply with the server's copy after the WebSocket drops mid-stream; AIChatAgent doesn't send that copy yet. Silent: code written for older versions still runs, without an error."
+  }
+]

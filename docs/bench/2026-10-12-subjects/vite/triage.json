@@ -1,0 +1,392 @@
+[
+  {
+    "id": "8.3.0#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance-only change to preload dependency handling with no observable behavior change."
+  },
+  {
+    "id": "8.3.0#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes code frame positions for CRLF files so they match the intended output."
+  },
+  {
+    "id": "8.3.0#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a misdetection where paths merely containing the text node_modules were treated as dependencies."
+  },
+  {
+    "id": "8.3.0#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization that pre-compiles proxy matchers without changing matching behavior."
+  },
+  {
+    "id": "8.3.1#1",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency update."
+  },
+  {
+    "id": "8.3.1#2",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency update."
+  },
+  {
+    "id": "8.3.1#3",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Rolldown dependency update."
+  },
+  {
+    "id": "8.3.1#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "mergeConfig now handles server.ws: false correctly, as documented."
+  },
+  {
+    "id": "8.3.1#5",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes incorrect merging of build.rolldownOptions.output.comments."
+  },
+  {
+    "id": "8.3.1#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the optimizer wrongly skipping imports whose binding name starts with 'type'."
+  },
+  {
+    "id": "8.3.1#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes a hang or error in optimizer when closed before init."
+  },
+  {
+    "id": "8.3.1#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes the watcher being reinitialized after server close."
+  },
+  {
+    "id": "8.3.1#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes sourcemap sources content injection for URL source roots."
+  },
+  {
+    "id": "8.3.1#10",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Changelog tooling chore."
+  },
+  {
+    "id": "8.3.1#11",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Adds only an internal debug log."
+  },
+  {
+    "id": "8.3.1#12",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Updates a comment describing optimizeDeps.include."
+  },
+  {
+    "id": "8.3.1#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Regexp refactor with same matching behavior."
+  },
+  {
+    "id": "8.3.1#14",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Removes duplicate configuration, a refactor."
+  },
+  {
+    "id": "8.3.1#15",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor replacing find with some."
+  },
+  {
+    "id": "8.3.2#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS preloading when renderBuiltUrl returns URLs with queries."
+  },
+  {
+    "id": "8.3.2#2",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Concerns the experimental bundled dev mode."
+  },
+  {
+    "id": "8.3.2#3",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Concerns the experimental bundled dev mode."
+  },
+  {
+    "id": "8.3.2#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency update."
+  },
+  {
+    "id": "8.3.2#5",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Rolldown dependency update."
+  },
+  {
+    "id": "8.3.2#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes resolving percent-encoded srcset URLs in HTML so they work as expected."
+  },
+  {
+    "id": "8.3.2#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Limits oversized console forwarding output, a bug fix with no documented behavior changing."
+  },
+  {
+    "id": "8.3.2#8",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes merging of minify option so user config is applied as documented."
+  },
+  {
+    "id": "8.3.2#9",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Removes spurious warnings, a bug fix."
+  },
+  {
+    "id": "8.3.2#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preserves require fallbacks that previously broke, a bug fix."
+  },
+  {
+    "id": "8.3.2#11",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "renderBuiltUrl",
+    "why": "renderBuiltUrl now receives queries in the passed filename/args, changing what existing callbacks see."
+  },
+  {
+    "id": "8.3.2#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Turns a crash on watcher errors into working behavior."
+  },
+  {
+    "id": "8.3.2#13",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Memory release of old environments, not observable by users."
+  },
+  {
+    "id": "8.3.2#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Encodes whitespace in sourceURL to fix broken behavior."
+  },
+  {
+    "id": "8.3.2#15",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Aligns worker URLs between client and server, a bug fix."
+  },
+  {
+    "id": "8.3.2#16",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization with no observable change."
+  },
+  {
+    "id": "8.3.2#17",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance improvement in the preload helper only."
+  },
+  {
+    "id": "8.3.2#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance change only; time middleware only matters for debug logging."
+  },
+  {
+    "id": "8.3.2#19",
+    "candidate": false,
+    "skip": "docs",
+    "why": "Fixes dead links in documentation."
+  },
+  {
+    "id": "8.3.2#20",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dev dependency update for tests."
+  },
+  {
+    "id": "8.3.2#21",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal dependency swap with no user-visible change."
+  },
+  {
+    "id": "8.3.2#22",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Test-only change."
+  },
+  {
+    "id": "8.3.3#1",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Dependency bump fixing bugs in launch-editor."
+  },
+  {
+    "id": "8.3.3#2",
+    "candidate": true,
+    "kind": "behavior",
+    "signal": "silent",
+    "symbol": "transformIndexHtml",
+    "why": "The filename passed to transformIndexHtml hooks no longer includes queries, which could change hook logic that relied on them."
+  },
+  {
+    "id": "8.3.3#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Enforces fs.serve restrictions as documented for wasm instance queries."
+  },
+  {
+    "id": "8.3.3#4",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Internal storage of safeModulePaths changes, not user-observable."
+  },
+  {
+    "id": "8.3.4#1",
+    "candidate": true,
+    "kind": "added",
+    "signal": "silent",
+    "symbol": "import.meta.hot.acceptExports",
+    "why": "Bundled dev mode now supports acceptExports; older versions did not support it there, silently."
+  },
+  {
+    "id": "8.3.4#2",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Stops mutation of hmr defaults, a bug fix."
+  },
+  {
+    "id": "8.3.4#3",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Corrects preloads with chunkImportMap and non-root base to work as intended."
+  },
+  {
+    "id": "8.3.4#4",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Preload helper now waits for stylesheets, a bug fix."
+  },
+  {
+    "id": "8.3.4#5",
+    "candidate": false,
+    "skip": "experimental",
+    "why": "Bundled dev mode is experimental."
+  },
+  {
+    "id": "8.3.4#6",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Avoids needless rewriting of unchanged adopted styles in the client; no observable change in intended behavior."
+  },
+  {
+    "id": "8.3.4#7",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Makes preprocessor imports resolve correctly with lightningcss, turning a failure into working behavior."
+  },
+  {
+    "id": "8.3.4#8",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Dependency update with no described user-observable change."
+  },
+  {
+    "id": "8.3.4#9",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Rolldown dependency bump with no described user-observable change."
+  },
+  {
+    "id": "8.3.4#10",
+    "candidate": false,
+    "skip": "fix",
+    "why": "A restart requested during a restart is no longer dropped, which fixes a bug."
+  },
+  {
+    "id": "8.3.4#11",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Modules with a query that merely ends in a js-like suffix are no longer misclassified as JS, which is a bug fix."
+  },
+  {
+    "id": "8.3.4#12",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Avoids watching the filesystem root, which corrects a bug."
+  },
+  {
+    "id": "8.3.4#13",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Fixes CSS caching for chunks in a cycle, which was an issue (#23628)."
+  },
+  {
+    "id": "8.3.4#14",
+    "candidate": false,
+    "skip": "fix",
+    "why": "The optimizer scan now handles deep imports with custom extensions it previously missed."
+  },
+  {
+    "id": "8.3.4#15",
+    "candidate": false,
+    "skip": "unclear",
+    "why": "Removes input option unescaping 'for now' without saying what behavior users see versus the previous release."
+  },
+  {
+    "id": "8.3.4#16",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Static aliases now match on path boundaries, which corrects over-matching."
+  },
+  {
+    "id": "8.3.4#17",
+    "candidate": false,
+    "skip": "fix",
+    "why": "Normalizing the path before the root check in ensureWatchedFile corrects a bug."
+  },
+  {
+    "id": "8.3.4#18",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Performance optimization in the module runner with no observable behavior change."
+  },
+  {
+    "id": "8.3.4#19",
+    "candidate": false,
+    "skip": "internal",
+    "why": "Refactor of where bundled-dev imports CSS HMR helpers from; no user-visible change."
+  }
+]

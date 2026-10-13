@@ -100,9 +100,9 @@
     "review_scope": "New workflow composition only; prior protected verdicts remain scoped to their exact snapshots."
   },
   "current_protected_coverage": {
-    "base_main": "2ed9e22acee094c89dc28286ed2569e6f79ee792",
-    "source_head": "4640be1a27d9f681b7aa180babe30cdb4743b87e",
-    "all_changed_protected_files_match_a_completed_review": false,
+    "base_main": "b882a9ad9bdd17bfb896eb772540457cfa358ec3",
+    "source_head": "df510e9771f9d7ebce3a635e16a5ee8b814232b9",
+    "all_changed_protected_files_match_a_completed_review": true,
     "files": [
       {
         "path": ".github/workflows/publish.yml",
@@ -123,10 +123,28 @@
         "current_blob": "b473b4720d9135593e7644cb69aee3d17341f884"
       },
       {
+        "path": "tools/verify/src/command.ts",
+        "reviewed_head": "df510e9771f9d7ebce3a635e16a5ee8b814232b9",
+        "reviewed_blob": "16c0c4b4caadfb40afb0f1037676eec9f5b8116d",
+        "current_blob": "16c0c4b4caadfb40afb0f1037676eec9f5b8116d"
+      },
+      {
         "path": "tools/verify/src/docker.ts",
-        "reviewed_head": "709d9a407221a609822c7f98637aca01df63d48e",
-        "reviewed_blob": "e86d7fb0f917b859283d88bbd17a5c9389ad49bb",
-        "current_blob": "e86d7fb0f917b859283d88bbd17a5c9389ad49bb"
+        "reviewed_head": "7cb1695bd0a6757e269a9707485af7de30efb1a1",
+        "reviewed_blob": "223fb0a6030db20569d0ee3ce87992730b645328",
+        "current_blob": "223fb0a6030db20569d0ee3ce87992730b645328"
+      },
+      {
+        "path": "tools/verify/src/pr-cli.ts",
+        "reviewed_head": "7cb1695bd0a6757e269a9707485af7de30efb1a1",
+        "reviewed_blob": "75ddb8053270d333be7bcbf7ac5ff027bc014e6a",
+        "current_blob": "75ddb8053270d333be7bcbf7ac5ff027bc014e6a"
+      },
+      {
+        "path": "tools/verify/test/command.test.ts",
+        "reviewed_head": "df510e9771f9d7ebce3a635e16a5ee8b814232b9",
+        "reviewed_blob": "f916874cd3fe00482fe8df0241249a56c7e0e275",
+        "current_blob": "f916874cd3fe00482fe8df0241249a56c7e0e275"
       },
       {
         "path": "tools/verify/test/verify.test.ts",
@@ -143,7 +161,18 @@
   },
   "pending_command_review": {
     "scope": "new host executable helper and callsite migrations",
-    "reason": "native Windows cwd lookup",
-    "completed": false
+    "completed": true,
+    "reviewed_head": "7cb1695bd0a6757e269a9707485af7de30efb1a1",
+    "record": "../2026-10-13-command/opus-verdict.md"
+  },
+  "command_correction_review": {
+    "reviewed_head": "df510e9771f9d7ebce3a635e16a5ee8b814232b9",
+    "record": "../2026-10-13-command/opus-correction-verdict.md",
+    "reason": "First review identified global dispatch symlink regression; engineer blocked merge until correction, reviewed changed parts only."
+  },
+  "later_editorial_main_integration": {
+    "main": "b882a9ad9bdd17bfb896eb772540457cfa358ec3",
+    "protected_code_changed": false,
+    "journal_merge": "clean"
   }
 }

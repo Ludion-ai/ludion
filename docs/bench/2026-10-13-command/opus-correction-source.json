@@ -1,0 +1,9 @@
+{
+  "head": "df510e9771f9d7ebce3a635e16a5ee8b814232b9",
+  "prior_review_head": "7cb1695bd0a6757e269a9707485af7de30efb1a1",
+  "changed_files": [
+    "tools/verify/src/command.ts",
+    "tools/verify/test/command.test.ts",
+    "tools/bench/src/agent.ts"
+  ]
+}

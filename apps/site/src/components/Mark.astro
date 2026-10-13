@@ -8,13 +8,15 @@ interface Props {
   kind: "silent" | "drafted";
   /** Show the words next to the mark (the legend). */
   label?: boolean;
+  /** Only the drawing: the words are already next to it. */
+  decorative?: boolean;
 }
-const { kind, label = false } = Astro.props;
+const { kind, label = false, decorative = false } = Astro.props;
 const words = kind === "silent" ? en.bench.list.silentTitle : en.lesson.draftedAlone;
 const short = kind === "silent" ? en.bench.list.silentLegend : en.bench.list.draftedLegend;
 ---
 
-<span class:list={["mark", kind]} data-tip={label ? undefined : words}>
+<span class:list={["mark", kind]} data-tip={label || decorative ? undefined : words}>
   <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
     {
       kind === "silent" ? (
@@ -27,7 +29,7 @@ const short = kind === "silent" ? en.bench.list.silentLegend : en.bench.list.dra
       )
     }
   </svg>
-  {label ? <span class="words">{short}</span> : <span class="visually-hidden">{words}</span>}
+  {label ? <span class="words">{short}</span> : !decorative && <span class="visually-hidden">{words}</span>}
 </span>
 
 <style>

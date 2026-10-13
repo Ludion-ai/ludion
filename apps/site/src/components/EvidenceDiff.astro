@@ -1,0 +1,150 @@
+---
+// A differential test at a glance (only for a lesson core's isDifferential calls one, so only under a "Verified
+// across versions" seal): the versions of the lesson's own package (or runtime) it runs on, oldest first, and what CI
+// requires of each: pass inside the lesson's range, fail outside it with output containing the error the lesson
+// names. Read from the evidence itself, so it says what is checked, not a result of its own.
+import semver from "semver";
+import { en } from "../strings/en.ts";
+
+export interface Run {
+  runtime: string;
+  packages?: Record<string, string>;
+  expect?: "pass" | "fail";
+  error?: string;
+}
+
+interface Props {
+  runs: Run[];
+  /** The lesson's own package: the one whose version is the difference. */
+  pkg: { ecosystem: string; name: string };
+}
+const { runs, pkg } = Astro.props;
+const runtime = pkg.ecosystem === "runtime";
+// The lesson's own pin on each run: the package's version, or for a runtime its release line (node@22 → 22).
+const version = (r: Run) => (runtime ? r.runtime.slice(r.runtime.indexOf("@") + 1) : (r.packages?.[pkg.name] ?? ""));
+const varies = pkg.name;
+const order = [...runs].sort((a, b) => {
+  const x = semver.coerce(version(a));
+  const y = semver.coerce(version(b));
+  return x && y ? semver.compare(x, y) : version(a).localeCompare(version(b));
+});
+const d = en.lesson.diff;
+---
+
+<div class="diff">
+  <p class="what">{d.caption}</p>
+  <ol class="runs">
+    {
+      order.map((r, i) => (
+        <li class:list={[r.expect ?? "pass"]}>
+          <span class="pkg">
+            {varies}
+            <b>{version(r)}</b>
+          </span>
+          <span class="verdict">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              {r.expect === "fail" ? (
+                <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" />
+              ) : (
+                <path d="M2.8 8.6l3.3 3.3 7.1-7.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" />
+              )}
+            </svg>
+            {r.expect === "fail" ? d.fails : d.passes}
+          </span>
+          {r.expect === "fail" && r.error && <code class="err">{r.error}</code>}
+          {i < order.length - 1 && <span class="arrow" aria-hidden="true">→</span>}
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .diff {
+    margin: 0 0 24px;
+  }
+  .what {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .runs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 20px;
+    border: 1.5px solid var(--rule);
+    border-radius: 4px;
+  }
+  li.pass {
+    border-color: var(--ink);
+  }
+  li.fail {
+    border-style: dashed;
+    border-color: var(--failed-line);
+  }
+  .pkg {
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .pkg b {
+    display: block;
+    margin-top: 2px;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .fail .verdict {
+    color: var(--failed-fg);
+  }
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+  .err {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+  .arrow {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translate(50%, -50%);
+    font-size: 18px;
+    color: var(--muted);
+    background: var(--paper);
+    line-height: 1;
+    padding: 2px 0;
+  }
+  @media (max-width: 640px) {
+    .runs {
+      grid-auto-flow: row;
+    }
+    .arrow {
+      display: none;
+    }
+  }
+</style>

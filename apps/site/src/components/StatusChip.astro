@@ -12,15 +12,17 @@ interface Props {
   by?: VerifiedBy;
   size?: "small" | "large";
   tone?: "solid" | "outline";
+  /** Only the tick and the evidence mark show; the word is kept for screen readers (dense lists). */
+  compact?: boolean;
 }
-const { status, label, by, size = "small", tone = "solid" } = Astro.props;
+const { status, label, by, size = "small", tone = "solid", compact = false } = Astro.props;
 ---
 
-<span class:list={["seal", status, size, tone]}>
+<span class:list={["seal", status, size, tone, { compact }]} title={compact ? label : undefined}>
   <svg class="tick" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
     <path d="M2.8 8.6l3.3 3.3 7.1-7.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"></path>
   </svg>
-  <span class="word">{label}</span>
+  <span class:list={["word", { "visually-hidden": compact }]}>{label}</span>
   {status === "verified" && by && <span class="mark">{en.lesson.mark[by]}</span>}
 </span>
 
@@ -71,6 +73,13 @@ const { status, label, by, size = "small", tone = "solid" } = Astro.props;
   }
   .large .mark {
     padding: 0 13px;
+  }
+  .compact {
+    height: 24px;
+    font-size: 12px;
+  }
+  .compact .tick {
+    margin-right: 6px;
   }
   .verified {
     background: var(--seal-bg);

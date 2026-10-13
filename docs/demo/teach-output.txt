@@ -1,0 +1,15 @@
+vitest >=4.0.0 changed what `vi.restoreAllMocks` does. vi.restoreAllMocks no longer resets the state of spies and only restores spies created manually with vi.spyOn. Silent: code written for older versions still runs, without an error.
+
+Test on node@24 with vitest@4.0.0, vite@7.1.11:
+  [42 lines of the test code, left out of this replay]
+
+Test on node@24 with vitest@3.2.4, vite@7.1.11, expected to fail with "FAIL: vi.restoreAllMocks cleared the call history of a vi.fn() mock":
+  [42 lines of the test code, left out of this replay]
+
+Source: https://raw.githubusercontent.com/vitest-dev/vitest/v4.0.0/docs/guide/migration.md
+  "`vi.restoreAllMocks` no longer resets the state of spies and only restores spies created manually with `vi.spyOn`, automocks are no longer affected by this function"
+
+Signal: silent. File: lessons/vitest/01M4S20965Q1Q76WSJ87G7GRXZ.json
+
+Tests: not run (Docker isn't installed here; CI runs them). Sources: found.
+Saved to your ledger: C:\dev\ludion-demo\.ludion\ledger\01M4S20965Q1Q76WSJ87G7GRXZ.json. `ludion sync` in any project that uses vitest >=4.0.0 now writes it.

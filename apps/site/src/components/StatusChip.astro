@@ -43,6 +43,18 @@ const { status, label, by, size = "small", tone = "solid", compact = false } = A
     height: 40px;
     font-size: 15px;
   }
+  /* The one large seal on a page never widens it: where its line is narrower than the seal (a 320 px screen), the
+     word takes two lines and the block grows taller. */
+  .large.solid {
+    height: auto;
+    min-height: 40px;
+    max-width: 100%;
+  }
+  .large.solid .word {
+    white-space: normal;
+    padding-block: 5px;
+    line-height: 1.1;
+  }
   .tick,
   .word,
   .mark {
@@ -52,6 +64,7 @@ const { status, label, by, size = "small", tone = "solid", compact = false } = A
   .tick {
     width: 13px;
     margin-left: 9px;
+    flex-shrink: 0;
   }
   .large .tick {
     width: 16px;

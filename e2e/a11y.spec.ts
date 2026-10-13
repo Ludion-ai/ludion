@@ -25,6 +25,24 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
 }
 
+test("no page scrolls sideways, from 320 px up (WCAG 1.4.10, reflow)", async ({ page, request }) => {
+  // Every page, since one lesson's long name is enough to widen its page: durable_objects.code_update_strategy on a
+  // phone, a long flag in the narrow claim column beside a lesson's panel at 1024 px. The share cards are fixed
+  // 1200×630 images and left out.
+  const pages = (await allPages(request)).filter((path) => !path.startsWith("/bench/og/"));
+  const widths = [320, 390, 768, 1024];
+  test.setTimeout(30_000 + pages.length * widths.length * 3_000);
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 800 });
+    for (const path of pages) {
+      await page.goto(path);
+      await page.evaluate(() => document.fonts.ready);
+      const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+      expect(scroll, `${path} at ${width}px`).toBeLessThanOrEqual(client);
+    }
+  }
+});
+
 test("every page names its public URL as canonical", async ({ page, request }) => {
   const pages = await allPages(request);
   test.setTimeout(30_000 + pages.length * 2_000);

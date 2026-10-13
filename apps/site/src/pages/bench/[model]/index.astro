@@ -201,6 +201,8 @@ const modelRuns = done3?.runs.filter((r) => r.model === model).sort((x, y) => Nu
   .missed li {
     padding: 14px 0;
     border-top: 1px solid var(--rule);
+    /* A claim's long name (durable_objects.code_update_strategy) breaks rather than widen a phone's page. */
+    overflow-wrap: anywhere;
   }
   .q {
     margin: 0;

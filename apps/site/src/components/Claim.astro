@@ -1,17 +1,26 @@
 ---
 // A claim's text. Command-line flags and dotted names (--discard-changes, importlib.util) never break across
-// lines; everything else wraps normally. Rendered as text nodes only, never as HTML.
+// lines, unless one is wider than a whole line (durable_objects.code_update_strategy on a phone, or a long flag in a
+// large heading): then it breaks where it must rather than widen the page. Everything else wraps normally. Rendered
+// as text nodes only, never as HTML.
 interface Props {
   text: string;
 }
 const { text } = Astro.props;
 const parts = text.split(/(--?[A-Za-z][\w-]*|\b[\w]+(?:\.[\w]+)+\b)/);
+// A browser may break a line after a hyphen, so each run of hyphens is held to the character after it. A dotted name
+// has no place to break in it to begin with.
+const held = (name: string) => name.split(/(-+[^-])/);
 ---
 
-{parts.map((part, i) => (i % 2 === 1 ? <span class="nb">{part}</span> : part))}
+{parts.map((part, i) => (i % 2 === 1 ? <span class="nb">{held(part).map((piece, j) => (j % 2 === 1 ? <span class="held">{piece}</span> : piece))}</span> : part))}
 
 <style>
+  /* The last resort: a name wider than its line breaks anywhere but just after a hyphen. */
   .nb {
+    overflow-wrap: anywhere;
+  }
+  .held {
     white-space: nowrap;
   }
 </style>

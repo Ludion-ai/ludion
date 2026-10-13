@@ -62,24 +62,25 @@ const shared = () => {
         </p>
         <h1 class:list={["claim", claimSize(claim)]}>
           <Claim text={parts.head} />
+        </h1>
           {parts.detail && (
             <>
               {" "}
-              <span class="detail">
+              <p class="detail">
                 <Claim text={parts.detail} />
-              </span>
+              </p>
             </>
           )}
           {parts.tail && (
             <>
               {" "}
-              <span class:list={["tail", parts.tail.kind]}>
+              <p class:list={["tail", parts.tail.kind]}>
                 {parts.tail.kind === "silent" && <Mark kind="silent" decorative />}
                 {parts.tail.text}
-              </span>
+              </p>
             </>
           )}
-        </h1>
+        <p class="jump"><a href="#evidence">{en.lesson.evidence}<span aria-hidden="true"> ↓</span></a></p>
         <Signature
           teacher={page.teacher}
           teacherId={lesson.author_id}
@@ -188,16 +189,17 @@ const shared = () => {
   h1 {
     line-height: 1.04;
     letter-spacing: -0.036em;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
+    font-weight:500;
     overflow-wrap: anywhere;
   }
   /* The detail and the closing sentence: the same heading, in a lighter voice. */
   .detail {
     display: block;
     margin-top: 18px;
-    font-size: clamp(19px, 2vw, 24px);
-    font-weight: 450;
-    line-height: 1.45;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.65;
     letter-spacing: -0.01em;
     color: var(--text);
   }
@@ -205,7 +207,7 @@ const shared = () => {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 18px;
+    margin-block: 18px;
     font-size: 15px;
     font-weight: 500;
     letter-spacing: 0;
@@ -225,6 +227,7 @@ const shared = () => {
     border-top: 1px solid var(--rule);
     font-size: 14px;
   }
+  .jump {margin:22px 0;font-size:14px;}
   .mh {
     margin: 0 0 10px;
     font-weight: 700;
@@ -271,21 +274,24 @@ const shared = () => {
   .mnote a {
     color: var(--ink);
   }
-  h1.xl { font-size: clamp(38px, 6vw, 76px); }
-  h1.l { font-size: clamp(32px, 4.6vw, 56px); }
-  h1.m { font-size: clamp(27px, 3.4vw, 40px); line-height: 1.1; }
-  h1.s { font-size: clamp(22px, 2.5vw, 30px); line-height: 1.2; letter-spacing: -0.024em; }
+  h1.xl { font-size: clamp(32px, 4vw, 44px); }
+  h1.l { font-size: clamp(30px, 3.4vw, 40px); }
+  h1.m { font-size: clamp(27px, 3vw, 36px); line-height: 1.15; }
+  h1.s { font-size: clamp(24px, 2.5vw, 30px); line-height: 1.2; letter-spacing: -0.024em; }
   /* The result panel: the seal and the record that backs it. */
   .result {
-    border-top: 2px solid var(--rule-strong);
+    border-top: 1px solid var(--rule);
     padding-top: 18px;
   }
-  /* The large seal fits a 360 px screen on one line; narrower, its word takes two (StatusChip). */
+  /* Keep the full evidence label readable down to a 320 px screen. */
   @media (max-width: 400px) {
     .result :global(.seal.large) {
       min-height: 34px;
       font-size: 13px;
     }
+    .result :global(.seal.large .tick) { width: 12px; margin-left: 7px; }
+    .result :global(.seal.large .word) { padding: 0 7px 0 5px; }
+    .result :global(.seal.large .mark) { padding: 0 6px; }
   }
   dl {
     margin: 22px 0 0;

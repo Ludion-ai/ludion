@@ -12,9 +12,17 @@ import { en } from "../strings/en.ts";
 
 <style>
   h1 {
-    font-weight: 800;
-    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 600;
+    font-size: var(--font-title);
+    line-height: 1.12;
     letter-spacing: -0.04em;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
+  }
+  p {
+    max-width: 38em;
+    margin: 0;
+    font-size: var(--font-body);
+    line-height: 1.65;
+    color: var(--muted);
   }
 </style>

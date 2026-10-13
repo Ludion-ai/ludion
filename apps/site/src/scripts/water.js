@@ -1,5 +1,6 @@
 // A water surface under a page's top rule. One WebGL2 fragment shader, black and white (~3 KB gzipped).
-// The page marks it: [data-water] is the pool (the canvas goes in it, behind its content); [data-water-surface] is
+// The page marks it: [data-water] sets the old lower bounds; the canvas sits behind the whole opening;
+// [data-water-surface] is
 // the element whose top edge is the surface (the pool itself if it carries the attribute); [data-water-hit], if any,
 // is where one ring starts, at --done seconds (the home replay) or data-water-at seconds. One pool per page.
 // The canvas never paints a background. In dark it only adds light (screen); in light it only tints (multiply).
@@ -14,7 +15,7 @@
   const canvas = document.createElement("canvas");
   canvas.className = "water";
   canvas.setAttribute("aria-hidden", "true");
-  bottle.prepend(canvas);
+  document.body.prepend(canvas);
   const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
   if (!gl) { canvas.remove(); return; }
   document.documentElement.classList.add("has-water");
@@ -23,7 +24,7 @@
   in vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
   const fs = `#version 300 es
   precision highp float;
-  uniform vec2 uRes; uniform float uDpr, uTime, uSurface, uHit, uDark, uHitX;
+  uniform vec2 uRes; uniform float uDpr, uTime, uSurface, uStart, uHit, uDark, uHitX;
   uniform vec3 uLight, uTint, uLine;
   uniform float uCaustic, uBody, uPeak;
   out vec4 o;
@@ -60,28 +61,29 @@
       flash = exp(-uHit*1.2);
     }
     float d = px.y - ys, below = smoothstep(-0.7, 0.7, d), dd = max(d, 0.0);
-    float fade = 1.0 - smoothstep(0.45, 1.0, px.y / H);      // nothing left by the bottom edge: no seam
+    // Above the old surface the caustics continue to the page top. Below it, keep the old fade and lower edge.
+    float fade = 1.0 - smoothstep(0.45, 1.0, max(0.0, px.y - uStart) / (H - uStart));
     // Two octaves of warp bend the cell edges into the soft curves real caustics have.
     vec2 w = vec2(gn(px/170.0 + t*0.03), gn(px/170.0 + 9.1 - t*0.03)) * 2.0
            + vec2(gn(px/60.0 - t*0.05), gn(px/60.0 + 3.3 + t*0.05)) * 0.45;
     vec2 cp = px / vec2(115.0, 74.0) + w;
-    float deep = 1.0 - exp(-dd/140.0);                         // deeper light is wider and dimmer
+    float deep = 1.0 - exp(-abs(d)/140.0);                     // light away from the surface is softer
     float width = mix(0.07, 0.20, deep) * (0.8 + 0.4*gn(px/90.0 + 5.0));
     float c = net(cp, t, width) + 0.35*net(cp*1.8 + 4.0, t*1.15, width*1.2);
     float patchy = 0.35 + 0.65*smoothstep(-0.25, 0.35, gn(px/420.0 + vec2(t*0.015, 0.0)));
-    c *= patchy * below * fade * exp(-dd/190.0);
+    c *= patchy * fade * exp(-dd/190.0);
     float line = exp(-d*d/1.1) ;
     float glow = below * exp(-dd/18.0);
     vec3 col;
     if (uDark > 0.5) {
       // Screen blend: black adds nothing. Light only, capped so text contrast holds.
-      col = uLight * min(c * uCaustic, uPeak) + uLine * line * (0.55 + 0.4*flash) + uLight * glow * (0.05 + 0.10*flash) * fade;
+      col = uLight * min(c * uCaustic, uPeak) + uLine * line * (0.18 + 0.10*flash) + uLight * glow * (0.05 + 0.10*flash) * fade;
     } else {
       // Multiply blend: white changes nothing. The water body tints; caustic lines stay bright; the meniscus is a fine dark line.
-      float body = below * fade * uBody * (1.0 - exp(-dd/60.0));
+      float body = fade * uBody * (1.0 - exp(-abs(d)/60.0));
       vec3 tint = mix(vec3(1.0), uTint, body);
       tint = mix(tint, vec3(1.0), clamp(c * uCaustic, 0.0, 1.0));
-      tint = mix(tint, uLine, line * (0.6 + 0.3*flash));
+      tint = mix(tint, uLine, line * (0.2 + 0.1*flash));
       col = tint;
     }
     o = vec4(col, 1.0);
@@ -99,18 +101,23 @@
   const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
 
   const themes = {
-    dark:  { light: "#ffffff", line: "#f5f5f5", tint: "#000000", caustic: 0.22, body: 0, peak: 0.085 },
-    light: { light: "#ffffff", line: "#0a0a0a", tint: "#e4e4e4", caustic: 1.0, body: 1.0, peak: 1 },
+    dark:  { light: "#ffffff", line: "#f5f5f5", tint: "#000000", caustic: 0.075, body: 0, peak: 0.045 },
+    light: { light: "#ffffff", line: "#0a0a0a", tint: "#eeeeee", caustic: 1.0, body: 0.65, peak: 1 },
   };
   const darkQ = matchMedia("(prefers-color-scheme: dark)");
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const motionQ = matchMedia("(prefers-reduced-motion: reduce)");
+  let reduce = motionQ.matches;
   // When the ring starts: the home replay's seal flip (--done), or the pool's data-water-at; no ring without a hit.
   const hitEl = document.querySelector("[data-water-hit]");
   const hitAt = hitEl ? (parseFloat(getComputedStyle(bottle).getPropertyValue("--done")) || parseFloat(bottle.dataset.waterAt ?? "") || 0.6) : null;
 
-  let dpr = 1, hitX = 260, surface = 44;
+  let dpr = 1, hitX = 260, surface = 44, poolStart = 0;
   const size = () => {
     dpr = Math.min(devicePixelRatio || 1, 1.5);
+    const pool = bottle.getBoundingClientRect();
+    poolStart = pool.top + scrollY - 24;
+    // The old canvas began 24 px above the pool and was capped at 760 px. Only extend its upper edge.
+    canvas.style.height = `${poolStart + Math.min(pool.height + 64, 760)}px`;
     const r = canvas.getBoundingClientRect();
     canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -120,27 +127,37 @@
   const draw = (t) => {
     const dark = darkQ.matches, th = themes[dark ? "dark" : "light"];
     canvas.style.mixBlendMode = dark ? "screen" : "multiply";
+    canvas.style.opacity = dark ? "0.6" : "0.8";
     gl.uniform2f(U("uRes"), canvas.width, canvas.height); gl.uniform1f(U("uDpr"), dpr);
-    gl.uniform1f(U("uTime"), t); gl.uniform1f(U("uSurface"), surface); gl.uniform1f(U("uDark"), dark ? 1 : 0);
+    gl.uniform1f(U("uTime"), t * 0.5); gl.uniform1f(U("uSurface"), surface); gl.uniform1f(U("uStart"), poolStart); gl.uniform1f(U("uDark"), dark ? 1 : 0);
     gl.uniform1f(U("uHit"), reduce || hitAt == null ? -1 : t - hitAt); gl.uniform1f(U("uHitX"), hitX);
     gl.uniform3fv(U("uLight"), rgb(th.light)); gl.uniform3fv(U("uLine"), rgb(th.line)); gl.uniform3fv(U("uTint"), rgb(th.tint));
     gl.uniform1f(U("uCaustic"), th.caustic); gl.uniform1f(U("uBody"), th.body); gl.uniform1f(U("uPeak"), th.peak);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
   const still = () => draw(8);
-  size(); new ResizeObserver(() => { size(); if (reduce) still(); }).observe(bottle);
+  size();
+  const resize = new ResizeObserver(() => { size(); if (reduce) still(); });
+  resize.observe(bottle);
+  resize.observe(document.body);
+  // Font metrics can move the pool even when its own dimensions stay the same.
+  document.fonts.ready.then(() => { size(); if (reduce) still(); });
   darkQ.addEventListener("change", () => { if (reduce) still(); });
-  if (reduce) { still(); return; }
-
   let visible = true, last = 0, raf = 0;
   const start = performance.now();
   const loop = (now) => {
     raf = 0;
-    if (!visible || document.hidden) return;
+    if (reduce || !visible || document.hidden) return;
     if (now - last >= 33) { last = now; draw((now - start) / 1000); }   // 30 fps is plenty for water
     raf = requestAnimationFrame(loop);
   };
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && !raf) raf = requestAnimationFrame(loop); }).observe(canvas);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden && !raf) raf = requestAnimationFrame(loop); });
-  raf = requestAnimationFrame(loop);
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (!reduce && visible && !raf) raf = requestAnimationFrame(loop); }).observe(canvas);
+  document.addEventListener("visibilitychange", () => { if (!reduce && !document.hidden && !raf) raf = requestAnimationFrame(loop); });
+  motionQ.addEventListener("change", (event) => {
+    reduce = event.matches;
+    if (reduce) { cancelAnimationFrame(raf); raf = 0; still(); }
+    else if (visible && !document.hidden && !raf) raf = requestAnimationFrame(loop);
+  });
+  if (reduce) still();
+  else raf = requestAnimationFrame(loop);
 })();

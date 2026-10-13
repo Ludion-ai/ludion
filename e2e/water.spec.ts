@@ -28,22 +28,21 @@ const contrast = (a: [number, number, number], b: [number, number, number]) => {
 };
 
 /**
- * Every piece of text over the water in the page's pool ([data-water]) inside the first `screen` px: its box, its
+ * Every piece of text across the opening (including header and hero) inside the first `screen` px: its box, its
  * color, and whether WCAG counts it as large. Text on a panel with its own background (the seal, a code block) is left
  * out: the water is under the panel, not under the text. Found from the text itself (each element with its own non-blank text), so every page with
  * water is covered without a list of selectors.
  */
 async function targets(page: Page, screen: number): Promise<Target[]> {
   return page.evaluate((screen) => {
-    const pool = document.querySelector("[data-water]");
-    if (!pool) return [];
+    if (!document.querySelector("[data-water]")) return [];
     const out: Target[] = [];
     const seen = new Map<string, number>();
-    for (const el of pool.querySelectorAll<HTMLElement>("*")) {
+    for (const el of document.body.querySelectorAll<HTMLElement>("*")) {
       if (el.closest(".visually-hidden, canvas, svg")) continue;
       // Text on its own panel (the seal, a code block) sits on that panel's color, not over the water.
       let onPanel = false;
-      for (let p: HTMLElement | null = el; p && p !== pool; p = p.parentElement) {
+      for (let p: HTMLElement | null = el; p && p !== document.body; p = p.parentElement) {
         const bg = getComputedStyle(p).backgroundColor;
         const alpha = bg.startsWith("rgba") ? Number(bg.split(",")[3]!.replace(")", "")) : bg === "transparent" ? 0 : 1;
         if (alpha > 0) {
@@ -105,13 +104,24 @@ for (const { path, moments } of pages) {
       const hasWater = await page.evaluate(() => document.documentElement.classList.contains("has-water"));
       test.skip(!hasWater, "No WebGL2 in this browser: the page is plain design B, which axe covers.");
 
+      await page.evaluate(() => document.fonts.ready);
+      await page.clock.runFor(100);
+
+      const coverage = await page.evaluate(() => {
+        const canvas = document.querySelector<HTMLCanvasElement>("canvas.water")!.getBoundingClientRect();
+        const pool = document.querySelector<HTMLElement>("[data-water]")!.getBoundingClientRect();
+        return { top: canvas.top, bottom: canvas.bottom, oldBottom: pool.top - 24 + Math.min(pool.height + 64, 760) };
+      });
+      expect(coverage.top, "water reaches the page top").toBeCloseTo(0, 0);
+      expect(coverage.bottom, "water keeps its previous lower edge").toBeCloseTo(coverage.oldBottom, 0);
+
       // Let the text finish arriving (CSS animations run on real time), then record where every piece of text is.
       await page.waitForFunction(() => document.getAnimations().every((a) => a.playState === "finished" || a.playState === "idle"));
       const boxes = await targets(page, SCREEN);
       expect(boxes.length, url).toBeGreaterThan(3);
 
       // Hide the text, keep the layout: only the water and the page remain under each box.
-      await page.addStyleTag({ content: "[data-water] > :not(canvas) { visibility: hidden !important; }" });
+      await page.addStyleTag({ content: ".has-water body > :not(canvas) { visibility: hidden !important; }" });
       const left = Math.floor(Math.min(...boxes.map((b) => b.rect.x)));
       const top = Math.floor(Math.min(...boxes.map((b) => b.rect.y)));
       const right = Math.ceil(Math.max(...boxes.map((b) => b.rect.x + b.rect.width)));

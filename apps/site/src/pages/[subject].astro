@@ -20,6 +20,7 @@ const lessons = index.lessons.filter((l) => l.subject === subject);
 <Base title={en.subject.title(subject)}>
   <div class="wrap">
     <header>
+      <p class="back"><a href="/lessons/">← {en.nav.lessons}</a></p>
       <h1>{subject}/</h1>
       <p class="summary">{en.subject.summary(lessons.length)}</p>
     </header>
@@ -40,6 +41,7 @@ const lessons = index.lessons.filter((l) => l.subject === subject);
               verifiedBy={l.verified_by}
               verifiedAt={l.verified_at}
               drafted={l.drafted_by === "agent"}
+              hideSubject
             />
           </li>
         ))
@@ -51,20 +53,34 @@ const lessons = index.lessons.filter((l) => l.subject === subject);
 
 <style>
   header {
-    margin-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  .back {
+    margin: 0 0 24px;
+    font-size: var(--font-small);
+    color: var(--muted);
+  }
+  .back a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .back a:hover {
+    color: var(--ink);
+    text-decoration: underline;
   }
   h1 {
     font-family: var(--font-code);
     font-variant-ligatures: none;
-    font-weight: 700;
-    font-size: clamp(30px, 5vw, 52px);
-    line-height: 1;
+    font-weight: 500;
+    font-size: clamp(30px, 4vw, 40px);
+    line-height: 1.15;
     letter-spacing: -0.03em;
     overflow-wrap: anywhere;
   }
   .summary {
     margin: 12px 0 0;
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.6;
     color: var(--muted);
   }
 </style>

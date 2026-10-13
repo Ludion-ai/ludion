@@ -53,6 +53,7 @@ const canonicalUrl = new URL(path, config.site).href;
     <script is:inline src="/ga.js" defer></script>
   </head>
   <body>
+    <a class="skip" href="#main">{en.nav.skip}</a>
     <header class="site-header">
       <div class="wrap bar">
         <a class="home" href="/" aria-label={en.site.name}><Wordmark /></a>
@@ -63,7 +64,7 @@ const canonicalUrl = new URL(path, config.site).href;
         </nav>
       </div>
     </header>
-    <main>
+    <main id="main">
       <slot />
     </main>
     <footer class="site-footer">
@@ -83,6 +84,19 @@ const canonicalUrl = new URL(path, config.site).href;
 </html>
 
 <style>
+  .skip {
+    position: absolute;
+    top: 12px;
+    left: var(--gutter);
+    z-index: 10;
+    padding: 10px 14px;
+    background: var(--paper);
+    color: var(--ink);
+    transform: translateY(-160%);
+  }
+  .skip:focus {
+    transform: none;
+  }
   .site-header {
     border-bottom: 1px solid var(--rule);
   }
@@ -104,7 +118,7 @@ const canonicalUrl = new URL(path, config.site).href;
   }
   nav a {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: none;
     padding: 8px 0;
   }
@@ -140,5 +154,10 @@ const canonicalUrl = new URL(path, config.site).href;
   }
   .foot a {
     color: var(--ink);
+  }
+  @media (max-width: 400px) {
+    .bar { gap: 16px; }
+    nav { gap: 16px; }
+    nav a { font-size: 14px; }
   }
 </style>

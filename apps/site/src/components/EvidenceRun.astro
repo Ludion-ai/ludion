@@ -14,9 +14,10 @@ const label = Astro.props.label ?? (runner === "lean" ? en.lesson.proof : en.les
 <figure class="run">
   <figcaption>
     <span>{label}</span>
-    <button type="button" class="copy" data-copied={en.lesson.copied}>{en.lesson.copy}</button>
+    <button type="button" class="copy" data-copied={en.lesson.copied} data-failed={en.lesson.copyFailed}>{en.lesson.copy}</button>
   </figcaption>
   <pre tabindex="0"><code>{code}</code></pre>
+  <span class="copy-status visually-hidden" role="status"></span>
 </figure>
 
 <script>
@@ -27,9 +28,12 @@ const label = Astro.props.label ?? (runner === "lean" ? en.lesson.proof : en.les
       try {
         await navigator.clipboard.writeText(code);
         button.textContent = button.dataset.copied ?? original;
+        const status = button.closest("figure")?.querySelector(".copy-status");
+        if (status) status.textContent = button.dataset.copied ?? "";
         setTimeout(() => (button.textContent = original), 2000);
       } catch {
-        // Clipboard blocked; the code is still selectable.
+        const status = button.closest("figure")?.querySelector(".copy-status");
+        if (status) status.textContent = button.dataset.failed ?? "";
       }
     });
   }
@@ -51,7 +55,7 @@ const label = Astro.props.label ?? (runner === "lean" ? en.lesson.proof : en.les
     padding: 6px 6px 6px 16px;
     border-bottom: 1px solid var(--rule);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--ink);
   }
   /* A pin can be one long word (@modelcontextprotocol/client@2.0.0-beta.5), wider than a phone. */
@@ -66,7 +70,7 @@ const label = Astro.props.label ?? (runner === "lean" ? en.lesson.proof : en.les
     background: var(--paper);
     border: 1px solid var(--rule);
     border-radius: 3px;
-    min-height: 32px;
+    min-height: 40px;
     padding: 0 12px;
     cursor: pointer;
   }

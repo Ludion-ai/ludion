@@ -21,8 +21,8 @@ body {
   background: var(--paper);
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 17px;
-  line-height: 1.55;
+  font-size: var(--font-body);
+  line-height: 1.65;
 }
 
 h1,
@@ -30,8 +30,8 @@ h2,
 h3 {
   color: var(--ink);
   margin: 0;
-  font-weight: 700;
-  line-height: 1.1;
+  font-weight: 500;
+  line-height: 1.15;
 }
 
 .claim {
@@ -94,4 +94,13 @@ pre {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Native same-origin navigation: a short transition, with ordinary navigation as the fallback. */
+@view-transition { navigation: auto; }
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 160ms; }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }

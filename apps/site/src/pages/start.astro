@@ -6,84 +6,435 @@ import { en } from "../strings/en.ts";
 
 const { config } = await siteData();
 const s = en.start;
+const pluginCommand = `/plugin marketplace add ${config.org}/${config.repo}\n/plugin install ludion@ludion`;
+const mcpCommand = `claude mcp add --transport http ludion ${config.site}/mcp`;
 ---
 
 <Base title={s.title} description={s.intro}>
-  <article class="wrap">
-    <h1>{s.heading}</h1>
-    <p class="intro">{s.intro}</p>
+  <article class="start-page wrap">
+    <header class="page-intro">
+      <h1>{s.heading}</h1>
+      <p class="intro">{s.intro}</p>
+    </header>
 
     <Pool>
-    <section aria-labelledby="claude-code">
-      <h2 id="claude-code">{s.claudeCode}</h2>
-      <pre><code>/plugin marketplace add {config.org}/{config.repo}
-/plugin install ludion@ludion</code></pre>
-      <p>{s.claudeCodeBody}</p>
-    </section>
+      <section class="sync" aria-labelledby="sync">
+        <div class="install">
+          <h2 id="sync">{s.sync}</h2>
+          <p class="where">{s.runIn}</p>
+          <div class="command primary-command">
+            <pre><code id="sync-command">npx ludion-ai sync</code></pre>
+            <button type="button" data-copy="sync-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: npx ludion-ai sync`} aria-live="polite" hidden>{en.lesson.copy}</button>
+          </div>
+          <p class="wiring">{s.anyAssistantBody}</p>
+        </div>
 
-    <section aria-labelledby="any">
-      <h2 id="any">{s.anyAssistant}</h2>
-      <pre><code>npx ludion-ai sync</code></pre>
-      <p>{s.anyAssistantBody}</p>
-    </section>
+        <aside class="path" aria-labelledby="sync-path">
+          <h3 id="sync-path" class="visually-hidden">{s.flowLabel}</h3>
+          <ol class="flow">
+            {s.flow.map((step) => (
+              <li>
+                <span class="step-title">{step.title}</span>
+                <span class:list={["step-detail", { "file": step.detail === ".ludion/lessons.md" }]}>{step.detail}</span>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      </section>
 
-    <section aria-labelledby="mcp">
-      <h2 id="mcp">{s.mcp}</h2>
-      <pre><code>claude mcp add --transport http ludion {config.site}/mcp</code></pre>
-    </section>
+      <p class="coverage">{s.coverage} <a href="/lessons/">{s.browse}<span aria-hidden="true"> →</span></a></p>
 
-    <section aria-labelledby="teach">
-      <h2 id="teach">{s.teach}</h2>
-      <pre><code>npx ludion-ai teach draft.json
-npx ludion-ai teach draft.json --public</code></pre>
-      <p>{s.teachBody}</p>
-    </section>
+      <section class="reference" aria-labelledby="setup-details">
+        <h2 id="setup-details">{s.details}</h2>
 
-    <section aria-labelledby="privacy">
-      <h2 id="privacy">{s.privacy}</h2>
-      <p>{s.privacyBody}</p>
-    </section>
+        <details>
+          <summary><span>{s.claudeCode}</span><span class="summary-note">{s.claudeCodeShort}</span></summary>
+          <div class="detail-body">
+            <p>{s.claudeCodeBody}</p>
+            <div class="command">
+              <pre><code id="plugin-command">{pluginCommand}</code></pre>
+              <button type="button" data-copy="plugin-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.claudeCode}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>{s.mcp}</span><span class="summary-note">{s.mcpShort}</span></summary>
+          <div class="detail-body">
+            <div class="command">
+              <pre><code id="mcp-command">{mcpCommand}</code></pre>
+              <button type="button" data-copy="mcp-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.mcp}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>{s.teach}</span><span class="summary-note">{s.teachShort}</span></summary>
+          <div class="detail-body">
+            <p>{s.teachBody}</p>
+            <p class="command-label">{s.localLesson}</p>
+            <div class="command">
+              <pre><code id="teach-command">npx ludion-ai teach draft.json</code></pre>
+              <button type="button" data-copy="teach-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.localLesson}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+            </div>
+            <p class="command-label">{s.publicLesson}</p>
+            <div class="command">
+              <pre><code id="public-command">npx ludion-ai teach draft.json --public</code></pre>
+              <button type="button" data-copy="public-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.publicLesson}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+            </div>
+            <p class="consent">{s.teachConsent}</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>{s.privacy}</span><span class="summary-note">{s.privacyShort}</span></summary>
+          <div class="detail-body privacy">
+            <p>{s.privacyBody}</p>
+          </div>
+        </details>
+        <p class="privacy-summary">{s.privacySummary}</p>
+      </section>
     </Pool>
   </article>
 </Base>
 
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
+    const code = document.getElementById(button.dataset.copy!);
+    if (!code) return;
+    button.hidden = false;
+    const label = button.textContent;
+    let reset: ReturnType<typeof setTimeout>;
+
+    button.addEventListener("click", async () => {
+      clearTimeout(reset);
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? "");
+        button.textContent = button.dataset.copied ?? label;
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(code);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        button.textContent = button.dataset.selected ?? label;
+      }
+      reset = setTimeout(() => { button.textContent = label; }, 2000);
+    });
+  });
+</script>
+
 <style>
-  article {
-    max-width: 46em;
+  .start-page {
+    max-width: calc(1040px + var(--gutter) * 2);
+  }
+  .page-intro {
+    padding-block: 16px 64px;
+    max-width: 40rem;
   }
   h1 {
-    font-size: clamp(30px, 5vw, 52px);
-    font-weight: 800;
+    font-size: var(--font-title, clamp(32px, 4vw, 48px));
+    font-weight: 560;
     letter-spacing: -0.04em;
+    line-height: 1.1;
+    text-wrap: balance;
   }
   .intro {
-    margin: 18px 0 40px;
-    font-size: clamp(18px, 2vw, 21px);
-    line-height: 1.45;
+    margin: 20px 0 0;
+    max-width: 35em;
+    font-size: var(--font-body, 16px);
+    line-height: 1.65;
+    color: var(--muted);
   }
-  section {
-    padding: 24px 0 8px;
-    border-top: 1px solid var(--rule);
-  }
-  section:first-of-type {
-    border-top: 0;
+  .sync {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: 48px 80px;
+    padding-top: 48px;
   }
   h2 {
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 560;
+    letter-spacing: -0.02em;
+  }
+  .where {
+    margin: 12px 0 24px;
+    font-size: var(--font-small, 13px);
+    color: var(--muted);
+  }
+  .command {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    background: var(--paper);
+    padding: 16px;
+  }
+  .primary-command {
+    padding: 22px;
   }
   pre {
-    margin: 0 0 14px;
-    padding: 14px 16px;
-    border: 1px solid var(--rule);
-    border-radius: 3px;
+    flex: 1;
+    min-width: 0;
+    margin: 0;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.7;
   }
-  p {
-    line-height: 1.55;
+  pre code {
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .primary-command pre code {
+    font-size: 15px;
+  }
+  button {
+    flex: 0 0 auto;
+    min-height: 40px;
+    min-width: 48px;
+    border: 0;
+    border-radius: 3px;
+    padding: 4px 6px;
+    margin: -2px -4px 0 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  button:hover {
+    background: var(--paper-2);
+    color: var(--ink);
+  }
+  button[hidden] {
+    display: none;
+  }
+  .result {
+    margin: 18px 0 0;
+    font-size: var(--font-small, 13px);
+    line-height: 1.8;
+    color: var(--muted);
+  }
+  .result code {
+    color: var(--text);
+    font-size: 12px;
+  }
+  .wiring {
+    margin: 24px 0 0;
+    max-width: 42em;
+    font-size: var(--font-small, 13px);
+    color: var(--muted);
+    line-height: 1.75;
+  }
+  .path {
+    padding-top: 4px;
+  }
+  .flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .flow li {
+    position: relative;
+    padding: 0 0 36px 24px;
+    border-left: 1px solid var(--rule);
+  }
+  .flow li:last-child {
+    padding-bottom: 0;
+    border-left-color: transparent;
+  }
+  .flow li::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: -4px;
+    width: 7px;
+    height: 7px;
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 50%;
+  }
+  .step-title,
+  .step-detail {
+    display: block;
+  }
+  .step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .step-detail {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .step-detail.file {
+    font-family: var(--font-code);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .coverage {
+    margin: 36px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: var(--font-small, 13px);
+    line-height: 1.75;
+  }
+  .coverage a {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--ink);
+  }
+  .reference {
+    margin-top: 72px;
+  }
+  .reference > h2 {
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: var(--font-small, 13px);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  details {
+    border-top: 1px solid var(--rule);
+  }
+  details:last-of-type {
+    border-bottom: 1px solid var(--rule);
+  }
+  summary {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 22px 28px 22px 0;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 500;
+    list-style: none;
+    cursor: pointer;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: "+";
+    position: absolute;
+    right: 1px;
+    top: 20px;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  details[open] > summary::after {
+    content: "−";
+  }
+  summary:hover > :first-child {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .summary-note {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .detail-body {
+    max-width: 44rem;
+    padding-bottom: 28px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .detail-body > p {
+    margin: 0 0 18px;
+  }
+  .detail-body .command + .command-label {
+    margin-top: 24px;
+  }
+  .detail-body .command-label {
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .detail-body .consent {
+    margin: 20px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .privacy-summary {
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  @media (max-width: 800px) {
+    .sync {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .flow li {
+      padding: 18px 0 0;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .flow li::before {
+      top: -4px;
+      left: 0;
+    }
+  }
+  @media (max-width: 540px) {
+    .page-intro {
+      padding-block: 8px 40px;
+    }
+    .sync {
+      padding-top: 32px;
+    }
+    .primary-command {
+      padding: 16px;
+      gap: 8px;
+    }
+    .primary-command pre code {
+      font-size: 13px;
+    }
+    .flow {
+      grid-template-columns:minmax(0,1fr);
+      gap:0;
+    }
+    .flow li {
+      padding:0 0 24px 20px;
+      border-top:0;
+      border-left:1px solid var(--rule);
+    }
+    .flow li:last-child {padding-bottom:0;}
+    .flow li::before {top:5px;left:-4px;}
+    .step-title {
+      font-size: 13px;
+    }
+    .step-detail {
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .step-detail.file {
+      font-size: 12px;
+    }
+    .reference {
+      margin-top: 48px;
+    }
+    .summary-note {
+      display: none;
+    }
+    .command {
+      gap: 8px;
+      padding: 14px;
+    }
+    .command pre code {
+      font-size: 12px;
+    }
   }
 </style>

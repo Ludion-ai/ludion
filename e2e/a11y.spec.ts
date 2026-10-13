@@ -5,6 +5,9 @@ import { allPages } from "./pages.ts";
 
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
+// Inspect settled semantics/layout. Animated canvas contrast and motion behavior have dedicated checks.
+test.use({ reducedMotion: "reduce" });
+
 for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`${colorScheme} theme`, () => {
     test.use({ colorScheme });
@@ -15,7 +18,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       test.setTimeout(30_000 + pages.length * 5_000);
       for (const path of pages) {
         await page.goto(path);
-        // Judge the finished page: wait for any one-off animation (the home page's replay) to end.
+        // Judge the finished page, without any one-off transition in progress.
         await page.waitForFunction(() => document.getAnimations().every((a) => a.playState === "finished" || a.playState === "idle"));
         const { violations } = await new AxeBuilder({ page }).withTags(TAGS).analyze();
         const summary = violations.map((v) => `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(" ")).join(", ")})`);

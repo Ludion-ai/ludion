@@ -149,7 +149,7 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     margin: 0;
     padding: 3px;
     border: 1px solid var(--rule);
-    border-radius: 999px;
+    border-radius: 5px;
   }
   label {
     position: relative;
@@ -157,7 +157,7 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     align-items: center;
     gap: 6px;
     padding: 5px 12px;
-    border-radius: 999px;
+    border-radius: 3px;
     font-size: 13px;
     color: var(--muted);
     cursor: pointer;
@@ -219,14 +219,14 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     grid-template-columns: 1fr calc(var(--models, 3) * 4.4rem);
     align-items: end;
     padding-bottom: 10px;
-    border-bottom: 2px solid var(--rule-strong);
+    border-bottom: 1px solid var(--rule-strong);
   }
   h3 {
     margin: 0;
     font-family: var(--font-code);
     font-variant-ligatures: none;
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 500;
     letter-spacing: -0.02em;
     color: var(--ink);
   }
@@ -369,16 +369,13 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     .showing {
       margin-left: 0;
     }
-    /* One line each, scrolled sideways, instead of pills wrapping inside a pill. */
     .filters {
       flex-direction: column;
       align-items: stretch;
       gap: 8px;
     }
     fieldset {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      scrollbar-width: none;
+      flex-wrap: wrap;
       align-self: flex-start;
       max-width: 100%;
       min-width: 0; /* a fieldset is at least its content's width by default */

@@ -41,10 +41,12 @@ export function trustedCommand(tool: Tool, cwd = process.cwd(), env: NodeJS.Proc
   const suffixes = process.platform === "win32" ? [".exe", ".com"] : [""];
   for (const dir of directories) for (const suffix of suffixes) {
     try {
-      const file = realpathSync(join(dir, `${tool}${suffix}`));
+      const candidate = join(dir, `${tool}${suffix}`);
+      const file = realpathSync(candidate);
       if (roots.some((root) => inside(root, file)) || !statSync(file).isFile()) continue;
       accessSync(file, constants.X_OK);
-      return { file, env: childEnv };
+      // Global dispatch shims (e.g. snap) use their invocation name; validate the target but retain that name.
+      return { file: candidate, env: childEnv };
     } catch { /* Keep searching global PATH. */ }
   }
   const error = new Error(`Trusted ${tool} was not found outside project directories. Install it on a global PATH.`) as NodeJS.ErrnoException;

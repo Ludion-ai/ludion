@@ -149,7 +149,9 @@ export function runAgent(prompt: string, o: RunOptions): Promise<AgentRun> {
   mkdirSync(work);
   if (o.project) cpSync(o.project, work, { recursive: true });
   if (o.claudeMd) writeFileSync(join(work, "CLAUDE.md"), o.claudeMd + "\n");
-  const command = trustedCommand("claude", work, runEnv(process.env, o.condition));
+  let command;
+  try { command = trustedCommand("claude", work, runEnv(process.env, o.condition)); }
+  catch (error) { return Promise.reject(error); }
   o.prepare?.(work);
   let mcpConfigPath: string | undefined;
   if (o.condition === "ludion") {

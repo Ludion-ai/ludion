@@ -49,6 +49,11 @@ describe("host executable trust boundary", () => {
     const expected = binary(f.global);
     expect(trustedCommand("git", f.sub, { PATH: [alias, f.global].join(delimiter) }).file).toBe(realpathSync(expected));
   });
+  it.skipIf(process.platform === "win32")("retains the invocation name of a trusted global dispatch symlink", () => {
+    const f = fixture(); const target = binary(f.global, "dispatcher");
+    const candidate = join(f.global, "git"); symlinkSync(target, candidate);
+    expect(trustedCommand("git", f.sub, { PATH: f.global }).file).toBe(candidate);
+  });
   it("fails closed with the existing missing-tool status instead of falling back to cwd", () => {
     const f = fixture(); binary(f.project);
     const result = spawnTool("git", ["--version"], { cwd: f.project, env: { PATH: f.project } });

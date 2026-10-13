@@ -4,6 +4,7 @@
 // were verified, all counted from index.json; then a search box and filters (a few lines of JavaScript; without it
 // every lesson shows).
 import Base from "../../layouts/Base.astro";
+import Pool from "../../components/Pool.astro";
 import LessonCard from "../../components/LessonCard.astro";
 import Mark from "../../components/Mark.astro";
 import { claimParts } from "../../build/claim-parts.ts";
@@ -36,6 +37,7 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
       <p class="sub">{index.lessons.length ? L.intro(shown.length, index.lessons.length) : L.empty}</p>
       {
         subjects.length > 0 && (
+          <Pool class="tiles-pool" at={0.5}>
           <ul class="tiles">
             {subjects.map((s) => (
               <li>
@@ -50,6 +52,7 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
               </li>
             ))}
           </ul>
+          </Pool>
         )
       }
       {byHow.length > 0 && (
@@ -174,13 +177,15 @@ const max = Math.max(1, ...subjects.map((s) => s.count));
     color: var(--text);
   }
   /* A tile per subject: its name, its count, its share of the largest, its newest day. */
+  :global(.tiles-pool) {
+    margin-top: 44px;
+  }
   .tiles {
     list-style: none;
-    margin: 44px 0 0;
+    margin: 0;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-    border-top: 2px solid var(--rule-strong);
   }
   .tiles li {
     border-bottom: 1px solid var(--rule);

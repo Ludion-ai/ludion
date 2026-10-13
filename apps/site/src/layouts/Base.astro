@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import "../styles/water.css";
 import Wordmark from "../components/Wordmark.astro";
 import { siteData } from "../build/data.ts";
 import { en } from "../strings/en.ts";
@@ -74,6 +75,10 @@ const canonicalUrl = new URL(path, config.site).href;
         <p>{en.footer.analytics}</p>
       </div>
     </footer>
+    <script>
+      // The water under the page's top rule, where the page marks a pool ([data-water]); otherwise it does nothing.
+      import "../scripts/water.js";
+    </script>
   </body>
 </html>
 

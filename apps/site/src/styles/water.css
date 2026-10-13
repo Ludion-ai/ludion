@@ -1,10 +1,11 @@
-/* Water under the home replay (design B, black and white). Home only, loaded as its own file. Applied only once
-   water.js has a WebGL2 context (html.has-water); without it the page is plain design B and the rule stays a 2 px line.
-   The canvas never paints a background (it blends; see water.js), and .replay must not become an isolated group. */
-html {
+/* Water under a page's top rule (design B, black and white): the pool is [data-water], its surface the top edge of
+   [data-water-surface] (water.js). Applied only once water.js has a WebGL2 context (html.has-water); without it the
+   page is plain design B and the rule stays a 2 px line. The canvas never paints a background (it blends; see
+   water.js), and the pool must not become an isolated group. */
+html.has-water {
   overflow-x: clip; /* the canvas bleeds to the window edges */
 }
-.has-water .replay {
+.has-water [data-water] {
   position: relative;
 }
 canvas.water {
@@ -13,15 +14,17 @@ canvas.water {
   left: calc(50% - 50vw);
   width: 100vw;
   height: calc(100% + 64px);
+  /* A long pool (a list) keeps the water near its surface: the canvas never grows past this. */
+  max-height: 760px;
   z-index: 0;
   display: block;
   pointer-events: none;
 }
-.has-water .replay > :not(canvas, .visually-hidden) {
+.has-water [data-water] > :not(canvas, .visually-hidden) {
   position: relative;
   z-index: 1;
 }
-.has-water .grid {
+.has-water [data-water-surface] {
   border-top-color: transparent; /* the shader draws this rule as the surface */
 }
 

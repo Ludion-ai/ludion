@@ -1,11 +1,13 @@
 ---
-// Every active lesson as one line: subject, the versions it holds for, its kind, a mark if it is silent (never on an
-// addition, whose claim doesn't say so), "Drafted by an agent" on seed lessons, the claim's first sentence (a link to
-// the lesson), and at the right each model's verdict without tools: a filled dot if it knows, a ring if it doesn't, a
-// dotted ring if not measured (the marks of the knowledge dates). Filters by subject, kind, and silent hide rows;
+// Every active lesson, grouped by subject. A row: the versions it holds for (a monospace chip), the claim's first
+// sentence (a link to the lesson), its kind, a muted-speaker mark if it is silent (never on an addition, whose claim
+// doesn't say so), a pen if an agent drafted it, and at the right each model's verdict without tools: a filled dot
+// if it knows, a ring if it doesn't, a dotted ring if not measured (the marks of the knowledge dates). The marks are
+// explained once above the list. Filters by subject, kind, and silent hide rows (and a group with none left);
 // without JavaScript every row shows.
-import type { Knowledge } from "../build/knowledge.ts";
 import Claim from "./Claim.astro";
+import Mark from "./Mark.astro";
+import type { Knowledge } from "../build/knowledge.ts";
 import { en } from "../strings/en.ts";
 
 interface Props {
@@ -20,81 +22,103 @@ const kinds = [...new Set(k.lessons.map((x) => x.kind).filter((x) => x != null))
 const short = (name: string) => name.replace(/^Claude\s+/, "");
 ---
 
-<div class="filters" hidden>
-  <fieldset>
-    <legend>{l.subject}</legend>
-    <label><input type="radio" name="subject" value="" checked />{l.all}</label>
-    {subjects.map((s) => <label><input type="radio" name="subject" value={s} />{s}</label>)}
-  </fieldset>
-  <fieldset>
-    <legend>{l.kind}</legend>
-    <label><input type="radio" name="kind" value="" checked />{l.all}</label>
-    {kinds.map((x) => <label><input type="radio" name="kind" value={x} />{b.kind[x] ?? x}</label>)}
-  </fieldset>
-  <fieldset class="toggle">
-    <legend class="visually-hidden">{l.silent}</legend>
-    <label><input type="checkbox" name="silent" />{l.silentOnly}</label>
-  </fieldset>
-  <p class="showing" aria-live="polite"><span data-count>{l.showing(k.lessons.length, k.lessons.length)}</span></p>
+<div class="bar">
+  <div class="filters" hidden>
+    <fieldset>
+      <legend class="visually-hidden">{l.subject}</legend>
+      <label><input type="radio" name="subject" value="" checked />{l.all}</label>
+      {subjects.map((s) => <label><input type="radio" name="subject" value={s} />{s}/</label>)}
+    </fieldset>
+    <fieldset>
+      <legend class="visually-hidden">{l.kind}</legend>
+      <label><input type="radio" name="kind" value="" checked />{l.anyKind}</label>
+      {kinds.map((x) => <label><input type="radio" name="kind" value={x} />{b.kind[x] ?? x}</label>)}
+    </fieldset>
+    <fieldset>
+      <legend class="visually-hidden">{l.silent}</legend>
+      <label class="toggle"><input type="checkbox" name="silent" /><Mark kind="silent" label /></label>
+    </fieldset>
+    <p class="showing" aria-live="polite"><span data-count>{l.showing(k.lessons.length, k.lessons.length)}</span></p>
+  </div>
+  <p class="legend">
+    <Mark kind="silent" label />
+    <Mark kind="drafted" label />
+    <span class="dots-key"><i class="dot knows" />{b.knowledge.tip.knows}</span>
+    <span class="dots-key"><i class="dot misses" />{b.knowledge.tip.misses}</span>
+    <span class="dots-key"><i class="dot none" />{b.knowledge.tip.none}</span>
+  </p>
 </div>
 
-<div class="cols" aria-hidden="true" style={`--models:${k.models.length}`}>
-  <span>{l.subject}</span>
-  <span class="marks">{k.models.map((m) => <span>{short(m.name)}</span>)}</span>
-</div>
-<ol class="list" aria-labelledby={labelledBy} style={`--models:${k.models.length}`}>
+<div class="groups" aria-labelledby={labelledBy} role="list" style={`--models:${k.models.length}`}>
   {
-    k.lessons.map((x) => (
-      <li data-subject={x.subject} data-kind={x.kind ?? ""} data-silent={x.silent ? "1" : ""}>
-        <span class="meta">
-          <span class="subject">{x.subject}/</span>
-          {x.versions && <code class="chip">{x.versions}</code>}
-          {x.kind && <span class="kind">{b.kind[x.kind] ?? x.kind}</span>}
-          {x.silent && (
-            <span class="silent" title={l.silentTitle}>
-              {l.silent}
+    subjects.map((s) => {
+      const rows = k.lessons.filter((x) => x.subject === s);
+      return (
+        <section class="group" role="listitem" data-group={s} aria-label={`${s}/`}>
+          <header class="ghead">
+            <h3>
+              {s}/<span class="n">{l.lessons(rows.length)}</span>
+            </h3>
+            <span class="who" aria-hidden="true">
+              {k.models.map((m) => (
+                <span>{short(m.name)}</span>
+              ))}
             </span>
-          )}
-          {x.drafted && <span class="drafted">{en.lesson.draftedAlone}</span>}
-        </span>
-        <a class="claim" href={`/lessons/${x.id}/`}>
-          <Claim text={x.sentence} />
-        </a>
-        <span class="marks">
-          {k.models.map((m) => {
-            const v = x.verdicts[m.id] ?? "none";
-            return (
-              <span class:list={["v", v]}>
-                <i class="dot" aria-hidden="true" />
-                <span class="visually-hidden">{l.verdict(m.name, b.knowledge.tip[v]!)}</span>
-                <span class="who" aria-hidden="true">{short(m.name)}</span>
-              </span>
-            );
-          })}
-        </span>
-      </li>
-    ))
+          </header>
+          <ol class="list">
+            {rows.map((x) => (
+              <li data-subject={x.subject} data-kind={x.kind ?? ""} data-silent={x.silent ? "1" : ""}>
+                <code class="chip">{x.versions}</code>
+                <a class="claim" href={`/lessons/${x.id}/`}>
+                  <Claim text={x.sentence} />
+                </a>
+                <span class="tags">
+                  {x.kind && <span class="kind">{b.kind[x.kind] ?? x.kind}</span>}
+                  {x.silent && <Mark kind="silent" />}
+                  {x.drafted && <Mark kind="drafted" />}
+                </span>
+                <span class="marks">
+                  {k.models.map((m) => {
+                    const v = x.verdicts[m.id] ?? "none";
+                    return (
+                      <span class:list={["v", v]}>
+                        <i class="dot" aria-hidden="true" />
+                        <span class="visually-hidden">{l.verdict(m.name, b.knowledge.tip[v]!)}</span>
+                        <span class="m" aria-hidden="true">
+                          {short(m.name)}
+                        </span>
+                      </span>
+                    );
+                  })}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      );
+    })
   }
-</ol>
+</div>
 
 <script>
   import { en } from "../strings/en.ts";
   for (const box of document.querySelectorAll<HTMLElement>(".filters")) {
-    const list = box.parentElement!.querySelector<HTMLOListElement>("ol.list")!;
-    const rows = [...list.children] as HTMLElement[];
+    const root = box.closest("section")!;
+    const rows = [...root.querySelectorAll<HTMLElement>("li[data-subject]")];
+    const groups = [...root.querySelectorAll<HTMLElement>("[data-group]")];
     const count = box.querySelector<HTMLElement>("[data-count]")!;
     const apply = () => {
-      const form = new FormData();
-      for (const input of box.querySelectorAll<HTMLInputElement>("input")) if (input.checked) form.set(input.name, input.value);
-      const subject = String(form.get("subject") ?? "");
-      const kind = String(form.get("kind") ?? "");
-      const silent = form.has("silent");
+      const pick = (name: string) => box.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? "";
+      const subject = pick("subject");
+      const kind = pick("kind");
+      const silent = box.querySelector<HTMLInputElement>('input[name="silent"]')!.checked;
       let shown = 0;
       for (const row of rows) {
         const on = (!subject || row.dataset.subject === subject) && (!kind || row.dataset.kind === kind) && (!silent || row.dataset.silent === "1");
         row.hidden = !on;
         if (on) shown++;
       }
+      for (const g of groups) g.hidden = !g.querySelector("li:not([hidden])");
       count.textContent = en.bench.list.showing(shown, rows.length);
     };
     box.addEventListener("change", apply);
@@ -103,12 +127,17 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
 </script>
 
 <style>
+  .bar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0 0 28px;
+  }
   .filters {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px 24px;
-    margin: 14px 0 18px;
+    gap: 10px 22px;
   }
   .filters[hidden] {
     display: none;
@@ -116,33 +145,26 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
   fieldset {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
+    gap: 2px;
     margin: 0;
-    padding: 0;
-    border: 0;
-  }
-  legend {
-    float: left;
-    margin-right: 6px;
-    font-size: 13px;
-    color: var(--muted);
+    padding: 3px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
   }
   label {
     position: relative;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
-    border: 1px solid var(--rule);
+    padding: 5px 12px;
     border-radius: 999px;
     font-size: 13px;
-    color: var(--text);
+    color: var(--muted);
     cursor: pointer;
     font-family: var(--font-code);
     font-variant-ligatures: none;
   }
-  .filters input[type="radio"] {
+  label input {
     position: absolute;
     opacity: 0;
     inset: 0;
@@ -150,17 +172,16 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     cursor: pointer;
   }
   label:has(input:checked) {
-    border-color: var(--ink);
-    color: var(--ink);
-    font-weight: 600;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  label:has(input:checked) :global(.mark),
+  label:has(input:checked) :global(.words) {
+    color: var(--paper);
   }
   label:has(input:focus-visible) {
     outline: 2px solid var(--ink);
     outline-offset: 2px;
-  }
-  .toggle input {
-    margin: 0;
-    accent-color: var(--ink);
   }
   .showing {
     margin: 0 0 0 auto;
@@ -168,25 +189,57 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
-
-  .cols,
-  li {
-    display: grid;
-    grid-template-columns: 19.5rem 1fr calc(var(--models, 3) * 4.6rem);
-    gap: 4px 20px;
-    align-items: baseline;
-  }
-  .cols {
-    grid-template-columns: 1fr calc(var(--models, 3) * 4.6rem);
-    font-size: 12px;
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin: 0;
+    font-size: 13px;
     color: var(--muted);
-    padding-bottom: 6px;
   }
-  .marks {
+  .dots-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .group + .group {
+    margin-top: 40px;
+  }
+  .group[hidden] {
+    display: none;
+  }
+  .ghead {
+    display: grid;
+    grid-template-columns: 1fr calc(var(--models, 3) * 4.4rem);
+    align-items: end;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--rule-strong);
+  }
+  h3 {
+    margin: 0;
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .n {
+    margin-left: 12px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+  .who {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
     text-align: center;
+    font-size: 11px;
+    color: var(--muted);
   }
   .list {
     list-style: none;
@@ -194,60 +247,55 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     padding: 0;
   }
   li {
-    padding: 10px 0;
-    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 6.5rem 1fr auto calc(var(--models, 3) * 4.4rem);
+    gap: 4px 18px;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule);
   }
   li[hidden] {
     display: none;
   }
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 6px 8px;
-    font-size: 13px;
-  }
-  .subject {
-    font-family: var(--font-code);
-    font-variant-ligatures: none;
-    font-weight: 600;
-    color: var(--ink);
-    min-width: 6em;
-  }
   .chip {
+    justify-self: start;
     padding: 1px 6px;
-    border: 1px solid var(--rule);
     border-radius: 3px;
     background: var(--paper-2);
     font-size: 12px;
     color: var(--ink);
     white-space: nowrap;
   }
-  .kind,
-  .drafted {
-    color: var(--muted);
-  }
-  .drafted {
-    font-size: 12px;
-  }
-  .silent {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--ink);
-    border-bottom: 1.5px dotted var(--ink);
-    cursor: help;
-  }
   .claim {
     color: var(--ink);
     text-decoration: none;
     line-height: 1.5;
-    font-size: 14.5px;
+    font-size: 15px;
   }
   .claim:hover,
   .claim:focus-visible {
     text-decoration: underline;
+  }
+  .tags {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    align-self: center;
+  }
+  .kind {
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+  }
+  .marks {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    align-self: center;
   }
   .v {
     display: flex;
@@ -255,50 +303,77 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     align-items: center;
   }
   .dot {
-    display: block;
+    display: inline-block;
     width: 11px;
     height: 11px;
     box-sizing: border-box;
     border-radius: 50%;
     border: 1.5px solid var(--mark);
   }
-  .knows .dot {
+  .knows .dot,
+  .dot.knows {
     background: var(--mark);
   }
-  .none .dot {
+  .none .dot,
+  .dot.none {
     border: 1.5px dotted var(--checking-line);
   }
-  .who {
+  .m {
     display: none;
   }
 
   @media (max-width: 860px) {
-    .cols {
+    .ghead {
+      grid-template-columns: 1fr;
+    }
+    .ghead .who {
       display: none;
     }
     li {
-      grid-template-columns: 1fr;
-      gap: 6px;
+      grid-template-columns: auto 1fr;
+      gap: 8px 12px;
+      padding: 14px 0;
+    }
+    .claim {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    .tags {
+      justify-self: end;
     }
     .marks {
-      grid-auto-flow: row;
-      grid-auto-columns: auto;
+      grid-column: 1 / -1;
       display: flex;
       flex-wrap: wrap;
-      gap: 4px 14px;
-      text-align: left;
+      gap: 4px 16px;
     }
     .v {
-      display: inline-flex;
       gap: 6px;
     }
-    .who {
+    .m {
       display: inline;
       color: var(--muted);
       font-size: 12px;
     }
     .showing {
       margin-left: 0;
+    }
+    /* One line each, scrolled sideways, instead of pills wrapping inside a pill. */
+    .filters {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    fieldset {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      align-self: flex-start;
+      max-width: 100%;
+      min-width: 0; /* a fieldset is at least its content's width by default */
+    }
+    label {
+      white-space: nowrap;
     }
   }
 </style>

@@ -166,8 +166,19 @@ export const en = {
     card: {
       title: (name: string) => `${name}: FreshBench card`,
     },
+    hero: {
+      eyebrow: "FreshBench",
+      heading: "What the models don't know.",
+      sub: "Changes in the versions a project installed, asked to Claude models and graded against keys checked at the source. Every count has its 95% interval; every answer is in the repository.",
+      knowledge: (name: string) => `measured lessons ${name} doesn't know, without tools`,
+      lift: (total: number, name: string) => `of ${total} answered right in a project by ${name}, without → with ludion sync`,
+      cutoff: (name: string, after: number, dated: number) => `${name}'s reliable knowledge cutoff. ${after} of ${dated} dated lessons came out after it.`,
+    },
+    section: (n: number) => String(n).padStart(2, "0"),
     knowledge: {
-      heading: "What each model knows, lesson by lesson",
+      heading: "What each model knows",
+      short: "A square per lesson, asked twice with no tools.",
+      countShort: "doesn't know",
       caption: (lessons: number) =>
         `One square per lesson (${lessons}). Filled: the model answered the change right both times, with no tools. Empty: it didn't. Dotted: not measured yet.`,
       count: "measured lessons it doesn't know",
@@ -179,7 +190,9 @@ export const en = {
         `A square per lesson. Filled: it answered the change right twice, with no tools. Empty: it didn't.${none ? " Dotted: not measured yet." : ""}`,
     },
     lift: {
-      heading: "In a project, with and without ludion sync",
+      heading: "With and without ludion sync",
+      short: (questions: number, seeds: number, frozenAt: string | null) =>
+        `${questions} FreshBench B questions, asked to Claude Code in a project with the new versions installed. With sync, the project got the ${seeds} seed lessons${frozenAt ? ` frozen at ${frozenAt}` : ""}.`,
       points: "points",
       difference: (from: string, to: string) => `Difference between ${from} and ${to}, in percentage points.`,
       bar: (label: string, correct: number, total: number, low: string, high: string) =>
@@ -188,7 +201,8 @@ export const en = {
       bySubject: "By subject",
     },
     dates: {
-      heading: "Knowledge dates",
+      heading: "When each change came out",
+      short: "Each dot is a lesson, on the day npm published its first version. Gray: the model's reliable knowledge cutoff, as its maker publishes it. A break in the axis is a long stretch with nothing in it.",
       caption:
         "Each dot is a lesson, placed on the day npm published the first version it is about. Filled: the model knows it. Hollow: it doesn't. Dotted: not measured. The gray band is a model's reliable knowledge cutoff, where its maker publishes one. A break in the axis is a stretch with nothing in it, shortened.",
       cutoff: (month: string) => `Reliable knowledge cutoff, ${month}`,
@@ -206,6 +220,11 @@ export const en = {
       kind: "Kind",
       silentOnly: "Silent only",
       all: "All",
+      anyKind: "any kind",
+      lessons: (n: number) => (n === 1 ? "1 lesson" : `${n} lessons`),
+      silentLegend: "silent",
+      draftedLegend: "drafted by an agent",
+      short: "Grouped by subject. Each claim links to its lesson, with its evidence.",
       showing: (n: number, of: number) => `${n} of ${of}`,
       silent: "silent",
       silentTitle: "Silent: code written for older versions still runs, without an error.",
@@ -213,6 +232,7 @@ export const en = {
     },
     kind: { added: "added", removed: "removed", renamed: "renamed", deprecated: "deprecated", default: "default", behavior: "behavior" } as Record<string, string>,
     methodDetails: "How this was measured, and how to run it again",
+    data: "Data",
     month: (ym: string) => new Date(`${ym}-01T00:00:00Z`).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" }),
     monthShort: (ym: string) => new Date(`${ym}-01T00:00:00Z`).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }),
   },

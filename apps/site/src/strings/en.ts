@@ -82,15 +82,12 @@ export const en = {
       "FreshBench asks coding assistants about changes in the versions a project installed, and a judge grades each answer against a key checked against primary sources. Every count comes with its 95% Wilson interval, and each part of this page says what it counts.",
     measured: (date: string) => `Measured on ${date}`,
     ago: (days: number) => (days <= 0 ? "today" : days === 1 ? "1 day ago" : `${days} days ago`),
-    files: "The run's questions, answers, grades, and logs",
     method: "How it was measured",
     json: "This table as JSON",
     reproduce: "Run it again",
     reproduceNote: (dir: string) =>
       `The parts in brackets are the run with sync. Its CLI and lessons are the ones frozen for the run, served from the repository at that commit, not today's ludion.ai. Setup: ${dir}/README.md.`,
     done3Heading: "In a project, with and without ludion sync",
-    done3Caption: (questions: number, frozenAt: string | null, seeds: number) =>
-      `FreshBench B questions (${questions}, one per change), asked to Claude Code in a project with the new versions installed. Each cell: answers graded correct out of questions.${frozenAt ? ` With sync, the project got the ${seeds} seed lessons frozen at commit ${frozenAt}.` : ""}`,
     withoutToolsHeading: "Without tools",
     withoutToolsCaption: (lessons: number) =>
       `FreshBench A questions for the ${lessons} measured lessons, each asked twice with no tools. A cell counts the lessons whose change the model answered right both times; ludion sync leaves those lessons out for that model.`,
@@ -169,18 +166,17 @@ export const en = {
     hero: {
       eyebrow: "FreshBench",
       heading: "What the models don't know.",
-      sub: "Changes in the versions a project installed, asked to Claude models and graded against keys checked at the source. Every count has its 95% interval; every answer is in the repository.",
+      sub: "Changes in the versions a project installed, asked to Claude models and graded against keys checked at the source. Each section shows its counts with their 95% intervals; every answer is in the repository.",
       knowledge: (name: string) => `measured lessons ${name} doesn't know, without tools`,
       lift: (total: number, name: string) => `of ${total} answered right in a project by ${name}, without → with ludion sync`,
-      cutoff: (name: string, after: number, dated: number) => `${name}'s reliable knowledge cutoff. ${after} of ${dated} dated lessons came out after it.`,
+      cutoff: (name: string, after: number, dated: number) =>
+        `${name}'s reliable knowledge cutoff. ${after} of ${dated} dated ${dated === 1 ? "lesson" : "lessons"} came out after it.`,
     },
     section: (n: number) => String(n).padStart(2, "0"),
     knowledge: {
       heading: "What each model knows",
       short: "A square per lesson, asked twice with no tools.",
       countShort: "doesn't know",
-      caption: (lessons: number) =>
-        `One square per lesson (${lessons}). Filled: the model answered the change right both times, with no tools. Empty: it didn't. Dotted: not measured yet.`,
       count: "measured lessons it doesn't know",
       notMeasured: (n: number) => (n === 1 ? "1 lesson not measured" : `${n} lessons not measured`),
       summary: (name: string, misses: number, measured: number, none: number) =>
@@ -197,14 +193,12 @@ export const en = {
       difference: (from: string, to: string) => `Difference between ${from} and ${to}, in percentage points.`,
       bar: (label: string, correct: number, total: number, low: string, high: string) =>
         `${label}: ${correct} of ${total} answered right, 95% interval ${low} to ${high}.`,
-      notMeasured: (names: string) => `Not measured in a project: ${names}.`,
       bySubject: "By subject",
     },
     dates: {
       heading: "When each change came out",
-      short: "Each dot is a lesson, on the day npm published its first version. Gray: the model's reliable knowledge cutoff, as its maker publishes it. A break in the axis is a long stretch with nothing in it.",
-      caption:
-        "Each dot is a lesson, placed on the day npm published the first version it is about. Filled: the model knows it. Hollow: it doesn't. Dotted: not measured. The gray band is a model's reliable knowledge cutoff, where its maker publishes one. A break in the axis is a stretch with nothing in it, shortened.",
+      short: "Each dot is a lesson, on the day npm published the first version it is about. A break in the axis is a long stretch with nothing in it.",
+      band: "reliable knowledge cutoff, as its maker publishes it",
       cutoff: (month: string) => `Reliable knowledge cutoff, ${month}`,
       cutoffSource: "Cutoffs as Anthropic's model overview publishes them",
       measured: "Measured",
@@ -218,7 +212,6 @@ export const en = {
       heading: "Every lesson",
       subject: "Subject",
       kind: "Kind",
-      silentOnly: "Silent only",
       all: "All",
       anyKind: "any kind",
       lessons: (n: number) => (n === 1 ? "1 lesson" : `${n} lessons`),

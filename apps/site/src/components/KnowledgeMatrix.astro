@@ -1,9 +1,11 @@
 ---
 // Every model's knowledge in one figure: a row per model, a column per active lesson grouped by subject, a square in
 // each cell. Filled (--mark): the model knows the change without tools. Outline: it doesn't. Dotted: not measured.
-// The count of measured lessons it doesn't know sits at the row's end. On a narrow screen the same figure is cut by
-// subject: the counts first, then per subject a short row of squares per model, so the models still line up. Squares are links out of the tab order and
-// the accessibility tree (the lesson list has every lesson as text); each row says its count in one sentence.
+// The count of measured lessons it doesn't know sits at the row's end. Where the full figure can't fit with its
+// squares at their smallest (8 px), it is cut by subject instead: the counts first, then per subject a short row of
+// squares per model, so the models still line up. Which one shows depends on the figure's own width, computed here
+// from its columns. Squares are links out of the tab order and the accessibility tree (the lesson list has every
+// lesson as text); each model's count is said in one sentence.
 import { plain, type Knowledge } from "../build/knowledge.ts";
 import { en } from "../strings/en.ts";
 
@@ -21,9 +23,14 @@ const cols = groups.reduce((t, g) => t + Math.max(g.length, 4), 0);
 const longest = Math.max(1, ...groups.map((g) => g.length));
 const tip = (l: (typeof k.lessons)[number], v: string) => `${plain(l.sentence)}\n${l.subject}/ · ${kn.tip[v]}${l.drafted ? ` · ${en.lesson.draftedAlone}` : ""}`;
 const first = (name: string) => short(name).replace(/\s.*$/, "");
+// The narrowest the full figure can be: every column at 8 px plus its 3 px gap, the names, the counts, the gaps.
+const minWidth = Math.ceil(cols * 11.5 + 120 + 112 + 48 + groups.length * 16 + 8);
+const switchCss = `.km{container:km / inline-size}.km-narrow{display:none}@container km (max-width:${minWidth}px){.km-wide{display:none}.km-narrow{display:block}}`;
 ---
 
-<div class="matrix" style={`--n:${cols};--groups:${groups.length}`}>
+<Fragment set:html={`<style>${switchCss}</style>`} />
+<div class="km">
+<div class="matrix km-wide" style={`--n:${cols};--groups:${groups.length}`}>
   <div class="row head" aria-hidden="true">
     <span />
     <span class="groups">
@@ -78,20 +85,17 @@ const first = (name: string) => short(name).replace(/\s.*$/, "");
   }
 </div>
 
-<div class="narrow" style={`--max:${longest}`}>
-  <p class="visually-hidden">
-    {k.strips.map((s) => `${kn.summary(s.name, s.misses.correct, s.misses.total, s.notMeasured)} ${b.interval(b.percent(s.misses.low), b.percent(s.misses.high))}.`).join(" ")}
-  </p>
-  <div class="counts" aria-hidden="true">
+<div class="narrow km-narrow" style={`--max:${longest}`}>
+  <div class="counts">
     {
       k.strips.map((s) => (
-        <a href={`/bench/${s.model}/`} tabindex="-1">
-          <span class="who">{short(s.name)}</span>
-          <span class="big">
+        <a href={`/bench/${s.model}/`} aria-label={`${kn.summary(s.name, s.misses.correct, s.misses.total, s.notMeasured)} ${b.interval(b.percent(s.misses.low), b.percent(s.misses.high))}.`}>
+          <span class="who" aria-hidden="true">{short(s.name)}</span>
+          <span class="big" aria-hidden="true">
             {s.misses.correct}
             <span class="of">/{s.misses.total}</span>
           </span>
-          <span class="ci">{b.range(s.misses.low, s.misses.high)}</span>
+          <span class="ci" aria-hidden="true">{b.range(s.misses.low, s.misses.high)}</span>
         </a>
       ))
     }
@@ -116,6 +120,7 @@ const first = (name: string) => short(name).replace(/\s.*$/, "");
   }
 </div>
 
+</div>
 <style>
   /* The squares fill the width left after the names and counts, never larger than 14 px. */
   .matrix {
@@ -174,6 +179,8 @@ const first = (name: string) => short(name).replace(/\s.*$/, "");
   }
   .head .subj {
     display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--rule-strong);
     width: 100%;
@@ -242,7 +249,6 @@ const first = (name: string) => short(name).replace(/\s.*$/, "");
   }
 
   .narrow {
-    display: none;
     container-type: inline-size;
     --g: 2px;
     --s: clamp(7px, calc((100cqw - 4.2rem) / var(--max) - var(--g) - 0.5px), 13px);
@@ -300,13 +306,5 @@ const first = (name: string) => short(name).replace(/\s.*$/, "");
     display: flex;
     flex-wrap: wrap;
     gap: var(--g);
-  }
-  @media (max-width: 760px) {
-    .matrix {
-      display: none;
-    }
-    .narrow {
-      display: block;
-    }
   }
 </style>

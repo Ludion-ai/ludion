@@ -29,8 +29,8 @@ const measuredLessons = k.lessons.filter((l) => Object.values(l.verdicts).some((
 const cutoffSource = axis?.rows.find((r) => r.cutoff)?.cutoff?.url;
 
 // The figures up top follow one model: the one measured in a project, else the first one measured at all.
-type Measured = Extract<Row, { measured: true }>;
-const runs = t.rows.filter((r): r is Measured => r.measured);
+type MeasuredRow = Extract<Row, { measured: true }>;
+const runs = t.rows.filter((r): r is MeasuredRow => r.measured);
 const lead = runs[0]?.model ?? k.strips.find((s) => s.misses.total > 0)?.model;
 const leadStrip = k.strips.find((s) => s.model === lead);
 const leadName = (leadStrip?.name ?? "").replace(/^Claude\s+/, "");
@@ -54,6 +54,7 @@ let n = 0;
       {
         leadStrip && (
           <ul class="tiles">
+            {leadStrip.misses.total > 0 && (
             <li>
               <a href="#knowledge">
                 <span class="fig squares" aria-hidden="true">
@@ -70,6 +71,7 @@ let n = 0;
                 <span class="what">{b.hero.knowledge(leadName)}</span>
               </a>
             </li>
+            )}
             {off && on && (
               <li>
                 <a href="#done3">
@@ -110,7 +112,7 @@ let n = 0;
 
       {
         models && (
-          <section aria-labelledby="knowledge" id="knowledge-section">
+          <section aria-labelledby="knowledge">
             <div class="shead">
               <p class="no" aria-hidden="true">{b.section(++n)}</p>
               <h2 id="knowledge">{b.knowledge.heading}</h2>
@@ -161,6 +163,12 @@ let n = 0;
               <h2 id="dates">{b.dates.heading}</h2>
               <div class="note">
                 <p>{b.dates.short}</p>
+                <p class="keys" aria-hidden="true">
+                  <span><i class="key dot knows" />{b.knowledge.tip.knows}</span>
+                  <span><i class="key dot misses" />{b.knowledge.tip.misses}</span>
+                  <span><i class="key dot none" />{b.knowledge.tip.none}</span>
+                  <span><i class="key band" />{b.dates.band}</span>
+                </p>
                 <p class="meta">
                   <a href={`${repo}/blob/main/docs/bench/release-dates.json`}>{b.dates.source}</a>
                   {cutoffSource && (
@@ -451,6 +459,15 @@ let n = 0;
   .key.none {
     border-style: dotted;
     border-color: var(--checking-line);
+  }
+  .key.dot {
+    border-radius: 50%;
+  }
+  .key.band {
+    width: 18px;
+    border: 0;
+    background: var(--paper-2);
+    outline: 1px solid var(--rule);
   }
   @media (max-width: 760px) {
     .shead {

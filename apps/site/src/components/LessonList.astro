@@ -49,12 +49,12 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
   </p>
 </div>
 
-<div class="groups" aria-labelledby={labelledBy} role="list" style={`--models:${k.models.length}`}>
+<ul class="groups" aria-labelledby={labelledBy} style={`--models:${k.models.length}`}>
   {
     subjects.map((s) => {
       const rows = k.lessons.filter((x) => x.subject === s);
       return (
-        <section class="group" role="listitem" data-group={s} aria-label={`${s}/`}>
+        <li class="group" data-group={s}>
           <header class="ghead">
             <h3>
               {s}/<span class="n">{l.lessons(rows.length)}</span>
@@ -94,11 +94,11 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
               </li>
             ))}
           </ol>
-        </section>
+        </li>
       );
     })
   }
-</div>
+</ul>
 
 <script>
   import { en } from "../strings/en.ts";
@@ -118,7 +118,7 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
         row.hidden = !on;
         if (on) shown++;
       }
-      for (const g of groups) g.hidden = !g.querySelector("li:not([hidden])");
+      for (const g of groups) g.hidden = !g.querySelector("li[data-subject]:not([hidden])");
       count.textContent = en.bench.list.showing(shown, rows.length);
     };
     box.addEventListener("change", apply);
@@ -203,6 +203,11 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
     gap: 6px;
   }
 
+  .groups {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
   .group + .group {
     margin-top: 40px;
   }
@@ -248,11 +253,12 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
   }
   li {
     display: grid;
-    grid-template-columns: 6.5rem 1fr auto calc(var(--models, 3) * 4.4rem);
+    grid-template-columns: 6.5rem minmax(0, 1fr) auto calc(var(--models, 3) * 4.4rem);
     gap: 4px 18px;
     align-items: baseline;
     padding: 11px 0;
     border-bottom: 1px solid var(--rule);
+    position: relative; /* holds its visually hidden words */
   }
   li[hidden] {
     display: none;
@@ -330,9 +336,16 @@ const short = (name: string) => name.replace(/^Claude\s+/, "");
       display: none;
     }
     li {
-      grid-template-columns: auto 1fr;
+      grid-template-columns: auto minmax(0, 1fr);
       gap: 8px 12px;
       padding: 14px 0;
+    }
+    /* A long symbol may break on a phone rather than widen the page. */
+    .claim {
+      overflow-wrap: anywhere;
+    }
+    .claim :global(.nb) {
+      white-space: normal;
     }
     .claim {
       grid-column: 1 / -1;

@@ -98,5 +98,42 @@
     ],
     "resolution": "Chromium before build; retain Docker/artifact/minimum-Node checks; retain README runtime/evidence qualifiers and all histories.",
     "review_scope": "New workflow composition only; prior protected verdicts remain scoped to their exact snapshots."
+  },
+  "current_protected_coverage": {
+    "base_main": "2ed9e22acee094c89dc28286ed2569e6f79ee792",
+    "source_head": "4640be1a27d9f681b7aa180babe30cdb4743b87e",
+    "all_changed_protected_files_match_a_completed_review": true,
+    "files": [
+      {
+        "path": ".github/workflows/publish.yml",
+        "reviewed_head": "709d9a407221a609822c7f98637aca01df63d48e",
+        "reviewed_blob": "6e4ccef2b0c1c42bbc08c049701261371af08713",
+        "current_blob": "6e4ccef2b0c1c42bbc08c049701261371af08713"
+      },
+      {
+        "path": ".github/workflows/test.yml",
+        "reviewed_head": "4640be1a27d9f681b7aa180babe30cdb4743b87e",
+        "reviewed_blob": "9ccff1d7b1fe986ab3565632cdd8f10ab608f3be",
+        "current_blob": "9ccff1d7b1fe986ab3565632cdd8f10ab608f3be"
+      },
+      {
+        "path": "CLAUDE.md",
+        "reviewed_head": "709d9a407221a609822c7f98637aca01df63d48e",
+        "reviewed_blob": "b473b4720d9135593e7644cb69aee3d17341f884",
+        "current_blob": "b473b4720d9135593e7644cb69aee3d17341f884"
+      },
+      {
+        "path": "tools/verify/src/docker.ts",
+        "reviewed_head": "709d9a407221a609822c7f98637aca01df63d48e",
+        "reviewed_blob": "e86d7fb0f917b859283d88bbd17a5c9389ad49bb",
+        "current_blob": "e86d7fb0f917b859283d88bbd17a5c9389ad49bb"
+      },
+      {
+        "path": "tools/verify/test/verify.test.ts",
+        "reviewed_head": "709d9a407221a609822c7f98637aca01df63d48e",
+        "reviewed_blob": "4721ca77070aba5cad453bfe13c131a2aac31f70",
+        "current_blob": "4721ca77070aba5cad453bfe13c131a2aac31f70"
+      }
+    ]
   }
 }

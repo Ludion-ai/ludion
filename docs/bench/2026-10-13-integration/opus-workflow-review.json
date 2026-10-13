@@ -1,0 +1,31 @@
+{
+  "result_type": "success",
+  "is_error": false,
+  "model_usage": {
+    "claude-opus-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 2566,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 4898,
+      "webSearchRequests": 0,
+      "costUSD": 0.09051200000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1356,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "reference": {
+    "head": "4640be1a27d9f681b7aa180babe30cdb4743b87e",
+    "paths": [
+      ".github/workflows/test.yml",
+      "apps/site/package.json",
+      "apps/site/scripts/og.ts"
+    ],
+    "workflow_blob": "9ccff1d7b1fe986ab3565632cdd8f10ab608f3be"
+  },
+  "scope": "Only new CI workflow composition; no tools or execution.",
+  "advisory_verification": "deploy.yml installs Chromium before build. Site is a private root workspace; no standalone installation is supported here."
+}

@@ -1,5 +1,14 @@
 # Decisions
 
+### 2026-10-14: Home as a brand scene
+
+The owner clarified that home should show Ludion, rather than store technical information. Removed the split hero, newest-lesson record and recent-lesson feed. Setup remains at `/start/`, lessons and attribution at their existing URLs, and the literal recorded answer comparison is now `/bench/#recorded-answer`, with the same conditions, source links and no-JavaScript fallback. Home retains partial-coverage and analytics/license disclosures. Its prior `#replay` and `#recent` fragments now identify outgoing evidence/coverage links.
+
+The home uses a short headline, one L-shaped refraction in a monochrome surface and native setup/evidence links. The first thin-line drawing looked like a diagram; the L now has a solid quiet face with reversed refraction lines. It is decorative brand art, not a verification result or a live product simulation. The existing water loop drives the subtle refraction, so reduced motion, hidden-tab and offscreen pauses apply together. No new dependency, external bitmap or second animation loop. Other pages retain their water settings; home alone gets a larger, quieter caustic field and no page-wide meniscus line. Canvas bounds and raster-budget formulas stay unchanged. The old home pool moved with the redesigned content, so this preserves the bounds rule rather than claiming identical screen coordinates.
+
+This is a design iteration for review, not measured conversion improvement. The live site stays on the preceding release while the PR is a draft.
+
+
 CLAUDE.md is the spec. This file holds the details it leaves to us: what was decided, and why. Newest decisions go at the top of their section. When a decision changes, edit it here in the same PR as the code, and say what it replaced.
 
 ## v2 decisions

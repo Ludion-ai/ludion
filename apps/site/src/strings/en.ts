@@ -1,5 +1,4 @@
 // Every UI string. Japanese will be a translation of this file, not a refactor.
-import type { VerifiedBy } from "@ludion/core";
 export const en = {
   site: {
     name: "Ludion",
@@ -14,11 +13,10 @@ export const en = {
   },
   home: {
     title: "Ludion: teach it once",
-    headline: "Keep your coding AI current.",
-    sub: "Verified lessons for the package versions in your project.",
+    headline: "For the version you’re on.",
+    sub: "Verified lessons for your coding AI.",
     start: "Get started",
-    example: "One verified lesson",
-    readEvidence: "Read the evidence",
+    seeItWork: "See it work",
     coverage: "Coverage is partial.",
     comparison: {
       title: "One question. Two answers.",
@@ -31,13 +29,6 @@ export const en = {
       setup: "Vitest 5.0.3, frozen lessons",
       condition: "Recorded answer condition",
     },
-    replayTitle: "How a lesson passes",
-    checking: "Checking",
-    replay: (by: VerifiedBy, date: string) =>
-      `A replay of how this lesson passed: ${by === "test" ? "CI ran its test" : by === "differential" ? "CI ran its tests on two versions" : by === "proof" ? "Lean checked its proof" : "its quote was found on the source page"}, and it was verified on ${date}.`,
-    logTitle: (by: VerifiedBy, runner: string) => (by === "source" ? "Source check" : by === "proof" ? "Proof check (lean)" : `Test (${runner})`),
-    recent: "Recently verified",
-    seeLessons: "See all lessons",
   },
   lessons: {
     title: "Lessons",

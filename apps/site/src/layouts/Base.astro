@@ -52,7 +52,7 @@ const canonicalUrl = new URL(path, config.site).href;
     <meta name="color-scheme" content="light dark" />
     <script is:inline src="/ga.js" defer></script>
   </head>
-  <body>
+  <body class:list={[{ showcase: Astro.url.pathname === "/" }]}>
     <a class="skip" href="#main">{en.nav.skip}</a>
     <header class="site-header">
       <div class="wrap bar">
@@ -69,7 +69,7 @@ const canonicalUrl = new URL(path, config.site).href;
     </main>
     <footer class="site-footer">
       <div class="wrap foot">
-        <p>{en.footer.count(index.lessons.length, teacherCount)}</p>
+        {Astro.url.pathname !== "/" && <p>{en.footer.count(index.lessons.length, teacherCount)}</p>}
         <p>
           {en.footer.license} <a href={`https://github.com/${config.org}/${config.repo}`}>{en.footer.github}</a>
         </p>
@@ -155,6 +155,10 @@ const canonicalUrl = new URL(path, config.site).href;
   .foot a {
     color: var(--ink);
   }
+  .showcase .site-header { border-bottom: 0; }
+  .showcase main { padding-top: 0; }
+  .showcase main > :global(:last-child) { padding-bottom: 36px; }
+  .showcase .foot { font-size: 12px; padding-block: 18px 24px; }
   @media (max-width: 400px) {
     .bar { gap: 16px; }
     nav { gap: 16px; }

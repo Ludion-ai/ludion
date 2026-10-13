@@ -14,7 +14,7 @@ test("setup copies the actual sync command and opens privacy details by keyboard
 });
 
 test("the recorded comparison switches answers and keeps each full answer reachable", async ({ page, request }) => {
-  await page.goto("/");
+  await page.goto("/bench/#recorded-answer");
   const comparison = page.locator("[data-comparison]");
   await expect(comparison.getByRole("button", { name:"With sync", exact:true })).toHaveAttribute("aria-pressed","true");
   const before = comparison.locator('[data-answer="without"]');
@@ -34,12 +34,13 @@ test("the recorded comparison switches answers and keeps each full answer reacha
   }
 });
 
-test("without JavaScript, both recorded answers and setup remain available", async ({ browser }) => {
+test("without JavaScript, both recorded answers and home setup remain available", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled:false });
   const page = await context.newPage();
-  await page.goto("/");
+  await page.goto("/bench/#recorded-answer");
   await expect(page.locator('[data-answer="without"]')).toBeVisible();
   await expect(page.locator('[data-answer="with"]')).toBeVisible();
+  await page.goto("/");
   await expect(page.getByRole("link",{name:"Get started",exact:true})).toHaveAttribute("href","/start/");
   await context.close();
 });
@@ -47,7 +48,7 @@ test("without JavaScript, both recorded answers and setup remain available", asy
 test("switching recorded answers keeps the page position stable at each layout", async ({page}) => {
   for (const width of [320,390,1280]) {
     await page.setViewportSize({width,height:900});
-    await page.goto("/");
+    await page.goto("/bench/#recorded-answer");
     await page.evaluate(() => document.fonts.ready);
     const comparison = page.locator("[data-comparison]");
     const before = await comparison.boundingBox();
@@ -69,9 +70,13 @@ test("changing reduced motion stops and resumes the wave without reloading", asy
   await page.clock.runFor(300);
   const clip = {x:0,y:0,width:320,height:64};
   const first = await page.screenshot({clip});
+  const refraction = page.locator("[data-surface-refraction]");
+  const stillTransform = await refraction.getAttribute("transform");
   await page.clock.runFor(1200);
   expect((await page.screenshot({clip})).equals(first)).toBe(true);
+  await expect(refraction).toHaveAttribute("transform", stillTransform!);
   await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.runFor(1200);
   expect((await page.screenshot({clip})).equals(first)).toBe(false);
+  expect(await refraction.getAttribute("transform")).not.toBe(stillTransform);
 });

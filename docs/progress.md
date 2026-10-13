@@ -1,5 +1,12 @@
 # Progress
 
+### 2026-10-14: Brand-focused home iteration
+
+- Built: a single monochrome brand scene instead of a split text/card hero and technical feed. Actual answers moved to `/bench/#recorded-answer`; setup, lessons, claim/evidence scope, attribution, partial coverage and privacy remain reachable.
+- Reviewed: independent critique found the initial outline too faint; strengthened its face before adding subtle refraction. Independent source review caught negative-base GLSL `pow`; replaced it with squared offsets.
+- Validation: final-source checks recorded in `docs/site/2026-10-14-home-showcase.md`. This iteration is local and reviewable before the draft PR is marked ready.
+
+
 What was built, what the check showed, what was decided and why. Newest first. Numbers come from `docs/bench/`.
 
 ### 2026-10-14: Site refinement and a recorded homepage comparison

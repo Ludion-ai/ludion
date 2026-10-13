@@ -13,6 +13,7 @@
   const bottle = document.querySelector("[data-water]");
   if (!bottle) return;
   const surfaceEl = bottle.matches("[data-water-surface]") ? bottle : (bottle.querySelector("[data-water-surface]") ?? bottle);
+  const refraction = bottle.querySelector("[data-surface-refraction]");
   const canvas = document.createElement("canvas");
   canvas.className = "water";
   canvas.setAttribute("aria-hidden", "true");
@@ -25,7 +26,7 @@
   in vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
   const fs = `#version 300 es
   precision highp float;
-  uniform vec2 uRes; uniform float uDpr, uTime, uSurface, uStart, uHit, uDark, uHitX;
+  uniform vec2 uRes; uniform float uDpr, uTime, uSurface, uStart, uHit, uDark, uHitX, uShowcase;
   uniform vec3 uLight, uTint, uLine;
   uniform float uCaustic, uBody, uPeak;
   out vec4 o;
@@ -67,14 +68,19 @@
     // Two octaves of warp bend the cell edges into the soft curves real caustics have.
     vec2 w = vec2(gn(px/170.0 + t*0.03), gn(px/170.0 + 9.1 - t*0.03)) * 2.0
            + vec2(gn(px/60.0 - t*0.05), gn(px/60.0 + 3.3 + t*0.05)) * 0.45;
-    vec2 cp = px / vec2(115.0, 74.0) + w;
+    vec2 cp = px / mix(vec2(115.0, 74.0), vec2(300.0, 180.0), uShowcase) + w;
     float deep = 1.0 - exp(-abs(d)/140.0);                     // light away from the surface is softer
     float width = mix(0.07, 0.20, deep) * (0.8 + 0.4*gn(px/90.0 + 5.0));
     float c = net(cp, t, width) + 0.35*net(cp*1.8 + 4.0, t*1.15, width*1.2);
     float patchy = 0.35 + 0.65*smoothstep(-0.25, 0.35, gn(px/420.0 + vec2(t*0.015, 0.0)));
     c *= patchy * fade * exp(-dd/190.0);
-    float line = exp(-d*d/1.1) ;
-    float glow = below * exp(-dd/18.0);
+    // Home is a quiet surface with one focal shape, rather than a net behind every word.
+    float fx = (px.x - uRes.x / uDpr * 0.5) / (uRes.x / uDpr * 0.3);
+    float fy = (px.y - uSurface) / 220.0;
+    float focus = exp(-(fx * fx + fy * fy));
+    c *= mix(1.0, 0.22 + 0.78 * focus, uShowcase);
+    float line = exp(-d*d/1.1) * (1.0 - uShowcase);
+    float glow = below * exp(-dd/18.0) * (1.0 - uShowcase);
     vec3 col;
     if (uDark > 0.5) {
       // Screen blend: black adds nothing. Light only, capped so text contrast holds.
@@ -129,11 +135,14 @@
     if (hitEl) { const s = hitEl.getBoundingClientRect(); hitX = s.left - canvas.getBoundingClientRect().left + s.width / 2; }
   };
   const draw = (t) => {
+    // The cut refracts slowly with the same clock as the water. One loop, one motion preference, one pause policy.
+    if (refraction) refraction.setAttribute("transform", `translate(${(16 + Math.sin(t * 0.3) * 5).toFixed(2)} ${(-12 + Math.cos(t * 0.2) * 4).toFixed(2)}) skewY(${(7 + Math.sin(t * 0.14) * 3).toFixed(2)})`);
     const dark = darkQ.matches, th = themes[dark ? "dark" : "light"];
     canvas.style.mixBlendMode = dark ? "screen" : "multiply";
     canvas.style.opacity = dark ? "0.6" : "0.8";
     gl.uniform2f(U("uRes"), canvas.width, canvas.height); gl.uniform1f(U("uDpr"), dpr);
     gl.uniform1f(U("uTime"), t * 0.5); gl.uniform1f(U("uSurface"), surface); gl.uniform1f(U("uStart"), poolStart); gl.uniform1f(U("uDark"), dark ? 1 : 0);
+    gl.uniform1f(U("uShowcase"), bottle.hasAttribute("data-water-showcase") ? 1 : 0);
     gl.uniform1f(U("uHit"), reduce || hitAt == null ? -1 : t - hitAt); gl.uniform1f(U("uHitX"), hitX);
     gl.uniform3fv(U("uLight"), rgb(th.light)); gl.uniform3fv(U("uLine"), rgb(th.line)); gl.uniform3fv(U("uTint"), rgb(th.tint));
     gl.uniform1f(U("uCaustic"), th.caustic); gl.uniform1f(U("uBody"), th.body); gl.uniform1f(U("uPeak"), th.peak);

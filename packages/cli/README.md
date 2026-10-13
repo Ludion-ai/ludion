@@ -22,6 +22,6 @@ In Claude Code, the plugin runs `sync` at the start of every session and adds th
 /plugin install ludion@ludion
 ```
 
-No telemetry. Apache-2.0. Lessons are CC BY-SA 4.0.
+No telemetry. Apache-2.0. Lessons are CC BY 4.0.
 
 Versions 0.0.x of `ludion-ai` were an earlier, unrelated project; 0.1.0 replaces them.

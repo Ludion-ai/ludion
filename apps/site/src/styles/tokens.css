@@ -1,5 +1,5 @@
 /* Proposal B, "Exit 0". A lesson is a claim that passed. The page reads like a precise instrument: ink on paper,
-   no accent color and no hue at all. The verified seal is the one inverted block on a page (paper on ink), and it carries the mark
+   no accent color and no hue at all, except --mark on measured data. The verified seal is the one inverted block on a page (paper on ink), and it carries the mark
    of its evidence: exit 0, a proof, a found quote. Light is used only to show a run's progress and the moment it passes. */
 :root {
   --paper: #ffffff;
@@ -26,6 +26,9 @@
   --failed-line: #575757;
   --failed-fg: #262626;
   --bloom: rgb(10 10 10 / 0.35);
+  /* The one hue: a mark of measured data on /bench (a lesson a model knows, a measured share), the blue of deep
+     water. Never on text, never on chrome, never for good or bad. 5.5:1 on paper. */
+  --mark: #0b6fa4;
 
   --font-ui: "Schibsted Grotesk Variable", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
   --font-code: "JetBrains Mono Variable", ui-monospace, monospace;
@@ -58,6 +61,7 @@
     --failed-line: #a8a8a8;
     --failed-fg: #e0e0e0;
     --bloom: rgb(255 255 255 / 0.45);
+    --mark: #5ec2e8; /* 10.4:1 on paper */
     color-scheme: dark;
   }
 }

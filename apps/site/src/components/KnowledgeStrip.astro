@@ -1,0 +1,248 @@
+---
+// One model's knowledge strip: a square per active lesson, in subject order. Filled (--mark): the model knows the
+// change without tools. Outline only: it doesn't. Dotted: not measured. The emptiness is the result; the words are
+// one hover or click away (each square shows its claim and opens its lesson). Beside it, the count of measured lessons
+// it doesn't know, with that share's 95% interval. Screen readers get one sentence instead of the squares; the
+// lesson list below the strips has every lesson as text.
+import { plain, type KnownLesson, type Strip } from "../build/knowledge.ts";
+import { en } from "../strings/en.ts";
+
+interface Props {
+  strip: Strip;
+  lessons: KnownLesson[];
+  /** Link the model's name to its /bench/<model>/ page. */
+  link?: boolean;
+  /** Bigger squares and type, no motion: the share card. */
+  size?: "normal" | "card";
+  /** Delay before this strip's squares light, so a stack of strips lights one after another. */
+  delay?: number;
+}
+const { strip, lessons, link = true, size = "normal", delay = 0 } = Astro.props;
+const b = en.bench;
+const k = b.knowledge;
+const state = (l: KnownLesson) => l.verdicts[strip.model] ?? "none";
+const groups = [...new Set(lessons.map((l) => l.subject))].map((s) => lessons.filter((l) => l.subject === s));
+let i = 0;
+// The card is a fixed 1200×630: its squares shrink so the longest subject fits on one row and every subject's row
+// fits under the count (about 974 px across after the subject names, about 220 px down).
+const longest = Math.max(1, ...groups.map((g) => g.length));
+const cardSize = Math.max(8, Math.min(32, Math.floor(974 / longest) - 5, Math.floor(220 / Math.max(1, groups.length)) - 9));
+---
+
+<div class:list={["strip", size]} style={`--delay:${delay}ms${size === "card" ? `;--s:${cardSize}px` : ""}`}>
+  <div class="head">
+    <p class="name">{link ? <a href={`/bench/${strip.model}/`}>{strip.name}</a> : strip.name}</p>
+    <p class="count" aria-hidden="true">
+      <span class="big">{strip.misses.correct}<span class="of"> / {strip.misses.total}</span></span>
+      <span class="label">{k.count}</span>
+    </p>
+    <p class="sub" aria-hidden="true">
+      {b.interval(b.percent(strip.misses.low), b.percent(strip.misses.high))}{strip.notMeasured > 0 && <><br />{k.notMeasured(strip.notMeasured)}</>}
+    </p>
+    <p class="visually-hidden">
+      {k.summary(strip.name, strip.misses.correct, strip.misses.total, strip.notMeasured)} {b.interval(b.percent(strip.misses.low), b.percent(strip.misses.high))}.
+    </p>
+  </div>
+  <div class="squares" aria-hidden="true">
+    {
+      groups.map((g) => (
+        <span class="group">
+          <span class="subj">{g[0]!.subject}/</span>
+          {g.map((l) => (
+            <a
+              class:list={["sq", state(l)]}
+              href={`/lessons/${l.id}/`}
+              tabindex="-1"
+              style={`--i:${i++}`}
+              data-tip={`${plain(l.sentence)}\n${l.subject}/ · ${k.tip[state(l)]}${l.drafted ? ` · ${en.lesson.draftedAlone}` : ""}`}
+            />
+          ))}
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .strip {
+    --s: 14px;
+    display: grid;
+    grid-template-columns: 15em 1fr;
+    gap: 8px 28px;
+    align-items: center;
+    padding: 20px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .head p {
+    margin: 0;
+  }
+  .name {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .name a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .name a:hover {
+    text-decoration: underline;
+  }
+  .count {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2px;
+  }
+  .big {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .of {
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .sub {
+    margin-top: 6px !important;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.45;
+  }
+  /* A row per subject, its name first, so a run of empty squares reads as that subject's. */
+  .squares {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px;
+  }
+  .subj {
+    width: 6.5em;
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--muted);
+  }
+  .sq {
+    display: block;
+    width: var(--s);
+    height: var(--s);
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1.5px solid var(--mark);
+    animation: light 0.32s ease-out calc(var(--delay) + var(--i) * 14ms) both;
+  }
+  .sq.knows {
+    background: var(--mark);
+  }
+  .sq.none {
+    border: 1.5px dotted var(--checking-line);
+  }
+  .sq:hover {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+  @keyframes light {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sq {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .strip {
+      grid-template-columns: 1fr;
+    }
+    .head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 0 16px;
+    }
+    .name {
+      grid-column: 1 / -1;
+    }
+    .sub {
+      text-align: right;
+    }
+    /* A grid of squares, a row of ten at a time, so counts can be read off it. */
+    .squares {
+      gap: 10px;
+    }
+    .group {
+      display: grid;
+      grid-template-columns: repeat(10, var(--s));
+      gap: 5px;
+    }
+    .subj {
+      grid-column: 1 / -1;
+      width: auto;
+      margin: 4px 0 1px;
+    }
+    .strip {
+      --s: 22px;
+    }
+  }
+
+  .card {
+    grid-template-columns: 1fr;
+    border-top: 0;
+    padding: 0;
+    gap: 22px;
+  }
+  .card .head {
+    display: flex;
+    align-items: baseline;
+    gap: 22px;
+  }
+  .card .name,
+  .card .sub {
+    display: none;
+  }
+  .card .count {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 22px;
+  }
+  .card .big {
+    font-size: 120px;
+    letter-spacing: -0.05em;
+  }
+  .card .label {
+    font-size: 30px;
+    max-width: 9em;
+    line-height: 1.2;
+  }
+  .card .squares {
+    gap: 9px;
+  }
+  .card .group {
+    gap: 5px;
+  }
+  .card .subj {
+    width: 6em;
+    font-size: 19px;
+  }
+  .card .sq {
+    border-width: 2.5px;
+    border-radius: 3px;
+    animation: none;
+  }
+</style>

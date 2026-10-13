@@ -11,8 +11,12 @@ interface Props {
   canonical?: boolean;
   /** The public path when it differs from the built one (teacher pages are linked as /@<login>). */
   canonicalPath?: string;
+  /** Share image (a site path, 1200×630) for og:image and the large Twitter card. */
+  image?: string;
+  /** Keep the page out of search results (the share cards' source pages). */
+  noindex?: boolean;
 }
-const { title, description = en.site.description, canonical = true, canonicalPath } = Astro.props;
+const { title, description = en.site.description, canonical = true, canonicalPath, image, noindex = false } = Astro.props;
 const { index, config } = await siteData();
 const teacherCount = Object.keys(index.teachers).length;
 // The trailing-slash URL: the one without it only redirects (307).
@@ -28,6 +32,22 @@ const canonicalUrl = new URL(path, config.site).href;
     <title>{title}</title>
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonicalUrl} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    {
+      image && (
+        <>
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content={en.site.name} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="og:url" content={canonicalUrl} />
+          <meta property="og:image" content={new URL(image, config.site).href} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta name="twitter:card" content="summary_large_image" />
+        </>
+      )
+    }
     <meta name="color-scheme" content="light dark" />
     <script is:inline src="/ga.js" defer></script>
   </head>
@@ -37,7 +57,7 @@ const canonicalUrl = new URL(path, config.site).href;
         <a class="home" href="/" aria-label={en.site.name}><Wordmark /></a>
         <nav aria-label={en.nav.label}>
           <a href="/lessons/" aria-current={Astro.url.pathname.startsWith("/lessons") ? "page" : undefined}>{en.nav.lessons}</a>
-          <a href="/models/" aria-current={Astro.url.pathname.startsWith("/models") ? "page" : undefined}>{en.nav.models}</a>
+          <a href="/bench/" aria-current={Astro.url.pathname.startsWith("/bench") ? "page" : undefined}>{en.nav.bench}</a>
           <a href="/start/" aria-current={Astro.url.pathname.startsWith("/start") ? "page" : undefined}>{en.nav.start}</a>
         </nav>
       </div>

@@ -10,7 +10,7 @@ import { isV1 } from "./types.ts";
  * Names a subject can't take: top-level paths of the site and the Worker (a subject gets a page at /<subject>/), files at
  * the site's root, and `subjects`, whose shard would be /index/subjects.json.
  */
-export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "mcp", "api", "auth", "404", "index.json", "index.html", "404.html", "subjects", "llms.txt", "sitemap.xml", "robots.txt"]);
+export const RESERVED_SUBJECTS: ReadonlySet<string> = new Set(["lessons", "teachers", "index", "start", "models", "bench", "bench.json", "mcp", "api", "auth", "404", "index.json", "index.html", "404.html", "subjects", "llms.txt", "sitemap.xml", "robots.txt"]);
 
 /** The directory for a package: npm @scope/name → scope.name; anything else lowercased as is. */
 export function subjectFor(pkg: LessonV1["package"]): string {

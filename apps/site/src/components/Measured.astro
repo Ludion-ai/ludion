@@ -1,0 +1,21 @@
+---
+// "Measured on Oct 11, 2026, 2 days ago." The count is computed at build time and again in the browser, so it stays
+// right between deploys.
+import { daysBetween } from "../build/days.ts";
+import { en, formatDate } from "../strings/en.ts";
+
+interface Props {
+  date: string;
+}
+const { date } = Astro.props;
+---
+
+<span>{en.bench.measured(formatDate(date))}, <span class="since" data-since={date}>{en.bench.ago(daysBetween(date, new Date()))}</span>.</span>
+
+<script>
+  import { daysBetween } from "../build/days.ts";
+  import { en } from "../strings/en.ts";
+  for (const el of document.querySelectorAll<HTMLElement>(".since[data-since]")) {
+    el.textContent = en.bench.ago(daysBetween(el.dataset.since!, new Date()));
+  }
+</script>

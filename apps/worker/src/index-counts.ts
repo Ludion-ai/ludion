@@ -1,7 +1,7 @@
 // Counts requests for the index shards, to answer one question: how many distinct clients run `ludion sync`?
 // What is written per request: the UTC day, the shard's path, the CLI's version (from its User-Agent), and a key.
-// The key is an HMAC of (day, IP, User-Agent) under a secret, so it is different every day and can't be reversed
-// by trying addresses. The IP and the User-Agent themselves are never written. docs/decisions.md, "Counting index requests".
+// The key is an HMAC of (day, IP, User-Agent) under a secret, so it is different every day and can't be reversed, without the secret,
+// by trying addresses. The IP is never written, and neither is any User-Agent but the CLI's own (`ludion-ai/<version>`). docs/decisions.md, "Counting index requests".
 
 export interface CountEnv {
   /** Analytics Engine dataset (wrangler.jsonc). */

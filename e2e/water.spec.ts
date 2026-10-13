@@ -1,7 +1,7 @@
 // The home page's water: text contrast over the canvas, and the home JavaScript budget.
 // axe can't see text drawn over a canvas, so this measures it directly: hide the text, step the water's clock,
 // screenshot, and take the worst background pixel under each text box (docs/decisions.md, Site; water.js).
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Response } from "@playwright/test";
 import { PNG } from "pngjs";
 import { gzipSync } from "node:zlib";
 
@@ -112,11 +112,15 @@ for (const colorScheme of ["light", "dark"] as const) {
 }
 
 test("the home page's JavaScript stays within 60 KB gzipped", async ({ page }) => {
-  const scripts: Buffer[] = [];
-  page.on("response", async (res) => {
-    if (res.request().resourceType() === "script") scripts.push(await res.body());
-  });
+  const bodies: Promise<Buffer>[] = [];
+  const capture = (res: Response) => {
+    if (res.request().resourceType() === "script") bodies.push(res.body());
+  };
+  page.on("response", capture);
   await page.goto("/", { waitUntil: "networkidle" });
+  page.off("response", capture);
+  // Playwright does not await async response listeners. Await every body before tallying or ending the test.
+  const scripts = await Promise.all(bodies);
   const total = scripts.reduce((sum, body) => sum + gzipSync(body).length, 0);
   console.log(`Home JavaScript: ${scripts.length} file(s), ${(total / 1024).toFixed(1)} KB gzipped`);
   expect(scripts.length).toBeGreaterThan(0);

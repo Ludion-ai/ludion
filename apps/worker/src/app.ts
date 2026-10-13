@@ -1,7 +1,8 @@
 import { Hono } from "hono";
+import { countIndexRequest, type CountEnv } from "./index-counts.ts";
 import { handleMcp } from "./mcp/server.ts";
 
-export interface Env {
+export interface Env extends CountEnv {
   ASSETS: Fetcher;
   SITE_URL: string;
 }
@@ -24,6 +25,14 @@ export function createApp(): Hono<{ Bindings: Env }> {
 
   // MCP over Streamable HTTP, stateless; OPTIONS for CORS preflight from browser-based clients.
   app.on(["GET", "POST", "DELETE", "OPTIONS"], "/mcp", (c) => handleMcp(c.req.raw, c.env, c.executionCtx as ExecutionContext));
+
+  // The index shards are static assets; the Worker runs for them (wrangler.jsonc, run_worker_first) only to count the
+  // request, after the response is built and without waiting for the count.
+  app.get("/index/*", async (c) => {
+    const res = await c.env.ASSETS.fetch(c.req.raw);
+    if (res.ok) c.executionCtx.waitUntil(countIndexRequest(c.req.raw, c.env));
+    return res;
+  });
 
   // /@<login> serves the teacher page at the lowercase login. Unknown teachers get the 404 page.
   app.get("*", async (c, next) => {

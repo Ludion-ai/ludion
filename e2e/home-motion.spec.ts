@@ -56,14 +56,17 @@ test("selection makes the paper route move, then settles and stops offscreen or 
   const selected = lens.locator("[data-lens-case]:not([hidden])");
   const papers = selected.locator(".machine-wide [data-lens-token]");
   await lens.locator("[data-lens-model]").selectOption("claude-opus-5-5");
+  await expect(lens).toHaveAttribute("data-lens-playing", "true");
   await page.clock.runFor(100);
   const start = await transforms(papers);
   await page.clock.runFor(900);
   expect(await transforms(papers)).not.toEqual(start);
-  await page.clock.runFor(2500);
+  // Initial and middle samples above run every frame. For terminal/idle samples,
+  // advance time once: replaying every unrelated water frame adds no assertion.
+  await page.clock.fastForward(2500);
   const end = await transforms(papers);
   await expect(lens).toHaveAttribute("data-lens-progress", "1");
-  await page.clock.runFor(500);
+  await page.clock.fastForward(500);
   expect(await transforms(papers)).toEqual(end);
   // Unknown knowledge is included; its paper remains fully present in the final context.
   expect(await selected.locator('.machine-wide [data-state="unmeasured"]').count()).toBeGreaterThan(0);
@@ -76,14 +79,14 @@ test("selection makes the paper route move, then settles and stops offscreen or 
   // before advancing the mocked animation clock through the background period.
   await expect(lens).toHaveAttribute("data-lens-playing", "false");
   const offscreen = await transforms(papers);
-  await page.clock.runFor(3000);
+  await page.clock.fastForward(3000);
   expect(await transforms(papers)).toEqual(offscreen);
   await lens.scrollIntoViewIfNeeded();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await lens.locator("[data-lens-model]").selectOption("claude-opus-5-5");
   await page.clock.runFor(100);
   const reduced = await transforms(papers);
-  await page.clock.runFor(3000);
+  await page.clock.fastForward(3000);
   expect(await transforms(papers)).toEqual(reduced);
   await expect(lens).toHaveAttribute("data-lens-progress", "1");
 });
@@ -99,24 +102,26 @@ test("inheritance comparison draws a moving old and current route, then honors r
   await graphic.scrollIntoViewIfNeeded();
   await trace.locator('[data-trace-step="teacher"]').press("Enter");
   await trace.locator('[data-trace-step="change"]').press("Enter");
+  await expect(trace).toHaveAttribute("data-trace-moving", "true");
   await page.clock.runFor(150);
   await expect(trace).toHaveAttribute("data-trace-moving", "true");
   const start = await transforms(papers);
   await page.clock.runFor(800);
   expect(await transforms(papers)).not.toEqual(start);
-  await page.clock.runFor(2200);
+  await page.clock.fastForward(2200);
   await expect(trace).toHaveAttribute("data-trace-moving", "false");
   const end = await transforms(papers);
-  await page.clock.runFor(300);
+  await page.clock.fastForward(300);
   expect(await transforms(papers)).toEqual(end);
   await trace.locator('[data-trace-step="teacher"]').press("Enter");
   await trace.locator('[data-trace-step="change"]').press("Enter");
   await page.clock.runFor(300);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.clock.runFor(100);
+  await expect.poll(() => page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);
   await expect(trace).toHaveAttribute("data-trace-moving", "false");
+  await page.clock.runFor(100);
   const reduced = await transforms(papers);
-  await page.clock.runFor(3000);
+  await page.clock.fastForward(3000);
   expect(await transforms(papers)).toEqual(reduced);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await trace.locator('[data-trace-step="teacher"]').press("Enter");
@@ -126,7 +131,7 @@ test("inheritance comparison draws a moving old and current route, then honors r
   await page.clock.runFor(100);
   await expect(trace).toHaveAttribute("data-trace-moving", "false");
   const offscreen = await transforms(papers);
-  await page.clock.runFor(3000);
+  await page.clock.fastForward(3000);
   expect(await transforms(papers)).toEqual(offscreen);
 });
 
@@ -137,7 +142,8 @@ test("delivery distinguishes reference wiring from inline copies and halts activ
   await page.goto("/");
   const delivery = page.locator("[data-delivery]");
   await delivery.locator("[data-delivery-visual]").scrollIntoViewIfNeeded();
-  await page.clock.runFor(2700);
+  await expect(delivery).toHaveAttribute("data-delivery-playing", "true");
+  await page.clock.fastForward(2700);
   for (const [id, mode] of [["cursor", "inline"], ["codex", "reference"]] as const) {
     await delivery.locator(`[data-delivery-target="${id}"]`).press("Enter");
     await expect(delivery.locator(".destination-file")).toHaveAttribute("data-mode", mode);
@@ -147,7 +153,7 @@ test("delivery distinguishes reference wiring from inline copies and halts activ
     await page.clock.runFor(1900);
     const after = await received.evaluate(item => getComputedStyle(item).opacity);
     expect(Number(after)).toBeGreaterThan(Number(before));
-    await page.clock.runFor(800);
+    await page.clock.fastForward(800);
     await expect(received).toHaveCSS("opacity", "1");
   }
   await delivery.locator("[data-delivery-replay]").press("Enter");
@@ -156,7 +162,7 @@ test("delivery distinguishes reference wiring from inline copies and halts activ
   await hidden(page, true);
   await expect(delivery).toHaveAttribute("data-delivery-playing", "false");
   const paused = await delivery.locator(".packet").getAttribute("style");
-  await page.clock.runFor(3000);
+  await page.clock.fastForward(3000);
   expect(await delivery.locator(".packet").getAttribute("style")).toBe(paused);
   await hidden(page, false);
   await page.clock.runFor(100);
@@ -179,7 +185,7 @@ test("hiding the document cancels the package and inheritance replays without co
   await expect(lens).toHaveAttribute("data-lens-playing", "false");
   const lensPapers = lens.locator("[data-lens-case]:not([hidden]) .machine-wide [data-lens-token]");
   const settled = await transforms(lensPapers);
-  await page.clock.runFor(3000);
+  await page.clock.fastForward(3000);
   expect(await transforms(lensPapers)).toEqual(settled);
   await hidden(page, false);
   const trace = page.locator("[data-lesson-trace]");
@@ -192,7 +198,7 @@ test("hiding the document cancels the package and inheritance replays without co
   await expect(trace).toHaveAttribute("data-trace-moving", "false");
   const tracePapers = trace.locator("[data-trace-paper]");
   const paused = await transforms(tracePapers);
-  await page.clock.runFor(3000);
+  await page.clock.fastForward(3000);
   expect(await transforms(tracePapers)).toEqual(paused);
   await hidden(page, false);
 });

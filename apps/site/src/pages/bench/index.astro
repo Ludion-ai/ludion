@@ -1,7 +1,7 @@
 ---
 // FreshBench results. Every number comes from docs/bench (build/bench.ts, build/knowledge.ts): models.json for what
 // each model knows without tools, the Done 3 run's grades, and release-dates.json for when each change came out.
-// A short introduction and three figures up top, each a link to its section; then the sections, each a numbered heading,
+// A short introduction and three figures up top, followed by a recorded answer comparison; then the detailed sections,
 // one or two lines, and its figure. "Doesn't know" is shown as empty squares, the words one hover or click away; the
 // tables and the method are folded at the end. It took over /models (which redirects here, public/_redirects).
 import Base from "../../layouts/Base.astro";
@@ -12,13 +12,16 @@ import KnowledgeMatrix from "../../components/KnowledgeMatrix.astro";
 import LessonList from "../../components/LessonList.astro";
 import LiftBars from "../../components/LiftBars.astro";
 import Measured from "../../components/Measured.astro";
+import RecordedComparison from "../../components/RecordedComparison.astro";
 import Tip from "../../components/Tip.astro";
 import { done3Table, reproduceCommand, withoutToolsTable, type Row } from "../../build/bench.ts";
+import { homeComparison } from "../../build/home.ts";
 import { dateAxis, dayOf, knowledge } from "../../build/knowledge.ts";
 import { siteData } from "../../build/data.ts";
 import { en } from "../../strings/en.ts";
 
 const { done3, models, index, config, releaseDates } = await siteData();
+const hasComparison = homeComparison(done3) !== null;
 const b = en.bench;
 const repo = `https://github.com/${config.org}/${config.repo}`;
 const subjectOf = new Map(index.lessons.map((l) => [l.id, l.subject]));
@@ -112,6 +115,14 @@ let n = 0;
 
     <div class="wrap">
       {!done3 && !models && <p>{b.none}</p>}
+
+      {
+        hasComparison && (
+          <section id="recorded-answer" class="recorded-answer" aria-label="Recorded answer comparison">
+            <RecordedComparison />
+          </section>
+        )
+      }
 
       {
         models && (
@@ -388,6 +399,11 @@ let n = 0;
   section {
     margin-top: 72px;
   }
+  .recorded-answer {
+    max-width: 760px;
+    margin-top: 56px;
+    scroll-margin-top: 32px;
+  }
   /* A section's head: its number and heading on the left, a line or two and its key on the right. */
   .shead {
     display: grid;
@@ -520,6 +536,9 @@ let n = 0;
     }
     section {
       margin-top: 48px;
+    }
+    .recorded-answer {
+      margin-top: 40px;
     }
   }
 

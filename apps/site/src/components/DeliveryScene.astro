@@ -1,0 +1,206 @@
+---
+import BrandMark from "./BrandMark.astro";
+import { en } from "../strings/en.ts";
+import { DATA_LINE } from "../../../../packages/cli/src/render.ts";
+import { COVERAGE_LINE } from "@ludion/core";
+const s = en.home.delivery;
+// These are the actual wiring contracts in packages/cli/src/render.ts. This UI previews them; it writes no files.
+const routes = [
+  {id:"claude",name:"Claude Code",file:"CLAUDE.md",code:"@.ludion/lessons.md",note:s.claude},
+  {id:"codex",name:"Codex",file:"AGENTS.md",code:"Before writing code that uses this project's packages, read `.ludion/lessons.md`: changes in the installed versions that you may not know.",note:s.codex},
+  {id:"cursor",name:"Cursor",file:".cursor/rules/ludion.mdc",code:`---\ndescription: Changes in this project's installed package versions (written by ludion sync)\nalwaysApply: true\n---\n\n# Lessons from Ludion\n\n${DATA_LINE}\n\n${COVERAGE_LINE}`,note:s.cursor},
+];
+---
+<div class="delivery" data-delivery>
+  <div class="delivery-bar"><span>{s.label}</span><div role="group" aria-label={s.choose} class="destinations" hidden>{routes.map((route,i) => <button type="button" data-delivery-target={route.id} aria-pressed={i === 0 ? "true" : "false"}>{route.name}</button>)}</div></div>
+  <figure class="delivery-figure" aria-labelledby="delivery-caption">
+    <div class="delivery-visual" data-delivery-visual aria-hidden="true">
+      <div class="fallback-route"><span><BrandMark size={24}/><code>.ludion/lessons.md</code></span><i>→</i><span><code data-static-destination>CLAUDE.md</code></span></div>
+      <div class="three-space" data-delivery-space></div>
+      <div class="visual-labels"><div><span>{s.context}</span><code>.ludion/lessons.md</code></div><div><span data-flat-assistant>Claude Code</span><code data-static-destination>CLAUDE.md</code></div></div>
+    </div>
+    <figcaption id="delivery-caption">{s.illustration}</figcaption>
+    <button class="replay" data-delivery-replay type="button" aria-disabled="false" hidden><span aria-hidden="true">↻</span>{s.replay}</button>
+  </figure>
+  <div class="wiring-output">
+    {routes.map((route) => <article class="wiring-route" data-wiring-route={route.id} data-file={route.file}>
+      <div class="file-bar"><span>{route.name}</span><code>{route.file}</code></div>
+      <pre><code>{route.code}</code></pre><p>{route.note}</p>
+    </article>)}
+  </div>
+  <div class="command"><code>npx ludion-ai sync</code><button type="button" data-delivery-copy hidden aria-label={s.copyLabel} data-copied={s.copied} data-fallback={s.copyFallback}>{s.copy}</button><a href="/start/">{s.setup}<span aria-hidden="true"> ↗</span></a></div>
+  <p class="delivery-scope">{s.scope}</p><span class="visually-hidden" role="status" data-delivery-status></span>
+  <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>.ludion/lessons.md</code></div><div class="world-lines">{Array.from({length:6},()=> <i></i>)}</div></div></template>
+  <template data-delivery-object="destination"><div class="world-file destination-file"><span class="world-label" data-world-assistant>Claude Code</span><code data-world-file>CLAUDE.md</code><div class="world-lines">{Array.from({length:5},()=> <i></i>)}</div></div></template>
+  <template data-delivery-object="packet"><div class="packet"><BrandMark size={46}/><span>{s.context}</span></div></template>
+  <template data-delivery-object="floor"><div class="world-floor"></div></template>
+</div>
+
+<script>
+  import { Object3D, PerspectiveCamera } from "three";
+  import { CSS3DObject, CSS3DRenderer } from "three/addons/renderers/CSS3DRenderer.js";
+  for (const root of document.querySelectorAll<HTMLElement>("[data-delivery]")) {
+    const visual = root.querySelector<HTMLElement>("[data-delivery-visual]")!;
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-delivery-target]")];
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-wiring-route]")];
+    const replay = root.querySelector<HTMLButtonElement>("[data-delivery-replay]")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const group = new Object3D();
+    const camera = new PerspectiveCamera(36,1,1,2000);
+    const renderer = new CSS3DRenderer();
+    renderer.domElement.className = "three-root";
+    root.querySelector("[data-delivery-space]")!.append(renderer.domElement);
+    const object = (name:string) => {
+      const template = root.querySelector<HTMLTemplateElement>(`[data-delivery-object="${name}"]`)!;
+      const el = template.content.firstElementChild!.cloneNode(true) as HTMLElement;
+      const item = new CSS3DObject(el); group.add(item); return item;
+    };
+    const source = object("source"), destination = object("destination"), packet = object("packet"), floor = object("floor");
+    floor.position.set(0,-145,-30); floor.rotation.x = -Math.PI/2;
+    let visible = false, frame = 0, started = 0, playing = false, progress = 1, seen = false, pointerX = 0, pointerY = 0, last = 0;
+    const setBusy = (busy:boolean) => { playing = busy; replay.setAttribute("aria-disabled",String(busy)); root.dataset.deliveryPlaying = String(busy); };
+    const finish = () => { progress = 1; setBusy(false); };
+    const draw = (now:number) => {
+      frame = 0;
+      if (!visible || document.hidden) return;
+      if (playing) {
+        progress = Math.min(1,(now-started)/1100);
+        if (progress === 1) finish();
+      }
+      if (now-last >= 30 || !playing) {
+        last = now;
+        const mobile = visual.clientWidth < 600;
+        const spread = mobile ? 145 : 280;
+        const p = progress*progress*(3-2*progress);
+        source.position.set(-spread,0,-25); destination.position.set(spread,0,-25);
+        source.rotation.y = mobile ? .08 : .25; destination.rotation.y = mobile ? -.08 : -.25;
+        const scale = mobile ? .9 : 1;
+        source.scale.setScalar(scale); destination.scale.setScalar(scale);
+        packet.scale.setScalar(mobile ? .5 : .72);
+        packet.position.set(-spread+2*spread*p,100+Math.sin(p*Math.PI)*50,100+Math.sin(p*Math.PI)*90);
+        packet.rotation.y = Math.sin(p*Math.PI)*-.3;
+        packet.element.style.opacity = p === 1 ? "0" : String(Math.min(1,(1-p)*5));
+        group.rotation.set(reduce.matches ? 0 : pointerY*.06,reduce.matches ? 0 : pointerX*.12,0);
+        renderer.render(group,camera);
+      }
+      if (playing && !reduce.matches) frame = requestAnimationFrame(draw);
+    };
+    const schedule = () => { if (visible && !frame && !document.hidden) frame = requestAnimationFrame(draw); };
+    const resize = () => {
+      const width = visual.clientWidth, height = visual.clientHeight;
+      renderer.setSize(width,height); camera.aspect = width/height; camera.fov = width < 600 ? 40 : 36;
+      camera.position.set(0,80,width < 600 ? 760 : 830); camera.lookAt(0,0,0); camera.updateProjectionMatrix(); schedule();
+    };
+    const play = () => {
+      if (playing) return;
+      if (reduce.matches) { finish(); schedule(); return; }
+      progress = 0; started = performance.now(); setBusy(true); schedule();
+    };
+    const choose = (id:string, animate=true) => {
+      const panel = panels.find(item => item.dataset.wiringRoute === id)!;
+      const label = buttons.find(item => item.dataset.deliveryTarget === id)!.textContent!;
+      for (const item of panels) item.hidden = item !== panel;
+      for (const button of buttons) button.setAttribute("aria-pressed",String(button.dataset.deliveryTarget === id));
+      destination.element.querySelector("[data-world-assistant]")!.textContent = label;
+      destination.element.querySelector("[data-world-file]")!.textContent = panel.dataset.file!;
+      for (const label of root.querySelectorAll("[data-static-destination]")) label.textContent = panel.dataset.file!;
+      root.querySelector("[data-flat-assistant]")!.textContent = label;
+      root.querySelector("[data-delivery-status]")!.textContent = `${label}: ${panel.dataset.file}`;
+      finish(); if (animate) play(); else schedule();
+    };
+    root.classList.add("delivery-ready");
+    root.querySelector<HTMLElement>(".destinations")!.hidden = false; replay.hidden = false;
+    choose("claude",false); resize();
+    new ResizeObserver(resize).observe(visual);
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (!visible) { cancelAnimationFrame(frame); frame = 0; if (playing) finish(); }
+      else { if (!seen) { seen = true; play(); } schedule(); }
+    }).observe(visual);
+    visual.addEventListener("pointermove",event => {
+      if (event.pointerType !== "mouse" || reduce.matches) return;
+      const rect = visual.getBoundingClientRect(); pointerX = (event.clientX-rect.left)/rect.width-.5; pointerY = (event.clientY-rect.top)/rect.height-.5; schedule();
+    });
+    visual.addEventListener("pointerleave",()=>{pointerX=pointerY=0;schedule();});
+    for (const button of buttons) button.addEventListener("click",()=>choose(button.dataset.deliveryTarget!));
+    replay.addEventListener("click",play);
+    reduce.addEventListener("change",()=>{finish();pointerX=pointerY=0;cancelAnimationFrame(frame);frame=0;schedule();});
+    document.addEventListener("visibilitychange",()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;finish();}else schedule();});
+    const copy = root.querySelector<HTMLButtonElement>("[data-delivery-copy]")!;
+    if (navigator.clipboard) {
+      copy.hidden = false;
+      copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText("npx ludion-ai sync");copy.textContent=copy.dataset.copied!;root.querySelector("[data-delivery-status]")!.textContent=copy.dataset.copied!;}catch{root.querySelector("[data-delivery-status]")!.textContent=copy.dataset.fallback!;}});
+    }
+  }
+</script>
+
+<style>
+  .delivery { width:min(100% - 36px,1120px); margin:auto; background:var(--paper); overflow:hidden; text-align:left; }
+  .delivery-bar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; padding:14px 22px; border-block:1px solid var(--rule); font-size:12px; color:var(--muted); }
+  .destinations { display:flex; gap:4px; }
+  .destinations[hidden] { display:none; }
+  button { font:inherit; font-size:12px; min-height:40px; padding:9px 13px; border:0; border-radius:5px; background:transparent; color:var(--muted); cursor:pointer; }
+  button[aria-pressed="true"] { background:var(--paper-2); color:var(--ink); }
+  .delivery-figure { margin:0; position:relative; border-bottom:1px solid var(--rule); }
+  .delivery-visual { position:relative; height:410px; overflow:hidden; background:radial-gradient(ellipse at 50% 65%,var(--paper-2),var(--paper) 72%); }
+  .three-space { position:absolute; inset:0; visibility:hidden; }
+  .delivery-ready .three-space { visibility:visible; }
+  .fallback-route { display:flex; align-items:center; justify-content:center; gap:28px; height:100%; }
+  .fallback-route > span { display:grid; justify-items:center; gap:18px; color:var(--ink); }
+  .fallback-route code { font-size:12px; }
+  .fallback-route i { font-style:normal; color:var(--muted); }
+  .delivery-ready .fallback-route { visibility:hidden; }
+  .visual-labels { position:absolute; inset:auto 0 18px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:690px; margin-inline:auto; padding-inline:18px; visibility:hidden; text-align:center; color:var(--ink); }
+  .delivery-ready .visual-labels { visibility:visible; }
+  .visual-labels > div { display:grid; align-content:start; gap:6px; }
+  .visual-labels span { font-size:10px; color:var(--muted); }
+  .visual-labels code { font-size:12px; overflow-wrap:anywhere; }
+  figcaption { padding:0 22px 20px; font-size:11px; text-align:center; color:var(--muted); background:var(--paper); }
+  .replay { display:block; margin:0 auto 14px; color:var(--ink); }
+  .replay[hidden] { display:none; }
+  .replay span { margin-right:8px; }
+  .replay[aria-disabled="true"] { opacity:.5; }
+  .wiring-output { max-width:820px; margin-inline:auto; padding:24px 28px; }
+  .wiring-route + .wiring-route { margin-top:24px; }
+  .wiring-route[hidden] { display:none; }
+  .delivery-ready .wiring-route + .wiring-route { margin:0; }
+  .file-bar { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; color:var(--muted); font-size:11px; }
+  .file-bar code { color:var(--ink); font-size:12px; overflow-wrap:anywhere; }
+  pre { margin:17px 0 0; padding:18px 20px; border:1px solid var(--rule); border-radius:5px; background:var(--paper-2); white-space:pre-wrap; overflow-wrap:anywhere; }
+  pre code { font-size:12px; line-height:1.7; }
+  .wiring-route p { font-size:11px; color:var(--muted); margin:12px 0 0; }
+  .command { display:flex; align-items:center; flex-wrap:wrap; gap:10px 20px; padding:16px 28px; border-top:1px solid var(--rule); }
+  .command > code { font-size:14px; color:var(--ink); }
+  .command button { color:var(--ink); margin-left:auto; }
+  .command a { font-size:12px; color:var(--muted); }
+  .command button[hidden] { display:none; }
+  .delivery-scope { margin:0; padding:13px 28px; border-top:1px solid var(--rule); font-size:11px; line-height:1.7; color:var(--muted); }
+  .world-file { width:360px; height:220px; padding:24px; overflow:hidden; background:var(--paper); border:1px solid var(--rule); border-radius:8px; box-shadow:0 18px 40px rgb(0 0 0 / .04); }
+  .world-label { display:block; font-size:15px; color:var(--muted); margin-bottom:16px; }
+  .world-file-head { display:flex; align-items:center; gap:15px; }
+  .world-file-head code { color:var(--ink); font-size:19px; }
+  .world-lines { display:grid; gap:13px; margin-top:25px; }
+  .world-lines i { height:1px; width:100%; background:var(--rule); }
+  .world-lines i:nth-child(2n) { width:68%; }
+  .destination-file { width:280px; height:220px; }
+  .destination-file > code { display:block; color:var(--ink); font-size:23px; overflow-wrap:anywhere; }
+  .packet { display:grid; justify-items:center; align-content:center; gap:15px; width:140px; height:140px; border:1px solid var(--rule); border-radius:14px; background:var(--paper); color:var(--ink); box-shadow:0 12px 24px rgb(0 0 0 / .04); }
+  .packet span { color:var(--muted); font-size:14px; }
+  .world-floor { width:1000px; height:440px; background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px); background-size:40px 40px; opacity:.5; mask-image:radial-gradient(ellipse,#000,transparent 70%); }
+  @media(max-width:640px) {
+    .delivery-bar { padding:14px 18px; justify-content:center; }
+    .delivery-bar > span { width:100%; text-align:center; }
+    .destinations { width:100%; justify-content:center; }
+    .destinations button { padding-inline:10px; }
+    .delivery-visual { height:260px; }
+    .visual-labels code { font-size:11px; }
+    .visual-labels { padding-inline:4px; }
+    .fallback-route { gap:12px; }
+    .fallback-route code { font-size:9px; }
+    .wiring-output { padding:20px 18px; }
+    .command { padding:16px 18px; gap:6px 12px; }
+    .command > code { font-size:12px; }
+    .delivery-scope { padding-inline:18px; }
+    pre { padding:14px; }
+  }
+</style>

@@ -1,5 +1,4 @@
 // Every UI string. Japanese will be a translation of this file, not a refactor.
-import type { VerifiedBy } from "@ludion/core";
 export const en = {
   site: {
     name: "Ludion",
@@ -14,12 +13,61 @@ export const en = {
   },
   home: {
     title: "Ludion: teach it once",
-    headline: "Keep your coding AI current.",
-    sub: "Verified lessons for the package versions in your project.",
+    headline: ["The software changed.", "Your AI should know."],
+    sub: "Verified lessons, matched to your project.",
     start: "Get started",
-    example: "One verified lesson",
-    readEvidence: "Read the evidence",
+    seeItWork: "See it work",
     coverage: "Coverage is partial.",
+    scroll: "Explore Ludion",
+    scene: {
+      caption: "Installed version → matched lessons → project context. An illustration of sync.",
+    },
+    chapters: { label:"Explore Ludion", fit:"Match", proof:"Inspect", delivery:"Connect", result:"Result" },
+    fit: { eyebrow:"Version + model", title:"Your versions. Your context.", sub:"Try a different version or measured model." },
+    proof: { eyebrow:"A correction that survives", title:"Follow the fact.", sub:"From a software change to its evidence and teacher." },
+    connection: { eyebrow:"In your workflow", title:"One context. Your assistant.", sub:"Preview how sync connects the files in your project." },
+    lens: {
+      title:"Project context", project:"Example project", model:"Measured model", noModel:"No model filter",
+      available:"Package lessons", matching:"Version matches", included:"In context", pruned:"measured known · left out", unmeasured:"unmeasured · included",
+      preview:(shown:number,matched:number)=>`Previewing ${shown} of ${matched} version matches.`,
+      status:(included:number,pruned:number)=>`${included} lessons included; ${pruned} measured-known lessons left out.`,
+      lessonSelection:"Inspect a matched lesson", measuredMiss:"Measured misses", measuredKnown:"Measured knows · left out", notMeasured:"Not measured · included",
+      inContext:"Included in context", leftOut:"Left out for this model", evidence:"Full lesson", subject:"All package lessons", empty:"No lesson matches this example yet.",
+      scope:"Current-index example for one package. Uses sync’s actual selection; no project files are read.",
+      measurement:"FreshBench: two answers per lesson, without tools", coverage:"Coverage is partial.",
+    },
+    trace: {
+      label:"Lesson inspector", inspect:"Follow the fact", steps:{change:"Change",evidence:"Evidence",teacher:"Teacher",context:"Context"},
+      changeTitle:"One default. Two versions.", evidenceTitle:"The same test, across versions.", evidenceNote:"Evidence requirements, not a live test run.", source:"Read the source",
+      teacherTitle:"A person signs the lesson.", teacherId:"GitHub account ID", publication:"Publication record", fullLesson:"Open the full lesson",
+      contextTitle:"A fact in project context.", contextNote:"Recorded sync excerpt, October 12, 2026. The complete record delivered 9 lessons; 2 dependencies had no coverage.", recordLink:"Recorded sync",
+      root:"Root configuration", inline:"Inline project", inherits:"Inherits root setup", noInherit:"Does not inherit root setup", unavailable:"Explore the current lessons.",
+    },
+    delivery: {
+      label:"Assistant connection", choose:"Choose your assistant", context:"Project context", illustration:"An illustration of context delivery. Choose an assistant to inspect the actual wiring.",
+      replay:"Replay connection", claude:"Imports the context. CLAUDE.md is created if missing.", codex:"Adds a reference when AGENTS.md exists.",
+      cursor:"Header excerpt. When .cursor exists, the complete rule inlines the lesson content.",
+      copy:"Copy command", copied:"Copied", copyLabel:"Copy: npx ludion-ai sync", copyFallback:"Select the command to copy it.", setup:"Setup guide",
+      scope:"Wiring preview, not a CLI run. No files are changed here. Coverage is partial.",
+    },
+    recorded: {
+      eyebrow: "In context",
+      title: "The same question. A different answer.",
+      sub: "An actual recorded comparison. Explore what changed with sync.",
+    },
+    closing: {
+      eyebrow: "Start with your installed versions",
+      title: "Bring Ludion to your project.",
+      action: "Set up Ludion",
+    },
+    moment: {
+      recorded: "Recorded comparison",
+      project: "The installed project version stays the same",
+      installed: "Installed",
+      context: "Project context",
+      replay: "Replay recorded change",
+      evidence: "View the record",
+    },
     comparison: {
       title: "One question. Two answers.",
       recorded: "Recorded answers",
@@ -31,13 +79,6 @@ export const en = {
       setup: "Vitest 5.0.3, frozen lessons",
       condition: "Recorded answer condition",
     },
-    replayTitle: "How a lesson passes",
-    checking: "Checking",
-    replay: (by: VerifiedBy, date: string) =>
-      `A replay of how this lesson passed: ${by === "test" ? "CI ran its test" : by === "differential" ? "CI ran its tests on two versions" : by === "proof" ? "Lean checked its proof" : "its quote was found on the source page"}, and it was verified on ${date}.`,
-    logTitle: (by: VerifiedBy, runner: string) => (by === "source" ? "Source check" : by === "proof" ? "Proof check (lean)" : `Test (${runner})`),
-    recent: "Recently verified",
-    seeLessons: "See all lessons",
   },
   lessons: {
     title: "Lessons",

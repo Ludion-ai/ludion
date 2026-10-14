@@ -1,5 +1,18 @@
 # Progress
 
+### 2026-10-14: Whole-home product interaction and authorized release
+
+- Built: the approved visual opening now leads to operable version/model matching using the actual CLI selection, a signed lesson inspector, finite Three.js assistant delivery with exact conditional file wiring, the scoped recorded comparison and setup. Native chapter navigation, stable panels, no-JavaScript fallback, keyboard/focus and reduced-motion/offscreen handling remain. Existing URLs, generated claims, teacher and agent-draft attribution, privacy and partial coverage are preserved.
+- Independent review: changed the initial model to make real pruning visible, varied the repeated card composition, made projected file names readable through flat labels, and stacked narrow selectors. A state accessibility sweep found a link target too close to the sticky navigation; enlarged it and added a mobile light/dark regression test.
+- Validation and release evidence: `docs/site/2026-10-14-home-app.md` and `docs/bench/2026-10-14-home-app/validation.json`. Production publication is explicitly authorized; this change proceeds through PR #110, green CI and the repository's only deploy workflow. Local success alone does not establish that production has changed.
+
+### 2026-10-14: Visual opening and recorded interaction on scroll
+
+- Built: a visual opening with procedural flow, scroll-linked layer alignment and pointer depth; a second scene with a native recorded-answer switch/replay; a short setup closing. Removed the arbitrary central L. Supplied bracket logo used for the header/favicon. Actual comparison remains available on Bench too; existing lesson/setup URLs, scopes, attribution, partial coverage and privacy remain.
+- Reviewed: actual Raycast/Linear openings and following scenes, plus independent source review. The first light-theme contrast check found a small red bracket at 4.07:1; darkened that text accent. Added keyboard focus retention through replay and an actual focus assertion. An earlier review caught the negative-base GLSL expression; its squared-offset fix remains.
+- Validation: final-source checks recorded in `docs/site/2026-10-14-home-showcase.md`. This iteration is local and reviewable before the draft PR is marked ready.
+
+
 What was built, what the check showed, what was decided and why. Newest first. Numbers come from `docs/bench/`.
 
 ### 2026-10-14: Site refinement and a recorded homepage comparison

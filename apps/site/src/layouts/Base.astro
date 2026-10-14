@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import "../styles/water.css";
 import Wordmark from "../components/Wordmark.astro";
+import BrandMark from "../components/BrandMark.astro";
 import { siteData } from "../build/data.ts";
 import { en } from "../strings/en.ts";
 
@@ -50,13 +51,15 @@ const canonicalUrl = new URL(path, config.site).href;
       )
     }
     <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <script is:inline src="/ga.js" defer></script>
   </head>
-  <body>
+  <body class:list={[{ showcase: Astro.url.pathname === "/" }]}>
     <a class="skip" href="#main">{en.nav.skip}</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a class="home" href="/" aria-label={en.site.name}><Wordmark /></a>
+        <a class="home" href="/" aria-label={en.site.name}><BrandMark /><Wordmark height={23} /></a>
         <nav aria-label={en.nav.label}>
           <a href="/lessons/" aria-current={Astro.url.pathname.startsWith("/lessons") ? "page" : undefined}>{en.nav.lessons}</a>
           <a href="/bench/" aria-current={Astro.url.pathname.startsWith("/bench") ? "page" : undefined}>{en.nav.bench}</a>
@@ -69,7 +72,7 @@ const canonicalUrl = new URL(path, config.site).href;
     </main>
     <footer class="site-footer">
       <div class="wrap foot">
-        <p>{en.footer.count(index.lessons.length, teacherCount)}</p>
+        {Astro.url.pathname !== "/" && <p>{en.footer.count(index.lessons.length, teacherCount)}</p>}
         <p>
           {en.footer.license} <a href={`https://github.com/${config.org}/${config.repo}`}>{en.footer.github}</a>
         </p>
@@ -109,6 +112,8 @@ const canonicalUrl = new URL(path, config.site).href;
   }
   .home {
     display: inline-flex;
+    align-items:center;
+    gap:12px;
     padding: 6px 0;
     text-decoration: none;
   }
@@ -134,7 +139,7 @@ const canonicalUrl = new URL(path, config.site).href;
     flex-direction: column;
     padding-top: 56px;
   }
-  main > :global(:last-child) {
+  body:not(.showcase) main > :global(:last-child) {
     padding-bottom: 96px;
   }
   .site-footer {
@@ -155,6 +160,9 @@ const canonicalUrl = new URL(path, config.site).href;
   .foot a {
     color: var(--ink);
   }
+  .showcase .site-header { border-bottom: 0; }
+  .showcase main { padding-top: 0; }
+  .showcase .foot { font-size: 12px; padding-block: 18px 24px; }
   @media (max-width: 400px) {
     .bar { gap: 16px; }
     nav { gap: 16px; }

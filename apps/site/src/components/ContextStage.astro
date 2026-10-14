@@ -1,0 +1,157 @@
+---
+import { en } from "../strings/en.ts";
+// The installed version, symbol and context path come from docs/demo/grep-output.txt. This is an illustration,
+// not a CLI simulation, a new verification run, or a product interface. The literal record follows on scroll.
+const s = en.home.scene;
+const lines = Array.from({length: 28}, (_, row) => {
+  const points = Array.from({length: 65}, (_, column) => {
+    const x = column * 20;
+    const y = 110 + row * 13 + Math.sin(column / 9 + row / 12) * (28 + row * 2);
+    return `${column ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  return points.join(" ");
+});
+const columns = Array.from({length: 35}, (_, column) => `M${column * 40},80 C${column * 40 + 50},180 ${column * 40 - 110},320 ${column * 40 + 60},500`);
+---
+<figure class="context-stage" data-context-stage aria-labelledby="context-caption">
+  <div class="projection" data-context-projection>
+    <svg class="field" viewBox="0 0 1280 520" fill="none" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="field-ink" x1="0" x2="1280" gradientUnits="userSpaceOnUse"><stop stop-color="currentColor" stop-opacity="0"/><stop offset=".3" stop-color="currentColor" stop-opacity=".16"/><stop offset=".7" stop-color="currentColor" stop-opacity=".26"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient>
+      </defs>
+      {lines.map((d) => <path d={d} stroke="url(#field-ink)" stroke-width=".8"/>)}
+      {columns.map((d) => <path d={d} stroke="url(#field-ink)" stroke-width=".5"/>)}
+      <path class="signal" d={lines[9]} stroke="currentColor" stroke-width="1.5" pathLength="100"/>
+      <path class="signal delayed" d={lines[19]} stroke="currentColor" stroke-width="1" pathLength="100"/>
+    </svg>
+    <div class="scene-light" aria-hidden="true"></div>
+    <div class="document-plane">
+      <div class="rib rib-back" aria-hidden="true"></div><div class="rib rib-mid" aria-hidden="true"></div>
+      <span class="bracket opening" aria-hidden="true"></span>
+      <span class="bracket closing" aria-hidden="true"></span>
+      <div class="document" aria-hidden="true">
+        <div class="document-head"><span class="version">vitest <b>5.0.3</b></span><span class="flow-arrow">→</span><span class="file">.ludion/lessons.md</span></div>
+        <div class="document-body">
+          <div class="context-lines">{Array.from({length: 11}, (_, row) => <span style={`--row:${row}`}><i></i><i></i><i></i><i></i></span>)}</div>
+          <div class="focus-row"><span class="focus-bracket">「</span><code>extends</code><span class="focus-bracket">」</span></div>
+        </div>
+        <span class="scan" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+  <figcaption id="context-caption">
+    <p class="scene-caption">{s.caption}</p>
+  </figcaption>
+</figure>
+
+<script>
+  // Scroll and pointer input share one scheduled paint. No render loop, mouse-only controls, or model request.
+  for (const stage of document.querySelectorAll<HTMLElement>("[data-context-stage]")) {
+    const scene = stage.querySelector<HTMLElement>("[data-context-projection]")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    let inView = false, frame = 0, pointerX = 0, pointerY = 0;
+    const paint = () => {
+      frame = 0;
+      if (reduce.matches) {
+        scene.style.removeProperty("--scroll");
+        scene.style.removeProperty("--pointer-x");
+        scene.style.removeProperty("--pointer-y");
+        return;
+      }
+      const rect = stage.getBoundingClientRect();
+      // Finish the alignment while the surface is still visible, instead of starting at the viewport's top edge.
+      const scroll = Math.min(1, Math.max(0, scrollY / Math.max(rect.height * .9, 1)));
+      scene.style.setProperty("--scroll", String(scroll));
+      scene.style.setProperty("--pointer-x", String(pointerX));
+      scene.style.setProperty("--pointer-y", String(pointerY));
+    };
+    const schedule = () => { if (!frame && inView) frame = requestAnimationFrame(paint); };
+    const activity = () => {
+      stage.classList.toggle("active", inView && !document.hidden && !reduce.matches);
+      schedule();
+    };
+    new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; activity(); }).observe(stage);
+    scene.addEventListener("pointermove", (event) => {
+      if (event.pointerType !== "mouse" || reduce.matches) return;
+      const rect = scene.getBoundingClientRect();
+      pointerX = (event.clientX - rect.left) / rect.width - .5;
+      pointerY = (event.clientY - rect.top) / rect.height - .5;
+      schedule();
+    });
+    scene.addEventListener("pointerleave", () => { pointerX = 0; pointerY = 0; schedule(); });
+    window.addEventListener("scroll", schedule, {passive:true});
+    window.addEventListener("resize", schedule, {passive:true});
+    document.addEventListener("visibilitychange", activity);
+    reduce.addEventListener("change", () => { paint(); activity(); });
+  }
+</script>
+
+<style>
+  .context-stage { margin:0; --brand:#e5412a; }
+  .projection { height:460px; position:relative; perspective:1400px; overflow:clip; --scroll:0; --pointer-x:0; --pointer-y:0; }
+  .field { position:absolute; width:100%; height:100%; inset:0; color:var(--ink); transform:translateY(calc(var(--scroll) * -30px)); }
+  .signal { stroke-dasharray:9 91; stroke-dashoffset:100; opacity:.45; animation:flow 8s linear infinite; animation-play-state:paused; }
+  .signal.delayed { animation-delay:-4s; opacity:.25; }
+  .active .signal,.active .scan { animation-play-state:running; }
+  @keyframes flow { to{stroke-dashoffset:-100} }
+  .scene-light { position:absolute; inset:20% 14% 0; background:radial-gradient(ellipse at 65% 45%,color-mix(in srgb,var(--brand) 9%,transparent),transparent 65%); filter:blur(20px); }
+  .document-plane {
+    position:absolute; width:min(72%,840px); left:50%; top:49%;
+    transform:translate(-50%,-45%) rotateX(calc(36deg - var(--scroll) * 28deg + var(--pointer-y) * -4deg)) rotateY(calc(-9deg + var(--pointer-x) * 5deg)) rotateZ(calc(-9deg + var(--scroll) * 9deg));
+    transform-style:preserve-3d;
+  }
+  .document { position:relative; overflow:hidden; border:1px solid var(--rule); border-radius:3px; background:linear-gradient(120deg,var(--paper-2),var(--paper) 50%,var(--paper-2)); box-shadow:0 28px 70px rgb(0 0 0 / .06),0 1px 0 var(--paper) inset; }
+  .document-head { display:flex; align-items:center; gap:20px; padding:18px 26px; border-bottom:1px solid var(--rule); font:16px var(--font-code); color:var(--muted); text-align:left; }
+  .flow-arrow { color:var(--muted); }
+  .file { margin-left:auto; }
+  .version { color:var(--ink); white-space:nowrap; }
+  .version b { font-weight:500; margin-left:8px; }
+  .document-body { position:relative; height:240px; padding:30px 32px; }
+  .context-lines { position:absolute; inset:24px 32px; display:flex; flex-direction:column; justify-content:space-between; }
+  .context-lines > span { display:flex; gap:12px; transform:translateX(calc(mod(var(--row),3) * 10px)); opacity:.55; }
+  .context-lines i { display:block; height:2px; width:16%; background:var(--rule); }
+  .context-lines i:nth-child(2) { width:27%; }
+  .context-lines i:nth-child(3) { width:12%; }
+  .context-lines i:nth-child(4) { width:30%; }
+  .focus-row { position:absolute; inset:38% 0 auto; height:60px; display:flex; align-items:center; justify-content:center; gap:20px; background:linear-gradient(90deg,transparent,var(--paper) 25%,var(--paper) 75%,transparent); color:var(--ink); box-shadow:0 1px 0 var(--rule),0 -1px 0 var(--rule); }
+  .focus-row code { font-size:28px; letter-spacing:-.04em; font-weight:400; }
+  .focus-bracket { color:var(--muted); font-size:20px; }
+  .focus-bracket:last-child { color:#bf3826; }
+  .rib { position:absolute; inset:0; border:1px solid var(--rule); border-radius:3px; background:var(--paper); box-shadow:0 10px 30px rgb(0 0 0 / .03); }
+  .rib-mid { transform:translate(calc(20px * (1 - var(--scroll))),calc(-20px * (1 - var(--scroll)))) translateZ(calc(-35px * (1 - var(--scroll)))); opacity:.6; }
+  .rib-back { transform:translate(calc(40px * (1 - var(--scroll))),calc(-40px * (1 - var(--scroll)))) translateZ(calc(-70px * (1 - var(--scroll)))); opacity:.3; }
+  .bracket { position:absolute; width:80px; height:110px; z-index:2; pointer-events:none; }
+  .opening { top:-14px; left:-14px; border-top:4px solid var(--ink); border-left:4px solid var(--ink); }
+  .closing { right:-14px; bottom:-14px; border-right:4px solid var(--brand); border-bottom:4px solid var(--brand); }
+  .scan { position:absolute; inset:0; background:linear-gradient(110deg,transparent 42%,color-mix(in srgb,var(--brand) 5%,transparent) 49%,transparent 56%); transform:translateX(-110%); animation:scan 8s ease-in-out infinite; animation-play-state:paused; pointer-events:none; }
+  @keyframes scan { 0%,15%{transform:translateX(-110%)}65%,100%{transform:translateX(110%)} }
+  figcaption { padding-inline:var(--gutter); }
+  .scene-caption { margin:0; color:var(--muted); font-size:11px; }
+  @media(prefers-color-scheme:dark) {
+    .focus-bracket:last-child { color:var(--brand); }
+    .document { background:linear-gradient(120deg,#161616,#090909 50%,#151515); border-color:#363636; box-shadow:0 25px 100px rgb(0 0 0 / .7),0 1px 0 #353535 inset; }
+    .rib { background:#151515; border-color:#363636; }
+    .scene-light { background:radial-gradient(ellipse at 65% 45%,rgb(229 65 42 / .13),transparent 65%); }
+  }
+  @media(max-width:640px) {
+    .projection { height:320px; perspective:1000px; }
+    .document-plane { width:calc(100% - 48px); transform:translate(-50%,-45%) rotateX(calc(10deg - var(--scroll) * 10deg)) rotateZ(calc(-4deg + var(--scroll) * 4deg)); }
+    .document-head { padding:14px; font-size:12px; gap:8px; }
+    .version b { margin-left:3px; }
+    .document-body { height:180px; padding:20px 18px; }
+    .context-lines { inset:20px 18px; }
+    .context-lines > span { gap:8px; }
+    .focus-row { height:48px; gap:10px; }
+    .focus-row code { font-size:23px; }
+    .rib-mid { transform:translate(calc(10px * (1 - var(--scroll))),calc(-10px * (1 - var(--scroll)))) translateZ(calc(-20px * (1 - var(--scroll)))); }
+    .rib-back { transform:translate(calc(20px * (1 - var(--scroll))),calc(-20px * (1 - var(--scroll)))) translateZ(calc(-40px * (1 - var(--scroll)))); }
+    .bracket { width:42px; height:65px; border-width:3px; }
+    .opening { top:-9px; left:-9px; }
+    .closing { bottom:-9px; right:-9px; }
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .document-plane { transform:translate(-50%,-45%); }
+    .signal { stroke-dashoffset:0; animation:none; }
+    .scan { display:none; }
+  }
+</style>

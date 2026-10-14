@@ -20,10 +20,10 @@ test("capture actual pages at mobile and desktop widths in both themes", async (
   expect(lesson, "Capture a real lesson and its subject from the index.").toBeDefined();
   expect(teacher, "Capture a real teacher from the index.").toBeDefined();
   const lookup = await browser.newPage();
-  await lookup.goto("/");
+  await lookup.goto("/bench/");
   const answerHref = await lookup.locator('[data-answer="with"] .full').getAttribute("href");
   await lookup.close();
-  expect(answerHref, "Capture the same recorded answer the home links.").toBeTruthy();
+  expect(answerHref, "Capture the same recorded answer the Bench links.").toBeTruthy();
   const modelHref = answerHref!.split("/").slice(0,3).join("/") + "/";
   const pages: Record<string, string> = {
     home: "/",

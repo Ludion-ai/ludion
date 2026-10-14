@@ -1,258 +1,161 @@
 ---
-// First visit: what the lessons are for, how to start, and one real verified lesson.
-// The water continues to the page top, with the existing lower fade preserved.
+// A visual opening, followed by an operable recorded example. Details retain their existing URLs.
 import Base from "../layouts/Base.astro";
-import Claim from "../components/Claim.astro";
-import LessonCard from "../components/LessonCard.astro";
-import StatusChip from "../components/StatusChip.astro";
-import SubjectTag from "../components/SubjectTag.astro";
-import RecordedComparison from "../components/RecordedComparison.astro";
-import { claimParts } from "../build/claim-parts.ts";
-import { homeComparison } from "../build/home.ts";
-import { siteData } from "../build/data.ts";
-import { en, formatDate } from "../strings/en.ts";
-
-const { index, teacherHref, done3 } = await siteData();
-const hasComparison = homeComparison(done3) !== null;
-const [newest, ...rest] = index.lessons;
-const recent = rest.slice(0, 3);
-const parts = newest ? claimParts(newest.claim) : null;
+import RecordedMoment from "../components/RecordedMoment.astro";
+import ContextStage from "../components/ContextStage.astro";
+import ProjectLens from "../components/ProjectLens.astro";
+import LessonTrace from "../components/LessonTrace.astro";
+import DeliveryScene from "../components/DeliveryScene.astro";
+import BrandMark from "../components/BrandMark.astro";
+import { en } from "../strings/en.ts";
 ---
 
-<Base title={en.home.title} description={en.home.sub}>
-  <section class:list={["hero", "wrap", { "single": !hasComparison }]}>
-    <div class="intro">
-    <h1>{en.home.headline}</h1>
-    <p class="sub">{en.home.sub}</p>
-    <div class="actions">
-      <a class="start" href="/start/">{en.home.start}<span aria-hidden="true"> →</span></a>
-      <code>npx ludion-ai sync</code>
+<Base title={en.home.title} description={en.site.description}>
+  <section class="home-stage" aria-labelledby="home-heading" data-water data-water-showcase>
+    <div class="introduction wrap">
+      <h1 id="home-heading">{en.home.headline.map((line) => <span>{line}</span>)}</h1>
+      <p>{en.home.sub}</p>
     </div>
-    <p class="coverage"><a href="/lessons/">{en.home.coverage}</a></p>
+    <div class="invitation wrap">
+      <div class="actions">
+        <a class="start" href="/start/">{en.home.start}<span aria-hidden="true"> ↗</span></a>
+        <a class="proof" id="replay" href="#in-context">{en.home.seeItWork}<span aria-hidden="true"> ↓</span></a>
+      </div>
     </div>
-    <RecordedComparison />
+    <div class="scene"><span class="horizon" data-water-surface aria-hidden="true"></span><ContextStage /></div>
+    <a class="scroll-cue" href="#fit">{en.home.scroll}<span aria-hidden="true"> ↓</span></a>
   </section>
-
-  {
-    newest && parts && (
-      <section class="replay wrap" aria-labelledby="replay" data-water data-water-at="0.6">
-        <div class="grid" data-water-surface>
-          <article class="example">
-            <h2 id="replay">{en.home.example}</h2>
-            <a class="claim text" href={`/lessons/${newest.id}/`}>
-              <span class="head"><Claim text={parts.head} /></span>
-              {parts.detail && <span class="detail">{" "}<Claim text={parts.detail} /></span>}
-              {parts.tail && <span class="tail"> {parts.tail.text}</span>}
-            </a>
-            <p class="evidence"><a href={`/lessons/${newest.id}/#evidence`}>{en.home.readEvidence}<span aria-hidden="true"> →</span></a></p>
-          </article>
-          <div class="record">
-            <p class="state" data-water-hit>
-              <StatusChip status="verified" label={en.lesson.verifiedBy[newest.verified_by]} by={newest.verified_by} />
-            </p>
-            <p class="applies"><SubjectTag subject={newest.subject} version={newest.version} /></p>
-            <p class="sign">
-              <span class="by">{en.lesson.taughtBy}{" "}{teacherHref(newest.teacher_id) ? <a href={teacherHref(newest.teacher_id)!}>@{newest.teacher}</a> : <span>@{newest.teacher}</span>}{newest.drafted_by === "agent" && <span class="drafted">{en.lesson.drafted}</span>}</span>
-            </p>
-            <time datetime={newest.verified_at}>{formatDate(newest.verified_at)}</time>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {
-    recent.length > 0 && (
-      <section class="recent wrap" aria-labelledby="recent">
-        <h2 id="recent">{en.home.recent}</h2>
-        <ul class="list">
-          {recent.map((l) => (
-            <li>
-              <LessonCard
-                id={l.id}
-                claim={l.claim}
-                subject={l.subject}
-                version={l.version}
-                kind={(l as { kind?: string }).kind}
-                teacher={l.teacher}
-                teacherId={l.teacher_id}
-                teacherHref={teacherHref(l.teacher_id)}
-                verifiedBy={l.verified_by}
-                verifiedAt={l.verified_at}
-                drafted={l.drafted_by === "agent"}
-              />
-            </li>
-          ))}
-        </ul>
-        <p class="all"><a href="/lessons/">{en.home.seeLessons}<span aria-hidden="true"> →</span></a></p>
-      </section>
-    )
-  }
+  <div class="home-story">
+    <nav class="story-nav" aria-label={en.home.chapters.label}><span class="story-brand" aria-hidden="true"><BrandMark size={15}/></span>{[{id:"fit",label:en.home.chapters.fit},{id:"proof",label:en.home.chapters.proof},{id:"connect",label:en.home.chapters.delivery},{id:"in-context",label:en.home.chapters.result}].map(({id,label})=><a href={`#${id}`} data-story-link={id}>{label}</a>)}</nav>
+    <section class="story-scene" id="fit" aria-labelledby="fit-heading">
+      <div class="section-intro wrap"><span class="eyebrow">{en.home.fit.eyebrow}</span><h2 id="fit-heading">{en.home.fit.title}</h2><p>{en.home.fit.sub}</p></div>
+      <ProjectLens copy={en.home.lens}/>
+    </section>
+    <section class="story-scene story-scene--split" id="proof" aria-labelledby="proof-heading">
+      <div class="proof-layout">
+      <div class="section-intro wrap"><span class="eyebrow">{en.home.proof.eyebrow}</span><h2 id="proof-heading">{en.home.proof.title}</h2><p>{en.home.proof.sub}</p></div>
+      <LessonTrace copy={en.home.trace}/>
+      </div>
+    </section>
+    <section class="story-scene" id="connect" aria-labelledby="connect-heading">
+      <div class="section-intro wrap"><span class="eyebrow">{en.home.connection.eyebrow}</span><h2 id="connect-heading">{en.home.connection.title}</h2><p>{en.home.connection.sub}</p></div>
+      <DeliveryScene/>
+    </section>
+  <section class="recorded-scene" id="in-context" aria-labelledby="recorded-heading">
+    <div class="section-intro wrap"><span class="eyebrow">{en.home.recorded.eyebrow}</span><h2 id="recorded-heading">{en.home.recorded.title}</h2><p>{en.home.recorded.sub}</p></div>
+    <RecordedMoment />
+    <p class="coverage" id="recent"><a href="/lessons/">{en.home.coverage}</a></p>
+  </section>
+  </div>
+  <section class="closing-scene wrap" aria-labelledby="closing-heading">
+    <p class="eyebrow">{en.home.closing.eyebrow}</p><h2 id="closing-heading">{en.home.closing.title}</h2>
+    <a class="start" href="/start/">{en.home.closing.action}<span aria-hidden="true"> ↗</span></a>
+  </section>
 </Base>
 
+<script>
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      if (!motion.matches) entry.target.classList.add("arriving");
+      observer.unobserve(entry.target);
+    }
+  }, {threshold:.15});
+  const scenes = document.querySelectorAll(".story-scene, .recorded-scene, .closing-scene");
+  for (const scene of scenes) observer.observe(scene);
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-story-link]")];
+  const chapters = new IntersectionObserver(entries=>{
+    for(const entry of entries) if(entry.isIntersecting) for(const link of links) {
+      if(link.dataset.storyLink === entry.target.id) link.setAttribute("aria-current","location"); else link.removeAttribute("aria-current");
+    }
+  },{rootMargin:"-10% 0px -60% 0px"});
+  for(const scene of document.querySelectorAll(".story-scene, .recorded-scene")) chapters.observe(scene);
+</script>
+
 <style>
-  .hero {
-    display:grid;
-    grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);
-    gap:72px;
-    align-items:center;
-    padding-block:40px 88px;
+  .home-stage {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: calc(100svh - 64px);
+    padding-block: clamp(80px,12vh,132px) 36px;
+    text-align: center;
   }
-  .hero.single { grid-template-columns:minmax(0,1fr); }
+  .introduction { position: relative; z-index: 2; }
   h1 {
-    font-weight: 600;
-    font-size: clamp(40px, 4.6vw, 60px);
-    max-width:13ch;
-    line-height: 1.06;
-    letter-spacing: -0.04em;
+    font-size: clamp(34px, 4.8vw, 58px);
+    font-weight: 480;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
   }
-  .sub {
-    margin: 22px 0 0;
-    max-width: 34em;
-    font-size: 18px;
-    line-height: 1.55;
-    font-weight: 400;
-    color: var(--text);
+  h1 span { display:block; }
+  .introduction p { margin: 22px 0 0; color: var(--muted); font-size: 15px; }
+  .invitation { margin-top:26px; position:relative; z-index:2; }
+  .scene {
+    position: relative;
+    width: min(100%, 1400px);
+    min-width: 0;
+    align-self: center;
+    justify-self: center;
+    margin-block: 12px 28px;
   }
-  .actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 18px 28px;
-    margin-top: 32px;
-  }
+  .horizon { position: absolute; top: 56%; left: 0; width: 100%; height: 0; }
+  .actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 18px 28px; }
   .start {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    gap: 18px;
     min-height: 44px;
-    gap: 6px;
-    padding: 10px 16px;
+    padding: 10px 21px;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
     background: var(--ink);
     color: var(--paper);
-    border-radius: 3px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     text-decoration: none;
+    transition: transform 180ms, opacity 180ms;
   }
-  .start:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  .start:hover { opacity: 0.84; transform: translateY(-2px); }
+  .proof { padding: 10px 0; font-size: 14px; text-decoration: none; }
+  .proof:hover { text-decoration: underline; }
+  .scroll-cue { justify-self:center; color:var(--muted); font-size:11px; text-decoration:none; padding:8px; }
+  .home-story { padding-top:22px; border-top:1px solid var(--rule); background:var(--paper); }
+  .story-nav { display:flex; align-items:center; justify-content:center; gap:4px; position:sticky; z-index:5; top:16px; width:max-content; max-width:calc(100% - 36px); margin:0 auto; padding:4px 6px; border:1px solid var(--rule); border-radius:999px; background:color-mix(in srgb,var(--paper) 92%,transparent); backdrop-filter:blur(12px); box-shadow:0 7px 24px rgb(0 0 0 / .035); }
+  .story-brand { padding-inline:10px; color:var(--ink); line-height:1; }
+  .story-nav a { padding:10px 16px; min-height:40px; font-size:12px; color:var(--muted); text-decoration:none; border-radius:999px; }
+  .story-nav a[aria-current] { background:var(--paper-2); color:var(--ink); }
+  .story-scene { padding-block:100px 110px; text-align:center; scroll-margin-top:40px; }
+  .story-scene + .story-scene { border-top:1px solid var(--rule); }
+  @media (min-width:1100px) {
+    .proof-layout { display:grid; grid-template-columns:250px minmax(0,1fr); align-items:start; gap:48px; width:min(100% - 72px,1120px); margin:auto; }
+    .story-scene--split .section-intro { width:auto; margin:50px 0 0; text-align:left; }
+    .story-scene--split .section-intro p { margin-inline:0; }
+    .proof-layout :global(.lesson-trace) { width:100%; }
   }
-  .actions code {
-    color: var(--muted);
-    overflow-wrap: anywhere;
-  }
-  .coverage { margin:18px 0 0; font-size:13px; color:var(--muted); }
-  .coverage a {color:inherit;}
-  .replay {
-    padding-block: 0;
-  }
-  .grid {
-    padding-top: 80px;
-    border-top: 2px solid var(--rule-strong);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 18rem;
-    gap: 32px 80px;
-    align-items: start;
-  }
-  .example h2,
-  .recent h2 {
-    margin: 0 0 20px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--muted);
-  }
-  .text {
-    display: block;
-    max-width: 44em;
-    overflow-wrap: anywhere;
-    text-decoration: none;
-  }
-  .head {
-    display: block;
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: -0.02em;
-  }
-  .detail {
-    display: block;
-    margin-top: 14px;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.65;
-    letter-spacing: 0;
-    color: var(--text);
-  }
-  .tail {
-    display: block;
-    margin-top: 12px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.55;
-    letter-spacing: 0;
-    color: var(--muted);
-  }
-  .text:hover .head {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .evidence {
-    margin: 20px 0 0;
-    font-size: 14px;
-  }
-  .record {
-    padding-top: 35px;
-    font-size: 13px;
-    line-height: 1.65;
-    color: var(--muted);
-  }
-  .record p {
-    margin: 0 0 14px;
-  }
-  .by {
-    overflow-wrap: anywhere;
-  }
-  .by a {
-    color: var(--ink);
-  }
-  .recent {
-    padding-top: 88px;
-  }
-  .all {
-    margin: 0;
-    padding-top: 22px;
-    border-top: 1px solid var(--rule);
-    font-size: 15px;
-    font-weight: 500;
-  }
-  @media (max-width: 900px) {
-    .hero {grid-template-columns:minmax(0,1fr);gap:48px;}
-    h1 {max-width:20ch;}
-    .grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .record {
-      padding-top: 0;
-    }
-  }
+  .recorded-scene { padding-block:140px 120px; text-align:center; border-top:1px solid var(--rule); background:var(--paper); scroll-margin-top:40px; }
+  .section-intro { margin-bottom:48px; }
+  .eyebrow { display:block; font-size:11px; color:var(--muted); margin:0 0 20px; }
+  h2 { font-size:clamp(28px,3.2vw,40px); font-weight:460; letter-spacing:-.035em; text-wrap:balance; }
+  .section-intro p { max-width:40ch; margin:18px auto 0; color:var(--muted); font-size:15px; }
+  .coverage { margin:30px 0 0; font-size:12px; color:var(--muted); }
+  .coverage a { color: inherit; text-decoration-color: var(--rule); }
+  .closing-scene { padding-block:110px 130px; text-align:center; border-top:1px solid var(--rule); }
+  .closing-scene .start { margin-top:32px; }
+  .arriving .section-intro,.closing-scene.arriving h2 { animation:arrive 650ms cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes arrive { from{opacity:.3; transform:translateY(22px)}to{opacity:1;transform:none} }
   @media (max-width: 640px) {
-    .hero {
-      padding-block: 16px 64px;
-    }
-    .sub {
-      font-size: 17px;
-    }
-    .head {
-      font-size: 21px;
-      overflow-wrap: anywhere;
-    }
-    .grid {
-      padding-top: 64px;
-      gap: 24px;
-    }
-    .recent {
-      padding-top: 64px;
-    }
+    .home-stage { padding-block:64px 26px; }
+    h1 { max-width: 22ch; margin-inline: auto; font-size:clamp(27px,8.6vw,34px); }
+    .introduction p { max-width: 24ch; margin-inline: auto; font-size: 14px; }
+    .scene { margin-block:24px; }
+    .actions { gap: 20px; }
+    .recorded-scene { padding-block:86px 80px; }
+    .section-intro { margin-bottom:32px; }
+    .closing-scene { padding-block:80px; }
+    .story-scene { padding-block:76px 80px; }
+    .story-brand { display:none; }
+    .story-nav a { padding-inline:12px; font-size:11px; }
   }
 </style>

@@ -1,0 +1,145 @@
+---
+import BrandMark from "./BrandMark.astro";
+import { homeComparison } from "../build/home.ts";
+import { siteData } from "../build/data.ts";
+import { en, formatDate } from "../strings/en.ts";
+const { done3, models } = await siteData();
+const example = homeComparison(done3);
+const s = en.home.moment;
+const c = en.home.comparison;
+const model = example ? models?.models[example.model]?.name ?? example.model : "";
+---
+{example && <figure class="moment" data-moment>
+  <figcaption class="topline"><span>{s.recorded}</span><span>{model}</span></figcaption>
+  <div class="workspace">
+    <aside class="project" aria-label={s.project}>
+      <span class="label">{s.installed}</span>
+      <p class="version"><code>vitest</code><span>5.0.3</span></p>
+      <div class="context">
+        <span class="label">{s.context}</span>
+        <code>.ludion/lessons.md</code>
+        <span class="context-state" data-context-state>{c.with}</span>
+      </div>
+      <div class="delivery" aria-hidden="true">
+        <span class="delivery-brand"><BrandMark size={18} />Ludion</span>
+        <span class="delivery-path"><i></i></span>
+      </div>
+    </aside>
+    <div class="conversation">
+      <p class="question">{example.question}</p>
+      <div class="answers">
+        {[{label:c.without,key:"without",answer:example.before},{label:c.with,key:"with",answer:example.after}].map(({label,key,answer}) =>
+          <div class="answer" data-moment-answer={key}>
+            <p class="condition"><span>{label}</span><span class="grade">{en.bench.grade[answer.grade]}</span></p>
+            <blockquote>{answer.excerpt.split(/(`[^`]+`)/g).map((part) => part.startsWith("`") && part.endsWith("`") ? <code>{part.slice(1,-1)}</code> : part)}</blockquote>
+            <a class="full" href={answer.href}>{c.full}<span aria-hidden="true"> ↗</span></a>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+  <div class="controls" hidden>
+    <div class="switch" role="group" aria-label={c.condition}>
+      <button type="button" data-moment-show="without" aria-pressed="false">{c.without}</button>
+      <button type="button" data-moment-show="with" aria-pressed="true">{c.with}</button>
+    </div>
+    <button type="button" class="replay" data-moment-replay><span aria-hidden="true">▶</span>{s.replay}</button>
+  </div>
+  <span class="visually-hidden" role="status" data-moment-status></span>
+  <p class="scope">{c.setup} · {formatDate(example.measuredAt)}<br />{c.note} <a href="/bench/#recorded-answer">{s.evidence}</a></p>
+</figure>}
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>("[data-moment]")) {
+    const controls = root.querySelector<HTMLElement>(".controls")!;
+    const replay = root.querySelector<HTMLButtonElement>("[data-moment-replay]")!;
+    const motion = matchMedia("(prefers-reduced-motion: reduce)");
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    root.classList.add("interactive");
+    controls.hidden = false;
+    const select = (key: string, announce = true) => {
+      if (timer) clearTimeout(timer);
+      timer = undefined;
+      root.classList.remove("delivering");
+      replay.setAttribute("aria-disabled", "false");
+      root.dataset.condition = key;
+      for (const answer of root.querySelectorAll<HTMLElement>("[data-moment-answer]")) answer.hidden = answer.dataset.momentAnswer !== key;
+      for (const button of root.querySelectorAll<HTMLButtonElement>("[data-moment-show]")) button.setAttribute("aria-pressed", String(button.dataset.momentShow === key));
+      const panel = root.querySelector<HTMLElement>(`[data-moment-answer="${key}"]`)!;
+      root.querySelector<HTMLElement>("[data-context-state]")!.textContent = panel.querySelector(".condition > span")!.textContent;
+      if (announce) root.querySelector<HTMLElement>("[data-moment-status]")!.textContent = Array.from(panel.querySelectorAll(".condition > span"), (span) => span.textContent).join(": ");
+    };
+    select("with", false);
+    for (const button of root.querySelectorAll<HTMLButtonElement>("[data-moment-show]")) button.addEventListener("click", () => select(button.dataset.momentShow!));
+    replay.addEventListener("click", () => {
+      if (timer) return;
+      if (motion.matches) { select("with"); return; }
+      select("without", false);
+      root.classList.add("delivering");
+      // Keep keyboard focus on the replay while the recorded transition is in progress.
+      replay.setAttribute("aria-disabled", "true");
+      root.querySelector<HTMLElement>("[data-moment-status]")!.textContent = replay.textContent!.trim();
+      timer = setTimeout(() => select("with"), 760);
+    });
+    motion.addEventListener("change", () => { if (motion.matches && timer) select("with"); });
+    document.addEventListener("visibilitychange", () => { if (document.hidden && timer) select("with", false); });
+  }
+</script>
+
+<style>
+  .moment { width:min(100% - 36px,860px); margin:0 auto; text-align:left; border:1px solid var(--rule); border-radius:10px; background:var(--paper); overflow:hidden; }
+  .topline { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; padding:14px 22px; border-bottom:1px solid var(--rule); color:var(--muted); font-size:12px; }
+  .workspace { display:grid; grid-template-columns:220px minmax(0,1fr); }
+  .project { min-width:0; padding:28px 22px; border-right:1px solid var(--rule); background:var(--paper-2); }
+  .label { display:block; color:var(--muted); font-size:11px; }
+  .version { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:8px 0 34px; color:var(--ink); }
+  .version span { font-size:18px; letter-spacing:-.03em; }
+  .context code { display:block; margin-top:8px; font-size:11px; color:var(--ink); overflow-wrap:anywhere; }
+  .context-state { display:block; margin-top:8px; color:var(--muted); font-size:11px; }
+  .moment[data-condition="without"] .context code { opacity:.5; }
+  .delivery { display:flex; align-items:center; gap:16px; margin-top:35px; }
+  .delivery-brand { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink); }
+  .delivery-path { position:relative; flex:1; height:1px; background:var(--rule); overflow:hidden; }
+  .delivery-path i { display:block; width:26px; height:1px; background:var(--ink); transform:translateX(-100%); }
+  .delivering .delivery-path i { animation:delivery 720ms ease-in-out both; }
+  @keyframes delivery {from{transform:translateX(-26px)}to{transform:translateX(110px)}}
+  .conversation { padding:28px 30px; min-width:0; }
+  .question { margin:0 0 26px; color:var(--ink); font-size:17px; font-weight:450; line-height:1.55; text-wrap:pretty; }
+  .answers { display:grid; gap:20px; }
+  .interactive .answer { grid-area:1 / 1; }
+  .answer[hidden] { display:none; }
+  .interactive .answer[hidden] { display:block; visibility:hidden; }
+  .interactive .answer:not([hidden]) { animation:answer 240ms ease-out; }
+  @keyframes answer {from{opacity:.25;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .condition { margin:0 0 12px; display:flex; justify-content:space-between; gap:16px; font-size:11px; color:var(--muted); }
+  .grade { color:var(--ink); }
+  blockquote { margin:0; font-size:20px; font-weight:450; letter-spacing:-.025em; line-height:1.55; color:var(--ink); overflow-wrap:anywhere; }
+  blockquote code { font-size:.84em; letter-spacing:0; }
+  .full { display:inline-block; margin-top:18px; color:var(--muted); font-size:11px; }
+  .controls { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:12px 22px; border-top:1px solid var(--rule); }
+  .controls[hidden] { display:none; }
+  .switch { display:flex; gap:4px; }
+  button { font:inherit; font-size:12px; min-height:38px; padding:8px 11px; border:0; border-radius:5px; cursor:pointer; background:transparent; color:var(--muted); }
+  button[aria-pressed="true"] { background:var(--paper-2); color:var(--ink); }
+  .replay { color:var(--ink); padding-inline:8px; }
+  .replay span { font-size:9px; margin-right:8px; }
+  .replay[aria-disabled="true"] { opacity:.55; cursor:default; }
+  .scope { margin:0; padding:12px 22px 15px; border-top:1px solid var(--rule); color:var(--muted); font-size:11px; line-height:1.65; }
+  .scope a { color:inherit; }
+  @media(max-width:640px) {
+    .workspace { grid-template-columns:minmax(0,1fr); }
+    .project { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:8px 18px; border-right:0; border-bottom:1px solid var(--rule); padding:16px 18px; }
+    .project > .label { display:none; }
+    .version { margin:0; justify-content:flex-start; gap:10px; }
+    .version span { font-size:15px; }
+    .context { justify-self:end; min-width:0; }
+    .context > .label,.context-state,.delivery { display:none; }
+    .context code { margin:0; font-size:10px; }
+    .conversation { padding:22px 20px; }
+    .question { font-size:15px; margin-bottom:20px; }
+    blockquote { font-size:18px; }
+    .topline,.controls,.scope { padding-inline:18px; }
+    .controls { justify-content:center; }
+    .topline { font-size:11px; }
+  }
+</style>

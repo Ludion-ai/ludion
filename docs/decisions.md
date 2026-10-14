@@ -1,5 +1,26 @@
 # Decisions
 
+### 2026-10-14: Show home benefits as an explorable application
+
+The owner approved the visual opening and authorized extending the whole homepage and deploying it. The next screens therefore demonstrate actual version/model matching, signed evidence and assistant-file delivery through native controls. Match uses the CLI's selection code at build time, with Haiku as the initial measured model so known-lesson pruning is visible. Unknown measurements remain included. Inspect retains the generated claim/signature while revealing the exact evidence, account identity and recorded context. Connect uses Three.js CSS3D for a finite context-delivery illustration, with real conditional wiring and ordinary copy/setup controls outside the projection. The existing recorded comparison remains a separate scoped record. No application backend or simulated verification was introduced.
+
+Desktop evidence moves to an asymmetric composition and delivery opens into a wider space. Mobile labels remain outside perspective, selectors stack at narrow widths and controls work without motion. Hidden/offscreen state cancels animation; there is no second idle render loop. A measured state-accessibility defect in the footer link was fixed and has a regression test. Details, measured checks, dependency limits and screenshots: `docs/site/2026-10-14-home-app.md`; receipt: `docs/bench/2026-10-14-home-app/validation.json`. Three is the only added package, pinned with its license notice; unrelated pre-existing audit findings were reviewed and recorded rather than upgrading the whole dependency tree in this release. Production uses the existing PR/CI/deploy workflow, as explicitly requested by the owner.
+
+### 2026-10-14: Home as a sequence of visual and interactive scenes
+
+The owner wants home to show Ludion, then reveal additional product screens on scroll. Inspected the actual openings and next viewports of [Raycast](https://www.raycast.com/) and [Linear](https://linear.app/): they establish a strong opening composition before the deeper product scenes. Replaced the arbitrary central L and the subsequent attempt to fit a whole recorded comparison in the first viewport. A short opening now leads to an illustrated context plane; the next scene contains an operable, literal recorded comparison. Setup remains at `/start/`, all lessons and attribution retain their URLs, and the complete comparison remains at `/bench/#recorded-answer`. `#replay` and `#recent` remain valid home fragments. Partial coverage and analytics/license disclosures remain.
+
+The opening is a code-native illustration of installed versions → matched lessons → project context. Its `vitest 5.0.3`, `extends` and `.ludion/lessons.md` are grounded in `docs/demo/grep-output.txt`; it presents no live verification, completeness claim or invented app interface. The owner's supplied logo kit contributes the Japanese bracket mark in the header and favicon, with a restrained vermillion brand accent. The files are assets, not instructions; no supplied code was executed and no service rename was inferred.
+
+The illustrated plane responds to pointer position and flattens/aligns its layers while it is still visible during scrolling. A procedural SVG field carries slow light paths; the existing wave continues from the page top. CSS flow pauses offscreen and in hidden tabs. Scroll/pointer input schedules a single paint, rather than a second render loop. Reduced motion removes the perspective/flow and resets input variables. Without JavaScript, a static opening, ordinary navigation and both recorded answers remain available. No dependency, remote bitmap, paid API call or account was added. Visual review found the file/version labels too small and the 320px title too dominant: enlarged the labels, made their input→output direction explicit and reduced the small-screen title.
+
+The second scene joins the same Claude Opus 5.5 project question with and without sync, preserving literal excerpts, grades, source URLs, installed version, frozen scope, date and one-trial qualification. Replay animates a clearly labeled recorded change only. Manual selection, reduced-motion changes and a hidden tab cancel its pending timer. Replay uses `aria-disabled` plus a handler guard so keyboard focus survives the short transition. Both answer panels reserve the same height. Teacher attribution, agent-draft labels, generated claims and evidence scopes on the lesson pages remain untouched.
+
+Other pages retain their wave settings; home alone gets a larger, quieter caustic field. Canvas bounds and raster-budget formulas stay unchanged. The home pool moved with the redesigned content, so this preserves the bounds rule rather than claiming identical screen coordinates. Verification and actual captures are in `docs/site/2026-10-14-home-showcase.md`.
+
+This is a design iteration for review, not measured conversion improvement. The live site stays on the preceding release while the PR is a draft.
+
+
 CLAUDE.md is the spec. This file holds the details it leaves to us: what was decided, and why. Newest decisions go at the top of their section. When a decision changes, edit it here in the same PR as the code, and say what it replaced.
 
 ## v2 decisions

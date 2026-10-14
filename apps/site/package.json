@@ -14,6 +14,7 @@
     "@fontsource-variable/schibsted-grotesk": "^5.3.0",
     "@ludion/core": "*",
     "astro": "^7.3.6",
-    "semver": "^7.8.5"
+    "semver": "^7.8.5",
+    "three": "0.186.1"
   }
 }

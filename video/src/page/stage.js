@@ -146,7 +146,7 @@ const wrong = panel("s-wrong", {
 const right = panel("s-right", {
   kicker: "With ludion sync",
   answer: data.with.excerpt,
-  note: `Recorded answer, graded ${data.with.grade}. Same model, same question, after ${data.sync.command}.`,
+  note: `Recorded answer, graded ${data.with.grade}. Same model, same question, with the lessons ludion sync wrote.`,
   stamp: "Correct.",
 });
 
@@ -159,6 +159,7 @@ const cmdChars = [...data.sync.command].map((ch) => el("span", null, esc(ch), cm
 const cmdCaret = el("span", "caret", null, cmd);
 const out = el("div", "out", null, term);
 const outLines = data.sync.output.map((l) => el("p", null, esc(l), out));
+const syncFoot = el("div", "foot", esc(data.sync.recorded), sync);
 
 // The lesson, as sync wrote it.
 const lesson = scene("s-lesson");
@@ -195,7 +196,7 @@ function bar(label, n, dim) {
 }
 const barWithout = bar("without sync", data.bench.without, true);
 const barWith = bar("with ludion sync", data.bench.with, false);
-const proofNote = el("div", "foot", esc(`FreshBench B questions, ${data.bench.date}: Claude Code (${data.model}) with its default tools, in projects with the new versions installed. One trial per condition.`), proof);
+const proofNote = el("div", "foot", esc(`FreshBench B questions, ${data.bench.date}: Claude Code (${data.model}) with its default read-only tools, in projects with the new versions installed. One trial per condition.`), proof);
 
 // End: the mark closes, the wordmark, the line from the site, the command.
 const end = scene("s-end");
@@ -222,7 +223,7 @@ function measure() {
   // Where each answer word ends, for the caret.
   for (const p of [wrong, right]) {
     Object.assign(p.aCaret.style, { position: "absolute", left: "0", top: "0", height: `${p.aWords[0].offsetHeight * 0.76}px`, width: "0.5em" });
-    p.wordBox = p.aWords.map((w) => ({ x: w.offsetLeft + w.offsetWidth, y: w.offsetTop + w.offsetHeight * 0.12, h: w.offsetHeight }));
+    p.wordBox = p.aWords.map((w) => ({ x0: w.offsetLeft, x: w.offsetLeft + w.offsetWidth, y: w.offsetTop + w.offsetHeight * 0.12, h: w.offsetHeight }));
   }
   // Strike bars: one per line the phrase covers.
   for (const p of [wrong]) {
@@ -277,7 +278,7 @@ function water(t) {
   const p = { time: t * 0.62, surface: surfaceY, light: 0, line: 0, above: 1, swell: 1, flood: 0, focus: 0.7, focusY: 0.5, glitch: 0, scale: 1 };
   if (t < SCENES.hook[1]) {
     p.above = 0;
-    p.light = 0.55 * E.outCubic(lin(t, 0.15, 1.2));
+    p.light = 0.55 * E.outCubic(lin(t, 0.0, 1.0));
     p.line = 0.0;
     p.focusY = surfaceY / H;
     p.hit = [W / 2 + (tall || square ? 0 : W * 0.2), surfaceY, t - CUES.slam];
@@ -349,7 +350,7 @@ function renderHook(t) {
   const on = inScene(t, "hook");
   vis(hook, on);
   if (!on) return;
-  hookLine.style.transform = `scaleX(${E.outExpo(lin(t, 0.0, 0.55))})`;
+  hookLine.style.transform = `scaleX(${E.outExpo(lin(t, 0.0, 0.4))})`;
   hookLine.style.opacity = 1 - lin(t, 1.7, 1.95);
   const starts = tall ? [0.2, 0.42, CUES.slam] : square ? [0.2, 0.42, CUES.slam] : [0.2, 0.42, CUES.slam];
   hookWords.forEach((w, i) => {
@@ -432,7 +433,7 @@ function renderPanel(t, p, o) {
   // The caret follows the last word shown.
   const streaming = t >= o.times[0] - 0.3 && t < o.times[o.times.length - 1] + 0.6;
   const shownIdx = o.times.findLastIndex((x) => t >= x);
-  const at = shownIdx >= 0 ? p.wordBox[shownIdx] : { x: 0, y: p.wordBox[0].y, h: p.wordBox[0].h };
+  const at = shownIdx >= 0 ? p.wordBox[shownIdx] : { x: p.wordBox[0].x0, y: p.wordBox[0].y, h: p.wordBox[0].h };
   p.aCaret.style.transform = `translate(${at.x + (shownIdx >= 0 ? 8 : 0)}px, ${at.y}px)`;
   p.aCaret.style.opacity = streaming && (t < o.times[0] || Math.floor(t * 4) % 2 === 0) ? 1 : 0;
   // Strike the false phrase.
@@ -469,6 +470,7 @@ function renderSync(t) {
   const push = E.inExpo(lin(t, 13.8, 15.0));
   sync.style.transform = `scale(${1 + 0.1 * push})`;
   sync.style.opacity = 1 - E.inExpo(lin(t, 14.85, 15.0));
+  syncFoot.style.opacity = E.outCubic(lin(t, CUES.output, CUES.output + 0.3));
 }
 
 function renderLesson(t) {

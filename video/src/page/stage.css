@@ -37,7 +37,7 @@
   --hero: 170px; --claim: 92px; --pkg: 32px; --silent: 230px; --silentline: 46px;
   --ans: 60px; --q: 33px; --kick: 26px; --foot: 21px; --cmd: 70px; --out: 25px;
   --lesson: 84px; --detail: 42px; --ev: 26px; --corner: 92px;
-  --big: 150px; --logo: 160px; --tag: 46px; --surface: 0.58; --boxTop: 250px; --boxBottom: 260px; --noteGap: 80px;
+  --big: 150px; --logo: 160px; --tag: 46px; --surface: 0.58; --boxTop: 250px; --boxBottom: 260px; --noteGap: 80px; --proofScale: 1.3;
 }
 /* 1:1, 1080 x 1080 */
 .fmt-1x1 {
@@ -130,15 +130,15 @@ code, .mono { font-family: var(--code); font-variant-ligatures: none; }
 
 /* Proof */
 #s-proof .chart { position: absolute; left: calc(var(--pad) + var(--corner) * 0.95); right: calc(var(--pad) + var(--corner) * 0.6); top: 50%; }
-#s-proof h3 { font-size: calc(var(--ans) * 1.05); font-weight: 560; letter-spacing: -0.03em; line-height: 1.1; color: var(--ink); text-wrap: balance; }
-#s-proof .bars { margin-top: calc(var(--ans) * 0.9); display: grid; gap: calc(var(--ans) * 0.55); }
+#s-proof h3 { font-size: calc(var(--ans) * var(--proofScale, 1) * 1.05); font-weight: 560; letter-spacing: -0.03em; line-height: 1.1; color: var(--ink); text-wrap: balance; }
+#s-proof .bars { margin-top: calc(var(--ans) * 0.9); display: grid; gap: calc(var(--ans) * 0.55); font-size: calc(var(--proofScale, 1) * 1em); }
 #s-proof .bar { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0 calc(var(--ans) * 0.5); }
 #s-proof .bar .label { font-family: var(--code); font-size: var(--kick); color: var(--muted); grid-column: 2; grid-row: 1; margin-bottom: 0.6em; letter-spacing: 0.04em; text-transform: uppercase; align-self: end; }
-#s-proof .bar .track { position: relative; grid-column: 2; grid-row: 2; height: calc(var(--ans) * 0.5); background: #1a1a1a; }
+#s-proof .bar .track { position: relative; grid-column: 2; grid-row: 2; height: calc(var(--ans) * var(--proofScale, 1) * 0.5); background: #1a1a1a; }
 #s-proof .bar .num { grid-column: 1; grid-row: 1 / 3; }
 #s-proof .bar .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: var(--mark); transform-origin: 0 50%; }
 #s-proof .bar.dim .fill { background: #5c5c5c; }
-#s-proof .bar .num { font-size: calc(var(--ans) * 2.1); font-weight: 600; letter-spacing: -0.05em; line-height: 0.8; font-variant-numeric: tabular-nums; min-width: 2.9em; text-align: left; }
+#s-proof .bar .num { font-size: calc(var(--ans) * var(--proofScale, 1) * 2.1); font-weight: 600; letter-spacing: -0.05em; line-height: 0.8; font-variant-numeric: tabular-nums; min-width: 2.9em; text-align: left; }
 #s-proof .bar .num small { font-size: 0.42em; color: var(--muted); letter-spacing: 0; font-weight: 500; }
 
 /* End */

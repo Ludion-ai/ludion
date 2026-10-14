@@ -104,6 +104,12 @@ Codex: security, audits, the benchmark (`tools/bench`). Claude Code: the seed pi
 - **#93 merged** after 0.1.4 reached npm. Nothing is posted or sent; the maintainer letters 03 to 05 are still set aside for the owner's discussion. #96 (`/bench`) was merged by the owner.
 - **Codex**: #67 and #68 closed unmerged; #69 is the one open PR.
 
+### 2026-10-14: The launch film
+
+- **Built**: `video/` renders the 30-second launch film in 16:9, 9:16 and 1:1 (1080p-class, 60 fps, sound) with `node video/render.mjs`. Text and numbers are read from `docs/bench/2026-10-11-done3/`, `lessons/` and a new recording of `npx ludion-ai sync` (`video/recordings/`). Decisions: `docs/decisions.md`, "The launch film".
+- **Checked**: frames and frame strips from each encoded MP4 in all three formats; the sound by spectrogram, loudness per half second and integrated loudness. No one has listened to it yet.
+- **Waits for the owner**: where the MP4s are kept (they are not in Git) and whether the site's top embeds one.
+
 ### 2026-10-13 (night): UI bugs fixed, every page down to 320 px
 
 - **Found** (the owner reported UI bugs; every page swept at 320, 390, 768, and 1280 px by a script that flags sideways scroll and any element wider than its box, `docs/site/2026-10-13-ui-fixes/sweep.mjs`, output in `sweep-before.txt`): on `/bench`, the subject headings of "Every lesson" sat in the version column, so "Haiku 5.5 Sonnet 5.5 Opus 5.5" ran over the first claim, and on a phone the rows were squeezed beside the heading with the version chip under the kind tag. On phones, long dotted names in claims widened the page (a lesson page was 433 px wide at 390), and at 320 px 59 pages scrolled sideways, with the large seal, source quotes, and one test caption among the causes. A second sweep after a phone-only first fix found a long flag too wide for a lesson's claim column at 1024 px, so the fix applies at every width. Decisions: `docs/decisions.md`, "Every page down to 320 px".

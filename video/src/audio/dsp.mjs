@@ -11,6 +11,10 @@ export function bus(seconds) {
   return { L: new Float32Array(n), R: new Float32Array(n), n };
 }
 
+/** The last 10 ms of anything placed fade to zero, so no sound ends in a click. */
+const TAIL = Math.round(0.01 * SR);
+const tail = (i, len) => (i < len - TAIL ? 1 : (len - i) / TAIL);
+
 /** Add a mono signal into a bus at `at` seconds, with gain and pan (-1 left .. 1 right, equal power). */
 export function place(b, sig, at, gain = 1, pan = 0) {
   const o = Math.round(at * SR);
@@ -20,8 +24,9 @@ export function place(b, sig, at, gain = 1, pan = 0) {
   for (let i = 0; i < sig.length; i++) {
     const j = o + i;
     if (j < 0 || j >= b.n) continue;
-    b.L[j] += sig[i] * gl;
-    b.R[j] += sig[i] * gr;
+    const k = tail(i, sig.length);
+    b.L[j] += sig[i] * gl * k;
+    b.R[j] += sig[i] * gr * k;
   }
 }
 
@@ -31,8 +36,9 @@ export function placeStereo(b, [l, r], at, gain = 1) {
   for (let i = 0; i < l.length; i++) {
     const j = o + i;
     if (j < 0 || j >= b.n) continue;
-    b.L[j] += l[i] * gain;
-    b.R[j] += r[i] * gain;
+    const k = tail(i, l.length);
+    b.L[j] += l[i] * gain * k;
+    b.R[j] += r[i] * gain * k;
   }
 }
 
@@ -164,7 +170,8 @@ export function pluck(f, seconds, seed, damp = 0.5, decay = 0.996) {
     const avg = decay * (0.5 * (cur + prev));
     prev = cur;
     line[idx] = avg;
-    out[i] = cur;
+    // A natural decay on top of the string's own, so the note is nearly silent by its end.
+    out[i] = cur * Math.exp((-5 * i) / n);
     idx = (idx + 1) % len;
   }
   return out;

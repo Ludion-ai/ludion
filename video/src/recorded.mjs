@@ -111,7 +111,7 @@ export function loadRecorded(repo) {
       tests,
       packageName: hero.package.name,
     },
-    sync: { command: "npx ludion-ai sync", output: sync },
+    sync: { command: "npx ludion-ai sync", output: sync, recorded: "Recorded 2026-10-14: ludion-ai 0.1.4 in the benchmark's vitest project." },
   };
 }
 

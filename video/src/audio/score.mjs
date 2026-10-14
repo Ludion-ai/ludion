@@ -283,6 +283,12 @@ export function synthesize(data) {
   [72, 76, 79, 84, 88].forEach((m, i) => place(arp, pluck(midi(m), 1.6, 8000 + i, 0.5, 0.997), CUES.cta + i * 0.125, 0.28 - i * 0.03, i % 2 ? 0.4 : -0.4));
 
   // ----- mixing -----
+  // For finding a sound by ear-less analysis: LUDION_MUTE=pads,arp silences those stems.
+  for (const name of (process.env.LUDION_MUTE ?? "").split(",").filter(Boolean)) {
+    const stem = { drums, bass, pads, arp, fx, dry }[name];
+    stem.L.fill(0);
+    stem.R.fill(0);
+  }
   // Side-chain: the bass and pads duck under each kick.
   const duck = (t) => {
     let g = 1;

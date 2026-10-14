@@ -28,27 +28,27 @@ import { en } from "../strings/en.ts";
   <div class="home-story">
     <nav class="story-nav" aria-label={en.home.chapters.label}><span class="story-brand" aria-hidden="true"><BrandMark size={15}/></span>{[{id:"fit",label:en.home.chapters.fit},{id:"proof",label:en.home.chapters.proof},{id:"connect",label:en.home.chapters.delivery},{id:"in-context",label:en.home.chapters.result}].map(({id,label})=><a href={`#${id}`} data-story-link={id}>{label}</a>)}</nav>
     <section class="story-scene" id="fit" aria-labelledby="fit-heading">
-      <div class="section-intro wrap"><span class="eyebrow">{en.home.fit.eyebrow}</span><h2 id="fit-heading">{en.home.fit.title}</h2><p>{en.home.fit.sub}</p></div>
+      <div class="section-intro wrap"><h2 id="fit-heading">{en.home.fit.title}</h2></div>
       <ProjectLens copy={en.home.lens}/>
     </section>
     <section class="story-scene story-scene--split" id="proof" aria-labelledby="proof-heading">
       <div class="proof-layout">
-      <div class="section-intro wrap"><span class="eyebrow">{en.home.proof.eyebrow}</span><h2 id="proof-heading">{en.home.proof.title}</h2><p>{en.home.proof.sub}</p></div>
+      <div class="section-intro wrap"><h2 id="proof-heading">{en.home.proof.title}</h2></div>
       <LessonTrace copy={en.home.trace}/>
       </div>
     </section>
     <section class="story-scene" id="connect" aria-labelledby="connect-heading">
-      <div class="section-intro wrap"><span class="eyebrow">{en.home.connection.eyebrow}</span><h2 id="connect-heading">{en.home.connection.title}</h2><p>{en.home.connection.sub}</p></div>
+      <div class="section-intro wrap"><h2 id="connect-heading">{en.home.connection.title}</h2></div>
       <DeliveryScene/>
     </section>
   <section class="recorded-scene" id="in-context" aria-labelledby="recorded-heading">
-    <div class="section-intro wrap"><span class="eyebrow">{en.home.recorded.eyebrow}</span><h2 id="recorded-heading">{en.home.recorded.title}</h2><p>{en.home.recorded.sub}</p></div>
+    <div class="section-intro wrap"><h2 id="recorded-heading">{en.home.recorded.title}</h2></div>
     <RecordedMoment />
     <p class="coverage" id="recent"><a href="/lessons/">{en.home.coverage}</a></p>
   </section>
   </div>
   <section class="closing-scene wrap" aria-labelledby="closing-heading">
-    <p class="eyebrow">{en.home.closing.eyebrow}</p><h2 id="closing-heading">{en.home.closing.title}</h2>
+    <h2 id="closing-heading">{en.home.closing.title}</h2>
     <a class="start" href="/start/">{en.home.closing.action}<span aria-hidden="true"> ↗</span></a>
   </section>
 </Base>
@@ -122,7 +122,7 @@ import { en } from "../strings/en.ts";
   .proof:hover { text-decoration: underline; }
   .scroll-cue { justify-self:center; color:var(--muted); font-size:11px; text-decoration:none; padding:8px; }
   .home-story { padding-top:22px; border-top:1px solid var(--rule); background:var(--paper); }
-  .story-nav { display:flex; align-items:center; justify-content:center; gap:4px; position:sticky; z-index:5; top:16px; width:max-content; max-width:calc(100% - 36px); margin:0 auto; padding:4px 6px; border:1px solid var(--rule); border-radius:999px; background:color-mix(in srgb,var(--paper) 92%,transparent); backdrop-filter:blur(12px); box-shadow:0 7px 24px rgb(0 0 0 / .035); }
+  .story-nav { display:flex; align-items:center; justify-content:center; gap:4px; width:max-content; max-width:calc(100% - 36px); margin:0 auto; padding:4px 6px; border:1px solid var(--rule); border-radius:999px; background:var(--paper); }
   .story-brand { padding-inline:10px; color:var(--ink); line-height:1; }
   .story-nav a { padding:10px 16px; min-height:40px; font-size:12px; color:var(--muted); text-decoration:none; border-radius:999px; }
   .story-nav a[aria-current] { background:var(--paper-2); color:var(--ink); }
@@ -136,9 +136,7 @@ import { en } from "../strings/en.ts";
   }
   .recorded-scene { padding-block:140px 120px; text-align:center; border-top:1px solid var(--rule); background:var(--paper); scroll-margin-top:40px; }
   .section-intro { margin-bottom:48px; }
-  .eyebrow { display:block; font-size:11px; color:var(--muted); margin:0 0 20px; }
   h2 { font-size:clamp(28px,3.2vw,40px); font-weight:460; letter-spacing:-.035em; text-wrap:balance; }
-  .section-intro p { max-width:40ch; margin:18px auto 0; color:var(--muted); font-size:15px; }
   .coverage { margin:30px 0 0; font-size:12px; color:var(--muted); }
   .coverage a { color: inherit; text-decoration-color: var(--rule); }
   .closing-scene { padding-block:110px 130px; text-align:center; border-top:1px solid var(--rule); }

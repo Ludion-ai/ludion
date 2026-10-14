@@ -65,4 +65,26 @@ describe("the explorable project selection", () => {
       expect(item.preview.every((lesson) => lesson.verdict === null)).toBe(true);
     }
   });
+
+  it("draws every package lesson once, with gate exits matching the actual selection", () => {
+    const lens = projectLens(index, models);
+    for (const item of lens.cases) {
+      expect(new Set(item.tiles.map((tile) => tile.id)).size).toBe(item.total);
+      expect(item.tiles).toHaveLength(item.total);
+      expect(item.tiles.filter((tile) => tile.matched)).toHaveLength(item.matched);
+      expect(item.tiles.filter((tile) => tile.included)).toHaveLength(item.included);
+      expect(item.tiles.filter((tile) => tile.state === "known")).toHaveLength(item.pruned);
+      expect(item.tiles.filter((tile) => tile.state === "unmeasured")).toHaveLength(item.unmeasured);
+      expect(item.tiles.filter((tile) => tile.state === "unmatched")).toHaveLength(item.total - item.matched);
+      expect(item.tiles.filter((tile) => tile.state === "unmeasured").every((tile) => tile.included)).toBe(true);
+      expect(item.tiles.filter((tile) => tile.state === "known").every((tile) => tile.matched && !tile.included)).toBe(true);
+    }
+    const older = lens.cases.find((item) => item.project.id === "vitest-4" && item.model === lens.defaultModel)!;
+    expect(older.tiles.find((tile) => tile.id === EXTENDS)).toMatchObject({ matched: false, included: false, state: "unmatched" });
+    const current = lens.cases.find((item) => item.project.id === "vitest-5" && item.model === lens.defaultModel)!;
+    expect(current.tiles.find((tile) => tile.id === CONFIG)).toMatchObject({ matched: true, included: false, state: "known" });
+    expect(current.tiles.find((tile) => tile.id === EXTENDS)).toMatchObject({ matched: true, included: true, state: "misses" });
+    const unmeasured = projectLens(index, null);
+    for (const item of unmeasured.cases) expect(item.tiles.filter((tile) => tile.matched).every((tile) => tile.state === "unmeasured" && tile.included)).toBe(true);
+  });
 });

@@ -11,6 +11,7 @@ import { en } from "../strings/en.ts";
 interface Props {
   copy: {
     label: string;
+    read: string;
     inspect: string;
     steps: { change: string; evidence: string; teacher: string; context: string };
     changeTitle: string;
@@ -60,19 +61,29 @@ const steps = Object.entries(copy.steps);
       </div>
       <div class="trace-inspector">
         <div class="lesson-meta"><code>{lesson.package.name} {lesson.versions}</code><span>{lesson.symbol}</span></div>
-        <p class="generated-claim"><Claim text={claim} /></p>
+        <details class="trace-claim"><summary>{copy.read}</summary><p class="generated-claim"><Claim text={claim} /></p></details>
         <div class="trace-signature"><Signature teacher={page.teacher} teacherId={lesson.author_id} teacherHref={data.teacherHref(lesson.author_id)} verifiedBy={page.verified_by} verifiedAt={page.verified_at} drafted={lesson.drafted_by === "agent"} compact /></div>
         <div class="trace-panels">
           <section id="trace-change" class="trace-panel" data-trace-panel="change" aria-labelledby="trace-change-title">
-            <h3 id="trace-change-title">{copy.changeTitle}</h3>
-            <div class="version-bridge trace-object">
+            <h3 id="trace-change-title" class="visually-hidden">{copy.changeTitle}</h3>
+            <div class="inheritance-scene trace-object" data-trace-graphic>
+              <div class="root-config"><span>{copy.root}</span><code>setupFiles</code></div>
+              <svg class="inheritance-map" viewBox="0 0 320 210" aria-hidden="true">
+                <path class="branch-guide" d="M160 12 C160 90 80 70 80 198"/>
+                <path class="branch-guide" d="M160 12 C160 90 240 70 240 198"/>
+                <path class="branch-line blocked" data-trace-path="old" d="M160 12 C160 90 80 70 80 198" pathLength="1"/>
+                <path class="branch-line connected" data-trace-path="current" d="M160 12 C160 90 240 70 240 198" pathLength="1"/>
+                <g class="flow-paper old-paper" data-trace-paper="old"><rect x="-10" y="-14" width="20" height="28" rx="3"/><path d="M-5 -5H5 M-5 2H2 M-5 9H5"/></g>
+                <g class="flow-paper current-paper" data-trace-paper="current"><rect x="-10" y="-14" width="20" height="28" rx="3"/><path d="M-5 -5H5 M-5 2H2 M-5 9H5"/></g>
+                <g class="branch-stop" transform="translate(105 111)"><circle r="12"/><path d="M-4 -4L4 4 M4 -4L-4 4"/></g>
+              </svg>
+            <div class="version-bridge">
               {[previous, current].map((run) => <div class:list={["version-node", { inherited: run.expect !== "fail" }]}>
                 <p class="version-pin"><span>{lesson.package.name}</span><strong>{run.packages?.[lesson.package.name]}</strong></p>
-                <div class="config-node">{copy.root}<code>setupFiles</code></div>
-                <div class="inheritance" aria-hidden="true"><i></i><span>{run.expect === "fail" ? "×" : "↓"}</span><i></i></div>
                 <div class="config-node">{copy.inline}<code>{lesson.symbol}</code></div>
                 <p class="behavior">{run.expect === "fail" ? copy.noInherit : copy.inherits}</p>
               </div>)}
+            </div>
             </div>
             <p class="panel-note">{copy.evidenceNote}</p>
           </section>
@@ -106,6 +117,7 @@ const steps = Object.entries(copy.steps);
 
 <script>
   for (const trace of document.querySelectorAll<HTMLElement>("[data-lesson-trace]")) {
+    let updateGraphic = (_active:boolean) => {};
     const buttons = [...trace.querySelectorAll<HTMLButtonElement>("[data-trace-step]")];
     const panels = [...trace.querySelectorAll<HTMLElement>("[data-trace-panel]")];
     const select = (id: string) => {
@@ -115,6 +127,7 @@ const steps = Object.entries(copy.steps);
         panel.hidden = !selected;
         panel.toggleAttribute("data-active", selected);
       }
+      updateGraphic(id === "change");
     };
     trace.classList.add("trace-ready");
     trace.querySelector<HTMLElement>("[data-trace-controls]")!.hidden = false;
@@ -132,6 +145,39 @@ const steps = Object.entries(copy.steps);
       buttons[next]!.focus();
       select(buttons[next]!.dataset.traceStep!);
     });
+    const graphic = trace.querySelector<HTMLElement>("[data-trace-graphic]")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const paths = [...graphic.querySelectorAll<SVGPathElement>("[data-trace-path]")];
+    const papers = [...graphic.querySelectorAll<SVGGElement>("[data-trace-paper]")];
+    const stopPoint = paths[0]!.getPointAtLength(paths[0]!.getTotalLength()*.54);
+    graphic.querySelector(".branch-stop")!.setAttribute("transform",`translate(${stopPoint.x} ${stopPoint.y})`);
+    let visible = false, frame = 0, started = 0, playing = false, progress = 1;
+    const active = () => trace.querySelector('[data-trace-panel="change"]')!.hasAttribute("data-active");
+    const stop = () => { cancelAnimationFrame(frame); frame = 0; playing = false; progress = 1; trace.dataset.traceMoving = "false"; };
+    const draw = (now:number) => {
+      frame = 0;
+      if (!visible || document.hidden || !active()) return;
+      if (playing) { progress = Math.min(1,(now-started)/2600); if(progress === 1) { playing=false; trace.dataset.traceMoving="false"; } }
+      const p = progress*progress*(3-2*progress);
+      for (const [index,path] of paths.entries()) {
+        const t = index === 0 ? Math.min(.54,p) : p;
+        path.style.strokeDasharray = `${t} 1`;
+        const point = path.getPointAtLength(t*path.getTotalLength());
+        papers[index]!.setAttribute("transform",`translate(${point.x} ${point.y})`);
+        papers[index]!.style.opacity = p === 1 ? "0" : index === 0 && p > .54 ? String(Math.max(0,1-(p-.54)*5)) : "1";
+      }
+      if (playing) frame = requestAnimationFrame(draw);
+    };
+    const schedule = () => { if(visible && active() && !frame && !document.hidden)frame=requestAnimationFrame(draw); };
+    const play = () => { stop(); if(!reduce.matches){progress=0;started=performance.now();playing=true;trace.dataset.traceMoving="true";}schedule(); };
+    updateGraphic = enabled => { stop(); if(enabled && visible)play(); };
+    new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(!visible)stop();else if(active())play();}).observe(graphic);
+    window.addEventListener("scroll",()=>{
+      if(!visible || reduce.matches || !active())return;
+      stop(); progress=Math.max(0,Math.min(1,(innerHeight*.78-graphic.getBoundingClientRect().top)/(innerHeight*.58)));schedule();
+    },{passive:true});
+    reduce.addEventListener("change",()=>{stop();schedule();});
+    document.addEventListener("visibilitychange",()=>{stop();if(!document.hidden)schedule();});
   }
 </script>
 
@@ -156,6 +202,8 @@ const steps = Object.entries(copy.steps);
   .lesson-meta code { font-size:11px; }
   .lesson-meta > span { margin-left:auto; border:1px solid var(--rule); border-radius:4px; padding:2px 6px; font:11px var(--font-code); }
   .generated-claim { font-size:13px; line-height:1.7; margin:16px 0; color:var(--text); max-width:68ch; }
+  .trace-claim { margin-block:10px 16px; }
+  .trace-claim summary { width:max-content; min-height:36px; padding:8px 0; font-size:11px; color:var(--muted); cursor:pointer; }
   .trace-signature { margin-bottom:24px; }
   .trace-signature :global(.signature.compact) { font-size:10px; gap:6px 12px; }
   .trace-signature :global(.compact .by) { font-size:11px; }
@@ -169,16 +217,26 @@ const steps = Object.entries(copy.steps);
   .trace-panel + .trace-panel { margin-top:30px; }
   .trace-ready .trace-panel + .trace-panel { margin-top:0; }
   h3 { font-size:17px; letter-spacing:-.025em; font-weight:450; }
-  .version-bridge { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin-top:30px; }
+  .inheritance-scene { padding-top:10px; }
+  .root-config { display:grid; justify-items:center; gap:8px; width:max-content; max-width:100%; margin:auto; padding:18px 30px; border:1px solid var(--rule); border-radius:8px; background:var(--paper-2); }
+  .root-config span { font-size:11px; color:var(--muted); }
+  .root-config code { font-size:14px; color:var(--ink); }
+  .inheritance-map { display:block; width:min(100%,440px); height:auto; overflow:visible; margin:-2px auto 0; }
+  .inheritance-map path { fill:none; stroke:var(--ink); stroke-width:1; }
+  .branch-guide { opacity:.14; }
+  .inheritance-map .blocked { stroke-dasharray:.54 1; opacity:.45; }
+  .inheritance-map .connected { stroke-dasharray:1 1; }
+  .flow-paper rect { fill:var(--paper); stroke:var(--ink); }
+  .flow-paper path { opacity:.35; }
+  .flow-paper { opacity:0; }
+  .branch-stop circle { fill:var(--paper); stroke:var(--rule); }
+  .branch-stop path { opacity:.5; }
+  .version-bridge { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; max-width:440px; margin-inline:auto; }
   .version-node { min-width:0; }
   .version-pin { color:var(--muted); font:11px var(--font-code); margin:0 0 22px; }
   .version-pin strong { display:block; color:var(--ink); font-size:32px; font-weight:450; letter-spacing:-.06em; margin-top:6px; }
   .config-node { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; padding:13px 12px; border:1px solid var(--rule); border-radius:5px; color:var(--muted); font-size:11px; }
   .config-node code { color:var(--ink); font-size:11px; }
-  .inheritance { display:flex; align-items:center; justify-content:center; gap:10px; height:45px; color:var(--muted); }
-  .inheritance i { width:1px; height:15px; background:var(--rule); }
-  .inherited .inheritance { color:var(--ink); }
-  .inherited .inheritance i { background:var(--ink); }
   .inherited .config-node:last-of-type { border-color:var(--ink); }
   .behavior { margin:15px 0 0; font-size:11px; color:var(--muted); }
   .panel-note { font-size:11px; color:var(--muted); line-height:1.7; margin:24px 0 0; }
@@ -192,6 +250,7 @@ const steps = Object.entries(copy.steps);
   .trace-panel :global(.source figcaption) { font-size:11px; font-weight:500; }
   .trace-panel :global(.source blockquote p) { font-size:13px; letter-spacing:0; line-height:1.7; }
   .trace-panel :global(.source .where) { font-size:11px; }
+  .trace-panel :global(.source .where a) { display:inline-block; min-height:24px; padding-block:3px; }
   .teacher-object { display:flex; gap:24px; align-items:center; margin-top:35px; }
   .account-mark { display:grid; place-items:center; width:82px; height:82px; flex-shrink:0; border:1px solid var(--rule); border-radius:15px; color:var(--muted); font-size:42px; line-height:1; font-weight:400; }
   .teacher-name { font-size:24px; letter-spacing:-.04em; text-decoration:none; color:var(--ink); overflow-wrap:anywhere; }

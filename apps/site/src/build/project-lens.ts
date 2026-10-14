@@ -17,6 +17,15 @@ export interface LensLesson {
   included: boolean;
 }
 
+/** One anonymous paper tile per active package lesson. Its state comes from the same CLI selection as the counts. */
+export interface LensTile {
+  id: string;
+  matched: boolean;
+  included: boolean;
+  verdict: Verdict | null;
+  state: "unmatched" | "known" | "misses" | "unmeasured";
+}
+
 export interface LensCase {
   project: (typeof LENS_PROJECTS)[number];
   model: string;
@@ -25,6 +34,7 @@ export interface LensCase {
   included: number;
   pruned: number;
   unmeasured: number;
+  tiles: LensTile[];
   /** A small labeled preview; the counts above describe the entire matching set, not just these rows. */
   preview: LensLesson[];
 }
@@ -61,6 +71,15 @@ export function projectLens(index: Index, models: Models | null) {
       const matched = packageEntries
         .filter((_, i) => matchingVersions(lessons[i]!, installed).length > 0)
         .map((entry): LensLesson => ({ entry, verdict: models?.lessons[entry.id]?.[model.id] ?? null, included: included.has(entry.id) }));
+      const matchedIds = new Set(matched.map(({ entry }) => entry.id));
+      const tiles = packageEntries.map((entry): LensTile => {
+        const verdict = models?.lessons[entry.id]?.[model.id] ?? null;
+        const matches = matchedIds.has(entry.id);
+        return {
+          id: entry.id, matched: matches, included: included.has(entry.id), verdict,
+          state: !matches ? "unmatched" : verdict === "knows" ? "known" : verdict === "misses" ? "misses" : "unmeasured",
+        };
+      });
       matched.sort((a, b) => {
         const aPriority = priority.indexOf(a.entry.symbol ?? "");
         const bPriority = priority.indexOf(b.entry.symbol ?? "");
@@ -71,6 +90,7 @@ export function projectLens(index: Index, models: Models | null) {
         project, model: model.id, total: packageEntries.length, matched: matched.length,
         included: selection.kept.length, pruned: selection.prunedForModel.length,
         unmeasured: matched.filter((lesson) => lesson.verdict === null).length,
+        tiles,
         preview: matched.slice(0, 3),
       });
     }

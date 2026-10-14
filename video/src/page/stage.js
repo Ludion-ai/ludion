@@ -278,7 +278,7 @@ function water(t) {
   const p = { time: t * 0.62, surface: surfaceY, light: 0, line: 0, above: 1, swell: 1, flood: 0, focus: 0.7, focusY: 0.5, glitch: 0, scale: 1 };
   if (t < SCENES.hook[1]) {
     p.above = 0;
-    p.light = 0.55 * E.outCubic(lin(t, 0.0, 1.0));
+    p.light = 0.55 * E.outCubic(lin(t, 0.0, 1.0)) + 0.25 * pulse(t, 6);
     p.line = 0.0;
     p.focusY = surfaceY / H;
     p.hit = [W / 2 + (tall || square ? 0 : W * 0.2), surfaceY, t - CUES.slam];
@@ -298,7 +298,7 @@ function water(t) {
     p.time = t * 0.25;
     p.hit = [W / 2, H * 0.42, t - CUES.muffle];
   } else if (t < SCENES.wrong[1]) {
-    p.light = 0.08 + 0.05 * Math.exp(-(t - SCENES.wrong[0]) * 4);
+    p.light = 0.08 + 0.05 * Math.exp(-(t - SCENES.wrong[0]) * 4) + 0.06 * pulse(t, 7);
     p.focusY = 0.45;
     p.glitch = t >= CUES.stamp ? Math.exp(-(t - CUES.stamp) * 5) + 0.6 * lin(t, 12.1, 12.5) : 0;
     p.light *= t >= CUES.stamp ? 0.5 : 1;

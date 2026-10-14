@@ -163,9 +163,13 @@ const canonicalUrl = new URL(path, config.site).href;
   .showcase .site-header { border-bottom: 0; }
   .showcase main { padding-top: 0; }
   .showcase .foot { font-size: 12px; padding-block: 18px 24px; }
-  @media (max-width: 400px) {
-    .bar { gap: 16px; }
-    nav { gap: 16px; }
-    nav a { font-size: 14px; }
+  @media (max-width:760px),(max-width:1000px) and (max-height:500px) {
+    .bar { flex-wrap:wrap; gap:4px 12px; min-height:60px; padding-block:6px; }
+    .home { gap:8px; min-height:44px; }
+    .home :global(.wordmark svg) { height:21px; }
+    nav { flex-wrap:wrap; gap:4px; margin-left:auto; }
+    nav a { display:inline-flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; padding:8px 4px; font-size:14px; }
+    .foot { line-height:1.7; }
+    .foot a { display:inline-flex; align-items:center; min-height:44px; }
   }
 </style>

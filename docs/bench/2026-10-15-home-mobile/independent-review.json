@@ -1,0 +1,419 @@
+{
+  "schema": 1,
+  "kind": "independent mobile visual and source audit",
+  "measuredAt": "2026-10-14T23:21:03.564Z",
+  "savedAt": "2026-10-14T23:22:46.805Z",
+  "repository": "C:/dev/ludion",
+  "sourceSha": "10e5b078b5cc3c0fe9e0246b344842046557846c",
+  "baseSha": "f6966ee335d13ee36ffc1db1f73e47f6ec38e748",
+  "sourceSha256": {
+    "apps/site/src/components/ContextStage.astro": "454717f19a66a47d99aba94b6ce13cd5f6f6b7b2db90b018a2df8395d2377d77",
+    "apps/site/src/components/DeliveryScene.astro": "c6614759bb77b271e1d84346be77d097d1510ad4e9d7f415350d87f1b588419f",
+    "apps/site/src/components/LessonTrace.astro": "5560b222991d9109110355e22358c734a55ce80a3fdc9d7064a8a7660f0739c3",
+    "apps/site/src/components/ProjectLens.astro": "542b0977f37a311bc742f8b10c1765de3ba4baeb6eea645e4111f159a874f81b",
+    "apps/site/src/components/RecordedMoment.astro": "bb067b8999f5dde2b8a4f2f82085408f247885932874aec4b51f7ca62492aac8",
+    "apps/site/src/layouts/Base.astro": "8613586cddd243614bbb339783965b9347ae2ea4530225b5cd3ab39d58a4d11b",
+    "apps/site/src/pages/index.astro": "bcff97841b87d6096ed6e256b26abe78efb57516f875edba0fe3cc671febc297",
+    "e2e/home-benefits.spec.ts": "f49748b6627a961685f3408f13cfe0631dcf992c8606467ea6f8663617eaa57c",
+    "e2e/home-mobile.spec.ts": "2e2886936e27849b8943e57aaa7cdb82cb9388ec3e62d40933fbbcd3be0e60c2"
+  },
+  "server": {
+    "baseURL": "http://127.0.0.1:8787/",
+    "description": "Fresh local Wrangler session 35604, supplied by parent after rebased build; no production assertions",
+    "httpStatus": 200,
+    "builtHtmlSha256": "76abd50387f8bb4a77bdeb51093361f85f89a8e129dba67fad17745aa60d0066",
+    "servedHtmlSha256": "76abd50387f8bb4a77bdeb51093361f85f89a8e129dba67fad17745aa60d0066",
+    "servedMatchesBuild": true
+  },
+  "method": {
+    "browser": "Playwright Chromium",
+    "touch": true,
+    "motion": "no-preference",
+    "profiles": "641x390, 667x375, 844x390; light and dark",
+    "animationSampling": "150 ms initial, 800 ms later middle, 1950 ms later terminal; actual frame time, no mocked clock",
+    "claims": "Open, close, reopen and close the native disclosure in all four tabs; compare rendered claim with the active index"
+  },
+  "expectedLesson": {
+    "id": "01M4N4KZ0QT41TY27SW0E683RX",
+    "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+    "teacher": "Ludion-ai",
+    "teacherId": 292738933,
+    "draftedBy": "agent",
+    "verifiedBy": "differential",
+    "verifiedAt": "2026-10-12T00:56:16Z"
+  },
+  "summary": {
+    "profiles": 6,
+    "tabStates": 24,
+    "allProfilesMovedAndSettled": true,
+    "allClaimAndScopeChecksPassed": true,
+    "pageErrors": 0,
+    "horizontalOverflow": false,
+    "signatureTopPx": 290,
+    "signatureBottomPx": 379
+  },
+  "profiles": [
+    {
+      "width": 641,
+      "height": 390,
+      "colorScheme": "light",
+      "motion": {
+        "moved": true,
+        "playing": "false"
+      },
+      "tabs": [
+        {
+          "id": "change",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "evidence",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "teacher",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "context",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        }
+      ],
+      "signature": {
+        "top": 290,
+        "bottom": 379
+      },
+      "overflow": false,
+      "errors": [],
+      "screenshot": "C:/Users/haya0/Documents/Codex/2026-10-13/lu/work/mobile-review-rebased/641-390-light-proof.png"
+    },
+    {
+      "width": 641,
+      "height": 390,
+      "colorScheme": "dark",
+      "motion": {
+        "moved": true,
+        "playing": "false"
+      },
+      "tabs": [
+        {
+          "id": "change",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "evidence",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "teacher",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "context",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        }
+      ],
+      "signature": {
+        "top": 290,
+        "bottom": 379
+      },
+      "overflow": false,
+      "errors": [],
+      "screenshot": "C:/Users/haya0/Documents/Codex/2026-10-13/lu/work/mobile-review-rebased/641-390-dark-proof.png"
+    },
+    {
+      "width": 667,
+      "height": 375,
+      "colorScheme": "light",
+      "motion": {
+        "moved": true,
+        "playing": "false"
+      },
+      "tabs": [
+        {
+          "id": "change",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "evidence",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "teacher",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "context",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        }
+      ],
+      "signature": {
+        "top": 290,
+        "bottom": 379
+      },
+      "overflow": false,
+      "errors": [],
+      "screenshot": "C:/Users/haya0/Documents/Codex/2026-10-13/lu/work/mobile-review-rebased/667-375-light-proof.png"
+    },
+    {
+      "width": 667,
+      "height": 375,
+      "colorScheme": "dark",
+      "motion": {
+        "moved": true,
+        "playing": "false"
+      },
+      "tabs": [
+        {
+          "id": "change",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "evidence",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "teacher",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "context",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        }
+      ],
+      "signature": {
+        "top": 290,
+        "bottom": 379
+      },
+      "overflow": false,
+      "errors": [],
+      "screenshot": "C:/Users/haya0/Documents/Codex/2026-10-13/lu/work/mobile-review-rebased/667-375-dark-proof.png"
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "colorScheme": "light",
+      "motion": {
+        "moved": true,
+        "playing": "false"
+      },
+      "tabs": [
+        {
+          "id": "change",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "evidence",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "teacher",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "context",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        }
+      ],
+      "signature": {
+        "top": 290,
+        "bottom": 379
+      },
+      "overflow": false,
+      "errors": [],
+      "screenshot": "C:/Users/haya0/Documents/Codex/2026-10-13/lu/work/mobile-review-rebased/844-390-light-proof.png"
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "colorScheme": "dark",
+      "motion": {
+        "moved": true,
+        "playing": "false"
+      },
+      "tabs": [
+        {
+          "id": "change",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "evidence",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "teacher",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        },
+        {
+          "id": "context",
+          "active": true,
+          "teacher": true,
+          "draft": true,
+          "scope": true,
+          "claimMatches": true,
+          "openOverflow": false,
+          "reopened": true
+        }
+      ],
+      "signature": {
+        "top": 290,
+        "bottom": 379
+      },
+      "overflow": false,
+      "errors": [],
+      "desktop": {
+        "viewBox": "0 0 320 210",
+        "paths": [
+          "M160 12 C160 90 80 70 80 198",
+          "M160 12 C160 90 240 70 240 198"
+        ],
+        "perspective": "1800px"
+      },
+      "screenshot": "C:/Users/haya0/Documents/Codex/2026-10-13/lu/work/mobile-review-rebased/844-390-dark-proof.png"
+    }
+  ],
+  "desktopScreenshot": "C:/Users/haya0/Documents/Codex/2026-10-13/lu/work/mobile-review-rebased/desktop-1280-owner-hero.png",
+  "limitations": [
+    "Headless Chromium is not real-device FPS or conversion evidence.",
+    "Local source/build proof does not establish CI or production publication.",
+    "200 percent equivalent viewport checks were reported separately and are not native browser zoom measurements."
+  ]
+}

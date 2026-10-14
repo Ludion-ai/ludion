@@ -26,21 +26,22 @@ const lens = projectLens(data.index, data.models);
 // Each route contains exactly one tile per package lesson; only the CLI-derived state chooses its exit.
 const papers = (item: LensCase, vertical: boolean) => {
   const point = (i: number, count: number, x: number, y: number, compact = false) => {
-    const columns = compact ? 3 : 4;
+    const columns = compact ? 3 : vertical ? 5 : 4;
     const rows = Math.ceil(count / columns);
-    const scale = Math.min(compact ? .58 : 1, (compact ? 45 : 112) / Math.max(24, rows * 24));
+    const scale = Math.min(compact ? vertical ? .8 : .58 : vertical ? 1.3 : 1,
+      (compact ? vertical ? 60 : 45 : vertical ? 125 : 112) / Math.max(24, rows * 24));
     return [x + ((i % columns) - (columns - 1) / 2) * 23 * scale,
       y + (Math.floor(i / columns) - (rows - 1) / 2) * 24 * scale, scale];
   };
   let matched = 0, kept = 0, unmatched = 0, known = 0;
   return item.tiles.map((tile, i) => {
-    const start = point(i, item.total, vertical ? 166 : 112, vertical ? 72 : 113);
-    const middle = tile.matched ? point(matched++, item.matched, vertical ? 166 : 373, vertical ? 220 : 113) : start;
+    const start = point(i, item.total, vertical ? 76 : 112, vertical ? 75 : 113);
+    const middle = tile.matched ? point(matched++, item.matched, vertical ? 242 : 373, vertical ? 75 : 113) : start;
     const end = tile.included
-      ? point(kept++, item.included, vertical ? 166 : 696, vertical ? 385 : 113)
+      ? point(kept++, item.included, vertical ? 84 : 696, vertical ? 260 : 113)
       : tile.matched
-        ? point(known++, item.pruned, vertical ? 278 : 494, vertical ? 300 : 237, true)
-        : point(unmatched++, item.total - item.matched, vertical ? 278 : 237, vertical ? 173 : 237, true);
+        ? point(known++, item.pruned, vertical ? 261 : 494, vertical ? 251 : 237, true)
+        : point(unmatched++, item.total - item.matched, vertical ? 228 : 237, vertical ? 173 : 237, true);
     return { ...tile, start, middle, end };
   });
 };
@@ -51,8 +52,8 @@ const papers = (item: LensCase, vertical: boolean) => {
   <div class="inputs">
     <div class="static-project" data-lens-static><code>vitest <b>5.0.3</b></code><span>{lens.models.find((model) => model.id === lens.defaultModel)?.name || s.noModel}</span></div>
     <div class="inputs-controls" hidden>
-      <label>{s.project}<select data-lens-project>{LENS_PROJECTS.map((project) => <option value={project.id} selected={project.id === lens.defaultProject}>{project.name} {project.version}</option>)}</select></label>
-      <label>{s.model}<select data-lens-model>{lens.models.map((model) => <option value={model.id} selected={model.id === lens.defaultModel}>{model.name || s.noModel}</option>)}</select></label>
+      <label><span class="input-label">{s.project}</span><select data-lens-project>{LENS_PROJECTS.map((project) => <option value={project.id} selected={project.id === lens.defaultProject}>{project.name} {project.version}</option>)}</select><span class="selected-value" data-lens-selected="project" hidden aria-hidden="true"></span></label>
+      <label><span class="input-label">{s.model}</span><select data-lens-model>{lens.models.map((model) => <option value={model.id} selected={model.id === lens.defaultModel}>{model.name || s.noModel}</option>)}</select><span class="selected-value" data-lens-selected="model" hidden aria-hidden="true"></span></label>
     </div>
   </div>
   <div class="readout">
@@ -67,19 +68,20 @@ const papers = (item: LensCase, vertical: boolean) => {
         <p class="selection-note"><span><i class="key-known" aria-hidden="true"></i>{item.pruned} {s.pruned}</span><span><i class="key-unmeasured" aria-hidden="true"></i>{item.unmeasured} {s.unmeasured}</span></p>
         <div class="selection-diagram" data-lens-diagram>
           <span class="visually-hidden">{s.diagram}</span>
-          {[false, true].map((vertical) => <svg class:list={["paper-machine", vertical ? "machine-tall" : "machine-wide"]} viewBox={vertical ? "0 0 340 480" : "0 0 820 290"} aria-hidden="true">
+          {[false, true].map((vertical) => <svg class:list={["paper-machine", vertical ? "machine-tall" : "machine-wide"]} viewBox={vertical ? "0 0 320 340" : "0 0 820 290"} aria-hidden="true">
             {vertical ? <>
-              <path class="route-line" d="M166 70V388"/><path class="side-route" d="M166 151Q248 151 278 173M166 265Q248 265 278 300"/>
-              <path class="gate" d="M113 143V131H219V143M113 163V175H219V163M113 256V244H219V256M113 276V288H219V276"/>
-              <text x="25" y="155">{s.versionGate}</text><text x="25" y="269">{s.modelGate}</text><text x="25" y="386">{s.contextGate}</text>
-              <path class="context-sheet" d="M111 308H205L224 327V460H111ZM205 308V327H224"/>
+              <path class="route-line" d="M76 75H242L84 260"/><path class="side-route" d="M159 75Q192 119 228 173M171 158Q242 176 261 251"/>
+              <path class="gate" d="M150 27H141V137H150M168 27H177V137H168"/>
+              <path class="gate" transform="translate(171 158) rotate(135)" d="M-12-48H-20V48H-12M12-48H20V48H12"/>
+              <text x="159" y="16" text-anchor="middle">{s.versionGate}</text><text x="242" y="195" text-anchor="middle">{s.modelGate}</text><text x="175" y="318">{s.contextGate}</text>
+              <path class="context-sheet" d="M12 183H134L155 204V329H12ZM134 183V204H155"/>
             </> : <>
               <path class="route-line" d="M111 123H707"/><path class="side-route" d="M237 123Q237 208 237 237M494 123Q494 208 494 237"/>
               <path class="gate" d="M222 67H210V179H222M252 67H264V179H252M479 67H467V179H479M509 67H521V179H509"/>
               <text x="237" y="40" text-anchor="middle">{s.versionGate}</text><text x="494" y="40" text-anchor="middle">{s.modelGate}</text><text x="696" y="21" text-anchor="middle">{s.contextGate}</text>
               <path class="context-sheet" d="M638 35H737L756 54V197H638ZM737 35V54H756"/>
             </>}
-            {papers(item, vertical).map((paper) => <g class:list={["paper-tile", `paper-${paper.state}`]} data-lens-token data-state={paper.state} data-origin={paper.start.join(",")} data-middle={paper.middle.join(",")} data-end={paper.end.join(",")} data-gate={vertical ? paper.matched ? "166,265,1" : "166,151,1" : paper.matched ? "494,123,1" : "237,123,1"} transform={`translate(${paper.end[0]} ${paper.end[1]}) scale(${paper.end[2]})`}>
+            {papers(item, vertical).map((paper) => <g class:list={["paper-tile", `paper-${paper.state}`]} data-lens-token data-state={paper.state} data-origin={paper.start.join(",")} data-middle={paper.middle.join(",")} data-end={paper.end.join(",")} data-gate={vertical ? paper.matched ? "171,158,1" : "159,75,1" : paper.matched ? "494,123,1" : "237,123,1"} transform={`translate(${paper.end[0]} ${paper.end[1]}) scale(${paper.end[2]})`}>
               <path class="paper-face" d="M-7-10H2L7-5V10H-7ZM2-10V-5H7"/><path class="paper-rule" d="M-3-1H3M-3 3H1"/>
             </g>)}
           </svg>)}
@@ -115,11 +117,32 @@ const papers = (item: LensCase, vertical: boolean) => {
     const model = root.querySelector<HTMLSelectElement>("[data-lens-model]")!;
     const cases = Array.from(root.querySelectorAll<HTMLElement>("[data-lens-case]"));
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const compact = matchMedia("(max-width:640px), (max-width:1000px) and (max-height:500px)");
     let current = cases.find(item => !item.hidden)!;
     let frame = 0, visible = false, progress = 1, seen = false, replayStart: number | null = null;
     root.classList.add("interactive");
     root.querySelector<HTMLElement>(".inputs-controls")!.hidden = false;
     root.querySelector<HTMLElement>("[data-lens-static]")!.hidden = true;
+    // Native selects stay native. If enlarged text cannot fit their single line, show the complete option below.
+    // The mirror is visual only: the native option already supplies the complete selected value to assistive tech.
+    const text = document.createElement("canvas").getContext("2d");
+    const fitLabels = () => {
+      for (const [field, key] of [[project, "project"], [model, "model"]] as const) {
+        const output = root.querySelector<HTMLElement>(`[data-lens-selected="${key}"]`)!;
+        const value = field.selectedOptions[0]?.textContent ?? "";
+        output.textContent = value;
+        if (!compact.matches || !text) { output.hidden = true; continue; }
+        const style = getComputedStyle(field);
+        text.font = style.font;
+        const available = field.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 18;
+        output.hidden = text.measureText(value).width <= available;
+      }
+    };
+    const labelSize = new ResizeObserver(fitLabels);
+    labelSize.observe(project); labelSize.observe(model);
+    compact.addEventListener("change", fitLabels);
+    document.fonts.ready.then(fitLabels);
+    document.fonts.addEventListener("loadingdone", fitLabels);
     for (const item of cases) {
       const picker = item.querySelector<HTMLElement>(".lesson-picker");
       if (!picker) continue;
@@ -195,6 +218,7 @@ const papers = (item: LensCase, vertical: boolean) => {
         if (detail) detail.open = open;
       }
       root.querySelector<HTMLElement>("[data-lens-status]")!.textContent = current.dataset.announcement!;
+      fitLabels();
       if (reduce.matches || !visible || document.hidden) settle();
       else { replayStart = performance.now(); progress = 0; schedule(); }
     };
@@ -226,6 +250,7 @@ const papers = (item: LensCase, vertical: boolean) => {
   .inputs { min-width:0; padding:20px 30px; border-bottom:1px solid var(--rule); background:var(--paper-2); }
   .inputs-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:36px; max-width:560px; margin:auto; }
   .inputs-controls[hidden],.static-project[hidden] { display:none; }
+  .selected-value { display:none; }
   label { display:grid; gap:8px; color:var(--muted); font-size:11px; }
   select { appearance:auto; width:100%; min-width:0; min-height:44px; padding:9px 10px; border:1px solid var(--rule); border-radius:5px; background:var(--paper); color:var(--ink); font:inherit; font-size:12px; cursor:pointer; }
   .static-project { display:flex; justify-content:center; flex-wrap:wrap; gap:20px; font-size:12px; color:var(--muted); }
@@ -297,21 +322,47 @@ const papers = (item: LensCase, vertical: boolean) => {
   .empty { margin:24px 0; font-size:14px; color:var(--muted); }
   .lens-scope { margin:0; padding:12px 24px; border-top:1px solid var(--rule); color:var(--muted); font-size:10px; line-height:1.8; }
   .lens-scope a { display:inline-block; min-height:24px; padding-block:3px; }
-  @media(max-width:600px) {
-    .inputs { padding:17px 18px; }
-    .inputs-controls { gap:12px; }
-    .readout { padding:24px 20px 0; }
-    .lens-title { flex-wrap:wrap; padding:13px 18px; gap:7px; }
+  @media(max-width:640px), (max-width:1000px) and (max-height:500px) {
+    .inputs { padding:10px 14px; }
+    .inputs-controls { grid-template-columns:minmax(0,1fr); gap:6px; }
+    label { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; font-size:12px; line-height:1.4; }
+    .input-label { flex:0 0 5.5em; max-width:100%; overflow-wrap:anywhere; }
+    select { flex:1 1 10em; width:0; max-width:100%; font-size:16px; line-height:1.35; padding:8px 10px; }
+    .selected-value:not([hidden]) { display:block; flex:1 0 100%; min-width:0; max-width:100%; color:var(--ink); font-size:inherit; line-height:1.5; overflow-wrap:anywhere; }
+    .readout { padding:12px 16px 0; }
+    .lens-title { flex-wrap:wrap; padding:11px 18px; gap:7px; }
     .lens-title code { margin-left:auto; font-size:9px; }
-    .selection-flow { gap:5px; grid-template-columns:1fr 14px 1fr 14px 1fr; }
+    .selection-flow { gap:4px; grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr) 14px minmax(0,1fr); }
+    .lens-case,.selection-flow { min-width:0; }
+    .selection-flow div { gap:4px; }
     .selection-flow b { font-size:25px; }
-    .selection-flow span { font-size:9px; }
+    .selection-flow span { font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
     .machine-wide { display:none; }
-    .machine-tall { display:block; max-width:380px; margin:auto; }
-    .selection-note { justify-content:flex-start; gap:9px; }
+    .machine-tall { display:block; height:248px; margin:auto; }
+    .selection-diagram { margin-top:8px; }
+    .machine-tall text { font-size:16.5px; }
+    .machine-tall .paper-face { stroke-width:1; }
+    .selection-note { justify-content:flex-start; gap:4px; margin-top:10px; font-size:12px; line-height:1.4; }
+    .selection-note > span { min-width:0; max-width:100%; }
+    .selection-note i { flex-shrink:0; }
     .generated-claim { font-size:14px; }
-    .lens-scope { padding-inline:18px; }
+    .lens-scope { padding-inline:18px; font-size:12px; }
+    .preview-scope,.lesson-state,.lesson-footer { font-size:12px; line-height:1.5; }
+    .lesson-state code { font-size:12px; }
+    button { min-width:0; max-width:100%; min-height:44px; }
+    button code { min-width:0; font-size:12px; overflow-wrap:anywhere; }
+    .verdict { max-width:100%; overflow-wrap:anywhere; }
   }
-  @media(max-width:400px) { .inputs-controls { grid-template-columns:minmax(0,1fr); gap:14px; } }
+  @media(min-width:520px) and (max-width:1000px) and (max-height:500px) {
+    .inputs-controls { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; max-width:none; }
+    label { display:grid; grid-template-columns:minmax(0,1fr); gap:5px; }
+    select { width:100%; }
+    .lens-case { display:grid; grid-template-columns:180px minmax(0,1fr); column-gap:16px; }
+    .interactive .lens-case[hidden] { display:grid; }
+    .selection-flow { grid-area:1 / 1; align-self:center; }
+    .selection-note { grid-area:2 / 1; align-self:start; }
+    .selection-diagram { grid-area:1 / 2 / 3 / 3; margin-top:0; }
+    .inspection,.empty { grid-column:1 / -1; }
+  }
   @media(prefers-reduced-motion:reduce) { .lens * { animation:none !important; transition:none !important; } }
 </style>

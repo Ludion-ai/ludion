@@ -149,8 +149,18 @@ const steps = Object.entries(copy.steps);
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
     const paths = [...graphic.querySelectorAll<SVGPathElement>("[data-trace-path]")];
     const papers = [...graphic.querySelectorAll<SVGGElement>("[data-trace-paper]")];
-    const stopPoint = paths[0]!.getPointAtLength(paths[0]!.getTotalLength()*.54);
-    graphic.querySelector(".branch-stop")!.setAttribute("transform",`translate(${stopPoint.x} ${stopPoint.y})`);
+    const map = graphic.querySelector<SVGSVGElement>("svg")!;
+    const desktopPaths = paths.map(path=>path.getAttribute("d")!);
+    const compact = matchMedia("(max-width:760px), (max-width:1000px) and (max-height:500px)");
+    const resizeMap = () => {
+      const geometry = compact.matches ? ["M140 6C140 38 70 34 70 84","M140 6C140 38 210 34 210 84"] : desktopPaths;
+      map.setAttribute("viewBox",compact.matches ? "0 0 280 90" : "0 0 320 210");
+      paths.forEach((path,index)=>path.setAttribute("d",geometry[index]!));
+      [...map.querySelectorAll<SVGPathElement>(".branch-guide")].forEach((path,index)=>path.setAttribute("d",geometry[index]!));
+      const stopPoint = paths[0]!.getPointAtLength(paths[0]!.getTotalLength()*.54);
+      graphic.querySelector(".branch-stop")!.setAttribute("transform",`translate(${stopPoint.x} ${stopPoint.y})`);
+    };
+    resizeMap();
     let visible = false, frame = 0, started = 0, playing = false, progress = 1;
     const active = () => trace.querySelector('[data-trace-panel="change"]')!.hasAttribute("data-active");
     const stop = () => { cancelAnimationFrame(frame); frame = 0; playing = false; progress = 1; trace.dataset.traceMoving = "false"; };
@@ -169,6 +179,7 @@ const steps = Object.entries(copy.steps);
       if (playing) frame = requestAnimationFrame(draw);
     };
     const schedule = () => { if(visible && active() && !frame && !document.hidden)frame=requestAnimationFrame(draw); };
+    window.addEventListener("resize",()=>{resizeMap();schedule();});
     const play = () => { stop(); if(!reduce.matches){progress=0;started=performance.now();playing=true;trace.dataset.traceMoving="true";}schedule(); };
     updateGraphic = enabled => { stop(); if(enabled && visible)play(); };
     new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(!visible)stop();else if(active())play();}).observe(graphic);
@@ -268,30 +279,67 @@ const steps = Object.entries(copy.steps);
   .record-link { display:inline-block; margin-top:15px; font-size:11px; }
   .trace-panel[data-active] .trace-object { animation:trace-appear 350ms cubic-bezier(.2,.8,.2,1) both; }
   @keyframes trace-appear { from{opacity:.45;transform:translateY(7px)}to{opacity:1;transform:none} }
-  @media(max-width:760px) {
+  @media(max-width:760px),(max-width:1000px) and (max-height:500px) {
     .trace-ready .trace-workspace { grid-template-columns:minmax(0,1fr); }
-    .trace-rail { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:8px; border-right:0; border-bottom:1px solid var(--rule); }
-    .trace-rail button { margin:0; justify-content:center; padding:10px 5px; font-size:11px; gap:5px; }
+    .trace-bar { padding:8px 16px; }
+    .trace-bar a { display:inline-flex; align-items:center; min-height:44px; }
+    .trace-rail { display:flex; flex-wrap:wrap; gap:4px; padding:6px; border-right:0; border-bottom:1px solid var(--rule); }
+    .trace-rail button { flex:1 1 60px; width:auto; min-width:min-content; margin:0; justify-content:center; padding:10px 5px; font-size:12px; }
+    .step-dot { display:none; }
     .step-number { display:none; }
-    .trace-inspector { padding:24px; }
+    .trace-inspector { padding:18px 16px 22px; }
+    .lesson-meta { flex-wrap:wrap; }
+    .trace-claim { margin-block:6px 10px; }
+    .trace-claim summary { min-height:44px; font-size:12px; }
+    .trace-signature { margin-bottom:18px; }
+    .trace-signature :global(.signature.compact),.trace-signature :global(.compact .by) { font-size:12px; }
+    .trace-ready .trace-panels { display:block; }
+    .trace-ready .trace-panel[hidden] { display:none; }
+    .trace-panel { padding-top:18px; }
+    .root-config { padding:8px 20px; gap:4px; }
+    .root-config span { font-size:12px; }
+    .inheritance-map { width:min(100%,280px); }
+    .version-bridge { grid-template-columns:repeat(auto-fit,minmax(min(100%,6em),1fr)); max-width:280px; gap:12px; }
+    .version-pin { margin-bottom:12px; }
+    .version-pin strong { font-size:25px; line-height:1.15; margin-top:4px; }
+    .config-node { display:grid; padding:9px 10px; font-size:12px; gap:3px; }
+    .config-node code { font-size:12px; }
+    .behavior { font-size:12px; line-height:1.5; margin-top:10px; }
+    .panel-note { font-size:12px; margin-top:18px; }
+    .evidence-contract { grid-template-columns:1fr; }
+    .contract-row,.contract-row > span,.contract-row > code,.contract-row .expected-error { font-size:12px; }
+    .publication { font-size:12px; margin-top:24px; }
+    .record-link { display:inline-flex; align-items:center; min-height:44px; font-size:12px; }
+    .file-head code { min-width:0; max-width:100%; overflow-wrap:anywhere; }
   }
   @media(max-width:400px) {
-    .trace-bar { padding:14px 16px; font-size:10px; }
-    .trace-inspector { padding:20px 16px 25px; }
+    .trace-bar { padding:8px 16px; font-size:11px; }
+    .trace-inspector { padding:18px 16px 22px; }
     .trace-rail { gap:2px; padding:6px; }
-    .trace-rail button { font-size:10px; }
+    .trace-rail button { font-size:12px; }
     .step-dot { width:4px; height:4px; }
     .generated-claim { font-size:12px; }
     .version-bridge { gap:12px; }
-    .version-pin strong { font-size:27px; }
-    .config-node { padding:10px 8px; font-size:10px; }
-    .config-node code { font-size:10px; }
+    .version-pin strong { font-size:25px; }
+    .config-node { padding:9px 8px; font-size:12px; }
+    .config-node code { font-size:12px; }
     .evidence-contract { gap:8px; }
     .contract-row { padding:11px; }
     .teacher-object { gap:16px; }
     .account-mark { width:58px; height:58px; font-size:32px; border-radius:10px; }
     .teacher-name { font-size:21px; }
     .publication > div { grid-template-columns:100px minmax(0,1fr); }
+  }
+  @media(min-width:641px) and (max-width:1000px) and (max-height:500px) {
+    .trace-bar { padding:0 12px; }
+    .trace-rail { padding:2px; }
+    .trace-inspector { display:grid; grid-template-columns:160px minmax(0,1fr); grid-template-rows:max-content max-content 1fr; align-content:start; gap:0 14px; padding:12px 14px; }
+    .lesson-meta { grid-area:1 / 1; align-self:start; }
+    .trace-claim { grid-area:2 / 1; align-self:start; }
+    .trace-signature { grid-area:3 / 1; align-self:start; }
+    .trace-panels { grid-area:1 / 2 / span 3; min-width:0; border-left:1px solid var(--rule); padding-left:14px; }
+    .trace-panel { border-top:0; padding-top:0; }
+    .root-config { padding-block:6px; }
   }
   @media(prefers-reduced-motion:reduce) { .trace-panel[data-active] .trace-object { animation:none; } }
 </style>

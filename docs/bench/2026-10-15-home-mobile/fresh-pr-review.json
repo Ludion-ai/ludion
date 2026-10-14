@@ -1,0 +1,1809 @@
+{
+  "reviewedAt": "2026-10-14T23:35:43.541Z",
+  "headCommit": "f230b128d73a4e9f035e9875dc4c56cd4ff6756a",
+  "baseCommit": "f6966ee335d13ee36ffc1db1f73e47f6ec38e748",
+  "branch": "site/mobile-composition",
+  "sourceState": "HEAD plus explicit dirty CSS and e2e test acceptance fixes; do not label this build as clean HEAD",
+  "gitStatus": "M apps/site/src/components/LessonTrace.astro\n M docs/decisions.md\n M docs/progress.md\n M docs/site/2026-10-15-home-mobile.md\n M e2e/home-mobile.spec.ts",
+  "sources": [
+    {
+      "path": "C:\\dev\\ludion\\apps\\site\\src\\components\\ContextStage.astro",
+      "sha256": "454717f19a66a47d99aba94b6ce13cd5f6f6b7b2db90b018a2df8395d2377d77"
+    },
+    {
+      "path": "C:\\dev\\ludion\\apps\\site\\src\\components\\DeliveryScene.astro",
+      "sha256": "c6614759bb77b271e1d84346be77d097d1510ad4e9d7f415350d87f1b588419f"
+    },
+    {
+      "path": "C:\\dev\\ludion\\apps\\site\\src\\components\\LessonTrace.astro",
+      "sha256": "6c92d4cb211cc5190db46d2cadc39c7c4f495e2c928d387d737609efb1cf85e7"
+    },
+    {
+      "path": "C:\\dev\\ludion\\apps\\site\\src\\components\\ProjectLens.astro",
+      "sha256": "542b0977f37a311bc742f8b10c1765de3ba4baeb6eea645e4111f159a874f81b"
+    },
+    {
+      "path": "C:\\dev\\ludion\\apps\\site\\src\\components\\RecordedMoment.astro",
+      "sha256": "bb067b8999f5dde2b8a4f2f82085408f247885932874aec4b51f7ca62492aac8"
+    },
+    {
+      "path": "C:\\dev\\ludion\\apps\\site\\src\\layouts\\Base.astro",
+      "sha256": "8613586cddd243614bbb339783965b9347ae2ea4530225b5cd3ab39d58a4d11b"
+    },
+    {
+      "path": "C:\\dev\\ludion\\apps\\site\\src\\pages\\index.astro",
+      "sha256": "bcff97841b87d6096ed6e256b26abe78efb57516f875edba0fe3cc671febc297"
+    },
+    {
+      "path": "C:\\dev\\ludion\\e2e\\home-benefits.spec.ts",
+      "sha256": "f49748b6627a961685f3408f13cfe0631dcf992c8606467ea6f8663617eaa57c"
+    },
+    {
+      "path": "C:\\dev\\ludion\\e2e\\home-mobile.spec.ts",
+      "sha256": "ec59165a8c27b7f9d2aa1cb7b77e0dfc4cf42b1aff00e5b43271575a9d844277"
+    }
+  ],
+  "runtime": {
+    "url": "http://127.0.0.1:8787",
+    "htmlStatus": 200,
+    "htmlSha256": "a31fd92ec194805dc17fe51d15bdf3c5abdbafd40383417a991425d11193d67b",
+    "distHtmlPath": "C:\\dev\\ludion\\apps\\site\\dist\\index.html",
+    "distHtmlMatches": true,
+    "assets": [
+      {
+        "url": "http://127.0.0.1:8787/_astro/en.DjaFb6E_.css",
+        "status": 200,
+        "sha256": "2fe4fa32122ae3093c3f19924c8568bb1c0139b6e9e899f3de2b14928fa45ab1",
+        "bytes": 5229,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\en.DjaFb6E_.css",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/Base.BLa3bavU.css",
+        "status": 200,
+        "sha256": "e9e3f7ae89fb9eeb59548b1d738c1b2cf183c3e7cd81d86e550624bb7d2580d9",
+        "bytes": 2850,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\Base.BLa3bavU.css",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/index.gQlaBBYP.css",
+        "status": 200,
+        "sha256": "786e1ad0e695150f06d9df6a4d729d4b070b792908637b40252fce7042e8e277",
+        "bytes": 60686,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\index.gQlaBBYP.css",
+        "distMatches": true,
+        "fixMarker": true
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/Claim.4l9DwGj4.css",
+        "status": 200,
+        "sha256": "74fce81339362a8452dbe2c002330a9034f23f9c59b3085d9bf1918d70ad2b19",
+        "bytes": 103,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\Claim.4l9DwGj4.css",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/EvidenceSource.DuerE9R6.css",
+        "status": 200,
+        "sha256": "fb83ea0f61a815a179eb434ceebe6a03de6e29e1b203a6bf391e0d2a4cf6dd16",
+        "bytes": 621,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\EvidenceSource.DuerE9R6.css",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/Signature.BxK1OtxP.css",
+        "status": 200,
+        "sha256": "c580445af8391c8b949f0112706240f66def8899a687ada5f90b10aacb9b383c",
+        "bytes": 3218,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\Signature.BxK1OtxP.css",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/ContextStage.astro_astro_type_script_index_0_lang.C4IcnwUP.js",
+        "status": 200,
+        "sha256": "d0ab2930d26ef26536340743ac943132d0ad6d4baccce020304e9a60ef44917c",
+        "bytes": 1159,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\ContextStage.astro_astro_type_script_index_0_lang.C4IcnwUP.js",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/ProjectLens.astro_astro_type_script_index_0_lang.BE31GDAw.js",
+        "status": 200,
+        "sha256": "4733de192d085a14b33dacdf321a853811a94542ce26908b1e4434c8f4d6417a",
+        "bytes": 3732,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\ProjectLens.astro_astro_type_script_index_0_lang.BE31GDAw.js",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/LessonTrace.astro_astro_type_script_index_0_lang.8q33jhdo.js",
+        "status": 200,
+        "sha256": "bef700f603b01e00f888020a82836fd310cccae579ee696b0956e0bc00bc8922",
+        "bytes": 2835,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\LessonTrace.astro_astro_type_script_index_0_lang.8q33jhdo.js",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/DeliveryScene.astro_astro_type_script_index_0_lang.D-CSH3Fj.js",
+        "status": 200,
+        "sha256": "3f089b494f714e4e336b79d13791bf78a1f415caa65606dc974a4ac13d1ab393",
+        "bytes": 94683,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\DeliveryScene.astro_astro_type_script_index_0_lang.D-CSH3Fj.js",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/RecordedMoment.astro_astro_type_script_index_0_lang.BL2Fm_Fm.js",
+        "status": 200,
+        "sha256": "4f350b630f685d1d0db6d75137e20b9a96396e73ce5b02385da78acca76e53b3",
+        "bytes": 1400,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\RecordedMoment.astro_astro_type_script_index_0_lang.BL2Fm_Fm.js",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/Base.astro_astro_type_script_index_0_lang.Dtvi9iqz.js",
+        "status": 200,
+        "sha256": "a721b62d0469c0434689218ec09051b82e6a28c9deca9a1a433c73ebff09500d",
+        "bytes": 7252,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\Base.astro_astro_type_script_index_0_lang.Dtvi9iqz.js",
+        "distMatches": true,
+        "fixMarker": false
+      },
+      {
+        "url": "http://127.0.0.1:8787/_astro/index.astro_astro_type_script_index_0_lang.BXnEBzbb.js",
+        "status": 200,
+        "sha256": "25397a76d02cca75d5ee70ead51b6ec3f1df0c1a2c212e87c7df4a72cf45da87",
+        "bytes": 679,
+        "distPath": "C:\\dev\\ludion\\apps\\site\\dist\\_astro\\index.astro_astro_type_script_index_0_lang.BXnEBzbb.js",
+        "distMatches": true,
+        "fixMarker": false
+      }
+    ]
+  },
+  "desktopPlaneAngleRuleUnchangedFromOriginMain": true,
+  "beforeFindings": [
+    {
+      "severity": "P2",
+      "file": "apps/site/src/components/LessonTrace.astro",
+      "area": "mobile version-bridge",
+      "origin": "Inherited from origin/main; required 200-percent acceptance gap",
+      "reproduction": "320x844, double each computed font without changing viewport/non-text dimensions",
+      "facts": "119px columns, old/new version glyph widths162px/135px overlapped by31px",
+      "proof": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\320-text200-trace.png",
+      "resolution": "Auto-fit columns with font-relative6em minimum; final glyph containment and no overlap checked"
+    },
+    {
+      "severity": "P2",
+      "file": "apps/site/src/components/LessonTrace.astro",
+      "area": "mobile context file-head code",
+      "origin": "Inherited from origin/main; required 200-percent acceptance gap",
+      "facts": "237.609px filename glyph range x52..289.609 exceeded overflow-hidden context-file right285 by4.609px",
+      "proof": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\320-text200-context.png",
+      "resolution": "Bounded filename with overflow-wrap:anywhere; final visible glyph clipping checked"
+    }
+  ],
+  "observations": [
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "change",
+      "layout": 320,
+      "scrollWidth": 320,
+      "innerWidth": 320,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 35,
+            "right": 285,
+            "top": 1106.53125,
+            "bottom": 1164.03125,
+            "width": 250,
+            "height": 57.5
+          },
+          "glyph": {
+            "left": 35,
+            "right": 197,
+            "top": 1101.53125,
+            "bottom": 1167.53125,
+            "width": 162,
+            "height": 66
+          },
+          "column": {
+            "left": 35,
+            "right": 285,
+            "top": 1073.53125,
+            "bottom": 1360.21875,
+            "width": 250,
+            "height": 286.6875
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 35,
+            "right": 285,
+            "top": 1405.21875,
+            "bottom": 1462.71875,
+            "width": 250,
+            "height": 57.5
+          },
+          "glyph": {
+            "left": 35,
+            "right": 170,
+            "top": 1400.21875,
+            "bottom": 1466.21875,
+            "width": 135,
+            "height": 66
+          },
+          "column": {
+            "left": 35,
+            "right": 285,
+            "top": 1372.21875,
+            "bottom": 1622.90625,
+            "width": 250,
+            "height": 250.6875
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run."
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "evidence",
+      "layout": 320,
+      "scrollWidth": 320,
+      "innerWidth": 320,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run. Read the source ↗"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "teacher",
+      "layout": 320,
+      "scrollWidth": 320,
+      "innerWidth": 320,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": null
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "context",
+      "layout": 320,
+      "scrollWidth": 320,
+      "innerWidth": 320,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 52,
+          "right": 268,
+          "top": 618.59375,
+          "bottom": 691.1875,
+          "width": 216,
+          "height": 72.59375
+        },
+        "range": {
+          "left": 52,
+          "right": 263.203125,
+          "top": 621.59375,
+          "bottom": 686.890625,
+          "width": 211.203125,
+          "height": 65.296875
+        },
+        "card": {
+          "left": 35,
+          "right": 285,
+          "top": 604.59375,
+          "bottom": 1720.234375,
+          "width": 250,
+          "height": 1115.640625
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Recorded sync excerpt, October 12, 2026. The complete record delivered 9 lessons; 2 dependencies had no coverage."
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "change",
+      "layout": 430,
+      "scrollWidth": 430,
+      "innerWidth": 430,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 75,
+            "right": 355,
+            "top": 1042.625,
+            "bottom": 1100.125,
+            "width": 280,
+            "height": 57.5
+          },
+          "glyph": {
+            "left": 75,
+            "right": 237,
+            "top": 1037.625,
+            "bottom": 1103.625,
+            "width": 162,
+            "height": 66
+          },
+          "column": {
+            "left": 75,
+            "right": 355,
+            "top": 1009.625,
+            "bottom": 1296.3125,
+            "width": 280,
+            "height": 286.6875
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 75,
+            "right": 355,
+            "top": 1341.3125,
+            "bottom": 1398.8125,
+            "width": 280,
+            "height": 57.5
+          },
+          "glyph": {
+            "left": 75,
+            "right": 210,
+            "top": 1336.3125,
+            "bottom": 1402.3125,
+            "width": 135,
+            "height": 66
+          },
+          "column": {
+            "left": 75,
+            "right": 355,
+            "top": 1308.3125,
+            "bottom": 1559,
+            "width": 280,
+            "height": 250.6875
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run."
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "evidence",
+      "layout": 430,
+      "scrollWidth": 430,
+      "innerWidth": 430,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run. Read the source ↗"
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "teacher",
+      "layout": 430,
+      "scrollWidth": 430,
+      "innerWidth": 430,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": null
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "context",
+      "layout": 430,
+      "scrollWidth": 430,
+      "innerWidth": 430,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 52,
+          "right": 289.609375,
+          "top": 920.03125,
+          "bottom": 956.328125,
+          "width": 237.609375,
+          "height": 36.296875
+        },
+        "range": {
+          "left": 52,
+          "right": 289.609375,
+          "top": 923.03125,
+          "bottom": 952.03125,
+          "width": 237.609375,
+          "height": 29
+        },
+        "card": {
+          "left": 35,
+          "right": 395,
+          "top": 906.03125,
+          "bottom": 1615.875,
+          "width": 360,
+          "height": 709.84375
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Recorded sync excerpt, October 12, 2026. The complete record delivered 9 lessons; 2 dependencies had no coverage."
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "change",
+      "layout": 844,
+      "scrollWidth": 844,
+      "innerWidth": 844,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 460.5,
+            "right": 740.5,
+            "top": 476.46875,
+            "bottom": 533.96875,
+            "width": 280,
+            "height": 57.5
+          },
+          "glyph": {
+            "left": 460.5,
+            "right": 622.5,
+            "top": 471.46875,
+            "bottom": 537.46875,
+            "width": 162,
+            "height": 66
+          },
+          "column": {
+            "left": 460.5,
+            "right": 740.5,
+            "top": 443.46875,
+            "bottom": 730.15625,
+            "width": 280,
+            "height": 286.6875
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 460.5,
+            "right": 740.5,
+            "top": 775.15625,
+            "bottom": 832.65625,
+            "width": 280,
+            "height": 57.5
+          },
+          "glyph": {
+            "left": 460.5,
+            "right": 595.5,
+            "top": 770.15625,
+            "bottom": 836.15625,
+            "width": 135,
+            "height": 66
+          },
+          "column": {
+            "left": 460.5,
+            "right": 740.5,
+            "top": 742.15625,
+            "bottom": 992.84375,
+            "width": 280,
+            "height": 250.6875
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run."
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "evidence",
+      "layout": 844,
+      "scrollWidth": 844,
+      "innerWidth": 844,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run. Read the source ↗"
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "teacher",
+      "layout": 844,
+      "scrollWidth": 844,
+      "innerWidth": 844,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "range": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "card": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": null
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "context",
+      "layout": 844,
+      "scrollWidth": 844,
+      "innerWidth": 844,
+      "clipped": [],
+      "glyphs": [
+        {
+          "text": "4.1.11",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "text": "5.0.0",
+          "element": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "glyph": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "column": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        }
+      ],
+      "versionGlyphsContained": true,
+      "versionOverlap": false,
+      "file": {
+        "text": ".ludion/lessons.md",
+        "element": {
+          "left": 407,
+          "right": 644.609375,
+          "top": 318.78125,
+          "bottom": 355.078125,
+          "width": 237.609375,
+          "height": 36.296875
+        },
+        "range": {
+          "left": 407,
+          "right": 644.609375,
+          "top": 321.78125,
+          "bottom": 350.78125,
+          "width": 237.609375,
+          "height": 29
+        },
+        "card": {
+          "left": 390,
+          "right": 811,
+          "top": 304.78125,
+          "bottom": 875.953125,
+          "width": 421,
+          "height": 571.171875
+        }
+      },
+      "claim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Recorded sync excerpt, October 12, 2026. The complete record delivered 9 lessons; 2 dependencies had no coverage."
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "textPercent": 100,
+      "step": "change",
+      "layout": 390,
+      "scrollWidth": 390,
+      "selected": "change",
+      "columns": "134px 134px",
+      "versionText": [
+        "4.1.11",
+        "5.0.0"
+      ],
+      "nativeControls": true,
+      "generatedClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026"
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 100,
+      "step": "change",
+      "layout": 844,
+      "scrollWidth": 844,
+      "selected": "change",
+      "columns": "134px 134px",
+      "versionText": [
+        "4.1.11",
+        "5.0.0"
+      ],
+      "nativeControls": true,
+      "generatedClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026"
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "textPercent": 100,
+      "step": "change",
+      "layout": 1280,
+      "scrollWidth": 1280,
+      "selected": "change",
+      "columns": "208px 208px",
+      "versionText": [
+        "4.1.11",
+        "5.0.0"
+      ],
+      "nativeControls": true,
+      "generatedClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026"
+    }
+  ],
+  "motion": {
+    "settled": {
+      "playing": "false",
+      "received": "1"
+    },
+    "initial": "matrix(1, 0, 0, 1, -13, -44.2852)",
+    "middle": "matrix(1, 0, 0, 1, -13, -3.34973)",
+    "movementObserved": true,
+    "final": {
+      "playing": "false",
+      "received": "1",
+      "mode": "inline",
+      "file": ".cursor/rules/ludion.mdc"
+    },
+    "reduced": {
+      "playing": "false",
+      "received": "1",
+      "packet": "matrix(1, 0, 0, 1, -13, 53)"
+    },
+    "reducedStable": true
+  },
+  "screenshots": [
+    {
+      "path": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\final-320-text200-change.png",
+      "sha256": "27903d39d3f73e6efba5a933fea1521c8c86a6653f7b359fb16d81b3a8f150a9",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "change"
+    },
+    {
+      "path": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\final-320-text200-context.png",
+      "sha256": "4a4b6ec841993b23095e03fe97da174f7e2c333c3c3c5e13bfb64a3541d10ac8",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "context"
+    },
+    {
+      "path": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\final-390-844-trace.png",
+      "sha256": "4886423fddfebf8ce20d6053a67d857ded747ed1c055987fdfb9cb0b047c67b3",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "textPercent": 100,
+      "step": "change"
+    },
+    {
+      "path": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\final-844-390-trace.png",
+      "sha256": "137349a1f5af18a81fc1ca9b38855f47a1d6b3ab06289153c2f71347e7d5026a",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 100,
+      "step": "change"
+    },
+    {
+      "path": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\final-1280-900-trace.png",
+      "sha256": "08b42ccd74199ed5b7d657fdad875b67a3840424d4e9435fa90b9c6337184ff4",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "textPercent": 100,
+      "step": "change"
+    },
+    {
+      "path": "C:\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\mobile-pr-source-review\\final-320-text200-open-claim-context.png",
+      "sha256": "9a050a02a475dee94f680bc5e10ae5611639ed02ef0ba8dceb5f12dd5f914cb8",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "context",
+      "claimOpen": true
+    }
+  ],
+  "pageErrors": [],
+  "limitations": [
+    "Chromium viewport simulation; no actual Safari/Android accessibility settings or browser chrome",
+    "Read-only review; no build, full test suite, lesson execution, merge, deployment or production verification performed",
+    "200-percent text is computed-font doubling, matching the regression fixture; no pinch/page zoom claim",
+    "Initial source review checked actual origin/main diff; final runtime includes the two inherited acceptance fixes while source remains dirty"
+  ],
+  "verdict": "NO_BLOCKER",
+  "openClaimEnlargedObservations": [
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "change",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run.",
+      "layout": 320,
+      "scrollWidth": 320
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "evidence",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run. Read the source ↗",
+      "layout": 320,
+      "scrollWidth": 320
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "teacher",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": null,
+      "layout": 320,
+      "scrollWidth": 320
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "context",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Recorded sync excerpt, October 12, 2026. The complete record delivered 9 lessons; 2 dependencies had no coverage.",
+      "layout": 320,
+      "scrollWidth": 320
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "change",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run.",
+      "layout": 430,
+      "scrollWidth": 430
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "evidence",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run. Read the source ↗",
+      "layout": 430,
+      "scrollWidth": 430
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "teacher",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": null,
+      "layout": 430,
+      "scrollWidth": 430
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 844
+      },
+      "textPercent": 200,
+      "step": "context",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Recorded sync excerpt, October 12, 2026. The complete record delivered 9 lessons; 2 dependencies had no coverage.",
+      "layout": 430,
+      "scrollWidth": 430
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "change",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run.",
+      "layout": 844,
+      "scrollWidth": 844
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "evidence",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Evidence requirements, not a live test run. Read the source ↗",
+      "layout": 844,
+      "scrollWidth": 844
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "teacher",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": null,
+      "layout": 844,
+      "scrollWidth": 844
+    },
+    {
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "textPercent": 200,
+      "step": "context",
+      "claimOpen": true,
+      "claimVisible": true,
+      "fullClaim": "vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error.",
+      "claimClipped": [],
+      "signature": "Taught by— @Ludion-ai, drafted by an agentVerified across versionspass / failOct 12, 2026",
+      "scope": "Recorded sync excerpt, October 12, 2026. The complete record delivered 9 lessons; 2 dependencies had no coverage.",
+      "layout": 844,
+      "scrollWidth": 844
+    }
+  ],
+  "rotationSelectionAndFocus": {
+    "focused": "teacher",
+    "selected": "teacher",
+    "claimOpen": true,
+    "model": "claude-opus-5-5",
+    "destination": "cursor",
+    "scrollWidth": 844,
+    "layout": 844
+  },
+  "regressionSensitivity": {
+    "method": "Browser-only override of two final CSS fixes to reproduce pre-fix state; no source edit or rebuild",
+    "viewport": {
+      "width": 320,
+      "height": 844
+    },
+    "textPercent": 200,
+    "versionColumnFailures": [
+      {
+        "text": "4.1.11",
+        "glyph": {
+          "left": 35,
+          "right": 197,
+          "top": 4556.53125,
+          "bottom": 4622.53125
+        },
+        "container": {
+          "left": 35,
+          "right": 154,
+          "top": 4528.53125,
+          "bottom": 4890.8125
+        }
+      },
+      {
+        "text": "5.0.0",
+        "glyph": {
+          "left": 166,
+          "right": 301,
+          "top": 4556.53125,
+          "bottom": 4622.53125
+        },
+        "container": {
+          "left": 166,
+          "right": 285,
+          "top": 4528.53125,
+          "bottom": 4890.8125
+        }
+      }
+    ],
+    "versionPairOverlap": true,
+    "contextHeaderFailures": [
+      {
+        "text": ".ludion/lessons.md",
+        "glyph": {
+          "left": 52,
+          "right": 289.609375,
+          "top": 932.59375,
+          "bottom": 961.59375
+        },
+        "container": {
+          "left": 36,
+          "right": 284,
+          "top": 916.59375,
+          "bottom": 1026.1875
+        }
+      }
+    ],
+    "previousVersionBugDetected": true,
+    "previousFilenameBugDetected": true,
+    "testFileSha256": "ec59165a8c27b7f9d2aa1cb7b77e0dfc4cf42b1aff00e5b43271575a9d844277"
+  }
+}

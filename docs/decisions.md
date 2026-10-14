@@ -1,5 +1,15 @@
 # Decisions
 
+### 2026-10-15: Compose home for the phone instead of shrinking desktop
+
+The owner asked for phone proportions to be designed independently. Keep the approved meaning and actual records, but use a shorter opening plane, a bent package-selection route and native file surfaces for delivery on narrow or short screens. The same finite delivery timeline drives both the phone packet and desktop CSS3D scene; the hidden desktop projection is not rendered on a phone. Short landscape uses two columns so the configuration comparison appears in the first viewport. Retain the owner's independently merged desktop angle correction in #114.
+
+Delete the inspector's largest-panel height reservation on compact screens: its controls remain above content, and a shorter teacher panel need not reserve the configuration drawing's height. Retain desktop's reservation and the recorded-answer reservation beneath which the answer controls sit. Native selectors remain native, with a wrapping readout of the exact selected option only if enlarged text cannot fit its single line. No labels are abbreviated or shrunk to fit. Compact touch controls are enlarged, annotations are readable, and chapter/header navigation wraps.
+
+A fresh PR review found inherited enlarged-text gaps that the initial acceptance check had missed: overlapping version labels and a clipped Context filename. The compact version grid now uses a font-relative minimum and stacks when two complete values cannot fit; file-header code wraps. Preserve the failing preceding-build check and strengthen the actual Change/Context glyph-bound assertions instead of relying only on page scroll width.
+
+Generated claims, teacher identity, agent-draft labels, evidence requirements, partial coverage, conditional wiring, privacy and existing links retain their contracts. No dependency or new application backend was added. Phone reflow, rotation, finite motion, simulated text-only resizing, light/dark captures and independent review are recorded in `docs/site/2026-10-15-home-mobile.md` and `docs/bench/2026-10-15-home-mobile/validation.json`. Chromium viewport checks do not establish real-device Safari behavior, frame rate or conversion improvement.
+
 ### 2026-10-14: Express the homepage through shapes and finite motion
 
 The owner clarified that more expression means graphics and movement, not more comparative text. Keep the approved opening and replace repeated prose below it with paper selection, configuration branching and context transport. Use one anonymous tile per actual active package lesson with states from sync's selection code; unknown measurements remain included. Evidence graphics show requirements rather than inventing a test run. Delivery distinguishes references from Cursor's inline copy; native wiring details retain the conditional contract.

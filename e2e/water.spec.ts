@@ -123,7 +123,8 @@ for (const { path, moments } of pages) {
       expect(coverage.pixels,"extended wave keeps the old raster-pixel budget").toBeLessThanOrEqual(coverage.maxPixels);
 
       // Let the text finish arriving (CSS animations run on real time), then record where every piece of text is.
-      await page.waitForFunction(() => document.getAnimations().every((a) => a.playState === "finished" || a.playState === "idle"));
+      // Decorative context-flow paths are continuous and have no moving text. Wait for finite arrivals only.
+      await page.waitForFunction(() => document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity).every((a) => a.playState === "finished" || a.playState === "idle"));
       const boxes = await targets(page, SCREEN);
       expect(boxes.length, url).toBeGreaterThan(3);
 

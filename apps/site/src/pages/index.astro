@@ -1,55 +1,74 @@
 ---
-// Home is one brand scene. Setup, lessons and recorded evidence have their own pages.
+// A visual opening, followed by an operable recorded example. Details retain their existing URLs.
 import Base from "../layouts/Base.astro";
-import LudionSurface from "../components/LudionSurface.astro";
+import RecordedMoment from "../components/RecordedMoment.astro";
+import ContextStage from "../components/ContextStage.astro";
 import { en } from "../strings/en.ts";
 ---
 
 <Base title={en.home.title} description={en.site.description}>
   <section class="home-stage" aria-labelledby="home-heading" data-water data-water-showcase>
     <div class="introduction wrap">
-      <h1 id="home-heading">{en.home.headline}</h1>
+      <h1 id="home-heading">{en.home.headline.map((line) => <span>{line}</span>)}</h1>
       <p>{en.home.sub}</p>
-    </div>
-    <div class="scene">
-      <span class="horizon" data-water-surface aria-hidden="true"></span>
-      <LudionSurface />
     </div>
     <div class="invitation wrap">
       <div class="actions">
         <a class="start" href="/start/">{en.home.start}<span aria-hidden="true"> ↗</span></a>
-        <a class="proof" id="replay" href="/bench/#recorded-answer">{en.home.seeItWork}<span aria-hidden="true"> →</span></a>
+        <a class="proof" id="replay" href="#in-context">{en.home.seeItWork}<span aria-hidden="true"> ↓</span></a>
       </div>
-      <p class="coverage" id="recent"><a href="/lessons/">{en.home.coverage}</a></p>
     </div>
+    <div class="scene"><span class="horizon" data-water-surface aria-hidden="true"></span><ContextStage /></div>
+    <a class="scroll-cue" href="#in-context">{en.home.scroll}<span aria-hidden="true"> ↓</span></a>
+  </section>
+  <section class="recorded-scene" id="in-context" aria-labelledby="recorded-heading">
+    <div class="section-intro wrap"><span class="eyebrow">{en.home.recorded.eyebrow}</span><h2 id="recorded-heading">{en.home.recorded.title}</h2><p>{en.home.recorded.sub}</p></div>
+    <RecordedMoment />
+    <p class="coverage" id="recent"><a href="/lessons/">{en.home.coverage}</a></p>
+  </section>
+  <section class="closing-scene wrap" aria-labelledby="closing-heading">
+    <p class="eyebrow">{en.home.closing.eyebrow}</p><h2 id="closing-heading">{en.home.closing.title}</h2>
+    <a class="start" href="/start/">{en.home.closing.action}<span aria-hidden="true"> ↗</span></a>
   </section>
 </Base>
 
+<script>
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      if (!motion.matches) entry.target.classList.add("arriving");
+      observer.unobserve(entry.target);
+    }
+  }, {threshold:.15});
+  for (const scene of document.querySelectorAll(".recorded-scene, .closing-scene")) observer.observe(scene);
+</script>
+
 <style>
   .home-stage {
-    flex: 1;
     display: grid;
-    grid-template-rows: auto minmax(250px, 1fr) auto;
-    min-height: calc(100svh - 152px);
-    padding-block: 56px 36px;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: calc(100svh - 64px);
+    padding-block: clamp(80px,12vh,132px) 36px;
     text-align: center;
   }
   .introduction { position: relative; z-index: 2; }
   h1 {
-    font-size: clamp(30px, 3.5vw, 44px);
-    font-weight: 430;
-    line-height: 1.15;
+    font-size: clamp(34px, 4.8vw, 58px);
+    font-weight: 480;
+    line-height: 1.12;
     letter-spacing: -0.035em;
     text-wrap: balance;
   }
-  .introduction p { margin: 15px 0 0; color: var(--muted); font-size: 15px; }
+  h1 span { display:block; }
+  .introduction p { margin: 22px 0 0; color: var(--muted); font-size: 15px; }
+  .invitation { margin-top:26px; position:relative; z-index:2; }
   .scene {
     position: relative;
-    width: min(100%, 920px);
+    width: min(100%, 1400px);
     min-width: 0;
     align-self: center;
     justify-self: center;
-    margin-block: 16px 24px;
+    margin-block: 12px 28px;
   }
   .horizon { position: absolute; top: 56%; left: 0; width: 100%; height: 0; }
   .actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 18px 28px; }
@@ -72,13 +91,26 @@ import { en } from "../strings/en.ts";
   .start:hover { opacity: 0.84; transform: translateY(-2px); }
   .proof { padding: 10px 0; font-size: 14px; text-decoration: none; }
   .proof:hover { text-decoration: underline; }
-  .coverage { margin: 17px 0 0; font-size: 12px; color: var(--muted); }
+  .scroll-cue { justify-self:center; color:var(--muted); font-size:11px; text-decoration:none; padding:8px; }
+  .recorded-scene { padding-block:140px 120px; text-align:center; border-top:1px solid var(--rule); background:var(--paper); scroll-margin-top:40px; }
+  .section-intro { margin-bottom:48px; }
+  .eyebrow { display:block; font-size:11px; color:var(--muted); margin:0 0 20px; }
+  h2 { font-size:clamp(28px,3.2vw,40px); font-weight:460; letter-spacing:-.035em; text-wrap:balance; }
+  .section-intro p { max-width:40ch; margin:18px auto 0; color:var(--muted); font-size:15px; }
+  .coverage { margin:30px 0 0; font-size:12px; color:var(--muted); }
   .coverage a { color: inherit; text-decoration-color: var(--rule); }
+  .closing-scene { padding-block:110px 130px; text-align:center; border-top:1px solid var(--rule); }
+  .closing-scene .start { margin-top:32px; }
+  .arriving .section-intro,.closing-scene.arriving h2 { animation:arrive 650ms cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes arrive { from{opacity:.3; transform:translateY(22px)}to{opacity:1;transform:none} }
   @media (max-width: 640px) {
-    .home-stage { min-height: calc(100svh - 180px); padding-block: 48px 32px; grid-template-rows: auto minmax(240px, 1fr) auto; }
-    h1 { max-width: 19ch; margin-inline: auto; }
+    .home-stage { padding-block:64px 26px; }
+    h1 { max-width: 22ch; margin-inline: auto; font-size:clamp(27px,8.6vw,34px); }
     .introduction p { max-width: 24ch; margin-inline: auto; font-size: 14px; }
-    .scene { margin-block: 20px; }
+    .scene { margin-block:24px; }
     .actions { gap: 20px; }
+    .recorded-scene { padding-block:86px 80px; }
+    .section-intro { margin-bottom:32px; }
+    .closing-scene { padding-block:80px; }
   }
 </style>

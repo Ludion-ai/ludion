@@ -1,0 +1,10 @@
+---
+// Exact path geometry from the owner's supplied kagi-logo-kit, svg/kagi-mark-inline.svg.
+// The enclosing link names Ludion; this is a decorative mark, not a service rename.
+interface Props { size?: number; }
+const { size = 22 } = Astro.props;
+---
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 80 80" width={size} height={size} aria-hidden="true" focusable="false">
+  <path fill="currentColor" d="M8 8H56V24H24V72H8Z" />
+  <path fill="#E5412A" d="M88 88H40V72H72V24H88Z" />
+</svg>

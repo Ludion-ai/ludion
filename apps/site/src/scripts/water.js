@@ -13,7 +13,6 @@
   const bottle = document.querySelector("[data-water]");
   if (!bottle) return;
   const surfaceEl = bottle.matches("[data-water-surface]") ? bottle : (bottle.querySelector("[data-water-surface]") ?? bottle);
-  const refraction = bottle.querySelector("[data-surface-refraction]");
   const canvas = document.createElement("canvas");
   canvas.className = "water";
   canvas.setAttribute("aria-hidden", "true");
@@ -135,8 +134,6 @@
     if (hitEl) { const s = hitEl.getBoundingClientRect(); hitX = s.left - canvas.getBoundingClientRect().left + s.width / 2; }
   };
   const draw = (t) => {
-    // The cut refracts slowly with the same clock as the water. One loop, one motion preference, one pause policy.
-    if (refraction) refraction.setAttribute("transform", `translate(${(16 + Math.sin(t * 0.3) * 5).toFixed(2)} ${(-12 + Math.cos(t * 0.2) * 4).toFixed(2)}) skewY(${(7 + Math.sin(t * 0.14) * 3).toFixed(2)})`);
     const dark = darkQ.matches, th = themes[dark ? "dark" : "light"];
     canvas.style.mixBlendMode = dark ? "screen" : "multiply";
     canvas.style.opacity = dark ? "0.6" : "0.8";

@@ -13,11 +13,33 @@ export const en = {
   },
   home: {
     title: "Ludion: teach it once",
-    headline: "For the version you’re on.",
-    sub: "Verified lessons for your coding AI.",
+    headline: ["The software changed.", "Your AI should know."],
+    sub: "Verified lessons, matched to your project.",
     start: "Get started",
     seeItWork: "See it work",
     coverage: "Coverage is partial.",
+    scroll: "Explore Ludion",
+    scene: {
+      caption: "Installed version → matched lessons → project context. An illustration of sync.",
+    },
+    recorded: {
+      eyebrow: "In context",
+      title: "The same question. A different answer.",
+      sub: "An actual recorded comparison. Explore what changed with sync.",
+    },
+    closing: {
+      eyebrow: "Start with your installed versions",
+      title: "Bring Ludion to your project.",
+      action: "Set up Ludion",
+    },
+    moment: {
+      recorded: "Recorded comparison",
+      project: "The installed project version stays the same",
+      installed: "Installed",
+      context: "Project context",
+      replay: "Replay recorded change",
+      evidence: "View the record",
+    },
     comparison: {
       title: "One question. Two answers.",
       recorded: "Recorded answers",

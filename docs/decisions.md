@@ -1,5 +1,11 @@
 # Decisions
 
+### 2026-10-14: Express the homepage through shapes and finite motion
+
+The owner clarified that more expression means graphics and movement, not more comparative text. Keep the approved opening and replace repeated prose below it with paper selection, configuration branching and context transport. Use one anonymous tile per actual active package lesson with states from sync's selection code; unknown measurements remain included. Evidence graphics show requirements rather than inventing a test run. Delivery distinguishes references from Cursor's inline copy; native wiring details retain the conditional contract.
+
+Use native disclosures for complete claims and wiring. Teacher and agent-draft attribution remain visible; coverage, privacy, exact records and URLs are retained. Motion finishes, settles when reduced, and stops when hidden/offscreen. Add neither a permanent idle loop nor a new dependency. Make the chapter nav static after the real expanded-state axe finding instead of weakening the check. Mobile geometry and flat labels were corrected after independent actual-screen review. Measurements and limits: `docs/bench/2026-10-14-home-motion/validation.json` and `docs/site/2026-10-14-home-motion.md`.
+
 ### 2026-10-14: Show home benefits as an explorable application
 
 The owner approved the visual opening and authorized extending the whole homepage and deploying it. The next screens therefore demonstrate actual version/model matching, signed evidence and assistant-file delivery through native controls. Match uses the CLI's selection code at build time, with Haiku as the initial measured model so known-lesson pruning is visible. Unknown measurements remain included. Inspect retains the generated claim/signature while revealing the exact evidence, account identity and recorded context. Connect uses Three.js CSS3D for a finite context-delivery illustration, with real conditional wiring and ordinary copy/setup controls outside the projection. The existing recorded comparison remains a separate scoped record. No application backend or simulated verification was introduced.

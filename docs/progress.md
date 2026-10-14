@@ -1,5 +1,11 @@
 # Progress
 
+### 2026-10-14: Less home copy, more graphic motion
+
+- Built: actual-selection paper routes, animated configuration branching and finite Three.js context delivery. Repeated explanatory headings were deleted; literal claims and wiring moved into native disclosures. The approved opening, attribution, draft labels, evidence/date scopes, coverage, privacy and URLs remain.
+- Review: compacted the mobile route and added readable flat delivery-mode labels. Expanded-state axe found a source link covered by the sticky chapter nav; changed the nav to static flow. Final independent source/image/live review found no remaining blockers.
+- Measured checks: `docs/site/2026-10-14-home-motion.md` and `docs/bench/2026-10-14-home-motion/validation.json`. Authorized publication proceeds through its own PR, green CI and deploy.yml. Local checks do not establish publication.
+
 ### 2026-10-14: Whole-home product interaction and authorized release
 
 - Built: the approved visual opening now leads to operable version/model matching using the actual CLI selection, a signed lesson inspector, finite Three.js assistant delivery with exact conditional file wiring, the scoped recorded comparison and setup. Native chapter navigation, stable panels, no-JavaScript fallback, keyboard/focus and reduced-motion/offscreen handling remain. Existing URLs, generated claims, teacher and agent-draft attribution, privacy and partial coverage are preserved.

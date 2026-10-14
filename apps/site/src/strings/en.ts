@@ -23,10 +23,11 @@ export const en = {
       caption: "Installed version → matched lessons → project context. An illustration of sync.",
     },
     chapters: { label:"Explore Ludion", fit:"Match", proof:"Inspect", delivery:"Connect", result:"Result" },
-    fit: { eyebrow:"Version + model", title:"Your versions. Your context.", sub:"Try a different version or measured model." },
-    proof: { eyebrow:"A correction that survives", title:"Follow the fact.", sub:"From a software change to its evidence and teacher." },
-    connection: { eyebrow:"In your workflow", title:"One context. Your assistant.", sub:"Preview how sync connects the files in your project." },
+    fit: { title:"Your versions. Your context." },
+    proof: { title:"Follow the fact." },
+    connection: { title:"One context. Your assistant." },
     lens: {
+      inspect:"Inspect lessons", diagram:"Version → model → context", versionGate:"Version", modelGate:"Model", contextGate:"Context",
       title:"Project context", project:"Example project", model:"Measured model", noModel:"No model filter",
       available:"Package lessons", matching:"Version matches", included:"In context", pruned:"measured known · left out", unmeasured:"unmeasured · included",
       preview:(shown:number,matched:number)=>`Previewing ${shown} of ${matched} version matches.`,
@@ -37,6 +38,7 @@ export const en = {
       measurement:"FreshBench: two answers per lesson, without tools", coverage:"Coverage is partial.",
     },
     trace: {
+      read:"Read lesson",
       label:"Lesson inspector", inspect:"Follow the fact", steps:{change:"Change",evidence:"Evidence",teacher:"Teacher",context:"Context"},
       changeTitle:"One default. Two versions.", evidenceTitle:"The same test, across versions.", evidenceNote:"Evidence requirements, not a live test run.", source:"Read the source",
       teacherTitle:"A person signs the lesson.", teacherId:"GitHub account ID", publication:"Publication record", fullLesson:"Open the full lesson",
@@ -44,6 +46,7 @@ export const en = {
       root:"Root configuration", inline:"Inline project", inherits:"Inherits root setup", noInherit:"Does not inherit root setup", unavailable:"Explore the current lessons.",
     },
     delivery: {
+      wiring:"Inspect wiring", reference:"Reference", inline:"Inline context",
       label:"Assistant connection", choose:"Choose your assistant", context:"Project context", illustration:"An illustration of context delivery. Choose an assistant to inspect the actual wiring.",
       replay:"Replay connection", claude:"Imports the context. CLAUDE.md is created if missing.", codex:"Adds a reference when AGENTS.md exists.",
       cursor:"Header excerpt. When .cursor exists, the complete rule inlines the lesson content.",
@@ -51,12 +54,9 @@ export const en = {
       scope:"Wiring preview, not a CLI run. No files are changed here. Coverage is partial.",
     },
     recorded: {
-      eyebrow: "In context",
       title: "The same question. A different answer.",
-      sub: "An actual recorded comparison. Explore what changed with sync.",
     },
     closing: {
-      eyebrow: "Start with your installed versions",
       title: "Bring Ludion to your project.",
       action: "Set up Ludion",
     },

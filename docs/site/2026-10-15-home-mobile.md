@@ -24,9 +24,9 @@ The phone delivery surfaces deliberately use the available visual area rather th
 
 Regression checks cover real selection counts and unknown measurements, primary touch targets, diagram labels, native disclosures, keyboard focus through rotation, simulated 200% text-only resizing, native delivery movement and termination, reduced motion and existing evidence assertions. The text-size fixture doubles each computed font while keeping viewport and non-text dimensions fixed; it is not a real Safari accessibility setting or pinch gesture.
 
-The initial targeted run found three failures in touch geometry, the rotation fixture's accessible selector and enlarged-text reflow. Those were corrected rather than accepted. Independent actual-screen review also found stretched landscape metadata rows; the final composition pins attribution to the top. Full browser, accessibility, typecheck, build, unit and capture results are in the receipt. An optional screenshot test is invoked separately.
+The initial targeted run found three failures in touch geometry, the rotation fixture's accessible selector and enlarged-text reflow. Those were corrected rather than accepted. Independent actual-screen review also found stretched landscape metadata rows; the final composition pins attribution to the top. A fresh PR review then found inherited gaps in the enlarged Change version labels and Context filename: version numbers overlapped and a filename character clipped. Version columns now fit the enlarged text or stack, and file headers wrap. The strengthened regression fails against the preceding build, then checks both complete versions, glyph bounds, non-overlap and the Context header before checking its exact record scope. Full browser, accessibility, typecheck, build, unit and capture results are in the receipt. An optional screenshot test is invoked separately.
 
-The integrated local build produces 166 pages. Typecheck and 460 unit tests pass; the full browser suite passes 40 tests in 2.6 minutes with one optional screenshot skip. The separately invoked capture check produces 132 actual-page PNGs across both themes. The sample build produces 130 pages and passes both sample accessibility checks. Eight normal-motion profiles complete without page exceptions, bad assets or horizontal overflow; home JavaScript is 35.1 KB gzipped against the existing 60 KB limit. These counts and timings are copied from the receipt rather than estimates.
+The integrated local build produces 166 pages. Typecheck and 460 unit tests pass; the full browser suite passes 40 tests with one optional screenshot skip. The separately invoked capture check produces 132 actual-page PNGs across both themes. The sample build produces 130 pages and passes both sample accessibility checks. Eight normal-motion profiles complete without page exceptions, bad assets or horizontal overflow; home JavaScript is 35.1 KB gzipped against the existing 60 KB limit. These counts are copied from the receipt rather than estimates; each actual run's timing remains in its check result.
 
 ## Actual local captures
 
@@ -35,6 +35,8 @@ The integrated local build produces 166 pages. Typecheck and 460 unit tests pass
 | ![390 px opening](2026-10-15-home-mobile/home-390-844-opening.png) | ![390 px delivery](2026-10-15-home-mobile/home-390-844-connect.png) |
 
 [Phone Match](2026-10-15-home-mobile/home-320-667-fit.png), [phone Inspect](2026-10-15-home-mobile/home-390-844-proof.png), [landscape Inspect](2026-10-15-home-mobile/home-844-390-proof.png), [desktop opening with the owner's angle change](2026-10-15-home-mobile/home-1280-900-opening.png).
+
+Enlarged-text proofs: [complete version labels](2026-10-15-home-mobile/text200-change-320.png) and [complete Context filename and record](2026-10-15-home-mobile/text200-context-320.png). The fresh PR review's runtime-asset and glyph measurements are preserved in the benchmark receipt.
 
 ## Release and limits
 

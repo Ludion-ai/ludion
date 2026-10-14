@@ -299,7 +299,7 @@ const steps = Object.entries(copy.steps);
     .root-config { padding:8px 20px; gap:4px; }
     .root-config span { font-size:12px; }
     .inheritance-map { width:min(100%,280px); }
-    .version-bridge { max-width:280px; gap:12px; }
+    .version-bridge { grid-template-columns:repeat(auto-fit,minmax(min(100%,6em),1fr)); max-width:280px; gap:12px; }
     .version-pin { margin-bottom:12px; }
     .version-pin strong { font-size:25px; line-height:1.15; margin-top:4px; }
     .config-node { display:grid; padding:9px 10px; font-size:12px; gap:3px; }
@@ -310,6 +310,7 @@ const steps = Object.entries(copy.steps);
     .contract-row,.contract-row > span,.contract-row > code,.contract-row .expected-error { font-size:12px; }
     .publication { font-size:12px; margin-top:24px; }
     .record-link { display:inline-flex; align-items:center; min-height:44px; font-size:12px; }
+    .file-head code { min-width:0; max-width:100%; overflow-wrap:anywhere; }
   }
   @media(max-width:400px) {
     .trace-bar { padding:8px 16px; font-size:11px; }

@@ -1,12 +1,11 @@
 {
-  "checkedAt": "2026-10-14T23:24:11.686Z",
-  "runtimeCommit": "10e5b078b5cc3c0fe9e0246b344842046557846c",
+  "checkedAt": "2026-10-14T23:40:39.835Z",
   "baseCommit": "f6966ee335d13ee36ffc1db1f73e47f6ec38e748",
   "comparisonBaseCommit": "6fbafdf03c5d84364cc75ca3535c7e4dadc10ed0",
   "sourceSHA256": {
     "apps/site/src/components/ContextStage.astro": "454717f19a66a47d99aba94b6ce13cd5f6f6b7b2db90b018a2df8395d2377d77",
     "apps/site/src/components/DeliveryScene.astro": "c6614759bb77b271e1d84346be77d097d1510ad4e9d7f415350d87f1b588419f",
-    "apps/site/src/components/LessonTrace.astro": "5560b222991d9109110355e22358c734a55ce80a3fdc9d7064a8a7660f0739c3",
+    "apps/site/src/components/LessonTrace.astro": "6c92d4cb211cc5190db46d2cadc39c7c4f495e2c928d387d737609efb1cf85e7",
     "apps/site/src/components/ProjectLens.astro": "542b0977f37a311bc742f8b10c1765de3ba4baeb6eea645e4111f159a874f81b",
     "apps/site/src/components/RecordedMoment.astro": "bb067b8999f5dde2b8a4f2f82085408f247885932874aec4b51f7ca62492aac8",
     "apps/site/src/layouts/Base.astro": "8613586cddd243614bbb339783965b9347ae2ea4530225b5cd3ab39d58a4d11b",
@@ -14,13 +13,13 @@
     "apps/site/src/build/project-lens.ts": "bb82e40b2eb6798b5f811f2f717c61d2ea66e1dc8425f296e46f35e365e37ee7",
     "apps/site/src/strings/en.ts": "f13468fef45c8ed0d32c3196d17a11c31548efebeda63aa883d925b67aa20625",
     "e2e/home-benefits.spec.ts": "f49748b6627a961685f3408f13cfe0631dcf992c8606467ea6f8663617eaa57c",
-    "e2e/home-mobile.spec.ts": "2e2886936e27849b8943e57aaa7cdb82cb9388ec3e62d40933fbbcd3be0e60c2",
+    "e2e/home-mobile.spec.ts": "ec59165a8c27b7f9d2aa1cb7b77e0dfc4cf42b1aff00e5b43271575a9d844277",
     "e2e/home-motion.spec.ts": "ca59b2e2b1e5b0e9d4aad02559afb0452bfb2fcda7f014e59ad950a2f94bef7a"
   },
   "checks": {
     "build": {
       "command": "npm run build",
-      "result": "08:19:30 ✓ Completed in 1.07s.\n\n08:19:30 [build] ✓ Completed in 1.74s.\n08:19:30 [build] 166 page(s) built in 1.89s\n08:19:30 [build] Complete!\n[ludion] Share cards: dist\\bench\\og\\claude-haiku-5-5.png, dist\\bench\\og\\claude-opus-5-5.png, dist\\bench\\og\\claude-sonnet-5-5.png"
+      "result": "08:34:09 ✓ Completed in 786ms.\n\n08:34:09 [build] ✓ Completed in 1.22s.\n08:34:09 [build] 166 page(s) built in 1.32s\n08:34:09 [build] Complete!\n[ludion] Share cards: dist\\bench\\og\\claude-haiku-5-5.png, dist\\bench\\og\\claude-opus-5-5.png, dist\\bench\\og\\claude-sonnet-5-5.png"
     },
     "typecheck": {
       "command": "npm run typecheck",
@@ -32,21 +31,21 @@
     },
     "e2e": {
       "command": "npx playwright test --workers=2",
-      "result": "  dt 2: 7.52 (needs 4.5)\n  span.version 2: 7.52 (needs 4.5)\n  dt 3: 7.52 (needs 4.5)\n  p.unmeasured: 7.52 (needs 4.5)\n  ok 40 [chromium] › e2e\\water.spec.ts:96:5 › text over the water keeps its contrast (a lesson, dark) (15.3s)\nHome JavaScript: 8 file(s), 35.1 KB gzipped\n  ok 41 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (904ms)\n\n  1 skipped\n  40 passed (2.6m)"
+      "result": "  time: 7.52 (needs 4.5)\n  dt: 7.52 (needs 4.5)\n  dt 2: 7.52 (needs 4.5)\n  span.version 2: 7.52 (needs 4.5)\n  dt 3: 7.52 (needs 4.5)\n  p.unmeasured: 7.52 (needs 4.5)\n  ok 40 [chromium] › e2e\\water.spec.ts:96:5 › text over the water keeps its contrast (a lesson, dark) (14.8s)\n\n  1 skipped\n  40 passed (2.4m)"
     },
     "samples": {
-      "build": "08:22:56 ✓ Completed in 334ms.\n\n08:22:56 [build] ✓ Completed in 856ms.\n08:22:56 [build] 130 page(s) built in 971ms\n08:22:56 [build] Complete!",
-      "axe": "(node:3428) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (light) (9.5s)\n  ok 2 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (dark) (9.2s)\n\n  2 passed (21.4s)"
+      "build": "08:37:40 ✓ Completed in 462ms.\n\n08:37:40 [build] ✓ Completed in 990ms.\n08:37:40 [build] 130 page(s) built in 1.09s\n08:37:40 [build] Complete!",
+      "axe": "(node:26764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (light) (14.0s)\n  ok 2 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (dark) (17.4s)\n\n  2 passed (37.1s)"
     },
     "allPageCaptures": {
-      "result": "(node:76036) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\screenshots.spec.ts:13:1 › capture actual pages at mobile and desktop widths in both themes (54.7s)\n\n  1 passed (55.4s)",
+      "result": "(node:74624) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\screenshots.spec.ts:13:1 › capture actual pages at mobile and desktop widths in both themes (53.6s)\n\n  1 passed (54.1s)",
       "pngCount": 132
     },
     "homeJavaScript": [
       "Home JavaScript: 8 file(s), 35.1 KB gzipped\r"
     ],
     "normalMotion": {
-      "capturedAt": "2026-10-14T23:20:52.945Z",
+      "capturedAt": "2026-10-14T23:36:18.362Z",
       "baseURL": "http://127.0.0.1:8787/",
       "results": [
         {
@@ -1029,7 +1028,7 @@
       ]
     },
     "after": {
-      "capturedAt": "2026-10-14T23:20:22.676Z",
+      "capturedAt": "2026-10-14T23:35:08.607Z",
       "results": [
         {
           "width": 320,
@@ -1757,16 +1756,25 @@
   },
   "screenshots": {
     "home-1280-900-opening.png": "860fe516e3be71812238c71a16db2b71cefad507d1c99e8bc965dd684a971569",
-    "home-320-667-fit.png": "8123ee4e11b49fa287bccc7f34c68eded2fe78de355464d24e4b867324b24b57",
+    "home-320-667-fit.png": "7a11e5da86a51a4a25c1a1a016afd768241438cc221e393135015ec992c9469b",
     "home-390-844-connect.png": "ee33c8d699f9eccc7ce5e552e759f9e4a2c49bd822b9a017bef975228795829d",
     "home-390-844-opening.png": "041cbcc7c5b37be5952ac3e283476389b53e8f19aee30e6ea512ecf16c9d19ea",
     "home-390-844-proof.png": "09328f7e0eaffeee7163279f83e63c9f3d892131478f89b87c110cf16c0ffa7c",
-    "home-844-390-proof.png": "3aa6bdd1bcccedd7013ebf2e91cddcccdf27cd8b20fa81dbb8a6d8e4776cedc7"
+    "home-844-390-proof.png": "3aa6bdd1bcccedd7013ebf2e91cddcccdf27cd8b20fa81dbb8a6d8e4776cedc7",
+    "text200-change-320.png": "27903d39d3f73e6efba5a933fea1521c8c86a6653f7b359fb16d81b3a8f150a9",
+    "text200-context-320.png": "4a4b6ec841993b23095e03fe97da174f7e2c333c3c3c5e13bfb64a3541d10ac8"
   },
   "independentReview": {
-    "receipt": "independent-review.json",
-    "sourceSHA": "10e5b078b5cc3c0fe9e0246b344842046557846c",
-    "verdict": "No remaining blocking source or visual defect found after landscape row correction."
+    "initial": {
+      "receipt": "independent-review.json",
+      "sourceSHA": "10e5b078b5cc3c0fe9e0246b344842046557846c",
+      "scope": "Initial mobile source, normal landscape and page-zoom equivalent; later fresh review exposed inherited text-only enlargement gaps."
+    },
+    "fresh": {
+      "receipt": "fresh-pr-review.json",
+      "headBeforeCommit": "f230b128d73a4e9f035e9875dc4c56cd4ff6756a",
+      "verdict": "No remaining blocker after correcting both enlarged-text gaps; actual dirty sources and runtime assets are hashed in this receipt."
+    }
   },
   "testHistory": {
     "initial": "    Error Context: ..\\..\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\home-mobile-test-results\\home-mobile-200-percent-te-a34a9-t-shrinking-the-mobile-page-chromium\\error-context.md\n\n  3 failed\n    [chromium] › e2e\\home-mobile.spec.ts:84:1 › phone compositions keep real selection, readable diagrams and reachable touch targets \n    [chromium] › e2e\\home-mobile.spec.ts:132:1 › portrait and landscape reflow preserve chosen facts, native disclosures and keyboard focus \n    [chromium] › e2e\\home-mobile.spec.ts:162:1 › 200 percent text-only resizing retains controls, selected labels and complete evidence without shrinking the mobile page \n  12 passed (35.4s)",
@@ -1778,7 +1786,13 @@
       "Full exact selected-value wrapping readout when a native select cannot wrap",
       "Content-sized phone inspector with stable selected tab screen position; desktop height assertion retained",
       "Landscape grid metadata pinned to its content rather than stretched to illustration height"
-    ]
+    ],
+    "enlargedTextFollowup": {
+      "actualDefectStaleBuild": "\n    Error Context: ..\\..\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\home-mobile-version-stale-results\\home-mobile-200-percent-te-a34a9-t-shrinking-the-mobile-page-chromium\\error-context.md\n\n  1 failed\n    [chromium] › e2e\\home-mobile.spec.ts:169:1 › 200 percent text-only resizing retains controls, selected labels and complete evidence without shrinking the mobile page",
+      "firstRecheck": "        at unclippedText (C:\\dev\\ludion\\e2e\\home-mobile.spec.ts:59:74)\n        at C:\\dev\\ludion\\e2e\\home-mobile.spec.ts:184:5\n\n    Error Context: ..\\..\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\home-mobile-version-fixed-results\\home-mobile-200-percent-te-a34a9-t-shrinking-the-mobile-page-chromium\\error-context.md\n\n  1 failed\n    [chromium] › e2e\\home-mobile.spec.ts:169:1 › 200 percent text-only resizing retains controls, selected labels and complete evidence without shrinking the mobile page \n  14 passed (11.1s)",
+      "finalRecheck": "  ok 13 [chromium] › e2e\\home-motion.spec.ts:94:1 › inheritance comparison draws a moving old and current route, then honors reduced motion and offscreen pause (1.8s)\n  ok 15 [chromium] › e2e\\home-motion.spec.ts:174:1 › hiding the document cancels the package and inheritance replays without continuing background movement (842ms)\n  ok 14 [chromium] › e2e\\home-motion.spec.ts:138:1 › delivery distinguishes reference wiring from inline copies and halts active scenes when the document is hidden (2.0s)\n\n  15 passed (11.9s)",
+      "boundaryCorrection": "The version pin linebox is not a clipping ancestor. Final bounds check uses the real containing version-node column, retains the previous horizontal overflow failure and an explicit glyph-range non-overlap assertion; Context is checked against its file-head ancestor."
+    }
   },
   "preserved": [
     "Owner desktop angle change PR114",
@@ -1796,5 +1810,17 @@
   ],
   "release": {
     "state": "Local verified; PR/CI/public verification pending"
-  }
+  },
+  "sourceSnapshot": {
+    "baseHead": "f230b128d73a4e9f035e9875dc4c56cd4ff6756a",
+    "state": "Final CSS/test acceptance fixes on the previous PR head; sourceSHA256 values identify the reviewed snapshot and are checked against the next committed blobs."
+  },
+  "ciHistory": [
+    {
+      "runId": 38653908168,
+      "headSha": "f230b128d73a4e9f035e9875dc4c56cd4ff6756a",
+      "conclusion": "cancelled",
+      "reason": "Superseded while fresh PR review corrected inherited enlarged-text acceptance gaps; this cancelled run is not represented as green or as a test failure."
+    }
+  ]
 }

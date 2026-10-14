@@ -56,7 +56,7 @@ async function unclippedText(locator: Locator) {
     }
     return result;
   }));
-  expect(failures, "Visible control text must remain inside its target").toEqual([]);
+  expect(failures, "Visible text must remain inside its container").toEqual([]);
 }
 
 async function selectedLabelsFit(selects: Locator) {
@@ -176,9 +176,32 @@ test("200 percent text-only resizing retains controls, selected labels and compl
     await lens.locator("[data-lens-model]").selectOption("claude-sonnet-5-5");
     await selectedLabelsFit(lens.locator("select"));
     await unclippedText(trace.locator("[data-trace-step]"));
+    // Check the default Change scene before leaving it. Element boxes can fit
+    // while the enlarged version glyphs overflow and collide with each other.
+    const change = trace.locator('[data-trace-panel="change"]');
+    await expect(change).toBeVisible();
+    await expect(change.locator(".version-pin strong")).toHaveText(["4.1.11", "5.0.0"]);
+    // A paragraph's line box is not a clipping boundary: font ascent/descent
+    // can extend into its margin. The enclosing version column must contain it.
+    await unclippedText(change.locator(".version-node"));
+    const versions = await change.locator(".version-pin strong").evaluateAll(items => items.map(el => {
+      const range = document.createRange(); range.selectNodeContents(el);
+      const rect = range.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+    }));
+    const [older, current] = versions;
+    expect(versions).toHaveLength(2);
+    expect(older!.right <= current!.left || current!.right <= older!.left || older!.bottom <= current!.top || current!.bottom <= older!.top, "Complete enlarged version numbers must not overlap").toBe(true);
     await trace.locator(".trace-claim > summary").tap(); await trace.locator('[data-trace-step="evidence"]').tap();
     await expect(trace.locator(".generated-claim")).toBeVisible(); await expect(trace.locator(".trace-signature")).toContainText("drafted by an agent");
     await expect(trace.locator('[data-trace-panel="evidence"] .panel-note')).toContainText("not a live test run");
+    await trace.locator('[data-trace-step="context"]').tap();
+    const context = trace.locator('[data-trace-panel="context"]');
+    await expect(context.locator(".file-head code")).toHaveText(".ludion/lessons.md");
+    // Compare glyphs to the enclosing file header; an oversized code box alone
+    // can conceal clipping at the parent's overflow boundary.
+    await unclippedText(context.locator(".file-head"));
+    await expect(context.locator(".panel-note")).toContainText("9 lessons; 2 dependencies had no coverage");
     await delivery.locator('[data-delivery-target="cursor"]').tap();
     await delivery.locator('[data-wiring-route="cursor"] .wiring-details > summary').tap();
     await unclippedText(delivery.locator("[data-mobile-destination]"));

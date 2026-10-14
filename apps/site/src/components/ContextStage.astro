@@ -88,7 +88,7 @@ const columns = Array.from({length: 35}, (_, column) => `M${column * 40},80 C${c
 
 <style>
   .context-stage { margin:0; --brand:#e5412a; }
-  .projection { height:460px; position:relative; perspective:1400px; overflow:clip; --scroll:0; --pointer-x:0; --pointer-y:0; }
+  .projection { height:460px; position:relative; perspective:1800px; overflow:clip; --scroll:0; --pointer-x:0; --pointer-y:0; }
   .field { position:absolute; width:100%; height:100%; inset:0; color:var(--ink); transform:translateY(calc(var(--scroll) * -30px)); }
   .signal { stroke-dasharray:9 91; stroke-dashoffset:100; opacity:.45; animation:flow 8s linear infinite; animation-play-state:paused; }
   .signal.delayed { animation-delay:-4s; opacity:.25; }
@@ -97,7 +97,9 @@ const columns = Array.from({length: 35}, (_, column) => `M${column * 40},80 C${c
   .scene-light { position:absolute; inset:20% 14% 0; background:radial-gradient(ellipse at 65% 45%,color-mix(in srgb,var(--brand) 9%,transparent),transparent 65%); filter:blur(20px); }
   .document-plane {
     position:absolute; width:min(72%,840px); left:50%; top:49%;
-    transform:translate(-50%,-45%) rotateX(calc(36deg - var(--scroll) * 28deg + var(--pointer-y) * -4deg)) rotateY(calc(-9deg + var(--pointer-x) * 5deg)) rotateZ(calc(-9deg + var(--scroll) * 9deg));
+    /* A wide screen shows the plane large, so it leans less than the first version (36°, −9°, −9°), which read as
+       too steep on a PC; phones keep their own, flatter angles below. */
+    transform:translate(-50%,-45%) rotateX(calc(20deg - var(--scroll) * 16deg + var(--pointer-y) * -3deg)) rotateY(calc(-4deg + var(--pointer-x) * 4deg)) rotateZ(calc(-4deg + var(--scroll) * 4deg));
     transform-style:preserve-3d;
   }
   .document { position:relative; overflow:hidden; border:1px solid var(--rule); border-radius:3px; background:linear-gradient(120deg,var(--paper-2),var(--paper) 50%,var(--paper-2)); box-shadow:0 28px 70px rgb(0 0 0 / .06),0 1px 0 var(--paper) inset; }

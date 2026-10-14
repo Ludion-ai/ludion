@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-10-14T08:02:39.322Z",
-  "baseCommit": "f6f2f8f30ea5c5f65ad4966f1f01eec09cf93c5d",
+  "checkedAt": "2026-10-14T11:35:05.745Z",
+  "baseCommit": "55e7e2d2695be5525af81daa780a8f886e6d5d1a",
   "sourceSHA256": {
     "apps/site/src/build/project-lens.ts": "bb82e40b2eb6798b5f811f2f717c61d2ea66e1dc8425f296e46f35e365e37ee7",
     "apps/site/src/components/ProjectLens.astro": "32434deb8d37ac5ed9c53fa65204ae99182df5c1f32baf64a5eb14b446f41336",
@@ -10,12 +10,13 @@
     "apps/site/src/strings/en.ts": "f13468fef45c8ed0d32c3196d17a11c31548efebeda63aa883d925b67aa20625",
     "apps/site/test/project-lens.test.ts": "29d45cc8d5266b397ac61a8a2155eda3734b34c76222ba41e79af1e24c546002",
     "e2e/home-benefits.spec.ts": "20a96beb21ab8733564953fff476f80d7d1ecb0dbcb99667c25ce62c55f2c3c0",
-    "e2e/home-motion.spec.ts": "a022162982f835eebc9089ef3966e93fe4683754506cd17c7c778bbd9ace856a"
+    "e2e/home-motion.spec.ts": "ca59b2e2b1e5b0e9d4aad02559afb0452bfb2fcda7f014e59ad950a2f94bef7a",
+    "e2e/water.spec.ts": "a749750651a64401cecc9c83373ee6586a514c36888ea489643515448c127327"
   },
   "checks": {
     "build": {
       "command": "npm run build",
-      "result": "\n16:49:44 [build] ✓ Completed in 1.17s.\n16:49:44 [build] 166 page(s) built in 1.26s\n16:49:44 [build] Complete!\n[ludion] Share cards: dist\\bench\\og\\claude-haiku-5-5.png, dist\\bench\\og\\claude-opus-5-5.png, dist\\bench\\og\\claude-sonnet-5-5.png"
+      "result": "\n20:29:04 [build] ✓ Completed in 2.59s.\n20:29:04 [build] 166 page(s) built in 2.74s\n20:29:04 [build] Complete!\n[ludion] Share cards: dist\\bench\\og\\claude-haiku-5-5.png, dist\\bench\\og\\claude-opus-5-5.png, dist\\bench\\og\\claude-sonnet-5-5.png"
     },
     "typecheck": {
       "command": "npm run typecheck",
@@ -23,27 +24,27 @@
     },
     "unit": {
       "command": "npm test",
-      "result": "  error messages and mixed Japanese: 12/12 found the right lesson (needs all)\n\n Test Files  28 passed (28)\n      Tests  460 passed (460)\n   Start at  16:47:22\n   Duration  5.77s (transform 3.50s, setup 0ms, import 8.96s, tests 13.02s, environment 2ms)"
+      "result": "  error messages and mixed Japanese: 12/12 found the right lesson (needs all)\n\n Test Files  28 passed (28)\n      Tests  460 passed (460)\n   Start at  20:29:52\n   Duration  5.86s (transform 3.93s, setup 0ms, import 9.48s, tests 12.94s, environment 4ms)"
     },
     "e2e": {
       "command": "npx playwright test --workers=2",
-      "result": "Worst contrast over the water (/lessons/01M4T6BQ9DJH2BCV6Q28GH4HJ1/, dark), lowest first:\n  p.what: 7.48 (needs 4.5)\n  span.drafted: 7.52 (needs 4.5)\n  time: 7.52 (needs 4.5)\n  dt: 7.52 (needs 4.5)\n  dt 2: 7.52 (needs 4.5)\n  span.version 2: 7.52 (needs 4.5)\n  dt 3: 7.52 (needs 4.5)\n  p.unmeasured: 7.52 (needs 4.5)\n  ok 36 [chromium] › e2e\\water.spec.ts:96:5 › text over the water keeps its contrast (a lesson, dark) (14.5s)\nHome JavaScript: 8 file(s), 34.6 KB gzipped\n  ok 37 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (862ms)\n\n  1 skipped\n  36 passed (2.4m)"
+      "result": "Home JavaScript: 8 file(s), 34.6 KB gzipped\n  ok 37 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (904ms)\nWorst contrast over the water (/lessons/01M4T6BQ9DJH2BCV6Q28GH4HJ1/, dark), lowest first:\n  p.what: 7.48 (needs 4.5)\n  span.drafted: 7.52 (needs 4.5)\n  time: 7.52 (needs 4.5)\n  dt: 7.52 (needs 4.5)\n  dt 2: 7.52 (needs 4.5)\n  span.version 2: 7.52 (needs 4.5)\n  dt 3: 7.52 (needs 4.5)\n  p.unmeasured: 7.52 (needs 4.5)\n  ok 36 [chromium] › e2e\\water.spec.ts:96:5 › text over the water keeps its contrast (a lesson, dark) (14.5s)\n\n  1 skipped\n  36 passed (2.4m)"
     },
     "allPageCaptures": {
       "command": "SCREENSHOTS_DIR=<outputs/home-motion/all-pages-local> npx playwright test screenshots.spec.ts --workers=1",
-      "result": "(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\screenshots.spec.ts:13:1 › capture actual pages at mobile and desktop widths in both themes (55.7s)\n\n  1 passed (56.3s)",
+      "result": "(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\screenshots.spec.ts:13:1 › capture actual pages at mobile and desktop widths in both themes (49.6s)\n\n  1 passed (50.0s)",
       "pngCount": 132
     },
     "samples": {
-      "build": "\n16:57:41 [build] ✓ Completed in 714ms.\n16:57:41 [build] 130 page(s) built in 797ms\n16:57:41 [build] Complete!",
-      "axe": "  ok 2 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (light) (11.6s)\n  ok 3 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (dark) (13.4s)\n\n  1 skipped\n  2 passed (27.8s)"
+      "build": "\n20:29:55 [build] ✓ Completed in 959ms.\n20:29:55 [build] 130 page(s) built in 1.10s\n20:29:55 [build] Complete!",
+      "axe": "  ok 2 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (light) (9.4s)\n  ok 3 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (dark) (9.4s)\n\n  1 skipped\n  2 passed (24.4s)"
     },
     "homeJavaScript": [
       "Home JavaScript: 8 file(s), 34.6 KB gzipped\r",
-      "  ok 37 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (862ms)\r"
+      "  ok 37 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (904ms)\r"
     ],
     "normalMotion": {
-      "capturedAt": "2026-10-14T08:01:48.844Z",
+      "capturedAt": "2026-10-14T11:31:24.060Z",
       "baseURL": "http://127.0.0.1:8787/",
       "results": [
         {
@@ -98,14 +99,14 @@
     }
   },
   "textMeasurement": {
-    "checkedAt": "2026-10-14T07:55:51.212Z",
-    "baselineSourceSha": "f6f2f8f30ea5c5f65ad4966f1f01eec09cf93c5d",
+    "checkedAt": "2026-10-14T11:31:37.592Z",
+    "baselineSourceSha": "55e7e2d2695be5525af81daa780a8f886e6d5d1a",
     "method": "Fresh 1280x900 light-mode Chromium load, default choices, after native scene initialization and fonts, before scrolling. main.innerText trimmed and split on whitespace. Includes native option text and visually-hidden accessible captions; excludes collapsed details. This is a bounded DOM text measure, not reader comprehension or conversion.",
     "measurements": [
       {
         "name": "before",
         "url": "https://ludion.ai/",
-        "htmlSha256": "237e435a3bc23a453c0d9235ea0cb788539aacd13b9f90b4e7f30f2a9d1a037b",
+        "htmlSha256": "585c6cb05dc29daf1d019d0628e0390e765ca8a96dac4a3d2f8abb2cb469feac",
         "words": 524,
         "sections": [
           {
@@ -130,7 +131,7 @@
       {
         "name": "candidate",
         "url": "http://127.0.0.1:8787/",
-        "htmlSha256": "2b1b8e737c0ac0092fa0967aa29b29a8e44fbebdac5b5c682a3caea35283eab5",
+        "htmlSha256": "8329bf5f286e237e76880bec57bee5e78307d21b03bf702c97e69cada1f0fbd6",
         "words": 372,
         "sections": [
           {
@@ -169,11 +170,27 @@
     "reductionPercent": 29.00763358778626
   },
   "screenshots": {
-    "connect-1280-dark.png": "b776c351529f9854ee98e1156644d36d9b92a084729189869b5a448b8a019d75",
-    "connect-320-light.png": "a1f9c165edfe5ddb25926a8542d9f794c5cd62ac73997640dbcc783ae0ba249e",
-    "inspect-1280-dark.png": "0c5f9e56da580279f46d4b150a9b5e63dc17a05416bf7cb36b72bb94a16ea66f",
-    "match-1280-light.png": "a5f99c86506832988ae0e5d4329e6ddd68e8dbc4a37167b0d2cac09f0dbda47c",
-    "match-320-dark.png": "456c714b573dce63f030af081ebccc04b8210271f438510a158634f10a9c0a61"
+    "connect-1280-dark.png": "28663a926f09d3cb1cbb57b762765831eedc259d173116fe45125ef6cb125fb7",
+    "connect-320-light.png": "23a5c7b48c4d11b48fdfc1326ddd5f0459e2ad9c1d84f13b09cd109d5d91f229",
+    "inspect-1280-dark.png": "3731765940763dcfbf051961cecc0b52494d780875c2d05e6692772b340279aa",
+    "match-1280-light.png": "77bd63409f57e73e8ba5c7553c37bd173e84b9050a73208f4b130c318cdee405",
+    "match-320-dark.png": "1b438ab8275a75c9844aa31f4b68b4f5ee8f0c36dfc2cbcb565cb8dc11b28307"
+  },
+  "ciHistory": [
+    {
+      "runId": 38532426764,
+      "headSha": "8ec496489d53d5cf52b0faf7b4446abecc1b88cc",
+      "result": "33 passed,3 failed,1 optional screenshot skip",
+      "failures": [
+        "2motion checks30s timeout during terminal/stopped interval sampling",
+        "JavaScript budget async response.body handler escaped test lifetime and undercounted"
+      ],
+      "uiRuntimeChangedForRepair": false
+    }
+  ],
+  "budgetRepeat": {
+    "command": "npx playwright test water.spec.ts --grep JavaScript --workers=1 --repeat-each=5",
+    "result": "(node:9868) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\nHome JavaScript: 8 file(s), 34.6 KB gzipped\n  ok 5 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (808ms)\n\n  5 passed (5.9s)"
   },
   "review": {
     "independent": true,
@@ -187,6 +204,6 @@
   ],
   "testFixture": {
     "initialSweep": "35 passed; one media-change ordering failure; one optional screenshot skip.",
-    "resolution": "Wait for native media/stopped state before advancing the mocked animation clock;5targeted repeats and final full sweep pass, no source behavior change."
+    "resolution": "Wait for native media/stopped state before advancing the mocked animation clock;5targeted repeats and final full sweep pass, no source behavior change. CI repair retains every-frame transient samples but fast-forwards terminal/idle intervals with unchanged assertions; upstream body-Promise budget fix is preserved byteidentical."
   }
 }

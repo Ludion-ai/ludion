@@ -165,11 +165,14 @@ for (const { path, moments } of pages) {
 }
 
 test("the home page's JavaScript stays within 60 KB gzipped", async ({ page }) => {
-  const scripts: Buffer[] = [];
-  page.on("response", async (res) => {
-    if (res.request().resourceType() === "script") scripts.push(await res.body());
+  // Keep each body's promise and wait for all of them: summing as they arrive raced the end of the test, so a run
+  // counted only the scripts whose bodies had come back (1, 6 or 8 files) or failed with "response.body: Test ended".
+  const bodies: Promise<Buffer>[] = [];
+  page.on("response", (res) => {
+    if (res.request().resourceType() === "script") bodies.push(res.body());
   });
   await page.goto("/", { waitUntil: "networkidle" });
+  const scripts = await Promise.all(bodies);
   const total = scripts.reduce((sum, body) => sum + gzipSync(body).length, 0);
   console.log(`Home JavaScript: ${scripts.length} file(s), ${(total / 1024).toFixed(1)} KB gzipped`);
   expect(scripts.length).toBeGreaterThan(0);

@@ -1,0 +1,12 @@
+{
+  "name": "ludion-launch-video",
+  "private": true,
+  "type": "module",
+  "description": "Ludion's launch video, drawn one frame at a time. Not a workspace: the root install never fetches ffmpeg.",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0"
+  }
+}

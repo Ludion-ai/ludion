@@ -135,12 +135,15 @@ const columns = Array.from({length: 35}, (_, column) => `M${column * 40},80 C${c
     .rib { background:#151515; border-color:#363636; }
     .scene-light { background:radial-gradient(ellipse at 65% 45%,rgb(229 65 42 / .13),transparent 65%); }
   }
-  @media(max-width:640px) {
-    .projection { height:320px; perspective:1000px; }
-    .document-plane { width:calc(100% - 48px); transform:translate(-50%,-45%) rotateX(calc(10deg - var(--scroll) * 10deg)) rotateZ(calc(-4deg + var(--scroll) * 4deg)); }
-    .document-head { padding:14px; font-size:12px; gap:8px; }
+  @media(max-width:640px),(max-width:1000px) and (max-height:500px) {
+    .projection { height:clamp(220px,31svh,280px); perspective:1000px; }
+    .document-plane { width:calc(100% - 48px); max-width:420px; transform:translate(-50%,-45%) rotateX(calc(10deg - var(--scroll) * 10deg)) rotateZ(calc(-4deg + var(--scroll) * 4deg)); }
+    .document-head { display:grid; grid-template-columns:12px minmax(0,1fr); padding:12px 14px; font-size:12px; gap:6px 8px; }
+    .version { grid-column:1 / -1; }
+    .flow-arrow { transform:rotate(90deg); }
+    .file { grid-column:2; margin-left:0; min-width:0; overflow-wrap:anywhere; }
     .version b { margin-left:3px; }
-    .document-body { height:180px; padding:20px 18px; }
+    .document-body { height:clamp(124px,38vw,156px); padding:20px 18px; }
     .context-lines { inset:20px 18px; }
     .context-lines > span { gap:8px; }
     .focus-row { height:48px; gap:10px; }
@@ -150,6 +153,13 @@ const columns = Array.from({length: 35}, (_, column) => `M${column * 40},80 C${c
     .bracket { width:42px; height:65px; border-width:3px; }
     .opening { top:-9px; left:-9px; }
     .closing { bottom:-9px; right:-9px; }
+  }
+  @media(max-width:1000px) and (max-height:500px) {
+    .projection { height:208px; }
+    .document-plane { width:calc(100% - 32px); }
+    .document-head { padding:9px 12px; font-size:11px; }
+    .document-body { height:108px; }
+    .scene-caption { font-size:10px; }
   }
   @media(prefers-reduced-motion:reduce) {
     .document-plane { transform:translate(-50%,-45%); }

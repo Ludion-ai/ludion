@@ -91,9 +91,12 @@ test("lesson inspector follows evidence by keyboard while the literal claim is a
     await expect(trace.locator(".trace-signature")).toBeVisible();
     await trace.locator(".trace-claim > summary").press("Enter");
     await expect(trace.locator(".generated-claim")).toBeVisible();
+    await trace.locator("[data-trace-controls]").scrollIntoViewIfNeeded();
     const initial = (await trace.boundingBox())!;
     await trace.locator('[data-trace-step="change"]').focus();
     for (const [step,key] of [["evidence","ArrowRight"],["teacher","ArrowDown"],["context","End"],["change","Home"]] as const) {
+      const tab = trace.locator(`[data-trace-step="${step}"]`);
+      const tabTop = (await tab.boundingBox())!.y;
       await trace.locator("[data-trace-step]:focus").press(key);
       await expect(current).toHaveAttribute("data-trace-panel",step);
       await expect(trace.locator(`[data-trace-step="${step}"]`)).toBeFocused();
@@ -101,7 +104,10 @@ test("lesson inspector follows evidence by keyboard while the literal claim is a
       await expect(trace.locator(".generated-claim")).toHaveText(lesson.claim);
       await expect(trace.locator(".trace-signature")).toContainText(`@${lesson.teacher}`);
       await expect(trace.locator(".trace-signature")).toContainText("drafted by an agent");
-      expect((await trace.boundingBox())!.height).toBeCloseTo(initial.height,0);
+      // Desktop reserves a fixed workspace. Mobile panels fit their own content;
+      // switching must preserve the selected control's position and focus.
+      if (width === 1280) expect((await trace.boundingBox())!.height).toBeCloseTo(initial.height,0);
+      else expect((await tab.boundingBox())!.y).toBeCloseTo(tabTop,0);
       if (step==="evidence") {
         await expect(current).toContainText("Must fail, printing");
         await expect(current).toContainText("Must pass");
@@ -115,9 +121,13 @@ test("lesson inspector follows evidence by keyboard while the literal claim is a
         await expect(current.locator(".panel-note")).toContainText("9 lessons; 2 dependencies had no coverage");
       }
     }
-    await trace.locator('[data-trace-step="context"]').press("Enter");
+    const contextTab = trace.locator('[data-trace-step="context"]');
+    const contextTop = (await contextTab.boundingBox())!.y;
+    await contextTab.press("Enter");
     await expect(current).toHaveAttribute("data-trace-panel","context");
-    expect((await trace.boundingBox())!.height).toBeCloseTo(initial.height,0);
+    await expect(contextTab).toBeFocused();
+    if (width === 1280) expect((await trace.boundingBox())!.height).toBeCloseTo(initial.height,0);
+    else expect((await contextTab.boundingBox())!.y).toBeCloseTo(contextTop,0);
   }
 });
 

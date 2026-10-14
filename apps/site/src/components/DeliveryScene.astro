@@ -18,6 +18,11 @@ const routes = [
       <div class="fallback-route"><span><BrandMark size={24}/><code>.ludion/lessons.md</code></span><i>→</i><span><code data-static-destination>CLAUDE.md</code></span></div>
       <div class="three-space" data-delivery-space></div>
       <div class="visual-labels"><div><span>{s.context}</span><code>.ludion/lessons.md</code></div><div><span data-flat-mode>{s.reference}</span><code data-static-destination>CLAUDE.md</code></div></div>
+      <div class="mobile-space" data-mobile-delivery>
+        <div class="mobile-file"><span>{s.context}</span><code>.ludion/lessons.md</code></div>
+        <div class="mobile-route"><i></i><div class="mobile-packet" data-mobile-packet><i class="paper-shape"></i></div></div>
+        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>Claude Code</span><code data-static-destination>CLAUDE.md</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">.ludion/lessons.md</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
+      </div>
     </div>
     <figcaption id="delivery-caption" class="visually-hidden">{s.illustration}</figcaption>
     <button class="replay" data-delivery-replay type="button" aria-disabled="false" hidden><span aria-hidden="true">↻</span>{s.replay}</button>
@@ -45,6 +50,7 @@ const routes = [
     const panels = [...root.querySelectorAll<HTMLElement>("[data-wiring-route]")];
     const replay = root.querySelector<HTMLButtonElement>("[data-delivery-replay]")!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const compact = matchMedia("(max-width:640px), (max-width:1000px) and (max-height:500px)");
     const group = new Object3D();
     const camera = new PerspectiveCamera(36,1,1,2000);
     const renderer = new CSS3DRenderer();
@@ -74,6 +80,9 @@ const routes = [
         const p = progress*progress*(3-2*progress);
         const travel = Math.min(1,p/.75);
         const received = Math.max(0,Math.min(1,(p-.55)/.45));
+        root.style.setProperty("--mobile-travel",String(travel));
+        root.style.setProperty("--packet-opacity",String(1-received));
+        root.style.setProperty("--received",String(received));
         source.position.set(-spread,0,-25); destination.position.set(spread,0,-25);
         source.rotation.y = mobile ? .08 : .25; destination.rotation.y = mobile ? -.08 : -.25;
         const scale = mobile ? .9 : 1;
@@ -84,7 +93,9 @@ const routes = [
         packet.element.style.opacity = String(1-received);
         destination.element.style.setProperty("--received",String(received));
         group.rotation.set(reduce.matches ? 0 : pointerY*.06,reduce.matches ? 0 : pointerX*.12,0);
-        renderer.render(group,camera);
+        // Phones use readable native file surfaces. The same finite timeline
+        // drives their packet; desktop retains the existing CSS3D projection.
+        if (!compact.matches) renderer.render(group,camera);
       }
       if (playing && !reduce.matches) frame = requestAnimationFrame(draw);
     };
@@ -107,6 +118,9 @@ const routes = [
       destination.element.querySelector("[data-world-assistant]")!.textContent = label;
       destination.element.querySelector("[data-world-file]")!.textContent = panel.dataset.file!;
       destination.element.dataset.mode = id === "cursor" ? "inline" : "reference";
+      root.querySelector<HTMLElement>("[data-mobile-destination]")!.dataset.mode = destination.element.dataset.mode;
+      root.querySelector("[data-mobile-assistant]")!.textContent = label;
+      root.querySelector("[data-mobile-mode]")!.textContent = id === "cursor" ? root.dataset.inline! : root.dataset.reference!;
       for (const label of root.querySelectorAll("[data-static-destination]")) label.textContent = panel.dataset.file!;
       root.querySelector("[data-flat-mode]")!.textContent = id === "cursor" ? root.dataset.inline! : root.dataset.reference!;
       root.querySelector("[data-delivery-status]")!.textContent = `${label}: ${panel.dataset.file}`;
@@ -129,6 +143,7 @@ const routes = [
     for (const button of buttons) button.addEventListener("click",()=>choose(button.dataset.deliveryTarget!));
     replay.addEventListener("click",play);
     reduce.addEventListener("change",()=>{finish();pointerX=pointerY=0;cancelAnimationFrame(frame);frame=0;schedule();});
+    compact.addEventListener("change",()=>{resize();schedule();});
     document.addEventListener("visibilitychange",()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;finish();}else schedule();});
     const copy = root.querySelector<HTMLButtonElement>("[data-delivery-copy]")!;
     if (navigator.clipboard) {
@@ -148,6 +163,7 @@ const routes = [
   .delivery-figure { margin:0; position:relative; border-bottom:1px solid var(--rule); }
   .delivery-visual { position:relative; height:410px; overflow:hidden; background:radial-gradient(ellipse at 50% 65%,var(--paper-2),var(--paper) 72%); }
   .three-space { position:absolute; inset:0; visibility:hidden; }
+  .mobile-space { display:none; }
   .delivery-ready .three-space { visibility:visible; }
   .fallback-route { display:flex; align-items:center; justify-content:center; gap:28px; height:100%; }
   .fallback-route > span { display:grid; justify-items:center; gap:18px; color:var(--ink); }
@@ -203,20 +219,55 @@ const routes = [
   .packet-papers .paper-shape:first-child { transform:translate(-7px,-4px) rotate(-13deg); }
   .packet-papers .paper-shape:last-child { transform:translate(7px,4px) rotate(12deg); }
   .world-floor { width:1000px; height:440px; background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px); background-size:40px 40px; opacity:.5; mask-image:radial-gradient(ellipse,#000,transparent 70%); }
-  @media(max-width:640px) {
-    .delivery-bar { padding:14px 18px; justify-content:center; }
-    .delivery-bar > span { width:100%; text-align:center; }
-    .destinations { width:100%; justify-content:center; }
-    .destinations button { padding-inline:10px; }
-    .delivery-visual { height:260px; }
+  @media(max-width:640px),(max-width:1000px) and (max-height:500px) {
+    .delivery-bar { padding:8px; }
+    .delivery-bar > span { display:none; }
+    .destinations { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; }
+    .destinations button { min-height:44px; padding-inline:6px; font-size:12px; }
+    .delivery-visual { height:auto; min-height:258px; }
+    .delivery-ready .three-space,.visual-labels { display:none; }
+    .delivery-ready .mobile-space { display:grid; grid-template-rows:auto 36px auto; padding:16px 18px; max-width:390px; margin:auto; }
+    .mobile-file { padding:12px 16px; border:1px solid var(--rule); border-radius:8px; background:var(--paper); min-width:0; }
+    .mobile-file > span { display:block; color:var(--muted); font-size:12px; margin-bottom:5px; }
+    .mobile-file > code { display:block; font-size:14px; line-height:1.6; color:var(--ink); overflow-wrap:anywhere; }
+    .mobile-route { position:relative; }
+    .mobile-route > i { display:block; position:absolute; left:50%; top:0; height:100%; width:1px; background:var(--rule); }
+    .mobile-packet { position:absolute; left:50%; top:0; opacity:var(--packet-opacity,0); transform:translate(-50%,calc(-45px + var(--mobile-travel,1) * 98px)); }
+    .mobile-packet .paper-shape { width:26px; height:34px; box-shadow:0 4px 12px rgb(0 0 0 / .08); }
+    .mobile-received { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:12px; padding-top:10px; border-top:1px solid var(--rule); opacity:var(--received,1); transform:translateY(calc((1 - var(--received,1)) * 12px)); }
+    .mobile-received > span { font-size:12px; color:var(--muted); }
+    .mobile-reference { font-size:12px; color:var(--ink); overflow-wrap:anywhere; }
+    .mobile-inline { display:flex; gap:6px; }
+    .mobile-inline .paper-shape { width:14px; height:19px; border-radius:2px; }
+    .mobile-inline .paper-shape::before,.mobile-inline .paper-shape::after { left:3px; top:6px; width:6px; }
+    .mobile-inline .paper-shape::after { top:12px; width:4px; }
+    [data-mode="reference"] .mobile-inline,[data-mode="inline"] .mobile-reference { display:none; }
+    .replay { min-height:44px; margin-bottom:8px; font-size:12px; }
     .visual-labels code { font-size:11px; }
     .visual-labels { padding-inline:4px; }
-    .fallback-route { gap:12px; }
-    .fallback-route code { font-size:9px; }
-    .wiring-output { padding:20px 18px; }
-    .command { padding:16px 18px; gap:6px 12px; }
-    .command > code { font-size:12px; }
+    .fallback-route { min-height:258px; flex-direction:column; gap:14px; padding:18px; }
+    .fallback-route code { font-size:14px; overflow-wrap:anywhere; }
+    .fallback-route i { transform:rotate(90deg); }
+    .delivery-ready .fallback-route { display:none; }
+    .wiring-output { padding:14px 18px; }
+    .wiring-route p,.file-bar,.delivery-scope { font-size:12px; }
+    .wiring-details { margin-top:4px; }
+    .wiring-details summary { width:100%; min-height:44px; font-size:12px; }
+    .command { display:grid; grid-template-columns:1fr 1fr; padding:12px 18px; gap:6px 12px; }
+    .command > code { grid-column:1 / -1; font-size:14px; }
+    .command button { width:100%; margin:0; min-height:44px; background:var(--paper-2); }
+    .command a { display:inline-flex; align-items:center; justify-content:center; min-height:44px; }
     .delivery-scope { padding-inline:18px; }
     pre { padding:14px; }
+  }
+  @media(min-width:641px) and (max-width:1000px) and (max-height:500px) {
+    .delivery-ready .mobile-space { grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr); grid-template-rows:auto; max-width:720px; padding-block:18px; align-items:center; }
+    .delivery-visual { min-height:160px; }
+    .mobile-route { height:100%; min-height:60px; }
+    .mobile-route > i { left:0; top:50%; width:100%; height:1px; }
+    .mobile-packet { top:50%; left:0; transform:translate(calc(-30px + var(--mobile-travel,1) * 92px),-50%); }
+    .command { display:flex; }
+    .command > code { margin-right:auto; }
+    .command button { width:auto; }
   }
 </style>

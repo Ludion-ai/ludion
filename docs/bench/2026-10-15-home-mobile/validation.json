@@ -1,0 +1,1800 @@
+{
+  "checkedAt": "2026-10-14T23:24:11.686Z",
+  "runtimeCommit": "10e5b078b5cc3c0fe9e0246b344842046557846c",
+  "baseCommit": "f6966ee335d13ee36ffc1db1f73e47f6ec38e748",
+  "comparisonBaseCommit": "6fbafdf03c5d84364cc75ca3535c7e4dadc10ed0",
+  "sourceSHA256": {
+    "apps/site/src/components/ContextStage.astro": "454717f19a66a47d99aba94b6ce13cd5f6f6b7b2db90b018a2df8395d2377d77",
+    "apps/site/src/components/DeliveryScene.astro": "c6614759bb77b271e1d84346be77d097d1510ad4e9d7f415350d87f1b588419f",
+    "apps/site/src/components/LessonTrace.astro": "5560b222991d9109110355e22358c734a55ce80a3fdc9d7064a8a7660f0739c3",
+    "apps/site/src/components/ProjectLens.astro": "542b0977f37a311bc742f8b10c1765de3ba4baeb6eea645e4111f159a874f81b",
+    "apps/site/src/components/RecordedMoment.astro": "bb067b8999f5dde2b8a4f2f82085408f247885932874aec4b51f7ca62492aac8",
+    "apps/site/src/layouts/Base.astro": "8613586cddd243614bbb339783965b9347ae2ea4530225b5cd3ab39d58a4d11b",
+    "apps/site/src/pages/index.astro": "bcff97841b87d6096ed6e256b26abe78efb57516f875edba0fe3cc671febc297",
+    "apps/site/src/build/project-lens.ts": "bb82e40b2eb6798b5f811f2f717c61d2ea66e1dc8425f296e46f35e365e37ee7",
+    "apps/site/src/strings/en.ts": "f13468fef45c8ed0d32c3196d17a11c31548efebeda63aa883d925b67aa20625",
+    "e2e/home-benefits.spec.ts": "f49748b6627a961685f3408f13cfe0631dcf992c8606467ea6f8663617eaa57c",
+    "e2e/home-mobile.spec.ts": "2e2886936e27849b8943e57aaa7cdb82cb9388ec3e62d40933fbbcd3be0e60c2",
+    "e2e/home-motion.spec.ts": "ca59b2e2b1e5b0e9d4aad02559afb0452bfb2fcda7f014e59ad950a2f94bef7a"
+  },
+  "checks": {
+    "build": {
+      "command": "npm run build",
+      "result": "08:19:30 ✓ Completed in 1.07s.\n\n08:19:30 [build] ✓ Completed in 1.74s.\n08:19:30 [build] 166 page(s) built in 1.89s\n08:19:30 [build] Complete!\n[ludion] Share cards: dist\\bench\\og\\claude-haiku-5-5.png, dist\\bench\\og\\claude-opus-5-5.png, dist\\bench\\og\\claude-sonnet-5-5.png"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "result": "> typecheck\n> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json"
+    },
+    "unit": {
+      "command": "npm test",
+      "result": "  error messages and mixed Japanese: 12/12 found the right lesson (needs all)\n\n Test Files  28 passed (28)\n      Tests  460 passed (460)\n   Start at  08:23:37\n   Duration  5.84s (transform 3.48s, setup 0ms, import 9.30s, tests 12.53s, environment 2ms)"
+    },
+    "e2e": {
+      "command": "npx playwright test --workers=2",
+      "result": "  dt 2: 7.52 (needs 4.5)\n  span.version 2: 7.52 (needs 4.5)\n  dt 3: 7.52 (needs 4.5)\n  p.unmeasured: 7.52 (needs 4.5)\n  ok 40 [chromium] › e2e\\water.spec.ts:96:5 › text over the water keeps its contrast (a lesson, dark) (15.3s)\nHome JavaScript: 8 file(s), 35.1 KB gzipped\n  ok 41 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (904ms)\n\n  1 skipped\n  40 passed (2.6m)"
+    },
+    "samples": {
+      "build": "08:22:56 ✓ Completed in 334ms.\n\n08:22:56 [build] ✓ Completed in 856ms.\n08:22:56 [build] 130 page(s) built in 971ms\n08:22:56 [build] Complete!",
+      "axe": "(node:3428) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (light) (9.5s)\n  ok 2 [chromium] › e2e\\samples\\a11y.spec.ts:8:3 › axe finds no violations on any sample page (dark) (9.2s)\n\n  2 passed (21.4s)"
+    },
+    "allPageCaptures": {
+      "result": "(node:76036) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ok 1 [chromium] › e2e\\screenshots.spec.ts:13:1 › capture actual pages at mobile and desktop widths in both themes (54.7s)\n\n  1 passed (55.4s)",
+      "pngCount": 132
+    },
+    "homeJavaScript": [
+      "Home JavaScript: 8 file(s), 35.1 KB gzipped\r"
+    ],
+    "normalMotion": {
+      "capturedAt": "2026-10-14T23:20:52.945Z",
+      "baseURL": "http://127.0.0.1:8787/",
+      "results": [
+        {
+          "width": 320,
+          "colorScheme": "light",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        },
+        {
+          "width": 320,
+          "colorScheme": "dark",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        },
+        {
+          "width": 390,
+          "colorScheme": "light",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        },
+        {
+          "width": 390,
+          "colorScheme": "dark",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        },
+        {
+          "width": 844,
+          "colorScheme": "light",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        },
+        {
+          "width": 844,
+          "colorScheme": "dark",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        },
+        {
+          "width": 1280,
+          "colorScheme": "light",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        },
+        {
+          "width": 1280,
+          "colorScheme": "dark",
+          "httpStatus": 200,
+          "errors": [],
+          "badAssets": [],
+          "overflow": false
+        }
+      ]
+    }
+  },
+  "geometry": {
+    "method": "Same explicit viewport, light theme and reduced motion. Actual component boxes; heights are CSS pixels. The baseline predates owner PR114, whose desktop perspective changed independently without changing these measured component heights.",
+    "comparisons": [
+      {
+        "width": 320,
+        "height": 667,
+        "componentHeights": {
+          "hero": {
+            "before": 729.328125,
+            "after": 607
+          },
+          "lens": {
+            "before": 916.90625,
+            "after": 737.234375
+          },
+          "trace": {
+            "before": 884.234375,
+            "after": 681.515625
+          },
+          "delivery": {
+            "before": 260,
+            "after": 258
+          }
+        },
+        "exploreBottom": 647,
+        "teacherHeight": 594.40625,
+        "overflow": false,
+        "errors": []
+      },
+      {
+        "width": 360,
+        "height": 800,
+        "componentHeights": {
+          "hero": {
+            "before": 737.015625,
+            "after": 740
+          },
+          "lens": {
+            "before": 940.53125,
+            "after": 737.234375
+          },
+          "trace": {
+            "before": 862.140625,
+            "after": 691.171875
+          },
+          "delivery": {
+            "before": 260,
+            "after": 258
+          }
+        },
+        "exploreBottom": 780,
+        "teacherHeight": 594.40625,
+        "overflow": false,
+        "errors": []
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "componentHeights": {
+          "hero": {
+            "before": 780,
+            "after": 784
+          },
+          "lens": {
+            "before": 939.390625,
+            "after": 737.234375
+          },
+          "trace": {
+            "before": 826.453125,
+            "after": 691.171875
+          },
+          "delivery": {
+            "before": 260,
+            "after": 258
+          }
+        },
+        "exploreBottom": 824,
+        "teacherHeight": 594.40625,
+        "overflow": false,
+        "errors": []
+      },
+      {
+        "width": 430,
+        "height": 932,
+        "componentHeights": {
+          "hero": {
+            "before": 868,
+            "after": 872
+          },
+          "lens": {
+            "before": 911.71875,
+            "after": 678.65625
+          },
+          "trace": {
+            "before": 865.59375,
+            "after": 693.421875
+          },
+          "delivery": {
+            "before": 260,
+            "after": 258
+          }
+        },
+        "exploreBottom": 912,
+        "teacherHeight": 581.8125,
+        "overflow": false,
+        "errors": []
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "componentHeights": {
+          "hero": {
+            "before": 876.875,
+            "after": 330
+          },
+          "lens": {
+            "before": 678.5625,
+            "after": 524.78125
+          },
+          "trace": {
+            "before": 859.09375,
+            "after": 485.625
+          },
+          "delivery": {
+            "before": 410,
+            "after": 160
+          }
+        },
+        "exploreBottom": 378,
+        "teacherHeight": 378.015625,
+        "overflow": false,
+        "errors": []
+      },
+      {
+        "width": 768,
+        "height": 1024,
+        "componentHeights": {
+          "hero": {
+            "before": 960,
+            "after": 960
+          },
+          "lens": {
+            "before": 651.671875,
+            "after": 651.671875
+          },
+          "trace": {
+            "before": 859.09375,
+            "after": 859.09375
+          },
+          "delivery": {
+            "before": 410,
+            "after": 410
+          }
+        },
+        "exploreBottom": 988,
+        "teacherHeight": 859.09375,
+        "overflow": false,
+        "errors": []
+      },
+      {
+        "width": 1280,
+        "height": 900,
+        "componentHeights": {
+          "hero": {
+            "before": 944.03125,
+            "after": 944.03125
+          },
+          "lens": {
+            "before": 746.453125,
+            "after": 746.453125
+          },
+          "trace": {
+            "before": 859.09375,
+            "after": 859.09375
+          },
+          "delivery": {
+            "before": 410,
+            "after": 410
+          }
+        },
+        "exploreBottom": 972.03125,
+        "teacherHeight": 859.09375,
+        "overflow": false,
+        "errors": []
+      }
+    ],
+    "before": {
+      "capturedAt": "2026-10-14T12:03:17.738Z",
+      "results": [
+        {
+          "width": 320,
+          "height": 667,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 320,
+              "height": 667
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 320,
+              "height": 729.328125,
+              "bottom": 793.328125
+            },
+            "projection": {
+              "x": 0,
+              "y": 352.90625,
+              "width": 320,
+              "height": 320,
+              "bottom": 672.90625
+            },
+            "docHead": {
+              "x": 25,
+              "y": 408.5531311035156,
+              "width": 270,
+              "height": 45,
+              "bottom": 453.5531311035156
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 407.5531311035156,
+              "width": 272,
+              "height": 226.99996948242188,
+              "bottom": 634.5531005859375
+            },
+            "docFile": {
+              "x": 151.390625,
+              "y": 422.5531311035156,
+              "width": 129.609375,
+              "height": 16,
+              "bottom": 438.5531311035156
+            },
+            "scrollCue": {
+              "x": 109.328125,
+              "y": 733.1875,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 767.328125
+            },
+            "fit": {
+              "x": 0,
+              "y": 866.328125,
+              "width": 320,
+              "height": 1169.28125,
+              "bottom": 2035.609375
+            },
+            "lens": {
+              "x": 18,
+              "y": 1038.703125,
+              "width": 284,
+              "height": 916.90625,
+              "bottom": 1955.609375
+            },
+            "trace": {
+              "x": 18,
+              "y": 2176.796875,
+              "width": 284,
+              "height": 884.234375,
+              "bottom": 3061.03125
+            },
+            "delivery": {
+              "x": 18,
+              "y": 3418.203125,
+              "width": 284,
+              "height": 260,
+              "bottom": 3678.203125
+            },
+            "moment": {
+              "x": 18,
+              "y": 4315.828125,
+              "width": 284,
+              "height": 634.296875,
+              "bottom": 4950.125
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 258.796875,
+              "width": 284,
+              "height": 884.234375
+            },
+            "teacher": {
+              "x": 18,
+              "y": 258.796875,
+              "width": 284,
+              "height": 884.234375
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 360,
+          "height": 800,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 360,
+              "height": 800
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 360,
+              "height": 737.015625,
+              "bottom": 801.015625
+            },
+            "projection": {
+              "x": 0,
+              "y": 360.59375,
+              "width": 360,
+              "height": 320,
+              "bottom": 680.59375
+            },
+            "docHead": {
+              "x": 25,
+              "y": 416.2406311035156,
+              "width": 310,
+              "height": 45,
+              "bottom": 461.2406311035156
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 415.2406311035156,
+              "width": 312,
+              "height": 226.99996948242188,
+              "bottom": 642.2406005859375
+            },
+            "docFile": {
+              "x": 191.390625,
+              "y": 430.2406311035156,
+              "width": 129.609375,
+              "height": 16,
+              "bottom": 446.2406311035156
+            },
+            "scrollCue": {
+              "x": 129.328125,
+              "y": 740.875,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 775.015625
+            },
+            "fit": {
+              "x": 0,
+              "y": 874.015625,
+              "width": 360,
+              "height": 1192.90625,
+              "bottom": 2066.921875
+            },
+            "lens": {
+              "x": 18,
+              "y": 1046.390625,
+              "width": 324,
+              "height": 940.53125,
+              "bottom": 1986.921875
+            },
+            "trace": {
+              "x": 18,
+              "y": 2208.109375,
+              "width": 324,
+              "height": 862.140625,
+              "bottom": 3070.25
+            },
+            "delivery": {
+              "x": 18,
+              "y": 3427.421875,
+              "width": 324,
+              "height": 260,
+              "bottom": 3687.421875
+            },
+            "moment": {
+              "x": 18,
+              "y": 4306.90625,
+              "width": 324,
+              "height": 616.15625,
+              "bottom": 4923.0625
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 325.109375,
+              "width": 324,
+              "height": 862.140625
+            },
+            "teacher": {
+              "x": 18,
+              "y": 325.109375,
+              "width": 324,
+              "height": 862.140625
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 390,
+              "height": 780,
+              "bottom": 844
+            },
+            "projection": {
+              "x": 0,
+              "y": 384.984375,
+              "width": 390,
+              "height": 320,
+              "bottom": 704.984375
+            },
+            "docHead": {
+              "x": 25,
+              "y": 440.6312561035156,
+              "width": 340,
+              "height": 45,
+              "bottom": 485.6312561035156
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 439.6312561035156,
+              "width": 342,
+              "height": 226.99996948242188,
+              "bottom": 666.6312255859375
+            },
+            "docFile": {
+              "x": 221.390625,
+              "y": 454.6312561035156,
+              "width": 129.609375,
+              "height": 16,
+              "bottom": 470.6312561035156
+            },
+            "scrollCue": {
+              "x": 144.328125,
+              "y": 783.859375,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 818
+            },
+            "fit": {
+              "x": 0,
+              "y": 917,
+              "width": 390,
+              "height": 1159.578125,
+              "bottom": 2076.578125
+            },
+            "lens": {
+              "x": 18,
+              "y": 1057.1875,
+              "width": 354,
+              "height": 939.390625,
+              "bottom": 1996.578125
+            },
+            "trace": {
+              "x": 18,
+              "y": 2217.765625,
+              "width": 354,
+              "height": 826.453125,
+              "bottom": 3044.21875
+            },
+            "delivery": {
+              "x": 18,
+              "y": 3369.203125,
+              "width": 354,
+              "height": 260,
+              "bottom": 3629.203125
+            },
+            "moment": {
+              "x": 18,
+              "y": 4248.6875,
+              "width": 354,
+              "height": 565.015625,
+              "bottom": 4813.703125
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 347.765625,
+              "width": 354,
+              "height": 826.453125
+            },
+            "teacher": {
+              "x": 18,
+              "y": 347.765625,
+              "width": 354,
+              "height": 826.453125
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 430,
+          "height": 932,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 430,
+              "height": 932
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 430,
+              "height": 868,
+              "bottom": 932
+            },
+            "projection": {
+              "x": 0,
+              "y": 429.5,
+              "width": 430,
+              "height": 320,
+              "bottom": 749.5
+            },
+            "docHead": {
+              "x": 25,
+              "y": 485.1468811035156,
+              "width": 380,
+              "height": 44.999969482421875,
+              "bottom": 530.1468505859375
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 484.1468811035156,
+              "width": 382,
+              "height": 226.99996948242188,
+              "bottom": 711.1468505859375
+            },
+            "docFile": {
+              "x": 261.390625,
+              "y": 499.1468811035156,
+              "width": 129.609375,
+              "height": 15.999969482421875,
+              "bottom": 515.1468505859375
+            },
+            "scrollCue": {
+              "x": 164.328125,
+              "y": 871.859375,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 906
+            },
+            "fit": {
+              "x": 0,
+              "y": 1005,
+              "width": 430,
+              "height": 1131.90625,
+              "bottom": 2136.90625
+            },
+            "lens": {
+              "x": 18,
+              "y": 1145.1875,
+              "width": 394,
+              "height": 911.71875,
+              "bottom": 2056.90625
+            },
+            "trace": {
+              "x": 18,
+              "y": 2278.09375,
+              "width": 394,
+              "height": 865.59375,
+              "bottom": 3143.6875
+            },
+            "delivery": {
+              "x": 18,
+              "y": 3468.671875,
+              "width": 394,
+              "height": 260,
+              "bottom": 3728.671875
+            },
+            "moment": {
+              "x": 18,
+              "y": 4322.359375,
+              "width": 394,
+              "height": 565.015625,
+              "bottom": 4887.375
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 384.09375,
+              "width": 394,
+              "height": 865.59375
+            },
+            "teacher": {
+              "x": 18,
+              "y": 384.09375,
+              "width": 394,
+              "height": 865.59375
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 844,
+          "height": 390,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 844,
+              "height": 390
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 844,
+              "height": 876.875,
+              "bottom": 940.875
+            },
+            "projection": {
+              "x": 0,
+              "y": 364.59375,
+              "width": 844,
+              "height": 460,
+              "bottom": 824.59375
+            },
+            "docHead": {
+              "x": 119.1640625,
+              "y": 455.984375,
+              "width": 605.671875,
+              "height": 58,
+              "bottom": 513.984375
+            },
+            "docPlane": {
+              "x": 118.1640625,
+              "y": 454.984375,
+              "width": 607.671875,
+              "height": 300,
+              "bottom": 754.984375
+            },
+            "docFile": {
+              "x": 526.0234375,
+              "y": 473.984375,
+              "width": 172.8125,
+              "height": 21,
+              "bottom": 494.984375
+            },
+            "scrollCue": {
+              "x": 371.328125,
+              "y": 870.734375,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 904.875
+            },
+            "fit": {
+              "x": 0,
+              "y": 1013.875,
+              "width": 844,
+              "height": 968.75,
+              "bottom": 1982.625
+            },
+            "lens": {
+              "x": 18,
+              "y": 1194.0625,
+              "width": 808,
+              "height": 678.5625,
+              "bottom": 1872.625
+            },
+            "trace": {
+              "x": 32,
+              "y": 2163.8125,
+              "width": 780,
+              "height": 859.09375,
+              "bottom": 3022.90625
+            },
+            "delivery": {
+              "x": 18,
+              "y": 3384.09375,
+              "width": 808,
+              "height": 410,
+              "bottom": 3794.09375
+            },
+            "moment": {
+              "x": 18,
+              "y": 4444.90625,
+              "width": 808,
+              "height": 449.125,
+              "bottom": 4894.03125
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 32,
+              "y": 47.8125,
+              "width": 780,
+              "height": 859.09375
+            },
+            "teacher": {
+              "x": 32,
+              "y": 47.8125,
+              "width": 780,
+              "height": 859.09375
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 768,
+          "height": 1024,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 768,
+              "height": 1024
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 768,
+              "height": 960,
+              "bottom": 1024
+            },
+            "projection": {
+              "x": 0,
+              "y": 423.5,
+              "width": 768,
+              "height": 460,
+              "bottom": 883.5
+            },
+            "docHead": {
+              "x": 108.5234375,
+              "y": 514.890625,
+              "width": 550.953125,
+              "height": 58,
+              "bottom": 572.890625
+            },
+            "docPlane": {
+              "x": 107.5234375,
+              "y": 513.890625,
+              "width": 552.953125,
+              "height": 300,
+              "bottom": 813.890625
+            },
+            "docFile": {
+              "x": 460.6640625,
+              "y": 532.890625,
+              "width": 172.8125,
+              "height": 21,
+              "bottom": 553.890625
+            },
+            "scrollCue": {
+              "x": 333.328125,
+              "y": 953.859375,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 988
+            },
+            "fit": {
+              "x": 0,
+              "y": 1097,
+              "width": 768,
+              "height": 941.859375,
+              "bottom": 2038.859375
+            },
+            "lens": {
+              "x": 18,
+              "y": 1277.1875,
+              "width": 732,
+              "height": 651.671875,
+              "bottom": 1928.859375
+            },
+            "trace": {
+              "x": 32,
+              "y": 2220.046875,
+              "width": 704,
+              "height": 859.09375,
+              "bottom": 3079.140625
+            },
+            "delivery": {
+              "x": 18,
+              "y": 3440.328125,
+              "width": 732,
+              "height": 410,
+              "bottom": 3850.328125
+            },
+            "moment": {
+              "x": 18,
+              "y": 4501.140625,
+              "width": 732,
+              "height": 449.125,
+              "bottom": 4950.265625
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 32,
+              "y": 365.046875,
+              "width": 704,
+              "height": 859.09375
+            },
+            "teacher": {
+              "x": 32,
+              "y": 365.046875,
+              "width": 704,
+              "height": 859.09375
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 1280,
+          "height": 900,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 1280,
+              "height": 900
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 1280,
+              "height": 944.03125,
+              "bottom": 1008.03125
+            },
+            "projection": {
+              "x": 0,
+              "y": 431.75,
+              "width": 1280,
+              "height": 460,
+              "bottom": 891.75
+            },
+            "docHead": {
+              "x": 221,
+              "y": 523.140625,
+              "width": 838,
+              "height": 58,
+              "bottom": 581.140625
+            },
+            "docPlane": {
+              "x": 220,
+              "y": 522.140625,
+              "width": 840,
+              "height": 300,
+              "bottom": 822.140625
+            },
+            "docFile": {
+              "x": 860.1875,
+              "y": 541.140625,
+              "width": 172.8125,
+              "height": 21,
+              "bottom": 562.140625
+            },
+            "scrollCue": {
+              "x": 589.328125,
+              "y": 937.890625,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 972.03125
+            },
+            "fit": {
+              "x": 0,
+              "y": 1081.03125,
+              "width": 1280,
+              "height": 1050.453125,
+              "bottom": 2131.484375
+            },
+            "lens": {
+              "x": 140,
+              "y": 1275.03125,
+              "width": 1000,
+              "height": 746.453125,
+              "bottom": 2021.484375
+            },
+            "trace": {
+              "x": 378,
+              "y": 2232.484375,
+              "width": 822,
+              "height": 859.09375,
+              "bottom": 3091.578125
+            },
+            "delivery": {
+              "x": 80,
+              "y": 3466.578125,
+              "width": 1120,
+              "height": 410,
+              "bottom": 3876.578125
+            },
+            "moment": {
+              "x": 210,
+              "y": 4541.203125,
+              "width": 860,
+              "height": 449.125,
+              "bottom": 4990.328125
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 378,
+              "y": 302.484375,
+              "width": 822,
+              "height": 859.09375
+            },
+            "teacher": {
+              "x": 378,
+              "y": 302.484375,
+              "width": 822,
+              "height": 859.09375
+            }
+          },
+          "errors": []
+        }
+      ]
+    },
+    "after": {
+      "capturedAt": "2026-10-14T23:20:22.676Z",
+      "results": [
+        {
+          "width": 320,
+          "height": 667,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 320,
+              "height": 667
+            },
+            "hero": {
+              "x": 0,
+              "y": 60,
+              "width": 320,
+              "height": 607,
+              "bottom": 667
+            },
+            "projection": {
+              "x": 0,
+              "y": 323.234375,
+              "width": 320,
+              "height": 220,
+              "bottom": 543.234375
+            },
+            "docHead": {
+              "x": 25,
+              "y": 346.98126220703125,
+              "width": 270,
+              "height": 63,
+              "bottom": 409.98126220703125
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 345.98126220703125,
+              "width": 272,
+              "height": 189,
+              "bottom": 534.9812622070312
+            },
+            "docFile": {
+              "x": 59,
+              "y": 380.98126220703125,
+              "width": 222,
+              "height": 16,
+              "bottom": 396.98126220703125
+            },
+            "scrollCue": {
+              "x": 106.96875,
+              "y": 603,
+              "width": 106.046875,
+              "height": 44,
+              "bottom": 647
+            },
+            "fit": {
+              "x": 0,
+              "y": 744,
+              "width": 320,
+              "height": 915.609375,
+              "bottom": 1659.609375
+            },
+            "lens": {
+              "x": 18,
+              "y": 874.375,
+              "width": 284,
+              "height": 737.234375,
+              "bottom": 1611.609375
+            },
+            "trace": {
+              "x": 18,
+              "y": 1743.796875,
+              "width": 284,
+              "height": 681.515625,
+              "bottom": 2425.3125
+            },
+            "delivery": {
+              "x": 18,
+              "y": 2666.6875,
+              "width": 284,
+              "height": 258,
+              "bottom": 2924.6875
+            },
+            "moment": {
+              "x": 18,
+              "y": 3474.328125,
+              "width": 284,
+              "height": 681.796875,
+              "bottom": 4156.125
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 243.796875,
+              "width": 284,
+              "height": 943.671875
+            },
+            "teacher": {
+              "x": 18,
+              "y": 243.796875,
+              "width": 284,
+              "height": 594.40625
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 360,
+          "height": 800,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 360,
+              "height": 800
+            },
+            "hero": {
+              "x": 0,
+              "y": 60,
+              "width": 360,
+              "height": 740,
+              "bottom": 800
+            },
+            "projection": {
+              "x": 0,
+              "y": 380.9375,
+              "width": 360,
+              "height": 248,
+              "bottom": 628.9375
+            },
+            "docHead": {
+              "x": 25,
+              "y": 412.64453125,
+              "width": 310,
+              "height": 63,
+              "bottom": 475.64453125
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 411.64453125,
+              "width": 312,
+              "height": 201.796875,
+              "bottom": 613.44140625
+            },
+            "docFile": {
+              "x": 59,
+              "y": 446.64453125,
+              "width": 262,
+              "height": 16,
+              "bottom": 462.64453125
+            },
+            "scrollCue": {
+              "x": 126.96875,
+              "y": 736,
+              "width": 106.046875,
+              "height": 44,
+              "bottom": 780
+            },
+            "fit": {
+              "x": 0,
+              "y": 877,
+              "width": 360,
+              "height": 884.421875,
+              "bottom": 1761.421875
+            },
+            "lens": {
+              "x": 18,
+              "y": 976.1875,
+              "width": 324,
+              "height": 737.234375,
+              "bottom": 1713.421875
+            },
+            "trace": {
+              "x": 18,
+              "y": 1845.609375,
+              "width": 324,
+              "height": 691.171875,
+              "bottom": 2536.78125
+            },
+            "delivery": {
+              "x": 18,
+              "y": 2746.96875,
+              "width": 324,
+              "height": 258,
+              "bottom": 3004.96875
+            },
+            "moment": {
+              "x": 18,
+              "y": 3554.609375,
+              "width": 324,
+              "height": 635.65625,
+              "bottom": 4190.265625
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 309.609375,
+              "width": 324,
+              "height": 921.578125
+            },
+            "teacher": {
+              "x": 18,
+              "y": 309.609375,
+              "width": 324,
+              "height": 594.40625
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "hero": {
+              "x": 0,
+              "y": 60,
+              "width": 390,
+              "height": 784,
+              "bottom": 844
+            },
+            "projection": {
+              "x": 0,
+              "y": 400.0625,
+              "width": 390,
+              "height": 261.625,
+              "bottom": 661.6875
+            },
+            "docHead": {
+              "x": 25,
+              "y": 433.31561279296875,
+              "width": 340,
+              "height": 63,
+              "bottom": 496.31561279296875
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 432.31561279296875,
+              "width": 342,
+              "height": 213.1875,
+              "bottom": 645.5031127929688
+            },
+            "docFile": {
+              "x": 59,
+              "y": 467.31561279296875,
+              "width": 292,
+              "height": 16,
+              "bottom": 483.31561279296875
+            },
+            "scrollCue": {
+              "x": 141.96875,
+              "y": 780,
+              "width": 106.046875,
+              "height": 44,
+              "bottom": 824
+            },
+            "fit": {
+              "x": 0,
+              "y": 921,
+              "width": 390,
+              "height": 884.421875,
+              "bottom": 1805.421875
+            },
+            "lens": {
+              "x": 18,
+              "y": 1020.1875,
+              "width": 354,
+              "height": 737.234375,
+              "bottom": 1757.421875
+            },
+            "trace": {
+              "x": 18,
+              "y": 1889.609375,
+              "width": 354,
+              "height": 691.171875,
+              "bottom": 2580.78125
+            },
+            "delivery": {
+              "x": 18,
+              "y": 2790.96875,
+              "width": 354,
+              "height": 258,
+              "bottom": 3048.96875
+            },
+            "moment": {
+              "x": 18,
+              "y": 3578.8125,
+              "width": 354,
+              "height": 612.40625,
+              "bottom": 4191.21875
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 331.609375,
+              "width": 354,
+              "height": 921.578125
+            },
+            "teacher": {
+              "x": 18,
+              "y": 331.609375,
+              "width": 354,
+              "height": 594.40625
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 430,
+          "height": 932,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 430,
+              "height": 932
+            },
+            "hero": {
+              "x": 0,
+              "y": 60,
+              "width": 430,
+              "height": 872,
+              "bottom": 932
+            },
+            "projection": {
+              "x": 0,
+              "y": 438.453125,
+              "width": 430,
+              "height": 280,
+              "bottom": 718.453125
+            },
+            "docHead": {
+              "x": 25,
+              "y": 477.19061279296875,
+              "width": 380,
+              "height": 63,
+              "bottom": 540.1906127929688
+            },
+            "docPlane": {
+              "x": 24,
+              "y": 476.19061279296875,
+              "width": 382,
+              "height": 221,
+              "bottom": 697.1906127929688
+            },
+            "docFile": {
+              "x": 59,
+              "y": 511.19061279296875,
+              "width": 332,
+              "height": 16,
+              "bottom": 527.1906127929688
+            },
+            "scrollCue": {
+              "x": 161.96875,
+              "y": 868,
+              "width": 106.046875,
+              "height": 44,
+              "bottom": 912
+            },
+            "fit": {
+              "x": 0,
+              "y": 1009,
+              "width": 430,
+              "height": 825.84375,
+              "bottom": 1834.84375
+            },
+            "lens": {
+              "x": 18,
+              "y": 1108.1875,
+              "width": 394,
+              "height": 678.65625,
+              "bottom": 1786.84375
+            },
+            "trace": {
+              "x": 18,
+              "y": 1919.03125,
+              "width": 394,
+              "height": 693.421875,
+              "bottom": 2612.453125
+            },
+            "delivery": {
+              "x": 18,
+              "y": 2822.640625,
+              "width": 394,
+              "height": 258,
+              "bottom": 3080.640625
+            },
+            "moment": {
+              "x": 18,
+              "y": 3610.484375,
+              "width": 394,
+              "height": 612.40625,
+              "bottom": 4222.890625
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 18,
+              "y": 376.03125,
+              "width": 394,
+              "height": 897.34375
+            },
+            "teacher": {
+              "x": 18,
+              "y": 376.03125,
+              "width": 394,
+              "height": 581.8125
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 844,
+          "height": 390,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 844,
+              "height": 390
+            },
+            "hero": {
+              "x": 0,
+              "y": 60,
+              "width": 844,
+              "height": 330,
+              "bottom": 390
+            },
+            "projection": {
+              "x": 432,
+              "y": 80.328125,
+              "width": 380,
+              "height": 208,
+              "bottom": 288.328125
+            },
+            "docHead": {
+              "x": 449,
+              "y": 109.8843765258789,
+              "width": 346,
+              "height": 52.99999237060547,
+              "bottom": 162.88436889648438
+            },
+            "docPlane": {
+              "x": 448,
+              "y": 108.8843765258789,
+              "width": 348,
+              "height": 163,
+              "bottom": 271.8843765258789
+            },
+            "docFile": {
+              "x": 481,
+              "y": 138.88436889648438,
+              "width": 302,
+              "height": 14,
+              "bottom": 152.88436889648438
+            },
+            "scrollCue": {
+              "x": 372.71875,
+              "y": 333.65625,
+              "width": 98.546875,
+              "height": 44.34375,
+              "bottom": 378
+            },
+            "fit": {
+              "x": 0,
+              "y": 463,
+              "width": 844,
+              "height": 646.671875,
+              "bottom": 1109.671875
+            },
+            "lens": {
+              "x": 18,
+              "y": 544.890625,
+              "width": 808,
+              "height": 524.78125,
+              "bottom": 1069.671875
+            },
+            "trace": {
+              "x": 186,
+              "y": 1142.671875,
+              "width": 640,
+              "height": 485.625,
+              "bottom": 1628.296875
+            },
+            "delivery": {
+              "x": 18,
+              "y": 1813.1875,
+              "width": 808,
+              "height": 160,
+              "bottom": 1973.1875
+            },
+            "moment": {
+              "x": 18,
+              "y": 2393.0625,
+              "width": 808,
+              "height": 472.90625,
+              "bottom": 2865.96875
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 186,
+              "y": 124.671875,
+              "width": 640,
+              "height": 651.0625
+            },
+            "teacher": {
+              "x": 186,
+              "y": 124.671875,
+              "width": 640,
+              "height": 378.015625
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 768,
+          "height": 1024,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 768,
+              "height": 1024
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 768,
+              "height": 960,
+              "bottom": 1024
+            },
+            "projection": {
+              "x": 0,
+              "y": 423.5,
+              "width": 768,
+              "height": 460,
+              "bottom": 883.5
+            },
+            "docHead": {
+              "x": 108.5234375,
+              "y": 514.890625,
+              "width": 550.953125,
+              "height": 58,
+              "bottom": 572.890625
+            },
+            "docPlane": {
+              "x": 107.5234375,
+              "y": 513.890625,
+              "width": 552.953125,
+              "height": 300,
+              "bottom": 813.890625
+            },
+            "docFile": {
+              "x": 460.6640625,
+              "y": 532.890625,
+              "width": 172.8125,
+              "height": 21,
+              "bottom": 553.890625
+            },
+            "scrollCue": {
+              "x": 333.328125,
+              "y": 953.859375,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 988
+            },
+            "fit": {
+              "x": 0,
+              "y": 1097,
+              "width": 768,
+              "height": 941.859375,
+              "bottom": 2038.859375
+            },
+            "lens": {
+              "x": 18,
+              "y": 1277.1875,
+              "width": 732,
+              "height": 651.671875,
+              "bottom": 1928.859375
+            },
+            "trace": {
+              "x": 32,
+              "y": 2220.046875,
+              "width": 704,
+              "height": 859.09375,
+              "bottom": 3079.140625
+            },
+            "delivery": {
+              "x": 18,
+              "y": 3440.328125,
+              "width": 732,
+              "height": 410,
+              "bottom": 3850.328125
+            },
+            "moment": {
+              "x": 18,
+              "y": 4501.140625,
+              "width": 732,
+              "height": 449.125,
+              "bottom": 4950.265625
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 32,
+              "y": 365.046875,
+              "width": 704,
+              "height": 859.09375
+            },
+            "teacher": {
+              "x": 32,
+              "y": 365.046875,
+              "width": 704,
+              "height": 859.09375
+            }
+          },
+          "errors": []
+        },
+        {
+          "width": 1280,
+          "height": 900,
+          "initial": {
+            "overflow": false,
+            "viewport": {
+              "width": 1280,
+              "height": 900
+            },
+            "hero": {
+              "x": 0,
+              "y": 64,
+              "width": 1280,
+              "height": 944.03125,
+              "bottom": 1008.03125
+            },
+            "projection": {
+              "x": 0,
+              "y": 431.75,
+              "width": 1280,
+              "height": 460,
+              "bottom": 891.75
+            },
+            "docHead": {
+              "x": 221,
+              "y": 523.140625,
+              "width": 838,
+              "height": 58,
+              "bottom": 581.140625
+            },
+            "docPlane": {
+              "x": 220,
+              "y": 522.140625,
+              "width": 840,
+              "height": 300,
+              "bottom": 822.140625
+            },
+            "docFile": {
+              "x": 860.1875,
+              "y": 541.140625,
+              "width": 172.8125,
+              "height": 21,
+              "bottom": 562.140625
+            },
+            "scrollCue": {
+              "x": 589.328125,
+              "y": 937.890625,
+              "width": 101.328125,
+              "height": 34.140625,
+              "bottom": 972.03125
+            },
+            "fit": {
+              "x": 0,
+              "y": 1081.03125,
+              "width": 1280,
+              "height": 1050.453125,
+              "bottom": 2131.484375
+            },
+            "lens": {
+              "x": 140,
+              "y": 1275.03125,
+              "width": 1000,
+              "height": 746.453125,
+              "bottom": 2021.484375
+            },
+            "trace": {
+              "x": 378,
+              "y": 2232.484375,
+              "width": 822,
+              "height": 859.09375,
+              "bottom": 3091.578125
+            },
+            "delivery": {
+              "x": 80,
+              "y": 3466.578125,
+              "width": 1120,
+              "height": 410,
+              "bottom": 3876.578125
+            },
+            "moment": {
+              "x": 210,
+              "y": 4541.203125,
+              "width": 860,
+              "height": 449.125,
+              "bottom": 4990.328125
+            }
+          },
+          "expanded": {
+            "evidence": {
+              "x": 378,
+              "y": 302.484375,
+              "width": 822,
+              "height": 859.09375
+            },
+            "teacher": {
+              "x": 378,
+              "y": 302.484375,
+              "width": 822,
+              "height": 859.09375
+            }
+          },
+          "errors": []
+        }
+      ]
+    }
+  },
+  "screenshots": {
+    "home-1280-900-opening.png": "860fe516e3be71812238c71a16db2b71cefad507d1c99e8bc965dd684a971569",
+    "home-320-667-fit.png": "8123ee4e11b49fa287bccc7f34c68eded2fe78de355464d24e4b867324b24b57",
+    "home-390-844-connect.png": "ee33c8d699f9eccc7ce5e552e759f9e4a2c49bd822b9a017bef975228795829d",
+    "home-390-844-opening.png": "041cbcc7c5b37be5952ac3e283476389b53e8f19aee30e6ea512ecf16c9d19ea",
+    "home-390-844-proof.png": "09328f7e0eaffeee7163279f83e63c9f3d892131478f89b87c110cf16c0ffa7c",
+    "home-844-390-proof.png": "3aa6bdd1bcccedd7013ebf2e91cddcccdf27cd8b20fa81dbb8a6d8e4776cedc7"
+  },
+  "independentReview": {
+    "receipt": "independent-review.json",
+    "sourceSHA": "10e5b078b5cc3c0fe9e0246b344842046557846c",
+    "verdict": "No remaining blocking source or visual defect found after landscape row correction."
+  },
+  "testHistory": {
+    "initial": "    Error Context: ..\\..\\Users\\haya0\\Documents\\Codex\\2026-10-13\\lu\\work\\home-mobile-test-results\\home-mobile-200-percent-te-a34a9-t-shrinking-the-mobile-page-chromium\\error-context.md\n\n  3 failed\n    [chromium] › e2e\\home-mobile.spec.ts:84:1 › phone compositions keep real selection, readable diagrams and reachable touch targets \n    [chromium] › e2e\\home-mobile.spec.ts:132:1 › portrait and landscape reflow preserve chosen facts, native disclosures and keyboard focus \n    [chromium] › e2e\\home-mobile.spec.ts:162:1 › 200 percent text-only resizing retains controls, selected labels and complete evidence without shrinking the mobile page \n  12 passed (35.4s)",
+    "repaired": "  ok 13 [chromium] › e2e\\home-motion.spec.ts:94:1 › inheritance comparison draws a moving old and current route, then honors reduced motion and offscreen pause (1.5s)\n  ok 15 [chromium] › e2e\\home-motion.spec.ts:174:1 › hiding the document cancels the package and inheritance replays without continuing background movement (685ms)\n  ok 14 [chromium] › e2e\\home-motion.spec.ts:138:1 › delivery distinguishes reference wiring from inline copies and halts active scenes when the document is hidden (1.9s)\n\n  15 passed (11.6s)",
+    "corrections": [
+      "44px lesson-picker targets",
+      "Native See-it-work accessible label in rotation fixture",
+      "Actual chapter navigation and selection min-content enlarged-text overflow",
+      "Full exact selected-value wrapping readout when a native select cannot wrap",
+      "Content-sized phone inspector with stable selected tab screen position; desktop height assertion retained",
+      "Landscape grid metadata pinned to its content rather than stretched to illustration height"
+    ]
+  },
+  "preserved": [
+    "Owner desktop angle change PR114",
+    "Generated claims, numeric teacher identity and agent-draft labels",
+    "Exact benchmark excerpts, records and evidence requirements",
+    "Unknown measurements and partial coverage",
+    "Conditional wiring, privacy and existing URLs",
+    "Finite motion, no-JavaScript fallback, reduced-motion and hidden/offscreen cancellation"
+  ],
+  "limits": [
+    "Chromium viewport and simulated text-only resizing are not real iOS/Safari or Android browser-chrome proof",
+    "No real-device GPU/frame-rate measurement",
+    "No comprehension or conversion measurement",
+    "Illustrations are not live sync, evidence runs or model calls"
+  ],
+  "release": {
+    "state": "Local verified; PR/CI/public verification pending"
+  }
+}

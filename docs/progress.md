@@ -1,5 +1,12 @@
 # Progress
 
+### 2026-10-15: Home composed for phones
+
+- Built: phone-specific proportions for the visual opening, package selection, content-sized lesson inspector, native animated file delivery and recorded comparison controls. Short landscape shows the configuration comparison beside its metadata. The shared phone header wraps and exposes larger touch controls. Retained the independently merged desktop angle correction in #114.
+- Preserved: exact package/model selection, unknown measurement handling, generated claims, teacher and agent-draft attribution, recorded answers, conditional wiring, scopes, partial coverage, privacy, URLs and motion termination. No dependency or protected path changed.
+- Review: corrected actual enlarged-text overflow in chapter navigation and selection counts, enlarged small lesson targets/annotations, retained full selected values when native controls cannot wrap, and removed stretched landscape metadata rows that pushed attribution below the comparison.
+- Measured checks and source/capture receipts: `docs/site/2026-10-15-home-mobile.md` and `docs/bench/2026-10-15-home-mobile/validation.json`. Publication proceeds through its own unprotected PR, current-head green CI and deploy.yml; local checks alone do not establish publication.
+
 ### 2026-10-14: Less home copy, more graphic motion
 
 - Built: actual-selection paper routes, animated configuration branching and finite Three.js context delivery. Repeated explanatory headings were deleted; literal claims and wiring moved into native disclosures. The approved opening, attribution, draft labels, evidence/date scopes, coverage, privacy and URLs remain.

@@ -90,6 +90,12 @@ The owner's decision on who revises (a spending question that `docs/bench/2026-1
 - **Lessons already kept for a PR** (`kept.json`) are left out of later rounds and never written twice; `lessons` adds the new ones to `kept.json` with their round.
 - Replaces, in "Spending": revising on Sonnet, and the per-lesson review on Sonnet.
 
+### 2026-10-13: A fix made after a review is reviewed again; wrangler 4.113.0#10 retracted
+
+- **What happened.** #84 asked for one Opus review round. It found that wrangler 4.113.0#10 (`01M4RAVZ6AW3ZB9PASXP4454AY`, `deploy` provisioning header) covered only the label half of the change, and the lesson's detail was rewritten to lead with "now that automatic provisioning is generally available". That rewrite was not reviewed, and the owner merged #84 with it. A fresh Opus review of the merged lesson (2026-10-13) says **DROP**: the upstream PR (workers-sdk 14744) "only removes an 'Experimental:' label from CLI output", so no `kind` can honestly say "changed what `deploy` does", and the rewrite made the misleading reading the main message (provisioning has been on by default since wrangler 4.45.0, so "was it experimental before 4.113.0?" gets a wrong answer). The tests do tell the two versions apart, but they prove only that a string changed.
+- **Decision.** The lesson is retracted by deleting its file (CLAUDE.md: "retract by deleting the file"), with its search questions. It is not replaced: a `replaces` lesson would have to claim a different fact, and one unreviewed claim doesn't correct another. Better targets the review named, to go through the pipeline as new lessons: 4.113.0's #13352 (Queue, Dispatch Namespace and Flagship bindings may omit the resource name and are provisioned on deploy) and the 4.45.0 change that turned provisioning on by default.
+- **Rule from it.** A rewrite made after the one review round is reviewed again, by the same reviewer, before the PR is merged; if there is no budget for that, the lesson is left out of the PR. "Fixed" in a PR comment without a second review is not "reviewed".
+
 ### 2026-10-12: Who works on what
 
 - At the owner's request: Codex works on security, audits, and the benchmark (`tools/bench`, FreshBench, the C tasks); Claude Code on the seed pipeline (`tools/seed`), lessons, the site, and publishing (npm, the plugin). When a change needs files the other side is changing, the owner hears about it before the work starts. `docs/decisions.md` and `docs/progress.md` are shared, and each side adds its own sections.

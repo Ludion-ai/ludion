@@ -1,0 +1,120 @@
+{
+  "checkedAt": "2026-10-14T06:02:19.354Z",
+  "baseCommit": "d3ff5efe38f3c5108007896bc1723b71f3174fd7",
+  "sourceSHA256": {
+    "apps/site/src/build/project-lens.ts": "27cbf9cd9305d9e9379ccae1484dc96e7dbbdc2da58191f302cbe99d59edb20f",
+    "apps/site/src/components/ProjectLens.astro": "49c639d15ca0f11029884840cc9c2be4e75fc7e4be5d7e21d9b1f9a2f5fd0146",
+    "apps/site/src/components/LessonTrace.astro": "dde1857bb8842e1bab9b346504d7ecb3543084922259e1ea7bcbd1f4e24e2588",
+    "apps/site/src/components/DeliveryScene.astro": "da250bfd423f10034700bd55222222c5219882ba7dc3ed99b8274d03f2e4f233",
+    "apps/site/src/pages/index.astro": "1737685811a1f18f67711d24889291d2b6a30fde9ba01efbd518820e8b8781ed",
+    "apps/site/src/layouts/Base.astro": "2f14e59f204c230bb191335ddd764ba2efd3654229b667ac69e08bdec56c2dcc",
+    "apps/site/src/strings/en.ts": "83d97db466efc26b12eb1d01343459d2335e44d84847f314af21e0494d22cc54",
+    "apps/site/package.json": "06e6f2890a5677a401a013ad03be004451a8faa8a5638b8751323e0ccae8bff3",
+    "package-lock.json": "e43baf9fe96c5db87c9129358e395f13334809248566f8f8eeb7ed50fa12ec27",
+    "apps/site/test/project-lens.test.ts": "cf6c75e6f507833a3e7b54ecf634a4f9dd0c88436648e07093735c380d1f5694",
+    "e2e/home-benefits.spec.ts": "18afa3b000b1bb9a9e93508726febd50f38125cae31f747a4ffa99a2d8931cc1",
+    "apps/site/src/components/ContextStage.astro": "38033604311ea55ae2d78b865c0c5d8499730aa93f927a2056d9f10f366b9650",
+    "apps/site/src/components/RecordedMoment.astro": "28ed2948efb89f709fe89aab6c45f2e940950e17ccf179305b5b97d12ec6d3f1",
+    "apps/site/src/components/BrandMark.astro": "c852840aa5dd3746a0c217d152e63280615f593d8af456e29cd00f4e5b2eba76",
+    "apps/site/src/scripts/water.js": "562c48af9e4f11d925abb4443bc93f0c10414f5373d558bdbb65c128537814f8"
+  },
+  "localPreview": {
+    "status": 200,
+    "htmlSHA256": "144de981f7d6830737f569ccc1a2c871b030d3512bf43bddcbbcc1e6e8433c3f",
+    "matchesBuiltHTML": true
+  },
+  "checks": {
+    "build": {
+      "command": "npm run build",
+      "result": "\n14:57:05 [build] ✓ Completed in 1.38s.\n14:57:05 [build] 166 page(s) built in 1.76s\n14:57:05 [build] Complete!\n[ludion] Share cards: dist\\bench\\og\\claude-haiku-5-5.png, dist\\bench\\og\\claude-opus-5-5.png, dist\\bench\\og\\claude-sonnet-5-5.png"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "result": "> typecheck\n> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json"
+    },
+    "unit": {
+      "command": "npm test",
+      "result": "  error messages and mixed Japanese: 12/12 found the right lesson (needs all)\n\n Test Files  28 passed (28)\n      Tests  459 passed (459)\n   Start at  10:35:48\n   Duration  6.03s (transform 7.02s, setup 0ms, import 12.58s, tests 14.57s, environment 2ms)"
+    },
+    "e2e": {
+      "command": "npm run test:e2e -- --workers=2",
+      "result": "  ok 32 [chromium] › e2e\\water.spec.ts:167:1 › the home page's JavaScript stays within 60 KB gzipped (918ms)\n\n  1 skipped\n  31 passed (2.3m)"
+    },
+    "jsBudget": "Home JavaScript: 8 file(s), 33.1 KB gzipped",
+    "screenshots": {
+      "command": "SCREENSHOTS_DIR=<output> npm run test:e2e -- screenshots.spec.ts --workers=1",
+      "result": "  ok 1 [chromium] › e2e\\screenshots.spec.ts:13:1 › capture actual pages at mobile and desktop widths in both themes (48.9s)\n\n  1 passed (49.4s)"
+    },
+    "samples": {
+      "build": "10:38:37 [build] ✓ Completed in 834ms.\n10:38:37 [build] 130 page(s) built in 921ms\n10:38:37 [build] Complete!",
+      "axe": "\n  1 skipped\n  2 passed (33.7s)"
+    },
+    "advancedStates": {
+      "count": 24,
+      "violations": 0
+    }
+  },
+  "normalMotionCaptures": {
+    "capturedAt": "2026-10-14T05:58:19.775Z",
+    "baseURL": "http://127.0.0.1:8787/",
+    "results": [
+      {
+        "width": 320,
+        "colorScheme": "light",
+        "httpStatus": 200,
+        "errors": [],
+        "badAssets": [],
+        "overflow": false
+      },
+      {
+        "width": 320,
+        "colorScheme": "dark",
+        "httpStatus": 200,
+        "errors": [],
+        "badAssets": [],
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "colorScheme": "light",
+        "httpStatus": 200,
+        "errors": [],
+        "badAssets": [],
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "colorScheme": "dark",
+        "httpStatus": 200,
+        "errors": [],
+        "badAssets": [],
+        "overflow": false
+      },
+      {
+        "width": 1280,
+        "colorScheme": "light",
+        "httpStatus": 200,
+        "errors": [],
+        "badAssets": [],
+        "overflow": false
+      },
+      {
+        "width": 1280,
+        "colorScheme": "dark",
+        "httpStatus": 200,
+        "errors": [],
+        "badAssets": [],
+        "overflow": false
+      }
+    ]
+  },
+  "independentReview": {
+    "source": "No remaining blockers; actual selection, provenance, recorded scopes and conditional wiring retained.",
+    "visual": "Initial pruning, scene composition and projected file legibility findings addressed. Remaining metadata density and repeated claim context warrant visitor observation."
+  },
+  "limits": [
+    "Release requires green CI and the deploy workflow; local checks alone do not prove publication.",
+    "Real-device GPU, comprehension, conversion and competitive animation quality have not been measured.",
+    "Existing audit findings from two pre-existing advisories remain; no affected MCP OAuth client path or Sharp found in the reviewed Worker runtime path."
+  ]
+}

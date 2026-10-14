@@ -3,6 +3,10 @@
 import Base from "../layouts/Base.astro";
 import RecordedMoment from "../components/RecordedMoment.astro";
 import ContextStage from "../components/ContextStage.astro";
+import ProjectLens from "../components/ProjectLens.astro";
+import LessonTrace from "../components/LessonTrace.astro";
+import DeliveryScene from "../components/DeliveryScene.astro";
+import BrandMark from "../components/BrandMark.astro";
 import { en } from "../strings/en.ts";
 ---
 
@@ -19,13 +23,30 @@ import { en } from "../strings/en.ts";
       </div>
     </div>
     <div class="scene"><span class="horizon" data-water-surface aria-hidden="true"></span><ContextStage /></div>
-    <a class="scroll-cue" href="#in-context">{en.home.scroll}<span aria-hidden="true"> ↓</span></a>
+    <a class="scroll-cue" href="#fit">{en.home.scroll}<span aria-hidden="true"> ↓</span></a>
   </section>
+  <div class="home-story">
+    <nav class="story-nav" aria-label={en.home.chapters.label}><span class="story-brand" aria-hidden="true"><BrandMark size={15}/></span>{[{id:"fit",label:en.home.chapters.fit},{id:"proof",label:en.home.chapters.proof},{id:"connect",label:en.home.chapters.delivery},{id:"in-context",label:en.home.chapters.result}].map(({id,label})=><a href={`#${id}`} data-story-link={id}>{label}</a>)}</nav>
+    <section class="story-scene" id="fit" aria-labelledby="fit-heading">
+      <div class="section-intro wrap"><span class="eyebrow">{en.home.fit.eyebrow}</span><h2 id="fit-heading">{en.home.fit.title}</h2><p>{en.home.fit.sub}</p></div>
+      <ProjectLens copy={en.home.lens}/>
+    </section>
+    <section class="story-scene story-scene--split" id="proof" aria-labelledby="proof-heading">
+      <div class="proof-layout">
+      <div class="section-intro wrap"><span class="eyebrow">{en.home.proof.eyebrow}</span><h2 id="proof-heading">{en.home.proof.title}</h2><p>{en.home.proof.sub}</p></div>
+      <LessonTrace copy={en.home.trace}/>
+      </div>
+    </section>
+    <section class="story-scene" id="connect" aria-labelledby="connect-heading">
+      <div class="section-intro wrap"><span class="eyebrow">{en.home.connection.eyebrow}</span><h2 id="connect-heading">{en.home.connection.title}</h2><p>{en.home.connection.sub}</p></div>
+      <DeliveryScene/>
+    </section>
   <section class="recorded-scene" id="in-context" aria-labelledby="recorded-heading">
     <div class="section-intro wrap"><span class="eyebrow">{en.home.recorded.eyebrow}</span><h2 id="recorded-heading">{en.home.recorded.title}</h2><p>{en.home.recorded.sub}</p></div>
     <RecordedMoment />
     <p class="coverage" id="recent"><a href="/lessons/">{en.home.coverage}</a></p>
   </section>
+  </div>
   <section class="closing-scene wrap" aria-labelledby="closing-heading">
     <p class="eyebrow">{en.home.closing.eyebrow}</p><h2 id="closing-heading">{en.home.closing.title}</h2>
     <a class="start" href="/start/">{en.home.closing.action}<span aria-hidden="true"> ↗</span></a>
@@ -40,7 +61,15 @@ import { en } from "../strings/en.ts";
       observer.unobserve(entry.target);
     }
   }, {threshold:.15});
-  for (const scene of document.querySelectorAll(".recorded-scene, .closing-scene")) observer.observe(scene);
+  const scenes = document.querySelectorAll(".story-scene, .recorded-scene, .closing-scene");
+  for (const scene of scenes) observer.observe(scene);
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-story-link]")];
+  const chapters = new IntersectionObserver(entries=>{
+    for(const entry of entries) if(entry.isIntersecting) for(const link of links) {
+      if(link.dataset.storyLink === entry.target.id) link.setAttribute("aria-current","location"); else link.removeAttribute("aria-current");
+    }
+  },{rootMargin:"-10% 0px -60% 0px"});
+  for(const scene of document.querySelectorAll(".story-scene, .recorded-scene")) chapters.observe(scene);
 </script>
 
 <style>
@@ -92,6 +121,19 @@ import { en } from "../strings/en.ts";
   .proof { padding: 10px 0; font-size: 14px; text-decoration: none; }
   .proof:hover { text-decoration: underline; }
   .scroll-cue { justify-self:center; color:var(--muted); font-size:11px; text-decoration:none; padding:8px; }
+  .home-story { padding-top:22px; border-top:1px solid var(--rule); background:var(--paper); }
+  .story-nav { display:flex; align-items:center; justify-content:center; gap:4px; position:sticky; z-index:5; top:16px; width:max-content; max-width:calc(100% - 36px); margin:0 auto; padding:4px 6px; border:1px solid var(--rule); border-radius:999px; background:color-mix(in srgb,var(--paper) 92%,transparent); backdrop-filter:blur(12px); box-shadow:0 7px 24px rgb(0 0 0 / .035); }
+  .story-brand { padding-inline:10px; color:var(--ink); line-height:1; }
+  .story-nav a { padding:10px 16px; min-height:40px; font-size:12px; color:var(--muted); text-decoration:none; border-radius:999px; }
+  .story-nav a[aria-current] { background:var(--paper-2); color:var(--ink); }
+  .story-scene { padding-block:100px 110px; text-align:center; scroll-margin-top:40px; }
+  .story-scene + .story-scene { border-top:1px solid var(--rule); }
+  @media (min-width:1100px) {
+    .proof-layout { display:grid; grid-template-columns:250px minmax(0,1fr); align-items:start; gap:48px; width:min(100% - 72px,1120px); margin:auto; }
+    .story-scene--split .section-intro { width:auto; margin:50px 0 0; text-align:left; }
+    .story-scene--split .section-intro p { margin-inline:0; }
+    .proof-layout :global(.lesson-trace) { width:100%; }
+  }
   .recorded-scene { padding-block:140px 120px; text-align:center; border-top:1px solid var(--rule); background:var(--paper); scroll-margin-top:40px; }
   .section-intro { margin-bottom:48px; }
   .eyebrow { display:block; font-size:11px; color:var(--muted); margin:0 0 20px; }
@@ -112,5 +154,8 @@ import { en } from "../strings/en.ts";
     .recorded-scene { padding-block:86px 80px; }
     .section-intro { margin-bottom:32px; }
     .closing-scene { padding-block:80px; }
+    .story-scene { padding-block:76px 80px; }
+    .story-brand { display:none; }
+    .story-nav a { padding-inline:12px; font-size:11px; }
   }
 </style>

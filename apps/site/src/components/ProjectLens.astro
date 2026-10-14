@@ -1,0 +1,204 @@
+---
+import Claim from "./Claim.astro";
+import BrandMark from "./BrandMark.astro";
+import Signature from "./Signature.astro";
+import { siteData } from "../build/data.ts";
+import { LENS_PROJECTS, projectLens } from "../build/project-lens.ts";
+import { formatDate } from "../strings/en.ts";
+
+interface Props {
+  copy: {
+    title: string;
+    project: string;
+    model: string;
+    noModel: string;
+    available: string;
+    matching: string;
+    included: string;
+    pruned: string;
+    unmeasured: string;
+    preview: (shown: number, matched: number) => string;
+    status: (included: number, pruned: number) => string;
+    lessonSelection: string;
+    measuredMiss: string;
+    measuredKnown: string;
+    notMeasured: string;
+    inContext: string;
+    leftOut: string;
+    evidence: string;
+    subject: string;
+    empty: string;
+    scope: string;
+    measurement: string;
+    coverage: string;
+  };
+}
+const { copy: s } = Astro.props;
+const data = await siteData();
+const lens = projectLens(data.index, data.models);
+---
+
+<figure class="lens" data-project-lens>
+  <figcaption class="lens-title"><span class="app-mark"><BrandMark size={16} /></span><span>{s.title}</span><code>.ludion/lessons.md</code></figcaption>
+  <div class="workspace">
+    <aside class="inputs">
+      <div class="static-project" data-lens-static><code>vitest <b>5.0.3</b></code><span>{lens.models.find((model) => model.id === lens.defaultModel)?.name || s.noModel}</span></div>
+      <div class="inputs-controls" hidden>
+        <label>{s.project}<select data-lens-project>{LENS_PROJECTS.map((project) => <option value={project.id} selected={project.id === lens.defaultProject}>{project.name} {project.version}</option>)}</select></label>
+        <label>{s.model}<select data-lens-model>{lens.models.map((model) => <option value={model.id} selected={model.id === lens.defaultModel}>{model.name || s.noModel}</option>)}</select></label>
+      </div>
+      <div class="lockfile" aria-hidden="true"><span>package-lock.json</span><div><i>"version"</i><span data-lens-version>"5.0.3"</span></div></div>
+      <div class="filter-route" aria-hidden="true"><span></span><i></i><span></span><i></i><span class="route-context"></span></div>
+    </aside>
+    <div class="readout">
+      {lens.cases.map((item) => {
+        const defaultCase = item.project.id === lens.defaultProject && item.model === lens.defaultModel;
+        return <div class="lens-case" data-lens-case data-project={item.project.id} data-version={item.project.version} data-model={item.model} data-announcement={s.status(item.included, item.pruned)} hidden={!defaultCase}>
+          <div class="selection-flow">
+            <div><b>{item.total}</b><span>{s.available}</span></div><span class="flow-arrow" aria-hidden="true">→</span>
+            <div><b>{item.matched}</b><span>{s.matching}</span></div><span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="included-count"><b>{item.included}</b><span>{s.included}</span></div>
+          </div>
+          <p class="selection-note"><span>{item.pruned} {s.pruned}</span><span>{item.unmeasured} {s.unmeasured}</span></p>
+          {item.preview.length ? <>
+            <div class="lesson-picker" role="group" aria-label={s.lessonSelection} hidden>{item.preview.map((lesson, i) => <button type="button" data-lens-select={lesson.entry.id} aria-pressed={i === 0 ? "true" : "false"} class:list={[{ excluded: !lesson.included }]}><code>{lesson.entry.symbol}</code>{!lesson.included && <><span class="left-out" aria-hidden="true">−</span><span class="visually-hidden"> · {s.leftOut}</span></>}</button>)}</div>
+            <div class="lesson-panels">
+              {item.preview.map((lesson, i) => <details class="lesson-panel" data-lens-lesson={lesson.entry.id} open={i === 0}>
+                <summary><code>{lesson.entry.symbol}</code></summary>
+                <div class="lesson-body">
+                  <p class="lesson-state"><span>{lesson.included ? s.inContext : s.leftOut}</span><code>{lesson.entry.version}</code></p>
+                  <p class="generated-claim"><Claim text={lesson.entry.claim} /></p>
+                  <div class="lesson-provenance"><Signature teacher={lesson.entry.teacher} teacherId={lesson.entry.teacher_id} teacherHref={data.teacherHref(lesson.entry.teacher_id)} verifiedBy={lesson.entry.verified_by} verifiedAt={lesson.entry.verified_at} drafted={lesson.entry.drafted_by === "agent"} compact /></div>
+                  <div class="lesson-footer"><span class:list={["verdict", { known: lesson.verdict === "knows" }]}>{lesson.verdict === "knows" ? s.measuredKnown : lesson.verdict === "misses" ? s.measuredMiss : s.notMeasured}</span><a href={`/lessons/${lesson.entry.id}/`}>{s.evidence}<span aria-hidden="true"> ↗</span></a></div>
+                </div>
+              </details>)}
+            </div>
+            <p class="preview-scope">{s.preview(item.preview.length, item.matched)} <a href={`/${item.project.name}/`}>{s.subject}<span aria-hidden="true"> ↗</span></a></p>
+          </> : <p class="empty">{s.empty}</p>}
+        </div>;
+      })}
+    </div>
+  </div>
+  <span class="visually-hidden" role="status" data-lens-status></span>
+  <p class="lens-scope">{s.scope} <a href="/lessons/">{s.coverage}</a>{lens.measuredAt && <><br /><a href="/bench/method/">{s.measurement} · {formatDate(lens.measuredAt)}</a></>}</p>
+</figure>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>("[data-project-lens]")) {
+    const project = root.querySelector<HTMLSelectElement>("[data-lens-project]")!;
+    const model = root.querySelector<HTMLSelectElement>("[data-lens-model]")!;
+    const cases = Array.from(root.querySelectorAll<HTMLElement>("[data-lens-case]"));
+    root.classList.add("interactive");
+    root.querySelector<HTMLElement>(".inputs-controls")!.hidden = false;
+    root.querySelector<HTMLElement>("[data-lens-static]")!.hidden = true;
+    for (const item of cases) {
+      const picker = item.querySelector<HTMLElement>(".lesson-picker");
+      if (!picker) continue;
+      picker.hidden = false;
+      const panels = Array.from(item.querySelectorAll<HTMLDetailsElement>("[data-lens-lesson]"));
+      const choose = (id: string) => {
+        for (const panel of panels) { panel.open = true; panel.hidden = panel.dataset.lensLesson !== id; }
+        for (const button of picker.querySelectorAll<HTMLButtonElement>("[data-lens-select]")) button.setAttribute("aria-pressed", String(button.dataset.lensSelect === id));
+      };
+      choose(panels[0]!.dataset.lensLesson!);
+      for (const button of picker.querySelectorAll<HTMLButtonElement>("[data-lens-select]")) button.addEventListener("click", () => choose(button.dataset.lensSelect!));
+    }
+    const chooseCase = () => {
+      const current = cases.find((item) => item.dataset.project === project.value && item.dataset.model === model.value);
+      if (!current) return;
+      for (const item of cases) item.hidden = item !== current;
+      root.querySelector<HTMLElement>("[data-lens-version]")!.textContent = `"${current.dataset.version}"`;
+      root.querySelector<HTMLElement>("[data-lens-status]")!.textContent = current.dataset.announcement!;
+    };
+    project.addEventListener("change", chooseCase);
+    model.addEventListener("change", chooseCase);
+  }
+</script>
+
+<style>
+  .lens { width:min(100% - 36px,1000px); margin:0 auto; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--paper); color:var(--text); text-align:left; box-shadow:0 24px 80px -56px var(--bloom); }
+  .lens-title { display:flex; align-items:center; gap:12px; padding:15px 22px; border-bottom:1px solid var(--rule); color:var(--muted); font-size:12px; }
+  .app-mark { color:var(--ink); font-size:16px; line-height:1; }
+  .lens-title code { margin-left:auto; font-size:11px; }
+  .workspace { display:grid; grid-template-columns:240px minmax(0,1fr); }
+  .inputs { min-width:0; padding:30px 24px; background:var(--paper-2); border-right:1px solid var(--rule); }
+  .inputs-controls { display:grid; gap:28px; }
+  .inputs-controls[hidden],.static-project[hidden] { display:none; }
+  label { display:grid; gap:9px; color:var(--muted); font-size:11px; }
+  select { appearance:auto; width:100%; min-width:0; min-height:44px; padding:9px 8px; border:1px solid var(--rule); border-radius:5px; background:var(--paper); color:var(--ink); font:inherit; font-size:12px; cursor:pointer; }
+  .static-project { display:grid; gap:16px; font-size:12px; }
+  .static-project code { font-size:14px; }
+  .static-project span { color:var(--muted); }
+  .lockfile { margin-top:46px; font-family:var(--font-code); font-size:10px; color:var(--muted); }
+  .lockfile > span { display:block; margin-bottom:13px; }
+  .lockfile > div { display:flex; justify-content:space-between; padding-block:10px; border-block:1px solid var(--rule); }
+  .lockfile i { font-style:normal; }
+  .lockfile div span { color:var(--ink); }
+  .filter-route { display:flex; align-items:center; margin-top:34px; }
+  .filter-route > span { height:6px; width:6px; border-radius:50%; border:1px solid var(--muted); }
+  .filter-route .route-context { border-radius:1px; width:13px; height:17px; background:var(--ink); border-color:var(--ink); }
+  .filter-route i { height:1px; flex:1; background:var(--rule); }
+  .readout { min-width:0; padding:26px 30px 22px; }
+  .lens-case[hidden] { display:none; }
+  .interactive .readout { display:grid; }
+  .interactive .lens-case { grid-area:1 / 1; }
+  .interactive .lens-case[hidden] { display:block; visibility:hidden; }
+  .selection-flow { display:grid; grid-template-columns:1fr 20px 1fr 20px 1fr; align-items:center; gap:8px; margin-bottom:16px; }
+  .selection-flow div { display:grid; gap:4px; }
+  .selection-flow b { font-size:28px; font-weight:450; letter-spacing:-.05em; line-height:1.1; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .selection-flow span { font-size:10px; color:var(--muted); }
+  .selection-flow .flow-arrow { font-size:14px; }
+  .selection-note { display:flex; flex-wrap:wrap; gap:6px 18px; margin:0 0 27px; color:var(--muted); font-size:10px; }
+  .lesson-picker { display:flex; flex-wrap:wrap; gap:5px; border-block:1px solid var(--rule); padding:9px 0; }
+  .lesson-picker[hidden] { display:none; }
+  button { display:flex; align-items:center; gap:6px; min-height:38px; padding:8px 10px; border:0; border-radius:4px; color:var(--muted); background:transparent; cursor:pointer; }
+  button code { font-size:11px; overflow-wrap:anywhere; }
+  button[aria-pressed="true"] { color:var(--ink); background:var(--paper-2); }
+  .left-out { font-size:13px; }
+  .lesson-panels { display:grid; }
+  .lesson-panel { min-width:0; }
+  .lesson-panel summary { cursor:pointer; padding:16px 0; border-top:1px solid var(--rule); }
+  .lesson-panel summary code { font-size:12px; }
+  .interactive .lesson-panel { grid-area:1 / 1; }
+  .interactive .lesson-panel summary { display:none; }
+  .lesson-panel[hidden] { display:none; }
+  .interactive .lesson-panel[hidden] { display:block; visibility:hidden; }
+  .lesson-body { padding:23px 0 0; }
+  .lesson-state { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin:0 0 17px; color:var(--muted); font-size:10px; }
+  .lesson-state code { font-size:10px; }
+  .generated-claim { margin:0 0 22px; font-size:17px; line-height:1.6; letter-spacing:-.015em; color:var(--ink); overflow-wrap:anywhere; }
+  .lesson-provenance :global(.signature) { font-size:10px; gap:5px 10px; }
+  .lesson-provenance :global(.by) { font-size:11px; font-weight:450; }
+  .lesson-provenance :global(.drafted) { font-size:10px; }
+  .lesson-footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; margin-top:20px; color:var(--muted); font-size:10px; }
+  .verdict { padding-left:11px; position:relative; }
+  .verdict::before { position:absolute; left:0; top:.7em; width:4px; height:4px; border:1px solid var(--muted); border-radius:50%; content:""; }
+  .verdict.known::before { background:var(--muted); }
+  .lesson-footer a,.preview-scope a,.lens-scope a { color:inherit; }
+  .preview-scope { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin:25px 0 0; padding-top:14px; border-top:1px solid var(--rule); font-size:10px; color:var(--muted); }
+  .empty { margin:35px 0; font-size:14px; color:var(--muted); }
+  .lens-scope { margin:0; padding:15px 22px; border-top:1px solid var(--rule); color:var(--muted); font-size:10px; line-height:1.8; }
+  .lens-scope a { display:inline-block; min-height:24px; padding-block:3px; }
+  .interactive .lens-case:not([hidden]) .included-count b { animation:count-arrive 340ms ease-out both; }
+  .interactive .lesson-panel:not([hidden]) .lesson-body { animation:lesson-arrive 260ms ease-out both; }
+  @keyframes count-arrive { from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:none} }
+  @keyframes lesson-arrive { from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none} }
+  @media(max-width:700px) {
+    .workspace { grid-template-columns:minmax(0,1fr); }
+    .inputs { padding:17px 18px; border-right:0; border-bottom:1px solid var(--rule); }
+    .inputs-controls { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .static-project { display:flex; flex-wrap:wrap; gap:12px; }
+    .lockfile,.filter-route { display:none; }
+    .readout { padding:24px 20px 20px; }
+    .lens-title { flex-wrap:wrap; padding:13px 18px; gap:7px; }
+    .lens-title code { margin-left:auto; font-size:9px; }
+    .selection-flow { gap:5px; grid-template-columns:1fr 14px 1fr 14px 1fr; }
+    .selection-flow b { font-size:25px; }
+    .selection-flow span { font-size:9px; }
+    .selection-note { margin-bottom:20px; }
+    .generated-claim { font-size:15px; }
+    .lens-scope { padding-inline:18px; }
+  }
+  @media(max-width:400px) { .inputs-controls { grid-template-columns:minmax(0,1fr); gap:14px; } }
+  @media(prefers-reduced-motion:reduce) { .lens * { animation:none !important; transition:none !important; } }
+</style>

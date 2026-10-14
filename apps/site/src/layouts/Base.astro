@@ -139,7 +139,7 @@ const canonicalUrl = new URL(path, config.site).href;
     flex-direction: column;
     padding-top: 56px;
   }
-  main > :global(:last-child) {
+  body:not(.showcase) main > :global(:last-child) {
     padding-bottom: 96px;
   }
   .site-footer {
@@ -162,7 +162,6 @@ const canonicalUrl = new URL(path, config.site).href;
   }
   .showcase .site-header { border-bottom: 0; }
   .showcase main { padding-top: 0; }
-  .showcase main > :global(:last-child) { padding-bottom: 36px; }
   .showcase .foot { font-size: 12px; padding-block: 18px 24px; }
   @media (max-width: 400px) {
     .bar { gap: 16px; }

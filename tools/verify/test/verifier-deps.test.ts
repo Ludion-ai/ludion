@@ -49,23 +49,79 @@ function lockHash(dir: string): string {
   return createHash("sha256").update(readFileSync(join(dir, "package-lock.json"))).digest("hex");
 }
 
-function assertNoHostPaths(json: string, extras: string[] = []): void {
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** String keys and values in a serialized receipt. A non-JSON blob is one string. */
+function receiptStrings(json: string): string[] {
+  try {
+    const found: string[] = [];
+    const visit = (value: unknown): void => {
+      if (typeof value === "string") {
+        found.push(value);
+        return;
+      }
+      if (Array.isArray(value)) {
+        for (const item of value) visit(item);
+        return;
+      }
+      if (value !== null && typeof value === "object") {
+        for (const [key, item] of Object.entries(value)) {
+          found.push(key);
+          visit(item);
+        }
+      }
+    };
+    visit(JSON.parse(json));
+    return found;
+  } catch {
+    return [json];
+  }
+}
+
+function hostUsername(): string {
+  try {
+    return userInfo().username;
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Username is a path segment, not a substring. `node` must not match `node_version`
+ * or `node_modules`. `username` defaults to the host user; tests pass a fixed name.
+ */
+function assertNoHostPaths(json: string, extras: string[] = [], username = hostUsername()): void {
   expect(json).not.toMatch(/[A-Za-z]:[\\/]/);
   expect(json).not.toContain("\\");
   expect(json).not.toContain("/home/");
   expect(json).not.toContain("/Users/");
   const names = [tmpdir(), homedir(), process.cwd(), process.env.RUNNER_TEMP, ...extras];
-  try {
-    names.push(userInfo().username);
-  } catch {
-    // No username on this host.
-  }
   for (const value of names) {
     if (typeof value !== "string" || value.length === 0) continue;
     expect(json).not.toContain(value);
     expect(json).not.toContain(value.replaceAll("\\", "/"));
   }
+  if (username.length === 0) return;
+  const segment = new RegExp(`(^|[\\\\/])${escapeRegExp(username)}([\\\\/]|$)`, process.platform === "win32" ? "i" : "");
+  const needles = [`/home/${username}`, `\\Users\\${username}`, `/Users/${username}`];
+  for (const value of receiptStrings(json)) {
+    expect(value, value).not.toMatch(segment);
+    for (const needle of needles) expect(value, value).not.toContain(needle);
+  }
 }
+
+describe("assertNoHostPaths", () => {
+  it("flags the username only as a path segment", () => {
+    const receipt = (value: string) => JSON.stringify(value);
+    expect(() => assertNoHostPaths(receipt("node_version"), [], "node")).not.toThrow();
+    expect(() => assertNoHostPaths(receipt("/verifier/node_modules/vitest/vitest.mjs"), [], "node")).not.toThrow();
+    expect(() => assertNoHostPaths(receipt("/home/node/x"), [], "node")).toThrow();
+    expect(() => assertNoHostPaths(receipt("C:\\Users\\node\\x"), [], "node")).toThrow();
+    expect(() => assertNoHostPaths(receipt("/var/node/x"), [], "node")).toThrow();
+  });
+});
 
 describe("path containment", () => {
   it("counts a directory as inside itself, a child as inside, and a prefix sibling as outside", () => {

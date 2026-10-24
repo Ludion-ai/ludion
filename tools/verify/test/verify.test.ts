@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { formatLesson, type FetchFn, type LessonV0, type LessonV1 } from "@ludion/core";
-import { dockerArgs, imageFor, installArgs, interpretRun, type RunFn, type RunSpec } from "../src/docker.ts";
+import { dockerArgs, imageFor, IMAGE_DIGESTS, installArgs, interpretRun, resolveSandboxUser, type RunFn, type RunSpec } from "../src/docker.ts";
 import { compileLessonSchema } from "../src/base-schema.ts";
 import { collectLessonFiles } from "../src/files.ts";
 import { summaryLine, verifyLesson, type VerifyContext } from "../src/verify.ts";
@@ -215,13 +215,19 @@ describe("verifyLesson, format 1", () => {
 
 describe("docker", () => {
   it("isolates the run as docs/decisions.md says: network off, read-only, limits", () => {
+    const user = resolveSandboxUser(
+      typeof process.getuid === "function" ? process.getuid() : undefined,
+      typeof process.getgid === "function" ? process.getgid() : undefined,
+    );
     expect(dockerArgs("python", "n")).toEqual([
       "run", "--rm", "-i", "--name", "n",
-      "--network", "none", "--memory", "512m", "--cpus", "1", "--pids-limit", "128", "--read-only", "--tmpfs", "/tmp",
-      "python:3.14-slim", "python", "-",
+      "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--read-only",
+      "--memory", "512m", "--cpus", "1", "--pids-limit", "256", "--user", user, "--network", "none",
+      "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
+      `python:3.14-slim@${IMAGE_DIGESTS["python:3.14-slim"]}`, "python", "-",
     ]);
-    expect(dockerArgs("bash", "n").slice(-3)).toEqual(["python:3.14-slim", "bash", "-s"]);
-    expect(dockerArgs("node", "n").slice(-3)).toEqual(["node:24-slim", "node", "-"]);
+    expect(dockerArgs("bash", "n").slice(-3)).toEqual([`python:3.14-slim@${IMAGE_DIGESTS["python:3.14-slim"]}`, "bash", "-s"]);
+    expect(dockerArgs("node", "n").slice(-3)).toEqual([`node:24-slim@${IMAGE_DIGESTS["node:24-slim"]}`, "node", "-"]);
   });
 
   it("interprets exit codes, skip lines, and timeouts", () => {
@@ -239,8 +245,8 @@ describe("docker", () => {
 
 describe("docker, format 1", () => {
   it("maps runtimes to images", () => {
-    expect(imageFor("node@22")).toEqual({ image: "node:22-slim", command: ["node", "-"], language: "node" });
-    expect(imageFor("python@3.12")).toEqual({ image: "python:3.12-slim", command: ["python", "-"], language: "python" });
+    expect(imageFor("node@22")).toEqual({ image: `node:22-slim@${IMAGE_DIGESTS["node:22-slim"]}`, command: ["node", "-"], language: "node" });
+    expect(imageFor("python@3.12")).toEqual({ image: `python:3.12-slim@${IMAGE_DIGESTS["python:3.12-slim"]}`, command: ["python", "-"], language: "python" });
     expect(imageFor("ruby@3")).toBeUndefined();
   });
 
@@ -250,7 +256,7 @@ describe("docker, format 1", () => {
     expect(args[args.indexOf("--network") + 1]).toBe("none");
     expect(args).toContain("--read-only");
     expect(args.slice(args.indexOf("-v"), args.indexOf("-v") + 2)).toEqual(["-v", "/tmp/w:/w"]);
-    expect(args.slice(-3)).toEqual(["node:24-slim", "node", "-"]);
+    expect(args.slice(-3)).toEqual([`node:24-slim@${IMAGE_DIGESTS["node:24-slim"]}`, "node", "-"]);
   });
 
   it("installs packages with the network on but install scripts off, and never runs lesson code there", () => {

@@ -1,0 +1,72 @@
+# Required check "protected-paths".
+# Fails a PR that touches a protected path until an independent review has approved the PR's CURRENT head:
+# the PR must carry the "review-approved" label AND have a comment with a line "reviewed-sha: <head sha>".
+# A push changes the head SHA, so any earlier approval stops counting by itself; nothing has to be removed.
+#
+# Runs on pull_request_target so the workflow definition always comes from the base branch; a PR cannot
+# edit this file to pass itself. It never checks out or runs PR code: it only reads the API.
+# All agents push from the same GitHub account, so this is a process gate, not a technical one:
+# see docs/protected-paths.md for who may approve and how.
+name: protected-paths
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: protected-paths-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  protected-paths:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Check protected paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          LABEL: review-approved
+        run: |
+          set -euo pipefail
+          pattern='(^|/)(CLAUDE|AGENTS)\.md$|(^|/)\.cursorrules$|(^|/)CODEOWNERS$|^\.claude/|^\.cursor/|^\.github/|^tools/verify/|^lessons/|^packages/[^/]+/src/schema\.ts$|^packages/[^/]+/schema/|\.schema\.json$|^ludion\.config\.json$|^wrangler\.jsonc$|^docs/protected-paths\.md$'
+
+          # Read the head SHA live, not from the event payload, so a stale run cannot approve a newer head.
+          head=$(gh api "repos/${REPO}/pulls/${PR}" --jq '.head.sha')
+
+          files=$(gh api --paginate "repos/${REPO}/pulls/${PR}/files" \
+            --jq '.[] | .filename, (.previous_filename // empty)')
+          hits=$(printf '%s\n' "$files" | grep -E "$pattern" | sort -u || true)
+
+          if [ -z "$hits" ]; then
+            echo "No protected paths changed."
+            exit 0
+          fi
+
+          token="stop-$(date +%s%N)"
+          echo "::stop-commands::${token}"
+          echo "Protected paths changed:"
+          printf '%s\n' "$hits" | sed 's/^/  /'
+          echo "::${token}::"
+
+          has_label=$(gh api "repos/${REPO}/issues/${PR}/labels" --jq "[.[] | select(.name == \"${LABEL}\")] | length")
+          if [ "$has_label" = "0" ]; then
+            echo "::error::This PR changes protected paths. It needs an independent review and the \"${LABEL}\" label (docs/protected-paths.md)."
+            exit 1
+          fi
+
+          approved=$(gh api --paginate "repos/${REPO}/issues/${PR}/comments" \
+            --jq '.[].body' | grep -Eo '^reviewed-sha: *[0-9a-f]{40}' | sed -E 's/^reviewed-sha: *//' | grep -Fx "$head" || true)
+          if [ -z "$approved" ]; then
+            echo "::error::No comment says \"reviewed-sha: ${head}\". The review must cover the current head; review again after every push."
+            exit 1
+          fi
+
+          echo "Approved for head ${head}."

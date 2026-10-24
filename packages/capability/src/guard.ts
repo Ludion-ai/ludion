@@ -26,12 +26,53 @@ function detail(s: string): string {
   return s.slice(0, 500);
 }
 
+/** Any root (`/`, `\`), drive (`C:`), `..` segment, control char, or over-long path. */
+function isUnsafePath(p: string): boolean {
+  if (p.length === 0 || p.length > 260 || /^([\\/]|[A-Za-z]:)/.test(p)) return true;
+  if (/[\u0000-\u001f\u007f]/.test(p)) return true;
+  return p.split(/[\\/]/).includes("..");
+}
+
+/** A path with a dot-leading segment (`.config/x`, `pkg/.x/y`, `.hidden.ts`). The guard does not scan these normally. */
+function hasDotSegment(p: string): boolean {
+  return p.split(/[\\/]/).some((s) => s.length > 1 && s.startsWith("."));
+}
+
 function isRel(p: string): boolean {
-  if (p.length === 0 || p.length > 260 || /^([\\/]|[A-Za-z]:)/.test(p)) return false;
-  const parts = p.split(/[\\/]/);
-  if (parts.includes("..")) return false;
-  // The guard does not scan dot-directories or dot-files. `**` in a glob still reaches them.
-  return !parts.some((s) => s.length > 1 && s.startsWith("."));
+  return !isUnsafePath(p) && !hasDotSegment(p);
+}
+
+/**
+ * Dot paths are not scanned as evidence, but they may not be skipped silently either:
+ * a dot path that a config condition (by glob or by basename) or a call condition would read makes the result unknown.
+ */
+function dotPathResult(structure: readonly StructureConditionT[], files: Record<string, string>, checks: Check[]): GuardResultT | undefined {
+  for (const [path, text] of Object.entries(files)) {
+    if (!hasDotSegment(path)) continue;
+    const filePath = path.replaceAll("\\", "/");
+    for (const condition of structure) {
+      if (condition.kind === "config") {
+        if (anyGlob(condition.file, filePath) || anyGlob(condition.file.map(lastSegment), lastSegment(filePath))) {
+          checks.push(check(`config:${condition.key}`, null, filePath));
+          return unknown("config_not_static", `${filePath} is a config under a dot path that the guard does not read`, checks);
+        }
+        continue;
+      }
+      if (!anyGlob(condition.files, filePath)) continue;
+      const label = `call:${condition.target.module}.${condition.target.export}.${condition.target.member.join(".")}`;
+      const found = analyze(text);
+      if (found.error) {
+        checks.push(check(label, null, found.error));
+        return unknown("parse_failed", `${filePath}: ${found.error}`, checks);
+      }
+      const resolved = resolveTarget(found, condition.target);
+      if (resolved.unresolved || resolved.matches.length > 0) {
+        checks.push(check(label, null, filePath));
+        return unknown("binding_unresolved", `${filePath} has a target call under a dot path that the guard does not scan`, checks);
+      }
+    }
+  }
+  return undefined;
 }
 
 type InapplicableReason = Extract<GuardResultT, { status: "inapplicable" }>["reason"];
@@ -125,6 +166,14 @@ function evaluateGuardBody(record: unknown, input: GuardInput, checks: Check[]):
     return inapplicable("runtime_mismatch", `node major ${major} is outside ${artifactRecord.artifact.guard.runtime.node_major.join(",")}`, checks);
   }
   checks.push(check("runtime", true, major));
+
+  const unsafe = Object.keys(input.files).find(isUnsafePath);
+  if (unsafe !== undefined) {
+    checks.push(check("files", null, unsafe));
+    return unknown("parse_failed", `input path ${JSON.stringify(unsafe.slice(0, 200))} is not a relative path`, checks);
+  }
+  const dotResult = dotPathResult(artifactRecord.artifact.guard.structure, input.files, checks);
+  if (dotResult) return dotResult;
 
   const configResult = evaluateConfigs(artifactRecord.artifact.guard.structure, input.files, checks);
   if (configResult) return configResult;

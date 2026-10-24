@@ -53,7 +53,7 @@ describe("evaluateGuard", () => {
     expect(judge({ files: { "src/fixed.test.ts": alreadyFixedTest } })).toMatchObject({ status: "inapplicable", reason: "already_fixed" });
   });
 
-  it("keeps clearAllMocks in another block applicable and ignores dot-directories", () => {
+  it("keeps clearAllMocks in another block applicable and does not skip dot-directories silently", () => {
     const otherBlock = [
       'import { vi } from "vitest";',
       "afterEach(() => {",
@@ -67,7 +67,29 @@ describe("evaluateGuard", () => {
     expect(judge({ files: { "src/split.test.ts": otherBlock } }).status).toBe("applicable");
 
     const hidden = { ".hidden/a.test.ts": applicableTest, "src/.private/a.test.ts": applicableTest };
-    expect(judge({ files: hidden })).toMatchObject({ status: "inapplicable", reason: "target_absent" });
+    expect(judge({ files: hidden })).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    expect(judge({ files: { ...applicableFiles(), "src/.private/a.test.ts": applicableTest } })).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    // An unimported call of the target shape in a dot file is unknown as well.
+    expect(judge({ files: { ...applicableFiles(), ".hidden/b.test.ts": "afterEach(() => { vi.restoreAllMocks(); });\n" } })).toMatchObject({ status: "unknown" });
+    // Dot files without the target call, and dot files outside every condition, do not change the result.
+    expect(judge({ files: { ...applicableFiles(), ".hidden/c.test.ts": "export const x = 1;\n", ".github/notes.md": "vi.restoreAllMocks()" } }).status).toBe("applicable");
+  });
+
+  it("returns unknown for a clearMocks config under a dot path instead of skipping it (C1)", () => {
+    for (const path of [".config/vitest.config.ts", "packages/.x/vitest.config.ts", ".cfg/vitest.config.mts", "a/b/.c/vitest.config.js"]) {
+      const result = judge({ files: { ...applicableFiles(), [path]: clearMocksConfig } });
+      expect({ path, status: result.status, reason: (result as { reason?: string }).reason }).toEqual({ path, status: "unknown", reason: "config_not_static" });
+    }
+    expect(judge({ files: { ...applicableFiles(), "packages/x/vitest.config.ts": clearMocksConfig } })).toMatchObject({ status: "unknown", reason: "config_not_static" });
+    expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": clearMocksConfig } })).toMatchObject({ status: "inapplicable", reason: "config_excludes" });
+  });
+
+  it("returns unknown for any absolute, drive, backslash-rooted or parent input path (C4)", () => {
+    for (const path of ["/src/a.test.ts", "/opt/repo/src/a.test.ts", "/tmp/x.test.ts", "\\src\\a.test.ts", "C:/repo/a.test.ts", "c:\\a.test.ts", "src/../../a.test.ts", "src/a\u0000.test.ts"]) {
+      const result = judge({ files: { ...applicableFiles(), [path]: applicableTest } });
+      expect({ path, status: result.status }).toEqual({ path, status: "unknown" });
+    }
+    expect(judge({ files: { ...applicableFiles(), "src/sub/b.test.ts": applicableTest } }).status).toBe("applicable");
   });
 
   it("resolves a namespace import and rejects a shadowed or type-only binding", () => {

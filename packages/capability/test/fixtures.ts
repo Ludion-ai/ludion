@@ -155,7 +155,7 @@ export function exampleArtifactInput(): CapabilityArtifactT {
       mount_at: ".ludion-verify",
       argv: ["vitest", "run"],
       required_tests: ["history-cleared", "spy-restored", "impl-kept"],
-      run_recipient_tests: true,
+      run_recipient_tests: false,
       protected_paths: [],
       allow_skip: false,
       timeout_ms: 120_000,

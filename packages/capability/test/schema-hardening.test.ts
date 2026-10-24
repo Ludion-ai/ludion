@@ -17,7 +17,7 @@ const COMMIT = "21321cb".padEnd(40, "0");
 const IMAGE = `node@sha256:${HEX}`;
 const ULID = "01M4T6BQ9DJH2BCV6Q28GH4HJA";
 const INTEGRITY = `sha512-${"A".repeat(86)}==`;
-const REALPATH = "/opt/ludion/verifier-store/node_modules/vitest/vitest.mjs";
+const REALPATH = "/verifier/node_modules/vitest/package.json";
 
 const FAIL_GLOBS = [
   "/etc/**",
@@ -176,7 +176,7 @@ function verifierRuntime(realpath = REALPATH, integrity = INTEGRITY) {
     vitest_realpath: realpath,
     vitest_version: "4.0.0",
     vitest_integrity: integrity,
-    lockfile_sha256: SHA("b"),
+    lockfile_sha256: "b".repeat(64),
   };
 }
 
@@ -401,7 +401,12 @@ describe("9 verifier runtime", () => {
   const badPaths = [
     "node_modules/vitest/vitest.mjs",
     "/work/node_modules/vitest/vitest.mjs",
-    "/opt/ludion/verifier-store/../../work/node_modules/vitest/vitest.mjs",
+    "/verifier/../work/node_modules/vitest/package.json",
+    "/verifier/node_modules/../../x",
+    "/verifier/a%2e%2e/x",
+    "/verifier/a\u0000b",
+    "/verifierx/node_modules/vitest/package.json",
+    "/opt/ludion/verifier-store/node_modules/vitest/package.json",
     "C:/x",
   ];
 
@@ -411,6 +416,15 @@ describe("9 verifier runtime", () => {
       expect(VerifierRuntime.safeParse(verifierRuntime(p)).success, p).toBe(false);
     }
     expect(VerifierRuntime.safeParse(verifierRuntime(REALPATH, "sha512-abc")).success).toBe(false);
+    for (const v of ["4.1.11", "4.2.0-beta.1", "4.1.11+build.5", "1.0.0-rc.1+sha.abc"]) {
+      expect(VerifierRuntime.safeParse({ ...verifierRuntime(), vitest_version: v }).success, v).toBe(true);
+    }
+    for (const v of ["4.1", "v4.1.11", "4.1.11-", "04.1.11", "4.1.11+", "latest"]) {
+      expect(VerifierRuntime.safeParse({ ...verifierRuntime(), vitest_version: v }).success, v).toBe(false);
+    }
+    expect(VerifierRuntime.safeParse({ ...verifierRuntime(), lockfile_sha256: SHA("b") }).success).toBe(false);
+    expect(VerifierRuntime.safeParse({ ...verifierRuntime(), lockfile_sha256: "B".repeat(64) }).success).toBe(false);
+    expect(VerifierRuntime.safeParse({ ...verifierRuntime(), vitest_location: "recipient" }).success).toBe(false);
     expect(VerifierRuntime.safeParse(verifierRuntime(REALPATH, `sha256-${"A".repeat(86)}==`)).success).toBe(false);
     expect(VerifierRuntime.safeParse(verifierRuntime(REALPATH, `sha512-${"A".repeat(85)}==`)).success).toBe(false);
   });

@@ -546,7 +546,8 @@
             },
             "vitest_version": {
               "type": "string",
-              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+              "maxLength": 128,
+              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
             },
             "vitest_integrity": {
               "type": "string",
@@ -554,7 +555,7 @@
             },
             "lockfile_sha256": {
               "type": "string",
-              "pattern": "^sha256:[0-9a-f]{64}$"
+              "pattern": "^[0-9a-f]{64}$"
             }
           },
           "required": [

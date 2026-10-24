@@ -317,7 +317,12 @@ export interface DockerRunOptions {
   runtime: string;
   /** Container name. One token, no spaces. */
   name: string;
-  /** Absolute host directory bind-mounted at /w. Optional for a run with no packages. Read-only on run. */
+  /**
+   * Absolute host directory. Optional for a run with no packages.
+   * Install bind-mounts it writable at /w. Run does not bind-mount it: /w is a tmpfs,
+   * and node_modules (node) or site (python) is bind-mounted read-only beneath /w
+   * when that directory exists.
+   */
   workDir?: string;
   /**
    * Absolute host directory of the isolated verifier install, bind-mounted at /verifier.
@@ -338,11 +343,18 @@ export interface DockerRunOptions {
  * - phase "install" is the only phase that keeps Docker's default network. It runs npm or pip with
  *   install scripts disabled and no lesson code, so it can reach a registry.
  *
- * The only tmpfs is /tmp (rw, noexec, nosuid, nodev, 64m). The run phase sets HOME=/tmp when a work
- * folder is mounted, and lessons use /tmp as scratch. The install phase writes the tree, HOME
- * (/w/.home), the npm cache (/w/.npm), and the pip target (/w/site) on the bind mount, but pip and
- * npm still unpack through the system temp directory, which a read-only root would make immutable.
- * No tmpfs is added for /var, /run, or /home.
+ * /tmp is always `--tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m`. A run that has a work directory
+ * also sets `--tmpfs /w:rw,noexec,nosuid,nodev,size=128m,mode=1777` and `-w /w`. That /w is scratch
+ * for lesson code (for example `mkdir /w/proj`). It is not a bind of the host work directory, so
+ * those writes are not persisted and are not host-backed. Install results are the only host paths
+ * mounted into it, and only read-only: `<workDir>/node_modules` at `/w/node_modules` for a node
+ * runtime, `<workDir>/site` at `/w/site` for a python runtime, each only when that directory exists.
+ * Both sources go through dockerMountSource. `:ro` is a literal appended in this function. The run
+ * phase never bind-mounts the work directory. The install phase still bind-mounts the work directory
+ * writable at /w and writes the tree, HOME (`/w/.home`), the npm cache (`/w/.npm`), and the pip
+ * target (`/w/site`) there. pip and npm still unpack through /tmp, which a read-only root would
+ * make immutable. No tmpfs is added for /var, /run, or /home. A run with no work directory is
+ * unchanged: no /w tmpfs and no work bind.
  *
  * Docker does not forward the host environment into a container unless `--env-file` or `-e NAME`
  * (no value) asks it to. Neither is used. Every `-e` is an explicit `NAME=value` from the allowlist
@@ -356,9 +368,25 @@ export interface DockerRunOptions {
  * lessons/ grep, 2026-10-25 (read-only): 18 wrangler lessons mention /tmp, only as HOME
  * (mkdtemp "/tmp/home-") or as a project cwd ("/tmp/proj", mkdtemp "/tmp/proj-" or "/tmp/p-").
  * Every spawn runs the node binary with a script under /w/node_modules. None exec a file that
- * lives on /tmp. noexec blocks execve of files stored on this mount; it does not stop the image's
- * interpreter from reading a script, so those lessons still run. 111 lesson code blocks were checked.
+ * lives on /tmp. noexec blocks execve of files stored on /tmp or on the /w tmpfs; it does not stop
+ * the image's interpreter from reading a script, so those lessons still run. 111 lesson code blocks
+ * were checked. Lesson code also creates directories under /w, which is why /w is a tmpfs.
  */
+
+/** Host path of an install result directory, or undefined when that path is not a directory. */
+function installResultHostPath(workDir: string, name: "node_modules" | "site"): string | undefined {
+  const path = join(workDir, name);
+  let real: string;
+  try {
+    real = realpathSync(path);
+  } catch (err) {
+    const code = typeof err === "object" && err !== null && "code" in err ? (err as { code?: unknown }).code : undefined;
+    if (code === "ENOENT" || code === "ENOTDIR") return undefined;
+    throw err;
+  }
+  if (!lstatSync(real).isDirectory()) return undefined;
+  return path;
+}
 export function buildDockerRunArgs(opts: DockerRunOptions): string[] {
   if (opts === null || typeof opts !== "object" || Array.isArray(opts)) throw new Error("Docker options must be an object.");
   for (const key of Object.keys(opts)) {
@@ -411,10 +439,31 @@ export function buildDockerRunArgs(opts: DockerRunOptions): string[] {
   // Phase decides the network. "run" always passes none. "install" adds no network flag at all.
   if (phase === "run") args.push("--network", "none");
   args.push("--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m");
-  if (source !== undefined) {
-    // `:ro` on the run phase is a literal. Install stays writable so npm and pip can write the tree.
-    if (phase === "run") args.push("-v", `${source}:/w:ro`, "-w", "/w");
-    else args.push("-v", `${source}:/w`, "-w", "/w");
+  if (source !== undefined && opts.workDir !== undefined) {
+    const workDir = opts.workDir;
+    if (phase === "run") {
+      // Scratch for lesson writes (mkdir /w/proj). Not a bind, so nothing is written back to the host.
+      // `source` is the validated work directory and is intentionally not placed on a -v.
+      args.push("--tmpfs", "/w:rw,noexec,nosuid,nodev,size=128m,mode=1777");
+      if (img.language === "node") {
+        const hostPath = installResultHostPath(workDir, "node_modules");
+        if (hostPath !== undefined) {
+          const resultSource = dockerMountSource(hostPath, "Node modules directory");
+          // `:ro` is a literal. There is no option to make this bind writable.
+          args.push("-v", `${resultSource}:/w/node_modules:ro`);
+        }
+      } else {
+        const hostPath = installResultHostPath(workDir, "site");
+        if (hostPath !== undefined) {
+          const resultSource = dockerMountSource(hostPath, "Site directory");
+          args.push("-v", `${resultSource}:/w/site:ro`);
+        }
+      }
+      args.push("-w", "/w");
+    } else {
+      // Install stays writable so npm and pip can write the tree.
+      args.push("-v", `${source}:/w`, "-w", "/w");
+    }
     const env = phase === "run" ? RUN_ENV : installStep === "pip" ? PIP_INSTALL_ENV : NPM_INSTALL_ENV;
     for (const pair of env) args.push("-e", pair);
   }

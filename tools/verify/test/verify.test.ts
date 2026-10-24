@@ -253,12 +253,22 @@ describe("docker, format 1", () => {
   it("runs lesson code with the network off, even when packages are mounted", () => {
     const work = mkdtempSync(join(tmpdir(), "ludion-verify-mount-"));
     try {
+      mkdirSync(join(work, "node_modules"));
       const args = dockerArgs("node@24", "n", work);
       expect(args).toContain("--network");
       expect(args[args.indexOf("--network") + 1]).toBe("none");
       expect(args).toContain("--read-only");
-      const mount = args[args.indexOf("-v") + 1];
-      expect(mount).toMatch(/:\/w:ro$/);
+      const tmpfs = args.flatMap((arg, index) => arg === "--tmpfs" ? [args[index + 1] ?? ""] : []);
+      expect(tmpfs).toContain("/w:rw,noexec,nosuid,nodev,size=128m,mode=1777");
+      const binds = args.flatMap((arg, index) => arg === "-v" ? [args[index + 1] ?? ""] : []);
+      expect(binds.length).toBeGreaterThan(0);
+      for (const spec of binds) {
+        expect(spec.endsWith(":ro"), spec).toBe(true);
+        const colon = spec.indexOf(":");
+        const rest = colon === -1 ? spec : spec.slice(colon + 1);
+        const target = rest.endsWith(":ro") || rest.endsWith(":rw") ? rest.slice(0, -3) : rest;
+        expect(target, spec).not.toBe("/w");
+      }
       expect(args.slice(-3)).toEqual([`node:24-slim@${IMAGE_DIGESTS["node:24-slim"]}`, "node", "-"]);
     } finally {
       rmSync(work, { recursive: true, force: true });

@@ -50,6 +50,36 @@ function valueAfter(args: readonly string[], flag: string): string {
   return value!;
 }
 
+function valuesAfter(args: readonly string[], flag: string): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < args.length; i++) if (args[i] === flag) out.push(args[i + 1] ?? "");
+  return out;
+}
+
+function mounts(args: readonly string[]): string[] {
+  return valuesAfter(args, "-v");
+}
+
+/** Bind destination. dockerMountSource strips every colon from the host path. */
+function mountDestination(spec: string): string {
+  const colon = spec.indexOf(":");
+  const rest = colon === -1 ? spec : spec.slice(colon + 1);
+  if (rest.endsWith(":ro") || rest.endsWith(":rw")) return rest.slice(0, -3);
+  return rest;
+}
+
+const TMP_TMPFS = "/tmp:rw,noexec,nosuid,nodev,size=64m";
+const RUN_WORK_TMPFS = "/w:rw,noexec,nosuid,nodev,size=128m,mode=1777";
+
+/** Run phase: /w is a tmpfs, and every bind is read-only and not the whole work directory. */
+function expectRunMounts(args: readonly string[]): void {
+  for (const spec of mounts(args)) {
+    expect(spec.endsWith(":ro"), spec).toBe(true);
+    expect(mountDestination(spec), spec).not.toBe("/w");
+    expect(spec, spec).not.toMatch(/:\/w(?::rw)?$/);
+  }
+}
+
 function expectHardened(args: readonly string[], phase: "run" | "install"): void {
   expect(args[0]).toBe("run");
   expect(valueAfter(args, "--cap-drop")).toBe("ALL");
@@ -70,9 +100,20 @@ function expectHardened(args: readonly string[], phase: "run" | "install"): void
     expect(args).not.toContain("none");
     expect(args).not.toContain("-i");
   }
-  const tmpfs = valueAfter(args, "--tmpfs");
-  expect(tmpfs).toBe("/tmp:rw,noexec,nosuid,nodev,size=64m");
-  expect(tmpfs).toContain("noexec,nosuid");
+  const tmpfs = valuesAfter(args, "--tmpfs");
+  expect(tmpfs[0]).toBe(TMP_TMPFS);
+  expect(tmpfs[0]).toContain("noexec,nosuid");
+  expect(tmpfs.filter((value) => value.startsWith("/tmp:"))).toEqual([TMP_TMPFS]);
+  const scratch = tmpfs.filter((value) => value !== TMP_TMPFS);
+  if (phase === "install") {
+    expect(scratch).toEqual([]);
+  } else if (valuesAfter(args, "-w").includes("/w")) {
+    expect(scratch).toEqual([RUN_WORK_TMPFS]);
+    expectRunMounts(args);
+  } else {
+    expect(scratch).toEqual([]);
+    expectRunMounts(args);
+  }
   const image = args.find((arg) => PIN.test(arg));
   expect(image).toBeDefined();
   const tag = image!.slice(0, image!.indexOf("@"));
@@ -143,12 +184,6 @@ function envPairs(args: readonly string[]): string[] {
   return out;
 }
 
-function mounts(args: readonly string[]): string[] {
-  const out: string[] = [];
-  for (let i = 0; i < args.length; i++) if (args[i] === "-v") out.push(args[i + 1] ?? "");
-  return out;
-}
-
 function workMount(args: readonly string[]): string {
   const found = mounts(args).find((mount) => mount.includes(":/w"));
   expect(found).toBeDefined();
@@ -168,9 +203,15 @@ describe("docker run hardening", () => {
         if (opts.phase === "install" && opts.workDir !== undefined && opts.installStep !== undefined) seedInstall(opts.workDir, opts.installStep);
         const args = buildDockerRunArgs(opts);
         expectHardened(args, phase);
-        if (opts.workDir === undefined) expect(args).not.toContain("-v");
-        else if (phase === "run") expect(workMount(args)).toMatch(/:\/w:ro$/);
-        else {
+        if (opts.workDir === undefined) {
+          expect(args).not.toContain("-v");
+          expect(valuesAfter(args, "--tmpfs")).toEqual([TMP_TMPFS]);
+        } else if (phase === "run") {
+          expect(valuesAfter(args, "--tmpfs")).toEqual([TMP_TMPFS, RUN_WORK_TMPFS]);
+          expect(mounts(args)).toEqual([]);
+          expect(valueAfter(args, "-w")).toBe("/w");
+          expectRunMounts(args);
+        } else {
           expect(workMount(args)).toMatch(/:\/w$/);
           expect(workMount(args)).not.toMatch(/:ro$/);
         }
@@ -272,7 +313,9 @@ describe("docker run hardening", () => {
       expectHardened(safe, "run");
       expect(valueAfter(safe, "--network")).toBe("none");
       expect(valueAfter(safe, "--user")).not.toBe("0:0");
-      expect(workMount(safe)).toMatch(/:\/w:ro$/);
+      expect(valuesAfter(safe, "--tmpfs")).toEqual([TMP_TMPFS, RUN_WORK_TMPFS]);
+      expect(mounts(safe).some((spec) => mountDestination(spec) === "/w")).toBe(false);
+      expectRunMounts(safe);
     });
   });
 
@@ -298,15 +341,102 @@ describe("docker run hardening", () => {
 
   it("rewrites a real temp directory into a mount source with no colon or comma", () => {
     withWork((work) => {
+      mkdirSync(join(work, "node_modules"));
       const source = dockerMountSource(work);
+      const nmSource = dockerMountSource(join(work, "node_modules"));
       expect(source.startsWith("/")).toBe(true);
       expect(source).not.toContain(":");
       expect(source).not.toContain(",");
       expect(source).not.toContain("\\");
       expect(source).not.toContain("..");
-      if (process.platform === "win32") expect(source.startsWith(`/${work.slice(0, 1).toLowerCase()}/`)).toBe(true);
+      expect(nmSource).not.toContain(":");
+      expect(nmSource).not.toContain(",");
+      expect(nmSource).not.toContain("\\");
+      if (process.platform === "win32") expect(nmSource.startsWith(`/${work.slice(0, 1).toLowerCase()}/`)).toBe(true);
       const args = dockerArgs("node", "n", work);
-      expect(valueAfter(args, "-v")).toBe(`${source}:/w:ro`);
+      expect(mounts(args)).toEqual([`${nmSource}:/w/node_modules:ro`]);
+      expect(args).not.toContain(`${source}:/w`);
+      expect(args).not.toContain(`${source}:/w:ro`);
+      expect(args).not.toContain(`${source}:/w:rw`);
+      expectRunMounts(args);
+    });
+  });
+
+  it("mounts install results read-only under a tmpfs /w and never the work directory", () => {
+    withWork((work) => {
+      const bare = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n" });
+      expect(valuesAfter(bare, "--tmpfs")).toEqual([TMP_TMPFS]);
+      expect(bare).not.toContain("-w");
+      expect(bare).not.toContain(RUN_WORK_TMPFS);
+      expect(envPairs(bare)).toEqual([]);
+
+      const empty = buildDockerRunArgs({ phase: "run", runtime: "node@24", name: "n", workDir: work });
+      expect(valuesAfter(empty, "--tmpfs")).toEqual([TMP_TMPFS, RUN_WORK_TMPFS]);
+      expect(mounts(empty)).toEqual([]);
+      expect(valueAfter(empty, "-w")).toBe("/w");
+      expect(envPairs(empty)).toEqual(RUN_ENV);
+      expect(empty).not.toContain(`${dockerMountSource(work)}:/w`);
+      expectRunMounts(empty);
+
+      mkdirSync(join(work, "node_modules"));
+      mkdirSync(join(work, "site"));
+      writeFileSync(join(work, "package.json"), "{}\n");
+      const workSource = dockerMountSource(work);
+      const nmSource = dockerMountSource(join(work, "node_modules"));
+      const siteSource = dockerMountSource(join(work, "site"));
+      const node = buildDockerRunArgs({ phase: "run", runtime: "node@24", name: "n", workDir: work });
+      expect(mounts(node)).toEqual([`${nmSource}:/w/node_modules:ro`]);
+      expect(node).not.toContain(`${workSource}:/w`);
+      expect(node).not.toContain(`${workSource}:/w:ro`);
+      expect(node).not.toContain(`${workSource}:/w:rw`);
+      expect(node).not.toContain(`${siteSource}:/w/site:ro`);
+      expect(envPairs(node)).toEqual(RUN_ENV);
+      expect(valueAfter(node, "-w")).toBe("/w");
+      expectRunMounts(node);
+
+      const py = buildDockerRunArgs({ phase: "run", runtime: "python@3.12", name: "n", workDir: work });
+      expect(mounts(py)).toEqual([`${siteSource}:/w/site:ro`]);
+      expect(py.join(" ")).not.toContain(":/w/node_modules");
+      expect(py).not.toContain(`${workSource}:/w`);
+      expect(envPairs(py)).toEqual(RUN_ENV);
+      expectRunMounts(py);
+
+      rmSync(join(work, "site"), { recursive: true });
+      const pyMissing = buildDockerRunArgs({ phase: "run", runtime: "python@3.12", name: "n", workDir: work });
+      expect(mounts(pyMissing)).toEqual([]);
+      expect(valuesAfter(pyMissing, "--tmpfs")).toEqual([TMP_TMPFS, RUN_WORK_TMPFS]);
+
+      rmSync(join(work, "node_modules"), { recursive: true });
+      writeFileSync(join(work, "node_modules"), "not a directory\n");
+      const fileNm = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work });
+      expect(mounts(fileNm)).toEqual([]);
+      rmSync(join(work, "node_modules"));
+
+      mkdirSync(join(work, "node_modules"));
+      mkdirSync(join(work, "node_modules", ".git"));
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work })).toThrow(/Node modules directory contains \.git/);
+      rmSync(join(work, "node_modules"), { recursive: true });
+
+      mkdirSync(join(work, "site"));
+      mkdirSync(join(work, "site", ".git"));
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "python@3.12", name: "n", workDir: work })).toThrow(/Site directory contains \.git/);
+      rmSync(join(work, "site"), { recursive: true });
+
+      const outside = mkdtempSync(join(homedir(), "ludion-nm-outside-"));
+      try {
+        symlinkSync(outside, join(work, "node_modules"), process.platform === "win32" ? "junction" : "dir");
+        let message = "";
+        try {
+          buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work });
+        } catch (err) {
+          message = err instanceof Error ? err.message : "";
+        }
+        expect(message).toMatch(/Node modules directory/);
+        expect(message).toMatch(/inside the runner temp directory/);
+        expect(message).not.toContain(outside);
+      } finally {
+        rmSync(outside, { recursive: true, force: true });
+      }
     });
   });
 
@@ -514,16 +644,15 @@ describe("docker run construction", () => {
     expect(body).toContain(":/verifier:ro");
     expect(body).not.toContain(":/verifier:rw");
     expect(body).not.toContain(":/verifier\"");
+    expect(body).toContain(":/w/node_modules:ro");
+    expect(body).toContain(":/w/site:ro");
+    expect(body).toContain("--tmpfs\", \"/w:rw,noexec,nosuid,nodev,size=128m,mode=1777");
+    expect(body).not.toContain(":/w:ro");
+    expect(body).not.toContain(":/w:rw");
   });
 });
 
 describe("verifier deps mount", () => {
-  function mounts(args: readonly string[]): string[] {
-    const out: string[] = [];
-    for (let i = 0; i < args.length; i++) if (args[i] === "-v") out.push(args[i + 1] ?? "");
-    return out;
-  }
-
   it("bind-mounts verifier deps read-only on run and refuses install, overlap, and a dropped :ro", () => {
     const parent = mkdtempSync(join(tmpdir(), "ludion-mount-"));
     const work = join(parent, "work");
@@ -538,15 +667,22 @@ describe("verifier deps mount", () => {
       const args = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work, verifierDeps: deps });
       expectHardened(args, "run");
       const bound = mounts(args);
-      expect(bound).toHaveLength(2);
-      const workMount = bound.find((mount) => mount.includes(":/w"));
+      expect(bound).toHaveLength(1);
+      expect(bound.some((mount) => mountDestination(mount) === "/w")).toBe(false);
       const verifierMount = bound.find((mount) => mount.includes(":/verifier"));
-      expect(workMount).toBeDefined();
-      expect(workMount).toMatch(/:\/w:ro$/);
       expect(verifierMount).toMatch(/:\/verifier:ro$/);
       expect(verifierMount).not.toMatch(/:rw\b/);
       expect(args.filter((arg) => arg === "--read-only")).toEqual(["--read-only"]);
       expect(valueAfter(args, "--network")).toBe("none");
+
+      mkdirSync(join(work, "node_modules"));
+      const withModules = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work, verifierDeps: deps });
+      expect(mounts(withModules)).toEqual([
+        `${dockerMountSource(join(work, "node_modules"))}:/w/node_modules:ro`,
+        `${dockerMountSource(deps)}:/verifier:ro`,
+      ]);
+      expect(mounts(withModules).some((mount) => mountDestination(mount) === "/w")).toBe(false);
+      expectRunMounts(withModules);
 
       const prefix = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work, verifierDeps: workExtra });
       expect(mounts(prefix).some((mount) => mount.endsWith(":/verifier:ro"))).toBe(true);
@@ -605,7 +741,9 @@ describe("install environment", () => {
       expect(envPairs(lock)).toEqual(NPM_INSTALL_ENV);
       expect(envPairs(ci)).toEqual(NPM_INSTALL_ENV);
       expect(envPairs(pip)).toEqual(PIP_INSTALL_ENV);
-      expect(workMount(run)).toMatch(/:\/w:ro$/);
+      expect(valuesAfter(run, "--tmpfs")).toEqual([TMP_TMPFS, RUN_WORK_TMPFS]);
+      expect(mounts(run)).toEqual([]);
+      expectRunMounts(run);
       expect(workMount(lock)).toMatch(/:\/w$/);
       expect(workMount(ci)).toMatch(/:\/w$/);
       expect(workMount(pip)).toMatch(/:\/w$/);

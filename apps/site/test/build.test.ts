@@ -1,12 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseAddedLog, parseDeletedLog } from "../src/build/git-info.ts";
-import { withoutToolsTable } from "../src/build/bench.ts";
-import type { Models } from "../src/build/models.ts";
+import { parseAddedLog } from "../src/build/git-info.ts";
 import { readWithheld, reservedSubjects } from "../src/build/data.ts";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { teacherPages } from "../src/build/teacher-pages.ts";
 
 const R = "\x1e";
 const F = "\x1f";
@@ -35,59 +32,12 @@ describe("parseAddedLog", () => {
   });
 });
 
-describe("teacherPages", () => {
-  it("gives each teacher a page at their lowercase login", () => {
-    expect(teacherPages(new Map([[1, "Alice"], [2, "bob"]]), new Set([1, 2]))).toEqual(new Map([["alice", 1], ["bob", 2]]));
-  });
-
-  it("on a name clash, gives the page to the id whose login came from the API", () => {
-    // Id 1 renamed away from "sam" (lookup failed, so we only have the stored name); id 2 now holds "Sam".
-    expect(teacherPages(new Map([[1, "sam"], [2, "Sam"]]), new Set([2]))).toEqual(new Map([["sam", 2]]));
-  });
-
-  it("gives the page to no one when neither login came from the API", () => {
-    expect(teacherPages(new Map([[1, "sam"], [2, "Sam"]]), new Set())).toEqual(new Map());
-  });
-});
-
-describe("parseDeletedLog", () => {
-  it("finds each retracted lesson's newest deletion, with the commit to read it from", () => {
-    const log = [
-      `${R}abc123${F}2026-10-12T03:00:00Z${F}Retract a lesson whose quote is gone (#51)`,
-      "",
-      "lessons/vitest/01K70000000000000000000004.json",
-      `${R}def456${F}2026-10-10T00:00:00Z${F}Retract (#40)`,
-      "lessons/vitest/01K70000000000000000000004.json",
-      "lessons/lessons.schema.json",
-    ].join("\n");
-    expect(parseDeletedLog(log)).toEqual({
-      "01K70000000000000000000004": { path: "lessons/vitest/01K70000000000000000000004.json", commit: "abc123", retracted_at: "2026-10-12T03:00:00Z", pr: 51 },
-    });
-  });
-});
-
 describe("reservedSubjects", () => {
   it("names subjects that a top-level page would shadow", () => {
     expect(reservedSubjects(["vitest", "models", "start", "vitest"])).toEqual(["models", "start"]);
   });
 });
 
-describe("withoutToolsTable", () => {
-  it("counts only measured lessons that are still active", () => {
-    const models: Models = {
-      measured_at: "2026-10-11",
-      bench: "docs/bench/x/",
-      method: "",
-      models: { a: { name: "A" }, b: { name: "B" } },
-      lessons: { L1: { a: "knows", b: "misses" }, L2: { a: "misses" }, GONE: { a: "knows", b: "knows" } },
-    };
-    const rows = withoutToolsTable(models, new Map([["L1", "x"], ["L2", "x"], ["L3", "x"]])).rows;
-    expect(rows.map((r) => (r.measured ? [r.model, r.cells.all!.correct, r.cells.all!.total] : [r.model]))).toEqual([
-      ["a", 1, 2],
-      ["b", 0, 1],
-    ]);
-  });
-});
 describe("readWithheld", () => {
   it("reads only lesson ids from reverify's failing.json, relative to the repo root", () => {
     const root = mkdtempSync(join(tmpdir(), "ludion-withhold-"));

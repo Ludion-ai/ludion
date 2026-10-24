@@ -1,139 +1,55 @@
 ---
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { asTest, claimOf, isV1 } from "@ludion/core";
-import Claim from "./Claim.astro";
-import Signature from "./Signature.astro";
-import EvidenceSource from "./EvidenceSource.astro";
-import { siteData } from "../build/data.ts";
 import { en } from "../strings/en.ts";
 
-interface Props {
-  copy: {
-    label: string;
-    read: string;
-    inspect: string;
-    steps: { change: string; evidence: string; teacher: string; context: string };
-    changeTitle: string;
-    evidenceTitle: string;
-    evidenceNote: string;
-    source: string;
-    teacherTitle: string;
-    teacherId: string;
-    publication: string;
-    fullLesson: string;
-    contextTitle: string;
-    contextNote: string;
-    recordLink: string;
-    root: string;
-    inline: string;
-    inherits: string;
-    noInherit: string;
-    unavailable: string;
-  };
-}
-const { copy } = Astro.props;
-const data = await siteData();
-// The lesson used in the recorded home example. No synthesized claim, running test, or fake verification log.
-const pinned = "01M4N4KZ0QT41TY27SW0E683RX";
-const page = data.pages.find((p) => p.lesson.id === pinned && data.index.lessons.some((l) => l.id === pinned));
-const lesson = page && isV1(page.lesson) ? page.lesson : null;
-const claim = lesson ? claimOf(lesson) : "";
-const tests = lesson?.evidence.map(asTest).filter((t) => t !== null) ?? [];
-const previous = tests.find((t) => t.expect === "fail");
-const current = tests.find((t) => t.expect !== "fail");
-const source = lesson?.evidence.find((e) => "source" in e);
-const repo = `https://github.com/${data.config.org}/${data.config.repo}`;
-const href = `/lessons/${pinned}/`;
-// Read the actual recorded delivery excerpt rather than constructing a simulated .ludion/lessons.md file.
-const recorded = readFileSync(join(data.root, "docs/demo/grep-output.txt"), "utf8").trim();
-const installed = recorded.match(/\(installed: ([^)]+)\)$/)?.[1];
-const show = lesson && page && previous && current && source && "source" in source && installed && recorded.includes(claim);
-const steps = Object.entries(copy.steps);
+const v = en.home.verify;
+const steps = [
+  { id: "guard", label: v.steps.guard, body: v.guardBody },
+  { id: "program", label: v.steps.program, body: v.programBody },
+  { id: "verifier", label: v.steps.verifier, body: v.verifierBody },
+  { id: "receipt", label: v.steps.receipt, body: v.invalidates },
+];
 ---
-
-{show && lesson && page && previous && current && source && "source" in source ? (
-  <article class="lesson-trace" data-lesson-trace aria-label={copy.label}>
-    <header class="trace-bar"><span class="trace-word">{copy.label}</span><a href={href}>{copy.fullLesson}<span aria-hidden="true"> ↗</span></a></header>
-    <div class="trace-workspace">
-      <div class="trace-rail" data-trace-controls hidden role="group" aria-label={copy.inspect}>
-        {steps.map(([id, label], index) => <button type="button" data-trace-step={id} aria-pressed={id === "change"} aria-controls={`trace-${id}`}><span class="step-dot" aria-hidden="true"></span><span>{label}</span><span class="step-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span></button>)}
-      </div>
-      <div class="trace-inspector">
-        <div class="lesson-meta"><code>{lesson.package.name} {lesson.versions}</code><span>{lesson.symbol}</span></div>
-        <details class="trace-claim"><summary>{copy.read}</summary><p class="generated-claim"><Claim text={claim} /></p></details>
-        <div class="trace-signature"><Signature teacher={page.teacher} teacherId={lesson.author_id} teacherHref={data.teacherHref(lesson.author_id)} verifiedBy={page.verified_by} verifiedAt={page.verified_at} drafted={lesson.drafted_by === "agent"} compact /></div>
-        <div class="trace-panels">
-          <section id="trace-change" class="trace-panel" data-trace-panel="change" aria-labelledby="trace-change-title">
-            <h3 id="trace-change-title" class="visually-hidden">{copy.changeTitle}</h3>
-            <div class="inheritance-scene trace-object" data-trace-graphic>
-              <div class="root-config"><span>{copy.root}</span><code>setupFiles</code></div>
-              <svg class="inheritance-map" viewBox="0 0 320 210" aria-hidden="true">
-                <path class="branch-guide" d="M160 12 C160 90 80 70 80 198"/>
-                <path class="branch-guide" d="M160 12 C160 90 240 70 240 198"/>
-                <path class="branch-line blocked" data-trace-path="old" d="M160 12 C160 90 80 70 80 198" pathLength="1"/>
-                <path class="branch-line connected" data-trace-path="current" d="M160 12 C160 90 240 70 240 198" pathLength="1"/>
-                <g class="flow-paper old-paper" data-trace-paper="old"><rect x="-10" y="-14" width="20" height="28" rx="3"/><path d="M-5 -5H5 M-5 2H2 M-5 9H5"/></g>
-                <g class="flow-paper current-paper" data-trace-paper="current"><rect x="-10" y="-14" width="20" height="28" rx="3"/><path d="M-5 -5H5 M-5 2H2 M-5 9H5"/></g>
-                <g class="branch-stop" transform="translate(105 111)"><circle r="12"/><path d="M-4 -4L4 4 M4 -4L-4 4"/></g>
-              </svg>
-            <div class="version-bridge">
-              {[previous, current].map((run) => <div class:list={["version-node", { inherited: run.expect !== "fail" }]}>
-                <p class="version-pin"><span>{lesson.package.name}</span><strong>{run.packages?.[lesson.package.name]}</strong></p>
-                <div class="config-node">{copy.inline}<code>{lesson.symbol}</code></div>
-                <p class="behavior">{run.expect === "fail" ? copy.noInherit : copy.inherits}</p>
-              </div>)}
-            </div>
-            </div>
-            <p class="panel-note">{copy.evidenceNote}</p>
-          </section>
-          <section id="trace-evidence" class="trace-panel" data-trace-panel="evidence" aria-labelledby="trace-evidence-title">
-            <h3 id="trace-evidence-title">{copy.evidenceTitle}</h3>
-            <div class="evidence-contract trace-object">
-              {[previous, current].map((run) => <div class="contract-row"><code>{run.runtime}<br />{lesson.package.name}@{run.packages?.[lesson.package.name]}</code><span>{run.expect === "fail" ? en.lesson.diff.fails : en.lesson.diff.passes}</span>{run.expect === "fail" && <code class="expected-error">{run.error}</code>}</div>)}
-            </div>
-            <EvidenceSource url={source.source.url} quote={source.source.quote} />
-            <p class="panel-note">{copy.evidenceNote} <a href={`${href}#evidence`}>{copy.source}<span aria-hidden="true"> ↗</span></a></p>
-          </section>
-          <section id="trace-teacher" class="trace-panel" data-trace-panel="teacher" aria-labelledby="trace-teacher-title">
-            <h3 id="trace-teacher-title">{copy.teacherTitle}</h3>
-            <div class="teacher-object trace-object">
-              <span class="account-mark" aria-hidden="true">@</span>
-              <div><a class="teacher-name" href={data.teacherHref(lesson.author_id) ?? `https://github.com/${page.teacher}`}>@{page.teacher}</a><p>{copy.teacherId}<code>{lesson.author_id}</code></p></div>
-            </div>
-            <dl class="publication"><div><dt>{copy.publication}</dt><dd>{page.pr !== null ? <a href={`${repo}/pull/${page.pr}`}>{en.lesson.pullRequest(page.pr)} ↗</a> : <a href={`${repo}/blob/main/lessons/${lesson.subject}/${lesson.id}.json`}>{en.lesson.viewFile} ↗</a>}</dd></div><div><dt>{en.record.verified}</dt><dd><time datetime={page.verified_at}>{page.verified_at.slice(0, 10)}</time></dd></div></dl>
-          </section>
-          <section id="trace-context" class="trace-panel" data-trace-panel="context" aria-labelledby="trace-context-title">
-            <h3 id="trace-context-title">{copy.contextTitle}</h3>
-            <div class="context-file trace-object"><div class="file-head"><code>.ludion/lessons.md</code><span>{installed}</span></div><pre><code>{recorded}</code></pre></div>
-            <p class="panel-note">{copy.contextNote}</p>
-            <a class="record-link" href={`${repo}/blob/main/docs/demo/README.md`}>{copy.recordLink}<span aria-hidden="true"> ↗</span></a>
-          </section>
-        </div>
-      </div>
+<article class="lesson-trace" data-lesson-trace aria-label={v.title}>
+  <header class="trace-bar"><span class="trace-word">{v.title}</span></header>
+  <div class="trace-workspace">
+    <div class="trace-rail" data-trace-controls hidden role="group" aria-label={v.title}>
+      {steps.map((step) => (
+        <button type="button" data-trace-step={step.id} aria-pressed={step.id === "guard" ? "true" : "false"} aria-controls={`trace-${step.id}`}>
+          <span class="step-dot" aria-hidden="true"></span>
+          <span>{step.label}</span>
+        </button>
+      ))}
     </div>
-  </article>
-) : <p class="trace-unavailable"><a href="/lessons/">{copy.unavailable}</a></p>}
+    <div class="trace-inspector">
+      <div class="trace-panels">
+        {steps.map((step) => (
+          <section id={`trace-${step.id}`} class="trace-panel" data-trace-panel={step.id} aria-labelledby={`trace-${step.id}-title`}>
+            <h3 id={`trace-${step.id}-title`}>{step.label}</h3>
+            <p>{step.body}</p>
+          </section>
+        ))}
+      </div>
+      <p class="panel-note">{v.notVerified}</p>
+      <p class="panel-note">{v.sameModel}</p>
+      <p class="example">{en.home.example}</p>
+    </div>
+  </div>
+</article>
 
 <script>
   for (const trace of document.querySelectorAll<HTMLElement>("[data-lesson-trace]")) {
-    let updateGraphic = (_active:boolean) => {};
     const buttons = [...trace.querySelectorAll<HTMLButtonElement>("[data-trace-step]")];
     const panels = [...trace.querySelectorAll<HTMLElement>("[data-trace-panel]")];
     const select = (id: string) => {
-      for (const button of buttons) button.setAttribute("aria-pressed", String(button.dataset.traceStep === id));
-      for (const panel of panels) {
-        const selected = panel.dataset.tracePanel === id;
-        panel.hidden = !selected;
-        panel.toggleAttribute("data-active", selected);
+      for (const button of buttons) {
+        button.setAttribute("aria-pressed", String(button.dataset.traceStep === id));
       }
-      updateGraphic(id === "change");
+      for (const panel of panels) panel.hidden = panel.dataset.tracePanel !== id;
     };
     trace.classList.add("trace-ready");
     trace.querySelector<HTMLElement>("[data-trace-controls]")!.hidden = false;
-    select("change");
+    select("guard");
     for (const button of buttons) button.addEventListener("click", () => select(button.dataset.traceStep!));
-    // Buttons keep ordinary Tab/Enter behavior; arrow keys offer a faster way to inspect the sequence.
     for (const [index, button] of buttons.entries()) button.addEventListener("keydown", (event) => {
       let next: number;
       if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % buttons.length;
@@ -145,201 +61,94 @@ const steps = Object.entries(copy.steps);
       buttons[next]!.focus();
       select(buttons[next]!.dataset.traceStep!);
     });
-    const graphic = trace.querySelector<HTMLElement>("[data-trace-graphic]")!;
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-    const paths = [...graphic.querySelectorAll<SVGPathElement>("[data-trace-path]")];
-    const papers = [...graphic.querySelectorAll<SVGGElement>("[data-trace-paper]")];
-    const map = graphic.querySelector<SVGSVGElement>("svg")!;
-    const desktopPaths = paths.map(path=>path.getAttribute("d")!);
-    const compact = matchMedia("(max-width:760px), (max-width:1000px) and (max-height:500px)");
-    const resizeMap = () => {
-      const geometry = compact.matches ? ["M140 6C140 38 70 34 70 84","M140 6C140 38 210 34 210 84"] : desktopPaths;
-      map.setAttribute("viewBox",compact.matches ? "0 0 280 90" : "0 0 320 210");
-      paths.forEach((path,index)=>path.setAttribute("d",geometry[index]!));
-      [...map.querySelectorAll<SVGPathElement>(".branch-guide")].forEach((path,index)=>path.setAttribute("d",geometry[index]!));
-      const stopPoint = paths[0]!.getPointAtLength(paths[0]!.getTotalLength()*.54);
-      graphic.querySelector(".branch-stop")!.setAttribute("transform",`translate(${stopPoint.x} ${stopPoint.y})`);
-    };
-    resizeMap();
-    let visible = false, frame = 0, started = 0, playing = false, progress = 1;
-    const active = () => trace.querySelector('[data-trace-panel="change"]')!.hasAttribute("data-active");
-    const stop = () => { cancelAnimationFrame(frame); frame = 0; playing = false; progress = 1; trace.dataset.traceMoving = "false"; };
-    const draw = (now:number) => {
-      frame = 0;
-      if (!visible || document.hidden || !active()) return;
-      if (playing) { progress = Math.min(1,(now-started)/2600); if(progress === 1) { playing=false; trace.dataset.traceMoving="false"; } }
-      const p = progress*progress*(3-2*progress);
-      for (const [index,path] of paths.entries()) {
-        const t = index === 0 ? Math.min(.54,p) : p;
-        path.style.strokeDasharray = `${t} 1`;
-        const point = path.getPointAtLength(t*path.getTotalLength());
-        papers[index]!.setAttribute("transform",`translate(${point.x} ${point.y})`);
-        papers[index]!.style.opacity = p === 1 ? "0" : index === 0 && p > .54 ? String(Math.max(0,1-(p-.54)*5)) : "1";
-      }
-      if (playing) frame = requestAnimationFrame(draw);
-    };
-    const schedule = () => { if(visible && active() && !frame && !document.hidden)frame=requestAnimationFrame(draw); };
-    window.addEventListener("resize",()=>{resizeMap();schedule();});
-    const play = () => { stop(); if(!reduce.matches){progress=0;started=performance.now();playing=true;trace.dataset.traceMoving="true";}schedule(); };
-    updateGraphic = enabled => { stop(); if(enabled && visible)play(); };
-    new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(!visible)stop();else if(active())play();}).observe(graphic);
-    window.addEventListener("scroll",()=>{
-      if(!visible || reduce.matches || !active())return;
-      stop(); progress=Math.max(0,Math.min(1,(innerHeight*.78-graphic.getBoundingClientRect().top)/(innerHeight*.58)));schedule();
-    },{passive:true});
-    reduce.addEventListener("change",()=>{stop();schedule();});
-    document.addEventListener("visibilitychange",()=>{stop();if(!document.hidden)schedule();});
   }
 </script>
 
 <style>
-  .lesson-trace { width:min(calc(100% - var(--gutter) * 2),1000px); margin-inline:auto; border:1px solid var(--rule); border-radius:12px; background:var(--paper); overflow:hidden; text-align:left; box-shadow:0 24px 80px rgb(0 0 0 / .045); }
-  .trace-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:16px 24px; border-bottom:1px solid var(--rule); font-size:11px; }
-  .trace-word { color:var(--muted); }
-  .trace-bar a { text-decoration:none; }
-  .trace-bar a:hover { text-decoration:underline; }
-  .trace-workspace { display:grid; grid-template-columns:minmax(0,1fr); }
-  .trace-ready .trace-workspace { grid-template-columns:170px minmax(0,1fr); }
-  .trace-rail { padding:22px 12px; border-right:1px solid var(--rule); background:var(--paper-2); }
-  .trace-rail[hidden] { display:none; }
-  .trace-rail button { font:inherit; font-size:12px; width:100%; display:flex; align-items:center; gap:10px; min-height:44px; margin:0 0 7px; padding:10px 12px; border:1px solid transparent; border-radius:7px; background:transparent; color:var(--muted); text-align:left; cursor:pointer; transition:background 180ms,color 180ms; }
-  .trace-rail button:hover { color:var(--ink); }
-  .trace-rail button[aria-pressed="true"] { background:var(--paper); color:var(--ink); border-color:var(--rule); }
-  .step-dot { width:6px; height:6px; border:1px solid var(--muted); border-radius:50%; flex-shrink:0; }
-  [aria-pressed="true"] .step-dot { background:var(--ink); border-color:var(--ink); }
-  .step-number { margin-left:auto; font:9px var(--font-code); color:var(--muted); }
-  .trace-inspector { padding:28px 32px 34px; min-width:0; }
-  .lesson-meta { display:flex; align-items:center; gap:12px; color:var(--muted); font-size:11px; }
-  .lesson-meta code { font-size:11px; }
-  .lesson-meta > span { margin-left:auto; border:1px solid var(--rule); border-radius:4px; padding:2px 6px; font:11px var(--font-code); }
-  .generated-claim { font-size:13px; line-height:1.7; margin:16px 0; color:var(--text); max-width:68ch; }
-  .trace-claim { margin-block:10px 16px; }
-  .trace-claim summary { width:max-content; min-height:36px; padding:8px 0; font-size:11px; color:var(--muted); cursor:pointer; }
-  .trace-signature { margin-bottom:24px; }
-  .trace-signature :global(.signature.compact) { font-size:10px; gap:6px 12px; }
-  .trace-signature :global(.compact .by) { font-size:11px; }
-  .trace-signature :global(.seal.compact) { font-size:10px; height:22px; }
-  .trace-panels { border-top:1px solid var(--rule); }
-  .trace-ready .trace-panels { display:grid; }
-  .trace-panel { padding-top:24px; min-width:0; }
-  .trace-ready .trace-panel { grid-area:1 / 1; }
-  /* Reserve the largest stage so selecting a step doesn't move the following scene. Hidden stages can't receive focus. */
-  .trace-ready .trace-panel[hidden] { display:block; visibility:hidden; pointer-events:none; }
-  .trace-panel + .trace-panel { margin-top:30px; }
-  .trace-ready .trace-panel + .trace-panel { margin-top:0; }
-  h3 { font-size:17px; letter-spacing:-.025em; font-weight:450; }
-  .inheritance-scene { padding-top:10px; }
-  .root-config { display:grid; justify-items:center; gap:8px; width:max-content; max-width:100%; margin:auto; padding:18px 30px; border:1px solid var(--rule); border-radius:8px; background:var(--paper-2); }
-  .root-config span { font-size:11px; color:var(--muted); }
-  .root-config code { font-size:14px; color:var(--ink); }
-  .inheritance-map { display:block; width:min(100%,440px); height:auto; overflow:visible; margin:-2px auto 0; }
-  .inheritance-map path { fill:none; stroke:var(--ink); stroke-width:1; }
-  .branch-guide { opacity:.14; }
-  .inheritance-map .blocked { stroke-dasharray:.54 1; opacity:.45; }
-  .inheritance-map .connected { stroke-dasharray:1 1; }
-  .flow-paper rect { fill:var(--paper); stroke:var(--ink); }
-  .flow-paper path { opacity:.35; }
-  .flow-paper { opacity:0; }
-  .branch-stop circle { fill:var(--paper); stroke:var(--rule); }
-  .branch-stop path { opacity:.5; }
-  .version-bridge { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; max-width:440px; margin-inline:auto; }
-  .version-node { min-width:0; }
-  .version-pin { color:var(--muted); font:11px var(--font-code); margin:0 0 22px; }
-  .version-pin strong { display:block; color:var(--ink); font-size:32px; font-weight:450; letter-spacing:-.06em; margin-top:6px; }
-  .config-node { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; padding:13px 12px; border:1px solid var(--rule); border-radius:5px; color:var(--muted); font-size:11px; }
-  .config-node code { color:var(--ink); font-size:11px; }
-  .inherited .config-node:last-of-type { border-color:var(--ink); }
-  .behavior { margin:15px 0 0; font-size:11px; color:var(--muted); }
-  .panel-note { font-size:11px; color:var(--muted); line-height:1.7; margin:24px 0 0; }
-  .panel-note a { color:inherit; }
-  .evidence-contract { margin:24px 0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-  .contract-row { display:flex; flex-direction:column; gap:10px; border:1px solid var(--rule); border-radius:5px; padding:14px; font-size:11px; }
-  .contract-row > code { font-size:11px; overflow-wrap:anywhere; }
-  .contract-row > span { color:var(--muted); font-size:11px; }
-  .contract-row .expected-error { font-size:10px; line-height:1.7; color:var(--muted); }
-  .trace-panel :global(.source) { padding:16px; margin:0; border-radius:5px; }
-  .trace-panel :global(.source figcaption) { font-size:11px; font-weight:500; }
-  .trace-panel :global(.source blockquote p) { font-size:13px; letter-spacing:0; line-height:1.7; }
-  .trace-panel :global(.source .where) { font-size:11px; }
-  .trace-panel :global(.source .where a) { display:inline-block; min-height:24px; padding-block:3px; }
-  .teacher-object { display:flex; gap:24px; align-items:center; margin-top:35px; }
-  .account-mark { display:grid; place-items:center; width:82px; height:82px; flex-shrink:0; border:1px solid var(--rule); border-radius:15px; color:var(--muted); font-size:42px; line-height:1; font-weight:400; }
-  .teacher-name { font-size:24px; letter-spacing:-.04em; text-decoration:none; color:var(--ink); overflow-wrap:anywhere; }
-  .teacher-object p { margin:9px 0 0; font-size:11px; color:var(--muted); }
-  .teacher-object p code { display:block; margin-top:4px; font-size:11px; color:var(--ink); }
-  .publication { margin:34px 0 0; font-size:11px; }
-  .publication > div { display:grid; grid-template-columns:140px minmax(0,1fr); gap:14px; padding:12px 0; border-top:1px solid var(--rule); }
-  .publication dt { color:var(--muted); }
-  .publication dd { margin:0; overflow-wrap:anywhere; }
-  .context-file { margin-top:24px; border:1px solid var(--rule); border-radius:5px; overflow:hidden; }
-  .file-head { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; padding:13px 16px; border-bottom:1px solid var(--rule); background:var(--paper-2); color:var(--muted); font-size:11px; }
-  .file-head code { color:var(--ink); font-size:11px; }
-  pre { margin:0; padding:22px 16px; white-space:pre-wrap; overflow-wrap:anywhere; }
-  pre code { font-size:12px; line-height:1.8; }
-  .record-link { display:inline-block; margin-top:15px; font-size:11px; }
-  .trace-panel[data-active] .trace-object { animation:trace-appear 350ms cubic-bezier(.2,.8,.2,1) both; }
-  @keyframes trace-appear { from{opacity:.45;transform:translateY(7px)}to{opacity:1;transform:none} }
-  @media(max-width:760px),(max-width:1000px) and (max-height:500px) {
-    .trace-ready .trace-workspace { grid-template-columns:minmax(0,1fr); }
-    .trace-bar { padding:8px 16px; }
-    .trace-bar a { display:inline-flex; align-items:center; min-height:44px; }
-    .trace-rail { display:flex; flex-wrap:wrap; gap:4px; padding:6px; border-right:0; border-bottom:1px solid var(--rule); }
-    .trace-rail button { flex:1 1 60px; width:auto; min-width:min-content; margin:0; justify-content:center; padding:10px 5px; font-size:12px; }
-    .step-dot { display:none; }
-    .step-number { display:none; }
-    .trace-inspector { padding:18px 16px 22px; }
-    .lesson-meta { flex-wrap:wrap; }
-    .trace-claim { margin-block:6px 10px; }
-    .trace-claim summary { min-height:44px; font-size:12px; }
-    .trace-signature { margin-bottom:18px; }
-    .trace-signature :global(.signature.compact),.trace-signature :global(.compact .by) { font-size:12px; }
-    .trace-ready .trace-panels { display:block; }
-    .trace-ready .trace-panel[hidden] { display:none; }
-    .trace-panel { padding-top:18px; }
-    .root-config { padding:8px 20px; gap:4px; }
-    .root-config span { font-size:12px; }
-    .inheritance-map { width:min(100%,280px); }
-    .version-bridge { grid-template-columns:repeat(auto-fit,minmax(min(100%,6em),1fr)); max-width:280px; gap:12px; }
-    .version-pin { margin-bottom:12px; }
-    .version-pin strong { font-size:25px; line-height:1.15; margin-top:4px; }
-    .config-node { display:grid; padding:9px 10px; font-size:12px; gap:3px; }
-    .config-node code { font-size:12px; }
-    .behavior { font-size:12px; line-height:1.5; margin-top:10px; }
-    .panel-note { font-size:12px; margin-top:18px; }
-    .evidence-contract { grid-template-columns:1fr; }
-    .contract-row,.contract-row > span,.contract-row > code,.contract-row .expected-error { font-size:12px; }
-    .publication { font-size:12px; margin-top:24px; }
-    .record-link { display:inline-flex; align-items:center; min-height:44px; font-size:12px; }
-    .file-head code { min-width:0; max-width:100%; overflow-wrap:anywhere; }
+  .lesson-trace {
+    width: min(calc(100% - var(--gutter) * 2), 1000px);
+    margin-inline: auto;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    background: var(--paper);
+    overflow: hidden;
+    text-align: left;
+    box-shadow: 0 24px 80px rgb(0 0 0 / .045);
   }
-  @media(max-width:400px) {
-    .trace-bar { padding:8px 16px; font-size:11px; }
-    .trace-inspector { padding:18px 16px 22px; }
-    .trace-rail { gap:2px; padding:6px; }
-    .trace-rail button { font-size:12px; }
-    .step-dot { width:4px; height:4px; }
-    .generated-claim { font-size:12px; }
-    .version-bridge { gap:12px; }
-    .version-pin strong { font-size:25px; }
-    .config-node { padding:9px 8px; font-size:12px; }
-    .config-node code { font-size:12px; }
-    .evidence-contract { gap:8px; }
-    .contract-row { padding:11px; }
-    .teacher-object { gap:16px; }
-    .account-mark { width:58px; height:58px; font-size:32px; border-radius:10px; }
-    .teacher-name { font-size:21px; }
-    .publication > div { grid-template-columns:100px minmax(0,1fr); }
+  .trace-bar {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 11px;
   }
-  @media(min-width:641px) and (max-width:1000px) and (max-height:500px) {
-    .trace-bar { padding:0 12px; }
-    .trace-rail { padding:2px; }
-    .trace-inspector { display:grid; grid-template-columns:160px minmax(0,1fr); grid-template-rows:max-content max-content 1fr; align-content:start; gap:0 14px; padding:12px 14px; }
-    .lesson-meta { grid-area:1 / 1; align-self:start; }
-    .trace-claim { grid-area:2 / 1; align-self:start; }
-    .trace-signature { grid-area:3 / 1; align-self:start; }
-    .trace-panels { grid-area:1 / 2 / span 3; min-width:0; border-left:1px solid var(--rule); padding-left:14px; }
-    .trace-panel { border-top:0; padding-top:0; }
-    .root-config { padding-block:6px; }
+  .trace-workspace { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .trace-ready .trace-workspace { grid-template-columns: 170px minmax(0, 1fr); }
+  .trace-rail { padding: 22px 12px; border-right: 1px solid var(--rule); background: var(--paper-2); }
+  .trace-rail[hidden] { display: none; }
+  .trace-rail button {
+    font: inherit;
+    font-size: 12px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin: 0 0 7px;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    text-align: left;
+    cursor: pointer;
   }
-  @media(prefers-reduced-motion:reduce) { .trace-panel[data-active] .trace-object { animation:none; } }
+  .trace-rail button:hover { color: var(--ink); }
+  .trace-rail button[aria-pressed="true"] { background: var(--paper); color: var(--ink); border-color: var(--rule); }
+  .step-dot { width: 6px; height: 6px; border: 1px solid var(--muted); border-radius: 50%; flex-shrink: 0; }
+  [aria-pressed="true"] .step-dot { background: var(--ink); border-color: var(--ink); }
+  .trace-inspector { padding: 28px 32px 34px; min-width: 0; }
+  .trace-panels { border-top: 1px solid var(--rule); }
+  .trace-ready .trace-panels { display: grid; }
+  .trace-panel { padding-top: 24px; min-width: 0; }
+  .trace-ready .trace-panel { grid-area: 1 / 1; }
+  .trace-ready .trace-panel[hidden] { display: block; visibility: hidden; pointer-events: none; }
+  .trace-panel + .trace-panel { margin-top: 28px; }
+  .trace-ready .trace-panel + .trace-panel { margin-top: 0; }
+  h3 { margin: 0 0 12px; font-size: 17px; letter-spacing: -0.025em; font-weight: 450; }
+  .trace-panel p, .panel-note, .example {
+    margin: 0;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+  .panel-note, .example { margin-top: 18px; color: var(--muted); font-size: 13px; }
+  .example { font-size: 12px; }
+  @media (max-width: 760px), (max-width: 1000px) and (max-height: 500px) {
+    .trace-ready .trace-workspace { grid-template-columns: minmax(0, 1fr); }
+    .trace-bar { padding: 8px 16px; }
+    .trace-rail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 6px;
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .trace-rail button {
+      flex: 1 1 60px;
+      width: auto;
+      margin: 0;
+      justify-content: center;
+      padding: 10px 5px;
+      font-size: 12px;
+    }
+    .step-dot { display: none; }
+    .trace-inspector { padding: 18px 16px 22px; }
+    .trace-ready .trace-panels { display: block; }
+    .trace-ready .trace-panel[hidden] { display: none; }
+    .panel-note, .example, .trace-panel p { font-size: 14px; }
+  }
 </style>

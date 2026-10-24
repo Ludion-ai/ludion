@@ -1,7 +1,7 @@
 // The water on every page that has a pool: text contrast over the canvas, and the home JavaScript budget.
 // axe can't see text drawn over a canvas, so this measures it directly: hide the text, step the water's clock,
 // screenshot, and take the worst background pixel under each text box (docs/decisions.md, Site; water.js).
-import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { PNG } from "pngjs";
 import { gzipSync } from "node:zlib";
 
@@ -75,28 +75,18 @@ async function targets(page: Page, screen: number): Promise<Target[]> {
 }
 
 const SCREEN = 1100;
-// The home replay over 12 s (before, during, and after the ring), the other pools over 6 s.
-const pages: { path: string | ((request: APIRequestContext) => Promise<string>); moments: number }[] = [
+// The home replay over 12 s (before, during, and after the ring), sync setup over 6 s.
+const pages: { path: string; moments: number }[] = [
   { path: "/", moments: MOMENTS },
-  { path: "/bench/", moments: 20 },
-  { path: "/lessons/", moments: 20 },
-  {
-    // The newest lesson verified across versions: its evidence (the pool) has the most text near the top.
-    path: async (request) => {
-      const index = (await (await request.get("/index.json")).json()) as { lessons: { id: string; verified_by: string }[] };
-      const l = index.lessons.find((x) => x.verified_by === "differential") ?? index.lessons[0]!;
-      return `/lessons/${l.id}/`;
-    },
-    moments: 20,
-  },
+  { path: "/start/", moments: 20 },
 ];
 
 for (const { path, moments } of pages) {
   for (const colorScheme of ["light", "dark"] as const) {
-    test(`text over the water keeps its contrast (${typeof path === "string" ? path : "a lesson"}, ${colorScheme})`, async ({ browser, request }) => {
+    test(`text over the water keeps its contrast (${path}, ${colorScheme})`, async ({ browser }) => {
       // CI renders WebGL in software, so keep each screenshot small (only the text area) and allow time.
       test.setTimeout(240_000);
-      const url = typeof path === "string" ? path : await path(request);
+      const url = path;
       const context = await browser.newContext({ viewport: { width: 1280, height: SCREEN }, colorScheme });
       const page = await context.newPage();
       await page.clock.install({ time: 0 });

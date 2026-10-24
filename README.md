@@ -17,23 +17,9 @@ npx ludion-ai sync
 
 An 89-second replay of recorded runs is in [`docs/demo/sync-vitest.cast`](docs/demo/sync-vitest.cast) (`asciinema play docs/demo/sync-vitest.cast`). It shows one question answered without and with `sync`, then a lesson taught with `ludion teach` and written by `sync` in another project. It is built from recorded output by `docs/demo/make-cast.ts`, and [`docs/demo/README.md`](docs/demo/README.md) says what was recorded when and what was left out.
 
-## What it measured
+## Ludion v3 (in design)
 
-All numbers below come from runs whose files are in [`docs/bench/`](docs/bench/).
-
-**With vs without `ludion sync`** (2026-10-11, [`docs/bench/2026-10-11-done3/`](docs/bench/2026-10-11-done3/)). Claude Code (`claude-opus-5-5`) with its read-only tools (read, search, web search and fetch, and a few fixed commands such as `npm ls`), in projects with the new versions installed, answering 45 questions about changes in vitest 5.0, wrangler 4.111 to 4.148, and the Cloudflare Agents SDK 0.19 to 0.27. An opus judge graded each answer against an answer key checked against primary sources. The lessons were the 31 seeds frozen at commit `7d61ed1`, covering 30 of the 45 changes.
-
-| | without sync | with sync |
-| - | - | - |
-| changes a lesson covers (30) | 16/30 | 28/30 |
-| changes no lesson covers (15) | 8/15 | 8/15 |
-| all 45 | **24/45** | **36/45** |
-
-The whole gain came from changes a lesson covers; the others didn't move. One trial per question per condition. The coding-task half of this check (C tasks) is still being run, one batch a day.
-
-**A correction that survives** (2026-10-11, [`docs/bench/2026-10-11-done1/`](docs/bench/2026-10-11-done1/)). A vitest 5 lesson taught in one project reached another through `ludion sync`. Claude Code then did the task right 5 times out of 5, against 1 out of 5 before (one task, and the agent had no shell).
-
-**What models know without tools** (2026-10-11, [`docs/bench/2026-10-11-models/`](docs/bench/2026-10-11-models/)). Claude Haiku, Sonnet, and Opus 5.5 each answered the same 45 changes twice with no tools: 3 to 5 right out of 45 per trial.
+A capability is meant to pair a guard (applicable, inapplicable, unknown, stale), a program, a fixed verifier its generator can't change, and a receipt. Nothing here is verified yet; no results are published.
 
 ## What it holds today
 

@@ -1,3 +1,11 @@
-# /models became /bench (docs/decisions.md, "The bench page").
-/models /bench/ 301
-/models/ /bench/ 301
+# Lesson and bench pages were removed (Ludion v3, in design). Lessons still ship via sync and index.json.
+/models / 301
+/models/ / 301
+/lessons /start/ 301
+/lessons/ /start/ 301
+/lessons/* /start/ 301
+/teachers/* /start/ 301
+/bench / 301
+/bench/ / 301
+/bench/* / 301
+/bench.json / 301

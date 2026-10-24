@@ -1,27 +1,38 @@
 ---
 import BrandMark from "./BrandMark.astro";
 import { en } from "../strings/en.ts";
-import { DATA_LINE } from "../../../../packages/cli/src/render.ts";
-import { COVERAGE_LINE } from "@ludion/core";
-const s = en.home.delivery;
-// These are the actual wiring contracts in packages/cli/src/render.ts. This UI previews them; it writes no files.
+const iso = en.home.isolate;
+// Stage labels for the existing delivery animation. This page runs nothing.
+const s = {
+  label: iso.title,
+  choose: iso.title,
+  context: "program",
+  reference: "verifier",
+  inline: "verifier",
+  illustration: iso.scope,
+  replay: "Replay",
+  scope: iso.scope,
+  limits: iso.limits,
+  unavailable: iso.unavailable,
+  setup: en.nav.start,
+};
 const routes = [
-  {id:"claude",name:"Claude Code",file:"CLAUDE.md",code:"@.ludion/lessons.md",note:s.claude},
-  {id:"codex",name:"Codex",file:"AGENTS.md",code:"Before writing code that uses this project's packages, read `.ludion/lessons.md`: changes in the installed versions that you may not know.",note:s.codex},
-  {id:"cursor",name:"Cursor",file:".cursor/rules/ludion.mdc",code:`---\ndescription: Changes in this project's installed package versions (written by ludion sync)\nalwaysApply: true\n---\n\n# Lessons from Ludion\n\n${DATA_LINE}\n\n${COVERAGE_LINE}`,note:s.cursor},
+  { id: "install", name: iso.install, file: "install", note: iso.installDetail },
+  { id: "run", name: iso.run, file: "run", note: iso.runDetail },
+  { id: "apply", name: iso.apply, file: "apply", note: iso.applyDetail },
 ];
 ---
 <div class="delivery" data-delivery data-reference={s.reference} data-inline={s.inline}>
   <div class="delivery-bar"><span>{s.label}</span><div role="group" aria-label={s.choose} class="destinations" hidden>{routes.map((route,i) => <button type="button" data-delivery-target={route.id} aria-pressed={i === 0 ? "true" : "false"}>{route.name}</button>)}</div></div>
   <figure class="delivery-figure" aria-labelledby="delivery-caption">
     <div class="delivery-visual" data-delivery-visual aria-hidden="true">
-      <div class="fallback-route"><span><BrandMark size={24}/><code>.ludion/lessons.md</code></span><i>→</i><span><code data-static-destination>CLAUDE.md</code></span></div>
+      <div class="fallback-route"><span><BrandMark size={24}/><code>program</code></span><i>→</i><span><code data-static-destination>install</code></span></div>
       <div class="three-space" data-delivery-space></div>
-      <div class="visual-labels"><div><span>{s.context}</span><code>.ludion/lessons.md</code></div><div><span data-flat-mode>{s.reference}</span><code data-static-destination>CLAUDE.md</code></div></div>
+      <div class="visual-labels"><div><span>{s.context}</span><code>program</code></div><div><span data-flat-mode>{s.reference}</span><code data-static-destination>install</code></div></div>
       <div class="mobile-space" data-mobile-delivery>
-        <div class="mobile-file"><span>{s.context}</span><code>.ludion/lessons.md</code></div>
+        <div class="mobile-file"><span>{s.context}</span><code>program</code></div>
         <div class="mobile-route"><i></i><div class="mobile-packet" data-mobile-packet><i class="paper-shape"></i></div></div>
-        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>Claude Code</span><code data-static-destination>CLAUDE.md</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">.ludion/lessons.md</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
+        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>{routes[0]!.name}</span><code data-static-destination>install</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">program</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
       </div>
     </div>
     <figcaption id="delivery-caption" class="visually-hidden">{s.illustration}</figcaption>
@@ -29,14 +40,16 @@ const routes = [
   </figure>
   <div class="wiring-output">
     {routes.map((route) => <article class="wiring-route" data-wiring-route={route.id} data-file={route.file}>
-      <div class="file-bar"><span>{route.name}</span><code>{route.file}</code></div>
-      <details class="wiring-details"><summary>{s.wiring}</summary><pre><code>{route.code}</code></pre></details><p>{route.note}</p>
+      <div class="file-bar"><span>{route.name}</span></div>
+      <p>{route.note}</p>
     </article>)}
   </div>
-  <div class="command"><code>npx ludion-ai sync</code><button type="button" data-delivery-copy hidden aria-label={s.copyLabel} data-copied={s.copied} data-fallback={s.copyFallback}>{s.copy}</button><a href="/start/">{s.setup}<span aria-hidden="true"> ↗</span></a></div>
+  <p class="limits">{s.limits}</p>
+  <p class="unavailable">{s.unavailable}</p>
+  <p class="command"><a href="/start/">{s.setup}<span aria-hidden="true"> ↗</span></a></p>
   <p class="delivery-scope">{s.scope}</p><span class="visually-hidden" role="status" data-delivery-status></span>
-  <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>.ludion/lessons.md</code></div><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></template>
-  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>Claude Code</span><code data-world-file>CLAUDE.md</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>.ludion/lessons.md</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
+  <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>program</code></div><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></template>
+  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>install</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>program</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
   <template data-delivery-object="packet"><div class="packet"><div class="packet-papers"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div><span>{s.context}</span></div></template>
   <template data-delivery-object="floor"><div class="world-floor"></div></template>
 </div>
@@ -128,7 +141,7 @@ const routes = [
     };
     root.classList.add("delivery-ready");
     root.querySelector<HTMLElement>(".destinations")!.hidden = false; replay.hidden = false;
-    choose("claude",false); resize();
+    choose("install",false); resize();
     new ResizeObserver(resize).observe(visual);
     new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -145,11 +158,6 @@ const routes = [
     reduce.addEventListener("change",()=>{finish();pointerX=pointerY=0;cancelAnimationFrame(frame);frame=0;schedule();});
     compact.addEventListener("change",()=>{resize();schedule();});
     document.addEventListener("visibilitychange",()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;finish();}else schedule();});
-    const copy = root.querySelector<HTMLButtonElement>("[data-delivery-copy]")!;
-    if (navigator.clipboard) {
-      copy.hidden = false;
-      copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText("npx ludion-ai sync");copy.textContent=copy.dataset.copied!;root.querySelector("[data-delivery-status]")!.textContent=copy.dataset.copied!;}catch{root.querySelector("[data-delivery-status]")!.textContent=copy.dataset.fallback!;}});
-    }
   }
 </script>
 
@@ -195,6 +203,8 @@ const routes = [
   .command button { color:var(--ink); margin-left:auto; }
   .command a { font-size:12px; color:var(--muted); }
   .command button[hidden] { display:none; }
+  .limits, .unavailable { margin:0; padding:16px 28px 0; font-size:13px; line-height:1.7; color:var(--text); overflow-wrap:anywhere; }
+  .unavailable { padding-top:8px; color:var(--muted); font-size:12px; }
   .delivery-scope { margin:0; padding:13px 28px; border-top:1px solid var(--rule); font-size:11px; line-height:1.7; color:var(--muted); }
   .world-file { width:360px; height:220px; padding:24px; overflow:hidden; background:var(--paper); border:1px solid var(--rule); border-radius:8px; box-shadow:0 18px 40px rgb(0 0 0 / .04); }
   .world-label { display:block; font-size:15px; color:var(--muted); margin-bottom:16px; }
@@ -222,8 +232,8 @@ const routes = [
   @media(max-width:640px),(max-width:1000px) and (max-height:500px) {
     .delivery-bar { padding:8px; }
     .delivery-bar > span { display:none; }
-    .destinations { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; }
-    .destinations button { min-height:44px; padding-inline:6px; font-size:12px; }
+    .destinations { display:grid; grid-template-columns:minmax(0,1fr); width:100%; }
+    .destinations button { min-height:44px; padding-inline:8px; font-size:12px; white-space:normal; overflow-wrap:anywhere; text-align:left; }
     .delivery-visual { height:auto; min-height:258px; }
     .delivery-ready .three-space,.visual-labels { display:none; }
     .delivery-ready .mobile-space { display:grid; grid-template-rows:auto 36px auto; padding:16px 18px; max-width:390px; margin:auto; }
@@ -253,9 +263,9 @@ const routes = [
     .wiring-route p,.file-bar,.delivery-scope { font-size:12px; }
     .wiring-details { margin-top:4px; }
     .wiring-details summary { width:100%; min-height:44px; font-size:12px; }
-    .command { display:grid; grid-template-columns:1fr 1fr; padding:12px 18px; gap:6px 12px; }
-    .command > code { grid-column:1 / -1; font-size:14px; }
-    .command button { width:100%; margin:0; min-height:44px; background:var(--paper-2); }
+    .limits, .unavailable, .wiring-route p, .file-bar, .delivery-scope { font-size:12px; }
+    .limits, .unavailable { padding-inline:18px; }
+    .command { display:flex; padding:12px 18px; }
     .command a { display:inline-flex; align-items:center; justify-content:center; min-height:44px; }
     .delivery-scope { padding-inline:18px; }
     pre { padding:14px; }
@@ -267,7 +277,5 @@ const routes = [
     .mobile-route > i { left:0; top:50%; width:100%; height:1px; }
     .mobile-packet { top:50%; left:0; transform:translate(calc(-30px + var(--mobile-travel,1) * 92px),-50%); }
     .command { display:flex; }
-    .command > code { margin-right:auto; }
-    .command button { width:auto; }
   }
 </style>

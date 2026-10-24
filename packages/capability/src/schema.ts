@@ -152,6 +152,9 @@ export const FIXED_PROTECTED_GLOBS = [
   ".github/**",
   ".git/**",
   "**/.git/**",
+  "**/.git",
+  "**/.gitmodules",
+  "**/.husky/**",
   "node_modules/**",
   "**/node_modules/**",
   "**/package.json",
@@ -168,6 +171,12 @@ export const FIXED_PROTECTED_GLOBS = [
   "**/test-setup.{ts,mts,cts,js,mjs,cjs}",
   "**/tsconfig*.json",
   "**/.npmrc",
+  // Yarn v1 .yarnrc and Berry .yarnrc.yml. Not "**/.yarnrc*": with conservative overlap that glob
+  // would collide with every "*.test.ts" write (e.g. ".yarnrc.test.ts").
+  "**/.yarnrc",
+  "**/.yarnrc.yml",
+  "**/.yarnrc.yaml",
+  "**/.pnpmfile.cjs",
 ] as const;
 
 /** De-duplicated union of the fixed denylist and producer extras. */

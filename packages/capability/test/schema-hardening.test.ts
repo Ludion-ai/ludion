@@ -291,6 +291,47 @@ describe("2 fixed denylist", () => {
     }
   });
 
+  it("rejects .git files, submodule and package-manager hooks at any depth and case", () => {
+    const rejected = [
+      ".git",
+      "sub/.git",
+      ".GIT",
+      "a/b/.Git",
+      ".gitmodules",
+      "sub/.gitmodules",
+      ".yarnrc",
+      ".yarnrc.yml",
+      ".YARNRC.yaml",
+      "pkg/.yarnrc.yml",
+      ".pnpmfile.cjs",
+      "pkg/.pnpmfile.cjs",
+      ".husky/pre-commit",
+      "pkg/.husky/_/husky.sh",
+    ];
+    for (const g of rejected) {
+      const parsed = parseArtifact((a) => {
+        a.program.effects.writes = [g];
+        a.verifier.protected_paths = [];
+      });
+      expect({ g, ok: parsed.success }).toEqual({ g, ok: false });
+      expect(messages(parsed)).toContain("overlaps protected glob");
+    }
+    for (const g of ["src/git.ts", "src/gitmodules.test.ts", "src/yarnrc.test.ts", "src/husky.test.ts"]) {
+      const parsed = parseArtifact((a) => {
+        a.program.effects.writes = [g];
+        a.verifier.protected_paths = [];
+      });
+      expect({ g, ok: parsed.success }).toEqual({ g, ok: true });
+    }
+    for (const g of ["**/.git", "**/.gitmodules", "**/.yarnrc", "**/.yarnrc.yml", "**/.pnpmfile.cjs", "**/.husky/**"]) {
+      expect(FIXED_PROTECTED_GLOBS).toContain(g);
+    }
+    expect(globMatch("**/.git", ".git")).toBe(true);
+    expect(globMatch("**/.git", "sub/.git")).toBe(true);
+    expect(globMatch("**/.yarnrc.yml", "a/.yarnrc.yml")).toBe(true);
+    expect(globMatch("**/.husky/**", ".husky/pre-commit")).toBe(true);
+  });
+
   it("rejects tools/verify even when the producer lists no protected paths", () => {
     const parsed = parseArtifact((a) => {
       a.verifier.protected_paths = [];

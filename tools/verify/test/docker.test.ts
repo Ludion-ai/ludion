@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,6 +10,7 @@ import {
   checkNpmLockfile,
   dockerArgs,
   dockerMountSource,
+  ensureViteScratchDirs,
   imageFor,
   IMAGE_DIGESTS,
   installArgs,
@@ -70,6 +71,33 @@ function mountDestination(spec: string): string {
 
 const TMP_TMPFS = "/tmp:rw,noexec,nosuid,nodev,size=64m";
 const RUN_WORK_TMPFS = "/w:rw,noexec,nosuid,nodev,size=128m,mode=1777";
+const VITE_SCRATCH_TMPFS = {
+  ".vite-temp": "/w/node_modules/.vite-temp:rw,noexec,nosuid,nodev,size=32m,mode=1777",
+  ".vite": "/w/node_modules/.vite:rw,noexec,nosuid,nodev,size=32m,mode=1777",
+} as const;
+
+function linkDir(target: string, path: string): void {
+  symlinkSync(target, path, process.platform === "win32" ? "junction" : "dir");
+}
+
+/** Vite tmpfs flags sit immediately after the read-only node_modules bind, in this order. */
+function expectViteScratchTmpfs(args: readonly string[], names: readonly (keyof typeof VITE_SCRATCH_TMPFS)[]): void {
+  const roAt = args.findIndex((arg) => arg.endsWith(":/w/node_modules:ro"));
+  expect(roAt).toBeGreaterThan(0);
+  expect(args[roAt - 1]).toBe("-v");
+  let cursor = roAt + 1;
+  for (const name of names) {
+    expect(args[cursor], name).toBe("--tmpfs");
+    expect(args[cursor + 1], name).toBe(VITE_SCRATCH_TMPFS[name]);
+    cursor += 2;
+  }
+  const vite = valuesAfter(args, "--tmpfs").filter((flag) => flag.startsWith("/w/node_modules/"));
+  expect(vite).toEqual(names.map((name) => VITE_SCRATCH_TMPFS[name]));
+  for (const spec of mounts(args)) {
+    expect(spec.endsWith(":ro"), spec).toBe(true);
+    expect(spec, spec).not.toContain(".vite");
+  }
+}
 
 /** Run phase: /w is a tmpfs, and every bind is read-only and not the whole work directory. */
 function expectRunMounts(args: readonly string[]): void {
@@ -458,6 +486,164 @@ describe("docker run hardening", () => {
     }
     const srcText = readFileSync(DOCKER_TS, "utf8");
     expect(srcText.slice(srcText.indexOf("export const runInDocker"))).toContain("prepareSandboxWorkDir(workDir)");
+  });
+});
+
+describe("vite scratch directories", () => {
+  function viteRoot(): { root: string; work: string; outside: string } {
+    const root = mkdtempSync(join(tmpdir(), "ludion-vite-"));
+    const work = join(root, "work");
+    const outside = join(root, "outside");
+    mkdirSync(work);
+    mkdirSync(outside);
+    return { root, work, outside };
+  }
+
+  it("mounts both scratch tmpfs after the read-only bind when the directories exist", () => {
+    const { root, work } = viteRoot();
+    const deps = join(root, "deps");
+    mkdirSync(deps);
+    try {
+      const nm = join(work, "node_modules");
+      mkdirSync(nm);
+      mkdirSync(join(nm, ".vite-temp"));
+      mkdirSync(join(nm, ".vite"));
+      mkdirSync(join(work, "site"));
+      const args = buildDockerRunArgs({ phase: "run", runtime: "node@24", name: "n", workDir: work, verifierDeps: deps });
+      expectViteScratchTmpfs(args, [".vite-temp", ".vite"]);
+      expect(valuesAfter(args, "--tmpfs")).toEqual([
+        TMP_TMPFS,
+        RUN_WORK_TMPFS,
+        VITE_SCRATCH_TMPFS[".vite-temp"],
+        VITE_SCRATCH_TMPFS[".vite"],
+      ]);
+      expect(mounts(args)).toEqual([
+        `${dockerMountSource(nm)}:/w/node_modules:ro`,
+        `${dockerMountSource(deps)}:/verifier:ro`,
+      ]);
+      expectRunMounts(args);
+      expect(args.join(" ")).not.toMatch(/-v \S*\.vite/);
+
+      const py = buildDockerRunArgs({ phase: "run", runtime: "python@3.12", name: "n", workDir: work });
+      expect(valuesAfter(py, "--tmpfs")).toEqual([TMP_TMPFS, RUN_WORK_TMPFS]);
+      expect(py.join(" ")).not.toContain(":/w/node_modules");
+      expect(mounts(py)).toEqual([`${dockerMountSource(join(work, "site"))}:/w/site:ro`]);
+      expectRunMounts(py);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("omits a scratch tmpfs when that directory is absent and does not create it", () => {
+    const { root, work } = viteRoot();
+    try {
+      const nm = join(work, "node_modules");
+      mkdirSync(nm);
+      const absent = buildDockerRunArgs({ phase: "run", runtime: "node@24", name: "n", workDir: work });
+      expect(valuesAfter(absent, "--tmpfs")).toEqual([TMP_TMPFS, RUN_WORK_TMPFS]);
+      expect(absent.join("\n")).not.toContain("/w/node_modules/.vite");
+      expect(mounts(absent)).toEqual([`${dockerMountSource(nm)}:/w/node_modules:ro`]);
+      expectRunMounts(absent);
+      expect(existsSync(join(nm, ".vite-temp"))).toBe(false);
+      expect(existsSync(join(nm, ".vite"))).toBe(false);
+
+      mkdirSync(join(nm, ".vite"));
+      const onlyCache = buildDockerRunArgs({ phase: "run", runtime: "node@24", name: "n", workDir: work });
+      expectViteScratchTmpfs(onlyCache, [".vite"]);
+      expect(onlyCache.join("\n")).not.toContain(VITE_SCRATCH_TMPFS[".vite-temp"]);
+      expectRunMounts(onlyCache);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("does not mount a symlinked or non-directory .vite-temp", () => {
+    const { root, work, outside } = viteRoot();
+    try {
+      const nm = join(work, "node_modules");
+      mkdirSync(nm);
+      mkdirSync(join(nm, ".vite"));
+      linkDir(outside, join(nm, ".vite-temp"));
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node@24", name: "n", workDir: work })).toThrow(
+        /Vite scratch directory \.vite-temp must be a real directory/,
+      );
+      expect(readdirSync(outside)).toEqual([]);
+
+      rmSync(join(nm, ".vite-temp"), { recursive: true, force: true });
+      writeFileSync(join(nm, ".vite-temp"), "not a directory\n");
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node@24", name: "n", workDir: work })).toThrow(
+        /Vite scratch directory \.vite-temp must be a real directory/,
+      );
+      expect(readFileSync(join(nm, ".vite-temp"), "utf8")).toBe("not a directory\n");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("creates empty real scratch directories and rejects a symlink, a file, or a linked node_modules", () => {
+    const { root, work, outside } = viteRoot();
+    try {
+      const nm = join(work, "node_modules");
+      mkdirSync(join(nm, ".vite"), { recursive: true });
+      writeFileSync(join(nm, ".vite", "keep.txt"), "keep");
+      ensureViteScratchDirs(nm);
+      for (const name of [".vite-temp", ".vite"] as const) {
+        const st = lstatSync(join(nm, name));
+        expect(st.isSymbolicLink(), name).toBe(false);
+        expect(st.isDirectory(), name).toBe(true);
+      }
+      expect(readdirSync(join(nm, ".vite-temp"))).toEqual([]);
+      expect(readFileSync(join(nm, ".vite", "keep.txt"), "utf8")).toBe("keep");
+      ensureViteScratchDirs(nm);
+      expect(readFileSync(join(nm, ".vite", "keep.txt"), "utf8")).toBe("keep");
+
+      const linkedScratch = viteRoot();
+      try {
+        const linkedNm = join(linkedScratch.work, "node_modules");
+        mkdirSync(linkedNm);
+        linkDir(linkedScratch.outside, join(linkedNm, ".vite-temp"));
+        expect(() => ensureViteScratchDirs(linkedNm)).toThrow(/Vite scratch directory \.vite-temp must be a real directory/);
+        expect(readdirSync(linkedScratch.outside)).toEqual([]);
+        expect(existsSync(join(linkedNm, ".vite"))).toBe(false);
+
+        rmSync(join(linkedNm, ".vite-temp"), { recursive: true, force: true });
+        writeFileSync(join(linkedNm, ".vite-temp"), "x");
+        expect(() => ensureViteScratchDirs(linkedNm)).toThrow(/Vite scratch directory \.vite-temp must be a real directory/);
+        expect(readFileSync(join(linkedNm, ".vite-temp"), "utf8")).toBe("x");
+        expect(existsSync(join(linkedNm, ".vite"))).toBe(false);
+
+        rmSync(join(linkedNm, ".vite-temp"), { force: true });
+        writeFileSync(join(linkedNm, ".vite"), "file\n");
+        expect(() => ensureViteScratchDirs(linkedNm)).toThrow(/Vite scratch directory \.vite must be a real directory/);
+        expect(readFileSync(join(linkedNm, ".vite"), "utf8")).toBe("file\n");
+      } finally {
+        rmSync(linkedScratch.root, { recursive: true, force: true });
+      }
+
+      const escaped = viteRoot();
+      try {
+        linkDir(escaped.outside, join(escaped.work, "node_modules"));
+        expect(() => ensureViteScratchDirs(join(escaped.work, "node_modules"))).toThrow(/node_modules must be a real directory/);
+        expect(readdirSync(escaped.outside)).toEqual([]);
+      } finally {
+        rmSync(escaped.root, { recursive: true, force: true });
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("creates the scratch directories in runInDocker only after npm ci succeeds", () => {
+    const body = readFileSync(DOCKER_TS, "utf8");
+    const runBody = body.slice(body.indexOf("export const runInDocker"));
+    const ciCall = runBody.indexOf('installArgs(spec.runtime, workDir, packages, "npm-ci"');
+    const failure = runBody.indexOf("if (ciFailure) return ciFailure;");
+    const scratch = runBody.indexOf('ensureViteScratchDirs(join(workDir, "node_modules"))');
+    const lesson = runBody.lastIndexOf("dockerArgs(spec.runtime, name, workDir)");
+    expect(ciCall).toBeGreaterThanOrEqual(0);
+    expect(failure).toBeGreaterThan(ciCall);
+    expect(scratch).toBeGreaterThan(failure);
+    expect(lesson).toBeGreaterThan(scratch);
   });
 });
 

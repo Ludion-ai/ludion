@@ -9,9 +9,9 @@
 // are not caller options, so a caller cannot drop them. The only host input is the process uid/gid, read
 // inside that function, and it is never taken from the options object.
 import { spawn, spawnSync } from "node:child_process";
-import { chmodSync, existsSync, lstatSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { VERIFIER_STORE_PREFIX, isInside } from "./verifier-deps.ts";
 
 /** What to run: a format 0 runner (python, bash, node) or a format 1 runtime (node@24, python@3.12, …). */
@@ -178,6 +178,13 @@ const NPM_INSTALL_ENV = [
 const PIP_INSTALL_ENV = ["HOME=/w/.home", "PIP_CONFIG_FILE=/w/pip.conf"] as const;
 
 const RUN_ENV = ["HOME=/tmp", "NODE_PATH=/w/node_modules", "PYTHONPATH=/w/site", "LUDION_PACKAGES=/w"] as const;
+
+/**
+ * Vite (and vitest, which bundles its config through Vite) writes scratch files under these two
+ * directories inside node_modules. The names are fixed. They are not discovered by reading the tree.
+ */
+const VITE_SCRATCH_DIRS = [".vite-temp", ".vite"] as const;
+const VITE_SCRATCH_TMPFS_OPTS = "rw,noexec,nosuid,nodev,size=32m,mode=1777";
 
 function requireName(name: string): string {
   if (typeof name !== "string" || !CONTAINER_NAME.test(name)) {
@@ -349,6 +356,10 @@ export interface DockerRunOptions {
  * those writes are not persisted and are not host-backed. Install results are the only host paths
  * mounted into it, and only read-only: `<workDir>/node_modules` at `/w/node_modules` for a node
  * runtime, `<workDir>/site` at `/w/site` for a python runtime, each only when that directory exists.
+ * For a node runtime, a real host directory at `node_modules/.vite-temp` or `node_modules/.vite`
+ * adds `--tmpfs /w/node_modules/.vite-temp:rw,noexec,nosuid,nodev,size=32m,mode=1777` or
+ * `--tmpfs /w/node_modules/.vite:rw,noexec,nosuid,nodev,size=32m,mode=1777` immediately after the
+ * read-only `node_modules` bind, so Vite's scratch writes stay off the host.
  * Both sources go through dockerMountSource. `:ro` is a literal appended in this function. The run
  * phase never bind-mounts the work directory. The install phase still bind-mounts the work directory
  * writable at /w and writes the tree, HOME (`/w/.home`), the npm cache (`/w/.npm`), and the pip
@@ -387,6 +398,62 @@ function installResultHostPath(workDir: string, name: "node_modules" | "site"): 
   if (!lstatSync(real).isDirectory()) return undefined;
   return path;
 }
+
+function fsErrorCode(err: unknown): string | undefined {
+  if (typeof err !== "object" || err === null || !("code" in err)) return undefined;
+  const code = (err as { code?: unknown }).code;
+  return typeof code === "string" ? code : undefined;
+}
+
+/** lstat, or undefined when the path is absent. Any other error is rethrown. */
+function lstatIfExists(path: string): ReturnType<typeof lstatSync> | undefined {
+  try {
+    return lstatSync(path);
+  } catch (err) {
+    if (fsErrorCode(err) === "ENOENT") return undefined;
+    throw err;
+  }
+}
+
+/** True when an lstat result is a directory and not a symlink. */
+function isRealDirectory(st: ReturnType<typeof lstatSync>): boolean {
+  return st !== undefined && !st.isSymbolicLink() && st.isDirectory();
+}
+
+function viteScratchError(name: string): Error {
+  return new Error(`Vite scratch directory ${name} must be a real directory.`);
+}
+
+/**
+ * Host-side, after `npm ci` succeeds. Creates empty `.vite-temp` and `.vite` directories so Docker
+ * can mount a tmpfs on them. Docker cannot create a mountpoint inside the read-only node_modules
+ * bind. The parent is lstat'd and must be a real directory (not a symlink), and mkdir is not
+ * recursive, so this cannot follow a symlink at `node_modules` or walk out through `..`. An
+ * existing symlink or file is rejected with a fixed error. An existing real directory is left as it is.
+ */
+export function ensureViteScratchDirs(nodeModules: string): void {
+  if (basename(nodeModules) !== "node_modules") throw new Error("node_modules must be a real directory.");
+  const parent = lstatIfExists(nodeModules);
+  if (parent === undefined || !isRealDirectory(parent)) throw new Error("node_modules must be a real directory.");
+  const parentReal = realpathSync(nodeModules);
+  for (const name of VITE_SCRATCH_DIRS) {
+    const target = join(nodeModules, name);
+    let st = lstatIfExists(target);
+    if (st === undefined) {
+      const pinned = lstatIfExists(nodeModules);
+      if (pinned === undefined || !isRealDirectory(pinned)) throw new Error("node_modules must be a real directory.");
+      try {
+        mkdirSync(target, { recursive: false });
+      } catch (err) {
+        if (fsErrorCode(err) !== "EEXIST") throw err;
+      }
+      st = lstatIfExists(target);
+    }
+    if (st === undefined || !isRealDirectory(st)) throw viteScratchError(name);
+    if (!samePath(dirname(realpathSync(target)), parentReal)) throw viteScratchError(name);
+  }
+}
+
 export function buildDockerRunArgs(opts: DockerRunOptions): string[] {
   if (opts === null || typeof opts !== "object" || Array.isArray(opts)) throw new Error("Docker options must be an object.");
   for (const key of Object.keys(opts)) {
@@ -450,7 +517,15 @@ export function buildDockerRunArgs(opts: DockerRunOptions): string[] {
         if (hostPath !== undefined) {
           const resultSource = dockerMountSource(hostPath, "Node modules directory");
           // `:ro` is a literal. There is no option to make this bind writable.
+          // The bind comes before the nested tmpfs. Docker applies mounts in order and cannot
+          // create these mountpoints inside a read-only bind; the host directories already exist.
           args.push("-v", `${resultSource}:/w/node_modules:ro`);
+          for (const name of VITE_SCRATCH_DIRS) {
+            const scratch = lstatIfExists(join(hostPath, name));
+            if (scratch === undefined) continue;
+            if (!isRealDirectory(scratch)) throw viteScratchError(name);
+            args.push("--tmpfs", `/w/node_modules/${name}:${VITE_SCRATCH_TMPFS_OPTS}`);
+          }
         }
       } else {
         const hostPath = installResultHostPath(workDir, "site");
@@ -750,6 +825,11 @@ export const runInDocker: RunFn = async (spec) => {
     const installed = await run(installArgs(spec.runtime, workDir, packages, "npm-ci", ciName), undefined, INSTALL_TIMEOUT_MS, ciName);
     const ciFailure = installFailed(installed);
     if (ciFailure) return ciFailure;
+    try {
+      ensureViteScratchDirs(join(workDir, "node_modules"));
+    } catch (err) {
+      return { kind: "error", reason: failureReason(err, "Vite scratch directories could not be created.") };
+    }
     return await run(dockerArgs(spec.runtime, name, workDir), spec.code, TIMEOUT_WITH_PACKAGES_MS, name);
   } finally {
     rmSync(workDir, { recursive: true, force: true });

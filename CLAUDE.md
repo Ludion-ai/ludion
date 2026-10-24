@@ -55,3 +55,5 @@ Build in the order that gets to these three fastest. Measure as you go; put ever
 ## Stop and ask the owner only for
 
 A merge tap on a non-auto-merge PR, money, legal terms, new accounts, secret values, npm trusted-publisher setup, or any Cloudflare change outside the `ludion` Worker and the `ludion.ai` zone. Decide everything else yourself and record it.
+
+<!-- probe: protected-paths test, do not merge -->

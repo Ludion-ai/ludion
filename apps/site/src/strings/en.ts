@@ -36,6 +36,8 @@ export const en = {
     },
     verify: {
       title: "A fixed verifier the generator can't change.",
+      bar: "verify.example",
+      stepsLabel: "Steps",
       steps: { guard: "Guard", program: "Program", verifier: "Verifier", receipt: "Receipt" },
       guardBody: "Reads structure, package version ranges and the contract. File hashes from the original project are not part of the guard.",
       programBody: "The program is part of the capability. Its hash is meant to go into every receipt.",
@@ -46,6 +48,8 @@ export const en = {
     },
     isolate: {
       title: "In a sandbox, or not at all.",
+      bar: "isolate.example",
+      stagesLabel: "Stages",
       install: "1 · Install dependencies",
       installDetail: "Network allowed, pinned lockfile.",
       run: "2 · Run program and verifier",
@@ -58,6 +62,7 @@ export const en = {
     },
     receipt: {
       title: "What a receipt is meant to record.",
+      bar: "receipt.example",
       fields: [
         "Capability id",
         "Source tree hash",

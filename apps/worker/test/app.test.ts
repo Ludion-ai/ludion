@@ -4,6 +4,11 @@ import { describe, expect, it } from "vitest";
 
 const get = (path: string, init?: RequestInit) => exports.default.fetch(new Request(`https://ludion.ai${path}`, init));
 
+/** Location may be a path or an absolute URL. Compare the path only. */
+function locationPath(res: Response): string {
+  return new URL(res.headers.get("Location")!, "https://ludion.ai").pathname;
+}
+
 interface IndexJson {
   lessons: { id: string; teacher: string }[];
   teachers: Record<string, { login: string }>;
@@ -22,39 +27,45 @@ describe("worker", () => {
     expect((await res.json() as { version: number }).version).toBe(1);
   });
 
-  it("serves every lesson page in the index", async () => {
+  it("redirects every lesson page in the index to /start/ (lesson pages were removed)", async () => {
     const { lessons } = await builtIndex();
     for (const l of lessons) {
-      const res = await get(`/lessons/${l.id}/`);
-      expect(res.status).toBe(200);
-      expect(await res.text()).toContain(`/lessons/${l.id}/`);
+      const res = await get(`/lessons/${l.id}/`, { redirect: "manual" });
+      expect(res.status, l.id).toBe(301);
+      expect(locationPath(res), l.id).toBe("/start/");
     }
   });
 
-  it("redirects a lesson URL without the trailing slash", async () => {
+  it("redirects a lesson URL without the trailing slash straight to /start/ with a 301", async () => {
     const { lessons } = await builtIndex();
     if (lessons.length === 0) return;
     const res = await get(`/lessons/${lessons[0]!.id}`, { redirect: "manual" });
-    expect(res.status).toBe(307);
-    expect(res.headers.get("Location")).toBe(`/lessons/${lessons[0]!.id}/`);
+    expect(res.status).toBe(301);
+    expect(locationPath(res)).toBe("/start/");
   });
 
-  it("serves /@<login> in any case from the lowercase teacher page", async () => {
+  it("redirects /@<login> in any case to /start/ (teacher pages were removed)", async () => {
     const { teachers } = await builtIndex();
     for (const { login } of Object.values(teachers)) {
       for (const variant of [login, login.toUpperCase(), `${login.toLowerCase()}/`]) {
-        const res = await get(`/@${variant}`);
-        expect(res.status, variant).toBe(200);
-        expect(await res.text()).toContain(`@${login}`);
+        const res = await get(`/@${variant}`, { redirect: "manual" });
+        expect(res.status, variant).toBe(301);
+        expect(locationPath(res), variant).toBe("/start/");
       }
     }
   });
 
-  it("gives the 404 page for an unknown teacher or an invalid login", async () => {
-    for (const path of ["/@nobody-has-this-login-0", "/@bad_login!", "/no-such-page/"]) {
+  it("redirects an unknown teacher to /start/ (teacher pages were removed)", async () => {
+    const res = await get("/@nobody-has-this-login-0", { redirect: "manual" });
+    expect(res.status).toBe(301);
+    expect(locationPath(res)).toBe("/start/");
+  });
+
+  it("gives the 404 page for an invalid login or an unknown page", async () => {
+    for (const path of ["/@bad_login!", "/no-such-page/"]) {
       const res = await get(path);
       expect(res.status, path).toBe(404);
-      expect(await res.text()).toContain("No page here.");
+      expect(await res.text(), path).toContain("No page here.");
     }
   });
 

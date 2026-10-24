@@ -10,9 +10,9 @@ const steps = [
 ];
 ---
 <article class="lesson-trace" data-lesson-trace aria-label={v.title}>
-  <header class="trace-bar"><span class="trace-word">{v.title}</span></header>
+  <header class="trace-bar"><span class="trace-word">{v.bar}</span></header>
   <div class="trace-workspace">
-    <div class="trace-rail" data-trace-controls hidden role="group" aria-label={v.title}>
+    <div class="trace-rail" data-trace-controls hidden role="group" aria-label={v.stepsLabel}>
       {steps.map((step) => (
         <button type="button" data-trace-step={step.id} aria-pressed={step.id === "guard" ? "true" : "false"} aria-controls={`trace-${step.id}`}>
           <span class="step-dot" aria-hidden="true"></span>

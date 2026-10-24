@@ -3,6 +3,8 @@ import { globMatch } from "../src/glob.ts";
 import {
   CapabilityArtifact,
   FIXED_PROTECTED_GLOBS,
+  Guard,
+  RECIPIENT_TEST_GLOBS,
   PinnedImage,
   Receipt,
   VerifierRuntime,
@@ -115,7 +117,7 @@ function baseArtifact() {
       mount_at: ".ludion-verify",
       argv: ["vitest", "run"],
       required_tests: ["history-cleared"],
-      run_recipient_tests: true,
+      run_recipient_tests: false,
       protected_paths: [] as string[],
       allow_skip: false as const,
       timeout_ms: 120_000,
@@ -332,6 +334,48 @@ describe("2 fixed denylist", () => {
     expect(globMatch("**/.husky/**", ".husky/pre-commit")).toBe(true);
   });
 
+  it("protects recipient test files only when recipient tests are run", () => {
+    const writes = [
+      "src/*.test.ts",
+      "src/*.spec.tsx",
+      "test/*.test.mjs",
+      "lib/a.spec.cjs",
+      "src/a.test.mts",
+      "src/a.test.cts",
+      "src/a.test.js",
+      "src/__tests__/*.test.ts",
+      "src/__tests__/helper.ts",
+    ];
+    for (const g of writes) {
+      const off = parseArtifact((a) => {
+        a.verifier.run_recipient_tests = false;
+        a.program.effects.writes = [g];
+      });
+      expect({ g, ok: off.success, m: messages(off) }).toEqual({ g, ok: true, m: "ok" });
+      const on = parseArtifact((a) => {
+        a.verifier.run_recipient_tests = true;
+        a.program.effects.writes = [g];
+      });
+      expect({ g, ok: on.success }).toEqual({ g, ok: false });
+      expect(messages(on)).toContain("overlaps protected glob");
+    }
+    for (const g of ["src/*.ts", "src/history.ts", "src/testing/helper.ts", "src/a.testing.ts"]) {
+      const on = parseArtifact((a) => {
+        a.verifier.run_recipient_tests = true;
+        a.program.effects.writes = [g];
+      });
+      // src/*.ts can still name src/a.test.ts, so only literal non-test paths stay accepted.
+      expect({ g, ok: on.success }).toEqual({ g, ok: g !== "src/*.ts" });
+    }
+    expect(effectiveProtectedPaths({ protected_paths: [], run_recipient_tests: true })).toEqual([...FIXED_PROTECTED_GLOBS, ...RECIPIENT_TEST_GLOBS]);
+    for (const g of RECIPIENT_TEST_GLOBS) {
+      expect(parseArtifact((a) => {
+        a.program.effects.writes = ["src/history.ts"];
+        a.verifier.protected_paths = [g];
+      }).success, g).toBe(true);
+    }
+  });
+
   it("rejects tools/verify even when the producer lists no protected paths", () => {
     const parsed = parseArtifact((a) => {
       a.verifier.protected_paths = [];
@@ -438,6 +482,24 @@ describe("8 receipt outcomes", () => {
   });
 });
 
+describe("C4 guard absolute paths", () => {
+  it("rejects any root, drive, backslash or home path anywhere in the guard", () => {
+    const base = baseArtifact().guard;
+    expect(Guard.safeParse(base).success).toBe(true);
+    const keyed = (key: string) => ({
+      ...base,
+      structure: [...base.structure, { kind: "config" as const, file: ["vitest.config.ts"], key, inapplicable_if: true }],
+    });
+    for (const key of ["/opt/x", "/srv/app", "/tmp", "/", "\\\\server\\share", "\\x", "C:\\x", "d:/x", "c:", "~/x", "~", "see C:\\x"]) {
+      expect({ key, ok: Guard.safeParse(keyed(key)).success }).toEqual({ key, ok: false });
+    }
+    for (const key of ["clearMocks", "test.clearMocks", "a/b", "ab:c"]) {
+      expect({ key, ok: Guard.safeParse(keyed(key)).success }).toEqual({ key, ok: true });
+    }
+    expect(Guard.safeParse({ ...base, contract_id: base.contract_id, packages: [{ ...base.packages[0], name: "/opt/vitest" }] }).success).toBe(false);
+  });
+});
+
 describe("9 verifier runtime", () => {
   const badPaths = [
     "node_modules/vitest/vitest.mjs",
@@ -449,7 +511,19 @@ describe("9 verifier runtime", () => {
     "/verifierx/node_modules/vitest/package.json",
     "/opt/ludion/verifier-store/node_modules/vitest/package.json",
     "C:/x",
+    "/verifier/",
+    "/verifier",
+    "/verifier//vitest/package.json",
+    "/verifier/node_modules/vitest/",
+    "/verifier/./x",
+    "/verifier/..",
   ];
+
+  it("accepts a file one or more segments under the store", () => {
+    for (const p of ["/verifier/x", "/verifier/node_modules/vitest/package.json"]) {
+      expect(VerifierRuntime.safeParse(verifierRuntime(p)).success, p).toBe(true);
+    }
+  });
 
   it("pins the realpath under the verifier store and checks integrity", () => {
     expect(VerifierRuntime.safeParse(verifierRuntime()).success).toBe(true);

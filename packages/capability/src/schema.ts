@@ -145,7 +145,13 @@ export function imageDigest(ref: string): string {
 
 export const VERIFIER_MOUNT_DIR = ".ludion-verify" as const;
 
-/** Writes may never touch these, whatever the producer lists. */
+/**
+ * Writes may never touch these, whatever the producer lists.
+ *
+ * Setup files named by setupFiles / globalSetup (arbitrary names) are deliberately NOT listed here:
+ * the P2 runner ignores the recipient's vitest config and runs with a runner-owned fixed config
+ * (P2 blocker 3), so recipient setup files are never loaded by the verifier. This denylist relies on that.
+ */
 export const FIXED_PROTECTED_GLOBS = [
   ".ludion-verify/**",
   "tools/verify/**",
@@ -179,11 +185,21 @@ export const FIXED_PROTECTED_GLOBS = [
   "**/.pnpmfile.cjs",
 ] as const;
 
-/** De-duplicated union of the fixed denylist and producer extras. */
-export function effectiveProtectedPaths(v: { protected_paths: readonly string[] }): string[] {
+/**
+ * Recipient test files. When run_recipient_tests is true their results are verification evidence,
+ * so the program may not write them. `*` after the dot covers ts/tsx/js/jsx/mjs/cjs/mts/cts and any other extension.
+ */
+export const RECIPIENT_TEST_GLOBS = [
+  "**/*.{test,spec}.*",
+  "**/__tests__/**",
+] as const;
+
+/** De-duplicated union of the fixed denylist, recipient tests when they are run, and producer extras. */
+export function effectiveProtectedPaths(v: { protected_paths: readonly string[]; run_recipient_tests?: boolean }): string[] {
   const out: string[] = [];
   const seen = new Set<string>();
-  for (const g of FIXED_PROTECTED_GLOBS) {
+  const fixed: readonly string[] = v.run_recipient_tests === true ? [...FIXED_PROTECTED_GLOBS, ...RECIPIENT_TEST_GLOBS] : FIXED_PROTECTED_GLOBS;
+  for (const g of fixed) {
     if (!seen.has(g)) {
       seen.add(g);
       out.push(g);
@@ -305,6 +321,18 @@ export const PackageCondition = z.strictObject({
   inapplicable_versions: z.array(ExactSemver).default([]),
 });
 
+/** Any string that starts at a filesystem root, a drive, a UNC/backslash root or a home dir, or embeds a drive path. */
+function isAbsoluteLike(s: string): boolean {
+  return /^([\\/]|[A-Za-z]:|~[\\/]?$|~[\\/])/.test(s) || /(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(s);
+}
+
+function guardStrings(v: unknown, out: string[] = []): string[] {
+  if (typeof v === "string") out.push(v);
+  else if (Array.isArray(v)) for (const x of v) guardStrings(x, out);
+  else if (v !== null && typeof v === "object") for (const [k, x] of Object.entries(v)) { out.push(k); guardStrings(x, out); }
+  return out;
+}
+
 export const Guard = z.strictObject({
   contract_id: Slug,
   structure: z.array(StructureCondition).min(1),
@@ -313,7 +341,7 @@ export const Guard = z.strictObject({
 }).superRefine((g, ctx) => {
   const s = JSON.stringify(g);
   if (/sha256:|\b[0-9a-f]{40,}\b/.test(s)) ctx.addIssue({ code: "custom", message: "guard must not contain content hashes" });
-  if (/(^|")([A-Za-z]:[\\/]|\/(home|Users|w)\/)/.test(s)) ctx.addIssue({ code: "custom", message: "guard must not contain absolute paths" });
+  if (guardStrings(g).some(isAbsoluteLike)) ctx.addIssue({ code: "custom", message: "guard must not contain absolute paths" });
   for (const p of g.packages) {
     if (p.applicable_versions.some((v) => p.inapplicable_versions.includes(v))) {
       ctx.addIssue({ code: "custom", message: `${p.name}: version listed as both applicable and inapplicable` });
@@ -527,6 +555,10 @@ const FullSemver = z.string().max(128).regex(
 
 function isVerifierRealpath(p: string): boolean {
   if (!p.startsWith(VERIFIER_STORE_PREFIX)) return false;
+  // A file under the store: at least one segment after the prefix, no empty segment, no trailing slash.
+  const rest = p.slice(VERIFIER_STORE_PREFIX.length);
+  if (rest.length === 0 || rest.endsWith("/")) return false;
+  if (rest.split("/").some((s) => s.length === 0)) return false;
   if (!p.isWellFormed()) return false;
   if (p.includes("\\") || p.includes("%") || p.includes("//")) return false;
   for (let i = 0; i < p.length; i++) {

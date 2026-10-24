@@ -9,8 +9,9 @@ PRs that change any of these paths are not auto-merged (CLAUDE.md, "Every change
 - the schema: `packages/*/src/schema.ts`, `packages/*/schema/`, any `*.schema.json`
 - `lessons/`
 - `ludion.config.json`, `wrangler.jsonc`
-- dependencies: `package.json` at any depth and lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `npm-shrinkwrap.json`)
 - this file, `docs/protected-paths.md`
+
+Dependency files (`package.json`, lockfiles) are not protected paths, so dependency updates are not blocked. Instead, every new dependency is checked by security before it is added.
 
 The required check `protected-paths` (`.github/workflows/protected-paths.yml`) fails such a PR until **both** are true for the PR's current head:
 

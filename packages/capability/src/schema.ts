@@ -508,8 +508,13 @@ export const VerifierResult = z.strictObject({
   }
 });
 
-/** Read-only mount outside the working copy, installed from main's lockfile at verifier.source.main_commit. */
-export const VERIFIER_STORE_PREFIX = "/opt/ludion/verifier-store/" as const;
+/** Read-only mount of the verifier deps inside the container (P2 runner), installed from main's lockfile at verifier.source.main_commit. */
+export const VERIFIER_STORE_PREFIX = "/verifier/" as const;
+
+/** SemVer 2.0 including prerelease and build metadata. Linear-time regex: separators are outside each class. */
+const FullSemver = z.string().max(128).regex(
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/,
+);
 
 function isVerifierRealpath(p: string): boolean {
   if (!p.startsWith(VERIFIER_STORE_PREFIX)) return false;
@@ -529,9 +534,10 @@ function isVerifierRealpath(p: string): boolean {
 export const VerifierRuntime = z.strictObject({
   vitest_location: z.literal("verifier_store"),
   vitest_realpath: z.string().max(400).refine(isVerifierRealpath, "verifier-store realpath"),
-  vitest_version: ExactSemver,
+  vitest_version: FullSemver,
   vitest_integrity: z.string().regex(/^sha512-[A-Za-z0-9+/]{86}==$/),
-  lockfile_sha256: Sha256,
+  /** 64 lowercase hex, no `sha256:` prefix. */
+  lockfile_sha256: z.string().regex(/^[0-9a-f]{64}$/),
 });
 
 const Runtime = z.strictObject({

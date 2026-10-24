@@ -11,6 +11,7 @@ import { parseNameStatus, planChanges, verifyPullRequest, type PullRequestAuthor
 import { countByStatus, labelsOf, printResults, stepSummary } from "./report.ts";
 import { createSafeFetch } from "./safe-fetch.ts";
 import { runtimesIn } from "./files.ts";
+import { verifierProvenance, verifierRootFromModule } from "./verifier-deps.ts";
 import type { LessonFile } from "./verify.ts";
 
 const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
@@ -64,7 +65,13 @@ async function main(): Promise<number> {
 
   printResults(results);
   const labels = labelsOf(results);
-  writeFileSync(values.json, JSON.stringify({ results, labels }, null, 2) + "\n");
+  // Provenance is for the P1 Capability runner. results and labels are unchanged.
+  const verifier = verifierProvenance({
+    verifierRoot: verifierRootFromModule(import.meta.url),
+    recipientRoot: process.cwd(),
+    nodeVersion: process.version,
+  });
+  writeFileSync(values.json, JSON.stringify({ results, labels, verifier }, null, 2) + "\n");
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, stepSummary(results));
   return countByStatus(results).failed > 0 ? 1 : 0;
 }

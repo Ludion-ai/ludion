@@ -1,4 +1,4 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -324,5 +324,84 @@ describe("docker run construction", () => {
     expect(src.slice(0, fnAt)).not.toMatch(/\[\s*"run"/);
     expect(src.slice(fnAt + body.length)).not.toMatch(/\[\s*"run"/);
     expect(src).not.toMatch(/spawn(?:Sync)?\(\s*"docker"\s*,\s*\[\s*"run"/);
+  });
+
+  it("mounts verifier deps from buildDockerRunArgs with a literal :ro", () => {
+    const src = readFileSync(DOCKER_TS, "utf8");
+    const fnAt = src.indexOf("export function buildDockerRunArgs");
+    const after = src.slice(fnAt);
+    const next = after.slice(1).search(/\nexport function /);
+    const body = after.slice(0, next + 1);
+    expect(body).toContain(":/verifier:ro");
+    expect(body).not.toContain(":/verifier:rw");
+    expect(body).not.toContain(":/verifier\"");
+  });
+});
+
+describe("verifier deps mount", () => {
+  function mounts(args: readonly string[]): string[] {
+    const out: string[] = [];
+    for (let i = 0; i < args.length; i++) if (args[i] === "-v") out.push(args[i + 1] ?? "");
+    return out;
+  }
+
+  it("bind-mounts verifier deps read-only on run and refuses install, overlap, and a dropped :ro", () => {
+    const parent = mkdtempSync(join(tmpdir(), "ludion-mount-"));
+    const work = join(parent, "work");
+    const workExtra = join(parent, "work-extra");
+    const deps = join(parent, "deps");
+    const nested = join(work, "nested-deps");
+    mkdirSync(work);
+    mkdirSync(workExtra);
+    mkdirSync(deps);
+    mkdirSync(nested);
+    try {
+      const args = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work, verifierDeps: deps });
+      expectHardened(args, "run");
+      const bound = mounts(args);
+      expect(bound).toHaveLength(2);
+      const workMount = bound.find((mount) => mount.endsWith(":/w"));
+      const verifierMount = bound.find((mount) => mount.includes(":/verifier"));
+      expect(workMount).toBeDefined();
+      expect(workMount).not.toContain(":ro");
+      expect(verifierMount).toMatch(/:\/verifier:ro$/);
+      expect(verifierMount).not.toMatch(/:rw\b/);
+      expect(args.filter((arg) => arg === "--read-only")).toEqual(["--read-only"]);
+      expect(valueAfter(args, "--network")).toBe("none");
+
+      const prefix = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work, verifierDeps: workExtra });
+      expect(mounts(prefix).some((mount) => mount.endsWith(":/verifier:ro"))).toBe(true);
+
+      const onlyVerifier = buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", verifierDeps: deps });
+      expectHardened(onlyVerifier, "run");
+      expect(mounts(onlyVerifier)).toEqual([expect.stringMatching(/:\/verifier:ro$/)]);
+      expect(onlyVerifier.join(" ")).not.toContain(":/w");
+
+      expect(() => buildDockerRunArgs({
+        phase: "install",
+        runtime: "node@24",
+        name: "ludion-install-1",
+        workDir: work,
+        packages: { vitest: "5.0.3" },
+        verifierDeps: deps,
+      })).toThrow(/verifierDeps is only allowed for the run phase/);
+      expect(installArgs("node@24", work, { vitest: "5.0.3" }, "ludion-install-npm").join(" ")).not.toContain("/verifier");
+
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work, verifierDeps: nested })).toThrow(/overlap/);
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: nested, verifierDeps: work })).toThrow(/overlap/);
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", workDir: work, verifierDeps: work })).toThrow(/overlap/);
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", verifierDeps: "relative/deps" })).toThrow(/Verifier deps directory/);
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", verifierDeps: "/tmp/deps,rw" })).toThrow(/Verifier deps directory/);
+      expect(() => buildDockerRunArgs({ phase: "run", runtime: "node", name: "n", verifierDeps: "/tmp/../etc" })).toThrow(/Verifier deps directory/);
+      expect(() => buildDockerRunArgs({
+        phase: "run",
+        runtime: "node",
+        name: "n",
+        verifierDeps: deps,
+        readOnly: false,
+      } as DockerRunOptions)).toThrow(/Unknown docker option readOnly/);
+    } finally {
+      rmSync(parent, { recursive: true, force: true });
+    }
   });
 });

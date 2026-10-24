@@ -10,6 +10,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { isInside } from "./verifier-deps.ts";
 
 /** What to run: a format 0 runner (python, bash, node) or a format 1 runtime (node@24, python@3.12, …). */
 export interface RunSpec {
@@ -156,7 +157,7 @@ export function prepareSandboxWorkDir(workDir: string): void {
 const CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/;
 const PACKAGE_NAME = /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]{0,213}$/;
 const PACKAGE_VERSION = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
-const ALLOWED_OPTIONS = new Set(["phase", "runtime", "name", "workDir", "packages"]);
+const ALLOWED_OPTIONS = new Set(["phase", "runtime", "name", "workDir", "packages", "verifierDeps"]);
 
 function requireName(name: string): string {
   if (typeof name !== "string" || !CONTAINER_NAME.test(name)) {
@@ -166,16 +167,17 @@ function requireName(name: string): string {
 }
 
 /**
- * Absolute host path safe to place before `:/w` in a bind mount. A comma or an extra colon would be
+ * Absolute host path safe to place before `:` in a bind mount. A comma or an extra colon would be
  * read by Docker as mount options (`-v host,opt:/w` or `-v host:/etc:ro`). A Windows drive prefix is
  * rewritten to `/c/...` so the value that is actually passed has no colon; any other colon is rejected.
+ * `what` is only the noun in the error text. Work directories and the verifier deps directory share this check.
  */
-export function dockerMountSource(workDir: string): string {
+export function dockerMountSource(workDir: string, what = "Work directory"): string {
   if (typeof workDir !== "string" || workDir.length === 0 || workDir.length > 4096) {
-    throw new Error("Work directory must be an absolute path.");
+    throw new Error(`${what} must be an absolute path.`);
   }
   if (/[\0\r\n]/.test(workDir) || workDir.includes(",")) {
-    throw new Error("Work directory contains a character that would change the mount.");
+    throw new Error(`${what} contains a character that would change the mount.`);
   }
   let source = workDir;
   const drive = /^([A-Za-z]):[\\/](.*)$/.exec(workDir);
@@ -183,22 +185,24 @@ export function dockerMountSource(workDir: string): string {
     const letter = drive[1];
     const rest = drive[2];
     if (letter === undefined || rest === undefined || rest.includes(":")) {
-      throw new Error("Work directory contains a character that would change the mount.");
+      throw new Error(`${what} contains a character that would change the mount.`);
     }
     source = `/${letter.toLowerCase()}/${rest.replace(/\\/g, "/")}`;
   } else if (workDir.includes(":") || workDir.includes("\\") || !workDir.startsWith("/")) {
     throw new Error(workDir.includes(":") || workDir.includes("\\")
-      ? "Work directory contains a character that would change the mount."
-      : "Work directory must be an absolute path.");
+      ? `${what} contains a character that would change the mount.`
+      : `${what} must be an absolute path.`);
   }
   const parts = source.split("/");
   if (!source.startsWith("/") || parts.slice(1).some((part) => part === "" || part === "." || part === "..")) {
-    throw new Error("Work directory must be an absolute path without '.' or '..'.");
+    throw new Error(`${what} must be an absolute path without '.' or '..'.`);
   }
-  if (/[,:]/.test(source)) throw new Error("Work directory contains a character that would change the mount.");
+  if (/[,:]/.test(source)) throw new Error(`${what} contains a character that would change the mount.`);
+  // The destination is not part of the source. Checking `source:/w` proves the source itself
+  // contributes no colon and no comma, whether the caller later mounts it at /w or /verifier:ro.
   const spec = `${source}:/w`;
   if (!spec.endsWith(":/w") || spec.slice(0, -3).includes(":") || spec.includes(",")) {
-    throw new Error("Work directory contains a character that would change the mount.");
+    throw new Error(`${what} contains a character that would change the mount.`);
   }
   return source;
 }
@@ -230,6 +234,11 @@ export interface DockerRunOptions {
   name: string;
   /** Absolute host directory bind-mounted at /w. Optional for a run with no packages. */
   workDir?: string;
+  /**
+   * Absolute host directory of the isolated verifier install, bind-mounted at /verifier.
+   * Run phase only. The mount is always read-only (`:ro`); there is no field to drop that.
+   */
+  verifierDeps?: string;
   /** Exact package versions. Install phase only. They are not lesson code. */
   packages?: Record<string, string>;
 }
@@ -248,6 +257,10 @@ export interface DockerRunOptions {
  * npm still unpack through the system temp directory, which a read-only root would make immutable.
  * No tmpfs is added for /var, /run, or /home.
  *
+ * When `verifierDeps` is set on a run, it is mounted at /verifier with `:ro` appended by this
+ * function. The option is rejected for the install phase. A verifier deps directory that contains
+ * the work directory, or the other way around, is rejected: the two mounts must not alias.
+ *
  * lessons/ grep, 2026-10-25 (read-only): 18 wrangler lessons mention /tmp, only as HOME
  * (mkdtemp "/tmp/home-") or as a project cwd ("/tmp/proj", mkdtemp "/tmp/proj-" or "/tmp/p-").
  * Every spawn runs the node binary with a script under /w/node_modules. None exec a file that
@@ -263,12 +276,18 @@ export function buildDockerRunArgs(opts: DockerRunOptions): string[] {
   if (phase !== "run" && phase !== "install") throw new Error(`Unknown docker phase ${String(phase)}.`);
   if (typeof opts.runtime !== "string") throw new Error("Docker runtime must be a string.");
   if (phase === "run" && opts.packages !== undefined) throw new Error("The run phase does not take packages.");
+  // Install keeps the network so npm or pip can run. It must not see the verifier tree.
+  if (opts.verifierDeps !== undefined && phase !== "run") throw new Error("verifierDeps is only allowed for the run phase.");
   const name = requireName(opts.name);
   const img = imageFor(opts.runtime);
   if (!img || !PINNED_IMAGE.test(img.image)) throw new Error(`Unknown runtime ${opts.runtime}.`);
   const user = sandboxUser();
   const packages = phase === "install" ? validatedPackages(opts.packages) : [];
   const source = opts.workDir === undefined ? undefined : dockerMountSource(opts.workDir);
+  const verifierSource = opts.verifierDeps === undefined ? undefined : dockerMountSource(opts.verifierDeps, "Verifier deps directory");
+  if (opts.workDir !== undefined && opts.verifierDeps !== undefined && (isInside(opts.workDir, opts.verifierDeps) || isInside(opts.verifierDeps, opts.workDir))) {
+    throw new Error("verifierDeps and workDir overlap.");
+  }
 
   const args = ["run", "--rm"];
   if (phase === "run") args.push("-i");
@@ -293,6 +312,8 @@ export function buildDockerRunArgs(opts: DockerRunOptions): string[] {
       args.push("-e", "HOME=/w/.home", "-e", "npm_config_cache=/w/.npm");
     }
   }
+  // Literal `:ro`. Callers cannot drop it: it is not read from the options object.
+  if (verifierSource !== undefined) args.push("-v", `${verifierSource}:/verifier:ro`);
   args.push(img.image);
   if (phase === "run") {
     args.push(...img.command);

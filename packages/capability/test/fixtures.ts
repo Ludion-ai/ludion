@@ -3,8 +3,10 @@ import {
   CapabilityRecord,
   Counterexample,
   Receipt,
+  VERIFIER_STORE_PREFIX,
   capabilityId,
   counterexamplesHash,
+  imageDigest,
   programHash,
   sha256Hex,
   verifierHash,
@@ -15,6 +17,12 @@ import {
   type LineageT,
   type ReceiptT,
 } from "../src/index.ts";
+
+/** Digest-pinned image. `sha256Hex("image")` is `sha256:` plus 64 lowercase hex digits. */
+export const FIXTURE_IMAGE = `node@${sha256Hex("image")}`;
+export const FIXTURE_MAIN_COMMIT = "21321cb".padEnd(40, "0");
+export const FIXTURE_VITEST_INTEGRITY = `sha512-${"A".repeat(86)}==`;
+export const FIXTURE_VITEST_REALPATH = `${VERIFIER_STORE_PREFIX}node_modules/vitest/vitest.mjs`;
 
 export const CONTRACT_ID = "mock_cleanup.clear_history";
 
@@ -133,21 +141,26 @@ export function exampleArtifactInput(): CapabilityArtifactT {
       kind: "codemod.ts-ast",
       entry: "insert-clear.ts",
       files: { "insert-clear.ts": "/* Insert vi.clearAllMocks() immediately before a resolved vi.restoreAllMocks() call. */\nexport {}\n" },
-      effects: { writes: ["src/**/*.test.ts", "test/**/*.test.ts"], network: false, env: [], spawn: false },
+      effects: { writes: ["src/*.test.ts", "test/*.test.ts"], network: false, env: [], spawn: false },
       timeout_ms: 60_000,
     },
     verifier: {
       kind: "vitest-run",
+      source: {
+        repo: "Ludion-ai/ludion",
+        main_commit: FIXTURE_MAIN_COMMIT,
+        tools_verify_hash: sha256Hex("tools/verify fixture"),
+      },
       files: { "contract.test.mjs": "/* history-cleared / spy-restored / impl-kept */\n" },
       mount_at: ".ludion-verify",
-      argv: ["node", "node_modules/vitest/vitest.mjs", "run"],
+      argv: ["vitest", "run"],
       required_tests: ["history-cleared", "spy-restored", "impl-kept"],
       run_recipient_tests: true,
-      protected_paths: [".ludion-verify/**"],
+      protected_paths: [],
       allow_skip: false,
       timeout_ms: 120_000,
     },
-    dependencies: { capabilities: [], image: "node:24-slim" },
+    dependencies: { capabilities: [], image: FIXTURE_IMAGE },
     invalidates_on: ["program_changed", "verifier_changed", "dependency_changed", "counterexample_added", "lockfile_changed", "source_changed"],
   };
 }
@@ -261,15 +274,21 @@ export function receiptDraft(record: CapabilityRecordT, guard: GuardResultT, ove
     resolved_versions: { vitest: "4.0.0", vite: "7.1.11" },
     runtime: {
       node_version: "v24.1.2",
-      image: "node:24-slim",
-      image_digest: sha256Hex("image"),
+      image: FIXTURE_IMAGE,
+      image_digest: imageDigest(FIXTURE_IMAGE),
       platform: "linux/amd64",
       network: "none",
     },
     guard,
     outcome: "executed",
     verifier: verified,
-    verifier_runtime: { vitest_version: "4.0.0", vitest_path: "node_modules/vitest/vitest.mjs" },
+    verifier_runtime: {
+      vitest_location: "verifier_store",
+      vitest_realpath: FIXTURE_VITEST_REALPATH,
+      vitest_version: "4.0.0",
+      vitest_integrity: FIXTURE_VITEST_INTEGRITY,
+      lockfile_sha256: sha256Hex("main lockfile"),
+    },
     diff: { ref: "changes.patch", hash: sha256Hex("diff"), files_changed: 1 },
     durations_ms: { guard: 1, install: 2, program: 3, verifier: 4, total: 10 },
     model_calls: { count: 0, span: "guard_to_verifier" },
@@ -281,6 +300,18 @@ export function receiptDraft(record: CapabilityRecordT, guard: GuardResultT, ove
 
 export function executedReceipt(record: CapabilityRecordT, guard: GuardResultT, overrides: Record<string, unknown> = {}): ReceiptT {
   return Receipt.parse(receiptDraft(record, guard, overrides));
+}
+
+/** Receipt whose program did not run. Runtime, verifier, verifier runtime, and diff are null. */
+export function notExecutedReceipt(record: CapabilityRecordT, guard: GuardResultT, overrides: Record<string, unknown> = {}): ReceiptT {
+  return Receipt.parse(receiptDraft(record, guard, {
+    outcome: "not_executed",
+    runtime: null,
+    verifier: null,
+    verifier_runtime: null,
+    diff: null,
+    ...overrides,
+  }));
 }
 
 export function reuseCurrent(record: CapabilityRecordT, nodeVersion = "v24.11.0") {

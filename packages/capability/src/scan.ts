@@ -13,6 +13,8 @@ export type Analysis = {
   calls: CallSite[];
   bindings: Binding[];
   shadows: Shadow[];
+  /** Receiver uses the scanner cannot bind: optional chain or computed member. */
+  unmodeled: Array<{ name: string; tok: number }>;
 };
 
 type Token = { k: "ident" | "num" | "str" | "punct"; s: string; line: number };
@@ -254,6 +256,17 @@ export function resolveTarget(
   const matches: Array<{ line: number; via: "import" | "alias"; braceId: number }> = [];
   let unresolved = false;
   if (analysis.error) return { matches, unresolved };
+  for (const access of analysis.unmodeled) {
+    const covered = analysis.shadows.some((s) => s.name === access.name && access.tok >= s.from && access.tok < s.to);
+    if (covered) continue;
+    const live = analysis.bindings.some((b) => {
+      if (b.local !== access.name || b.module !== target.module) return false;
+      if (b.kind === "namespace") return true;
+      return b.imported === target.export;
+    });
+    // A same-named receiver we cannot model is unresolved even without a live import.
+    if (live || access.name === target.export) unresolved = true;
+  }
   for (const call of analysis.calls) {
     const covered = analysis.shadows.some((s) => s.name === call.recv && call.tok >= s.from && call.tok < s.to);
     const live = analysis.bindings.filter((b) => b.local === call.recv && b.module === target.module && !covered);
@@ -576,15 +589,140 @@ function bindingsFrom(tokens: Token[]): Binding[] {
   return bindings;
 }
 
+const OBJECT_PRED = new Set([
+  "=", "(", "[", ",", "return", "throw", "yield", "await", "new", "void", "typeof", "delete", "default",
+  "&&", "||", "??", "?", "!", "~", "&", "|", "^",
+  "+", "-", "*", "/", "%", "**",
+  "==", "===", "!=", "!==", "<", ">", "<=", ">=",
+  "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=",
+  "in", "of", "instanceof", "...",
+]);
+
+function isClassBodyOpen(tokens: Token[], i: number): boolean {
+  const prev = tokens[i - 1];
+  if (!prev) return false;
+  if (prev.s === "class") return true;
+  if (prev.k !== "ident") return false;
+  if (tokens[i - 2]?.s === "class" || tokens[i - 2]?.s === "extends") return true;
+  let j = i - 1;
+  while (j >= 1 && tokens[j - 1]?.s === "." && tokens[j]?.k === "ident") j -= 2;
+  return tokens[j]?.k === "ident" && tokens[j - 1]?.s === "extends";
+}
+
+function colonIsTernary(tokens: Token[], colon: number): boolean {
+  let paren = 0;
+  let bracket = 0;
+  let brace = 0;
+  for (let k = colon - 1; k >= 0; k--) {
+    const s = tokens[k]?.s;
+    if (s === ")") paren++;
+    else if (s === "(") {
+      if (paren === 0) return false;
+      paren--;
+    } else if (s === "]") bracket++;
+    else if (s === "[") {
+      if (bracket === 0) return false;
+      bracket--;
+    } else if (s === "}") brace++;
+    else if (s === "{") {
+      if (brace === 0) return false;
+      brace--;
+    } else if (paren === 0 && bracket === 0 && brace === 0 && s === "?") return true;
+    else if (paren === 0 && bracket === 0 && brace === 0 && (s === ";" || s === "=>")) return false;
+  }
+  return false;
+}
+
+function classifyBrace(tokens: Token[], i: number, kindStack: readonly string[]): "block" | "object" | "class" {
+  if (isClassBodyOpen(tokens, i)) return "class";
+  const prev = tokens[i - 1];
+  if (!prev) return "block";
+  if (prev.s === "=>" || prev.s === "else" || prev.s === "do" || prev.s === "try" || prev.s === "finally") return "block";
+  if (prev.s === ")") return "block";
+  if (prev.s === ":") {
+    if (kindStack[kindStack.length - 1] === "object") return "object";
+    return colonIsTernary(tokens, i - 1) ? "object" : "block";
+  }
+  if (prev.s === "{") return kindStack[kindStack.length - 1] === "object" ? "object" : "block";
+  if (OBJECT_PRED.has(prev.s)) return "object";
+  return "block";
+}
+
+function skipBracket(tokens: Token[], i: number): number {
+  let depth = 0;
+  let guard = 0;
+  while (i < tokens.length && guard++ < tokens.length + 2) {
+    const s = tokens[i]?.s;
+    if (s === "[") depth++;
+    else if (s === "]") {
+      depth--;
+      if (depth === 0) return i + 1;
+    }
+    i++;
+  }
+  return i;
+}
+
+function isPropName(t: Token | undefined): boolean {
+  if (!t) return false;
+  return t.k === "ident" || t.k === "str" || t.k === "num";
+}
+
+function modifierContinues(t: Token | undefined): boolean {
+  if (!t) return false;
+  return t.s === "*" || t.s === "[" || t.s === "get" || t.s === "set" || isPropName(t);
+}
+
+/** Method `name(params) {` at an object or class member. `resume` is the body `{`. */
+function methodParamsAt(tokens: Token[], i: number): { names: string[]; resume: number } | null {
+  let j = i;
+  const leading = new Set(["static", "public", "private", "protected", "readonly", "override", "abstract", "declare", "async"]);
+  while (j < tokens.length) {
+    const cur = tokens[j];
+    if (!cur || !leading.has(cur.s) || !modifierContinues(tokens[j + 1]) || tokens[j + 1]?.s === "(") break;
+    j++;
+  }
+  if (tokens[j]?.s === "*" && modifierContinues(tokens[j + 1])) j++;
+  if ((tokens[j]?.s === "get" || tokens[j]?.s === "set") && isPropName(tokens[j + 1])) j++;
+  if (tokens[j]?.s === "[") j = skipBracket(tokens, j);
+  else if (isPropName(tokens[j])) j++;
+  else return null;
+  if (tokens[j]?.s === "<") j = skipAngles(tokens, j);
+  if (tokens[j]?.s !== "(") return null;
+  const params = readParams(tokens, j);
+  let k = params.after;
+  if (tokens[k]?.s === ":") k = skipType(tokens, k + 1);
+  if (tokens[k]?.s !== "{") return null;
+  return { names: params.names, resume: k };
+}
+
+function noteUnmodeled(tokens: Token[], i: number, unmodeled: Array<{ name: string; tok: number }>): void {
+  const t = tokens[i];
+  if (t?.k !== "ident") return;
+  if (tokens[i - 1]?.s === "." || tokens[i - 1]?.s === "?.") return;
+  const next = tokens[i + 1];
+  if (!next) return;
+  if (next.s === "?." || next.s === "[") {
+    unmodeled.push({ name: t.s, tok: i });
+    return;
+  }
+  if (next.s !== ".") return;
+  let j = i + 1;
+  while (tokens[j]?.s === "." && tokens[j + 1]?.k === "ident") j += 2;
+  if (tokens[j]?.s === "?." || tokens[j]?.s === "[") unmodeled.push({ name: t.s, tok: i });
+}
+
 export function analyze(source: string): Analysis {
   const toked = tokenize(source);
-  if (toked.error) return { error: toked.error, calls: [], bindings: [], shadows: [] };
+  if (toked.error) return { error: toked.error, calls: [], bindings: [], shadows: [], unmodeled: [] };
   const tokens = toked.tokens;
   const calls: CallSite[] = [];
   const shadows: Shadow[] = [];
+  const unmodeled: Array<{ name: string; tok: number }> = [];
   const open: Array<{ name: string; from: number; depth: number }> = [];
   const frameStarts = [0];
   const braceStack = [0];
+  const kindStack: Array<"block" | "object" | "class"> = ["block"];
   let nextBrace = 1;
   let depth = 0;
   let paren = 0;
@@ -611,6 +749,7 @@ export function analyze(source: string): Analysis {
       depth++;
       const id = nextBrace++;
       braceStack.push(id);
+      kindStack.push(classifyBrace(tokens, i, kindStack));
       frameStarts.push(i);
       const params = pendingParams ?? pendingLoop;
       pendingParams = null;
@@ -623,6 +762,7 @@ export function analyze(source: string): Analysis {
       closeDeeperThan(depth, i);
       braceStack.pop();
       frameStarts.pop();
+      if (kindStack.length > 1) kindStack.pop();
       if (decl && depth < decl.depth) decl = null;
       continue;
     }
@@ -684,6 +824,24 @@ export function analyze(source: string): Analysis {
       decl = { depth, paren, bracket };
       continue;
     }
+    if (t.s === "catch" && tokens[i + 1]?.s === "(") {
+      const params = readParams(tokens, i + 1);
+      pendingParams = params.names;
+      i = params.after - 1;
+      continue;
+    }
+    const kindHere = kindStack[kindStack.length - 1];
+    const prev = tokens[i - 1];
+    const atMember = prev === undefined || prev.s === "{" || prev.s === "," || prev.s === ";" || prev.s === "}";
+    const methodStart = t.k === "ident" || t.k === "str" || t.k === "num" || t.s === "*" || t.s === "[";
+    if (atMember && (kindHere === "object" || kindHere === "class") && methodStart) {
+      const method = methodParamsAt(tokens, i);
+      if (method) {
+        pendingParams = method.names;
+        i = method.resume - 1;
+        continue;
+      }
+    }
     if (t.s === "function") {
       let j = i + 1;
       if (tokens[j]?.s === "*") j++;
@@ -713,15 +871,16 @@ export function analyze(source: string): Analysis {
       continue;
     }
     if (t.s === "class" && tokens[i + 1]?.k === "ident") declare(tokens[i + 1]!.s, i);
+    noteUnmodeled(tokens, i, unmodeled);
     collectCalls(tokens, i, braceStack[braceStack.length - 1] ?? 0, calls);
   }
   closeDeeperThan(-1, tokens.length);
-  return { calls, bindings: bindingsFrom(tokens), shadows };
+  return { calls, bindings: bindingsFrom(tokens), shadows, unmodeled };
 }
 
 type Val =
   | { t: "lit"; v: string | number | boolean | null }
-  | { t: "obj"; props: Array<{ key: string; value: Val }>; hasSpread: boolean }
+  | { t: "obj"; props: Array<{ key: string; value: Val }>; hasSpread: boolean; ambiguous: boolean }
   | { t: "expr" };
 
 export type ConfigRead =
@@ -748,6 +907,7 @@ function parseValue(tokens: Token[], i: number): { val: Val; next: number } {
 function parseObject(tokens: Token[], i: number): { val: Val; next: number } {
   const props: Array<{ key: string; value: Val }> = [];
   let hasSpread = false;
+  let ambiguous = false;
   let j = i + 1;
   let guard = 0;
   while (j < tokens.length && tokens[j]?.s !== "}" && guard++ < tokens.length + 2) {
@@ -762,7 +922,9 @@ function parseObject(tokens: Token[], i: number): { val: Val; next: number } {
       continue;
     }
     if (t.s === "[") {
-      j = skipExpr(tokens, j);
+      // Computed keys are not a static object. A string literal key can still be overwritten at runtime.
+      ambiguous = true;
+      j = skipBracket(tokens, j);
       if (tokens[j]?.s === ":") j = parseValue(tokens, j + 1).next;
       continue;
     }
@@ -771,6 +933,7 @@ function parseObject(tokens: Token[], i: number): { val: Val; next: number } {
       continue;
     }
     if ((t.s === "get" || t.s === "set") && tokens[j + 1]?.k === "ident") {
+      ambiguous = true;
       j += 2;
       if (tokens[j]?.s === "(") j = skipExpr(tokens, j);
       if (tokens[j]?.s === "{") j = skipExpr(tokens, j);
@@ -779,10 +942,12 @@ function parseObject(tokens: Token[], i: number): { val: Val; next: number } {
     const key = t.s;
     j++;
     if (tokens[j]?.s === "(") {
+      ambiguous = true;
       j = skipExpr(tokens, j);
       if (tokens[j]?.s === "{") j = skipExpr(tokens, j);
       continue;
     }
+    if (props.some((p) => p.key === key)) ambiguous = true;
     if (tokens[j]?.s === ":") {
       const v = parseValue(tokens, j + 1);
       props.push({ key, value: v.val });
@@ -792,12 +957,12 @@ function parseObject(tokens: Token[], i: number): { val: Val; next: number } {
     props.push({ key, value: { t: "expr" } });
   }
   if (tokens[j]?.s === "}") j++;
-  return { val: { t: "obj", props, hasSpread }, next: j };
+  return { val: { t: "obj", props, hasSpread, ambiguous }, next: j };
 }
 
 function lookup(obj: Val, path: string[]): "absent" | "not-static" | string | number | boolean | null {
   if (obj.t !== "obj") return "not-static";
-  if (obj.hasSpread) return "not-static";
+  if (obj.hasSpread || obj.ambiguous) return "not-static";
   const [head, ...rest] = path;
   if (head === undefined) return "not-static";
   const prop = obj.props.find((p) => p.key === head);

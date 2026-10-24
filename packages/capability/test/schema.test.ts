@@ -52,21 +52,28 @@ describe("guard portability and write boundary", () => {
     }).success).toBe(false);
   });
 
-  it("rejects write globs that can touch the verifier and a mount that is not protected", () => {
+  it("rejects writes that overlap the fixed denylist and a mount other than the fixed mount", () => {
     const artifact = exampleArtifactInput();
     expect(CapabilityArtifact.safeParse(artifact).success).toBe(true);
+    for (const writes of [["**/*.{test,spec}.*"], [".ludion-verify/**"], ["src/**/*.test.ts"], ["tools/verify/**"], ["tools/verify/x.ts"]]) {
+      expect(CapabilityArtifact.safeParse({
+        ...artifact,
+        program: { ...artifact.program, effects: { ...artifact.program.effects, writes } },
+      }).success, writes[0]).toBe(false);
+    }
     expect(CapabilityArtifact.safeParse({
       ...artifact,
-      program: { ...artifact.program, effects: { ...artifact.program.effects, writes: ["**/*.{test,spec}.*"] } },
-    }).success).toBe(false);
+      program: { ...artifact.program, effects: { ...artifact.program.effects, writes: ["src/*.test.ts", "test/*.test.ts"] } },
+    }).success).toBe(true);
     expect(CapabilityArtifact.safeParse({
       ...artifact,
-      program: { ...artifact.program, effects: { ...artifact.program.effects, writes: [".ludion-verify/**"] } },
+      verifier: { ...artifact.verifier, mount_at: "other" },
     }).success).toBe(false);
+    // Producer extras do not replace the fixed denylist, and the mount stays .ludion-verify.
     expect(CapabilityArtifact.safeParse({
       ...artifact,
       verifier: { ...artifact.verifier, protected_paths: ["other/**"] },
-    }).success).toBe(false);
+    }).success).toBe(true);
   });
 });
 

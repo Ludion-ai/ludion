@@ -8,11 +8,12 @@ import {
   programHash,
   runIfExecutable,
   sha256Hex,
+  imageDigest,
   validateReceipt,
   verifierHash,
   type GuardResultT,
 } from "../src/index.ts";
-import { exampleCounterexamples, exampleRecord, executedReceipt, guardInput, receiptDraft, reseal, reuseCurrent } from "./fixtures.ts";
+import { exampleCounterexamples, exampleRecord, executedReceipt, guardInput, notExecutedReceipt, receiptDraft, reseal, reuseCurrent } from "./fixtures.ts";
 
 function applicable(): GuardResultT {
   const result = evaluateGuard(exampleRecord(), guardInput());
@@ -117,7 +118,10 @@ describe("receipt reuse", () => {
     });
 
     const dep = `cap:${sha256Hex("dependency")}`;
-    const withDep = reseal({ ...structuredClone(rec.artifact), dependencies: { capabilities: [dep], image: "node:24-slim" } }, rec.lineage);
+    const withDep = reseal({
+      ...structuredClone(rec.artifact),
+      dependencies: { capabilities: [dep], image: rec.artifact.dependencies.image },
+    }, rec.lineage);
     expect(checkReceiptReuse(receipt, withDep, { ...reuseCurrent(rec), dependency_ids: [] })).toMatchObject({
       status: "stale",
       reason: "dependency_changed",
@@ -138,5 +142,58 @@ describe("receipt reuse", () => {
     expect(added.id).toBe(rec.id);
     expect(counterexamplesHash(added.counterexamples)).not.toBe(receipt.counterexamples_hash);
     expect(checkReceiptReuse(receipt, added, reuseCurrent(added))).toMatchObject({ status: "stale", reason: "counterexample_added" });
+  });
+
+  it("requires an executed verified receipt, every required test, and the same image", () => {
+    const rec = exampleRecord();
+    const guard = applicable();
+    const good = executedReceipt(rec, guard);
+    expect(checkReceiptReuse(good, rec, reuseCurrent(rec, "v24.11.0"))).toEqual({ reusable: true });
+    expect(checkReceiptReuse(good, rec, reuseCurrent(rec, "v24.0.1"))).toEqual({ reusable: true });
+    expect(checkReceiptReuse(good, rec, reuseCurrent(rec, "v22.14.0"))).toMatchObject({ status: "stale", reason: "runtime_changed" });
+
+    const idle = notExecutedReceipt(rec, inapplicable);
+    expect(checkReceiptReuse(idle, rec, reuseCurrent(rec))).toMatchObject({ reusable: false, reason: "not_executed" });
+
+    if (good.outcome !== "executed") throw new Error("fixture receipt was not executed");
+    const failed = executedReceipt(rec, guard, {
+      verifier: {
+        ...good.verifier,
+        status: "failed",
+        exit_code: 1,
+        tests: { total: 3, passed: 2, failed: 1, skipped: 0, todo: 0 },
+        required_passed: [],
+      },
+    });
+    expect(checkReceiptReuse(failed, rec, reuseCurrent(rec))).toMatchObject({ reusable: false, reason: "not_verified" });
+
+    const missing = executedReceipt(rec, guard, {
+      verifier: { ...good.verifier, required_passed: ["history-cleared", "spy-restored"] },
+    });
+    expect(checkReceiptReuse(missing, rec, reuseCurrent(rec))).toMatchObject({ reusable: false, reason: "required_tests_missing" });
+
+    const other = `node@sha256:${"b".repeat(64)}`;
+    const mismatched = executedReceipt(rec, guard, {
+      runtime: { ...good.runtime, image: other, image_digest: imageDigest(other) },
+    });
+    expect(checkReceiptReuse(mismatched, rec, reuseCurrent(rec))).toMatchObject({ reusable: false, reason: "image_mismatch" });
+
+    expect(checkReceiptReuse({ outcome: "executed" }, rec, reuseCurrent(rec))).toMatchObject({ reusable: false, reason: "invalid_receipt" });
+    expect(checkReceiptReuse(good, { ...rec, id: "not-an-id" }, reuseCurrent(rec))).toMatchObject({ reusable: false, reason: "invalid_record" });
+  });
+
+  it("rejects a not_executed receipt that still carries a verifier and a verified result with no required_passed", () => {
+    const rec = exampleRecord();
+    const guard = applicable();
+    const good = executedReceipt(rec, guard);
+    if (good.outcome !== "executed") throw new Error("fixture receipt was not executed");
+    expect(validateReceipt(receiptDraft(rec, inapplicable, {
+      outcome: "not_executed",
+      runtime: null,
+      verifier: good.verifier,
+      verifier_runtime: null,
+      diff: null,
+    })).success).toBe(false);
+    expect(validateReceipt({ ...good, verifier: { ...good.verifier, required_passed: [] } }).success).toBe(false);
   });
 });

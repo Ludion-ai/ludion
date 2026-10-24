@@ -18,6 +18,14 @@ export {
   VerifierResult,
   Receipt,
   EXECUTABLE,
+  VERIFIER_MOUNT_DIR,
+  FIXED_PROTECTED_GLOBS,
+  VERIFIER_STORE_PREFIX,
+  PinnedImage,
+  imageDigest,
+  effectiveProtectedPaths,
+  globsMayOverlap,
+  VerifierRuntime,
 } from "./schema.ts";
 export type {
   Capability,
@@ -39,6 +47,6 @@ export type {
   VerifierT,
 } from "./schema.ts";
 export { canonicalJson } from "./canonical-json.ts";
-export { capabilityId, counterexamplesHash, dependenciesHash, programHash, sha256Hex, staleResult, verifierHash, verifyRecord } from "./hash.ts";
+export { capabilityId, counterexamplesHash, dependenciesHash, fileDigest, programHash, sha256Hex, staleResult, verifierHash, verifyRecord } from "./hash.ts";
 export { evaluateGuard, type GuardInput } from "./guard.ts";
-export { checkReceiptReuse, runIfExecutable, validateReceipt, type ReuseCurrent } from "./receipt.ts";
+export { checkReceiptReuse, runIfExecutable, validateReceipt, type ReuseCurrent, type ReuseResult } from "./receipt.ts";

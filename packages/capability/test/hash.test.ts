@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { canonicalJson, capabilityId, verifyRecord, type CapabilityArtifactT } from "../src/index.ts";
-import { exampleArtifact, exampleLineage, exampleRecord, reseal } from "./fixtures.ts";
+import { CapabilityArtifact, canonicalJson, capabilityId, dependenciesHash, verifierHash, verifyRecord, type CapabilityArtifactT } from "../src/index.ts";
+import { exampleArtifact, exampleArtifactInput, exampleLineage, exampleRecord, reseal } from "./fixtures.ts";
 
 describe("canonical JSON", () => {
   it("sorts keys, omits undefined, and keeps array order", () => {
@@ -17,7 +17,7 @@ describe("canonical JSON", () => {
 });
 
 describe("capability id", () => {
-  it("is stable across key order, newlines, and unicode normalization", () => {
+  it("is stable across key order and changes when bytes or normalization differ", () => {
     const base = exampleArtifact();
     const reordered = JSON.parse(canonicalJson(base)) as CapabilityArtifactT;
     expect(capabilityId(reordered)).toBe(capabilityId(base));
@@ -37,18 +37,74 @@ describe("capability id", () => {
     const lf = structuredClone(base);
     const crlf = structuredClone(base);
     const cr = structuredClone(base);
-    lf.program.files["insert-clear.ts"] = "line\nline\n";
-    crlf.program.files["insert-clear.ts"] = "line\r\nline\r\n";
-    cr.program.files["insert-clear.ts"] = "line\rline\r";
-    expect(capabilityId(crlf)).toBe(capabilityId(lf));
-    expect(capabilityId(cr)).toBe(capabilityId(lf));
+    lf.program.files["insert-clear.ts"] = "a\nb";
+    crlf.program.files["insert-clear.ts"] = "a\r\nb";
+    cr.program.files["insert-clear.ts"] = "\r";
+    const lfOnly = structuredClone(base);
+    lfOnly.program.files["insert-clear.ts"] = "\n";
+    expect(capabilityId(crlf)).not.toBe(capabilityId(lf));
+    expect(capabilityId(cr)).not.toBe(capabilityId(lfOnly));
+
+    const nfcFile = structuredClone(base);
+    const nfdFile = structuredClone(base);
+    nfcFile.program.files["insert-clear.ts"] = "\u00e9";
+    nfdFile.program.files["insert-clear.ts"] = "e\u0301";
+    expect(capabilityId(nfdFile)).not.toBe(capabilityId(nfcFile));
 
     const nfc = structuredClone(base);
     const nfd = structuredClone(base);
     nfc.contract = { ...nfc.contract, intent: `${"caf\u00e9"} history cleanup for mocks` };
     nfd.contract = { ...nfd.contract, intent: `${"cafe\u0301"} history cleanup for mocks` };
     expect(nfc.contract.intent.normalize("NFC")).toBe(nfd.contract.intent.normalize("NFC"));
-    expect(capabilityId(nfd)).toBe(capabilityId(nfc));
+    expect(capabilityId(nfd)).not.toBe(capabilityId(nfc));
+  });
+
+  it("rejects a CR or NFD path and a lone surrogate, and parses defaults before hashing", () => {
+    expect(() => canonicalJson("\uD800")).toThrow(/well-formed/);
+    expect(() => canonicalJson({ "\uD800": 1 })).toThrow(/well-formed/);
+    const surrogate = exampleArtifact();
+    surrogate.program.files["insert-clear.ts"] = "\uD800";
+    expect(() => capabilityId(surrogate)).toThrow();
+
+    const crPath = exampleArtifactInput();
+    crPath.program.files["insert\r.ts"] = "x";
+    expect(CapabilityArtifact.safeParse(crPath).success).toBe(false);
+    const nfdPath = exampleArtifactInput();
+    nfdPath.program.files["cafe\u0301.ts"] = "x";
+    expect(CapabilityArtifact.safeParse(nfdPath).success).toBe(false);
+
+    const input = exampleArtifactInput();
+    const contract = { ...input.contract } as { excludes?: string[] };
+    delete contract.excludes;
+    const packages = input.guard.packages.map((pkg) => {
+      const next = { ...pkg } as { inapplicable_versions?: string[] };
+      delete next.inapplicable_versions;
+      return next;
+    });
+    const structure = input.guard.structure.map((condition) => {
+      if (condition.kind !== "call") return condition;
+      const target = { ...condition.target } as { member?: string[] };
+      delete target.member;
+      return { ...condition, target };
+    });
+    const { capabilities: _capabilities, ...dependencies } = input.dependencies;
+    const partial = { ...input, contract, guard: { ...input.guard, packages, structure }, dependencies };
+    const parsed = CapabilityArtifact.parse(partial);
+    expect(parsed.contract.excludes).toEqual([]);
+    expect(parsed.dependencies.capabilities).toEqual([]);
+    expect(parsed.guard.packages.every((pkg) => Array.isArray(pkg.inapplicable_versions))).toBe(true);
+    expect(parsed.guard.structure.filter((condition) => condition.kind === "call").every((condition) => condition.kind === "call" && condition.target.member.length === 0)).toBe(true);
+    expect(canonicalJson(partial)).not.toBe(canonicalJson(parsed));
+    expect(capabilityId(partial)).toBe(capabilityId(parsed));
+    expect(() => capabilityId({ ...input, format: "capability/0" })).toThrow();
+
+    const { protected_paths: _protected, ...verifierRest } = input.verifier;
+    expect(verifierHash(verifierRest)).toBe(verifierHash({ ...verifierRest, protected_paths: [] }));
+    expect(dependenciesHash(dependencies)).toBe(dependenciesHash({ ...dependencies, capabilities: [] }));
+    const loose = { ...exampleRecord() } as { counterexamples?: unknown; id: string };
+    delete loose.counterexamples;
+    expect(verifyRecord(loose)).toEqual({ ok: true });
+    expect(() => verifyRecord({ ...exampleRecord(), id: "not-an-id" })).toThrow();
   });
 
   it("ignores lineage and created_at", () => {

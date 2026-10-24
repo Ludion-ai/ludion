@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateGuard, GuardResult } from "../src/index.ts";
+import { canonicalJson, evaluateGuard, GuardResult, sha256Hex } from "../src/index.ts";
 import {
   aliasTest,
   alreadyFixedTest,
@@ -152,6 +152,58 @@ describe("evaluateGuard", () => {
       "",
     ].join("\n");
     expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": absent } }).status).toBe("applicable");
+
+    const computed = [
+      "export default {",
+      '  ["test"]: { clearMocks: true },',
+      "};",
+      "",
+    ].join("\n");
+    const computedIdent = [
+      "const k = 'test';",
+      "export default {",
+      "  [k]: { clearMocks: true },",
+      "};",
+      "",
+    ].join("\n");
+    const dupOuter = [
+      "export default {",
+      "  test: { clearMocks: false },",
+      "  test: { clearMocks: true },",
+      "};",
+      "",
+    ].join("\n");
+    const dupInner = [
+      "export default {",
+      "  test: { clearMocks: false, clearMocks: true },",
+      "};",
+      "",
+    ].join("\n");
+    const shorthand = [
+      "const test = { clearMocks: true };",
+      "export default { test };",
+      "",
+    ].join("\n");
+    for (const source of [computed, computedIdent, dupOuter, dupInner, shorthand]) {
+      expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": source } })).toMatchObject({
+        status: "unknown",
+        reason: "config_not_static",
+      });
+    }
+  });
+
+  it("does not treat a nested config basename as the root config", () => {
+    const nested = {
+      ...applicableFiles(),
+      "packages/x/vitest.config.ts": clearMocksConfig,
+    };
+    expect(judge({ files: nested })).toMatchObject({ status: "unknown", reason: "config_not_static" });
+    expect(judge({
+      files: { ...nested, "vitest.config.ts": clearMocksConfig },
+    })).toMatchObject({ status: "unknown", reason: "config_not_static" });
+    expect(judge({
+      files: { ...applicableFiles(), "packages/x/other.ts": "export const x = 1;\n" },
+    }).status).toBe("applicable");
   });
 
   it("classifies package versions, lockfile, contract, and node", () => {
@@ -176,5 +228,89 @@ describe("evaluateGuard", () => {
       expect(judge({ files: cx.fixture }).status, cx.id).toBe(cx.expected);
     }
     expect(CONTRACT_ID).toBe("mock_cleanup.clear_history");
+  });
+
+  it("does not resolve a shadowed parameter, catch binding, or unmodeled access", () => {
+    const shadowed = [
+      'import { vi } from "vitest";\nconst o = { m(vi) { vi.restoreAllMocks(); } };\n',
+      'import { vi } from "vitest";\nclass C { m(vi) { vi.restoreAllMocks(); } }\n',
+      'import { vi } from "vitest";\nclass C { async m(vi) { vi.restoreAllMocks(); } }\n',
+      'import { vi } from "vitest";\nclass C { set m(vi) { vi.restoreAllMocks(); } }\n',
+      'import { vi } from "vitest";\nclass C { get m(vi) { vi.restoreAllMocks(); } }\n',
+      'import { vi } from "vitest";\nconst o = { async m(vi) { vi.restoreAllMocks(); } };\n',
+      'import { vi } from "vitest";\nconst o = { set m(vi) { vi.restoreAllMocks(); } };\n',
+      'import { vi } from "vitest";\nconst o = { get m(vi) { vi.restoreAllMocks(); } };\n',
+      'import { vi } from "vitest";\ntry {} catch (vi) { vi.restoreAllMocks(); }\n',
+    ];
+    for (const source of shadowed) {
+      const result = judge({ files: { "src/shadowed.test.ts": source } });
+      expect(result.status, source).not.toBe("applicable");
+      expect(["unknown", "inapplicable"]).toContain(result.status);
+    }
+
+    const positive = [
+      'import { vi } from "vitest";',
+      "class C { m(other) { return other; } }",
+      "afterEach(() => { vi.restoreAllMocks(); });",
+      "",
+    ].join("\n");
+    expect(judge({ files: { "src/positive.test.ts": positive } }).status).toBe("applicable");
+    const inMethod = [
+      'import { vi } from "vitest";',
+      "const o = { m() { vi.restoreAllMocks(); } };",
+      "",
+    ].join("\n");
+    expect(judge({ files: { "src/method-ok.test.ts": inMethod } }).status).toBe("applicable");
+    const catchOk = [
+      'import { vi } from "vitest";',
+      "try {} catch (err) { vi.restoreAllMocks(); }",
+      "",
+    ].join("\n");
+    expect(judge({ files: { "src/catch-ok.test.ts": catchOk } }).status).toBe("applicable");
+
+    const forms = [
+      "vi?.restoreAllMocks()",
+      "vi.restoreAllMocks?.()",
+      'vi["restoreAllMocks"]()',
+      "vi[`restoreAllMocks`]()",
+      "vi[name]()",
+    ];
+    for (const call of forms) {
+      const only = `import { vi } from "vitest";\nconst name = "restoreAllMocks";\n${call};\n`;
+      expect(judge({ files: { "src/unmodeled.test.ts": only } }), call).toMatchObject({
+        status: "unknown",
+        reason: "binding_unresolved",
+      });
+      const mixed = `import { vi } from "vitest";\nconst name = "restoreAllMocks";\n${call};\nafterEach(() => { vi.restoreAllMocks(); });\n`;
+      expect(judge({ files: { "src/mixed.test.ts": mixed } }), call).toMatchObject({
+        status: "unknown",
+        reason: "binding_unresolved",
+      });
+    }
+    expect(judge({ files: applicableFiles() }).status).toBe("applicable");
+  });
+
+  it("returns unknown for a denylisted write and for a throwing getter", () => {
+    const rec = exampleRecord();
+    const artifact = structuredClone(rec.artifact);
+    artifact.program.effects.writes = ["tools/verify/x.ts"];
+    const forged = { ...rec, id: `cap:${sha256Hex(canonicalJson(artifact))}`, artifact };
+    const forgedResult = evaluateGuard(forged, guardInput());
+    expect(forgedResult).toMatchObject({ status: "unknown", reason: "parse_failed" });
+    expect(GuardResult.safeParse(forgedResult).success).toBe(true);
+
+    const throwing = exampleRecord();
+    Object.defineProperty(throwing.artifact.program, "files", {
+      configurable: true,
+      enumerable: true,
+      get() {
+        throw new Error("files exploded");
+      },
+    });
+    const thrownResult = evaluateGuard(throwing, guardInput());
+    expect(thrownResult).toMatchObject({ status: "unknown", reason: "parse_failed" });
+    expect(GuardResult.safeParse(thrownResult).success).toBe(true);
+
+    expect(evaluateGuard(exampleRecord(), guardInput())).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
   });
 });

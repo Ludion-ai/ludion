@@ -2,7 +2,8 @@ import { anyGlob } from "./glob.ts";
 import { verifyRecord } from "./hash.ts";
 import { nodeMajor } from "./node-version.ts";
 import { analyze, readConfigKey, resolveTarget } from "./scan.ts";
-import type { CapabilityRecordT, GuardResultT, StructureConditionT } from "./schema.ts";
+import { CapabilityRecord } from "./schema.ts";
+import type { GuardResultT, StructureConditionT } from "./schema.ts";
 
 export type GuardInput = {
   contract_id?: string;
@@ -26,7 +27,11 @@ function detail(s: string): string {
 }
 
 function isRel(p: string): boolean {
-  return p.length > 0 && p.length <= 260 && !/^([\\/]|[A-Za-z]:)/.test(p) && !p.split(/[\\/]/).includes("..");
+  if (p.length === 0 || p.length > 260 || /^([\\/]|[A-Za-z]:)/.test(p)) return false;
+  const parts = p.split(/[\\/]/);
+  if (parts.includes("..")) return false;
+  // The guard does not scan dot-directories or dot-files. `**` in a glob still reaches them.
+  return !parts.some((s) => s.length > 1 && s.startsWith("."));
 }
 
 type InapplicableReason = Extract<GuardResultT, { status: "inapplicable" }>["reason"];
@@ -41,14 +46,35 @@ function unknown(reason: UnknownReason, text: string, checks: Check[]): GuardRes
 }
 
 /**
- * Pure structural guard. Order: record integrity, contract, packages, node major, config, calls.
+ * Pure structural guard. Parses the record first, then record integrity, contract, packages, node major, config, calls.
  * A missing contract id is unknown/intent_missing. Listed versions only; anything else is unknown.
- * Node is compared by major. `similarity` is ignored.
+ * Node is compared by major. `similarity` is ignored. Schema failures and thrown getters are unknown/parse_failed.
  */
-export function evaluateGuard(record: CapabilityRecordT, input: GuardInput): GuardResultT {
-  void input.similarity;
+export function evaluateGuard(record: unknown, input: GuardInput): GuardResultT {
   const checks: Check[] = [];
-  const integrity = verifyRecord(record);
+  try {
+    return evaluateGuardBody(record, input, checks);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      status: "unknown",
+      reason: "parse_failed",
+      detail: `guard error: ${message.slice(0, 400)}`,
+      checks,
+    };
+  }
+}
+
+function evaluateGuardBody(record: unknown, input: GuardInput, checks: Check[]): GuardResultT {
+  void input.similarity;
+  const parsed = CapabilityRecord.safeParse(record);
+  if (!parsed.success) {
+    const message = parsed.error.issues.map((issue) => issue.message).join("; ");
+    checks.push(check("record", null, message));
+    return unknown("parse_failed", message || "record did not parse", checks);
+  }
+  const artifactRecord = parsed.data;
+  const integrity = verifyRecord(artifactRecord);
   if (!("ok" in integrity)) return integrity;
   checks.push(check("record", true));
 
@@ -56,9 +82,9 @@ export function evaluateGuard(record: CapabilityRecordT, input: GuardInput): Gua
     checks.push(check("contract", null, "caller did not pass contract_id"));
     return unknown("intent_missing", "contract_id was not provided", checks);
   }
-  if (input.contract_id !== record.artifact.guard.contract_id) {
+  if (input.contract_id !== artifactRecord.artifact.guard.contract_id) {
     checks.push(check("contract", false, input.contract_id));
-    return inapplicable("contract_mismatch", `contract ${input.contract_id} does not match ${record.artifact.guard.contract_id}`, checks);
+    return inapplicable("contract_mismatch", `contract ${input.contract_id} does not match ${artifactRecord.artifact.guard.contract_id}`, checks);
   }
   checks.push(check("contract", true));
 
@@ -67,7 +93,7 @@ export function evaluateGuard(record: CapabilityRecordT, input: GuardInput): Gua
     return unknown("lockfile_unreadable", "resolved_versions is null", checks);
   }
   const versions = input.resolved_versions;
-  for (const pkg of record.artifact.guard.packages) {
+  for (const pkg of artifactRecord.artifact.guard.packages) {
     const got = versions[pkg.name];
     if (got === undefined) {
       checks.push(check(`package:${pkg.name}`, false, "absent"));
@@ -94,22 +120,45 @@ export function evaluateGuard(record: CapabilityRecordT, input: GuardInput): Gua
     checks.push(check("runtime", null, input.node_version));
     return unknown("environment_unavailable", `node version ${input.node_version} is not vX.Y.Z`, checks);
   }
-  if (!record.artifact.guard.runtime.node_major.includes(major)) {
+  if (!artifactRecord.artifact.guard.runtime.node_major.includes(major)) {
     checks.push(check("runtime", false, major));
-    return inapplicable("runtime_mismatch", `node major ${major} is outside ${record.artifact.guard.runtime.node_major.join(",")}`, checks);
+    return inapplicable("runtime_mismatch", `node major ${major} is outside ${artifactRecord.artifact.guard.runtime.node_major.join(",")}`, checks);
   }
   checks.push(check("runtime", true, major));
 
-  const configResult = evaluateConfigs(record.artifact.guard.structure, input.files, checks);
+  const configResult = evaluateConfigs(artifactRecord.artifact.guard.structure, input.files, checks);
   if (configResult) return configResult;
 
-  return evaluateCalls(record.artifact.guard.structure, input.files, checks);
+  return evaluateCalls(artifactRecord.artifact.guard.structure, input.files, checks);
+}
+
+function lastSegment(path: string): string {
+  const norm = path.replaceAll("\\", "/");
+  const cut = norm.lastIndexOf("/");
+  return cut < 0 ? norm : norm.slice(cut + 1);
+}
+
+/** A config file whose basename matches the condition but whose full path does not. */
+function configOutsideGlob(globs: readonly string[], files: Record<string, string>): string | undefined {
+  const bases = globs.map(lastSegment);
+  for (const path of Object.keys(files)) {
+    if (!isRel(path)) continue;
+    const filePath = path.replaceAll("\\", "/");
+    if (anyGlob(globs, filePath)) continue;
+    if (anyGlob(bases, lastSegment(filePath))) return filePath;
+  }
+  return undefined;
 }
 
 function evaluateConfigs(structure: readonly StructureConditionT[], files: Record<string, string>, checks: Check[]): GuardResultT | undefined {
   const configs = structure.filter((c) => c.kind === "config");
   for (const condition of configs) {
     const label = `config:${condition.key}`;
+    const outside = configOutsideGlob(condition.file, files);
+    if (outside) {
+      checks.push(check(label, null, outside));
+      return unknown("config_not_static", `${outside} matches a config basename outside the condition globs`, checks);
+    }
     const matched = Object.entries(files).filter(([path]) => isRel(path) && anyGlob(condition.file, path));
     if (matched.length === 0) {
       checks.push(check(label, true, "no config file"));

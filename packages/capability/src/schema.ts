@@ -1,7 +1,6 @@
 // Single source for capability types. JSON Schema is generated with z.toJSONSchema.
 // superRefine invariants are not emitted into JSON Schema; zod is the validator.
 import { z } from "zod";
-import { globCoversDir, globMayOverlapDir, globsMayOverlap } from "./glob.ts";
 
 export const Sha256 = z.string().regex(/^sha256:[0-9a-f]{64}$/);
 /** sha256 of the canonical JSON of a CapabilityArtifact. The id is not part of the artifact. */
@@ -10,13 +9,252 @@ const ExactSemver = z.string().regex(/^\d+\.\d+\.\d+$/);
 const Ulid = z.string().regex(/^[0-9A-HJKMNP-TV-Z]{26}$/);
 const UtcTime = z.iso.datetime({ offset: false });
 const Slug = z.string().regex(/^[a-z0-9][a-z0-9_.-]{0,63}$/);
-/** Work-copy relative path. Rejects absolute paths, drive letters, and `..`. */
-const RelPath = z.string().min(1).max(260).refine(
-  (p) => !/^([\\/]|[A-Za-z]:)/.test(p) && !p.split(/[\\/]/).includes(".."),
-  "work-copy relative path",
-);
-const Glob = z.string().min(1).max(200);
-const Files = z.record(RelPath, z.string());
+
+const MAX_EXPANSIONS = 64;
+const GLOB_CHARSET = /^[A-Za-z0-9._\-/*?{},@+]+$/;
+
+/** Work-copy relative path: no absolute, drive, stream, dot segment, encoding trick, or non-NFC text. */
+function isSafeRelPath(p: string): boolean {
+  if (p.length === 0 || !p.isWellFormed() || p !== p.normalize("NFC")) return false;
+  if (p.startsWith("/")) return false;
+  if (p.includes("\\") || p.includes("%") || p.includes(":")) return false;
+  for (let i = 0; i < p.length; i++) {
+    const c = p.charCodeAt(i);
+    if (c <= 0x1f || c === 0x7f) return false;
+  }
+  const segs = p.split("/");
+  for (const s of segs) {
+    if (s === "" || s === "." || s === "..") return false;
+  }
+  return true;
+}
+
+function countStars(p: string): number {
+  let n = 0;
+  for (let i = 0; i < p.length; i++) if (p[i] === "*") n++;
+  return n;
+}
+
+/** Balanced braces, no nesting, at most two groups. */
+function bracesOk(p: string): boolean {
+  let depth = 0;
+  let groups = 0;
+  for (let i = 0; i < p.length; i++) {
+    const c = p[i];
+    if (c === "{") {
+      if (depth !== 0) return false;
+      depth = 1;
+      groups++;
+      if (groups > 2) return false;
+    } else if (c === "}") {
+      if (depth === 0) return false;
+      depth = 0;
+    }
+  }
+  return depth === 0;
+}
+
+function splitTopCommas(body: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < body.length; i++) {
+    const c = body[i];
+    if (c === "{") depth++;
+    else if (c === "}") depth--;
+    else if (c === "," && depth === 0) {
+      parts.push(body.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(body.slice(start));
+  return parts;
+}
+
+/** Expand every `{a,b}` group. Null when unbalanced, nested, or the cap would be exceeded. */
+function expandBraces(pattern: string): string[] | null {
+  const out: string[] = [];
+  const walk = (current: string): boolean => {
+    const start = current.indexOf("{");
+    if (start < 0) {
+      if (out.length >= MAX_EXPANSIONS) return false;
+      out.push(current);
+      return true;
+    }
+    let depth = 0;
+    let end = -1;
+    for (let i = start; i < current.length; i++) {
+      const c = current[i];
+      if (c === "{") {
+        depth++;
+        if (depth > 1) return false;
+      } else if (c === "}") {
+        depth--;
+        if (depth === 0) {
+          end = i;
+          break;
+        }
+      }
+    }
+    if (end < 0) return false;
+    const before = current.slice(0, start);
+    const after = current.slice(end + 1);
+    for (const alt of splitTopCommas(current.slice(start + 1, end))) {
+      if (!walk(before + alt + after)) return false;
+    }
+    return true;
+  };
+  return walk(pattern) ? out : null;
+}
+
+function isGlob(p: string): boolean {
+  if (!isSafeRelPath(p) || p.length > 200) return false;
+  if (!GLOB_CHARSET.test(p)) return false;
+  if (countStars(p) > 8) return false;
+  if (!bracesOk(p)) return false;
+  const expanded = expandBraces(p);
+  if (expanded === null) return false;
+  for (const one of expanded) {
+    if (!isSafeRelPath(one)) return false;
+    // Windows drops a trailing dot: `tools/verify./x` names `tools/verify/x`.
+    if (one.split("/").some((s) => s.endsWith("."))) return false;
+  }
+  return true;
+}
+
+const RelPath = z.string().min(1).max(260).refine(isSafeRelPath, "work-copy relative path");
+const Glob = z.string().min(1).max(200).refine(isGlob, "glob");
+const WellFormed = z.string().refine((s) => s.isWellFormed(), "well-formed UTF-16");
+const Files = z.record(RelPath, WellFormed).superRefine((files, ctx) => {
+  const seen = new Set<string>();
+  for (const key of Object.keys(files)) {
+    const folded = key.toLowerCase();
+    if (seen.has(folded)) ctx.addIssue({ code: "custom", message: `duplicate file path ignoring case: ${key}` });
+    seen.add(folded);
+  }
+});
+
+/** Image reference pinned by digest. Name, then `@sha256:` and 64 lowercase hex digits. */
+export const PinnedImage = z.string().max(300).regex(/^[a-z0-9][a-z0-9._\/:-]*@sha256:[0-9a-f]{64}$/);
+
+/** `sha256:<hex>` suffix of a PinnedImage reference. */
+export function imageDigest(ref: string): string {
+  const at = ref.lastIndexOf("@");
+  return at < 0 ? "" : ref.slice(at + 1);
+}
+
+export const VERIFIER_MOUNT_DIR = ".ludion-verify" as const;
+
+/** Writes may never touch these, whatever the producer lists. */
+export const FIXED_PROTECTED_GLOBS = [
+  ".ludion-verify/**",
+  "tools/verify/**",
+  ".github/**",
+  ".git/**",
+  "**/.git/**",
+  "node_modules/**",
+  "**/node_modules/**",
+  "**/package.json",
+  "**/package-lock.json",
+  "**/npm-shrinkwrap.json",
+  "**/pnpm-lock.yaml",
+  "**/yarn.lock",
+  "**/vitest.config.{ts,mts,cts,js,mjs,cjs}",
+  "**/vite.config.{ts,mts,cts,js,mjs,cjs}",
+  "**/vitest.workspace.{ts,mts,cts,js,mjs,cjs,json}",
+  "**/vitest.setup.{ts,mts,cts,js,mjs,cjs}",
+  "**/vitest-setup.{ts,mts,cts,js,mjs,cjs}",
+  "**/setupTests.{ts,mts,cts,js,mjs,cjs}",
+  "**/test-setup.{ts,mts,cts,js,mjs,cjs}",
+  "**/tsconfig*.json",
+  "**/.npmrc",
+] as const;
+
+/** De-duplicated union of the fixed denylist and producer extras. */
+export function effectiveProtectedPaths(v: { protected_paths: readonly string[] }): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const g of FIXED_PROTECTED_GLOBS) {
+    if (!seen.has(g)) {
+      seen.add(g);
+      out.push(g);
+    }
+  }
+  for (const g of v.protected_paths) {
+    if (!seen.has(g)) {
+      seen.add(g);
+      out.push(g);
+    }
+  }
+  return out;
+}
+
+/**
+ * Whether two sequences may name a common value.
+ * `star` matches zero or more atoms (`**` for segments, `*` for characters).
+ * State pairs stay polynomial via a visited set.
+ */
+function sequencesMayOverlap(
+  a: string | readonly string[],
+  b: string | readonly string[],
+  star: string,
+  atomsIntersect: (x: string, y: string) => boolean,
+): boolean {
+  const seen = new Set<string>();
+  const queue: Array<[number, number]> = [[0, 0]];
+  seen.add("0:0");
+  let head = 0;
+  while (head < queue.length) {
+    const cur = queue[head];
+    head++;
+    if (cur === undefined) continue;
+    const i = cur[0];
+    const j = cur[1];
+    if (i === a.length && j === b.length) return true;
+    const ai = i < a.length ? a[i] : undefined;
+    const bj = j < b.length ? b[j] : undefined;
+    if (ai === star) {
+      enqueue(i + 1, j);
+      if (j < b.length) enqueue(i, j + 1);
+    }
+    if (bj === star) {
+      enqueue(i, j + 1);
+      if (i < a.length) enqueue(i + 1, j);
+    }
+    if (ai !== undefined && bj !== undefined && ai !== star && bj !== star && atomsIntersect(ai, bj)) {
+      enqueue(i + 1, j + 1);
+    }
+  }
+  return false;
+
+  function enqueue(ni: number, nj: number) {
+    const key = `${ni}:${nj}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    queue.push([ni, nj]);
+  }
+}
+
+function charsMayOverlap(a: string, b: string): boolean {
+  return sequencesMayOverlap(a, b, "*", (x, y) => x === "?" || y === "?" || x === y);
+}
+
+function segmentsMayOverlap(a: readonly string[], b: readonly string[]): boolean {
+  return sequencesMayOverlap(a, b, "**", charsMayOverlap);
+}
+
+/** True when some path may match both globs. Case-insensitive. Brace expansion is capped. */
+export function globsMayOverlap(a: string, b: string): boolean {
+  const left = expandBraces(a.toLowerCase());
+  const right = expandBraces(b.toLowerCase());
+  if (left === null || right === null) return true;
+  for (const pa of left) {
+    for (const pb of right) {
+      if (segmentsMayOverlap(pa.split("/"), pb.split("/"))) return true;
+    }
+  }
+  return false;
+}
 
 export const Contract = z.strictObject({
   id: Slug,
@@ -87,21 +325,34 @@ export const Program = z.strictObject({
   timeout_ms: z.number().int().positive().max(120_000),
 });
 
+const ArgvRest = z.string().max(200);
+/** argv is owned by the P2 runner; the runner rejects flags such as --config, --root, and --passWithNoTests. The schema only pins argv[0]. */
+const VerifierArgv = z.tuple([z.literal("vitest")], ArgvRest).superRefine((argv, ctx) => {
+  if (argv.length > 16) ctx.addIssue({ code: "custom", message: "argv has at most 16 items" });
+});
+
 export const Verifier = z.strictObject({
   kind: z.literal("vitest-run"),
+  /** The verifier runner is tools/verify at main_commit. tools_verify_hash is the sha256 of that tree. */
+  source: z.strictObject({
+    repo: z.literal("Ludion-ai/ludion"),
+    main_commit: z.string().regex(/^[0-9a-f]{40}$/),
+    tools_verify_hash: Sha256,
+  }),
   files: Files,
-  mount_at: RelPath,
-  argv: z.array(z.string()).min(1),
+  mount_at: z.literal(VERIFIER_MOUNT_DIR),
+  argv: VerifierArgv,
   required_tests: z.array(z.string()).min(1),
   run_recipient_tests: z.boolean(),
-  protected_paths: z.array(Glob).min(1),
+  /** Producer extras. The fixed denylist always applies on top of this list. */
+  protected_paths: z.array(Glob).default([]),
   allow_skip: z.literal(false),
   timeout_ms: z.number().int().positive().max(300_000),
 });
 
 export const Dependencies = z.strictObject({
   capabilities: z.array(CapabilityId).default([]),
-  image: z.string(),
+  image: PinnedImage,
 });
 
 export const Lineage = z.strictObject({
@@ -146,21 +397,14 @@ export const CapabilityArtifact = z.strictObject({
       }
     }
   }
-  // The verifier tree is mounted fresh AFTER program execution (P2 runner). P1 still rejects a write
-  // glob that may intersect a protected glob or the mount directory, using literal-prefix overlap.
-  // An empty prefix (for example `**/*.test.ts`) overlaps everything.
+  // Writes may not intersect the fixed denylist or producer protected_paths.
+  // `**` reaches dot-directories, so `src/**/*.test.ts` overlaps `**/node_modules/**`.
   for (const w of a.program.effects.writes) {
-    for (const p of a.verifier.protected_paths) {
+    for (const p of effectiveProtectedPaths(a.verifier)) {
       if (globsMayOverlap(w, p)) {
-        ctx.addIssue({ code: "custom", message: `program.effects.writes glob "${w}" overlaps verifier.protected_paths glob "${p}"` });
+        ctx.addIssue({ code: "custom", message: `program.effects.writes glob "${w}" overlaps protected glob "${p}"` });
       }
     }
-    if (globMayOverlapDir(w, a.verifier.mount_at)) {
-      ctx.addIssue({ code: "custom", message: `program.effects.writes glob "${w}" overlaps verifier mount_at "${a.verifier.mount_at}"` });
-    }
-  }
-  if (!a.verifier.protected_paths.some((p) => globCoversDir(p, a.verifier.mount_at))) {
-    ctx.addIssue({ code: "custom", message: "protected_paths must cover verifier mount_at" });
   }
 });
 
@@ -250,17 +494,61 @@ export const VerifierResult = z.strictObject({
   required_passed: z.array(z.string()),
   protected_paths_modified: z.array(RelPath),
 }).superRefine((v, ctx) => {
-  if (v.status === "verified" && (v.exit_code !== 0 || v.tests.failed + v.tests.skipped + v.tests.todo > 0 || v.tests.passed === 0 || v.protected_paths_modified.length > 0)) {
+  if (v.status !== "verified") return;
+  if (v.exit_code !== 0 || v.tests.failed + v.tests.skipped + v.tests.todo > 0 || v.tests.passed === 0 || v.protected_paths_modified.length > 0) {
     ctx.addIssue({ code: "custom", message: "verified requires exit 0, no failed/skipped/todo, passed > 0, no protected-path change" });
+  }
+  if (v.required_passed.length === 0) {
+    ctx.addIssue({ code: "custom", message: "verified requires required_passed to be non-empty" });
+  }
+  const seen = new Set<string>();
+  for (const name of v.required_passed) {
+    if (seen.has(name)) ctx.addIssue({ code: "custom", message: `duplicate required_passed test "${name}"` });
+    seen.add(name);
   }
 });
 
-const VerifierRuntime = z.strictObject({
+/** Read-only mount outside the working copy, installed from main's lockfile at verifier.source.main_commit. */
+export const VERIFIER_STORE_PREFIX = "/opt/ludion/verifier-store/" as const;
+
+function isVerifierRealpath(p: string): boolean {
+  if (!p.startsWith(VERIFIER_STORE_PREFIX)) return false;
+  if (!p.isWellFormed()) return false;
+  if (p.includes("\\") || p.includes("%") || p.includes("//")) return false;
+  for (let i = 0; i < p.length; i++) {
+    const c = p.charCodeAt(i);
+    if (c <= 0x1f || c === 0x7f) return false;
+  }
+  for (const s of p.split("/")) {
+    if (s === "." || s === "..") return false;
+  }
+  return true;
+}
+
+/** Vitest is loaded from the verifier store, never from the recipient's node_modules. */
+export const VerifierRuntime = z.strictObject({
+  vitest_location: z.literal("verifier_store"),
+  vitest_realpath: z.string().max(400).refine(isVerifierRealpath, "verifier-store realpath"),
   vitest_version: ExactSemver,
-  vitest_path: RelPath,
+  vitest_integrity: z.string().regex(/^sha512-[A-Za-z0-9+/]{86}==$/),
+  lockfile_sha256: Sha256,
 });
 
-export const Receipt = z.strictObject({
+const Runtime = z.strictObject({
+  node_version: z.string().regex(/^v\d+\.\d+\.\d+$/),
+  image: PinnedImage,
+  image_digest: Sha256,
+  platform: z.string(),
+  network: z.literal("none"),
+});
+
+const Diff = z.strictObject({
+  ref: RelPath,
+  hash: Sha256,
+  files_changed: z.number().int().nonnegative(),
+});
+
+const receiptBase = {
   format: z.literal("receipt/1"),
   id: Ulid,
   capability_id: CapabilityId,
@@ -269,19 +557,7 @@ export const Receipt = z.strictObject({
   verifier_hash: Sha256,
   counterexamples_hash: Sha256,
   resolved_versions: z.record(z.string(), ExactSemver),
-  runtime: z.strictObject({
-    node_version: z.string().regex(/^v\d+\.\d+\.\d+$/),
-    image: z.string(),
-    image_digest: Sha256,
-    platform: z.string(),
-    network: z.literal("none"),
-  }).nullable(),
   guard: GuardResult,
-  outcome: z.enum(["executed", "not_executed", "environment_unavailable"]),
-  verifier: VerifierResult.nullable(),
-  /** Vitest binary the verifier actually ran. Required when outcome is executed. P2 still has to decide how to pin a recipient's node_modules. */
-  verifier_runtime: VerifierRuntime.nullable(),
-  diff: z.strictObject({ ref: RelPath, hash: Sha256, files_changed: z.number().int().nonnegative() }).nullable(),
   durations_ms: z.strictObject({
     guard: z.number().nonnegative(),
     install: z.number().nonnegative().nullable(),
@@ -292,16 +568,50 @@ export const Receipt = z.strictObject({
   model_calls: z.strictObject({ count: z.number().int().nonnegative(), span: z.literal("guard_to_verifier") }),
   started_at: UtcTime,
   finished_at: UtcTime,
-}).superRefine((r, ctx) => {
-  const ran = r.outcome === "executed";
-  if (r.guard.status !== "applicable" && (ran || r.verifier || r.diff)) {
+};
+
+const ExecutedReceipt = z.strictObject({
+  ...receiptBase,
+  outcome: z.literal("executed"),
+  runtime: Runtime,
+  verifier: VerifierResult,
+  /** Vitest binary the verifier actually ran. Loaded from the verifier store, never from the recipient's node_modules. */
+  verifier_runtime: VerifierRuntime,
+  diff: Diff.nullable(),
+});
+
+const NotExecutedReceipt = z.strictObject({
+  ...receiptBase,
+  outcome: z.literal("not_executed"),
+  runtime: z.null(),
+  verifier: z.null(),
+  verifier_runtime: z.null(),
+  diff: z.null(),
+});
+
+const EnvironmentUnavailableReceipt = z.strictObject({
+  ...receiptBase,
+  outcome: z.literal("environment_unavailable"),
+  runtime: z.null(),
+  verifier: z.null(),
+  verifier_runtime: z.null(),
+  diff: z.null(),
+});
+
+export const Receipt = z.discriminatedUnion("outcome", [
+  ExecutedReceipt,
+  NotExecutedReceipt,
+  EnvironmentUnavailableReceipt,
+]).superRefine((r, ctx) => {
+  if (r.outcome !== "executed") return;
+  if (r.guard.status !== "applicable") {
     ctx.addIssue({ code: "custom", message: `guard ${r.guard.status}: must not execute` });
   }
-  if (ran && (!r.runtime || !r.verifier || !r.verifier_runtime)) {
-    ctx.addIssue({ code: "custom", message: "executed run needs runtime, verifier result, and verifier provenance" });
-  }
-  if (r.verifier?.status === "verified" && !(r.diff && r.diff.files_changed > 0)) {
+  if (r.verifier.status === "verified" && !(r.diff && r.diff.files_changed > 0)) {
     ctx.addIssue({ code: "custom", message: "verified with empty diff is no_op, not a repair" });
+  }
+  if (imageDigest(r.runtime.image) !== r.runtime.image_digest) {
+    ctx.addIssue({ code: "custom", message: "runtime.image digest must equal runtime.image_digest" });
   }
 });
 

@@ -1,0 +1,68 @@
+# Required check "protected-paths".
+# Fails a PR that touches a protected path (CLAUDE.md, .github/, tools/verify/, the schema, lessons/,
+# ludion.config.json, wrangler.jsonc) unless it carries the "review-approved" label.
+#
+# Runs on pull_request_target so the workflow definition always comes from the base branch; a PR cannot
+# edit this file to pass itself. It never checks out or runs PR code: it only reads the file list from the API.
+#
+# Every push to the PR removes "review-approved", so the label always refers to the latest head.
+# All agents push from the same GitHub account, so the label is a process gate, not a technical one:
+# see docs/protected-paths.md for who may add it and when.
+name: protected-paths
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: protected-paths-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  protected-paths:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Check protected paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          ACTION: ${{ github.event.action }}
+          LABEL: review-approved
+        run: |
+          set -euo pipefail
+          pattern='^(CLAUDE\.md|ludion\.config\.json|wrangler\.jsonc)$|^\.github/|^tools/verify/|^lessons/|^packages/[^/]+/src/schema\.ts$|^packages/[^/]+/schema/|\.schema\.json$'
+
+          files=$(gh api --paginate "repos/${REPO}/pulls/${PR}/files" \
+            --jq '.[] | .filename, (.previous_filename // empty)')
+          hits=$(printf '%s\n' "$files" | grep -E "$pattern" | sort -u || true)
+
+          if [ -z "$hits" ]; then
+            echo "No protected paths changed."
+            exit 0
+          fi
+
+          echo "Protected paths changed:"
+          printf '  %s\n' $hits
+
+          has_label=$(gh api "repos/${REPO}/issues/${PR}/labels" --jq "[.[] | select(.name == \"${LABEL}\")] | length")
+
+          if [ "$ACTION" = "synchronize" ] && [ "$has_label" != "0" ]; then
+            gh api -X DELETE "repos/${REPO}/issues/${PR}/labels/${LABEL}" >/dev/null
+            echo "::error::New commits were pushed, so \"${LABEL}\" was removed. Review the new head again."
+            exit 1
+          fi
+
+          if [ "$has_label" = "0" ]; then
+            echo "::error::This PR changes protected paths. It needs an independent review and the \"${LABEL}\" label (docs/protected-paths.md)."
+            exit 1
+          fi
+
+          echo "\"${LABEL}\" is present for the current head."

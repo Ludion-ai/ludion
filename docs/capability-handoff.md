@@ -5,9 +5,9 @@ Repository / branch / HEAD: Ludion-ai/ludion / v3/capability-compiler / the comm
 Current stage: P1 done (types, hashing, structural guard, receipt validation; no execution). P2..P6 not started.
 Implemented: `packages/capability/` (`@ludion/capability`, zod ^4.6.5 only): `src/schema.ts`, `canonical-json.ts`, `hash.ts`, `node-version.ts`, `glob.ts`, `scan.ts`, `guard.ts`, `receipt.ts`, `index.ts`; `scripts/gen-json-schema.ts`; generated `capability.schema.json`, `receipt.schema.json`; tests `hash`, `guard`, `receipt`, `schema` (24 tests covering draft section 4 items 1-10 plus near-miss cases). Root `package.json` script `gen:capability-schema`; `package-lock.json` workspace link.
 Checked: command / result / artifact path
-- `npm run typecheck` / exit 0 / C:\dev\ludion-p0-baseline\p1-verify\typecheck.log (PC-local)
-- `npm run build` / exit 0 / C:\dev\ludion-p0-baseline\p1-verify\build.log (PC-local)
-- `npm test` / exit 0, 32 files / 484 tests passed (baseline 28 / 460) / C:\dev\ludion-p0-baseline\p1-verify\test.log (PC-local)
+- `npm run typecheck` / exit 0 / log kept outside the repository
+- `npm run build` / exit 0 / log kept outside the repository
+- `npm test` / exit 0, 32 files / 484 tests passed (baseline 28 / 460) / log kept outside the repository
 - `npm run gen:capability-schema` / exit 0, no diff against committed schemas
 Not run / unavailable: any container/Docker execution (Docker Desktop 4.96.3 installed but daemon not running: "Docker Desktop is unable to start", no WSL distro); CI on this branch; real program/verifier execution (P2); recipient runs (P4).
 Source trace and capability artifact: none yet; P1 has only unit fixtures in `packages/capability/test/fixtures.ts` (vitest `restoreAllMocks` example from the draft).

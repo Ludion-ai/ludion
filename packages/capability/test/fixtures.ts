@@ -22,7 +22,7 @@ import {
 export const FIXTURE_IMAGE = `node@${sha256Hex("image")}`;
 export const FIXTURE_MAIN_COMMIT = "21321cb".padEnd(40, "0");
 export const FIXTURE_VITEST_INTEGRITY = `sha512-${"A".repeat(86)}==`;
-export const FIXTURE_VITEST_REALPATH = `${VERIFIER_STORE_PREFIX}node_modules/vitest/vitest.mjs`;
+export const FIXTURE_VITEST_REALPATH = `${VERIFIER_STORE_PREFIX}node_modules/vitest/package.json`;
 
 export const CONTRACT_ID = "mock_cleanup.clear_history";
 
@@ -287,7 +287,7 @@ export function receiptDraft(record: CapabilityRecordT, guard: GuardResultT, ove
       vitest_realpath: FIXTURE_VITEST_REALPATH,
       vitest_version: "4.0.0",
       vitest_integrity: FIXTURE_VITEST_INTEGRITY,
-      lockfile_sha256: sha256Hex("main lockfile"),
+      lockfile_sha256: sha256Hex("main lockfile").slice("sha256:".length),
     },
     diff: { ref: "changes.patch", hash: sha256Hex("diff"), files_changed: 1 },
     durations_ms: { guard: 1, install: 2, program: 3, verifier: 4, total: 10 },

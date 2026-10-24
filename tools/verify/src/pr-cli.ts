@@ -11,7 +11,7 @@ import { parseNameStatus, planChanges, verifyPullRequest, type PullRequestAuthor
 import { countByStatus, labelsOf, printResults, stepSummary } from "./report.ts";
 import { createSafeFetch } from "./safe-fetch.ts";
 import { runtimesIn } from "./files.ts";
-import { verifierProvenance, verifierRootFromModule } from "./verifier-deps.ts";
+import { lockfileSha256AtHead, verifierProvenance, verifierRootFromModule } from "./verifier-deps.ts";
 import type { LessonFile } from "./verify.ts";
 
 const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
@@ -66,10 +66,21 @@ async function main(): Promise<number> {
   printResults(results);
   const labels = labelsOf(results);
   // Provenance is for the P1 Capability runner. results and labels are unchanged.
+  // The expected lockfile hash is the git blob at HEAD, not the working tree.
+  const verifierRoot = verifierRootFromModule(import.meta.url);
+  let expectedLockfileSha256: string | undefined;
+  let lockfileError: "lockfile_git_blob_unreadable" | undefined;
+  try {
+    expectedLockfileSha256 = lockfileSha256AtHead(verifierRoot);
+  } catch {
+    lockfileError = "lockfile_git_blob_unreadable";
+  }
   const verifier = verifierProvenance({
-    verifierRoot: verifierRootFromModule(import.meta.url),
+    verifierRoot,
     recipientRoot: process.cwd(),
     nodeVersion: process.version,
+    expectedLockfileSha256,
+    lockfileError,
   });
   writeFileSync(values.json, JSON.stringify({ results, labels, verifier }, null, 2) + "\n");
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, stepSummary(results));

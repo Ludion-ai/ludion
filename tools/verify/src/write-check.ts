@@ -1,7 +1,7 @@
 // Entry points the P1 Capability runner will call later. Nothing on main runs
 // vitest yet. After a run, the runner diffs the recipient tree and rejects a
-// write that is a symlink, leaves the root, matches a protected pattern, or
-// matches no declared write glob.
+// write that is a symlink, leaves the root, is a hard link, matches a protected
+// pattern, or matches no declared write glob.
 //
 // The glob matcher below is self-contained (`*`, `**`, `?`). P1's
 // packages/capability/src/glob.ts is not on main; matchGlob can be swapped for it later.
@@ -14,12 +14,16 @@ export interface SnapshotEntry {
   kind: "file" | "symlink" | "dir";
   sha256?: string;
   linkTarget?: string;
+  /** `st.mode & 0o7777`. A mode-only change is a change. */
+  mode: number;
+  /** Present for a regular file. `nlink > 1` on a changed or added file is a hard link. */
+  nlink?: number;
 }
 
 /** Closed for now. Unknown keys are rejected so a caller cannot add a skip list. */
 export type SnapshotOptions = Record<string, never>;
 
-export type WriteReason = "symlink" | "outside_root" | "protected" | "undeclared";
+export type WriteReason = "symlink" | "outside_root" | "hardlink" | "protected" | "undeclared";
 
 export interface WriteViolation {
   path: string;
@@ -29,10 +33,18 @@ export interface WriteViolation {
 /**
  * Paths a lesson run must not create or edit. `**` matches across segments, including
  * zero segments, so `node_modules/**` also matches the `node_modules` directory itself.
+ * `.git` patterns are a secondary layer: a checkout is not mounted in the first place.
+ * Yarn rc files are listed exactly. A trailing star on .yarnrc would also match .yarnrc.test.ts.
  */
 export const DEFAULT_PROTECTED: readonly string[] = [
+  ".ludion-verify/**",
   "tools/verify/**",
   ".github/**",
+  ".git/**",
+  "**/.git/**",
+  "**/.git",
+  "**/.gitmodules",
+  "**/.husky/**",
   "node_modules/**",
   "**/node_modules/**",
   "package.json",
@@ -40,25 +52,40 @@ export const DEFAULT_PROTECTED: readonly string[] = [
   "package-lock.json",
   "**/package-lock.json",
   "npm-shrinkwrap.json",
+  "**/npm-shrinkwrap.json",
   "pnpm-lock.yaml",
+  "**/pnpm-lock.yaml",
   "yarn.lock",
+  "**/yarn.lock",
   "bun.lockb",
+  "**/bun.lockb",
   "vitest.config.*",
   "vitest.workspace.*",
+  "vitest.projects.*",
   "vite.config.*",
   "**/vitest.config.*",
+  "**/vitest.workspace.*",
+  "**/vitest.projects.*",
   "**/vite.config.*",
   "**/vitest.setup.*",
+  "**/vitest-setup.*",
   "**/setupTests.*",
+  "**/test-setup.*",
   "**/test/setup.*",
   "tsconfig.json",
   "**/tsconfig*.json",
   ".npmrc",
   "**/.npmrc",
+  "**/.yarnrc",
+  "**/.yarnrc.yml",
+  "**/.yarnrc.yaml",
+  "**/.pnpmfile.cjs",
+  "**/bunfig.toml",
 ];
 
+/** Protected paths compare case-insensitively on every OS. The filesystem may not. */
 function fold(text: string): string {
-  return process.platform === "win32" ? text.toLowerCase() : text;
+  return text.toLowerCase();
 }
 
 /** One path segment. `*` and `?` never cross `/`. */
@@ -89,7 +116,7 @@ function segmentsOf(path: string): string[] {
 
 /**
  * Glob match for a relative posix path. `**` is only special as a whole segment and matches
- * zero or more segments. Case-insensitive on win32. `.` in a pattern is literal.
+ * zero or more segments. Both the pattern and the path are lowercased. `.` in a pattern is literal.
  */
 export function matchGlob(pattern: string, path: string): boolean {
   const pat = segmentsOf(pattern);
@@ -127,9 +154,8 @@ function posixRelative(root: string, target: string): string {
 
 /**
  * Snapshot `root` without following symlinks or junctions. A symlink is one entry
- * (its link text), never a walk into the target. The only skipped name is a real
- * directory named `.git`. A symlink or file named `.git` is recorded: that is a write,
- * not the git database.
+ * (its link text), never a walk into the target. `.git` is included. Protecting it
+ * here is secondary: the primary control is that a directory containing `.git` is not mounted.
  */
 export function snapshotTree(root: string, opts?: SnapshotOptions): Map<string, SnapshotEntry> {
   if (opts !== undefined) {
@@ -143,7 +169,7 @@ export function snapshotTree(root: string, opts?: SnapshotOptions): Map<string, 
       const abs = resolve(dir, name);
       const st = lstatSync(abs);
       const rel = posixRelative(root, abs);
-      if (name === ".git" && st.isDirectory()) continue;
+      const mode = st.mode & 0o7777;
       if (st.isSymbolicLink()) {
         let linkTarget = "";
         try {
@@ -151,19 +177,24 @@ export function snapshotTree(root: string, opts?: SnapshotOptions): Map<string, 
         } catch {
           linkTarget = "";
         }
-        out.set(rel, { kind: "symlink", linkTarget });
+        out.set(rel, { kind: "symlink", linkTarget, mode });
         continue;
       }
       if (st.isDirectory()) {
-        out.set(rel, { kind: "dir" });
+        out.set(rel, { kind: "dir", mode });
         walk(abs);
         continue;
       }
       if (st.isFile()) {
-        out.set(rel, { kind: "file", sha256: createHash("sha256").update(readFileSync(abs)).digest("hex") });
+        out.set(rel, {
+          kind: "file",
+          sha256: createHash("sha256").update(readFileSync(abs)).digest("hex"),
+          mode,
+          nlink: st.nlink,
+        });
         continue;
       }
-      out.set(rel, { kind: "file" });
+      out.set(rel, { kind: "file", mode });
     }
   };
   walk(root);
@@ -177,7 +208,7 @@ export function diffSnapshots(before: ReadonlyMap<string, SnapshotEntry>, after:
   for (const key of keys) {
     const left = before.get(key);
     const right = after.get(key);
-    if (!left || !right || left.kind !== right.kind || left.sha256 !== right.sha256 || left.linkTarget !== right.linkTarget) {
+    if (!left || !right || left.kind !== right.kind || left.sha256 !== right.sha256 || left.linkTarget !== right.linkTarget || left.mode !== right.mode || left.nlink !== right.nlink) {
       changed.push(key);
     }
   }
@@ -240,10 +271,21 @@ function locate(rootReal: string, changedPath: string): Located {
   }
 }
 
+/** `nlink` of a regular file, or 0 when the path is missing or not a regular file. Directory nlink is not a hard link. */
+function regularFileNlink(abs: string): number {
+  try {
+    const st = lstatSync(abs);
+    return st.isFile() ? st.nlink : 0;
+  } catch {
+    return 0;
+  }
+}
+
 /**
- * One reason per changed path, in this order: symlink, outside_root, protected, undeclared.
+ * One reason per changed path, in this order: symlink, outside_root, hardlink, protected, undeclared.
+ * A changed or added regular file with `nlink > 1` is a hard link. A declared glob does not excuse it.
  * `protectedPatterns` replaces {@link DEFAULT_PROTECTED} when the caller passes it.
- * A declared glob does not excuse a protected path.
+ * A declared glob does not excuse a protected path. Matching is case-insensitive.
  */
 export function checkWrites(input: {
   root: string;
@@ -265,6 +307,7 @@ export function checkWrites(input: {
     let reason: WriteReason | null = null;
     if (located.symlink) reason = "symlink";
     else if (!isInside(located.real, rootReal)) reason = "outside_root";
+    else if (regularFileNlink(resolve(rootReal, changedPath)) > 1) reason = "hardlink";
     else if (matchesAny(changedPath, protectedPatterns) || (located.realRel !== null && located.realRel !== "" && matchesAny(located.realRel, protectedPatterns))) {
       reason = "protected";
     } else if (!matchesAny(changedPath, input.declaredWrites)) reason = "undeclared";

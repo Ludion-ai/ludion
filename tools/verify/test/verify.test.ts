@@ -251,23 +251,42 @@ describe("docker, format 1", () => {
   });
 
   it("runs lesson code with the network off, even when packages are mounted", () => {
-    const args = dockerArgs("node@24", "n", "/tmp/w");
-    expect(args).toContain("--network");
-    expect(args[args.indexOf("--network") + 1]).toBe("none");
-    expect(args).toContain("--read-only");
-    expect(args.slice(args.indexOf("-v"), args.indexOf("-v") + 2)).toEqual(["-v", "/tmp/w:/w"]);
-    expect(args.slice(-3)).toEqual([`node:24-slim@${IMAGE_DIGESTS["node:24-slim"]}`, "node", "-"]);
+    const work = mkdtempSync(join(tmpdir(), "ludion-verify-mount-"));
+    try {
+      const args = dockerArgs("node@24", "n", work);
+      expect(args).toContain("--network");
+      expect(args[args.indexOf("--network") + 1]).toBe("none");
+      expect(args).toContain("--read-only");
+      const mount = args[args.indexOf("-v") + 1];
+      expect(mount).toMatch(/:\/w:ro$/);
+      expect(args.slice(-3)).toEqual([`node:24-slim@${IMAGE_DIGESTS["node:24-slim"]}`, "node", "-"]);
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
   });
 
   it("installs packages with the network on but install scripts off, and never runs lesson code there", () => {
-    const npm = installArgs("node@24", "/tmp/w", { vitest: "5.0.3" });
-    expect(npm).not.toContain("--network");
-    expect(npm).toContain("--ignore-scripts");
-    expect(npm).not.toContain("-i");
-    const pip = installArgs("python@3.12", "/tmp/w", { requests: "2.32.0" });
-    // Wheels only: no package build scripts run at install time either.
-    expect(pip.slice(-5)).toEqual(["--only-binary", ":all:", "--target", "/w/site", "requests==2.32.0"]);
-    expect(pip).not.toContain("--network");
+    const work = mkdtempSync(join(tmpdir(), "ludion-verify-install-"));
+    try {
+      writeFileSync(join(work, "package.json"), "{}\n");
+      writeFileSync(join(work, "package-lock.json"), "{}\n");
+      mkdirSync(join(work, ".home"));
+      mkdirSync(join(work, ".npm"));
+      const npm = installArgs("node@24", work, { vitest: "5.0.3" }, "npm-ci");
+      expect(npm).not.toContain("--network");
+      expect(npm).toContain("--ignore-scripts");
+      expect(npm).not.toContain("-i");
+      rmSync(work, { recursive: true, force: true });
+      mkdirSync(work);
+      writeFileSync(join(work, "requirements.txt"), `requests==2.32.0 --hash=sha256:${"ab".repeat(32)}\n`);
+      const pip = installArgs("python@3.12", work, { requests: "2.32.0" }, "pip");
+      // Wheels only, and the hash requirement is on the command. The pin itself is in requirements.txt.
+      expect(pip.slice(-8)).toEqual(["--require-hashes", "--only-binary", ":all:", "--no-cache-dir", "--target", "/w/site", "-r", "/w/requirements.txt"]);
+      expect(pip).not.toContain("--network");
+      expect(pip).not.toContain("requests==2.32.0");
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
   });
 
   it("checks an expected failure: non-zero exit with the named error passes; exit 0 or another error fails", () => {

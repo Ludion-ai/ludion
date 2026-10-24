@@ -1,5 +1,7 @@
 # Required check "verify". Runs on every PR; finishes at once when no lesson changed.
 # Lesson code runs only here, with a read-only token, no secrets, and no network (docs/decisions.md, CI).
+# The verifier itself (tools/verify and its dependencies) comes from the base commit, never from the PR:
+# a PR cannot change the code that checks it. The PR's own dependencies are never installed.
 name: verify
 
 on:
@@ -31,19 +33,30 @@ jobs:
             echo "lessons=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Check out the verifier from the base commit
+        if: steps.changes.outputs.lessons == 'true'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .verifier
+          persist-credentials: false
+
       - uses: actions/setup-node@v7
         if: steps.changes.outputs.lessons == 'true'
         with:
-          node-version-file: .node-version
+          node-version-file: .verifier/.node-version
           cache: npm
+          cache-dependency-path: .verifier/package-lock.json
 
-      - name: Install
+      - name: Install the verifier's dependencies (base lockfile, no install scripts)
         if: steps.changes.outputs.lessons == 'true'
-        run: npm ci
+        working-directory: .verifier
+        run: npm ci --ignore-scripts
 
       - name: Verify lessons
         if: steps.changes.outputs.lessons == 'true'
-        run: npm run verify:pr -- --json results.json
+        # Runs base's tools/verify against the PR checkout in the working directory.
+        run: node .verifier/tools/verify/src/pr-cli.ts --json results.json
 
       - uses: actions/upload-artifact@v7
         if: always() && steps.changes.outputs.lessons == 'true'

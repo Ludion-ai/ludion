@@ -19,8 +19,7 @@ interface Props {
   noindex?: boolean;
 }
 const { title, description = en.site.description, canonical = true, canonicalPath, image, noindex = false } = Astro.props;
-const { index, config } = await siteData();
-const teacherCount = Object.keys(index.teachers).length;
+const { config } = await siteData();
 // The trailing-slash URL: the one without it only redirects (307).
 const path = canonicalPath ?? (Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`);
 const canonicalUrl = new URL(path, config.site).href;
@@ -61,8 +60,7 @@ const canonicalUrl = new URL(path, config.site).href;
       <div class="wrap bar">
         <a class="home" href="/" aria-label={en.site.name}><BrandMark /><Wordmark height={23} /></a>
         <nav aria-label={en.nav.label}>
-          <a href="/lessons/" aria-current={Astro.url.pathname.startsWith("/lessons") ? "page" : undefined}>{en.nav.lessons}</a>
-          <a href="/bench/" aria-current={Astro.url.pathname.startsWith("/bench") ? "page" : undefined}>{en.nav.bench}</a>
+          <a href="/#guard" aria-current={Astro.url.pathname === "/" ? "page" : undefined}>{en.nav.design}</a>
           <a href="/start/" aria-current={Astro.url.pathname.startsWith("/start") ? "page" : undefined}>{en.nav.start}</a>
         </nav>
       </div>
@@ -72,7 +70,6 @@ const canonicalUrl = new URL(path, config.site).href;
     </main>
     <footer class="site-footer">
       <div class="wrap foot">
-        {Astro.url.pathname !== "/" && <p>{en.footer.count(index.lessons.length, teacherCount)}</p>}
         <p>
           {en.footer.license} <a href={`https://github.com/${config.org}/${config.repo}`}>{en.footer.github}</a>
         </p>

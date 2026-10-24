@@ -2,28 +2,33 @@
 
 PRs that change any of these paths are not auto-merged (CLAUDE.md, "Every change goes through a PR"):
 
-- `CLAUDE.md`
+- agent instructions: `CLAUDE.md` and `AGENTS.md` at any depth, `.cursorrules`, `.claude/`, `.cursor/`
+- `CODEOWNERS` at any depth
 - `.github/`
 - `tools/verify/`
-- the schema: `lessons/*.schema.json`, `packages/*/src/schema.ts`, `packages/*/schema/`, any `*.schema.json`
+- the schema: `packages/*/src/schema.ts`, `packages/*/schema/`, any `*.schema.json`
 - `lessons/`
-- `ludion.config.json`
-- `wrangler.jsonc`
+- `ludion.config.json`, `wrangler.jsonc`
+- dependencies: `package.json` at any depth and lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `npm-shrinkwrap.json`)
+- this file, `docs/protected-paths.md`
 
-The required check `protected-paths` (`.github/workflows/protected-paths.yml`) fails such a PR until it carries the `review-approved` label.
+The required check `protected-paths` (`.github/workflows/protected-paths.yml`) fails such a PR until **both** are true for the PR's current head:
 
-## Who adds `review-approved`, and when
+- the PR has the `review-approved` label, and
+- a PR comment contains a line `reviewed-sha: <full 40-character head SHA>`.
 
-1. The PR author does not review their own PR. A reviewer with fresh context, someone other than the author, reads the full diff and posts the verdict as a PR comment.
-2. If the verdict is "approve", the owner (or 社長 on the owner's behalf) approves the merge.
-3. Only after both, whoever adds the label also posts a comment saying who reviewed, which comment holds the verdict, and who approved.
+## How a protected PR gets approved
 
-Any push to the PR removes the label automatically, so steps 1 to 3 always apply to the latest head.
+1. A reviewer other than the author, with fresh context, reads the full diff at the current head and posts the verdict as a PR comment. An approving verdict ends with the line `reviewed-sha: <head SHA it reviewed>`.
+2. The owner (or 社長 on the owner's behalf) approves the merge.
+3. After both, the `review-approved` label is added, with a comment naming the reviewer, the verdict comment, and who approved.
+
+Any push changes the head SHA, so an earlier `reviewed-sha:` stops counting by itself. Steps 1 and 2 must be repeated for the new head; the label can stay. Comments do not start the check, so after posting the new `reviewed-sha:` line, re-run the failed `protected-paths` run (or remove and re-add the label).
 
 ## What this does and does not guarantee
 
-Every agent pushes from the same GitHub account, and GitHub does not let an account approve its own PR, so a required "Code Owner review" would block every merge. The label is therefore a **process gate, not a technical one**: anyone with write access can add it. What the check does guarantee:
+Every agent pushes from the same GitHub account, and GitHub does not let an account approve its own PR, so a required "Code Owner review" would block every merge. This check is therefore a **process gate, not a technical one**: anyone with write access can add the label or the comment. What it does guarantee:
 
 - The check's definition comes from the base branch (`pull_request_target`), so a PR cannot change it to pass itself.
-- The check never checks out or runs PR code.
-- A label added before the latest push does not count.
+- The check never checks out or runs PR code, and its token can only read.
+- An approval written for an older head never counts for a newer one.

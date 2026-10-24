@@ -1,67 +1,417 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "type": "object",
-  "properties": {
-    "format": {
-      "type": "string",
-      "const": "receipt/1"
-    },
-    "id": {
-      "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-    },
-    "capability_id": {
-      "type": "string",
-      "pattern": "^cap:sha256:[0-9a-f]{64}$"
-    },
-    "recipient": {
+  "oneOf": [
+    {
       "type": "object",
       "properties": {
-        "label": {
+        "format": {
           "type": "string",
-          "maxLength": 120
+          "const": "receipt/1"
         },
-        "source_tree_hash": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "capability_id": {
+          "type": "string",
+          "pattern": "^cap:sha256:[0-9a-f]{64}$"
+        },
+        "recipient": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "source_tree_hash": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "lockfile_hash": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "label",
+            "source_tree_hash",
+            "lockfile_hash"
+          ],
+          "additionalProperties": false
+        },
+        "program_hash": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$"
         },
-        "lockfile_hash": {
+        "verifier_hash": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$"
-        }
-      },
-      "required": [
-        "label",
-        "source_tree_hash",
-        "lockfile_hash"
-      ],
-      "additionalProperties": false
-    },
-    "program_hash": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
-    },
-    "verifier_hash": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
-    },
-    "counterexamples_hash": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
-    },
-    "resolved_versions": {
-      "type": "object",
-      "propertyNames": {
-        "type": "string"
-      },
-      "additionalProperties": {
-        "type": "string",
-        "pattern": "^\\d+\\.\\d+\\.\\d+$"
-      }
-    },
-    "runtime": {
-      "anyOf": [
-        {
+        },
+        "counterexamples_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "resolved_versions": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          }
+        },
+        "guard": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "applicable"
+                },
+                "reason": {
+                  "type": "string",
+                  "const": "all_conditions_met"
+                },
+                "matches": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 260
+                      },
+                      "line": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "via": {
+                        "type": "string",
+                        "enum": [
+                          "import",
+                          "alias"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "line",
+                      "via"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "matches",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "inapplicable"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "contract_mismatch",
+                    "package_absent",
+                    "version_verified_inapplicable",
+                    "runtime_mismatch",
+                    "target_absent",
+                    "already_fixed",
+                    "config_excludes",
+                    "known_counterexample"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "unknown"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "intent_missing",
+                    "lockfile_unreadable",
+                    "version_unverified",
+                    "parse_failed",
+                    "binding_unresolved",
+                    "config_not_static",
+                    "environment_unavailable"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "stale"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "artifact_hash_mismatch",
+                    "program_changed",
+                    "verifier_changed",
+                    "dependency_changed",
+                    "counterexample_added",
+                    "lockfile_changed",
+                    "source_changed",
+                    "runtime_changed"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "durations_ms": {
+          "type": "object",
+          "properties": {
+            "guard": {
+              "type": "number",
+              "minimum": 0
+            },
+            "install": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "program": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "verifier": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "total": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "guard",
+            "install",
+            "program",
+            "verifier",
+            "total"
+          ],
+          "additionalProperties": false
+        },
+        "model_calls": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "span": {
+              "type": "string",
+              "const": "guard_to_verifier"
+            }
+          },
+          "required": [
+            "count",
+            "span"
+          ],
+          "additionalProperties": false
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "outcome": {
+          "type": "string",
+          "const": "executed"
+        },
+        "runtime": {
           "type": "object",
           "properties": {
             "node_version": {
@@ -69,7 +419,9 @@
               "pattern": "^v\\d+\\.\\d+\\.\\d+$"
             },
             "image": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 300,
+              "pattern": "^[a-z0-9][a-z0-9._\\/:-]*@sha256:[0-9a-f]{64}$"
             },
             "image_digest": {
               "type": "string",
@@ -92,285 +444,7 @@
           ],
           "additionalProperties": false
         },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "guard": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "const": "applicable"
-            },
-            "reason": {
-              "type": "string",
-              "const": "all_conditions_met"
-            },
-            "matches": {
-              "minItems": 1,
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 260
-                  },
-                  "line": {
-                    "type": "integer",
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991
-                  },
-                  "via": {
-                    "type": "string",
-                    "enum": [
-                      "import",
-                      "alias"
-                    ]
-                  }
-                },
-                "required": [
-                  "file",
-                  "line",
-                  "via"
-                ],
-                "additionalProperties": false
-              }
-            },
-            "detail": {
-              "type": "string",
-              "maxLength": 500
-            },
-            "checks": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "condition": {
-                    "type": "string"
-                  },
-                  "ok": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "note": {
-                    "type": "string",
-                    "maxLength": 300
-                  }
-                },
-                "required": [
-                  "condition",
-                  "ok"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": [
-            "status",
-            "reason",
-            "matches",
-            "detail",
-            "checks"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "const": "inapplicable"
-            },
-            "reason": {
-              "type": "string",
-              "enum": [
-                "contract_mismatch",
-                "package_absent",
-                "version_verified_inapplicable",
-                "runtime_mismatch",
-                "target_absent",
-                "already_fixed",
-                "config_excludes",
-                "known_counterexample"
-              ]
-            },
-            "detail": {
-              "type": "string",
-              "maxLength": 500
-            },
-            "checks": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "condition": {
-                    "type": "string"
-                  },
-                  "ok": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "note": {
-                    "type": "string",
-                    "maxLength": 300
-                  }
-                },
-                "required": [
-                  "condition",
-                  "ok"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": [
-            "status",
-            "reason",
-            "detail",
-            "checks"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "const": "unknown"
-            },
-            "reason": {
-              "type": "string",
-              "enum": [
-                "intent_missing",
-                "lockfile_unreadable",
-                "version_unverified",
-                "parse_failed",
-                "binding_unresolved",
-                "config_not_static",
-                "environment_unavailable"
-              ]
-            },
-            "detail": {
-              "type": "string",
-              "maxLength": 500
-            },
-            "checks": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "condition": {
-                    "type": "string"
-                  },
-                  "ok": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "note": {
-                    "type": "string",
-                    "maxLength": 300
-                  }
-                },
-                "required": [
-                  "condition",
-                  "ok"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": [
-            "status",
-            "reason",
-            "detail",
-            "checks"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "const": "stale"
-            },
-            "reason": {
-              "type": "string",
-              "enum": [
-                "artifact_hash_mismatch",
-                "program_changed",
-                "verifier_changed",
-                "dependency_changed",
-                "counterexample_added",
-                "lockfile_changed",
-                "source_changed",
-                "runtime_changed"
-              ]
-            },
-            "detail": {
-              "type": "string",
-              "maxLength": 500
-            },
-            "checks": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "condition": {
-                    "type": "string"
-                  },
-                  "ok": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "note": {
-                    "type": "string",
-                    "maxLength": 300
-                  }
-                },
-                "required": [
-                  "condition",
-                  "ok"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": [
-            "status",
-            "reason",
-            "detail",
-            "checks"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "outcome": {
-      "type": "string",
-      "enum": [
-        "executed",
-        "not_executed",
-        "environment_unavailable"
-      ]
-    },
-    "verifier": {
-      "anyOf": [
-        {
+        "verifier": {
           "type": "object",
           "properties": {
             "status": {
@@ -459,172 +533,983 @@
           ],
           "additionalProperties": false
         },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "verifier_runtime": {
-      "anyOf": [
-        {
+        "verifier_runtime": {
           "type": "object",
           "properties": {
+            "vitest_location": {
+              "type": "string",
+              "const": "verifier_store"
+            },
+            "vitest_realpath": {
+              "type": "string",
+              "maxLength": 400
+            },
             "vitest_version": {
               "type": "string",
               "pattern": "^\\d+\\.\\d+\\.\\d+$"
             },
-            "vitest_path": {
+            "vitest_integrity": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 260
+              "pattern": "^sha512-[A-Za-z0-9+/]{86}==$"
+            },
+            "lockfile_sha256": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
             }
           },
           "required": [
+            "vitest_location",
+            "vitest_realpath",
             "vitest_version",
-            "vitest_path"
+            "vitest_integrity",
+            "lockfile_sha256"
           ],
           "additionalProperties": false
         },
-        {
-          "type": "null"
+        "diff": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 260
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "files_changed": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "ref",
+                "hash",
+                "files_changed"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
-      ]
+      },
+      "required": [
+        "format",
+        "id",
+        "capability_id",
+        "recipient",
+        "program_hash",
+        "verifier_hash",
+        "counterexamples_hash",
+        "resolved_versions",
+        "guard",
+        "durations_ms",
+        "model_calls",
+        "started_at",
+        "finished_at",
+        "outcome",
+        "runtime",
+        "verifier",
+        "verifier_runtime",
+        "diff"
+      ],
+      "additionalProperties": false
     },
-    "diff": {
-      "anyOf": [
-        {
+    {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "receipt/1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "capability_id": {
+          "type": "string",
+          "pattern": "^cap:sha256:[0-9a-f]{64}$"
+        },
+        "recipient": {
           "type": "object",
           "properties": {
-            "ref": {
+            "label": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 260
+              "maxLength": 120
             },
-            "hash": {
+            "source_tree_hash": {
               "type": "string",
               "pattern": "^sha256:[0-9a-f]{64}$"
             },
-            "files_changed": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
+            "lockfile_hash": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
             }
           },
           "required": [
-            "ref",
-            "hash",
-            "files_changed"
+            "label",
+            "source_tree_hash",
+            "lockfile_hash"
           ],
           "additionalProperties": false
         },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "durations_ms": {
-      "type": "object",
-      "properties": {
+        "program_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "verifier_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "counterexamples_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "resolved_versions": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          }
+        },
         "guard": {
-          "type": "number",
-          "minimum": 0
-        },
-        "install": {
-          "anyOf": [
+          "oneOf": [
             {
-              "type": "number",
-              "minimum": 0
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "applicable"
+                },
+                "reason": {
+                  "type": "string",
+                  "const": "all_conditions_met"
+                },
+                "matches": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 260
+                      },
+                      "line": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "via": {
+                        "type": "string",
+                        "enum": [
+                          "import",
+                          "alias"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "line",
+                      "via"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "matches",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
             },
             {
-              "type": "null"
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "inapplicable"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "contract_mismatch",
+                    "package_absent",
+                    "version_verified_inapplicable",
+                    "runtime_mismatch",
+                    "target_absent",
+                    "already_fixed",
+                    "config_excludes",
+                    "known_counterexample"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "unknown"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "intent_missing",
+                    "lockfile_unreadable",
+                    "version_unverified",
+                    "parse_failed",
+                    "binding_unresolved",
+                    "config_not_static",
+                    "environment_unavailable"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "stale"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "artifact_hash_mismatch",
+                    "program_changed",
+                    "verifier_changed",
+                    "dependency_changed",
+                    "counterexample_added",
+                    "lockfile_changed",
+                    "source_changed",
+                    "runtime_changed"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
             }
           ]
         },
-        "program": {
-          "anyOf": [
-            {
+        "durations_ms": {
+          "type": "object",
+          "properties": {
+            "guard": {
               "type": "number",
               "minimum": 0
             },
-            {
-              "type": "null"
+            "install": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "program": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "verifier": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "total": {
+              "type": "number",
+              "minimum": 0
             }
-          ]
+          },
+          "required": [
+            "guard",
+            "install",
+            "program",
+            "verifier",
+            "total"
+          ],
+          "additionalProperties": false
+        },
+        "model_calls": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "span": {
+              "type": "string",
+              "const": "guard_to_verifier"
+            }
+          },
+          "required": [
+            "count",
+            "span"
+          ],
+          "additionalProperties": false
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "outcome": {
+          "type": "string",
+          "const": "not_executed"
+        },
+        "runtime": {
+          "type": "null"
         },
         "verifier": {
-          "anyOf": [
+          "type": "null"
+        },
+        "verifier_runtime": {
+          "type": "null"
+        },
+        "diff": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "format",
+        "id",
+        "capability_id",
+        "recipient",
+        "program_hash",
+        "verifier_hash",
+        "counterexamples_hash",
+        "resolved_versions",
+        "guard",
+        "durations_ms",
+        "model_calls",
+        "started_at",
+        "finished_at",
+        "outcome",
+        "runtime",
+        "verifier",
+        "verifier_runtime",
+        "diff"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "receipt/1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "capability_id": {
+          "type": "string",
+          "pattern": "^cap:sha256:[0-9a-f]{64}$"
+        },
+        "recipient": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "source_tree_hash": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "lockfile_hash": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "label",
+            "source_tree_hash",
+            "lockfile_hash"
+          ],
+          "additionalProperties": false
+        },
+        "program_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "verifier_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "counterexamples_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "resolved_versions": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          }
+        },
+        "guard": {
+          "oneOf": [
             {
-              "type": "number",
-              "minimum": 0
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "applicable"
+                },
+                "reason": {
+                  "type": "string",
+                  "const": "all_conditions_met"
+                },
+                "matches": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 260
+                      },
+                      "line": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "via": {
+                        "type": "string",
+                        "enum": [
+                          "import",
+                          "alias"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "line",
+                      "via"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "matches",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
             },
             {
-              "type": "null"
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "inapplicable"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "contract_mismatch",
+                    "package_absent",
+                    "version_verified_inapplicable",
+                    "runtime_mismatch",
+                    "target_absent",
+                    "already_fixed",
+                    "config_excludes",
+                    "known_counterexample"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "unknown"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "intent_missing",
+                    "lockfile_unreadable",
+                    "version_unverified",
+                    "parse_failed",
+                    "binding_unresolved",
+                    "config_not_static",
+                    "environment_unavailable"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "const": "stale"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "artifact_hash_mismatch",
+                    "program_changed",
+                    "verifier_changed",
+                    "dependency_changed",
+                    "counterexample_added",
+                    "lockfile_changed",
+                    "source_changed",
+                    "runtime_changed"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "type": "string"
+                      },
+                      "ok": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 300
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "ok"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "reason",
+                "detail",
+                "checks"
+              ],
+              "additionalProperties": false
             }
           ]
         },
-        "total": {
-          "type": "number",
-          "minimum": 0
-        }
-      },
-      "required": [
-        "guard",
-        "install",
-        "program",
-        "verifier",
-        "total"
-      ],
-      "additionalProperties": false
-    },
-    "model_calls": {
-      "type": "object",
-      "properties": {
-        "count": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 9007199254740991
+        "durations_ms": {
+          "type": "object",
+          "properties": {
+            "guard": {
+              "type": "number",
+              "minimum": 0
+            },
+            "install": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "program": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "verifier": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "total": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "guard",
+            "install",
+            "program",
+            "verifier",
+            "total"
+          ],
+          "additionalProperties": false
         },
-        "span": {
+        "model_calls": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "span": {
+              "type": "string",
+              "const": "guard_to_verifier"
+            }
+          },
+          "required": [
+            "count",
+            "span"
+          ],
+          "additionalProperties": false
+        },
+        "started_at": {
           "type": "string",
-          "const": "guard_to_verifier"
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "outcome": {
+          "type": "string",
+          "const": "environment_unavailable"
+        },
+        "runtime": {
+          "type": "null"
+        },
+        "verifier": {
+          "type": "null"
+        },
+        "verifier_runtime": {
+          "type": "null"
+        },
+        "diff": {
+          "type": "null"
         }
       },
       "required": [
-        "count",
-        "span"
+        "format",
+        "id",
+        "capability_id",
+        "recipient",
+        "program_hash",
+        "verifier_hash",
+        "counterexamples_hash",
+        "resolved_versions",
+        "guard",
+        "durations_ms",
+        "model_calls",
+        "started_at",
+        "finished_at",
+        "outcome",
+        "runtime",
+        "verifier",
+        "verifier_runtime",
+        "diff"
       ],
       "additionalProperties": false
-    },
-    "started_at": {
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-    },
-    "finished_at": {
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
     }
-  },
-  "required": [
-    "format",
-    "id",
-    "capability_id",
-    "recipient",
-    "program_hash",
-    "verifier_hash",
-    "counterexamples_hash",
-    "resolved_versions",
-    "runtime",
-    "guard",
-    "outcome",
-    "verifier",
-    "verifier_runtime",
-    "diff",
-    "durations_ms",
-    "model_calls",
-    "started_at",
-    "finished_at"
-  ],
-  "additionalProperties": false
+  ]
 }

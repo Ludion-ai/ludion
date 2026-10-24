@@ -24,7 +24,7 @@ const mcpCommand = `claude mcp add --transport http ludion ${config.site}/mcp`;
           <p class="where">{s.runIn}</p>
           <div class="command primary-command">
             <pre><code id="sync-command">npx ludion-ai sync</code></pre>
-            <button type="button" data-copy="sync-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: npx ludion-ai sync`} aria-live="polite" hidden>{en.lesson.copy}</button>
+            <button type="button" data-copy="sync-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: npx ludion-ai sync`} aria-live="polite" hidden>{s.copy}</button>
           </div>
           <p class="wiring">{s.anyAssistantBody}</p>
         </div>
@@ -42,7 +42,7 @@ const mcpCommand = `claude mcp add --transport http ludion ${config.site}/mcp`;
         </aside>
       </section>
 
-      <p class="coverage">{s.coverage} <a href="/lessons/">{s.browse}<span aria-hidden="true"> →</span></a></p>
+      <p class="coverage">{s.coverage} {s.pagesMoved}</p>
 
       <section class="reference" aria-labelledby="setup-details">
         <h2 id="setup-details">{s.details}</h2>
@@ -53,7 +53,7 @@ const mcpCommand = `claude mcp add --transport http ludion ${config.site}/mcp`;
             <p>{s.claudeCodeBody}</p>
             <div class="command">
               <pre><code id="plugin-command">{pluginCommand}</code></pre>
-              <button type="button" data-copy="plugin-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.claudeCode}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+              <button type="button" data-copy="plugin-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.claudeCode}`} aria-live="polite" hidden>{s.copy}</button>
             </div>
           </div>
         </details>
@@ -63,7 +63,7 @@ const mcpCommand = `claude mcp add --transport http ludion ${config.site}/mcp`;
           <div class="detail-body">
             <div class="command">
               <pre><code id="mcp-command">{mcpCommand}</code></pre>
-              <button type="button" data-copy="mcp-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.mcp}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+              <button type="button" data-copy="mcp-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.mcp}`} aria-live="polite" hidden>{s.copy}</button>
             </div>
           </div>
         </details>
@@ -75,12 +75,12 @@ const mcpCommand = `claude mcp add --transport http ludion ${config.site}/mcp`;
             <p class="command-label">{s.localLesson}</p>
             <div class="command">
               <pre><code id="teach-command">npx ludion-ai teach draft.json</code></pre>
-              <button type="button" data-copy="teach-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.localLesson}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+              <button type="button" data-copy="teach-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.localLesson}`} aria-live="polite" hidden>{s.copy}</button>
             </div>
             <p class="command-label">{s.publicLesson}</p>
             <div class="command">
               <pre><code id="public-command">npx ludion-ai teach draft.json --public</code></pre>
-              <button type="button" data-copy="public-command" data-copied={en.lesson.copied} data-selected={s.copySelected} aria-label={`${en.lesson.copy}: ${s.publicLesson}`} aria-live="polite" hidden>{en.lesson.copy}</button>
+              <button type="button" data-copy="public-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.publicLesson}`} aria-live="polite" hidden>{s.copy}</button>
             </div>
             <p class="consent">{s.teachConsent}</p>
           </div>

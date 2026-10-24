@@ -1,86 +1,12 @@
 ---
-import Pool from "../components/Pool.astro";
-import Base from "../layouts/Base.astro";
-import LessonCard from "../components/LessonCard.astro";
 import { siteData } from "../build/data.ts";
-import { en } from "../strings/en.ts";
 
-// One page per subject with active lessons, at /<subject>/. Subjects can't take a top-level page's name
-// (RESERVED_SUBJECTS in packages/core; the build fails if one does).
+// One path per subject in the index. The page only redirects: lesson pages are no longer shown.
+// Subjects can't take a top-level page's name (RESERVED_SUBJECTS in packages/core; the build fails if one does).
 export async function getStaticPaths() {
   const { index } = await siteData();
   return [...new Set(index.lessons.map((l) => l.subject))].map((subject) => ({ params: { subject } }));
 }
 
-const { subject } = Astro.params as { subject: string };
-const { index, teacherHref } = await siteData();
-const lessons = index.lessons.filter((l) => l.subject === subject);
+return Astro.redirect("/start/", 301);
 ---
-
-<Base title={en.subject.title(subject)}>
-  <div class="wrap">
-    <header>
-      <p class="back"><a href="/lessons/">← {en.nav.lessons}</a></p>
-      <h1>{subject}/</h1>
-      <p class="summary">{en.subject.summary(lessons.length)}</p>
-    </header>
-    <Pool>
-    <ul class="list">
-      {
-        lessons.map((l) => (
-          <li>
-            <LessonCard
-              id={l.id}
-              claim={l.claim}
-              subject={l.subject}
-              version={l.version}
-              kind={(l as { kind?: string }).kind}
-              teacher={l.teacher}
-              teacherId={l.teacher_id}
-              teacherHref={teacherHref(l.teacher_id)}
-              verifiedBy={l.verified_by}
-              verifiedAt={l.verified_at}
-              drafted={l.drafted_by === "agent"}
-              hideSubject
-            />
-          </li>
-        ))
-      }
-    </ul>
-    </Pool>
-  </div>
-</Base>
-
-<style>
-  header {
-    margin-bottom: 40px;
-  }
-  .back {
-    margin: 0 0 24px;
-    font-size: var(--font-small);
-    color: var(--muted);
-  }
-  .back a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .back a:hover {
-    color: var(--ink);
-    text-decoration: underline;
-  }
-  h1 {
-    font-family: var(--font-code);
-    font-variant-ligatures: none;
-    font-weight: 500;
-    font-size: clamp(30px, 4vw, 40px);
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    overflow-wrap: anywhere;
-  }
-  .summary {
-    margin: 12px 0 0;
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--muted);
-  }
-</style>

@@ -1,7 +1,6 @@
 ---
 import { en } from "../strings/en.ts";
-// The installed version, symbol and context path come from docs/demo/grep-output.txt. This is an illustration,
-// not a CLI simulation, a new verification run, or a product interface. The literal record follows on scroll.
+// An illustration of the design: a guard answer, a verifier, and a receipt. Not a run result.
 const s = en.home.scene;
 const lines = Array.from({length: 28}, (_, row) => {
   const points = Array.from({length: 65}, (_, column) => {
@@ -30,10 +29,10 @@ const columns = Array.from({length: 35}, (_, column) => `M${column * 40},80 C${c
       <span class="bracket opening" aria-hidden="true"></span>
       <span class="bracket closing" aria-hidden="true"></span>
       <div class="document" aria-hidden="true">
-        <div class="document-head"><span class="version">vitest <b>5.0.3</b></span><span class="flow-arrow">→</span><span class="file">.ludion/lessons.md</span></div>
+        <div class="document-head"><span class="version">guard <b>applicable</b></span><span class="flow-arrow">→</span><span class="file">receipt</span></div>
         <div class="document-body">
           <div class="context-lines">{Array.from({length: 11}, (_, row) => <span style={`--row:${row}`}><i></i><i></i><i></i><i></i></span>)}</div>
-          <div class="focus-row"><span class="focus-bracket">「</span><code>extends</code><span class="focus-bracket">」</span></div>
+          <div class="focus-row"><span class="focus-bracket">「</span><code>verifier</code><span class="focus-bracket">」</span></div>
         </div>
         <span class="scan" aria-hidden="true"></span>
       </div>

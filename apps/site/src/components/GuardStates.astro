@@ -1,0 +1,83 @@
+---
+import { en } from "../strings/en.ts";
+const states = en.home.guard.states;
+---
+<ol class="states">
+  {states.map((state) => (
+    <li class:list={["state", { open: state.id === "applicable" }]} data-guard-state={state.id}>
+      <span class="gate" aria-hidden="true"></span>
+      <code>{state.id}</code>
+      <p>{state.detail}</p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .states {
+    width: min(100% - 36px, 1000px);
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--text);
+    text-align: left;
+    box-shadow: 0 24px 80px -56px var(--bloom);
+  }
+  .state {
+    display: grid;
+    grid-template-columns: 22px minmax(8.5em, 12em) minmax(0, 1fr);
+    gap: 8px 18px;
+    align-items: start;
+    margin: 0;
+    padding: 22px 24px;
+    border-top: 1px solid var(--rule);
+  }
+  .state:first-child { border-top: 0; }
+  .state code {
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+  .open code { color: var(--ink); }
+  .state p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+  .open p { color: var(--text); }
+  /* Bracket pair, the same gate stroke the old project lens used. */
+  .gate {
+    position: relative;
+    width: 16px;
+    height: 20px;
+    margin-top: 1px;
+  }
+  .gate::before,
+  .gate::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    border-block: 1px solid var(--muted);
+  }
+  .gate::before { left: 0; border-left: 1px solid var(--muted); }
+  .gate::after { right: 0; border-right: 1px solid var(--muted); }
+  .open .gate::before,
+  .open .gate::after { border-color: var(--ink); }
+  @media (max-width: 640px), (max-width: 1000px) and (max-height: 500px) {
+    .state {
+      grid-template-columns: 20px minmax(0, 1fr);
+      padding: 16px 18px;
+    }
+    .state code,
+    .state p { grid-column: 2; }
+    .state p { font-size: 14px; }
+  }
+</style>

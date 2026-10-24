@@ -1,35 +1,76 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { Index } from "@ludion/core";
+import { siteData } from "../src/build/data.ts";
 import { llmsTxt, sitemap } from "../src/build/discovery.ts";
 
-const entry = (id: string, subject: string, claim: string, extra: object = {}) =>
-  ({ id, subject, claim, teacher: "alice", teacher_id: 1, verified_by: "differential", verified_at: "2026-10-11T03:00:00Z", evidence: [], replaces: [], pr: 1, url: "u", ...extra }) as Index["lessons"][number];
-const index: Index = {
-  version: 1,
-  built_at: "2026-10-12T00:00:00Z",
-  lessons: [entry("B", "wrangler", "wrangler >=4.1.0 changed what `x` does.", { drafted_by: "agent" }), entry("A", "agents", "agents >=0.2.0 removed `[y]`.")],
-  teachers: {},
-};
+const SECTION_A = [
+  "/models / 301",
+  "/models/ / 301",
+  "/lessons /start/ 301",
+  "/lessons/* /start/ 301",
+  "/teachers/* /start/ 301",
+  "/bench / 301",
+  "/bench/* / 301",
+  "/bench.json / 301",
+];
 
 describe("being found", () => {
-  it("lists every page in the sitemap, teacher pages at their canonical /@login, with XML escaped", () => {
-    const xml = sitemap({ site: "https://ludion.ai", index, lessonPages: [{ id: "A", lastmod: "2026-10-11T03:00:00Z" }, { id: "T", lastmod: "2026-10-12T05:00:00Z" }], subjects: ["agents", "a&b"], teacherLogins: ["alice"], benchModels: ["claude-opus-5-5"] });
-    expect(xml).toContain("<loc>https://ludion.ai/bench/claude-opus-5-5/</loc>");
-    expect(xml).toContain("<url><loc>https://ludion.ai/lessons/A/</loc><lastmod>2026-10-11</lastmod></url>");
-    expect(xml).toContain("<loc>https://ludion.ai/lessons/T/</loc>");
-    expect(xml).toContain("<loc>https://ludion.ai/a%26b/</loc>");
-    expect(xml).toContain("<loc>https://ludion.ai/@alice</loc>");
-    // Home, start, bench, bench/method, lessons; one bench model; two subjects; two lessons; one teacher.
-    expect(xml.match(/<url>/g)).toHaveLength(5 + 1 + 2 + 2 + 1);
+  it("lists only the home page and sync setup in the sitemap", () => {
+    const xml = sitemap({ site: "https://ludion.ai", builtAt: "2026-10-12T00:00:00Z" });
+    const locs = [...xml.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1]);
+    expect(locs).toEqual(["https://ludion.ai/", "https://ludion.ai/start/"]);
+    expect(xml).toContain("<lastmod>2026-10-12</lastmod>");
+    expect(xml).not.toContain("/lessons/");
+    expect(xml).not.toContain("/bench");
+    expect(xml).not.toContain("/@");
   });
 
-  it("writes llms.txt with the coverage caveat and each active lesson by subject, labeled, its claim untouched", () => {
-    const txt = llmsTxt("https://ludion.ai", index);
-    expect(txt.startsWith("# Ludion\n\n> ")).toBe(true);
+  it("writes llms.txt for Ludion v3 in design, with the coverage caveat and no lesson or bench pages", () => {
+    const txt = llmsTxt("https://ludion.ai");
+    expect(txt.startsWith("# Ludion\n\n> Ludion v3 (in design)")).toBe(true);
+    expect(txt).toContain("Nothing here is verified yet.");
+    expect(txt).toContain("some changes of some packages, not all of them");
     expect(txt).toContain("No lesson for something is no evidence that it didn't change.");
-    expect(txt.indexOf("### agents")).toBeLessThan(txt.indexOf("### wrangler"));
-    expect(txt).toContain("- [B](https://ludion.ai/lessons/B/): wrangler >=4.1.0 changed what `x` does. Taught by @alice, drafted by an agent; verified by tests across versions on 2026-10-11.");
-    // The claim is served as is: brackets in a symbol stay (they sit inside a code span, outside the link).
-    expect(txt).toContain("- [A](https://ludion.ai/lessons/A/): agents >=0.2.0 removed `[y]`. Taught by @alice;");
+    expect(txt).toContain("https://ludion.ai/index.json");
+    expect(txt).toContain("every active lesson, machine-readable.");
+    expect(txt).toContain("https://ludion.ai/index/subjects.json");
+    expect(txt).not.toContain("/lessons/");
+    expect(txt).not.toContain("/bench");
+    expect(txt).not.toContain("Capability Compiler");
   });
+
+  it("redirects removed pages and never the home page or sync setup", () => {
+    const text = readFileSync(new URL("../public/_redirects", import.meta.url), "utf8");
+    for (const line of SECTION_A) expect(text).toContain(line);
+    const froms = text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"))
+      .map((line) => line.split(/\s+/)[0]);
+    expect(froms).not.toContain("/");
+    expect(froms).not.toContain("/start");
+    expect(froms).not.toContain("/start/");
+    for (const line of text.split("\n")) {
+      if (!line.trim() || line.startsWith("#")) continue;
+      expect(line).toContain(" 301");
+    }
+  });
+
+  it("gives every subject in the built index a real 301, with and without the trailing slash", async () => {
+    const { index } = await siteData();
+    const subjects = [...new Set(index.lessons.map((lesson) => lesson.subject))];
+    const text = readFileSync(new URL("../public/_redirects", import.meta.url), "utf8");
+    const lines = text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"));
+    expect(subjects.length).toBeGreaterThan(0);
+    for (const subject of subjects) {
+      expect(lines, subject).toContain(`/${subject} /start/ 301`);
+      expect(lines, subject).toContain(`/${subject}/ /start/ 301`);
+    }
+    const froms = lines.map((line) => line.split(/\s+/)[0]);
+    for (const path of ["/", "/start", "/start/", "/index.json", "/no-such-page/"]) expect(froms, path).not.toContain(path);
+    expect(froms.filter((from) => from?.startsWith("/index/"))).toEqual([]);
+  }, 120_000);
 });

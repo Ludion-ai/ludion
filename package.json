@@ -17,7 +17,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json",
     "build": "npm run build --workspaces --if-present",
-    "gen:validator": "node packages/core/scripts/gen-validator.ts"
+    "gen:validator": "node packages/core/scripts/gen-validator.ts",
+    "gen:capability-schema": "node packages/capability/scripts/gen-json-schema.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

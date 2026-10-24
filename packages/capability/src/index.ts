@@ -1,3 +1,6 @@
+// Everything the schema-branch entry exports (all of ./schema.ts plus glob matchers), then the compiler API.
+export * from "./schema.ts";
+export { anyGlob, globMatch } from "./glob.ts";
 export {
   Sha256,
   CapabilityId,

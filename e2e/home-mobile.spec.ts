@@ -65,7 +65,7 @@ test("200 percent text keeps the design on the phone", async ({ page }) => {
     await resizeText(page);
     await reflow(page);
     await expect(page.locator("h1")).toContainText("Not a description.");
-    await expect(page.locator("h1")).toContainText("A guarded, checkable capability.");
+    await expect(page.locator("h1")).toContainText("Designed as a guarded, checkable capability.");
     await expect(page.locator("[data-guard-state]")).toHaveCount(4);
     await expect(page.locator("#receipt")).toContainText("Pending");
     await expect(page.locator("#isolate")).toContainText("Design example, not a run result.");

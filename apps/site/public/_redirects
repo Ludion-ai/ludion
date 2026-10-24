@@ -9,3 +9,13 @@
 /bench/ / 301
 /bench/* / 301
 /bench.json / 301
+
+# Subject pages. New subjects fall back to the meta-refresh stub.
+/agents /start/ 301
+/agents/ /start/ 301
+/python /start/ 301
+/python/ /start/ 301
+/vitest /start/ 301
+/vitest/ /start/ 301
+/wrangler /start/ 301
+/wrangler/ /start/ 301

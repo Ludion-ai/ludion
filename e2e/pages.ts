@@ -14,4 +14,9 @@ export const redirects: [string, string][] = [
   ["/bench/method/", "/"],
   ["/bench.json", "/"],
   ["/models", "/"],
+  ["/vitest/", "/start/"],
+  ["/vitest", "/start/"],
+  ["/agents/", "/start/"],
+  ["/wrangler", "/start/"],
+  ["/python/", "/start/"],
 ];

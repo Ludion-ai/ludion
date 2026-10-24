@@ -22,7 +22,7 @@ Today's product, ludion sync, delivers lessons: some changes of some packages, n
 ## Use it
 
 - [Set up sync](${site}/start/): run \`npx ludion-ai sync\` in your project.
-- [index.json](${site}/index.json): every lesson, machine-readable.
+- [index.json](${site}/index.json): every active lesson, machine-readable.
 - [subjects.json](${site}/index/subjects.json): the subjects sync can fetch.
 `;
 }

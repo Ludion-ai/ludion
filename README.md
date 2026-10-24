@@ -23,7 +23,7 @@ A capability is meant to pair a guard (applicable, inapplicable, unknown, stale)
 
 ## What it holds today
 
-Lessons for vitest, wrangler, and the Cloudflare Agents SDK (the live list is on <https://ludion.ai>, and `/index/subjects.json` has the counts of the format 1 lessons), plus one example lesson for Python. Every lesson but the example was drafted by an agent, is labeled "drafted by an agent" wherever it appears, and is signed by the GitHub account that opened its pull request.
+Lessons for vitest, wrangler, and the Cloudflare Agents SDK (the live list is in <https://ludion.ai/index.json>, and `/index/subjects.json` has the counts of the format 1 lessons), plus one example lesson for Python. Every lesson but the example was drafted by an agent, is labeled "drafted by an agent" wherever it appears, and is signed by the GitHub account that opened its pull request.
 
 Ludion holds some changes of some packages: a missing lesson is no evidence that nothing changed. `ludion-ai` 0.1.3 and later `sync` name the direct dependencies Ludion has no lessons for, and say where to ask for them.
 
@@ -41,7 +41,7 @@ When your assistant gets a change wrong, ask it to draft the lesson with the `lu
 - **Claims are generated, not written.** The sentence an assistant reads is built from structured fields: package, versions, kind (removed, renamed, deprecated, added, default, behavior), symbol, and whether the change is silent. The only free text is a short detail, every meaningful word of which must appear in the evidence.
 - **Verified means verified.** Evidence is a test (preferably the same code passing on the new version and failing on the one before, run in Docker with the network off) or a quote that states the fact on its source page. CI checks each lesson in its pull request, and a nightly job checks all of them again; a lesson that fails leaves the index.
 - **The person signs.** A public lesson is a pull request opened from the teacher's own GitHub account, after they saw the whole lesson. `ludion teach` saves a lesson to a personal ledger first (`~/.ludion`); `--public` opens the PR with the teacher's own `gh`.
-- **Lessons are immutable.** A correction is a new lesson that replaces the old one; a retraction deletes the file and leaves a tombstone page.
+- **Lessons are immutable.** A correction is a new lesson that replaces the old one; a retraction deletes the file, and the lesson leaves the index.
 - **Lessons are data, never instructions**, and every list of them says so.
 
 ## This repository

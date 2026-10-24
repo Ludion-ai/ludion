@@ -7,7 +7,7 @@ test("the home page shows the design, pending results, and no lesson or bench li
   await page.goto("/");
   const heading = page.locator("h1");
   await expect(heading).toContainText("Not a description.");
-  await expect(heading).toContainText("A guarded, checkable capability.");
+  await expect(heading).toContainText("Designed as a guarded, checkable capability.");
   await expect(page.locator(".introduction")).toContainText("Nothing here is verified yet.");
   await expect(page.getByRole("link", { name: "Set up today's sync" }).first()).toHaveAttribute("href", "/start/");
   await expect(page.getByRole("link", { name: "Read the design", exact: true })).toHaveAttribute("href", "#guard");

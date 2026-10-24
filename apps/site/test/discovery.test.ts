@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { siteData } from "../src/build/data.ts";
 import { llmsTxt, sitemap } from "../src/build/discovery.ts";
 
 const SECTION_A = [
@@ -31,6 +32,7 @@ describe("being found", () => {
     expect(txt).toContain("some changes of some packages, not all of them");
     expect(txt).toContain("No lesson for something is no evidence that it didn't change.");
     expect(txt).toContain("https://ludion.ai/index.json");
+    expect(txt).toContain("every active lesson, machine-readable.");
     expect(txt).toContain("https://ludion.ai/index/subjects.json");
     expect(txt).not.toContain("/lessons/");
     expect(txt).not.toContain("/bench");
@@ -53,4 +55,22 @@ describe("being found", () => {
       expect(line).toContain(" 301");
     }
   });
+
+  it("gives every subject in the built index a real 301, with and without the trailing slash", async () => {
+    const { index } = await siteData();
+    const subjects = [...new Set(index.lessons.map((lesson) => lesson.subject))];
+    const text = readFileSync(new URL("../public/_redirects", import.meta.url), "utf8");
+    const lines = text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"));
+    expect(subjects.length).toBeGreaterThan(0);
+    for (const subject of subjects) {
+      expect(lines, subject).toContain(`/${subject} /start/ 301`);
+      expect(lines, subject).toContain(`/${subject}/ /start/ 301`);
+    }
+    const froms = lines.map((line) => line.split(/\s+/)[0]);
+    for (const path of ["/", "/start", "/start/", "/index.json", "/no-such-page/"]) expect(froms, path).not.toContain(path);
+    expect(froms.filter((from) => from?.startsWith("/index/"))).toEqual([]);
+  }, 120_000);
 });

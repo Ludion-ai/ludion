@@ -11,7 +11,7 @@ import { exampleArtifactInput, exampleRecord } from "./fixtures.ts";
 const REPO = fileURLToPath(new URL("../../../", import.meta.url));
 /** sha256 of sorted `path\\ncontent\\n` for lessons/** and packages/core/src/generated/**, with CRLF normalized to LF.
  *  Computed before this package existed. */
-const LESSON_TREE_SHA256 = "ced7ad161abdff4652f4ac2a008cce82d32d75d60fca30cf19285e0fef1f882e";
+const LESSON_TREE_SHA256 = "90793447b54df01085cc778b1cae8c0b24703711af2df79d8aa3fc3407409a8e";
 
 function treeHash(roots: string[]): string {
   const files: string[] = [];

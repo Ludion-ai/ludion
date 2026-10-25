@@ -4,7 +4,10 @@
  *  punctuation, and the whitespace characters space, tab, LF, CR, VT and FF. A leading U+FEFF is
  *  skipped and a leading `#!` line is a comment. U+2028/U+2029 outside a string or block comment,
  *  `#` not followed by an identifier, `-->`, `<!--`, unbalanced `()`, `[]` or `{}`, and any other character are errors.
- *  Comments and string or template text are removed. `${...}` expressions stay.
+ *  Comments and string or template text are removed. `${...}` expressions stay. A template leaves
+ *  one "`" marker token, so a tagged template is a value use of its tag. Only the escapes
+ *  \\ \' \" \n \t (and \` \$ in templates) are decoded; any other escape is an error.
+ *  An import specifier name that is a string literal is never resolved.
  *  Brace ids follow source `{` `}` pairs, so an object literal is its own block.
  *  `already_fixed` compares those ids (innermost pair).
  *  A backslash in code, `with (`, or bare `eval` is an error. A `/` or `/=` that
@@ -14,7 +17,8 @@
  */
 
 export type CallSite = { recv: string; members: string[]; line: number; braceId: number; tok: number };
-export type Binding = { local: string; via: "import" | "alias"; kind: "named" | "namespace"; imported: string; module: string };
+/** `stringName`: the imported name was a string literal (`import { "x" as y }`). Never resolved. */
+export type Binding = { local: string; via: "import" | "alias"; kind: "named" | "namespace"; imported: string; module: string; stringName?: true };
 export type Shadow = { name: string; from: number; to: number };
 
 export type Analysis = {
@@ -35,6 +39,8 @@ const CODE_SPACE = new Set([" ", "\t", "\n", "\r", "\v", "\f"]);
 /** Single-character punctuation the tokenizer models. Anything else in code is an error. */
 const SINGLE_PUNCT = new Set(["{", "}", "(", ")", "[", "]", ";", ",", ".", "<", ">", "+", "-", "*", "%", "&", "|", "^", "!", "~", "?", ":", "=", "@", "#"]);
 const OPENER: Record<string, string> = { ")": "(", "]": "[", "}": "{" };
+/** The only string and template escapes the tokenizer decodes. Anything else is an error. */
+const STRING_ESCAPES: Record<string, string> = { "\\": "\\", "'": "'", '"': '"', n: "\n", t: "\t" };
 
 /** Identifiers that are not a division left-hand side. A following `/` is refused. */
 const SLASH_KEYWORD = new Set([
@@ -50,7 +56,7 @@ function slashIsDivision(tokens: readonly Token[]): boolean {
   const prev = tokens[tokens.length - 1];
   if (!prev) return false;
   if (prev.k === "num" || prev.k === "str") return true;
-  if (prev.s === "]") return true;
+  if (prev.s === "]" || prev.s === "`") return true;
   return prev.k === "ident" && !SLASH_KEYWORD.has(prev.s);
 }
 
@@ -115,16 +121,12 @@ function tokenize(src: string): TokResult {
     if (m === "sq" || m === "dq") {
       const q = m === "sq" ? "'" : '"';
       if (c === "\\") {
+        // Allowlist: only \\ \' \" \n \t. Every other escape (\u, \x, \u{}, \v, \b, \f, \0,
+        // octal, line continuation, or an unneeded escape like \v in "\vitest") is not modeled.
         if (next === undefined) return fail("unclosed string");
-        if (next === "n") buf += "\n";
-        else if (next === "r") buf += "\r";
-        else if (next === "t") buf += "\t";
-        else if (next === "\n") buf += "";
-        else if (next === "\r") {
-          buf += "";
-          take(src[i + 2] === "\n" ? 3 : 2);
-          continue;
-        } else buf += next;
+        const decoded = STRING_ESCAPES[next];
+        if (decoded === undefined) return fail("unsupported string escape");
+        buf += decoded;
         take(2);
         continue;
       }
@@ -142,8 +144,10 @@ function tokenize(src: string): TokResult {
     }
     if (m === "tmpl") {
       if (c === "\\") {
+        // Same allowlist as strings, plus \` and \$.
         if (next === undefined) return fail("unclosed template");
-        take(next === "\r" && src[i + 2] === "\n" ? 3 : 2);
+        if (STRING_ESCAPES[next] === undefined && next !== "`" && next !== "$") return fail("unsupported string escape");
+        take(2);
         continue;
       }
       if (c === "`") {
@@ -192,6 +196,8 @@ function tokenize(src: string): TokResult {
       continue;
     }
     if (c === "`") {
+      // A marker token, so `` vi`x` `` is a value use of `vi`, not `vi`'s member call.
+      push({ k: "punct", s: "`", line });
       modeStack.push("tmpl");
       take(1);
       continue;
@@ -313,6 +319,8 @@ export function resolveTarget(
   // name anywhere in the file, and no `require`/`import()` of the module (or a computed one).
   const mod = target.module;
   if ((analysis.dynamicLoads ?? []).some((m) => m === null || m === mod || m.startsWith(`${mod}/`))) unresolved = true;
+  // Any import specifier name that is a string literal, from any module, is not modeled.
+  if (analysis.bindings.some((b) => b.stringName)) unresolved = true;
   for (const b of analysis.bindings) {
     if (b.module !== mod) continue;
     if (b.kind === "namespace") unresolved = true;
@@ -646,7 +654,7 @@ function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
     }
     let namespace: string | null = null;
     let defaultName: string | null = null;
-    const named: Array<{ imported: string; local: string; alias: boolean; typeOnly: boolean }> = [];
+    const named: Array<{ imported: string; local: string; alias: boolean; typeOnly: boolean; stringName?: true }> = [];
     const readNamed = () => {
       if (tokens[j]?.s !== "{") return;
       j++;
@@ -661,6 +669,14 @@ function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
           j++;
         }
         const importedTok = tokens[j];
+        if (importedTok?.k === "str") {
+          // Allowlist: an import specifier name must be one plain identifier.
+          const local = tokens[j + 1]?.s === "as" && tokens[j + 2]?.k === "ident" ? tokens[j + 2]!.s : "";
+          if (local) bound.add(j + 2);
+          named.push({ imported: importedTok.s, local, alias: true, typeOnly: specType, stringName: true });
+          j += local ? 3 : 1;
+          continue;
+        }
         if (importedTok?.k !== "ident") {
           j++;
           continue;
@@ -713,7 +729,9 @@ function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
     if (defaultName) bindings.push({ local: defaultName, via: "import", kind: "named", imported: "default", module: moduleName });
     for (const n of named) {
       if (n.typeOnly) continue;
-      bindings.push({ local: n.local, via: n.alias ? "alias" : "import", kind: "named", imported: n.imported, module: moduleName });
+      const binding: Binding = { local: n.local, via: n.alias ? "alias" : "import", kind: "named", imported: n.imported, module: moduleName };
+      if (n.stringName) binding.stringName = true;
+      bindings.push(binding);
     }
   }
   return bindings;
@@ -1209,12 +1227,24 @@ function lookup(obj: Val, path: string[]): "absent" | "not-static" | string | nu
   return lookup(prop.value, rest);
 }
 
-/** Keys that make the effective config depend on other files or entries. */
-const MULTI_CONFIG_KEYS = new Set(["projects", "workspace"]);
+/**
+ * Allowlist of config keys. The root object may contain only `test`, and `test` may contain only
+ * these mock-reset options, each a boolean literal. Any other key anywhere (plugins, resolve,
+ * test.alias, setupFiles, globalSetup, extends, projects, include, ...) can change what runs or
+ * what `vitest` resolves to, so the whole config is not-static.
+ */
+const ALLOWED_TEST_KEYS = new Set(["clearMocks", "restoreMocks", "mockReset"]);
 
-function hasMultiConfigKey(val: Val): boolean {
-  if (val.t !== "obj") return false;
-  return val.props.some((p) => MULTI_CONFIG_KEYS.has(p.key) || hasMultiConfigKey(p.value));
+function configShapeAllowed(root: Val): boolean {
+  if (root.t !== "obj" || root.hasSpread || root.ambiguous) return false;
+  return root.props.every(
+    (p) =>
+      p.key === "test" &&
+      p.value.t === "obj" &&
+      !p.value.hasSpread &&
+      !p.value.ambiguous &&
+      p.value.props.every((q) => ALLOWED_TEST_KEYS.has(q.key) && q.value.t === "lit" && typeof q.value.v === "boolean"),
+  );
 }
 
 function skipAngles(tokens: Token[], i: number): number {
@@ -1247,7 +1277,9 @@ function declaresDefineConfig(tokens: Token[]): boolean {
 
 /** `defineConfig(` is vitest/vite's helper only for this exact unaliased import. */
 function isTrustedDefineConfig(tokens: Token[]): boolean {
-  const locals = bindingsFrom(tokens, new Set()).filter((b) => b.local === "defineConfig");
+  const all = bindingsFrom(tokens, new Set());
+  if (all.some((b) => b.stringName)) return false;
+  const locals = all.filter((b) => b.local === "defineConfig");
   const binding = locals.length === 1 ? locals[0] : undefined;
   if (!binding || binding.via !== "import" || binding.kind !== "named" || binding.imported !== "defineConfig") return false;
   if (binding.module !== "vitest/config" && binding.module !== "vite") return false;
@@ -1257,7 +1289,7 @@ function isTrustedDefineConfig(tokens: Token[]): boolean {
 /**
  * Allowlist: the only readable config is one `export default defineConfig({ ... })` where
  * `defineConfig` is the unaliased top-level import from "vitest/config" or "vite", used nowhere
- * else, with a static object argument and no `projects`/`workspace` key. Every other shape
+ * else, with a static object argument whose keys are all in the allowlist above. Every other shape
  * (another export form, a wrapper, a callback, `mergeConfig`, `module.exports`) is not-static.
  */
 export function readConfigKey(source: string, key: string): ConfigRead {
@@ -1288,7 +1320,7 @@ export function readConfigKey(source: string, key: string): ConfigRead {
   // One use in the import specifier and one in the default export call. Any other use
   // (a reassignment, a second call, passing it as a value) is not modeled.
   if (defaults !== 1 || defineUses !== 2 || !root) return { kind: "not-static" };
-  if (hasMultiConfigKey(root)) return { kind: "not-static" };
+  if (!configShapeAllowed(root)) return { kind: "not-static" };
   const found = lookup(root, path);
   if (found === "not-static") return { kind: "not-static" };
   if (found === "absent") return { kind: "absent" };

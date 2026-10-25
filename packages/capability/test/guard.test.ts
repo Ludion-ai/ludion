@@ -173,7 +173,10 @@ describe("evaluateGuard", () => {
       "export default defineConfig({ test: { include: ['src/**/*.test.ts'] } });",
       "",
     ].join("\n");
-    expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": absent } }).status).toBe("applicable");
+    // Allowlist: `include` is not an allowed config key, so the whole config is not-static.
+    expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": absent } })).toMatchObject({ status: "unknown", reason: "config_not_static" });
+    const absentAllowed = ['import { defineConfig } from "vitest/config";', "export default defineConfig({ test: { restoreMocks: true } });", ""].join("\n");
+    expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": absentAllowed } }).status).toBe("applicable");
 
     const computed = [
       "export default {",

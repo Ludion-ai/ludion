@@ -150,10 +150,17 @@ describe("scanner fails toward unknown", () => {
     expect(judge(nonAscii)).toMatchObject({ status: "unknown", reason: "parse_failed" });
 
     const slash = "\\";
+    // Allowlist: `\b` is not a decoded escape, so a string or template containing it is parse_failed.
+    for (const lit of [`const text = "a${slash}b";`, `const tmpl = \`a${slash}b \${1}\`;`]) {
+      expect(judge(['import { vi } from "vitest";', lit, "afterEach(() => { vi.restoreAllMocks(); });", ""].join("\n")), lit).toMatchObject({
+        status: "unknown",
+        reason: "parse_failed",
+      });
+    }
     const safe = [
       'import { vi } from "vitest";',
-      `const text = "a${slash}b";`,
-      `const tmpl = \`a${slash}b \${1}\`;`,
+      `const text = "a${slash}${slash}b";`,
+      `const tmpl = \`a${slash}${slash}b \${1}\`;`,
       `// comment ${slash}`,
       `/* block ${slash} */`,
       "afterEach(() => { vi.restoreAllMocks(); });",

@@ -30,7 +30,7 @@ describe("allowlist: accepted shapes stay applicable", () => {
     expect(judgeConfig(clearMocksConfig)).toMatchObject({ status: "inapplicable", reason: "config_excludes" });
     expect(judgeConfig(config("clearMocks: true"))).toMatchObject({ status: "inapplicable", reason: "config_excludes" });
     expect(judgeConfig(config("clearMocks: false"))).toMatchObject({ status: "applicable" });
-    expect(judgeConfig(config("include: ['src/**/*.test.ts']"))).toMatchObject({ status: "applicable" });
+    expect(judgeConfig(config("restoreMocks: true, mockReset: false"))).toMatchObject({ status: "applicable" });
   });
 });
 
@@ -92,6 +92,53 @@ describe("allowlist: reviewer items are not applicable", () => {
     const html = ['import { vi } from "vitest";', "afterEach(() => { vi.restoreAllMocks(); });", "--> const vi = {};", ""].join("\n");
     expect(judgeTest(html)).toMatchObject({ status: "unknown", reason: "parse_failed" });
     expect(judgeTest(`${applicableTest}<!-- x\n`)).toMatchObject({ status: "unknown", reason: "parse_failed" });
+  });
+});
+
+describe("allowlist: second review items are not applicable", () => {
+  const callTest = (head: string, call = "vi.restoreAllMocks();") => [head, `afterEach(() => { ${call} });`, ""].join("\n");
+
+  it("string escapes outside \\\\ \\' \\\" \\n \\t are parse_failed", () => {
+    const bs = "\\";
+    const cfg = ['import { defineConfig } from "vitest/config";', `export default defineConfig({ test: { "clear${bs}u004dMocks": true } });`, ""].join("\n");
+    expect(judgeConfig(cfg)).toMatchObject({ status: "unknown", reason: "parse_failed" });
+    for (const spec of [`${bs}vitest`, `vi${bs}x74est`, `vi${bs}u0074est`, `vi${bs}u{74}est`, `${bs}bvitest`, `${bs}fvitest`, `vitest${bs}0`, `vi${bs}\ntest`, `${bs}x76itest`]) {
+      const src = callTest(`import { vi } from "${spec}";`);
+      expect(judgeTest(src), spec).toMatchObject({ status: "unknown", reason: "parse_failed" });
+    }
+    expect(judgeTest(callTest(`import { vi } from 'vitest'; const s = "it${bs}'s ${bs}"ok${bs}" ${bs}${bs} ${bs}n${bs}t";`))).toMatchObject({ status: "applicable" });
+  });
+
+  it("an import specifier name that is a string is binding_unresolved", () => {
+    expect(judgeTest(callTest('import { "expect" as vi } from "vitest";'))).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    expect(judgeTest(callTest('import { "vi" as vi } from "vitest";'))).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    expect(judgeTest(callTest('import { vi } from "vitest";\nimport { "a-b" as ab } from "./other";'))).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    const cfg = ['import { "defineConfig" as defineConfig } from "vitest/config";', "export default defineConfig({ test: { clearMocks: true } });", ""].join("\n");
+    expect(judgeConfig(cfg)).toMatchObject({ status: "unknown", reason: "config_not_static" });
+  });
+
+  it("any config key outside test.clearMocks/restoreMocks/mockReset is config_not_static", () => {
+    const wrap = (body: string) => ['import { defineConfig } from "vitest/config";', `export default defineConfig({ ${body} });`, ""].join("\n");
+    const cases = [
+      "plugins: [{ name: 'p', config: () => ({ test: { clearMocks: true } }) }], test: { clearMocks: false }",
+      "resolve: { alias: { vitest: './fake.ts' } }, test: { clearMocks: false }",
+      "test: { alias: { vitest: './fake.ts' }, clearMocks: false }",
+      "test: { setupFiles: ['./setup.ts'], clearMocks: false }",
+      "test: { globalSetup: './global.ts', clearMocks: false }",
+      "extends: './base.config.ts', test: { clearMocks: false }",
+      "test: { include: ['src/**/*.test.ts'] }",
+      "test: { globals: true }",
+      "test: { clearMocks: false }, define: {}",
+    ];
+    for (const body of cases) {
+      expect(judgeConfig(wrap(body)), body).toMatchObject({ status: "unknown", reason: "config_not_static" });
+    }
+  });
+
+  it("a tagged template on vi is a value use: binding_unresolved", () => {
+    expect(judgeTest(callTest('import { vi } from "vitest";', "vi`x`.restoreAllMocks();"))).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    expect(judgeTest(`${applicableTest}vi\`x\${1}\`;\n`)).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    expect(judgeTest(`${applicableTest}const t = \`a\` / 2;\n`)).toMatchObject({ status: "applicable" });
   });
 });
 

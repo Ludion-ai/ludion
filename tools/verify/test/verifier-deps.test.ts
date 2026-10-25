@@ -478,37 +478,31 @@ describe("pr-cli wiring", () => {
 });
 
 /**
- * Published P1 capability schema at a pinned commit. The text is data: it is read with git
- * and parsed here. It is not imported, and zod is not imported.
+ * Published P1 capability schema, pinned by its git blob sha. The text is data: it is read
+ * from this checkout and parsed here. It is not imported, and zod is not imported. No git
+ * command or remote branch is needed: the blob sha is computed in-process, so a shallow or
+ * single-branch clone works. The pinned blob is the schema published at
+ * 078f89d6254d1428e95c973bffacf7b474f47ac8 (origin/v3/capability-schema).
  */
-const PUBLISHED_SCHEMA_REV = "078f89d6254d1428e95c973bffacf7b474f47ac8";
+const PUBLISHED_SCHEMA_PATH = "packages/capability/src/schema.ts";
+const PUBLISHED_SCHEMA_BLOB = "79849b0fc6f14e999b7e9a179026ab417a1495b3";
 
-function gitText(value: string | Uint8Array): string {
-  return typeof value === "string" ? value : Buffer.from(value).toString("utf8");
+function gitBlobSha(bytes: Uint8Array): string {
+  return createHash("sha1").update(`blob ${bytes.length}\0`).update(bytes).digest("hex");
 }
 
 function readPublishedSchema(repoRoot: string): string {
-  try {
-    execFileSync("git", ["cat-file", "-e", `${PUBLISHED_SCHEMA_REV}^{commit}`], {
-      cwd: repoRoot,
-      shell: false,
-      windowsHide: true,
-      stdio: "ignore",
-    });
-  } catch {
-    throw new Error(`Commit ${PUBLISHED_SCHEMA_REV} is not in this clone. Fetch origin/v3/capability-schema.`);
+  const file = join(repoRoot, ...PUBLISHED_SCHEMA_PATH.split("/"));
+  const bytes = readFileSync(file);
+  if (bytes.length === 0) throw new Error(`${PUBLISHED_SCHEMA_PATH} was empty`);
+  const blob = gitBlobSha(bytes);
+  if (blob !== PUBLISHED_SCHEMA_BLOB) {
+    throw new Error(
+      `${PUBLISHED_SCHEMA_PATH} is not the published P1 schema: git blob ${blob}, expected ${PUBLISHED_SCHEMA_BLOB}. ` +
+        "The capability schema changed; review the change and re-pin PUBLISHED_SCHEMA_BLOB in this test on purpose.",
+    );
   }
-  const shown = execFileSync("git", ["show", `${PUBLISHED_SCHEMA_REV}:packages/capability/src/schema.ts`], {
-    cwd: repoRoot,
-    shell: false,
-    encoding: "utf8",
-    windowsHide: true,
-    stdio: ["ignore", "pipe", "pipe"],
-    maxBuffer: 8 * 1024 * 1024,
-  });
-  const text = gitText(shown);
-  if (text.length === 0) throw new Error(`git show ${PUBLISHED_SCHEMA_REV}:packages/capability/src/schema.ts was empty`);
-  return text;
+  return bytes.toString("utf8");
 }
 
 function readStringLiteral(source: string, start: number): { value: string; end: number } {

@@ -7,8 +7,7 @@
 ロードマップのステップ2〜3で使う、開発専用の Verified Repair Capability 題材を1件固定する。
 
 - この題材は `lessons/` にも本番 index にも入れない。既存 lesson を変換したものでもない。
-- 当初の方針「既存 lesson を1件変換する」からは外れる。理由は、wrangler / vitest / agents の既存 lesson がすべて、事前に固定した評価範囲と重なるため。
-- 最初に候補にして、重なりのため外したもの（いずれも既存 lesson）：vitest のモック後片付け関連の lesson 1件、wrangler の認証用環境変数名変更の lesson 1件、agents のチャット更新関連の lesson 1件。
+- 当初は既存 lesson を1件変換する方針だったが、候補にした既存 lesson 3件がいずれも評価と重なったため、既存 lesson ではない題材に切り替えた。
 
 ## 2. 上流の変更
 
@@ -127,13 +126,8 @@ guard の判定は `applicable` / `inapplicable` / `unknown` / `stale` の4状�
 
 - 採用：commander 12.1.0 → 13.0.0（`allowExcessArguments` の既定値が true から false に変わった）
 - 予備候補：nanoid 4.0.2 → 5.0.0（`nanoid/async` の削除）
-- 取り下げ：zod 3.25.76 → 4.0.0（`ZodError.errors` の削除。`.issues` を使う）
-  - zod の changelog の該当行は、この文書では引用していない（取り下げ前に引用まで確認できなかった）。
-  - evaluation reviewer は最初、zod 候補について「重なりなし」と判断した。
-  - その後、評価タスクの収集から除外しているリポジトリの一覧と照合したところ、colinhacks/zod がその一覧にあったため、この判断は取り下げられた。
-  - technical reviewer の見解：除外一覧にあるということは zod は評価タスクに出てこないので、重なりはないとも言える。ただし、書面の条件が「除外リポジトリと重ならないこと」なので、technical reviewer も切り替えに同意した。
-  - commander は、どの結果も出る前に予備候補として名前を挙げていた。したがって、結果を見てから選び直したものではない。
-  - commander の重なり確認は 2026-10-25 15:19 JST に通過した。
+- 取り下げ：zod 3.25.76 → 4.0.0。理由は評価との重なり。
+  - commander は、どの結果も出る前に予備候補として名前を挙げていた。結果を見てから選び直したものではない。
 - 不採用（理由つき）
   1. date-fns 2.30 → 3.0：前提が成り立たない。3.0 では ESM の default が動き、2.30 は ESM のディレクトリ import で失敗する。
   2. uuid 7 → 8：旧版のベースラインが ESM の deep import で失敗する。変更自体も2020年のもの。
@@ -148,4 +142,4 @@ guard の判定は `applicable` / `inapplicable` / `unknown` / `stale` の4状�
 
 ## 9. 公開文書の書き方
 
-この文書には、内部の役割名、PC 上のパス、評価タスク名を書かない。レビュー担当は「technical reviewer」「security reviewer」「evaluation reviewer」と書く。
+この文書には、内部の役割名、PC 上のパス、評価タスク名を書かない。レビュー担当は「technical reviewer」「security reviewer」と書く。

@@ -93,7 +93,7 @@ guard の判定は `applicable` / `inapplicable` / `unknown` / `stale` の4状�
 
 - guard と allowlist は、この題材を変換して得たものだけを使う。
 - 人が手で足したものは、すべて「手作業」として別に記録する。
-- 既存の restoreAllMocks 用ルールは拡張も変更もしない。
+- 既存の guard ルールは拡張も変更もしない。
 
 ## 7. 事前登録前の予備測定（開示）
 

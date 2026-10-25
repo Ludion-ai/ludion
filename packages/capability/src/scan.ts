@@ -2,8 +2,10 @@
  *  Comments and string or template text are removed. `${...}` expressions stay.
  *  Brace ids follow source `{` `}` pairs, so an object literal is its own block.
  *  `already_fixed` compares those ids (innermost pair).
- *  A backslash in code, `with (`, or bare `eval` is an error. A use of a name
- *  other than the receiver of `name.a.b(` is unmodeled.
+ *  A backslash in code, `with (`, or bare `eval` is an error. A `/` or `/=` that
+ *  is not clearly division is an error: regexp literals are not supported.
+ *  A use of a name other than the receiver of `name.a.b(` is unmodeled.
+ *  An ASI `const`/`let`/`var` still declares its names and marks them unmodeled.
  */
 
 export type CallSite = { recv: string; members: string[]; line: number; braceId: number; tok: number };
@@ -15,15 +17,29 @@ export type Analysis = {
   calls: CallSite[];
   bindings: Binding[];
   shadows: Shadow[];
-  /** Uses the scanner cannot bind. `tok` -1 is a hoisted `var` or a global-object access. */
+  /** Uses the scanner cannot bind. `tok` -1 is a hoisted `var`, a global-object access, or an ASI declaration. */
   unmodeled: Array<{ name: string; tok: number }>;
 };
 
 type Token = { k: "ident" | "num" | "str" | "punct"; s: string; line: number };
 
-const REGEX_AFTER = new Set(["return", "throw", "case", "typeof", "void", "delete", "in", "of", "yield", "await", "else", "do", "instanceof"]);
-const NO_REGEX_PUNCT = new Set([")", "]", "++", "--"]);
+/** Identifiers that are not a division left-hand side. A following `/` is refused. */
+const SLASH_KEYWORD = new Set([
+  "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default",
+  "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function",
+  "if", "implements", "import", "in", "instanceof", "interface", "let", "new", "of", "package",
+  "private", "protected", "public", "return", "static", "super", "switch", "this", "throw",
+  "try", "typeof", "var", "void", "while", "with", "yield",
+]);
 const MULTI_PUNCT = [">>>=", ">>=", "<<=", "===", "!==", "...", ">>>", "&&=", "||=", "??=", "=>", "?.", "==", "!=", "<=", ">=", "&&", "||", "??", "++", "--", "**", "<<", ">>", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^="];
+
+function slashIsDivision(tokens: readonly Token[]): boolean {
+  const prev = tokens[tokens.length - 1];
+  if (!prev) return false;
+  if (prev.k === "num" || prev.k === "str") return true;
+  if (prev.s === "]") return true;
+  return prev.k === "ident" && !SLASH_KEYWORD.has(prev.s);
+}
 
 type TokResult = { tokens: Token[]; error?: string };
 
@@ -34,7 +50,6 @@ function tokenize(src: string): TokResult {
   let i = 0;
   let line = 1;
   let brace = 0;
-  let regexAllowed = true;
   let buf = "";
   let bufLine = 1;
 
@@ -94,7 +109,6 @@ function tokenize(src: string): TokResult {
         modeStack.pop();
         push({ k: "str", s: buf, line: bufLine });
         buf = "";
-        regexAllowed = false;
         take(1);
         continue;
       }
@@ -110,7 +124,6 @@ function tokenize(src: string): TokResult {
       }
       if (c === "`") {
         modeStack.pop();
-        regexAllowed = false;
         take(1);
         continue;
       }
@@ -119,7 +132,6 @@ function tokenize(src: string): TokResult {
         brace++;
         interpBrace.push(brace);
         modeStack.push("code");
-        regexAllowed = true;
         continue;
       }
       take(1);
@@ -156,32 +168,13 @@ function tokenize(src: string): TokResult {
       take(1);
       continue;
     }
-    if (c === "/" && next !== "=" && regexAllowed) {
-      const start = i;
-      let j = i + 1;
-      let cls = false;
-      let closed = false;
-      while (j < src.length) {
-        const rc = src[j];
-        if (rc === "\n" || rc === undefined) break;
-        if (rc === "\\") {
-          j += 2;
-          continue;
-        }
-        if (rc === "[") cls = true;
-        else if (rc === "]") cls = false;
-        else if (rc === "/" && !cls) {
-          closed = true;
-          j++;
-          while (/[a-zA-Z]/.test(src[j] ?? "")) j++;
-          break;
-        }
-        j++;
-      }
-      if (!closed) return fail("unclosed regexp");
-      push({ k: "punct", s: src.slice(start, j), line });
-      take(j - start);
-      regexAllowed = false;
+    // `//` and `/*` are comments. Any other `/` or `/=` is division only when the
+    // previous token cannot start a regexp. Regex literals are not supported.
+    if (c === "/") {
+      const op = next === "=" ? "/=" : "/";
+      if (!slashIsDivision(tokens)) return fail("regexp or ambiguous slash");
+      push({ k: "punct", s: op, line });
+      take(op.length);
       continue;
     }
     if (/[A-Za-z_$]/.test(c) || (c.codePointAt(0) ?? 0) > 127) {
@@ -192,7 +185,6 @@ function tokenize(src: string): TokResult {
       const s = src.slice(start, j);
       push({ k: "ident", s, line: startLine });
       take(j - start);
-      regexAllowed = REGEX_AFTER.has(s);
       continue;
     }
     if (/[0-9]/.test(c) || (c === "." && /[0-9]/.test(next ?? ""))) {
@@ -214,7 +206,6 @@ function tokenize(src: string): TokResult {
       const s = src.slice(start, j);
       push({ k: "num", s, line: startLine });
       take(j - start);
-      regexAllowed = false;
       continue;
     }
 
@@ -241,7 +232,6 @@ function tokenize(src: string): TokResult {
     }
     push({ k: "punct", s: punct, line });
     take(plen);
-    regexAllowed = !NO_REGEX_PUNCT.has(punct);
   }
 
   if (mode() === "block") return fail("unclosed comment");
@@ -808,6 +798,7 @@ export function analyze(source: string): Analysis {
   const calls: CallSite[] = [];
   const shadows: Shadow[] = [];
   const hoisted: Array<{ name: string; tok: number }> = [];
+  const asiUnmodeled: Array<{ name: string; tok: number }> = [];
   const bound = new Set<number>();
   const methodNames = new Set<number>();
   const open: Array<{ name: string; from: number; depth: number }> = [];
@@ -821,7 +812,8 @@ export function analyze(source: string): Analysis {
   let pendingParams: string[] | null = null;
   let pendingLoop: string[] | null = null;
   let decl: { depth: number; paren: number; bracket: number } | null = null;
-  let openVar: boolean = false;
+  let openVar = false;
+  let openAsi = false;
 
   const remember = (indexes: readonly number[]) => {
     for (const index of indexes) bound.add(index);
@@ -866,6 +858,7 @@ export function analyze(source: string): Analysis {
       if (decl && depth < decl.depth) {
         decl = null;
         openVar = false;
+        openAsi = false;
       }
       continue;
     }
@@ -888,6 +881,7 @@ export function analyze(source: string): Analysis {
     if (t.s === ";" && decl) {
       decl = null;
       openVar = false;
+      openAsi = false;
     }
     if (t.s === "=>") {
       const params = paramsBeforeArrow(tokens, i);
@@ -924,13 +918,25 @@ export function analyze(source: string): Analysis {
       i = Math.max(i, j - 1);
       continue;
     }
-    const declToken = t.s === "const" || t.s === "let" || t.s === "var";
+    const declWord = t.s === "const" || t.s === "let" || t.s === "var";
+    const afterDot = tokens[i - 1]?.s === "." || tokens[i - 1]?.s === "?.";
+    const objectKey = tokens[i + 1]?.s === ":";
+    // For-heads are handled above. A declaration whose previous token is not a
+    // statement boundary still binds its names, but the newline is ASI: the names
+    // stay unmodeled so a bound name or the target export is binding_unresolved.
+    const declToken = declWord && !afterDot && !objectKey;
     const continueDecl = decl !== null && decl.depth === depth && decl.paren === paren && decl.bracket === bracket && t.s === ",";
-    if ((declToken && statementStart(tokens, i) && tokens[i + 1] && tokens[i + 1]?.s !== ":") || continueDecl) {
-      const pat = readPattern(tokens, declToken ? i + 1 : i + 1);
+    if ((declToken && tokens[i + 1]) || continueDecl) {
+      const pat = readPattern(tokens, i + 1);
       remember(pat.at);
-      if (declToken) openVar = t.s === "var";
+      if (declToken) {
+        openVar = t.s === "var";
+        openAsi = !statementStart(tokens, i);
+      }
       if (openVar) noteVar(pat.names);
+      if (openAsi) {
+        for (const name of pat.names) asiUnmodeled.push({ name, tok: -1 });
+      }
       for (const name of pat.names) declare(name, i);
       i = Math.max(i, finishPattern(tokens, pat.next) - 1);
       decl = { depth, paren, bracket };
@@ -997,7 +1003,7 @@ export function analyze(source: string): Analysis {
   const bindings = bindingsFrom(tokens, bound);
   const risks = collectRisks(tokens, bound, methodNames);
   if (risks.error) return { error: risks.error, calls: [], bindings: [], shadows: [], unmodeled: [] };
-  return { calls, bindings, shadows, unmodeled: [...hoisted, ...risks.unmodeled] };
+  return { calls, bindings, shadows, unmodeled: [...hoisted, ...asiUnmodeled, ...risks.unmodeled] };
 }
 
 type Val =
@@ -1108,11 +1114,35 @@ function skipAngles(tokens: Token[], i: number): number {
   return i;
 }
 
+function declaresDefineConfig(tokens: Token[]): boolean {
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (!t) break;
+    if (t.s === "function" && (tokens[i + 1]?.s === "defineConfig" || (tokens[i + 1]?.s === "*" && tokens[i + 2]?.s === "defineConfig"))) return true;
+    if (t.s === "class" && tokens[i + 1]?.s === "defineConfig") return true;
+    if (t.s !== "const" && t.s !== "let" && t.s !== "var") continue;
+    if (tokens[i - 1]?.s === "." || tokens[i - 1]?.s === "?.") continue;
+    if (tokens[i + 1]?.s === ":") continue;
+    if (readPattern(tokens, i + 1).names.includes("defineConfig")) return true;
+  }
+  return false;
+}
+
+/** `defineConfig(` is vitest/vite's helper only for this exact unaliased import. */
+function isTrustedDefineConfig(tokens: Token[]): boolean {
+  const locals = bindingsFrom(tokens, new Set()).filter((b) => b.local === "defineConfig");
+  const binding = locals.length === 1 ? locals[0] : undefined;
+  if (!binding || binding.via !== "import" || binding.kind !== "named" || binding.imported !== "defineConfig") return false;
+  if (binding.module !== "vitest/config" && binding.module !== "vite") return false;
+  return !declaresDefineConfig(tokens);
+}
+
 export function readConfigKey(source: string, key: string): ConfigRead {
   const toked = tokenize(source);
   if (toked.error) return { kind: "parse_failed", detail: toked.error };
   const tokens = toked.tokens;
   const path = key.split(".").filter((s) => s.length > 0);
+  const trusted = isTrustedDefineConfig(tokens);
   let notStatic = false;
   const roots: Val[] = [];
   for (let i = 0; i < tokens.length; i++) {
@@ -1120,17 +1150,18 @@ export function readConfigKey(source: string, key: string): ConfigRead {
     if (!t) break;
     if (t.k === "ident" && t.s === "mergeConfig" && tokens[i + 1]?.s === "(") notStatic = true;
     if (t.k === "ident" && t.s === "module" && tokens[i + 1]?.s === "." && tokens[i + 2]?.s === "exports") notStatic = true;
-    if (t.k === "ident" && t.s === "defineConfig") {
+    const bareDefine = t.k === "ident" && t.s === "defineConfig" && tokens[i - 1]?.s !== "." && tokens[i - 1]?.s !== "?.";
+    if (bareDefine) {
       let j = skipAngles(tokens, i + 1);
       if (tokens[j]?.s === "(") {
-        if (tokens[j + 1]?.s === "{") roots.push(parseObject(tokens, j + 1).val);
+        if (trusted && tokens[j + 1]?.s === "{") roots.push(parseObject(tokens, j + 1).val);
         else notStatic = true;
       }
     }
     if (t.k === "ident" && t.s === "export" && tokens[i + 1]?.s === "default") {
       const n = tokens[i + 2];
       if (n?.s === "{") roots.push(parseObject(tokens, i + 2).val);
-      else if (!(n?.k === "ident" && n.s === "defineConfig")) notStatic = true;
+      else if (!(trusted && n?.k === "ident" && n.s === "defineConfig")) notStatic = true;
     }
   }
   if (notStatic) return { kind: "not-static" };

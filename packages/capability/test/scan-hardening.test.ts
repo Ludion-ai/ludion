@@ -154,11 +154,20 @@ describe("scanner fails toward unknown", () => {
       `const tmpl = \`a${slash}b \${1}\`;`,
       `// comment ${slash}`,
       `/* block ${slash} */`,
-      `const re = /${slash}w/;`,
       "afterEach(() => { vi.restoreAllMocks(); });",
       "",
     ].join("\n");
     expect(judge(safe)).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
+
+    const re = [
+      'import { vi } from "vitest";',
+      `const re = /${slash}w/;`,
+      "afterEach(() => { vi.restoreAllMocks(); });",
+      "",
+    ].join("\n");
+    const reResult = judge(re);
+    expect(reResult.status).not.toBe("applicable");
+    expect(reResult).toMatchObject({ status: "unknown", reason: "parse_failed" });
   });
 
   it("keeps the B1-B4 examples non-applicable inside the target block", () => {

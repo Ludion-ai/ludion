@@ -2,6 +2,8 @@
  *  Comments and string or template text are removed. `${...}` expressions stay.
  *  Brace ids follow source `{` `}` pairs, so an object literal is its own block.
  *  `already_fixed` compares those ids (innermost pair).
+ *  A backslash in code, `with (`, or bare `eval` is an error. A use of a name
+ *  other than the receiver of `name.a.b(` is unmodeled.
  */
 
 export type CallSite = { recv: string; members: string[]; line: number; braceId: number; tok: number };
@@ -13,7 +15,7 @@ export type Analysis = {
   calls: CallSite[];
   bindings: Binding[];
   shadows: Shadow[];
-  /** Receiver uses the scanner cannot bind: optional chain or computed member. */
+  /** Uses the scanner cannot bind. `tok` -1 is a hoisted `var` or a global-object access. */
   unmodeled: Array<{ name: string; tok: number }>;
 };
 
@@ -124,7 +126,11 @@ function tokenize(src: string): TokResult {
       continue;
     }
 
-    if (c === " " || c === "\t" || c === "\n" || c === "\r" || c === "\f") {
+    // `\u0076i` is still the identifier `vi`. A backslash in code cannot be modeled.
+    if (c === "\\") return fail("backslash in code");
+
+    // JS whitespace includes NBSP, U+FEFF and U+2028. It must not glue onto an identifier.
+    if (/\s/.test(c)) {
       take(1);
       continue;
     }
@@ -182,7 +188,7 @@ function tokenize(src: string): TokResult {
       const start = i;
       const startLine = line;
       let j = i + 1;
-      while (j < src.length && /[A-Za-z0-9_$]/.test(src[j] ?? "")) j++;
+      while (j < src.length && (/[A-Za-z0-9_$]/.test(src[j] ?? "") || (src.charCodeAt(j) > 127 && !/\s/.test(src[j] ?? "")))) j++;
       const s = src.slice(start, j);
       push({ k: "ident", s, line: startLine });
       take(j - start);
@@ -249,6 +255,26 @@ function same(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && a.every((x, i) => x === b[i]);
 }
 
+function longer(members: readonly string[], prefix: readonly string[]): boolean {
+  return prefix.length > 0 && members.length > prefix.length && prefix.every((part, index) => members[index] === part);
+}
+
+type ChainShape = "exact" | "longer" | "no";
+
+function chainShape(
+  kind: Binding["kind"],
+  imported: string,
+  members: readonly string[],
+  target: { export: string; member: readonly string[] },
+): ChainShape {
+  const path = kind === "namespace" ? members.slice(1) : members;
+  if (kind === "namespace" && members[0] !== target.export) return "no";
+  if (kind === "named" && imported !== target.export) return "no";
+  if (same(path, target.member)) return "exact";
+  if (longer(path, target.member)) return "longer";
+  return "no";
+}
+
 export function resolveTarget(
   analysis: Analysis,
   target: { module: string; export: string; member: readonly string[] },
@@ -257,7 +283,8 @@ export function resolveTarget(
   let unresolved = false;
   if (analysis.error) return { matches, unresolved };
   for (const access of analysis.unmodeled) {
-    const covered = analysis.shadows.some((s) => s.name === access.name && access.tok >= s.from && access.tok < s.to);
+    // tok -1 is hoisted `var` or `globalThis.vi`. The declaration's own shadow must not hide it.
+    const covered = access.tok >= 0 && analysis.shadows.some((s) => s.name === access.name && access.tok >= s.from && access.tok < s.to);
     if (covered) continue;
     const live = analysis.bindings.some((b) => {
       if (b.local !== access.name || b.module !== target.module) return false;
@@ -272,37 +299,44 @@ export function resolveTarget(
     const live = analysis.bindings.filter((b) => b.local === call.recv && b.module === target.module && !covered);
     let matched = false;
     for (const b of live) {
-      const hit = b.kind === "namespace"
-        ? call.members[0] === target.export && same(call.members.slice(1), target.member)
-        : b.imported === target.export && same(call.members, target.member);
-      if (!hit) continue;
+      const shape = chainShape(b.kind, b.imported, call.members, target);
+      // `vi.restoreAllMocks.apply(` starts with the target and is longer. It is not a match.
+      if (shape === "longer") unresolved = true;
+      if (shape !== "exact") continue;
       matches.push({ line: call.line, via: b.kind === "namespace" ? "import" : b.via, braceId: call.braceId });
       matched = true;
       break;
     }
     if (matched) continue;
-    const exportShape = call.recv === target.export && same(call.members, target.member);
-    const shadowedBinding = covered && analysis.bindings.some((b) => {
+    const exportExact = call.recv === target.export && same(call.members, target.member);
+    const exportLonger = call.recv === target.export && longer(call.members, target.member);
+    const shadowed = covered && analysis.bindings.some((b) => {
       if (b.local !== call.recv || b.module !== target.module) return false;
-      if (b.kind === "namespace") return call.members[0] === target.export && same(call.members.slice(1), target.member);
-      return b.imported === target.export && same(call.members, target.member);
+      return chainShape(b.kind, b.imported, call.members, target) === "exact";
     });
-    if (exportShape || shadowedBinding) unresolved = true;
+    const shadowedLonger = covered && analysis.bindings.some((b) => {
+      if (b.local !== call.recv || b.module !== target.module) return false;
+      return chainShape(b.kind, b.imported, call.members, target) === "longer";
+    });
+    if (exportExact || exportLonger || shadowed || shadowedLonger) unresolved = true;
   }
   return { matches, unresolved };
 }
 
-function readPattern(tokens: Token[], i: number): { names: string[]; next: number } {
+type Pattern = { names: string[]; at: number[]; next: number };
+
+function readPattern(tokens: Token[], i: number): Pattern {
   const t = tokens[i];
-  if (!t) return { names: [], next: i };
-  if (t.k === "ident") return { names: [t.s], next: i + 1 };
+  if (!t) return { names: [], at: [], next: i };
+  if (t.k === "ident") return { names: [t.s], at: [i], next: i + 1 };
   if (t.s === "{") return readObjectPattern(tokens, i);
   if (t.s === "[") return readArrayPattern(tokens, i);
-  return { names: [], next: i };
+  return { names: [], at: [], next: i };
 }
 
-function readObjectPattern(tokens: Token[], i: number): { names: string[]; next: number } {
+function readObjectPattern(tokens: Token[], i: number): Pattern {
   const names: string[] = [];
+  const at: number[] = [];
   let j = i + 1;
   while (j < tokens.length && tokens[j]?.s !== "}") {
     const t = tokens[j];
@@ -314,29 +348,36 @@ function readObjectPattern(tokens: Token[], i: number): { names: string[]; next:
       j++;
       if (tokens[j]?.k === "ident") {
         names.push(tokens[j]!.s);
+        at.push(j);
         j++;
       }
       continue;
     }
     if (t.k === "ident" || t.k === "str") {
+      const keyAt = j;
       j++;
       if (tokens[j]?.s === ":") {
         j++;
         const inner = readPattern(tokens, j);
         names.push(...inner.names);
+        at.push(...inner.at);
         j = inner.next;
-      } else if (t.k === "ident") names.push(t.s);
+      } else if (t.k === "ident") {
+        names.push(t.s);
+        at.push(keyAt);
+      }
       if (tokens[j]?.s === "=") j = skipExpr(tokens, j + 1);
       continue;
     }
     j++;
   }
   if (tokens[j]?.s === "}") j++;
-  return { names, next: j };
+  return { names, at, next: j };
 }
 
-function readArrayPattern(tokens: Token[], i: number): { names: string[]; next: number } {
+function readArrayPattern(tokens: Token[], i: number): Pattern {
   const names: string[] = [];
+  const at: number[] = [];
   let j = i + 1;
   while (j < tokens.length && tokens[j]?.s !== "]") {
     const t = tokens[j];
@@ -351,11 +392,12 @@ function readArrayPattern(tokens: Token[], i: number): { names: string[]; next: 
       continue;
     }
     names.push(...inner.names);
+    at.push(...inner.at);
     j = inner.next;
     if (tokens[j]?.s === "=") j = skipExpr(tokens, j + 1);
   }
   if (tokens[j]?.s === "]") j++;
-  return { names, next: j };
+  return { names, at, next: j };
 }
 
 function skipExpr(tokens: Token[], i: number): number {
@@ -404,8 +446,9 @@ function finishPattern(tokens: Token[], i: number): number {
   return i;
 }
 
-function readParams(tokens: Token[], parenIndex: number): { names: string[]; after: number } {
+function readParams(tokens: Token[], parenIndex: number): { names: string[]; at: number[]; after: number } {
   const names: string[] = [];
+  const at: number[] = [];
   let i = parenIndex + 1;
   let depth = 1;
   let expect = true;
@@ -445,36 +488,44 @@ function readParams(tokens: Token[], parenIndex: number): { names: string[]; aft
     if (expect && (t.s === "{" || t.s === "[")) {
       const pat = readPattern(tokens, i);
       names.push(...pat.names);
+      at.push(...pat.at);
       i = pat.next;
       expect = false;
       continue;
     }
     if (expect && t.k === "ident") {
       names.push(t.s);
+      at.push(i);
       expect = false;
       i++;
       continue;
     }
     i++;
   }
-  return { names, after: Math.min(tokens.length, i + 1) };
+  return { names, at, after: Math.min(tokens.length, i + 1) };
 }
 
-function paramsBeforeArrow(tokens: Token[], arrow: number): string[] {
+function paramsBeforeArrow(tokens: Token[], arrow: number): { names: string[]; at: number[] } {
   const prev = tokens[arrow - 1];
-  if (!prev) return [];
-  if (prev.k === "ident") return prev.s === "async" ? [] : [prev.s];
-  if (prev.s !== ")") return [];
+  if (!prev) return { names: [], at: [] };
+  if (prev.k === "ident") {
+    if (prev.s === "async") return { names: [], at: [] };
+    return { names: [prev.s], at: [arrow - 1] };
+  }
+  if (prev.s !== ")") return { names: [], at: [] };
   let p = 0;
   for (let j = arrow - 1; j >= 0; j--) {
     const s = tokens[j]?.s;
     if (s === ")") p++;
     else if (s === "(") {
       p--;
-      if (p === 0) return readParams(tokens, j).names;
+      if (p === 0) {
+        const params = readParams(tokens, j);
+        return { names: params.names, at: params.at };
+      }
     }
   }
-  return [];
+  return { names: [], at: [] };
 }
 
 function statementStart(tokens: Token[], i: number): boolean {
@@ -496,6 +547,7 @@ function isForHead(tokens: Token[], constIndex: number): boolean {
 function collectCalls(tokens: Token[], i: number, braceId: number, calls: CallSite[]) {
   const t = tokens[i];
   // `V.vi.restoreAllMocks(` is one call. The `vi` after `.` is not a second receiver.
+  // A longer chain (`vi.restoreAllMocks.apply(`) is kept whole so resolveTarget can reject it.
   if (t?.k !== "ident" || tokens[i - 1]?.s === ".") return;
   const members: string[] = [];
   let j = i + 1;
@@ -507,7 +559,7 @@ function collectCalls(tokens: Token[], i: number, braceId: number, calls: CallSi
   calls.push({ recv: t.s, members, line: t.line, braceId, tok: i });
 }
 
-function bindingsFrom(tokens: Token[]): Binding[] {
+function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
   const bindings: Binding[] = [];
   for (let i = 0; i < tokens.length; i++) {
     if (tokens[i]?.s !== "import") continue;
@@ -543,14 +595,19 @@ function bindingsFrom(tokens: Token[]): Binding[] {
           j++;
           continue;
         }
+        const importedAt = j;
         j++;
         let local = importedTok.s;
         let alias = false;
+        let localAt = importedAt;
         if (tokens[j]?.s === "as" && tokens[j + 1]?.k === "ident") {
           alias = true;
           local = tokens[j + 1]!.s;
+          localAt = j + 1;
           j += 2;
         }
+        bound.add(importedAt);
+        bound.add(localAt);
         named.push({ imported: importedTok.s, local, alias, typeOnly: specType });
       }
       if (tokens[j]?.s === "}") j++;
@@ -559,10 +616,12 @@ function bindingsFrom(tokens: Token[]): Binding[] {
       j++;
       if (tokens[j]?.s !== "as" || tokens[j + 1]?.k !== "ident") continue;
       namespace = tokens[j + 1]!.s;
+      bound.add(j + 1);
       j += 2;
     } else if (tokens[j]?.s === "{") readNamed();
     else if (tokens[j]?.k === "ident") {
       defaultName = tokens[j]!.s;
+      bound.add(j);
       j++;
       if (tokens[j]?.s === ",") {
         j++;
@@ -570,6 +629,7 @@ function bindingsFrom(tokens: Token[]): Binding[] {
           j++;
           if (tokens[j]?.s === "as" && tokens[j + 1]?.k === "ident") {
             namespace = tokens[j + 1]!.s;
+            bound.add(j + 1);
             j += 2;
           }
         } else readNamed();
@@ -674,7 +734,7 @@ function modifierContinues(t: Token | undefined): boolean {
 }
 
 /** Method `name(params) {` at an object or class member. `resume` is the body `{`. */
-function methodParamsAt(tokens: Token[], i: number): { names: string[]; resume: number } | null {
+function methodParamsAt(tokens: Token[], i: number): { names: string[]; at: number[]; nameAt: number; resume: number } | null {
   let j = i;
   const leading = new Set(["static", "public", "private", "protected", "readonly", "override", "abstract", "declare", "async"]);
   while (j < tokens.length) {
@@ -684,32 +744,61 @@ function methodParamsAt(tokens: Token[], i: number): { names: string[]; resume: 
   }
   if (tokens[j]?.s === "*" && modifierContinues(tokens[j + 1])) j++;
   if ((tokens[j]?.s === "get" || tokens[j]?.s === "set") && isPropName(tokens[j + 1])) j++;
+  let nameAt = -1;
   if (tokens[j]?.s === "[") j = skipBracket(tokens, j);
-  else if (isPropName(tokens[j])) j++;
-  else return null;
+  else if (isPropName(tokens[j])) {
+    nameAt = j;
+    j++;
+  } else return null;
   if (tokens[j]?.s === "<") j = skipAngles(tokens, j);
   if (tokens[j]?.s !== "(") return null;
   const params = readParams(tokens, j);
   let k = params.after;
   if (tokens[k]?.s === ":") k = skipType(tokens, k + 1);
   if (tokens[k]?.s !== "{") return null;
-  return { names: params.names, resume: k };
+  return { names: params.names, at: params.at, nameAt, resume: k };
 }
 
-function noteUnmodeled(tokens: Token[], i: number, unmodeled: Array<{ name: string; tok: number }>): void {
-  const t = tokens[i];
-  if (t?.k !== "ident") return;
-  if (tokens[i - 1]?.s === "." || tokens[i - 1]?.s === "?.") return;
-  const next = tokens[i + 1];
-  if (!next) return;
-  if (next.s === "?." || next.s === "[") {
-    unmodeled.push({ name: t.s, tok: i });
+const GLOBAL_OBJECTS = new Set(["globalThis", "global", "window", "self"]);
+
+function isMemberCallReceiver(tokens: Token[], i: number): boolean {
+  let j = i + 1;
+  if (tokens[j]?.s !== ".") return false;
+  while (tokens[j]?.s === "." && tokens[j + 1]?.k === "ident") j += 2;
+  return tokens[j]?.s === "(";
+}
+
+function noteGlobalAccess(tokens: Token[], i: number, unmodeled: Array<{ name: string; tok: number }>): void {
+  const op = tokens[i + 1]?.s;
+  if (op === "." || op === "?.") {
+    const prop = tokens[i + 2];
+    if (prop?.k === "ident") unmodeled.push({ name: prop.s, tok: -1 });
+    if (op === "?." && prop?.s === "[" && tokens[i + 3]?.k === "str") unmodeled.push({ name: tokens[i + 3]!.s, tok: -1 });
     return;
   }
-  if (next.s !== ".") return;
-  let j = i + 1;
-  while (tokens[j]?.s === "." && tokens[j + 1]?.k === "ident") j += 2;
-  if (tokens[j]?.s === "?." || tokens[j]?.s === "[") unmodeled.push({ name: t.s, tok: i });
+  if (op === "[" && tokens[i + 2]?.k === "str") unmodeled.push({ name: tokens[i + 2]!.s, tok: -1 });
+}
+
+/** Value uses, `eval`, and `with (`. Import specifiers and declaration names are not uses. */
+function collectRisks(
+  tokens: Token[],
+  bound: ReadonlySet<number>,
+  methodNames: ReadonlySet<number>,
+): { error?: string; unmodeled: Array<{ name: string; tok: number }> } {
+  const unmodeled: Array<{ name: string; tok: number }> = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t?.k !== "ident") continue;
+    const prev = tokens[i - 1]?.s;
+    const afterDot = prev === "." || prev === "?.";
+    if (!afterDot && t.s === "eval") return { error: "eval", unmodeled };
+    // `obj = { with(x) {} }` is a method. `with (x)` in a block is the statement.
+    if (!afterDot && t.s === "with" && tokens[i + 1]?.s === "(" && !methodNames.has(i)) return { error: "with", unmodeled };
+    if (!afterDot && GLOBAL_OBJECTS.has(t.s)) noteGlobalAccess(tokens, i, unmodeled);
+    if (afterDot || bound.has(i) || isMemberCallReceiver(tokens, i)) continue;
+    unmodeled.push({ name: t.s, tok: i });
+  }
+  return { unmodeled };
 }
 
 export function analyze(source: string): Analysis {
@@ -718,7 +807,9 @@ export function analyze(source: string): Analysis {
   const tokens = toked.tokens;
   const calls: CallSite[] = [];
   const shadows: Shadow[] = [];
-  const unmodeled: Array<{ name: string; tok: number }> = [];
+  const hoisted: Array<{ name: string; tok: number }> = [];
+  const bound = new Set<number>();
+  const methodNames = new Set<number>();
   const open: Array<{ name: string; from: number; depth: number }> = [];
   const frameStarts = [0];
   const braceStack = [0];
@@ -730,6 +821,15 @@ export function analyze(source: string): Analysis {
   let pendingParams: string[] | null = null;
   let pendingLoop: string[] | null = null;
   let decl: { depth: number; paren: number; bracket: number } | null = null;
+  let openVar: boolean = false;
+
+  const remember = (indexes: readonly number[]) => {
+    for (const index of indexes) bound.add(index);
+  };
+  // `var` is function-hoisted. A shadow that starts at the keyword would hide the use before it.
+  const noteVar = (names: readonly string[]) => {
+    for (const name of names) hoisted.push({ name, tok: -1 });
+  };
 
   const declare = (name: string, from: number, at = depth) => open.push({ name, from, depth: at });
   const closeDeeperThan = (d: number, to: number) => {
@@ -763,7 +863,10 @@ export function analyze(source: string): Analysis {
       braceStack.pop();
       frameStarts.pop();
       if (kindStack.length > 1) kindStack.pop();
-      if (decl && depth < decl.depth) decl = null;
+      if (decl && depth < decl.depth) {
+        decl = null;
+        openVar = false;
+      }
       continue;
     }
     if (t.s === "(") {
@@ -782,17 +885,23 @@ export function analyze(source: string): Analysis {
       if (bracket > 0) bracket--;
       continue;
     }
-    if (t.s === ";" && decl) decl = null;
+    if (t.s === ";" && decl) {
+      decl = null;
+      openVar = false;
+    }
     if (t.s === "=>") {
       const params = paramsBeforeArrow(tokens, i);
-      if (tokens[i + 1]?.s === "{") pendingParams = params;
+      remember(params.at);
+      if (tokens[i + 1]?.s === "{") pendingParams = params.names;
       else {
         const end = skipExpr(tokens, i + 1);
-        for (const name of params) shadows.push({ name, from: i, to: end });
+        for (const name of params.names) shadows.push({ name, from: i, to: end });
       }
     }
     if ((t.s === "const" || t.s === "let" || t.s === "var") && isForHead(tokens, i)) {
       const pat = readPattern(tokens, i + 1);
+      remember(pat.at);
+      if (t.s === "var") noteVar(pat.names);
       let j = finishPattern(tokens, pat.next);
       let p = 0;
       while (j < tokens.length) {
@@ -819,6 +928,9 @@ export function analyze(source: string): Analysis {
     const continueDecl = decl !== null && decl.depth === depth && decl.paren === paren && decl.bracket === bracket && t.s === ",";
     if ((declToken && statementStart(tokens, i) && tokens[i + 1] && tokens[i + 1]?.s !== ":") || continueDecl) {
       const pat = readPattern(tokens, declToken ? i + 1 : i + 1);
+      remember(pat.at);
+      if (declToken) openVar = t.s === "var";
+      if (openVar) noteVar(pat.names);
       for (const name of pat.names) declare(name, i);
       i = Math.max(i, finishPattern(tokens, pat.next) - 1);
       decl = { depth, paren, bracket };
@@ -826,6 +938,7 @@ export function analyze(source: string): Analysis {
     }
     if (t.s === "catch" && tokens[i + 1]?.s === "(") {
       const params = readParams(tokens, i + 1);
+      remember(params.at);
       pendingParams = params.names;
       i = params.after - 1;
       continue;
@@ -837,6 +950,8 @@ export function analyze(source: string): Analysis {
     if (atMember && (kindHere === "object" || kindHere === "class") && methodStart) {
       const method = methodParamsAt(tokens, i);
       if (method) {
+        remember(method.at);
+        if (method.nameAt >= 0) methodNames.add(method.nameAt);
         pendingParams = method.names;
         i = method.resume - 1;
         continue;
@@ -847,6 +962,7 @@ export function analyze(source: string): Analysis {
       if (tokens[j]?.s === "*") j++;
       if (tokens[j]?.k === "ident" && (tokens[j + 1]?.s === "(" || tokens[j + 1]?.s === "<")) {
         declare(tokens[j]!.s, frameStarts[frameStarts.length - 1] ?? 0);
+        bound.add(j);
         j++;
       }
       if (tokens[j]?.s === "<") {
@@ -865,17 +981,23 @@ export function analyze(source: string): Analysis {
       }
       if (tokens[j]?.s === "(") {
         const params = readParams(tokens, j);
+        remember(params.at);
         pendingParams = params.names;
         i = Math.max(i, params.after - 1);
       }
       continue;
     }
-    if (t.s === "class" && tokens[i + 1]?.k === "ident") declare(tokens[i + 1]!.s, i);
-    noteUnmodeled(tokens, i, unmodeled);
+    if (t.s === "class" && tokens[i + 1]?.k === "ident") {
+      declare(tokens[i + 1]!.s, i);
+      bound.add(i + 1);
+    }
     collectCalls(tokens, i, braceStack[braceStack.length - 1] ?? 0, calls);
   }
   closeDeeperThan(-1, tokens.length);
-  return { calls, bindings: bindingsFrom(tokens), shadows, unmodeled };
+  const bindings = bindingsFrom(tokens, bound);
+  const risks = collectRisks(tokens, bound, methodNames);
+  if (risks.error) return { error: risks.error, calls: [], bindings: [], shadows: [], unmodeled: [] };
+  return { calls, bindings, shadows, unmodeled: [...hoisted, ...risks.unmodeled] };
 }
 
 type Val =

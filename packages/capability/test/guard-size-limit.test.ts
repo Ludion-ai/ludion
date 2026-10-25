@@ -22,8 +22,8 @@ function padTo(head: string, bytes: number, unit = "a"): string {
 }
 
 describe("guard input size limit", () => {
-  it("is 256 KiB", () => {
-    expect(MAX_GUARD_FILE_BYTES).toBe(262_144);
+  it("is 64 KiB", () => {
+    expect(MAX_GUARD_FILE_BYTES).toBe(65_536);
   });
 
   it("still scans a target file of exactly the limit", () => {

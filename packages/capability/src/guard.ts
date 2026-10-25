@@ -15,8 +15,8 @@ export type GuardInput = {
   similarity?: number;
 };
 
-/** Largest target file the guard scans, in UTF-8 bytes (256 KiB). A larger file makes the result unknown/parse_failed without scanning. */
-export const MAX_GUARD_FILE_BYTES = 262_144;
+/** Largest target file the guard scans, in UTF-8 bytes (64 KiB). A larger file makes the result unknown/parse_failed without scanning. */
+export const MAX_GUARD_FILE_BYTES = 65_536;
 
 /** UTF-8 byte length of `text` (as Buffer.byteLength counts it), stopping early once it passes `limit`. */
 function utf8BytesUpTo(text: string, limit: number): number {
@@ -260,6 +260,11 @@ function evaluateConfigs(structure: readonly StructureConditionT[], files: Recor
         return unknown("config_not_static", `${path} is not a static config object`, checks);
       }
       if (read.kind === "absent") continue;
+      // Only a single boolean literal is modeled. `1`, `"yes"` and the like are not read as a match.
+      if (typeof read.value !== "boolean") {
+        checks.push(check(label, null, path));
+        return unknown("config_not_static", `${path}: ${condition.key} is not a boolean literal`, checks);
+      }
       saw = true;
       if (read.value === condition.inapplicable_if) excluding = true;
     }

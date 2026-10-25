@@ -123,17 +123,18 @@ describe("scanner fails toward unknown", () => {
     }
   });
 
-  it("keeps the applicable and alias fixtures applicable", () => {
+  it("keeps the applicable fixture applicable; alias and same-name declarations are unknown", () => {
     expect(judge(applicableTest)).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
-    expect(judge(aliasTest)).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
+    // Allowlist: an alias, or any other declaration of `vi` in the file, is outside the accepted shape.
+    expect(judge(aliasTest)).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
     expect(judge(withExtra("vi.fn();"))).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
     expect(judge(withExtra("var n = 1;"))).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
     expect(judge(withExtra("function g(xs) { for (let vi of xs) {} }"))).toMatchObject({
-      status: "applicable",
-      reason: "all_conditions_met",
+      status: "unknown",
+      reason: "binding_unresolved",
     });
-    expect(judge(withExtra("const f = (vi) => 1;"))).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
-    expect(judge(withExtra("class C { m(vi) { return 1; } }"))).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
+    expect(judge(withExtra("const f = (vi) => 1;"))).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
+    expect(judge(withExtra("class C { m(vi) { return 1; } }"))).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
     expect(judge(withExtra("const obj = {}; obj.eval(); obj.with(1);"))).toMatchObject({
       status: "applicable",
       reason: "all_conditions_met",
@@ -144,8 +145,9 @@ describe("scanner fails toward unknown", () => {
     });
     expect(judge(`${head}// eval(\n/* with (x) {} */\n`)).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
 
+    // Allowlist: non-ASCII characters in code are not modeled.
     const nonAscii = withExtra("vi\u00e9.restoreAllMocks();");
-    expect(judge(nonAscii)).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
+    expect(judge(nonAscii)).toMatchObject({ status: "unknown", reason: "parse_failed" });
 
     const slash = "\\";
     const safe = [
@@ -188,12 +190,12 @@ describe("scanner fails toward unknown", () => {
     expect(escaped).toMatchObject({ status: "unknown", reason: "parse_failed" });
   });
 
-  it("treats Unicode whitespace as whitespace, not identifier text", () => {
+  it("refuses Unicode whitespace in code (allowlist), but accepts a leading BOM", () => {
     for (const ws of ["\u00a0", "\ufeff", "\u2028", "\u3000"]) {
       const src = ['import { vi } from "vitest";', `afterEach(() => { vi.restoreAllMocks(); vi${ws}.clearAllMocks(); });`, ""].join("\n");
       const result = judge(src);
       expect(result.status, JSON.stringify(ws)).not.toBe("applicable");
-      expect(result, JSON.stringify(ws)).toMatchObject({ status: "inapplicable", reason: "already_fixed" });
+      expect(result, JSON.stringify(ws)).toMatchObject({ status: "unknown", reason: "parse_failed" });
     }
     expect(judge(`\ufeff${applicableTest}`)).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
   });

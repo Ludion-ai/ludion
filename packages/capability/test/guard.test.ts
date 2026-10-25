@@ -44,9 +44,8 @@ describe("evaluateGuard", () => {
   });
 
   it("distinguishes alias, local name, globals, and an existing clearAllMocks", () => {
-    const alias = judge({ files: { "src/alias.test.ts": aliasTest } });
-    expect(alias).toMatchObject({ status: "applicable", reason: "all_conditions_met" });
-    if (alias.status === "applicable") expect(alias.matches[0]?.via).toBe("alias");
+    // Allowlist: an aliased import is outside the accepted shape, so it is unknown, not applicable.
+    expect(judge({ files: { "src/alias.test.ts": aliasTest } })).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
 
     expect(judge({ files: { "src/local.test.ts": localFunctionTest } })).toMatchObject({ status: "inapplicable", reason: "target_absent" });
     expect(judge({ files: { "src/global.test.ts": globalsTest } })).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
@@ -92,7 +91,7 @@ describe("evaluateGuard", () => {
     expect(judge({ files: { ...applicableFiles(), "src/sub/b.test.ts": applicableTest } }).status).toBe("applicable");
   });
 
-  it("resolves a namespace import and rejects a shadowed or type-only binding", () => {
+  it("refuses a namespace import and rejects a shadowed or type-only binding", () => {
     const ns = [
       'import * as V from "vitest";',
       "afterEach(() => {",
@@ -100,8 +99,8 @@ describe("evaluateGuard", () => {
       "});",
       "",
     ].join("\n");
-    const result = judge({ files: { "src/ns.test.ts": ns } });
-    expect(result.status).toBe("applicable");
+    // Allowlist: a namespace import is outside the accepted shape.
+    expect(judge({ files: { "src/ns.test.ts": ns } })).toMatchObject({ status: "unknown", reason: "binding_unresolved" });
 
     const typed = [
       'import type { vi } from "vitest";',
@@ -149,7 +148,8 @@ describe("evaluateGuard", () => {
       "};",
       "",
     ].join("\n");
-    expect(judge({ files: { ...applicableFiles(), "vite.config.ts": plain } })).toMatchObject({ status: "inapplicable", reason: "config_excludes" });
+    // Allowlist: only `export default defineConfig({...})` is read. A plain object export is not-static.
+    expect(judge({ files: { ...applicableFiles(), "vite.config.ts": plain } })).toMatchObject({ status: "unknown", reason: "config_not_static" });
     expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": functionConfig } })).toMatchObject({
       status: "unknown",
       reason: "config_not_static",
@@ -206,11 +206,17 @@ describe("evaluateGuard", () => {
       "export default { test };",
       "",
     ].join("\n");
-    for (const source of [computed, computedIdent, dupOuter, dupInner, shorthand]) {
-      expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": source } })).toMatchObject({
-        status: "unknown",
-        reason: "config_not_static",
-      });
+    // The same objects inside the accepted `defineConfig({...})` shape are still not-static.
+    const wrap = (source: string) =>
+      'import { defineConfig } from "vitest/config";\n' +
+      source.replace("export default {", "export default defineConfig({").replace(/\};\n?$/, "});\n").replace("export default { test };", "export default defineConfig({ test });");
+    for (const source of [computed, computedIdent, dupOuter, dupInner, shorthand, spread]) {
+      for (const variant of [source, wrap(source)]) {
+        expect(judge({ files: { ...applicableFiles(), "vitest.config.ts": variant } }), variant).toMatchObject({
+          status: "unknown",
+          reason: "config_not_static",
+        });
+      }
     }
   });
 

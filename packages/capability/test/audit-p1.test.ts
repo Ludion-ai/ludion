@@ -147,10 +147,11 @@ describe("audit P1 regressions", () => {
       reason: "config_excludes",
     });
 
+    // Allowlist: a plain object default export is outside the accepted shape.
     const plain = ["export default {", "  test: { clearMocks: true },", "};", ""].join("\n");
     expect(judge({ ...applicableFiles(), "vitest.config.ts": plain })).toMatchObject({
-      status: "inapplicable",
-      reason: "config_excludes",
+      status: "unknown",
+      reason: "config_not_static",
     });
   });
 

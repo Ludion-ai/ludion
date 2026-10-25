@@ -3,8 +3,8 @@ import { chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { evaluateGuard, executeProgram, PINNED_VERSION_SET } from "../src/index.ts";
-import { exampleArtifact, guardInput, reseal } from "./fixtures.ts";
+import { executeProgram, PINNED_VERSION_SET } from "../src/index.ts";
+import { applicableTest, CONTRACT_ID, exampleArtifact, reseal } from "./fixtures.ts";
 
 const RESOLVED_VERSIONS = { vitest: PINNED_VERSION_SET.vitest, vite: PINNED_VERSION_SET.vite };
 const NODE_VERSION = "v24.8.0";
@@ -52,7 +52,7 @@ function workCopy(): { root: string; target: string; other: string; originalOthe
   const target = join(root, "src", "a.test.ts");
   const other = join(root, "src", "other.ts");
   const originalOther = "export const other = 1;\n";
-  writeFileSync(target, "export const a = 1;\n");
+  writeFileSync(target, applicableTest);
   writeFileSync(other, originalOther);
   chmodSync(root, 0o777);
   chmodSync(join(root, "src"), 0o777);
@@ -66,11 +66,9 @@ describe.skipIf(process.env.LUDION_DOCKER_TESTS !== "1")("program executor in Do
     const work = workCopy();
     try {
       const record = programRecord(PROGRAM, 60_000);
-      const guard = evaluateGuard(record, guardInput());
-      expect(guard.status).toBe("applicable");
       const result = await executeProgram({
         record,
-        guard,
+        contract_id: CONTRACT_ID,
         workDir: work.root,
         resolved_versions: RESOLVED_VERSIONS,
         node_version: NODE_VERSION,
@@ -79,7 +77,11 @@ describe.skipIf(process.env.LUDION_DOCKER_TESTS !== "1")("program executor in Do
       if (result.outcome !== "executed") return;
       expect(result.evidence.timed_out).toBe(false);
       expect(result.changed_files).toEqual(["src/a.test.ts"]);
-      expect(readFileSync(work.target, "utf8").startsWith("// changed\n")).toBe(true);
+      // The container wrote to the executor's private snapshot; the caller's tree is untouched.
+      expect(result.evidence.diff).toHaveLength(1);
+      expect(result.evidence.diff[0]?.after).toBe(`// changed\n${applicableTest}`);
+      expect(result.guard.status).toBe("applicable");
+      expect(readFileSync(work.target, "utf8")).toBe(applicableTest);
       expect(readFileSync(work.other, "utf8")).toBe(work.originalOther);
       const report = JSON.parse(result.evidence.stdout_tail) as { other: string; escape: string; net: string };
       expect(report.other.startsWith("blocked")).toBe(true);
@@ -94,11 +96,9 @@ describe.skipIf(process.env.LUDION_DOCKER_TESTS !== "1")("program executor in Do
     const work = workCopy();
     try {
       const record = programRecord("setInterval(() => {}, 1000);\n", 2_000);
-      const guard = evaluateGuard(record, guardInput());
-      expect(guard.status).toBe("applicable");
       const result = await executeProgram({
         record,
-        guard,
+        contract_id: CONTRACT_ID,
         workDir: work.root,
         resolved_versions: RESOLVED_VERSIONS,
         node_version: NODE_VERSION,

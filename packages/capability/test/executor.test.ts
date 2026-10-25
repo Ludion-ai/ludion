@@ -1,8 +1,9 @@
 import { EventEmitter } from "node:events";
-import { lstatSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, linkSync, lstatSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   buildProgramDockerArgs,
   createDockerRunner,
@@ -21,7 +22,7 @@ import {
   type GuardResultT,
   type ProgramExecution,
 } from "../src/index.ts";
-import { exampleArtifact, exampleRecord, FIXTURE_IMAGE, guardInput, reseal } from "./fixtures.ts";
+import { alreadyFixedTest, applicableTest, CONTRACT_ID, exampleArtifact, exampleRecord, FIXTURE_IMAGE, globalsTest, guardInput, localFunctionTest, reseal } from "./fixtures.ts";
 
 const RESOLVED_VERSIONS = { vitest: PINNED_VERSION_SET.vitest, vite: PINNED_VERSION_SET.vite };
 const NODE_VERSION = "v24.8.0";
@@ -31,6 +32,25 @@ const NODE_VERSION = "v24.8.0";
 const symlinkProbe = probeSymlinks();
 
 const temps: string[] = [];
+
+// Vitest runs test files in parallel workers that share the OS temp directory. Give this file its own
+// temp root (os.tmpdir() reads these variables on every call) so the "no ludion-snapshot-/ludion-program-
+// directory left behind" checks only see directories created by this file.
+const savedTempEnv = { TMPDIR: process.env.TMPDIR, TMP: process.env.TMP, TEMP: process.env.TEMP };
+let privateTempRoot = "";
+beforeAll(() => {
+  privateTempRoot = realpathSync(mkdtempSync(join(tmpdir(), "ludion-testroot-")));
+  process.env.TMPDIR = privateTempRoot;
+  process.env.TMP = privateTempRoot;
+  process.env.TEMP = privateTempRoot;
+});
+afterAll(() => {
+  for (const [key, value] of Object.entries(savedTempEnv)) {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+  rmSync(privateTempRoot, { recursive: true, force: true });
+});
 
 afterEach(() => {
   for (const dir of temps.splice(0)) rmSync(dir, { recursive: true, force: true });
@@ -43,6 +63,24 @@ function keep(dir: string): string {
 
 function programDirs(): Set<string> {
   return new Set(readdirSync(tmpdir()).filter((name) => name.startsWith("ludion-program-")));
+}
+
+function snapshotDirs(): Set<string> {
+  return new Set(readdirSync(tmpdir()).filter((name) => name.startsWith("ludion-snapshot-")));
+}
+
+function newSince(before: Set<string>, now: Set<string>): string[] {
+  return [...now].filter((name) => !before.has(name));
+}
+
+/** Host path of the read-only /work mount in a docker argv. Undoes the Windows `/c/...` rewrite. */
+function mountedWork(req: DockerRunRequest): string {
+  const spec = req.args.find((arg) => arg.endsWith(":/work:ro"));
+  if (spec === undefined) throw new Error("no /work mount");
+  const source = spec.slice(0, -":/work:ro".length);
+  const drive = /^\/([a-z])\/(.*)$/.exec(source);
+  if (process.platform === "win32" && drive) return `${drive[1]!.toUpperCase()}:\\${drive[2]!.replace(/\//g, "\\")}`;
+  return source;
 }
 
 function applicableGuard(): GuardResultT {
@@ -69,7 +107,7 @@ function makeWork(): string {
   const root = keep(mkdtempSync(join(tmpdir(), "ludion-work-")));
   mkdirSync(join(root, "src"));
   mkdirSync(join(root, "test"));
-  writeFileSync(join(root, "src", "a.test.ts"), "export const a = 1;\n");
+  writeFileSync(join(root, "src", "a.test.ts"), applicableTest);
   writeFileSync(join(root, "src", "b.test.ts"), "export const b = 1;\n");
   writeFileSync(join(root, "src", "other.ts"), "export const other = 1;\n");
   return root;
@@ -248,47 +286,86 @@ describe("resolveWritableFiles", () => {
 });
 
 describe("executeProgram", () => {
-  it("does not start Docker for inapplicable, unknown, or stale guards", async () => {
-    const missed = evaluateGuard(exampleRecord(), guardInput({ files: { "src/nope.test.ts": "export const x = 1;\n" } }));
-    expect(missed.status).toBe("inapplicable");
-    const guards: GuardResultT[] = [
+  it("ignores a caller-supplied applicable guard and returns not_executed for a non-applicable tree", async () => {
+    const work = keep(mkdtempSync(join(tmpdir(), "ludion-work-")));
+    mkdirSync(join(work, "src"));
+    writeFileSync(join(work, "src", "nope.test.ts"), "export const x = 1;\n");
+    const forged = applicableGuard();
+    const callerResults: unknown[] = [
+      forged,
+      { status: "applicable" },
       { status: "inapplicable", reason: "target_absent", detail: "no target", checks: [] },
-      { status: "unknown", reason: "intent_missing", detail: "no contract", checks: [] },
-      { status: "stale", reason: "program_changed", detail: "program moved", checks: [] },
-      missed,
+      undefined,
     ];
-    for (const guard of guards) {
-      const before = programDirs();
+    for (const guard of callerResults) {
+      const beforePrograms = programDirs();
+      const beforeSnapshots = snapshotDirs();
       const runner = vi.fn<DockerRunner>(async () => {
         throw new Error("docker must not start");
       });
+      const preRepair = vi.fn(async () => {
+        throw new Error("pre-repair must not run");
+      });
       const result = await executeProgram({
-        record: exampleRecord(),
+        record: pinnedRecord(),
         guard,
-        workDir: process.cwd(),
+        contract_id: CONTRACT_ID,
+        workDir: work,
         runner,
+        preRepair,
         resolved_versions: RESOLVED_VERSIONS,
         node_version: NODE_VERSION,
       });
       expect(result).toMatchObject({
         outcome: "not_executed",
         reason: "guard_not_applicable",
-        guard_status: guard.status,
+        guard_status: "inapplicable",
+        guard: { status: "inapplicable" },
         docker_invoked: false,
+        pre_repair: null,
         model_calls: { count: 0 },
       });
       expect(result.wall_ms).toBeGreaterThanOrEqual(0);
       expect(Number.isInteger(result.wall_ms)).toBe(true);
       expect(runner).not.toHaveBeenCalled();
-      expect([...programDirs()].filter((name) => !before.has(name))).toEqual([]);
+      expect(preRepair).not.toHaveBeenCalled();
+      expect(newSince(beforePrograms, programDirs())).toEqual([]);
+      expect(newSince(beforeSnapshots, snapshotDirs())).toEqual([]);
     }
+  });
+
+  it.each([
+    ["a local restoreAllMocks function", { "src/local.test.ts": localFunctionTest }, CONTRACT_ID, "inapplicable"],
+    ["clearAllMocks already present", { "src/fixed.test.ts": alreadyFixedTest }, CONTRACT_ID, "inapplicable"],
+    ["vi without a vitest import", { "src/global.test.ts": globalsTest }, CONTRACT_ID, "unknown"],
+    ["a missing contract id", { "src/a.test.ts": applicableTest }, undefined, "unknown"],
+    ["an unrelated contract id", { "src/a.test.ts": applicableTest }, "other.contract", "inapplicable"],
+  ] as const)("evaluates the guard itself on the tree: %s is not executed", async (_name, files, contractId, _status) => {
+    const work = keep(mkdtempSync(join(tmpdir(), "ludion-work-")));
+    mkdirSync(join(work, "src"));
+    for (const [rel, text] of Object.entries(files)) writeFileSync(join(work, ...rel.split("/")), text);
+    const runner = vi.fn<DockerRunner>(async () => {
+      throw new Error("docker must not start");
+    });
+    const result = await executeProgram({
+      record: pinnedRecord(),
+      guard: applicableGuard(),
+      ...(contractId !== undefined ? { contract_id: contractId } : {}),
+      workDir: work,
+      runner,
+      resolved_versions: RESOLVED_VERSIONS,
+      node_version: NODE_VERSION,
+    });
+    const expected = evaluateGuard(pinnedRecord(), guardInput({ contract_id: contractId, files: { ...files } }));
+    expect(expected.status).not.toBe("applicable");
+    expect(result).toMatchObject({ outcome: "not_executed", reason: "guard_not_applicable", guard_status: expected.status, docker_invoked: false });
+    if (result.outcome === "not_executed") expect(result.guard?.status).toBe(expected.status);
+    expect(runner).not.toHaveBeenCalled();
   });
 
   it("runs an applicable program and reports the file it changed", async () => {
     const work = makeWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
     const stamps = [5_000, 5_600];
     let ticks = 0;
     const now = () => {
@@ -299,17 +376,25 @@ describe("executeProgram", () => {
     };
     const calls: DockerRunRequest[] = [];
     const beforeDirs = programDirs();
+    const beforeSnapshots = snapshotDirs();
+    const beforeA = applicableTest;
+    const afterA = applicableTest.replace("  vi.restoreAllMocks();", "  vi.clearAllMocks();\n  vi.restoreAllMocks();");
     const runner: DockerRunner = async (req) => {
       calls.push(req);
       const live = [...programDirs()].filter((name) => !beforeDirs.has(name));
       expect(live).toHaveLength(1);
       expect(readFileSync(join(tmpdir(), live[0]!, "insert-clear.ts"), "utf8")).toContain("vi.clearAllMocks");
-      writeFileSync(join(work, "src", "a.test.ts"), "export const a = 2;\n");
+      const mounted = mountedWork(req);
+      expect(newSince(beforeSnapshots, snapshotDirs())).toHaveLength(1);
+      expect(realpathSync(mounted)).not.toBe(realpathSync(work));
+      expect(mounted.includes("ludion-snapshot-")).toBe(true);
+      expect(readFileSync(join(mounted, "src", "a.test.ts"), "utf8")).toBe(applicableTest);
+      writeFileSync(join(mounted, "src", "a.test.ts"), afterA);
       return { kind: "exited", exitCode: 0, stdout: "done\n", stderr: "", timedOut: false };
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       now,
@@ -327,20 +412,24 @@ describe("executeProgram", () => {
     const programMount = req.args.find((arg) => arg.endsWith(":/program:ro"));
     expect(programMount).toBeDefined();
     const programDirSource = programMount?.slice(0, -":/program:ro".length) ?? "";
+    const snapshotSource = mountedWork(req);
     expect(req.args).toEqual(buildProgramDockerArgs({
       containerName: "ludion-program-apply",
       image: record.artifact.dependencies.image,
-      workDirSource: realpathSync(work),
+      workDirSource: snapshotSource,
       programDirSource,
       entry: record.artifact.program.entry,
       writableFiles: ["src/b.test.ts", "src/a.test.ts"],
     }));
-    const beforeA = "export const a = 1;\n";
-    const afterA = "export const a = 2;\n";
     const unchanged = "export const b = 1;\n";
+    const ownGuard = evaluateGuard(record, guardInput({
+      files: { "src/a.test.ts": beforeA, "src/b.test.ts": unchanged, "src/other.ts": "export const other = 1;\n" },
+    }));
+    expect(ownGuard.status).toBe("applicable");
     expect(result).toEqual({
       outcome: "executed",
       status: "ok",
+      guard: ownGuard,
       writable_files: ["src/a.test.ts", "src/b.test.ts"],
       changed_files: ["src/a.test.ts"],
       docker_args: req.args,
@@ -380,18 +469,20 @@ describe("executeProgram", () => {
       model_calls: { count: 0 },
     });
     expect([...programDirs()].filter((name) => !beforeDirs.has(name))).toEqual([]);
+    // The snapshot is gone and the caller's tree was never written.
+    expect(newSince(beforeSnapshots, snapshotDirs())).toEqual([]);
+    expect(existsSync(snapshotSource)).toBe(false);
+    expect(readFileSync(join(work, "src", "a.test.ts"), "utf8")).toBe(beforeA);
   });
 
   it("maps timeout, spawn errors, daemon failures, and non-zero exits", async () => {
     const work = makeWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
     const run = async (outcome: DockerRunOutcome) => {
       const runner: DockerRunner = async () => outcome;
       return executeProgram({
         record,
-        guard,
+        contract_id: CONTRACT_ID,
         workDir: work,
         runner,
         containerName: "ludion-program-case",
@@ -435,7 +526,7 @@ describe("executeProgram", () => {
       throw new Error("docker must not start");
     });
     const before = programDirs();
-    const base = { guard, runner, resolved_versions: RESOLVED_VERSIONS, node_version: NODE_VERSION };
+    const base = { guard, contract_id: CONTRACT_ID, runner, resolved_versions: RESOLVED_VERSIONS, node_version: NODE_VERSION };
     const invalid = await executeProgram({ ...base, record: { id: "nope" }, workDir: work });
     expect(invalid).toMatchObject({ outcome: "rejected", reason: "invalid_record", docker_invoked: false, model_calls: { count: 0 } });
     const rec = pinnedRecord();
@@ -451,7 +542,10 @@ describe("executeProgram", () => {
 });
 
 const TEST_SOURCE = [
-  'import { expect, it, test } from "vitest";',
+  'import { afterEach, expect, it, test, vi } from "vitest";',
+  "afterEach(() => {",
+  "  vi.restoreAllMocks();",
+  "});",
   'it("keeps history", () => {',
   "  expect(1).toBe(1);",
   "});",
@@ -502,12 +596,10 @@ describe("negative cases never verify", () => {
   it("empty program is executed with no changed files and evidence.no_op", async () => {
     const work = caseWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
     const runner: DockerRunner = async () => ({ kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false });
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       resolved_versions: RESOLVED_VERSIONS,
@@ -523,15 +615,13 @@ describe("negative cases never verify", () => {
   it("wrong repair records the garbage change and does not claim success", async () => {
     const work = caseWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
-    const runner: DockerRunner = async () => {
-      writeFileSync(join(work, "src", "a.test.ts"), `${TEST_SOURCE}const garbage = "unrelated";\n`);
+    const runner: DockerRunner = async (req) => {
+      writeFileSync(join(mountedWork(req), "src", "a.test.ts"), `${TEST_SOURCE}const garbage = "unrelated";\n`);
       return { kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false };
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       resolved_versions: RESOLVED_VERSIONS,
@@ -552,15 +642,13 @@ describe("negative cases never verify", () => {
   it("removing test blocks raises tests_removed", async () => {
     const work = caseWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
-    const runner: DockerRunner = async () => {
-      writeFileSync(join(work, "src", "a.test.ts"), 'import { expect } from "vitest";\nexpect(1).toBe(1);\n');
+    const runner: DockerRunner = async (req) => {
+      writeFileSync(join(mountedWork(req), "src", "a.test.ts"), 'import { expect } from "vitest";\nexpect(1).toBe(1);\n');
       return { kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false };
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       resolved_versions: RESOLVED_VERSIONS,
@@ -578,15 +666,13 @@ describe("negative cases never verify", () => {
   it("truncating a test file to empty raises tests_removed and file_emptied", async () => {
     const work = caseWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
-    const runner: DockerRunner = async () => {
-      writeFileSync(join(work, "src", "a.test.ts"), "");
+    const runner: DockerRunner = async (req) => {
+      writeFileSync(join(mountedWork(req), "src", "a.test.ts"), "");
       return { kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false };
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       resolved_versions: RESOLVED_VERSIONS,
@@ -604,10 +690,8 @@ describe("negative cases never verify", () => {
   it("adding skip, only, or todo raises skip_only_todo_added", async () => {
     const work = caseWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
-    const runner: DockerRunner = async () => {
-      writeFileSync(join(work, "src", "a.test.ts"), [
+    const runner: DockerRunner = async (req) => {
+      writeFileSync(join(mountedWork(req), "src", "a.test.ts"), [
         TEST_SOURCE,
         'it.skip("added", () => {});',
         'describe.only("focused", () => {});',
@@ -620,7 +704,7 @@ describe("negative cases never verify", () => {
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       resolved_versions: RESOLVED_VERSIONS,
@@ -638,16 +722,14 @@ describe("negative cases never verify", () => {
   it("stdout that claims VERIFIED or PASS does not become a verified status", async () => {
     const work = caseWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
     const stdout = 'VERIFIED\nPASS\n{"status":"verified"}\n';
-    const runner: DockerRunner = async () => {
-      writeFileSync(join(work, "src", "a.test.ts"), `${TEST_SOURCE}// touched\n`);
+    const runner: DockerRunner = async (req) => {
+      writeFileSync(join(mountedWork(req), "src", "a.test.ts"), `${TEST_SOURCE}// touched\n`);
       return { kind: "exited", exitCode: 0, stdout, stderr: "", timedOut: false };
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       resolved_versions: RESOLVED_VERSIONS,
@@ -665,19 +747,18 @@ describe("negative cases never verify", () => {
   });
 
   it("caps each side of a changed-file diff at 64 KiB", async () => {
-    const before = `${"a".repeat(70_000)}\n`;
+    // The guard reads at most 64 KiB per file, so an applicable "before" stays under the cap; "after" exceeds it.
+    const before = `${TEST_SOURCE}// ${"a".repeat(60_000)}\n`;
     const after = `${"あ".repeat(40_000)}\n`;
     const work = caseWork(before);
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
-    const runner: DockerRunner = async () => {
-      writeFileSync(join(work, "src", "a.test.ts"), after);
+    const runner: DockerRunner = async (req) => {
+      writeFileSync(join(mountedWork(req), "src", "a.test.ts"), after);
       return { kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false };
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       resolved_versions: RESOLVED_VERSIONS,
@@ -692,6 +773,7 @@ describe("negative cases never verify", () => {
     expect(diff).toBeDefined();
     if (diff === undefined) return;
     expect(diff.truncated).toBe(true);
+    expect(diff.before).toBe(before);
     expect(Buffer.byteLength(diff.before)).toBeLessThanOrEqual(65_536);
     expect(Buffer.byteLength(diff.after)).toBeLessThanOrEqual(65_536);
     expect(Buffer.byteLength(diff.after) % 3).toBe(0);
@@ -718,7 +800,7 @@ describe("version set", () => {
     });
     const result = await executeProgram({
       record: recordOf(),
-      guard: applicableGuard(),
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       preRepair,
@@ -742,8 +824,6 @@ describe("pre-repair", () => {
   it("runs the program when the contract test failed and records pre_repair", async () => {
     const work = makeWork();
     const record = pinnedRecord();
-    const guard = evaluateGuard(record, guardInput());
-    expect(guard.status).toBe("applicable");
     const order: string[] = [];
     const evidence = { ran: true as const, exit_code: 1, failed_tests: ["history-cleared"], passed_tests: ["spy-restored"] };
     const preRepair = async () => {
@@ -756,7 +836,7 @@ describe("pre-repair", () => {
     };
     const result = await executeProgram({
       record,
-      guard,
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       preRepair,
@@ -777,7 +857,7 @@ describe("pre-repair", () => {
     });
     const result = await executeProgram({
       record,
-      guard: evaluateGuard(record, guardInput()),
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       preRepair: async () => evidence,
@@ -804,7 +884,7 @@ describe("pre-repair", () => {
     });
     const result = await executeProgram({
       record,
-      guard: evaluateGuard(record, guardInput()),
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       preRepair: async () => evidence,
@@ -823,7 +903,7 @@ describe("pre-repair", () => {
     });
     const result = await executeProgram({
       record,
-      guard: evaluateGuard(record, guardInput()),
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       preRepair: async () => {
@@ -852,7 +932,7 @@ describe("pre-repair", () => {
     });
     const result = await executeProgram({
       record,
-      guard: evaluateGuard(record, guardInput()),
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       preRepair: async () => evidence,
@@ -876,7 +956,7 @@ describe("pre-repair", () => {
     });
     const result = await executeProgram({
       record,
-      guard: evaluateGuard(record, guardInput()),
+      contract_id: CONTRACT_ID,
       workDir: work,
       runner,
       require_pre_repair: true,
@@ -900,9 +980,10 @@ describe("pre-repair", () => {
       throw new Error("pre-repair must not run");
     });
     const result = await executeProgram({
-      record: exampleRecord(),
-      guard: { status: "inapplicable", reason: "target_absent", detail: "no target", checks: [] },
-      workDir: process.cwd(),
+      record: pinnedRecord(),
+      guard: applicableGuard(),
+      contract_id: CONTRACT_ID,
+      workDir: caseWork(localFunctionTest),
       runner,
       preRepair,
       resolved_versions: RESOLVED_VERSIONS,
@@ -910,6 +991,153 @@ describe("pre-repair", () => {
     });
     expect(result).toMatchObject({ outcome: "not_executed", reason: "guard_not_applicable", pre_repair: null, docker_invoked: false });
     expect(preRepair).not.toHaveBeenCalled();
+    expect(runner).not.toHaveBeenCalled();
+  });
+});
+
+describe("private snapshot", () => {
+  const okRun: DockerRunOutcome = { kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false };
+
+  async function runOn(work: string, runner: DockerRunner, extra: Partial<Parameters<typeof executeProgram>[0]> = {}) {
+    return executeProgram({
+      record: pinnedRecord(),
+      contract_id: CONTRACT_ID,
+      workDir: work,
+      runner,
+      resolved_versions: RESOLVED_VERSIONS,
+      node_version: NODE_VERSION,
+      ...extra,
+    });
+  }
+
+  function expectRefused(result: ProgramExecution, detail: RegExp): void {
+    expect(result).toMatchObject({ outcome: "rejected", reason: "unsafe_work_tree", docker_invoked: false, model_calls: { count: 0 } });
+    if (result.outcome === "rejected") expect(result.detail).toMatch(detail);
+  }
+
+  it("changes to the original tree after the snapshot do not reach the mount", async () => {
+    const work = makeWork();
+    const moved = `${work}-moved`;
+    keep(moved);
+    const beforeSnapshots = snapshotDirs();
+    const seen: Record<string, string | null> = {};
+    // preRepair is caller code that runs after the snapshot and the guard, and before the container.
+    const preRepair = async () => {
+      writeFileSync(join(work, "src", "a.test.ts"), "export const swapped = true;\n");
+      writeFileSync(join(work, "src", "new.test.ts"), "export const added = true;\n");
+      unlinkSync(join(work, "src", "b.test.ts"));
+      // Swap the whole directory for a different one at the same path.
+      renameSync(work, moved);
+      mkdirSync(join(work, "src"), { recursive: true });
+      writeFileSync(join(work, "src", "a.test.ts"), "export const replaced = true;\n");
+      return { ran: true as const, exit_code: 1, failed_tests: ["history-cleared"], passed_tests: [] };
+    };
+    const runner = vi.fn<DockerRunner>(async (req) => {
+      const mounted = mountedWork(req);
+      for (const rel of ["src/a.test.ts", "src/b.test.ts", "src/new.test.ts"]) {
+        const path = join(mounted, ...rel.split("/"));
+        seen[rel] = existsSync(path) ? readFileSync(path, "utf8") : null;
+      }
+      return okRun;
+    });
+    const result = await runOn(work, runner, { preRepair });
+    expect(runner).toHaveBeenCalledTimes(1);
+    expect(seen).toEqual({ "src/a.test.ts": applicableTest, "src/b.test.ts": "export const b = 1;\n", "src/new.test.ts": null });
+    expect(result).toMatchObject({ outcome: "executed", status: "ok", writable_files: ["src/a.test.ts", "src/b.test.ts"], changed_files: [] });
+    if (result.outcome === "executed") {
+      expect(result.evidence.files.map((file) => file.before_sha256)).toEqual([fileDigest(applicableTest), fileDigest("export const b = 1;\n")]);
+    }
+    expect(newSince(beforeSnapshots, snapshotDirs())).toEqual([]);
+    // The caller's (swapped) tree is left exactly as the caller left it.
+    expect(readFileSync(join(work, "src", "a.test.ts"), "utf8")).toBe("export const replaced = true;\n");
+  });
+
+  it("copies only regular files and skips node_modules and .git", async () => {
+    const work = makeWork();
+    mkdirSync(join(work, "node_modules", "pkg"), { recursive: true });
+    writeFileSync(join(work, "node_modules", "pkg", "index.js"), "module.exports = 1;\n");
+    mkdirSync(join(work, ".git"));
+    writeFileSync(join(work, ".git", "HEAD"), "ref: refs/heads/main\n");
+    mkdirSync(join(work, "docs", "deep"), { recursive: true });
+    writeFileSync(join(work, "docs", "deep", "note.md"), "note\n");
+    let listing: string[] = [];
+    const runner: DockerRunner = async (req) => {
+      const mounted = mountedWork(req);
+      const walk = (dir: string, rel: string): string[] =>
+        readdirSync(dir).sort().flatMap((name) => {
+          const childRel = rel ? `${rel}/${name}` : name;
+          return lstatSync(join(dir, name)).isDirectory() ? walk(join(dir, name), childRel) : [childRel];
+        });
+      listing = walk(mounted, "");
+      return okRun;
+    };
+    const result = await runOn(work, runner);
+    expect(result.outcome).toBe("executed");
+    expect(listing).toEqual(["docs/deep/note.md", "src/a.test.ts", "src/b.test.ts", "src/other.ts"]);
+  });
+
+  it.skipIf(!symlinkProbe.file)("refuses a file symlink anywhere in the tree and never starts Docker", async () => {
+    const outside = keep(mkdtempSync(join(tmpdir(), "ludion-outside-")));
+    writeFileSync(join(outside, "secret.txt"), "secret\n");
+    for (const rel of ["src/link.ts", "src/c.test.ts"]) {
+      const work = makeWork();
+      symlinkSync(join(outside, "secret.txt"), join(work, ...rel.split("/")));
+      const beforeSnapshots = snapshotDirs();
+      const runner = vi.fn<DockerRunner>(async () => okRun);
+      const preRepair = vi.fn(async () => ({ ran: true as const, exit_code: 1, failed_tests: ["x"], passed_tests: [] }));
+      const result = await runOn(work, runner, { preRepair });
+      expectRefused(result, new RegExp(`symlink in work tree: ${rel}`));
+      expect(runner).not.toHaveBeenCalled();
+      expect(preRepair).not.toHaveBeenCalled();
+      expect(newSince(beforeSnapshots, snapshotDirs())).toEqual([]);
+    }
+  });
+
+  it.skipIf(!symlinkProbe.junction)("refuses a directory junction or symlink in the tree", async () => {
+    const outside = keep(mkdtempSync(join(tmpdir(), "ludion-outside-")));
+    writeFileSync(join(outside, "x.test.ts"), applicableTest);
+    const work = makeWork();
+    symlinkSync(outside, join(work, "linked"), "junction");
+    const runner = vi.fn<DockerRunner>(async () => okRun);
+    const result = await runOn(work, runner);
+    expectRefused(result, /symlink in work tree: linked/);
+    expect(runner).not.toHaveBeenCalled();
+  });
+
+  it.skipIf(!symlinkProbe.junction)("skips a node_modules junction without following it", async () => {
+    const outside = keep(mkdtempSync(join(tmpdir(), "ludion-outside-")));
+    writeFileSync(join(outside, "x.test.ts"), "export const x = 1;\n");
+    const work = makeWork();
+    symlinkSync(outside, join(work, "node_modules"), "junction");
+    const runner = vi.fn<DockerRunner>(async () => okRun);
+    const result = await runOn(work, runner);
+    expect(result.outcome).toBe("executed");
+    expect(runner).toHaveBeenCalledTimes(1);
+  });
+
+  it("refuses a hardlinked write target and allows a hardlinked non-target", async () => {
+    const outside = keep(mkdtempSync(join(tmpdir(), "ludion-outside-")));
+    const target = makeWork();
+    linkSync(join(target, "src", "b.test.ts"), join(outside, "b-alias.ts"));
+    expect(lstatSync(join(target, "src", "b.test.ts")).nlink).toBe(2);
+    const runner = vi.fn<DockerRunner>(async () => okRun);
+    const refused = await runOn(target, runner);
+    expectRefused(refused, /hardlinked write target \(nlink 2\): src\/b\.test\.ts/);
+    expect(runner).not.toHaveBeenCalled();
+
+    const other = makeWork();
+    linkSync(join(other, "src", "other.ts"), join(outside, "other-alias.ts"));
+    const allowed = await runOn(other, runner);
+    expect(allowed.outcome).toBe("executed");
+    expect(runner).toHaveBeenCalledTimes(1);
+  });
+
+  it.skipIf(process.platform === "win32")("refuses a FIFO in the tree without opening it", async () => {
+    const work = makeWork();
+    execFileSync("mkfifo", [join(work, "src", "pipe.test.ts")]);
+    const runner = vi.fn<DockerRunner>(async () => okRun);
+    const result = await runOn(work, runner);
+    expectRefused(result, /not a regular file: src\/pipe\.test\.ts/);
     expect(runner).not.toHaveBeenCalled();
   });
 });

@@ -1,21 +1,41 @@
 // Program executor. Isolation boundary: a capability program runs only inside Docker,
 // with the network off, a read-only root, all capabilities dropped, and a non-root user.
-// The host work copy is mounted read-only. Only existing files matched by
-// program.effects.writes are bind-mounted read-write over that tree. New files are
-// not supported. The guard must already be applicable; any other status returns
-// not_executed and does not start Docker. This module never calls a model.
+// The executor copies the caller's work tree into its own fresh private temp directory
+// (lstat on every entry, symlinks and non-regular files refused, nothing followed) and
+// mounts only that snapshot, read-only. Only existing snapshot files matched by
+// program.effects.writes are bind-mounted read-write over it. New files are not supported.
+// The executor evaluates the guard itself, on the snapshot it will mount. A guard result
+// from the caller is never authority. Anything other than a well-formed applicable result
+// (including a guard that throws or returns nothing) returns not_executed and does not start
+// Docker. The snapshot is removed afterwards and nothing is written back to the caller's tree.
+// This module never calls a model.
 // Verification is a separate fixed verifier step (step 5). This module never issues verified.
 // Program stdout is stored as a tail and is never read as a success or verification claim.
 import { spawn as nodeSpawn, type ChildProcess } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
-import { lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync, type Stats } from "node:fs";
+import {
+  chmodSync,
+  closeSync,
+  constants as fsConstants,
+  fstatSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  openSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+  type Stats,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, sep } from "node:path";
 import { anyGlob } from "./glob.ts";
 import { verifyRecord } from "./hash.ts";
 import { nodeMajor } from "./node-version.ts";
-import { runIfExecutable } from "./receipt.ts";
-import { CapabilityRecord, effectiveProtectedPaths, FIXED_PROTECTED_GLOBS, globsMayOverlap, imageDigest, PinnedImage } from "./schema.ts";
+import { evaluateGuard, type GuardInput } from "./guard.ts";
+import { CapabilityRecord, effectiveProtectedPaths, FIXED_PROTECTED_GLOBS, GuardResult, globsMayOverlap, imageDigest, PinnedImage } from "./schema.ts";
 import type { GuardResultT } from "./schema.ts";
 
 export type DockerRunRequest = { args: readonly string[]; containerName: string; timeoutMs: number };
@@ -44,8 +64,18 @@ export type PreRepairEvidence =
 
 export type ExecuteProgramInput = {
   record: unknown;
-  guard: GuardResultT;
-  /** Absolute path of the recipient work copy. Caller-owned. Must be a real directory inside the runner temp roots. */
+  /**
+   * Ignored. Kept so older callers still type-check. The executor evaluates the guard itself on
+   * its own snapshot of workDir; a caller-supplied result can never make the program run.
+   */
+  guard?: unknown;
+  /** Contract id the caller intends to apply. Passed to the guard; a missing id is not applicable. */
+  contract_id?: string;
+  /**
+   * Absolute path of the recipient work copy. Caller-owned and never mounted or modified.
+   * Must be a real directory inside the runner temp roots. The executor copies it into a private
+   * snapshot (skipping node_modules and .git directories) and runs on that copy only.
+   */
   workDir: string;
   /** Lockfile versions the guard resolved for the recipient. */
   resolved_versions: Record<string, string>;
@@ -56,7 +86,7 @@ export type ExecuteProgramInput = {
   /** Clock for wall_ms. Defaults to performance.now. */
   now?: () => number;
   /**
-   * Called after the guard gate and the version check, and before the program container.
+   * Called after the snapshot, the guard gate and the version check, and before the program container.
    * Supplied by the fixed verifier (step 5). Omitted means this run has no pre-repair sample.
    */
   preRepair?: () => Promise<PreRepairEvidence>;
@@ -84,10 +114,32 @@ export type ExecutionEvidence = {
 };
 
 export type ProgramExecution =
-  | { outcome: "not_executed"; reason: "guard_not_applicable"; guard_status: GuardResultT["status"]; docker_invoked: false; pre_repair: PreRepairEvidence | null; wall_ms: number; model_calls: { count: 0 } }
+  | {
+      outcome: "not_executed";
+      /** guard_failed: the guard threw, or returned null, undefined, or a value that is not a GuardResult. */
+      reason: "guard_not_applicable" | "guard_failed";
+      /** Status of the executor's own guard evaluation. Null when the guard failed. */
+      guard_status: GuardResultT["status"] | null;
+      /** The executor's own guard result on the snapshot. Null when the guard failed. */
+      guard: GuardResultT | null;
+      detail: string;
+      docker_invoked: false;
+      pre_repair: PreRepairEvidence | null;
+      wall_ms: number;
+      model_calls: { count: 0 };
+    }
   | {
       outcome: "rejected";
-      reason: "invalid_record" | "unsafe_write_target" | "invalid_work_dir" | "invalid_program" | "version_set_mismatch" | "pre_repair_not_failing" | "pre_repair_unavailable";
+      /** unsafe_work_tree: the snapshot copy refused a symlink, a non-regular file, a hardlinked write target, a size cap, or a concurrent change. */
+      reason:
+        | "invalid_record"
+        | "unsafe_write_target"
+        | "invalid_work_dir"
+        | "unsafe_work_tree"
+        | "invalid_program"
+        | "version_set_mismatch"
+        | "pre_repair_not_failing"
+        | "pre_repair_unavailable";
       detail: string;
       docker_invoked: false;
       pre_repair: PreRepairEvidence | null;
@@ -99,6 +151,8 @@ export type ProgramExecution =
       outcome: "executed";
       /** Container process exit status, not verification. */
       status: "ok" | "failed" | "timeout";
+      /** The executor's own applicable guard result, evaluated on the mounted snapshot. */
+      guard: GuardResultT;
       /** Relative posix paths that were mounted read-write. */
       writable_files: string[];
       /** Subset of writable_files whose bytes changed. */
@@ -116,6 +170,11 @@ const TAIL_CAP = 4_000;
 const GRACE_MS = 10_000;
 const WRITABLE_CAP = 256;
 const DIFF_CAP = 64 * 1024;
+const SNAPSHOT_FILE_CAP = 10_000;
+const SNAPSHOT_BYTE_CAP = 64 * 1024 * 1024;
+const SNAPSHOT_DEPTH_CAP = 64;
+/** Directory names the snapshot does not copy, at any depth. They are skipped by name and never followed. */
+const SNAPSHOT_SKIP_DIRS: ReadonlySet<string> = new Set(["node_modules", ".git"]);
 const MODEL_CALLS = { count: 0 } as const;
 const EMPTY_SHA256 = `sha256:${createHash("sha256").update(Buffer.alloc(0)).digest("hex")}`;
 /** `\b(it|test)(\.each)?\s*\(` — `.skip` between the name and `(` does not match. */
@@ -292,6 +351,7 @@ export async function executeProgram(input: ExecuteProgramInput): Promise<Progra
       return {
         outcome: "executed",
         status: body.status,
+        guard: body.guard,
         writable_files: body.writable_files,
         changed_files: body.changed_files,
         docker_args: body.docker_args,
@@ -304,16 +364,7 @@ export async function executeProgram(input: ExecuteProgramInput): Promise<Progra
     return { ...body, wall_ms, model_calls: MODEL_CALLS, pre_repair: preRepairEvidence } as ProgramExecution;
   };
 
-  // Step 1. Anything other than applicable never starts Docker and never writes a program directory.
-  if (runIfExecutable(input.guard, () => true) === undefined) {
-    return finish({
-      outcome: "not_executed",
-      reason: "guard_not_applicable",
-      guard_status: input.guard.status,
-      docker_invoked: false,
-    });
-  }
-
+  // input.guard is deliberately never read. The only guard result that counts is the one below.
   const parsed = CapabilityRecord.safeParse(input.record);
   if (!parsed.success) {
     return finish({ outcome: "rejected", reason: "invalid_record", detail: clip(parsed.error.issues[0]?.message ?? "record did not parse"), docker_invoked: false });
@@ -330,7 +381,7 @@ export async function executeProgram(input: ExecuteProgramInput): Promise<Progra
   const record = parsed.data;
   const program = record.artifact.program;
 
-  // Step 2. The pinned version set is a host gate. A mismatch does not start Docker.
+  // The pinned version set is a host gate. A mismatch does not start Docker.
   const versions = versionMismatchDetail(
     record.artifact.guard.runtime.node_major,
     record.artifact.dependencies.image,
@@ -347,71 +398,263 @@ export async function executeProgram(input: ExecuteProgramInput): Promise<Progra
   const work = validateWorkDir(input.workDir);
   if (!work.ok) return finish({ outcome: "rejected", reason: "invalid_work_dir", detail: work.detail, docker_invoked: false });
 
-  const writable = resolveWritableFiles(work.real, program.effects.writes);
-  if (!writable.ok) return finish({ outcome: "rejected", reason: "unsafe_write_target", detail: writable.detail, docker_invoked: false });
-
-  const containerName = input.containerName ?? `ludion-program-${randomUUID()}`;
-  if (!CONTAINER_NAME.test(containerName)) {
-    return finish({ outcome: "rejected", reason: "invalid_program", detail: `Container name ${JSON.stringify(containerName)} is not a single safe token.`, docker_invoked: false });
-  }
-  if (!isSafeRel(program.entry) || !Object.hasOwn(program.files, program.entry)) {
-    return finish({ outcome: "rejected", reason: "invalid_program", detail: "program entry is not one of program.files", docker_invoked: false });
-  }
-  for (const key of Object.keys(program.files)) {
-    if (!isSafeRel(key)) {
-      return finish({ outcome: "rejected", reason: "invalid_program", detail: `program file ${JSON.stringify(key)} is not a safe relative path`, docker_invoked: false });
-    }
-  }
-
-  // Step 3. Pre-repair evidence is supplied by the caller. It runs after every host gate and before the container.
-  const pre = await takePreRepair(input);
-  preRepairEvidence = pre.evidence;
-  if (!pre.ok) {
-    return finish({ outcome: "rejected", reason: pre.reason, detail: pre.detail, docker_invoked: false });
-  }
-
-  const programDir = mkdtempSync(join(tmpdir(), "ludion-program-"));
+  // Step 1. Private snapshot. Everything after this reads and mounts only the snapshot.
+  const snapshotDir = mkdtempSync(join(tmpdir(), "ludion-snapshot-"));
   try {
-    try {
-      writeProgramFiles(programDir, program.files);
-    } catch (err) {
-      return finish({ outcome: "rejected", reason: "invalid_program", detail: clip(errorMessage(err)), docker_invoked: false });
+    const snap = takeSnapshot(work.real, snapshotDir, program.effects.writes);
+    if (!snap.ok) return finish({ outcome: "rejected", reason: "unsafe_work_tree", detail: clip(snap.detail), docker_invoked: false });
+
+    // Step 2. The executor's own guard, on the exact bytes it copied. Fail-closed on anything but applicable.
+    const gate = runGuard(record, {
+      ...(input.contract_id !== undefined ? { contract_id: input.contract_id } : {}),
+      files: snap.files,
+      resolved_versions: input.resolved_versions,
+      node_version: input.node_version,
+    });
+    if (!gate.ok) {
+      return finish({ outcome: "not_executed", reason: "guard_failed", guard_status: null, guard: null, detail: clip(gate.detail), docker_invoked: false });
     }
-    const before = readSnapshots(work.real, writable.files);
+    if (gate.guard.status !== "applicable") {
+      return finish({
+        outcome: "not_executed",
+        reason: "guard_not_applicable",
+        guard_status: gate.guard.status,
+        guard: gate.guard,
+        detail: clip(`guard status ${gate.guard.status}: ${gate.guard.reason}`),
+        docker_invoked: false,
+      });
+    }
+    const guard = gate.guard;
+
+    const writable = resolveWritableFiles(snap.real, program.effects.writes);
+    if (!writable.ok) return finish({ outcome: "rejected", reason: "unsafe_write_target", detail: writable.detail, docker_invoked: false });
+
+    const containerName = input.containerName ?? `ludion-program-${randomUUID()}`;
+    if (!CONTAINER_NAME.test(containerName)) {
+      return finish({ outcome: "rejected", reason: "invalid_program", detail: `Container name ${JSON.stringify(containerName)} is not a single safe token.`, docker_invoked: false });
+    }
+    if (!isSafeRel(program.entry) || !Object.hasOwn(program.files, program.entry)) {
+      return finish({ outcome: "rejected", reason: "invalid_program", detail: "program entry is not one of program.files", docker_invoked: false });
+    }
+    for (const key of Object.keys(program.files)) {
+      if (!isSafeRel(key)) {
+        return finish({ outcome: "rejected", reason: "invalid_program", detail: `program file ${JSON.stringify(key)} is not a safe relative path`, docker_invoked: false });
+      }
+    }
+
+    // Before-hashes come from the snapshot, before any caller code (preRepair) runs.
+    const before = readSnapshots(snap.real, writable.files);
     if (before === undefined) {
       return finish({ outcome: "rejected", reason: "unsafe_write_target", detail: "a writable file could not be hashed", docker_invoked: false });
     }
-    let args: string[];
+
+    // Step 3. Pre-repair evidence is supplied by the caller. It runs after every host gate and before the container.
+    const pre = await takePreRepair(input);
+    preRepairEvidence = pre.evidence;
+    if (!pre.ok) {
+      return finish({ outcome: "rejected", reason: pre.reason, detail: pre.detail, docker_invoked: false });
+    }
+
+    const programDir = mkdtempSync(join(tmpdir(), "ludion-program-"));
     try {
-      const programSource = toDockerMountSource(realpathSync(programDir));
-      args = buildProgramDockerArgs({
-        containerName,
-        image: record.artifact.dependencies.image,
-        workDirSource: work.real,
-        programDirSource: programSource,
-        entry: program.entry,
+      try {
+        writeProgramFiles(programDir, program.files);
+      } catch (err) {
+        return finish({ outcome: "rejected", reason: "invalid_program", detail: clip(errorMessage(err)), docker_invoked: false });
+      }
+      let args: string[];
+      try {
+        const programSource = toDockerMountSource(realpathSync(programDir));
+        args = buildProgramDockerArgs({
+          containerName,
+          image: record.artifact.dependencies.image,
+          workDirSource: snap.real,
+          programDirSource: programSource,
+          entry: program.entry,
+          writableFiles: writable.files,
+        });
+      } catch (err) {
+        return finish({ outcome: "rejected", reason: "invalid_program", detail: clip(errorMessage(err)), docker_invoked: false });
+      }
+      const dockerArgs = [...args];
+      const runner = input.runner ?? createDockerRunner();
+      let outcome: DockerRunOutcome;
+      try {
+        outcome = await runner({ args, containerName, timeoutMs: program.timeout_ms });
+      } catch (err) {
+        return finish({ outcome: "environment_unavailable", detail: clip(errorMessage(err)), docker_invoked: true });
+      }
+      const compared = compareSnapshots(snap.real, before);
+      return finish(mapOutcome(outcome, {
+        guard,
         writableFiles: writable.files,
-      });
-    } catch (err) {
-      return finish({ outcome: "rejected", reason: "invalid_program", detail: clip(errorMessage(err)), docker_invoked: false });
+        compared,
+        image: record.artifact.dependencies.image,
+        dockerArgs,
+      }));
+    } finally {
+      rmSync(programDir, { recursive: true, force: true });
     }
-    const dockerArgs = [...args];
-    const runner = input.runner ?? createDockerRunner();
-    let outcome: DockerRunOutcome;
-    try {
-      outcome = await runner({ args, containerName, timeoutMs: program.timeout_ms });
-    } catch (err) {
-      return finish({ outcome: "environment_unavailable", detail: clip(errorMessage(err)), docker_invoked: true });
-    }
-    const compared = compareSnapshots(work.real, before);
-    return finish(mapOutcome(outcome, {
-      writableFiles: writable.files,
-      compared,
-      image: record.artifact.dependencies.image,
-      dockerArgs,
-    }));
   } finally {
-    rmSync(programDir, { recursive: true, force: true });
+    // Only the directory this call created.
+    rmSync(snapshotDir, { recursive: true, force: true });
+  }
+}
+
+/**
+ * The executor's guard call. A throw, null, undefined, or a value that is not a GuardResult is a
+ * failure, never a pass. Only a schema-valid result is returned.
+ */
+function runGuard(record: unknown, guardInput: GuardInput): { ok: true; guard: GuardResultT } | { ok: false; detail: string } {
+  let raw: unknown;
+  try {
+    raw = evaluateGuard(record, guardInput);
+  } catch (err) {
+    return { ok: false, detail: `guard evaluation threw: ${errorMessage(err)}` };
+  }
+  if (raw === null) return { ok: false, detail: "guard evaluation returned null" };
+  if (raw === undefined) return { ok: false, detail: "guard evaluation returned undefined" };
+  const checked = GuardResult.safeParse(raw);
+  if (!checked.success) return { ok: false, detail: "guard evaluation returned a value that is not a guard result" };
+  return { ok: true, guard: checked.data };
+}
+
+type SnapshotResult = { ok: true; real: string; files: Record<string, string> } | { ok: false; detail: string };
+
+type SnapshotState = {
+  srcRoot: string;
+  writeGlobs: readonly string[];
+  privateModes: boolean;
+  files: Record<string, string>;
+  count: number;
+  bytes: number;
+};
+
+function sameNode(a: Stats, b: Stats): boolean {
+  return a.dev === b.dev && a.ino === b.ino;
+}
+
+/**
+ * Copy srcRoot into the fresh, empty dstRoot. lstat on every entry. A symlink or junction anywhere
+ * (other than one named node_modules or .git, which is skipped without being followed), a
+ * non-regular file, a hardlinked (nlink > 1) write target, a file that changes identity between
+ * lstat and open, or a directory that changes during the walk refuses the whole snapshot.
+ * Returns the snapshot's realpath and the copied text keyed by posix path, for the guard.
+ */
+function takeSnapshot(srcRoot: string, dstRoot: string, writeGlobs: readonly string[]): SnapshotResult {
+  let real: string;
+  try {
+    real = realpathSync(dstRoot);
+  } catch (err) {
+    return { ok: false, detail: `snapshot directory realpath failed: ${errorMessage(err)}` };
+  }
+  // A root host runs the container as 1000:1000, which then needs to read the copy. Otherwise the
+  // container runs as this uid and the snapshot stays private to it. Windows ignores modes.
+  const uid = hostUid();
+  const privateModes = !(typeof uid === "number" && uid === 0);
+  const state: SnapshotState = { srcRoot, writeGlobs, privateModes, files: {}, count: 0, bytes: 0 };
+  try {
+    chmodSync(real, privateModes ? 0o700 : 0o755);
+    const problem = copyDir(srcRoot, real, "", 0, state);
+    if (problem !== undefined) return { ok: false, detail: problem };
+  } catch (err) {
+    return { ok: false, detail: `snapshot failed: ${errorMessage(err)}` };
+  }
+  return { ok: true, real, files: state.files };
+}
+
+function copyDir(srcDir: string, dstDir: string, rel: string, depth: number, state: SnapshotState): string | undefined {
+  const label = rel.length === 0 ? "." : rel;
+  let dirBefore: Stats;
+  try {
+    dirBefore = lstatSync(srcDir);
+  } catch (err) {
+    return `cannot lstat ${label}: ${errorMessage(err)}`;
+  }
+  if (dirBefore.isSymbolicLink() || !dirBefore.isDirectory()) return `not a real directory: ${label}`;
+  let names: string[];
+  try {
+    names = readdirSync(srcDir);
+  } catch (err) {
+    return `cannot read ${label}: ${errorMessage(err)}`;
+  }
+  names.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  for (const name of names) {
+    const childRel = rel.length === 0 ? name : `${rel}/${name}`;
+    const src = join(srcDir, name);
+    const dst = join(dstDir, name);
+    let st: Stats;
+    try {
+      st = lstatSync(src);
+    } catch (err) {
+      return `cannot lstat ${childRel}: ${errorMessage(err)}`;
+    }
+    if (SNAPSHOT_SKIP_DIRS.has(name) && (st.isDirectory() || st.isSymbolicLink())) continue;
+    if (st.isSymbolicLink()) return `symlink in work tree: ${childRel}`;
+    if (st.isDirectory()) {
+      if (depth + 1 > SNAPSHOT_DEPTH_CAP) return `work tree deeper than ${SNAPSHOT_DEPTH_CAP} levels at ${childRel}`;
+      mkdirSync(dst, { mode: state.privateModes ? 0o700 : 0o755 });
+      const nested = copyDir(src, dst, childRel, depth + 1, state);
+      if (nested !== undefined) return nested;
+      continue;
+    }
+    if (!st.isFile()) return `not a regular file: ${childRel}`;
+    const writeTarget = anyGlob(state.writeGlobs, childRel);
+    if (writeTarget && st.nlink > 1) return `hardlinked write target (nlink ${st.nlink}): ${childRel}`;
+    state.count += 1;
+    if (state.count > SNAPSHOT_FILE_CAP) return `work tree has more than ${SNAPSHOT_FILE_CAP} files`;
+    state.bytes += st.size;
+    if (state.bytes > SNAPSHOT_BYTE_CAP) return `work tree is larger than ${SNAPSHOT_BYTE_CAP} bytes`;
+    const read = readRegularNoFollow(src, st, childRel, state.srcRoot);
+    if (!read.ok) return read.detail;
+    const mode = state.privateModes ? 0o600 : writeTarget ? 0o666 : 0o644;
+    writeFileSync(dst, read.buf, { flag: "wx", mode });
+    // writeFileSync's mode is masked by umask; set it explicitly for the root-host case.
+    if (!state.privateModes) chmodSync(dst, mode);
+    state.files[childRel] = read.buf.toString("utf8");
+  }
+  let dirAfter: Stats;
+  try {
+    dirAfter = lstatSync(srcDir);
+  } catch (err) {
+    return `cannot lstat ${label}: ${errorMessage(err)}`;
+  }
+  if (dirAfter.isSymbolicLink() || !dirAfter.isDirectory() || !sameNode(dirBefore, dirAfter)) {
+    return `work tree changed during the snapshot: ${label}`;
+  }
+  return undefined;
+}
+
+/**
+ * Read one regular file without following a symlink. O_NOFOLLOW where the platform has it; on every
+ * platform the open descriptor must be the same file (dev, ino, size) that lstat saw, and the
+ * path's realpath must still be the expected path under the work root.
+ */
+function readRegularNoFollow(path: string, seen: Stats, rel: string, srcRoot: string): { ok: true; buf: Buffer } | { ok: false; detail: string } {
+  const noFollow = typeof fsConstants.O_NOFOLLOW === "number" ? fsConstants.O_NOFOLLOW : 0;
+  let fd: number;
+  try {
+    fd = openSync(path, fsConstants.O_RDONLY | noFollow);
+  } catch (err) {
+    return { ok: false, detail: `cannot open ${rel}: ${errorMessage(err)}` };
+  }
+  try {
+    const opened = fstatSync(fd);
+    if (!opened.isFile() || !sameNode(opened, seen) || opened.size !== seen.size) {
+      return { ok: false, detail: `file changed between lstat and open: ${rel}` };
+    }
+    let real: string;
+    try {
+      real = realpathSync(path);
+    } catch (err) {
+      return { ok: false, detail: `realpath failed for ${rel}: ${errorMessage(err)}` };
+    }
+    if (!samePath(real, join(srcRoot, ...rel.split("/")))) return { ok: false, detail: `path escaped the work directory: ${rel}` };
+    const buf = readFileSync(fd);
+    if (buf.byteLength !== seen.size) return { ok: false, detail: `file changed while it was read: ${rel}` };
+    return { ok: true, buf };
+  } finally {
+    closeSync(fd);
   }
 }
 
@@ -761,7 +1004,7 @@ function isDaemonFailure(exitCode: number | null, stderr: string): boolean {
 
 function mapOutcome(
   outcome: DockerRunOutcome,
-  ctx: { writableFiles: string[]; compared: ComparedFile[]; image: string; dockerArgs: string[] },
+  ctx: { guard: GuardResultT; writableFiles: string[]; compared: ComparedFile[]; image: string; dockerArgs: string[] },
 ): ExecutionCore {
   // Stdout and stderr are tails only. Their text never selects status.
   if (outcome.kind === "spawn_error") {
@@ -778,7 +1021,7 @@ function mapOutcome(
 }
 
 function executedBody(
-  ctx: { writableFiles: string[]; compared: ComparedFile[]; image: string; dockerArgs: string[] },
+  ctx: { guard: GuardResultT; writableFiles: string[]; compared: ComparedFile[]; image: string; dockerArgs: string[] },
   status: "ok" | "failed" | "timeout",
   exitCode: number | null,
   timedOut: boolean,
@@ -794,6 +1037,7 @@ function executedBody(
   return {
     outcome: "executed",
     status,
+    guard: ctx.guard,
     writable_files: ctx.writableFiles,
     changed_files: changed,
     docker_args: ctx.dockerArgs,

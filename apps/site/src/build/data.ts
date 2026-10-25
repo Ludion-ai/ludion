@@ -73,7 +73,7 @@ export function readWithheld(root: string, path = process.env.LUDION_WITHHOLD): 
 function gitInfo(root: string): GitInfo {
   if (git(root, "rev-parse", "--is-shallow-repository").trim() === "true") {
     console.log("[ludion] Shallow clone: fetching full history for verified_at and pr.");
-    git(root, "fetch", "--unshallow", "--quiet");
+    git(root, "fetch", "--unshallow", "--quiet", "--no-tags", "origin", git(root, "rev-parse", "HEAD").trim());
   }
   return parseAddedLog(git(root, "log", "--diff-filter=A", "--name-only", `--format=${ADDED_LOG_FORMAT}`, "--", "lessons/"));
 }

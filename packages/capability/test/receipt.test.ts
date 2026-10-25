@@ -135,6 +135,24 @@ describe("receipt reuse", () => {
     expect(capabilityId(rec.artifact)).toBe(rec.id);
   });
 
+  it("compares omitted dependency ids with an empty array", () => {
+    const rec = exampleRecord();
+    const receipt = executedReceipt(rec, applicable());
+    const { dependency_ids: _ids, ...omitted } = reuseCurrent(rec);
+    expect(checkReceiptReuse(receipt, rec, omitted)).toEqual({ reusable: true });
+
+    const dep = `cap:${sha256Hex("omitted-dependency")}`;
+    const withDep = reseal({
+      ...structuredClone(rec.artifact),
+      dependencies: { capabilities: [dep], image: rec.artifact.dependencies.image },
+    }, rec.lineage);
+    const { dependency_ids: _drop, ...omittedDep } = reuseCurrent(withDep);
+    expect(checkReceiptReuse(receipt, withDep, omittedDep)).toMatchObject({
+      status: "stale",
+      reason: "dependency_changed",
+    });
+  });
+
   it("goes stale when a counterexample is added and does not change the capability id", () => {
     const rec = exampleRecord();
     const receipt = executedReceipt(rec, applicable());

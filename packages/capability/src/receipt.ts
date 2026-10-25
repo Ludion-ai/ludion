@@ -1,10 +1,33 @@
-import type { GuardResultT } from "./schema.ts";
+import type { CapabilityRecordT, GuardResultT, ReceiptT } from "./schema.ts";
 import { CapabilityRecord, Receipt, EXECUTABLE, imageDigest } from "./schema.ts";
 import { counterexamplesHash, programHash, staleResult, verifierHash, verifyRecord } from "./hash.ts";
 import { nodeMajor } from "./node-version.ts";
 
+function failureText(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
+/**
+ * Receipt plus count checks that the schema does not express.
+ * When a verifier is present, passed + failed + skipped + todo equals total,
+ * passed does not exceed total, and required_passed is no longer than passed.
+ */
+const ReceiptChecked = Receipt.superRefine((r, ctx) => {
+  if (r.outcome !== "executed") return;
+  const counts = r.verifier.tests;
+  if (counts.passed + counts.failed + counts.skipped + counts.todo !== counts.total) {
+    ctx.addIssue({ code: "custom", message: "verifier tests passed + failed + skipped + todo must equal total" });
+  }
+  if (counts.passed > counts.total) {
+    ctx.addIssue({ code: "custom", message: "verifier tests passed must not exceed total" });
+  }
+  if (r.verifier.required_passed.length > counts.passed) {
+    ctx.addIssue({ code: "custom", message: "required_passed must not have more entries than passed" });
+  }
+});
+
 export function validateReceipt(x: unknown) {
-  return Receipt.safeParse(x);
+  return ReceiptChecked.safeParse(x);
 }
 
 export type ReuseCurrent = {
@@ -12,7 +35,7 @@ export type ReuseCurrent = {
   lockfile_hash: string;
   node_version: string;
   /** Current dependency capability ids for this record, in artifact order.
-   *  Omit to skip the check. Any difference from artifact.dependencies.capabilities is dependency_changed.
+   *  Omit to compare against an empty array. Any difference from artifact.dependencies.capabilities is dependency_changed.
    */
   dependency_ids?: readonly string[];
 };
@@ -36,36 +59,53 @@ function reject(reason: ReuseRejectionReason, detail: string): ReuseResult {
 
 /**
  * Whether an existing receipt can still be reused.
- * Parses the receipt and the record first. Then record integrity, program hash, verifier hash,
- * counterexamples hash, dependency snapshot, capability id, lockfile, and source tree.
+ * Parses the receipt and the record first. A hashing or canonicalisation error is
+ * invalid_receipt or invalid_record and does not throw. Then record integrity, program hash,
+ * verifier hash, counterexamples hash, dependency snapshot, capability id, lockfile, and source tree.
  * An executed verified receipt must cover every required test, pin the same image digest,
  * and match the current node major. A node patch difference stays reusable.
  * A node major difference is stale/runtime_changed.
  */
 export function checkReceiptReuse(receipt: unknown, record: unknown, current: ReuseCurrent): ReuseResult {
-  const receiptParsed = Receipt.safeParse(receipt);
-  if (!receiptParsed.success) {
-    return reject("invalid_receipt", receiptParsed.error.issues[0]?.message ?? "receipt did not parse");
+  let got: ReceiptT;
+  try {
+    const receiptParsed = ReceiptChecked.safeParse(receipt);
+    if (!receiptParsed.success) {
+      return reject("invalid_receipt", receiptParsed.error.issues[0]?.message ?? "receipt did not parse");
+    }
+    got = receiptParsed.data;
+  } catch (err) {
+    return reject("invalid_receipt", failureText(err));
   }
-  const recordParsed = CapabilityRecord.safeParse(record);
-  if (!recordParsed.success) {
-    return reject("invalid_record", recordParsed.error.issues[0]?.message ?? "record did not parse");
-  }
-  const got = receiptParsed.data;
-  const rec = recordParsed.data;
 
-  const integrity = verifyRecord(rec);
-  if (!("ok" in integrity)) return integrity;
-  if (got.program_hash !== programHash(rec.artifact.program)) {
-    return staleResult("program_changed", "program hash differs from the receipt", "program");
+  let rec: CapabilityRecordT;
+  try {
+    const recordParsed = CapabilityRecord.safeParse(record);
+    if (!recordParsed.success) {
+      return reject("invalid_record", recordParsed.error.issues[0]?.message ?? "record did not parse");
+    }
+    rec = recordParsed.data;
+  } catch (err) {
+    return reject("invalid_record", failureText(err));
   }
-  if (got.verifier_hash !== verifierHash(rec.artifact.verifier)) {
-    return staleResult("verifier_changed", "verifier hash differs from the receipt", "verifier");
+
+  try {
+    const integrity = verifyRecord(rec);
+    if (!("ok" in integrity)) return integrity;
+    if (got.program_hash !== programHash(rec.artifact.program)) {
+      return staleResult("program_changed", "program hash differs from the receipt", "program");
+    }
+    if (got.verifier_hash !== verifierHash(rec.artifact.verifier)) {
+      return staleResult("verifier_changed", "verifier hash differs from the receipt", "verifier");
+    }
+    if (got.counterexamples_hash !== counterexamplesHash(rec.counterexamples)) {
+      return staleResult("counterexample_added", "counterexamples hash differs from the receipt", "counterexamples");
+    }
+  } catch (err) {
+    return reject("invalid_record", failureText(err));
   }
-  if (got.counterexamples_hash !== counterexamplesHash(rec.counterexamples)) {
-    return staleResult("counterexample_added", "counterexamples hash differs from the receipt", "counterexamples");
-  }
-  if (current.dependency_ids !== undefined && !sameIds(current.dependency_ids, rec.artifact.dependencies.capabilities)) {
+  const dependencyIds = current.dependency_ids ?? [];
+  if (!sameIds(dependencyIds, rec.artifact.dependencies.capabilities)) {
     return staleResult("dependency_changed", "dependency capability ids differ from the current snapshot", "dependencies");
   }
   if (got.capability_id !== rec.id) {

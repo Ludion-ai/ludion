@@ -28,6 +28,13 @@ export const CONTRACT_ID = "mock_cleanup.clear_history";
 
 export const APPLICABLE_VERSIONS: Record<string, string> = { vitest: "4.0.0", vite: "7.1.11" };
 
+/** npm lockfile (v3) text that resolves the given top-level package versions. */
+export function packageLock(versions: Record<string, string> = APPLICABLE_VERSIONS): string {
+  const packages: Record<string, unknown> = { "": { name: "recipient", devDependencies: { ...versions } } };
+  for (const [name, version] of Object.entries(versions)) packages[`node_modules/${name}`] = { version, dev: true };
+  return `${JSON.stringify({ name: "recipient", lockfileVersion: 3, requires: true, packages }, null, 2)}\n`;
+}
+
 export const applicableTest = [
   'import { vi } from "vitest";',
   "afterEach(() => {",

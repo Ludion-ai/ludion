@@ -7,7 +7,7 @@
 ロードマップのステップ2〜3で使う、開発専用の Verified Repair Capability 題材を1件固定する。
 
 - この題材は `lessons/` にも本番 index にも入れない。既存 lesson を変換したものでもない。
-- 当初は既存 lesson を1件変換する方針だったが、候補にした既存 lesson 3件がいずれも評価と重なったため、既存 lesson ではない題材に切り替えた。
+- 当初は既存 lesson を1件変換する方針だったが、評価の題材と重ならないようにするため、既存 lesson ではない題材にした。
 
 ## 2. 上流の変更
 
@@ -126,7 +126,7 @@ guard の判定は `applicable` / `inapplicable` / `unknown` / `stale` の4状�
 
 - 採用：commander 12.1.0 → 13.0.0（`allowExcessArguments` の既定値が true から false に変わった）
 - 予備候補：nanoid 4.0.2 → 5.0.0（`nanoid/async` の削除）
-- 取り下げ：zod 3.25.76 → 4.0.0。理由は評価との重なり。
+- 取り下げ：zod 3.25.76 → 4.0.0（評価の題材と重ならないようにするため）
   - commander は、どの結果も出る前に予備候補として名前を挙げていた。結果を見てから選び直したものではない。
 - 不採用（理由つき）
   1. date-fns 2.30 → 3.0：前提が成り立たない。3.0 では ESM の default が動き、2.30 は ESM のディレクトリ import で失敗する。
@@ -142,4 +142,4 @@ guard の判定は `applicable` / `inapplicable` / `unknown` / `stale` の4状�
 
 ## 9. 公開文書の書き方
 
-この文書には、内部の役割名、PC 上のパス、評価タスク名を書かない。レビュー担当は「technical reviewer」「security reviewer」と書く。
+この文書には、内部の役割名や PC 上のパスを書かない。レビュー担当は「technical reviewer」「security reviewer」と書く。

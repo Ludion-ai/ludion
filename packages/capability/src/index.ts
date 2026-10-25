@@ -53,3 +53,24 @@ export { canonicalJson } from "./canonical-json.ts";
 export { capabilityId, counterexamplesHash, dependenciesHash, fileDigest, programHash, sha256Hex, staleResult, verifierHash, verifyRecord } from "./hash.ts";
 export { evaluateGuard, type GuardInput } from "./guard.ts";
 export { checkReceiptReuse, runIfExecutable, validateReceipt, type ReuseCurrent, type ReuseResult } from "./receipt.ts";
+export {
+  buildProgramDockerArgs,
+  createDockerRunner,
+  executeProgram,
+  PINNED_VERSION_SET,
+  resolveSandboxUser,
+  resolveWritableFiles,
+  toDockerMountSource,
+  validateWriteGlobs,
+} from "./executor.ts";
+export type {
+  DockerRunOutcome,
+  DockerRunRequest,
+  DockerRunner,
+  ExecuteProgramInput,
+  ExecutionEvidence,
+  PreRepairEvidence,
+  ProgramDockerArgsOpts,
+  ProgramExecution,
+  RedFlag,
+} from "./executor.ts";

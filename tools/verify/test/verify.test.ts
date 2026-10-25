@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { formatLesson, type FetchFn, type LessonV0, type LessonV1 } from "@ludion/core";
-import { dockerArgs, imageFor, installArgs, interpretRun, type RunFn, type RunSpec } from "../src/docker.ts";
+import { dockerArgs, imageFor, IMAGE_DIGESTS, installArgs, interpretRun, resolveSandboxUser, type RunFn, type RunSpec } from "../src/docker.ts";
 import { compileLessonSchema } from "../src/base-schema.ts";
 import { collectLessonFiles } from "../src/files.ts";
 import { summaryLine, verifyLesson, type VerifyContext } from "../src/verify.ts";
@@ -215,13 +215,19 @@ describe("verifyLesson, format 1", () => {
 
 describe("docker", () => {
   it("isolates the run as docs/decisions.md says: network off, read-only, limits", () => {
+    const user = resolveSandboxUser(
+      typeof process.getuid === "function" ? process.getuid() : undefined,
+      typeof process.getgid === "function" ? process.getgid() : undefined,
+    );
     expect(dockerArgs("python", "n")).toEqual([
       "run", "--rm", "-i", "--name", "n",
-      "--network", "none", "--memory", "512m", "--cpus", "1", "--pids-limit", "128", "--read-only", "--tmpfs", "/tmp",
-      "python:3.14-slim", "python", "-",
+      "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--read-only",
+      "--memory", "512m", "--cpus", "1", "--pids-limit", "256", "--user", user, "--network", "none",
+      "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
+      `python:3.14-slim@${IMAGE_DIGESTS["python:3.14-slim"]}`, "python", "-",
     ]);
-    expect(dockerArgs("bash", "n").slice(-3)).toEqual(["python:3.14-slim", "bash", "-s"]);
-    expect(dockerArgs("node", "n").slice(-3)).toEqual(["node:24-slim", "node", "-"]);
+    expect(dockerArgs("bash", "n").slice(-3)).toEqual([`python:3.14-slim@${IMAGE_DIGESTS["python:3.14-slim"]}`, "bash", "-s"]);
+    expect(dockerArgs("node", "n").slice(-3)).toEqual([`node:24-slim@${IMAGE_DIGESTS["node:24-slim"]}`, "node", "-"]);
   });
 
   it("interprets exit codes, skip lines, and timeouts", () => {
@@ -239,29 +245,58 @@ describe("docker", () => {
 
 describe("docker, format 1", () => {
   it("maps runtimes to images", () => {
-    expect(imageFor("node@22")).toEqual({ image: "node:22-slim", command: ["node", "-"], language: "node" });
-    expect(imageFor("python@3.12")).toEqual({ image: "python:3.12-slim", command: ["python", "-"], language: "python" });
+    expect(imageFor("node@22")).toEqual({ image: `node:22-slim@${IMAGE_DIGESTS["node:22-slim"]}`, command: ["node", "-"], language: "node" });
+    expect(imageFor("python@3.12")).toEqual({ image: `python:3.12-slim@${IMAGE_DIGESTS["python:3.12-slim"]}`, command: ["python", "-"], language: "python" });
     expect(imageFor("ruby@3")).toBeUndefined();
   });
 
   it("runs lesson code with the network off, even when packages are mounted", () => {
-    const args = dockerArgs("node@24", "n", "/tmp/w");
-    expect(args).toContain("--network");
-    expect(args[args.indexOf("--network") + 1]).toBe("none");
-    expect(args).toContain("--read-only");
-    expect(args.slice(args.indexOf("-v"), args.indexOf("-v") + 2)).toEqual(["-v", "/tmp/w:/w"]);
-    expect(args.slice(-3)).toEqual(["node:24-slim", "node", "-"]);
+    const work = mkdtempSync(join(tmpdir(), "ludion-verify-mount-"));
+    try {
+      mkdirSync(join(work, "node_modules"));
+      const args = dockerArgs("node@24", "n", work);
+      expect(args).toContain("--network");
+      expect(args[args.indexOf("--network") + 1]).toBe("none");
+      expect(args).toContain("--read-only");
+      const tmpfs = args.flatMap((arg, index) => arg === "--tmpfs" ? [args[index + 1] ?? ""] : []);
+      expect(tmpfs).toContain("/w:rw,noexec,nosuid,nodev,size=128m,mode=1777");
+      const binds = args.flatMap((arg, index) => arg === "-v" ? [args[index + 1] ?? ""] : []);
+      expect(binds.length).toBeGreaterThan(0);
+      for (const spec of binds) {
+        expect(spec.endsWith(":ro"), spec).toBe(true);
+        const colon = spec.indexOf(":");
+        const rest = colon === -1 ? spec : spec.slice(colon + 1);
+        const target = rest.endsWith(":ro") || rest.endsWith(":rw") ? rest.slice(0, -3) : rest;
+        expect(target, spec).not.toBe("/w");
+      }
+      expect(args.slice(-3)).toEqual([`node:24-slim@${IMAGE_DIGESTS["node:24-slim"]}`, "node", "-"]);
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
   });
 
   it("installs packages with the network on but install scripts off, and never runs lesson code there", () => {
-    const npm = installArgs("node@24", "/tmp/w", { vitest: "5.0.3" });
-    expect(npm).not.toContain("--network");
-    expect(npm).toContain("--ignore-scripts");
-    expect(npm).not.toContain("-i");
-    const pip = installArgs("python@3.12", "/tmp/w", { requests: "2.32.0" });
-    // Wheels only: no package build scripts run at install time either.
-    expect(pip.slice(-5)).toEqual(["--only-binary", ":all:", "--target", "/w/site", "requests==2.32.0"]);
-    expect(pip).not.toContain("--network");
+    const work = mkdtempSync(join(tmpdir(), "ludion-verify-install-"));
+    try {
+      writeFileSync(join(work, "package.json"), "{}\n");
+      writeFileSync(join(work, "package-lock.json"), "{}\n");
+      mkdirSync(join(work, ".home"));
+      mkdirSync(join(work, ".npm"));
+      const npm = installArgs("node@24", work, { vitest: "5.0.3" }, "npm-ci");
+      expect(npm).not.toContain("--network");
+      expect(npm).toContain("--ignore-scripts");
+      expect(npm).not.toContain("-i");
+      rmSync(work, { recursive: true, force: true });
+      mkdirSync(work);
+      writeFileSync(join(work, "requirements.txt"), `requests==2.32.0 --hash=sha256:${"ab".repeat(32)}\n`);
+      const pip = installArgs("python@3.12", work, { requests: "2.32.0" }, "pip");
+      // Wheels only, and the hash requirement is on the command. The pin itself is in requirements.txt.
+      expect(pip.slice(-8)).toEqual(["--require-hashes", "--only-binary", ":all:", "--no-cache-dir", "--target", "/w/site", "-r", "/w/requirements.txt"]);
+      expect(pip).not.toContain("--network");
+      expect(pip).not.toContain("requests==2.32.0");
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
   });
 
   it("checks an expected failure: non-zero exit with the named error passes; exit 0 or another error fails", () => {

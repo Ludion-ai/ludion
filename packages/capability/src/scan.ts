@@ -1,5 +1,13 @@
 /** Structural JS/TS scan for the P1 guard. Not a full parser.
- *  Comments and string or template text are removed. `${...}` expressions stay.
+ *  Allowlist: anything the tokenizer does not model is an error, and an error is never applicable.
+ *  Code may contain only ASCII identifiers, numbers, strings, templates, comments, the listed
+ *  punctuation, and the whitespace characters space, tab, LF, CR, VT and FF. A leading U+FEFF is
+ *  skipped and a leading `#!` line is a comment. U+2028/U+2029 outside a string or block comment,
+ *  `#` not followed by an identifier, `-->`, `<!--`, unbalanced `()`, `[]` or `{}`, and any other character are errors.
+ *  Comments and string or template text are removed. `${...}` expressions stay. A template leaves
+ *  one "`" marker token, so a tagged template is a value use of its tag. Only the escapes
+ *  \\ \' \" \n \t (and \` \$ in templates) are decoded; any other escape is an error.
+ *  An import specifier name that is a string literal is never resolved.
  *  Brace ids follow source `{` `}` pairs, so an object literal is its own block.
  *  `already_fixed` compares those ids (innermost pair).
  *  A backslash in code, `with (`, or bare `eval` is an error. A `/` or `/=` that
@@ -9,7 +17,8 @@
  */
 
 export type CallSite = { recv: string; members: string[]; line: number; braceId: number; tok: number };
-export type Binding = { local: string; via: "import" | "alias"; kind: "named" | "namespace"; imported: string; module: string };
+/** `stringName`: the imported name was a string literal (`import { "x" as y }`). Never resolved. */
+export type Binding = { local: string; via: "import" | "alias"; kind: "named" | "namespace"; imported: string; module: string; stringName?: true };
 export type Shadow = { name: string; from: number; to: number };
 
 export type Analysis = {
@@ -19,9 +28,19 @@ export type Analysis = {
   shadows: Shadow[];
   /** Uses the scanner cannot bind. `tok` -1 is a hoisted `var`, a global-object access, or an ASI declaration. */
   unmodeled: Array<{ name: string; tok: number }>;
+  /** `require(...)` and `import(...)` module names. Null when the argument is not a single string literal. */
+  dynamicLoads?: Array<string | null>;
 };
 
 type Token = { k: "ident" | "num" | "str" | "punct"; s: string; line: number };
+
+/** Whitespace the tokenizer models. NBSP, U+FEFF (after offset 0), U+2028 and U+2029 are not in it. */
+const CODE_SPACE = new Set([" ", "\t", "\n", "\r", "\v", "\f"]);
+/** Single-character punctuation the tokenizer models. Anything else in code is an error. */
+const SINGLE_PUNCT = new Set(["{", "}", "(", ")", "[", "]", ";", ",", ".", "<", ">", "+", "-", "*", "%", "&", "|", "^", "!", "~", "?", ":", "=", "@", "#"]);
+const OPENER: Record<string, string> = { ")": "(", "]": "[", "}": "{" };
+/** The only string and template escapes the tokenizer decodes. Anything else is an error. */
+const STRING_ESCAPES: Record<string, string> = { "\\": "\\", "'": "'", '"': '"', n: "\n", t: "\t" };
 
 /** Identifiers that are not a division left-hand side. A following `/` is refused. */
 const SLASH_KEYWORD = new Set([
@@ -37,7 +56,7 @@ function slashIsDivision(tokens: readonly Token[]): boolean {
   const prev = tokens[tokens.length - 1];
   if (!prev) return false;
   if (prev.k === "num" || prev.k === "str") return true;
-  if (prev.s === "]") return true;
+  if (prev.s === "]" || prev.s === "`") return true;
   return prev.k === "ident" && !SLASH_KEYWORD.has(prev.s);
 }
 
@@ -50,6 +69,8 @@ function tokenize(src: string): TokResult {
   let i = 0;
   let line = 1;
   let brace = 0;
+  /** Open `(`, `[`, `{` and template `${` (as `{`), innermost last. */
+  const nest: string[] = [];
   let buf = "";
   let bufLine = 1;
 
@@ -68,12 +89,21 @@ function tokenize(src: string): TokResult {
   };
   const push = (tok: Token) => tokens.push(tok);
 
+  if (src.startsWith("\uFEFF")) i = 1;
+  // A hashbang is only valid at the very start of the file. It is a line comment.
+  if (src.startsWith("#!", i)) {
+    modeStack.push("line");
+    take(2);
+  }
+
   while (i < src.length) {
     const c = src[i] ?? "";
     const next = src[i + 1];
     const m = mode();
 
     if (m === "line") {
+      // JS ends a `//` comment at U+2028/U+2029. The scanner does not model that line break.
+      if (c === "\u2028" || c === "\u2029") return fail("line separator in comment");
       take(1);
       if (c === "\n" || (c === "\r" && next !== "\n")) modeStack.pop();
       continue;
@@ -91,16 +121,12 @@ function tokenize(src: string): TokResult {
     if (m === "sq" || m === "dq") {
       const q = m === "sq" ? "'" : '"';
       if (c === "\\") {
+        // Allowlist: only \\ \' \" \n \t. Every other escape (\u, \x, \u{}, \v, \b, \f, \0,
+        // octal, line continuation, or an unneeded escape like \v in "\vitest") is not modeled.
         if (next === undefined) return fail("unclosed string");
-        if (next === "n") buf += "\n";
-        else if (next === "r") buf += "\r";
-        else if (next === "t") buf += "\t";
-        else if (next === "\n") buf += "";
-        else if (next === "\r") {
-          buf += "";
-          take(src[i + 2] === "\n" ? 3 : 2);
-          continue;
-        } else buf += next;
+        const decoded = STRING_ESCAPES[next];
+        if (decoded === undefined) return fail("unsupported string escape");
+        buf += decoded;
         take(2);
         continue;
       }
@@ -118,8 +144,10 @@ function tokenize(src: string): TokResult {
     }
     if (m === "tmpl") {
       if (c === "\\") {
+        // Same allowlist as strings, plus \` and \$.
         if (next === undefined) return fail("unclosed template");
-        take(next === "\r" && src[i + 2] === "\n" ? 3 : 2);
+        if (STRING_ESCAPES[next] === undefined && next !== "`" && next !== "$") return fail("unsupported string escape");
+        take(2);
         continue;
       }
       if (c === "`") {
@@ -130,6 +158,7 @@ function tokenize(src: string): TokResult {
       if (c === "$" && next === "{") {
         take(2);
         brace++;
+        nest.push("{");
         interpBrace.push(brace);
         modeStack.push("code");
         continue;
@@ -141,11 +170,14 @@ function tokenize(src: string): TokResult {
     // `\u0076i` is still the identifier `vi`. A backslash in code cannot be modeled.
     if (c === "\\") return fail("backslash in code");
 
-    // JS whitespace includes NBSP, U+FEFF and U+2028. It must not glue onto an identifier.
-    if (/\s/.test(c)) {
+    if (CODE_SPACE.has(c)) {
       take(1);
       continue;
     }
+    // NBSP, U+FEFF, U+2028, U+2029 and other non-ASCII characters in code are not modeled.
+    if ((c.codePointAt(0) ?? 0) > 127) return fail("unsupported character in code");
+    // HTML-like comments (`<!--`, and `-->` at a line start in scripts) are not modeled.
+    if (src.startsWith("-->", i) || src.startsWith("<!--", i)) return fail("html-like comment");
     if (c === "/" && next === "/") {
       modeStack.push("line");
       take(2);
@@ -164,6 +196,8 @@ function tokenize(src: string): TokResult {
       continue;
     }
     if (c === "`") {
+      // A marker token, so `` vi`x` `` is a value use of `vi`, not `vi`'s member call.
+      push({ k: "punct", s: "`", line });
       modeStack.push("tmpl");
       take(1);
       continue;
@@ -177,11 +211,11 @@ function tokenize(src: string): TokResult {
       take(op.length);
       continue;
     }
-    if (/[A-Za-z_$]/.test(c) || (c.codePointAt(0) ?? 0) > 127) {
+    if (/[A-Za-z_$]/.test(c)) {
       const start = i;
       const startLine = line;
       let j = i + 1;
-      while (j < src.length && (/[A-Za-z0-9_$]/.test(src[j] ?? "") || (src.charCodeAt(j) > 127 && !/\s/.test(src[j] ?? "")))) j++;
+      while (j < src.length && /[A-Za-z0-9_$]/.test(src[j] ?? "")) j++;
       const s = src.slice(start, j);
       push({ k: "ident", s, line: startLine });
       take(j - start);
@@ -209,6 +243,9 @@ function tokenize(src: string): TokResult {
       continue;
     }
 
+    if (!SINGLE_PUNCT.has(c)) return fail("unsupported character in code");
+    // `#` is modeled only as a private name (`#x`). A `#!` after the first line is not a hashbang.
+    if (c === "#" && !/[A-Za-z_$]/.test(next ?? "")) return fail("unsupported character in code");
     let punct = c;
     let plen = 1;
     for (const candidate of MULTI_PUNCT) {
@@ -217,6 +254,10 @@ function tokenize(src: string): TokResult {
         plen = candidate.length;
         break;
       }
+    }
+    if (punct === "(" || punct === "[" || punct === "{") nest.push(punct);
+    if (punct === ")" || punct === "]" || punct === "}") {
+      if (nest.pop() !== OPENER[punct]) return fail("unbalanced brackets");
     }
     if (punct === "{") brace++;
     if (punct === "}") {
@@ -238,6 +279,7 @@ function tokenize(src: string): TokResult {
   if (mode() === "sq" || mode() === "dq") return fail("unclosed string");
   if (mode() === "tmpl" || interpBrace.length > 0 || modeStack.length !== 1) return fail("unclosed template");
   if (brace !== 0) return fail("unbalanced braces");
+  if (nest.length !== 0) return fail("unbalanced brackets");
   return { tokens };
 }
 
@@ -272,6 +314,20 @@ export function resolveTarget(
   const matches: Array<{ line: number; via: "import" | "alias"; braceId: number }> = [];
   let unresolved = false;
   if (analysis.error) return { matches, unresolved };
+  // Allowlist: the only accepted binding is one top-level `import { <export> } from "<module>"`,
+  // with no alias, no namespace import of the module, no other binding or declaration of that
+  // name anywhere in the file, and no `require`/`import()` of the module (or a computed one).
+  const mod = target.module;
+  if ((analysis.dynamicLoads ?? []).some((m) => m === null || m === mod || m.startsWith(`${mod}/`))) unresolved = true;
+  // Any import specifier name that is a string literal, from any module, is not modeled.
+  if (analysis.bindings.some((b) => b.stringName)) unresolved = true;
+  for (const b of analysis.bindings) {
+    if (b.module !== mod) continue;
+    if (b.kind === "namespace") unresolved = true;
+    if (b.imported === target.export && b.via === "alias") unresolved = true;
+  }
+  if (analysis.bindings.filter((b) => b.local === target.export).length > 1) unresolved = true;
+  if (analysis.shadows.some((s) => s.name === target.export)) unresolved = true;
   for (const access of analysis.unmodeled) {
     // tok -1 is hoisted `var` or `globalThis.vi`. The declaration's own shadow must not hide it.
     const covered = access.tok >= 0 && analysis.shadows.some((s) => s.name === access.name && access.tok >= s.from && access.tok < s.to);
@@ -407,6 +463,34 @@ function skipExpr(tokens: Token[], i: number): number {
     i++;
   }
   return i;
+}
+
+/**
+ * `skipExpr` for every start index in one pass. Valid only when `()`, `[]`, `{}` are balanced and
+ * properly nested, which `tokenize` guarantees. Keeps arrow chains (`x=>x=>...`) linear.
+ */
+function exprEnds(tokens: Token[]): Int32Array {
+  const n = tokens.length;
+  const match = new Int32Array(n).fill(-1);
+  const stack: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const s = tokens[i]?.s;
+    if (s === "(" || s === "[" || s === "{") stack.push(i);
+    else if (s === ")" || s === "]" || s === "}") {
+      const open = stack.pop();
+      if (open !== undefined) match[open] = i;
+    }
+  }
+  const end = new Int32Array(n + 1);
+  end[n] = n;
+  for (let i = n - 1; i >= 0; i--) {
+    const s = tokens[i]?.s;
+    if (s === "," || s === ";" || s === ")" || s === "]" || s === "}") end[i] = i;
+    else if ((s === "(" || s === "[" || s === "{") && match[i]! >= 0) end[i] = end[match[i]! + 1]!;
+    else if (s === "(" || s === "[" || s === "{") end[i] = n;
+    else end[i] = end[i + 1]!;
+  }
+  return end;
 }
 
 function skipType(tokens: Token[], i: number): number {
@@ -549,10 +633,14 @@ function collectCalls(tokens: Token[], i: number, braceId: number, calls: CallSi
   calls.push({ recv: t.s, members, line: t.line, braceId, tok: i });
 }
 
+/** Static `import` declarations at the top level only (brace depth 0). */
 function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
   const bindings: Binding[] = [];
+  let depth = 0;
   for (let i = 0; i < tokens.length; i++) {
-    if (tokens[i]?.s !== "import") continue;
+    if (tokens[i]?.s === "{") depth++;
+    else if (tokens[i]?.s === "}") depth--;
+    if (tokens[i]?.s !== "import" || depth !== 0) continue;
     const next = tokens[i + 1];
     if (!next || next.s === "(" || next.s === ".") continue;
     let j = i + 1;
@@ -566,7 +654,7 @@ function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
     }
     let namespace: string | null = null;
     let defaultName: string | null = null;
-    const named: Array<{ imported: string; local: string; alias: boolean; typeOnly: boolean }> = [];
+    const named: Array<{ imported: string; local: string; alias: boolean; typeOnly: boolean; stringName?: true }> = [];
     const readNamed = () => {
       if (tokens[j]?.s !== "{") return;
       j++;
@@ -581,6 +669,14 @@ function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
           j++;
         }
         const importedTok = tokens[j];
+        if (importedTok?.k === "str") {
+          // Allowlist: an import specifier name must be one plain identifier.
+          const local = tokens[j + 1]?.s === "as" && tokens[j + 2]?.k === "ident" ? tokens[j + 2]!.s : "";
+          if (local) bound.add(j + 2);
+          named.push({ imported: importedTok.s, local, alias: true, typeOnly: specType, stringName: true });
+          j += local ? 3 : 1;
+          continue;
+        }
         if (importedTok?.k !== "ident") {
           j++;
           continue;
@@ -633,7 +729,9 @@ function bindingsFrom(tokens: Token[], bound: Set<number>): Binding[] {
     if (defaultName) bindings.push({ local: defaultName, via: "import", kind: "named", imported: "default", module: moduleName });
     for (const n of named) {
       if (n.typeOnly) continue;
-      bindings.push({ local: n.local, via: n.alias ? "alias" : "import", kind: "named", imported: n.imported, module: moduleName });
+      const binding: Binding = { local: n.local, via: n.alias ? "alias" : "import", kind: "named", imported: n.imported, module: moduleName };
+      if (n.stringName) binding.stringName = true;
+      bindings.push(binding);
     }
   }
   return bindings;
@@ -791,10 +889,30 @@ function collectRisks(
   return { unmodeled };
 }
 
+/** Every `require` use and every `import(` call. A non-literal or computed argument is null. */
+function dynamicLoadsFrom(tokens: Token[]): Array<string | null> {
+  const loads: Array<string | null> = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t?.k !== "ident") continue;
+    const prev = tokens[i - 1]?.s;
+    if (prev === "." || prev === "?.") continue;
+    const isRequire = t.s === "require" && tokens[i + 1]?.s !== ":";
+    const isImportCall = t.s === "import" && tokens[i + 1]?.s === "(";
+    if (!isRequire && !isImportCall) continue;
+    const arg = tokens[i + 2];
+    const close = tokens[i + 3]?.s;
+    if (tokens[i + 1]?.s === "(" && arg?.k === "str" && (close === ")" || (isImportCall && close === ","))) loads.push(arg.s);
+    else loads.push(null);
+  }
+  return loads;
+}
+
 export function analyze(source: string): Analysis {
   const toked = tokenize(source);
   if (toked.error) return { error: toked.error, calls: [], bindings: [], shadows: [], unmodeled: [] };
   const tokens = toked.tokens;
+  const ends = exprEnds(tokens);
   const calls: CallSite[] = [];
   const shadows: Shadow[] = [];
   const hoisted: Array<{ name: string; tok: number }> = [];
@@ -888,7 +1006,7 @@ export function analyze(source: string): Analysis {
       remember(params.at);
       if (tokens[i + 1]?.s === "{") pendingParams = params.names;
       else {
-        const end = skipExpr(tokens, i + 1);
+        const end = ends[i + 1] ?? tokens.length;
         for (const name of params.names) shadows.push({ name, from: i, to: end });
       }
     }
@@ -912,7 +1030,7 @@ export function analyze(source: string): Analysis {
       }
       if (tokens[j]?.s === "{") pendingLoop = pat.names;
       else {
-        const end = skipExpr(tokens, j);
+        const end = ends[Math.min(j, tokens.length)] ?? tokens.length;
         for (const name of pat.names) shadows.push({ name, from: i, to: end });
       }
       i = Math.max(i, j - 1);
@@ -1003,7 +1121,7 @@ export function analyze(source: string): Analysis {
   const bindings = bindingsFrom(tokens, bound);
   const risks = collectRisks(tokens, bound, methodNames);
   if (risks.error) return { error: risks.error, calls: [], bindings: [], shadows: [], unmodeled: [] };
-  return { calls, bindings, shadows, unmodeled: [...hoisted, ...asiUnmodeled, ...risks.unmodeled] };
+  return { calls, bindings, shadows, unmodeled: [...hoisted, ...asiUnmodeled, ...risks.unmodeled], dynamicLoads: dynamicLoadsFrom(tokens) };
 }
 
 type Val =
@@ -1017,7 +1135,16 @@ export type ConfigRead =
   | { kind: "parse_failed"; detail: string }
   | { kind: "value"; value: string | number | boolean | null };
 
+/** A property value. A literal counts only when the next token ends the property (`,` or `}`). */
 function parseValue(tokens: Token[], i: number): { val: Val; next: number } {
+  const read = parseValueRaw(tokens, i);
+  if (read.val.t === "lit" && tokens[read.next]?.s !== "," && tokens[read.next]?.s !== "}") {
+    return { val: { t: "expr" }, next: skipExpr(tokens, read.next) };
+  }
+  return read;
+}
+
+function parseValueRaw(tokens: Token[], i: number): { val: Val; next: number } {
   const t = tokens[i];
   if (!t) return { val: { t: "expr" }, next: i };
   if (t.s === "{") return parseObject(tokens, i);
@@ -1096,8 +1223,28 @@ function lookup(obj: Val, path: string[]): "absent" | "not-static" | string | nu
   const prop = obj.props.find((p) => p.key === head);
   if (!prop) return "absent";
   if (rest.length === 0) return prop.value.t === "lit" ? prop.value.v : "not-static";
-  if (prop.value.t !== "obj") return prop.value.t === "expr" ? "not-static" : "absent";
+  if (prop.value.t !== "obj") return "not-static";
   return lookup(prop.value, rest);
+}
+
+/**
+ * Allowlist of config keys. The root object may contain only `test`, and `test` may contain only
+ * these mock-reset options, each a boolean literal. Any other key anywhere (plugins, resolve,
+ * test.alias, setupFiles, globalSetup, extends, projects, include, ...) can change what runs or
+ * what `vitest` resolves to, so the whole config is not-static.
+ */
+const ALLOWED_TEST_KEYS = new Set(["clearMocks", "restoreMocks", "mockReset"]);
+
+function configShapeAllowed(root: Val): boolean {
+  if (root.t !== "obj" || root.hasSpread || root.ambiguous) return false;
+  return root.props.every(
+    (p) =>
+      p.key === "test" &&
+      p.value.t === "obj" &&
+      !p.value.hasSpread &&
+      !p.value.ambiguous &&
+      p.value.props.every((q) => ALLOWED_TEST_KEYS.has(q.key) && q.value.t === "lit" && typeof q.value.v === "boolean"),
+  );
 }
 
 function skipAngles(tokens: Token[], i: number): number {
@@ -1130,50 +1277,52 @@ function declaresDefineConfig(tokens: Token[]): boolean {
 
 /** `defineConfig(` is vitest/vite's helper only for this exact unaliased import. */
 function isTrustedDefineConfig(tokens: Token[]): boolean {
-  const locals = bindingsFrom(tokens, new Set()).filter((b) => b.local === "defineConfig");
+  const all = bindingsFrom(tokens, new Set());
+  if (all.some((b) => b.stringName)) return false;
+  const locals = all.filter((b) => b.local === "defineConfig");
   const binding = locals.length === 1 ? locals[0] : undefined;
   if (!binding || binding.via !== "import" || binding.kind !== "named" || binding.imported !== "defineConfig") return false;
   if (binding.module !== "vitest/config" && binding.module !== "vite") return false;
   return !declaresDefineConfig(tokens);
 }
 
+/**
+ * Allowlist: the only readable config is one `export default defineConfig({ ... })` where
+ * `defineConfig` is the unaliased top-level import from "vitest/config" or "vite", used nowhere
+ * else, with a static object argument whose keys are all in the allowlist above. Every other shape
+ * (another export form, a wrapper, a callback, `mergeConfig`, `module.exports`) is not-static.
+ */
 export function readConfigKey(source: string, key: string): ConfigRead {
   const toked = tokenize(source);
   if (toked.error) return { kind: "parse_failed", detail: toked.error };
   const tokens = toked.tokens;
   const path = key.split(".").filter((s) => s.length > 0);
-  const trusted = isTrustedDefineConfig(tokens);
-  let notStatic = false;
-  const roots: Val[] = [];
+  if (!isTrustedDefineConfig(tokens)) return { kind: "not-static" };
+  let defaults = 0;
+  let defineUses = 0;
+  let root: Val | undefined;
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i];
     if (!t) break;
-    if (t.k === "ident" && t.s === "mergeConfig" && tokens[i + 1]?.s === "(") notStatic = true;
-    if (t.k === "ident" && t.s === "module" && tokens[i + 1]?.s === "." && tokens[i + 2]?.s === "exports") notStatic = true;
-    const bareDefine = t.k === "ident" && t.s === "defineConfig" && tokens[i - 1]?.s !== "." && tokens[i - 1]?.s !== "?.";
-    if (bareDefine) {
-      let j = skipAngles(tokens, i + 1);
-      if (tokens[j]?.s === "(") {
-        if (trusted && tokens[j + 1]?.s === "{") roots.push(parseObject(tokens, j + 1).val);
-        else notStatic = true;
-      }
-    }
+    if (t.k === "ident" && t.s === "mergeConfig" && tokens[i + 1]?.s === "(") return { kind: "not-static" };
+    if (t.k === "ident" && t.s === "module" && tokens[i + 1]?.s === "." && tokens[i + 2]?.s === "exports") return { kind: "not-static" };
+    const prev = tokens[i - 1]?.s;
+    if (t.k === "ident" && t.s === "defineConfig" && prev !== "." && prev !== "?.") defineUses++;
     if (t.k === "ident" && t.s === "export" && tokens[i + 1]?.s === "default") {
-      const n = tokens[i + 2];
-      if (n?.s === "{") roots.push(parseObject(tokens, i + 2).val);
-      else if (!(trusted && n?.k === "ident" && n.s === "defineConfig")) notStatic = true;
+      defaults++;
+      const shaped = tokens[i + 2]?.s === "defineConfig" && tokens[i + 3]?.s === "(" && tokens[i + 4]?.s === "{";
+      if (!shaped) return { kind: "not-static" };
+      const obj = parseObject(tokens, i + 4);
+      if (tokens[obj.next]?.s !== ")") return { kind: "not-static" };
+      root = obj.val;
     }
   }
-  if (notStatic) return { kind: "not-static" };
-  if (roots.length === 0) return { kind: "absent" };
-  let saw: string | number | boolean | null | undefined;
-  for (const root of roots) {
-    const found = lookup(root, path);
-    if (found === "not-static") return { kind: "not-static" };
-    if (found === "absent") continue;
-    if (saw !== undefined && saw !== found) return { kind: "not-static" };
-    saw = found;
-  }
-  if (saw === undefined) return { kind: "absent" };
-  return { kind: "value", value: saw };
+  // One use in the import specifier and one in the default export call. Any other use
+  // (a reassignment, a second call, passing it as a value) is not modeled.
+  if (defaults !== 1 || defineUses !== 2 || !root) return { kind: "not-static" };
+  if (!configShapeAllowed(root)) return { kind: "not-static" };
+  const found = lookup(root, path);
+  if (found === "not-static") return { kind: "not-static" };
+  if (found === "absent") return { kind: "absent" };
+  return { kind: "value", value: found };
 }

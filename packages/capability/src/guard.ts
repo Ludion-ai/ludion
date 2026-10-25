@@ -15,6 +15,30 @@ export type GuardInput = {
   similarity?: number;
 };
 
+/** Largest target file the guard scans, in UTF-8 bytes (256 KiB). A larger file makes the result unknown/parse_failed without scanning. */
+export const MAX_GUARD_FILE_BYTES = 262_144;
+
+/** UTF-8 byte length of `text` (as Buffer.byteLength counts it), stopping early once it passes `limit`. */
+function utf8BytesUpTo(text: string, limit: number): number {
+  let bytes = 0;
+  for (let i = 0; i < text.length && bytes <= limit; i++) {
+    const c = text.charCodeAt(i);
+    if (c < 0x80) bytes += 1;
+    else if (c < 0x800) bytes += 2;
+    else if (c >= 0xd800 && c <= 0xdbff && i + 1 < text.length && (text.charCodeAt(i + 1) & 0xfc00) === 0xdc00) {
+      bytes += 4;
+      i++;
+    } else bytes += 3;
+  }
+  return bytes;
+}
+
+/** A note when `text` is over MAX_GUARD_FILE_BYTES. Checked before any scan, because the scanner is not linear on every input. */
+function oversize(text: string): string | undefined {
+  if (text.length * 3 <= MAX_GUARD_FILE_BYTES) return undefined;
+  return utf8BytesUpTo(text, MAX_GUARD_FILE_BYTES) > MAX_GUARD_FILE_BYTES ? `file is over the ${MAX_GUARD_FILE_BYTES} byte scan limit` : undefined;
+}
+
 type Check = { condition: string; ok: boolean | null; note?: string };
 type Hit = { file: string; line: number; via: "import" | "alias"; braceId: number };
 
@@ -60,6 +84,11 @@ function dotPathResult(structure: readonly StructureConditionT[], files: Record<
       }
       if (!anyGlob(condition.files, filePath)) continue;
       const label = `call:${condition.target.module}.${condition.target.export}.${condition.target.member.join(".")}`;
+      const tooBig = oversize(text);
+      if (tooBig) {
+        checks.push(check(label, null, tooBig));
+        return unknown("parse_failed", `${filePath}: ${tooBig}`, checks);
+      }
       const found = analyze(text);
       if (found.error) {
         checks.push(check(label, null, found.error));
@@ -216,6 +245,11 @@ function evaluateConfigs(structure: readonly StructureConditionT[], files: Recor
     let excluding = false;
     let saw = false;
     for (const [path, text] of matched) {
+      const tooBig = oversize(text);
+      if (tooBig) {
+        checks.push(check(label, null, tooBig));
+        return unknown("parse_failed", `${path}: ${tooBig}`, checks);
+      }
       const read = readConfigKey(text, condition.key);
       if (read.kind === "parse_failed") {
         checks.push(check(label, null, read.detail));
@@ -258,6 +292,11 @@ function evaluateCalls(structure: readonly StructureConditionT[], files: Record<
     const matchedFiles = Object.entries(files).filter(([path]) => isRel(path) && anyGlob(condition.files, path));
     for (const [path, text] of matchedFiles) {
       const filePath = path.replaceAll("\\", "/");
+      const tooBig = oversize(text);
+      if (tooBig) {
+        checks.push(check(label, null, tooBig));
+        return unknown("parse_failed", `${filePath}: ${tooBig}`, checks);
+      }
       const found = analyzed(filePath, text);
       if (found.error) {
         checks.push(check(label, null, found.error));

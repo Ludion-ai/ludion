@@ -3,10 +3,11 @@ import { chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { executeProgram, PINNED_VERSION_SET } from "../src/index.ts";
-import { applicableTest, CONTRACT_ID, exampleArtifact, reseal } from "./fixtures.ts";
+import { evaluateGuard, executeProgram, PINNED_VERSION_SET } from "../src/index.ts";
+import { lockfileVersions } from "../src/executor.ts";
+import { applicableTest, CONTRACT_ID, exampleArtifact, packageLock, reseal } from "./fixtures.ts";
 
-const RESOLVED_VERSIONS = { vitest: PINNED_VERSION_SET.vitest, vite: PINNED_VERSION_SET.vite };
+const LOCK = packageLock({ vitest: PINNED_VERSION_SET.vitest, vite: PINNED_VERSION_SET.vite });
 const NODE_VERSION = "v24.8.0";
 
 const PROGRAM = [
@@ -54,6 +55,7 @@ function workCopy(): { root: string; target: string; other: string; originalOthe
   const originalOther = "export const other = 1;\n";
   writeFileSync(target, applicableTest);
   writeFileSync(other, originalOther);
+  writeFileSync(join(root, "package-lock.json"), LOCK);
   chmodSync(root, 0o777);
   chmodSync(join(root, "src"), 0o777);
   chmodSync(target, 0o666);
@@ -70,7 +72,6 @@ describe.skipIf(process.env.LUDION_DOCKER_TESTS !== "1")("program executor in Do
         record,
         contract_id: CONTRACT_ID,
         workDir: work.root,
-        resolved_versions: RESOLVED_VERSIONS,
         node_version: NODE_VERSION,
       });
       expect(result).toMatchObject({ outcome: "executed", status: "ok", model_calls: { count: 0 } });
@@ -80,7 +81,15 @@ describe.skipIf(process.env.LUDION_DOCKER_TESTS !== "1")("program executor in Do
       // The container wrote to the executor's private snapshot; the caller's tree is untouched.
       expect(result.evidence.diff).toHaveLength(1);
       expect(result.evidence.diff[0]?.after).toBe(`// changed\n${applicableTest}`);
-      expect(result.guard.status).toBe("applicable");
+      // The executor evaluated the guard on this same work copy (files and lockfile), right before running.
+      const expectedGuard = evaluateGuard(record, {
+        contract_id: CONTRACT_ID,
+        files: { "package-lock.json": LOCK, "src/a.test.ts": applicableTest, "src/other.ts": work.originalOther },
+        resolved_versions: lockfileVersions(LOCK),
+        node_version: NODE_VERSION,
+      });
+      expect(expectedGuard.status).toBe("applicable");
+      expect(result.guard).toEqual(expectedGuard);
       expect(readFileSync(work.target, "utf8")).toBe(applicableTest);
       expect(readFileSync(work.other, "utf8")).toBe(work.originalOther);
       const report = JSON.parse(result.evidence.stdout_tail) as { other: string; escape: string; net: string };
@@ -100,7 +109,6 @@ describe.skipIf(process.env.LUDION_DOCKER_TESTS !== "1")("program executor in Do
         record,
         contract_id: CONTRACT_ID,
         workDir: work.root,
-        resolved_versions: RESOLVED_VERSIONS,
         node_version: NODE_VERSION,
       });
       expect(result).toMatchObject({ outcome: "executed", status: "timeout", model_calls: { count: 0 } });

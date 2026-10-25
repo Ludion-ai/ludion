@@ -20,10 +20,9 @@ vi.mock("../src/guard.ts", async (importOriginal) => {
 });
 
 const { executeProgram, PINNED_VERSION_SET } = await import("../src/index.ts");
-const { applicableTest, CONTRACT_ID, exampleArtifact, reseal } = await import("./fixtures.ts");
+const { applicableTest, CONTRACT_ID, exampleArtifact, packageLock, reseal } = await import("./fixtures.ts");
 type DockerRunner = import("../src/index.ts").DockerRunner;
 
-const RESOLVED_VERSIONS = { vitest: PINNED_VERSION_SET.vitest, vite: PINNED_VERSION_SET.vite };
 const temps: string[] = [];
 
 // Vitest runs test files in parallel workers that share the OS temp directory. Give this file its own
@@ -61,6 +60,7 @@ function applicableWork(): string {
   temps.push(root);
   mkdirSync(join(root, "src"));
   writeFileSync(join(root, "src", "a.test.ts"), applicableTest);
+  writeFileSync(join(root, "package-lock.json"), packageLock());
   return root;
 }
 
@@ -77,7 +77,6 @@ async function run(work: string) {
     workDir: work,
     runner,
     preRepair,
-    resolved_versions: RESOLVED_VERSIONS,
     node_version: "v24.8.0",
   });
   return { result, runner, preRepair };
@@ -110,7 +109,7 @@ describe("guard evaluation fails closed", () => {
     expect(result).toMatchObject({
       outcome: "not_executed",
       reason: "guard_failed",
-      guard_status: null,
+      guard_status: "unknown",
       guard: null,
       docker_invoked: false,
       pre_repair: null,
@@ -122,14 +121,15 @@ describe("guard evaluation fails closed", () => {
     expect([...ludionTemps()].filter((name) => !before.has(name))).toEqual([]);
   });
 
-  it("the guard sees the snapshot's files, not caller-supplied ones", async () => {
+  it("the guard sees the snapshot's files and the versions from its lockfile", async () => {
     const work = applicableWork();
     writeFileSync(join(work, "src", "other.ts"), "export const other = 1;\n");
     await run(work);
     expect(guardMock.calls).toHaveLength(1);
     expect(guardMock.calls[0]).toMatchObject({
       contract_id: CONTRACT_ID,
-      files: { "src/a.test.ts": applicableTest, "src/other.ts": "export const other = 1;\n" },
+      files: { "package-lock.json": packageLock(), "src/a.test.ts": applicableTest, "src/other.ts": "export const other = 1;\n" },
+      resolved_versions: { vitest: "4.0.0", vite: "7.1.11" },
     });
   });
 });

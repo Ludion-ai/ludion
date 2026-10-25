@@ -4,8 +4,9 @@
 // (lstat on every entry, symlinks and non-regular files refused, nothing followed) and
 // mounts only that snapshot, read-only. Only existing snapshot files matched by
 // program.effects.writes are bind-mounted read-write over it. New files are not supported.
-// The executor evaluates the guard itself, on the snapshot it will mount. A guard result
-// from the caller is never authority. Anything other than a well-formed applicable result
+// The executor evaluates the guard itself, on the snapshot it will mount, right before running.
+// There is no guard input from the caller, and package versions come only from the snapshot's
+// package-lock.json. Anything other than a well-formed applicable result
 // (including a guard that throws or returns nothing) returns not_executed and does not start
 // Docker. The snapshot is removed afterwards and nothing is written back to the caller's tree.
 // This module never calls a model.
@@ -64,11 +65,8 @@ export type PreRepairEvidence =
 
 export type ExecuteProgramInput = {
   record: unknown;
-  /**
-   * Ignored. Kept so older callers still type-check. The executor evaluates the guard itself on
-   * its own snapshot of workDir; a caller-supplied result can never make the program run.
-   */
-  guard?: unknown;
+  // There is no guard or resolved_versions input. The executor evaluates the guard itself on its own
+  // snapshot of workDir, with versions read from that snapshot's package-lock.json.
   /** Contract id the caller intends to apply. Passed to the guard; a missing id is not applicable. */
   contract_id?: string;
   /**
@@ -77,8 +75,6 @@ export type ExecuteProgramInput = {
    * snapshot (skipping node_modules and .git directories) and runs on that copy only.
    */
   workDir: string;
-  /** Lockfile versions the guard resolved for the recipient. */
-  resolved_versions: Record<string, string>;
   /** Recipient Node version, `vX.Y.Z` or `X.Y.Z`. */
   node_version: string;
   runner?: DockerRunner;
@@ -118,8 +114,8 @@ export type ProgramExecution =
       outcome: "not_executed";
       /** guard_failed: the guard threw, or returned null, undefined, or a value that is not a GuardResult. */
       reason: "guard_not_applicable" | "guard_failed";
-      /** Status of the executor's own guard evaluation. Null when the guard failed. */
-      guard_status: GuardResultT["status"] | null;
+      /** Status of the executor's own guard evaluation. "unknown" when the guard failed. */
+      guard_status: GuardResultT["status"];
       /** The executor's own guard result on the snapshot. Null when the guard failed. */
       guard: GuardResultT | null;
       detail: string;
@@ -364,7 +360,7 @@ export async function executeProgram(input: ExecuteProgramInput): Promise<Progra
     return { ...body, wall_ms, model_calls: MODEL_CALLS, pre_repair: preRepairEvidence } as ProgramExecution;
   };
 
-  // input.guard is deliberately never read. The only guard result that counts is the one below.
+  // The only guard result that counts is the executor's own, evaluated on the snapshot below.
   const parsed = CapabilityRecord.safeParse(input.record);
   if (!parsed.success) {
     return finish({ outcome: "rejected", reason: "invalid_record", detail: clip(parsed.error.issues[0]?.message ?? "record did not parse"), docker_invoked: false });
@@ -381,17 +377,6 @@ export async function executeProgram(input: ExecuteProgramInput): Promise<Progra
   const record = parsed.data;
   const program = record.artifact.program;
 
-  // The pinned version set is a host gate. A mismatch does not start Docker.
-  const versions = versionMismatchDetail(
-    record.artifact.guard.runtime.node_major,
-    record.artifact.dependencies.image,
-    input.resolved_versions,
-    input.node_version,
-  );
-  if (versions !== undefined) {
-    return finish({ outcome: "rejected", reason: "version_set_mismatch", detail: clip(versions), docker_invoked: false });
-  }
-
   const writes = checkWriteGlobs(program.effects.writes, effectiveProtectedPaths(record.artifact.verifier));
   if (!writes.ok) return finish({ outcome: "rejected", reason: "unsafe_write_target", detail: writes.detail, docker_invoked: false });
 
@@ -404,15 +389,31 @@ export async function executeProgram(input: ExecuteProgramInput): Promise<Progra
     const snap = takeSnapshot(work.real, snapshotDir, program.effects.writes);
     if (!snap.ok) return finish({ outcome: "rejected", reason: "unsafe_work_tree", detail: clip(snap.detail), docker_invoked: false });
 
-    // Step 2. The executor's own guard, on the exact bytes it copied. Fail-closed on anything but applicable.
+    // Package versions come from the snapshot's own lockfile, never from the caller. Null means unreadable.
+    const resolvedVersions = lockfileVersions(snap.files[LOCKFILE]);
+
+    // The pinned version set is a host gate. A mismatch does not start Docker. An unreadable
+    // lockfile is left to the guard, which returns unknown/lockfile_unreadable.
+    const versions = versionMismatchDetail(
+      record.artifact.guard.runtime.node_major,
+      record.artifact.dependencies.image,
+      resolvedVersions,
+      input.node_version,
+    );
+    if (versions !== undefined) {
+      return finish({ outcome: "rejected", reason: "version_set_mismatch", detail: clip(versions), docker_invoked: false });
+    }
+
+    // Step 2. The executor's own guard, on the exact bytes it copied, right before execution.
+    // Fail-closed on anything but applicable.
     const gate = runGuard(record, {
       ...(input.contract_id !== undefined ? { contract_id: input.contract_id } : {}),
       files: snap.files,
-      resolved_versions: input.resolved_versions,
+      resolved_versions: resolvedVersions,
       node_version: input.node_version,
     });
     if (!gate.ok) {
-      return finish({ outcome: "not_executed", reason: "guard_failed", guard_status: null, guard: null, detail: clip(gate.detail), docker_invoked: false });
+      return finish({ outcome: "not_executed", reason: "guard_failed", guard_status: "unknown", guard: null, detail: clip(gate.detail), docker_invoked: false });
     }
     if (gate.guard.status !== "applicable") {
       return finish({
@@ -862,15 +863,48 @@ type ComparedFile = {
   changed: boolean;
 };
 
+/** npm lockfile at the work-copy root. The only source of package versions. */
+const LOCKFILE = "package-lock.json";
+
+/**
+ * Top-level package versions from an npm lockfile (lockfileVersion 2 or 3, `packages["node_modules/<name>"]`).
+ * Nested copies (`node_modules/a/node_modules/b`) are ignored. Missing, unparsable, or another format is null.
+ */
+export function lockfileVersions(text: string | undefined): Record<string, string> | null {
+  if (text === undefined) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return null;
+  const lock = parsed as { lockfileVersion?: unknown; packages?: unknown };
+  if (lock.lockfileVersion !== 2 && lock.lockfileVersion !== 3) return null;
+  if (typeof lock.packages !== "object" || lock.packages === null || Array.isArray(lock.packages)) return null;
+  const out: Record<string, string> = Object.create(null) as Record<string, string>;
+  for (const [key, entry] of Object.entries(lock.packages as Record<string, unknown>)) {
+    if (!key.startsWith("node_modules/")) continue;
+    const name = key.slice("node_modules/".length);
+    if (name.length === 0 || name.includes("/node_modules/")) continue;
+    if (name.includes("/") && !(name.startsWith("@") && name.split("/").length === 2)) continue;
+    if (typeof entry !== "object" || entry === null) continue;
+    const version = (entry as { version?: unknown }).version;
+    if (typeof version !== "string" || version.length === 0 || version.length > 64) continue;
+    out[name] = version;
+  }
+  return { ...out };
+}
+
 function versionMismatchDetail(
   nodeMajors: readonly string[],
   image: string,
-  resolved: Record<string, string>,
+  resolved: Record<string, string> | null,
   nodeVersion: string,
 ): string | undefined {
   const problems: string[] = [];
-  if (resolved["vitest"] !== PINNED_VERSION_SET.vitest) problems.push("vitest");
-  if (resolved["vite"] !== PINNED_VERSION_SET.vite) problems.push("vite");
+  if (resolved !== null && resolved["vitest"] !== PINNED_VERSION_SET.vitest) problems.push("vitest");
+  if (resolved !== null && resolved["vite"] !== PINNED_VERSION_SET.vite) problems.push("vite");
   if (nodeMajor(nodeVersion) !== PINNED_VERSION_SET.node_major) problems.push("node");
   if (!nodeMajors.includes(PINNED_VERSION_SET.node_major)) problems.push("record node_major");
   if (image !== PINNED_VERSION_SET.image) problems.push("image");

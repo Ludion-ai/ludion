@@ -22,9 +22,12 @@ import {
   type GuardResultT,
   type ProgramExecution,
 } from "../src/index.ts";
-import { alreadyFixedTest, applicableTest, CONTRACT_ID, exampleArtifact, exampleRecord, FIXTURE_IMAGE, globalsTest, guardInput, localFunctionTest, reseal } from "./fixtures.ts";
+import { alreadyFixedTest, applicableTest, CONTRACT_ID, exampleArtifact, exampleRecord, FIXTURE_IMAGE, globalsTest, guardInput, localFunctionTest, packageLock, reseal } from "./fixtures.ts";
+import { lockfileVersions } from "../src/executor.ts";
 
 const RESOLVED_VERSIONS = { vitest: PINNED_VERSION_SET.vitest, vite: PINNED_VERSION_SET.vite };
+/** The work copy's own lockfile. The executor reads versions only from this file. */
+const LOCK = packageLock(RESOLVED_VERSIONS);
 const NODE_VERSION = "v24.8.0";
 
 // it.skipIf reads its flag while this file is imported, which is before beforeAll.
@@ -110,6 +113,7 @@ function makeWork(): string {
   writeFileSync(join(root, "src", "a.test.ts"), applicableTest);
   writeFileSync(join(root, "src", "b.test.ts"), "export const b = 1;\n");
   writeFileSync(join(root, "src", "other.ts"), "export const other = 1;\n");
+  writeFileSync(join(root, "package-lock.json"), LOCK);
   return root;
 }
 
@@ -286,10 +290,11 @@ describe("resolveWritableFiles", () => {
 });
 
 describe("executeProgram", () => {
-  it("ignores a caller-supplied applicable guard and returns not_executed for a non-applicable tree", async () => {
+  it("has no guard input: an untyped caller's applicable guard is ignored on a non-applicable tree", async () => {
     const work = keep(mkdtempSync(join(tmpdir(), "ludion-work-")));
     mkdirSync(join(work, "src"));
     writeFileSync(join(work, "src", "nope.test.ts"), "export const x = 1;\n");
+    writeFileSync(join(work, "package-lock.json"), LOCK);
     const forged = applicableGuard();
     const callerResults: unknown[] = [
       forged,
@@ -306,16 +311,9 @@ describe("executeProgram", () => {
       const preRepair = vi.fn(async () => {
         throw new Error("pre-repair must not run");
       });
-      const result = await executeProgram({
-        record: pinnedRecord(),
-        guard,
-        contract_id: CONTRACT_ID,
-        workDir: work,
-        runner,
-        preRepair,
-        resolved_versions: RESOLVED_VERSIONS,
-        node_version: NODE_VERSION,
-      });
+      // ExecuteProgramInput has no guard field; an untyped (JS) caller can still pass one.
+      const untyped = { record: pinnedRecord(), guard, contract_id: CONTRACT_ID, workDir: work, runner, preRepair, node_version: NODE_VERSION };
+      const result = await executeProgram(untyped);
       expect(result).toMatchObject({
         outcome: "not_executed",
         reason: "guard_not_applicable",
@@ -340,24 +338,23 @@ describe("executeProgram", () => {
     ["vi without a vitest import", { "src/global.test.ts": globalsTest }, CONTRACT_ID, "unknown"],
     ["a missing contract id", { "src/a.test.ts": applicableTest }, undefined, "unknown"],
     ["an unrelated contract id", { "src/a.test.ts": applicableTest }, "other.contract", "inapplicable"],
-  ] as const)("evaluates the guard itself on the tree: %s is not executed", async (_name, files, contractId, _status) => {
+  ] as const)("evaluates the guard itself on the tree: %s is not executed", async (_name, files, contractId, status) => {
     const work = keep(mkdtempSync(join(tmpdir(), "ludion-work-")));
     mkdirSync(join(work, "src"));
+    writeFileSync(join(work, "package-lock.json"), LOCK);
     for (const [rel, text] of Object.entries(files)) writeFileSync(join(work, ...rel.split("/")), text);
     const runner = vi.fn<DockerRunner>(async () => {
       throw new Error("docker must not start");
     });
     const result = await executeProgram({
       record: pinnedRecord(),
-      guard: applicableGuard(),
       ...(contractId !== undefined ? { contract_id: contractId } : {}),
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
-    const expected = evaluateGuard(pinnedRecord(), guardInput({ contract_id: contractId, files: { ...files } }));
-    expect(expected.status).not.toBe("applicable");
+    const expected = evaluateGuard(pinnedRecord(), guardInput({ contract_id: contractId, files: { ...files, "package-lock.json": LOCK } }));
+    expect(expected.status).toBe(status);
     expect(result).toMatchObject({ outcome: "not_executed", reason: "guard_not_applicable", guard_status: expected.status, docker_invoked: false });
     if (result.outcome === "not_executed") expect(result.guard?.status).toBe(expected.status);
     expect(runner).not.toHaveBeenCalled();
@@ -399,7 +396,6 @@ describe("executeProgram", () => {
       runner,
       now,
       containerName: "ludion-program-apply",
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(ticks).toBe(2);
@@ -423,7 +419,7 @@ describe("executeProgram", () => {
     }));
     const unchanged = "export const b = 1;\n";
     const ownGuard = evaluateGuard(record, guardInput({
-      files: { "src/a.test.ts": beforeA, "src/b.test.ts": unchanged, "src/other.ts": "export const other = 1;\n" },
+      files: { "package-lock.json": LOCK, "src/a.test.ts": beforeA, "src/b.test.ts": unchanged, "src/other.ts": "export const other = 1;\n" },
     }));
     expect(ownGuard.status).toBe("applicable");
     expect(result).toEqual({
@@ -487,8 +483,7 @@ describe("executeProgram", () => {
         runner,
         containerName: "ludion-program-case",
         now: () => 0,
-        resolved_versions: RESOLVED_VERSIONS,
-        node_version: NODE_VERSION,
+          node_version: NODE_VERSION,
       });
     };
     const timed = await run({ kind: "exited", exitCode: 137, stdout: "", stderr: "", timedOut: true });
@@ -521,12 +516,11 @@ describe("executeProgram", () => {
 
   it("rejects an invalid record and a work directory outside the temp roots", async () => {
     const work = makeWork();
-    const guard = applicableGuard();
     const runner = vi.fn<DockerRunner>(async () => {
       throw new Error("docker must not start");
     });
     const before = programDirs();
-    const base = { guard, contract_id: CONTRACT_ID, runner, resolved_versions: RESOLVED_VERSIONS, node_version: NODE_VERSION };
+    const base = { contract_id: CONTRACT_ID, runner, node_version: NODE_VERSION };
     const invalid = await executeProgram({ ...base, record: { id: "nope" }, workDir: work });
     expect(invalid).toMatchObject({ outcome: "rejected", reason: "invalid_record", docker_invoked: false, model_calls: { count: 0 } });
     const rec = pinnedRecord();
@@ -559,6 +553,7 @@ function caseWork(source = TEST_SOURCE): string {
   const root = keep(mkdtempSync(join(tmpdir(), "ludion-work-")));
   mkdirSync(join(root, "src"));
   writeFileSync(join(root, "src", "a.test.ts"), source);
+  writeFileSync(join(root, "package-lock.json"), LOCK);
   return root;
 }
 
@@ -602,7 +597,6 @@ describe("negative cases never verify", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     assertNeverVerified(result);
@@ -624,7 +618,6 @@ describe("negative cases never verify", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     assertNeverVerified(result);
@@ -651,7 +644,6 @@ describe("negative cases never verify", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     assertNeverVerified(result);
@@ -675,7 +667,6 @@ describe("negative cases never verify", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     assertNeverVerified(result);
@@ -707,7 +698,6 @@ describe("negative cases never verify", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     assertNeverVerified(result);
@@ -732,7 +722,6 @@ describe("negative cases never verify", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     assertNeverVerified(result);
@@ -761,7 +750,6 @@ describe("negative cases never verify", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     assertNeverVerified(result);
@@ -791,6 +779,8 @@ describe("version set", () => {
     ["image", () => exampleRecord(), { vitest: "4.0.0", vite: "7.1.11" }, NODE_VERSION],
   ] as const)("rejects a %s mismatch with version_set_mismatch and does not start Docker", async (_name, recordOf, resolved, nodeVersion) => {
     const work = makeWork();
+    // The versions come from the work copy's lockfile.
+    writeFileSync(join(work, "package-lock.json"), packageLock({ ...resolved }));
     const before = programDirs();
     const runner = vi.fn<DockerRunner>(async () => {
       throw new Error("docker must not start");
@@ -804,7 +794,6 @@ describe("version set", () => {
       workDir: work,
       runner,
       preRepair,
-      resolved_versions: { ...resolved },
       node_version: nodeVersion,
     });
     expect(result).toMatchObject({
@@ -840,7 +829,6 @@ describe("pre-repair", () => {
       workDir: work,
       runner,
       preRepair,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(order).toEqual(["pre", "run"]);
@@ -861,7 +849,6 @@ describe("pre-repair", () => {
       workDir: work,
       runner,
       preRepair: async () => evidence,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(result).toMatchObject({
@@ -888,7 +875,6 @@ describe("pre-repair", () => {
       workDir: work,
       runner,
       preRepair: async () => evidence,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(result).toMatchObject({ outcome: "rejected", reason: "pre_repair_not_failing", docker_invoked: false, pre_repair: evidence });
@@ -909,7 +895,6 @@ describe("pre-repair", () => {
       preRepair: async () => {
         throw new Error("verifier down");
       },
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(result).toMatchObject({
@@ -936,7 +921,6 @@ describe("pre-repair", () => {
       workDir: work,
       runner,
       preRepair: async () => evidence,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(result).toMatchObject({
@@ -960,7 +944,6 @@ describe("pre-repair", () => {
       workDir: work,
       runner,
       require_pre_repair: true,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(result).toMatchObject({
@@ -981,12 +964,10 @@ describe("pre-repair", () => {
     });
     const result = await executeProgram({
       record: pinnedRecord(),
-      guard: applicableGuard(),
       contract_id: CONTRACT_ID,
       workDir: caseWork(localFunctionTest),
       runner,
       preRepair,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
     });
     expect(result).toMatchObject({ outcome: "not_executed", reason: "guard_not_applicable", pre_repair: null, docker_invoked: false });
@@ -1004,7 +985,6 @@ describe("private snapshot", () => {
       contract_id: CONTRACT_ID,
       workDir: work,
       runner,
-      resolved_versions: RESOLVED_VERSIONS,
       node_version: NODE_VERSION,
       ...extra,
     });
@@ -1073,7 +1053,7 @@ describe("private snapshot", () => {
     };
     const result = await runOn(work, runner);
     expect(result.outcome).toBe("executed");
-    expect(listing).toEqual(["docs/deep/note.md", "src/a.test.ts", "src/b.test.ts", "src/other.ts"]);
+    expect(listing).toEqual(["docs/deep/note.md", "package-lock.json", "src/a.test.ts", "src/b.test.ts", "src/other.ts"]);
   });
 
   it.skipIf(!symlinkProbe.file)("refuses a file symlink anywhere in the tree and never starts Docker", async () => {
@@ -1139,6 +1119,137 @@ describe("private snapshot", () => {
     const result = await runOn(work, runner);
     expectRefused(result, /not a regular file: src\/pipe\.test\.ts/);
     expect(runner).not.toHaveBeenCalled();
+  });
+});
+
+describe("versions come from the work copy's lockfile", () => {
+  const okRun: DockerRunOutcome = { kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false };
+
+  it("a lockfile with vitest 3.2.4 never runs, even when the caller passes pinned versions", async () => {
+    const work = makeWork();
+    writeFileSync(join(work, "package-lock.json"), packageLock({ vitest: "3.2.4", vite: "7.1.11" }));
+    const runner = vi.fn<DockerRunner>(async () => okRun);
+    const preRepair = vi.fn(async () => ({ ran: true as const, exit_code: 1, failed_tests: ["x"], passed_tests: [] }));
+    // resolved_versions is not part of ExecuteProgramInput; an untyped caller's value is ignored.
+    const untyped = { record: pinnedRecord(), contract_id: CONTRACT_ID, workDir: work, runner, preRepair, node_version: NODE_VERSION, resolved_versions: RESOLVED_VERSIONS };
+    const result = await executeProgram(untyped);
+    expect(result).toMatchObject({ outcome: "rejected", reason: "version_set_mismatch", docker_invoked: false, model_calls: { count: 0 } });
+    if (result.outcome === "rejected") expect(result.detail).toContain("vitest");
+    expect(runner).not.toHaveBeenCalled();
+    expect(preRepair).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["missing", undefined],
+    ["not JSON", "{ not json"],
+    ["lockfileVersion 1", JSON.stringify({ lockfileVersion: 1, dependencies: { vitest: { version: "4.0.0" }, vite: { version: "7.1.11" } } })],
+    ["packages is an array", JSON.stringify({ lockfileVersion: 3, packages: [] })],
+  ] as const)("a %s lockfile is unknown/lockfile_unreadable and does not run", async (_name, text) => {
+    const work = makeWork();
+    if (text === undefined) unlinkSync(join(work, "package-lock.json"));
+    else writeFileSync(join(work, "package-lock.json"), text);
+    const runner = vi.fn<DockerRunner>(async () => okRun);
+    const result = await executeProgram({ record: pinnedRecord(), contract_id: CONTRACT_ID, workDir: work, runner, node_version: NODE_VERSION });
+    expect(result).toMatchObject({
+      outcome: "not_executed",
+      reason: "guard_not_applicable",
+      guard_status: "unknown",
+      guard: { status: "unknown", reason: "lockfile_unreadable" },
+      docker_invoked: false,
+    });
+    expect(runner).not.toHaveBeenCalled();
+  });
+
+  it("a lockfile without vite is rejected by the pin check", async () => {
+    const work = makeWork();
+    writeFileSync(join(work, "package-lock.json"), packageLock({ vitest: "4.0.0" }));
+    const runner = vi.fn<DockerRunner>(async () => okRun);
+    const result = await executeProgram({ record: pinnedRecord(), contract_id: CONTRACT_ID, workDir: work, runner, node_version: NODE_VERSION });
+    expect(result).toMatchObject({ outcome: "rejected", reason: "version_set_mismatch", docker_invoked: false });
+    expect(runner).not.toHaveBeenCalled();
+  });
+
+  it("lockfileVersions reads top-level entries only", () => {
+    const text = JSON.stringify({
+      lockfileVersion: 3,
+      packages: {
+        "": { name: "x" },
+        "node_modules/vitest": { version: "4.0.0" },
+        "node_modules/@scope/pkg": { version: "1.2.3" },
+        "node_modules/a/node_modules/vitest": { version: "3.2.4" },
+        "node_modules/bad": { version: 7 },
+        "packages/local": { version: "9.9.9" },
+      },
+    });
+    expect(lockfileVersions(text)).toEqual({ vitest: "4.0.0", "@scope/pkg": "1.2.3" });
+    expect(lockfileVersions(JSON.stringify({ lockfileVersion: 2, packages: {} }))).toEqual({});
+    expect(lockfileVersions(undefined)).toBeNull();
+    expect(lockfileVersions("null")).toBeNull();
+  });
+});
+
+describe("swap after the snapshot (TOCTOU)", () => {
+  const okRun: DockerRunOutcome = { kind: "exited", exitCode: 0, stdout: "", stderr: "", timedOut: false };
+  const evidence = { ran: true as const, exit_code: 1, failed_tests: ["history-cleared"], passed_tests: [] };
+
+  async function runSwap(work: string, swap: () => void, outsideFile: string) {
+    let mountedReal = "";
+    let mountedIsFile = false;
+    let mountedText = "";
+    const runner = vi.fn<DockerRunner>(async (req) => {
+      const mountedTarget = join(mountedWork(req), "src", "a.test.ts");
+      mountedReal = realpathSync(mountedTarget);
+      mountedIsFile = lstatSync(mountedTarget).isFile();
+      mountedText = readFileSync(mountedTarget, "utf8");
+      // The program "writes" its target. It must land in the private snapshot, never outside.
+      writeFileSync(mountedTarget, `${applicableTest}// written by the program\n`);
+      expect(req.args.some((arg) => arg.endsWith(":/work/src/a.test.ts:rw"))).toBe(true);
+      return okRun;
+    });
+    const result = await executeProgram({
+      record: pinnedRecord(),
+      contract_id: CONTRACT_ID,
+      workDir: work,
+      runner,
+      preRepair: async () => {
+        swap();
+        return evidence;
+      },
+      node_version: NODE_VERSION,
+    });
+    expect(runner).toHaveBeenCalledTimes(1);
+    expect(mountedIsFile).toBe(true);
+    expect(mountedText).toBe(applicableTest);
+    // The :rw mount source resolved inside this file's private temp root (the executor's snapshot), not outside.
+    expect(mountedReal.toLowerCase().startsWith(privateTempRoot.toLowerCase())).toBe(true);
+    expect(mountedReal.toLowerCase().startsWith(realpathSync(outsideFile).toLowerCase())).toBe(false);
+    expect(readFileSync(outsideFile, "utf8")).toBe("outside\n");
+    expect(result).toMatchObject({ outcome: "executed", changed_files: ["src/a.test.ts"] });
+    if (result.outcome === "executed") expect(result.evidence.diff[0]?.after).toBe(`${applicableTest}// written by the program\n`);
+  }
+
+  it.skipIf(!symlinkProbe.file)("a write target swapped for a symlink after lstat does not redirect the read or the :rw mount", async () => {
+    const outside = keep(mkdtempSync(join(tmpdir(), "ludion-outside-")));
+    const outsideFile = join(outside, "victim.ts");
+    writeFileSync(outsideFile, "outside\n");
+    const work = makeWork();
+    await runSwap(work, () => {
+      unlinkSync(join(work, "src", "a.test.ts"));
+      symlinkSync(outsideFile, join(work, "src", "a.test.ts"));
+    }, outsideFile);
+    expect(readFileSync(join(work, "src", "a.test.ts"), "utf8")).toBe("outside\n");
+  });
+
+  it.skipIf(!symlinkProbe.junction)("a directory swapped for a junction after lstat does not redirect the read or the :rw mount", async () => {
+    const outside = keep(mkdtempSync(join(tmpdir(), "ludion-outside-")));
+    const outsideFile = join(outside, "a.test.ts");
+    writeFileSync(outsideFile, "outside\n");
+    const work = makeWork();
+    const parked = keep(mkdtempSync(join(tmpdir(), "ludion-parked-")));
+    await runSwap(work, () => {
+      renameSync(join(work, "src"), join(parked, "src"));
+      symlinkSync(outside, join(work, "src"), "junction");
+    }, outsideFile);
   });
 });
 

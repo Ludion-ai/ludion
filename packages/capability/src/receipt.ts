@@ -12,7 +12,7 @@ export type ReuseCurrent = {
   lockfile_hash: string;
   node_version: string;
   /** Current dependency capability ids for this record, in artifact order.
-   *  Omit to skip the check. Any difference from artifact.dependencies.capabilities is dependency_changed.
+   *  Omit to compare against an empty array. Any difference from artifact.dependencies.capabilities is dependency_changed.
    */
   dependency_ids?: readonly string[];
 };
@@ -65,7 +65,8 @@ export function checkReceiptReuse(receipt: unknown, record: unknown, current: Re
   if (got.counterexamples_hash !== counterexamplesHash(rec.counterexamples)) {
     return staleResult("counterexample_added", "counterexamples hash differs from the receipt", "counterexamples");
   }
-  if (current.dependency_ids !== undefined && !sameIds(current.dependency_ids, rec.artifact.dependencies.capabilities)) {
+  const dependencyIds = current.dependency_ids ?? [];
+  if (!sameIds(dependencyIds, rec.artifact.dependencies.capabilities)) {
     return staleResult("dependency_changed", "dependency capability ids differ from the current snapshot", "dependencies");
   }
   if (got.capability_id !== rec.id) {

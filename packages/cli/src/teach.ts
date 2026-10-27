@@ -7,7 +7,7 @@ import {
   type FetchFn, type LessonV1,
 } from "@ludion/core";
 import { interpretRun, runInDocker, type RunFn } from "../../../tools/verify/src/docker.ts";
-import { createSafeFetch } from "../../../tools/verify/src/safe-fetch.ts";
+import { createSafeFetch } from "../../sandbox/src/safe-fetch.ts";
 import type { LedgerEntry } from "./ledger.ts";
 
 export type Draft = Omit<LessonV1, "format" | "id" | "author" | "author_id" | "created_at" | "subject"> & { subject?: string; format?: 1 };

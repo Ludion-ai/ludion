@@ -6,7 +6,7 @@ PRs that change any of these paths are not auto-merged (CLAUDE.md, "Every change
 - `CODEOWNERS` at any depth
 - `.github/`
 - `tools/verify/`
-- the security commands' Docker sandbox: `packages/cli/src/security/docker.ts`
+- the security commands' sandbox (Docker runner, public-address fetch and the guard on starting containers): `packages/sandbox/`
 - the schema: `packages/*/src/schema.ts`, `packages/*/schema/`, any `*.schema.json`
 - `lessons/`
 - `ludion.config.json`, `wrangler.jsonc`

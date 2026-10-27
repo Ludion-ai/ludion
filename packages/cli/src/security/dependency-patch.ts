@@ -3,8 +3,7 @@ import { chmodSync, closeSync, cpSync, existsSync, lstatSync, mkdirSync, mkdtemp
 import { tmpdir } from "node:os";
 import { join, resolve, sep } from "node:path";
 import semver from "semver";
-import { createDockerRunner } from "../../../capability/src/executor.ts";
-import { buildDockerRunArgs, runDockerImageCommand } from "../../../../tools/verify/src/docker.ts";
+import { runContainer, runDockerImageCommand, type Tool } from "../../../sandbox/src/docker.ts";
 import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenGraph, parsePom, textFile, type Ecosystem, type Inventory } from "./inventory.ts";
 import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
 import { hash } from "./php.ts";
@@ -21,7 +20,7 @@ export type DependencyReceipt = {
   reason?: string; recovery_journal?: string;
   archives?: ArchiveEvidence[];
 };
-type Dependencies = { client?: OsvClient; fetchFn?: typeof fetch; signal?: AbortSignal; command?: typeof runDockerImageCommand; testRun?: (args: string[], name: string, timeoutMs: number) => Promise<void> };
+type Dependencies = { client?: OsvClient; fetchFn?: typeof fetch; signal?: AbortSignal; command?: typeof runDockerImageCommand; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number, tool: Tool) => Promise<void> };
 
 export function compatible(before: Inventory, after: Inventory): void {
   for (const pkg of before.packages) {
@@ -190,8 +189,8 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
   const receipt: DependencyReceipt = { schema: 1, id, ecosystem, scope: "dependency_files_only_not_deployed", started_at: new Date().toISOString(), finished_at: "", outcome: "failed", tree_hash: originalTree, config_hash: hash(configText), before: scan, after: null, tool_image: "", baseline_image: null, candidate_image: null, baseline_passed: false, candidate_passed: false, test: [...config.test], files: [] };
   let temp = "";
   const command = deps.command ?? runDockerImageCommand;
-  const run = deps.testRun ?? (async (args, name, timeoutMs) => {
-    const result = await createDockerRunner()({ args, containerName: name, timeoutMs });
+  const run = deps.testRun ?? (async (name, image, command, timeoutMs, tool) => {
+    const result = await runContainer(name, image, command, timeoutMs, tool);
     if (result.kind === "spawn_error") throw new Error(`Docker unavailable: ${result.message}`);
     if (result.timedOut || result.exitCode !== 0) throw new Error(result.timedOut ? "Application validation timed out." : `Application validation failed (${result.exitCode}): ${result.stderr.slice(-1000)}`);
   });
@@ -265,7 +264,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       const imageId = await command(["image", "inspect", image, "--format", "{{.Id}}"], 15_000); active();
       if (label === "baseline") receipt.baseline_image = imageId; else receipt.candidate_image = imageId;
       const name = `ludion-check-${id}-${label}`;
-      await run(buildDockerRunArgs({ phase: "security", name, image: imageId, command: config.test, tool: ecosystem }), name, config.timeout_seconds * 1000); active();
+      await run(name, imageId, config.test, config.timeout_seconds * 1000, ecosystem); active();
       if (label === "baseline") receipt.baseline_passed = true; else receipt.candidate_passed = true;
     }
     if (snapshot(root) !== receipt.tree_hash) throw new Error("Project changed during validation; no dependency file was updated.");

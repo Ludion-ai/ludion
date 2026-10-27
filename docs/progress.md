@@ -280,3 +280,7 @@ Verdict REQUEST CHANGES, with one blocking finding: the sandbox flags had moved 
 - The guard ends a builder function at its closing brace and flags `exec docker run` and non-kill/pull/version literal argv inside builder files.
 
 Kept, with the reason: the now-unused security branch of `buildDockerRunArgs` in `tools/verify` (in-flight branches still call it; it goes when `tools/verify` is deleted), and this file's existing double-blank-line spacing.
+
+## 2026-10-28 — `packages/sandbox` (cleanup PR-B)
+
+Moved the security Docker runner, the public-address fetch and the container-start guard into `packages/sandbox`; `dependency-patch.ts` now runs its tests through `runContainer` with its tool, like `patch.ts`. New tests: the exact argv for each tool, refusal of an unknown tool before anything starts, and `runContainer` passing only the tool through.

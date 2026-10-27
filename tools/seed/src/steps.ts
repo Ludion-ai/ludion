@@ -7,7 +7,7 @@ import {
   type Lesson, type LessonV1,
 } from "@ludion/core";
 import semver from "semver";
-import { createSafeFetch } from "../../verify/src/safe-fetch.ts";
+import { createSafeFetch } from "../../../packages/sandbox/src/safe-fetch.ts";
 import type { Entry } from "./collect.ts";
 import { draftPrompt, prepare } from "./draft.ts";
 import { read, write, type RunInfo } from "./io.ts";

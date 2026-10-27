@@ -1,6 +1,6 @@
 // Live facts for the judge: npm registry metadata and attestations, OSV (malicious records and advisories),
-// CISA KEV and FIRST EPSS. Fixed origins, bounded bodies and deadlines. A failed lookup throws: the judge then has
-// no fact for that version, which it treats as undecidable, never as a pass. Only package names, versions and
+// CISA KEV and FIRST EPSS. Fixed origins, bounded bodies and deadlines. A failed lookup throws; `ludion judge` then
+// reports the judgement as undecidable, never as a pass. Only package names, versions and
 // advisory ids leave the machine.
 import { installScripts, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
 
@@ -47,16 +47,16 @@ export function provenanceFrom(attestations: unknown): { repository: string | nu
 }
 
 /** Registry facts for the given versions of one package (one packument read, plus one attestation read per version). */
-export async function registryFacts(name: string, versions: string[], fetchFn: Fetch = fetch): Promise<Map<string, Omit<VersionFacts, "malicious">>> {
+export async function registryFacts(name: string, versions: string[], fetchFn: Fetch = fetch): Promise<Map<string, Omit<VersionFacts, "malicious" | "advisories">>> {
   const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);
   if (!doc || typeof doc !== "object" || typeof doc.versions !== "object" || typeof doc.time !== "object") throw new Error(`Invalid registry document for ${name}.`);
-  const facts = new Map<string, Omit<VersionFacts, "malicious">>();
+  const facts = new Map<string, Omit<VersionFacts, "malicious" | "advisories">>();
   for (const version of versions) {
     const manifest = doc.versions[version];
     const published = typeof doc.time[version] === "string" ? doc.time[version] : null;
     if (!manifest) {
       // Unpublished: the registry keeps only its publish time. Nothing else about it can be compared.
-      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, provenance: null, install_scripts: [], dependencies: [] });
+      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, provenance: null, install_scripts: [], dependencies: [], integrity: null });
       continue;
     }
     let provenance: VersionFacts["provenance"] = null;
@@ -71,6 +71,7 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
       provenance,
       install_scripts: installScripts(manifest.scripts),
       dependencies: Object.keys({ ...manifest.dependencies, ...manifest.optionalDependencies }).sort(),
+      integrity: typeof manifest.dist?.integrity === "string" ? manifest.dist.integrity : null,
     });
   }
   return facts;
@@ -125,7 +126,10 @@ export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch): Pr
   const facts = new Map<string, VersionFacts>();
   for (const [name, versions] of wanted) {
     const registry = await registryFacts(name, [...versions], fetchFn);
-    for (const [version, fact] of registry) facts.set(`${name}@${version}`, { ...fact, malicious: (ids.get(`${name}@${version}`) ?? []).filter(id => id.startsWith("MAL-")) });
+    for (const [version, fact] of registry) {
+      const all = ids.get(`${name}@${version}`) ?? [];
+      facts.set(`${name}@${version}`, { ...fact, malicious: all.filter(id => id.startsWith("MAL-")), advisories: all.filter(id => !id.startsWith("MAL-")) });
+    }
   }
   // A fix: an advisory on the version before that no longer names the version after.
   const fixed: { id: string; package: string }[] = [];

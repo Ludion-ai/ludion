@@ -17,10 +17,11 @@ const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (
   ludion watch [--dir <path>] [--apply] [--interval <seconds>] [--json]
       Repeat patch checks in the foreground (default 900 seconds). Ctrl+C cancels pending apply;
       a Docker step already in progress may finish before exit.
-  ludion judge --before <dir> --after <dir> [--files a,b] [--json]
+  ludion judge --before <dir> --after <dir> --files <changed,files> [--json]
       Judge an npm dependency update between two checkouts (preview, comments only): provenance,
       publisher, install scripts, malicious-package records, deprecation, new dependencies and the
-      wait. Build and tests are not run. Exit 0: ready except build; 3: wait; 1: stop or undecidable.
+      wait. Build and tests are not run. Exit 0: ready except build; 3: wait; 1: stop or undecidable
+      (also when a lookup fails or --files is missing); 2: the inputs could not be read.
 `;
 
 async function main(argv: string[]): Promise<number> {

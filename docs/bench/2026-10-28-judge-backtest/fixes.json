@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-27T15:55:30.689Z",
+  "generated_at": "2026-10-27T16:12:42.020Z",
   "method": "See the header of tools/backtest/src/fixes.ts.",
   "sample": 200,
   "skipped": {
@@ -12,10 +12,10 @@
   "delay_hours": {
     "median": 72,
     "p90": 144,
-    "n": 167
+    "n": 165
   },
-  "stopped": 33,
-  "extended": 25,
+  "stopped": 35,
+  "extended": 26,
   "by_urgency": {
     "exploited": 8,
     "high": 34,
@@ -32,7 +32,23 @@
       8
     ],
     [
+      "has known advisories that # did not have: GHSA-#j#-xgg#-r#c#",
+      5
+    ],
+    [
+      "has known advisories that # did not have: GHSA-#gmr-mq#h-m#h",
+      4
+    ],
+    [
       "is no longer listed by the registry (unpublished or withdraw",
+      1
+    ],
+    [
+      "has known advisories that # did not have: GHSA-ch#-px#q-f#j,",
+      1
+    ],
+    [
+      "has known advisories that # did not have: GHSA-#xg-f#-w#g#",
       1
     ],
     [
@@ -60,7 +76,11 @@
       1
     ],
     [
-      "adds install scripts: install#",
+      "has known advisories that # did not have: GHSA-#j-#rm#-mrmf#",
+      1
+    ],
+    [
+      "has no comparable predecessor and runs install scripts (inst",
       1
     ],
     [
@@ -86,7 +106,8 @@
       "wait_hours": 24,
       "delay_hours": null,
       "stops": [
-        "react-server-dom-turbopack@19.2.2 is deprecated: High Security Vulnerability in React Server Components"
+        "react-server-dom-turbopack@19.2.2 is deprecated: High Security Vulnerability in React Server Components",
+        "react-server-dom-turbopack@19.2.2 has known advisories that 19.2.1 did not have: GHSA-7gmr-mq3h-m5h9."
       ],
       "extends": []
     },
@@ -137,12 +158,14 @@
       "fix_published": "2025-06-18T08:02:40.016Z",
       "verdict": "stop",
       "urgency": "high",
-      "wait_hours": 24,
+      "wait_hours": 72,
       "delay_hours": null,
       "stops": [
         "taylored@7.0.8 is no longer listed by the registry (unpublished or withdrawn)."
       ],
-      "extends": []
+      "extends": [
+        "taylored@7.0.7, the version it replaces, is no longer listed; there is nothing to compare with."
+      ]
     },
     {
       "id": "GHSA-9qr9-h5gf-34mp",
@@ -211,7 +234,8 @@
       "wait_hours": 24,
       "delay_hours": null,
       "stops": [
-        "react-server-dom-turbopack@19.0.2 is deprecated: High Security Vulnerability in React Server Components"
+        "react-server-dom-turbopack@19.0.2 is deprecated: High Security Vulnerability in React Server Components",
+        "react-server-dom-turbopack@19.0.2 has known advisories that 19.0.1 did not have: GHSA-7gmr-mq3h-m5h9."
       ],
       "extends": []
     },
@@ -240,8 +264,7 @@
       "delay_hours": 144,
       "stops": [],
       "extends": [
-        "debug@4.4.3 was published by qix, 4.4.2 by unknown.",
-        "debug@4.4.3 adds dependencies: ms."
+        "debug@4.4.2, the version it replaces, is no longer listed; there is nothing to compare with."
       ]
     },
     {
@@ -449,11 +472,13 @@
       "from": "6.0.8",
       "to": "6.0.9",
       "fix_published": "2025-09-14T13:34:06.523Z",
-      "verdict": "ready_except_build",
+      "verdict": "stop",
       "urgency": "normal",
       "wait_hours": 72,
-      "delay_hours": 72,
-      "stops": [],
+      "delay_hours": null,
+      "stops": [
+        "ghost@6.0.9 has known advisories that 6.0.8 did not have: GHSA-ch52-px8q-f22j, GHSA-r7f2-6fj8-6fg2, GHSA-wvp2-4qqp-4h3r."
+      ],
       "extends": []
     },
     {
@@ -531,11 +556,13 @@
       "from": "8.0.1",
       "to": "8.0.2",
       "fix_published": "2025-03-21T10:16:03.749Z",
-      "verdict": "ready_except_build",
+      "verdict": "stop",
       "urgency": "normal",
       "wait_hours": 72,
-      "delay_hours": 72,
-      "stops": [],
+      "delay_hours": null,
+      "stops": [
+        "parse-server@8.0.2 has known advisories that 8.0.1 did not have: GHSA-69xg-f649-w5g2."
+      ],
       "extends": []
     },
     {
@@ -919,7 +946,8 @@
       "wait_hours": 72,
       "delay_hours": null,
       "stops": [
-        "next@16.0.9 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details."
+        "next@16.0.9 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.",
+        "next@16.0.9 has known advisories that 16.0.8 did not have: GHSA-5j59-xgg2-r9c4."
       ],
       "extends": []
     },
@@ -935,7 +963,7 @@
       "delay_hours": 144,
       "stops": [],
       "extends": [
-        "color-name@2.0.2 was published by dy, 2.0.1 by unknown."
+        "color-name@2.0.1, the version it replaces, is no longer listed; there is nothing to compare with."
       ]
     },
     {
@@ -1250,7 +1278,8 @@
       "wait_hours": 24,
       "delay_hours": null,
       "stops": [
-        "react-server-dom-turbopack@19.1.3 is deprecated: High Security Vulnerability in React Server Components"
+        "react-server-dom-turbopack@19.1.3 is deprecated: High Security Vulnerability in React Server Components",
+        "react-server-dom-turbopack@19.1.3 has known advisories that 19.1.2 did not have: GHSA-7gmr-mq3h-m5h9."
       ],
       "extends": []
     },
@@ -1537,7 +1566,8 @@
       "wait_hours": 72,
       "delay_hours": null,
       "stops": [
-        "next@15.5.8 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details."
+        "next@15.5.8 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.",
+        "next@15.5.8 has known advisories that 15.5.7 did not have: GHSA-5j59-xgg2-r9c4."
       ],
       "extends": []
     },
@@ -1881,7 +1911,8 @@
       "wait_hours": 72,
       "delay_hours": null,
       "stops": [
-        "next@15.1.10 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details."
+        "next@15.1.10 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.",
+        "next@15.1.10 has known advisories that 15.1.9 did not have: GHSA-5j59-xgg2-r9c4."
       ],
       "extends": []
     },
@@ -1923,8 +1954,7 @@
       "delay_hours": 144,
       "stops": [],
       "extends": [
-        "flowise@3.0.10 was published by flowiseai, 3.0.9 by unknown.",
-        "flowise@3.0.10 adds dependencies: @aws-sdk/client-secrets-manager, @bull-board/api, @bull-board/express, @google-cloud/logging-winston, @keyv/redis, @oclif/core, @opentelemetry/api, @opentelemetry/auto-instrumentations-node, @opentelemetry/core, @opentelemetry/exporter-metrics-otlp-grpc, @opentelemetry/exporter-metrics-otlp-http, @opentelemetry/exporter-metrics-otlp-proto, @opentelemetry/exporter-trace-otlp-grpc, @opentelemetry/exporter-trace-otlp-http, @opentelemetry/exporter-trace-otlp-proto, @opentelemetry/resources, @opentelemetry/sdk-metrics, @opentelemetry/sdk-node, @opentelemetry/sdk-trace-base, @opentelemetry/semantic-conventions, @types/bcryptjs, @types/lodash, @types/passport, @types/passport-jwt, @types/passport-local, @types/uuid, async-mutex, axios, bcryptjs, bullmq, cache-manager, connect-pg-simple, connect-redis, connect-sqlite3, content-disposition, cookie-parser, cors, crypto-js, csv-parser, dotenv, express, express-basic-auth, express-mysql-session, express-rate-limit, express-session, flowise-components, flowise-nim-container-manager, flowise-ui, global-agent, gulp, handlebars, http-errors, http-status-codes, jsonwebtoken, jwt-decode, langchainhub, lodash, moment, moment-timezone, multer, multer-cloud-storage, multer-s3, mysql2, nanoid, nodemailer, openai, passport, passport-auth0, passport-cookie, passport-github, passport-google-oauth20, passport-jwt, passport-local, passport-openidconnect, pg, posthog-node, prom-client, rate-limit-redis, reflect-metadata, s3-streamlogger, sanitize-html, sqlite3, stripe, turndown, typeorm, uuid, winston, winston-daily-rotate-file."
+        "flowise@3.0.9, the version it replaces, is no longer listed; there is nothing to compare with."
       ]
     },
     {
@@ -1965,8 +1995,7 @@
       "delay_hours": 144,
       "stops": [],
       "extends": [
-        "error-ex@1.3.4 was published by qix, 1.3.3 by unknown.",
-        "error-ex@1.3.4 adds dependencies: is-arrayish."
+        "error-ex@1.3.3, the version it replaces, is no longer listed; there is nothing to compare with."
       ]
     },
     {
@@ -2008,7 +2037,8 @@
       "wait_hours": 24,
       "delay_hours": null,
       "stops": [
-        "next@15.2.3 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details."
+        "next@15.2.3 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.",
+        "next@15.2.3 has known advisories that 15.2.2 did not have: GHSA-223j-4rm8-mrmf."
       ],
       "extends": []
     },
@@ -2104,8 +2134,7 @@
       "delay_hours": 144,
       "stops": [],
       "extends": [
-        "simple-swizzle@0.2.4 was published by qix, 0.2.3 by unknown.",
-        "simple-swizzle@0.2.4 adds dependencies: is-arrayish."
+        "simple-swizzle@0.2.3, the version it replaces, is no longer listed; there is nothing to compare with."
       ]
     },
     {
@@ -2236,11 +2265,10 @@
       "wait_hours": 144,
       "delay_hours": null,
       "stops": [
-        "duckdb@1.3.4 adds install scripts: install."
+        "duckdb@1.3.4 has no comparable predecessor and runs install scripts (install)."
       ],
       "extends": [
-        "duckdb@1.3.4 was published by duckdb_admin, 1.3.3 by unknown.",
-        "duckdb@1.3.4 adds dependencies: @mapbox/node-pre-gyp, node-addon-api, node-gyp."
+        "duckdb@1.3.3, the version it replaces, is no longer listed; there is nothing to compare with."
       ]
     },
     {
@@ -2347,7 +2375,8 @@
       "wait_hours": 24,
       "delay_hours": null,
       "stops": [
-        "react-server-dom-parcel@19.2.2 is deprecated: High Security Vulnerability in React Server Components"
+        "react-server-dom-parcel@19.2.2 is deprecated: High Security Vulnerability in React Server Components",
+        "react-server-dom-parcel@19.2.2 has known advisories that 19.2.1 did not have: GHSA-7gmr-mq3h-m5h9."
       ],
       "extends": []
     },
@@ -2375,7 +2404,8 @@
       "wait_hours": 72,
       "delay_hours": null,
       "stops": [
-        "next@15.0.6 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details."
+        "next@15.0.6 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.",
+        "next@15.0.6 has known advisories that 15.0.5 did not have: GHSA-5j59-xgg2-r9c4."
       ],
       "extends": []
     },
@@ -2579,7 +2609,7 @@
       "delay_hours": 72,
       "stops": [],
       "extends": [
-        "eslint-config-prettier@8.10.2 was published by jounqin, 8.10.1 by unknown."
+        "eslint-config-prettier@8.10.1, the version it replaces, is no longer listed; there is nothing to compare with."
       ]
     },
     {
@@ -2621,7 +2651,8 @@
       "wait_hours": 72,
       "delay_hours": null,
       "stops": [
-        "next@15.2.7 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details."
+        "next@15.2.7 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.",
+        "next@15.2.7 has known advisories that 15.2.6 did not have: GHSA-5j59-xgg2-r9c4."
       ],
       "extends": []
     },
@@ -2798,6 +2829,5 @@
       ],
       "extends": []
     }
-  ],
-  "stop_reasons_note": "Recomputed from rows after the run: the run printed an empty list because of a summary bug (Object.entries on a Map), fixed in tools/backtest/src/fixes.ts."
+  ]
 }

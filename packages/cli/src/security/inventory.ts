@@ -184,7 +184,8 @@ export function changedManifest(root: string, ecosystem: Ecosystem, changes: Cha
   // A requirement in the manifest is the fix only when its installed root copy is the vulnerable one. A vulnerable
   // nested copy of a direct dependency cannot be fixed by raising the requirement or by an override.
   if (ecosystem === "npm" && existsSync(join(root, "package-lock.json"))) {
-    const locked = jsonFile(root, "package-lock.json").packages ?? {};
+    const locked = jsonFile(root, "package-lock.json").packages;
+    if (!locked || typeof locked !== "object") throw new Error("Fixing npm dependencies requires package-lock v2/v3.");
     for (const change of changes) {
       const rootVersion = locked[`node_modules/${change.name}`]?.version;
       if (groups.some(group => manifest[group]?.[change.name] !== undefined) && rootVersion !== change.from) {

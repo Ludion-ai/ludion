@@ -1,16 +1,21 @@
 // Backtest of the judge's gate 2 and wait against the known malicious npm releases of 2025 (docs/design.md,
-// "ロードマップと検証ゲート" 1). For every OSV MAL- record of 2025 that names specific versions of a package that had
-// earlier, clean versions (a compromised package, not a typosquat), it asks: had a project's update to that version
-// been judged when the wait ended, would the judge have stopped it, from what was public at that moment?
+// "ロードマップと検証ゲート" 1). For every OSV MAL- record of 2025 that names specific versions of a package that had a
+// clean version at least 7 days earlier (mostly hijacked maintainer accounts; the selection also keeps some
+// dependency-confusion placeholders such as 999999999.x versions), it asks: had a project's update to that version been
+// judged when the wait ended, would the judge have stopped it, from what was public at that moment?
 //
 // What was public when the wait ended, and how this reconstructs it:
 // - The version's publish time: the registry keeps it even for removed versions (`time`).
-// - The OSV MAL- record: public from its `published` time. The judge re-queries when the wait ends.
+// - The OSV MAL- record: public from its `published` time. The judge re-queries when the wait ends. A record can
+//   gain versions after it is published; OSV does not say when. When a version may have been added later (it was
+//   published after the record, or more than an hour after the record's earliest version), the "conservative" column
+//   takes the record's `modified` time (the version was listed by then at the latest), the "optimistic" one `published`.
 // - The previous version's provenance, publisher and install scripts: still in the registry.
 // - The malicious version's own provenance, publisher and scripts: in the registry only if it was never removed.
 //   Removed versions are counted as unknown; the "provenance inferred" column assumes a removed version that
 //   replaced one with provenance had none (published with a stolen token), which is stated as an assumption.
-// Removal and deprecation times are not in the registry, so they are never used: the result is a lower bound.
+// Removal and deprecation times are not in the registry, so they are never used; that under-counts stops, while the
+// optimistic timing can over-count them. The direction of the total error is unknown.
 //
 // Usage: node tools/backtest/src/malicious.ts <osv-npm-dir> <cache-dir> <out.json>
 // Reads untrusted JSON only; runs nothing from it. Network: registry.npmjs.org, read-only, cached.
@@ -19,7 +24,7 @@ import { join } from "node:path";
 import semver from "semver";
 import { installScripts, WAIT_HOURS } from "../../../packages/cli/src/security/judge.ts";
 
-type Malicious = { id: string; name: string; versions: string[]; osvPublished: string };
+type Malicious = { id: string; name: string; versions: string[]; osvPublished: string; osvModified: string };
 type Packument = { time: Record<string, string>; versions: Record<string, { publisher: string | null; provenance: boolean; scripts: string[] }> };
 
 const [osvDir, cacheDir, outFile] = process.argv.slice(2);
@@ -36,7 +41,7 @@ function records(): Malicious[] {
     for (const affected of record.affected ?? []) {
       if (affected?.package?.ecosystem !== "npm" || (affected.ranges ?? []).length) continue;
       const versions = (affected.versions ?? []).filter((v: unknown): v is string => typeof v === "string" && !!semver.valid(v));
-      if (versions.length) out.push({ id: record.id, name: affected.package.name, versions, osvPublished: record.published });
+      if (versions.length) out.push({ id: record.id, name: affected.package.name, versions, osvPublished: record.published, osvModified: typeof record.modified === "string" ? record.modified : record.published });
     }
   }
   return out;
@@ -80,6 +85,8 @@ const docs = new Map(await pool(names, 8, async name => {
 
 type Row = {
   id: string; name: string; version: string; published: string; osv_published: string; hours_to_mal: number;
+  /** True when the record may have gained this version after it was published; then the conservative time is `modified`. */
+  listing_uncertain: boolean; hours_to_mal_conservative: number;
   previous: string; previous_provenance: boolean; present_now: boolean;
   /** Stops visible without assuming anything about removed versions. */
   static_stops: string[];
@@ -99,6 +106,9 @@ for (const record of all) {
     const earlier = Object.entries(doc.time).filter(([v, t]) => !bad.has(v) && Date.parse(t) <= Date.parse(published) - 7 * 86_400_000).sort((a, b) => Date.parse(b[1]) - Date.parse(a[1]));
     if (!earlier.length) { skipped.no_earlier_clean_version++; continue; }
     const previous = earlier[0]![0];
+    const earliest = Math.min(...record.versions.map(v => Date.parse(doc.time[v] ?? published)));
+    const uncertain = Date.parse(published) > Date.parse(record.osvPublished) || (record.versions.length > 1 && Date.parse(published) > earliest + 3_600_000);
+    const conservative = uncertain ? Math.max(Date.parse(record.osvPublished), Date.parse(record.osvModified)) : Date.parse(record.osvPublished);
     const prev = doc.versions[previous], now = doc.versions[version];
     const stops: string[] = [];
     if (now && prev) {
@@ -107,20 +117,23 @@ for (const record of all) {
     }
     rows.push({
       id: record.id, name: record.name, version, published, osv_published: record.osvPublished, hours_to_mal: Math.round(hours(published, record.osvPublished) * 10) / 10,
+      listing_uncertain: uncertain, hours_to_mal_conservative: Math.round(((conservative - Date.parse(published)) / 3_600_000) * 10) / 10,
       previous, previous_provenance: !!prev?.provenance, present_now: !!now, static_stops: stops,
       inferred_provenance_stop: !now && !!prev?.provenance,
     });
   }
 }
 
-const caught = (row: Row, wait: number, inferred: boolean) => row.hours_to_mal <= wait || row.static_stops.length > 0 || (inferred && row.inferred_provenance_stop);
+const caught = (row: Row, wait: number, inferred: boolean, conservative = false) => (conservative ? row.hours_to_mal_conservative : row.hours_to_mal) <= wait || row.static_stops.length > 0 || (inferred && row.inferred_provenance_stop);
 /** Per urgency: how many of the given malicious versions the judge would have stopped when the wait ended. */
 const summarise = (set: Row[]) => ({
   versions: set.length,
   packages: new Set(set.map(r => r.name)).size,
+  listing_uncertain: set.filter(r => r.listing_uncertain).length,
   ...Object.fromEntries(Object.entries(WAIT_HOURS).map(([urgency, wait]) => [urgency, {
     wait_hours: wait,
     stopped_measured: set.filter(r => caught(r, wait, false)).length,
+    stopped_conservative: set.filter(r => caught(r, wait, false, true)).length,
     stopped_with_provenance_inference: set.filter(r => caught(r, wait, true)).length,
     by_requery_only: set.filter(r => r.hours_to_mal <= wait).length,
   }])),

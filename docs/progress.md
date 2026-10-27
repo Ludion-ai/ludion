@@ -250,3 +250,10 @@ Validation: typecheck, workspace and sample builds; 666 tests passed / 7 skipped
 ### Security preview — independent review corrections
 
 The independent reviewer reproduced a stale validated result in validation-only mode and a missed empty-directory source change, and found watch stop did not cancel pending apply. Fixed all three: freshness check for both modes, directory identities/modes plus preserved copy modes, and cancellation gates after async work and before apply. Stop latency is explicitly documented: a running Docker step may finish, but pending application is cancelled. Added regressions. Final local results: 673 passed / 8 skipped overall, security 32 passed / 1 Windows mode skip, all 31 browser checks passed with screenshot capture enabled, 36 refreshed PNGs, and all four real Docker scenarios rerun successfully. Prior remote CI also passed; new-head CI and final protected-file review remain gates.
+
+
+## 2026-10-27 — Security Docker runner extracted
+
+Added `packages/cli/src/security/docker.ts` and switched `patch.ts` to it; the generated test argv is identical to the previous security phase of `buildDockerRunArgs`. New unit tests cover the exact argv, refusal of unsafe names, tags instead of image IDs and flag-like or empty test argv, the image-command allowlist, exit/output handling, name-only kill on timeout, spawn errors and the output cap. The `docker run` guard was tightened to explicit builder files and functions; a deliberate run argv outside `runArgs` was confirmed to fail it, then removed.
+
+Results: typecheck passed; 680 passed / 8 skipped. The CLI bundle went from 2,455,228 to 1,675,049 bytes because it no longer pulls in the capability schema and guard. Real Docker, validation only, on a temporary copy of `examples/php-security`: PHP 8.4.26-cli-alpine → 8.4.27-cli-alpine, baseline and candidate passed, outcome `validated`, Dockerfile hash unchanged, temporary images removed. No deployment or npm publish.

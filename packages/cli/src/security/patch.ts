@@ -2,8 +2,7 @@ import { randomUUID } from "node:crypto";
 import { closeSync, existsSync, lstatSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { createDockerRunner } from "../../../capability/src/executor.ts";
-import { buildDockerRunArgs, runDockerImageCommand } from "../../../../tools/verify/src/docker.ts";
+import { runArgs, runContainer, runDockerImageCommand } from "./docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
 
@@ -25,10 +24,6 @@ function digestFrom(text: string): string {
   const digest = entries.find(v => typeof v === "string" && /^(?:(?:docker\.io\/)?library\/)?php@sha256:[a-f0-9]{64}$/.test(v));
   if (typeof digest !== "string") throw new Error("Downloaded image has no official PHP repository digest.");
   return `php@${digest.split("@")[1]!}`;
-}
-
-export function runArgs(name: string, image: string, command: string[]): string[] {
-  return buildDockerRunArgs({ phase: "security", name, image, command });
 }
 
 export async function patchProject(dir: string, apply: boolean, deps: { signal?: AbortSignal; fetchFn?: typeof fetch; command?: Command; testRun?: (args: string[], name: string, timeoutMs: number) => Promise<void> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
@@ -53,7 +48,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
   };
   const command = deps.command ?? dockerCommand;
   const run = deps.testRun ?? (async (args, name, timeoutMs) => {
-    const result = await createDockerRunner()({ args, containerName: name, timeoutMs });
+    const result = await runContainer(args, name, timeoutMs);
     if (result.kind === "spawn_error") throw new Error(`Docker unavailable: ${result.message}`);
     if (result.timedOut || result.exitCode !== 0) throw new Error(result.timedOut ? "Validation timed out." : `Validation exited ${result.exitCode}: ${result.stderr.slice(-1000)}`);
   });

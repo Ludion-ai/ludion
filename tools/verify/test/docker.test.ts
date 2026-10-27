@@ -1,6 +1,6 @@
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
@@ -715,20 +715,41 @@ const RUN_ARGV = /\[\s*["']run["']|\.push\(\s*["']run["']|`run`|`run /;
 const DOCKER_SPAWN = /(?:spawnSync|execFileSync|spawn|execFile)\(\s*["']docker["']/;
 const DOCKER_EXEC = /\bexec(?:Sync)?\(\s*[`'"][^`'"]*docker run/;
 
-function isDockerSource(path: string): boolean {
-  const norm = path.replaceAll("\\", "/");
-  return norm === "docker.ts" || norm.endsWith("/docker.ts");
+/**
+ * The only files that may spawn docker, each with the one function allowed to build a `run` argv.
+ * The security commands have their own builder: application tests, not lesson code.
+ */
+const RUN_BUILDERS: Readonly<Record<string, string>> = {
+  "tools/verify/src/docker.ts": "buildDockerRunArgs",
+  "packages/cli/src/security/docker.ts": "runArgs",
+};
+
+/** Repo-relative posix path. Synthetic scan files are already relative; the source tree is absolute. */
+function repoPath(path: string): string {
+  return relative(REPO, resolve(REPO, path)).replaceAll("\\", "/");
 }
 
-/** A docker version probe does not start a container. Every other docker spawn outside docker.ts is a hit. */
+function isDockerSource(path: string): boolean {
+  return Object.hasOwn(RUN_BUILDERS, repoPath(path));
+}
+
+/** Start and end offsets of `export function <name>`, up to the next exported function. */
+function exportedFunction(src: string, name: string): { at: number; end: number } {
+  const at = src.indexOf(`export function ${name}(`);
+  if (at < 0) throw new Error(`export function ${name} not found`);
+  const next = src.slice(at + 1).search(/\nexport function /);
+  return { at, end: next < 0 ? src.length : at + 1 + next };
+}
+
+/** A docker version probe does not start a container. Every other docker spawn outside a builder file is a hit. */
 function isVersionProbe(line: string): boolean {
   return /(?:spawnSync|execFileSync|spawn|execFile)\(\s*["']docker["']\s*,\s*\[\s*["']version["']/.test(line);
 }
 
 /**
- * Files other than docker.ts must not spawn docker or build a `run` argv.
- * docker.ts may spawn pull, kill, and the args from buildDockerRunArgs.
- * A literal `run` argv in docker.ts is reported so the caller can require it to sit in that function.
+ * Files other than the RUN_BUILDERS files must not spawn docker or build a `run` argv.
+ * A builder file may spawn pull, kill, and the args from its builder function.
+ * A literal `run` argv in a builder file is reported so the caller can require it to sit in that function.
  * `packages/cli` `docker version` is allowed: it does not start a container, and moving it would edit packages/.
  */
 function scanDockerSources(files: readonly ScanFile[]): ScanHit[] {
@@ -774,7 +795,7 @@ function sourceTree(): ScanFile[] {
 }
 
 describe("docker run construction", () => {
-  it("starts a run argument list only inside buildDockerRunArgs", () => {
+  it("starts a run argument list only inside a builder function", () => {
     const src = readFileSync(DOCKER_TS, "utf8");
     const fnAt = src.indexOf("export function buildDockerRunArgs");
     const arrayAt = src.search(/\[\s*"run"/);
@@ -790,10 +811,15 @@ describe("docker run construction", () => {
     expect(src).not.toMatch(/spawn(?:Sync)?\(\s*"docker"\s*,\s*\[\s*"run"/);
     const hits = scanDockerSources(sourceTree());
     expect(hits.filter((hit) => !isDockerSource(hit.path))).toEqual([]);
-    for (const hit of hits.filter((item) => isDockerSource(item.path))) {
-      const offset = src.split("\n").slice(0, hit.line - 1).join("\n").length;
-      expect(offset).toBeGreaterThan(fnAt);
-      expect(offset).toBeLessThan(fnAt + body.length);
+    for (const [path, name] of Object.entries(RUN_BUILDERS)) {
+      const text = readFileSync(join(REPO, path), "utf8");
+      const builder = exportedFunction(text, name);
+      expect(text.slice(builder.at, builder.end)).toMatch(/\[\s*"run"/);
+      for (const hit of hits.filter((item) => repoPath(item.path) === path)) {
+        const offset = text.split("\n").slice(0, hit.line - 1).join("\n").length;
+        expect(offset).toBeGreaterThan(builder.at);
+        expect(offset).toBeLessThan(builder.end);
+      }
     }
   });
 
@@ -819,6 +845,13 @@ describe("docker run construction", () => {
     expect(scanDockerSources([
       { path: "packages/cli/src/teach.ts", text: 'spawnSync("docker", ["run", "--rm"]);\n' },
     ]).length).toBeGreaterThan(0);
+    // The name docker.ts is not an exemption: only the RUN_BUILDERS paths are.
+    expect(scanDockerSources([
+      { path: "packages/cli/src/elsewhere/docker.ts", text: 'spawnSync("docker", ["run", "--rm"]);\n' },
+    ]).map((hit) => hit.reason)).toEqual(["run argv", "docker spawn"]);
+    expect(scanDockerSources([
+      { path: "packages/cli/src/security/docker.ts", text: 'spawn("docker", args, { stdio: "ignore" });\n' },
+    ])).toEqual([]);
   });
 
   it("mounts verifier deps from buildDockerRunArgs with a literal :ro", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
+import { installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { provenanceFrom } from "../src/security/npm-facts.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
@@ -190,6 +190,48 @@ describe("gate 4 and urgency", () => {
     const before = lockEntries(lock({ "node_modules/x/node_modules/foo": { version: "1.0.0" } })), after = lockEntries(lock({ "node_modules/foo": { version: "1.0.0" } }));
     expect(lockDiff(before, after)).toEqual([]);
     expect(lockEntryChanges(before, after).map(e => e.path)).toEqual(["node_modules/foo"]);
+  });
+  it("judges what a dependent falls back to when its nested copy is removed", () => {
+    const lock = (packages: Record<string, { version: string; name?: string }>) => JSON.stringify({ lockfileVersion: 3, packages: { "": {}, ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { resolved: url(p.name ?? path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...p }])) } });
+    const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["a@1.0.0", fact()], ["evil-pkg@1.0.0", fact()]]);
+    const run = (b: string, a: string) => {
+      const before = lockEntries(b), after = lockEntries(a);
+      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    };
+    const base = { "node_modules/a": { version: "1.0.0" }, "node_modules/a/node_modules/lodash": { version: "4.17.21" }, "node_modules/foo": { version: "1.0.0" } };
+    const down = run(lock({ ...base, "node_modules/lodash": { version: "4.17.20" } }), lock({ "node_modules/a": { version: "1.0.0" }, "node_modules/lodash": { version: "4.17.20" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(down.verdict).toBe("stop");
+    expect(down.changes.map(c => [c.path, c.name, c.from, c.to])).toContainEqual(["node_modules/a/node_modules/lodash", "lodash", "4.17.21", "4.17.20"]);
+    // The root copy is an alias for another package: the dependent now loads that package.
+    const alias = run(lock({ ...base, "node_modules/lodash": { version: "1.0.0", name: "evil-pkg" } }), lock({ "node_modules/a": { version: "1.0.0" }, "node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(alias.findings.some(f => f.effect === "stop" && f.message.includes("instead of lodash@4.17.21"))).toBe(true);
+    // A removed copy whose dependent is gone too changes nothing for anyone.
+    expect(lockDiff(lockEntries(lock(base)), lockEntries(lock({ "node_modules/foo": { version: "1.0.0" } })))).toEqual([]);
+  });
+  it("lets package.json change only registry dependency specs", () => {
+    const before = { name: "app", dependencies: { foo: "^1.0.0" } };
+    expect(manifestChanges(before, { ...before, dependencies: { foo: "^1.0.1" } })).toEqual([]);
+    expect(manifestChanges(before, { ...before, dependencies: { foo: "^1.0.1", bar: "npm:baz@^2.0.0" } })).toEqual([]);
+    expect(manifestChanges(before, { ...before, scripts: { postinstall: "node x.js" } })).toEqual([expect.stringContaining('changes "scripts"')]);
+    for (const spec of ["github:evil/foo", "git+https://example.com/foo.git", "file:../foo", "https://example.com/foo.tgz", "link:../foo"]) {
+      expect(manifestChanges(before, { ...before, dependencies: { foo: spec } }), spec).toEqual([expect.stringContaining("not a registry range")]);
+    }
+    expect(manifestChanges(before, { ...before, overrides: { foo: "github:evil/foo" } })).toEqual(["package.json overrides point outside the npm registry."]);
+    const result = run({}, {}, { now: "2027-01-01T00:00:00Z" });
+    expect(judge({ changes: result.changes, facts: new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()]]), fixes: [], files: ["package.json", "package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), manifest: { before, after: { ...before, scripts: { preinstall: "sh x" } } } }).verdict).toBe("stop");
+  });
+  it("refuses lockfile keys that are not plain install paths, and stops on bundled dependencies", () => {
+    for (const key of ["node_modules/../x/node_modules/lodash", "node_modules\\lodash", "node_modules//lodash"]) {
+      expect(() => lockEntries(JSON.stringify({ lockfileVersion: 3, packages: { "": {}, [key]: { version: "1.0.0" } } })), key).toThrow("Unexpected package-lock path");
+    }
+    expect(lockEntries(JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "packages/app/node_modules/@s/x": { version: "1.0.0" } } }))[0]?.name).toBe("@s/x");
+    const bundled = { path: "node_modules/p/node_modules/b", name: "b", version: "1.0.1", dev: false, resolved: null, integrity: null, bundled: true };
+    const result = judge({ changes: [change()], entries: [bundled], facts: new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()]]), fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    expect(result.findings.map(f => f.message)).toContain("b@1.0.1 at node_modules/p/node_modules/b is bundled inside its parent and has no registry tarball of its own; a change to a bundled dependency needs review.");
+  });
+  it("judges a version whose hash changed at its path, not only gate 4", () => {
+    const lock = (integrity: string) => JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/lib": { version: "1.0.1", resolved: url("lib", "1.0.1"), integrity } } });
+    expect(lockDiff(lockEntries(lock("sha512-old")), lockEntries(lock(INTEGRITY))).map(c => [c.name, c.from, c.to])).toEqual([["lib", "1.0.1", "1.0.1"]]);
   });
   it("is undecidable when the given changed files leave out the lockfile", () => {
     expect(run({}, {}, { files: [], now: "2027-01-01T00:00:00Z" }).verdict).toBe("undecidable");

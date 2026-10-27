@@ -16,6 +16,8 @@ export async function judgeCli(args: string[]): Promise<number> {
     return readFileSync(path, "utf8");
   };
   const beforeLock = read(before, "package-lock.json"), afterLock = read(after, "package-lock.json");
+  const beforeManifest = read(before, "package.json"), afterManifest = read(after, "package.json");
+  const manifest = beforeManifest === afterManifest ? undefined : { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) };
   const beforeEntries = lockEntries(beforeLock), afterEntries = lockEntries(afterLock);
   const changes = lockDiff(beforeEntries, afterEntries), entries = lockEntryChanges(beforeEntries, afterEntries);
   const hadLinks = new Set(lockLinks(beforeLock));
@@ -26,7 +28,7 @@ export async function judgeCli(args: string[]): Promise<number> {
   if (!Number.isFinite(now.getTime())) throw new Error("--now must be an ISO date.");
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], errors: string[] = [];
   try { ({ facts, fixes } = await gatherFacts(changes, fetch, entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
-  const result = judge({ changes, entries, facts, fixes, files, links, now, errors });
+  const result = judge({ changes, entries, facts, fixes, files, links, now, errors, manifest });
   console.log(values.json ? JSON.stringify(result, null, 2) : renderJudgement(result));
   return result.verdict === "ready_except_build" ? 0 : result.verdict === "wait" ? 3 : 1;
 }

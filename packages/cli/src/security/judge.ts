@@ -12,7 +12,7 @@ export const EXPLOITED_UNCOMPARABLE_HOURS = 24;
 export const EXTENDED_MIN_HOURS = 72;
 
 /** One locked package entry: what a package-lock v2/v3 says was installed at a node_modules path. */
-export type LockEntry = { path: string; name: string; version: string; dev: boolean; resolved: string | null; integrity: string | null };
+export type LockEntry = { path: string; name: string; version: string; dev: boolean; resolved: string | null; integrity: string | null; bundled?: boolean };
 /**
  * A package version that the change adds. `from` is the version it replaces: the one at the same install path, else the
  * highest of the same name and major line, else null (new to the project).
@@ -84,16 +84,24 @@ function readLock(lockText: string): Record<string, any> {
   return lock.packages;
 }
 
+/** A package-lock `packages` key: an optional workspace prefix, then one or more node_modules/<name> segments. */
+const LOCK_PATH = /^(?:[A-Za-z0-9@._-]+(?:\/[A-Za-z0-9@._-]+)*\/)?(?:node_modules\/(?:@[a-z0-9][a-z0-9._-]*\/)?[A-Za-z0-9._-]+\/)*node_modules\/(?:@[a-z0-9][a-z0-9._-]*\/)?[A-Za-z0-9._-]+$/i;
+/** The name a package is required by at a path: the last node_modules segment. */
+const requireName = (path: string) => path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
+
 /** Installed registry packages in a package-lock v2/v3, by node_modules path. Links and the root are left out (see lockLinks). */
 export function lockEntries(lockText: string): LockEntry[] {
   const entries: LockEntry[] = [];
   for (const [path, item] of Object.entries(readLock(lockText))) {
-    const at = path.lastIndexOf("node_modules/");
-    if (at < 0 || item?.link) continue;
+    if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
+    if (!path.includes("node_modules/")) continue;
+    // A key that is not a plain install path (.., backslashes, empty segments) could make two keys mean one place.
+    if (!LOCK_PATH.test(path) || path.split("/").some(segment => segment === "." || segment === "..")) throw new Error(`Unexpected package-lock path: ${path}.`);
+    if (item?.link) continue;
     // An alias (node_modules/my-name with "name": "real") installs the real package.
-    const name = typeof item.name === "string" ? item.name : path.slice(at + "node_modules/".length);
+    const name = typeof item.name === "string" ? item.name : requireName(path);
     if (typeof item.version !== "string" || !semver.valid(item.version)) throw new Error(`Invalid locked version at ${path}.`);
-    entries.push({ path, name, version: item.version, dev: item.dev === true, resolved: typeof item.resolved === "string" ? item.resolved : null, integrity: typeof item.integrity === "string" ? item.integrity : null });
+    entries.push({ path, name, version: item.version, dev: item.dev === true, bundled: item.inBundle === true, resolved: typeof item.resolved === "string" ? item.resolved : null, integrity: typeof item.integrity === "string" ? item.integrity : null });
   }
   return entries;
 }
@@ -115,28 +123,84 @@ export function lockEntryChanges(before: LockEntry[], after: LockEntry[]): LockE
   });
 }
 
+/** What Node would load for `name` required from the package at `dir` ("" for the project root): the nearest node_modules. */
+function resolveFrom(entries: Map<string, LockEntry>, dir: string, name: string): LockEntry | undefined {
+  let at = dir;
+  while (true) {
+    const found = entries.get(`${at}node_modules/${name}`);
+    if (found || !at) return found;
+    const up = at.replace(/node_modules\/(?:@[^/]+\/)?[^/]+\/$/, "");
+    // A workspace folder has no node_modules segment to climb; the project root is next.
+    at = up === at ? "" : up;
+  }
+}
+
 /**
  * Every install path whose package or version changes, whether the target of a fix or not (design: check the whole
- * lockfile diff). Each is compared with what that path held before, so moving a path to a version that is already
- * installed elsewhere (a downgrade, say) is judged too. A copy that only moved to a new path at a version of the same
- * name and major that was already installed changes nothing to judge; gate 4 still checks its tarball and hash.
+ * lockfile diff), each compared with what that path held before. Two more ways a dependent can get other code are
+ * judged too: a path that moves to a version already installed elsewhere, and a removed nested copy, after which its
+ * dependent falls back to whatever Node resolution finds further up. A copy that only moved to a new path, with the
+ * same version and the same hash as one already installed, changes nothing to judge; gate 4 still checks its tarball.
  */
 export function lockDiff(before: LockEntry[], after: LockEntry[]): Change[] {
-  const atPath = new Map(before.map(e => [e.path, e]));
+  const atPath = new Map(before.map(e => [e.path, e])), afterAt = new Map(after.map(e => [e.path, e]));
   const changes = new Map<string, Change>();
+  const add = (entry: LockEntry, from: LockEntry | undefined, previous: string | null, replaced: string | null) => {
+    const key = `${entry.name}\0${previous}\0${entry.version}\0${replaced}\0${entry.integrity}`;
+    const existing = changes.get(key);
+    // A version counts as dev only when every copy of it is dev.
+    changes.set(key, existing ? { ...existing, dev: existing.dev && entry.dev } : { path: from?.path ?? entry.path, name: entry.name, from: previous, to: entry.version, dev: entry.dev, resolved: entry.resolved, integrity: entry.integrity, replaced });
+  };
   for (const entry of after) {
     const samePath = atPath.get(entry.path);
-    if (samePath && samePath.name === entry.name && samePath.version === entry.version) continue;
+    if (samePath && samePath.name === entry.name && samePath.version === entry.version && samePath.integrity === entry.integrity) continue;
     const replaced = samePath && samePath.name !== entry.name ? `${samePath.name}@${samePath.version}` : null;
     const previous = samePath?.name === entry.name ? samePath.version
       : before.filter(e => e.name === entry.name && semver.major(e.version) === semver.major(entry.version)).map(e => e.version).sort(semver.rcompare)[0] ?? null;
-    if (!replaced && previous === entry.version) continue;
-    const key = `${entry.name}\0${previous}\0${entry.version}\0${replaced}`;
-    const existing = changes.get(key);
-    // A version counts as dev only when every copy of it is dev.
-    changes.set(key, existing ? { ...existing, dev: existing.dev && entry.dev } : { path: entry.path, name: entry.name, from: previous, to: entry.version, dev: entry.dev, resolved: entry.resolved, integrity: entry.integrity, replaced });
+    if (!replaced && !samePath && previous === entry.version && before.some(e => e.name === entry.name && e.version === entry.version && e.integrity === entry.integrity)) continue;
+    add(entry, undefined, previous, replaced);
+  }
+  for (const gone of before) {
+    if (afterAt.has(gone.path)) continue;
+    // The package that depended on the removed copy; if it is gone too, nothing requires the name from there.
+    const dependent = gone.path.slice(0, gone.path.lastIndexOf("node_modules/"));
+    if (dependent.includes("node_modules/") && !afterAt.has(dependent.replace(/\/$/, ""))) continue;
+    const now = resolveFrom(afterAt, dependent, requireName(gone.path));
+    if (!now || (now.name === gone.name && now.version === gone.version && now.integrity === gone.integrity)) continue;
+    add(now, gone, now.name === gone.name ? gone.version : null, now.name === gone.name ? null : `${gone.name}@${gone.version}`);
   }
   return [...changes.values()].sort((a, b) => a.name.localeCompare(b.name) || semver.compare(a.to, b.to) || a.path.localeCompare(b.path));
+}
+
+const DEPENDENCY_GROUPS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];
+/** A registry range, or an npm: alias of a registry range. Git, URL, file:, link: and workspace: specs are not. */
+function registrySpec(spec: unknown): boolean {
+  if (typeof spec !== "string") return false;
+  const alias = /^npm:((?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*)@(.+)$/i.exec(spec);
+  return !!semver.validRange(alias ? alias[2]! : spec);
+}
+/**
+ * Why a package.json change is more than a dependency update: any other field (scripts run on install, for one), or a
+ * dependency or override that leaves the registry.
+ */
+export function manifestChanges(before: unknown, after: unknown): string[] {
+  const b = (before ?? {}) as Record<string, unknown>, a = (after ?? {}) as Record<string, unknown>;
+  if (typeof after !== "object" || after === null || Array.isArray(after)) return ["package.json is not an object."];
+  const out: string[] = [];
+  for (const key of [...new Set([...Object.keys(b), ...Object.keys(a)])].sort()) {
+    if (JSON.stringify(b[key]) === JSON.stringify(a[key])) continue;
+    if (key === "overrides") {
+      const specs: unknown[] = [];
+      const walk = (value: unknown): void => { if (value && typeof value === "object") Object.values(value).forEach(walk); else specs.push(value); };
+      walk(a[key]);
+      if (specs.some(spec => !(typeof spec === "string" && (spec.startsWith("$") || registrySpec(spec))))) out.push("package.json overrides point outside the npm registry.");
+      continue;
+    }
+    if (!DEPENDENCY_GROUPS.includes(key)) { out.push(`package.json changes "${key}", which is not a dependency list (scripts, for one, run on install).`); continue; }
+    const group = (a[key] ?? {}) as Record<string, unknown>, old = (b[key] ?? {}) as Record<string, unknown>;
+    for (const [name, spec] of Object.entries(group)) if (spec !== old[name] && !registrySpec(spec)) out.push(`package.json ${key}.${name} is "${String(spec)}", not a registry range.`);
+  }
+  return out;
 }
 
 /** Urgency of the change: from the advisories it fixes, and whether any fixed package is used in production. */
@@ -171,6 +235,8 @@ export function judge(input: {
   projectWait?: Partial<Record<Urgency, number>>;
   /** Lookup failures: each makes the judgement undecidable. */
   errors?: string[];
+  /** package.json before and after, when it changed: only registry dependency specs may change. */
+  manifest?: { before: unknown; after: unknown };
 }): Judgement {
   const { changes, facts, fixes, now } = input;
   const findings: Finding[] = [];
@@ -192,10 +258,12 @@ export function judge(input: {
     const unexpected = input.files.filter(f => !["package.json", "package-lock.json"].includes(f));
     if (unexpected.length) add({ gate: 4, effect: "stop", message: `The change also touches ${unexpected.join(", ")}; a dependency update must change only package.json and package-lock.json.` });
   }
+  if (input.manifest) for (const message of manifestChanges(input.manifest.before, input.manifest.after)) add({ gate: 4, effect: "stop", message });
   for (const link of input.links ?? []) add({ gate: 4, effect: "stop", message: `${link}: a link to a local directory that is new or points elsewhere, instead of a registry package.` });
-  const entries = input.entries ?? changes.map(c => ({ path: c.path, name: c.name, version: c.to, dev: c.dev, resolved: c.resolved, integrity: c.integrity }));
+  const entries: LockEntry[] = input.entries ?? changes.map(c => ({ path: c.path, name: c.name, version: c.to, dev: c.dev, resolved: c.resolved, integrity: c.integrity }));
   for (const e of entries) {
     const where = `${e.name}@${e.version} at ${e.path}`;
+    if (e.bundled) { add({ gate: 4, package: e.name, effect: "stop", message: `${where} is bundled inside its parent and has no registry tarball of its own; a change to a bundled dependency needs review.` }); continue; }
     if (e.resolved !== registryTarball(e.name, e.version)) add({ gate: 4, package: e.name, effect: "stop", message: `${where} resolves to ${e.resolved ?? "nothing"}, not the registry's tarball ${registryTarball(e.name, e.version)}.` });
     const fact = facts.get(`${e.name}@${e.version}`);
     if (!e.integrity?.startsWith("sha512-")) add({ gate: 4, package: e.name, effect: "stop", message: `${where} has no sha512 integrity in the lockfile.` });
@@ -265,7 +333,8 @@ export function judge(input: {
       "Obfuscated code and new network or process calls in the changed code are not inspected.",
       "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.",
       "Provenance is read from the registry's attestation record; its Sigstore signature is not verified here.",
-      "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends.",
+      "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
+      "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
     ],
   };
 }

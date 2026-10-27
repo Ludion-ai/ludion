@@ -1,7 +1,7 @@
 // Checks production right after a deploy (deploy.yml). Exits non-zero if any check fails.
 //   1. build.json's built_at is newer than this job's start (waits up to 2 minutes for the new version).
 //   2. The home page answers 200.
-//   3. The ended 0.1.x endpoints (/index.json, /mcp) answer 410 with the reason.
+//   3. The ended 0.1.x endpoints (/index.json, /index/*, /mcp) answer 410 with the reason.
 // Usage: STARTED_AT=<ISO time the job started> node tools/check-production.ts [site]
 const site = process.argv[2] ?? "https://ludion.ai";
 const startedAt = Date.parse(process.env.STARTED_AT ?? "");
@@ -40,7 +40,7 @@ const home = await fetch(`${site}/`).catch((err: Error) => err);
 if (home instanceof Response && home.ok) console.log("/: 200");
 else failures.push(`/ answered ${home instanceof Response ? home.status : home.message}`);
 
-for (const [path, method] of [["/index.json", "GET"], ["/mcp", "POST"]] as const) {
+for (const [path, method] of [["/index.json", "GET"], ["/index/subjects.json", "GET"], ["/mcp", "POST"]] as const) {
   const res = await fetch(`${site}${path}`, { method, ...(method === "POST" ? { body: "{}", headers: { "content-type": "application/json" } } : {}) }).catch((err: Error) => err);
   const body = res instanceof Response ? await res.text() : res.message;
   if (res instanceof Response && res.status === 410 && body.includes('"ended"')) console.log(`${path}: 410 ended`);

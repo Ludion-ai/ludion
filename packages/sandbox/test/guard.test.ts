@@ -1,6 +1,6 @@
 // The repository guard on starting containers. It lives in packages/sandbox, a protected path, so changing
 // which files may start a container needs the same independent review as changing the sandbox flags.
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -89,23 +89,18 @@ function scanDockerSources(files: readonly ScanFile[]): ScanHit[] {
 
 function sourceTree(): ScanFile[] {
   const files: ScanFile[] = [];
-  // Every package and app, and the repo's own tools.
-  const roots = [join(REPO, "tools")];
-  for (const parent of ["packages", "apps"]) {
-    for (const name of readdirSync(join(REPO, parent))) {
-      const src = join(REPO, parent, name, "src");
-      if (existsSync(src) && statSync(src).isDirectory()) roots.push(src);
-    }
-  }
+  // The whole repository's script sources. Unit test folders hold the synthetic cases below; build output and
+  // installed packages are not ours (dist/ bundles the sandbox itself).
+  const skip = new Set(["node_modules", ".git", "dist", ".astro", ".wrangler", "test", "tests", "test-results", "playwright-report"]);
   const walk = (dir: string): void => {
     for (const name of readdirSync(dir)) {
-      if (name === "test" || name === "tests") continue;
+      if (skip.has(name)) continue;
       const path = join(dir, name);
       if (statSync(path).isDirectory()) walk(path);
-      else if (name.endsWith(".ts") && !name.endsWith(".test.ts")) files.push({ path, text: readFileSync(path, "utf8") });
+      else if (/.(?:[cm]?ts|[cm]?js)$/.test(name) && !/.test.[cm]?[jt]s$/.test(name)) files.push({ path, text: readFileSync(path, "utf8") });
     }
   };
-  for (const root of roots) walk(root);
+  walk(REPO);
   return files;
 }
 

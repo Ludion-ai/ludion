@@ -640,7 +640,7 @@ Still open from #137's review: the `docker build` flags (N1) are written in `pat
 
 ## 2026-10-28 — The lesson product is deleted from main
 
-Cleanup PR-C in `docs/design.md`. Main at `3bd1de1` is tagged `archive/lessons-2026-10-27`; everything below can be restored from it.
+Cleanup PR-C in `docs/design.md`. Main at `3bd1de1` is tagged `archive/lessons-2026-10-27`; everything below can be restored from it, except the last edits #137–#139 made to six files before deleting them (`tools/verify/src/{docker,cli,pr-cli}.ts`, `tools/verify/test/docker.test.ts`, `packages/cli/src/teach.ts`, `tools/seed/src/steps.ts`): those are in main's history before PR-C.
 
 Deleted: `packages/core`, `packages/capability`, `tools/seed`, `tools/bench`, `tools/verify`, `lessons/`, `LICENSE-LESSONS`, `plugin/`, `.claude-plugin/`, `video/`, the CLI's `sync` and `teach` (ledger, match, publish, render, shards, teach), the site's lesson data, design samples and index pages, the Worker's MCP server and index counting, the `reverify`, `seed-watch` and `verify` workflows, and the docs except `decisions.md`, `progress.md`, `design.md`, `protected-paths.md` and the two 2026-10-27 security evidence folders (they are the new product's evidence).
 

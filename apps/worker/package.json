@@ -5,8 +5,8 @@
   "type": "module",
   "dependencies": {
     "@ludion/core": "*",
-    "@modelcontextprotocol/server": "2.0.0",
-    "agents": "^0.27.0",
+    "@modelcontextprotocol/server": "^2.3.1",
+    "agents": "^0.30.1",
     "hono": "^4.13.13",
     "zod": "^4.6.5"
   },

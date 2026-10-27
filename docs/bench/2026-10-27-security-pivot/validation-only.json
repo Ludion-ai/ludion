@@ -1,0 +1,54 @@
+{
+  "case": "validation-only",
+  "exit_code": 0,
+  "duration_ms": 57398,
+  "before_hash": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+  "after_hash": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+  "source_changed": false,
+  "receipt": {
+    "schema": 1,
+    "id": "d8180a9b-478a-4ae7-9c44-f215984ae04c",
+    "started_at": "2026-10-27T11:08:29.323Z",
+    "finished_at": "2026-10-27T11:09:20.631Z",
+    "outcome": "validated",
+    "scope": "dockerfile_only_not_deployed",
+    "scan": {
+      "schema": 1,
+      "checked_at": "2026-10-27T11:08:29.169Z",
+      "status": "update_available",
+      "scope": "dockerfile_base_image",
+      "current": {
+        "reference": "php:8.4.26-cli-alpine",
+        "version": "8.4.26",
+        "branch": "8.4",
+        "flavor": "-cli-alpine",
+        "start": 5,
+        "end": 26
+      },
+      "candidate": {
+        "version": "8.4.27",
+        "reference": "php:8.4.27-cli-alpine"
+      },
+      "security_releases": [
+        {
+          "version": "8.4.27",
+          "date": "21 Oct 2026",
+          "security": true
+        }
+      ],
+      "source": "https://www.php.net/releases/index.php?json&version=8.4&max=100",
+      "note": "Checks official PHP security-release metadata against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment."
+    },
+    "tree_hash": "970ac766b9c46260a733f6abf9cd3358651cc46feceb16baad53a6c2267cd90d",
+    "dockerfile_before": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+    "dockerfile_after": "a0975ca636a21b524578b998665d2aef70910033df410d387a36f61e49c2db3f",
+    "old_digest": "php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1",
+    "new_digest": "php@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65",
+    "test": [
+      "php",
+      "tests/smoke.php"
+    ],
+    "baseline_passed": true,
+    "candidate_passed": true
+  }
+}

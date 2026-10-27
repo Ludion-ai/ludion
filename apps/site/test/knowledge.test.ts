@@ -7,52 +7,23 @@ import { en } from "../src/strings/en.ts";
 
 const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
 
-function texts(value: unknown, out: string[] = []): string[] {
-  if (typeof value === "string") out.push(value);
-  else if (Array.isArray(value)) for (const item of value) texts(item, out);
-  else if (value && typeof value === "object") for (const item of Object.values(value)) texts(item, out);
-  return out;
-}
-
-describe("the guard", () => {
-  it("names exactly the four states, and only applicable goes on to execution", () => {
-    expect(en.home.guard.states.map((state) => state.id)).toEqual(["applicable", "inapplicable", "unknown", "stale"]);
-    const going = en.home.guard.states.filter((state) => /go(?:ing)? on to \w* ?execution/i.test(state.detail));
-    expect(going.map((state) => state.id)).toEqual(["applicable"]);
+describe("security preview claims", () => {
+  it("distinguishes an update, no match, unavailable metadata and unsupported input", () => {
+    expect(en.home.guard.states.map(s => s.id)).toEqual(["update", "no-match", "unknown", "unsupported"]);
+    expect(en.home.guard.states.find(s => s.id === "no-match")?.detail).toContain("not a guarantee");
+    expect(en.home.guard.note).toContain("not the version deployed");
   });
-});
-
-describe("v3 copy", () => {
-  it("leaves every result pending and puts no metric digits in the design copy", () => {
-    expect(en.home.receipt.pending).toBe("Pending");
-    const ordinals = new Set([en.home.isolate.install, en.home.isolate.run]);
-    const copy = [
-      ...texts(en.home.guard),
-      ...texts(en.home.verify),
-      ...texts(en.home.receipt),
-      en.home.sub,
-      ...en.home.headline,
-      ...texts(en.home.isolate).filter((text) => !ordinals.has(text)),
-    ];
-    // "v3" is the product name. The two ordinal step labels are excluded above. Any other digit is a metric.
-    for (const text of copy) expect(text.replaceAll("v3", ""), text).not.toMatch(/\d/);
+  it("does not present illustrations or source updates as completed production remediation", () => {
+    expect(en.home.isolate.scope).toContain("not a completed update");
+    expect(en.home.receipt.scope).toContain("not a run result");
+    expect(en.home.receipt.notDeployed).toBe("Not changed");
+    expect(en.home.coverage).toContain("automatic production deployment are not supported");
   });
-
-  it("labels every illustration as a design example", () => {
-    const label = "Design example, not a run result.";
-    expect(en.home.scene.caption).toContain(label);
-    expect(en.home.isolate.scope).toContain(label);
-    expect(en.home.receipt.scope).toContain(label);
-  });
-
-  it("keeps the unverified wording and never the forbidden names", () => {
-    const source = readFileSync(new URL("../src/strings/en.ts", import.meta.url), "utf8");
-    expect(source).not.toContain("Capability Compiler");
-    expect(source).not.toContain("independent verifier");
-    expect(source).not.toContain("/lessons/");
-    expect(en.home.sub).toContain("meant to run only when its guard says applicable");
-    expect(en.home.sub).toContain("meant to be judged by a fixed verifier");
-    expect(en.home.sub).toContain("Nothing here is verified yet.");
+  it("retains explicit application validation and user policy before source changes", () => {
+    expect(en.home.isolate.applyDetail).toContain("--apply");
+    expect(en.home.verify.notVerified).toContain("failed baseline");
+    expect(en.home.verify.notVerified).toContain("changed project");
+    expect(en.home.verify.sameModel).toContain("does not invent a passing test");
   });
 });
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// ludion: tells your coding assistant what changed in the versions your project installed.
+// ludion: security-update source preview, with legacy assistant-context compatibility.
 //   ludion sync [--dir <path>] [--model <id>] [--quiet] [--offline]
 //   ludion teach <draft.json | - | --draft <base64url>> [--public] [--drafted-by-agent]
-// No telemetry: the only network requests are the index shards (sync), source pages (teach), and gh (teach --public).
+// Security commands use official PHP metadata and Docker image retrieval. Legacy requests remain index/source/gh.
 import { createInterface } from "node:readline/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -14,8 +14,22 @@ import { CONSENT, openPullRequest } from "./publish.ts";
 import { lessonLines, readLessonsFile, renderLessons, writeAndWire } from "./render.ts";
 import { fetchLessons } from "./shards.ts";
 import { check, ghIdentity, isUnverified, ledgerEntry, readDraft, showLesson, toLesson } from "./teach.ts";
+import { securityCli } from "./security/cli.ts";
 
-const HELP = `ludion: tells your coding assistant what changed in the versions your project installed.
+const HELP = `ludion: security updates for your project's PHP Docker image (preview).
+
+  ludion init [--dir <path>]
+      Create ludion.security.json. Set your application's real test command.
+  ludion scan [--dir <path>] [--json]
+      Look up official same-branch PHP security releases. Exit 1: update found; 2: error.
+  ludion patch [--dir <path>] [--apply] [--json]
+      Download official images, build and test old/new versions offline, and save a receipt.
+      --apply updates only the Dockerfile after validation. Production is not deployed.
+  ludion watch [--dir <path>] [--apply] [--interval <seconds>] [--json]
+      Repeat patch checks in the foreground (default 900 seconds). Ctrl+C cancels pending apply;
+      a Docker step already in progress may finish before exit.
+
+Legacy assistant-context commands (kept for existing integrations):
 
   ludion sync [--dir <path>] [--model <id>] [--quiet] [--offline]
       Read the lockfile, fetch the lessons for the installed versions, leave out what the model
@@ -152,6 +166,7 @@ async function teach(argv: string[]): Promise<number> {
 
 async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
+  if (command && ["init", "scan", "patch", "watch"].includes(command)) return securityCli(command, rest);
   if (command === "sync") return sync(rest);
   if (command === "teach") return teach(rest);
   console.log(HELP);
@@ -166,6 +181,6 @@ main(process.argv.slice(2)).then(
   },
   (err: Error) => {
     console.error(`ludion: ${err.message}`);
-    process.exitCode = 1;
+    process.exitCode = 2;
   },
 );

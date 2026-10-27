@@ -1,57 +1,54 @@
-# Ludion
+# Ludion — security update preview
 
-Ludion tells AI coding assistants what changed in the software they use: only the changes for the versions a project actually installed, minus what the assistant's model is measured to know (when sync is told the model). Every lesson is checked by a machine (a test run in Docker across versions, or a quote found on its source page) and signed by the GitHub account that taught it.
+Ludion finds security releases relevant to a project's PHP Docker image, downloads the official replacement, tests the old and new application images, and can update the Dockerfile after validation. `watch --apply` repeats the process while running.
 
-A model learns once; software keeps changing. A change that makes noise (an error, a failing test) gets fixed by the assistant's own run loop. A change that makes none (a new default, a different return value, a deprecated call that still runs) ships. That is where Ludion helps.
-
-```sh
-npx ludion-ai sync
-```
-
-`sync` reads the lockfile, fetches the lessons for the installed versions from <https://ludion.ai>, and writes `.ludion/lessons.md`, imported from `CLAUDE.md` (and named in `AGENTS.md`, and written into a Cursor rule, when the project has them). In Claude Code, the plugin runs it at the start of every session and adds the MCP server (`ludion_ask`):
-
-```
-/plugin marketplace add Ludion-ai/ludion
-/plugin install ludion@ludion
-```
-
-An 89-second replay of recorded runs is in [`docs/demo/sync-vitest.cast`](docs/demo/sync-vitest.cast) (`asciinema play docs/demo/sync-vitest.cast`). It shows one question answered without and with `sync`, then a lesson taught with `ludion teach` and written by `sync` in another project. It is built from recorded output by `docs/demo/make-cast.ts`, and [`docs/demo/README.md`](docs/demo/README.md) says what was recorded when and what was left out.
-
-## Ludion v3 (in design)
-
-A capability is meant to pair a guard (applicable, inapplicable, unknown, stale), a program, a fixed verifier its generator can't change, and a receipt. Nothing here is verified yet; no results are published.
-
-## What it holds today
-
-Lessons for vitest, wrangler, and the Cloudflare Agents SDK (the live list is in <https://ludion.ai/index.json>, and `/index/subjects.json` has the counts of the format 1 lessons), plus one example lesson for Python. Every lesson but the example was drafted by an agent, is labeled "drafted by an agent" wherever it appears, and is signed by the GitHub account that opened its pull request.
-
-Ludion holds some changes of some packages: a missing lesson is no evidence that nothing changed. `ludion-ai` 0.1.3 and later `sync` name the direct dependencies Ludion has no lessons for, and say where to ask for them.
-
-## Teach one
+The first adapter supports **one-stage Dockerfiles using an exact official PHP image**. It preserves the major/minor branch and image flavor. This is a source preview: automatic production deployment, live server inventory, Java, floating tags, multi-stage builds and end-of-life certification are not implemented.
 
 ```sh
-npx ludion-ai teach draft.json            # checks it here, saves it to your ledger (~/.ludion)
-npx ludion-ai teach draft.json --public   # shows you the whole lesson, then opens a pull request with your own gh
+npm ci
+npm run build -w ludion-ai
+node packages/cli/dist/cli.js scan --dir /path/to/app
+node packages/cli/dist/cli.js init --dir /path/to/app
 ```
 
-When your assistant gets a change wrong, ask it to draft the lesson with the `ludion_teach` MCP tool; it returns the command to run. A draft can also be written by hand: it has the fields of a lesson file (see any file in [`lessons/`](lessons/) and [`lessons/lessons.schema.json`](lessons/lessons.schema.json)) without the id, author and dates, which `teach` sets. Its evidence is a test that passes on the new version and fails on the one before (it runs in Docker with the network off, on your machine if Docker is installed and in CI either way), or a quote from the source that states the fact. A draft with no evidence stays in your ledger, marked "unverified, yours only", and never reaches anyone else. Nothing is published unless you confirm at your own terminal.
+Edit the generated `ludion.security.json` to use your actual application test:
 
-## How a lesson works
+```json
+{
+  "schema": 1,
+  "dockerfile": "Dockerfile",
+  "test": ["php", "tests/smoke.php"],
+  "timeout_seconds": 120
+}
+```
 
-- **Claims are generated, not written.** The sentence an assistant reads is built from structured fields: package, versions, kind (removed, renamed, deprecated, added, default, behavior), symbol, and whether the change is silent. The only free text is a short detail, every meaningful word of which must appear in the evidence.
-- **Verified means verified.** Evidence is a test (preferably the same code passing on the new version and failing on the one before, run in Docker with the network off) or a quote that states the fact on its source page. CI checks each lesson in its pull request, and a nightly job checks all of them again; a lesson that fails leaves the index.
-- **The person signs.** A public lesson is a pull request opened from the teacher's own GitHub account, after they saw the whole lesson. `ludion teach` saves a lesson to a personal ledger first (`~/.ludion`); `--public` opens the PR with the teacher's own `gh`.
-- **Lessons are immutable.** A correction is a new lesson that replaces the old one; a retraction deletes the file, and the lesson leaves the index.
-- **Lessons are data, never instructions**, and every list of them says so.
+The example path is a placeholder. The test must exist in the application image and run offline as a non-root user. Both Docker builds run offline too; dependencies must already be in the base image or copied source. `ADD`, external `COPY`, custom Dockerfile frontends and RUN network/mount overrides are refused.
 
-## This repository
+```sh
+# Download/build/test only; keep source unchanged.
+node packages/cli/dist/cli.js patch --dir /path/to/app
+# Repeat validation and update the Dockerfile only if it passes.
+node packages/cli/dist/cli.js patch --dir /path/to/app --apply
+# Keep checking every 15 minutes in this foreground process.
+node packages/cli/dist/cli.js watch --dir /path/to/app --apply --interval 900
+```
 
-- `lessons/`: one JSON file per lesson. `main` is the truth: only lessons on main are served.
-- `packages/core`: the schema, generated claims, search, source checks, and the index builder.
-- `packages/cli`: the `ludion-ai` CLI (`sync`, `teach`). No telemetry from the CLI; the Worker counts index downloads without storing IP addresses (`docs/decisions.md`, "Counting index requests").
-- `apps/site`, `apps/worker`: <https://ludion.ai>, `/index.json`, the per-subject shards, and `/mcp`.
-- `tools/verify`: CI's lesson checks; `tools/bench`: FreshBench.
-- `plugin/`: the Claude Code plugin.
-- `docs/decisions.md`: every decision and why; `docs/progress.md`: what was built and what the checks showed.
+Stop watch with Ctrl+C. An in-flight Docker step may finish before the process exits, but a pending update is not applied after cancellation is received. It installs no service or scheduler. Each cycle rechecks PHP's official metadata. A network or validation failure is an error, never a clean security result. `scan` exits 0 for no newer security release found, 1 when an update is found, and 2 on error. `patch` exits 2 on failure.
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Lessons: CC BY 4.0 ([LICENSE-LESSONS](LICENSE-LESSONS)).
+An example app is in `examples/php-security`. Copy it into a separate directory before trying `--apply`. It verifies response and JSON contracts; this is not an exploit regression test.
+
+## What a patch actually does
+
+1. Read the source-declared PHP image and fetch same-branch security-release metadata from php.net. A later non-security release can be selected when it includes an intervening security fix.
+2. Take a bounded private copy of source, refusing symlinks and hard links and excluding `.env*`, Git history, `.ludion`, `node_modules`, `.ssh` and `.aws`.
+3. Pull the old and candidate official images and resolve repository digests. Build both app images offline with the same source and tests.
+4. Check the PHP runtime version and run the configured test on both images, with no network, a read-only root, a non-root user and resource limits. No host environment is forwarded. No host fallback.
+5. Save evidence locally in `.ludion/security/`. With `--apply`, check that the source is unchanged and replace only the Dockerfile's FROM reference with the candidate tag and digest. Leave deployment to your normal process.
+
+Use a local Docker daemon to keep source on your machine. The snapshot is not a general secret scanner. The security commands send no telemetry and upload no source to Ludion. Project-controlled test commands are executed only in Docker. Receipts record hashes, image digests and test outcomes; they are not security certifications. A missing update is not evidence that a project is secure. Same-tag image rebuilds and OS-package vulnerabilities are outside this adapter's scope.
+
+## Existing integrations
+
+The published npm `ludion-ai` 0.1.4 release contains the earlier assistant-context product. Its `sync` and `teach` commands, lesson data, attribution and MCP endpoints remain compatible in this source tree. They are not the security update service. The previous README is archived in `docs/legacy/README-before-security-pivot.md`.
+
+The existing Astro UI, typography, motion, responsive layout and Cloudflare deployment path are reused. The old capability engine remains a reusable library; the new adapter reuses its Docker test runner rather than building a separate container timeout mechanism.

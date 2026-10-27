@@ -360,7 +360,7 @@ describe("resolveLoadedVitest", () => {
     const hash = lockHash(root);
     const loaded = resolveLoadedVitest(root, hash);
     expect(loaded.vitest_version).toBe(pkg.version);
-    expect(loaded.vitest_version).toBe("4.1.11");
+    expect(loaded.vitest_version).toBe("4.1.12");
     expect(loaded.vitest_version).toBe(lock.packages["node_modules/vitest"].version);
     expect(loaded.vitest_integrity).toBe(lock.packages["node_modules/vitest"].integrity);
     expect(loaded.vitest_realpath).toBe("/verifier/node_modules/vitest/vitest.mjs");

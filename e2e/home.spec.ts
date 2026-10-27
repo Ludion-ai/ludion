@@ -1,38 +1,38 @@
 import { expect, test } from "@playwright/test";
 
-const EXAMPLE = "Design example, not a run result.";
+const EXAMPLES: Record<string, string> = { guard: "Illustrated workflow.", verify: "Illustrated workflow.", isolate: "Workflow illustration", receipt: "Receipt structure, not a run result." };
 const SECTIONS = ["guard", "verify", "isolate", "receipt"] as const;
 
-test("the home page shows the design, pending results, and no lesson or bench links", async ({ page }) => {
+test("the home page describes security updates and clearly limits production claims", async ({ page }) => {
   await page.goto("/");
   const heading = page.locator("h1");
-  await expect(heading).toContainText("Not a description.");
-  await expect(heading).toContainText("Designed as a guarded, checkable capability.");
-  await expect(page.locator(".introduction")).toContainText("Nothing here is verified yet.");
-  await expect(page.getByRole("link", { name: "Set up today's sync" }).first()).toHaveAttribute("href", "/start/");
-  await expect(page.getByRole("link", { name: "Read the design", exact: true })).toHaveAttribute("href", "#guard");
+  await expect(heading).toContainText("Keep building.");
+  await expect(heading).toContainText("Keep security updates moving.");
+  await expect(page.locator(".introduction")).toContainText("PHP security updates");
+  await expect(page.getByRole("link", { name: "Try the preview" }).first()).toHaveAttribute("href", "/start/");
+  await expect(page.getByRole("link", { name: "See the workflow", exact: true })).toHaveAttribute("href", "#guard");
   for (const id of SECTIONS) {
     const section = page.locator(`#${id}`);
     await expect(section).toBeVisible();
-    await expect(section).toContainText(EXAMPLE);
+    await expect(section).toContainText(EXAMPLES[id]!);
   }
-  await expect(page.locator("[data-guard-state]")).toHaveText([/applicable/, /inapplicable/, /unknown/, /stale/]);
-  await expect(page.locator("#receipt")).toContainText("Pending");
+  await expect(page.locator("[data-guard-state]")).toHaveText([/update/, /no-match/, /unknown/, /unsupported/]);
+  await expect(page.locator("#receipt")).toContainText("Production deployment");
   const hrefs = await page.locator("a[href]").evaluateAll((els) => els.map((el) => el.getAttribute("href") ?? ""));
   expect(hrefs.filter((href) => href.includes("/lessons/") || href.includes("/bench"))).toEqual([]);
 });
 
-test("the design stays in the page without JavaScript", async ({ browser }) => {
+test("the security workflow stays in the page without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText("Not a description.");
-  await expect(page.locator(".introduction")).toContainText("Nothing here is verified yet.");
-  await expect(page.getByRole("link", { name: "Read the design", exact: true })).toHaveAttribute("href", "#guard");
-  for (const id of SECTIONS) await expect(page.locator(`#${id}`)).toContainText(EXAMPLE);
+  await expect(page.locator("h1")).toContainText("Keep building.");
+  await expect(page.locator(".introduction")).toContainText("PHP security updates");
+  await expect(page.getByRole("link", { name: "See the workflow", exact: true })).toHaveAttribute("href", "#guard");
+  for (const id of SECTIONS) await expect(page.locator(`#${id}`)).toContainText(EXAMPLES[id]!);
   await expect(page.locator("[data-guard-state]")).toHaveCount(4);
-  await expect(page.locator("#receipt")).toContainText("Pending");
-  await expect(page.locator("[data-trace-panel=receipt]")).toContainText("invalidates_on");
+  await expect(page.locator("#receipt")).toContainText("Production deployment");
+  await expect(page.locator("[data-trace-panel=receipt]")).toContainText("source and Dockerfile hashes");
   await context.close();
 });
 
@@ -69,11 +69,11 @@ test("home opens on the visual scene and scrolls to the guard", async ({ page })
     const initial = await scene.evaluate((el) => getComputedStyle(el).getPropertyValue("--scroll"));
     const guard = page.locator("#guard");
     expect((await guard.boundingBox())!.y).toBeGreaterThanOrEqual(700);
-    await page.getByRole("link", { name: "Read the design", exact: true }).click();
+    await page.getByRole("link", { name: "See the workflow", exact: true }).click();
     await expect(page).toHaveURL(/#guard$/);
     await expect.poll(async () => (await guard.boundingBox())!.y).toBeCloseTo(40, 0);
     await expect(stage).not.toHaveClass(/active/);
-    await expect(page.locator("[data-guard-state=applicable]")).toBeVisible();
+    await expect(page.locator("[data-guard-state=update]")).toBeVisible();
     await stage.scrollIntoViewIfNeeded();
     await expect(stage).toHaveClass(/active/);
     await page.mouse.wheel(0, 250);

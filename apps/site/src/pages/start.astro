@@ -1,98 +1,67 @@
 ---
 import Base from "../layouts/Base.astro";
 import Pool from "../components/Pool.astro";
-import { siteData } from "../build/data.ts";
-import { en } from "../strings/en.ts";
-
-const { config } = await siteData();
-const s = en.start;
-const pluginCommand = `/plugin marketplace add ${config.org}/${config.repo}\n/plugin install ludion@ludion`;
-const mcpCommand = `claude mcp add --transport http ludion ${config.site}/mcp`;
+const commands = {
+  source: "git clone https://github.com/Ludion-ai/ludion.git\ncd ludion\nnpm ci\nnpm run build -w ludion-ai",
+  scan: "node packages/cli/dist/cli.js scan --dir /path/to/app",
+  init: "node packages/cli/dist/cli.js init --dir /path/to/app",
+  patch: "node packages/cli/dist/cli.js patch --dir /path/to/app",
+  apply: "node packages/cli/dist/cli.js patch --dir /path/to/app --apply",
+  watch: "node packages/cli/dist/cli.js watch --dir /path/to/app --apply --interval 900",
+};
+const config = JSON.stringify({ schema: 1, dockerfile: "Dockerfile", test: ["php", "tests/smoke.php"], timeout_seconds: 120 }, null, 2);
 ---
-
-<Base title={s.title} description={s.intro}>
+<Base title="Try the PHP security preview | Ludion" description="Find and validate PHP Docker security updates. Run from source, choose your application test, then opt in to updating your Dockerfile.">
   <article class="start-page wrap">
     <header class="page-intro">
-      <h1>{s.heading}</h1>
-      <p class="intro">{s.intro}</p>
+      <h1>Close your first patch gap.</h1>
+      <p class="intro">Start with one PHP project. Check for a security update, validate it against your application, then choose whether to apply it.</p>
     </header>
-
     <Pool>
-      <section class="sync" aria-labelledby="sync">
+      <section class="sync" aria-labelledby="scan">
         <div class="install">
-          <h2 id="sync">{s.sync}</h2>
-          <p class="where">{s.runIn}</p>
+          <h2 id="scan">Check your PHP image</h2>
+          <p class="where">Source preview · Node 24+ · Docker for validation. The published npm 0.1.4 release does not include these commands.</p>
+          <p>After building this source revision, run:</p>
           <div class="command primary-command">
-            <pre><code id="sync-command">npx ludion-ai sync</code></pre>
-            <button type="button" data-copy="sync-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: npx ludion-ai sync`} aria-live="polite" hidden>{s.copy}</button>
+            <pre><code id="scan-command">{commands.scan}</code></pre>
+            <button type="button" data-copy="scan-command" data-copied="Copied" data-selected="Selected" aria-label="Copy scan command" aria-live="polite" hidden>Copy</button>
           </div>
-          <p class="wiring">{s.anyAssistantBody}</p>
+          <p class="wiring">Replace /path/to/app with your project directory. The scan reads its Dockerfile and checks PHP's official release metadata. It does not change your project.</p>
         </div>
-
-        <aside class="path" aria-labelledby="sync-path">
-          <h3 id="sync-path" class="visually-hidden">{s.flowLabel}</h3>
+        <aside class="path" aria-labelledby="update-path">
+          <h3 id="update-path" class="visually-hidden">The update path</h3>
           <ol class="flow">
-            {s.flow.map((step) => (
-              <li>
-                <span class="step-title">{step.title}</span>
-                <span class:list={["step-detail", { "file": step.detail === ".ludion/lessons.md" }]}>{step.detail}</span>
-              </li>
-            ))}
+            <li><span class="step-title">Detect</span><span class="step-detail">Official PHP security releases</span></li>
+            <li><span class="step-title">Validate</span><span class="step-detail">Your application test, old and new</span></li>
+            <li><span class="step-title">Apply</span><span class="step-detail">A digest-pinned Dockerfile change</span></li>
           </ol>
         </aside>
       </section>
-
-      <p class="coverage">{s.coverage} {s.pagesMoved}</p>
-
+      <p class="coverage">Supported: one-stage Dockerfiles with an exact official PHP image, such as php:8.4.26-cli-alpine. Multi-stage builds, floating tags, Java and host-installed PHP need manual handling. Production is not automatically redeployed.</p>
       <section class="reference" aria-labelledby="setup-details">
-        <h2 id="setup-details">{s.details}</h2>
-
-        <details>
-          <summary><span>{s.claudeCode}</span><span class="summary-note">{s.claudeCodeShort}</span></summary>
-          <div class="detail-body">
-            <p>{s.claudeCodeBody}</p>
-            <div class="command">
-              <pre><code id="plugin-command">{pluginCommand}</code></pre>
-              <button type="button" data-copy="plugin-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.claudeCode}`} aria-live="polite" hidden>{s.copy}</button>
-            </div>
-          </div>
+        <h2 id="setup-details">From a check to an update</h2>
+        <details open>
+          <summary><span>1 · Build the source preview</span><span class="summary-note">Keep the existing npm install separate</span></summary>
+          <div class="detail-body"><p>Use the security-preview source revision. These instructions become available on the default branch when its pull request is merged.</p><div class="command"><pre><code id="source-command">{commands.source}</code></pre><button type="button" data-copy="source-command" data-copied="Copied" data-selected="Selected" aria-label="Copy source setup" aria-live="polite" hidden>Copy</button></div></div>
         </details>
-
         <details>
-          <summary><span>{s.mcp}</span><span class="summary-note">{s.mcpShort}</span></summary>
-          <div class="detail-body">
-            <div class="command">
-              <pre><code id="mcp-command">{mcpCommand}</code></pre>
-              <button type="button" data-copy="mcp-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.mcp}`} aria-live="polite" hidden>{s.copy}</button>
-            </div>
-          </div>
+          <summary><span>2 · Choose your application test</span><span class="summary-note">Required before validation</span></summary>
+          <div class="detail-body"><p>Create the configuration in your application:</p><div class="command"><pre><code id="init-command">{commands.init}</code></pre><button type="button" data-copy="init-command" data-copied="Copied" data-selected="Selected" aria-label="Copy init command" aria-live="polite" hidden>Copy</button></div><p>Edit ludion.security.json. The example test path is a placeholder: replace it with a real test that is copied into your application image and can run offline as a non-root user.</p><div class="command"><pre><code>{config}</code></pre></div><p>Docker builds also run offline. Dependencies must already be available in the base image or your source tree. Network installs, remote ADD and external build stages are not supported.</p></div>
         </details>
-
         <details>
-          <summary><span>{s.teach}</span><span class="summary-note">{s.teachShort}</span></summary>
-          <div class="detail-body">
-            <p>{s.teachBody}</p>
-            <p class="command-label">{s.localLesson}</p>
-            <div class="command">
-              <pre><code id="teach-command">npx ludion-ai teach draft.json</code></pre>
-              <button type="button" data-copy="teach-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.localLesson}`} aria-live="polite" hidden>{s.copy}</button>
-            </div>
-            <p class="command-label">{s.publicLesson}</p>
-            <div class="command">
-              <pre><code id="public-command">npx ludion-ai teach draft.json --public</code></pre>
-              <button type="button" data-copy="public-command" data-copied={s.copied} data-selected={s.copySelected} aria-label={`${s.copy}: ${s.publicLesson}`} aria-live="polite" hidden>{s.copy}</button>
-            </div>
-            <p class="consent">{s.teachConsent}</p>
-          </div>
+          <summary><span>3 · Validate, then apply</span><span class="summary-note">Source changes are opt-in</span></summary>
+          <div class="detail-body"><p>Download, build and test both versions without changing the Dockerfile:</p><div class="command"><pre><code id="patch-command">{commands.patch}</code></pre><button type="button" data-copy="patch-command" data-copied="Copied" data-selected="Selected" aria-label="Copy validation command" aria-live="polite" hidden>Copy</button></div><p>To validate again and apply the replacement only on success:</p><div class="command"><pre><code id="apply-command">{commands.apply}</code></pre><button type="button" data-copy="apply-command" data-copied="Copied" data-selected="Selected" aria-label="Copy apply command" aria-live="polite" hidden>Copy</button></div><p>Review the receipt in your project's .ludion/security/ directory. A failed baseline, failed candidate or changed source leaves the Dockerfile untouched. Deploy the updated application through your normal process.</p></div>
         </details>
-
         <details>
-          <summary><span>{s.privacy}</span><span class="summary-note">{s.privacyShort}</span></summary>
-          <div class="detail-body privacy">
-            <p>{s.privacyBody}</p>
-          </div>
+          <summary><span>4 · Keep checking automatically</span><span class="summary-note">While the process is running</span></summary>
+          <div class="detail-body"><p>Check every 900 seconds and apply validated Dockerfile updates:</p><div class="command"><pre><code id="watch-command">{commands.watch}</code></pre><button type="button" data-copy="watch-command" data-copied="Copied" data-selected="Selected" aria-label="Copy watch command" aria-live="polite" hidden>Copy</button></div><p>Keep this foreground process running. Ctrl+C requests a stop: an in-flight Docker step may finish, but a pending update will not be applied after cancellation is received. This installs no background service and does not deploy production. Errors are reported; an unavailable source is never treated as a successful check.</p></div>
         </details>
-        <p class="privacy-summary">{s.privacySummary}</p>
+        <details>
+          <summary><span>What leaves your machine</span><span class="summary-note">Source, requests and limits</span></summary>
+          <div class="detail-body privacy"><p>The security commands request release metadata from php.net and official images through Docker. Source is copied to a temporary local build context and sent to your configured Docker daemon; use a local daemon to keep it on your machine. No source is uploaded to Ludion and the security commands send no telemetry.</p><p>The snapshot excludes .env files, .git, .ludion, node_modules, .ssh and .aws; it is not a general secret scanner. The application test runs inside a container, without host environment variables. Receipts stay in the project. The website uses Google Analytics; the legacy sync API retains its existing request-counting behavior.</p></div>
+        </details>
+        <p class="privacy-summary">A passing application test is evidence for that test. No newer security release is not a guarantee of safety. This preview does not inventory live servers or certify end-of-life support.</p>
       </section>
     </Pool>
   </article>

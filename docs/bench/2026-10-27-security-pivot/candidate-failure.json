@@ -1,0 +1,55 @@
+{
+  "case": "candidate-failure",
+  "exit_code": 2,
+  "duration_ms": 8589,
+  "before_hash": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+  "after_hash": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+  "source_changed": false,
+  "receipt": {
+    "schema": 1,
+    "id": "343b8cbd-be5f-4cab-b79b-3aecd607eb6f",
+    "started_at": "2026-10-27T11:09:21.355Z",
+    "finished_at": "2026-10-27T11:09:29.229Z",
+    "outcome": "failed",
+    "scope": "dockerfile_only_not_deployed",
+    "scan": {
+      "schema": 1,
+      "checked_at": "2026-10-27T11:09:21.354Z",
+      "status": "update_available",
+      "scope": "dockerfile_base_image",
+      "current": {
+        "reference": "php:8.4.26-cli-alpine",
+        "version": "8.4.26",
+        "branch": "8.4",
+        "flavor": "-cli-alpine",
+        "start": 5,
+        "end": 26
+      },
+      "candidate": {
+        "version": "8.4.27",
+        "reference": "php:8.4.27-cli-alpine"
+      },
+      "security_releases": [
+        {
+          "version": "8.4.27",
+          "date": "21 Oct 2026",
+          "security": true
+        }
+      ],
+      "source": "https://www.php.net/releases/index.php?json&version=8.4&max=100",
+      "note": "Checks official PHP security-release metadata against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment."
+    },
+    "tree_hash": "4cf5ae3d610e8f16bebecde351850b69c9d3a64bda03860e782a4ba6f1d7437a",
+    "dockerfile_before": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+    "dockerfile_after": null,
+    "old_digest": "php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1",
+    "new_digest": "php@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65",
+    "test": [
+      "php",
+      "tests/smoke.php"
+    ],
+    "baseline_passed": true,
+    "candidate_passed": false,
+    "reason": "Validation exited 42: Intentional candidate regression\n"
+  }
+}

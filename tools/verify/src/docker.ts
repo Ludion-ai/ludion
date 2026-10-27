@@ -14,6 +14,26 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { VERIFIER_STORE_PREFIX, isInside } from "./verifier-deps.ts";
 
+/** Image retrieval/build/inspection only. Container execution must use buildDockerRunArgs and the timed runner. */
+export function runDockerImageCommand(args: string[], timeoutMs: number): Promise<string> {
+  if (!["pull", "build", "image"].includes(args[0] ?? "") || (args[0] === "image" && !["inspect", "rm"].includes(args[1] ?? ""))) {
+    return Promise.reject(new Error("Only Docker image retrieval, build, inspect and cleanup are allowed here."));
+  }
+  return new Promise((resolve, reject) => {
+    const child = spawn("docker", args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    let output = "", error = "", timeout = false;
+    const timer = setTimeout(() => { timeout = true; child.kill(); }, timeoutMs);
+    child.stdout.on("data", chunk => { output = (output + String(chunk)).slice(-16_384); });
+    child.stderr.on("data", chunk => { error = (error + String(chunk)).slice(-16_384); });
+    child.on("error", err => { clearTimeout(timer); reject(new Error(`Docker unavailable: ${err.message}`)); });
+    child.on("close", code => {
+      clearTimeout(timer);
+      if (timeout || code !== 0) reject(new Error(timeout ? "Docker image command timed out." : `Docker image command failed (${code}): ${error.slice(-1500)}`));
+      else resolve(output.trim());
+    });
+  });
+}
+
 /** What to run: a format 0 runner (python, bash, node) or a format 1 runtime (node@24, python@3.12, …). */
 export interface RunSpec {
   runtime: string;
@@ -454,8 +474,19 @@ export function ensureViteScratchDirs(nodeModules: string): void {
   }
 }
 
-export function buildDockerRunArgs(opts: DockerRunOptions): string[] {
+export type SecurityDockerRunOptions = { phase: "security"; name: string; image: string; command: readonly string[] };
+
+export function buildDockerRunArgs(opts: DockerRunOptions | SecurityDockerRunOptions): string[] {
   if (opts === null || typeof opts !== "object" || Array.isArray(opts)) throw new Error("Docker options must be an object.");
+  // Application security checks use an immutable, locally built image ID, with no bind mounts or caller-supplied flags.
+  // The existing lesson/install policy below stays unchanged.
+  if (opts.phase === "security") {
+    for (const key of Object.keys(opts)) if (!["phase", "name", "image", "command"].includes(key)) throw new Error(`Unknown security docker option ${key}.`);
+    requireName(opts.name);
+    if (typeof opts.image !== "string" || !/^sha256:[a-f0-9]{64}$/.test(opts.image)) throw new Error("Security tests require an immutable local image ID.");
+    if (!Array.isArray(opts.command) || !opts.command.length || !opts.command.every(a => typeof a === "string" && a.length > 0 && a.length <= 2000 && !a.includes("\0")) || opts.command[0]!.startsWith("-")) throw new Error("Expected a nonempty application test argv.");
+    return ["run", "--rm", "--name", opts.name, "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534", "--cpus", "1", "--memory", "512m", "--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m", "--entrypoint", opts.command[0]!, opts.image, ...opts.command.slice(1)];
+  }
   for (const key of Object.keys(opts)) {
     if (!ALLOWED_OPTIONS.has(key)) throw new Error(`Unknown docker option ${key}.`);
   }

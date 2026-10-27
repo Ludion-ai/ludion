@@ -1,20 +1,20 @@
 {
   "case": "apply",
   "exit_code": 0,
-  "duration_ms": 16959,
+  "duration_ms": 17701,
   "before_hash": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
   "after_hash": "a0975ca636a21b524578b998665d2aef70910033df410d387a36f61e49c2db3f",
   "source_changed": true,
   "receipt": {
     "schema": 1,
-    "id": "2b717e86-52db-4bd5-81c9-187f1c45ccda",
-    "started_at": "2026-10-27T10:57:19.008Z",
-    "finished_at": "2026-10-27T10:57:35.188Z",
+    "id": "f702e9be-ac86-4152-8972-c6544fe1d6bf",
+    "started_at": "2026-10-27T11:08:01.677Z",
+    "finished_at": "2026-10-27T11:08:16.073Z",
     "outcome": "applied",
     "scope": "dockerfile_only_not_deployed",
     "scan": {
       "schema": 1,
-      "checked_at": "2026-10-27T10:57:19.006Z",
+      "checked_at": "2026-10-27T11:08:01.675Z",
       "status": "update_available",
       "scope": "dockerfile_base_image",
       "current": {
@@ -39,7 +39,7 @@
       "source": "https://www.php.net/releases/index.php?json&version=8.4&max=100",
       "note": "Checks official PHP security-release metadata against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment."
     },
-    "tree_hash": "c25634f2caf521d5fb26cefb3048c7e8d57ac13ca018f8b8f2161d06a259dd0c",
+    "tree_hash": "970ac766b9c46260a733f6abf9cd3358651cc46feceb16baad53a6c2267cd90d",
     "dockerfile_before": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
     "dockerfile_after": "a0975ca636a21b524578b998665d2aef70910033df410d387a36f61e49c2db3f",
     "old_digest": "php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1",

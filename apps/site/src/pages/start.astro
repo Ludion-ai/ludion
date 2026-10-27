@@ -55,7 +55,7 @@ const config = JSON.stringify({ schema: 1, dockerfile: "Dockerfile", test: ["php
         </details>
         <details>
           <summary><span>4 · Keep checking automatically</span><span class="summary-note">While the process is running</span></summary>
-          <div class="detail-body"><p>Check every 900 seconds and apply validated Dockerfile updates:</p><div class="command"><pre><code id="watch-command">{commands.watch}</code></pre><button type="button" data-copy="watch-command" data-copied="Copied" data-selected="Selected" aria-label="Copy watch command" aria-live="polite" hidden>Copy</button></div><p>Keep this foreground process running. Stop with Ctrl+C. This installs no background service and does not deploy production. Errors are reported; an unavailable source is never treated as a successful check.</p></div>
+          <div class="detail-body"><p>Check every 900 seconds and apply validated Dockerfile updates:</p><div class="command"><pre><code id="watch-command">{commands.watch}</code></pre><button type="button" data-copy="watch-command" data-copied="Copied" data-selected="Selected" aria-label="Copy watch command" aria-live="polite" hidden>Copy</button></div><p>Keep this foreground process running. Ctrl+C requests a stop: an in-flight Docker step may finish, but a pending update will not be applied after cancellation is received. This installs no background service and does not deploy production. Errors are reported; an unavailable source is never treated as a successful check.</p></div>
         </details>
         <details>
           <summary><span>What leaves your machine</span><span class="summary-note">Source, requests and limits</span></summary>

@@ -1,4 +1,4 @@
-import { constants, closeSync, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
+import { chmodSync, constants, closeSync, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { hash } from "./php.ts";
 
@@ -53,8 +53,10 @@ export function snapshot(root: string, destination?: string): string {
       const stat = lstatSync(src);
       if (stat.isSymbolicLink()) throw new Error(`Snapshot refuses symlink: ${key}`);
       if (stat.isDirectory()) {
+        entries.push(`directory\0${key}\0${stat.mode & 0o777}`);
         if (destination) mkdirSync(join(destination, key), { recursive: true });
         walk(src, key, depth + 1);
+        if (destination) chmodSync(join(destination, key), stat.mode & 0o777);
       } else {
         if (!stat.isFile() || stat.nlink > 1) throw new Error(`Snapshot refuses non-regular or hard-linked file: ${key}`);
         bytes += stat.size;
@@ -66,8 +68,11 @@ export function snapshot(root: string, destination?: string): string {
           if (!opened.isFile() || opened.ino !== stat.ino || opened.dev !== stat.dev) throw new Error("Project changed while taking snapshot.");
           data = readFileSync(fd);
         } finally { closeSync(fd); }
-        entries.push(`${key}\0${stat.mode & 0o777}\0${hash(data)}`);
-        if (destination) writeFileSync(join(destination, key), data, { flag: "wx", mode: stat.mode & 0o777 });
+        entries.push(`file\0${key}\0${stat.mode & 0o777}\0${hash(data)}`);
+        if (destination) {
+          writeFileSync(join(destination, key), data, { flag: "wx", mode: stat.mode & 0o777 });
+          chmodSync(join(destination, key), stat.mode & 0o777);
+        }
       }
     }
   }

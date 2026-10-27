@@ -31,11 +31,14 @@ export function runArgs(name: string, image: string, command: string[]): string[
   return buildDockerRunArgs({ phase: "security", name, image, command });
 }
 
-export async function patchProject(dir: string, apply: boolean, deps: { fetchFn?: typeof fetch; command?: Command; testRun?: (args: string[], name: string, timeoutMs: number) => Promise<void> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
+export async function patchProject(dir: string, apply: boolean, deps: { signal?: AbortSignal; fetchFn?: typeof fetch; command?: Command; testRun?: (args: string[], name: string, timeoutMs: number) => Promise<void> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
+  const active = () => { if (deps.signal?.aborted) throw new Error("Update cancelled. No pending source change will be applied."); };
+  active();
   const root = rootPath(dir), config = readConfig(root);
   const dockerfile = regularFile(root, config.dockerfile);
   const original = readFileSync(dockerfile, "utf8");
   const scan = await scanPhp(original, deps.fetchFn);
+  active();
   if (!scan.candidate) return { receipt: null, path: null, scan };
   const state = privateState(root), lock = join(state, "patch.lock");
   let lockFd: number;
@@ -65,31 +68,40 @@ export async function patchProject(dir: string, apply: boolean, deps: { fetchFn?
       ["baseline", scan.current.reference, scan.current.version],
       ["candidate", scan.candidate.reference, scan.candidate.version],
     ] as const) {
+      active();
       await command(["pull", ref], 300_000);
+      active();
       const digest = digestFrom(await command(["image", "inspect", ref, "--format", "{{json .RepoDigests}}"], 15_000));
+      active();
       if (label === "baseline") receipt.old_digest = digest; else receipt.new_digest = digest;
       const pinned = `${ref.split("@")[0]}@${digest.split("@")[1]}`;
       writeFileSync(join(temporary, config.dockerfile), replaceImage(original, scan.current, pinned));
       const image = `ludion-security-${id}-${label}`;
       images.push(image);
       await command(["build", "--network=none", "--pull=false", "--tag", image, "--file", join(temporary, config.dockerfile), temporary], 300_000);
+      active();
       const imageId = await command(["image", "inspect", image, "--format", "{{.Id}}"], 15_000);
+      active();
       const versionName = `ludion-security-${id}-${label}-runtime`;
       // Probe the built image as well as its base; a Dockerfile may replace the PHP binary.
       await run(runArgs(versionName, imageId, ["php", "-r", `exit(PHP_VERSION === '${expected}' ? 0 : 1);`]), versionName, config.timeout_seconds * 1000);
+      active();
       const name = `ludion-security-${id}-${label}-test`;
       await run(runArgs(name, imageId, config.test), name, config.timeout_seconds * 1000);
+      active();
       if (label === "baseline") receipt.baseline_passed = true; else receipt.candidate_passed = true;
     }
     const pinned = `${scan.candidate.reference}@${receipt.new_digest!.split("@")[1]}`;
     const updated = replaceImage(original, scan.current, pinned);
     receipt.dockerfile_after = hash(updated);
+    active();
+    if (snapshot(root) !== receipt.tree_hash || readFileSync(regularFile(root, config.dockerfile), "utf8") !== original) throw new Error("Project changed during validation. Dockerfile was not updated; retry.");
     receipt.outcome = "validated";
     receipt.finished_at = new Date().toISOString();
     // Persist the validation evidence before touching source. It is not a deployment or exploit-test receipt.
     writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx", mode: 0o600 });
     if (apply) {
-      if (snapshot(root) !== receipt.tree_hash || readFileSync(regularFile(root, config.dockerfile), "utf8") !== original) throw new Error("Project changed during validation. Dockerfile was not updated; retry.");
+      active();
       staged = `${dockerfile}.ludion-${id}.tmp`;
       writeFileSync(staged, updated, { flag: "wx", mode: lstatSync(dockerfile).mode & 0o777 });
       renameSync(staged, dockerfile);

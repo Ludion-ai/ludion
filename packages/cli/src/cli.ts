@@ -26,7 +26,8 @@ const HELP = `ludion: security updates for your project's PHP Docker image (prev
       Download official images, build and test old/new versions offline, and save a receipt.
       --apply updates only the Dockerfile after validation. Production is not deployed.
   ludion watch [--dir <path>] [--apply] [--interval <seconds>] [--json]
-      Repeat patch checks in the foreground (default 900 seconds). Stop with Ctrl+C.
+      Repeat patch checks in the foreground (default 900 seconds). Ctrl+C cancels pending apply;
+      a Docker step already in progress may finish before exit.
 
 Legacy assistant-context commands (kept for existing integrations):
 

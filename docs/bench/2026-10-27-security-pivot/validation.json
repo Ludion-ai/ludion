@@ -1,23 +1,25 @@
 {
-  "recorded_at": "2026-10-27T11:00:40.095Z",
+  "recorded_at": "2026-10-27T11:10:25.882Z",
   "typecheck": "passed",
   "build": "passed",
   "design_sample_build": "passed",
   "suite": {
     "command": "npm test",
-    "passed": 666,
-    "skipped": 7,
+    "passed": 673,
+    "skipped": 8,
     "failed": 0
   },
   "security_adapter": {
     "command": "npx vitest run --project node packages/cli/test/security.test.ts",
-    "passed": 25,
-    "failed": 0
+    "passed": 32,
+    "skipped": 1,
+    "failed": 0,
+    "skip_reason": "POSIX directory/file mode test is skipped on Windows"
   },
   "browser": {
-    "command": "npm run test:e2e",
-    "passed": 29,
-    "skipped": 2,
+    "command": "SCREENSHOTS_DIR=<outputs/screenshots> npm run test:e2e",
+    "passed": 31,
+    "skipped": 0,
     "failed": 0
   },
   "screenshot_capture": {
@@ -42,32 +44,32 @@
     "total": 0
   },
   "live": {
-    "checked_at": "2026-10-27T10:57:59.087Z",
+    "checked_at": "2026-10-27T11:09:33.973Z",
     "scope": "Application smoke contracts, not exploit regression or production deployment",
     "cases": [
       {
         "case": "apply",
         "outcome": "applied",
         "source_changed": true,
-        "duration_ms": 16959
+        "duration_ms": 17701
       },
       {
         "case": "validation-only",
         "outcome": "validated",
         "source_changed": false,
-        "duration_ms": 9380
+        "duration_ms": 57398
       },
       {
         "case": "candidate-failure",
         "outcome": "failed",
         "source_changed": false,
-        "duration_ms": 9005
+        "duration_ms": 8589
       },
       {
         "case": "baseline-failure",
         "outcome": "failed",
         "source_changed": false,
-        "duration_ms": 4648
+        "duration_ms": 4340
       }
     ]
   },
@@ -76,5 +78,10 @@
     "No production application deployed",
     "No npm package published",
     "Remote CI and protected-file independent review pending"
+  ],
+  "independent_review_fixes": [
+    "Validation-only rejects changed source",
+    "Directory identity/modes are included and file/directory copy modes are preserved",
+    "Stop requests block pending apply after in-flight steps; docs state cancellation latency"
   ]
 }

@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -76,11 +76,40 @@ describe("bounded patch application and evidence", () => {
     expect(result.receipt?.outcome).toBe("failed");
     expect(readFileSync(join(root, "Dockerfile"), "utf8")).toBe(SOURCE);
   });
-  it("refuses to apply when any included source changed during testing", async () => {
+  it.each([false, true])("refuses a fresh validation result when included source changed (apply=%s)", async apply => {
     const root = fixture(); let count = 0;
-    const result = await patchProject(root, true, { fetchFn, command, testRun: async () => { if (++count === 4) writeFileSync(join(root, "new-source.php"), "<?php"); } });
+    const result = await patchProject(root, apply, { fetchFn, command, testRun: async () => { if (++count === 4) writeFileSync(join(root, "new-source.php"), "<?php"); } });
     expect(result.receipt?.outcome).toBe("failed");
     expect(result.receipt?.reason).toContain("Project changed");
+    expect(readFileSync(join(root, "Dockerfile"), "utf8")).toBe(SOURCE);
+  });
+  it.each(["add", "remove"])("blocks a change to an empty source directory: %s", async operation => {
+    const root = fixture(); let count = 0;
+    const path = join(root, "empty");
+    if (operation === "remove") mkdirSync(path);
+    const result = await patchProject(root, true, { fetchFn, command, testRun: async () => {
+      if (++count === 4) { if (operation === "add") mkdirSync(path); else rmdirSync(path); }
+    } });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("Project changed");
+    expect(readFileSync(join(root, "Dockerfile"), "utf8")).toBe(SOURCE);
+  });
+  it.skipIf(process.platform === "win32")("hashes and preserves directory and file permissions", () => {
+    const root = fixture(), destination = mkdtempSync(join(tmpdir(), "ludion-security-mode-"));
+    mkdirSync(join(root, "empty"), { mode: 0o750 });
+    chmodSync(join(root, "Dockerfile"), 0o751);
+    const before = snapshot(root, destination);
+    expect(lstatSync(join(destination, "empty")).mode & 0o777).toBe(0o750);
+    expect(lstatSync(join(destination, "Dockerfile")).mode & 0o777).toBe(0o751);
+    expect(snapshot(destination)).toBe(before);
+    chmodSync(join(root, "empty"), 0o700);
+    expect(snapshot(root)).not.toBe(before);
+  });
+  it.each([1, 2, 3, 4])("cancellation during validation step %s blocks application", async cancelAt => {
+    const root = fixture(), abort = new AbortController(); let count = 0;
+    const result = await patchProject(root, true, { signal: abort.signal, fetchFn, command, testRun: async () => { if (++count === cancelAt) abort.abort(); } });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("cancelled");
     expect(readFileSync(join(root, "Dockerfile"), "utf8")).toBe(SOURCE);
   });
   it("cannot accept an image digest from another repository", async () => {

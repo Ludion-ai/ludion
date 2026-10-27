@@ -30,8 +30,8 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     show(scan, !!values.json);
     return scan.candidate ? 1 : 0;
   }
-  async function patch(): Promise<number> {
-    const result = await patchProject(root, !!values.apply);
+  async function patch(signal?: AbortSignal): Promise<number> {
+    const result = await patchProject(root, !!values.apply, { signal });
     if (values.json) console.log(JSON.stringify(result, null, 2));
     else {
       show(result.scan, false);
@@ -49,7 +49,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
   process.once("SIGINT", stop); process.once("SIGTERM", stop);
   try {
     while (!abort.signal.aborted) {
-      try { await patch(); } catch (err) { console.error(`ludion: ${err instanceof Error ? err.message : String(err)}`); }
+      try { await patch(abort.signal); } catch (err) { console.error(`ludion: ${err instanceof Error ? err.message : String(err)}`); }
       await delay(interval * 1000, undefined, { signal: abort.signal }).catch(err => { if (!abort.signal.aborted) throw err; });
     }
   } finally { process.off("SIGINT", stop); process.off("SIGTERM", stop); }

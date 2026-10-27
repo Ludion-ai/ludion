@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "checked_at": "2026-10-27T10:57:35.990Z",
+  "checked_at": "2026-10-27T11:08:23.087Z",
   "status": "no_newer_security_release",
   "scope": "dockerfile_base_image",
   "current": {

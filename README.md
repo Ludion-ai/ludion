@@ -33,7 +33,7 @@ node packages/cli/dist/cli.js patch --dir /path/to/app --apply
 node packages/cli/dist/cli.js watch --dir /path/to/app --apply --interval 900
 ```
 
-Stop watch with Ctrl+C. It installs no service or scheduler. Each cycle rechecks PHP's official metadata. A network or validation failure is an error, never a clean security result. `scan` exits 0 for no newer security release found, 1 when an update is found, and 2 on error. `patch` exits 2 on failure.
+Stop watch with Ctrl+C. An in-flight Docker step may finish before the process exits, but a pending update is not applied after cancellation is received. It installs no service or scheduler. Each cycle rechecks PHP's official metadata. A network or validation failure is an error, never a clean security result. `scan` exits 0 for no newer security release found, 1 when an update is found, and 2 on error. `patch` exits 2 on failure.
 
 An example app is in `examples/php-security`. Copy it into a separate directory before trying `--apply`. It verifies response and JSON contracts; this is not an exploit regression test.
 

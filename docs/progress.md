@@ -259,3 +259,9 @@ Expanded the existing PHP source preview with shared OSV detection, supported in
 Real copied-fixture runs all applied successfully: lodash 4.17.20→4.18.1 (5→0 known matches), symfony/http-foundation 5.4.0→5.4.54 (2→0), commons-text 1.9→1.10.0 and transitive commons-lang3 3.11→3.18.0 (2→0). Both baseline and candidate application smoke tests passed. Observed warm-cache times were 24–40 seconds; not a benchmark or exploit regression. Integration failures in npm cache ownership and Composer CLI compatibility were fixed without weakening blocking behavior.
 
 Local verification: typecheck, workspace and sample builds pass; 714 tests passed / 8 skipped; all 31 browser checks passed with 36 screenshots, zero axe violations, mobile/200%-text/reduced-motion checks and 32.1 KB gzipped home JS. npm audit: 0 findings. Evidence: docs/bench/2026-10-27-security-expansion/. Independent exact-head review, GitHub CI and owner merge approval remain release gates. npm publication and customer production deployment are outside this change.
+
+## 2026-10-27 — Design adopted; legacy frozen
+
+`docs/design.md` (security fixes applied automatically, npm first) is the plan from here. `security/multi-ecosystem` was only on one machine; it is now pushed. Main at `3bd1de1` is frozen as the tag `archive/lessons-2026-10-27`, so the cleanup's deletions can be undone from it.
+
+Local check of this branch at `0d7fdbb` (Windows, Node 24.19): typecheck and build pass; vitest 714 passed / 8 skipped.

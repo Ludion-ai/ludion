@@ -617,6 +617,7 @@ Expand the same scan/patch/watch pipeline to public npm package-lock, Composer a
 Separate manifest-only acquisition from offline application execution. Pin npm12 with non-registry dependencies blocked; install Composer from redirect-checked pinned archives entirely offline with source references removed; strip Maven's online model to dependencies and use a fixed Central mirror. Baseline and candidate must pass the unchanged application test, candidate inventory must have no known findings, and source/config must remain unchanged. Apply source files only, preserving majors, with recovery journals for multi-file writes. Central Docker scratch paths are fixed per tool.
 
 Reuse the existing site UI and expose the actual four-ecosystem scope and exclusions. Remove Chromium installation from the production deploy workflow because the static build no longer generates browser-rendered bench cards; PR browser checks remain. The npm package remains unpublished. Security smoke tests demonstrate application behavior, not exploit regression coverage.
+
 ## 2026-10-27 — Security commands own their Docker boundary
 
 The legacy lesson/capability code is being removed in stages: first give the security commands their own Docker access, then stop the legacy assistant-context delivery, then delete the legacy packages. This step moves only what the security commands use into `packages/cli/src/security/docker.ts`: image pull/build/inspect/rm, the hardened test `docker run` argv (unchanged flag for flag), and the timed container runner with name-only kill. `patch.ts` no longer imports `packages/capability` or `tools/verify`. The old copies stay until the legacy code is deleted, so lesson verification and in-flight security branches keep working.
@@ -636,3 +637,22 @@ Cleanup PR-B in `docs/design.md`. What the security commands need from the legac
 The whole `packages/sandbox/` directory is the protected path now, replacing the single file `packages/cli/src/security/docker.ts`: the guard and the fetch are part of the same boundary. The security commands (`patch.ts`, `dependency-patch.ts`) import nothing from `packages/capability` or `tools/verify` any more.
 
 Still open from #137's review: the `docker build` flags (N1) are written in `patch.ts` and `dependency-patch.ts`, not in the protected package, and the line-based guard can be evaded (N3/N4).
+
+## 2026-10-28 — The lesson product is deleted from main
+
+Cleanup PR-C in `docs/design.md`. Main at `3bd1de1` is tagged `archive/lessons-2026-10-27`; everything below can be restored from it.
+
+Deleted: `packages/core`, `packages/capability`, `tools/seed`, `tools/bench`, `tools/verify`, `lessons/`, `LICENSE-LESSONS`, `plugin/`, `.claude-plugin/`, `video/`, the CLI's `sync` and `teach` (ledger, match, publish, render, shards, teach), the site's lesson data, design samples and index pages, the Worker's MCP server and index counting, the `reverify`, `seed-watch` and `verify` workflows, and the docs except `decisions.md`, `progress.md`, `design.md`, `protected-paths.md` and the two 2026-10-27 security evidence folders (they are the new product's evidence).
+
+Two departures from the design's PR split:
+
+- **The Worker's "ended" answer is in this PR, not PR-D.** The Worker's `/mcp` and `/index/*` were built from `packages/core` and the lessons, so they could not survive the deletion. `/mcp`, `/mcp/*`, `/index.json` and `/index/*` now answer 410 with `{"error":"ended", "message": ...}` and CORS `*`, so a 0.1.x client fails with a reason. These routes go after 90 days (2027-01-26). `/@<login>` and the old lesson URLs still redirect to `/start/`. The `INDEX_HITS` Analytics Engine binding is removed with the counting.
+- **The CLAUDE.md sentences that promised compatibility are changed here too**, since this PR is what ends it. The rest of the CLAUDE.md rewrite is PR-D.
+
+`ludion sync` and `ludion teach` print that they ended and exit 2. The 0.1.x plugin pinned its exact CLI version, so its session hook keeps running 0.1.x, gets the 410, and leaves the existing lessons file as it was (that version's behaviour on a fetch failure).
+
+The deploy check (`tools/check-production.ts`) now waits for `/build.json` (a new build-time marker) instead of `index.json`, checks that `/` answers 200, and checks that `/index.json` and `/mcp` answer the 410.
+
+The repository guard on starting containers now scans `tools/`, every `packages/*/src` and every `apps/*/src` (before: `tools/verify/src` and `packages/*/src`), and `packages/sandbox/src/docker.ts` is its only builder. `tools/verify/` and `lessons/` stay in the protected-path pattern, so bringing either back needs the same review.
+
+The required status check `verify` is gone with its workflow. Branch protection on main still lists it, so this PR cannot merge until the owner removes `verify` from the required checks.

@@ -1,3 +1,0 @@
-npm warn exec The following package was not found and will be installed: ludion-ai@0.1.4
-ludion: 18 lessons for this project. Wrote .ludion/lessons.md, CLAUDE.md.
-ludion: no lessons for 2 of this project's dependencies (listed in .ludion/lessons.md). Ask for lessons: https://github.com/Ludion-ai/ludion/issues/new?template=subject-request.yml

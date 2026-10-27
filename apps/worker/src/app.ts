@@ -1,15 +1,22 @@
 import { Hono } from "hono";
-import { countIndexRequest, type CountEnv } from "./index-counts.ts";
-import { handleMcp } from "./mcp/server.ts";
 
-export interface Env extends CountEnv {
+export interface Env {
   ASSETS: Fetcher;
   SITE_URL: string;
 }
 
 export const HSTS = "max-age=31536000";
 
-const TEACHER_PATH = /^\/@([A-Za-z0-9-]{1,39})\/?$/;
+const TEACHER_PATH = /^\/@[A-Za-z0-9-]{1,39}\/?$/;
+
+/**
+ * The lesson data and MCP endpoints of ludion-ai 0.1.x ended on 2026-10-28 (docs/design.md, cleanup). Old clients
+ * get a fixed 410 that says why, for 90 days; then these routes go too.
+ */
+export const ENDED = {
+  error: "ended",
+  message: "Ludion's lesson data and MCP server ended on 2026-10-28. Ludion is now a security-update tool: https://ludion.ai",
+};
 
 export function createApp(): Hono<{ Bindings: Env }> {
   const app = new Hono<{ Bindings: Env }>();
@@ -23,23 +30,14 @@ export function createApp(): Hono<{ Bindings: Env }> {
     c.res.headers.set("Strict-Transport-Security", HSTS);
   });
 
-  // MCP over Streamable HTTP, stateless; OPTIONS for CORS preflight from browser-based clients.
-  app.on(["GET", "POST", "DELETE", "OPTIONS"], "/mcp", (c) => handleMcp(c.req.raw, c.env, c.executionCtx as ExecutionContext));
+  for (const path of ["/mcp", "/mcp/*", "/index.json", "/index/*"]) {
+    app.all(path, (c) => c.json(ENDED, 410, { "Access-Control-Allow-Origin": "*", "Cache-Control": "public, max-age=3600" }));
+  }
 
-  // The index shards are static assets; the Worker runs for them (wrangler.jsonc, run_worker_first) only to count the
-  // request, after the response is built and without waiting for the count.
-  app.get("/index/*", async (c) => {
-    const res = await c.env.ASSETS.fetch(c.req.raw);
-    if (res.ok) c.executionCtx.waitUntil(countIndexRequest(c.req.raw, c.env));
-    return res;
-  });
-
-  // /@<login> serves the teacher page at the lowercase login. Unknown teachers get the 404 page.
+  // Teacher pages were removed with the lessons.
   app.get("*", async (c, next) => {
-    const m = TEACHER_PATH.exec(new URL(c.req.url).pathname);
-    if (!m) return next();
-    const target = new URL(`/teachers/${m[1]!.toLowerCase()}/`, c.req.url);
-    return c.env.ASSETS.fetch(new Request(target, c.req.raw));
+    if (!TEACHER_PATH.test(new URL(c.req.url).pathname)) return next();
+    return c.redirect("/start/", 301);
   });
 
   app.all("*", (c) => c.env.ASSETS.fetch(c.req.raw));

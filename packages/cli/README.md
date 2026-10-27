@@ -59,6 +59,6 @@ The snapshot is not a general secret scanner. Use a local Docker daemon to keep 
 
 Examples for all four ecosystems are under examples/*-security. Copy an example outside the repository before --apply. npm, Composer and Maven examples intentionally pin vulnerable versions for smoke-test demonstrations; the tests are not exploit regressions.
 
-## Existing integrations
+## The earlier lesson product
 
-Legacy sync/teach, lesson attribution/data and MCP endpoints remain compatible. They are not vulnerability feeds. The existing Astro UI, typography, motion, responsive layout, Worker and deployment pipeline are reused. Previous product documentation is preserved under docs/legacy/.
+The lesson commands (`sync`, `teach`), the lesson data and the MCP server of ludion-ai 0.1.x ended on 2026-10-28; their code and data are kept in the git tag `archive/lessons-2026-10-27`. The existing Astro UI, typography, motion, responsive layout, Worker and deployment pipeline are reused.

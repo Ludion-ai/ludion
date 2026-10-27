@@ -1,6 +1,0 @@
-{
-  "name": "bench-tailwindcss",
-  "private": true,
-  "type": "module",
-  "devDependencies": { "tailwindcss": "4.3.3", "@tailwindcss/cli": "4.3.3" }
-}

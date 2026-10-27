@@ -2,7 +2,7 @@
 import { existsSync } from "node:fs";
 
 export default function setup(): void {
-  if (!existsSync("apps/site/dist/index.json")) {
+  if (!existsSync("apps/site/dist/build.json")) {
     throw new Error("apps/site/dist is missing. The Worker tests serve the built site; run `npm run build` first, then `npm test`.");
   }
 }

@@ -9,9 +9,8 @@
     "directory": "apps/site/dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/mcp", "/mcp/*", "/@*", "/index/*"]
+    "run_worker_first": ["/mcp", "/mcp/*", "/@*", "/index.json", "/index/*"]
   },
   "vars": { "SITE_URL": "https://ludion.ai" },
-  "analytics_engine_datasets": [{ "binding": "INDEX_HITS", "dataset": "ludion_index_hits" }],
   "observability": { "enabled": true }
 }

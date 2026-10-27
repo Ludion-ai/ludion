@@ -196,8 +196,9 @@ function consumers(lockText: string): Consumer[] {
 
 /**
  * What every dependent loads, before and after. A dependent at a path that held the same package before is compared
- * with what that copy loaded; one at a new path (moved, or a new copy) with what any copy of that package loaded,
- * whatever its version. A target it did not load before is a change, however the tree moved to get there: a shadowing
+ * with what that copy loaded. One at a new path (moved, or a new copy) is unchanged only if every earlier copy of that
+ * package, whatever its version, loaded the same target; otherwise it is compared with the highest earlier target of
+ * the same name, and with any differently named earlier target as a replacement. A target it did not load before is a change, however the tree moved to get there: a shadowing
  * copy, a moved or upgraded dependent, a removed copy, an alias. A requirement nothing satisfied before (a new
  * dependency) is not compared here; a newly installed target is judged by the lockfile diff.
  */
@@ -224,9 +225,11 @@ export function resolutionChanges(beforeText: string, afterText: string): Change
     const samePlace = before.names.get(c.path) === c.name;
     const was = samePlace ? [before.byPath.get(`${c.path}\0${name}`)].filter((t): t is LockEntry => !!t) : before.byName.get(`${c.name}\0${name}`) ?? [];
     if (!was.length) continue;
-    if (was.some(w => w.name === target.name && w.version === target.version && w.integrity === target.integrity)) continue;
+    const same = (w: LockEntry) => w.name === target.name && w.version === target.version && w.integrity === target.integrity;
+    if (samePlace ? same(was[0]!) : was.every(same)) continue;
     const sameName = was.filter(w => w.name === target.name).map(w => w.version).sort(semver.rcompare)[0] ?? null;
-    const replaced = sameName === null ? `${was[0]!.name}@${was[0]!.version}` : null;
+    const other = was.find(w => w.name !== target.name);
+    const replaced = other ? `${other.name}@${other.version}` : null;
     const id = `${target.name}\0${sameName}\0${target.version}\0${replaced}\0${target.integrity}`;
     const existing = changes.get(id);
     changes.set(id, existing ? { ...existing, dev: existing.dev && target.dev } : { path: target.path, name: target.name, from: sameName, to: target.version, dev: target.dev, resolved: target.resolved, integrity: target.integrity, replaced });

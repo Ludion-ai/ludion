@@ -272,6 +272,19 @@ describe("gate 4 and urgency", () => {
     const twoCopies = { ...common, "node_modules/x/node_modules/a": a, "node_modules/x/node_modules/a/node_modules/lodash": { version: "3.10.1" } };
     const pooled = verdict(lock({ ...twoCopies, "node_modules/foo": { version: "1.0.0" } }), lock({ ...twoCopies, "node_modules/a/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
     expect(pooled.verdict).toBe("stop");
+    // (E) a@1.0.0 moves next to a copy of the vulnerable 3.10.1 that another version of a (0.9.0) already loaded.
+    const old = { "node_modules/x/node_modules/a": { version: "0.9.0", dependencies: { lodash: "*" } }, "node_modules/x/node_modules/a/node_modules/lodash": { version: "3.10.1" } };
+    const { "node_modules/a": _a, ...withoutA } = common;
+    const e = verdict(lock({ ...common, ...old, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...old, "node_modules/y/node_modules/a": a, "node_modules/y/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(e.verdict).toBe("stop");
+    expect(e.findings.map(f => f.message)).toEqual(expect.arrayContaining([expect.stringContaining("lodash goes down from 4.17.21 to 3.10.1")]));
+    // (E2) moved and upgraded at once.
+    const e2 = verdict(lock({ ...common, ...old, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...old, "node_modules/y/node_modules/a": a101, "node_modules/y/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(e2.verdict).toBe("stop");
+    // (E3) the other version of a loaded an alias; the moved a@1.0.0 now loads it instead of lodash.
+    const oldAlias = { "node_modules/x/node_modules/a": { version: "0.9.0", dependencies: { lodash: "npm:evil-pkg@1.0.0" } }, "node_modules/x/node_modules/a/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" } };
+    const e3 = verdict(lock({ ...common, ...oldAlias, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...oldAlias, "node_modules/y/node_modules/a": a, "node_modules/y/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(e3.findings.some(f => f.effect === "stop" && f.message.includes("instead of lodash@4.17.21"))).toBe(true);
   });
   it("refuses lockfile paths that differ only in case, and dependency groups that are not objects", () => {
     expect(() => lockEntries(JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/lodash": { version: "1.0.0" }, "node_modules/Lodash": { version: "1.0.0" } } }))).toThrow("differ only in case");

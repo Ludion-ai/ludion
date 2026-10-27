@@ -2,7 +2,7 @@
 // checkouts of a project. Comments only (design, 判定役 v0): it never changes files.
 import { lstatSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, renderJudgement, type FixedAdvisory, type VersionFacts } from "./judge.ts";
+import { allChanges, judge, lockEntries, lockEntryChanges, lockLinks, renderJudgement, type FixedAdvisory, type VersionFacts } from "./judge.ts";
 import { gatherFacts } from "./npm-facts.ts";
 import { regularFile, rootPath } from "./project.ts";
 
@@ -19,7 +19,7 @@ export async function judgeCli(args: string[]): Promise<number> {
   const beforeManifest = read(before, "package.json"), afterManifest = read(after, "package.json");
   const manifest = beforeManifest === afterManifest ? undefined : { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) };
   const beforeEntries = lockEntries(beforeLock), afterEntries = lockEntries(afterLock);
-  const changes = lockDiff(beforeEntries, afterEntries), entries = lockEntryChanges(beforeEntries, afterEntries);
+  const changes = allChanges(beforeLock, afterLock), entries = lockEntryChanges(beforeEntries, afterEntries);
   const hadLinks = new Set(lockLinks(beforeLock));
   const links = lockLinks(afterLock).filter(link => !hadLinks.has(link));
   // The changed files come from the caller (e.g. `git diff --name-only` in CI). Without them gate 4 cannot be judged.

@@ -92,7 +92,11 @@ const requireName = (path: string) => path.slice(path.lastIndexOf("node_modules/
 /** Installed registry packages in a package-lock v2/v3, by node_modules path. Links and the root are left out (see lockLinks). */
 export function lockEntries(lockText: string): LockEntry[] {
   const entries: LockEntry[] = [];
+  const folded = new Set<string>();
   for (const [path, item] of Object.entries(readLock(lockText))) {
+    // On Windows and macOS, node_modules/Lodash and node_modules/lodash are one folder.
+    if (folded.has(path.toLowerCase())) throw new Error(`Two package-lock paths differ only in case: ${path}.`);
+    folded.add(path.toLowerCase());
     if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
     if (!path.includes("node_modules/")) continue;
     // A key that is not a plain install path (.., backslashes, empty segments) could make two keys mean one place.
@@ -172,6 +176,70 @@ export function lockDiff(before: LockEntry[], after: LockEntry[]): Change[] {
   return [...changes.values()].sort((a, b) => a.name.localeCompare(b.name) || semver.compare(a.to, b.to) || a.path.localeCompare(b.path));
 }
 
+/** Something that requires packages: the project root, a workspace folder, or an installed package (by name@version). */
+type Consumer = { id: string; dir: string; requires: string[] };
+const DECLARED = ["dependencies", "optionalDependencies", "peerDependencies"];
+
+function consumers(lockText: string): Consumer[] {
+  const out: Consumer[] = [];
+  for (const [path, item] of Object.entries(readLock(lockText))) {
+    if (!item || typeof item !== "object" || item.link) continue;
+    const own = path === "" || !path.includes("node_modules/");
+    // The root and workspace folders also require their devDependencies; installed packages do not.
+    const groups = own ? [...DECLARED, "devDependencies"] : DECLARED;
+    const requires = [...new Set(groups.flatMap(group => item[group] && typeof item[group] === "object" ? Object.keys(item[group]) : []))].sort();
+    const id = own ? `<${path || "root"}>` : `${typeof item.name === "string" ? item.name : requireName(path)}@${item.version}`;
+    out.push({ id, dir: path ? `${path}/` : "", requires });
+  }
+  return out;
+}
+
+/**
+ * What every dependent loads, before and after: for each consumer that exists on both sides (the root, a workspace or
+ * an installed name@version, wherever it sits) and each package it declares, the package Node resolution finds. A
+ * target it did not load before is a change, however the tree moved to get there: a shadowing copy, a moved dependent,
+ * a removed copy, an alias.
+ */
+export function resolutionChanges(beforeText: string, afterText: string): Change[] {
+  const targets = (text: string) => {
+    const entries = new Map(lockEntries(text).map(e => [e.path, e]));
+    const map = new Map<string, LockEntry[]>();
+    for (const c of consumers(text)) for (const name of c.requires) {
+      const target = resolveFrom(entries, c.dir, name);
+      if (!target) continue;
+      const key = `${c.id}\0${name}`;
+      map.set(key, [...(map.get(key) ?? []), target]);
+    }
+    return map;
+  };
+  const before = targets(beforeText), after = targets(afterText);
+  const changes = new Map<string, Change>();
+  for (const [key, now] of after) {
+    const was = before.get(key);
+    if (!was) continue; // A new consumer or a new requirement: its packages are judged as installed changes.
+    for (const target of now) {
+      if (was.some(w => w.name === target.name && w.version === target.version && w.integrity === target.integrity)) continue;
+      const sameName = was.filter(w => w.name === target.name).map(w => w.version).sort(semver.rcompare)[0] ?? null;
+      const replaced = sameName === null ? `${was[0]!.name}@${was[0]!.version}` : null;
+      const id = `${target.name}\0${sameName}\0${target.version}\0${replaced}\0${target.integrity}`;
+      const existing = changes.get(id);
+      changes.set(id, existing ? { ...existing, dev: existing.dev && target.dev } : { path: target.path, name: target.name, from: sameName, to: target.version, dev: target.dev, resolved: target.resolved, integrity: target.integrity, replaced });
+    }
+  }
+  return [...changes.values()];
+}
+
+/** The lockfile diff and the resolution diff together, without duplicates. */
+export function allChanges(beforeText: string, afterText: string): Change[] {
+  const merged = new Map<string, Change>();
+  for (const c of [...lockDiff(lockEntries(beforeText), lockEntries(afterText)), ...resolutionChanges(beforeText, afterText)]) {
+    const key = `${c.name}\0${c.from}\0${c.to}\0${c.replaced}\0${c.integrity}`;
+    const existing = merged.get(key);
+    merged.set(key, existing ? { ...existing, dev: existing.dev && c.dev } : c);
+  }
+  return [...merged.values()].sort((a, b) => a.name.localeCompare(b.name) || semver.compare(a.to, b.to) || a.path.localeCompare(b.path));
+}
+
 const DEPENDENCY_GROUPS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];
 /** A registry range, or an npm: alias of a registry range. Git, URL, file:, link: and workspace: specs are not. */
 function registrySpec(spec: unknown): boolean {
@@ -197,6 +265,7 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
       continue;
     }
     if (!DEPENDENCY_GROUPS.includes(key)) { out.push(`package.json changes "${key}", which is not a dependency list (scripts, for one, run on install).`); continue; }
+    if (a[key] !== undefined && (typeof a[key] !== "object" || a[key] === null || Array.isArray(a[key]))) { out.push(`package.json ${key} is not an object of name: range.`); continue; }
     const group = (a[key] ?? {}) as Record<string, unknown>, old = (b[key] ?? {}) as Record<string, unknown>;
     for (const [name, spec] of Object.entries(group)) if (spec !== old[name] && !registrySpec(spec)) out.push(`package.json ${key}.${name} is "${String(spec)}", not a registry range.`);
   }

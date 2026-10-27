@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
+import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { provenanceFrom } from "../src/security/npm-facts.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
@@ -232,6 +232,39 @@ describe("gate 4 and urgency", () => {
   it("judges a version whose hash changed at its path, not only gate 4", () => {
     const lock = (integrity: string) => JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/lib": { version: "1.0.1", resolved: url("lib", "1.0.1"), integrity } } });
     expect(lockDiff(lockEntries(lock("sha512-old")), lockEntries(lock(INTEGRITY))).map(c => [c.name, c.from, c.to])).toEqual([["lib", "1.0.1", "1.0.1"]]);
+  });
+  it("judges what each dependent loads: shadowing copies, aliases and moved dependents", () => {
+    type Spec = { version: string; name?: string; dependencies?: Record<string, string> };
+    const lock = (packages: Record<string, Spec>) => JSON.stringify({ lockfileVersion: 3, packages: {
+      "": { dependencies: { a: "^1.0.0", foo: "^1.0.0", lodash: "^4.0.0", x: "^1.0.0" } },
+      ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { resolved: url(p.name ?? path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...p }])),
+    } });
+    const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["lodash@3.10.1", fact({ advisories: ["GHSA-old"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["evil-pkg@1.0.0", fact()], ["a@1.0.0", fact()], ["x@1.0.0", fact()]]);
+    const verdict = (b: string, a: string) => judge({ changes: allChanges(b, a), entries: lockEntryChanges(lockEntries(b), lockEntries(a)), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    const a = { version: "1.0.0", dependencies: { lodash: "*" } };
+    const common = { "node_modules/a": a, "node_modules/lodash": { version: "4.17.21" }, "node_modules/x": { version: "1.0.0", dependencies: { lodash: "^3.0.0", "evil-pkg": "1.0.0" } }, "node_modules/x/node_modules/lodash": { version: "3.10.1" }, "node_modules/x/node_modules/evil-pkg": { version: "1.0.0" } };
+    // (A) A new copy under a shadows the root lodash with an older, vulnerable major that was already installed.
+    const shadow = verdict(lock({ ...common, "node_modules/foo": { version: "1.0.0" } }), lock({ ...common, "node_modules/a/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(shadow.verdict).toBe("stop");
+    expect(shadow.findings.map(f => f.message)).toEqual(expect.arrayContaining([expect.stringContaining("lodash goes down from 4.17.21 to 3.10.1"), expect.stringContaining("GHSA-old")]));
+    // (B) The shadowing copy is another package under the name lodash.
+    const alias = verdict(lock({ ...common, "node_modules/foo": { version: "1.0.0" } }), lock({ ...common, "node_modules/a/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(alias.verdict).toBe("stop");
+    expect(alias.findings.some(f => f.message.includes("instead of lodash@4.17.21"))).toBe(true);
+    // (C) a moves under x, its nested 4.17.21 is gone, and from there it now loads x's lodash 3.10.1.
+    const before = lock({ ...common, "node_modules/a/node_modules/lodash": { version: "4.17.21" }, "node_modules/lodash": { version: "4.17.20" }, "node_modules/foo": { version: "1.0.0" } });
+    const { "node_modules/a": _moved, ...rest } = common;
+    const after = lock({ ...rest, "node_modules/lodash": { version: "4.17.20" }, "node_modules/x/node_modules/a": a, "node_modules/foo": { version: "1.0.1" } });
+    const moved = verdict(before, after);
+    expect(moved.verdict).toBe("stop");
+    expect(moved.changes.some(c => c.name === "lodash" && c.from === "4.17.21" && c.to === "3.10.1")).toBe(true);
+    // Nothing changes for anyone: no change.
+    expect(allChanges(before, before)).toEqual([]);
+  });
+  it("refuses lockfile paths that differ only in case, and dependency groups that are not objects", () => {
+    expect(() => lockEntries(JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/lodash": { version: "1.0.0" }, "node_modules/Lodash": { version: "1.0.0" } } }))).toThrow("differ only in case");
+    expect(manifestChanges({ dependencies: {} }, { dependencies: ["x"] })).toEqual(["package.json dependencies is not an object of name: range."]);
+    expect(manifestChanges({}, { dependencies: "abc" })).toEqual(["package.json dependencies is not an object of name: range."]);
   });
   it("is undecidable when the given changed files leave out the lockfile", () => {
     expect(run({}, {}, { files: [], now: "2027-01-01T00:00:00Z" }).verdict).toBe("undecidable");

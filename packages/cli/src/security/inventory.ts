@@ -181,6 +181,17 @@ export function changedManifest(root: string, ecosystem: Ecosystem, changes: Cha
   const repeated = changes.map(c => c.name).filter((n, i, all) => all.indexOf(n) !== i)
     .filter(n => ecosystem !== "npm" || groups.some(group => manifest[group]?.[n] !== undefined));
   if (repeated.length) throw new Error(`More than one installed version of ${[...new Set(repeated)].join(", ")} needs a fix; that needs review.`);
+  // A requirement in the manifest is the fix only when its installed root copy is the vulnerable one. A vulnerable
+  // nested copy of a direct dependency cannot be fixed by raising the requirement or by an override.
+  if (ecosystem === "npm" && existsSync(join(root, "package-lock.json"))) {
+    const locked = jsonFile(root, "package-lock.json").packages ?? {};
+    for (const change of changes) {
+      const rootVersion = locked[`node_modules/${change.name}`]?.version;
+      if (groups.some(group => manifest[group]?.[change.name] !== undefined) && rootVersion !== change.from) {
+        throw new Error(`The vulnerable ${change.name}@${change.from} is a nested copy of a direct dependency (the project's own copy is ${rootVersion ?? "missing"}); that needs review.`);
+      }
+    }
+  }
   const direct = new Set<string>();
   for (const group of groups) {
     for (const change of changes) if (manifest[group]?.[change.name] !== undefined) {
@@ -194,7 +205,10 @@ export function changedManifest(root: string, ecosystem: Ecosystem, changes: Cha
     if (transitive.length) {
       const overrides = manifest.overrides ?? {};
       if (typeof overrides !== "object" || Array.isArray(overrides)) throw new Error("Invalid npm overrides.");
-      const own = Object.keys(overrides);
+      // Every key at any depth: a nested override ({"parent": {"semver": ...}}) also decides the version.
+      const own: string[] = [];
+      const keys = (value: unknown): void => { if (value && typeof value === "object") for (const [key, inner] of Object.entries(value)) { own.push(key.replace(/^\$/, "")); keys(inner); } };
+      keys(overrides);
       for (const change of transitive) {
         if (own.some(key => key === change.name || key.startsWith(`${change.name}@`))) throw new Error(`The project already overrides ${change.name}; the fix needs review.`);
         // Scoped to the vulnerable version: other installed versions of the same name keep their own resolution.

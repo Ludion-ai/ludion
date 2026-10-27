@@ -311,3 +311,16 @@ Round 1 review of #142 (REQUEST CHANGES): the npm transitive override was global
 Real Docker after the fix, built CLI, `--apply`: the reviewer's scenario as a project (make-dir 3.0.0 + normalize-package-data 2.5.0, lockfile from before 2019-06-01, so semver 5.7.0 nested and 6.1.1 hoisted, both vulnerable): semver 5.7.0 → 5.7.2 and 6.1.1 → 6.3.1, each to its own smallest fix, plus the planned hosted-git-info 2.7.1 → 2.8.9 and path-parse 1.0.6 → 1.0.7; nothing else moved, no override left in package.json, 0 known findings after, smoke test passed. npm example again: lodash 4.17.20 → 4.18.0, applied. Local: typecheck and build pass; vitest 185 passed / 1 skipped.
 
 Found by the judge (next PR): lodash 4.18.0, the smallest version OSV lists as fixing lodash's five advisories, is deprecated on npm ("Bad release. Please use lodash@4.17.21 instead."). The patch command does not read deprecation; the judge stops it.
+
+## 2026-10-28 — Judge v0 (npm) and its backtest
+
+`ludion judge --before <dir> --after <dir>` (decisions, same date). Live on the npm example's fix (lodash 4.17.20 → 4.18.0): **stop**, because 4.18.0 is deprecated on npm ("Bad release. Please use lodash@4.17.21 instead."), plus a publisher change (extend). Tests: 22 judge unit tests (every stop and extend rule, the newest-publish wait, a malicious passenger behind a clean target, undecidable cases, gate 4, urgency, provenance parsing).
+
+Backtest (docs/bench/2026-10-28-judge-backtest, numbers there):
+- Malicious releases of 2025 (OSV MAL-, 1,412 versions in 969 compromised packages), stopped by the wait and the re-query, lower bound: 12h 55%, 24h 84%, 72h 94%, 7 days 95%. Gate "stop every known malicious release": **not met**.
+- Genuine fixes (200 sampled from 2025's npm GHSA fixes): median delay 72h, p90 144h; 33 stops, 30 of them deprecations made later (today's facts), about 3 of 200 at the time. Gate "median delay within 24h": **not met** with the initial waits.
+- Notification reduction (100 repositories): not measured yet.
+
+What the numbers say: most malicious releases are recorded within a day (median 11.5h), so the 24h–72h band is where the trade-off sits; a 24h normal wait would meet the delay gate and give up about 10 points of malicious-release stops. The owner decides the table; the backtest can be rerun with other waits from the cached data.
+
+Also from #142's round-2 review: a vulnerable nested copy of a direct dependency now stops with a clear reason instead of rewriting the direct requirement; an existing project override at any depth stops; docs say why Maven is exempt from the removal check.

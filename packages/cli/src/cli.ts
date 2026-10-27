@@ -2,6 +2,7 @@
 // ludion: security updates (source preview). Security commands use official PHP metadata, OSV and controlled
 // package retrieval; tests run only in Docker.
 import { securityCli } from "./security/cli.ts";
+import { judgeCli } from "./security/judge-cli.ts";
 
 const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (source preview).
 
@@ -16,11 +17,16 @@ const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (
   ludion watch [--dir <path>] [--apply] [--interval <seconds>] [--json]
       Repeat patch checks in the foreground (default 900 seconds). Ctrl+C cancels pending apply;
       a Docker step already in progress may finish before exit.
+  ludion judge --before <dir> --after <dir> [--files a,b] [--json]
+      Judge an npm dependency update between two checkouts (preview, comments only): provenance,
+      publisher, install scripts, malicious-package records, deprecation, new dependencies and the
+      wait. Build and tests are not run. Exit 0: ready except build; 3: wait; 1: stop or undecidable.
 `;
 
 async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
   if (command && ["init", "scan", "patch", "watch"].includes(command)) return securityCli(command, rest);
+  if (command === "judge") return judgeCli(rest);
   if (command === "sync" || command === "teach") {
     console.error(`ludion ${command} ended on 2026-10-28 with the lesson data it used. Ludion is now a security-update tool; run ludion help.`);
     return 2;

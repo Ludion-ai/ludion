@@ -285,6 +285,18 @@ describe("gate 4 and urgency", () => {
     const oldAlias = { "node_modules/x/node_modules/a": { version: "0.9.0", dependencies: { lodash: "npm:evil-pkg@1.0.0" } }, "node_modules/x/node_modules/a/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" } };
     const e3 = verdict(lock({ ...common, ...oldAlias, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...oldAlias, "node_modules/y/node_modules/a": a, "node_modules/y/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }));
     expect(e3.findings.some(f => f.effect === "stop" && f.message.includes("instead of lodash@4.17.21"))).toBe(true);
+    // (F) the moved a@1.0.0 now loads lodash 5.0.0, which another version of a loaded and which has an advisory 4.17.21 did not.
+    const f5 = new Map([...facts, ["lodash@5.0.0", fact({ advisories: ["GHSA-five"] })]]);
+    const verdictF = (b: string, a2: string) => judge({ changes: allChanges(b, a2), entries: lockEntryChanges(lockEntries(b), lockEntries(a2)), facts: f5, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    const old5 = { "node_modules/x/node_modules/a": { version: "0.9.0", dependencies: { lodash: "*" } }, "node_modules/x/node_modules/a/node_modules/lodash": { version: "5.0.0" } };
+    const f = verdictF(lock({ ...common, ...old5, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...old5, "node_modules/y/node_modules/a": a, "node_modules/y/node_modules/lodash": { version: "5.0.0" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(f.verdict).toBe("stop");
+    expect(f.findings.some(fi => fi.effect === "stop" && fi.message.includes("GHSA-five"))).toBe(true);
+    // (F2) moved and upgraded at once.
+    const f2 = verdictF(lock({ ...common, ...old5, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...old5, "node_modules/y/node_modules/a": a101, "node_modules/y/node_modules/lodash": { version: "5.0.0" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(f2.verdict).toBe("stop");
+    // A harmless move adds no row that compares a version with itself.
+    expect(f.changes.some(c => c.from === c.to && !c.replaced)).toBe(false);
   });
   it("refuses lockfile paths that differ only in case, and dependency groups that are not objects", () => {
     expect(() => lockEntries(JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/lodash": { version: "1.0.0" }, "node_modules/Lodash": { version: "1.0.0" } } }))).toThrow("differ only in case");

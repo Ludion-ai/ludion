@@ -176,6 +176,11 @@ export function changedManifest(root: string, ecosystem: Ecosystem, changes: Cha
   }
   const name = MANIFESTS[ecosystem][0], manifest = jsonFile(root, name);
   const groups = ecosystem === "npm" ? ["dependencies", "devDependencies", "optionalDependencies"] : ["require", "require-dev"];
+  // Several vulnerable versions of one transitive npm name each get their own scoped override. A direct requirement,
+  // or a Composer package, has one version to raise.
+  const repeated = changes.map(c => c.name).filter((n, i, all) => all.indexOf(n) !== i)
+    .filter(n => ecosystem !== "npm" || groups.some(group => manifest[group]?.[n] !== undefined));
+  if (repeated.length) throw new Error(`More than one installed version of ${[...new Set(repeated)].join(", ")} needs a fix; that needs review.`);
   const direct = new Set<string>();
   for (const group of groups) {
     for (const change of changes) if (manifest[group]?.[change.name] !== undefined) {
@@ -189,9 +194,11 @@ export function changedManifest(root: string, ecosystem: Ecosystem, changes: Cha
     if (transitive.length) {
       const overrides = manifest.overrides ?? {};
       if (typeof overrides !== "object" || Array.isArray(overrides)) throw new Error("Invalid npm overrides.");
+      const own = Object.keys(overrides);
       for (const change of transitive) {
-        if (overrides[change.name] !== undefined) throw new Error(`The project already overrides ${change.name}; the fix needs review.`);
-        overrides[change.name] = change.to;
+        if (own.some(key => key === change.name || key.startsWith(`${change.name}@`))) throw new Error(`The project already overrides ${change.name}; the fix needs review.`);
+        // Scoped to the vulnerable version: other installed versions of the same name keep their own resolution.
+        overrides[`${change.name}@${change.from}`] = change.to;
       }
       manifest.overrides = overrides;
     }

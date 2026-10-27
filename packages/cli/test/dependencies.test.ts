@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import semver from "semver";
-import { acquisitionPolicy, applyFiles, changedPackages, compatible, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile } from "../src/security/dependency-patch.ts";
+import { acquisitionPolicy, applyFiles, changedPackages, compatible, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals } from "../src/security/dependency-patch.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl } from "../src/security/acquisition.ts";
 import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, type Inventory } from "../src/security/inventory.ts";
 import { OsvClient, type Advisory } from "../src/security/osv.ts";
@@ -274,11 +274,18 @@ describe("the smallest fix (docs/design.md)", () => {
     const plan = [fix("lodash", "4.17.20", "4.17.21"), fix("minimist", "1.2.5", "1.2.8")];
     const pinned = JSON.parse(changedManifest(root, "npm", plan, true)), final = JSON.parse(changedManifest(root, "npm", plan));
     expect(pinned.dependencies.lodash).toBe("4.17.21");
-    expect(pinned.overrides).toEqual({ other: "1.0.0", minimist: "1.2.8" });
+    // Scoped to the vulnerable version, so another installed minimist keeps its own resolution.
+    expect(pinned.overrides).toEqual({ other: "1.0.0", "minimist@1.2.5": "1.2.8" });
     expect(final.dependencies.lodash).toBe("^4.17.21");
     expect(final.overrides).toEqual({ other: "1.0.0" });
     writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" }, overrides: { minimist: "1.2.6" } }));
     expect(() => changedManifest(root, "npm", plan, true)).toThrow("already overrides minimist");
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" }, overrides: { "minimist@^1.2.0": "1.2.6" } }));
+    expect(() => changedManifest(root, "npm", plan, true)).toThrow("already overrides minimist");
+    // Two vulnerable versions of a transitive name: one scoped override each. Of a direct name: review.
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" } }));
+    expect(JSON.parse(changedManifest(root, "npm", [fix("semver", "5.7.0", "5.7.2"), fix("semver", "6.1.1", "6.3.1")], true)).overrides).toEqual({ "semver@5.7.0": "5.7.2", "semver@6.1.1": "6.3.1" });
+    expect(() => changedManifest(root, "npm", [fix("lodash", "4.17.20", "4.17.21"), fix("lodash", "3.10.0", "3.10.2")], true)).toThrow("More than one installed version of lodash");
   });
   it("resolves npm and Composer candidates for the planned packages only, never a blanket update", () => {
     const npm = resolverDockerfile("npm", `node@${DIGEST}`, true, false, [fix("lodash", "4.17.20", "4.17.21")]);
@@ -290,11 +297,33 @@ describe("the smallest fix (docs/design.md)", () => {
     ]);
     expect(resolverDockerfile("npm", `node@${DIGEST}`, false)).not.toContain("--package-lock-only");
     const composer = resolverDockerfile("composer", `composer@${DIGEST}`, true, false, [fix("symfony/http-foundation", "5.4.0", "5.4.54")]);
-    expect(composer).toContain('"composer","update","symfony/http-foundation:5.4.54","--with-dependencies","--minimal-changes"');
+    expect(composer).toContain('"composer","update","--with-dependencies","--minimal-changes"');
+    // Packages only after --, so no planned coordinate can be read as an option.
+    expect(composer).toContain('"--no-progress","--","symfony/http-foundation:5.4.54"]');
     expect(composer).not.toContain("--with-all-dependencies");
     expect(() => resolverDockerfile("npm", `node@${DIGEST}`, true)).toThrow("planned fix");
     expect(() => resolverDockerfile("composer", `composer@${DIGEST}`, true, false, [fix("--with-all-dependencies", "1", "2")])).toThrow();
     expect(() => resolverDockerfile("npm", `node@${DIGEST}`, true, false, [fix("lodash", "4.17.20", "latest")])).toThrow();
+  });
+  it("stops when the candidate moves a package version that no planned fix replaces", async () => {
+    const base: Inventory = { ecosystem: "npm", files: [], scope: "locked_dependencies", limitations: [], packages: [
+      { ecosystem: "npm", name: "semver", version: "5.7.0", direct: false }, { ecosystem: "npm", name: "semver", version: "6.1.1", direct: false } ] };
+    const plan = [fix("semver", "5.7.0", "5.7.2")];
+    const scoped: Inventory = { ...base, packages: [{ ...base.packages[0]!, version: "5.7.2" }, base.packages[1]!, { ecosystem: "npm", name: "new-dep", version: "1.0.0", direct: false }] };
+    expect(unplannedRemovals(base, scoped, plan)).toEqual([]);
+    // The global-override failure: the other semver drifts to the newest 6.x.
+    const drifted: Inventory = { ...base, packages: [{ ...base.packages[0]!, version: "5.7.2" }, { ...base.packages[1]!, version: "6.3.1" }] };
+    expect(unplannedRemovals(base, drifted, plan)).toEqual(["semver@6.1.1"]);
+    // The project also has a package no fix touches; the fake npm's candidate lockfile drops it.
+    const root = fixture(), withOther = lock();
+    (withOther.packages as Record<string, unknown>)["node_modules/other"] = { version: "1.0.0", resolved: "https://registry.npmjs.org/other/-/other-1.0.0.tgz" };
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(withOther));
+    const before = snapshot(root);
+    const result = await patchDependencies(root, true, { client: client(), command: fakeCommand(), testRun: async () => {} });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("moved packages that were not planned (other@1.0.0)");
+    expect(result.receipt?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }, { name: "other", from: ["1.0.0"], to: [] }]);
+    expect(snapshot(root)).toBe(before);
   });
   it("records every changed package, planned or not, and refuses a manifest the package manager rewrote", async () => {
     const base: Inventory = { ecosystem: "npm", files: [], scope: "locked_dependencies", limitations: [], packages: [

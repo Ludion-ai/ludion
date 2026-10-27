@@ -17,7 +17,11 @@ export type LockEntry = { path: string; name: string; version: string; dev: bool
  * A package version that the change adds. `from` is the version it replaces: the one at the same install path, else the
  * highest of the same name and major line, else null (new to the project).
  */
-export type Change = { path: string; name: string; from: string | null; to: string; dev: boolean; resolved: string | null; integrity: string | null };
+export type Change = {
+  path: string; name: string; from: string | null; to: string; dev: boolean; resolved: string | null; integrity: string | null;
+  /** The different package that was installed at this path before (an alias now names another package), or null. */
+  replaced: string | null;
+};
 
 /** What the registry and OSV say about one version, as of the moment the facts were gathered. */
 export type VersionFacts = {
@@ -111,22 +115,28 @@ export function lockEntryChanges(before: LockEntry[], after: LockEntry[]): LockE
   });
 }
 
-/** Every package version the change adds, whether the target of a fix or not (design: check the whole lockfile diff). */
+/**
+ * Every install path whose package or version changes, whether the target of a fix or not (design: check the whole
+ * lockfile diff). Each is compared with what that path held before, so moving a path to a version that is already
+ * installed elsewhere (a downgrade, say) is judged too. A copy that only moved to a new path at a version of the same
+ * name and major that was already installed changes nothing to judge; gate 4 still checks its tarball and hash.
+ */
 export function lockDiff(before: LockEntry[], after: LockEntry[]): Change[] {
-  const had = new Set(before.map(e => `${e.name}\0${e.version}`));
   const atPath = new Map(before.map(e => [e.path, e]));
   const changes = new Map<string, Change>();
   for (const entry of after) {
-    if (had.has(`${entry.name}\0${entry.version}`)) continue;
-    const key = `${entry.name}\0${entry.version}`;
     const samePath = atPath.get(entry.path);
+    if (samePath && samePath.name === entry.name && samePath.version === entry.version) continue;
+    const replaced = samePath && samePath.name !== entry.name ? `${samePath.name}@${samePath.version}` : null;
     const previous = samePath?.name === entry.name ? samePath.version
       : before.filter(e => e.name === entry.name && semver.major(e.version) === semver.major(entry.version)).map(e => e.version).sort(semver.rcompare)[0] ?? null;
+    if (!replaced && previous === entry.version) continue;
+    const key = `${entry.name}\0${previous}\0${entry.version}\0${replaced}`;
     const existing = changes.get(key);
     // A version counts as dev only when every copy of it is dev.
-    changes.set(key, existing ? { ...existing, dev: existing.dev && entry.dev } : { path: entry.path, name: entry.name, from: previous, to: entry.version, dev: entry.dev, resolved: entry.resolved, integrity: entry.integrity });
+    changes.set(key, existing ? { ...existing, dev: existing.dev && entry.dev } : { path: entry.path, name: entry.name, from: previous, to: entry.version, dev: entry.dev, resolved: entry.resolved, integrity: entry.integrity, replaced });
   }
-  return [...changes.values()].sort((a, b) => a.name.localeCompare(b.name) || semver.compare(a.to, b.to));
+  return [...changes.values()].sort((a, b) => a.name.localeCompare(b.name) || semver.compare(a.to, b.to) || a.path.localeCompare(b.path));
 }
 
 /** Urgency of the change: from the advisories it fixes, and whether any fixed package is used in production. */
@@ -210,7 +220,8 @@ export function judge(input: {
     if (next.malicious.length) add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to} is in OSV's malicious-package records (${next.malicious.join(", ")}).` });
     if (!next.present) add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to} is no longer listed by the registry (unpublished or withdrawn).` });
     if (next.deprecated) add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to} is deprecated: ${next.deprecated.slice(0, 200)}` });
-    if (c.from && semver.lt(c.to, c.from)) add({ gate: 1, package: c.name, effect: "stop", message: `${c.name} goes down from ${c.from} to ${c.to}.` });
+    if (c.replaced) add({ gate: 2, package: c.name, effect: "stop", message: `${c.path} now installs ${c.name}@${c.to} instead of ${c.replaced}: another package under the same name.` });
+    if (c.from && semver.lt(c.to, c.from)) add({ gate: 1, package: c.name, effect: "stop", message: `${c.name} goes down from ${c.from} to ${c.to} at ${c.path}.` });
     const introduced = next.advisories.filter(id => !prev?.advisories.includes(id));
     if (introduced.length) add({ gate: 1, package: c.name, effect: "stop", message: `${c.name}@${c.to} has known advisories ${c.from ? `that ${c.from} did not have` : "and is new to the project"}: ${introduced.join(", ")}.` });
     const remaining = next.advisories.filter(id => prev?.advisories.includes(id));
@@ -264,7 +275,7 @@ export function renderJudgement(j: Judgement): string {
   const head = { stop: "Ludion judgement: STOP — not applied automatically", wait: `Ludion judgement: wait until ${j.wait_until}`, ready_except_build: "Ludion judgement: gates 1, 2 and 4 found nothing and the wait is over — build/test gate not run (v0)", undecidable: "Ludion judgement: undecidable — not applied automatically" }[j.verdict];
   const lines = [head, `Urgency: ${j.urgency} · wait ${j.wait_hours}h from the newest publish (${j.newest_publish ?? "unknown"})`];
   lines.push(`Changed packages (${j.changes.length}):`);
-  for (const c of j.changes) lines.push(`  ${c.name} ${c.from ?? "(new)"} → ${c.to}${c.dev ? " (dev)" : ""}`);
+  for (const c of j.changes) lines.push(`  ${c.name} ${c.from ?? "(new)"} → ${c.to}${c.dev ? " (dev)" : ""}${c.replaced ? ` (replaces ${c.replaced} at ${c.path})` : ""}`);
   if (j.fixes.length) lines.push(`Fixes: ${[...new Set(j.fixes.map(f => f.id))].join(", ")}`);
   const order = { stop: 0, extend: 1, info: 2 } as const;
   for (const f of [...j.findings].sort((a, b) => order[a.effect] - order[b.effect])) lines.push(`  [${f.effect}] gate ${f.gate}: ${f.message}`);

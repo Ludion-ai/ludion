@@ -1,6 +1,7 @@
 {
-  "generated_at": "2026-10-27T16:12:42.020Z",
+  "generated_at": "2026-10-27T16:31:03.514Z",
   "method": "See the header of tools/backtest/src/fixes.ts.",
+  "candidates": 826,
   "sample": 200,
   "skipped": {
     "fix_not_published_2025": 23,

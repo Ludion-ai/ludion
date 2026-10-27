@@ -29,7 +29,7 @@ Not stopped within 7 days: 70 versions of 2025 (optimistic; 95 conservative). Al
 
 `node tools/backtest/src/fixes.ts <osv-npm-dir> <out.json> 200`, same OSV export; registry, attestations, OSV, CISA KEV and FIRST EPSS read live on 2026-10-27.
 
-Sample: the first 200 (by a hash of id, package and fixed version) of 826 fixed npm versions in GHSA records published in 2025, kept when the fixed version was published in 2025 and an earlier version of the same major exists. Each is the update from the highest earlier version of that major to the fixed version, judged by the live judge with only the fixed package in the diff.
+Sample: the first 200 (by a hash of id, package and fixed version) of 826 fixed npm versions (`candidates` in the JSON) in GHSA records published in 2025, kept when the fixed version was published in 2025 and an earlier version of the same major exists. Each is the update from the highest earlier version of that major to the fixed version, judged by the live judge with only the fixed package in the diff.
 
 | | |
 | --- | --- |
@@ -40,7 +40,7 @@ Sample: the first 200 (by a hash of id, package and fixed version) of 826 fixed 
 
 The run uses today's registry and OSV facts. Of the 30 deprecation stops, 24 carry messages like "This version has a security vulnerability" or "High Security Vulnerability in React Server Components": the fixed version was deprecated after a further advisory. The 12 "advisories on the fixed version" are likewise advisories published after the fix. Those did not exist when the wait ended. Of the other 6 deprecations, two (glob 11.1.0, tar 7.5.2) also cite security vulnerabilities; when any of the 6 were made is unknown. At the time, between 3 and 11 of 200 would have stopped: 3 counts the lost provenance, the install script and the unlisted version (assuming taylored 7.0.8 was already unlisted when the wait ended); 11 adds the 6 other deprecations and the 2 advisory-only stops. The judge rules that apply to this one-package sample have not changed since the run (later fixes concern other lockfile entries and urgency with several packages).
 
-This is the second run, after the round-1 review of #143 added gate 1's advisory and downgrade checks and the strict tarball and integrity checks (gate 4 findings are left out here because the sample has no real lockfile). The first run (median 72h, 33 stops) printed an empty stop-reason list because of a summary bug, since fixed; this file is generated as is.
+This is the third run (the second and third give identical results; the third also records the candidate count), after the round-1 review of #143 added gate 1's advisory and downgrade checks and the strict tarball and integrity checks (gate 4 findings are left out here because the sample has no real lockfile). The first run (median 72h, 33 stops) printed an empty stop-reason list because of a summary bug, since fixed; this file is generated as is.
 
 **Gate result: not met.** The design asks for a median delay within 24h. With the initial waits, most fixes are "normal" (72h) and the median is 72h. Reaching 24h means a shorter normal wait, which the malicious backtest prices: at 24h the re-query stops 78–84% of 2025's malicious releases instead of 90–94% at 72h.
 

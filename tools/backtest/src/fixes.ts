@@ -70,7 +70,7 @@ for (const c of candidates) {
   if (!published?.startsWith("2025")) { skipped.fix_not_published_2025!++; continue; }
   const from = Object.keys(t).filter(v => !semver.prerelease(v) && semver.lt(v, c.fixed) && semver.major(v) === semver.major(c.fixed) && Date.parse(t[v]!) < Date.parse(published)).sort(semver.rcompare)[0];
   if (!from) { skipped.no_earlier_version!++; continue; }
-  const change: Change = { path: `node_modules/${c.name}`, name: c.name, from, to: c.fixed, dev: false, resolved: registryTarball(c.name, c.fixed), integrity: "sha512-backtest" };
+  const change: Change = { path: `node_modules/${c.name}`, name: c.name, from, to: c.fixed, dev: false, resolved: registryTarball(c.name, c.fixed), integrity: "sha512-backtest", replaced: null };
   let gathered;
   try { gathered = await gatherFacts([change]); } catch (error) { skipped.facts!++; console.error(`${c.name}@${c.fixed}: ${String(error)}`); continue; }
   const result = judge({ changes: [change], facts: gathered.facts, fixes: gathered.fixes, files: ["package-lock.json"], now: new Date("2100-01-01T00:00:00Z") });
@@ -88,6 +88,7 @@ const count = (f: (r: Row) => boolean) => rows.filter(f).length;
 const result = {
   generated_at: new Date().toISOString(),
   method: "See the header of tools/backtest/src/fixes.ts.",
+  candidates: candidates.length,
   sample: rows.length,
   skipped,
   delay_hours: { median: delays[Math.floor(delays.length / 2)] ?? null, p90: delays[Math.floor(delays.length * 0.9)] ?? null, n: delays.length },

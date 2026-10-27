@@ -10,7 +10,7 @@ const lockOf = (packages: Record<string, { version: string; dev?: boolean }>) =>
 });
 const PROV = { repository: "https://github.com/acme/lib", workflow: ".github/workflows/release.yml" };
 const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], ...over });
-const change = (over: Partial<Change> = {}): Change => ({ path: "node_modules/lib", name: "lib", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("lib", "1.0.1"), integrity: INTEGRITY, ...over });
+const change = (over: Partial<Change> = {}): Change => ({ path: "node_modules/lib", name: "lib", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("lib", "1.0.1"), integrity: INTEGRITY, replaced: null, ...over });
 const fixHigh: FixedAdvisory = { id: "GHSA-aaaa-bbbb-cccc", package: "lib", aliases: ["CVE-2026-1"], severity: "CRITICAL", kev: false, epss: null };
 const run = (next: Partial<VersionFacts>, prev: Partial<VersionFacts> = {}, opts: { fixes?: FixedAdvisory[]; now?: string; changes?: Change[]; files?: string[] | null } = {}) => judge({
   changes: opts.changes ?? [change()],
@@ -72,7 +72,7 @@ describe("gate 2 and the wait", () => {
   });
   it("stops a downgrade, and a version with advisories the old one did not have", () => {
     const down = run({}, {}, { changes: [change({ from: "1.0.1", to: "1.0.0", resolved: url("lib", "1.0.0") })], now: "2027-01-01T00:00:00Z" });
-    expect(down.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: "lib goes down from 1.0.1 to 1.0.0." }));
+    expect(down.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: "lib goes down from 1.0.1 to 1.0.0 at node_modules/lib." }));
     const vulnerable = run({ advisories: ["GHSA-new"] }, { advisories: ["GHSA-old"] }, { now: "2027-01-01T00:00:00Z" });
     expect(vulnerable.verdict).toBe("stop");
     expect(vulnerable.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: expect.stringContaining("GHSA-new") }));
@@ -164,6 +164,32 @@ describe("gate 4 and urgency", () => {
     // An entry with no registry facts to check its hash: undecidable.
     const before = lockEntries(lock({ "node_modules/foo": { version: "1.0.0" } })), after = lockEntries(lock({ "node_modules/foo": { version: "1.0.1" }, "node_modules/baz": { version: "1.0.0" } }));
     expect(judge({ changes: lockDiff(before, after).filter(c => c.name === "foo"), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") }).verdict).toBe("undecidable");
+  });
+  it("judges a path that moves to a version or another package already installed elsewhere", () => {
+    const lock = (packages: Record<string, { version: string; name?: string }>) => JSON.stringify({ lockfileVersion: 3, packages: { "": {}, ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { resolved: url(p.name ?? path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...p }])) } });
+    const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["evil-pkg@1.0.0", fact()]]);
+    const verdict = (beforeText: string, afterText: string) => {
+      const before = lockEntries(beforeText), after = lockEntries(afterText);
+      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package.json", "package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    };
+    // (A) The root copy goes down to the vulnerable version a nested copy already had.
+    const a = verdict(
+      lock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/x/node_modules/lodash": { version: "4.17.20" }, "node_modules/foo": { version: "1.0.0" } }),
+      lock({ "node_modules/lodash": { version: "4.17.20" }, "node_modules/x/node_modules/lodash": { version: "4.17.20" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(a.verdict).toBe("stop");
+    expect(a.changes.map(c => [c.name, c.from, c.to])).toEqual([["foo", "1.0.0", "1.0.1"], ["lodash", "4.17.21", "4.17.20"]]);
+    expect(a.findings.map(f => f.message)).toEqual(expect.arrayContaining(["lodash goes down from 4.17.21 to 4.17.20 at node_modules/lodash.", expect.stringContaining("GHSA-x")]));
+    // (B) An alias: node_modules/lodash now installs another package that was already in the tree.
+    const b = verdict(
+      lock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/y/node_modules/evil-pkg": { version: "1.0.0" }, "node_modules/foo": { version: "1.0.0" } }),
+      lock({ "node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/y/node_modules/evil-pkg": { version: "1.0.0" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(b.verdict).toBe("stop");
+    expect(b.findings.map(f => f.message)).toContain("node_modules/lodash now installs evil-pkg@1.0.0 instead of lodash@4.17.21: another package under the same name.");
+    expect(renderJudgement(b)).toContain("(replaces lodash@4.17.21 at node_modules/lodash)");
+    // A copy that only moved (hoisting) to a version already installed is no change to judge.
+    const before = lockEntries(lock({ "node_modules/x/node_modules/foo": { version: "1.0.0" } })), after = lockEntries(lock({ "node_modules/foo": { version: "1.0.0" } }));
+    expect(lockDiff(before, after)).toEqual([]);
+    expect(lockEntryChanges(before, after).map(e => e.path)).toEqual(["node_modules/foo"]);
   });
   it("is undecidable when the given changed files leave out the lockfile", () => {
     expect(run({}, {}, { files: [], now: "2027-01-01T00:00:00Z" }).verdict).toBe("undecidable");

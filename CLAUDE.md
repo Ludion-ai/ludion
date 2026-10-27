@@ -18,7 +18,7 @@ Ludion is becoming a security-update product: detect relevant official fixes, do
 - Official metadata and image retrieval are separate from offline execution. Keep source, config and tests unchanged during validation. Source changes invalidate the result.
 - Apply only with explicit --apply policy. Unknown inputs, unavailable sources, baseline failure, candidate failure and timeouts block updates. Never fabricate a passing test or weaken one to accept an update.
 - Receipts show what was checked, not more. Keep evidence and historical attribution intact. Legacy lessons remain immutable; corrections use replacement/retraction.
-- Every change goes through a PR. Never push directly to main. PRs changing this file, .github/, tools/verify/, schemas, lessons/, ludion.config.json or wrangler.jsonc require a fresh-context review subagent, its verdict posted to the PR, and the owner to merge. Other PRs may auto-merge only with green CI.
+- Every change goes through a PR. Never push directly to main. PRs changing this file, .github/, tools/verify/, packages/cli/src/security/docker.ts, schemas, lessons/, ludion.config.json or wrangler.jsonc require a fresh-context review subagent, its verdict posted to the PR, and the owner to merge. Other PRs may auto-merge only with green CI.
 - Production deployment remains through deploy.yml only. No new accounts, spending, secret values or Cloudflare changes outside the ludion Worker and ludion.ai zone without owner authorization.
 
 ## Check the change

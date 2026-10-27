@@ -1,6 +1,7 @@
 // The security commands' only access to Docker. Image commands are limited to pull, build, inspect and cleanup.
 // Application tests run from an immutable local image ID with fixed hardening that callers cannot change:
 // no network, read-only root, no capabilities, the nobody user, resource limits, no host mounts or environment.
+// This file is a protected path (docs/protected-paths.md): the sandbox flags change only with an independent review.
 import { spawn as nodeSpawn, type ChildProcess } from "node:child_process";
 
 export type ContainerOutcome =
@@ -11,13 +12,13 @@ const CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/;
 const OUTPUT_CAP = 1_000_000;
 const GRACE_MS = 10_000;
 
-/** Image retrieval/build/inspection only. Containers run only through runArgs and runContainer. */
-export function runDockerImageCommand(args: string[], timeoutMs: number): Promise<string> {
+/** Image retrieval/build/inspection only. Containers run only through runContainer. */
+export function runDockerImageCommand(args: string[], timeoutMs: number, spawn: typeof nodeSpawn = nodeSpawn): Promise<string> {
   if (!["pull", "build", "image"].includes(args[0] ?? "") || (args[0] === "image" && !["inspect", "rm"].includes(args[1] ?? ""))) {
     return Promise.reject(new Error("Only Docker image retrieval, build, inspect and cleanup are allowed here."));
   }
   return new Promise((resolve, reject) => {
-    const child = nodeSpawn("docker", args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn("docker", args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     let output = "", error = "", timeout = false;
     const timer = setTimeout(() => { timeout = true; child.kill(); }, timeoutMs);
     child.stdout.on("data", chunk => { output = (output + String(chunk)).slice(-16_384); });
@@ -39,14 +40,18 @@ export function runArgs(name: string, image: string, command: readonly string[])
   return ["run", "--rm", "--name", name, "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534", "--cpus", "1", "--memory", "512m", "--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m", "--entrypoint", command[0]!, image, ...command.slice(1)];
 }
 
-/** Runs one container. On timeout, kills only that container name, then the docker client after a grace period. */
-export function runContainer(args: readonly string[], name: string, timeoutMs: number, spawn: typeof nodeSpawn = nodeSpawn): Promise<ContainerOutcome> {
+/**
+ * Runs one application test container, always with the runArgs hardening: there is no way to pass other docker
+ * arguments. On timeout, kills only that container name, then the docker client after a grace period.
+ */
+export function runContainer(name: string, image: string, command: readonly string[], timeoutMs: number, spawn: typeof nodeSpawn = nodeSpawn): Promise<ContainerOutcome> {
+  const args = runArgs(name, image, command);
   return new Promise(resolve => {
     let child: ChildProcess;
     try {
       child = spawn("docker", args, { stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
     } catch (err) {
-      resolve({ kind: "spawn_error", message: err instanceof Error ? err.message : String(err) });
+      resolve({ kind: "spawn_error", message: err instanceof Error && err.message ? err.message : String(err) });
       return;
     }
     let stdout = "", stderr = "", timedOut = false, settled = false;

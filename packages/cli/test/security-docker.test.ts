@@ -45,42 +45,64 @@ describe("security test container arguments", () => {
 
 describe("Docker image commands", () => {
   it("allow only pull, build, image inspect and image rm", async () => {
+    const { spawn, calls } = fakeSpawn();
     for (const args of [["run", "php"], ["exec", "x", "sh"], ["image", "ls"], ["image", "save", "php"], ["container", "rm", "x"], []]) {
-      await expect(runDockerImageCommand(args, 1_000)).rejects.toThrow("Only Docker image retrieval");
+      await expect(runDockerImageCommand(args, 1_000, spawn)).rejects.toThrow("Only Docker image retrieval");
     }
+    expect(calls).toEqual([]);
+  });
+  it("return trimmed output, and reject on a non-zero exit, a timeout or a missing Docker", async () => {
+    const ok = fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "sha256:abc\n"); child.emit("close", 0); }));
+    await expect(runDockerImageCommand(["image", "inspect", "x"], 1_000, ok.spawn)).resolves.toBe("sha256:abc");
+    expect(ok.calls[0]!.options).toEqual({ windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    const fails = fakeSpawn((_args, child) => queueMicrotask(() => { child.stderr.emit("data", "manifest unknown"); child.emit("close", 1); }));
+    await expect(runDockerImageCommand(["pull", "x"], 1_000, fails.spawn)).rejects.toThrow("Docker image command failed (1): manifest unknown");
+    const slow = fakeSpawn();
+    await expect(runDockerImageCommand(["pull", "x"], 20, slow.spawn)).rejects.toThrow("timed out");
+    const missing = fakeSpawn((_args, child) => queueMicrotask(() => child.emit("error", new Error("spawn docker ENOENT"))));
+    await expect(runDockerImageCommand(["pull", "x"], 1_000, missing.spawn)).rejects.toThrow("Docker unavailable: spawn docker ENOENT");
   });
 });
 
 describe("security test container runner", () => {
-  it("returns the exit code and output without a shell", async () => {
+  it("runs exactly the hardened argv and returns the exit code and output", async () => {
     const { spawn, calls } = fakeSpawn((_args, child) => queueMicrotask(() => {
       child.stdout.emit("data", Buffer.from("ok"));
       child.stderr.emit("data", "warn");
       child.emit("close", 3);
     }));
-    await expect(runContainer(["run", "x"], "x", 1_000, spawn)).resolves.toEqual({ kind: "exited", exitCode: 3, stdout: "ok", stderr: "warn", timedOut: false });
+    await expect(runContainer("x", IMAGE, ["php", "t.php"], 1_000, spawn)).resolves.toEqual({ kind: "exited", exitCode: 3, stdout: "ok", stderr: "warn", timedOut: false });
+    expect(calls.map(c => c.args)).toEqual([runArgs("x", IMAGE, ["php", "t.php"])]);
     expect(calls[0]!.options).toEqual({ stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+  });
+  it("refuses unhardened input before starting anything", () => {
+    const { spawn, calls } = fakeSpawn();
+    expect(() => runContainer("x", "php:latest", ["php"], 1_000, spawn)).toThrow("immutable");
+    expect(() => runContainer("x", IMAGE, ["--privileged"], 1_000, spawn)).toThrow("nonempty");
+    expect(calls).toEqual([]);
   });
   it("kills only the named container on timeout and reports the timeout", async () => {
     const { spawn, calls } = fakeSpawn();
-    const pending = runContainer(["run", "--name", "slow"], "slow", 20, spawn);
+    const pending = runContainer("slow", IMAGE, ["php"], 20, spawn);
     await vi.waitFor(() => expect(calls.filter(c => c.args[0] === "kill")).toHaveLength(1));
-    expect(calls.map(c => c.args)).toEqual([["run", "--name", "slow"], ["kill", "slow"]]);
+    expect(calls.map(c => c.args)).toEqual([runArgs("slow", IMAGE, ["php"]), ["kill", "slow"]]);
     calls[0]!.child.emit("close", 137);
     await expect(pending).resolves.toEqual({ kind: "exited", exitCode: 137, stdout: "", stderr: "", timedOut: true });
   });
   it("reports a missing Docker as a spawn error, whether spawn throws or emits", async () => {
     const emits = fakeSpawn((_args, child) => queueMicrotask(() => child.emit("error", new Error("spawn docker ENOENT"))));
-    await expect(runContainer(["run"], "x", 1_000, emits.spawn)).resolves.toEqual({ kind: "spawn_error", message: "spawn docker ENOENT" });
+    await expect(runContainer("x", IMAGE, ["php"], 1_000, emits.spawn)).resolves.toEqual({ kind: "spawn_error", message: "spawn docker ENOENT" });
     const throws = (() => { throw new Error("EACCES"); }) as unknown as typeof import("node:child_process").spawn;
-    await expect(runContainer(["run"], "x", 1_000, throws)).resolves.toEqual({ kind: "spawn_error", message: "EACCES" });
+    await expect(runContainer("x", IMAGE, ["php"], 1_000, throws)).resolves.toEqual({ kind: "spawn_error", message: "EACCES" });
+    const silent = (() => { throw new Error(""); }) as unknown as typeof import("node:child_process").spawn;
+    await expect(runContainer("x", IMAGE, ["php"], 1_000, silent)).resolves.toEqual({ kind: "spawn_error", message: "Error" });
   });
   it("caps captured output", async () => {
     const { spawn } = fakeSpawn((_args, child) => queueMicrotask(() => {
       for (let i = 0; i < 3; i++) child.stdout.emit("data", "x".repeat(600_000));
       child.emit("close", 0);
     }));
-    const result = await runContainer(["run"], "x", 1_000, spawn);
+    const result = await runContainer("x", IMAGE, ["php"], 1_000, spawn);
     expect(result.kind === "exited" && result.stdout.length).toBe(1_000_000);
   });
 });

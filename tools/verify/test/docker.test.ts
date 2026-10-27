@@ -733,13 +733,21 @@ function isDockerSource(path: string): boolean {
   return Object.hasOwn(RUN_BUILDERS, repoPath(path));
 }
 
-/** Start and end offsets of `export function <name>`, up to the next exported function. */
+/**
+ * Start and end offsets of a top-level `export function <name>(`: from the line that declares it to its closing
+ * `}` at column 0. A mention in a comment or a later helper does not count as part of the function.
+ */
 function exportedFunction(src: string, name: string): { at: number; end: number } {
-  const at = src.indexOf(`export function ${name}(`);
-  if (at < 0) throw new Error(`export function ${name} not found`);
-  const next = src.slice(at + 1).search(/\nexport function /);
-  return { at, end: next < 0 ? src.length : at + 1 + next };
+  const start = new RegExp(`^export function ${name}\\(`, "m").exec(src);
+  if (!start) throw new Error(`export function ${name} not found`);
+  const close = /\n\}\r?(?:\n|$)/.exec(src.slice(start.index));
+  if (!close) throw new Error(`export function ${name} has no closing brace at column 0`);
+  return { at: start.index, end: start.index + close.index + 2 };
 }
+
+/** Literal argv a builder file may pass to a docker spawn: none of these start a container. */
+const BUILDER_SPAWN_LITERALS = new Set(["kill", "pull", "version"]);
+const DOCKER_SPAWN_LITERAL = /(?:spawnSync|execFileSync|spawn|execFile)\(\s*["']docker["']\s*,\s*\[\s*["']([^"']*)["']/;
 
 /** A docker version probe does not start a container. Every other docker spawn outside a builder file is a hit. */
 function isVersionProbe(line: string): boolean {
@@ -748,8 +756,9 @@ function isVersionProbe(line: string): boolean {
 
 /**
  * Files other than the RUN_BUILDERS files must not spawn docker or build a `run` argv.
- * A builder file may spawn pull, kill, and the args from its builder function.
+ * A builder file may spawn docker with a computed argv (from its builder function) or a literal kill, pull or version.
  * A literal `run` argv in a builder file is reported so the caller can require it to sit in that function.
+ * Any other literal docker argv, and any exec of `docker run`, is a hit in every file.
  * `packages/cli` `docker version` is allowed: it does not start a container, and moving it would edit packages/.
  */
 function scanDockerSources(files: readonly ScanFile[]): ScanHit[] {
@@ -762,6 +771,9 @@ function scanDockerSources(files: readonly ScanFile[]): ScanHit[] {
       const base = { path: file.path, line: i + 1 };
       if (dockerFile) {
         if (RUN_ARGV.test(line)) hits.push({ ...base, reason: "run argv" });
+        if (DOCKER_EXEC.test(line)) hits.push({ ...base, reason: "exec docker run" });
+        const literal = DOCKER_SPAWN_LITERAL.exec(line)?.[1];
+        if (literal !== undefined && !BUILDER_SPAWN_LITERALS.has(literal)) hits.push({ ...base, reason: "docker spawn" });
         continue;
       }
       if (RUN_ARGV.test(line)) hits.push({ ...base, reason: "run argv" });
@@ -816,6 +828,7 @@ describe("docker run construction", () => {
       const builder = exportedFunction(text, name);
       expect(text.slice(builder.at, builder.end)).toMatch(/\[\s*"run"/);
       for (const hit of hits.filter((item) => repoPath(item.path) === path)) {
+        expect(hit).toMatchObject({ reason: "run argv" });
         const offset = text.split("\n").slice(0, hit.line - 1).join("\n").length;
         expect(offset).toBeGreaterThan(builder.at);
         expect(offset).toBeLessThan(builder.end);
@@ -850,8 +863,35 @@ describe("docker run construction", () => {
       { path: "packages/cli/src/elsewhere/docker.ts", text: 'spawnSync("docker", ["run", "--rm"]);\n' },
     ]).map((hit) => hit.reason)).toEqual(["run argv", "docker spawn"]);
     expect(scanDockerSources([
-      { path: "packages/cli/src/security/docker.ts", text: 'spawn("docker", args, { stdio: "ignore" });\n' },
+      { path: "packages/cli/src/security/docker.ts", text: 'spawn("docker", args, { stdio: "ignore" });\nspawn("docker", ["kill", name]);\n' },
     ])).toEqual([]);
+    // A builder file still may not start a container any other way than its builder's argv.
+    expect(scanDockerSources([
+      { path: "packages/cli/src/security/docker.ts", text: 'spawn("docker", ["container", "run", "--privileged", image]);\n' },
+      { path: "packages/cli/src/security/docker.ts", text: 'execSync("docker run --privileged x");\n' },
+      { path: "tools/verify/src/docker.ts", text: 'spawnSync("docker", ["exec", "x", "sh"]);\n' },
+    ]).map((hit) => hit.reason)).toEqual(["docker spawn", "exec docker run", "docker spawn"]);
+  });
+
+  it("bounds a builder function at its own closing brace, not at the next export", () => {
+    const text = [
+      "// export function runArgs( is only mentioned here",
+      "export function runArgs(name: string): string[] {",
+      "  if (name) {",
+      '    return ["run", name];',
+      "  }",
+      "  return [];",
+      "}",
+      "function helper(): string[] {",
+      '  return ["run", "--privileged"];',
+      "}",
+      "export function runContainer(): void {}",
+      "",
+    ].join("\n");
+    const fn = exportedFunction(text, "runArgs");
+    expect(text.slice(fn.at, fn.end)).toBe(text.split("\n").slice(1, 7).join("\n"));
+    expect(text.indexOf('"--privileged"')).toBeGreaterThan(fn.end);
+    expect(() => exportedFunction(text, "missing")).toThrow("not found");
   });
 
   it("mounts verifier deps from buildDockerRunArgs with a literal :ro", () => {

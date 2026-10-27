@@ -239,7 +239,7 @@ describe("gate 4 and urgency", () => {
       "": { dependencies: { a: "^1.0.0", foo: "^1.0.0", lodash: "^4.0.0", x: "^1.0.0" } },
       ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { resolved: url(p.name ?? path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...p }])),
     } });
-    const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["lodash@3.10.1", fact({ advisories: ["GHSA-old"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["evil-pkg@1.0.0", fact()], ["a@1.0.0", fact()], ["x@1.0.0", fact()]]);
+    const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["lodash@3.10.1", fact({ advisories: ["GHSA-old"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["evil-pkg@1.0.0", fact()], ["a@1.0.0", fact()], ["a@1.0.1", fact()], ["x@1.0.0", fact()]]);
     const verdict = (b: string, a: string) => judge({ changes: allChanges(b, a), entries: lockEntryChanges(lockEntries(b), lockEntries(a)), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
     const a = { version: "1.0.0", dependencies: { lodash: "*" } };
     const common = { "node_modules/a": a, "node_modules/lodash": { version: "4.17.21" }, "node_modules/x": { version: "1.0.0", dependencies: { lodash: "^3.0.0", "evil-pkg": "1.0.0" } }, "node_modules/x/node_modules/lodash": { version: "3.10.1" }, "node_modules/x/node_modules/evil-pkg": { version: "1.0.0" } };
@@ -260,6 +260,18 @@ describe("gate 4 and urgency", () => {
     expect(moved.changes.some(c => c.name === "lodash" && c.from === "4.17.21" && c.to === "3.10.1")).toBe(true);
     // Nothing changes for anyone: no change.
     expect(allChanges(before, before)).toEqual([]);
+    // (D) a itself is upgraded and its new version takes x's vulnerable lodash 3.10.1 through a new copy.
+    const a101 = { version: "1.0.1", dependencies: { lodash: "^3.0.0" } };
+    const upgraded = verdict(lock({ ...common, "node_modules/foo": { version: "1.0.0" } }), lock({ ...common, "node_modules/a": a101, "node_modules/a/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(upgraded.verdict).toBe("stop");
+    expect(upgraded.findings.map(f => f.message)).toEqual(expect.arrayContaining([expect.stringContaining("lodash goes down from 4.17.21 to 3.10.1")]));
+    // (D2) ...or an alias of another installed package.
+    const aliasUpgrade = verdict(lock({ ...common, "node_modules/foo": { version: "1.0.0" } }), lock({ ...common, "node_modules/a": { version: "1.0.1", dependencies: { lodash: "npm:evil-pkg@1.0.0" } }, "node_modules/a/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(aliasUpgrade.findings.some(f => f.effect === "stop" && f.message.includes("instead of lodash@4.17.21"))).toBe(true);
+    // Each copy of a dependent is compared with itself: another copy of a@1.0.0 already loading 3.10.1 does not excuse this one.
+    const twoCopies = { ...common, "node_modules/x/node_modules/a": a, "node_modules/x/node_modules/a/node_modules/lodash": { version: "3.10.1" } };
+    const pooled = verdict(lock({ ...twoCopies, "node_modules/foo": { version: "1.0.0" } }), lock({ ...twoCopies, "node_modules/a/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(pooled.verdict).toBe("stop");
   });
   it("refuses lockfile paths that differ only in case, and dependency groups that are not objects", () => {
     expect(() => lockEntries(JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/lodash": { version: "1.0.0" }, "node_modules/Lodash": { version: "1.0.0" } } }))).toThrow("differ only in case");

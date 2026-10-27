@@ -176,8 +176,8 @@ export function lockDiff(before: LockEntry[], after: LockEntry[]): Change[] {
   return [...changes.values()].sort((a, b) => a.name.localeCompare(b.name) || semver.compare(a.to, b.to) || a.path.localeCompare(b.path));
 }
 
-/** Something that requires packages: the project root, a workspace folder, or an installed package (by name@version). */
-type Consumer = { id: string; dir: string; requires: string[] };
+/** Something that requires packages: the project root, a workspace folder, or an installed package. */
+type Consumer = { path: string; name: string; dir: string; requires: string[] };
 const DECLARED = ["dependencies", "optionalDependencies", "peerDependencies"];
 
 function consumers(lockText: string): Consumer[] {
@@ -188,43 +188,48 @@ function consumers(lockText: string): Consumer[] {
     // The root and workspace folders also require their devDependencies; installed packages do not.
     const groups = own ? [...DECLARED, "devDependencies"] : DECLARED;
     const requires = [...new Set(groups.flatMap(group => item[group] && typeof item[group] === "object" ? Object.keys(item[group]) : []))].sort();
-    const id = own ? `<${path || "root"}>` : `${typeof item.name === "string" ? item.name : requireName(path)}@${item.version}`;
-    out.push({ id, dir: path ? `${path}/` : "", requires });
+    const name = own ? `<${path || "root"}>` : typeof item.name === "string" ? item.name : requireName(path);
+    out.push({ path, name, dir: path ? `${path}/` : "", requires });
   }
   return out;
 }
 
 /**
- * What every dependent loads, before and after: for each consumer that exists on both sides (the root, a workspace or
- * an installed name@version, wherever it sits) and each package it declares, the package Node resolution finds. A
- * target it did not load before is a change, however the tree moved to get there: a shadowing copy, a moved dependent,
- * a removed copy, an alias.
+ * What every dependent loads, before and after. A dependent at a path that held the same package before is compared
+ * with what that copy loaded; one at a new path (moved, or a new copy) with what any copy of that package loaded,
+ * whatever its version. A target it did not load before is a change, however the tree moved to get there: a shadowing
+ * copy, a moved or upgraded dependent, a removed copy, an alias. A requirement nothing satisfied before (a new
+ * dependency) is not compared here; a newly installed target is judged by the lockfile diff.
  */
 export function resolutionChanges(beforeText: string, afterText: string): Change[] {
-  const targets = (text: string) => {
+  const resolve = (text: string) => {
     const entries = new Map(lockEntries(text).map(e => [e.path, e]));
-    const map = new Map<string, LockEntry[]>();
-    for (const c of consumers(text)) for (const name of c.requires) {
-      const target = resolveFrom(entries, c.dir, name);
-      if (!target) continue;
-      const key = `${c.id}\0${name}`;
-      map.set(key, [...(map.get(key) ?? []), target]);
+    const byPath = new Map<string, LockEntry>(), byName = new Map<string, LockEntry[]>(), names = new Map<string, string>();
+    for (const c of consumers(text)) {
+      names.set(c.path, c.name);
+      for (const name of c.requires) {
+        const target = resolveFrom(entries, c.dir, name);
+        if (!target) continue;
+        byPath.set(`${c.path}\0${name}`, target);
+        byName.set(`${c.name}\0${name}`, [...(byName.get(`${c.name}\0${name}`) ?? []), target]);
+      }
     }
-    return map;
+    return { byPath, byName, names, consumers: consumers(text) };
   };
-  const before = targets(beforeText), after = targets(afterText);
+  const before = resolve(beforeText), after = resolve(afterText);
   const changes = new Map<string, Change>();
-  for (const [key, now] of after) {
-    const was = before.get(key);
-    if (!was) continue; // A new consumer or a new requirement: its packages are judged as installed changes.
-    for (const target of now) {
-      if (was.some(w => w.name === target.name && w.version === target.version && w.integrity === target.integrity)) continue;
-      const sameName = was.filter(w => w.name === target.name).map(w => w.version).sort(semver.rcompare)[0] ?? null;
-      const replaced = sameName === null ? `${was[0]!.name}@${was[0]!.version}` : null;
-      const id = `${target.name}\0${sameName}\0${target.version}\0${replaced}\0${target.integrity}`;
-      const existing = changes.get(id);
-      changes.set(id, existing ? { ...existing, dev: existing.dev && target.dev } : { path: target.path, name: target.name, from: sameName, to: target.version, dev: target.dev, resolved: target.resolved, integrity: target.integrity, replaced });
-    }
+  for (const c of after.consumers) for (const name of c.requires) {
+    const target = after.byPath.get(`${c.path}\0${name}`);
+    if (!target) continue;
+    const samePlace = before.names.get(c.path) === c.name;
+    const was = samePlace ? [before.byPath.get(`${c.path}\0${name}`)].filter((t): t is LockEntry => !!t) : before.byName.get(`${c.name}\0${name}`) ?? [];
+    if (!was.length) continue;
+    if (was.some(w => w.name === target.name && w.version === target.version && w.integrity === target.integrity)) continue;
+    const sameName = was.filter(w => w.name === target.name).map(w => w.version).sort(semver.rcompare)[0] ?? null;
+    const replaced = sameName === null ? `${was[0]!.name}@${was[0]!.version}` : null;
+    const id = `${target.name}\0${sameName}\0${target.version}\0${replaced}\0${target.integrity}`;
+    const existing = changes.get(id);
+    changes.set(id, existing ? { ...existing, dev: existing.dev && target.dev } : { path: target.path, name: target.name, from: sameName, to: target.version, dev: target.dev, resolved: target.resolved, integrity: target.integrity, replaced });
   }
   return [...changes.values()];
 }
@@ -404,6 +409,7 @@ export function judge(input: {
       "Provenance is read from the registry's attestation record; its Sigstore signature is not verified here.",
       "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
       "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
+      "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.",
     ],
   };
 }

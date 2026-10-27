@@ -297,3 +297,12 @@ About 2,900 files removed, docs from 65 MB to the security evidence only. CLI bu
 CLAUDE.md, README wording ("An empty result is not a security guarantee", from #138's review) and the last lesson-era site copy. Local: typecheck pass; build pass; vitest 179 passed / 1 skipped; Playwright + axe 30 passed / 1 skipped.
 
 Round 1 review of this PR (REQUEST CHANGES): CLAUDE.md read design targets as current behaviour. It now states the goal as a goal and lists what is not built yet (gate 2, waits, lockfile-diff checks, minimal candidates, exposure timestamps, apply setting), with the rule not to describe the preview as gated, waited or minimal until each lands; plus the reviewer's non-blocking clarifications. Also added from #140's review: the decisions note on which six files' final versions are only in main's history, a production check of `/index/subjects.json`, and a container-start guard that scans every `.ts/.mts/.cts/.js/.mjs/.cjs` file in the repository except unit-test folders, build output and installed packages.
+
+## 2026-10-28 — The smallest fix for npm and Composer
+
+Candidates move only the planned packages (decisions, same date). Real Docker, built CLI, temporary copies of the examples:
+- npm, `--apply`: lodash 4.17.20 → **4.18.0** (the old unscoped `npm update` chose 4.18.1); `changed_packages` is lodash only; requirement stays exact; applied in 17 s.
+- Composer, `--apply`: **stopped**. The plan (5.4.0 → 5.4.50, the smallest version OSV lists as fixing both advisories) was refused by Composer because Packagist's advisory database still flags 5.4.50 (PKSA-xmwy-rmx5-m7h4). No file changed; exit 2.
+- Maven, validation only: commons-text 1.9 → 1.10.0 and transitive commons-lang3 3.11 → 3.18.0, `validated` (128 s with image pulls).
+
+Local: typecheck pass; CLI tests 83 passed / 1 skipped, sandbox 46 passed.

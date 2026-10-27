@@ -660,3 +660,18 @@ The required status check `verify` is gone with its workflow. Branch protection 
 ## 2026-10-28 — CLAUDE.md follows the design (cleanup PR-D)
 
 CLAUDE.md now carries the design's rules instead of the PHP-preview wording: the one goal and its two measures (exposure time, human minutes per fix), the four gates and "undecidable stops", the waiting times, the seven rules that keep Ludion from becoming the attack path, and that candidate code runs only through `packages/sandbox`. The lesson product's end and the tag are one line. The site drops its last lesson-era copy (CC BY lesson licence, sync counting). Publishing the npm deprecation of 0.1.x (design step 7) is left to the owner: it needs an npm login, and whether `ludion-ai` is reused is one of the owner's open decisions.
+
+## 2026-10-28 — The smallest fix for npm and Composer
+
+`docs/design.md` (and #138's review) found that npm and Composer candidates ran `npm update` and `composer update --with-all-dependencies` with no package name: every dependency could move, which is the opposite of a minimal fix and an entry point for an unrelated new (possibly malicious) version.
+
+- **Requirements keep the project's style.** A direct requirement is raised with the same operator: exact stays exact, `^` stays `^`, `~x.y.z` stays `~` (Composer's two-part `~1.2` would narrow, so it is not touched), with the fixed version as its floor. Any other style stops for review. Before, every requirement became `>=fixed <next-major`.
+- **npm records exactly the fixed version.** npm always picks the newest version a range allows, so the candidate resolves twice, lockfile-only: first from a manifest that pins direct fixes exactly and transitive fixes as `overrides`, then from the final manifest, where npm keeps the recorded versions because they satisfy it. Then `npm ci` installs that lockfile. A project that already overrides a planned package stops for review. A transitive fix outside its parent's range is undone by the second step, and the candidate's advisory recheck then stops the update.
+- **Composer updates only the named packages**: `composer update <name>:<fixed> --with-dependencies --minimal-changes`, scripts and plugins off.
+- **The package manager may not rewrite the manifest.** The exported manifest must equal the one Ludion wrote.
+- **Receipts list every changed package** (`changed_packages`: name, versions before, versions after), planned or not, for the judge's lockfile-diff checks.
+- **Maven's online model keeps only the properties its dependency model uses** (#138 review, item 3). A used property named like a dependency-plugin parameter (`excludes`, `scope`, `mdep.*`, ...) stops for review, since Maven would read it as a plugin parameter and could hide part of the tree.
+
+Real Docker found that OSV and Packagist can disagree: OSV says symfony/http-foundation 5.4.50 fixes both advisories it lists for 5.4.0, but Packagist's advisory database blocks 5.4.50 for a further advisory, so Composer refuses the candidate and the update stops. That is the intended fail-closed result; a later planner should read Packagist's advisories too.
+
+Also from #141's round-2 review: CLAUDE.md's not-built list names the missing parts of gates 1, 3 and 4, PRs and the no-Docker behaviour, and the container guard skips output and test folders only outside `src/` and scans `.tsx`, `.jsx` and `.astro` too.

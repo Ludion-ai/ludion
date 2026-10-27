@@ -97,7 +97,7 @@ function sourceTree(): ScanFile[] {
       if (skip.has(name)) continue;
       const path = join(dir, name);
       if (statSync(path).isDirectory()) walk(path);
-      else if (/.(?:[cm]?ts|[cm]?js)$/.test(name) && !/.test.[cm]?[jt]s$/.test(name)) files.push({ path, text: readFileSync(path, "utf8") });
+      else if (/\.[cm]?[jt]s$/.test(name) && !/\.test\.[cm]?[jt]s$/.test(name)) files.push({ path, text: readFileSync(path, "utf8") });
     }
   };
   walk(REPO);
@@ -106,7 +106,12 @@ function sourceTree(): ScanFile[] {
 
 describe("docker run construction", () => {
   it("starts a run argument list only inside a builder function", () => {
-    const hits = scanDockerSources(sourceTree());
+    const tree = sourceTree();
+    // The scan reaches scripts outside packages: plain JavaScript, root config and the repository's tools.
+    for (const path of ["tools/check-production.ts", "playwright.config.ts", ".claude/hooks/guard.mjs", "packages/cli/build.ts"]) {
+      expect(tree.some((file) => repoPath(file.path) === path), path).toBe(true);
+    }
+    const hits = scanDockerSources(tree);
     expect(hits.filter((hit) => !isDockerSource(hit.path))).toEqual([]);
     for (const [path, name] of Object.entries(RUN_BUILDERS)) {
       const text = readFileSync(join(REPO, path), "utf8");

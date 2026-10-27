@@ -293,8 +293,10 @@ describe("ledger", () => {
 describe("the Claude Code plugin", () => {
   const json = (p: string) => JSON.parse(readFileSync(join(import.meta.dirname, "../../..", p), "utf8"));
 
-  it("runs this CLI version, pinned, so a plugin install never runs whatever npm serves next", () => {
-    const { name, version } = json("packages/cli/package.json");
+  it("keeps the legacy plugin pinned to its published release independently of the source preview", () => {
+    const { name } = json("packages/cli/package.json");
+    const { version } = json("plugin/.claude-plugin/plugin.json");
+    expect(version).toMatch(/^\d+\.\d+\.\d+$/);
     const [hook] = json("plugin/hooks/hooks.json").hooks.SessionStart[0].hooks;
     expect(hook.command).toBe(`npx -y ${name}@${version} sync --quiet --dir "\${CLAUDE_PROJECT_DIR}"`);
   });

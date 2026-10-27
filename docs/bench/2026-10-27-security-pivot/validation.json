@@ -1,0 +1,80 @@
+{
+  "recorded_at": "2026-10-27T11:00:40.095Z",
+  "typecheck": "passed",
+  "build": "passed",
+  "design_sample_build": "passed",
+  "suite": {
+    "command": "npm test",
+    "passed": 666,
+    "skipped": 7,
+    "failed": 0
+  },
+  "security_adapter": {
+    "command": "npx vitest run --project node packages/cli/test/security.test.ts",
+    "passed": 25,
+    "failed": 0
+  },
+  "browser": {
+    "command": "npm run test:e2e",
+    "passed": 29,
+    "skipped": 2,
+    "failed": 0
+  },
+  "screenshot_capture": {
+    "passed": 1,
+    "png_files": 36,
+    "widths": [
+      320,
+      390,
+      1280
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ]
+  },
+  "audit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "live": {
+    "checked_at": "2026-10-27T10:57:59.087Z",
+    "scope": "Application smoke contracts, not exploit regression or production deployment",
+    "cases": [
+      {
+        "case": "apply",
+        "outcome": "applied",
+        "source_changed": true,
+        "duration_ms": 16959
+      },
+      {
+        "case": "validation-only",
+        "outcome": "validated",
+        "source_changed": false,
+        "duration_ms": 9380
+      },
+      {
+        "case": "candidate-failure",
+        "outcome": "failed",
+        "source_changed": false,
+        "duration_ms": 9005
+      },
+      {
+        "case": "baseline-failure",
+        "outcome": "failed",
+        "source_changed": false,
+        "duration_ms": 4648
+      }
+    ]
+  },
+  "limits": [
+    "Application smoke contracts, not an exploit regression",
+    "No production application deployed",
+    "No npm package published",
+    "Remote CI and protected-file independent review pending"
+  ]
+}

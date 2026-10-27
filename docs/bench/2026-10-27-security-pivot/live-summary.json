@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-10-27T10:57:59.087Z",
+  "scope": "Application smoke contracts, not exploit regression or production deployment",
+  "cases": [
+    {
+      "case": "apply",
+      "outcome": "applied",
+      "source_changed": true,
+      "duration_ms": 16959
+    },
+    {
+      "case": "validation-only",
+      "outcome": "validated",
+      "source_changed": false,
+      "duration_ms": 9380
+    },
+    {
+      "case": "candidate-failure",
+      "outcome": "failed",
+      "source_changed": false,
+      "duration_ms": 9005
+    },
+    {
+      "case": "baseline-failure",
+      "outcome": "failed",
+      "source_changed": false,
+      "duration_ms": 4648
+    }
+  ]
+}

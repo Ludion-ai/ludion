@@ -6,9 +6,9 @@ const iso = en.home.isolate;
 const s = {
   label: iso.bar,
   choose: iso.stagesLabel,
-  context: "program",
-  reference: "verifier",
-  inline: "verifier",
+  context: "PHP update",
+  reference: "security patch",
+  inline: "tested update",
   illustration: iso.scope,
   replay: "Replay",
   scope: iso.scope,
@@ -17,22 +17,22 @@ const s = {
   setup: en.nav.start,
 };
 const routes = [
-  { id: "install", name: iso.install, file: "install", note: iso.installDetail },
-  { id: "run", name: iso.run, file: "run", note: iso.runDetail },
-  { id: "apply", name: iso.apply, file: "apply", note: iso.applyDetail },
+  { id: "install", name: iso.install, file: "official PHP image", note: iso.installDetail },
+  { id: "run", name: iso.run, file: "application test", note: iso.runDetail },
+  { id: "apply", name: iso.apply, file: "Dockerfile", note: iso.applyDetail },
 ];
 ---
 <div class="delivery" data-delivery data-reference={s.reference} data-inline={s.inline}>
   <div class="delivery-bar"><span>{s.label}</span><div role="group" aria-label={s.choose} class="destinations" hidden>{routes.map((route,i) => <button type="button" data-delivery-target={route.id} aria-pressed={i === 0 ? "true" : "false"}>{route.name}</button>)}</div></div>
   <figure class="delivery-figure" aria-labelledby="delivery-caption">
     <div class="delivery-visual" data-delivery-visual aria-hidden="true">
-      <div class="fallback-route"><span><BrandMark size={24}/><code>program</code></span><i>→</i><span><code data-static-destination>install</code></span></div>
+      <div class="fallback-route"><span><BrandMark size={24}/><code>PHP patch</code></span><i>→</i><span><code data-static-destination>official PHP image</code></span></div>
       <div class="three-space" data-delivery-space></div>
-      <div class="visual-labels"><div><span>{s.context}</span><code>program</code></div><div><span data-flat-mode>{s.reference}</span><code data-static-destination>install</code></div></div>
+      <div class="visual-labels"><div><span>{s.context}</span><code>PHP patch</code></div><div><span data-flat-mode>{s.reference}</span><code data-static-destination>official PHP image</code></div></div>
       <div class="mobile-space" data-mobile-delivery>
-        <div class="mobile-file"><span>{s.context}</span><code>program</code></div>
+        <div class="mobile-file"><span>{s.context}</span><code>PHP patch</code></div>
         <div class="mobile-route"><i></i><div class="mobile-packet" data-mobile-packet><i class="paper-shape"></i></div></div>
-        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>{routes[0]!.name}</span><code data-static-destination>install</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">program</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
+        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>{routes[0]!.name}</span><code data-static-destination>official PHP image</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">PHP patch</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
       </div>
     </div>
     <figcaption id="delivery-caption" class="visually-hidden">{s.illustration}</figcaption>
@@ -48,8 +48,8 @@ const routes = [
   <p class="unavailable">{s.unavailable}</p>
   <p class="command"><a href="/start/">{s.setup}<span aria-hidden="true"> ↗</span></a></p>
   <p class="delivery-scope">{s.scope}</p><span class="visually-hidden" role="status" data-delivery-status></span>
-  <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>program</code></div><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></template>
-  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>install</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>program</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
+  <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>PHP patch</code></div><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></template>
+  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>official PHP image</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>PHP patch</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
   <template data-delivery-object="packet"><div class="packet"><div class="packet-papers"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div><span>{s.context}</span></div></template>
   <template data-delivery-object="floor"><div class="world-floor"></div></template>
 </div>
@@ -130,12 +130,12 @@ const routes = [
       for (const button of buttons) button.setAttribute("aria-pressed",String(button.dataset.deliveryTarget === id));
       destination.element.querySelector("[data-world-assistant]")!.textContent = label;
       destination.element.querySelector("[data-world-file]")!.textContent = panel.dataset.file!;
-      destination.element.dataset.mode = id === "cursor" ? "inline" : "reference";
+      destination.element.dataset.mode = id === "apply" ? "inline" : "reference";
       root.querySelector<HTMLElement>("[data-mobile-destination]")!.dataset.mode = destination.element.dataset.mode;
       root.querySelector("[data-mobile-assistant]")!.textContent = label;
-      root.querySelector("[data-mobile-mode]")!.textContent = id === "cursor" ? root.dataset.inline! : root.dataset.reference!;
+      root.querySelector("[data-mobile-mode]")!.textContent = id === "apply" ? root.dataset.inline! : root.dataset.reference!;
       for (const label of root.querySelectorAll("[data-static-destination]")) label.textContent = panel.dataset.file!;
-      root.querySelector("[data-flat-mode]")!.textContent = id === "cursor" ? root.dataset.inline! : root.dataset.reference!;
+      root.querySelector("[data-flat-mode]")!.textContent = id === "apply" ? root.dataset.inline! : root.dataset.reference!;
       root.querySelector("[data-delivery-status]")!.textContent = `${label}: ${panel.dataset.file}`;
       finish(); if (animate) play(); else schedule();
     };

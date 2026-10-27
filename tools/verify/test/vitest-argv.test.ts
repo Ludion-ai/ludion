@@ -357,7 +357,7 @@ describe("real vitest json reports", () => {
   it("judges reports produced by the repo vitest, without loading the repo config", () => {
     const pkgPath = join(REPO, "node_modules", "vitest", "package.json");
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { version: string; bin: { vitest: string } };
-    expect(pkg.version).toBe("4.1.11");
+    expect(pkg.version).toBe("4.1.12");
     const vitestBin = join(REPO, "node_modules", "vitest", pkg.bin.vitest);
     const root = mkdtempSync(join(tmpdir(), "ludion-vitest-judge-"));
     const run = (file: string, outName: string, extra: string[] = []) => {

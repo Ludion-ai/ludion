@@ -1,0 +1,55 @@
+{
+  "case": "baseline-failure",
+  "exit_code": 2,
+  "duration_ms": 4648,
+  "before_hash": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+  "after_hash": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+  "source_changed": false,
+  "receipt": {
+    "schema": 1,
+    "id": "46268c07-b039-44ec-9cb6-a6e5c330dfb3",
+    "started_at": "2026-10-27T10:57:54.764Z",
+    "finished_at": "2026-10-27T10:57:58.888Z",
+    "outcome": "failed",
+    "scope": "dockerfile_only_not_deployed",
+    "scan": {
+      "schema": 1,
+      "checked_at": "2026-10-27T10:57:54.763Z",
+      "status": "update_available",
+      "scope": "dockerfile_base_image",
+      "current": {
+        "reference": "php:8.4.26-cli-alpine",
+        "version": "8.4.26",
+        "branch": "8.4",
+        "flavor": "-cli-alpine",
+        "start": 5,
+        "end": 26
+      },
+      "candidate": {
+        "version": "8.4.27",
+        "reference": "php:8.4.27-cli-alpine"
+      },
+      "security_releases": [
+        {
+          "version": "8.4.27",
+          "date": "21 Oct 2026",
+          "security": true
+        }
+      ],
+      "source": "https://www.php.net/releases/index.php?json&version=8.4&max=100",
+      "note": "Checks official PHP security-release metadata against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment."
+    },
+    "tree_hash": "47683a8fca8c0fb72d34661f16bce29e7b31078036077a683e0d8e6fef24e5ab",
+    "dockerfile_before": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+    "dockerfile_after": null,
+    "old_digest": "php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1",
+    "new_digest": null,
+    "test": [
+      "php",
+      "tests/smoke.php"
+    ],
+    "baseline_passed": false,
+    "candidate_passed": false,
+    "reason": "Validation exited 41: "
+  }
+}

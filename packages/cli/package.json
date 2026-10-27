@@ -1,7 +1,7 @@
 {
   "name": "ludion-ai",
-  "version": "0.1.4",
-  "description": "Tells your coding assistant what changed in the versions your project installed.",
+  "version": "0.2.0-preview.1",
+  "description": "Detect, validate and apply PHP Docker security updates. Source preview; legacy assistant-context commands remain compatible.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {

@@ -25,18 +25,14 @@ describe("being found", () => {
     expect(xml).not.toContain("/@");
   });
 
-  it("writes llms.txt for Ludion v3 in design, with the coverage caveat and no lesson or bench pages", () => {
+  it("describes the security source preview and labels old endpoints as legacy", () => {
     const txt = llmsTxt("https://ludion.ai");
-    expect(txt.startsWith("# Ludion\n\n> Ludion v3 (in design)")).toBe(true);
-    expect(txt).toContain("Nothing here is verified yet.");
-    expect(txt).toContain("some changes of some packages, not all of them");
-    expect(txt).toContain("No lesson for something is no evidence that it didn't change.");
+    expect(txt).toContain("Security updates without following every advisory");
+    expect(txt).toContain("Automatic production deployment, live server inventory, Java and EOL certification are not supported");
+    expect(txt).toContain("not a vulnerability database");
     expect(txt).toContain("https://ludion.ai/index.json");
-    expect(txt).toContain("every active lesson, machine-readable.");
-    expect(txt).toContain("https://ludion.ai/index/subjects.json");
-    expect(txt).not.toContain("/lessons/");
-    expect(txt).not.toContain("/bench");
-    expect(txt).not.toContain("Capability Compiler");
+    expect(txt).toContain("https://ludion.ai/start/");
+    expect(txt).not.toContain("Ludion v3 (in design)");
   });
 
   it("redirects removed pages and never the home page or sync setup", () => {

@@ -2,8 +2,7 @@ import { randomUUID } from "node:crypto";
 import { closeSync, existsSync, lstatSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { createDockerRunner } from "../../../capability/src/executor.ts";
-import { buildDockerRunArgs, runDockerImageCommand } from "../../../../tools/verify/src/docker.ts";
+import { runContainer, runDockerImageCommand } from "./docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
 
@@ -27,11 +26,7 @@ function digestFrom(text: string): string {
   return `php@${digest.split("@")[1]!}`;
 }
 
-export function runArgs(name: string, image: string, command: string[]): string[] {
-  return buildDockerRunArgs({ phase: "security", name, image, command });
-}
-
-export async function patchProject(dir: string, apply: boolean, deps: { signal?: AbortSignal; fetchFn?: typeof fetch; command?: Command; testRun?: (args: string[], name: string, timeoutMs: number) => Promise<void> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
+export async function patchProject(dir: string, apply: boolean, deps: { signal?: AbortSignal; fetchFn?: typeof fetch; command?: Command; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number) => Promise<void> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
   const active = () => { if (deps.signal?.aborted) throw new Error("Update cancelled. No pending source change will be applied."); };
   active();
   const root = rootPath(dir), config = readConfig(root);
@@ -53,8 +48,8 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     test: [...config.test], baseline_passed: false, candidate_passed: false,
   };
   const command = deps.command ?? dockerCommand;
-  const run = deps.testRun ?? (async (args, name, timeoutMs) => {
-    const result = await createDockerRunner()({ args, containerName: name, timeoutMs });
+  const run = deps.testRun ?? (async (name, image, command, timeoutMs) => {
+    const result = await runContainer(name, image, command, timeoutMs);
     if (result.kind === "spawn_error") throw new Error(`Docker unavailable: ${result.message}`);
     if (result.timedOut || result.exitCode !== 0) throw new Error(result.timedOut ? "Validation timed out." : `Validation exited ${result.exitCode}: ${result.stderr.slice(-1000)}`);
   });
@@ -85,10 +80,10 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
       active();
       const versionName = `ludion-security-${id}-${label}-runtime`;
       // Probe the built image as well as its base; a Dockerfile may replace the PHP binary.
-      await run(runArgs(versionName, imageId, ["php", "-r", `exit(PHP_VERSION === '${expected}' ? 0 : 1);`]), versionName, config.timeout_seconds * 1000);
+      await run(versionName, imageId, ["php", "-r", `exit(PHP_VERSION === '${expected}' ? 0 : 1);`], config.timeout_seconds * 1000);
       active();
       const name = `ludion-security-${id}-${label}-test`;
-      await run(runArgs(name, imageId, config.test), name, config.timeout_seconds * 1000);
+      await run(name, imageId, config.test, config.timeout_seconds * 1000);
       active();
       if (label === "baseline") receipt.baseline_passed = true; else receipt.candidate_passed = true;
     }

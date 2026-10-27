@@ -2,7 +2,7 @@
 // ludion: security-update source preview, with legacy assistant-context compatibility.
 //   ludion sync [--dir <path>] [--model <id>] [--quiet] [--offline]
 //   ludion teach <draft.json | - | --draft <base64url>> [--public] [--drafted-by-agent]
-// Security commands use official PHP metadata and Docker image retrieval. Legacy requests remain index/source/gh.
+// Security commands use official PHP metadata, OSV and controlled package retrieval.
 import { createInterface } from "node:readline/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -16,15 +16,16 @@ import { fetchLessons } from "./shards.ts";
 import { check, ghIdentity, isUnverified, ledgerEntry, readDraft, showLesson, toLesson } from "./teach.ts";
 import { securityCli } from "./security/cli.ts";
 
-const HELP = `ludion: security updates for your project's PHP Docker image (preview).
+const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (source preview).
 
-  ludion init [--dir <path>]
+  ludion init [--dir <path>] [--ecosystem php|npm|composer|maven]
       Create ludion.security.json. Set your application's real test command.
-  ludion scan [--dir <path>] [--json]
-      Look up official same-branch PHP security releases. Exit 1: update found; 2: error.
+  ludion scan [--dir <path>] [--ecosystem php|npm|composer|maven] [--json]
+      Detect supported inventories and look up PHP releases / OSV advisories.
+      Exit 1: attention needed; 2: error. An empty result is not a security guarantee.
   ludion patch [--dir <path>] [--apply] [--json]
       Download official images, build and test old/new versions offline, and save a receipt.
-      --apply updates only the Dockerfile after validation. Production is not deployed.
+      --apply updates only source dependency files after validation. Production is not deployed.
   ludion watch [--dir <path>] [--apply] [--interval <seconds>] [--json]
       Repeat patch checks in the foreground (default 900 seconds). Ctrl+C cancels pending apply;
       a Docker step already in progress may finish before exit.

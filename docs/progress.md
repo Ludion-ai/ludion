@@ -250,3 +250,12 @@ Validation: typecheck, workspace and sample builds; 666 tests passed / 7 skipped
 ### Security preview — independent review corrections
 
 The independent reviewer reproduced a stale validated result in validation-only mode and a missed empty-directory source change, and found watch stop did not cancel pending apply. Fixed all three: freshness check for both modes, directory identities/modes plus preserved copy modes, and cancellation gates after async work and before apply. Stop latency is explicitly documented: a running Docker step may finish, but pending application is cancelled. Added regressions. Final local results: 673 passed / 8 skipped overall, security 32 passed / 1 Windows mode skip, all 31 browser checks passed with screenshot capture enabled, 36 refreshed PNGs, and all four real Docker scenarios rerun successfully. Prior remote CI also passed; new-head CI and final protected-file review remain gates.
+
+
+## 2026-10-27 — npm, Composer and Maven security updates
+
+Expanded the existing PHP source preview with shared OSV detection, supported inventory discovery, constrained manifest-only acquisition, offline baseline/candidate application validation and source-file application for npm, Composer and standalone Maven. Included direct and transitive dependencies, native same-major resolution, candidate advisory rechecks, multi-file recovery journals, stale-source/policy and cancellation gates. Existing UI now shows all four supported ecosystems and explicit limitations; legacy integrations remain. Removed the obsolete production Chromium install; PR browser tests stay.
+
+Real copied-fixture runs all applied successfully: lodash 4.17.20→4.18.1 (5→0 known matches), symfony/http-foundation 5.4.0→5.4.54 (2→0), commons-text 1.9→1.10.0 and transitive commons-lang3 3.11→3.18.0 (2→0). Both baseline and candidate application smoke tests passed. Observed warm-cache times were 24–40 seconds; not a benchmark or exploit regression. Integration failures in npm cache ownership and Composer CLI compatibility were fixed without weakening blocking behavior.
+
+Local verification: typecheck, workspace and sample builds pass; 714 tests passed / 8 skipped; all 31 browser checks passed with 36 screenshots, zero axe violations, mobile/200%-text/reduced-motion checks and 32.1 KB gzipped home JS. npm audit: 0 findings. Evidence: docs/bench/2026-10-27-security-expansion/. Independent exact-head review, GitHub CI and owner merge approval remain release gates. npm publication and customer production deployment are outside this change.

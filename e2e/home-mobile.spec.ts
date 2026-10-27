@@ -49,7 +49,7 @@ test("a phone does not scroll sideways and keeps reachable controls", async ({ p
     await touchTargets(page.locator(".site-header nav a"), viewport.width);
     await touchTargets(page.locator("[data-trace-step]"), viewport.width);
     await touchTargets(page.locator("[data-delivery-target]"), viewport.width);
-    await expect(page.locator("[data-delivery-target=install]")).toContainText("Download");
+    await expect(page.locator("[data-delivery-target=install]")).toContainText("Resolve");
     await expect(page.locator("[data-delivery-target=run]")).toContainText("Validate");
     await expect(page.locator("[data-delivery-target=apply]")).toContainText("Apply");
     await reflow(page);
@@ -65,7 +65,7 @@ test("200 percent text keeps the design on the phone", async ({ page }) => {
     await resizeText(page);
     await reflow(page);
     await expect(page.locator("h1")).toContainText("Keep building.");
-    await expect(page.locator("h1")).toContainText("Keep security updates moving.");
+    await expect(page.locator("h1")).toContainText("Keep your stack moving.");
     await expect(page.locator("[data-guard-state]")).toHaveCount(4);
     await expect(page.locator("#receipt")).toContainText("Production deployment");
     await expect(page.locator("#isolate")).toContainText("Workflow illustration");

@@ -7,6 +7,7 @@ import GuardStates from "../components/GuardStates.astro";
 import LessonTrace from "../components/LessonTrace.astro";
 import DeliveryScene from "../components/DeliveryScene.astro";
 import BrandMark from "../components/BrandMark.astro";
+import Coverage from "../components/Coverage.astro";
 import { en } from "../strings/en.ts";
 const chapters = [
   { id: "guard", label: en.home.chapters.guard },
@@ -55,6 +56,7 @@ const chapters = [
     <p class="coverage">{en.home.coverage}</p>
   </section>
   </div>
+  <Coverage />
   <section class="closing-scene wrap" aria-labelledby="closing-heading">
     <h2 id="closing-heading">{en.home.closing.title}</h2>
     <a class="start" href="/start/">{en.home.closing.action}<span aria-hidden="true"> ↗</span></a>

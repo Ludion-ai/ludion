@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "ecosystem": "maven",
+  "image": "maven:3.9-eclipse-temurin-21",
+  "test": ["java", "--class-path", "/app/lib/*", "tests/Smoke.java"],
+  "timeout_seconds": 90
+}

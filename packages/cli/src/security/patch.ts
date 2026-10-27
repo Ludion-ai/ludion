@@ -35,6 +35,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
   const active = () => { if (deps.signal?.aborted) throw new Error("Update cancelled. No pending source change will be applied."); };
   active();
   const root = rootPath(dir), config = readConfig(root);
+  if (!("dockerfile" in config)) throw new Error("PHP patch requires a PHP Dockerfile configuration.");
   const dockerfile = regularFile(root, config.dockerfile);
   const original = readFileSync(dockerfile, "utf8");
   const scan = await scanPhp(original, deps.fetchFn);

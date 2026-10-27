@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { installScripts, judge, lockDiff, lockEntries, lockLinks, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
+import { installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { provenanceFrom } from "../src/security/npm-facts.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
@@ -33,7 +33,7 @@ describe("the lockfile diff", () => {
   });
   it("lists links to local directories, which a registry diff would not see", () => {
     const linked = JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/lib": { resolved: "packages/lib", link: true }, "packages/lib": { version: "1.0.0" } } });
-    expect(lockLinks(linked)).toEqual(["node_modules/lib"]);
+    expect(lockLinks(linked)).toEqual(["node_modules/lib -> packages/lib"]);
     expect(lockEntries(linked)).toEqual([]);
   });
   it("refuses lockfiles it cannot read exactly", () => {
@@ -145,6 +145,30 @@ describe("gate 4 and urgency", () => {
     expect(run({}, {}, { changes: [change({ resolved: url("lib", "1.0.1") + "?x=1" })], now: "2027-01-01T00:00:00Z" }).verdict).toBe("stop");
     expect(registryTarball("@scope/pkg", "1.2.3")).toBe("https://registry.npmjs.org/@scope/pkg/-/pkg-1.2.3.tgz");
   });
+  it("checks every changed entry: a re-pointed unchanged version and a second copy of a new one", () => {
+    const evil = { resolved: "https://registry.npmjs.org/evil-pkg/-/evil-pkg-1.0.0.tgz", integrity: "sha512-" + "E".repeat(86) + "==" };
+    const lock = (packages: Record<string, { version: string; resolved?: string; integrity?: string }>) => JSON.stringify({ lockfileVersion: 3, packages: { "": {}, ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { resolved: url(path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...p }])) } });
+    const facts = new Map([["lodash@4.17.21", fact()], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["bar@2.0.0", fact()]]);
+    const verdict = (beforeText: string, afterText: string) => {
+      const before = lockEntries(beforeText), after = lockEntries(afterText);
+      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    };
+    // (A) lodash keeps its version but points at another package; only foo is a version change.
+    const a = verdict(lock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/foo": { version: "1.0.0" } }), lock({ "node_modules/lodash": { version: "4.17.21", ...evil }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(a.verdict).toBe("stop");
+    expect(a.findings.filter(f => f.gate === 4).map(f => f.message)).toEqual([expect.stringContaining("lodash@4.17.21 at node_modules/lodash resolves to"), expect.stringContaining("lodash@4.17.21 at node_modules/lodash: the lockfile integrity")]);
+    // (B) a new version twice, the nested copy pointing at another package.
+    const b = verdict(lock({ "node_modules/foo": { version: "1.0.0" } }), lock({ "node_modules/foo": { version: "1.0.0" }, "node_modules/bar": { version: "2.0.0" }, "node_modules/x/node_modules/bar": { version: "2.0.0", ...evil } }));
+    expect(b.verdict).toBe("stop");
+    expect(b.findings.some(f => f.message.includes("bar@2.0.0 at node_modules/x/node_modules/bar resolves to"))).toBe(true);
+    // An entry with no registry facts to check its hash: undecidable.
+    const before = lockEntries(lock({ "node_modules/foo": { version: "1.0.0" } })), after = lockEntries(lock({ "node_modules/foo": { version: "1.0.1" }, "node_modules/baz": { version: "1.0.0" } }));
+    expect(judge({ changes: lockDiff(before, after).filter(c => c.name === "foo"), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") }).verdict).toBe("undecidable");
+  });
+  it("is undecidable when the given changed files leave out the lockfile", () => {
+    expect(run({}, {}, { files: [], now: "2027-01-01T00:00:00Z" }).verdict).toBe("undecidable");
+    expect(run({}, {}, { files: ["package.json"], now: "2027-01-01T00:00:00Z" }).verdict).toBe("undecidable");
+  });
   it("ranks urgency by exploitation, severity or EPSS, and dev-only last", () => {
     const prod = [change()], dev = [change({ dev: true })];
     expect(urgencyOf([{ ...fixHigh, kev: true }], prod)).toBe("exploited");
@@ -153,6 +177,9 @@ describe("gate 4 and urgency", () => {
     expect(urgencyOf([{ ...fixHigh, severity: "MODERATE" }], prod)).toBe("normal");
     expect(urgencyOf([], prod)).toBe("normal");
     expect(urgencyOf([{ ...fixHigh, kev: true }], dev)).toBe("low");
+    // A dev-only fix does not hurry a production passenger.
+    const passenger = change({ path: "node_modules/other", name: "other", resolved: url("other", "1.0.1") });
+    expect(urgencyOf([{ ...fixHigh, kev: true }], [change({ dev: true }), passenger])).toBe("normal");
     expect(WAIT_HOURS).toEqual({ exploited: 12, high: 24, normal: 72, low: 168 });
   });
 });

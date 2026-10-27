@@ -114,13 +114,12 @@ export async function epssScores(cves: string[], fetchFn: Fetch = fetch): Promis
 }
 
 /** Everything the judge needs for one lockfile change, fetched live. */
-export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch): Promise<{ facts: Map<string, VersionFacts>; fixes: FixedAdvisory[] }> {
+export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, also: { name: string; version: string }[] = []): Promise<{ facts: Map<string, VersionFacts>; fixes: FixedAdvisory[] }> {
   const wanted = new Map<string, Set<string>>();
-  for (const c of changes) {
-    const set = wanted.get(c.name) ?? new Set<string>();
-    set.add(c.to); if (c.from) set.add(c.from);
-    wanted.set(c.name, set);
-  }
+  const want = (name: string, version: string) => { const set = wanted.get(name) ?? new Set<string>(); set.add(version); wanted.set(name, set); };
+  for (const c of changes) { want(c.name, c.to); if (c.from) want(c.name, c.from); }
+  // Other entries gate 4 checks (re-pointed or second copies): their registry integrity is needed too.
+  for (const e of also) want(e.name, e.version);
   const all = [...wanted].flatMap(([name, versions]) => [...versions].map(version => ({ name, version })));
   const ids = await osvIds(all, fetchFn);
   const facts = new Map<string, VersionFacts>();

@@ -2,7 +2,7 @@
 // checkouts of a project. Comments only (design, 判定役 v0): it never changes files.
 import { lstatSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { judge, lockDiff, lockEntries, lockLinks, renderJudgement, type FixedAdvisory, type VersionFacts } from "./judge.ts";
+import { judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, renderJudgement, type FixedAdvisory, type VersionFacts } from "./judge.ts";
 import { gatherFacts } from "./npm-facts.ts";
 import { regularFile, rootPath } from "./project.ts";
 
@@ -16,16 +16,17 @@ export async function judgeCli(args: string[]): Promise<number> {
     return readFileSync(path, "utf8");
   };
   const beforeLock = read(before, "package-lock.json"), afterLock = read(after, "package-lock.json");
-  const changes = lockDiff(lockEntries(beforeLock), lockEntries(afterLock));
+  const beforeEntries = lockEntries(beforeLock), afterEntries = lockEntries(afterLock);
+  const changes = lockDiff(beforeEntries, afterEntries), entries = lockEntryChanges(beforeEntries, afterEntries);
   const hadLinks = new Set(lockLinks(beforeLock));
-  const links = lockLinks(afterLock).filter(path => !hadLinks.has(path));
+  const links = lockLinks(afterLock).filter(link => !hadLinks.has(link));
   // The changed files come from the caller (e.g. `git diff --name-only` in CI). Without them gate 4 cannot be judged.
   const files = values.files !== undefined ? values.files.split(",").map(f => f.trim()).filter(Boolean) : null;
   const now = values.now ? new Date(values.now) : new Date();
   if (!Number.isFinite(now.getTime())) throw new Error("--now must be an ISO date.");
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], errors: string[] = [];
-  try { ({ facts, fixes } = await gatherFacts(changes)); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
-  const result = judge({ changes, facts, fixes, files, links, now, errors });
+  try { ({ facts, fixes } = await gatherFacts(changes, fetch, entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
+  const result = judge({ changes, entries, facts, fixes, files, links, now, errors });
   console.log(values.json ? JSON.stringify(result, null, 2) : renderJudgement(result));
   return result.verdict === "ready_except_build" ? 0 : result.verdict === "wait" ? 3 : 1;
 }

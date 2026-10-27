@@ -94,9 +94,21 @@ export function lockEntries(lockText: string): LockEntry[] {
   return entries;
 }
 
-/** node_modules paths that are links to a local directory instead of a registry package. */
+/** node_modules paths that are links to a local directory instead of a registry package, as "path -> target". */
 export function lockLinks(lockText: string): string[] {
-  return Object.entries(readLock(lockText)).filter(([path, item]) => path.includes("node_modules/") && item?.link).map(([path]) => path).sort();
+  return Object.entries(readLock(lockText)).filter(([path, item]) => path.includes("node_modules/") && item?.link).map(([path, item]) => `${path} -> ${String(item.resolved)}`).sort();
+}
+
+/**
+ * Every installed entry that differs from the entry at the same path before (new path, other name or version, other
+ * tarball or hash), every copy. Gate 4 checks all of them: re-pointing an unchanged version is a change too.
+ */
+export function lockEntryChanges(before: LockEntry[], after: LockEntry[]): LockEntry[] {
+  const atPath = new Map(before.map(e => [e.path, e]));
+  return after.filter(e => {
+    const b = atPath.get(e.path);
+    return !b || b.name !== e.name || b.version !== e.version || b.resolved !== e.resolved || b.integrity !== e.integrity;
+  });
 }
 
 /** Every package version the change adds, whether the target of a fix or not (design: check the whole lockfile diff). */
@@ -119,11 +131,14 @@ export function lockDiff(before: LockEntry[], after: LockEntry[]): Change[] {
 
 /** Urgency of the change: from the advisories it fixes, and whether any fixed package is used in production. */
 export function urgencyOf(fixes: FixedAdvisory[], changes: Change[], epssHigh = 0.1): Urgency {
-  const production = changes.some(c => !c.dev);
   const fixed = fixes.filter(f => changes.some(c => c.name === f.package));
-  if (!production) return "low";
-  if (fixed.some(f => f.kev)) return "exploited";
-  if (fixed.some(f => f.severity?.toUpperCase() === "CRITICAL" || (f.epss !== null && f.epss >= epssHigh))) return "high";
+  // A fix's urgency counts only for the packages it fixes: a dev-only fix does not hurry a production passenger.
+  const fixing = changes.filter(c => fixed.some(f => f.package === c.name) && !c.dev);
+  if (!changes.some(c => !c.dev)) return "low";
+  if (!fixing.length) return "normal";
+  const urgent = fixed.filter(f => fixing.some(c => c.name === f.package));
+  if (urgent.some(f => f.kev)) return "exploited";
+  if (urgent.some(f => f.severity?.toUpperCase() === "CRITICAL" || (f.epss !== null && f.epss >= epssHigh))) return "high";
   return "normal";
 }
 
@@ -137,8 +152,10 @@ export function judge(input: {
   fixes: FixedAdvisory[];
   /** Files the change touches, relative to the project root; null when the caller could not tell (then undecidable). */
   files: string[] | null;
-  /** node_modules paths that became links to a local directory. */
+  /** Links to a local directory that are new or point elsewhere ("path -> target"). */
   links?: string[];
+  /** Every installed entry that changed at its path (lockEntryChanges); by default the first copy of each change. */
+  entries?: LockEntry[];
   now: Date;
   /** A stricter project wait, in hours, per urgency (design: the stricter setting wins). */
   projectWait?: Partial<Record<Urgency, number>>;
@@ -158,19 +175,22 @@ export function judge(input: {
 
   // Gate 4: one revertible change to the dependency files only, with every added version pinned to the registry's own
   // tarball and hash for exactly that name and version.
-  if (input.files === null) {
-    add({ gate: 4, effect: "info", message: "The PR's changed files were not given (--files), so gate 4 could not check that only package.json and package-lock.json change." });
+  if (input.files === null || !input.files.includes("package-lock.json")) {
+    add({ gate: 4, effect: "info", message: input.files === null ? "The PR's changed files were not given (--files), so gate 4 could not check that only package.json and package-lock.json change." : "The given changed files do not include package-lock.json, although the lockfile changed." });
     undecidable = true;
   } else {
     const unexpected = input.files.filter(f => !["package.json", "package-lock.json"].includes(f));
     if (unexpected.length) add({ gate: 4, effect: "stop", message: `The change also touches ${unexpected.join(", ")}; a dependency update must change only package.json and package-lock.json.` });
   }
-  for (const link of input.links ?? []) add({ gate: 4, effect: "stop", message: `${link} becomes a link to a local directory instead of a registry package.` });
-  for (const c of changes) {
-    if (c.resolved !== registryTarball(c.name, c.to)) add({ gate: 4, package: c.name, effect: "stop", message: `${c.name}@${c.to} resolves to ${c.resolved ?? "nothing"}, not the registry's tarball ${registryTarball(c.name, c.to)}.` });
-    const registry = facts.get(`${c.name}@${c.to}`)?.integrity;
-    if (!c.integrity?.startsWith("sha512-")) add({ gate: 4, package: c.name, effect: "stop", message: `${c.name}@${c.to} has no sha512 integrity in the lockfile.` });
-    else if (facts.has(`${c.name}@${c.to}`) && registry !== c.integrity) add({ gate: 4, package: c.name, effect: "stop", message: `${c.name}@${c.to}'s lockfile integrity is not the registry's (${registry ?? "none"}).` });
+  for (const link of input.links ?? []) add({ gate: 4, effect: "stop", message: `${link}: a link to a local directory that is new or points elsewhere, instead of a registry package.` });
+  const entries = input.entries ?? changes.map(c => ({ path: c.path, name: c.name, version: c.to, dev: c.dev, resolved: c.resolved, integrity: c.integrity }));
+  for (const e of entries) {
+    const where = `${e.name}@${e.version} at ${e.path}`;
+    if (e.resolved !== registryTarball(e.name, e.version)) add({ gate: 4, package: e.name, effect: "stop", message: `${where} resolves to ${e.resolved ?? "nothing"}, not the registry's tarball ${registryTarball(e.name, e.version)}.` });
+    const fact = facts.get(`${e.name}@${e.version}`);
+    if (!e.integrity?.startsWith("sha512-")) add({ gate: 4, package: e.name, effect: "stop", message: `${where} has no sha512 integrity in the lockfile.` });
+    else if (!fact) { add({ gate: 4, package: e.name, effect: "stop", message: `No registry facts to check the integrity of ${where}; undecidable.` }); undecidable = true; }
+    else if (fact.integrity !== e.integrity) add({ gate: 4, package: e.name, effect: "stop", message: `${where}: the lockfile integrity is not the registry's (${fact.integrity ?? "none"}).` });
   }
 
   // Gate 2: every changed version, compared with the version it replaces.

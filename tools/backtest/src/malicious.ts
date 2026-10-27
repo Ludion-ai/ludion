@@ -148,6 +148,8 @@ const result = {
   generated_at: new Date().toISOString(),
   method: "See the header of tools/backtest/malicious.ts.",
   sources: { osv: "OSV npm export (MAL- records published in 2025)", registry: "registry.npmjs.org packuments (time, versions)" },
+  records: all.length,
+  record_packages: names.length,
   malicious_versions: rows.length,
   packages: new Set(rows.map(r => r.name)).size,
   skipped,

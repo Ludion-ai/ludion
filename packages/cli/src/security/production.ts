@@ -67,9 +67,10 @@ const RUNTIMES = new Set(["electron", "electron-nightly", "electron-prebuilt", "
 const CODE = /\.(js|jsx|ts|tsx|mjs|cjs|mts|cts|vue|svelte|astro|mdx|marko)$/i;
 const STYLE = /\.(css|scss|sass|less|styl|stylus|pcss|postcss)$/i;
 const MARKUP = /\.(html|htm|ejs|hbs|handlebars|pug|njk|liquid)$/i;
-const TEST_DIR = /(^|\/)(test|tests|__tests__|__mocks__|__snapshots__|__fixtures__|e2e|cypress|playwright|spec|specs)\//i;
-const TEST_FILE = /\.(test|spec|e2e|cy)\.[^/]+$|(^|\/)(setupTests|setup-tests|test-setup|jest\.setup|vitest\.setup)\.[^/]+$/i;
-const TOOL_CONFIG = /(^|\/)(jest|vitest|playwright|cypress|karma|ava|wdio|nightwatch|mocha|tap|eslint|prettier|stylelint|commitlint|lint-staged)\.(config|conf|workspace)(\.[^/]*)?$|(^|\/)\.(eslintrc|prettierrc|stylelintrc|lintstagedrc|commitlintrc|mocharc)[^/]*$|(^|\/)\.husky\//i;
+// Names as section 2 writes them (lowercase): another spelling is source.
+const TEST_DIR = /(^|\/)(test|tests|__tests__|__mocks__|__snapshots__|__fixtures__|e2e|cypress|playwright|spec|specs)\//;
+const TEST_FILE = /\.(test|spec|e2e|cy)\.[^/]+$|(^|\/)(setupTests|setup-tests|test-setup|jest\.setup|vitest\.setup)\.[^/]+$/;
+const TOOL_CONFIG = /(^|\/)(jest|vitest|playwright|cypress|karma|ava|wdio|nightwatch|mocha|tap|eslint|prettier|stylelint|commitlint|lint-staged)\.(config|conf|workspace)(\.[^/]*)?$|(^|\/)\.(eslintrc|prettierrc|stylelintrc|lintstagedrc|commitlintrc|mocharc)[^/]*$|(^|\/)\.husky\//;
 const TYPES_FILE = /\.d\.[mc]?ts$/i;
 /** P2: a build tool's configuration. */
 const BUILD_TOOLS = "vite|webpack|rollup|rspack|rsbuild|rolldown|esbuild|tsup|tsdown|build|next|nuxt|astro|svelte|remix|react-router|quasar|vue|babel|postcss|tailwind|uno|unocss|craco|metro|app|electron\\.vite|electron-builder|forge|capacitor|docusaurus|snowpack|wmr|parcel|gatsby|vinxi";
@@ -84,48 +85,78 @@ const DOCKERFILE = /(^|\/)(dockerfile|containerfile)[^/]*$|\.(dockerfile|contain
 const COMMAND_FILE = /(^|\/)(Procfile|docker-compose[^/]*\.ya?ml|compose[^/]*\.ya?ml|app\.ya?ml|render\.ya?ml|railway\.(json|toml)|fly\.toml|nixpacks\.toml|ecosystem\.config\.[^/]+|ecosystem\.json)$/i;
 const COMMAND_KEY = /(command|cmd|entrypoint|start|script|exec|args|run|interpreter)/i;
 
-const BUILTINS = new Set(builtinModules.flatMap(m => [m, m.split("/")[0]!]));
-/** The package a bare module specifier names, or null for relative, absolute, URL, builtin and alias specifiers. */
-export function packageOf(specifier: string): string | null {
+const BUILTINS = new Set(builtinModules);
+/**
+ * The package a bare module specifier names, or null for relative, absolute, URL and alias specifiers. A builtin
+ * specifier (`events`, `fs/promises`) names none in an import, but `buffer/` and `process/browser` name packages.
+ * `builtins: false` is for a build tool's configuration, where a quoted `buffer` names the installed package (P2).
+ */
+export function packageOf(specifier: string, builtins = true): string | null {
   let s = specifier.trim();
   if (s.startsWith("~") && !s.startsWith("~/")) s = s.slice(1);
   if (!s || /^[./]/.test(s) || s.includes(":") || /^(#|@\/|~\/|\$|@@\/)/.test(s) || /[\s\\]/.test(s)) return null;
   // A bundler's query (?raw, ?worker) is not part of the name.
-  const parts = s.replace(/[?#].*$/, "").split("/");
+  const bare = s.replace(/[?#].*$/, ""), parts = bare.split("/");
+  if (builtins && BUILTINS.has(bare)) return null;
   const name = s.startsWith("@") ? (parts.length > 1 ? `${parts[0]}/${parts[1]}` : null) : parts[0]!;
-  if (!name || BUILTINS.has(name) || !/^(@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*$/i.test(name)) return null;
+  if (!name || !/^(@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*$/i.test(name)) return null;
   return name;
 }
 
-/** Module specifiers a code file loads: import/export from, import(), require(), require.resolve(). Type-only ones are erased. */
+/** Comments that may stand between `import(` or `require(` and the specifier. */
+const CALL_COMMENTS = String.raw`(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)*`;
+const CALL = new RegExp(String.raw`\b(?:import|require(?:\.resolve)?)\s*\(\s*${CALL_COMMENTS}(["'\x60])([^"'\x60\n$]+)\1`, "g");
+/**
+ * Module specifiers a code file loads: every `from "x"`, `import "x"`, `import()`, `require()` and `require.resolve()`
+ * with a literal specifier. Only a strictly type-only import or export (`import type { A } from "x"`) is erased.
+ */
 export function codeSpecifiers(text: string): string[] {
-  const out: string[] = [];
-  for (const m of text.matchAll(/\b(?:import|export)\s+(type\s+)?(?:[^"';]{0,2000}?\s+from\s*)?["']([^"'\n]+)["']/g)) if (!m[1]) out.push(m[2]!);
-  for (const m of text.matchAll(/\b(?:import|require(?:\.resolve)?)\s*\(\s*["'`]([^"'`\n$]+)["'`]/g)) out.push(m[1]!);
+  const out: string[] = [], typeOnly = new Set<number>();
+  for (const m of text.matchAll(/\b(?:import|export)\s+type\s+(?:\{[^}]*\}|\*\s*as\s+[\w$]+|[\w$]+)\s*(from\s*(["'])[^"'\n]+\2)/g)) typeOnly.add(m.index! + m[0].length - m[1]!.length);
+  for (const m of text.matchAll(/\bfrom\s*(["'])([^"'\n]+)\1/g)) if (!typeOnly.has(m.index!)) out.push(m[2]!);
+  for (const m of text.matchAll(/\bimport\s*(["'])([^"'\n]+)\1/g)) out.push(m[2]!);
+  for (const m of text.matchAll(CALL)) out.push(m[2]!);
   for (const m of text.matchAll(/@jsxImportSource\s+([^\s*]+)/g)) out.push(m[1]!);
   return out;
 }
-/** What a stylesheet (or a component's <style>) imports: @import, @use, @forward, @plugin, @reference and url(~…). */
+/**
+ * What a stylesheet (or a component's <style>) imports: every item of an @import, @use, @forward, @plugin or
+ * @reference list (a Less option such as `(reference)` skipped), and url(~…).
+ */
 export function styleSpecifiers(text: string): string[] {
   const out: string[] = [];
-  for (const m of text.matchAll(/@(?:import|use|forward|plugin|reference)\s+(?:url\(\s*)?["']?([^"')\s;]+)/g)) out.push(m[1]!);
+  for (const m of text.matchAll(/@(?:import|use|forward|plugin|reference)\s+([^;{}]{0,4000})/g)) {
+    const clause = m[1]!.replace(/^\s*\([^)]*\)\s*/, "");
+    const quoted = [...clause.matchAll(/["']([^"'\n]+)["']/g)].map(q => q[1]!), urls = [...clause.matchAll(/url\(\s*["']?([^"')\s]+)/g)].map(u => u[1]!);
+    if (quoted.length || urls.length) out.push(...quoted, ...urls);
+    else { const bare = /^\s*([^\s,;]+)/.exec(clause); if (bare) out.push(bare[1]!); }
+  }
   for (const m of text.matchAll(/url\(\s*["']?~([^"')\s]+)/g)) out.push(m[1]!);
   return out;
 }
 /** Packages a file names by a node_modules path (a <script src>, a copied asset). */
 const nodeModulesPaths = (text: string) => [...text.matchAll(/node_modules\/((?:@[\w.-]+\/)?[\w.-]+)/g)].map(m => m[1]!);
 
-/** Package names a build tool's configuration names: quoted strings, Babel's short names spelled out, PostCSS's object keys. */
-export function configNames(text: string, kind: "babel" | "postcss" | "other"): string[] {
+/**
+ * Package names a build tool's configuration names: quoted strings (and, for a JSON value, every string and key), every
+ * node_modules/<name> path, Babel's short names spelled out, PostCSS's object keys. A builtin's name counts here.
+ */
+export function configNames(text: string, kind: "babel" | "postcss" | "other", json?: unknown): string[] {
   const raw: string[] = [...text.matchAll(/["'`]([^"'`\n]{1,214})["'`]/g)].map(m => m[1]!);
+  const walk = (value: unknown): void => {
+    if (typeof value === "string") raw.push(value);
+    else if (Array.isArray(value)) value.forEach(walk);
+    else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) { raw.push(k); walk(v); }
+  };
+  walk(json);
   if (kind === "postcss") raw.push(...[...text.matchAll(/(?:^|[{,\s])([A-Za-z_@][\w@/.-]*)\s*:/g)].map(m => m[1]!));
-  const out = new Set<string>();
+  const out = new Set<string>(nodeModulesPaths(text));
   for (const r of raw) {
     let s = r.replace(/^module:/, "");
     // "@angular-devkit/build-angular:browser" names a builder of a package; "node:fs" or a URL names none.
     const builder = /^([^:]+):[^/]/.exec(s);
     if (builder && !/^(node|https?|data|virtual|file|npm|workspace|link|git|github)$/i.test(builder[1]!)) s = builder[1]!;
-    const name = packageOf(s);
+    const name = packageOf(s, false);
     if (name) out.add(name);
     else if (/^@[a-z0-9][\w.-]*$/i.test(s) && kind === "babel") out.add(s);
     for (const n of nodeModulesPaths(r)) out.add(n);
@@ -145,6 +176,11 @@ export function configNames(text: string, kind: "babel" | "postcss" | "other"): 
 
 const segmentsOf = (text: string) => text.split(/&&|\|\||[;|&\n]/).map(s => s.trim()).filter(Boolean);
 const wordsOf = (segment: string) => segment.split(/\s+/).map(w => w.replace(/^[\["'`]+|["'`,\]]+$/g, "")).filter(Boolean);
+/** A command's words, with `--import=x` split into `--import x` and `./node_modules/.bin/x` read as the bin `x`. */
+const commandWords = (segment: string) => wordsOf(segment).flatMap(w => {
+  const loader = /^(-r|--require|--import|--loader|--experimental-loader)=(.+)$/.exec(w);
+  return loader ? [loader[1]!, loader[2]!.replace(/^["']|["']$/g, "")] : [w.replace(/^(\.\/)?(.*\/)?node_modules\/\.bin\//, "")];
+});
 const RUNNER = /^(npm|yarn|pnpm|bun|npx|bunx|pnpx|run-s|run-p|npm-run-all2?|concurrently|turbo|nx|lerna)$/;
 /** Words after which the next word that is not a flag names a package to run. */
 const EXECUTES = /^(npx|bunx|pnpx|dlx|exec|x)$/;
@@ -161,9 +197,21 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
   const stages: Stage[] = [];
   const install = /\b(npm\s+(ci|install|i)\b|yarn(\s+install)?\s*($|--|-)|pnpm\s+(install|i)\b|bun\s+(install|i)\b)/;
   const global = /(^|\s)(-g|--global)(\s|$)|\byarn\s+global\b/;
-  const omits = /--omit[= ]dev|--only[= ]prod(uction)?\b|--production\b|--prod\b|(^|\s)-P(\s|$)|NODE_ENV=["']?production/;
-  const prunes = /\bnpm\s+prune\b.*(--omit[= ]dev|--production)|\bpnpm\s+prune\b.*--prod|\byarn\s+workspaces\s+focus\b.*--production/;
-  const lines = text.replace(/\\\r?\n/g, " ").split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith("#"));
+  const omits = /--omit[= ]dev|--only[= ]prod(uction)?\b|--production(?![= ]?false)\b|--prod(?![= ]?false)\b|(^|\s)-P(\s|$)/;
+  // Asks for devDependencies whatever NODE_ENV says (beyond section 2's text, in the safe direction).
+  const includes = /--include[= ]dev\b|--production[= ]?false\b|--prod[= ]?false\b/;
+  const prunes = /\bnpm\s+prune\b.*(--omit[= ]dev|--production(?![= ]?false))|\bpnpm\s+prune\b.*--prod(?![= ]?false)|\byarn\s+workspaces\s+focus\b.*--production/;
+  // Continuation lines are joined; a BuildKit heredoc (RUN <<EOF … EOF) becomes one RUN whose lines are its commands.
+  const lines: string[] = [], raw = text.replace(/\\\r?\n/g, " ").split(/\r?\n/);
+  for (let i = 0; i < raw.length; i++) {
+    const line = raw[i]!.trim();
+    if (!line || line.startsWith("#")) continue;
+    const doc = /^(RUN\b.*?)<<-?\s*["']?(\w+)["']?(.*)$/i.exec(line);
+    if (!doc) { lines.push(line); continue; }
+    const body: string[] = [];
+    for (i++; i < raw.length && raw[i]!.trim() !== doc[2]; i++) body.push(raw[i]!);
+    lines.push(`${doc[1]} ${doc[3]}\n${body.join("\n")}`);
+  }
   for (const line of lines) {
     const m = /^(\w+)\s+([\s\S]*)$/.exec(line);
     if (!m) continue;
@@ -183,8 +231,10 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (op === "RUN") {
       stage.commands.push(command); stage.runs.push(command);
       for (const segment of segmentsOf(command)) {
-        if (install.test(segment) && !global.test(segment) && !omits.test(segment) && !stage.production) stage.holds = true;
-        if (prunes.test(segment)) stage.holds = false;
+        // A command's own NODE_ENV=… wins over the stage's.
+        const own = /(?:^|\s)NODE_ENV=["']?([^\s"']*)/.exec(segment), production = own ? own[1] === "production" : stage.production;
+        if (install.test(segment) && !global.test(segment) && (includes.test(segment) || (!omits.test(segment) && !production))) stage.holds = true;
+        else if (prunes.test(segment)) stage.holds = false;
       }
     }
     if (op === "COPY" || op === "ADD") {
@@ -225,21 +275,40 @@ function fileCommands(file: string, text: string): string[] {
     const walk = (value: unknown, key: string) => {
       if (typeof value === "string") { if (COMMAND_KEY.test(key)) out.push(value); }
       else if (Array.isArray(value)) { if (COMMAND_KEY.test(key) && value.every(v => typeof v === "string")) out.push(value.join(" ")); else value.forEach(v => walk(v, key)); }
-      else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) walk(v, k);
+      else if (value && typeof value === "object") {
+        // pm2: `script` runs with its `args`.
+        const o = value as Record<string, unknown>, args = Array.isArray(o.args) ? o.args.join(" ") : o.args;
+        if (typeof o.script === "string" && typeof args === "string") out.push(`${o.script} ${args}`);
+        for (const [k, v] of Object.entries(value)) walk(v, k);
+      }
     };
     try { walk(JSON.parse(text), ""); } catch { return [text]; }
     return out;
   }
   if (/\.[cm]?[jt]s$/i.test(file)) {
-    // A pm2 ecosystem file: `script: 'x'`, `args: ['a', 'b']`, anywhere on a line.
+    // A pm2 ecosystem file: `script: 'x'`, `args: ['a', 'b']`, anywhere on a line, and each object's script with its args.
     const out: string[] = [];
-    for (const m of text.matchAll(/\b(\w+)\s*:\s*(?:(["'`])([^"'`\n]*)\2|\[((?:\s*["'`][^"'`\n]*["'`]\s*,?\s*)*)\])/g)) if (COMMAND_KEY.test(m[1]!)) out.push(m[3] ?? m[4]!);
+    const value = (m: RegExpMatchArray) => m[3] ?? m[4]!.replace(/["'`,]/g, " ");
+    const pair = /\b(\w+)\s*:\s*(?:(["'`])([^"'`\n]*)\2|\[((?:\s*["'`][^"'`\n]*["'`]\s*,?\s*)*)\])/g;
+    for (const m of text.matchAll(pair)) if (COMMAND_KEY.test(m[1]!)) out.push(value(m));
+    for (const o of text.matchAll(/\{[^{}]*\}/g)) {
+      const found = new Map([...o[0].matchAll(pair)].map(m => [m[1]!, value(m)]));
+      if (found.has("script") && found.has("args")) out.push(`${found.get("script")} ${found.get("args")}`);
+    }
     return out;
   }
   const toml = /\.toml$/i.test(file), out: string[] = [], lines = text.split(/\r?\n/);
+  const indent = (l: string) => l.length - l.trimStart().length;
   lines.forEach((line, i) => {
     const m = /^\s*-?\s*["']?([\w.-]+)["']?\s*[:=]\s*(.*?)\s*,?\s*$/.exec(line);
     if (!m || !(toml || COMMAND_KEY.test(m[1]!))) return;
+    // A YAML block scalar (`command: >` or `|`): the more-indented lines after it.
+    if (/^[>|][+-]?\d*$/.test(m[2]!)) {
+      const body: string[] = [];
+      for (const next of lines.slice(i + 1)) { if (next.trim() && indent(next) <= indent(line)) break; body.push(next.trim()); }
+      out.push(body.join("\n"));
+      return;
+    }
     if (m[2]) { out.push(m[2]); return; }
     // A YAML block list under the key: "command:" then "- npm", "- start".
     const items: string[] = [];
@@ -302,18 +371,16 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
           scripts.set(dir, pkg.scripts);
           for (const s of Object.values<unknown>(pkg.scripts)) if (typeof s === "string") for (const n of nodeModulesPaths(s)) seedFrom(file, n, `named by a node_modules path in ${file}'s scripts`);
         }
-        for (const field of ["babel", "postcss"] as const) if (pkg?.[field]) for (const n of configNames(JSON.stringify(pkg[field]), field)) seedFrom(file, n, `named by ${file} (${field})`);
+        for (const field of ["babel", "postcss"] as const) if (pkg?.[field]) for (const n of configNames(JSON.stringify(pkg[field]), field, pkg[field])) seedFrom(file, n, `named by ${file} (${field})`);
         continue;
       }
-      if (DOCKERFILE.test(file) && !/(^|\/)\.devcontainer\//.test(file)) {
-        const t = text(file);
-        if (t === null || !/^\s*FROM\s/im.test(t)) continue;
-        if (base.replace(/dockerfile|containerfile/ig, " ").split(/[\s._-]+/).some(w => /^(dev|development|test|tests|ci|e2e)$/i.test(w))) continue;
-        const image = dockerImage(t, ignores(`${dir}.dockerignore`) || ignores(`${file}.dockerignore`) || ignores(".dockerignore"));
+      // A Dockerfile is a file so named with a FROM line; any other file so named (src/dockerfile.ts) is read below as usual.
+      const dockerfileText = DOCKERFILE.test(file) && !/(^|\/)\.devcontainer\//.test(file) ? text(file) : null;
+      if (dockerfileText !== null && /^\s*FROM\s/im.test(dockerfileText) && !base.replace(/dockerfile|containerfile/ig, " ").split(/[\s._-]+/).some(w => /^(dev|development|test|tests|ci|e2e)$/i.test(w))) {
+        const image = dockerImage(dockerfileText, ignores(`${dir}.dockerignore`) || ignores(`${file}.dockerignore`) || ignores(".dockerignore"));
         if (image.holds) imagesWithDev.push(file);
         for (const c of image.production) production.push({ from: file, text: c });
         for (const c of image.build) build.push({ from: `${file} (a stage it copies from)`, text: c });
-        continue;
       }
       if (COMMAND_FILE.test(file)) {
         const t = text(file);
@@ -352,8 +419,9 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       const why = kind === "production" ? `${from} runs it` : `the build runs it (${from})`;
       // P6 does not make test runners, linters and formatters production.
       const use = (e: LockEntry) => { if (kind === "production" || !devTool(e.name)) seed(e, why); };
+      for (const n of nodeModulesPaths(text)) for (const e of byName.get(n) ?? []) use(e);
       for (const segment of segmentsOf(text)) {
-        const words = wordsOf(segment), runner = words.some(w => RUNNER.test(w));
+        const words = commandWords(segment), runner = words.some(w => RUNNER.test(w));
         let executes = false;
         for (const [k, w] of words.entries()) {
           for (const e of bins.get(w) ?? []) use(e);

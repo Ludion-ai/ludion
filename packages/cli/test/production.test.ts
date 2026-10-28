@@ -186,7 +186,7 @@ describe("production images and commands", () => {
 
 describe("reading imports", () => {
   it("names a package by its first segment and ignores relative, builtin, URL and alias specifiers", () => {
-    expect(["lodash/fp", "@scope/pkg/sub", "~bootstrap/scss/x", "pdfjs-dist/build/pdf.worker?worker", "./a", "/abs", "node:fs", "fs", "@/components", "~/x", "#imports", "$app/stores", "https://x.y/z", "virtual:pwa"].map(packageOf))
+    expect(["lodash/fp", "@scope/pkg/sub", "~bootstrap/scss/x", "pdfjs-dist/build/pdf.worker?worker", "./a", "/abs", "node:fs", "fs", "@/components", "~/x", "#imports", "$app/stores", "https://x.y/z", "virtual:pwa"].map(s => packageOf(s)))
       .toEqual(["lodash", "@scope/pkg", "bootstrap", "pdfjs-dist", null, null, null, null, null, null, null, null, null, null]);
   });
   it("reads static, dynamic and required imports and the JSX pragma, but not type-only imports", () => {
@@ -243,5 +243,73 @@ describe("the lockfile reader's extraneous folders", () => {
     expect(j.verdict).toBe("stop");
     expect(j.findings.some(f => f.gate === 4 && f.effect === "stop" && f.message.includes("extraneous"))).toBe(true);
     expect(renderJudgement(j)).toContain("without the source tree (no --source)");
+  });
+});
+
+describe("after #168's review: what section 2 calls production is not left out", () => {
+  /** Dev packages the root declares, plus `unused`, which must stay dev-only so the tree is read under D2. */
+  const lock = (names: string[], bins: Record<string, string> = {}) => lockOf(
+    { devDependencies: Object.fromEntries([...names, "unused"].map(n => [n, "^1"])) },
+    Object.fromEntries([...names, "unused"].map(n => [`node_modules/${n}`, { dev: true, ...(bins[n] ? { bin: { [bins[n]]: "cli.js" } } : {}) }])),
+  );
+  const left = (names: string[], files: Record<string, string>, bins: Record<string, string> = {}) => {
+    const out = devOnly(lock(names, bins), tree({ "package.json": "{}", ...files }));
+    expect(out).toContain("unused@1.0.0");
+    return out;
+  };
+  it("reads a code file named like a Dockerfile as source (1)", () => {
+    expect(left(["handlebars"], { "src/dockerfile.ts": "import Handlebars from 'handlebars';" })).not.toContain("handlebars@1.0.0");
+    expect(left(["js-yaml"], { "scripts/dockerfile-snippets.ts": "import yaml from 'js-yaml'" })).not.toContain("js-yaml@1.0.0");
+  });
+  it("does not let a type-only declaration swallow the next import (2)", () => {
+    expect(left(["some-ui"], { "src/a.ts": "export type Props = {\n  title: string\n}\nexport { Button } from 'some-ui'\n" })).not.toContain("some-ui@1.0.0");
+    expect(left(["foo"], { "src/a.ts": "// we import type helpers below\nimport x from 'foo'\n" })).not.toContain("foo@1.0.0");
+    expect(left(["types-only"], { "src/a.ts": "import type { A } from 'types-only';\nexport type { B } from 'types-only';\n" })).toContain("types-only@1.0.0");
+  });
+  it("reads literal imports with comments, apostrophes or no spaces (3)", () => {
+    const out = left(["chart.js", "pkg", "listed", "min"], {
+      "src/a.ts": "const c = await import(/* webpackChunkName: \"x\" */ 'chart.js');\nconst p = import(/* @vite-ignore */ \"pkg\");\n",
+      "src/b.ts": "import {\n  a, // don't remove\n  b,\n} from 'listed';\n",
+      "src/c.min.js": "import{a}from\"min\";",
+    });
+    for (const n of ["chart.js", "pkg", "listed", "min"]) expect(out).not.toContain(`${n}@1.0.0`);
+  });
+  it("counts builtin-named packages that a build tool's configuration names, but not builtin imports (4)", () => {
+    const out = left(["buffer", "process", "events"], {
+      "webpack.config.js": "module.exports = { resolve: { fallback: { buffer: require.resolve('buffer/') } }, plugins: [new webpack.ProvidePlugin({ process: 'process/browser' })] };",
+      "src/a.js": "import { EventEmitter } from 'events';",
+    });
+    expect(out).not.toContain("buffer@1.0.0");
+    expect(out).not.toContain("process@1.0.0");
+    expect(out).toContain("events@1.0.0");
+  });
+  it("finds full installs in a heredoc, under a command's own NODE_ENV, or with dev asked for (5)", () => {
+    expect(dockerImage("FROM node:22\nRUN <<EOF\nnpm ci\nnpm run build\nEOF\nCMD node server.js\n", false)).toMatchObject({ holds: true, production: expect.arrayContaining([expect.stringContaining("npm run build")]) });
+    expect(dockerImage("FROM node:22\nENV NODE_ENV=production\nRUN NODE_ENV=development npm ci && npm run build\n", false).holds).toBe(true);
+    expect(dockerImage("FROM node:22\nRUN npm ci --production=false\n", false).holds).toBe(true);
+    expect(dockerImage("FROM node:22\nENV NODE_ENV=production\nRUN npm ci --include=dev\n", false).holds).toBe(true);
+    expect(dockerImage("FROM node:22\nENV NODE_ENV=production\nRUN npm ci\n", false).holds).toBe(false);
+    expect(dockerImage("FROM node:22\nRUN NODE_ENV=production npm ci\n", false).holds).toBe(false);
+  });
+  it("reads --flag=value loaders and ./node_modules/.bin commands (6)", () => {
+    expect(left(["tsx"], { "package.json": JSON.stringify({ scripts: { start: "node --import=tsx src/server.ts" } }) })).not.toContain("tsx@1.0.0");
+    expect(left(["dotenv"], { "package.json": JSON.stringify({ scripts: { start: "node --require=dotenv/config server.js" } }) })).not.toContain("dotenv@1.0.0");
+    expect(left(["serve"], { "package.json": JSON.stringify({ scripts: { start: "./node_modules/.bin/serve -s build" } }) }, { serve: "serve" })).not.toContain("serve@1.0.0");
+  });
+  it("reads every item of a stylesheet import list and skips Less options (7)", () => {
+    expect(styleSpecifiers("@import 'bootstrap/scss/functions', 'animate.css';\n@import (reference) '~lesslib/x.less';")).toEqual(["bootstrap/scss/functions", "animate.css", "~lesslib/x.less"]);
+    const out = left(["animate.css", "lesslib"], { "src/a.scss": "@import 'x/y', 'animate.css';", "src/b.less": "@import (reference) '~lesslib/x.less';" });
+    expect(out).not.toContain("animate.css@1.0.0");
+    expect(out).not.toContain("lesslib@1.0.0");
+  });
+  it("reads YAML block-scalar commands and pm2's script with its args (8)", () => {
+    expect(left(["tsx"], { "docker-compose.yml": "services:\n  api:\n    command: >\n      tsx src/server.ts\n    ports:\n      - 3000\n" }, { tsx: "tsx" })).not.toContain("tsx@1.0.0");
+    const pm2 = { "ecosystem.config.js": "module.exports = { apps: [{ name: 'web', script: 'npm', args: 'run serve' }] };", "package.json": JSON.stringify({ scripts: { serve: "serve -s build" } }) };
+    expect(left(["serve"], pm2, { serve: "serve" })).not.toContain("serve@1.0.0");
+  });
+  it("matches test folder names as written, reads node_modules paths anywhere in build configuration, and walks package.json fields", () => {
+    expect(left(["foo"], { "Test/helper.ts": "import 'foo';" })).not.toContain("foo@1.0.0");
+    expect(left(["icons"], { "electron-builder.yml": "extraResources:\n  - from: node_modules/icons/dist\n" })).not.toContain("icons@1.0.0");
+    expect(left(["babel-plugin-x"], { "package.json": JSON.stringify({ babel: { presets: [["env", { note: "it's" }]], plugins: ["x"] } }) })).not.toContain("babel-plugin-x@1.0.0");
   });
 });

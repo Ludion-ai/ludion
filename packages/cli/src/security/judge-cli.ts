@@ -23,6 +23,7 @@ export async function judgeCli(args: string[]): Promise<number> {
   const files = values.files !== undefined ? values.files.split(",").map(f => f.trim()).filter(Boolean) : null;
   const now = values.now ? new Date(values.now) : new Date();
   if (!Number.isFinite(now.getTime())) throw new Error("--now must be an ISO date.");
+  // pnpm: --source is not read; every changed version counts as production (pnpmChanges).
   if (!existsSync(join(after, "package-lock.json")) && existsSync(join(after, "pnpm-lock.yaml"))) return pnpm(read(before, "pnpm-lock.yaml"), read(after, "pnpm-lock.yaml"), JSON.parse(read(after, "package.json")), files, now, !!values.json);
   const beforeLock = read(before, "package-lock.json"), afterLock = read(after, "package-lock.json");
   const beforeManifest = read(before, "package.json"), afterManifest = read(after, "package.json");

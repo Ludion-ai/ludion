@@ -816,6 +816,17 @@ From that review's non-blocking findings:
 
 Known and kept: when a later head no longer changes `package-lock.json`, judge.yml does not run, and the earlier comment stays. That comment names the head it judged.
 
+## 2026-10-28 (cycle 2) — Dependabot feeds the judge
+
+The owner chose C1. With it, `.github/dependabot.yml` gives the judge on this repository (judge.yml, from the designer's C-1) real dependency PRs. There was no Dependabot configuration before. It covers npm version updates, checked weekly, with at most 5 open PRs at a time.
+
+Chosen here:
+
+- **`directory: /` only.** That is the root lockfile, the one judge.yml judges; the workspaces are locked in it. `examples/npm-security` is a fixture and is left alone.
+- **Everything else is Dependabot's default**: the day of the week, one PR per dependency (no groups), the default cooldown for version updates (3 days since 2026-07-14; design, "既存ツールとの差"), and the default versioning strategy and labels.
+- **The limit of 5 is on version updates.** Security updates are a repository setting, and the limit does not count them.
+- **The file only lets Dependabot open PRs.** Nothing in it merges one.
+
 ## 2026-10-28 — Composer plans also read Packagist's advisories
 
 The owner asked that Composer planning read Packagist's advisories as well as OSV, and take the later of the two fixed versions. Packagist's advisory API (`https://packagist.org/api/security-advisories/`, the source `composer audit` uses) carries FriendsOfPHP and vendor feeds, which can be published before OSV has them or end a range at a later fix.
@@ -968,17 +979,6 @@ Two limits are kept:
 
 Backtest v4 uses the exception as amended here.
 
-## 2026-10-28 (cycle 2) — Dependabot feeds the judge
-
-The owner chose C1. With it, `.github/dependabot.yml` gives the judge on this repository (judge.yml, from the designer's C-1) real dependency PRs. There was no Dependabot configuration before. It covers npm version updates, checked weekly, with at most 5 open PRs at a time.
-
-Chosen here:
-
-- **`directory: /` only.** That is the root lockfile, the one judge.yml judges; the workspaces are locked in it. `examples/npm-security` is a fixture and is left alone.
-- **Everything else is Dependabot's default**: the day of the week, one PR per dependency (no groups), the default cooldown for version updates (3 days since 2026-07-14; design, "既存ツールとの差"), and the default versioning strategy and labels.
-- **The limit of 5 is on version updates.** Security updates are a repository setting, and the limit does not count them.
-- **The file only lets Dependabot open PRs.** Nothing in it merges one.
-
 ## 2026-10-28 — After #151's post-merge review
 
 #151 was merged at f78c931 without a review recorded for that head. A fresh-context review of the full diff afterwards approved it with three non-blocking findings (the verdict is on #151 with `reviewed-sha: f78c931…`). Decided:
@@ -1117,6 +1117,10 @@ It changes no result.
 - **action.yml at the root**, two modes for two jobs, split like judge.yml and judge-comment.yml. Mode judge: pull_request, `contents: read`. It reads the PR's files as data through the API, so it needs no checkout, and runs the bundled judge. With a read token this should also work on private repositories, but only this public repository was tried. Mode comment: workflow_run, `pull-requests: write`. It uses judge-comment.yml's checks, copied to action/*.jq, with the judge workflow's path as an input.
 - **Only a release commit carries the bundle.** packages/cli/dist/cli.js and action/dist/record.js (`node action/build.ts`, which bundles .github/judge/record.ts) are not on main. On any other commit the action stops with an error and does not build. The release steps are in docs/bench/dogfood/prepublish-checklist.md.
 - `files` in packages/cli is narrowed to `dist/cli.js`. The dogfood measurement has no gate; its definitions were committed first (4c441d0).
+
+## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
+
+The owner chose E1 and E2. CLAUDE.md and docs/protected-paths.md now say that every review is posted on its PR ending `reviewed-sha:`, and that a review with no such record is never reported. CLAUDE.md also says that agents never merge a dependency-update PR (Dependabot, Renovate and the like), nor any PR an agent did not open. The same protected PR (#166) handles #156's findings N1–N7, #158's N1–N8 (N8, the length, is left as that review allows) and #157's findings 5 and 6. After #166's first review (B1), the required `protected-paths` check passes only when the latest review of the current head approves on its first line. The two Dependabot entries above were moved, unchanged, to follow the judge's entries. How each finding was handled: docs/bench/2026-10-28-l3-protected/README.md.
 
 ## 2026-10-28 (cycle 3) — Backtest v5: archives as signal sources, and the disputed category
 

@@ -1,0 +1,25 @@
+typecheck exit=0
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 23 passed (27)
+   Start at  11:34:23
+   Duration  1.05s (transform 61ms, setup 0ms, import 99ms, tests 859ms, environment 0ms)
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  4 failed | 233 passed (237)
+   Start at  11:34:25
+   Duration  1.12s (transform 714ms, setup 0ms, import 1.17s, tests 1.17s, environment 1ms)
+
+ Test Files  1 passed (1)
+      Tests  27 passed (27)
+   Start at  11:34:38
+   Duration  1.77s (transform 61ms, setup 0ms, import 93ms, tests 1.60s, environment 0ms)
+
+ Test Files  8 passed (8)
+      Tests  237 passed (237)
+   Start at  11:34:40
+   Duration  1.89s (transform 864ms, setup 0ms, import 1.26s, tests 1.95s, environment 0ms)

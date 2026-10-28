@@ -1,0 +1,10 @@
+# Merge head 385cf738cb71143f861a20aded6768422f6a0c25 (d542094 + origin/main 75622bd), copied with git archive into a Docker volume.
+# npm ci --ignore-scripts --no-audit --no-fund with network, then --network none --read-only --tmpfs /tmp:exec, user node, image node:24-slim with jq, unzip and git added.
+# Same commands as check-b1.sh without its mutations.
+node v24.22.1, jq jq-1.6
+typecheck exit=0
+ Test Files  1 passed (1)
+      Tests  31 passed (31)
+ Test Files  8 passed (8)
+      Tests  241 passed (241)
+actionlint 1.7.12, --network none, repository mounted read-only, on protected-paths.yml, judge.yml, judge-comment.yml: exit=0

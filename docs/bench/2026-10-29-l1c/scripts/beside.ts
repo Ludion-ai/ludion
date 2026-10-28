@@ -30,7 +30,10 @@ for (const r of noise.rows) {
   // The measurement read package.json and package-lock.json from raw.githubusercontent.com at the same SHA; the
   // archive of that SHA holds the same files.
   if (!has) { repos.push({ repo: r.repo, measured: r.ludion.count, recomputed: null, note: "no source tree: not recomputed" }); total += r.ludion.count; continue; }
-  const lockText = readFileSync(join(dir, "package-lock.json"), "utf8"), manifest = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+  // An archive can leave the two files out (export-ignore); then they come from /lock/<owner>__<repo>/, fetched from
+  // raw.githubusercontent.com at the same SHA, as the measurement read them.
+  const at = (file: string) => existsSync(join(dir, file)) ? join(dir, file) : join("/lock", r.repo.replace("/", "__"), file);
+  const lockText = readFileSync(at("package-lock.json"), "utf8"), manifest = JSON.parse(readFileSync(at("package.json"), "utf8"));
   const split = productionSplit(lockText, source, manifest);
   const vulnerable: { name: string; versions: string[] }[] = [...r.ludion.production, ...r.ludion.dev_only];
   const prod = vulnerable.filter(v => [...split.copies.values()].some((c: any) => c.name === v.name && v.versions.includes(c.version) && c.production)).map(v => v.name);

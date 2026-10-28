@@ -360,11 +360,17 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (op === "COPY" || op === "ADD") {
       const parts = wordsOf(arg), from = parts.find(p => /^--from=/i.test(p))?.slice(7);
       const sources = parts.filter(p => !p.startsWith("--")).slice(0, -1);
-      const strip = (p: string) => p.replace(/\/+$/, "") || "/";
+      // A path as a folder: no repeated or trailing slashes and no `.` segments; "" is the root (or the context's root).
+      const folderOf = (p: string) => p.replace(/\/+/g, "/").replace(/(^|\/)\.(?=\/|$)/g, "").replace(/\/+$/, "");
       // One package's folder out of node_modules holds that package (and what is nested in it), not every devDependency.
-      // Not for ADD, which can unpack an archive. The whole working folder, `/` or `.` still holds them, whatever its path.
+      // Not for ADD, which can unpack an archive. The root, the working folder or a folder above it still holds them,
+      // whatever its path.
       const folders = sources.map(s => op === "COPY" ? packageFolder(s) : null);
-      const holdsAll = (s: string, k: number, workdir: string | null) => (folders[k] === null && /node_modules/.test(s)) || /^(\.|\.\/)$/.test(s) || (workdir !== null && (s === "/" || strip(s) === strip(workdir)));
+      const holdsAll = (s: string, k: number, workdir: string | null) => {
+        if (folders[k] === null && /node_modules/.test(s)) return true;
+        const n = folderOf(s), w = workdir === null ? null : folderOf(workdir);
+        return n === "" || (w !== null && (n === w || w.startsWith(`${n}/`)));
+      };
       if (from !== undefined) {
         const source = named.get(from.toLowerCase()) ?? (/^\d+$/.test(from) ? stages[Number(from)] : undefined);
         if (source) {
@@ -484,18 +490,20 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
   const seeds = new Map<string, string>();
   /** node_modules paths that are links (workspaces, `file:`). A COPY follows the link, so such a folder is not known. */
   const linked = new Set(Object.keys(lock).filter(p => p.includes("node_modules/") && lock[p]?.link));
-  /** Install and link paths by their last folder name (`node_modules/a/node_modules/@s/b` under `@s/b`), built when first needed. */
+  /** Install and link paths by their part from the first node_modules on (`packages/api/node_modules/a` under `node_modules/a`), built when first needed. */
   let byFolder: Map<string, string[]> | null = null;
   const folderPaths = () => {
     if (!byFolder) {
       const map = new Map<string, string[]>();
-      for (const p of [...entries.map(e => e.path), ...linked]) add(map, p.slice(p.lastIndexOf("node_modules/") + "node_modules/".length), p);
+      for (const p of [...entries.map(e => e.path), ...linked]) add(map, p.slice(p.indexOf("node_modules/")), p);
       byFolder = map;
     }
     return byFolder;
   };
   /** The lockfile paths a held folder (`node_modules/a`, see packageFolder) is: at that path in the root or in a project folder. */
-  const heldPaths = (f: string) => (folderPaths().get(f.slice(f.lastIndexOf("node_modules/") + "node_modules/".length)) ?? []).filter(p => p === f || (p.endsWith(`/${f}`) && !p.slice(0, p.length - f.length).includes("node_modules/")));
+  const heldPaths = (f: string) => folderPaths().get(f) ?? [];
+  /** Whether a path, or a package folder it is nested in, is a link: a COPY of it follows the link. */
+  const throughLink = (p: string) => { for (let q = p; ; ) { if (linked.has(q)) return true; const up = q.lastIndexOf("/node_modules/"); if (up < 0) return false; q = q.slice(0, up); } };
   const seed = (e: LockEntry | undefined, why: string) => { if (e && !seeds.has(e.path)) seeds.set(e.path, why); };
   /** What a file at `file` loads for `name`: the nearest node_modules up its path, else every installed copy of that name. */
   const seedFrom = (file: string, name: string | null, why: string) => {
@@ -547,7 +555,7 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
         let unmatched = false;
         for (const f of image.held) {
           const at = heldPaths(f);
-          if (!at.length || at.some(p => linked.has(p))) unmatched = true;
+          if (!at.length || at.some(throughLink)) unmatched = true;
           else for (const p of at) if (!heldBy.has(p)) heldBy.set(p, file);
         }
         if (unmatched && !image.holds) { imagesWithDev.push(file); unmatchedImages.add(file); }

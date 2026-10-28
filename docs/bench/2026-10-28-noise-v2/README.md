@@ -156,7 +156,7 @@ So the 1fa3d68 premise, that every fix only adds production, did not hold. `besi
   - The YAML readers, the heredoc's closing line and the `FROM` chain use loops and lookups.
   - The pnpm comment says no split is made.
 - **The tests.** With that describe block run alone, the A–C tests fail on 6c4f58e's `production.ts`: 3 failed, and the pnpm test passed (it exercises judge.ts). The whole file was not run against 6c4f58e: its new 40k-repetition timing test did not finish there in several minutes. At 9313aa2, production.test.ts has 40 tests, all passing.
-- **What "linear" rests on now.** A test runs the review's crafted inputs at 40,000 repetitions, a crafted call at 1 MB of whitespace and 1 MB of an unclosed string, and a 16,000-stage `FROM` chain. Each must finish under 1 to 1.5 s, and in Docker the whole file took 308 ms. That is a bound on these inputs, not a proof for every input. Only the readers listed above were made linear. Following scripts stayed quadratic in the number of scripts until the change after the second delta review (below).
+- **What "linear" rests on now.** A test runs the review's crafted inputs at 40,000 repetitions, a crafted call at 1 MB of whitespace and 1 MB of an unclosed string, and a 16,000-stage `FROM` chain. Each must finish under 1 to 1.5 s, and in Docker the whole file took 308 ms. That is a bound on these inputs, not a proof for every input. Only the readers listed above were made linear. Following scripts stayed quadratic in the number of scripts until 8e25891 (below), and it is still quadratic in the number of package.json files that share a script name (see the last section).
 - **The third execution** ran at 9313aa2, from its own volume (`ludion-l1-run3`) that nothing else wrote to during the run. Its output is in `result-final/`.
 
 - It ran detached at 9313aa2, 14:00:45Z–14:16:17Z, and exited 0. No repository failed or needed a second attempt.
@@ -184,11 +184,7 @@ So the 1fa3d68 premise, that every fix only adds production, did not hold. `besi
 - The comment skip has no cap. Where skipping ends is remembered for every position passed, so it stays linear.
 - Each stylesheet clause is read both as written and line by line, never past the next at-rule.
 
-These changes were meant only to add readings to 9313aa2's. #168's second delta review found that this does not hold in general:
-- 9cd7ebc's `limit` ended a stylesheet clause at an at-rule inside a quoted string (`@import "a @import b", "pkg";`), which 9313aa2 had read;
-- an `@` in a comment inside a list ended the clause in both 9313aa2 and 9cd7ebc.
-
-Both cases are contrived. The reviewer ran c381a85's, 6c4f58e's, 9313aa2's and 9cd7ebc's readers over all 101 source trees. Every package an earlier version read, 9cd7ebc also read, except six that section 2 says are not imports (five `import type` lines, one quoted word in a `.sass` comment). No version left out at 9cd7ebc was production in an earlier version. 9cd7ebc was not run on the sample. At 9cd7ebc, production.test.ts has 41 tests, all passing.
+These changes were meant only to add readings to 9313aa2's. #168's second delta review found one case where this does not hold: 9cd7ebc's `limit` ended a stylesheet clause at an at-rule inside a quoted string (`@import "a @import b", "pkg";`), which 9313aa2 had read. The case is contrived. (That review also named `@import 'a', /* @use x */ 'pkg';`; the third delta review corrected this after a probe. The inner `@use` rule's own clause reads `pkg` in 9313aa2, 9cd7ebc and later. Only c381a85 misses it.) The reviewer ran c381a85's, 6c4f58e's, 9313aa2's and 9cd7ebc's readers over all 101 source trees. Every package an earlier version read, 9cd7ebc also read, except six that section 2 says are not imports (five `import type` lines, one quoted word in a `.sass` comment). No version left out at 9cd7ebc was production in an earlier version. 9cd7ebc was not run on the sample. At 9cd7ebc, production.test.ts has 41 tests, all passing.
 
 ## After #168's second delta review
 
@@ -196,15 +192,21 @@ The second delta review (at f44f7ae) found:
 - **One regression against 6c4f58e (blocking).** A heredoc delimiter that is not a `\w` word (`<<END-SCRIPT`, `<<'EOF.sh'`) was not seen, so a `RUN npm ci` inside it was missed.
 - An unquoted list on one line (`@import bourbon, neat`) gave only its first item.
 - Following scripts was quadratic in the number of scripts: 4,000 scripts took 19 s.
-- The `limit` and comment cases above.
+- The `limit` case above.
 
-The fixes, in the commit after f44f7ae:
+The fixes, in 8e25891:
 - The delimiter is read as one shell word, quoted or not, and the closing-line rule stays.
 - An unquoted list gives every item.
 - Scripts are looked up by name, and a glob is expanded once.
 - A stylesheet clause runs to the next at-rule outside quotes and comments, and jumps over comments while still reading what they quote.
 
-Each of these only adds readings to f44f7ae's, or keeps them, and the new test fails on f44f7ae's `production.ts`. The fixes were not run on the sample.
+The new test fails on f44f7ae's `production.ts`. Run alone there, it stops at its first failing assertion, the heredoc one. The third delta review's probes showed that the unquoted-list, quoted-`@import` and 4,000-script assertions fail there too. The `/* @use x */` assertion passes on f44f7ae as well, so it guards nothing.
+
+The third delta review (at 0729fa6, APPROVE) re-ran every version's reader and split over the 101 source trees, with 8e25891 included. Every package an earlier version read, 8e25891 also reads, except the six that section 2 excludes. No version left out at 8e25891 was production in an earlier version. 8e25891 was not run as a noise execution: no npm audit or OSV.
+
+**Known gaps** (third delta review, non-blocking, not fixed here):
+- Following scripts is still quadratic in the number of package.json files that share a script name: 20,000 files with a `build` script take 84 s. This predates the PR.
+- An apostrophe in a comment inside a stylesheet list (`@import 'a', /* don't */ 'pkg';`) hides the later items, in every version, because quotes are paired across the comment.
 
 ## Both gates
 

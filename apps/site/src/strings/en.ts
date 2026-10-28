@@ -136,7 +136,7 @@ export const en = {
     "supportedNote": "Yarn/pnpm discovery is partial and does not enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP and automatic production deployment are not supported in this preview. Custom build tools may need an explicitly trusted offline cache."
   },
   "footer": {
-    "license": "Code is Apache-2.0. Legacy lesson data is CC BY 4.0.",
+    "license": "Code is Apache-2.0.",
     "github": "GitHub",
     "analytics": "This site uses Google Analytics."
   },

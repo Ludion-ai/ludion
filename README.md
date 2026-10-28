@@ -9,11 +9,11 @@ Ludion detects known fixes, acquires dependencies, tests the original and update
 | PHP packages | Composer lockfile + OSV | Pinned public ZIP archives; standard vendor directory; no custom repositories or policy overrides |
 | Java / Maven | Resolved direct/transitive dependency graph + OSV | Standalone POM, public Central; no parents, profiles, modules, extensions or custom repositories |
 
-Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP, same-tag OS-image rebuilds, EOL certification and automatic production deployment remain unsupported. No matching finding is a security guarantee. Missing metadata and incomplete inventories remain visible.
+Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP, same-tag OS-image rebuilds, EOL certification and automatic production deployment remain unsupported. An empty result is not a security guarantee. Missing metadata and incomplete inventories remain visible.
 
 ## Run the source preview
 
-The published npm ludion-ai 0.1.4 release is the earlier assistant-context product. These commands require building this repository, Node 24 and a local Docker daemon; no npm release is implied.
+The published npm ludion-ai 0.1.4 release is the earlier lesson product, which ended on 2026-10-28. These commands require building this repository, Node 24 and a local Docker daemon; no npm release is implied.
 
 ```sh
 npm ci

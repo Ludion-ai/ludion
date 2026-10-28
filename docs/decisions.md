@@ -640,7 +640,7 @@ Still open from #137's review: the `docker build` flags (N1) are written in `pat
 
 ## 2026-10-28 — The lesson product is deleted from main
 
-Cleanup PR-C in `docs/design.md`. Main at `3bd1de1` is tagged `archive/lessons-2026-10-27`; everything below can be restored from it.
+Cleanup PR-C in `docs/design.md`. Main at `3bd1de1` is tagged `archive/lessons-2026-10-27`; everything below can be restored from it, except the last edits #137–#139 made to six files before deleting them (`tools/verify/src/{docker,cli,pr-cli}.ts`, `tools/verify/test/docker.test.ts`, `packages/cli/src/teach.ts`, `tools/seed/src/steps.ts`): those are in main's history before PR-C.
 
 Deleted: `packages/core`, `packages/capability`, `tools/seed`, `tools/bench`, `tools/verify`, `lessons/`, `LICENSE-LESSONS`, `plugin/`, `.claude-plugin/`, `video/`, the CLI's `sync` and `teach` (ledger, match, publish, render, shards, teach), the site's lesson data, design samples and index pages, the Worker's MCP server and index counting, the `reverify`, `seed-watch` and `verify` workflows, and the docs except `decisions.md`, `progress.md`, `design.md`, `protected-paths.md` and the two 2026-10-27 security evidence folders (they are the new product's evidence).
 
@@ -656,3 +656,7 @@ The deploy check (`tools/check-production.ts`) now waits for `/build.json` (a ne
 The repository guard on starting containers now scans `tools/`, every `packages/*/src` and every `apps/*/src` (before: `tools/verify/src` and `packages/*/src`), and `packages/sandbox/src/docker.ts` is its only builder. `tools/verify/` and `lessons/` stay in the protected-path pattern, so bringing either back needs the same review.
 
 The required status check `verify` is gone with its workflow. Branch protection on main still lists it, so this PR cannot merge until the owner removes `verify` from the required checks.
+
+## 2026-10-28 — CLAUDE.md follows the design (cleanup PR-D)
+
+CLAUDE.md now carries the design's rules instead of the PHP-preview wording: the one goal and its two measures (exposure time, human minutes per fix), the four gates and "undecidable stops", the waiting times, the seven rules that keep Ludion from becoming the attack path, and that candidate code runs only through `packages/sandbox`. The lesson product's end and the tag are one line. The site drops its last lesson-era copy (CC BY lesson licence, sync counting). Publishing the npm deprecation of 0.1.x (design step 7) is left to the owner: it needs an npm login, and whether `ludion-ai` is reused is one of the owner's open decisions.

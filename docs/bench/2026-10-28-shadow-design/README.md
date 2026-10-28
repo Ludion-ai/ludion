@@ -58,26 +58,30 @@ Measured today: 7,660 distinct names. **Ludion-ai/ludion-sandbox is an empty rep
 **2.4 Daily OSV.** Once a day, download `https://osv-vulnerabilities.storage.googleapis.com/npm/modified_id.csv`. Its lines are `<modified>,<id>`, newest first ([OSV data dumps](https://google.github.io/osv.dev/data/)), so it is read until the last processed time. Then fetch each new or modified `MAL-` record from `api.osv.dev/v1/vulns/<id>`. Nothing about the watched set is sent; the judge's own OSV queries stay names and versions only.
 
 **2.5 Replay.** A MAL- record that names a watched package's version V starts a replay, if V was captured:
-- **The judgement.** The judge's rules (the same functions `ludion judge` uses, at a pinned commit) run on the captured facts as they stood at T + w, for each wait w of the table. T is V's publish time. The re-query at the wait's end sees a MAL- record only if it was published by T + w, and sees deprecation or removal only if a capture before T + w showed it.
+- **The judgement.** The judge's rules (the same functions `ludion judge` uses, at a pinned commit) run on the captured facts once per urgency row u of the table (exploited, high, normal, low), as the backtests do (tools/backtest/src/malicious-v5.ts, `wait` and `young`). Within each row:
+  - Urgency is set to u, not taken from the judge's `urgencyOf`. A plain version update fixes nothing, so the judge would give it normal or low; the replay asks what happens if V comes with a fix of urgency u.
+  - Rule 2's young-dependency threshold is WAIT_HOURS[u].
+  - The row's wait W is the backtests': WAIT_HOURS[u]; 24h for exploited when the versions cannot be compared or in scenario (a); and max(2 × w, 72h) when the wait is extended (scenario (a), a publisher change, new dependencies, or prev no longer listed).
+  - The judgement is made as of T + W, where T is V's publish time. The re-query at that moment sees a MAL- record only if it was published by T + W, and sees deprecation or removal only if a capture before T + W showed it.
 - **The scenarios.** As in the backtests: (b) P locked at its version in a watched lockfile, updated to V, once per distinct prev; (a) V added as a new package.
-- **The outcome per wait.**
-  - **Stopped**: at T + w, the judge's verdict is `stop` or `undecidable`. The judge stops on what it cannot judge, so an undecidable verdict would not have been merged.
-  - **Missed**: at T + w, the verdict is `ready_except_build` or `wait`, so no stop finding exists by then. A version update that fixes nothing gets urgency normal (72h) or low (168h) from the judge (judge.ts, `urgencyOf`), and an extend finding doubles its wait. So at 12h and 24h the verdict is usually `wait`. Here that counts as missed: it means nothing would have stopped V had it come with a fix whose wait is w. This is the backtests' per-wait question.
-  - **Also shown, not counted:** the verdict at the judge's own `wait_until`, the urgency it gave, and any extension.
+- **The outcome per row.**
+  - **Stopped**: at T + W, the judge's verdict is `stop` or `undecidable`. The judge stops on what it cannot judge, so an undecidable verdict would not have been merged.
+  - **Missed**: at T + W, the verdict is `ready_except_build`: no stop finding exists by the row's wait end. With urgency and wait set per row, the verdict at T + W is never `wait`.
+  - **Also shown, not counted:** the verdict with the judge's own urgency at its own `wait_until`.
   - A V the shadow never captured, because it was removed before the first capture or a poll failed, is a **capture gap**, reported as unknown.
 - **Recording.** Each replay writes the judge's findings and the hashes of the captures it read.
 
 This framing is harsher than the backtests in one way. A malicious version reaches a project here through a direct update to it, as a Dependabot version update proposes. The backtests' most frequent stop, "no fix selects it" (1,033 of 1,039 stops at 24h in v5), does not apply.
 
-**2.6 Judging every captured version, for the count.** Condition (b) needs at least 100 decided judgements, so every captured version of a watched package is also judged at each wait's end, in scenario (b), against each distinct prev in the watched lockfiles. At each wait, "decided" is any verdict except `undecidable`: `stop`, `ready_except_build` or `wait`, mapped as in 2.5. An `undecidable` verdict is counted and shown, but not as decided. The estimate in section 5 is about 27,000 captured versions in four weeks, so the count itself is not the hard part.
+**2.6 Judging every captured version, for the count.** Condition (b) needs at least 100 decided judgements, so every captured version of a watched package is also judged in each urgency row, in scenario (b), against each distinct prev in the watched lockfiles. In each row, "decided" is `stop` or `ready_except_build` at T + W, as in 2.5. An `undecidable` verdict is counted and shown, but not as decided. The estimate in section 5 is about 27,000 captured versions in four weeks, so the count itself is not the hard part.
 
 ## 3. Proposed counting for (b), to be fixed in decisions.md before the shadow starts
 
 None of this is fixed yet. The decisions entry says these details are fixed in that file before the shadow starts.
 - **Start.** The four weeks start at the first poll after the watched set is frozen and the code commit is recorded. A day with no successful poll ends the run of consecutive weeks. The gap is reported, and the count restarts.
-- **Unit.** One version V of a watched package, per wait. A replay over several lockfiles is one unit; its outcome is missed if any scenario or prev misses it.
-- **Miss for (b).** A version named by a MAL- record published before the four weeks end plus 168h, whose outcome is missed at any wait. **A capture gap on such a version also counts as a miss**, because nothing can show that the judge would have stopped it.
-- **Decided.** At least 100 versions with a decided verdict at every one of the four waits.
+- **Unit.** One version V of a watched package, per urgency row. A replay over several lockfiles is one unit; its outcome is missed if any scenario or prev misses it.
+- **Miss for (b).** A version named by a MAL- record published before the four weeks end plus 168h, whose outcome is missed in any row. **A capture gap on such a version also counts as a miss**, because nothing can show that the judge would have stopped it.
+- **Decided.** At least 100 versions with a decided verdict in every one of the four rows.
 - **What is shown next to the gate.**
   - the number of MAL- records that named a watched version during the window;
   - capture lag (`fetched_at − published`), as a median and at p90;
@@ -127,15 +131,15 @@ Each line is arithmetic on section 4's measurements, not a measurement of the sh
 | Over four weeks | about 27,100 (18,700) | × 28 |
 | Stored per version | about 15.8 KB | 3,532 + 0.820 × 14,964 bytes |
 | Stored per day (versions) | about **15.3 MB** uncompressed | 968 × 15.8 KB; compression not measured |
-| Four weeks / one year | about 430 MB / 5.6 GB | × 28 / × 365 |
+| Four weeks / one year (versions only) | about 430 MB / 5.6 GB | × 28 / × 365 |
 | `time` maps: the first capture of each watched name, and the new entries after it | not measured (the `time` maps were not sized). Not in the 15.3 MB above | — |
 | Registry reads per day | about 968 packuments + 794 attestations at most | one packument per change event, attestations at 82.0% |
-| Packument download per day | about 82 MB at the median size, 1.36 GB at the p90 size. Neither is a bound: names that publish often tend to have large packuments, and the mean was not measured | 968 × 84.5 KB; 968 × 1.41 MB; not stored |
+| Packument download per day | about 82 MB at the median size, 1.36 GB at the p90 size. Neither is a bound: names that publish often may have large packuments (not measured), and the mean was not measured | 968 × 84.5 KB; 968 × 1.41 MB; not stored |
 | Feed reads per day | about 122,000 entries, 12.7 MB | 1.41/s × 86,400 × 104.6 bytes; low confidence |
 | OSV per day | 8.7 MB of `modified_id.csv`, about 35 record reads | 976 / 28 |
 | Replays per day | about 0.06 (22 records a year) | 22 / 365 |
 
-How long to keep captures: a MAL- record can come long after publication. @ensdomains/buffer 0.1.1 was named 24,006.8 hours later (backtest v4). So 90-day artifact retention is not enough. The proposal is to keep everything for the shadow plus at least 90 days, about 1.8 GB at the rate above (118 days × 15.3 MB), and to decide longer retention with the owner.
+How long to keep captures: a MAL- record can come long after publication. @ensdomains/buffer 0.1.1 was named 24,006.8 hours later (backtest v4). So 90-day artifact retention is not enough. The proposal is to keep everything for the shadow plus at least 90 days, about 1.8 GB of version data at the rate above (118 days × 15.3 MB), plus the `time` maps, which were not sized, and to decide longer retention with the owner.
 
 ## 6. Where it could run: options for the owner
 
@@ -143,9 +147,9 @@ The npm registry's rate limits for these reads are **not known**: no public numb
 
 | | A. GitHub Actions, scheduled, public repository | B. Cloudflare Worker, Cron Trigger, R2 | C. B for capture, A for OSV and replay |
 | --- | --- | --- | --- |
-| **Cost** | $0: "free … for public repositories that use standard GitHub-hosted runners" ([billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)). A private repository has 2,000 minutes a month, and a poll every 5 minutes is 8,640 runs a month, so it does not fit | Workers Paid: "minimum charge of $5 USD per month for an account". It includes 10 million requests and 30 million CPU ms ([pricing](https://developers.cloudflare.com/workers/platform/pricing/)). R2 at 15.3 MB/day stays in the free 10 GB-month for about 650 days, and one object per run is 8,640 Class A operations a month against 1 million free ([R2 pricing](https://developers.cloudflare.com/r2/pricing/)). Whether the account is already on Workers Paid is **not known** | B's cost plus A's |
+| **Cost** | $0: "free … for public repositories that use standard GitHub-hosted runners" ([billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)). A private repository has 2,000 minutes a month, and a poll every 5 minutes is 8,640 runs a month, so it does not fit | Workers Paid: "minimum charge of $5 USD per month for an account". It includes 10 million requests and 30 million CPU ms ([pricing](https://developers.cloudflare.com/workers/platform/pricing/)). R2 at 15.3 MB/day (versions only) stays in the free 10 GB-month for about 650 days, and one object per run is 8,640 Class A operations a month against 1 million free ([R2 pricing](https://developers.cloudflare.com/r2/pricing/)). Whether the account is already on Workers Paid is **not known** | B's cost plus A's |
 | **Free plan?** | — | No. The free plan allows 10 ms CPU per Cron Trigger and 50 subrequests ([limits](https://developers.cloudflare.com/workers/platform/limits/)), and parsing one 1.4 MB packument likely needs more (not measured) | — |
-| **Storage** | Commits to a data branch or a separate repository: 10 GB on-disk, 100 MB per file, 3,000 entries per directory ([repository limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)). Artifacts last at most 90 days in a public repository ([retention](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization)), too short (section 5). The captures would be public. They are public registry data, minus e-mail addresses (2.2) | R2, private. 1 year ≈ 5.6 GB | R2 |
+| **Storage** | Commits to a data branch or a separate repository: 10 GB on-disk, 100 MB per file, 3,000 entries per directory ([repository limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)). Artifacts last at most 90 days in a public repository ([retention](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization)), too short (section 5). The captures would be public. They are public registry data, minus e-mail addresses (2.2) | R2, private. 1 year ≈ 5.6 GB of version data | R2 |
 | **Capture lag** | Schedules run "once every 5 minutes" at the shortest and "can be delayed during periods of high loads", for example at the start of every hour ([events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)). The size of the delays is not known | Cron granularity is one minute. The CPU limit is 30 s per trigger under a 1-hour interval, wall time 15 min, 10,000 subrequests ([limits](https://developers.cloudflare.com/workers/platform/limits/)) | B's |
 | **Permissions** | A capture-and-judge job with `contents: read` and no secrets uploads its output as an artifact. A writer job with `contents: write` commits it and runs no Node or dependency code, the same split as judge.yml and judge-comment.yml. Actions pinned by SHA. No token beyond `GITHUB_TOKEN` | A new Worker, an R2 bucket and a Cron Trigger. That is a Cloudflare change outside the ludion Worker, so it needs the owner's authorization (CLAUDE.md). Deploying needs a Cloudflare API token. Production deployment goes through deploy.yml only, so deploy.yml (a protected path) or a new protected workflow would have to change | A reads R2, so it needs an R2 credential as a secret, or the Worker serves the captures over HTTP, which starts to look like the relay CLAUDE.md rules out |
 | **Failure handling** | The feed resumes from the stored `last_seq`, so a missed or failed run loses only the versions removed in the gap. Each one becomes a recorded capture gap. A `concurrency` group keeps one writer. Scheduled workflows in a public repository are disabled after 60 days without repository activity (events doc). Whether the bot's data commits count as activity is **not known**, so the daily job fails visibly when the last capture is older than a day | The same resume from `last_seq`, stored in R2. Whether a failed Cron Trigger is retried is **not known** (no source found). Alerting needs a status object that something checks, because no new account or alert service may be added | Two places to fail; the daily job checks the capture's freshness |
@@ -168,7 +172,7 @@ The npm registry's rate limits for these reads are **not known**: no public numb
 ## 8. Choices for the owner
 
 1. **Where it runs:** A, B or C (section 6). A has no new cost or service. B captures faster and keeps the data private.
-2. **Retention:** the shadow plus 90 days (about 1.8 GB), or longer.
+2. **Retention:** the shadow plus 90 days (about 1.8 GB of version data, plus `time` maps), or longer.
 3. **Wider watch, optional:** to get MAL- cases into (b), capture every npm version, not only the watched set. Feed volume would then be about 122,000 changes a day (low confidence), so storage and requests grow by two orders of magnitude. This was not estimated further. It would also change (b)'s population, so it would have to be fixed in decisions.md first.
 
 ## Files

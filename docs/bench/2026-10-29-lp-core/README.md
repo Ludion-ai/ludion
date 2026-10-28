@@ -1,0 +1,36 @@
+# LP-core: the protected-paths check reads approvals more strictly
+
+The detailed record of the LP-core lane (branch `lane/lp-core-approval`). The rules were fixed first in docs/decisions/2026-10-29-protected-paths-approval.md (commit 3ace8ad); the short result is in docs/progress/2026-10-29-lp-core-approval.md.
+
+## What changed
+
+- `.github/workflows/protected-paths.yml`: the jq program `REVIEWS` reads only comments by `OWNER`, `MEMBER` or `COLLABORATOR`; takes `reviewed-sha:` from the comment's last line only (trailing whitespace removed, nothing after the SHA); approves only when the first line, decoration aside, begins with the word `APPROVE` and has neither the word `NOT` nor `REQUEST`, in any case; treats a missing body as empty. The label check passes only on exactly one `review-approved` label (`!= "1"`, was `= "0"`), so an empty answer fails. `action/` and the root `action.yml` are protected paths.
+- Tests: the four protected-paths tests in `packages/cli/test/judge-workflow.test.ts` moved, extended, to `packages/cli/test/protected-paths-workflow.test.ts` (11 tests). judge-workflow.test.ts keeps its other 27.
+- `docs/protected-paths.md`: the paths, the rules above, and that reasons go on later lines.
+
+## Checks
+
+In Docker: image `ludion-c3-test:latest` (node:24-slim with jq 1.6, git, bash; v24.22.1). The working tree was copied into a volume, `npm ci --ignore-scripts --no-audit --no-fund` ran with network, then everything else with `--network none --read-only --tmpfs /tmp:exec`, user `node`. Raw output: `logs/tests-mutations.log`.
+
+- `npm run typecheck`: exit 0.
+- protected-paths-workflow.test.ts 11 passed; judge-workflow.test.ts 27 passed (38 together; before the move judge-workflow.test.ts had 31, 4 of them for protected-paths.yml).
+- `npx vitest run --project node packages tools`: 10 files, 264 passed (264).
+- actionlint 1.7.12 on protected-paths.yml, `--network none`, read-only: exit 0, no findings.
+- Mutations of protected-paths.yml, one at a time with `mutate.mjs` (each restored): 25 of 25 fail at least one test. The first run caught 23 of 25: "APPROVE on any line" (the first line replaced by all lines joined) and "pipefail off" passed every test. Two tests were added (an `APPROVE` on the second line under an empty or other first line; a failed `gh` call stops the script before any later `::error::`), and the second run caught all 25. The log holds the second run.
+
+### The new `REVIEWS` on real comments
+
+`gh api repos/Ludion-ai/ludion/issues/N/comments?per_page=100` for #156, #158, #166 and #170 (every comment is by `Ludion-ai`, `OWNER`), under jq 1.6 and jq 1.7.1 (the runners' version): both give the same lines. Raw output, for main's program (`old.jq`) and the new one (`reviews.jq`, cut from the workflow): `logs/real-comments.log`.
+
+| PR | Lines | `approve` |
+| --- | --- | --- |
+| #156 | 3 | 0 |
+| #158 | 3 | 0 |
+| #166 | 4 | 1 (`42819fa…`, its merged head) |
+| #170 | 3 | 0 |
+
+Under the old program, #156's 9610889, #158's 0372f44 and #166's d542094 read as `approve` (their first lines are "Review of #N (…): APPROVE"), and #166's ac359a5 too. Under the new rules none does: the first three do not begin with the verdict, and ac359a5's first line ends "(follow-up, not blocking)". #170's reviews begin "Fresh-context review (subagent, round N)". So the reviews written before this change would not pass the new check; a review of a protected PR must now begin with the verdict and keep `not` off its first line (docs/protected-paths.md, step 1). These PRs are all merged, so nothing open changes.
+
+## Not shown here
+
+The check that runs on this PR is main's protected-paths.yml, not this one (`pull_request_target`). The new rules take effect for PRs checked after the merge; until then they are shown by the tests above only.

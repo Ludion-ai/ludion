@@ -1,8 +1,9 @@
 # Required check "protected-paths".
 # Fails a PR that touches a protected path until an independent review has approved the PR's CURRENT head:
-# the PR must carry the "review-approved" label AND the latest comment with a line "reviewed-sha: <head sha>" must
-# approve. Every review ends with that line, whatever its verdict, so the comment's first line, the verdict, decides
-# (REVIEWS below), and a later review of the same head that does not approve undoes an earlier approval.
+# the PR must carry the "review-approved" label AND the latest comment by the repository's owner, a member or a
+# collaborator whose last line is "reviewed-sha: <head sha>" must approve. Every review ends with that line, whatever
+# its verdict, so the comment's first line, the verdict, decides (REVIEWS below), and a later review of the same head
+# that does not approve undoes an earlier approval.
 # A push changes the head SHA, so any earlier approval stops counting by itself; nothing has to be removed.
 #
 # Runs on pull_request_target so the workflow definition always comes from the base branch; a PR cannot
@@ -36,16 +37,21 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           LABEL: review-approved
-          # Applied to each page of the PR's comments, oldest first: "<approve|other> <sha>" for every reviewed-sha
-          # line. A review's first line states its verdict; it approves when that line has the word APPROVE and not
-          # REQUEST (docs/protected-paths.md).
+          # Applied to each page of the PR's comments, oldest first: "<approve|other> <sha>" for every comment by the
+          # repository's OWNER, a MEMBER or a COLLABORATOR whose last line (trailing blanks, \r included, removed) is
+          # "reviewed-sha: <40 hex>". It approves when its first line, with * _ ` read as spaces and leading # > removed,
+          # begins with the word APPROVE and has neither the word NOT nor REQUEST, in any case (docs/protected-paths.md).
           REVIEWS: |
-            .[] | (.body | split("\n")) as $lines
-            | (if $lines[0] | test("\\bAPPROVE\\b") and (test("REQUEST") | not) then "approve" else "other" end) as $verdict
-            | $lines[] | select(test("^reviewed-sha: *[0-9a-f]{40}")) | "\($verdict) \(sub("^reviewed-sha: *"; "") | .[0:40])"
+            .[]
+            | select(.author_association == "OWNER" or .author_association == "MEMBER" or .author_association == "COLLABORATOR")
+            | ((.body // "") | sub("\\s+$"; "") | split("\n")) as $lines
+            | (($lines[0] // "") | gsub("[*_`]"; " ") | sub("^[\\s#>]+"; "")) as $first
+            | (if ($first | test("^APPROVE\\b"; "i")) and ($first | test("\\bNOT\\b|REQUEST"; "i") | not) then "approve" else "other" end) as $verdict
+            | (($lines | last) // "") | capture("^reviewed-sha: *(?<sha>[0-9a-f]{40}) *$")
+            | "\($verdict) \(.sha)"
         run: |
           set -euo pipefail
-          pattern='(^|/)(CLAUDE|AGENTS)\.md$|(^|/)\.cursorrules$|(^|/)CODEOWNERS$|^\.claude/|^\.cursor/|^\.github/|^tools/verify/|^packages/sandbox/|^lessons/|^packages/[^/]+/src/schema\.ts$|^packages/[^/]+/schema/|\.schema\.json$|^ludion\.config\.json$|^wrangler\.jsonc$|^docs/protected-paths\.md$'
+          pattern='(^|/)(CLAUDE|AGENTS)\.md$|(^|/)\.cursorrules$|(^|/)CODEOWNERS$|^\.claude/|^\.cursor/|^\.github/|^tools/verify/|^packages/sandbox/|^lessons/|^packages/[^/]+/src/schema\.ts$|^packages/[^/]+/schema/|\.schema\.json$|^ludion\.config\.json$|^wrangler\.jsonc$|^docs/protected-paths\.md$|^action/|^action\.yml$'
 
           # Read the head SHA live, not from the event payload, so a stale run cannot approve a newer head.
           head=$(gh api "repos/${REPO}/pulls/${PR}" --jq '.head.sha')
@@ -66,16 +72,17 @@ jobs:
           echo "::${token}::"
 
           has_label=$(gh api "repos/${REPO}/issues/${PR}/labels" --jq "[.[] | select(.name == \"${LABEL}\")] | length")
-          if [ "$has_label" = "0" ]; then
+          # Fails closed: anything but exactly one such label (an empty answer included) is no label.
+          if [ "$has_label" != "1" ]; then
             echo "::error::This PR changes protected paths. It needs an independent review and the \"${LABEL}\" label (docs/protected-paths.md)."
             exit 1
           fi
 
-          # The latest review of the current head decides.
+          # The latest review of the current head, by the owner, a member or a collaborator, decides.
           verdict=$(gh api --paginate "repos/${REPO}/issues/${PR}/comments" --jq "$REVIEWS" \
             | awk -v head="$head" '$2 == head { verdict = $1 } END { print verdict }')
           if [ "$verdict" != "approve" ]; then
-            echo "::error::The latest review that says \"reviewed-sha: ${head}\" does not approve, or there is none. The review must cover the current head and approve it; review again after every push."
+            echo "::error::The latest review whose last line is \"reviewed-sha: ${head}\", by the owner, a member or a collaborator, does not approve, or there is none. Its first line must begin with APPROVE, without NOT or REQUEST; review again after every push."
             exit 1
           fi
 

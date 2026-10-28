@@ -1,0 +1,57 @@
+// Mutations of protected-paths.yml's rules, one at a time, each restored after its run: every one must fail at least
+// one test of packages/cli/test/protected-paths-workflow.test.ts. Each find string must occur exactly once.
+// Run from the repository root inside the test container: node docs/bench/2026-10-29-lp-core/mutate.mjs
+import { spawnSync } from "node:child_process";
+import { readFileSync, writeFileSync } from "node:fs";
+
+const FILE = ".github/workflows/protected-paths.yml";
+const M = [
+  ["every comment read, whoever wrote it", '| select(.author_association == "OWNER" or .author_association == "MEMBER" or .author_association == "COLLABORATOR")\n', ""],
+  ["CONTRIBUTOR also read", '.author_association == "COLLABORATOR")', '.author_association == "COLLABORATOR" or .author_association == "CONTRIBUTOR")'],
+  ["association compared without case", 'select(.author_association == "OWNER"', 'select((.author_association // "" | ascii_upcase) == "OWNER"'],
+  ["reviewed-sha on any line", '| (($lines | last) // "") | capture(', '| $lines[] | capture('],
+  ["text allowed after the SHA", '(?<sha>[0-9a-f]{40}) *$")', '(?<sha>[0-9a-f]{40})")'],
+  ["reviewed-sha anywhere in the last line", 'capture("^reviewed-sha:', 'capture("reviewed-sha:'],
+  ["trailing blanks not trimmed", '| sub("\\\\s+$"; "") | split', '| split'],
+  ["missing body not defaulted", '((.body // "")', '((.body)'],
+  ["APPROVE anywhere on the first line", 'test("^APPROVE\\\\b"; "i")', 'test("APPROVE\\\\b"; "i")'],
+  ["APPROVED counted as APPROVE", 'test("^APPROVE\\\\b"; "i")', 'test("^APPROVE"; "i")'],
+  ["APPROVE matched in upper case only", 'test("^APPROVE\\\\b"; "i")', 'test("^APPROVE\\\\b")'],
+  ["NOT and REQUEST matched in upper case only", 'test("\\\\bNOT\\\\b|REQUEST"; "i")', 'test("\\\\bNOT\\\\b|REQUEST")'],
+  ["NOT not excluded", 'test("\\\\bNOT\\\\b|REQUEST"; "i")', 'test("REQUEST"; "i")'],
+  ["REQUEST not excluded", 'test("\\\\bNOT\\\\b|REQUEST"; "i")', 'test("\\\\bNOT\\\\b"; "i")'],
+  ["decoration * _ ` not read as spaces", '| gsub("[*_`]"; " ") ', ""],
+  ["strikethrough read as decoration", 'gsub("[*_`]"; " ")', 'gsub("[*_`~]"; " ")'],
+  ["leading # and > not removed", 'sub("^[\\\\s#>]+"; "")', 'sub("^\\\\s+"; "")'],
+  ["APPROVE on any line", '(($lines[0] // "")', '(($lines | join(" "))'],
+  ["every review counted as approving", 'then "approve" else "other" end', 'then "approve" else "approve" end'],
+  ["the first review of the head decides", "'$2 == head { verdict = $1 }", "'$2 == head && verdict == \"\" { verdict = $1 }"],
+  ["any approval of the head counts", "'$2 == head { verdict = $1 }", "'$2 == head && $1 == \"approve\" { verdict = $1 }"],
+  ["label check passes on an empty answer", 'if [ "$has_label" != "1" ]; then', 'if [ "$has_label" = "0" ]; then'],
+  ["action/ not protected", "|^action/|", "|"],
+  ["action.yml not protected", "|^action\\.yml$'", "'"],
+  ["pipefail off", "set -euo pipefail", "set -eu"],
+];
+
+const original = readFileSync(FILE, "utf8");
+const tests = () => {
+  const r = spawnSync("npx", ["vitest", "run", "--project", "node", "packages/cli/test/protected-paths-workflow.test.ts"], { encoding: "utf8" });
+  const line = (r.stdout + r.stderr).replace(/\x1b\[[0-9;]*m/g, "").split("\n").find(l => /^\s*Tests\s/.test(l));
+  return line ? line.trim().replace(/\s+/g, " ") : `no Tests line (exit ${r.status})`;
+};
+let caught = 0;
+try {
+  for (const [name, find, replace] of M) {
+    const n = original.split(find).length - 1;
+    if (n !== 1) { console.log(`NOT APPLIED (${n} matches) | ${name}`); continue; }
+    writeFileSync(FILE, original.replace(find, () => replace));
+    const result = tests();
+    if (/failed/.test(result)) caught++;
+    console.log(`${name} | ${result}`);
+    writeFileSync(FILE, original);
+  }
+} finally {
+  writeFileSync(FILE, original);
+}
+console.log(`caught ${caught} of ${M.length}`);
+console.log(`restored | ${tests()}`);

@@ -1,0 +1,37 @@
+== v24.22.1 jq-1.6 tree=35edd028856d 72c822608c74 
+typecheck exit=0
+ ✓  node  packages/cli/test/judge-workflow.test.ts (27 tests) 1592ms
+ ✓  node  packages/cli/test/protected-paths-workflow.test.ts (11 tests) 3860ms
+ Test Files  2 passed (2)
+      Tests  38 passed (38)
+== node project, packages and tools
+ Test Files  10 passed (10)
+      Tests  264 passed (264)
+== mutations
+every comment read, whoever wrote it | Tests 1 failed | 10 passed (11)
+CONTRIBUTOR also read | Tests 1 failed | 10 passed (11)
+association compared without case | Tests 1 failed | 10 passed (11)
+reviewed-sha on any line | Tests 1 failed | 10 passed (11)
+text allowed after the SHA | Tests 1 failed | 10 passed (11)
+reviewed-sha anywhere in the last line | Tests 1 failed | 10 passed (11)
+trailing blanks not trimmed | Tests 1 failed | 10 passed (11)
+missing body not defaulted | Tests 1 failed | 10 passed (11)
+APPROVE anywhere on the first line | Tests 1 failed | 10 passed (11)
+APPROVED counted as APPROVE | Tests 1 failed | 10 passed (11)
+APPROVE matched in upper case only | Tests 1 failed | 10 passed (11)
+NOT and REQUEST matched in upper case only | Tests 2 failed | 9 passed (11)
+NOT not excluded | Tests 2 failed | 9 passed (11)
+REQUEST not excluded | Tests 1 failed | 10 passed (11)
+decoration * _ ` not read as spaces | Tests 1 failed | 10 passed (11)
+strikethrough read as decoration | Tests 1 failed | 10 passed (11)
+leading # and > not removed | Tests 1 failed | 10 passed (11)
+APPROVE on any line | Tests 1 failed | 10 passed (11)
+every review counted as approving | Tests 4 failed | 7 passed (11)
+the first review of the head decides | Tests 1 failed | 10 passed (11)
+any approval of the head counts | Tests 1 failed | 10 passed (11)
+label check passes on an empty answer | Tests 1 failed | 10 passed (11)
+action/ not protected | Tests 1 failed | 10 passed (11)
+action.yml not protected | Tests 1 failed | 10 passed (11)
+pipefail off | Tests 1 failed | 10 passed (11)
+caught 25 of 25
+restored | Tests 11 passed (11)

@@ -383,6 +383,12 @@ On GitHub, through the throwaway draft PR #159 (base `ci/judge-dogfood`; npm's l
 - Run 40665174013, at head 13a361d: the job succeeded, 09:33:36–09:33:54 UTC.
   - The record: `ready_except_build`, base 386f802 (the merge commit's first parent), judge 0.577 s, 12.781 s since the job started.
   - In Docker, judge-comment.yml's schema accepted the downloaded record, and its comment rendered.
+- Then `ci/judge-dogfood` moved to 570add8, and an empty commit went to #159. Run 40665447810, at head baf6d37: the job succeeded, 09:35:41–09:36:00 UTC.
+  - The PR's stored base SHA was still 386f802. The record's base was 570add8, the merge commit's first parent, so the stale-base case is judged.
+  - The record: `ready_except_build`, judge 0.701 s, 12.366 s since the job started.
+  - The schema accepted it.
+- #159 was then closed without merging, and its branch deleted.
+- judge-comment.yml has still not run on GitHub.
 
 ## 2026-10-28 — Packagist advisories in Composer plans
 

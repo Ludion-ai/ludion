@@ -156,7 +156,7 @@ So the 1fa3d68 premise, that every fix only adds production, did not hold. `besi
   - The YAML readers, the heredoc's closing line and the `FROM` chain use loops and lookups.
   - The pnpm comment says no split is made.
 - **The tests.** With that describe block run alone, the A–C tests fail on 6c4f58e's `production.ts`: 3 failed, and the pnpm test passed (it exercises judge.ts). The whole file was not run against 6c4f58e: its new 40k-repetition timing test did not finish there in several minutes. At 9313aa2, production.test.ts has 40 tests, all passing.
-- **What "linear" rests on now.** A test runs the review's crafted inputs at 40,000 repetitions, a crafted call at 1 MB of whitespace and 1 MB of an unclosed string, and a 16,000-stage `FROM` chain. Each must finish under 1 to 1.5 s, and in Docker the whole file took 308 ms. That is a bound on these inputs, not a proof for every input. Only the readers listed above were made linear. Following scripts stayed quadratic in the number of scripts until 8e25891 (below), and it is still quadratic in the number of package.json files that share a script name (see the last section).
+- **What "linear" rests on now.** A test runs the review's crafted inputs at 40,000 repetitions, a crafted call at 1 MB of whitespace and 1 MB of an unclosed string, and a 16,000-stage `FROM` chain. Each must finish under 1 to 1.5 s, and in Docker the whole file took 308 ms. That is a bound on these inputs, not a proof for every input. Only the readers listed above were made linear. Following scripts stayed quadratic in the number of scripts until 8e25891 (below), and it is still quadratic in the number of package.json files that share a script name (see Known gaps below).
 - **The third execution** ran at 9313aa2, from its own volume (`ludion-l1-run3`) that nothing else wrote to during the run. Its output is in `result-final/`.
 
 - It ran detached at 9313aa2, 14:00:45Z–14:16:17Z, and exited 0. No repository failed or needed a second attempt.
@@ -200,13 +200,13 @@ The fixes, in 8e25891:
 - Scripts are looked up by name, and a glob is expanded once.
 - A stylesheet clause runs to the next at-rule outside quotes and comments, and jumps over comments while still reading what they quote.
 
-The new test fails on f44f7ae's `production.ts`. Run alone there, it stops at its first failing assertion, the heredoc one. The third delta review's probes showed that the unquoted-list, quoted-`@import` and 4,000-script assertions fail there too. The `/* @use x */` assertion passes on f44f7ae as well, so it guards nothing.
+The new test fails on f44f7ae's `production.ts`. Run alone there, it stops at its first failing assertion, the heredoc one. The third delta review's probes showed that the unquoted-list, quoted-`@import` and 4,000-script assertions fail there too. The `/* @use x */` assertion passes on f44f7ae as well, so it does not test this fix. It would still catch a return to c381a85's behaviour, which misses `pkg`.
 
 The third delta review (at 0729fa6, APPROVE) re-ran every version's reader and split over the 101 source trees, with 8e25891 included. Every package an earlier version read, 8e25891 also reads, except the six that section 2 excludes. No version left out at 8e25891 was production in an earlier version. 8e25891 was not run as a noise execution: no npm audit or OSV.
 
 **Known gaps** (third delta review, non-blocking, not fixed here):
-- Following scripts is still quadratic in the number of package.json files that share a script name: 20,000 files with a `build` script take 84 s. This predates the PR.
-- An apostrophe in a comment inside a stylesheet list (`@import 'a', /* don't */ 'pkg';`) hides the later items, in every version, because quotes are paired across the comment.
+- Following scripts is still quadratic in the number of package.json files that share a script name. 20,000 package.json files whose `build` script runs `npm run build` take 84 s (0729fa6, in Docker); with `"build": "tsc"`, 5,000 files take 20 ms. This was present from c381a85, this PR's first implementation. 8e25891 made it about 10 times faster, but it is still quadratic.
+- An apostrophe in a comment inside a stylesheet list (`@import 'a', /* don't */ 'pkg';`) hides the later items in every version. From 6c4f58e on, the reason is that quotes are paired across the comment, giving `["a", "t */ "]`. c381a85 reads only the first item.
 
 ## Both gates
 

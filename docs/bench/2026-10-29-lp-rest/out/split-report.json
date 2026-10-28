@@ -1,11 +1,11 @@
 [
   {
     "kind": "decisions",
-    "commit": "b4d5fcb25b88d7c686443543b6e48277208039b1",
-    "old_lines": 1130,
-    "old_bytes": 206894,
-    "files": 61,
-    "moved_lines": 1124,
+    "commit": "e72301d64b8b33cf298ba6eacab4dad137f70a24",
+    "old_lines": 1269,
+    "old_bytes": 228737,
+    "files": 65,
+    "moved_lines": 1263,
     "kept_lines": 6,
     "lines_add_up": true,
     "byte_identical": true,
@@ -373,18 +373,42 @@
       {
         "file": "2026-10-28-backtest-v5-archives-as-signal-sources-and-the-disputed.md",
         "start": 1125,
-        "end": 1130,
+        "end": 1131,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-28-gate-1-s-production-dev-split-rebuilt-the-noise-rerun-s.md",
+        "start": 1132,
+        "end": 1222,
+        "lines": 91
+      },
+      {
+        "file": "2026-10-28-the-noise-rerun-s-result-what-is-left-open.md",
+        "start": 1223,
+        "end": 1228,
         "lines": 6
+      },
+      {
+        "file": "2026-10-28-168-s-review-the-split-s-reader-is-fixed-to-section-2-and-a.md",
+        "start": 1229,
+        "end": 1249,
+        "lines": 21
+      },
+      {
+        "file": "2026-10-28-168-s-delta-review-three-regressions-fixed-the-reader-made.md",
+        "start": 1250,
+        "end": 1269,
+        "lines": 20
       }
     ]
   },
   {
     "kind": "progress",
-    "commit": "b4d5fcb25b88d7c686443543b6e48277208039b1",
-    "old_lines": 552,
-    "old_bytes": 85838,
-    "files": 49,
-    "moved_lines": 548,
+    "commit": "e72301d64b8b33cf298ba6eacab4dad137f70a24",
+    "old_lines": 562,
+    "old_bytes": 88004,
+    "files": 50,
+    "moved_lines": 558,
     "kept_lines": 4,
     "lines_add_up": true,
     "byte_identical": true,
@@ -680,8 +704,14 @@
       {
         "file": "2026-10-28-moved-backtest-v5-archives-as-install-script-sources-and-the.md",
         "start": 540,
-        "end": 552,
-        "lines": 13
+        "end": 553,
+        "lines": 14
+      },
+      {
+        "file": "2026-10-28-l1-gate-1-s-split-rebuilt-the-noise-rerun-count-not-met-misses.md",
+        "start": 554,
+        "end": 562,
+        "lines": 9
       }
     ]
   }

@@ -2,7 +2,7 @@
 
 One result per file, in docs/progress/ (`YYYY-MM-DD-<lane>-<topic>.md`). A new result is a new file there; this file is not appended to (CLAUDE.md, "Engineering and security").
 
-On 2026-10-29 every entry that was here moved, word for word, into its own file (docs/decisions/2026-10-29-records-one-file-each.md); the old text is this file at b4d5fcb25b88d7c686443543b6e48277208039b1. The list keeps the old order and the old headings, so a reference such as (docs/progress.md, "<title>") still finds its entry. Lines of the old file that were not entries are kept below as they were.
+On 2026-10-29 every entry that was here moved, word for word, into its own file (docs/decisions/2026-10-29-records-one-file-each.md); the old text is this file at e72301d64b8b33cf298ba6eacab4dad137f70a24. The list keeps the old order and the old headings, so a reference such as (docs/progress.md, "<title>") still finds its entry. Lines of the old file that were not entries are kept below as they were.
 
 - [2026-10-25: v3 P1 Capability types, hashing, guard and receipt (no execution)](progress/2026-10-25-moved-v3-p1-capability-types-hashing-guard-and-receipt-no.md)
 - [2026-10-15: Home composed for phones](progress/2026-10-15-moved-home-composed-for-phones.md)
@@ -56,3 +56,4 @@ On 2026-10-29 every entry that was here moved, word for word, into its own file 
 - [2026-10-28 (cycle 3, L4) — Dogfood record, and the action prepared (not released)](progress/2026-10-28-l4-dogfood-record-and-the-action-prepared-not-released.md)
 - [2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews](progress/2026-10-28-moved-two-rules-into-claude-md-the-follow-ups-to-156-157-and-158-s.md)
 - [2026-10-28 (cycle 3) — Backtest v5: archives as install-script sources, and the disputed category](progress/2026-10-28-moved-backtest-v5-archives-as-install-script-sources-and-the.md)
+- [2026-10-28 (cycle 3, L1) — Gate 1's split rebuilt; the noise rerun: count not met, misses not met](progress/2026-10-28-l1-gate-1-s-split-rebuilt-the-noise-rerun-count-not-met-misses.md)

@@ -11,3 +11,4 @@ docs/bench/2026-10-28-backtest-v5. The definitions were committed at 23ab295 and
   - freo 1.0.4 is in it because its record does not name 1.0.3, which added the same preinstall 59 minutes earlier.
   - A draft correction request for @ensdomains/buffer 0.1.1 to the GitHub Advisory Database is in the folder. It has not been sent.
 - **A predictable limit.** jsDelivr's CDN answers 404 for the files of removed versions it still lists (cycle 2 had seen it serve only versions requested before removal). So 988 versions failed the disputed check closed (README, "Anomalies and limits").
+

@@ -1,0 +1,22 @@
+{
+	"type": "npm",
+	"name": "freo-design-system",
+	"version": "1.0.0",
+	"default": "/index.min.js",
+	"files": [
+		{
+			"name": "/index.js",
+			"hash": "5D9DT1snsVOWoaqV8VVqdCbO5S3p+h7BcZvyR4CNfIo=",
+			"size": 97
+		},
+		{
+			"name": "/package.json",
+			"hash": "UUuPpV0H907t8M3eCP7C+DVYVEuYcn9cGOcR/UrWpJk=",
+			"size": 214
+		}
+	],
+	"links": {
+		"stats": "https://data.jsdelivr.com/v1/stats/packages/npm/freo-design-system@1.0.0",
+		"entrypoints": "https://data.jsdelivr.com/v1/packages/npm/freo-design-system@1.0.0/entrypoints"
+	}
+}

@@ -2,7 +2,7 @@
 
 One decision per file, in docs/decisions/ (`YYYY-MM-DD-<topic>.md`). A new decision is a new file there; this file is not appended to (CLAUDE.md, "Engineering and security").
 
-On 2026-10-29 every entry that was here moved, word for word, into its own file (docs/decisions/2026-10-29-records-one-file-each.md); the old text is this file at b4d5fcb25b88d7c686443543b6e48277208039b1. The list keeps the old order and the old headings, so a reference such as (docs/decisions.md, "<title>") still finds its entry. Lines of the old file that were not entries are kept below as they were.
+On 2026-10-29 every entry that was here moved, word for word, into its own file (docs/decisions/2026-10-29-records-one-file-each.md); the old text is this file at e72301d64b8b33cf298ba6eacab4dad137f70a24. The list keeps the old order and the old headings, so a reference such as (docs/decisions.md, "<title>") still finds its entry. Lines of the old file that were not entries are kept below as they were.
 
 - [2026-10-15: Compose home for the phone instead of shrinking desktop](decisions/2026-10-15-compose-home-for-the-phone-instead-of-shrinking-desktop.md)
 - [2026-10-14: Express the homepage through shapes and finite motion](decisions/2026-10-14-express-the-homepage-through-shapes-and-finite-motion.md)
@@ -72,3 +72,7 @@ CLAUDE.md is the spec. This file holds the details it leaves to us: what was dec
 - [2026-10-28 — The judge as an action (preview), and the dogfood record](decisions/2026-10-28-the-judge-as-an-action-preview-and-the-dogfood-record.md)
 - [2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews](decisions/2026-10-28-two-rules-into-claude-md-the-follow-ups-to-156-157-and-158-s.md)
 - [2026-10-28 (cycle 3) — Backtest v5: archives as signal sources, and the disputed category](decisions/2026-10-28-backtest-v5-archives-as-signal-sources-and-the-disputed.md)
+- [2026-10-28 (cycle 3) — Gate 1's production/dev split, rebuilt; the noise rerun's definitions, fixed before running it](decisions/2026-10-28-gate-1-s-production-dev-split-rebuilt-the-noise-rerun-s.md)
+- [2026-10-28 (cycle 3, L1) — The noise rerun's result; what is left open](decisions/2026-10-28-the-noise-rerun-s-result-what-is-left-open.md)
+- [2026-10-28 (cycle 3, L1) — #168's review: the split's reader is fixed to section 2, and a second execution is reported beside the result](decisions/2026-10-28-168-s-review-the-split-s-reader-is-fixed-to-section-2-and-a.md)
+- [2026-10-28 (cycle 3, L1) — #168's delta review: three regressions fixed, the reader made linear, and a third execution beside the result](decisions/2026-10-28-168-s-delta-review-three-regressions-fixed-the-reader-made.md)

@@ -1,0 +1,926 @@
+[
+  {
+    "repo": "Rafi-SBM/PySan",
+    "sha": "26767d2af321aece388ececd853f4819ec3221d0",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@babel/core",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@babel/core@7.27.4 (dev) [OSV GHSA-4x5r-pxfx-6jf8 SEMVER [0, <7.29.6); npm GHSA-4x5r-pxfx-6jf8 <=7.29.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency @vitejs/plugin-react@4.5.2 > @babel/core@7.27.4 (Vite build plugin, vite.config.ts react() with no babel options). Not imported by src/; not run by any production command. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "@eslint/plugin-kit",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@eslint/plugin-kit@0.3.2 (dev) [OSV GHSA-xffm-g5w8-qvg7 SEMVER [0, <0.3.4); npm GHSA-xffm-g5w8-qvg7 <0.3.4]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency eslint@9.29.0 > @eslint/plugin-kit@0.3.2 (also via typescript-eslint/eslint-plugin-react-*). Lint only (scripts.lint `eslint .`, eslint.config.js). Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "@humanfs/node",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@humanfs/node@0.16.6 (dev) [OSV GHSA-p498-v437-472g SEMVER [0, <0.16.8); npm GHSA-p498-v437-472g <0.16.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > @humanfs/node@0.16.6. Lint only (scripts.lint, eslint.config.js). Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > @vitest/mocker@3.2.7 (also @vitest/coverage-v8). Test only (scripts.test `vitest run`). Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "ajv",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/ajv@6.12.6 (dev) [OSV GHSA-2g4f-4pwh-qvx6 SEMVER [0, <6.14.0); npm GHSA-2g4f-4pwh-qvx6 <6.14.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > ajv@6.12.6. Lint only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/brace-expansion@1.1.12 (dev) [OSV GHSA-3jxr-9vmj-r5cp SEMVER [0, <1.1.16); npm GHSA-f886-m6hf-6m8v <1.1.13]. Out of range: node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.12, node_modules/glob/node_modules/brace-expansion@2.1.7, node_modules/test-exclude/node_modules/brace-expansion@5.0.12. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > minimatch@3.1.2 > brace-expansion@1.1.12 (lint). Other copies (5.0.12, 2.1.7) are out of range. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "browserslist",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/browserslist@4.25.0 (dev) [OSV GHSA-73wf-gq98-2v4g SEMVER [0, <4.28.7); npm GHSA-c83g-rgw3-j3cx <=4.28.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @vitejs/plugin-react@4.5.2 > @babel/core@7.27.4 > @babel/helper-compilation-targets > browserslist@4.25.0 (build plugin). Not imported by src/. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "flatted",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/flatted@3.3.3 (dev) [OSV GHSA-25h7-pfq9-p65f SEMVER [0, <3.4.0); npm GHSA-25h7-pfq9-p65f <3.4.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > file-entry-cache > flat-cache > flatted@3.3.3. Lint cache only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "js-yaml",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/js-yaml@4.1.0 (dev) [OSV GHSA-2883-xcg3-v3hh SEMVER [4.0.0, <4.3.2); npm GHSA-mh29-5h37-fv8m >=4.0.0 <4.1.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > @eslint/eslintrc@3.3.1 > js-yaml@4.1.0. Lint only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "minimatch",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/minimatch@3.1.2 (dev) [OSV GHSA-23c5-xmqv-rm74 SEMVER [0, <3.1.4); npm GHSA-3ppc-4f35-3m26 <3.1.3]. Out of range: node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch@10.2.6, node_modules/glob/node_modules/minimatch@9.0.9, node_modules/test-exclude/node_modules/minimatch@10.2.6. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > minimatch@3.1.2. Lint only. Other copies (10.2.6, 9.0.9) are out of range. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "nanoid",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/nanoid@3.3.11 (dev) [OSV GHSA-28wg-ghj8-5hjv SEMVER [0, <3.3.16); npm GHSA-28wg-ghj8-5hjv <3.3.16]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vite@6.3.5 > postcss@8.5.6 > nanoid@3.3.11 (PostCSS at build time; its code is not emitted into dist). src/ does not import nanoid. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "postcss",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/postcss@8.5.6 (dev) [OSV GHSA-6g55-p6wh-862q SEMVER [0, <8.5.12); npm GHSA-qx2v-qp2m-jg93 <8.5.10]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency vite@6.3.5 > postcss@8.5.6 (CSS processing during vite build; emitted CSS is not PostCSS code). Not imported by src/. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "rollup",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/rollup@4.44.0 (dev) [OSV GHSA-mw96-cpmx-2vgc SEMVER [4.0.0, <4.59.0); npm GHSA-mw96-cpmx-2vgc >=4.0.0 <4.59.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vite@6.3.5 > rollup@4.44.0 (bundler during vite build). vite.config.ts only sets ESM output with manualChunks; the build configuration shows no rollup runtime helper or polyfill being injected; not imported by src/; no production command runs it. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "source-map-js",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/source-map-js@1.2.1 (dev) [OSV GHSA-68fv-2mgg-jv7q SEMVER [1.0.0, <1.2.2); npm GHSA-68fv-2mgg-jv7q >=1.0.0 <1.2.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: vite@6.3.5 > postcss@8.5.6 > source-map-js@1.2.1; @vitest/coverage-v8 > magicast > source-map-js. Build/test only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/tinypool@1.1.1 (dev) [OSV GHSA-5gmw-xhrv-c9v3 SEMVER [0, <2.1.1); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > tinypool@1.1.1. Test only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range: node_modules/vite@6.3.5 (dev) [OSV GHSA-4w7w-66w2-5vf9 SEMVER [0, <6.4.2); npm GHSA-g4jq-h2w9-997c >=6.0.0 <=6.3.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency vite@6.3.5. The production build (deploy.yml `npm run build` -> `vite build`, dist published to GitHub Pages) has an HTML entry with a module script (index.html `<script type=\"module\" src=\"/src/main.tsx\">`) and vite.config.ts does not set build.modulePreload, so the default { polyfill: true } applies. vite@6.3.5 dist/node/chunks/dep-DBxKXgDP.js:35961-35989 defines vite/modulepreload-polyfill as `polyfill.toString()` from Vite's own source and :36503 injects it into HTML entries with module scripts, so Vite's code is emitted into the production bundle."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vitest@3.2.7; imported only by src/**/*.test.ts(x), src/test/setup.ts and vite.config.ts (`vitest/config`, build/test configuration, not shipped). Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep)."
+      }
+    ]
+  },
+  {
+    "repo": "Kmaina32/Varban-Markets",
+    "sha": "89cdc0df1af2ac21965e6978f35edb3ef6cb4c42",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "SteinOA/DSSA-Tale-Mac",
+    "sha": "c9a47300b462d4f23710459a944507f9c959d465",
+    "finished": true,
+    "packages": [
+      {
+        "name": "baseline-browser-mapping",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/baseline-browser-mapping@2.10.42 (dev) [OSV GHSA-w5vr-8v7q-w6rv SEMVER [2.0.0, <2.11.0); npm GHSA-w5vr-8v7q-w6rv >=2.0.0 <2.11.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: root devDependency autoprefixer@10.5.2 > browserslist@4.28.5 > baseline-browser-mapping@2.10.42 (CSS build); eslint-plugin-react-hooks@7.1.1 > @babel/core > @babel/helper-compilation-targets > browserslist (lint). Production of DSSA-Tale-Mac (OpenWhispr) is an Electron app: scripts.build `cd src && vite build && cd .. && electron-builder`; electron-builder.json files = main.js, preload.js, node_modules (electron-builder never copies devDependencies), src/dist (vite renderer build), src/helpers etc.; scripts.start `electron .`. A grep of main.js, preload.js and src/ finds no import of this package or of the dev tool on its path (only src/vite.config.mjs and src/eslint.config.js import build/lint tools)."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@electron/asar/node_modules/brace-expansion@1.1.18 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [0, <1.1.19); npm GHSA-q2hr-2g5m-vwhr <1.1.21]; node_modules/@electron/universal/node_modules/brace-expansion@2.1.4 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [2.0.0, <2.1.5); npm GHSA-q2hr-2g5m-vwhr >=2.0.0 <2.1.7]; node_modules/brace-expansion@5.0.9 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [4.0.0, <5.0.10); npm GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12]; node_modules/dir-compare/node_modules/brace-expansion@1.1.18 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [0, <1.1.19); npm GHSA-q2hr-2g5m-vwhr <1.1.21]; node_modules/filelist/node_modules/brace-expansion@2.1.4 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [2.0.0, <2.1.5); npm GHSA-q2hr-2g5m-vwhr >=2.0.0 <2.1.7]; node_modules/glob/node_modules/brace-expansion@1.1.18 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [0, <1.1.19); npm GHSA-q2hr-2g5m-vwhr <1.1.21]. No in-range copy is non-dev in the lockfile (criterion a does not hold). All in-range copies are on build/lint tooling: electron-builder@26.15.3 > app-builder-lib > @electron/asar|@electron/universal|dir-compare|glob|ejs>jake>filelist > minimatch > brace-expansion (1.1.18, 2.1.4); eslint@10.7.0 / typescript-eslint / electron-builder > minimatch@10.2.5 > brace-expansion@5.0.9. Production of DSSA-Tale-Mac (OpenWhispr) is an Electron app: scripts.build `cd src && vite build && cd .. && electron-builder`; electron-builder.json files = main.js, preload.js, node_modules (electron-builder never copies devDependencies), src/dist (vite renderer build), src/helpers etc.; scripts.start `electron .`. A grep of main.js, preload.js and src/ finds no import of this package or of the dev tool on its path (only src/vite.config.mjs and src/eslint.config.js import build/lint tools)."
+      },
+      {
+        "name": "browserslist",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/browserslist@4.28.5 (dev) [OSV GHSA-73wf-gq98-2v4g SEMVER [0, <4.28.7); npm GHSA-c83g-rgw3-j3cx <=4.28.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: autoprefixer@10.5.2 > browserslist@4.28.5 (CSS build); eslint-plugin-react-hooks > @babel/core > @babel/helper-compilation-targets > browserslist (lint). Production of DSSA-Tale-Mac (OpenWhispr) is an Electron app: scripts.build `cd src && vite build && cd .. && electron-builder`; electron-builder.json files = main.js, preload.js, node_modules (electron-builder never copies devDependencies), src/dist (vite renderer build), src/helpers etc.; scripts.start `electron .`. A grep of main.js, preload.js and src/ finds no import of this package or of the dev tool on its path (only src/vite.config.mjs and src/eslint.config.js import build/lint tools)."
+      },
+      {
+        "name": "electron",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "d",
+        "evidence": "In range: node_modules/electron@41.10.5 (dev) [OSV GHSA-2p8c-gr87-2676 SEMVER [0, <42.11.3); npm GHSA-gr2m-v5gq-v685 <41.10.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency electron@41.10.5. package.json scripts.start `electron .` runs it, main.js:24 and preload.js:1 require(\"electron\"), and electron-builder (scripts.build) packages the app around the Electron runtime of the installed version (also (c))."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/fast-uri@3.1.5 (dev) [OSV GHSA-333x-w4r6-6crp SEMVER [3.0.0, <3.1.9); npm GHSA-5jgf-p345-68v8 >=3.1.3 <3.1.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: electron-builder@26.15.3 > app-builder-lib > ajv@8.20.0 > fast-uri@3.1.5 (packaging tool). Production of DSSA-Tale-Mac (OpenWhispr) is an Electron app: scripts.build `cd src && vite build && cd .. && electron-builder`; electron-builder.json files = main.js, preload.js, node_modules (electron-builder never copies devDependencies), src/dist (vite renderer build), src/helpers etc.; scripts.start `electron .`. A grep of main.js, preload.js and src/ finds no import of this package or of the dev tool on its path (only src/vite.config.mjs and src/eslint.config.js import build/lint tools)."
+      },
+      {
+        "name": "http-cache-semantics",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/http-cache-semantics@4.2.0 (dev) [OSV GHSA-ch52-4w7c-c8xp SEMVER [0, <=4.2.0); npm GHSA-ch52-4w7c-c8xp <=4.2.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: electron-builder@26.15.3 > app-builder-lib > @electron/get > got@11.8.6 > cacheable-request > http-cache-semantics@4.2.0 (downloads Electron at package/install time: scripts.build, postinstall `electron-builder install-app-deps`). Production of DSSA-Tale-Mac (OpenWhispr) is an Electron app: scripts.build `cd src && vite build && cd .. && electron-builder`; electron-builder.json files = main.js, preload.js, node_modules (electron-builder never copies devDependencies), src/dist (vite renderer build), src/helpers etc.; scripts.start `electron .`. A grep of main.js, preload.js and src/ finds no import of this package or of the dev tool on its path (only src/vite.config.mjs and src/eslint.config.js import build/lint tools)."
+      },
+      {
+        "name": "shell-quote",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/shell-quote@1.9.0 (dev) [OSV GHSA-pqg4-j6r4-53mv SEMVER [1.8.4, <1.11.0); npm GHSA-pqg4-j6r4-53mv >=1.8.4 <1.11.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency concurrently@10.0.4 > shell-quote@1.9.0; concurrently is used only by scripts.dev. Production of DSSA-Tale-Mac (OpenWhispr) is an Electron app: scripts.build `cd src && vite build && cd .. && electron-builder`; electron-builder.json files = main.js, preload.js, node_modules (electron-builder never copies devDependencies), src/dist (vite renderer build), src/helpers etc.; scripts.start `electron .`. A grep of main.js, preload.js and src/ finds no import of this package or of the dev tool on its path (only src/vite.config.mjs and src/eslint.config.js import build/lint tools)."
+      },
+      {
+        "name": "source-map-js",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/source-map-js@1.2.1 (dev) [OSV GHSA-68fv-2mgg-jv7q SEMVER [1.0.0, <1.2.2); npm GHSA-68fv-2mgg-jv7q >=1.0.0 <1.2.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: postcss@8.5.26 / vite@8.1.4 > postcss / @tailwindcss/vite > @tailwindcss/node > source-map-js@1.2.1 (renderer build). Production of DSSA-Tale-Mac (OpenWhispr) is an Electron app: scripts.build `cd src && vite build && cd .. && electron-builder`; electron-builder.json files = main.js, preload.js, node_modules (electron-builder never copies devDependencies), src/dist (vite renderer build), src/helpers etc.; scripts.start `electron .`. A grep of main.js, preload.js and src/ finds no import of this package or of the dev tool on its path (only src/vite.config.mjs and src/eslint.config.js import build/lint tools)."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range: node_modules/vite@8.1.4 (dev) [OSV GHSA-587h-7wmj-h5pm SEMVER [8.0.0, <8.1.6); npm GHSA-698v-4r3x-3vcv >=8.0.0 <=8.1.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vite@8.1.4 builds the renderer (src/vite.config.mjs; scripts.build:renderer `cd src && vite build`) into src/dist, which electron-builder.json packages (\"src/dist/**/*\"). The renderer uses dynamic imports (src/AppRouter.jsx:22 React.lazy(() => import(\"./components/NBControlPanel.tsx\")); src/components/ControlPanel.tsx:103-110). vite@8.1.4 dist/node/chunks/node.js:28098 `function preload(...)` and :28162-28163 emit `preload.toString()` as the __vitePreload helper, :28169 for client non-lib builds, so Vite's own code is in the packaged renderer."
+      }
+    ]
+  },
+  {
+    "repo": "bm-hien/is-this-code-safe",
+    "sha": "2a6288938c09a5f4c24c05c507fc7b53f087d77c",
+    "finished": true,
+    "packages": [
+      {
+        "name": "dompurify",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/dompurify@3.4.13 (dev) [OSV GHSA-6688-9rhm-gjv2 SEMVER [0, <3.4.16); npm GHSA-p98j-92pf-mc4p >=3.4.13 <=3.4.15]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependencies dompurify 3.4.13 and monaco-editor@0.56.0 > dompurify@3.4.13. scripts/build_web_editor.mjs bundles monaco-editor with esbuild, redirecting Monaco's DOMPurify to node_modules/dompurify/dist/purify.es.mjs and failing unless the bundle contains \"DOMPurify 3.4.13\"; the output web/assets/monaco-editor.mjs (line 893: `@license DOMPurify 3.4.13`) is loaded by web/source-editor.mjs:40, and .github/workflows/pages.yml runs `npm run build:web` and uploads web/ to GitHub Pages. It is bundled for the browser and shipped."
+      }
+    ]
+  },
+  {
+    "repo": "cofob/design-system",
+    "sha": "6e1c42d66655665ab4f4b59f09225ef93406a435",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@sveltejs/kit",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@sveltejs/kit@2.70.1 (dev) [OSV GHSA-27mw-82g8-phjj SEMVER [0, <3.0.0); npm GHSA-29g2-3rmr-qm68 <=2.70.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: examples/sveltekit devDependencies @sveltejs/kit (and @sveltejs/adapter-node > @sveltejs/kit@2.70.1). examples/sveltekit is private: true, an \"SvelteKit SSR fixture\" (src/routes/+page.svelte), built only by CI `npm run check` (root build over workspaces). It is not published (publish-npm.mjs: packages/design-system-* only) and not deployed (deploy:showroom deploys apps/showroom/dist only). Only examples/sveltekit/package.json and vite.config.ts reference kit. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest/node_modules/@vitest/mocker@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: packages/* devDependency vitest@3.2.7 > @vitest/mocker@3.2.7. Test only (workspace scripts.test `vitest run`). Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/brace-expansion@5.0.7 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [4.0.0, <5.0.10); npm GHSA-mh99-v99m-4gvg >=4.0.0 <5.0.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependencies eslint@10.7.0 / typescript-eslint > minimatch@10.2.5 > brace-expansion@5.0.7. Lint only. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "colord",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/colord@2.9.3 (dev) [OSV GHSA-2wm5-q62r-hmrv SEMVER [0, <2.9.4); npm GHSA-2wm5-q62r-hmrv <2.9.4]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency stylelint@16.26.1 > colord@2.9.3. Lint only (scripts.lint stylelint). Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "cookie",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@sveltejs/kit/node_modules/cookie@0.6.0 (dev) [OSV GHSA-pxg6-pf52-xh8x SEMVER [0, <0.7.0); npm GHSA-pxg6-pf52-xh8x <0.7.0]. Out of range: node_modules/cookie@1.1.1. No in-range copy is non-dev in the lockfile (criterion a does not hold). In-range copy node_modules/@sveltejs/kit/node_modules/cookie@0.6.0, path examples/sveltekit devDependency @sveltejs/kit@2.70.1 > cookie. The example is a private CI fixture that is neither published nor deployed (see @sveltejs/kit). The non-dev copy node_modules/cookie@1.1.1 is out of range. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/fast-uri@3.1.4 (dev) [OSV GHSA-333x-w4r6-6crp SEMVER [3.0.0, <3.1.9); npm GHSA-7p8r-x3mc-p8w7 >=3.0.0 <3.1.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: stylelint@16.26.1 > table > ajv@8.20.0 > fast-uri@3.1.4 (lint); apps/showroom devDependency @astrojs/check > @astrojs/language-server > volar-service-yaml > yaml-language-server > ajv > fast-uri (type check run before astro build). Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/postcss-selector-parser@7.1.4 (dev) [OSV GHSA-rj75-hqrm-r3gf SEMVER [7.0.0, <7.1.6); npm GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: postcss-nesting@13.0.2 and cssnano > postcss-calc (CSS build: packages/design-system-css postcss.config.mjs, build-css.mjs; examples/vanilla), stylelint (lint). The emitted CSS is not parser code. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/tinypool@1.1.1 (dev) [OSV GHSA-5gmw-xhrv-c9v3 SEMVER [0, <2.1.1); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > tinypool@1.1.1. Test only. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici@7.28.0 (dev) [OSV GHSA-2gqq-gqf2-x968 SEMVER [7.1.0, <7.29.1); npm GHSA-8xcm-r25x-g524 >=7.0.0 <7.29.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency wrangler@4.112.0 > miniflare@4.20260714.0 > undici@7.28.0. wrangler is only used by scripts.deploy:showroom (`wrangler pages deploy`), a deploy tool; nothing imports undici. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Workspace devDependency vitest@3.2.7; imported only by tests/*.test.ts, *.test.tsx and vitest.config.ts files. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit)."
+      }
+    ]
+  },
+  {
+    "repo": "jasperyeo/jasper-oktavina-wedding",
+    "sha": "fd75e3f66b6fdb00f14db5532f640f8e20e1bb52",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@modelcontextprotocol/sdk",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@modelcontextprotocol/sdk@1.30.0 (dev) [OSV GHSA-22jm-h49p-29qw SEMVER [1.24.0, <1.32.0); npm GHSA-6qxp-vccf-f47h >=1.12.0 <1.31.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency @angular/cli@22.1.4 > @modelcontextprotocol/sdk@1.30.0. It is loaded only by `ng mcp`: @angular/cli src/commands/command-config.js:84-85 is a lazy factory require(\"./mcp/cli\"), and src/command-builder/command-runner.js:138-150 registers only the invoked command, so `ng serve` (start) and `ng build` never load it. Not in the static docs/ build. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker@4.1.11 (dev) [OSV GHSA-qxg6-89mg-rqv8 SEMVER [2.1.0-beta.7, <4.1.12); npm GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: vitest@4.1.11 and @angular/build@22.1.4 > vitest > @vitest/mocker@4.1.11. angular.json test builder @angular/build:unit-test with runner vitest (`ng test`) only. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/body-parser@2.3.0 (dev) [OSV GHSA-27r3-jxmh-p828 SEMVER [2.0.0, <2.4.0); npm GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0]; node_modules/karma/node_modules/body-parser@1.20.8 (dev) [OSV GHSA-27r3-jxmh-p828 SEMVER [0, <1.20.9); npm GHSA-27r3-jxmh-p828 <1.20.9]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Copies: @angular/cli > @modelcontextprotocol/sdk > express@5.2.1 > body-parser@2.3.0 (loaded only by `ng mcp`, see @modelcontextprotocol/sdk); karma@6.4.4 > body-parser@1.20.8 (test runner). The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/brace-expansion@1.1.18 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [0, <1.1.19); npm GHSA-q2hr-2g5m-vwhr <1.1.21]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: karma@6.4.4 / karma-coverage@2.2.1 > minimatch@3.1.5 > brace-expansion@1.1.18. Test tooling only. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "engine.io",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/engine.io@6.6.9 (dev) [OSV GHSA-2gc4-cqfq-p2gv SEMVER [6.6.0, <6.6.10); npm GHSA-2gc4-cqfq-p2gv >=6.6.0 <6.6.10]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: karma@6.4.4 > socket.io@4.8.1 > engine.io@6.6.9. Test tooling only. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "d",
+        "evidence": "In range: node_modules/fast-uri@3.1.7 (dev) [OSV GHSA-333x-w4r6-6crp SEMVER [3.0.0, <3.1.9); npm GHSA-hrr3-gc8f-f4qj >=3.0.0 <3.1.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @angular/cli@22.1.4 > @angular-devkit/core@22.1.4 > ajv@8.20.0 > fast-uri@3.1.7 (also @angular/build > @angular-devkit/architect > core). `npm start` = `ng serve`: @angular/cli src/command-builder/architect-base-command-module.js:140,172 creates CoreSchemaRegistry; @angular-devkit/core src/json/schema/registry.js:47 require(\"ajv\"); ajv dist/core.js:22 -> dist/runtime/uri.js:3 require(\"fast-uri\"). Yes only because rule (d) counts package.json start; the deployed static build does not contain it."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/follow-redirects@1.16.0 (dev) [OSV GHSA-8r9p-f939-6h3c SEMVER [1.16.0, <1.16.1); npm GHSA-q3jh-wrc6-jgq8 >=1.16.0 <1.16.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: karma@6.4.4 > http-proxy@1.18.1 > follow-redirects@1.16.0. Test tooling only. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "hono",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/hono@4.13.7 (dev) [OSV GHSA-5r4p-p66f-jhc7 SEMVER [4.12.4, <4.13.11); npm GHSA-5r4p-p66f-jhc7 >=4.12.4 <4.13.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @angular/cli@22.1.4 > @modelcontextprotocol/sdk@1.30.0 > hono@4.13.7. Loaded only by `ng mcp` (see @modelcontextprotocol/sdk). The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "ip-address",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/ip-address@10.5.0 (dev) [OSV GHSA-2vr4-cq9g-pvrc SEMVER [10.2.0, <10.5.1); npm GHSA-rpw4-54j3-4h4q <=10.5.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @angular/cli > @modelcontextprotocol/sdk > express-rate-limit@8.6.2 > ip-address@10.5.0. Loaded only by `ng mcp`. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "piscina",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "d",
+        "evidence": "In range: node_modules/piscina@5.2.0 (dev) [OSV GHSA-67c8-pqhq-4rmx SEMVER [5.0.0, <5.3.2); npm GHSA-67c8-pqhq-4rmx >=5.0.0 <5.3.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @angular/build@22.1.4 > piscina@5.2.0. `npm start` = `ng serve` (angular.json serve builder @angular/build:dev-server) builds through @angular/build's esbuild pipeline: src/tools/esbuild/javascript-transformer.js:15,91 uses src/utils/worker-pool.js:12 require(\"piscina\"). Yes only because rule (d) counts package.json start; the static build does not contain it."
+      },
+      {
+        "name": "proxy-addr",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/proxy-addr@2.0.7 (dev) [OSV GHSA-jqcg-44mw-7w3h SEMVER [1.1.0, <2.0.8); npm GHSA-jqcg-44mw-7w3h >=1.1.0 <2.0.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @angular/cli > @modelcontextprotocol/sdk > express@5.2.1 > proxy-addr@2.0.7. Loaded only by `ng mcp`. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/qs@6.16.0 (dev) [OSV GHSA-6pq8-jhm2-2vcw SEMVER [6.7.0, <6.16.1); npm GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: karma@6.4.4 > body-parser@1.20.8 > qs@6.16.0 (test runner); @angular/cli > @modelcontextprotocol/sdk > express > qs (`ng mcp` only). Neither is loaded by ng serve or ng build. The deployed artifact of jasper-oktavina-wedding is the static Angular build (angular.json build builder @angular/build:application, outputPath base \"docs\"; scripts.build:gh-pages) served from docs/. package.json scripts.start is `ng serve` (angular.json serve builder @angular/build:dev-server). Rule (d) names package.json `start` as a production start command, so what `ng serve` runs or loads is counted. src/ has no import of this package (grep)."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "d",
+        "evidence": "In range: node_modules/vite@8.1.5 (dev) [OSV GHSA-587h-7wmj-h5pm SEMVER [8.0.0, <8.1.6); npm GHSA-698v-4r3x-3vcv >=8.0.0 <=8.1.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @angular/build@22.1.4 (dependency vite 8.1.5) > node_modules/vite@8.1.5. `npm start` = `ng serve`, whose dev-server builder loads Vite: @angular/build src/builders/dev-server/vite/index.js:158 and vite/server.js:130 require(\"vite\"). The production build (application builder, esbuild) does not contain Vite code; yes only because rule (d) counts package.json start."
+      }
+    ]
+  },
+  {
+    "repo": "Sylonin/xposed-newx-patches",
+    "sha": "fe578ab933af0bb5a9e01533c30907fd778ac23b",
+    "finished": true,
+    "packages": [
+      {
+        "name": "ip-address",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/npm/node_modules/ip-address@10.7.2 (dev) [OSV GHSA-rxp7-6hxx-x8q5 SEMVER [0, <10.7.4); npm GHSA-rxp7-6hxx-x8q5 <=10.7.3]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/npm@13.2.0 > npm@11.21.1 > make-fetch-happen > @npmcli/agent > socks-proxy-agent > socks@2.8.9 > ip-address@10.7.2. Release tooling only. xposed-newx-patches is a Gradle/Kotlin project; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs semantic-release (cycjimmy/semantic-release-action) after `npm install`, and .releaserc uses @semantic-release/exec to run gradlew. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/npm/node_modules/undici@6.29.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [4.0.0, <6.29.1); npm GHSA-4qv8-2p9j-2685 >=6.5.0 <6.29.1]. Out of range: node_modules/@actions/http-client/node_modules/undici@6.29.1, node_modules/undici@7.30.1. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/npm > npm@11.21.1 > node-gyp@12.4.0 > undici@6.29.0. Release tooling only. Copies 6.29.1 and 7.30.1 are out of range. xposed-newx-patches is a Gradle/Kotlin project; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs semantic-release (cycjimmy/semantic-release-action) after `npm install`, and .releaserc uses @semantic-release/exec to run gradlew. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      }
+    ]
+  },
+  {
+    "repo": "aniru-dh21/snap-validate",
+    "sha": "2482ba5e2418e163968205ae8e20a4b3cea7c2a3",
+    "finished": true,
+    "packages": [
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/deepmerge@4.3.1 (dev) [OSV GHSA-gcqx-w48m-w2h4 SEMVER [4.2.0, <=4.3.1); npm GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency jest@30.5.2 > @jest/core > jest-config@30.5.2 > deepmerge@4.3.1 (scripts.test jest). snap-validate is a library: package.json main src/index.js, exports esm/index.mjs, files src/ esm/ types/; src/ and esm/ do not import deepmerge (grep); scripts.build is an echo; no start, Dockerfile or Procfile."
+      }
+    ]
+  },
+  {
+    "repo": "MorpheApp/morphe-patcher",
+    "sha": "c3363f717344c74fb3f160f8c788022981d3110f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/npm/node_modules/brace-expansion@5.0.9 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [4.0.0, <5.0.10); npm GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/npm@13.2.0 > npm@11.21.0 > minimatch@10.2.5 > brace-expansion@5.0.9. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "handlebars",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/handlebars@4.7.9 (dev) [OSV GHSA-8r5x-fm3f-whwj SEMVER [4.0.0, <4.7.10); npm GHSA-xw65-4hp5-5hc7 >=4.0.0 <=4.7.9]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/commit-analyzer > conventional-changelog-writer@8.4.0 > handlebars@4.7.9 (release-note templating). Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "http-cache-semantics",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/npm/node_modules/http-cache-semantics@4.2.0 (dev) [OSV GHSA-ch52-4w7c-c8xp SEMVER [0, <=4.2.0); npm GHSA-ch52-4w7c-c8xp <=4.2.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release > @semantic-release/npm > npm@11.21.0 > make-fetch-happen > http-cache-semantics@4.2.0. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "ip-address",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/npm/node_modules/ip-address@10.5.0 (dev) [OSV GHSA-2vr4-cq9g-pvrc SEMVER [10.2.0, <10.5.1); npm GHSA-rpw4-54j3-4h4q <=10.5.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release > @semantic-release/npm > npm@11.21.0 > make-fetch-happen > @npmcli/agent > socks-proxy-agent > socks > ip-address@10.5.0. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/npm/node_modules/postcss-selector-parser@7.1.4 (dev) [OSV GHSA-rj75-hqrm-r3gf SEMVER [7.0.0, <7.1.6); npm GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release > @semantic-release/npm > npm@11.21.0 > @npmcli/arborist > @npmcli/query > postcss-selector-parser@7.1.4. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@actions/http-client/node_modules/undici@6.29.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [4.0.0, <6.29.1); npm GHSA-4qv8-2p9j-2685 >=6.5.0 <6.29.1]; node_modules/npm/node_modules/undici@6.28.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [4.0.0, <6.29.1); npm GHSA-3wwx-pv8p-q78v >=6.25.0 <6.28.1]; node_modules/undici@7.30.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [7.0.0, <7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Copies: @semantic-release/npm > @actions/core > @actions/http-client > undici@6.29.0; @semantic-release/npm > npm@11.21.0 > node-gyp > undici@6.28.0; @semantic-release/github@12.0.10 > undici@7.30.0. All under semantic-release (release tooling). morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package."
+      }
+    ]
+  },
+  {
+    "repo": "itsdarklikehell/my-resume",
+    "sha": "8ae8c354fbf3ca7cb8182cefca778f1abba2e4b1",
+    "finished": true,
+    "packages": [
+      {
+        "name": "esbuild",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/esbuild@0.21.5 (dev) [OSV GHSA-67mh-4wv8-2f99 SEMVER [0, <0.25.0); npm GHSA-67mh-4wv8-2f99 <=0.24.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vite@5.4.21 > esbuild@0.21.5 (and vitest/html-validate > vitest > vite). Vite is not used to produce the deployed site. my-resume is deployed by .github/workflows/static.yml, which uploads the repository as-is (path \".\", no install or build step) to GitHub Pages (DEPLOY.md agrees). scripts.build `vite build` is not used by the deployment; no start script, Dockerfile or Procfile; repo-wide grep finds no import of this package outside vite.config.js/package.json."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/tinypool@0.8.4 (dev) [OSV GHSA-5gmw-xhrv-c9v3 SEMVER [0, <2.1.1); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@1.6.1 > tinypool@0.8.4 (also html-validate > vitest). Test only (scripts.test). my-resume is deployed by .github/workflows/static.yml, which uploads the repository as-is (path \".\", no install or build step) to GitHub Pages (DEPLOY.md agrees). scripts.build `vite build` is not used by the deployment; no start script, Dockerfile or Procfile; repo-wide grep finds no import of this package outside vite.config.js/package.json."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vite@5.4.21 (dev) [OSV GHSA-4w7w-66w2-5vf9 SEMVER [0, <6.4.2); npm GHSA-4w7w-66w2-5vf9 <=6.4.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vite@5.4.21; vite.config.js would build to dist, but static.yml deploys the unbuilt repository, so no Vite output or code is deployed; scripts.preview is not a production command. my-resume is deployed by .github/workflows/static.yml, which uploads the repository as-is (path \".\", no install or build step) to GitHub Pages (DEPLOY.md agrees). scripts.build `vite build` is not used by the deployment; no start script, Dockerfile or Procfile; repo-wide grep finds no import of this package outside vite.config.js/package.json."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest@1.6.1 (dev) [OSV GHSA-5xrq-8626-4rwp SEMVER [0, <3.2.6); npm GHSA-5xrq-8626-4rwp <3.2.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vitest@1.6.1; scripts.test only; no test or source file imports it outside package.json. my-resume is deployed by .github/workflows/static.yml, which uploads the repository as-is (path \".\", no install or build step) to GitHub Pages (DEPLOY.md agrees). scripts.build `vite build` is not used by the deployment; no start script, Dockerfile or Procfile; repo-wide grep finds no import of this package outside vite.config.js/package.json."
+      }
+    ]
+  },
+  {
+    "repo": "staticdesigner/modevue",
+    "sha": "a5c491ff16d18a1d3649d4fa21af02aec905d251",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "wefio/NodeMemoryGraph",
+    "sha": "cd193624f10d72b69b010ca70de5d61c6f8cd09d",
+    "finished": true,
+    "packages": [
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@earendil-works/pi-coding-agent/node_modules/undici@8.10.2 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [8.0.0, <8.12.2); npm GHSA-4qv8-2p9j-2685 >=8.0.0 <8.12.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Copy node_modules/@earendil-works/pi-coding-agent/node_modules/undici@8.10.2. @earendil-works/pi-coding-agent@0.99.1 (root devDependency and peerDependency) has undici 8.10.2 as a runtime dependency (registry manifest \"dependencies\"; dist/core/http-dispatcher.js:2 `import * as undici from \"undici\"`). Shipped code imports it at runtime: .pi/extensions/nmg/index.ts:16 `import { defineTool } from \"@earendil-works/pi-coding-agent\"` (also :39, first-response-timing.ts:6, ooo-execution.ts:9); these files are in package.json \"files\" (the published pi extension). The Docker image installs --omit=dev and does not contain it, but the published extension imports it."
+      }
+    ]
+  },
+  {
+    "repo": "yaeouk-rajab/pulsewatch-mobile",
+    "sha": "797d1398fd706220cfbf47e387409e95dfdb1107",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "mbadr5858/badr-pdf",
+    "sha": "ec472a6ea0726105088fb0c1536dfbfcaa57cd7d",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker@4.1.11 (dev) [OSV GHSA-qxg6-89mg-rqv8 SEMVER [2.1.0-beta.7, <4.1.12); npm GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@4.1.11 > @vitest/mocker@4.1.11 (also @vitest/coverage-v8, @vitest/ui). Test only. Production of badr-pdf (BentoPDF) is a static site: Dockerfile builder stage runs `npm run build:with-docs` and the final stage is nginx (CMD [\"nginx\",\"-g\",\"daemon off;\"]); vercel.json buildCommand `npm run build:with-docs`, outputDirectory dist; .github/workflows/pages.yml uploads dist."
+      },
+      {
+        "name": "elliptic",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/elliptic@6.6.1 (dev) [OSV GHSA-848j-6mx2-7j84 SEMVER [0, <=6.6.1); npm GHSA-848j-6mx2-7j84 <=6.6.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency vite-plugin-node-polyfills@0.26.0 > node-stdlib-browser > crypto-browserify > browserify-sign > elliptic@6.6.1. vite.config.ts:564-565 restricts nodePolyfills to include [\"buffer\",\"stream\",\"util\",\"zlib\",\"process\"], so crypto-browserify/elliptic are not bundled; src/ has no import of elliptic or crypto. (public/coherentpdf.browser.min.js mentions elliptic but is a committed vendor bundle, not the installed copy.) Production of badr-pdf (BentoPDF) is a static site: Dockerfile builder stage runs `npm run build:with-docs` and the final stage is nginx (CMD [\"nginx\",\"-g\",\"daemon off;\"]); vercel.json buildCommand `npm run build:with-docs`, outputDirectory dist; .github/workflows/pages.yml uploads dist."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/qs@6.16.0 (dev) [OSV GHSA-6pq8-jhm2-2vcw SEMVER [6.7.0, <6.16.1); npm GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vite-plugin-node-polyfills@0.26.0 > node-stdlib-browser > url@0.11.4 > qs@6.16.0. \"url\" is not in the nodePolyfills include list (vite.config.ts:565); src/ has no import of url or qs. Production of badr-pdf (BentoPDF) is a static site: Dockerfile builder stage runs `npm run build:with-docs` and the final stage is nginx (CMD [\"nginx\",\"-g\",\"daemon off;\"]); vercel.json buildCommand `npm run build:with-docs`, outputDirectory dist; .github/workflows/pages.yml uploads dist."
+      },
+      {
+        "name": "sharp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/sharp@0.32.6 (dev) [OSV GHSA-f88m-g3jw-g9cj SEMVER [0, <0.35.0); npm GHSA-f88m-g3jw-g9cj <0.35.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: root devDependency @capacitor/assets@3.0.5 > sharp@0.32.6 (icon/splash CLI); root dependency @matbee/libreoffice-converter@2.7.2 lists sharp only as an optional peerDependency (registry manifest), and the app imports \"@matbee/libreoffice-converter/browser\" (src/js/utils/libreoffice-loader.ts:8), whose dist/browser.js has no reference to sharp. Production is static nginx with no Node runtime. Production of badr-pdf (BentoPDF) is a static site: Dockerfile builder stage runs `npm run build:with-docs` and the final stage is nginx (CMD [\"nginx\",\"-g\",\"daemon off;\"]); vercel.json buildCommand `npm run build:with-docs`, outputDirectory dist; .github/workflows/pages.yml uploads dist."
+      },
+      {
+        "name": "tar",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@capacitor/assets/node_modules/tar@6.2.1 (dev) [OSV GHSA-23hp-3jrh-7fpw SEMVER [0, <7.5.19); npm GHSA-34x7-hfp2-rc4v <7.5.7]. Out of range: node_modules/tar@7.5.22. No in-range copy is non-dev in the lockfile (criterion a does not hold). In-range copy node_modules/@capacitor/assets/node_modules/tar@6.2.1 via @capacitor/assets@3.0.5 > @capacitor/cli@5.7.8 > tar (dev asset CLI). Copy tar@7.5.22 is out of range. Production of badr-pdf (BentoPDF) is a static site: Dockerfile builder stage runs `npm run build:with-docs` and the final stage is nginx (CMD [\"nginx\",\"-g\",\"daemon off;\"]); vercel.json buildCommand `npm run build:with-docs`, outputDirectory dist; .github/workflows/pages.yml uploads dist."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici@7.30.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [7.0.0, <7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency jsdom@28.1.0 > undici@7.30.0 (vitest jsdom environment, vite.config.ts test.environment). Test only. Production of badr-pdf (BentoPDF) is a static site: Dockerfile builder stage runs `npm run build:with-docs` and the final stage is nginx (CMD [\"nginx\",\"-g\",\"daemon off;\"]); vercel.json buildCommand `npm run build:with-docs`, outputDirectory dist; .github/workflows/pages.yml uploads dist."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range: node_modules/vitepress/node_modules/vite@5.4.21 (dev) [OSV GHSA-4w7w-66w2-5vf9 SEMVER [0, <6.4.2); npm GHSA-4w7w-66w2-5vf9 <=6.4.1]. Out of range: node_modules/vite@8.3.4. No in-range copy is non-dev in the lockfile (criterion a does not hold). In-range copy is vitepress@1.6.4's nested vite@5.4.21 (root vite@8.3.4 is out of range). Production builds run build:with-docs = build && `vitepress build docs` && scripts/include-docs-in-dist.js, which copies docs/.vitepress/dist into dist/docs (Dockerfile:994; vercel.json buildCommand). docs/.vitepress/config.mts:230-231 sets search provider \"local\", so vitepress dist/client/theme-default/components/VPNavBarSearch.vue:14-15 `defineAsyncComponent(() => import(\"./VPLocalSearchBox.vue\"))` is in the client bundle; vite@5.4.21 inserts its own preload helper for client dynamic imports (dist/node/chunks/dep-BK3b2jBa.js:64801 `function preload`, :64871 insertPreload, :64886 `preload.toString()`), so Vite code ships in /docs."
+      }
+    ]
+  },
+  {
+    "repo": "padosoft/eval-harness-admin",
+    "sha": "7c2617ce7baa8edbd076a1562a54674d1a2e8562",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker@4.1.10 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@4.1.10 > @vitest/mocker@4.1.10. Test only (scripts.test). eval-harness-admin is a Laravel package (composer.json type library, PHP in src/); its React UI is built by `vite build` (vite.config.js, input resources/js/main.tsx, outDir dist). No start script, Dockerfile or Procfile; release.yml only creates a GitHub release. No non-test file in resources/js imports this package (grep)."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/postcss-selector-parser@6.1.4 (dev) [OSV GHSA-rj75-hqrm-r3gf SEMVER [0, <6.1.5); npm GHSA-rj75-hqrm-r3gf <6.1.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency tailwindcss@3.4.19 > postcss-selector-parser@6.1.4 (PostCSS plugin at build: postcss.config.js, tailwind.config.js). eval-harness-admin is a Laravel package (composer.json type library, PHP in src/); its React UI is built by `vite build` (vite.config.js, input resources/js/main.tsx, outDir dist). No start script, Dockerfile or Procfile; release.yml only creates a GitHub release. No non-test file in resources/js imports this package (grep)."
+      },
+      {
+        "name": "source-map-js",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/source-map-js@1.2.1 (dev) [OSV GHSA-68fv-2mgg-jv7q SEMVER [1.0.0, <1.2.2); npm GHSA-68fv-2mgg-jv7q >=1.0.0 <1.2.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: postcss@8.5.26 / autoprefixer / tailwindcss / vite@8.1.5 > postcss > source-map-js@1.2.1. Build only. eval-harness-admin is a Laravel package (composer.json type library, PHP in src/); its React UI is built by `vite build` (vite.config.js, input resources/js/main.tsx, outDir dist). No start script, Dockerfile or Procfile; release.yml only creates a GitHub release. No non-test file in resources/js imports this package (grep)."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vite@8.1.5 (dev) [OSV GHSA-587h-7wmj-h5pm SEMVER [8.0.0, <8.1.6); npm GHSA-698v-4r3x-3vcv >=8.0.0 <=8.1.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vite@8.1.5 as the build tool. vite.config.js builds a JS entry (rollupOptions.input resources/js/main.tsx, not an HTML entry, so no modulepreload polyfill), and resources/js has no dynamic import() (grep), so Vite's preload helper is not emitted; nothing imports vite at runtime; scripts.preview is not a start or deploy command. eval-harness-admin is a Laravel package (composer.json type library, PHP in src/); its React UI is built by `vite build` (vite.config.js, input resources/js/main.tsx, outDir dist). No start script, Dockerfile or Procfile; release.yml only creates a GitHub release. No non-test file in resources/js imports this package (grep)."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest@4.1.10 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vitest@4.1.10; imported only by resources/js/**/*.test.ts(x) and test.setup.ts. eval-harness-admin is a Laravel package (composer.json type library, PHP in src/); its React UI is built by `vite build` (vite.config.js, input resources/js/main.tsx, outDir dist). No start script, Dockerfile or Procfile; release.yml only creates a GitHub release. No non-test file in resources/js imports this package (grep)."
+      }
+    ]
+  },
+  {
+    "repo": "developer3000S/OmniRouteRus",
+    "sha": "6874cc4408cdd0c46010b4401501d7e0669b0caf",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@babel/core",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@babel/core@7.29.0 (dev) [OSV GHSA-4x5r-pxfx-6jf8 SEMVER [0, <7.29.6); npm GHSA-4x5r-pxfx-6jf8 <=7.29.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency eslint-config-next@16.2.6 > eslint-plugin-react-hooks@7.0.1 > @babel/core@7.29.0. Lint only. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "@humanfs/node",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@humanfs/node@0.16.7 (dev) [OSV GHSA-p498-v437-472g SEMVER [0, <0.16.8); npm GHSA-p498-v437-472g <0.16.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.39.5 > @humanfs/node@0.16.7 (also eslint-config-next, typescript-eslint). Lint only. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker@4.1.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@4.1.7 > @vitest/mocker@4.1.7. Test only (scripts.test:vitest). Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.6 (dev) [OSV GHSA-3jxr-9vmj-r5cp SEMVER [3.0.0, <5.0.7); npm GHSA-3jxr-9vmj-r5cp >=3.0.0 <5.0.7]; node_modules/brace-expansion@1.1.13 (dev) [OSV GHSA-3jxr-9vmj-r5cp SEMVER [0, <1.1.16); npm GHSA-3jxr-9vmj-r5cp <1.1.16]; node_modules/glob/node_modules/brace-expansion@5.0.6 (dev) [OSV GHSA-3jxr-9vmj-r5cp SEMVER [3.0.0, <5.0.7); npm GHSA-3jxr-9vmj-r5cp >=3.0.0 <5.0.7]; node_modules/test-exclude/node_modules/brace-expansion@5.0.6 (dev) [OSV GHSA-3jxr-9vmj-r5cp SEMVER [3.0.0, <5.0.7); npm GHSA-3jxr-9vmj-r5cp >=3.0.0 <5.0.7]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Copies: typescript-eslint/eslint-config-next > @typescript-eslint/typescript-estree > minimatch@10.2.5 > brace-expansion@5.0.6 and eslint@9.39.5 > minimatch@3.1.5 > brace-expansion@1.1.13 (lint); root devDependency glob@13.0.6 > minimatch > brace-expansion@5.0.6 (no shipped code imports glob); c8 > test-exclude > brace-expansion@5.0.6 (coverage). Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "browserslist",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/browserslist@4.28.2 (dev) [OSV GHSA-73wf-gq98-2v4g SEMVER [0, <4.28.7); npm GHSA-c83g-rgw3-j3cx <=4.28.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint-config-next > eslint-plugin-react-hooks@7.0.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets > browserslist@4.28.2. Lint only. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "joi",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/joi@18.2.1 (dev) [OSV GHSA-6h2x-m376-mqjq SEMVER [18.0.0, <18.2.6); npm GHSA-6w3j-5fw6-r9vr >=18.0.0 <18.2.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency wait-on@9.0.10 > joi@18.2.1; wait-on is used only by scripts.electron:dev. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "shell-quote",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/shell-quote@1.8.3 (dev) [OSV GHSA-395f-4hp3-45gv SEMVER [0, <1.9.0); npm GHSA-w7jw-789q-3m8p >=1.1.0 <=1.8.3]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency concurrently@9.2.1 > shell-quote@1.8.3; concurrently is used only by scripts.electron:dev. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vite@8.0.5 (dev) [OSV GHSA-587h-7wmj-h5pm SEMVER [8.0.0, <8.1.6); npm GHSA-v6wh-96g9-6wx3 >=8.0.0 <=8.0.15]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: @vitejs/plugin-react@6.0.2 > vite and vitest@4.1.7 > vite (vitest.config.ts); root dependency fumadocs-mdx@15.0.7 declares vite only as an optional peerDependency, imported only by fumadocs-mdx dist/vite/index.js, while next.config.mjs:2 imports fumadocs-mdx/next. The production build is Next webpack (Dockerfile). Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest@4.1.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vitest@4.1.7; imported only by test files and vitest configs (scripts.test:vitest). Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config."
+      }
+    ]
+  },
+  {
+    "repo": "mrBettazzi/nuxt-myweb",
+    "sha": "917e96c34deee92c167f3b07fd194425090e6b0e",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "shiiizuku/document-management-tracking-system",
+    "sha": "1a20cbb3a879e826654e0556412c1d534e8b6936",
+    "finished": true,
+    "packages": [
+      {
+        "name": "esbuild",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@esbuild-kit/core-utils/node_modules/esbuild@0.18.20 (dev) [OSV GHSA-67mh-4wv8-2f99 SEMVER [0, <0.25.0); npm GHSA-67mh-4wv8-2f99 <=0.24.2]. Out of range: node_modules/drizzle-kit/node_modules/esbuild@0.25.12, node_modules/esbuild@0.28.2. No in-range copy is non-dev in the lockfile (criterion a does not hold). In-range copy node_modules/@esbuild-kit/core-utils/node_modules/esbuild@0.18.20 via apps/api devDependency drizzle-kit@0.31.11 > @esbuild-kit/esm-loader > @esbuild-kit/core-utils. drizzle-kit is only used by scripts.db:generate; the API image prunes dev dependencies and migrates with the compiled drizzle-orm migrator. Copies 0.25.12 and 0.28.2 are out of range. Production of document-management-tracking-system is two Docker images: apps/api/Dockerfile (`npm prune --omit=dev`, CMD [\"node\",\"apps/api/dist/main.js\"]) and apps/web/Dockerfile (Next standalone, CMD [\"node\",\"apps/web/server.js\"]); docker-compose.yml runs migrate as `node dist/database/migrate.js` and the worker as `node apps/api/dist/worker.js`. Repo-wide grep finds no import of this package (only docs mention esbuild)."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici@8.11.2 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [8.0.0, <8.12.2); npm GHSA-4qv8-2p9j-2685 >=8.0.0 <8.12.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency jsdom@30.1.1 > undici@8.11.2 (also vitest > jsdom). Test environment only. Production of document-management-tracking-system is two Docker images: apps/api/Dockerfile (`npm prune --omit=dev`, CMD [\"node\",\"apps/api/dist/main.js\"]) and apps/web/Dockerfile (Next standalone, CMD [\"node\",\"apps/web/server.js\"]); docker-compose.yml runs migrate as `node dist/database/migrate.js` and the worker as `node apps/api/dist/worker.js`. Repo-wide grep finds no import of this package (only docs mention esbuild)."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vite@8.3.2 (dev) [OSV GHSA-587h-7wmj-h5pm SEMVER [8.3.0, <8.3.3); npm GHSA-698v-4r3x-3vcv >=8.3.0 <=8.3.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vite@8.3.2 (also vitest@5.0.3 > vite), used by the vitest configs (apps/web/vitest.config.ts, apps/api/vitest.config.ts). The web app is built by `next build` and the API by `nest build`; no production Vite build. Production of document-management-tracking-system is two Docker images: apps/api/Dockerfile (`npm prune --omit=dev`, CMD [\"node\",\"apps/api/dist/main.js\"]) and apps/web/Dockerfile (Next standalone, CMD [\"node\",\"apps/web/server.js\"]); docker-compose.yml runs migrate as `node dist/database/migrate.js` and the worker as `node apps/api/dist/worker.js`. Repo-wide grep finds no import of this package (only docs mention esbuild)."
+      }
+    ]
+  },
+  {
+    "repo": "wangyufengsky/qq-agents",
+    "sha": "4143fe2cae4faea4a2f63aa41784272e6662a6e4",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "microsoft/vscode-ts-file-path-support",
+    "sha": "dde70fb77b2ca4c5fe9b00272a9902e0360763b6",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@azure/msal-node",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@azure/msal-node@5.1.5 (dev) [OSV GHSA-xcx6-jx8p-x3h5 SEMVER [5.0.0-beta.0, <7.1.0); npm GHSA-xcx6-jx8p-x3h5 >=5.0.0-beta.0 <7.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vscode-extension devDependency @vscode/vsce@3.7.1 > @azure/identity@4.13.1 > @azure/msal-node@5.1.5 (packaging/publishing tool). vscode-ts-file-path-support ships a VS Code extension and a TS server plugin bundled by rollup (vscode-extension/rollup.config.mjs, language-service-plugin/rollup.config.mjs); the .vsix is produced by `vsce package` (vscode-extension scripts.build-package). Neither workspace declares runtime dependencies; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker@4.1.11 (dev) [OSV GHSA-qxg6-89mg-rqv8 SEMVER [2.1.0-beta.7, <4.1.12); npm GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@4.1.11 > @vitest/mocker@4.1.11. Test only (language-service-plugin scripts.test). vscode-ts-file-path-support ships a VS Code extension and a TS server plugin bundled by rollup (vscode-extension/rollup.config.mjs, language-service-plugin/rollup.config.mjs); the .vsix is produced by `vsce package` (vscode-extension scripts.build-package). Neither workspace declares runtime dependencies; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/fast-uri@3.1.8 (dev) [OSV GHSA-333x-w4r6-6crp SEMVER [3.0.0, <3.1.9); npm GHSA-w74x-v6f9-j3xg >=3.0.0 <3.1.9]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @vscode/vsce@3.7.1 > @secretlint/node > @secretlint/config-loader > ajv@8.18.0 > fast-uri@3.1.8 (packaging tool). vscode-ts-file-path-support ships a VS Code extension and a TS server plugin bundled by rollup (vscode-extension/rollup.config.mjs, language-service-plugin/rollup.config.mjs); the .vsix is produced by `vsce package` (vscode-extension scripts.build-package). Neither workspace declares runtime dependencies; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/qs@6.16.0 (dev) [OSV GHSA-6pq8-jhm2-2vcw SEMVER [6.7.0, <6.16.1); npm GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @vscode/vsce@3.7.1 > typed-rest-client@1.8.11 > qs@6.16.0 (packaging/publishing tool). vscode-ts-file-path-support ships a VS Code extension and a TS server plugin bundled by rollup (vscode-extension/rollup.config.mjs, language-service-plugin/rollup.config.mjs); the .vsix is produced by `vsce package` (vscode-extension scripts.build-package). Neither workspace declares runtime dependencies; repo-wide grep finds no import of this package."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici@7.29.1 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [7.0.0, <7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @vscode/vsce@3.7.1 > cheerio@1.2.0 > undici@7.29.1 (packaging tool). vscode-ts-file-path-support ships a VS Code extension and a TS server plugin bundled by rollup (vscode-extension/rollup.config.mjs, language-service-plugin/rollup.config.mjs); the .vsix is produced by `vsce package` (vscode-extension scripts.build-package). Neither workspace declares runtime dependencies; repo-wide grep finds no import of this package."
+      }
+    ]
+  },
+  {
+    "repo": "lalidiaz/node-store-api",
+    "sha": "975d0dc048f399e66be47a6fb3ae9f4ee0eed39c",
+    "finished": true,
+    "packages": [
+      {
+        "name": "semver",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "d",
+        "evidence": "In range: node_modules/semver@5.7.1 (dev) [OSV GHSA-c2qf-rxjj-qqgw SEMVER [2.0.0-alpha, <5.7.2); npm GHSA-c2qf-rxjj-qqgw >=2.0.0-alpha <5.7.2]; node_modules/simple-update-notifier/node_modules/semver@7.0.0 (dev) [OSV GHSA-c2qf-rxjj-qqgw SEMVER [7.0.0, <7.5.2); npm GHSA-c2qf-rxjj-qqgw >=7.0.0 <7.5.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). package.json scripts.start is `nodemon app.js` (the only start; no Dockerfile or Procfile), which runs devDependency nodemon@2.0.20: nodemon lib/utils/index.js:3 require(\"semver\") loads node_modules/semver@5.7.1, and bin/nodemon.js:15 require(\"simple-update-notifier\") loads simple-update-notifier@1.1.0, whose build/index.js:4 require(\"semver\") loads node_modules/simple-update-notifier/node_modules/semver@7.0.0."
+      }
+    ]
+  },
+  {
+    "repo": "airalab/robonomics.network",
+    "sha": "c8b14da0c05f9e52ec6f49311db1ea657199736b",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/brace-expansion@2.0.1 (dev) [OSV GHSA-3jxr-9vmj-r5cp SEMVER [2.0.0, <2.1.2); npm GHSA-v6h2-p8h4-qcjw >=2.0.0 <=2.0.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency glob@11.0.1 > minimatch@10.0.1 > brace-expansion@2.0.1. glob is build-time only (see glob). Production of robonomics.network is a static Astro site: astro.config.mjs sets no output/adapter (static) and .github/workflows/main.yml runs `yarn build` and publishes ./dist to gh-pages. No start script, Dockerfile or Procfile."
+      },
+      {
+        "name": "glob",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/glob@11.0.1 (dev) [OSV GHSA-5j98-mcp5-4vw2 SEMVER [11.0.0, <11.1.0); npm GHSA-5j98-mcp5-4vw2 >=11.0.0 <11.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency glob@11.0.1, imported by config/redirects.mjs:3 and config/svg-sprite.mjs:3, which astro.config.mjs imports as build configuration (createRedirectConfig at config time; svgSpritePlugin buildStart writes public/sprite.svg), and by translations/prompt.js (translation script). Not imported by src/ and not in the static output. Production of robonomics.network is a static Astro site: astro.config.mjs sets no output/adapter (static) and .github/workflows/main.yml runs `yarn build` and publishes ./dist to gh-pages. No start script, Dockerfile or Procfile."
+      },
+      {
+        "name": "minimatch",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/minimatch@10.0.1 (dev) [OSV GHSA-23c5-xmqv-rm74 SEMVER [10.0.0, <10.2.3); npm GHSA-3ppc-4f35-3m26 >=10.0.0 <10.2.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: glob@11.0.1 > minimatch@10.0.1. Build-time only (see glob). Production of robonomics.network is a static Astro site: astro.config.mjs sets no output/adapter (static) and .github/workflows/main.yml runs `yarn build` and publishes ./dist to gh-pages. No start script, Dockerfile or Procfile."
+      },
+      {
+        "name": "svgo",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/svgo@3.3.2 (dev) [OSV GHSA-2p49-hgcm-8545 SEMVER [3.0.0, <3.3.4); npm GHSA-xpqw-6gx7-v673 >=3.0.0 <3.3.3]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency svgo@3.3.2; config/svg-sprite.mjs:4 calls optimize() at build (buildStart/configureServer) to produce sprite.svg data, not svgo code; also dev/svg/svg-pipeline.js:16 (dev script). Production of robonomics.network is a static Astro site: astro.config.mjs sets no output/adapter (static) and .github/workflows/main.yml runs `yarn build` and publishes ./dist to gh-pages. No start script, Dockerfile or Procfile."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici@6.21.2 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [4.0.0, <6.29.1); npm GHSA-g9mf-h72j-4rw9 <6.23.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency cheerio@1.0.0 > undici@6.21.2; cheerio is only imported by dev/svg/svg-pipeline.js:17 (dev script). Production of robonomics.network is a static Astro site: astro.config.mjs sets no output/adapter (static) and .github/workflows/main.yml runs `yarn build` and publishes ./dist to gh-pages. No start script, Dockerfile or Procfile."
+      }
+    ]
+  },
+  {
+    "repo": "donkirkby/python-zendo",
+    "sha": "483ef789aca2d7b0f0cf332651ab54c0f827a76c",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "akshaydhadwal745/lens-camera",
+    "sha": "79c72e96b93e971a8b7337a68cdab12bd431aa6e",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "Blackshield-Company/openshield-desktop",
+    "sha": "1803691d2ed0c35aa6be614f93d8f519d80f0f5f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@sveltejs/kit",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@sveltejs/kit@2.70.3 (dev) [OSV GHSA-27mw-82g8-phjj SEMVER [0, <3.0.0); npm GHSA-pfhg-q3qv-9q6r <3.0.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency @sveltejs/kit@2.70.3 imported by shipped code: src/routes/+layout.svelte:4-5 ($app/stores, $app/navigation), src/routes/+page.svelte:3, src/lib/services/approvals.ts:24 ($app/environment) and others; kit's client runtime is bundled into build/."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > @vitest/mocker@3.2.7 (also @testing-library/svelte > vitest). Test only. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback)."
+      },
+      {
+        "name": "cookie",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/cookie@0.6.0 (dev) [OSV GHSA-pxg6-pf52-xh8x SEMVER [0, <0.7.0); npm GHSA-pxg6-pf52-xh8x <0.7.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Shipped code imports @sveltejs/kit (see @sveltejs/kit), and kit@2.70.3's runtime dependencies (registry manifest \"dependencies\": cookie ^0.6.0) reach node_modules/cookie@0.6.0. cookie is imported by kit's server runtime (src/runtime/server/cookie.js:1), which in this adapter-static SPA build runs at build time, so its code is probably not in the Tauri bundle. It is yes because rule (b) counts dependency reach."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/deepmerge@4.3.1 (dev) [OSV GHSA-gcqx-w48m-w2h4 SEMVER [4.2.0, <=4.3.1); npm GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: @sveltejs/vite-plugin-svelte@5.1.1 > deepmerge@4.3.1 (Vite build plugin; a peerDependency of kit, not a runtime dependency). Used only via svelte.config.js/vite.config.ts; shipped code does not import it. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback)."
+      },
+      {
+        "name": "devalue",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/devalue@5.9.2 (dev) [OSV GHSA-4q55-j62x-fr9h SEMVER [0, <5.9.3); npm GHSA-j22f-vq7h-c4qm >=5.1.0 <=5.9.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). @sveltejs/kit@2.70.3, imported by shipped code, has devalue ^5.8.1 as a runtime dependency, and kit src/runtime/client/client.js:34 `import * as devalue from \"devalue\"` is bundled into the client. svelte@5.57.0, imported by every component, also depends on devalue."
+      },
+      {
+        "name": "source-map-js",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/source-map-js@1.2.1 (dev) [OSV GHSA-68fv-2mgg-jv7q SEMVER [1.0.0, <1.2.2); npm GHSA-68fv-2mgg-jv7q >=1.0.0 <1.2.2]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vite@6.4.3 > postcss@8.5.28 > source-map-js@1.2.1. Build only. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback)."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/tinypool@1.1.1 (dev) [OSV GHSA-5gmw-xhrv-c9v3 SEMVER [0, <2.1.1); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > tinypool@1.1.1. Test only. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback)."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range: node_modules/vite@6.4.3 (dev) [OSV GHSA-587h-7wmj-h5pm SEMVER [0, <6.4.4); npm GHSA-698v-4r3x-3vcv <=6.4.3]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vite@6.4.3 builds the app (vite.config.ts with sveltekit()). Kit's generated client manifest uses dynamic imports (kit src/core/sync/write_client_manifest.js:50 `() => import(\"./nodes/${i}\")`), and vite@6.4.3 inserts its own preload helper for client dynamic imports (dist/node/chunks/dep-Dm0c1Wj2.js:45423 `function preload`, :45528 `preload.toString()`, :45553 insertPreload) into build/, which Tauri bundles. vite.config.ts itself notes that Vite injects modulepreload/crossorigin hints into the built index.html."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vitest@3.2.7; imported only by tests/*.test.ts and vitest.config.ts. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback)."
+      }
+    ]
+  }
+]

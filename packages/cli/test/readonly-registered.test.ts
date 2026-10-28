@@ -112,7 +112,7 @@ const readOnly = (check: Awaited<ReturnType<typeof scanProject>>["checks"][numbe
 describe("the registered readers", () => {
   it("are Python, Go and Rust, in that order", () => {
     expect(READONLY_READERS.map(r => [r.ecosystem, r.files])).toEqual([
-      ["PyPI", ["requirements.txt", "pyproject.toml", "poetry.lock", "uv.lock", "Pipfile.lock", "Pipfile"]],
+      ["PyPI", ["requirements.txt", "pyproject.toml", "poetry.lock", "uv.lock", "Pipfile.lock", "Pipfile", "setup.py", "setup.cfg"]],
       ["Go", ["go.mod"]],
       ["crates.io", ["Cargo.lock", "Cargo.toml"]],
     ]);
@@ -125,8 +125,8 @@ describe("scanProject with the registered readers", () => {
     const report = await scanProject(project(PYTHON), undefined, { client: new OsvClient(osv({ "PyPI:requests@2.19.0": ["GHSA-x84v-xcm2-53pg"] }, seen)) });
     expect(report.checks.map(c => c.ecosystem)).toEqual(["PyPI"]);
     const result = readOnly(report.checks[0]!);
-    // uv.lock records pyproject.toml's requirements, so pyproject.toml is covered, not "present but not read".
-    expect(result.inventory.files).toEqual(["uv.lock"]);
+    // pyproject.toml is read too: uv.lock has its project package ("app") and every requirement it declares.
+    expect(result.inventory.files).toEqual(["uv.lock", "pyproject.toml"]);
     expect(result.inventory.limitations).toEqual([]);
     expect(result.inventory.packages).toEqual([{ name: "requests", version: "2.19.0", direct: true }, { name: "urllib3", version: "1.23", direct: false }]);
     expect(seen).toEqual([{ package: { ecosystem: "PyPI", name: "requests" }, version: "2.19.0" }, { package: { ecosystem: "PyPI", name: "urllib3" }, version: "1.23" }]);
@@ -146,11 +146,11 @@ describe("scanProject with the registered readers", () => {
     expect(report.status).toBe("attention_required");
     expect(report.unsupported).toEqual([]);
   });
-  it("Rust: reads Cargo.lock, covers Cargo.toml, and keeps informational and unsound RustSec records apart", async () => {
+  it("Rust: reads Cargo.lock and Cargo.toml, and keeps informational and unsound RustSec records apart", async () => {
     const root = project(RUST);
     const informational = await scanProject(root, undefined, { client: new OsvClient(osv({ "crates.io:atty@0.2.14": ["RUSTSEC-2024-0375"] })) });
     const result = readOnly(informational.checks[0]!);
-    expect(result.inventory.files).toEqual(["Cargo.lock"]);
+    expect(result.inventory.files).toEqual(["Cargo.lock", "Cargo.toml"]);
     expect(result.inventory.limitations).toEqual([]);
     expect(result.inventory.packages).toEqual([{ name: "atty", version: "0.2.14", direct: true }, { name: "libc", version: "0.2.150", direct: false }]);
     expect(result.findings.map(f => [f.advisory.id, f.kind])).toEqual([["RUSTSEC-2024-0375", "informational"]]);
@@ -171,12 +171,94 @@ describe("scanProject with the registered readers", () => {
     const strip = (value: unknown) => JSON.parse(JSON.stringify(value, (key, v) => key === "checked_at" ? undefined : v));
     expect(strip(mixed.checks[0])).toEqual(strip(npmOnly.checks[0]));
     expect("result" in mixed.checks[0]! && "plan" in mixed.checks[0].result && mixed.checks[0].result.plan).toEqual([{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: ["GHSA-35jh-r3h4-6jhm"] }]);
-    // The Python reader read uv.lock and requirements.txt; pyproject.toml is covered by uv.lock.
-    expect(readOnly(mixed.checks[1]!).inventory.files).toEqual(["uv.lock", "requirements.txt"]);
+    expect(readOnly(mixed.checks[1]!).inventory.files).toEqual(["uv.lock", "pyproject.toml", "requirements.txt"]);
     // Before registration the same folder listed the Python, Go and Rust files as unsupported.
     const before = await scanProject(project(files), undefined, { readers: [], client: new OsvClient(osv(vulns)) });
     expect(before.checks.map(c => c.ecosystem)).toEqual(["npm"]);
     expect(before.unsupported).toEqual(["requirements.txt", "pyproject.toml", "go.mod", "Cargo.lock", "build.gradle", "build.gradle.kts"]);
+  });
+});
+
+/** The single read-only check scanProject gives for these files, with OSV reporting requests 2.19.0 if it were sent. */
+async function check(files: Record<string, string>) {
+  const report = await scanProject(project(files), undefined, { client: new OsvClient(osv({ "PyPI:requests@2.19.0": ["GHSA-x84v-xcm2-53pg"], "crates.io:atty@0.2.14": ["RUSTSEC-2021-0145"] })) });
+  expect(report.checks).toHaveLength(1);
+  return { ...readOnly(report.checks[0]!), report };
+}
+const SETUPTOOLS = '[build-system]\nrequires = ["setuptools>=61"]\nbuild-backend = "setuptools.build_meta"\n\n[tool.black]\nline-length = 100\n';
+const DECLARES = '[project]\nname = "app"\nversion = "0.1.0"\ndependencies = ["requests==2.19.0"]\n';
+const POETRY = (packages: string[]) => `${packages.map(name => `[[package]]\nname = "${name}"\nversion = "1.0.0"\ndescription = ""\noptional = false\npython-versions = "*"\nfiles = []\n\n`).join("")}[metadata]\nlock-version = "2.0"\npython-versions = "^3.10"\ncontent-hash = "${"c".repeat(64)}"\n`;
+
+describe("a Python project whose dependencies Ludion does not read is never clean (#189 review, finding 1)", () => {
+  it("a setuptools project: pyproject.toml with only [build-system], plus setup.py and setup.cfg", async () => {
+    const result = await check({ "pyproject.toml": SETUPTOOLS, "setup.py": 'from setuptools import setup\nsetup(install_requires=["requests==2.19.0"])\n', "setup.cfg": "[options]\ninstall_requires =\n    requests==2.19.0\n" });
+    expect(result.status).toBe("incomplete");
+    expect(result.inventory.packages).toEqual([]);
+    expect(result.inventory.limitations).toEqual([
+      "setup.py can declare dependencies (install_requires and extras_require passed to setup()) that Ludion does not read; they were not checked.",
+      "setup.cfg can declare dependencies ([options] install_requires and [options.extras_require]) that Ludion does not read; they were not checked.",
+    ]);
+    expect(result.report.status).toBe("attention_required");
+  });
+  it.each([["setup.py", "from setuptools import setup\nsetup()\n"], ["setup.cfg", "[metadata]\nname = app\n"]])("%s alone makes the Python reader run and say so", async (file, text) => {
+    const result = await check({ [file]: text });
+    expect(result.status).toBe("incomplete");
+    expect(result.inventory.limitations).toEqual([expect.stringMatching(new RegExp(`^${file.replace(".", "\\.")} can declare dependencies`))]);
+  });
+  it.each([
+    ["[tool.uv] dev-dependencies", '[project]\nname = "app"\nversion = "0.1.0"\n\n[tool.uv]\ndev-dependencies = ["requests==2.19.0"]\n'],
+    ["[tool.pdm] dev-dependencies", '[project]\nname = "app"\n\n[tool.pdm.dev-dependencies]\ntest = ["requests==2.19.0"]\n'],
+    ["[tool.hatch.envs.default] dependencies", '[project]\nname = "app"\n\n[tool.hatch.envs.default]\ndependencies = ["requests==2.19.0"]\n'],
+    ["[tool.flit.metadata] requires", '[tool.flit.metadata]\nmodule = "app"\nrequires = ["requests==2.19.0"]\n'],
+    ["[tool.setuptools.dynamic] dependencies", '[project]\nname = "app"\ndynamic = ["version"]\n\n[tool.setuptools.dynamic]\ndependencies = { file = ["requirements.in"] }\n'],
+  ])("pyproject.toml with %s and no lock", async (setting, text) => {
+    const result = await check({ "pyproject.toml": text });
+    expect(result.status).toBe("incomplete");
+    expect(result.inventory.limitations).toEqual([`pyproject.toml has dependency settings this reader does not read, and no lock file (uv.lock, poetry.lock) pins them; they were not checked: ${setting}.`]);
+  });
+  it("only a pyproject.toml with no dependency settings and no setup.py or setup.cfg adds nothing", async () => {
+    const result = await check({ "pyproject.toml": SETUPTOOLS });
+    expect(result.inventory.limitations).toEqual([]);
+    expect(result.status).toBe("no_known_vulnerabilities");
+  });
+});
+
+describe("a lock must be the lock of the manifest beside it (#189 review, findings 2 and 3)", () => {
+  const UV_OTHER = UV_LOCK.replace('name = "app"', 'name = "other"');
+  it.each([
+    ["P1: a uv.lock with no package at all", { "uv.lock": 'version = 1\nrequires-python = ">=3.10"\n', "pyproject.toml": DECLARES }, [/^uv\.lock names no project package/, /^uv\.lock does not list 1 requirement that pyproject\.toml declares.*: requests\.$/]],
+    ["P3: a uv.lock for another project", { "uv.lock": UV_OTHER, "pyproject.toml": DECLARES }, [/^uv\.lock does not lock pyproject\.toml's project "app" \(its project packages are other\)/]],
+    ["P6: a valid uv.lock beside an unparseable pyproject.toml", { "uv.lock": UV_LOCK, "pyproject.toml": "[project\n" }, [/^pyproject\.toml could not be read \(pyproject\.toml line 1: .*\), so whether uv\.lock is its lock was not checked\.$/]],
+    ["a uv.lock that lacks a declared requirement", { "uv.lock": UV_LOCK, "pyproject.toml": DECLARES.replace('"requests==2.19.0"', '"requests==2.19.0", "flask>=2"') }, [/^uv\.lock does not list 1 requirement that pyproject\.toml declares.*: flask\.$/]],
+    ["P7: an empty poetry.lock", { "poetry.lock": POETRY([]), "pyproject.toml": DECLARES }, [/^poetry\.lock does not list 1 requirement that pyproject\.toml declares.*: requests\.$/]],
+    ["P8: a poetry.lock from another project", { "poetry.lock": POETRY(["six"]), "pyproject.toml": DECLARES }, [/^poetry\.lock does not list 1 requirement that pyproject\.toml declares.*: requests\.$/]],
+    ["P9: an empty poetry.lock beside an unparseable pyproject.toml", { "poetry.lock": POETRY([]), "pyproject.toml": "[project\n" }, [/^poetry\.lock: pyproject\.toml could not be read/]],
+    ["P13: an empty Pipfile.lock", { "Pipfile.lock": JSON.stringify({ _meta: { "pipfile-spec": 6 }, default: {}, develop: {} }), Pipfile: '[packages]\nrequests = "*"\n' }, [/^Pipfile\.lock does not list 1 requirement that Pipfile declares.*: requests\.$/]],
+  ])("%s gives a limitation", async (_name, files, expected) => {
+    const result = await check(files);
+    // Incomplete, or vulnerabilities_found where the lock still lists requests 2.19.0: never a clean result.
+    expect(result.status).toBe(result.findings.length ? "vulnerabilities_found" : "incomplete");
+    expect(result.inventory.limitations).toEqual(expected.map(e => expect.stringMatching(e)));
+  });
+  it("a poetry.lock and a Pipfile.lock that list what their manifest declares add nothing", async () => {
+    // A project may name itself (an extra of its own extras); poetry.lock never lists the project.
+    expect((await check({ "poetry.lock": POETRY(["requests"]), "pyproject.toml": `${DECLARES}\n[project.optional-dependencies]\nall = ["app[dev]"]\n` })).inventory.limitations).toEqual([]);
+    expect((await check({ "Pipfile.lock": JSON.stringify({ _meta: { "pipfile-spec": 6 }, default: { requests: { version: "==2.19.0" } } }), Pipfile: '[packages]\nRequests = "*"\n' })).inventory.limitations).toEqual([]);
+  });
+  it.each([
+    ["R6: a workspace member's Cargo.toml beside a stray Cargo.lock", '[package]\nname = "app"\nversion = "0.1.0"\nworkspace = ".."\n', /^Cargo\.toml names another directory as its workspace root/],
+    ["R8: a Cargo.lock whose only member is another package", '[package]\nname = "zzz"\nversion = "0.1.0"\n', /^Cargo\.lock lists no workspace member named "zzz" \(Cargo\.toml's package\)/],
+    ["an unparseable Cargo.toml", '[package]\nname = "app"\n[dependencies]\nprivate = { git = "https://user:s3cret@example.com/x.git" \n', /^Cargo\.toml could not be read as TOML \(line \d+\), so whether Cargo\.lock is its lock was not checked\.$/],
+    ["a Cargo.toml with neither [package] nor [workspace]", '[dependencies]\natty = "0.2"\n', /^Cargo\.toml has neither \[package\] nor \[workspace\]/],
+  ])("%s gives a limitation", async (_name, manifest, expected) => {
+    const result = await check({ "Cargo.lock": CARGO_LOCK, "Cargo.toml": manifest });
+    expect(result.inventory.limitations).toEqual([expect.stringMatching(expected)]);
+    // Nothing from a Cargo.toml but a validated package name reaches a limitation: dependency entries can carry credentials.
+    expect(result.inventory.limitations.join(" ")).not.toContain("s3cret");
+    expect(result.status).toBe("vulnerabilities_found");
+  });
+  it("a virtual workspace root's Cargo.toml beside its Cargo.lock adds nothing", async () => {
+    expect((await check({ "Cargo.lock": CARGO_LOCK, "Cargo.toml": '[workspace]\nmembers = ["app"]\nresolver = "2"\n' })).inventory.limitations).toEqual([]);
   });
 });
 
@@ -199,6 +281,12 @@ describe("ludion scan with the registered readers", () => {
     expect(out).toContain("  requests@2.19.0 · GHSA-x84v-xcm2-53pg · Insufficiently Protected Credentials in Requests · OSV lists fixed: 2.20.0");
     expect(out).toContain("  Read-only: Ludion reports known advisories for this ecosystem but does not plan or apply updates.");
     expect(await scan(PYTHON, {})).toBe(0);
+  });
+  it("a setuptools project exits 2, as it did before registration (never 0)", async () => {
+    const files = { "pyproject.toml": SETUPTOOLS, "setup.py": "from setuptools import setup\nsetup()\n" };
+    expect(await scan(files, { "PyPI:requests@2.19.0": ["GHSA-x84v-xcm2-53pg"] })).toBe(2);
+    expect(out).toContain("PyPI: 0 package versions · 0 advisory matches · incomplete");
+    expect(out).toContain("  Incomplete: setup.py can declare dependencies (install_requires and extras_require passed to setup()) that Ludion does not read; they were not checked.");
   });
   it("Go: exit 2 when nothing matches (the toolchain limitation), exit 1 on a stdlib match", async () => {
     expect(await scan({ "go.mod": GO_MOD }, {}, "--ecosystem", "go")).toBe(2);

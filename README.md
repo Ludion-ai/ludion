@@ -108,7 +108,7 @@ node packages/cli/dist/cli.js patch --dir /path/to/app --apply
 node packages/cli/dist/cli.js watch --dir /path/to/app --apply --interval 900
 ```
 
-Ctrl+C cancels pending application. An in-flight Docker step may finish before exit. Watch installs no service or scheduler. Scan exits 1 for attention needed, 2 for an error, and 0 only when recorded supported inventories need no attention; it does not certify security. Patch exits 2 on failure.
+Ctrl+C cancels pending application. An in-flight Docker step may finish before exit. Watch installs no service or scheduler. Scan exits 1 when it finds a known vulnerability or a PHP security release, 2 when it finds none but something still needs attention (a failed check, an incomplete result or an unsupported inventory), and 0 only when recorded supported inventories need no attention; it does not certify security. Patch exits 2 on failure.
 
 ## Read-only scans: Python, Go and Rust
 
@@ -116,9 +116,9 @@ Ctrl+C cancels pending application. An in-flight Docker step may finish before e
 
 | Ecosystem | A scan runs when the root has | Inventory | OSV ecosystem |
 | --- | --- | --- | --- |
-| Python | requirements.txt, pyproject.toml, poetry.lock, uv.lock, Pipfile.lock or Pipfile | Registry packages locked in uv.lock (format 1), poetry.lock (1.x and 2.x) and Pipfile.lock (spec 6), and exact `==` pins in requirements.txt. pyproject.toml or Pipfile without a lock gives a limitation; their versions are not guessed. | PyPI |
+| Python | requirements.txt, pyproject.toml, poetry.lock, uv.lock, Pipfile.lock, Pipfile, setup.py or setup.cfg | Registry packages locked in uv.lock (format 1), poetry.lock (1.x and 2.x) and Pipfile.lock (spec 6), and exact `==` pins in requirements.txt. A lock gives a limitation when it is evidently not its manifest's: a uv.lock without the project's package, or a lock missing a requirement that pyproject.toml or Pipfile declares (or beside a manifest that cannot be read). Without a lock, pyproject.toml gives a limitation when it declares dependencies or has dependency settings of uv, PDM, Hatch, Flit, Rye, Pixi or setuptools, and Pipfile when it declares packages; versions are not guessed. setup.py and setup.cfg are never read, and their presence is a limitation. | PyPI |
 | Go | go.mod | go.mod's require list (the build list since Go 1.17), plus `stdlib` and `toolchain` at the version on the toolchain line. That line is only a minimum, so a Go result always has a limitation and exits 2 when nothing matches. | Go |
-| Rust | Cargo.lock or Cargo.toml | crates.io packages in Cargo.lock (formats 1 to 4), for every target and feature. Cargo.toml without Cargo.lock gives a limitation. | crates.io |
+| Rust | Cargo.lock or Cargo.toml | crates.io packages in Cargo.lock (formats 1 to 4), for every target and feature. Cargo.toml is read beside it: a lock without Cargo.toml's package among its workspace members, a Cargo.toml that names another workspace root (`package.workspace`), or one that cannot be read gives a limitation. Cargo.toml without Cargo.lock gives a limitation. | crates.io |
 
 Checked:
 
@@ -131,8 +131,8 @@ Not checked:
 
 - Versions are not compared. Ludion does not say which listed fixed version applies to the installed one, or whether one is newer: PEP 440 and Go versions are not semver.
 - Anything that cannot be read as an exact name and version (an unpinned or ranged requirement, a Git, path or URL source, a Go replace directive, an unknown file format version) is listed as `Incomplete:` and the result is `incomplete`, never clean.
-- Whether a lock is up to date with its manifest: the lock is the inventory (uv.lock and poetry.lock for pyproject.toml, Pipfile.lock for Pipfile, Cargo.lock for Cargo.toml).
-- Files in subdirectories, go.sum, and go.work (named as a limitation). Requirements files other than requirements.txt are named as a limitation, and a project whose only Python file is one of them is not scanned.
+- Whether a lock is up to date beyond those checks: the lock is the inventory, and a manifest's version ranges are not compared with it.
+- Files in subdirectories and go.sum are not read, and give no limitation. go.work is not read, and gives a limitation. Requirements files other than requirements.txt give a limitation, but a project whose only Python file is one of them is not scanned.
 - Nothing is installed, resolved, built or run, and whether vulnerable code is reached is not checked.
 
 Exit codes are scan's own: 1 when a vulnerability matches, 2 when a result is incomplete or a check fails, 0 otherwise. An informational-only match exits 0. `--json` also gives each match's `kind` and `fixed_versions`.

@@ -6,6 +6,8 @@ import { normalizeName, parsePipfileLock, parsePoetryLock, parseRequirements, pa
 import { parseToml } from "../src/security/readonly/python-toml.ts";
 
 const REGISTRY = 'source = { registry = "https://pypi.org/simple" }';
+/** uv always writes the project's own package: a uv.lock without one is not this project's lock (#189). */
+const NO_PROJECT = 'uv.lock names no project package (editable or virtual at "."), so it is not a lock of this project and nothing in it was checked.';
 const HASH = `sha256:${"a".repeat(64)}`;
 
 // Trimmed from a uv 0.11 lock of a virtual project (requests, Jinja2, a dev group and an extra), plus a forked numpy.
@@ -368,7 +370,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/x/requests-2.19.0.tar.g
   it("reports top-level entries it does not know instead of returning a clean empty result", () => {
     const result = parseUvLock(`version = 1\n[[packages]]\nname = "requests"\nversion = "2.19.0"\n${REGISTRY}\n`);
     expect(result.packages).toEqual([]);
-    expect(result.limitations).toEqual(['uv.lock has top-level entries this reader does not know ("packages"); anything in them was not read.']);
+    expect(result.limitations).toEqual(['uv.lock has top-level entries this reader does not know ("packages"); anything in them was not read.', NO_PROJECT]);
     expect(parsePoetryLock(`${POETRY_LOCK}\n[[packages]]\nname = "x"\n`).limitations[0]).toBe('poetry.lock has top-level entries this reader does not know ("packages"); anything in them was not read.');
   });
 
@@ -407,6 +409,7 @@ version = "1.0.0"
     expect(result.limitations).toEqual([
       "uv.lock: 3 packages have a source this reader does not know, so they were not checked: future, twice, nosource.",
       'uv.lock: 2 registry packages have no PEP 440 version, so they were not checked: noversion (missing), badversion ("1.0 or so").',
+      NO_PROJECT,
     ]);
   });
 
@@ -600,7 +603,8 @@ describe("readPython", () => {
     const root = project({ "uv.lock": UV_LOCK, "requirements.txt": "requests==2.19.0\nmarkupsafe==3.0.4\nurllib3==1.23\nrich>=13\n", "pyproject.toml": "[project]\nname = \"demo-app\"\n" });
     const inventory = readPython(root)!;
     expect(inventory.ecosystem).toBe("PyPI");
-    expect(inventory.files).toEqual(["uv.lock", "requirements.txt"]);
+    // pyproject.toml is read beside uv.lock, to check that uv.lock locks this project (#189).
+    expect(inventory.files).toEqual(["uv.lock", "pyproject.toml", "requirements.txt"]);
     expect(inventory.scope).toBe("locked_registry_packages (uv.lock); exact_pins_in_requirements_txt; project_itself_not_scanned (demo-app)");
     // markupsafe is reached only through jinja2 in uv.lock, so its pin in requirements.txt does not make it direct.
     // urllib3 is in no lock: requirements.txt is all that lists it, so it is marked direct.

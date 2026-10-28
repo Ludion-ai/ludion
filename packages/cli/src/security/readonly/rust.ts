@@ -1,6 +1,7 @@
 import { lstatSync } from "node:fs";
 import { join } from "node:path";
 import { textFile } from "../inventory.ts";
+import { isTable, parseToml, type TomlTable } from "./python-toml.ts";
 import type { ReadOnlyInventory, ReadOnlyPackage } from "./types.ts";
 
 /**
@@ -190,10 +191,16 @@ const named = (list: string[]) => `(${list.length}): ${list.slice(0, 10).join(",
 
 /** Pure: the crates.io packages in a Cargo.lock, and every limitation of that reading. Throws on anything malformed. */
 export function parseCargoLock(text: string): { packages: ReadOnlyPackage[]; limitations: string[] } {
+  const { packages, limitations } = cargoLock(text);
+  return { packages, limitations };
+}
+
+/** parseCargoLock, plus the workspace members' names (packages without a source); null for an unknown format. */
+function cargoLock(text: string): { packages: ReadOnlyPackage[]; limitations: string[]; members: string[] | null } {
   // The format version comes first: an unknown format is not guessed at, whatever its syntax.
   const firstTable = text.search(/^[ \t]*\[/m);
   const declared = /^[ \t]*version[ \t]*=[ \t]*([0-9]+)[ \t]*(?:#[^\r\n]*)?\r?$/m.exec(firstTable < 0 ? text : text.slice(0, firstTable))?.[1];
-  const unknown = (version: string) => ({ packages: [], limitations: [`Cargo.lock format version ${version.slice(0, 12)} is not one Ludion reads (1 to 4); its packages were not read or checked.`] });
+  const unknown = (version: string) => ({ packages: [], members: null, limitations: [`Cargo.lock format version ${version.slice(0, 12)} is not one Ludion reads (1 to 4); its packages were not read or checked.`] });
   if (declared !== undefined && !["3", "4"].includes(declared)) return unknown(declared);
   const tables = readToml(text);
   for (const [key, value] of tables[0]!.keys) {
@@ -251,14 +258,43 @@ export function parseCargoLock(text: string): { packages: ReadOnlyPackage[]; lim
   if (git.length) limitations.push(`Crates from git sources are outside crates.io advisory coverage and were not checked ${named(git)}`);
   if (other.length) limitations.push(`Crates from registries other than crates.io, or from a recorded path, were not checked ${named(other)}`);
   if (replaced.length) limitations.push(`Crates replaced through [replace] are not built and were not checked; each replacement is read by its own source ${named(replaced)}`);
-  return { packages: [...packages.values()], limitations };
+  return { packages: [...packages.values()], limitations, members: members.map(m => m.name) };
+}
+
+/**
+ * Whether a Cargo.lock is the lock of the Cargo.toml beside it. Cargo builds a workspace member with the lock at its
+ * workspace root, and a lock lists the packages of its own workspace as members (packages without a source). Nothing
+ * from Cargo.toml is printed but a validated package name: its dependency entries can carry credentials.
+ */
+export function cargoManifestLimitations(text: string, members: string[] | null): string[] {
+  let doc: TomlTable;
+  try { doc = parseToml(text, "Cargo.toml"); } catch (error) {
+    const line = /\bline (\d+)/.exec(error instanceof Error ? error.message : "")?.[1];
+    return [`Cargo.toml could not be read as TOML${line ? ` (line ${line})` : ""}, so whether Cargo.lock is its lock was not checked.`];
+  }
+  const pkg = doc.package, workspace = doc.workspace;
+  if ((pkg !== undefined && !isTable(pkg)) || (workspace !== undefined && !isTable(workspace))) return ["Cargo.toml's [package] or [workspace] is not a table, so whether Cargo.lock is its lock was not checked."];
+  if (!pkg && !workspace) return ["Cargo.toml has neither [package] nor [workspace], so whether Cargo.lock is its lock was not checked."];
+  const limitations: string[] = [];
+  if (pkg?.workspace !== undefined && !workspace) limitations.push("Cargo.toml names another directory as its workspace root (package.workspace). Cargo builds it with the Cargo.lock at that root, so the Cargo.lock here may not be the one in use.");
+  if (pkg) {
+    const name = typeof pkg.name === "string" && ANY_NAME.test(pkg.name) ? pkg.name : null;
+    if (name === null) limitations.push("Cargo.toml's [package] has no valid name, so whether Cargo.lock is its lock was not checked.");
+    else if (members?.length && !members.includes(name)) limitations.push(`Cargo.lock lists no workspace member named ${show(name)} (Cargo.toml's package), so it may be another project's lock or out of date.`);
+  }
+  return limitations;
 }
 
 const present = (root: string, name: string) => lstatSync(join(root, name), { throwIfNoEntry: false }) !== undefined;
 
 /** The Rust inventory of one directory: Cargo.lock if present, else a Cargo.toml whose versions are not locked. Null when neither exists. */
 export function readRust(root: string): ReadOnlyInventory | null {
-  if (present(root, "Cargo.lock")) return { ecosystem: "crates.io", files: ["Cargo.lock"], scope: RUST_SCOPE, ...parseCargoLock(textFile(root, "Cargo.lock")) };
+  if (present(root, "Cargo.lock")) {
+    const { packages, limitations, members } = cargoLock(textFile(root, "Cargo.lock"));
+    if (!present(root, "Cargo.toml")) return { ecosystem: "crates.io", files: ["Cargo.lock"], scope: RUST_SCOPE, packages, limitations };
+    limitations.push(...cargoManifestLimitations(textFile(root, "Cargo.toml"), members));
+    return { ecosystem: "crates.io", files: ["Cargo.lock", "Cargo.toml"], scope: RUST_SCOPE, packages, limitations };
+  }
   if (!present(root, "Cargo.toml")) return null;
   textFile(root, "Cargo.toml");
   return { ecosystem: "crates.io", files: ["Cargo.toml"], scope: RUST_SCOPE, packages: [], limitations: ["Cargo.toml has no Cargo.lock beside it, so its dependency versions are not locked and were not checked (a workspace member's Cargo.lock is at the workspace root)."] };

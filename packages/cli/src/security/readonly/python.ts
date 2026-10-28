@@ -14,7 +14,9 @@ export type PythonFile = { packages: ReadOnlyPackage[]; project: string[]; limit
 
 const MAX_PACKAGES = 2000;
 const LOCKS = ["uv.lock", "poetry.lock", "Pipfile.lock"] as const;
-const FILES = [...LOCKS, "requirements.txt", "pyproject.toml", "Pipfile"] as const;
+/** setup.py and setup.cfg are never read (setup.py is a program); their presence is a limitation. */
+const SETUP = ["setup.py", "setup.cfg"] as const;
+const FILES = [...LOCKS, "requirements.txt", "pyproject.toml", "Pipfile", ...SETUP] as const;
 /** PEP 508 project names. */
 const NAME = /^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$/;
 const NAME_START = /^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?/;
@@ -132,6 +134,8 @@ export function parseUvLock(text: string): PythonFile {
   if (local.length) limitations.push(`uv.lock: ${plural(local.length, "package comes", "packages come")} from git, URL or local path sources rather than a registry and ${local.length === 1 ? "was" : "were"} not checked against advisories: ${list(local)}.`);
   if (registry.length && !exact) limitations.push("uv.lock: the project's workspace members or dependency lists could not be read exactly, so no package is marked direct.");
   else if (registry.length && !roots.length) limitations.push('uv.lock names no project package (editable or virtual at "."), so no package is marked direct.');
+  // uv always writes the project's own package, so a lock without one is not this project's lock, even when empty.
+  else if (!roots.length) limitations.push('uv.lock names no project package (editable or virtual at "."), so it is not a lock of this project and nothing in it was checked.');
   return { packages: [...collect(registry.map(p => ({ ...p, direct: isDirect(p) }))).values()], project, limitations };
 }
 
@@ -428,6 +432,49 @@ export function pyprojectRequirements(text: string): { names: string[]; dynamic:
   return { names: [...new Set(names)], dynamic: !!dynamic?.some(d => d === "dependencies" || d === "optional-dependencies") };
 }
 
+/** The project's own name ([project] name, else [tool.poetry] name), PEP 503-normalized; null when it names none. */
+export function pyprojectName(text: string): string | null {
+  const doc = parseToml(text, "pyproject.toml");
+  const project = isTable(doc.project) ? doc.project.name : undefined;
+  const poetry = isTable(doc.tool) && isTable(doc.tool.poetry) ? doc.tool.poetry.name : undefined;
+  const name = typeof project === "string" ? project : typeof poetry === "string" ? poetry : null;
+  return name === null ? null : normalizeName(name);
+}
+
+/** Packaging tools whose own pyproject.toml settings can declare dependencies that pyprojectRequirements does not read. */
+const UNREAD_TOOLS = ["uv", "pdm", "hatch", "flit", "rye", "pixi", "setuptools"];
+/**
+ * Dependency settings in pyproject.toml that this reader does not read: under [tool.uv], [tool.pdm], [tool.hatch],
+ * [tool.flit], [tool.rye], [tool.pixi] and [tool.setuptools], every key naming dependencies or requirements
+ * ([tool.uv] dev-dependencies, [tool.hatch.envs.test] dependencies, [tool.flit.metadata] requires, ...).
+ */
+export function unreadDependencySettings(text: string): string[] {
+  const tool = parseToml(text, "pyproject.toml").tool, found: string[] = [];
+  const walk = (table: TomlTable, path: string[]) => {
+    for (const [key, value] of Object.entries(table)) {
+      if (/depend|requires/i.test(key)) found.push(`[${path.map(p => clip(p, 40)).join(".")}] ${clip(key, 40)}`);
+      else if (isTable(value) && path.length < 8) walk(value, [...path, key]);
+    }
+  };
+  if (isTable(tool)) for (const name of UNREAD_TOOLS) { const settings = tool[name]; if (isTable(settings)) walk(settings, ["tool", name]); }
+  return found;
+}
+
+/** Every package name a uv.lock or poetry.lock lists, whatever its source; null for a lock format this reader does not read. */
+function lockedNames(text: string, file: "uv.lock" | "poetry.lock"): Set<string> | null {
+  const lock = parseToml(text, file);
+  if (file === "uv.lock" ? lock.version !== 1 : !(isTable(lock.metadata) && typeof lock.metadata["lock-version"] === "string" && /^[12]\.\d+$/.test(lock.metadata["lock-version"]))) return null;
+  return new Set(lockPackages(file === "uv.lock" ? lock.package ?? lock.distribution : lock.package, file).map(entry => lockName(entry, file)));
+}
+/** Every package name a Pipfile.lock (spec 6) lists, in any category; null for another spec. */
+function pipfileLockedNames(text: string): Set<string> | null {
+  const lock: unknown = JSON.parse(text);
+  if (!plain(lock) || !plain(lock._meta) || lock._meta["pipfile-spec"] !== 6) return null;
+  const names = new Set<string>();
+  for (const [category, entries] of Object.entries(lock)) if (category !== "_meta" && plain(entries)) for (const name of Object.keys(entries)) names.add(normalizeName(name));
+  return names;
+}
+
 /** The package names a Pipfile declares, in [packages], [dev-packages] and custom categories. Throws when unreadable. */
 export function pipfileRequirements(text: string): string[] {
   const doc = parseToml(text, "Pipfile"), names: string[] = [];
@@ -461,24 +508,46 @@ export function readPython(root: string): ReadOnlyInventory | null {
   const others = otherRequirementFiles(root);
   if (!FILES.some(has) && !others.length) return null;
   const files: string[] = [], limitations: string[] = [], project: string[] = [];
-  const read = (file: string): string => { const text = textFile(root, file); files.push(file); return text; };
+  const read = (file: string): string => { const text = textFile(root, file); if (!files.includes(file)) files.push(file); return text; };
   const packages = new Map<string, ReadOnlyPackage>();
   const add = (result: PythonFile) => { collect(result.packages, packages); append(project, result.project); append(limitations, result.limitations); };
+  /** Requirements a manifest declares that its lock does not list: the lock may be out of date, or another project's. */
+  const unlocked = (lock: string, locked: Set<string> | null, manifest: string, declared: Iterable<string>, own: string | null) => {
+    if (!locked) return;
+    const missing = [...declared].filter(name => name !== own && !locked.has(name));
+    if (missing.length) limitations.push(`${lock} does not list ${plural(missing.length, "requirement", "requirements")} that ${manifest} declares, so it may be out of date or another project's lock, and ${missing.length === 1 ? "that requirement was" : "they were"} not checked: ${list(missing)}.`);
+  };
   /** A lock whose direct marks come from its manifest: a missing or unreadable manifest is a limitation, not silence. */
-  const withManifest = (lock: string, manifest: string, names: (text: string) => string[], parse: (text: string, direct: Set<string> | null) => PythonFile) => {
+  const withManifest = (lock: string, manifest: string, names: (text: string) => { names: string[]; own: string | null }, parse: (text: string, direct: Set<string> | null) => PythonFile, locked: (text: string) => Set<string> | null) => {
     const text = read(lock);
-    let direct: Set<string> | null = null, why = `there is no ${manifest} beside it`;
+    let direct: Set<string> | null = null, own: string | null = null, why = `there is no ${manifest} beside it`, unreadable = false;
     if (has(manifest)) {
-      try { direct = new Set(names(read(manifest))); } catch (error) { why = `${manifest} could not be read (${reason(error)})`; }
+      try { const declared = names(read(manifest)); direct = new Set(declared.names); own = declared.own; } catch (error) { unreadable = true; why = `${manifest} could not be read (${reason(error)})`; }
     }
     const result = parse(text, direct);
-    if (!direct && result.packages.length) result.limitations.push(`${lock}: ${why}, so no package from it is marked direct.`);
+    // An unreadable manifest is a limitation even beside an empty lock: what it declares was not compared.
+    if (!direct && (result.packages.length || unreadable)) result.limitations.push(`${lock}: ${why}, so no package from it is marked direct.`);
     add(result);
+    if (direct) unlocked(lock, locked(text), manifest, direct, own);
   };
   const locks = LOCKS.filter(has);
-  if (has("uv.lock")) add(parseUvLock(read("uv.lock")));
-  if (has("poetry.lock")) withManifest("poetry.lock", "pyproject.toml", t => pyprojectRequirements(t).names, parsePoetryLock);
-  if (has("Pipfile.lock")) withManifest("Pipfile.lock", "Pipfile", pipfileRequirements, parsePipfileLock);
+  if (has("uv.lock")) {
+    const text = read("uv.lock"), uv = parseUvLock(text);
+    add(uv);
+    // uv.lock locks this pyproject.toml only if it has its project package and every requirement it declares.
+    if (has("pyproject.toml")) {
+      const manifest = read("pyproject.toml");
+      try {
+        const declared = pyprojectRequirements(manifest).names, own = pyprojectName(manifest);
+        if (own !== null && uv.project.length && !uv.project.includes(own)) limitations.push(`uv.lock does not lock pyproject.toml's project ${quoted(own, 60)} (its project packages are ${list(uv.project)}), so it may be another project's lock; what pyproject.toml declares was not compared with it.`);
+        else unlocked("uv.lock", lockedNames(text, "uv.lock"), "pyproject.toml", declared, own);
+      } catch (error) {
+        limitations.push(`pyproject.toml could not be read (${reason(error)}), so whether uv.lock is its lock was not checked.`);
+      }
+    }
+  }
+  if (has("poetry.lock")) withManifest("poetry.lock", "pyproject.toml", t => ({ names: pyprojectRequirements(t).names, own: pyprojectName(t) }), parsePoetryLock, t => lockedNames(t, "poetry.lock"));
+  if (has("Pipfile.lock")) withManifest("Pipfile.lock", "Pipfile", t => ({ names: pipfileRequirements(t), own: null }), parsePipfileLock, pipfileLockedNames);
   if (has("requirements.txt")) {
     const pins = parseRequirements(read("requirements.txt"));
     // A lock's direct and indirect marks win over requirements.txt, which marks every pin direct.
@@ -489,8 +558,9 @@ export function readPython(root: string): ReadOnlyInventory | null {
   if (has("pyproject.toml") && !has("uv.lock") && !has("poetry.lock")) {
     const text = read("pyproject.toml");
     try {
-      const declared = pyprojectRequirements(text);
+      const declared = pyprojectRequirements(text), unread = unreadDependencySettings(text);
       if (declared.names.length || declared.dynamic) limitations.push(`pyproject.toml declares ${declared.dynamic ? "dependencies dynamically" : plural(declared.names.length, "requirement", "requirements")} and no lock file (uv.lock, poetry.lock) pins them; unpinned project requirements were not checked and their versions were not guessed.`);
+      if (unread.length) limitations.push(`pyproject.toml has dependency settings this reader does not read, and no lock file (uv.lock, poetry.lock) pins them; they were not checked: ${list(unread)}.`);
     } catch (error) {
       limitations.push(`pyproject.toml could not be read (${reason(error)}); any requirements it declares were not checked.`);
     }
@@ -505,6 +575,9 @@ export function readPython(root: string): ReadOnlyInventory | null {
     }
   }
   if (others.length) limitations.push(`Only requirements.txt is read; other requirements files were not checked: ${list(others)}.`);
+  // Never a clean result: setup.py is a program and setup.cfg its configuration, and neither is read.
+  if (has("setup.py")) limitations.push("setup.py can declare dependencies (install_requires and extras_require passed to setup()) that Ludion does not read; they were not checked.");
+  if (has("setup.cfg")) limitations.push("setup.cfg can declare dependencies ([options] install_requires and [options.extras_require]) that Ludion does not read; they were not checked.");
   const scope: string[] = [];
   if (locks.length) scope.push(`locked_registry_packages (${locks.join(", ")})`);
   if (has("requirements.txt")) scope.push("exact_pins_in_requirements_txt");

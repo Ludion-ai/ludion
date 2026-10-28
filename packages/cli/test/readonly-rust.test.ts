@@ -285,7 +285,8 @@ describe("sources can carry credentials, so no message contains any part of one"
 describe("readRust", () => {
   it("reads Cargo.lock from a project directory", () => {
     const root = project({ "Cargo.toml": '[package]\nname = "app"\nversion = "0.1.0"\n', "Cargo.lock": V3 });
-    expect(readRust(root)).toEqual({ ecosystem: "crates.io", files: ["Cargo.lock"], scope: RUST_SCOPE, packages: parseCargoLock(V3).packages, limitations: [] });
+    // Cargo.toml is read beside Cargo.lock, to check that the lock is its own (#189).
+    expect(readRust(root)).toEqual({ ecosystem: "crates.io", files: ["Cargo.lock", "Cargo.toml"], scope: RUST_SCOPE, packages: parseCargoLock(V3).packages, limitations: [] });
   });
   it("reports a Cargo.toml without Cargo.lock as unlocked and unchecked, with no packages", () => {
     expect(readRust(project({ "Cargo.toml": '[package]\nname = "app"\nversion = "0.1.0"\n\n[dependencies]\nserde = "1"\n' }))).toEqual({

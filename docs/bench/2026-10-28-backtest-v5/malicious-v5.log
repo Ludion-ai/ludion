@@ -1,0 +1,1568 @@
+5851 npm fixed versions in GHSA records, 2391 packages
+fix packages 500/2391
+fix packages 1000/2391
+fix packages 1500/2391
+fix packages 2000/2391
+facts 200/1148
+facts 400/1148
+facts 600/1148
+facts 800/1148
+facts 1000/1148
+fixes with a registry time: 5594; in some V's window: 4963; published after some V - 24h: 5399
+trees 100/5399 (0 min, 4694 packages, 0 attestations)
+trees 200/5399 (0 min, 5243 packages, 0 attestations)
+trees 300/5399 (0 min, 5972 packages, 0 attestations)
+trees 400/5399 (0 min, 6467 packages, 0 attestations)
+trees 500/5399 (0 min, 6987 packages, 0 attestations)
+trees 600/5399 (0 min, 7333 packages, 0 attestations)
+trees 700/5399 (0 min, 7869 packages, 0 attestations)
+trees 800/5399 (0 min, 8338 packages, 0 attestations)
+trees 900/5399 (0 min, 8580 packages, 0 attestations)
+trees 1000/5399 (0 min, 8801 packages, 0 attestations)
+trees 1100/5399 (0 min, 9322 packages, 0 attestations)
+trees 1200/5399 (0 min, 9762 packages, 0 attestations)
+trees 1300/5399 (0 min, 10090 packages, 0 attestations)
+trees 1400/5399 (0 min, 10487 packages, 0 attestations)
+trees 1500/5399 (0 min, 10888 packages, 0 attestations)
+trees 1600/5399 (0 min, 11292 packages, 0 attestations)
+trees 1700/5399 (0 min, 11514 packages, 0 attestations)
+trees 1800/5399 (0 min, 12232 packages, 0 attestations)
+trees 1900/5399 (0 min, 12618 packages, 5 attestations)
+trees 2000/5399 (0 min, 12959 packages, 13 attestations)
+trees 2100/5399 (0 min, 13507 packages, 31 attestations)
+trees 2200/5399 (0 min, 13539 packages, 33 attestations)
+trees 2300/5399 (0 min, 14187 packages, 47 attestations)
+trees 2400/5399 (0 min, 14721 packages, 75 attestations)
+trees 2500/5399 (0 min, 14965 packages, 103 attestations)
+trees 2600/5399 (1 min, 15194 packages, 151 attestations)
+trees 2700/5399 (1 min, 15349 packages, 203 attestations)
+trees 2800/5399 (1 min, 15691 packages, 275 attestations)
+trees 2900/5399 (1 min, 16079 packages, 329 attestations)
+trees 3000/5399 (1 min, 16502 packages, 400 attestations)
+trees 3100/5399 (1 min, 16616 packages, 505 attestations)
+trees 3200/5399 (1 min, 16726 packages, 608 attestations)
+trees 3300/5399 (1 min, 17016 packages, 761 attestations)
+trees 3400/5399 (1 min, 17313 packages, 877 attestations)
+trees 3500/5399 (1 min, 17433 packages, 977 attestations)
+trees 3600/5399 (1 min, 17519 packages, 1070 attestations)
+trees 3700/5399 (1 min, 17591 packages, 1163 attestations)
+trees 3800/5399 (1 min, 17661 packages, 1210 attestations)
+trees 3900/5399 (1 min, 18003 packages, 1400 attestations)
+trees 4000/5399 (1 min, 18157 packages, 1481 attestations)
+trees 4100/5399 (1 min, 18359 packages, 1638 attestations)
+trees 4200/5399 (1 min, 18458 packages, 1754 attestations)
+trees 4300/5399 (1 min, 18594 packages, 1874 attestations)
+trees 4400/5399 (1 min, 18705 packages, 1962 attestations)
+trees 4500/5399 (1 min, 18820 packages, 2074 attestations)
+trees 4600/5399 (1 min, 19026 packages, 2210 attestations)
+trees 4700/5399 (1 min, 19227 packages, 2325 attestations)
+trees 4800/5399 (1 min, 19401 packages, 2477 attestations)
+trees 4900/5399 (1 min, 19529 packages, 2633 attestations)
+trees 5000/5399 (1 min, 19574 packages, 2783 attestations)
+trees 5100/5399 (1 min, 19616 packages, 2842 attestations)
+trees 5200/5399 (1 min, 19648 packages, 2979 attestations)
+trees 5300/5399 (1 min, 19696 packages, 3053 attestations)
+v4 reproduced: 0 differences
+Software Heritage, install scripts: 35 versions
+Software Heritage rate limit: waiting 37 min
+disputed check 200/1148
+disputed check 400/1148
+disputed check 600/1148
+disputed check 800/1148
+disputed check 1000/1148
+Software Heritage rate limit: waiting 15 min
+{
+  "run": {
+    "started_at": "2026-10-28T11:56:25.398Z",
+    "ended_at": "2026-10-28T12:55:29.891Z",
+    "smoke": null,
+    "blobs": {
+      "tools/backtest/src/malicious-v5.ts": "95f60e297019ac1f721bad99461db4247e426b2c",
+      "tools/backtest/src/archives-v5.ts": "835452a38182d97e0f856c92f8f2706a657575fa",
+      "packages/cli/src/security/judge.ts": "e32c2b8bb5bc5d8c9958735bd0a4d92fb1ad1fca",
+      "packages/cli/src/security/npm-facts.ts": "8289c4e208a4cda1dc215032df95ba56f1912262",
+      "packages/cli/src/security/time-cap.ts": "4fb4608234c42d0597a65eb10452f22d0d602575"
+    },
+    "semver": "7.8.5",
+    "node": "v24.22.1"
+  },
+  "method": "docs/bench/2026-10-28-backtest-v5/definitions.md; the header of tools/backtest/src/malicious-v5.ts.",
+  "denominator": 1148,
+  "fixes": {
+    "events": 5851,
+    "with_registry_time": 5594,
+    "left_out": {
+      "not_served": 8,
+      "unreadable": 2,
+      "no_publish_time": 247
+    },
+    "in_some_window": 4963,
+    "with_exception": {
+      "resolved": 5399,
+      "stopped_by_rule1": 43,
+      "with_unknown_branch": 610,
+      "tree_versions": {
+        "median": 21,
+        "max": 2771
+      }
+    },
+    "without_exception": {
+      "resolved": 5399,
+      "stopped_by_rule1": 494,
+      "with_unknown_branch": 603,
+      "tree_versions": {
+        "median": 20,
+        "max": 2771
+      }
+    }
+  },
+  "v4_reproduced": {
+    "differences": 0,
+    "first": []
+  },
+  "by_urgency": {
+    "with_exception": {
+      "exploited": {
+        "conservative": {
+          "primary": {
+            "stopped": 1039,
+            "missed": 1,
+            "unknown": 108
+          },
+          "a": {
+            "stopped": 1065,
+            "missed": 1,
+            "unknown": 82
+          },
+          "b": {
+            "stopped": 1039,
+            "missed": 1,
+            "unknown": 108
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1051,
+            "missed": 1,
+            "unknown": 96
+          },
+          "a": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "b": {
+            "stopped": 1051,
+            "missed": 1,
+            "unknown": 96
+          }
+        }
+      },
+      "high": {
+        "conservative": {
+          "primary": {
+            "stopped": 1039,
+            "missed": 1,
+            "unknown": 108
+          },
+          "a": {
+            "stopped": 1065,
+            "missed": 1,
+            "unknown": 82
+          },
+          "b": {
+            "stopped": 1039,
+            "missed": 1,
+            "unknown": 108
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1051,
+            "missed": 1,
+            "unknown": 96
+          },
+          "a": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "b": {
+            "stopped": 1051,
+            "missed": 1,
+            "unknown": 96
+          }
+        }
+      },
+      "normal": {
+        "conservative": {
+          "primary": {
+            "stopped": 1065,
+            "missed": 1,
+            "unknown": 82
+          },
+          "a": {
+            "stopped": 1075,
+            "missed": 1,
+            "unknown": 72
+          },
+          "b": {
+            "stopped": 1065,
+            "missed": 1,
+            "unknown": 82
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "a": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "b": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          }
+        }
+      },
+      "low": {
+        "conservative": {
+          "primary": {
+            "stopped": 1078,
+            "missed": 1,
+            "unknown": 69
+          },
+          "a": {
+            "stopped": 1078,
+            "missed": 1,
+            "unknown": 69
+          },
+          "b": {
+            "stopped": 1078,
+            "missed": 1,
+            "unknown": 69
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1088,
+            "missed": 1,
+            "unknown": 59
+          },
+          "a": {
+            "stopped": 1088,
+            "missed": 1,
+            "unknown": 59
+          },
+          "b": {
+            "stopped": 1088,
+            "missed": 1,
+            "unknown": 59
+          }
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "conservative": {
+          "primary": {
+            "stopped": 1040,
+            "missed": 1,
+            "unknown": 107
+          },
+          "a": {
+            "stopped": 1067,
+            "missed": 1,
+            "unknown": 80
+          },
+          "b": {
+            "stopped": 1040,
+            "missed": 1,
+            "unknown": 107
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          },
+          "a": {
+            "stopped": 1086,
+            "missed": 1,
+            "unknown": 61
+          },
+          "b": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          }
+        }
+      },
+      "high": {
+        "conservative": {
+          "primary": {
+            "stopped": 1040,
+            "missed": 1,
+            "unknown": 107
+          },
+          "a": {
+            "stopped": 1067,
+            "missed": 1,
+            "unknown": 80
+          },
+          "b": {
+            "stopped": 1040,
+            "missed": 1,
+            "unknown": 107
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          },
+          "a": {
+            "stopped": 1086,
+            "missed": 1,
+            "unknown": 61
+          },
+          "b": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          }
+        }
+      },
+      "normal": {
+        "conservative": {
+          "primary": {
+            "stopped": 1067,
+            "missed": 1,
+            "unknown": 80
+          },
+          "a": {
+            "stopped": 1076,
+            "missed": 1,
+            "unknown": 71
+          },
+          "b": {
+            "stopped": 1067,
+            "missed": 1,
+            "unknown": 80
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1086,
+            "missed": 1,
+            "unknown": 61
+          },
+          "a": {
+            "stopped": 1086,
+            "missed": 1,
+            "unknown": 61
+          },
+          "b": {
+            "stopped": 1086,
+            "missed": 1,
+            "unknown": 61
+          }
+        }
+      },
+      "low": {
+        "conservative": {
+          "primary": {
+            "stopped": 1078,
+            "missed": 1,
+            "unknown": 69
+          },
+          "a": {
+            "stopped": 1078,
+            "missed": 1,
+            "unknown": 69
+          },
+          "b": {
+            "stopped": 1078,
+            "missed": 1,
+            "unknown": 69
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1088,
+            "missed": 1,
+            "unknown": 59
+          },
+          "a": {
+            "stopped": 1088,
+            "missed": 1,
+            "unknown": 59
+          },
+          "b": {
+            "stopped": 1088,
+            "missed": 1,
+            "unknown": 59
+          }
+        }
+      }
+    }
+  },
+  "stop_rate_interval": {
+    "with_exception": {
+      "exploited": {
+        "conservative": {
+          "lower": "1039 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1051 / 1148",
+          "upper": "1147 / 1148"
+        }
+      },
+      "high": {
+        "conservative": {
+          "lower": "1039 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1051 / 1148",
+          "upper": "1147 / 1148"
+        }
+      },
+      "normal": {
+        "conservative": {
+          "lower": "1065 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1085 / 1148",
+          "upper": "1147 / 1148"
+        }
+      },
+      "low": {
+        "conservative": {
+          "lower": "1078 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1088 / 1148",
+          "upper": "1147 / 1148"
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "conservative": {
+          "lower": "1040 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1052 / 1148",
+          "upper": "1147 / 1148"
+        }
+      },
+      "high": {
+        "conservative": {
+          "lower": "1040 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1052 / 1148",
+          "upper": "1147 / 1148"
+        }
+      },
+      "normal": {
+        "conservative": {
+          "lower": "1067 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1086 / 1148",
+          "upper": "1147 / 1148"
+        }
+      },
+      "low": {
+        "conservative": {
+          "lower": "1078 / 1148",
+          "upper": "1147 / 1148"
+        },
+        "optimistic": {
+          "lower": "1088 / 1148",
+          "upper": "1147 / 1148"
+        }
+      }
+    }
+  },
+  "gate_every_malicious_version_stopped": {
+    "with_exception": "not met",
+    "without_exception": "not met"
+  },
+  "stops_by_signal": {
+    "with_exception": {
+      "exploited": {
+        "stopped": 1039,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 573,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1033,
+          "alone": 460
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 1039,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 573,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1033,
+          "alone": 460
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1065,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 575,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1059,
+          "alone": 485
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1078,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 575,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1072,
+          "alone": 498
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "stopped": 1040,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 573,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1034,
+          "alone": 461
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 1040,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 573,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1034,
+          "alone": 461
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1067,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 575,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1061,
+          "alone": 487
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1078,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 575,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 574,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 5
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1072,
+          "alone": 498
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    }
+  },
+  "v4_stops_by_signal_reproduced": {
+    "with_exception": {
+      "exploited": {
+        "stopped": 990,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 984,
+          "alone": 983
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 990,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 984,
+          "alone": 983
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1052,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1046,
+          "alone": 1045
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1071,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 1,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1065,
+          "alone": 1064
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    }
+  },
+  "changes_from_v4_with_exception": {
+    "exploited": {
+      "moved": 49,
+      "from_to": {
+        "unknown -> stopped": 49
+      },
+      "by_stop_source": {
+        "(ecosyste.ms)": 98
+      }
+    },
+    "high": {
+      "moved": 49,
+      "from_to": {
+        "unknown -> stopped": 49
+      },
+      "by_stop_source": {
+        "(ecosyste.ms)": 98
+      }
+    },
+    "normal": {
+      "moved": 13,
+      "from_to": {
+        "unknown -> stopped": 13
+      },
+      "by_stop_source": {
+        "(ecosyste.ms)": 26
+      }
+    },
+    "low": {
+      "moved": 7,
+      "from_to": {
+        "unknown -> stopped": 7
+      },
+      "by_stop_source": {
+        "(ecosyste.ms)": 14
+      }
+    }
+  },
+  "install_scripts": {
+    "source_of_v_fact": {
+      "software-heritage": 1,
+      "ecosyste.ms": 693,
+      "registry": 8,
+      "unverified": 446
+    },
+    "ecosystems_for_removed_v": {
+      "read": 1140,
+      "held_with_scripts_key": 693,
+      "held_without_scripts_key": 0,
+      "not_held": 447,
+      "unreadable": 0
+    },
+    "v_declares_any": 575,
+    "fires": {
+      "a": 575,
+      "b": 572,
+      "either": 575
+    },
+    "prev_names_unreadable": []
+  },
+  "software_heritage": {
+    "for_install_scripts": {
+      "read": 35,
+      "held": 1,
+      "not_held_or_unreadable": [
+        {
+          "version": "@optimystic99/dev-utils@1.0.15",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "ethersjs3-wallet@3.0.8",
+          "why": "origin not archived"
+        },
+        {
+          "version": "ethersjs3-wallet@3.0.9",
+          "why": "origin not archived"
+        },
+        {
+          "version": "ethersjs3-wallet@3.0.10",
+          "why": "origin not archived"
+        },
+        {
+          "version": "nx@21.6.0",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "nx@21.7.0",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "nx@21.8.0",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@art-ws/http-server@2.0.21",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@art-ws/di-node@2.0.13",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@art-ws/openapi@0.1.9",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@art-ws/fastify-http-server@2.0.24",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "printjs-rpk@1.6.1",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@ui-ux-gang/devextreme-angular-rpk@24.1.7",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@ui-ux-gang/devextreme-rpk@24.1.7",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "mstate-cli@0.4.7",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@art-ws/openapi@0.1.11",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@art-ws/slf@2.0.22",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@art-ws/ssl-info@1.0.10",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@basic-ui-components-stc/basic-ui-components@1.0.5",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@nativescript-community/ui-material-ripple@7.2.73",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@nativescript-community/ui-label@1.3.36",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@nativescript-community/ui-material-bottom-navigation@7.2.73",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@nativescript-community/ui-label@1.3.37",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@nativescript-community/ui-material-ripple@7.2.74",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "@nativescript-community/ui-material-bottom-navigation@7.2.74",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "rxnt-healthchecks-nestjs@1.0.5",
+          "why": "no visit with a snapshot after publication"
+        },
+        {
+          "version": "rxnt-kue@1.0.7",
+          "why": "no visit with a snapshot after publication"
+        },
+        {
+          "version": "@alexcolls/nuxt-ux@0.6.2",
+          "why": "not in the first snapshots after publication"
+        },
+        {
+          "version": "composite-reducer@1.0.5",
+          "why": "no visit with a snapshot after publication"
+        },
+        {
+          "version": "vf-oss-template@1.0.4",
+          "why": "no visit with a snapshot after publication"
+        },
+        {
+          "version": "bidirectional-adapter@1.2.5",
+          "why": "no visit with a snapshot after publication"
+        },
+        {
+          "version": "normal-store@1.3.4",
+          "why": "no visit with a snapshot after publication"
+        },
+        {
+          "version": "dialogflow-es@1.1.4",
+          "why": "no visit with a snapshot after publication"
+        },
+        {
+          "version": "@ifelsedeveloper/protocol-contracts-svm-idl@0.1.3",
+          "why": "not in the first snapshots after publication"
+        }
+      ]
+    },
+    "for_disputed": 2
+  },
+  "disputed": {
+    "funnel": {
+      "jsDelivr does not hold V": 12,
+      "prev_d not listed by the registry": 124,
+      "code differs from prev_d (jsDelivr's files)": 22,
+      "V's package.json from jsDelivr does not match its list": 988,
+      "disputed": 2
+    },
+    "count": 2,
+    "by_urgency": {
+      "disputed": {
+        "exploited": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          }
+        },
+        "high": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          }
+        },
+        "normal": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          }
+        },
+        "low": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 1,
+              "unknown": 0
+            }
+          }
+        }
+      },
+      "others": {
+        "exploited": {
+          "conservative": {
+            "primary": {
+              "stopped": 1038,
+              "missed": 0,
+              "unknown": 108
+            },
+            "a": {
+              "stopped": 1064,
+              "missed": 0,
+              "unknown": 82
+            },
+            "b": {
+              "stopped": 1038,
+              "missed": 0,
+              "unknown": 108
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1050,
+              "missed": 0,
+              "unknown": 96
+            },
+            "a": {
+              "stopped": 1084,
+              "missed": 0,
+              "unknown": 62
+            },
+            "b": {
+              "stopped": 1050,
+              "missed": 0,
+              "unknown": 96
+            }
+          }
+        },
+        "high": {
+          "conservative": {
+            "primary": {
+              "stopped": 1038,
+              "missed": 0,
+              "unknown": 108
+            },
+            "a": {
+              "stopped": 1064,
+              "missed": 0,
+              "unknown": 82
+            },
+            "b": {
+              "stopped": 1038,
+              "missed": 0,
+              "unknown": 108
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1050,
+              "missed": 0,
+              "unknown": 96
+            },
+            "a": {
+              "stopped": 1084,
+              "missed": 0,
+              "unknown": 62
+            },
+            "b": {
+              "stopped": 1050,
+              "missed": 0,
+              "unknown": 96
+            }
+          }
+        },
+        "normal": {
+          "conservative": {
+            "primary": {
+              "stopped": 1064,
+              "missed": 0,
+              "unknown": 82
+            },
+            "a": {
+              "stopped": 1074,
+              "missed": 0,
+              "unknown": 72
+            },
+            "b": {
+              "stopped": 1064,
+              "missed": 0,
+              "unknown": 82
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1084,
+              "missed": 0,
+              "unknown": 62
+            },
+            "a": {
+              "stopped": 1084,
+              "missed": 0,
+              "unknown": 62
+            },
+            "b": {
+              "stopped": 1084,
+              "missed": 0,
+              "unknown": 62
+            }
+          }
+        },
+        "low": {
+          "conservative": {
+            "primary": {
+              "stopped": 1077,
+              "missed": 0,
+              "unknown": 69
+            },
+            "a": {
+              "stopped": 1077,
+              "missed": 0,
+              "unknown": 69
+            },
+            "b": {
+              "stopped": 1077,
+              "missed": 0,
+              "unknown": 69
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1087,
+              "missed": 0,
+              "unknown": 59
+            },
+            "a": {
+              "stopped": 1087,
+              "missed": 0,
+              "unknown": 59
+            },
+            "b": {
+              "stopped": 1087,
+              "missed": 0,
+              "unknown": 59
+            }
+          }
+        }
+      }
+    },
+    "versions": [
+      {
+        "version": "@ensdomains/buffer@0.1.1",
+        "id": "MAL-2025-190866",
+        "published": "2023-02-28T09:46:00.601Z",
+        "step": "disputed",
+        "disputed": true,
+        "prev_d": "0.1.0",
+        "evidence": {
+          "copies": [
+            {
+              "source": "ecosyste.ms",
+              "shasum": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "integrity": "sha512-92SfSiNS8XorgU7OUBHo/i1ZU7JV7iz/6bKuLPNVsMxV79/eI7fJR6jfJJc40zAHjs3ha+Xo965Idomlq3rqnw==",
+              "unpackedSize": 2096683
+            },
+            {
+              "source": "software-heritage",
+              "shasum": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "integrity": "sha512-92SfSiNS8XorgU7OUBHo/i1ZU7JV7iz/6bKuLPNVsMxV79/eI7fJR6jfJJc40zAHjs3ha+Xo965Idomlq3rqnw==",
+              "unpackedSize": 2096683
+            }
+          ],
+          "artifact": {
+            "length": 284259,
+            "filename": "buffer-0.1.1.tgz",
+            "checksums": {
+              "sha1": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "sha256": "f8472508ce11fa05d3642ea6695d2b1dac5821415d96087a0d8db4cd61ba4d24"
+            },
+            "url": "https://registry.npmjs.org/@ensdomains/buffer/-/buffer-0.1.1.tgz"
+          },
+          "swh_visit": "2023-03-23T20:17:15.177000+00:00",
+          "swh_root": "3d9e48db08c991644ad0eba0475ca1fbd9ecc047",
+          "files": 21,
+          "inert_or_removed": [
+            "cache/solidity-files-cache.json",
+            "package-lock.json",
+            "removed: build/contracts/Buffer.json",
+            "removed: build/contracts/Migrations.json"
+          ]
+        },
+        "outcome_with_exception": {
+          "exploited": "missed",
+          "high": "missed",
+          "normal": "missed",
+          "low": "missed"
+        }
+      },
+      {
+        "version": "freo-design-system@1.0.4",
+        "id": "MAL-2025-3399",
+        "published": "2025-04-25T21:51:55.175Z",
+        "step": "disputed",
+        "disputed": true,
+        "prev_d": "1.0.3",
+        "evidence": {
+          "copies": [
+            {
+              "source": "registry",
+              "shasum": "c2c00593539e871f247fc6c31fcb958de8f5d9d7",
+              "integrity": "sha512-2Tz+3x3QA2EAiesyprujknm2obMxuaw0I31moOCe/BZ4LQDpHCBq27ihJ5i0AzMTsm4kLy0oQetwUCvHy9TYPw==",
+              "unpackedSize": 1053
+            },
+            {
+              "source": "ecosyste.ms",
+              "shasum": "c2c00593539e871f247fc6c31fcb958de8f5d9d7",
+              "integrity": "sha512-2Tz+3x3QA2EAiesyprujknm2obMxuaw0I31moOCe/BZ4LQDpHCBq27ihJ5i0AzMTsm4kLy0oQetwUCvHy9TYPw==",
+              "unpackedSize": 1053
+            },
+            {
+              "source": "software-heritage",
+              "shasum": "c2c00593539e871f247fc6c31fcb958de8f5d9d7",
+              "integrity": "sha512-2Tz+3x3QA2EAiesyprujknm2obMxuaw0I31moOCe/BZ4LQDpHCBq27ihJ5i0AzMTsm4kLy0oQetwUCvHy9TYPw==",
+              "unpackedSize": 1053
+            }
+          ],
+          "artifact": {
+            "length": 676,
+            "filename": "freo-design-system-1.0.4.tgz",
+            "checksums": {
+              "sha1": "c2c00593539e871f247fc6c31fcb958de8f5d9d7",
+              "sha256": "7718f6b45c446d1e86e5e2808fdcad4bf2d2fa8b787d72c1b7520bea0d5a5c8b"
+            },
+            "url": "https://registry.npmjs.org/freo-design-system/-/freo-design-system-1.0.4.tgz"
+          },
+          "swh_visit": "2025-12-05T04:09:22.569000+00:00",
+          "swh_root": "7acd82168578cfa3bf2783d332a7069718e76c37",
+          "files": 2,
+          "inert_or_removed": []
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      }
+    ]
+  },
+  "requests": {
+    "ecosystems": {
+      "requests": 1141,
+      "unreadable": 0
+    },
+    "registry": {
+      "requests": 728,
+      "unreadable": 0
+    },
+    "swh": {
+      "requests": 104,
+      "unreadable": 0
+    },
+    "jsdelivr": {
+      "requests": 2036,
+      "unreadable": 0
+    },
+    "registry-tarball": {
+      "requests": 733,
+      "unreadable": 0
+    }
+  },
+  "rule2_note": "Rule 2 cannot fire on P: every P in the denominator has a legitimate version at least 7 days before V, and the longest base wait is 168h."
+}

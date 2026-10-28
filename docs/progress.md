@@ -407,6 +407,10 @@ On GitHub, through the throwaway draft PR #159 (base `ci/judge-dogfood`; npm's l
 - #159 was then closed without merging, and its branch deleted.
 - judge-comment.yml has still not run on GitHub.
 
+## 2026-10-28 (cycle 2) — Dependabot for npm
+
+Added `.github/dependabot.yml`: npm version updates for the root directory, weekly, at most 5 open PRs. Decisions: "Dependabot feeds the judge". In Docker (python:3.14-slim), check-jsonschema 0.33.0's vendored Dependabot schema accepts the file; with `interval: fortnightly` it rejects it. Dependabot reads the file only from the default branch, so its first PRs come after the merge; nothing has run yet.
+
 ## 2026-10-28 — Packagist advisories in Composer plans
 
 Composer scans and plans now read Packagist's advisory API next to OSV and take the later fix. New tests: Packagist's later fix wins over OSV's, OSV's later fix is kept, a Packagist-only advisory is found, a fix landing in the next range moves on, unaffected and empty answers stay clean, no same-major fix and unreadable ranges block, and an outage, a missing field, an unrequested name, a record for another package and an invalid id all fail the scan; npm inventories do not query Packagist. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passed; packages tests 176 passed. The site build needs git and was not run in the container; CI runs the full suite.
@@ -473,10 +477,6 @@ Gate: **not met**. The delay gates are met: exploited 16.4h (n = 6), high 0h (n 
 - **Unverified.** Gate 2's provenance, scripts and publisher remain unverified for 1,140 of the 1,148 removed versions.
 - **Second execution.** A second, diagnostic execution (baafc36) only added the fixes behind each unknown, and gives identical counts.
 
-## 2026-10-28 (cycle 2) — Dependabot for npm
-
-Added `.github/dependabot.yml`: npm version updates for the root directory, weekly, at most 5 open PRs. Decisions: "Dependabot feeds the judge". In Docker (python:3.14-slim), check-jsonschema 0.33.0's vendored Dependabot schema accepts the file; with `interval: fortnightly` it rejects it. Dependabot reads the file only from the default branch, so its first PRs come after the merge; nothing has run yet.
-
 ## 2026-10-28 (cycle 2) — #151's post-merge review, and its fixes
 
 #151 was merged at f78c931, a docs-only commit after the last recorded review (b885de6). A fresh-context subagent reviewed the full diff 2c1c1e7..f78c931 after the merge: **APPROVE**, with three non-blocking findings. The verdict is on the PR (https://github.com/Ludion-ai/ludion/pull/151#issuecomment-6463525016, `reviewed-sha: f78c931ecd4a3bd46eb58483a0f8d52008d862c9`). This PR fixes them (decisions: "After #151's post-merge review"):
@@ -533,10 +533,30 @@ docs/bench/dogfood.
 - **The action.** Checked locally in Docker with gh stubbed (17 of 17), and live in mode judge on throwaway PR #169, which is closed. Mode comment has not run on GitHub.
 - **npm pack.** README.md, dist/cli.js and package.json. Nothing was published.
 
-## 2026-10-28 (cycle 3, L9) — Workspace package.json stops: rule built, not wired (stopped for the coordinator)
+## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
 
-docs/bench/2026-10-28-l9-workspace-stop.
-- **Definitions** of a false gate 4 stop were committed first (05b6b7d).
-- **The module.** workspace-manifests.ts and its 8 tests. In Docker the CLI suite passed 187, with 5 skipped, and survived 0 of 14 mutations.
-- **On the real files.** Run alone on #161's and #162's files, the module finds both workspace manifests agree with the lockfile.
-- **Not done.** The judge does not call the module: judge.ts and judge-cli.ts are L1's, and judge.yml is protected. So #161 and #162 were not judged again, and nothing was merged.
+The rules and the review follow-ups are in #166 (decisions: the entry of the same name). Checked in Docker at dd86e86, offline, with a read-only root, as a non-root user: typecheck exit 0; judge-workflow.test.ts 27 passed (20 before); packages 8 files, 237 passed; actionlint found nothing on both judge workflows; 8 mutations re-run one at a time, each caught. After #166's first review (B1), `protected-paths` passes only when the latest review of the current head approves; the checks of that fix are in the bench README. Raw output and details: docs/bench/2026-10-28-l3-protected/.
+
+## 2026-10-28 (cycle 3) — Backtest v5: archives as install-script sources, and the disputed category
+
+docs/bench/2026-10-28-backtest-v5. The definitions were committed at 23ab295 and the scripts at cadac0b, both pushed before the run. The execution ran 11:56:25Z–12:55:30Z, and its output was committed unchanged (f05e30f). v4 is reproduced with 0 differences.
+- **Gate: not met.** At 12h and 24h, 1,039 / 1 / 108 (stopped / missed / unknown of 1,148); at 72h, 1,065 / 1 / 82; at 168h, 1,078 / 1 / 69. As an interval: 90.51%–99.91%, 92.77%–99.91% and 93.90%–99.91% (v4: 86.24%, 91.64%, 93.29% at the lower bound). The delay gates are v4's, carried over and met.
+- **What moved.** ecosyste.ms's copies of removed versions show install scripts, which moves 49 / 13 / 7 versions (24h / 72h / 168h) from unknown to stopped.
+  - 7 of these moves rest on whether the registry lists prev on the run date. That is all 7 at 168h and 7 of 13 at 72h.
+  - Without those 7, the lower bounds are 89.90%, 92.16% and 93.29% (v4's 168h figure).
+  - Software Heritage was read for 35 versions' install scripts and held 1, which changed nothing. It was also read for the 2 disputed candidates, and held both.
+- **Disputed: at least 2, and 988 undecided.** The two are @ensdomains/buffer 0.1.1, still the one miss, and freo-design-system 1.0.4 (stopped). Both stay in the denominator.
+  - "Legitimate" means only "named by no MAL- record", and the category does not say a version is benign.
+  - freo 1.0.4 is in it because its record does not name 1.0.3, which added the same preinstall 59 minutes earlier.
+  - A draft correction request for @ensdomains/buffer 0.1.1 to the GitHub Advisory Database is in the folder. It has not been sent.
+- **A predictable limit.** jsDelivr's CDN answers 404 for the files of removed versions it still lists (cycle 2 had seen it serve only versions requested before removal). So 988 versions failed the disputed check closed (README, "Anomalies and limits").
+
+## 2026-10-28 (cycle 3, L1) — Gate 1's split rebuilt; the noise rerun: count not met, misses not met
+
+- Definitions pushed before any implementation (77f905a). `production.ts`, `ludion judge --source`, and the lockfile reader's skip of npm's extraneous folders (c381a85; 25 new tests). The rerun's first execution at c381a85: 100 of 100 repositories, none failed.
+- Count: the judge 938 against npm audit 1,867. 2,814 > 1,867, so **not met** (the first run had 560, met). npm audit's numbers did not change. The rebuilt split on the first run's own OSV results also gives 938.
+- Misses: 160 left out, every one a first-run "no". Five fresh-context reviewers gave 11 yes, 149 no (137 reused) and 0 undecidable: **11 misses in 4 repositories**, so **not met** (the first run had 167 misses in 32 repositories). Every first-run "yes" and "undecidable" is now counted.
+- JakeWharton/jakewharton.com's lockfile now reads.
+- One reviewer ran `npm ci` on the host by mistake, on Ludion's own lockfile. npm's log shows that esbuild's and workerd's postinstall scripts ran (exit 0); every tarball came from the local cache. An earlier version of this entry said no install script ran; that was wrong (docs/bench/2026-10-28-noise-v2/README.md).
+- After #168's review (REQUEST CHANGES: eight places where the reader left out what section 2 calls production), the reader was fixed with nine tests, each failing on c381a85 (6c4f58e). A second execution beside the result gave the same numbers (938; the same 160 left out; 11 misses). f0d489e removed an exponential-backtracking pattern an automated security review found.
+- #168's delta review (REQUEST CHANGES) found three regressions in 6c4f58e and quadratic paths. They were fixed in 9313aa2, with tests that fail on 6c4f58e. A third execution beside the result gave the same numbers again. 9cd7ebc then closed two ways to hide an import that an automated security review found. #168's second delta review (REQUEST CHANGES) found a heredoc-delimiter regression against 6c4f58e and a case where 9cd7ebc read less than 9313aa2; both are fixed with tests in the next commit. None of these later commits was run on the sample.

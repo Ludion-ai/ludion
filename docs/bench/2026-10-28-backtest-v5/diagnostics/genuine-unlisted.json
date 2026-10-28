@@ -1,0 +1,66 @@
+{
+ "rows": 200,
+ "with_unlisted": 8,
+ "list": [
+  {
+   "update": "taylored 7.0.7 -> 7.0.8",
+   "from_listed": false,
+   "to_listed": false,
+   "verdict_with_exception": "stop",
+   "stops": [
+    "taylored@7.0.8 is no longer listed by the registry (unpublished or withdrawn)."
+   ]
+  },
+  {
+   "update": "debug 4.4.2 -> 4.4.3",
+   "from_listed": false,
+   "to_listed": true,
+   "verdict_with_exception": "ready_except_build",
+   "stops": []
+  },
+  {
+   "update": "color-name 2.0.1 -> 2.0.2",
+   "from_listed": false,
+   "to_listed": true,
+   "verdict_with_exception": "ready_except_build",
+   "stops": []
+  },
+  {
+   "update": "flowise 3.0.9 -> 3.0.10",
+   "from_listed": false,
+   "to_listed": true,
+   "verdict_with_exception": "ready_except_build",
+   "stops": []
+  },
+  {
+   "update": "error-ex 1.3.3 -> 1.3.4",
+   "from_listed": false,
+   "to_listed": true,
+   "verdict_with_exception": "ready_except_build",
+   "stops": []
+  },
+  {
+   "update": "simple-swizzle 0.2.3 -> 0.2.4",
+   "from_listed": false,
+   "to_listed": true,
+   "verdict_with_exception": "ready_except_build",
+   "stops": []
+  },
+  {
+   "update": "duckdb 1.3.3 -> 1.3.4",
+   "from_listed": false,
+   "to_listed": true,
+   "verdict_with_exception": "stop",
+   "stops": [
+    "duckdb@1.3.4 has no comparable predecessor and runs install scripts (install)."
+   ]
+  },
+  {
+   "update": "eslint-config-prettier 8.10.1 -> 8.10.2",
+   "from_listed": false,
+   "to_listed": true,
+   "verdict_with_exception": "ready_except_build",
+   "stops": []
+  }
+ ]
+}

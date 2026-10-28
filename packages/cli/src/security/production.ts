@@ -163,9 +163,10 @@ export function codeSpecifiers(text: string): string[] {
 }
 /**
  * What a stylesheet (or a component's <style>) imports: every item of an @import, @use, @forward, @plugin or
- * @reference list, and url(~…). A clause ends at `;`, `{`, `}` or the next `@` outside quotes, and is read twice: as
- * written, and ending at a line break unless the line ends with a comma (Sass's indented syntax, Stylus). A Less option
- * such as `(reference)` is skipped. c381a85's reading (the first item) is kept beside them.
+ * @reference list, and url(~…). A clause ends at `;`, `{`, `}` or an `@` outside quotes and comments, and is read
+ * twice: as written, and ending at a line break unless the line ends with a comma (Sass's indented syntax, Stylus). A
+ * Less option such as `(reference)` is skipped, and an unquoted list (`@import bourbon, neat`) gives every item.
+ * c381a85's reading (the first item) is kept beside them.
  */
 export function styleSpecifiers(text: string): string[] {
   const out: string[] = [], next = finder(text);
@@ -179,6 +180,12 @@ export function styleSpecifiers(text: string): string[] {
         if (end < 0 || end >= limit || (nl >= 0 && nl < end)) break;
         clause += text.slice(p, end + 1); p = end + 1; lastSolid = c; continue;
       }
+      // A comment is jumped over, so an `@` in it does not end the clause; what it quotes is still read.
+      if (c === "/" && text[p + 1] === "*") {
+        const end = next("*/", p + 2);
+        if (end < 0 || end >= limit) break;
+        clause += text.slice(p, end + 2); p = end + 2; continue;
+      }
       if (c === ";" || c === "{" || c === "}" || c === "@") break;
       if (c === "\n" && lines && lastSolid !== ",") break;
       if (!/\s/.test(c)) lastSolid = c;
@@ -186,13 +193,29 @@ export function styleSpecifiers(text: string): string[] {
     }
     return clause.replace(/^\s*\([^)]*\)\s*/, "");
   };
-  // Both readings are kept: a list that runs across lines in CSS, and one item per line in the indented syntaxes. A
-  // clause never runs into the next at-rule, even inside quotes, so the whole file is read in linear time.
   const rules = [...text.matchAll(/@(?:import|use|forward|plugin|reference)\s+/g)];
-  for (const [i, m] of rules.entries()) for (const clause of [true, false].map(lines => clauseAt(m.index! + m[0].length, rules[i + 1]?.index ?? text.length, lines))) {
+  // Which rules stand outside quotes and block comments: only those end another rule's clause. One pass over the text.
+  const outside: boolean[] = [];
+  for (let i = 0, r = 0, quote = "", comment = false; i < text.length && r < rules.length; i++) {
+    while (r < rules.length && rules[r]!.index === i) outside[r++] = !quote && !comment;
+    const c = text[i];
+    if (comment) { if (c === "*" && text[i + 1] === "/") { comment = false; i++; } }
+    else if (quote) { if (c === quote || c === "\n") quote = ""; }
+    else if (c === '"' || c === "'") quote = c;
+    else if (c === "/" && text[i + 1] === "*") { comment = true; i++; }
+  }
+  // A rule's clause runs to the next rule outside quotes and comments (a rule inside them: to the next rule of any kind),
+  // so the clauses of rules outside them never overlap, and the whole file is read in linear time.
+  const limits: number[] = [];
+  for (let k = rules.length - 1, nextOutside = text.length; k >= 0; k--) {
+    limits[k] = outside[k] ? nextOutside : rules[k + 1]?.index ?? text.length;
+    if (outside[k]) nextOutside = rules[k]!.index!;
+  }
+  // Both readings are kept: a list that runs across lines in CSS, and one item per line in the indented syntaxes.
+  for (const [k, m] of rules.entries()) for (const clause of [true, false].map(lines => clauseAt(m.index! + m[0].length, limits[k]!, lines))) {
     const quoted = [...clause.matchAll(/["']([^"'\n]+)["']/g)].map(q => q[1]!), urls = [...clause.matchAll(/url\(\s*["']?([^"')\s]+)/g)].map(u => u[1]!);
     if (quoted.length || urls.length) out.push(...quoted, ...urls);
-    else { const bare = /^\s*([^\s,;]+)/.exec(clause); if (bare) out.push(bare[1]!); }
+    else for (const item of clause.split(",")) { const bare = /^\s*([^\s,;]+)/.exec(item); if (bare) out.push(bare[1]!); }
   }
   for (const m of text.matchAll(/@(?:import|use|forward|plugin|reference)\s+(?:url\(\s*)?["']?([^"')\s;]+)/g)) out.push(m[1]!);
   for (const m of text.matchAll(/url\(\s*["']?~([^"')\s]+)/g)) out.push(m[1]!);
@@ -276,11 +299,13 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
   for (let i = 0; i < raw.length; i++) {
     const line = raw[i]!.trim();
     if (!line || line.startsWith("#")) continue;
-    // `<<` as its own word (not `<<<`, not `1<<2`), a delimiter starting with a letter or `_`, and a closing line.
-    const doc = /^(RUN\b.*?\s)<<(-?)[ \t]*(["']?)([A-Za-z_]\w*)\3(.*)$/i.exec(line);
-    const end = doc ? after((doc[2] ? trimmed : exact).get(doc[4]!), i) : -1;
+    // `<<` as its own word (not `<<<`, not `1<<2`), a delimiter that is one shell word (`EOF`, `END-SCRIPT`,
+    // `'EOF.sh'`), and a closing line.
+    const doc = /^(RUN\b.*?\s)<<(-?)[ \t]*(?:(["'])([^"'\n]+)\3|([^\s<"']+))(.*)$/i.exec(line);
+    const word = doc ? doc[4] ?? doc[5]! : "";
+    const end = doc ? after((doc[2] ? trimmed : exact).get(word), i) : -1;
     if (!doc || end < 0) { lines.push(line); continue; }
-    lines.push(`${doc[1]} ${doc[5]}\n${raw.slice(i + 1, end).join("\n")}`);
+    lines.push(`${doc[1]} ${doc[6]}\n${raw.slice(i + 1, end).join("\n")}`);
     i = end;
   }
   for (const line of lines) {
@@ -491,8 +516,23 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
     if (/^(pre|post)?start$/.test(name)) production.push({ from: `${dir}package.json scripts.${name}`, text });
     if (/^(pre|post)?(build|generate|export)(:.*)?$/.test(name)) build.push({ from: `${dir}package.json scripts.${name}`, text });
   }
+  // Scripts by name, and their names in order, so following `npm run x` or `run-p x:*` is a lookup, not a walk.
+  const byScript = new Map<string, [string, string][]>();
+  for (const [dir, s] of scripts) for (const [name, body] of Object.entries(s)) {
+    if (typeof body !== "string") continue;
+    const at = byScript.get(name);
+    if (at) at.push([dir, body]); else byScript.set(name, [[dir, body]]);
+  }
+  const scriptNames = [...byScript.keys()].sort();
+  const withPrefix = (prefix: string) => {
+    let lo = 0, hi = scriptNames.length;
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (scriptNames[mid]! < prefix) lo = mid + 1; else hi = mid; }
+    const out: string[] = [];
+    for (let k = lo; k < scriptNames.length && scriptNames[k]!.startsWith(prefix); k++) out.push(scriptNames[k]!);
+    return out;
+  };
   const run = (commands: { from: string; text: string }[], kind: "production" | "build") => {
-    const followed = new Set<string>();
+    const followed = new Set<string>(), expanded = new Set<string>();
     for (let i = 0; i < commands.length; i++) {
       const { from, text } = commands[i]!;
       const why = kind === "production" ? `${from} runs it` : `the build runs it (${from})`;
@@ -510,8 +550,10 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
           else if (!w.startsWith("-")) executes = false;
           if (!runner) continue;
           const script = w.replace(/^npm:/, ""), glob = script.endsWith("*") ? script.slice(0, -1) : null;
-          for (const [dir, s] of scripts) for (const [name, body] of Object.entries(s)) {
-            if (typeof body !== "string" || !(name === script || (glob !== null && glob !== "" && name.startsWith(glob))) || followed.has(`${dir}\0${name}`)) continue;
+          // A glob already expanded has queued every script it matches.
+          const names = glob === null ? [script] : glob === "" || expanded.has(glob) ? [] : (expanded.add(glob), withPrefix(glob));
+          for (const name of names) for (const [dir, body] of byScript.get(name) ?? []) {
+            if (followed.has(`${dir}\0${name}`)) continue;
             followed.add(`${dir}\0${name}`);
             commands.push({ from: `${dir}package.json scripts.${name} (from ${from})`, text: body });
           }

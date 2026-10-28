@@ -374,6 +374,20 @@ describe("after #168's delta review: what c381a85 counted is not lost", () => {
     expect(quick(() => styleSpecifiers(`@import "x ${"@import \"y ".repeat(40_000)}`))).toBeLessThan(1000);
     expect(quick(() => styleSpecifiers(`${"@import 'a', ".repeat(40_000)}`))).toBeLessThan(1000);
   });
+  it("after the second delta review: shell-word heredoc delimiters, unquoted lists, at-rules in strings and comments, many scripts", () => {
+    const quick = (f: () => unknown) => { const t0 = performance.now(); f(); return performance.now() - t0; };
+    for (const word of ["END-SCRIPT", "'EOF.sh'", "\"x y\""]) {
+      const close = word.replace(/^["']|["']$/g, "");
+      expect(dockerImage(`FROM node:22\nWORKDIR /app\nRUN <<${word}\nnpm ci\nnpm run build\n${close}\nCMD ["node", "a.js"]\n`, false).holds).toBe(true);
+    }
+    expect(styleSpecifiers("@import bourbon, neat")).toEqual(expect.arrayContaining(["bourbon", "neat"]));
+    expect(styleSpecifiers("@import \"a @import b\", \"pkg\";")).toContain("pkg");
+    expect(styleSpecifiers("@import url(\"https://cdn.example/x.css?q=@use \"), 'pkg';")).toContain("pkg");
+    expect(styleSpecifiers("@import 'a', /* @use x */ 'pkg';")).toContain("pkg");
+    const scripts = Object.fromEntries(Array.from({ length: 4000 }, (_, k) => [`s${k}`, `npm run s${k + 1} && run-p s* x`]));
+    const lock = lockOf({ devDependencies: { x: "^1" } }, { "node_modules/x": { dev: true } });
+    expect(quick(() => productionSplit(lock, tree({ "package.json": JSON.stringify({ scripts: { start: "npm run s0", ...scripts } }), "src/a.js": "" })))).toBeLessThan(1500);
+  });
   it("says in the comment that pnpm gets no split", () => {
     const fact: VersionFacts = { published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: null, install_scripts: [], dependencies: [], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z" };
     const j = judge({ changes: [], facts: new Map([["a@1.0.0", fact]]), fixes: [], files: ["pnpm-lock.yaml"], now: new Date("2026-10-28T00:00:00Z"), lockfile: "pnpm-lock", split: { source: "pnpm", incomplete: null, images_with_dev: [] } });

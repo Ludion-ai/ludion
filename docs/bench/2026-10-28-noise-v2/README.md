@@ -137,7 +137,7 @@ All nine P1 cases are in `scripts/` files. The first rule did not count those as
 - `scripts/beside.mjs` (`result-fixed/beside-tally.json`) counts the second execution's misses from the review's verdicts, as registered. It found that every package the second execution leaves out was reviewed, and that its left-out list is a subset of the result's: here, the same list.
 - So none of the eight findings changed a count or a left-out package in this sample. One repository's number of dev-only versions changed (Azure/api-management-developer-portal, 121 → 118), with no vulnerable package among them. The findings matter for repositories outside the sample.
 
-## After #168's delta review: three regressions fixed, the reader made linear, and a third execution
+## After #168's delta review: three regressions fixed, the listed readers made linear, and a third execution
 
 #168's delta review (at 93d778b) found three cases where 6c4f58e left out what c381a85 had counted and section 2 calls production:
 - **A.** A stylesheet import clause ran across lines, so Sass's indented syntax and Stylus lost unquoted imports.
@@ -155,8 +155,8 @@ So the 1fa3d68 premise, that every fix only adds production, did not hold. `besi
   - Import calls find comment ends by binary search over positions listed once, and read each whitespace run and specifier position once.
   - The YAML readers, the heredoc's closing line and the `FROM` chain use loops and lookups.
   - The pnpm comment says no split is made.
-- **The tests.** The A–C tests fail on 6c4f58e's `production.ts`: 3 failed, and the pnpm test passed (it exercises judge.ts). At 9313aa2, production.test.ts has 40 tests, all passing.
-- **What "linear" rests on now.** A test runs the review's crafted inputs at 40,000 repetitions, a crafted call at 1 MB of whitespace and 1 MB of an unclosed string, and a 16,000-stage `FROM` chain. Each must finish under 1 to 1.5 s, and in Docker the whole file took 308 ms. That is a bound on these inputs, not a proof for every input.
+- **The tests.** With that describe block run alone, the A–C tests fail on 6c4f58e's `production.ts`: 3 failed, and the pnpm test passed (it exercises judge.ts). The whole file was not run against 6c4f58e: its new 40k-repetition timing test did not finish there in several minutes. At 9313aa2, production.test.ts has 40 tests, all passing.
+- **What "linear" rests on now.** A test runs the review's crafted inputs at 40,000 repetitions, a crafted call at 1 MB of whitespace and 1 MB of an unclosed string, and a 16,000-stage `FROM` chain. Each must finish under 1 to 1.5 s, and in Docker the whole file took 308 ms. That is a bound on these inputs, not a proof for every input. Only the readers listed above were made linear. Following scripts stayed quadratic in the number of scripts until the change after the second delta review (below).
 - **The third execution** ran at 9313aa2, from its own volume (`ludion-l1-run3`) that nothing else wrote to during the run. Its output is in `result-final/`.
 
 - It ran detached at 9313aa2, 14:00:45Z–14:16:17Z, and exited 0. No repository failed or needed a second attempt.
@@ -184,7 +184,27 @@ So the 1fa3d68 premise, that every fix only adds production, did not hold. `besi
 - The comment skip has no cap. Where skipping ends is remembered for every position passed, so it stays linear.
 - Each stylesheet clause is read both as written and line by line, never past the next at-rule.
 
-These changes only add readings to 9313aa2's. So, on this sample, 9cd7ebc's left-out list can only be the same as the third execution's or smaller, and its count the same or larger. It was not run on the sample. At 9cd7ebc, production.test.ts has 41 tests, all passing.
+These changes were meant only to add readings to 9313aa2's. #168's second delta review found that this does not hold in general:
+- 9cd7ebc's `limit` ended a stylesheet clause at an at-rule inside a quoted string (`@import "a @import b", "pkg";`), which 9313aa2 had read;
+- an `@` in a comment inside a list ended the clause in both 9313aa2 and 9cd7ebc.
+
+Both cases are contrived. The reviewer ran c381a85's, 6c4f58e's, 9313aa2's and 9cd7ebc's readers over all 101 source trees. Every package an earlier version read, 9cd7ebc also read, except six that section 2 says are not imports (five `import type` lines, one quoted word in a `.sass` comment). No version left out at 9cd7ebc was production in an earlier version. 9cd7ebc was not run on the sample. At 9cd7ebc, production.test.ts has 41 tests, all passing.
+
+## After #168's second delta review
+
+The second delta review (at f44f7ae) found:
+- **One regression against 6c4f58e (blocking).** A heredoc delimiter that is not a `\w` word (`<<END-SCRIPT`, `<<'EOF.sh'`) was not seen, so a `RUN npm ci` inside it was missed.
+- An unquoted list on one line (`@import bourbon, neat`) gave only its first item.
+- Following scripts was quadratic in the number of scripts: 4,000 scripts took 19 s.
+- The `limit` and comment cases above.
+
+The fixes, in the commit after f44f7ae:
+- The delimiter is read as one shell word, quoted or not, and the closing-line rule stays.
+- An unquoted list gives every item.
+- Scripts are looked up by name, and a glob is expanded once.
+- A stylesheet clause runs to the next at-rule outside quotes and comments, and jumps over comments while still reading what they quote.
+
+Each of these only adds readings to f44f7ae's, or keeps them, and the new test fails on f44f7ae's `production.ts`. The fixes were not run on the sample.
 
 ## Both gates
 

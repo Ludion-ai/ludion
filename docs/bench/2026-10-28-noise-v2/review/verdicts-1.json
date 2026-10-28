@@ -1,0 +1,369 @@
+[
+  {
+    "repo": "Rafi-SBM/PySan",
+    "sha": "26767d2af321aece388ececd853f4819ec3221d0",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@eslint/plugin-kit",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/@eslint/plugin-kit@0.3.2 (lockfile dev) [OSV GHSA-xffm-g5w8-qvg7 introduced 0 fixed 0.3.4; npm <0.3.4]. D1: its only lockfile parent is node_modules/eslint (root devDependencies eslint, a linter); path devDependencies eslint@9.29.0 > @eslint/plugin-kit; no path from a declared dependency avoids a D1 package. Section 2's added conditions checked, none applies: the only build/config imports are vite.config.ts:1-2 (vitest/config, @vitejs/plugin-react); vite.config.ts names jsdom, react, react-dom, vitest, @vitejs/plugin-react only; no stylesheet imports it; build is package.json:29 `tsc -b && vite build` (typescript, vite); no prestart/start/poststart, Dockerfile, Procfile, compose, vercel or netlify file; not a P3/P4 package; the closure of every production copy (P0 react/react-dom, P1/P2 vitest, @vitejs/plugin-react, jsdom, P3/P6 vite, typescript, and also @vitest/coverage-v8's closure) does not reach it. Repo-wide grep: no reference outside package-lock.json."
+      },
+      {
+        "name": "@humanfs/node",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/@humanfs/node@0.16.6 (dev) [OSV GHSA-p498-v437-472g introduced 0 fixed 0.16.8; npm <0.16.8]. D1: only parent node_modules/eslint (root devDependency, linter); path eslint@9.29.0 > @humanfs/node. Not production: no source import (29 source files import only react, react-dom, vitest, @vitejs/plugin-react), not named in vite.config.ts, not run by build (package.json:29 tsc, vite), no start script or Dockerfile, not P3/P4, not reached from any production copy's closure. None of section 2's added conditions applies."
+      },
+      {
+        "name": "ajv",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/ajv@6.12.6 (dev) [OSV GHSA-2g4f-4pwh-qvx6 introduced 0 fixed 6.14.0; npm <6.14.0]. D1: parents are node_modules/eslint and node_modules/@eslint/eslintrc (both linter packages); every path from declared dependencies passes through eslint. Not imported, not named by vite.config.ts, not run by the build (tsc, vite), no start/Dockerfile, not P3/P4, not reached from any production copy (closure checked). None of section 2's added conditions applies."
+      },
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/brace-expansion@1.1.12 (dev) [OSV GHSA-3jxr-9vmj-r5cp fixed 1.1.16, GHSA-6j4f-fj2g-mc7p fixed 1.1.19, GHSA-f886-m6hf-6m8v fixed 1.1.13, GHSA-mh99-v99m-4gvg fixed 1.1.17, GHSA-q2hr-2g5m-vwhr fixed 1.1.21, GHSA-qhr7-859c-m2p7 fixed 1.1.20, GHSA-rgw5-rvv9-x895 fixed 1.1.18; npm ranges <1.1.13 to <1.1.21]. Out of range (no OSV or npm range matches): node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.12, node_modules/test-exclude/node_modules/brace-expansion@5.0.12, node_modules/glob/node_modules/brace-expansion@2.1.7. D1 for the in-range copy: only parent node_modules/minimatch@3.1.2, whose parents are eslint, @eslint/eslintrc and @eslint/config-array (all linter packages); path eslint@9.29.0 > minimatch@3.1.2 > brace-expansion@1.1.12. Not production by P0-P6 or following (closure checked, including @vitest/coverage-v8's). None of section 2's added conditions applies."
+      },
+      {
+        "name": "flatted",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/flatted@3.3.3 (dev) [OSV GHSA-25h7-pfq9-p65f fixed 3.4.0, GHSA-rf6f-7fwh-wjgh fixed 3.4.2; npm <3.4.0, <=3.4.1]. D1: path eslint@9.29.0 > file-entry-cache > flat-cache > flatted; flat-cache and file-entry-cache are reached only from eslint, so every path passes through eslint (linter). Not imported, named, run by build, P3/P4, or reached from a production copy. None of section 2's added conditions applies."
+      },
+      {
+        "name": "js-yaml",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/js-yaml@4.1.0 (dev) [OSV GHSA-mh29-5h37-fv8m 4.0.0-4.1.1, GHSA-h67p-54hq-rp68 4.0.0-4.2.0, GHSA-52cp-r559-cp3m 4.0.0-4.3.0, GHSA-5p4m-2wfm-xmqj 4.0.0-4.3.1, GHSA-2883-xcg3-v3hh 4.0.0-4.3.2 (fixed); npm >=4.0.0 <4.1.1 etc.]. D1: only parent node_modules/@eslint/eslintrc (an @eslint/* linter package, reached from eslint); path eslint@9.29.0 > @eslint/eslintrc > js-yaml. Not imported (no source or build config references js-yaml), not named, not run, not P3/P4, not reached from a production copy. None of section 2's added conditions applies."
+      },
+      {
+        "name": "minimatch",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/minimatch@3.1.2 (dev) [OSV GHSA-23c5-xmqv-rm74 fixed 3.1.4, GHSA-3ppc-4f35-3m26 and GHSA-7r86-cg39-jmmj fixed 3.1.3; npm <3.1.3, <3.1.4]. Out of range: @typescript-eslint/typescript-estree/node_modules/minimatch@10.2.6, test-exclude/node_modules/minimatch@10.2.6, glob/node_modules/minimatch@9.0.9. D1 for the in-range copy: parents are eslint, @eslint/eslintrc and @eslint/config-array (linter packages); path eslint@9.29.0 > minimatch@3.1.2. Not production by P0-P6 or following (closure checked). None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "cofob/design-system",
+    "sha": "6e1c42d66655665ab4f4b59f09225ef93406a435",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/vitest/node_modules/@vitest/mocker@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 2.1.0 to fixed 4.1.11, GHSA-qxg6-89mg-rqv8 2.1.0-beta.7 to fixed 4.1.12; npm same]. D1: only parent node_modules/vitest@3.2.7 (test runner declared in devDependencies of packages/design-system-*); path vitest > @vitest/mocker. vitest is not production (see vitest). Repository facts: 11 project folders; no Dockerfile, Procfile, compose, vercel.json, netlify.toml or wrangler config; no prestart/start/poststart in any package.json; build (package.json:25 `npm run build --workspaces --if-present`) runs tsc, svelte-package, vite, svelte-kit, astro (apps/showroom/package.json:8) and node scripts; build configs (astro.config.mjs, vite.config.ts x2, svelte.config.js x4, postcss.config.mjs x2) name no target; 1923 source files import no target; the closure of all production copies (P0-P6) does not reach it. None of section 2's added conditions applies."
+      },
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/brace-expansion@5.0.7 (dev) [OSV GHSA-mh99-v99m-4gvg 4.0.0-5.0.8, GHSA-rgw5-rvv9-x895 4.0.0-5.0.9, GHSA-6j4f-fj2g-mc7p 4.0.0-5.0.10, GHSA-qhr7-859c-m2p7 4.0.0-5.0.11, GHSA-q2hr-2g5m-vwhr 4.0.0-5.0.12 (fixed)]. D1: only parent node_modules/minimatch@10.2.5, whose parents are eslint, @eslint/config-array and @typescript-eslint/typescript-estree (linter packages); path root devDependencies eslint (package.json:56) > minimatch > brace-expansion. Not imported, not named by any build config, not run by build or production command, not P3/P4, not reached from any production copy (closure checked). No Dockerfile. None of section 2's added conditions applies."
+      },
+      {
+        "name": "colord",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/colord@2.9.3 (dev) [OSV GHSA-2wm5-q62r-hmrv introduced 0 fixed 2.9.4; npm <2.9.4]. D1: only lockfile parent is node_modules/stylelint (root devDependency, package.json:63, linter); path stylelint > colord. Checked the CSS build: cssnano (production by P1/P2 via packages/design-system-css/postcss.config.mjs) uses postcss-colormin@7.0.10, which depends on @colordx/core, not colord, so the CSS pipeline does not reach it. No stylesheet or source import, not named, not run by build, not P3/P4, not reached from any production copy. None of section 2's added conditions applies."
+      },
+      {
+        "name": "fast-uri",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/fast-uri@3.1.4 (dev) [OSV GHSA-333x-w4r6-6crp 3.0.0-3.1.9, GHSA-7p8r-x3mc-p8w7 3.0.0-3.1.5 and 9 more (fixed)]. Parents: node_modules/table/node_modules/ajv@8.20.0 (table < stylelint, D1) and node_modules/yaml-language-server/node_modules/ajv@8.20.0 (< yaml-language-server < volar-service-yaml < @astrojs/language-server < @astrojs/check, apps/showroom devDependency, package.json:29). The @astrojs/check path has no D1 package, so D1 fails. D2: whole source tree read (3335 files, 1923 source); no Dockerfile of any kind; no source or stylesheet import; no build tool configuration names it; no build or production command runs it: apps/showroom build `astro check && astro build` (apps/showroom/package.json:8) runs the `astro` bin, astro@7.1.1 does not declare @astrojs/check as a dependency, optional or peer dependency, and neither @astrojs/check (bin astro-check) nor fast-uri appears in a command; not P3/P4; not reached from any production copy (closure checked). Note for the worker: at run time `astro check` loads @astrojs/check (type diagnostics, no output); section 2's P6 reads commands by bin name or first word, so that load does not count. None of section 2's added conditions applies."
+      },
+      {
+        "name": "tinypool",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/tinypool@1.1.1 (dev) [OSV GHSA-5gmw-xhrv-c9v3 fixed 2.1.1, GHSA-85c8-ppgw-ccpr fixed 2.1.2; npm <=2.1.0, <2.1.2]. D1: only parent node_modules/vitest@3.2.7 (test runner in packages/* devDependencies); path vitest > tinypool. Not imported, named, run by build, P3/P4, or reached from a production copy. None of section 2's added conditions applies."
+      },
+      {
+        "name": "undici",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/undici@7.28.0 (dev) [OSV GHSA-2m5v-pch6-74hx 7.0.0-7.30.1, GHSA-4cwx-7wf7-3272 7.0.0-7.29.0 and 21 more (fixed)]. Only path: root devDependency wrangler (package.json:67) > miniflare@4.20260714.0 > undici; no D1 package on it, so D1 fails. D2: whole source tree read; no Dockerfile; no source import (repo-wide grep finds undici only in package-lock.json); not named by any build tool configuration (no wrangler config file exists, and wrangler configs are not P2 files); wrangler is run only by scripts.deploy:showroom (package.json:48), which is not a prestart/start/poststart or build/generate/export script; not P3/P4; miniflare and wrangler are not production copies, so it is not reached from one. None of section 2's added conditions applies."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/vitest@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 2.1.0 to fixed 4.1.11; npm >=2.1.0 <4.1.11]. D1: test runner declared in devDependencies of every packages/design-system-* folder (e.g. packages/design-system-css/package.json:75). No lockfile entry depends on it. Imported only by tests/*.test.ts(x), test-setup.ts and vitest.config.ts files (excluded by section 2); tsconfig `types: [vitest/globals]` is not an import under section 2; run only by test scripts. Not named by a build config, not P3/P4, not reached from a production copy. None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "Sylonin/xposed-newx-patches",
+    "sha": "fe578ab933af0bb5a9e01533c30907fd778ac23b",
+    "finished": true,
+    "packages": [
+      {
+        "name": "ip-address",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/npm/node_modules/ip-address@10.7.2 (dev, inBundle) [OSV GHSA-rxp7-6hxx-x8q5 introduced 0 fixed 10.7.4; npm <=10.7.3]. Path: root devDependency semantic-release (package.json:9) > @semantic-release/npm > npm > make-fetch-happen > @npmcli/agent > socks-proxy-agent > socks > ip-address; semantic-release is not a D1 package, so D1 fails. D2: the whole tree was read (68 files, a Gradle/Kotlin/Java project with no js/ts/css/html file, so no source imports); package.json has only devDependencies and no scripts; no Dockerfile, Procfile, compose, vercel or netlify file; no build tool configuration; not P3/P4; no copy in the lockfile is production by P0-P6, so nothing reaches it. Repo-wide grep finds ip-address only in package-lock.json. None of section 2's added conditions applies."
+      },
+      {
+        "name": "undici",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/npm/node_modules/undici@6.29.0 (dev, inBundle) [OSV GHSA-2m5v-pch6-74hx 4.0.0, GHSA-4qv8-2p9j-2685 6.5.0, GHSA-9fm3-97px-rjf6 5.15.0, GHSA-qrxm-fqhp-jwvm 4.2.1, GHSA-xjj6-f33q-929c 6.23.0, all fixed 6.29.1]. Out of range: node_modules/@actions/http-client/node_modules/undici@6.29.1 and node_modules/undici@7.30.1. Path of the in-range copy: semantic-release > @semantic-release/npm > npm > node-gyp > undici; D1 fails (no D1 package). D2: same repository facts as ip-address (no source files, no scripts, no Dockerfile or other command file, no build config, zero production copies). None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "aniru-dh21/snap-validate",
+    "sha": "2482ba5e2418e163968205ae8e20a4b3cea7c2a3",
+    "finished": true,
+    "packages": [
+      {
+        "name": "deepmerge",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/deepmerge@4.3.1 (dev) [OSV GHSA-gcqx-w48m-w2h4 introduced 4.2.0 last_affected 4.3.1; npm >=4.2.0 <=4.3.1]. D1: only lockfile parent is node_modules/jest-config@30.5.2 (a jest-* test runner package); path root devDependency jest (scripts.test, package.json:17) > @jest/core > jest-config > deepmerge. Section 2's added conditions checked: babel.config.js:3 names @babel/preset-env, which with its peer @babel/core is production by P2, but their closure does not reach deepmerge; scripts.build is an echo (package.json:26); no start script, Dockerfile, Procfile or compose; 21 source files (src, esm, examples, test-types.ts) do not import it; not P3/P4; not reached from any production copy. Repo-wide grep: no reference outside package-lock.json."
+      }
+    ]
+  },
+  {
+    "repo": "MorpheApp/morphe-patcher",
+    "sha": "c3363f717344c74fb3f160f8c788022981d3110f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/npm/node_modules/brace-expansion@5.0.9 (dev, inBundle; the only copy) [OSV GHSA-6j4f-fj2g-mc7p 4.0.0-5.0.10, GHSA-qhr7-859c-m2p7 4.0.0-5.0.11, GHSA-q2hr-2g5m-vwhr 4.0.0-5.0.12 (fixed)]. Path: root devDependency semantic-release (package.json:7) > @semantic-release/npm > npm > minimatch > brace-expansion; no D1 package on it. D2: the whole tree was read (182 files, a Gradle/Kotlin library with no js/ts/css/html file); package.json (lines 1-9) has only devDependencies and no scripts; no Dockerfile, Procfile, compose, vercel or netlify file; no build tool configuration; not P3/P4; zero production copies in the lockfile, so nothing reaches it. Repo-wide grep finds no reference outside package-lock.json. None of section 2's added conditions applies."
+      },
+      {
+        "name": "handlebars",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/handlebars@4.7.9 (dev) [OSV GHSA-8r5x-fm3f-whwj 4.0.0, GHSA-xw65-4hp5-5hc7 4.0.0, GHSA-p8wg-vrv2-v86f 3.0.0, all fixed 4.7.10; npm <=4.7.9]. Path: semantic-release > @semantic-release/commit-analyzer > conventional-changelog-writer > handlebars; D1 fails. D2 on the same repository facts as brace-expansion (no source files, no scripts, no Dockerfile or other command file, no build config, zero production copies). None of section 2's added conditions applies."
+      },
+      {
+        "name": "http-cache-semantics",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/npm/node_modules/http-cache-semantics@4.2.0 (dev, inBundle) [OSV GHSA-ch52-4w7c-c8xp introduced 0 last_affected 4.2.0; npm <=4.2.0]. Path: semantic-release > @semantic-release/npm > npm > make-fetch-happen > http-cache-semantics; D1 fails. D2 on the same repository facts (no source files, no scripts, no Dockerfile or other command file, no build config, zero production copies). None of section 2's added conditions applies."
+      },
+      {
+        "name": "ip-address",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/npm/node_modules/ip-address@10.5.0 (dev, inBundle) [OSV GHSA-2vr4-cq9g-pvrc 10.2.0-10.5.1, GHSA-rpw4-54j3-4h4q 0-10.5.1, GHSA-h3mg-xc3c-68pw and GHSA-j6r3-76f7-8jcv 0-10.7.1, GHSA-rxp7-6hxx-x8q5 0-10.7.4 (fixed)]. Path: semantic-release > @semantic-release/npm > npm > make-fetch-happen > @npmcli/agent > socks-proxy-agent > socks > ip-address; D1 fails. D2 on the same repository facts (no source files, no scripts, no Dockerfile or other command file, no build config, zero production copies). None of section 2's added conditions applies."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/npm/node_modules/postcss-selector-parser@7.1.4 (dev, inBundle) [OSV GHSA-rj75-hqrm-r3gf introduced 7.0.0 fixed 7.1.6; npm >=7.0.0 <7.1.6]. Path: semantic-release > @semantic-release/npm > npm > @npmcli/arborist > @npmcli/query > postcss-selector-parser; D1 fails. No stylesheet or PostCSS configuration exists in the repository. D2 on the same repository facts (no source files, no scripts, no Dockerfile or other command file, no build config, zero production copies). None of section 2's added conditions applies."
+      },
+      {
+        "name": "undici",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range, all three copies (dev): node_modules/@actions/http-client/node_modules/undici@6.29.0 and node_modules/npm/node_modules/undici@6.28.0 [OSV GHSA-2m5v-pch6-74hx, GHSA-4qv8-2p9j-2685, GHSA-9fm3-97px-rjf6, GHSA-qrxm-fqhp-jwvm, GHSA-xjj6-f33q-929c fixed 6.29.1; 6.28.0 also GHSA-3wwx-pv8p-q78v, GHSA-r53p-7pc4-xj5r, GHSA-rfgv-xxqx-mfg5 fixed 6.28.1], node_modules/undici@7.30.0 [GHSA-2m5v-pch6-74hx etc. 7.x fixed 7.30.1]. Paths: semantic-release > @semantic-release/npm > @actions/core > @actions/http-client > undici@6.29.0; semantic-release > @semantic-release/npm > npm > node-gyp > undici@6.28.0; semantic-release > @semantic-release/github > undici@7.30.0. No D1 package on any path. D2 on the same repository facts (no source files, no scripts, no Dockerfile or other command file, no build config, zero production copies). None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "itsdarklikehell/my-resume",
+    "sha": "8ae8c354fbf3ca7cb8182cefca778f1abba2e4b1",
+    "finished": true,
+    "packages": [
+      {
+        "name": "tinypool",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/tinypool@0.8.4 (dev) [OSV GHSA-5gmw-xhrv-c9v3 fixed 2.1.1, GHSA-85c8-ppgw-ccpr fixed 2.1.2]. D1: only parent node_modules/vitest@1.6.1 (test runner, root devDependency); both paths (vitest > tinypool; html-validate > vitest (peer) > tinypool) pass through vitest. Section 2's added conditions checked: vite.config.js imports and names only vite; build is package.json:14 `vite build`; no start script, Dockerfile, Procfile or compose; the 11 source files (script.js, sw.js, src/*.js, index.html, 404.html, styles.css) import no package; html-validate runs only in lint:html (package.json:8) and is not production; not P3/P4; not reached from any production copy (vite and its closure)."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/vitest@1.6.1 (dev) [OSV GHSA-5xrq-8626-4rwp introduced 0 fixed 3.2.6; npm <3.2.6]. D1: a test runner declared in root devDependencies (package.json:27), run only by scripts.test (package.json:10). Its only lockfile dependent is html-validate (peerDependencies), which is a lint tool used only by lint:html and is not production. No source or config imports or names vitest (repo-wide grep: only package.json and the lockfile); not P3/P4; no Dockerfile or start script. None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "mbadr5858/badr-pdf",
+    "sha": "ec472a6ea0726105088fb0c1536dfbfcaa57cd7d",
+    "finished": true,
+    "packages": [
+      {
+        "name": "tar",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/@capacitor/assets/node_modules/tar@6.2.1 (dev) [OSV 12 records, e.g. GHSA-r292-9mhp-454m introduced 0 fixed 7.5.21, GHSA-23hp-3jrh-7fpw fixed 7.5.19; npm <7.5.7 ... <=7.5.20]. Out of range: node_modules/tar@7.5.22. Only path to the in-range copy: root devDependency @capacitor/assets@3.0.5 > nested @capacitor/cli@5.7.8 > tar@6.2.1; no D1 package on it, so D1 fails. D2: source tree read (605 source files); production Dockerfiles Dockerfile and Dockerfile.nonroot: final stages are nginx (Dockerfile:82, Dockerfile.nonroot:73) that copy only /app/dist and conf files from builder plus local nginx.conf and shell scripts (Dockerfile:98-103, Dockerfile.nonroot:87-92), so neither holds devDependencies (no node_modules, no whole working folder, no build-context root); the builder stage's RUN (P6) is `npm ci` and `npm run build:with-docs` (Dockerfile:15,79), same as vercel.json:4 buildCommand, which runs node scripts, tsc, vite and vitepress (package.json:9,11), not cap or capacitor-assets; no prestart/start/poststart in the root package.json (desktop/package.json start `electron .` names no lockfile copy); capacitor.config.json and vite.config.ts name no capacitor CLI or tar; no source import of tar, @capacitor/assets or @capacitor/cli; not P3/P4; not reached from any production copy (closure checked). Note for the worker: .github/workflows/android.yml:36 runs `npx capacitor-assets generate --android` to build the released APK; GitHub workflows are not among section 2's P5/P6 command sources. None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "developer3000S/OmniRouteRus",
+    "sha": "6874cc4408cdd0c46010b4401501d7e0669b0caf",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@babel/core",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/@babel/core@7.29.0 (dev) [OSV GHSA-4x5r-pxfx-6jf8 introduced 0 fixed 7.29.6; npm <=7.29.0]. Not reused: section 2's condition 'a production stage holding devDependencies' applies: Dockerfile's final stage runner-cli is FROM runner-base (Dockerfile:22,75), which copies packages out of the builder's node_modules (Dockerfile:47-52) after the builder ran `npm ci` without --omit=dev and without NODE_ENV=production (Dockerfile:14). So only D1 can show it dev-only, with every non-D1 declared dependency of the root and open-sse folders, and every copy no declared dependency reaches, production with their closure. D1 holds: parents are node_modules/eslint-plugin-react-hooks@7.0.1 (linter) and @babel/helper-module-transforms (peer; reached only from @babel/core itself); every path is root devDependencies eslint-config-next@16.2.6 (package.json:222, eslint-*) > eslint-plugin-react-hooks > @babel/core. I computed that closure (non-D1 declared deps, unreachable copies, P0, P1 imports from 1773 source files, P2 next.config.mjs and postcss.config.mjs, P6 build:cli tsx, Dockerfile RUN/CMD) and it does not reach @babel/core (@vitejs/plugin-react@6.0.2 has no @babel/core dependency; next@16.2.6 does not depend on it). No babel configuration; no source import (eslint.config.mjs is excluded)."
+      },
+      {
+        "name": "@humanfs/node",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/@humanfs/node@0.16.7 (dev) [OSV GHSA-p498-v437-472g introduced 0 fixed 0.16.8; npm <0.16.8]. Not reused: the production stage holds devDependencies (Dockerfile:14,47-52, as for @babel/core), so only D1 applies. D1 holds: only parent node_modules/eslint@9.39.5 (root devDependency, package.json:221, linter), and every lockfile dependent of eslint is itself a D1 package (eslint-config-next, typescript-eslint, @typescript-eslint/*, eslint-plugin-import, eslint-plugin-jsx-a11y, eslint-plugin-react, eslint-plugin-react-hooks, eslint-import-resolver-typescript, @eslint-community/eslint-utils). The closure of all production copies under that regime (non-D1 declared deps, unreachable copies, P0-P6) does not reach eslint or @humanfs/node. No source import of eslint or @humanfs (eslint.config.mjs excluded; the only other hit is a string literal in open-sse/services/compression/engines/rtk/commandDetector.ts:42)."
+      },
+      {
+        "name": "browserslist",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/browserslist@4.28.2 (dev) [OSV GHSA-73wf-gq98-2v4g and GHSA-c83g-rgw3-j3cx introduced 0 fixed 4.28.7; npm <=4.28.6]. Not reused: the production stage holds devDependencies (Dockerfile:14,47-52), so only D1 applies. D1 holds: parents are @babel/helper-compilation-targets (reached only from @babel/core) and update-browserslist-db (peer; reached only from browserslist); every path is eslint-config-next (D1) > eslint-plugin-react-hooks (D1) > @babel/core > @babel/helper-compilation-targets > browserslist. next@16.2.6 depends on @next/env, @swc/helpers, baseline-browser-mapping, caniuse-lite, postcss and styled-jsx, not browserslist; @tailwindcss/postcss (named in postcss.config.mjs) does not reach it. The regime closure (non-D1 declared deps, unreachable copies, P0-P6) does not reach it; no source import or config naming."
+      }
+    ]
+  },
+  {
+    "repo": "microsoft/vscode-ts-file-path-support",
+    "sha": "dde70fb77b2ca4c5fe9b00272a9902e0360763b6",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/@vitest/mocker@4.1.11 (dev) [OSV GHSA-qxg6-89mg-rqv8 2.1.0-beta.7 to fixed 4.1.12, GHSA-xp26-3454-mjgp 4.1.11 to fixed 4.1.12]. D1: only parent node_modules/vitest@4.1.11, a test runner declared in devDependencies of the root (package.json:9) and language-service-plugin (package.json:16), run only by test scripts. vitest has no lockfile dependent and is imported only by language-service-plugin/test/tests.test.ts and vitest.config.js (both excluded). Section 2's added conditions checked: build runs rollup (language-service-plugin/package.json:10, vscode-extension build-src) and vsce (build-package); the two rollup.config.mjs name @rollup/plugin-typescript, rollup, rollup-plugin-copy, rollup-plugin-delete and a node_modules/@vscode/ts-plugin-file-path-support path, not vitest; no Dockerfile or start script; not P3/P4; not reached from any production copy."
+      }
+    ]
+  },
+  {
+    "repo": "Blackshield-Company/openshield-desktop",
+    "sha": "1803691d2ed0c35aa6be614f93d8f519d80f0f5f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/@vitest/mocker@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 2.1.0 to fixed 4.1.11, GHSA-qxg6-89mg-rqv8 2.1.0-beta.7 to fixed 4.1.12]. D1: only parent node_modules/vitest@3.2.7 (test runner, root devDependencies package.json:32); paths vitest > @vitest/mocker and @testing-library/svelte > vitest (peer) > @vitest/mocker both pass through vitest. Section 2's added conditions checked: build is package.json:8 `vite build` (also tauri.conf.json beforeBuildCommand `npm run build`); vite.config.ts and svelte.config.js name vite, ws and @sveltejs/* only; 40 source files import no vitest package; vitest is imported only by tests/*.test.ts and vitest.config.ts (excluded); @testing-library/svelte is imported only by tests and is not production; no Dockerfile or start script; not P3/P4; not reached from any production copy."
+      },
+      {
+        "name": "tinypool",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/tinypool@1.1.1 (dev) [OSV GHSA-5gmw-xhrv-c9v3 fixed 2.1.1, GHSA-85c8-ppgw-ccpr fixed 2.1.2]. D1: only parent node_modules/vitest@3.2.7 (test runner, root devDependency); every path passes through vitest. Not imported, named, run by build, P3/P4, or reached from a production copy (same repository facts as @vitest/mocker). None of section 2's added conditions applies."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/vitest@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 2.1.0 to fixed 4.1.11; npm >=2.1.0 <4.1.11]. D1: a test runner declared in root devDependencies (package.json:32), run only by scripts.test (package.json:12). Its only lockfile dependent is @testing-library/svelte (peer), which is imported only by tests/*.test.ts and is not production. Imported only by tests and vitest.config.ts (excluded); not named by vite.config.ts or svelte.config.js; no Dockerfile or start script; not P3/P4. None of section 2's added conditions applies."
+      }
+    ]
+  }
+]

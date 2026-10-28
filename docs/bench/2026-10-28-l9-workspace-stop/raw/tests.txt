@@ -1,0 +1,37 @@
+# started 2026-10-28T12:59:14Z, node v24.22.1
+== npx tsc -p tsconfig.json
+tsc exit 0
+== npx vitest run --project node packages/cli/test
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/dependencies.test.ts (63 tests) 104ms
+ ✓ |node| packages/cli/test/judge.test.ts (63 tests) 45ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (20 tests | 5 skipped) 23ms
+ ✓ |node| packages/cli/test/security.test.ts (33 tests) 57ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (8 tests) 7ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 4ms
+
+ Test Files  6 passed (6)
+      Tests  187 passed | 5 skipped (192)
+   Start at  12:59:16
+   Duration  1.48s (transform 376ms, setup 0ms, import 591ms, tests 242ms, environment 0ms)
+
+vitest exit 0
+== node mutate.mjs
+killed   always agrees (failed tests: 5)
+killed   rule 1 off (any folder) (failed tests: 1)
+killed   rule 1 after only (failed tests: 1)
+killed   rule 1 glob loosened (failed tests: 1)
+killed   rule 1 non-plain dir (failed tests: 1)
+killed   rule 2 off (failed tests: 1)
+killed   rule 3 sides off (failed tests: 1)
+killed   rule 3 overrides off (failed tests: 1)
+killed   rule 3 manifestChanges off (failed tests: 1)
+killed   rule 4 before off (failed tests: 1)
+killed   rule 4 after off (failed tests: 1)
+killed   rule 5 off (failed tests: 1)
+killed   missing list not empty (failed tests: 1)
+killed   key order counts (failed tests: 1)
+survived: 0 of 14
+# finished 2026-10-28T12:59:33Z

@@ -107,7 +107,7 @@ export function installScripts(scripts: unknown): string[] {
 }
 
 type Lockfile = { lockfileVersion?: unknown; packages?: Record<string, any> };
-function readLock(lockText: string): Record<string, any> {
+export function readLock(lockText: string): Record<string, any> {
   const lock = JSON.parse(lockText) as Lockfile;
   if (!lock.packages || typeof lock.packages !== "object" || ![2, 3].includes(Number(lock.lockfileVersion))) throw new Error("The judge reads package-lock v2/v3 only.");
   return lock.packages;
@@ -116,7 +116,19 @@ function readLock(lockText: string): Record<string, any> {
 /** A package-lock `packages` key: an optional workspace prefix, then one or more node_modules/<name> segments. */
 const LOCK_PATH = /^(?:[A-Za-z0-9@._-]+(?:\/[A-Za-z0-9@._-]+)*\/)?(?:node_modules\/(?:@[a-z0-9][a-z0-9._-]*\/)?[A-Za-z0-9._-]+\/)*node_modules\/(?:@[a-z0-9][a-z0-9._-]*\/)?[A-Za-z0-9._-]+$/i;
 /** The name a package is required by at a path: the last node_modules segment. */
-const requireName = (path: string) => path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
+export const requireName = (path: string) => path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
+/**
+ * An installed package's own workspace folder, which npm records as `extraneous` at a path that is not an install path
+ * (node_modules/primitives/packages/ai-gateway). npm does not install it and Node never loads a package from there, so
+ * it is skipped; it carries no tarball, hash or link. Any other key that is not an install path is still refused.
+ */
+const extraneousFolder = (path: string, item: any) => path.includes("node_modules/") && !LOCK_PATH.test(path) && item?.extraneous === true
+  && item.resolved === undefined && item.integrity === undefined && item.link === undefined && !path.split("/").some(segment => segment === "." || segment === "..");
+
+/** The skipped extraneous folders (see extraneousFolder), each with its entry, so a change to them can be stopped. */
+export function lockExtraneous(lockText: string): string[] {
+  return Object.entries(readLock(lockText)).filter(([path, item]) => !path.includes("\\") && extraneousFolder(path, item)).map(([path, item]) => `${path} ${JSON.stringify(item)}`).sort();
+}
 
 /** Installed registry packages in a package-lock v2/v3, by node_modules path. Links and the root are left out (see lockLinks). */
 export function lockEntries(lockText: string): LockEntry[] {
@@ -127,7 +139,7 @@ export function lockEntries(lockText: string): LockEntry[] {
     if (folded.has(path.toLowerCase())) throw new Error(`Two package-lock paths differ only in case: ${path}.`);
     folded.add(path.toLowerCase());
     if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
-    if (!path.includes("node_modules/")) continue;
+    if (!path.includes("node_modules/") || extraneousFolder(path, item)) continue;
     // A key that is not a plain install path (.., backslashes, empty segments) could make two keys mean one place.
     if (!LOCK_PATH.test(path) || path.split("/").some(segment => segment === "." || segment === "..")) throw new Error(`Unexpected package-lock path: ${path}.`);
     if (item?.link) continue;
@@ -157,7 +169,7 @@ export function lockEntryChanges(before: LockEntry[], after: LockEntry[]): LockE
 }
 
 /** What Node would load for `name` required from the package at `dir` ("" for the project root): the nearest node_modules. */
-function resolveFrom(entries: Map<string, LockEntry>, dir: string, name: string): LockEntry | undefined {
+export function resolveFrom(entries: Map<string, LockEntry>, dir: string, name: string): LockEntry | undefined {
   let at = dir;
   while (true) {
     const found = entries.get(`${at}node_modules/${name}`);
@@ -217,7 +229,7 @@ const DECLARED = ["dependencies", "optionalDependencies", "peerDependencies"];
 function consumers(lockText: string): Consumer[] {
   const out: Consumer[] = [];
   for (const [path, item] of Object.entries(readLock(lockText))) {
-    if (!item || typeof item !== "object" || item.link) continue;
+    if (!item || typeof item !== "object" || item.link || extraneousFolder(path, item)) continue;
     const own = path === "" || !path.includes("node_modules/");
     // The root and workspace folders also require their devDependencies; installed packages do not.
     const groups = own ? [...DECLARED, "devDependencies"] : DECLARED;
@@ -316,6 +328,17 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
   return out;
 }
 
+/** Which production/dev split was used (production.ts): with or without the whole source tree, and images holding devDependencies. */
+export type SplitSummary = { source: "read" | "not_given" | "incomplete" | "pnpm"; incomplete: string | null; images_with_dev: string[] };
+const D1_ONLY = "so only test runners, linters, formatters and @types packages, and what only they reach, count as dev-only";
+function splitMessage(s: SplitSummary): string {
+  if (s.source === "pnpm") return "No production/dev split for pnpm-lock.yaml: --source is not read, and every changed version counts as production.";
+  if (s.source === "not_given") return `Production/dev split without the source tree (no --source), ${D1_ONLY}.`;
+  if (s.source === "incomplete") return `Production/dev split: the source tree could not be read completely (${s.incomplete ?? "unknown"}), ${D1_ONLY}.`;
+  if (s.images_with_dev.length) return `Production/dev split: the final stage of ${s.images_with_dev.join(", ")} holds devDependencies, ${D1_ONLY}.`;
+  return "Production/dev split from the lockfile and the source tree: a dev copy counts as dev-only only when the source does not import it, no build tool names or runs it, and no production command uses it.";
+}
+
 /** Urgency of the change: from the advisories it fixes, and whether any fixed package is used in production. */
 export function urgencyOf(fixes: FixedAdvisory[], changes: Change[], epssHigh = 0.1): Urgency {
   // Every fix counts here, not only the change's own (ownFixes): a dependent that moves off the vulnerable version in
@@ -361,11 +384,21 @@ export function judge(input: {
   created?: Map<string, string | null>;
   /** pnpm-lock.yaml changes are read as name@version sets: gate 4's per-entry checks are not implemented for them. */
   lockfile?: "package-lock" | "pnpm-lock";
+  /** How the changes' `dev` was decided (production.ts), shown in the comment. */
+  split?: SplitSummary;
+  /** Skipped extraneous lockfile folders (lockExtraneous) that are added, removed or changed. */
+  extraneous?: string[];
+  /**
+   * Changed workspace package.json files (workspace-manifests.ts) with why each is more than the lockfile's dependency
+   * update: no reasons when it agrees, null when a side could not be read.
+   */
+  workspaces?: { file: string; reasons: string[] | null }[];
 }): Judgement {
   const { changes, facts, fixes, now } = input;
   const findings: Finding[] = [];
   const add = (finding: Finding) => findings.push(finding);
   const urgency = urgencyOf(fixes, changes);
+  if (input.split) add({ gate: 1, effect: "info", message: splitMessage(input.split) });
   let undecidable = false;
   for (const error of input.errors ?? []) { add({ gate: 2, effect: "stop", message: `A lookup failed: ${error.slice(0, 300)}` }); undecidable = true; }
   if (!changes.length && !(input.links ?? []).length) {
@@ -380,12 +413,22 @@ export function judge(input: {
     add({ gate: 4, effect: "info", message: input.files === null ? `The PR's changed files were not given (--files), so gate 4 could not check that only package.json and ${lockName} change.` : `The given changed files do not include ${lockName}, although the lockfile changed.` });
     undecidable = true;
   } else {
-    const unexpected = input.files.filter(f => !["package.json", lockName].includes(f));
+    // A workspace's package.json may change too, but only as the lockfile records it
+    // (docs/decisions/2026-10-29-l9-workspace-package-json.md).
+    const agreeing = (input.workspaces ?? []).filter(w => w.reasons?.length === 0 && input.files!.includes(w.file)).map(w => w.file);
+    const unexpected = input.files.filter(f => !["package.json", lockName].includes(f) && !agreeing.includes(f));
     if (unexpected.length) add({ gate: 4, effect: "stop", message: `The change also touches ${unexpected.join(", ")}; a dependency update must change only package.json and ${lockName}.` });
+    for (const { file, reasons } of input.workspaces ?? []) {
+      if (!input.files.includes(file)) continue;
+      if (reasons === null) { add({ gate: 4, effect: "stop", message: `${file} could not be read both before and after the change, so whether it agrees with the lockfile is undecidable.` }); undecidable = true; }
+      else for (const message of reasons) add({ gate: 4, effect: "stop", message });
+    }
+    if (agreeing.length) add({ gate: 4, effect: "info", message: `${agreeing.join(", ")}: a workspace's dependency lists change, and before and after they equal the lockfile's record of that workspace.` });
   }
   if (input.lockfile === "pnpm-lock") { add({ gate: 4, effect: "info", message: "pnpm-lock.yaml is read as the set of versions it adds: each entry's tarball and hash, and what each dependent loads, are not checked for pnpm." }); undecidable = true; }
   if (input.manifest) for (const message of manifestChanges(input.manifest.before, input.manifest.after)) add({ gate: 4, effect: "stop", message });
   for (const link of input.links ?? []) add({ gate: 4, effect: "stop", message: `${link}: a link to a local directory that is new or points elsewhere, instead of a registry package.` });
+  for (const entry of input.extraneous ?? []) add({ gate: 4, effect: "stop", message: `An extraneous lockfile folder outside the install paths is added, removed or changed: ${entry.slice(0, 300)}` });
   const entries: LockEntry[] = input.lockfile === "pnpm-lock" ? [] : input.entries ?? changes.map(c => ({ path: c.path, name: c.name, version: c.to, dev: c.dev, resolved: c.resolved, integrity: c.integrity }));
   for (const e of entries) {
     const where = `${e.name}@${e.version} at ${e.path}`;
@@ -485,7 +528,7 @@ export function judge(input: {
     not_checked: [
       "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
       "Obfuscated code and new network or process calls in the changed code are not inspected.",
-      "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.",
+      "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used (docs/decisions.md, \"Gate 1's production/dev split, rebuilt\").",
       "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
       "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
       "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",

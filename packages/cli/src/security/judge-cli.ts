@@ -5,37 +5,65 @@ import { join } from "node:path";
 import semver from "semver";
 import { fromPnpmLock } from "../lockfile.ts";
 import { parseArgs } from "node:util";
-import { allChanges, declaredByProject, judge, lockEntries, lockEntryChanges, lockLinks, renderJudgement, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
+import { allChanges, declaredByProject, judge, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, renderJudgement, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
 import { gatherFacts } from "./npm-facts.ts";
+import { productionSplit, readSourceTree } from "./production.ts";
 import { regularFile, rootPath } from "./project.ts";
+import { workspaceDir, workspaceManifestChanges } from "./workspace-manifests.ts";
+
+function readText(root: string, file: string): string {
+  const path = regularFile(root, file);
+  if (lstatSync(path).size > 64 * 1024 * 1024) throw new Error(`${file} exceeds 64 MiB.`);
+  return readFileSync(path, "utf8");
+}
 
 export async function judgeCli(args: string[]): Promise<number> {
-  const { values } = parseArgs({ args, options: { before: { type: "string" }, after: { type: "string" }, files: { type: "string" }, now: { type: "string" }, json: { type: "boolean" } } });
-  if (!values.before || !values.after) throw new Error("Give both checkouts: ludion judge --before <dir> --after <dir> --files <changed,files> [--json].");
+  const { values } = parseArgs({ args, options: { before: { type: "string" }, after: { type: "string" }, files: { type: "string" }, source: { type: "string" }, now: { type: "string" }, json: { type: "boolean" } } });
+  if (!values.before || !values.after) throw new Error("Give both checkouts: ludion judge --before <dir> --after <dir> --files <changed,files> [--source <project dir>] [--json].");
   const before = rootPath(values.before), after = rootPath(values.after);
-  const read = (root: string, file: string) => {
-    const path = regularFile(root, file);
-    if (lstatSync(path).size > 64 * 1024 * 1024) throw new Error(`${file} exceeds 64 MiB.`);
-    return readFileSync(path, "utf8");
-  };
   // The changed files come from the caller (e.g. `git diff --name-only` in CI). Without them gate 4 cannot be judged.
   const files = values.files !== undefined ? values.files.split(",").map(f => f.trim()).filter(Boolean) : null;
   const now = values.now ? new Date(values.now) : new Date();
   if (!Number.isFinite(now.getTime())) throw new Error("--now must be an ISO date.");
-  if (!existsSync(join(after, "package-lock.json")) && existsSync(join(after, "pnpm-lock.yaml"))) return pnpm(read(before, "pnpm-lock.yaml"), read(after, "pnpm-lock.yaml"), JSON.parse(read(after, "package.json")), files, now, !!values.json);
-  const beforeLock = read(before, "package-lock.json"), afterLock = read(after, "package-lock.json");
-  const beforeManifest = read(before, "package.json"), afterManifest = read(after, "package.json");
+  // pnpm: --source is not read; every changed version counts as production (pnpmChanges).
+  if (!existsSync(join(after, "package-lock.json")) && existsSync(join(after, "pnpm-lock.yaml"))) return pnpm(readText(before, "pnpm-lock.yaml"), readText(after, "pnpm-lock.yaml"), JSON.parse(readText(after, "package.json")), files, now, !!values.json);
+  const beforeLock = readText(before, "package-lock.json"), afterLock = readText(after, "package-lock.json");
+  const beforeManifest = readText(before, "package.json"), afterManifest = readText(after, "package.json");
   const manifest = beforeManifest === afterManifest ? undefined : { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) };
   const beforeEntries = lockEntries(beforeLock), afterEntries = lockEntries(afterLock);
-  const changes = allChanges(beforeLock, afterLock), entries = lockEntryChanges(beforeEntries, afterEntries);
+  // Gate 1's split (production.ts): a changed version is dev-only only when every installed copy of it is shown
+  // dev-only. The source tree, read as text and never run, is the project at the judged commit; without it only test
+  // runners, linters, formatters and @types packages can be dev-only.
+  const split = productionSplit(afterLock, values.source ? readSourceTree(rootPath(values.source)) : null, JSON.parse(afterManifest));
+  const changes = allChanges(beforeLock, afterLock).map(c => ({ ...c, dev: split.devOnly.has(`${c.name}@${c.to}`) }));
+  const entries = lockEntryChanges(beforeEntries, afterEntries);
   const hadLinks = new Set(lockLinks(beforeLock));
   const links = lockLinks(afterLock).filter(link => !hadLinks.has(link));
+  const extraneousBefore = lockExtraneous(beforeLock), extraneousAfter = lockExtraneous(afterLock);
+  const extraneous = [...extraneousAfter.filter(e => !extraneousBefore.includes(e)), ...extraneousBefore.filter(e => !extraneousAfter.includes(e)).map(e => `(removed) ${e}`)];
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], created = new Map<string, string | null>(), errors: string[] = [];
   try { ({ facts, fixes, created } = await gatherFacts(changes, fetch, entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const locked = new Set(beforeEntries.map(e => `${e.name}@${e.version}`));
-  const result = judge({ changes, entries, facts, fixes, files, links, now, errors, manifest, locked, created, direct: declaredByProject(afterLock) });
+  const workspaces = workspaceManifests(before, after, files, { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) }, { before: beforeLock, after: afterLock });
+  const result = judge({ changes, entries, facts, fixes, files, links, extraneous, now, errors, manifest, locked, created, direct: declaredByProject(afterLock), split: split.summary, workspaces });
   console.log(values.json ? JSON.stringify(result, null, 2) : renderJudgement(result));
   return exitCode(result.verdict);
+}
+
+/**
+ * Each changed `<dir>/package.json` of the two checkouts, with why it is more than the lockfile's dependency update
+ * (workspace-manifests.ts): no reasons when it agrees, null when a side could not be read (undecidable).
+ */
+export function workspaceManifests(before: string, after: string, files: string[] | null, root: { before: unknown; after: unknown }, lock: { before: string; after: string }): { file: string; reasons: string[] | null }[] {
+  const packages = (text: string) => (JSON.parse(text) as { packages?: Record<string, unknown> }).packages ?? {};
+  const locks = { before: packages(lock.before), after: packages(lock.after) };
+  const parse = (text: string): unknown => { try { return JSON.parse(text); } catch { return undefined; } };
+  return (files ?? []).filter(file => file !== "package.json" && file.endsWith("/package.json")).map(file => {
+    if (workspaceDir(file) === null) return { file, reasons: workspaceManifestChanges({ file, before: undefined, after: undefined, root, lock: locks }) };
+    let texts: [string, string];
+    try { texts = [readText(before, file), readText(after, file)]; } catch { return { file, reasons: null }; }
+    return { file, reasons: workspaceManifestChanges({ file, before: parse(texts[0]), after: parse(texts[1]), root, lock: locks }) };
+  });
 }
 
 const exitCode = (verdict: string) => verdict === "ready_except_build" ? 0 : verdict === "wait" ? 3 : 1;
@@ -58,7 +86,7 @@ async function pnpm(beforeLock: string, afterLock: string, manifest: any, files:
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], created = new Map<string, string | null>(), errors: string[] = [];
   try { ({ facts, fixes, created } = await gatherFacts(changes, fetch)); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const direct = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"].flatMap(g => manifest?.[g] && typeof manifest[g] === "object" ? Object.keys(manifest[g]) : []);
-  const result = judge({ changes, facts, fixes, files, now, errors, locked, created, direct, lockfile: "pnpm-lock" });
+  const result = judge({ changes, facts, fixes, files, now, errors, locked, created, direct, lockfile: "pnpm-lock", split: { source: "pnpm", incomplete: null, images_with_dev: [] } });
   console.log(json ? JSON.stringify(result, null, 2) : renderJudgement(result));
   return exitCode(result.verdict);
 }

@@ -1,0 +1,417 @@
+{
+  "schema": 1,
+  "judged_at": "2026-10-28T15:27:03.000Z",
+  "verdict": "stop",
+  "urgency": "normal",
+  "wait_hours": 144,
+  "newest_publish": "2026-10-24T18:44:36.789Z",
+  "wait_until": "2026-10-30T18:44:36.789Z",
+  "changes": [
+    {
+      "path": "node_modules/@astrojs/internal-helpers",
+      "name": "@astrojs/internal-helpers",
+      "from": "0.12.0",
+      "to": "0.13.0",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@astrojs/internal-helpers/-/internal-helpers-0.13.0.tgz",
+      "integrity": "sha512-20jxQqnSmpskcGyad7N5l6Xf1gz0UCa6lNde44bEBdaXGpncEYfAZJ142r2ZgzBaG4dUyzGmhqZWv1INU2eiHQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/@astrojs/markdown-satteri",
+      "name": "@astrojs/markdown-satteri",
+      "from": "0.4.3",
+      "to": "0.4.5",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@astrojs/markdown-satteri/-/markdown-satteri-0.4.5.tgz",
+      "integrity": "sha512-0IeGdoFbv0f+442KJhYS44Wg8F3MuHmRsxIEYuFyqkjRubc6dPBFZ7azor5t4AeXLQoT5A5h9HyViKpd70Dl9w==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/@astrojs/prism",
+      "name": "@astrojs/prism",
+      "from": "4.0.2",
+      "to": "4.1.1",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@astrojs/prism/-/prism-4.1.1.tgz",
+      "integrity": "sha512-sXlAXJX6t4QfuLg+CuCDzpg7NoxWcyb4paFprgtFppLeisCBmh935h+tJ5CWXfsXEoW2IDy/ihbRMtiu28Chjw==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/@astrojs/telemetry",
+      "name": "@astrojs/telemetry",
+      "from": "3.3.3",
+      "to": "3.4.1",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@astrojs/telemetry/-/telemetry-3.4.1.tgz",
+      "integrity": "sha512-SMkvMsGOpM0FMAoT5pzhgI3LZC0JSPWf7Evwop+fZ3N6UkusPM7lI+sOJjMNI5OJrVoiei1/AGo1cY7sikTc5A==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@oxc-project/types",
+      "name": "@oxc-project/types",
+      "from": "0.152.0",
+      "to": "0.155.0",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@oxc-project/types/-/types-0.155.0.tgz",
+      "integrity": "sha512-SeE8JPwW1xs1tHeNycjUtUBdhorRa8o4jlvjwk49R7/Z291i+4DQa7JJIgOm/TaYQZx+QrPQbVJ/9c8dMIZN8Q==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-android-arm-eabi",
+      "name": "@rolldown/binding-android-arm-eabi",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-android-arm-eabi/-/binding-android-arm-eabi-1.2.15.tgz",
+      "integrity": "sha512-aLcgK9gIJ3YRvrrtfSBbRa27F5WrpiTaPulnFpsHPxpUHgFlSgnU4854MHwoRGEBhfRJDWCS2WQ7lIjskE9Olw==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-android-arm64",
+      "name": "@rolldown/binding-android-arm64",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-android-arm64/-/binding-android-arm64-1.2.15.tgz",
+      "integrity": "sha512-xD7DdZCrbThKuxNg7ooQmvp07ys4J/pnSEMTG3/OdOWl6daC67m/Q4fL78sRHMxTH/N4fGUbYhcPM0MF5WFHkg==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-darwin-arm64",
+      "name": "@rolldown/binding-darwin-arm64",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-darwin-arm64/-/binding-darwin-arm64-1.2.15.tgz",
+      "integrity": "sha512-m2WuQ6r0B4OTYxyPpNLtXaMRbRDUbG8YQV2Q3KTdSSK8Th6KHCnC8jVCJt8bvYeSB5WivkkNbc85mKadaSdOxA==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-darwin-x64",
+      "name": "@rolldown/binding-darwin-x64",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-darwin-x64/-/binding-darwin-x64-1.2.15.tgz",
+      "integrity": "sha512-5RtnsHM36nodM9WbMy+zip0LGS/G+y5wro5RHrpOlr4ac24+1zSi9kiV2MP1myZeZ/ifEHfulQcWjnAXzc2C2A==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-freebsd-x64",
+      "name": "@rolldown/binding-freebsd-x64",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-freebsd-x64/-/binding-freebsd-x64-1.2.15.tgz",
+      "integrity": "sha512-g3l09pyFqhu+135JKkbkwiKGQmwU5hUMUPJ4VdBADvuqR8d33L6H578rh8m7rtxbdp+VmX/+nzI7nvhSZlzpUQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-linux-arm-gnueabihf",
+      "name": "@rolldown/binding-linux-arm-gnueabihf",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm-gnueabihf/-/binding-linux-arm-gnueabihf-1.2.15.tgz",
+      "integrity": "sha512-nIe3VugI97nGQtspPxDqA4sXMUpeiocKIP/CqpY/u/vgbT+alX+cVxu1C/oVBPKg4feNTmYovE91v4DgXvXNwQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-linux-arm64-gnu",
+      "name": "@rolldown/binding-linux-arm64-gnu",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-gnu/-/binding-linux-arm64-gnu-1.2.15.tgz",
+      "integrity": "sha512-iTBjXx+B5QSvgI89lJfmqh4wTh8NabR1YZIIN3hNx4zSG0EVfVqkOvLulNpG4251pbd6/IAmZ/LefVk1Y4rPhw==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-linux-arm64-musl",
+      "name": "@rolldown/binding-linux-arm64-musl",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-musl/-/binding-linux-arm64-musl-1.2.15.tgz",
+      "integrity": "sha512-uN26XOnVR7rqQupG3V9oAG2EGGatWjcJHOeDOHUFCh4TBWmP2tHTFoVN13aYbwfm0aHqJAEmcwhAu6sooIjfqQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-linux-ppc64-gnu",
+      "name": "@rolldown/binding-linux-ppc64-gnu",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-ppc64-gnu/-/binding-linux-ppc64-gnu-1.2.15.tgz",
+      "integrity": "sha512-9nWkcdd+H+XhaA3fQIwpHnKIrfx/PQ6rO0pivr78Og07tXlUlctBBJoEYLPfhTmCR/QxEVdn6uPjHV5SymPhdw==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-linux-s390x-gnu",
+      "name": "@rolldown/binding-linux-s390x-gnu",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-s390x-gnu/-/binding-linux-s390x-gnu-1.2.15.tgz",
+      "integrity": "sha512-Ggh0ciFjLwIusLSLz7LZYEaGdxOAUJXI+Qu5JCbhPJJHEt8vP+IjRATTJheiJsdzzTYgUiHUiw3X1Ea3ZpMBdA==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-linux-x64-gnu",
+      "name": "@rolldown/binding-linux-x64-gnu",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu/-/binding-linux-x64-gnu-1.2.15.tgz",
+      "integrity": "sha512-FHg60rS6DBePAYZ9X9F67x+JObFdmgn6tupA1C/a3B+CufFmTD4mX+e8M75tCiAO3foR/6xwVBI0KQiI7sn/rw==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-linux-x64-musl",
+      "name": "@rolldown/binding-linux-x64-musl",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-x64-musl/-/binding-linux-x64-musl-1.2.15.tgz",
+      "integrity": "sha512-/cvV/7v5VGz/moiz0XKRj2dE8DzsKyhIu1KpOvJGPjRywg3yscON889UGvAe8zfiJLHup7VLjBduoGWi3HusWQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-openharmony-arm64",
+      "name": "@rolldown/binding-openharmony-arm64",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-openharmony-arm64/-/binding-openharmony-arm64-1.2.15.tgz",
+      "integrity": "sha512-MyzC5Hrv/sm+Z7TSGKP/j8001RO2xQm1zOpCNVL4j0cY/VhBZviludA2YFQ7i4lH6ZAXxQm0lcMdBzM+99mE7w==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-win32-arm64-msvc",
+      "name": "@rolldown/binding-win32-arm64-msvc",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-win32-arm64-msvc/-/binding-win32-arm64-msvc-1.2.15.tgz",
+      "integrity": "sha512-+PgYiS+AH5omy6L45ZLxybasauJaj3M8buoT83D+nzPmCayXlxUV9hydhciCKVyIg0B/v0BtXPDE1uGqNwCPpg==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/@rolldown/binding-win32-x64-msvc",
+      "name": "@rolldown/binding-win32-x64-msvc",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@rolldown/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.2.15.tgz",
+      "integrity": "sha512-HFZd2QNQYn1JbIi+Hpd7H+r/lkWxcfIu28nirZ6eCn2LafuvmExMlb/P96Sfx5tf7pPArw39IdhmCF8vmV+NhQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/@shikijs/vscode-textmate",
+      "name": "@shikijs/vscode-textmate",
+      "from": "10.0.2",
+      "to": "10.1.0",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/@shikijs/vscode-textmate/-/vscode-textmate-10.1.0.tgz",
+      "integrity": "sha512-cVBuhDQjBZaNMTwBquYfPydrUP+E3hE6oYGasx8h6ZrODIM7/r+gxLDXdd66oszbrggZHEntdE6j+5gYIVyMWQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro",
+      "name": "astro",
+      "from": "7.3.6",
+      "to": "7.4.2",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/astro/-/astro-7.4.2.tgz",
+      "integrity": "sha512-FAH4cdDlFaVnQGjazLTEIC5vJqGlo5XANc1wIbzQHIqAjJTll/RWTUs+SPNW1JdezG4YGxMZllaE5A41T2kzhA==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/devalue",
+      "name": "devalue",
+      "from": "5.9.4",
+      "to": "6.0.3",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/devalue/-/devalue-6.0.3.tgz",
+      "integrity": "sha512-3woMEITftG1wKeO/4d/QXH1DVKctTSZg3jNGPpjp9hNr5Hos8MCFF5McTML5ZtgKDObm2R591B0spRp2IVernA==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/fnv1a-64",
+      "name": "fnv1a-64",
+      "from": null,
+      "to": "0.1.2",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/fnv1a-64/-/fnv1a-64-0.1.2.tgz",
+      "integrity": "sha512-mJbcILTPybAR1jdOwt/lVv8N2cffeJFFP+gVbSAwLEx1ujXH27RpPd8Rokec/KX9c76UYIB6Co+H4lQzxPnJfA==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/p-queue",
+      "name": "p-queue",
+      "from": "9.3.3",
+      "to": "9.3.5",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/p-queue/-/p-queue-9.3.5.tgz",
+      "integrity": "sha512-Lki/zhXFVmDhesBUn/yHRLW9Bte7mE7xoFHzTR8sIomV7a2z+LxYAPkGvdfidNiu4fKSfjtawixxSHcZci5QcQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/postcss",
+      "name": "postcss",
+      "from": "8.5.29",
+      "to": "8.5.31",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.31.tgz",
+      "integrity": "sha512-YUbWYCgErwnMAVkjUnYa+KlMBzGpHwiIt/DE7f0G33AuX2LH9UcTk6KgWxd3zRU+pN3u/C+Xl3EnMLM4Hea7Sg==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/rolldown",
+      "name": "rolldown",
+      "from": "1.2.12",
+      "to": "1.2.15",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/rolldown/-/rolldown-1.2.15.tgz",
+      "integrity": "sha512-6odND+fel5zVw3I4Yc2e69gvguDnX0CAAGiNDZSq4ik5WUcaLrkD2GLuog0XcODbor31hZ5ayEMgVDno+KPV5g==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/smol-toml",
+      "name": "smol-toml",
+      "from": "1.9.0",
+      "to": "1.9.1",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/smol-toml/-/smol-toml-1.9.1.tgz",
+      "integrity": "sha512-j7WyPdf0CJoutMzMoPLF/bVXHtKZIT9Rb4eGeEbWw8X2t5oirjPgpL+OpaENZrILYaXqYwnVH+qgUwVbl+pUJQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/tinyps",
+      "name": "tinyps",
+      "from": null,
+      "to": "0.5.1",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/tinyps/-/tinyps-0.5.1.tgz",
+      "integrity": "sha512-B6Ykif5HflC3AdDkS4Zst/2muYVfeXoVMy+KorqH80s/1x4vunIORpNySH681X7fjj+dFM9MDKD6/Hsccjb87Q==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/unifont",
+      "name": "unifont",
+      "from": "0.7.5",
+      "to": "1.0.3",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/unifont/-/unifont-1.0.3.tgz",
+      "integrity": "sha512-XGnEwj5sWdCbiBX01mWLSBncS0yMRjnLygau3IfdOlfjMacNIQvTGW4VH7pWBq+gGWArfSef/CensMLjMmIr/A==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/unist-util-visit",
+      "name": "unist-util-visit",
+      "from": "5.1.0",
+      "to": "5.2.0",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/unist-util-visit/-/unist-util-visit-5.2.0.tgz",
+      "integrity": "sha512-fpsYs/VVoZxfGY9/j3FQpZmN8wdLJaV1Pt38AaJNZu9uKIHcFU3halCdBveEq1HGKO1OEfJY65w1zvoFV1b3qQ==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/unist-util-visit-parents",
+      "name": "unist-util-visit-parents",
+      "from": "6.0.2",
+      "to": "6.1.0",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/unist-util-visit-parents/-/unist-util-visit-parents-6.1.0.tgz",
+      "integrity": "sha512-vKXxz6O38sKDj1mtx/k2cWvkkFBuYGx6uGrlzBkVeWCRF/F8sdI0j3Wbkz/5rVNRRuVc8UrgRdbCxNhmYXgP3w==",
+      "replaced": null
+    },
+    {
+      "path": "node_modules/astro/node_modules/vite",
+      "name": "vite",
+      "from": "8.3.3",
+      "to": "8.3.5",
+      "dev": false,
+      "resolved": "https://registry.npmjs.org/vite/-/vite-8.3.5.tgz",
+      "integrity": "sha512-z1YpjieJ9g0ebTmQpLBv/oq9E3F9EIlOe+7LahW8SrE3LTiG3udBRUXQOlYXP9b+IC2q2phHeVxj9xGlw34OEQ==",
+      "replaced": null
+    }
+  ],
+  "fixes": [],
+  "findings": [
+    {
+      "gate": 1,
+      "effect": "info",
+      "message": "Production/dev split without the source tree (no --source), so only test runners, linters, formatters and @types packages, and what only they reach, count as dev-only."
+    },
+    {
+      "gate": 4,
+      "effect": "stop",
+      "message": "The change also touches apps/site/package.json; a dependency update must change only package.json and package-lock.json."
+    },
+    {
+      "gate": 2,
+      "package": "astro",
+      "effect": "extend",
+      "message": "astro@7.4.2 adds dependencies: tinyps."
+    },
+    {
+      "gate": 2,
+      "package": "fnv1a-64",
+      "effect": "extend",
+      "message": "fnv1a-64 is new to the project; there is no earlier version to compare with."
+    },
+    {
+      "gate": 2,
+      "package": "tinyps",
+      "effect": "extend",
+      "message": "tinyps is new to the project; there is no earlier version to compare with."
+    },
+    {
+      "gate": 2,
+      "package": "unifont",
+      "effect": "extend",
+      "message": "unifont@1.0.3 adds dependencies: fnv1a-64, std-env."
+    },
+    {
+      "gate": 2,
+      "package": "unist-util-visit-parents",
+      "effect": "stop",
+      "message": "unist-util-visit-parents@6.1.0 was published at or after the fix (T = 2026-10-21T14:18:56.764Z); only versions already locked or published before T may move with it."
+    },
+    {
+      "gate": 2,
+      "package": "unist-util-visit",
+      "effect": "stop",
+      "message": "unist-util-visit@5.2.0 was published at or after the fix (T = 2026-10-21T14:18:56.764Z); only versions already locked or published before T may move with it."
+    }
+  ],
+  "exposure": {
+    "fix_published_at": null,
+    "detected_at": "2026-10-28T15:27:03.000Z"
+  },
+  "time_cap": {
+    "t": "2026-10-21T14:18:56.764Z",
+    "targets": [
+      "astro@7.4.2"
+    ],
+    "after_t": [
+      "unist-util-visit-parents@6.1.0",
+      "unist-util-visit@5.2.0"
+    ],
+    "same_release": [],
+    "young": [],
+    "undecidable": [],
+    "wait_hours": 72
+  },
+  "not_checked": [
+    "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
+    "Obfuscated code and new network or process calls in the changed code are not inspected.",
+    "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used (docs/decisions.md, \"Gate 1's production/dev split, rebuilt\").",
+    "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
+    "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
+    "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
+    "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it."
+  ]
+}

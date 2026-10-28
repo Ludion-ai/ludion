@@ -32,7 +32,7 @@ fi
 get() { # $1: path, $2: commit, $3: side
   local path
   path=$(jq -rn --arg p "$1" '$p | split("/") | map(@uri) | join("/")')
-  mkdir -p "$INPUT/$3/$(dirname "$1")"
+  mkdir -p "$INPUT/$3/$(dirname -- "$1")"
   gh api -H "Accept: application/vnd.github.raw+json" "repos/${REPO}/contents/${path}?ref=$2" > "$INPUT/$3/$1"
 }
 for file in package.json package-lock.json; do

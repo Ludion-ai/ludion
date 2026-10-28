@@ -229,15 +229,18 @@ describe.skipIf(!(has("jq") && has("bash")) && !process.env.CI)("action/read.sh,
   it("copies each changed */package.json on the sides whose commit has it, and nothing else", () => {
     const r = readPr(
       [{ filename: "package-lock.json", status: "modified" }, { filename: "apps/site/package.json", status: "modified" }, { filename: "apps/new/package.json", status: "added" },
-        { filename: "apps/old/package.json", status: "removed" }, { filename: "b/package.json", previous_filename: "a/package.json", status: "renamed" }, { filename: "apps/site/src/x.ts", status: "modified" }],
-      { [BASE]: { ...roots("base"), "apps/site/package.json": "site base", "apps/old/package.json": "old base", "a/package.json": "a base", "apps/site/src/x.ts": "x" },
-        [MERGE]: { ...roots("merge"), "apps/site/package.json": "site merge", "apps/new/package.json": "new merge", "b/package.json": "b merge", "apps/site/src/x.ts": "y" } });
+        { filename: "apps/old/package.json", status: "removed" }, { filename: "b/package.json", previous_filename: "a/package.json", status: "renamed" }, { filename: "apps/site/src/x.ts", status: "modified" },
+        { filename: "d/package.json", previous_filename: "e/package.json", status: "copied" }, { filename: "-x/package.json", status: "modified" }],
+      { [BASE]: { ...roots("base"), "apps/site/package.json": "site base", "apps/old/package.json": "old base", "a/package.json": "a base", "apps/site/src/x.ts": "x", "e/package.json": "e base", "-x/package.json": "-x base" },
+        [MERGE]: { ...roots("merge"), "apps/site/package.json": "site merge", "apps/new/package.json": "new merge", "b/package.json": "b merge", "apps/site/src/x.ts": "y", "d/package.json": "d merge", "e/package.json": "e merge", "-x/package.json": "-x merge" } });
     expect(r.status, r.stderr).toBe(0);
     expect([r.got("before", "package.json"), r.got("after", "package-lock.json")]).toEqual(["root base", "lock merge"]);
     expect([r.got("before", "apps/site/package.json"), r.got("after", "apps/site/package.json")]).toEqual(["site base", "site merge"]);
     expect([r.got("before", "apps/new/package.json"), r.got("after", "apps/new/package.json")]).toEqual([null, "new merge"]);
     expect([r.got("before", "apps/old/package.json"), r.got("after", "apps/old/package.json")]).toEqual(["old base", null]);
     expect([r.got("before", "a/package.json"), r.got("after", "a/package.json"), r.got("before", "b/package.json"), r.got("after", "b/package.json")]).toEqual(["a base", null, null, "b merge"]);
+    expect([r.got("before", "d/package.json"), r.got("after", "d/package.json"), r.got("before", "e/package.json"), r.got("after", "e/package.json")]).toEqual([null, "d merge", "e base", "e merge"]);
+    expect([r.got("before", "-x/package.json"), r.got("after", "-x/package.json")]).toEqual(["-x base", "-x merge"]);
     expect([r.got("before", "apps/site/src/x.ts"), r.got("after", "apps/site/src/x.ts")]).toEqual([null, null]);
     expect(r.output).toBe(`base=${BASE}\n`);
   });

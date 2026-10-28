@@ -7,3 +7,6 @@ run read-guard-off sed -i 's#\*//\*|\*/\./\*|\*/\.\./\*)#__never__)#' action/rea
 run read-cntrl-kept sed -i 's#${file//\[\[:cntrl:\]\]/}#${file}#' action/read.sh
 run judge-guard-off sed -i 's#\*//\*|\*/\./\*|\*/\.\./\*) echo#__never__) echo#' .github/workflows/judge.yml
 run judge-cntrl-kept sed -i 's#${file//\[\[:cntrl:\]\]/}#${file}#' .github/workflows/judge.yml
+# After the second review at d61da60: the copy source left out of after/, and dirname without --.
+run read-copied-off sed -i 's#if .status == "copied" then "after"#if false then "after"#' action/read.sh
+run read-dirname-option sed -i 's#dirname -- "$1"#dirname "$1"#' action/read.sh

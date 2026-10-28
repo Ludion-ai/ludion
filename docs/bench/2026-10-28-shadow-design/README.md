@@ -1,12 +1,14 @@
 # Shadow operation: design and estimate (2026-10-28, cycle 3, LS)
 
-**Status: a design and an estimate. Nothing is built, deployed or scheduled, and no shadow has run.** Where the shadow runs needs the owner's approval, so section 6 gives the options without choosing one. The only thing that ran is a one-off measurement of public data, which feeds the estimates (section 4).
+**Status: a design and an estimate.** Where the shadow runs in production needs the owner's approval, so section 6 gives the options without choosing one. The only thing that ran for this document is a one-off measurement of public data, which feeds the estimates (section 4).
 
-The release conditions this shadow serves were fixed first, in docs/decisions.md ("The release conditions reassembled", commit cdea65e, 2026-10-28 22:49:56 JST). They were decided after seeing v5's results (オーナー決定 2026-10-28 22:46 JST). The wait table and the gates' numeric criteria are unchanged.
+**Later.** The recorder (sections 2.1 to 2.4) is built in a separate PR, and runs on the owner's PC until the owner chooses a place. The replay (2.5 to 2.7) is not built. How (b) is counted is fixed in docs/decisions/2026-10-29-shadow-counting.md, before any recording.
+
+The release conditions this shadow serves were fixed first, in docs/decisions/2026-10-28-release-gates-by-stage.md (first committed to docs/decisions.md as cdea65e, 2026-10-28 22:49:56 JST). They were decided after seeing v5's results (オーナー決定 2026-10-28 22:46 JST). The wait table and the gates' numeric criteria are unchanged.
 
 ## 1. Where the conditions stand today
 
-Read from main's records (docs/progress.md and the bench READMEs). Nothing in this section is a new measurement.
+As of 2026-10-28, read from main's records (docs/progress.md and the bench READMEs). Nothing in this section is a new measurement.
 
 | Condition | For | Where it stands |
 | --- | --- | --- |
@@ -25,8 +27,9 @@ Read from main's records (docs/progress.md and the bench READMEs). Nothing in th
         ▼                                           ▼
 [filter: watched names] ──► [capture, right away] ──► [store]     [replay when a MAL- record names a captured version]
                               packument time map,       append-only    the judge's rules on the captured facts,
-                              version manifest,         records        as of each wait's end (12h, 24h, 72h, 168h)
-                              attestation bundle                              │
+                              version manifest,         records        per urgency row, at the judge's wait_until
+                              attestation bundle,                            │
+                              file hashes (no tarball)                       │
                                                                               ▼
                                                                 [record: verdict per version, wait and scenario]
 ```
@@ -44,9 +47,10 @@ What is stored, per capture:
 - `fetched_at`, the URL, the HTTP status, and the response's sha256;
 - the packument's `dist-tags`, and its `time`: in full at the first capture of a name, then only the entries that are new or changed;
 - for each new or changed version, the manifest as served, minus e-mail addresses: `_npmUser.email` and `maintainers[].email` are dropped. `shared_publisher` is computed at capture with the judge's `sharedPublisher` and stored next to the name, with the commit of the code that computed it. This keeps the judge's input without republishing addresses;
-- the attestation bundle as served.
+- the attestation bundle as served;
+- **the file list of V's tarball**: each path, size and sha256. The tarball is downloaded from the registry and checked against `dist.integrity`. It is never extracted to disk, run or stored. Only the list is kept. This is what the disputed check in 2.7 needs from the moment of publication: v5 found that jsDelivr's CDN answers 404 for the files of removed versions, so the archives may not hold them later. Tarballs above a size limit are not hashed, and that is recorded.
 
-No tarball is fetched or stored: the judge compares the lockfile's integrity with `dist.integrity`, which the manifest carries. Later changes to a captured document are captured the same way, so the store also holds when a version was deprecated or disappeared. That is what the re-query at a wait's end needs.
+No tarball is stored: the judge compares the lockfile's integrity with `dist.integrity`, which the manifest carries. Later changes to a captured document are captured the same way, so the store also holds when a version was deprecated or disappeared. That is what the re-query at a wait's end needs.
 
 **2.3 The watched set.** It is the names in these lockfiles, frozen when the shadow starts:
 - this repository (dogfood);
@@ -55,40 +59,47 @@ No tarball is fetched or stored: the judge compares the lockfile's integrity wit
 
 Measured today: 7,660 distinct names. **Ludion-ai/ludion-sandbox is an empty repository** (GitHub: "Git Repository is empty."), so today it adds nothing.
 
-**2.4 Daily OSV.** Once a day, download `https://osv-vulnerabilities.storage.googleapis.com/npm/modified_id.csv`. Its lines are `<modified>,<id>`, newest first ([OSV data dumps](https://google.github.io/osv.dev/data/)), so it is read until the last processed time. Then fetch each new or modified `MAL-` record from `api.osv.dev/v1/vulns/<id>`. Nothing about the watched set is sent; the judge's own OSV queries stay names and versions only.
+**2.4 Daily OSV.** Once a day, download `https://osv-vulnerabilities.storage.googleapis.com/npm/modified_id.csv`. Its lines are `<modified>,<id>`, newest first ([OSV data dumps](https://google.github.io/osv.dev/data/)), so it is read until the last processed time. Then fetch each new or modified `MAL-` record from `api.osv.dev/v1/vulns/<id>`, and store it whether or not it names a watched package (about 35 a day). Nothing about the watched set is sent; the judge's own OSV queries stay names and versions only.
 
-**2.5 Replay.** A MAL- record that names a watched package's version V starts a replay, if V was captured:
-- **The judgement.** The judge's rules (the same functions `ludion judge` uses, at a pinned commit) run on the captured facts once per urgency row u of the table (exploited, high, normal, low), as the backtests do (tools/backtest/src/malicious-v5.ts, `wait` and `young`). Within each row:
-  - Urgency is set to u, not taken from the judge's `urgencyOf`. A plain version update fixes nothing, so the judge would give it normal or low; the replay asks what happens if V comes with a fix of urgency u.
-  - Rule 2's young-dependency threshold is WAIT_HOURS[u].
-  - The row's wait W is the backtests': WAIT_HOURS[u]; 24h for exploited when the versions cannot be compared or in scenario (a); and max(2 × w, 72h) when the wait is extended (scenario (a), a publisher change, new dependencies, or prev no longer listed).
-  - The judgement is made as of T + W, where T is V's publish time. The re-query at that moment sees a MAL- record only if it was published by T + W, and sees deprecation or removal only if a capture before T + W showed it.
-- **The scenarios.** As in the backtests: (b) P locked at its version in a watched lockfile, updated to V, once per distinct prev; (a) V added as a new package.
-- **The outcome per row.**
-  - **Stopped**: at T + W, the judge's verdict is `stop` or `undecidable`. The judge stops on what it cannot judge, so an undecidable verdict would not have been merged.
-  - **Missed**: at T + W, the verdict is `ready_except_build`: no stop finding exists by the row's wait end. With urgency and wait set per row, the verdict at T + W is never `wait`.
-  - **Also shown, not counted:** the verdict with the judge's own urgency at its own `wait_until`.
-  - A V the shadow never captured, because it was removed before the first capture or a poll failed, is a **capture gap**, reported as unknown.
-- **Recording.** Each replay writes the judge's findings and the hashes of the captures it read.
+**2.5 Replay.** A MAL- record that names a watched package's version V starts a replay. **How each judgement is made and counted is fixed in docs/decisions/2026-10-29-shadow-counting.md**: what follows only summarises it.
+- **The rows.** One judgement per urgency row (exploited, high, normal, low), as the backtests do.
+  - `judge()` takes urgency only from its fixes (`urgencyOf`), so the replay gives it a synthetic fix for P from prev to V. The fix's `kev` or `severity` makes `urgencyOf` return the row's urgency, and V becomes the time cap's target.
+  - So rule 2's threshold is WAIT_HOURS of the row, and the wait is the judge's own: the row's wait, 24h for exploited without comparable provenance, or max(2 × that wait, 72h) when extended.
+- **When.** At the judge's own `wait_until`: the newest publish in the change plus that wait, not V's publish time plus the wait. A same-release sibling published after V moves it. The re-query sees only MAL- records published by then, and captures taken before then.
+- **The scenarios.**
+  - (b): P locked at prev, updated to V.
+  - (a): V added as a new direct dependency. A new package has no `from`, so a fix cannot set its urgency, and (a) is judged only in the normal and low rows.
+- **The outcomes.**
+  - `stop`, or `undecidable` with every input captured, is stopped.
+  - `ready_except_build` is missed.
+  - A missing input means the judge is not run; that is a **capture gap**, counted as a miss. This covers V removed before its first capture, or a missing predecessor or `created`.
+- **Also shown, not counted.** The judge's literal verdict with its own urgency. The counted outcome is a per-row counterfactual, as in the backtests.
 
 This framing is harsher than the backtests in one way. A malicious version reaches a project here through a direct update to it, as a Dependabot version update proposes. The backtests' most frequent stop, "no fix selects it" (1,033 of 1,039 stops at 24h in v5), does not apply.
 
-**2.6 Judging every captured version, for the count.** Condition (b) needs at least 100 decided judgements, so every captured version of a watched package is also judged in each urgency row, in scenario (b), against each distinct prev in the watched lockfiles. In each row, "decided" is `stop` or `ready_except_build` at T + W, as in 2.5. An `undecidable` verdict is counted and shown, but not as decided. The estimate in section 5 is about 27,000 captured versions in four weeks, so the count itself is not the hard part.
+**2.6 Judging every captured version, for the count.** Condition (b) needs at least 100 decided judgements. So every captured version is also judged in scenario (b) against one prev: the highest version below it in the watched lockfiles, else the registry's predecessor. "Decided" is `stop` or `ready_except_build` in all four rows. The estimate in section 5 is about 27,000 captured versions in four weeks, so the count itself is not the hard part.
 
-## 3. Proposed counting for (b), to be fixed in decisions.md before the shadow starts
+**2.7 Disputed versions: false-report candidates and record omissions.** When a MAL- record names a captured version V, V is checked against v5's disputed standard: the registry's hash and two archives tied to it show that V's code equals its preceding legitimate version's (docs/bench/2026-10-28-backtest-v5/definitions.md, section 3). The recorder's own file list from 2.2 must agree with the archives, when it exists.
 
-None of this is fixed yet. The decisions entry says these details are fixed in that file before the shadow starts.
-- **Start.** The four weeks start at the first poll after the watched set is frozen and the code commit is recorded. A day with no successful poll ends the run of consecutive weeks. The gap is reported, and the count restarts.
-- **Unit.** One version V of a watched package, per urgency row. A replay over several lockfiles is one unit; its outcome is missed if any scenario or prev misses it.
-- **Miss for (b).** A version named by a MAL- record published before the four weeks end plus 168h, whose outcome is missed in any row. **A capture gap on such a version also counts as a miss**, because nothing can show that the judge would have stopped it.
-- **Decided.** At least 100 versions with a decided verdict in every one of the four rows.
-- **What is shown next to the gate.**
-  - the number of MAL- records that named a watched version during the window;
-  - capture lag (`fetched_at − published`), as a median and at p90;
-  - every capture gap;
-  - undecidable verdicts.
-  
-  If no MAL- record names a watched version, the report says that the miss half of (b) was **met with no case**.
+Being disputed catches two different things, so they are kept as two categories (owner's addendum, 2026-10-28 23:11 JST):
+- **False-report candidate.** The record may name a version that was never malicious. Example: @ensdomains/buffer 0.1.1, a 2023 release whose code equals 0.1.0's, named by a 2025 record about 0.1.2's compromise. A correction request for it was sent by the owner: github/advisory-database issue 10743.
+- **Record-omission candidate.** V is likely malicious, and the record misses its identical predecessor. Example: freo-design-system 1.0.4. Its predecessor 1.0.3 added the same `preinstall` 59 minutes earlier and is named by no record. The correction would add 1.0.3 to the record, not remove 1.0.4.
+
+The rule that tells them apart is mechanical, so that it is decided before any data. Take O, the first version of the run of code identical to V. If O was published after another MAL-named version of P, or O adds an install script its predecessor lacks, V is a record-omission candidate. Otherwise it is a false-report candidate. Both examples fall where the rule puts them.
+
+For condition (b):
+- record-omission candidates count as malicious;
+- false-report candidates stay in the denominator, are shown apart, and are not counted as misses.
+
+The shadow sends no correction request: any request is the owner's.
+
+## 3. How (b) is counted
+
+Fixed in docs/decisions/2026-10-29-shadow-counting.md, committed before the recorder's first poll.
+- The four weeks start at the first successful poll after that file and the recorder are merged. A UTC day without a successful poll restarts them.
+- A miss is a missed row or a capture gap on a version that is confirmed malicious or a record-omission candidate. The MAL- record must be published by the end of the window plus 336h.
+- Decided: at least 100 versions with `stop` or `ready_except_build` in all four rows.
+- Shown, not gated: MAL- counts by category, capture lag, every capture gap and undecidable verdict, and the judge's literal verdicts. If no MAL- record names a version in the window, the report says the miss half was **met with no case**.
 
 ## 4. Measured inputs
 
@@ -134,6 +145,7 @@ Each line is arithmetic on section 4's measurements, not a measurement of the sh
 | Four weeks / one year (versions only) | about 430 MB / 5.6 GB | × 28 / × 365 |
 | `time` maps: the first capture of each watched name, and the new entries after it | not measured (the `time` maps were not sized). Not in the 15.3 MB above | — |
 | Registry reads per day | about 968 packuments + 794 attestations at most | one packument per change event, attestations at 82.0% |
+| Tarball downloads per day, for the file lists (2.2) | about 968, size not measured; only the lists are stored | one per new version |
 | Packument download per day | about 82 MB at the median size, 1.36 GB at the p90 size. Neither is a bound: names that publish often may have large packuments (not measured), and the mean was not measured | 968 × 84.5 KB; 968 × 1.41 MB; not stored |
 | Feed reads per day | about 122,000 entries, 12.7 MB | 1.41/s × 86,400 × 104.6 bytes; low confidence |
 | OSV per day | 8.7 MB of `modified_id.csv`, about 35 record reads | 976 / 28 |
@@ -173,7 +185,7 @@ The npm registry's rate limits for these reads are **not known**: no public numb
 
 1. **Where it runs:** A, B or C (section 6). A has no new cost or service. B captures faster and keeps the data private.
 2. **Retention:** the shadow plus 90 days (about 1.8 GB of version data, plus `time` maps), or longer.
-3. **Wider watch, optional:** to get MAL- cases into (b), capture every npm version, not only the watched set. Feed volume would then be about 122,000 changes a day (low confidence), so storage and requests grow by two orders of magnitude. This was not estimated further. It would also change (b)'s population, so it would have to be fixed in decisions.md first.
+3. **Wider watch, optional:** to get MAL- cases into (b), capture every npm version, not only the watched set. Feed volume would then be about 122,000 changes a day (low confidence), so storage and requests grow by two orders of magnitude. This was not estimated further. It would also change (b)'s population, so it would have to be fixed in docs/decisions/ first.
 
 ## Files
 

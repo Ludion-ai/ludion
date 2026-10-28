@@ -71,14 +71,14 @@ Per scenario (conservative, with the exception), stopped / missed / unknown:
 
 **These 7 rest on a run-date proxy** (found in review). "prev not listed" is whether the registry lists prev on the run date, while the judgement it models happened in 2024–2025.
 - If prev was removed together with V, or after it, the judge then would have compared install-script names instead of stopping on any install script.
-- This rule was fixed before the run (definitions, section 2). v4 uses the same proxy to extend the wait. But this is the only place where "no longer listed" adds stops.
+- This rule was fixed before the run (definitions, section 2). v4 uses the same proxy to extend the wait. But in the malicious results this is the only place where "no longer listed" adds stops. (On the genuine side, duckdb 1.3.3 → 1.3.4's stop also rests on its predecessor being unlisted on the run date; there it counts against the judge.)
 - **How much rests on it.** All 7 of the 7 moves at 168h, 7 of the 13 at 72h, and 7 of the 49 at 12h and 24h.
 - **Without these 7,** the conservative lower bounds would be:
   - 1,032 / 1,148 = 89.90% at 12h and 24h;
   - 1,058 / 1,148 = 92.16% at 72h;
   - 1,071 / 1,148 = 93.29% at 168h, which is v4's figure.
 - **What ecosyste.ms shows for their predecessors** (read after the run):
-  - @optimystic99/dev-utils 1.0.10, prev of 1.0.22, declares the same `postinstall` as V, so a comparison would not have stopped it;
+  - @optimystic99/dev-utils 1.0.10, prev of 1.0.22, declares a `postinstall` too, the same script name as V (the judge compares names, not commands), so a comparison would not have stopped it;
   - rxnt-healthchecks-nestjs 1.0.1-alpha-1609 declares none, so 1.0.3 and 1.0.4 would stop as "added" either way;
   - google-profanity-words 1.0.0 is not held (404), and rxnt-kue 1.0.3's record has no metadata, so those 4 are undetermined.
 
@@ -151,7 +151,7 @@ As the definitions say (section 3), "preceding legitimate" means only that no MA
   - Software Heritage's artifact is the registry's tarball URL, with that sha1. Its visit was 2023-03-23.
   - Software Heritage and jsDelivr hold the same 21 files.
   - Compared with 0.1.0, the only differences are inert or removals: `cache/solidity-files-cache.json` and `package-lock.json` changed or added; `build/contracts/Buffer.json` and `build/contracts/Migrations.json` removed.
-  - `package.json` changed only in fields the check does not compare: the version, and `@nomiclabs/hardhat-truffle5` moved from dependencies to devDependencies.
+  - `package.json` changed only in ways the check allows: the version, and `@nomiclabs/hardhat-truffle5` moved from dependencies to devDependencies (a dropped runtime requirement adds no code).
   - 0.1.1 is a 2023 release with no install script. The compromise is in 0.1.2 (2025). The MAL record's other two sources name only 0.1.2.
 - **freo-design-system 1.0.4.**
   - The registry, ecosyste.ms and Software Heritage agree on the hash (shasum `c2c00593…`, unpackedSize 1,053).
@@ -217,7 +217,7 @@ The judge does not compare against a predecessor it cannot list. So no archive f
   - The container kept running (`docker ps`: "Up 6 minutes" at 12:02:43Z, 2.37 GiB at 12:33Z). It finished on its own at 12:55:30Z with exit 0.
   - It is the same, first execution: nothing was restarted.
 - **jsDelivr lists removed versions but does not serve their files.**
-  - This was predictable. Cycle 2 had recorded that jsDelivr serves the files of versions someone requested before removal (6 of 59 removed keys; docs/bench/2026-10-28-cycle2-investigation/README.md, section 2). Cycle 2 had itself fetched @ensdomains/buffer 0.1.1's files from the CDN.
+  - This was predictable. Cycle 2 had recorded that jsDelivr serves the files of versions someone requested before removal (6 of 59 removed keys; docs/bench/2026-10-28-cycle2-investigation/README.md, section 2).
   - So for a removed version, the disputed check can finish only where someone fetched its files from the CDN before removal.
   - The run fetched V's `package.json` from cdn.jsdelivr.net but did not record the HTTP status, so 988 versions failed under a label that says "does not match its list".
   - Checked after the run (13:00:35Z, `diagnostics/jsdelivr-cdn.json`): the CDN answers 404 "Couldn't find the requested release version" for all 988, while jsDelivr's data API still lists their files with hashes.
@@ -225,7 +225,7 @@ The judge does not compare against a predecessor it cannot list. So no archive f
   - In jsDelivr's lists, 23 of the 988 have no non-inert file that differs from prev_d. Their differences are only in `package.json`, which could not be read.
     - For 11 of them, ecosyste.ms's copy shows install scripts: ten @toptal versions (preinstall and postinstall) and eslint-config-prettier 10.1.6 (install). Unless prev_d declares the same ones, they would fail the `package.json` comparison anyway.
     - The open question therefore covers 12.
-  - Whether jsDelivr's lists for removed versions are complete was not checked by the run. The review compared two of them (eslint-config-prettier 10.1.6, color 5.0.1) with ecosyste.ms's `fileCount` and `unpackedSize` and found them consistent.
+  - Whether jsDelivr's lists for removed versions are complete was not checked by the run. The review compared today's live lists for two of them (eslint-config-prettier 10.1.6, color 5.0.1) with ecosyste.ms's `fileCount` and `unpackedSize`, file count and total size only, and found them consistent.
 - **Software Heritage holds few malicious versions.** It held 1 of the 35 versions read for install scripts, which confirms the cycle-2 finding. ecosyste.ms is the source that moved the numbers.
 - **Not covered:**
   - archives were not used for trees, nor for provenance, publisher or new dependencies (by definition);

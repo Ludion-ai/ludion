@@ -545,4 +545,4 @@ docs/bench/2026-10-28-backtest-v5. The definitions were committed at 23ab295 and
   - "Legitimate" means only "named by no MAL- record", and the category does not say a version is benign.
   - freo 1.0.4 is in it because its record does not name 1.0.3, which added the same preinstall 59 minutes earlier.
   - A draft correction request for @ensdomains/buffer 0.1.1 to the GitHub Advisory Database is in the folder. It has not been sent.
-- **Anomaly.** jsDelivr's CDN answers 404 for the files of removed versions it still lists, so 988 versions failed the disputed check closed (README, "Anomalies").
+- **A predictable limit.** jsDelivr's CDN answers 404 for the files of removed versions it still lists (cycle 2 had seen it serve only versions requested before removal). So 988 versions failed the disputed check closed (README, "Anomalies and limits").

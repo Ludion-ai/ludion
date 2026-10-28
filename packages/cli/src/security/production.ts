@@ -103,38 +103,87 @@ export function packageOf(specifier: string, builtins = true): string | null {
   return name;
 }
 
-// Comments that may stand between `import(` or `require(` and the specifier. A block comment's body cannot hold its
-// own closing star-slash, so each comment matches one way only and a crafted file cannot make the match backtrack
-// exponentially.
-const CALL_COMMENTS = String.raw`(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/\s*|\/\/[^\n]*\n\s*)*`;
-const CALL = new RegExp(String.raw`\b(?:import|require(?:\.resolve)?)\s*\(\s*${CALL_COMMENTS}(["'\x60])([^"'\x60\n$]+)\1`, "g");
+/**
+ * The literal specifier of each `import(…)`, `require(…)` and `require.resolve(…)` call, after any whitespace and up to
+ * 16 comments. Linear on any file: where comments end is found by binary search over positions listed once, and each
+ * whitespace run and each specifier position is read once, however many calls (inside one comment, say) reach it.
+ */
+function callSpecifiers(text: string): string[] {
+  const out: string[] = [], quoted = /(["'\x60])([^"'\x60\n$]+)\1/y;
+  const positions = new Map<string, number[]>();
+  const next = (token: string, from: number) => {
+    let at = positions.get(token);
+    if (!at) { at = []; for (let i = text.indexOf(token); i >= 0; i = text.indexOf(token, i + 1)) at.push(i); positions.set(token, at); }
+    let lo = 0, hi = at.length;
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (at[mid]! >= from) hi = mid; else lo = mid + 1; }
+    return at[lo] ?? -1;
+  };
+  const spaceEnd = new Map<number, number>(), specifierAt = new Map<number, string | null>();
+  const skipSpace = (p: number) => {
+    const known = spaceEnd.get(p);
+    if (known !== undefined) return known;
+    let q = p;
+    while (q < text.length && /\s/.test(text[q]!)) q++;
+    spaceEnd.set(p, q);
+    return q;
+  };
+  for (const m of text.matchAll(/\b(?:import|require(?:\.resolve)?)\s*\(/g)) {
+    let p = m.index! + m[0].length;
+    for (let k = 0; k <= 16; k++) {
+      p = skipSpace(p);
+      if (text.startsWith("/*", p)) { const end = next("*/", p + 2); if (end < 0) break; p = end + 2; }
+      else if (text.startsWith("//", p)) { const end = next("\n", p + 2); if (end < 0) break; p = end + 1; }
+      else break;
+    }
+    if (!specifierAt.has(p)) { quoted.lastIndex = p; specifierAt.set(p, quoted.exec(text)?.[2] ?? null); }
+    const specifier = specifierAt.get(p);
+    if (specifier) out.push(specifier);
+  }
+  return out;
+}
 /**
  * Module specifiers a code file loads: every `from "x"`, `import "x"`, `import()`, `require()` and `require.resolve()`
- * with a literal specifier. Only a strictly type-only import or export (`import type { A } from "x"`) is erased.
+ * with a literal specifier. Only a strictly type-only import or export (`import type { A } from "x"`) is erased; its
+ * brace list cannot hold quotes, semicolons or braces, so it cannot swallow another import.
  */
 export function codeSpecifiers(text: string): string[] {
   const out: string[] = [], typeOnly = new Set<number>();
-  for (const m of text.matchAll(/\b(?:import|export)\s+type\s+(?:\{[^}]*\}|\*\s*as\s+[\w$]+|[\w$]+)\s*(from\s*(["'])[^"'\n]+\2)/g)) typeOnly.add(m.index! + m[0].length - m[1]!.length);
+  for (const m of text.matchAll(/\b(?:import|export)\s+type\s+(?:\{[^{}"'\x60;]{0,2000}\}|\*\s*as\s+[\w$]+|[\w$]+)\s*(from\s*(["'])[^"'\n]+\2)/g)) typeOnly.add(m.index! + m[0].length - m[1]!.length);
   for (const m of text.matchAll(/\bfrom\s*(["'])([^"'\n]+)\1/g)) if (!typeOnly.has(m.index!)) out.push(m[2]!);
   for (const m of text.matchAll(/\bimport\s*(["'])([^"'\n]+)\1/g)) out.push(m[2]!);
-  for (const m of text.matchAll(CALL)) out.push(m[2]!);
+  out.push(...callSpecifiers(text));
   for (const m of text.matchAll(/@jsxImportSource\s+([^\s*]+)/g)) out.push(m[1]!);
   return out;
 }
 /**
  * What a stylesheet (or a component's <style>) imports: every item of an @import, @use, @forward, @plugin or
- * @reference list (a Less option such as `(reference)` skipped), and url(~…).
+ * @reference list, and url(~…). A clause ends at `;`, `{`, `}`, the next `@` outside quotes, or a line break unless
+ * the line ends with a comma; a Less option such as `(reference)` is skipped. c381a85's reading (the first item) is
+ * kept beside it.
  */
 export function styleSpecifiers(text: string): string[] {
   const out: string[] = [];
-  for (const m of text.matchAll(/@(?:import|use|forward|plugin|reference)\s+([^;{}]{0,4000})/g)) {
-    const clause = m[1]!.replace(/^\s*\([^)]*\)\s*/, "");
+  for (const m of text.matchAll(/@(?:import|use|forward|plugin|reference)[ \t]+/g)) {
+    let p = m.index! + m[0].length, clause = "";
+    while (p < text.length && clause.length < 4000) {
+      const c = text[p]!;
+      if (c === '"' || c === "'") {
+        const end = text.indexOf(c, p + 1), nl = text.indexOf("\n", p + 1);
+        if (end < 0 || (nl >= 0 && nl < end)) break;
+        clause += text.slice(p, end + 1); p = end + 1; continue;
+      }
+      if (c === ";" || c === "{" || c === "}" || c === "@") break;
+      if (c === "\n" && !clause.trimEnd().endsWith(",")) break;
+      clause += c; p++;
+    }
+    clause = clause.replace(/^\s*\([^)]*\)\s*/, "");
     const quoted = [...clause.matchAll(/["']([^"'\n]+)["']/g)].map(q => q[1]!), urls = [...clause.matchAll(/url\(\s*["']?([^"')\s]+)/g)].map(u => u[1]!);
     if (quoted.length || urls.length) out.push(...quoted, ...urls);
     else { const bare = /^\s*([^\s,;]+)/.exec(clause); if (bare) out.push(bare[1]!); }
   }
+  for (const m of text.matchAll(/@(?:import|use|forward|plugin|reference)\s+(?:url\(\s*)?["']?([^"')\s;]+)/g)) out.push(m[1]!);
   for (const m of text.matchAll(/url\(\s*["']?~([^"')\s]+)/g)) out.push(m[1]!);
-  return out;
+  return [...new Set(out)];
 }
 /** Packages a file names by a node_modules path (a <script src>, a copied asset). */
 const nodeModulesPaths = (text: string) => [...text.matchAll(/node_modules\/((?:@[\w.-]+\/)?[\w.-]+)/g)].map(m => m[1]!);
@@ -205,14 +254,21 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
   const prunes = /\bnpm\s+prune\b.*(--omit[= ]dev|--production(?![= ]?false))|\bpnpm\s+prune\b.*--prod(?![= ]?false)|\byarn\s+workspaces\s+focus\b.*--production/;
   // Continuation lines are joined; a BuildKit heredoc (RUN <<EOF … EOF) becomes one RUN whose lines are its commands.
   const lines: string[] = [], raw = text.replace(/\\\r?\n/g, " ").split(/\r?\n/);
+  // Where each possible closing line is, as written and trimmed (for `<<-`), so finding one is a lookup, not a scan.
+  const exact = new Map<string, number[]>(), trimmed = new Map<string, number[]>();
+  raw.forEach((l, j) => { for (const [map, key] of [[exact, l], [trimmed, l.trim()]] as const) { const at = map.get(key); if (at) at.push(j); else map.set(key, [j]); } });
+  /** Stages by name (lowercase) and by index, for FROM and COPY --from. */
+  const named = new Map<string, Stage>();
+  const after = (indices: number[] | undefined, i: number) => { let lo = 0, hi = indices?.length ?? 0; while (lo < hi) { const mid = (lo + hi) >> 1; if (indices![mid]! > i) hi = mid; else lo = mid + 1; } return indices?.[lo] ?? -1; };
   for (let i = 0; i < raw.length; i++) {
     const line = raw[i]!.trim();
     if (!line || line.startsWith("#")) continue;
-    const doc = /^(RUN\b.*?)<<-?\s*["']?(\w+)["']?(.*)$/i.exec(line);
-    if (!doc) { lines.push(line); continue; }
-    const body: string[] = [];
-    for (i++; i < raw.length && raw[i]!.trim() !== doc[2]; i++) body.push(raw[i]!);
-    lines.push(`${doc[1]} ${doc[3]}\n${body.join("\n")}`);
+    // `<<` as its own word (not `<<<`, not `1<<2`), a delimiter starting with a letter or `_`, and a closing line.
+    const doc = /^(RUN\b.*?\s)<<(-?)[ \t]*(["']?)([A-Za-z_]\w*)\3(.*)$/i.exec(line);
+    const end = doc ? after((doc[2] ? trimmed : exact).get(doc[4]!), i) : -1;
+    if (!doc || end < 0) { lines.push(line); continue; }
+    lines.push(`${doc[1]} ${doc[5]}\n${raw.slice(i + 1, end).join("\n")}`);
+    i = end;
   }
   for (const line of lines) {
     const m = /^(\w+)\s+([\s\S]*)$/.exec(line);
@@ -220,8 +276,10 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     const op = m[1]!.toUpperCase(), arg = m[2]!.trim();
     if (op === "FROM") {
       const f = /^(?:--\S+\s+)*(\S+)(?:\s+AS\s+(\S+))?/i.exec(arg);
-      const parent = stages.find(s => s.name !== null && s.name.toLowerCase() === (f?.[1] ?? "").toLowerCase()) ?? null;
-      stages.push({ name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, production: parent?.production ?? false, workdir: parent?.workdir ?? "/", runs: [], commands: [], copies: [] });
+      const parent = named.get((f?.[1] ?? "").toLowerCase()) ?? null;
+      const stage: Stage = { name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, production: parent?.production ?? false, workdir: parent?.workdir ?? "/", runs: [], commands: [], copies: [] };
+      stages.push(stage);
+      if (stage.name !== null && !named.has(stage.name.toLowerCase())) named.set(stage.name.toLowerCase(), stage);
       continue;
     }
     const stage = stages.at(-1);
@@ -244,7 +302,7 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
       const sources = parts.filter(p => !p.startsWith("--")).slice(0, -1);
       const strip = (p: string) => p.replace(/\/+$/, "") || "/";
       if (from !== undefined) {
-        const source = stages.find((s, i) => (s.name !== null && s.name.toLowerCase() === from.toLowerCase()) || String(i) === from);
+        const source = named.get(from.toLowerCase()) ?? (/^\d+$/.test(from) ? stages[Number(from)] : undefined);
         if (source) {
           stage.copies.push(source);
           if (sources.some(s => /node_modules/.test(s) || /^(\.|\.\/|\/)$/.test(s) || strip(s) === strip(source.workdir))) stage.holds ||= source.holds;
@@ -254,16 +312,15 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
   }
   const last = stages.at(-1);
   if (!last) return { holds: false, production: [], build: [] };
-  const chain = (s: Stage | null): Stage[] => s ? [s, ...chain(s.from)] : [];
-  const own = chain(last), production = own.flatMap(s => s.commands);
-  const build: string[] = [], seen = new Set<Stage>(own), queue = own.flatMap(s => s.copies);
-  while (queue.length) {
-    const s = queue.shift()!;
-    for (const c of chain(s)) {
-      if (seen.has(c)) continue;
-      seen.add(c);
-      build.push(...c.runs);
-      queue.push(...c.copies);
+  // Each stage is visited once, by loops, so a long FROM chain costs linear time and no recursion.
+  const own: Stage[] = [], seen = new Set<Stage>();
+  for (let at: Stage | null = last; at && !seen.has(at); at = at.from) { seen.add(at); own.push(at); }
+  const production = own.flatMap(s => s.commands), build: string[] = [], queue = own.flatMap(s => s.copies);
+  for (let q = 0; q < queue.length; q++) {
+    for (let at: Stage | null = queue[q]!; at && !seen.has(at); at = at.from) {
+      seen.add(at);
+      build.push(...at.runs);
+      queue.push(...at.copies);
     }
   }
   return { holds: last.holds, production, build };
@@ -302,23 +359,28 @@ function fileCommands(file: string, text: string): string[] {
   }
   const toml = /\.toml$/i.test(file), out: string[] = [], lines = text.split(/\r?\n/);
   const indent = (l: string) => l.length - l.trimStart().length;
-  lines.forEach((line, i) => {
-    const m = /^[ \t]*(?:-[ \t]*)?["']?([\w.-]+)["']?[ \t]*[:=][ \t]*(.*)$/.exec(line);
+  // Lines a block scalar or a block list takes are its value, not keys, and are not read again: linear time.
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!, m = /^[ \t]*(?:-[ \t]*)?["']?([\w.-]+)["']?[ \t]*[:=][ \t]*(.*)$/.exec(line);
     if (m) m[2] = m[2]!.trim().replace(/,$/, "").trim();
-    if (!m || !(toml || COMMAND_KEY.test(m[1]!))) return;
+    if (!m || !(toml || COMMAND_KEY.test(m[1]!))) continue;
     // A YAML block scalar (`command: >` or `|`): the more-indented lines after it.
     if (/^[>|][+-]?\d*$/.test(m[2]!)) {
       const body: string[] = [];
-      for (const next of lines.slice(i + 1)) { if (next.trim() && indent(next) <= indent(line)) break; body.push(next.trim()); }
+      let j = i + 1;
+      for (; j < lines.length && (!lines[j]!.trim() || indent(lines[j]!) > indent(line)); j++) body.push(lines[j]!.trim());
       out.push(body.join("\n"));
-      return;
+      i = j - 1;
+      continue;
     }
-    if (m[2]) { out.push(m[2]); return; }
+    if (m[2]) { out.push(m[2]); continue; }
     // A YAML block list under the key: "command:" then "- npm", "- start".
     const items: string[] = [];
-    for (const next of lines.slice(i + 1)) { const item = /^\s*-\s+(.+)$/.exec(next); if (!item) break; items.push(item[1]!); }
+    let j = i + 1;
+    for (let item: RegExpExecArray | null; j < lines.length && (item = /^\s*-\s+(.+)$/.exec(lines[j]!)); j++) items.push(item[1]!);
     if (items.length) out.push(items.join(" "));
-  });
+    i = j - 1;
+  }
   return out;
 }
 

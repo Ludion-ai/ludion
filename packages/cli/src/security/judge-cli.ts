@@ -67,7 +67,7 @@ async function pnpm(beforeLock: string, afterLock: string, manifest: any, files:
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], created = new Map<string, string | null>(), errors: string[] = [];
   try { ({ facts, fixes, created } = await gatherFacts(changes, fetch)); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const direct = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"].flatMap(g => manifest?.[g] && typeof manifest[g] === "object" ? Object.keys(manifest[g]) : []);
-  const result = judge({ changes, facts, fixes, files, now, errors, locked, created, direct, lockfile: "pnpm-lock" });
+  const result = judge({ changes, facts, fixes, files, now, errors, locked, created, direct, lockfile: "pnpm-lock", split: { source: "pnpm", incomplete: null, images_with_dev: [] } });
   console.log(json ? JSON.stringify(result, null, 2) : renderJudgement(result));
   return exitCode(result.verdict);
 }

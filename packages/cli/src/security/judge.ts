@@ -329,9 +329,10 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
 }
 
 /** Which production/dev split was used (production.ts): with or without the whole source tree, and images holding devDependencies. */
-export type SplitSummary = { source: "read" | "not_given" | "incomplete"; incomplete: string | null; images_with_dev: string[] };
+export type SplitSummary = { source: "read" | "not_given" | "incomplete" | "pnpm"; incomplete: string | null; images_with_dev: string[] };
 const D1_ONLY = "so only test runners, linters, formatters and @types packages, and what only they reach, count as dev-only";
 function splitMessage(s: SplitSummary): string {
+  if (s.source === "pnpm") return "No production/dev split for pnpm-lock.yaml: --source is not read, and every changed version counts as production.";
   if (s.source === "not_given") return `Production/dev split without the source tree (no --source), ${D1_ONLY}.`;
   if (s.source === "incomplete") return `Production/dev split: the source tree could not be read completely (${s.incomplete ?? "unknown"}), ${D1_ONLY}.`;
   if (s.images_with_dev.length) return `Production/dev split: the final stage of ${s.images_with_dev.join(", ")} holds devDependencies, ${D1_ONLY}.`;

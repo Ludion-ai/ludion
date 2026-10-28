@@ -297,7 +297,7 @@ describe("after #168's review: what section 2 calls production is not left out",
     expect(left(["serve"], { "package.json": JSON.stringify({ scripts: { start: "./node_modules/.bin/serve -s build" } }) }, { serve: "serve" })).not.toContain("serve@1.0.0");
   });
   it("reads every item of a stylesheet import list and skips Less options (7)", () => {
-    expect(styleSpecifiers("@import 'bootstrap/scss/functions', 'animate.css';\n@import (reference) '~lesslib/x.less';")).toEqual(["bootstrap/scss/functions", "animate.css", "~lesslib/x.less"]);
+    expect(styleSpecifiers("@import 'bootstrap/scss/functions', 'animate.css';\n@import (reference) '~lesslib/x.less';")).toEqual(expect.arrayContaining(["bootstrap/scss/functions", "animate.css", "~lesslib/x.less"]));
     const out = left(["animate.css", "lesslib"], { "src/a.scss": "@import 'x/y', 'animate.css';", "src/b.less": "@import (reference) '~lesslib/x.less';" });
     expect(out).not.toContain("animate.css@1.0.0");
     expect(out).not.toContain("lesslib@1.0.0");
@@ -329,5 +329,44 @@ describe("crafted files cannot make the reader backtrack without end", () => {
       "src/a.js": "",
     };
     expect(quick(() => productionSplit(lock, tree(files)))).toBeLessThan(3000);
+  });
+  it("reads #168's delta-review inputs in linear time: each took seconds when quadratic", () => {
+    const n = 40_000;
+    expect(quick(() => codeSpecifiers("import type {".repeat(n)))).toBeLessThan(1000);
+    expect(quick(() => codeSpecifiers("require(/*".repeat(n)))).toBeLessThan(1000);
+    expect(quick(() => codeSpecifiers("require(//".repeat(n)))).toBeLessThan(1000);
+    expect(quick(() => codeSpecifiers(`${"require(/*".repeat(n)}*/${" ".repeat(1_000_000)}'${"a".repeat(1_000_000)}`))).toBeLessThan(1000);
+    expect(quick(() => styleSpecifiers("@import ".repeat(n)))).toBeLessThan(1000);
+    const lock = lockOf({ devDependencies: { x: "^1" } }, { "node_modules/x": { dev: true } });
+    for (const compose of ["command: >\n".repeat(n), "command:\n".repeat(n), "- command:\n".repeat(n), Array.from({ length: 3000 }, (_, k) => `${" ".repeat(k)}command: >`).join("\n")]) {
+      expect(quick(() => productionSplit(lock, tree({ "docker-compose.yml": compose, "src/a.js": "" })))).toBeLessThan(1500);
+    }
+    const stages = ["FROM node:22 AS a0", ...Array.from({ length: 16_000 }, (_, k) => `FROM a${k} AS a${k + 1}\nRUN true`), "FROM node:22", "COPY --from=a16000 /x /x"].join("\n");
+    expect(quick(() => dockerImage(stages, false))).toBeLessThan(1500);
+    expect(quick(() => dockerImage(`FROM node:22\n${"RUN x <<EOF\n".repeat(n)}`, false))).toBeLessThan(1500);
+  });
+});
+
+describe("after #168's delta review: what c381a85 counted is not lost", () => {
+  it("ends a stylesheet clause at a line break, so unquoted imports in Sass and Stylus are all read (A)", () => {
+    expect(styleSpecifiers("@import foo\n@import bar")).toEqual(expect.arrayContaining(["foo", "bar"]));
+    expect(styleSpecifiers("@import nib\n@import \"vars\"")).toEqual(expect.arrayContaining(["nib", "vars"]));
+    expect(styleSpecifiers("@import bootstrap\n.a\n  content: \"x\"")).toContain("bootstrap");
+    expect(styleSpecifiers("@import 'a',\n  'b';")).toEqual(expect.arrayContaining(["a", "b"]));
+    expect(styleSpecifiers("@import \"@fontsource/inter\";")).toContain("@fontsource/inter");
+  });
+  it("does not let a type-only brace list cross quotes or semicolons (B)", () => {
+    expect(codeSpecifiers("// Prefer `import type {` for types; see docs\nimport { a } from 'real'")).toContain("real");
+  });
+  it("reads here-strings and shifts as written, and a heredoc only with its closing line (C)", () => {
+    const copy = "FROM node:22 AS deps\nWORKDIR /app\nRUN npm ci\nFROM node:22-slim\nRUN grep -q foo <<< \"foo bar\"\nRUN echo $((1<<2))\nCOPY --from=deps /app/node_modules ./node_modules\n";
+    expect(dockerImage(copy, false).holds).toBe(true);
+    expect(dockerImage("FROM node:22 AS deps\nRUN npm ci\nFROM node:22-slim\nRUN cat <<EOF\nno end\nCOPY --from=deps /node_modules ./node_modules\n", false).holds).toBe(true);
+    expect(dockerImage("FROM node:22\nRUN <<-EOT\n  npm ci\n  EOT\nCMD node a.js\n", false).holds).toBe(true);
+  });
+  it("says in the comment that pnpm gets no split", () => {
+    const fact: VersionFacts = { published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: null, install_scripts: [], dependencies: [], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z" };
+    const j = judge({ changes: [], facts: new Map([["a@1.0.0", fact]]), fixes: [], files: ["pnpm-lock.yaml"], now: new Date("2026-10-28T00:00:00Z"), lockfile: "pnpm-lock", split: { source: "pnpm", incomplete: null, images_with_dev: [] } });
+    expect(renderJudgement(j)).toContain("No production/dev split for pnpm-lock.yaml");
   });
 });

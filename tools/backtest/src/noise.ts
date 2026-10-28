@@ -7,12 +7,12 @@
 // 2026-10-27, saved as <out-dir>/search/hour-HH.json:
 //   gh api graphql -f q='is:pr is:public author:app/dependabot label:javascript created:2026-10-27THH:00:00Z..2026-10-27THH:59:59Z sort:created-desc' -f query="$(SEARCH below)"
 //
-// Usage: node tools/backtest/src/noise.ts <out-dir>                 the run, from the saved search
+// Usage: node tools/backtest/src/noise.ts <out-dir> --commit <sha>  the run, from the saved search, at that commit
 //        node tools/backtest/src/noise.ts <out-dir> --local <dir>   one local checkout (a smoke test, not a result)
 // It runs only in Docker, read-only root, non-root, no forwarded environment, with the worktree (and its node_modules)
 // at /w and the output folder at /out; the registered npm is checked at start:
 //   docker run --rm --read-only --user 1000:1000 --tmpfs /tmp -e HOME=/tmp -v <worktree>:/w:ro -v <out>:/out \
-//     node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 node /w/tools/backtest/src/noise.ts /out
+//     node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 node /w/tools/backtest/src/noise.ts /out --commit <sha>
 import { spawnSync } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -21,7 +21,11 @@ import { lockEntries } from "../../../packages/cli/src/security/judge.ts";
 import { osvIds } from "../../../packages/cli/src/security/npm-facts.ts";
 
 const [outDir, flag, localDir] = process.argv.slice(2);
-if (!outDir) throw new Error("Usage: node tools/backtest/src/noise.ts <out-dir> [--local <dir>]");
+if (!outDir || (flag !== "--local" && flag !== "--commit") || !localDir) throw new Error("Usage: node tools/backtest/src/noise.ts <out-dir> (--commit <sha> | --local <dir>)");
+/** The run: the commit it runs at is logged, and an earlier result in the same folder is never overwritten. */
+const commit = flag === "--commit" ? localDir : null;
+if (commit !== null && !/^[0-9a-f]{40}$/.test(commit)) throw new Error("--commit needs the full 40-character commit SHA.");
+if (commit !== null && existsSync(join(outDir, "noise.json"))) throw new Error(`${join(outDir, "noise.json")} exists: a result is never overwritten; use a new folder.`);
 mkdirSync(outDir, { recursive: true });
 
 const SAMPLE = 100;
@@ -191,14 +195,14 @@ if (npmVersion !== NPM_VERSION) throw new Error(`npm ${npmVersion} is not the re
 const started = new Date().toISOString();
 /** The console, also kept in <out>/run.log: a stopped execution is reported with its log. */
 const log = (line: string) => { console.log(line); appendFileSync(join(outDir!, "run.log"), `${new Date().toISOString()} ${line}\n`); };
-if (flag !== "--local") log(`start at ${started}, npm ${npmVersion}, node ${process.version}`);
+if (commit !== null) log(`start at ${started}, commit ${commit}, npm ${npmVersion}, node ${process.version}`);
 
 if (flag === "--local") {
   if (!localDir) throw new Error("--local needs a directory.");
   const row = await measure(localDir, "local", "", readFileSync(join(localDir, "package.json"), "utf8"), readFileSync(join(localDir, "package-lock.json"), "utf8"));
   writeFileSync(join(outDir, "smoke.json"), JSON.stringify({ note: "Smoke test on a local checkout; not a result.", npm: npmVersion, node: process.version, row }, null, 2));
   console.log(JSON.stringify({ npm_total: row.npm.total, npm_direct: row.npm.direct.length, npm_omit_dev_total: row.npm_omit_dev_total, ludion: row.ludion.count, dev_only: row.ludion.dev_only.length, left_out: row.left_out.length }));
-} else {
+} else try {
   const rows: Row[] = [], excluded: Excluded[] = [], owners = new Set<string>();
   let considered = 0;
   const all = candidates();
@@ -251,10 +255,15 @@ if (flag === "--local") {
       per_repository_ratio_median: (m => m === Infinity ? "infinite" : m)(median(rows.filter(r => r.npm.total > 0 || r.ludion.count > 0).map(r => r.npm.total > 0 ? r.ludion.count / r.npm.total : Infinity))),
       repositories_without_a_ratio: rows.filter(r => r.npm.total === 0 && r.ludion.count === 0).length,
       repositories_npm_zero_judge_above_zero: rows.filter(r => r.npm.total === 0 && r.ludion.count > 0).length,
-      repositories_at_or_below_a_third: rows.filter(r => r.ludion.count * 3 <= r.npm.total).length,
+      // Rows with no ratio (npm audit 0 and judge 0) are left out here, as in the median.
+      repositories_at_or_below_a_third: rows.filter(r => (r.npm.total > 0 || r.ludion.count > 0) && r.ludion.count * 3 <= r.npm.total).length,
     },
     exclusions_by_cause: causes,
     rows, excluded,
   }, null, 2));
   log(`done: ${rows.length} repositories, npm audit ${npmTotal}, judge ${judgeTotal}, considered ${considered} ${JSON.stringify(causes)}`);
+} catch (e) {
+  // A stopped execution keeps its reason in run.log too.
+  log(`stopped: ${String((e as Error)?.stack ?? e).slice(0, 2000)}`);
+  throw e;
 }

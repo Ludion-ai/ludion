@@ -5,7 +5,7 @@ import { resolvedMavenInventory } from "./dependency-patch.ts";
 import { OsvClient, type DependencyScan, type ReadOnlyScan } from "./osv.ts";
 import { scanPhp, type Scan } from "./php.ts";
 import { CONFIG, readConfig } from "./project.ts";
-import { isReadOnlyCliName, READONLY_CLI_NAMES, READONLY_READERS, type ReadOnlyReader } from "./readonly/index.ts";
+import { COVERED_BY, isReadOnlyCliName, READONLY_CLI_NAMES, READONLY_READERS, type ReadOnlyReader } from "./readonly/index.ts";
 import type { ReadOnlyEcosystem } from "./readonly/types.ts";
 
 export type ProjectScan = { schema: 1; checked_at: string; status: "attention_required" | "no_known_updates"; checks: ({ ecosystem: "php"; result: Scan } | { ecosystem: Ecosystem; result: DependencyScan } | { ecosystem: ReadOnlyEcosystem; result: ReadOnlyScan } | { ecosystem: string; error: string })[]; unsupported: string[] };
@@ -56,8 +56,9 @@ export async function scanProject(root: string, selected?: string, deps: { reade
       if (!read) throw new Error(`${present.join(", ")} present, but the ${reader.ecosystem} reader returned no inventory.`);
       if (read.ecosystem !== reader.ecosystem) throw new Error(`The ${reader.ecosystem} reader returned a ${String(read.ecosystem)} inventory.`);
       for (const file of read.files) if (!originals.has(file)) originals.set(file, textFile(root, file));
-      // Never dropped silently: a present file the reader neither read nor explained makes the result incomplete.
-      const unread = present.filter(f => !read.files.includes(f) && !read.limitations.some(l => l.includes(f)));
+      // Never dropped silently: a present file the reader neither read, nor covered by a lock it read, nor explained
+      // makes the result incomplete.
+      const unread = present.filter(f => !read.files.includes(f) && !(COVERED_BY[f] ?? []).some(lock => read.files.includes(lock)) && !read.limitations.some(l => l.includes(f)));
       const installed = unread.length ? { ...read, limitations: [...read.limitations, ...unread.map(f => `${f} is present but was not read.`)] } : read;
       const result = await client.scanReadOnly(installed);
       if ([...originals].some(([file, original]) => textFile(root, file) !== original)) throw new Error("Dependency files changed during the scan.");

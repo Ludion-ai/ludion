@@ -297,12 +297,18 @@ describe("scan with read-only readers", () => {
     const result = await scanProject(root, undefined, { readers: [reader], client: osv({}) });
     expect(result.status).toBe("no_known_updates"); expect(result.unsupported).toEqual([]);
   });
-  it("adds a limitation for a present file the reader neither read nor explained", async () => {
-    const root = project({ "poetry.lock": "", "pyproject.toml": "", "requirements.txt": "" });
-    const reader = fakeReader(() => ({ ...pypi([django], ["requirements.txt is ignored because poetry.lock is present."]), files: ["poetry.lock"] }));
-    const check = (await scanProject(root, undefined, { readers: [reader], client: osv({}) })).checks[0]!;
-    expect("result" in check && check.result.status).toBe("incomplete");
-    expect("result" in check && "fixed_versions_note" in check.result && check.result.inventory.limitations).toEqual(["requirements.txt is ignored because poetry.lock is present.", "pyproject.toml is present but was not read."]);
+  it("adds a limitation for a present file the reader neither read, nor covered by a lock it read, nor explained", async () => {
+    const root = project({ "poetry.lock": "", "pyproject.toml": "", "requirements.txt": "", "Cargo.toml": "" });
+    const limitations = async (read: ReadOnlyReader["read"], files = PYTHON_FILES) => {
+      const check = (await scanProject(root, undefined, { readers: [fakeReader(read, "PyPI", files)], client: osv({}) })).checks[0]!;
+      return "result" in check && "fixed_versions_note" in check.result ? [check.result.status, check.result.inventory.limitations] : check;
+    };
+    // poetry.lock records pyproject.toml's requirements, so reading the lock covers it; requirements.txt is explained.
+    expect(await limitations(() => ({ ...pypi([django], ["requirements.txt is ignored because poetry.lock is present."]), files: ["poetry.lock"] }))).toEqual(["incomplete", ["requirements.txt is ignored because poetry.lock is present."]]);
+    // Reading requirements.txt alone covers nothing else.
+    expect(await limitations(() => ({ ...pypi([django]), files: ["requirements.txt"] }))).toEqual(["incomplete", ["pyproject.toml is present but was not read.", "poetry.lock is present but was not read."]]);
+    // A lock covers its own manifest only: poetry.lock does not cover Cargo.toml.
+    expect(await limitations(() => ({ ...pypi([django]), files: ["poetry.lock", "pyproject.toml", "requirements.txt"] }), [...PYTHON_FILES, "Cargo.toml"])).toEqual(["incomplete", ["Cargo.toml is present but was not read."]]);
   });
   it.each([
     ["throws", () => { throw new Error("requirements.txt line 3: unreadable"); }, "requirements.txt line 3: unreadable"],

@@ -114,11 +114,11 @@ Ctrl+C cancels pending application. An in-flight Docker step may finish before e
 
 `ludion scan` also reads these files at the project root and looks up their packages in OSV. Ludion reports known advisories for these ecosystems but does not plan or apply updates. There is no update policy for them: `init`, `patch` and `watch` refuse `--ecosystem python|go|rust`. `scan --ecosystem python` (or `go`, `rust`) scans only that ecosystem.
 
-| Ecosystem | Files read | OSV ecosystem |
-| --- | --- | --- |
-| Python | requirements.txt, pyproject.toml, poetry.lock, uv.lock, Pipfile.lock | PyPI |
-| Go | go.mod | Go |
-| Rust | Cargo.lock, Cargo.toml | crates.io |
+| Ecosystem | A scan runs when the root has | Inventory | OSV ecosystem |
+| --- | --- | --- | --- |
+| Python | requirements.txt, pyproject.toml, poetry.lock, uv.lock, Pipfile.lock or Pipfile | Registry packages locked in uv.lock (format 1), poetry.lock (1.x and 2.x) and Pipfile.lock (spec 6), and exact `==` pins in requirements.txt. pyproject.toml or Pipfile without a lock gives a limitation; their versions are not guessed. | PyPI |
+| Go | go.mod | go.mod's require list (the build list since Go 1.17), plus `stdlib` and `toolchain` at the version on the toolchain line. That line is only a minimum, so a Go result always has a limitation and exits 2 when nothing matches. | Go |
+| Rust | Cargo.lock or Cargo.toml | crates.io packages in Cargo.lock (formats 1 to 4), for every target and feature. Cargo.toml without Cargo.lock gives a limitation. | crates.io |
 
 Checked:
 
@@ -131,7 +131,9 @@ Not checked:
 
 - Versions are not compared. Ludion does not say which listed fixed version applies to the installed one, or whether one is newer: PEP 440 and Go versions are not semver.
 - Anything that cannot be read as an exact name and version (an unpinned or ranged requirement, a Git, path or URL source, a Go replace directive, an unknown file format version) is listed as `Incomplete:` and the result is `incomplete`, never clean.
-- Files in subdirectories. Nothing is installed, resolved, built or run, and whether vulnerable code is reached is not checked.
+- Whether a lock is up to date with its manifest: the lock is the inventory (uv.lock and poetry.lock for pyproject.toml, Pipfile.lock for Pipfile, Cargo.lock for Cargo.toml).
+- Files in subdirectories, go.sum, and go.work (named as a limitation). Requirements files other than requirements.txt are named as a limitation, and a project whose only Python file is one of them is not scanned.
+- Nothing is installed, resolved, built or run, and whether vulnerable code is reached is not checked.
 
 Exit codes are scan's own: 1 when a vulnerability matches, 2 when a result is incomplete or a check fails, 0 otherwise. An informational-only match exits 0. `--json` also gives each match's `kind` and `fixed_versions`.
 

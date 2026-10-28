@@ -1,0 +1,14 @@
+# Throwaway live check of the root action's mode judge, pinned by a full SHA as README tells users (do not merge).
+name: ludion-action-live-check
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe
+        with:
+          mode: judge

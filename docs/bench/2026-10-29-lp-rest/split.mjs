@@ -66,7 +66,12 @@ function split(kind, path) {
     `On 2026-10-29 every entry that was here moved, word for word, into its own file (docs/decisions/2026-10-29-records-one-file-each.md); the old text is this file at ${commit}. The list keeps the old order and the old headings, so a reference such as (docs/${kind}.md, "<title>") still finds its entry. Lines of the old file that were not entries are kept below as they were.`, "");
   for (const c of parts) {
     if (c.lines[0] === `# ${title}`) continue;
-    if (!c.entry) { index.push(...c.lines); c.kept = true; continue; }
+    if (!c.entry) {
+      if (index.at(-1) !== "") index.push("");
+      if (c.head.startsWith(INTRO)) index.push("The old file's introduction, whose rule docs/decisions/2026-10-29-records-one-file-each.md replaces:", "");
+      index.push(...c.lines);
+      continue;
+    }
     let name = nameOf(c.head, kind), n = 1;
     while (taken.has(`${name}${n > 1 ? `-${n}` : ""}.md`)) n++;
     const file = `${name}${n > 1 ? `-${n}` : ""}.md`;

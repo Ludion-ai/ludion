@@ -1,0 +1,153 @@
+comment	Set up job	﻿2026-10-28T11:01:38.6942612Z Current runner version: '2.338.0'
+comment	Set up job	2026-10-28T11:01:38.6961376Z ##[group]Runner Image Provisioner
+comment	Set up job	2026-10-28T11:01:38.6962337Z Hosted Compute Agent
+comment	Set up job	2026-10-28T11:01:38.6962815Z Version: 20261021.618
+comment	Set up job	2026-10-28T11:01:38.6963332Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+comment	Set up job	2026-10-28T11:01:38.6964002Z Build Date: 2026-10-21T00:45:21Z
+comment	Set up job	2026-10-28T11:01:38.6964589Z Worker ID: {960cf499-9eea-4a82-b7e2-26ead90cb819}
+comment	Set up job	2026-10-28T11:01:38.6965164Z Region: centralus
+comment	Set up job	2026-10-28T11:01:38.6965633Z Cloud: Azure
+comment	Set up job	2026-10-28T11:01:38.6966070Z ##[endgroup]
+comment	Set up job	2026-10-28T11:01:38.6967173Z ##[group]Operating System
+comment	Set up job	2026-10-28T11:01:38.6967852Z Ubuntu
+comment	Set up job	2026-10-28T11:01:38.6968320Z 24.04.5
+comment	Set up job	2026-10-28T11:01:38.6968750Z LTS
+comment	Set up job	2026-10-28T11:01:38.6969168Z ##[endgroup]
+comment	Set up job	2026-10-28T11:01:38.6969635Z ##[group]Runner Image
+comment	Set up job	2026-10-28T11:01:38.6970142Z Image: ubuntu-24.04
+comment	Set up job	2026-10-28T11:01:38.6970581Z Version: 20261025.353.1
+comment	Set up job	2026-10-28T11:01:38.6971458Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+comment	Set up job	2026-10-28T11:01:38.6972873Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+comment	Set up job	2026-10-28T11:01:38.6973666Z ##[endgroup]
+comment	Set up job	2026-10-28T11:01:38.6974808Z ##[group]GITHUB_TOKEN Permissions
+comment	Set up job	2026-10-28T11:01:38.6976649Z Actions: read
+comment	Set up job	2026-10-28T11:01:38.6977170Z Contents: read
+comment	Set up job	2026-10-28T11:01:38.6977787Z Metadata: read
+comment	Set up job	2026-10-28T11:01:38.6978274Z PullRequests: write
+comment	Set up job	2026-10-28T11:01:38.6978760Z ##[endgroup]
+comment	Set up job	2026-10-28T11:01:38.6980358Z Secret source: Actions
+comment	Set up job	2026-10-28T11:01:38.6981079Z Cache mode: read
+comment	Set up job	2026-10-28T11:01:38.6981687Z Prepare workflow directory
+comment	Set up job	2026-10-28T11:01:38.7245186Z Prepare all required actions
+comment	Set up job	2026-10-28T11:01:38.7327055Z Complete job name: comment
+comment	Check the judgement and post it	﻿2026-10-28T11:01:38.8332879Z ##[group]Run set -euo pipefail
+comment	Check the judgement and post it	2026-10-28T11:01:38.8334091Z ^[[36;1mset -euo pipefail^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8334892Z ^[[36;1mdir="$RUNNER_TEMP/judgement"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8335651Z ^[[36;1mmkdir -p "$dir"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8336357Z ^[[36;1m^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8337269Z ^[[36;1m# A re-run uploads the record again (overwrite), so read the newest one.^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8338971Z ^[[36;1martifact=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/artifacts?name=judgement" \^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8340616Z ^[[36;1m  --jq '[.artifacts[] | select(.expired | not)] | sort_by(.created_at) | last // empty | "\(.id) \(.size_in_bytes)"')^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8341927Z ^[[36;1mif [ -z "$artifact" ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8342803Z ^[[36;1m  if [ "$CONCLUSION" = "cancelled" ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8343932Z ^[[36;1m    echo "Run ${RUN_ID} was cancelled before it recorded a judgement. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8345092Z ^[[36;1m    exit 0^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8345721Z ^[[36;1m  fi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8346848Z ^[[36;1m  echo "::error::Run ${RUN_ID} (${CONCLUSION}) has no judgement artifact. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8348290Z ^[[36;1m  exit 1^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8348925Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8349674Z ^[[36;1mread -r artifact_id size <<< "$artifact"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8350619Z ^[[36;1mif [ "$size" -gt 8388608 ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8351679Z ^[[36;1m  echo "::error::The judgement artifact is ${size} bytes. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8352724Z ^[[36;1m  exit 1^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8353353Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8354298Z ^[[36;1mgh api "repos/${REPO}/actions/artifacts/${artifact_id}/zip" > "$dir/artifact.zip"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8355816Z ^[[36;1munzip -p "$dir/artifact.zip" judgement.json | head -c 8388608 > "$dir/record.json"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8357190Z ^[[36;1mif ! jq -e -s "$VALID" "$dir/record.json" > /dev/null; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8358583Z ^[[36;1m  echo "::error::The judgement does not match its schema. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8359626Z ^[[36;1m  exit 1^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8360245Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8360871Z ^[[36;1m^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8361698Z ^[[36;1mpr=$(jq -r '.pr' "$dir/record.json")^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8362837Z ^[[36;1mhead=$(jq -r '.head_sha' "$dir/record.json")^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8363804Z ^[[36;1mif [ "$head" != "$RUN_HEAD" ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8365043Z ^[[36;1m  echo "::error::The judgement names head ${head}, but run ${RUN_ID} was for ${RUN_HEAD}. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8366397Z ^[[36;1m  exit 1^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8367011Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8368499Z ^[[36;1minfo=$(gh api "repos/${REPO}/pulls/${pr}" --jq '"\(.state) \(.head.sha) \(.base.ref) \(.base.repo.default_branch) \(.head.repo.full_name // "-") \(.head.ref)"')^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8370774Z ^[[36;1mread -r state current base_ref default_branch head_repo head_ref <<< "$info"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8372033Z ^[[36;1mif [ "$state" != "open" ] || [ "$current" != "$head" ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8373182Z ^[[36;1m  echo "PR #${pr} is ${state} at ${current}; this judgement is for ${head}. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8374065Z ^[[36;1m  exit 0^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8374563Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8375301Z ^[[36;1m# A PR into another branch was judged by that branch's judge.yml.^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8376407Z ^[[36;1mif [ "$base_ref" != "$default_branch" ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8377957Z ^[[36;1m  echo "PR #${pr} is into ${base_ref}, not ${default_branch}. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8378846Z ^[[36;1m  exit 0^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8379380Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8380132Z ^[[36;1mif [ "$head_repo" != "$RUN_REPO" ] || [ "$head_ref" != "$RUN_BRANCH" ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8381678Z ^[[36;1m  echo "::error::PR #${pr} is from ${head_repo} ${head_ref}, but run ${RUN_ID} was for ${RUN_REPO} ${RUN_BRANCH}. Nothing posted."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8382811Z ^[[36;1m  exit 1^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8383388Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8384319Z ^[[36;1m^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8385458Z ^[[36;1m# What the run's own head changes, read by its SHA: unlike the PR's file list, a later push cannot change it.^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8386926Z ^[[36;1mgh api "repos/${REPO}/compare/${base_ref}...${RUN_HEAD}" > "$dir/compare.json"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8388455Z ^[[36;1mrefused=$(jq -r "$REFUSE" "$dir/compare.json")^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8389301Z ^[[36;1m^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8390380Z ^[[36;1mjq -r -s --arg run "$RUN_URL" --argjson refused "$refused" "$BODY" "$dir/record.json" > "$dir/body.md"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8391849Z ^[[36;1mjq -n --rawfile body "$dir/body.md" '{body: $body}' > "$dir/payload.json"^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8393095Z ^[[36;1mids=$(gh api --paginate "repos/${REPO}/issues/${pr}/comments" \^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8394610Z ^[[36;1m  --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- ludion-judge -->"))) | .id')^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8395861Z ^[[36;1mid=${ids%%$'\n'*}^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8396598Z ^[[36;1mif [ -n "$id" ]; then^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8397895Z ^[[36;1m  gh api -X PATCH "repos/${REPO}/issues/comments/${id}" --input "$dir/payload.json" > /dev/null^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8399304Z ^[[36;1m  echo "Updated the judgement comment on PR #${pr} (${head})."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8400302Z ^[[36;1melse^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8401354Z ^[[36;1m  gh api -X POST "repos/${REPO}/issues/${pr}/comments" --input "$dir/payload.json" > /dev/null^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8402748Z ^[[36;1m  echo "Posted the judgement comment on PR #${pr} (${head})."^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8403813Z ^[[36;1mfi^[[0m
+comment	Check the judgement and post it	2026-10-28T11:01:38.8753114Z shell: /usr/bin/bash -e {0}
+comment	Check the judgement and post it	2026-10-28T11:01:38.8754131Z env:
+comment	Check the judgement and post it	2026-10-28T11:01:38.8759762Z   GH_TOKEN: ***
+comment	Check the judgement and post it	2026-10-28T11:01:38.8760478Z   REPO: Ludion-ai/ludion
+comment	Check the judgement and post it	2026-10-28T11:01:38.8761168Z   RUN_ID: 40676504450
+comment	Check the judgement and post it	2026-10-28T11:01:38.8761925Z   RUN_HEAD: b5014ddae044f02288232f13b5d1863a3089bdb2
+comment	Check the judgement and post it	2026-10-28T11:01:38.8762759Z   RUN_REPO: Ludion-ai/ludion
+comment	Check the judgement and post it	2026-10-28T11:01:38.8763527Z   RUN_BRANCH: dependabot/npm_and_yarn/hono-4.13.14
+comment	Check the judgement and post it	2026-10-28T11:01:38.8764665Z   RUN_URL: https://github.com/Ludion-ai/ludion/actions/runs/40676504450
+comment	Check the judgement and post it	2026-10-28T11:01:38.8765631Z   CONCLUSION: success
+comment	Check the judgement and post it	2026-10-28T11:01:38.8772922Z   VALID: def sha: type == "string" and length == 40 and test("^[0-9a-f]{40}$");
+comment	Check the judgement and post it	def time: type == "string" and (contains("\n") | not) and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,3})?Z$");
+comment	Check the judgement and post it	def seconds: . == null or (type == "number" and . >= 0 and . < 86400);
+comment	Check the judgement and post it	def text($n): type == "string" and length + 4 * (split("\n") | length) <= $n;
+comment	Check the judgement and post it	length == 1 and (.[0] | type == "object"
+comment	Check the judgement and post it	  and (keys == ["base_sha", "finished_at", "head_sha", "job_seconds", "judge_exit_code", "judge_seconds", "judgement", "merge_sha", "pr", "reason", "schema", "started_at", "text", "verdict"])
+comment	Check the judgement and post it	  and .schema == 1
+comment	Check the judgement and post it	  and (.pr | type == "number" and . == floor and . >= 1 and . < 1000000000)
+comment	Check the judgement and post it	  and (.head_sha | sha) and (.base_sha | sha) and (.merge_sha | sha)
+comment	Check the judgement and post it	  and (.started_at | time) and (.finished_at | . == null or time)
+comment	Check the judgement and post it	  and (.verdict | IN("stop", "wait", "ready_except_build", "undecidable"))
+comment	Check the judgement and post it	  and (.judge_seconds | seconds) and (.job_seconds | seconds)
+comment	Check the judgement and post it	  and (.judge_exit_code | . == null or (type == "number" and . == floor))
+comment	Check the judgement and post it	  and (if .judgement == null
+comment	Check the judgement and post it	    then .verdict == "undecidable" and .text == null and (.reason | text(2000))
+comment	Check the judgement and post it	    else (.judgement | type == "object") and .judgement.verdict == .verdict and .reason == null and (.text | text(60000) and length > 0)
+comment	Check the judgement and post it	    end))
+comment	Check the judgement and post it	
+comment	Check the judgement and post it	2026-10-28T11:01:38.8782227Z   REFUSE: (.files | length) >= 300
+comment	Check the judgement and post it	or any(.files[]; (.filename | startswith(".github/")) or ((.previous_filename // "") | startswith(".github/")))
+comment	Check the judgement and post it	
+comment	Check the judgement and post it	2026-10-28T11:01:38.8789385Z   BODY: def hidden: (. < 32 and . != 10) or (. >= 127 and . <= 159) or . == 173 or . == 1564 or . == 6158 or (. >= 8203 and . <= 8207) or (. >= 8232 and . <= 8238) or (. >= 8288 and . <= 8303) or . == 65279 or (. >= 917504 and . <= 917631);
+comment	Check the judgement and post it	def clean: explode | map(if . == 9 then 32 else . end | select(hidden | not)) | implode;
+comment	Check the judgement and post it	def block: clean | split("\n") | map("    " + .) | join("\n");
+comment	Check the judgement and post it	def named: {stop: "停止", wait: "待機", ready_except_build: "可（関門3は未実施のため、適用してよいという判定ではない）", undecidable: "判定不能"}[.];
+comment	Check the judgement and post it	.[0] as $r | [
+comment	Check the judgement and post it	  "<!-- ludion-judge -->",
+comment	Check the judgement and post it	  "**プレビュー：コメントのみ。この判定でマージは行われない。**",
+comment	Check the judgement and post it	  "",
+comment	Check the judgement and post it	  "Ludion 判定役 v0（npm）による参考表示で、必須チェックではない。判定するのは関門1・2・4の一部と待機だけで（実装した範囲と「Not checked」は判定役の出力にある）、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。",
+comment	Check the judgement and post it	  "",
+comment	Check the judgement and post it	  (if $refused then
+comment	Check the judgement and post it	    "判定: **判定不能**（`undecidable`） · この PR の head は .github/ を変更している、または変更ファイルが 300 以上で確かめられない。判定ジョブはワークフロー定義を PR から読むため、その結果は信用しない。 · head `\($r.head_sha)` · [実行ログ](\($run))"
+comment	Check the judgement and post it	  else
+comment	Check the judgement and post it	    "判定: **\($r.verdict | named)**（`\($r.verdict)`） · 判定した head `\($r.head_sha)` · 判定にかかった時間: 判定役 \($r.judge_seconds // "不明") 秒、ジョブ開始から \($r.job_seconds // "不明") 秒 · [実行ログ](\($run))",
+comment	Check the judgement and post it	    "",
+comment	Check the judgement and post it	    (if $r.text then "判定役の出力:" else "判定役は判定を出せなかった。判定不能として記録した理由:" end),
+comment	Check the judgement and post it	    "",
+comment	Check the judgement and post it	    (($r.text // $r.reason) | block)
+comment	Check the judgement and post it	  end)
+comment	Check the judgement and post it	] | join("\n") + "\n"
+comment	Check the judgement and post it	
+comment	Check the judgement and post it	2026-10-28T11:01:38.8796407Z ##[endgroup]
+comment	Check the judgement and post it	2026-10-28T11:01:44.2457060Z Updated the judgement comment on PR #161 (b5014ddae044f02288232f13b5d1863a3089bdb2).
+comment	Complete job	﻿2026-10-28T11:01:44.2586668Z Cleaning up orphan processes

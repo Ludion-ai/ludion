@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "pr": 169,
+  "head_sha": "1c92aa083aad7ce2eb2a47bb8e7edb5de5ad4380",
+  "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
+  "merge_sha": "c898f37f4b024aa5b05018e129faf8798dc6bf98",
+  "started_at": "2026-10-28T11:53:18.481Z",
+  "verdict": "undecidable",
+  "reason": null,
+  "finished_at": "2026-10-28T11:53:23.953Z",
+  "judge_seconds": 0.461,
+  "job_seconds": 5.472,
+  "judge_exit_code": 1,
+  "judgement": {
+    "schema": 1,
+    "judged_at": "2026-10-28T11:53:23.576Z",
+    "verdict": "undecidable",
+    "urgency": "low",
+    "wait_hours": 168,
+    "newest_publish": null,
+    "wait_until": null,
+    "changes": [],
+    "fixes": [],
+    "findings": [
+      {
+        "gate": 1,
+        "effect": "info",
+        "message": "The lockfile change adds no package version."
+      },
+      {
+        "gate": 4,
+        "effect": "info",
+        "message": "The given changed files do not include package-lock.json, although the lockfile changed."
+      }
+    ],
+    "exposure": {
+      "fix_published_at": null,
+      "detected_at": "2026-10-28T11:53:23.576Z"
+    },
+    "time_cap": {
+      "t": null,
+      "targets": [],
+      "after_t": [],
+      "same_release": [],
+      "young": [],
+      "undecidable": [
+        "The change names no fixed package and no direct dependency, so T (the fix's publish time) is unknown."
+      ],
+      "wait_hours": 168
+    },
+    "not_checked": [
+      "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
+      "Obfuscated code and new network or process calls in the changed code are not inspected.",
+      "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.",
+      "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
+      "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
+      "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
+      "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it."
+    ]
+  },
+  "text": "Ludion judgement: undecidable — not applied automatically\nUrgency: low · wait 168h from the newest publish (unknown)\nPublished at or after T (unknown, the fix's publish time): unknown version(s)\nChanged packages (0):\n  [info] gate 1: The lockfile change adds no package version.\n  [info] gate 4: The given changed files do not include package-lock.json, although the lockfile changed.\nNot checked:\n  - Gate 3 (build and tests of old and new versions) is not run by the judge v0.\n  - Obfuscated code and new network or process calls in the changed code are not inspected.\n  - Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.\n  - Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.\n  - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).\n  - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.\n  - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.\nExposure: fix published n/a · seen 2026-10-28T11:53:23.576Z"
+}

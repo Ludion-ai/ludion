@@ -1,0 +1,1 @@
+::error::mode judge runs on pull_request, not pull_request_target.

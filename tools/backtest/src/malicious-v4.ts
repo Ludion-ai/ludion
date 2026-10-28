@@ -424,7 +424,17 @@ const out = rows.map(r => {
       return { fix: fixId(x), advisory: x.fix.id, t: new Date(x.fix.t).toISOString(), hours_after_v: Math.round((x.fix.t - p) / H * 10) / 10, v_before_t: p < x.fix.t, ...(ex ? { allowed_as: ex.basis } : {}), judged_at: new Date(x[mode].newest).toISOString() };
     };
     const all = (s: Scenario) => selectedBy[s].map(describe);
-    return { outcomes, reasons, selecting: { a: all("a"), b: all("b") }, unverified: { a: unverifiedBy.a.map(describe), b: unverifiedBy.b.map(describe) }, selections_in_rule1_stopped_trees: stoppedByRule1 };
+    // Diagnostic only (added after the first execution; it changes no outcome): for an unknown V, the fixes whose
+    // unreadable branch makes it unknown, and whether rule 1 stopped each of them without the exception.
+    const unknownBecause = Object.fromEntries(URGENCIES.filter(u => outcomes[u].conservative.primary === "unknown").map(u => {
+      const causes = new Map<string, { fix: string; t: string; stopped_without_exception: boolean; unknown_without_exception: boolean }>();
+      for (const s of ["a", "b"] as const) for (const x of live) {
+        if (x.fix.t > p && x[mode].newest + wait(r, u, s) * H < record(r, "conservative") && x[mode].unknown) causes.set(fixId(x), { fix: fixId(x), t: new Date(x.fix.t).toISOString(), stopped_without_exception: x.without.stopped, unknown_without_exception: x.without.unknown });
+      }
+      const list = [...causes.values()];
+      return [u, { fixes: list.length, stopped_by_rule1_without_exception: list.filter(c => c.stopped_without_exception).length, first: list.slice(0, 3), from_unverified_selection: unverifiedBy.a.length + unverifiedBy.b.length > 0 }];
+    }));
+    return { outcomes, reasons, selecting: { a: all("a"), b: all("b") }, unverified: { a: unverifiedBy.a.map(describe), b: unverifiedBy.b.map(describe) }, selections_in_rule1_stopped_trees: stoppedByRule1, unknown_because: unknownBecause };
   };
   const f = facts.get(`${r.name}@${r.version}`)!;
   return {
@@ -505,6 +515,7 @@ const result = {
     selected_only_with_the_exception: madePossible.map(listed),
     published_before_t_of_a_selecting_fix: beforeT.map(listed),
     exception_check_unverified: unverified.map(x => ({ ...listed(x), unverified_fixes: x.with_exception.unverified })),
+    stopped_only_without_the_exception: out.filter(x => URGENCIES.some(u => wouldHaveStopped[u]!.includes(`${x.name}@${x.version}`))).map(x => ({ ...listed(x), unknown_because: x.with_exception.unknown_because })),
   },
   rows: out,
 };

@@ -661,6 +661,30 @@ The required status check `verify` is gone with its workflow. Branch protection 
 
 CLAUDE.md now carries the design's rules instead of the PHP-preview wording: the one goal and its two measures (exposure time, human minutes per fix), the four gates and "undecidable stops", the waiting times, the seven rules that keep Ludion from becoming the attack path, and that candidate code runs only through `packages/sandbox`. The lesson product's end and the tag are one line. The site drops its last lesson-era copy (CC BY lesson licence, sync counting). Publishing the npm deprecation of 0.1.x (design step 7) is left to the owner: it needs an npm login, and whether `ludion-ai` is reused is one of the owner's open decisions.
 
+## 2026-10-28 (cycle 2) — CLAUDE.md's built and not-built list catches up
+
+The owner chose D1. CLAUDE.md's "Not built yet … Built" paragraph now matches main; nothing else in CLAUDE.md changes (rules, procedures, other sections). Details stay in docs/design.md and this file; the paragraph only points at them.
+
+It adds as built:
+
+- rules 1 and 2;
+- the same-release exception, in its strict form as implemented;
+- Packagist's advisories in Composer planning;
+- that the judge v0 covers gates 1, 2 and 4 and the wait.
+
+It adds as not built:
+
+- gate 3 in `ludion judge`;
+- automatic merge;
+- the backtest gate, which is not met: backtest v4 still misses one malicious version, and unknowns remain.
+
+Chosen here:
+
+- **"ゲート1は未合格" is read as the backtest gate.** That is the first of the design's measured gates ("ゲートで測るもの" 1), not the first of the four gates. CLAUDE.md says "the backtest gate", so the two are not confused. The sentence replaces the one that named only the first backtest.
+- **One fact already in the list had become false and is corrected.** "patch receipts list them, nothing judges them" stopped being true when rules 1 and 2 began to check every version a `ludion patch` candidate adds. The list now says the other checks over the lockfile diff are not built outside the judge.
+- **The exception's publisher condition is stated narrowly.** CLAUDE.md says trusted publishing's shared user never matches, not that every shared CI user fails to match: a shared account with a plain lowercase name still counts as an account ("After #151's post-merge review").
+- **The judge workflow on this repository (#156) is not listed.** It is not merged, and it is a use of the judge, not a product feature.
+
 ## 2026-10-28 — The smallest fix for npm and Composer
 
 `docs/design.md` (and #138's review) found that npm and Composer candidates ran `npm update` and `composer update --with-all-dependencies` with no package name: every dependency could move, which is the opposite of a minimal fix and an entry point for an unrelated new (possibly malicious) version.

@@ -1145,3 +1145,21 @@ The rest is judged as before: the lockfile diff, gate 2, the wait, and gate 4's 
 - **Inputs.** #161 and #162, at the head SHAs they have when it runs, which are recorded. Inputs are taken as judge.yml takes them: `before` from the first parent of `refs/pull/N/merge`, `after` from that merge commit, `--files` from `git diff --no-renames --name-only` between them. Each changed `<dir>/package.json` is added on both sides.
 - **Judges.** The fixed judge and the unfixed judge (main at that time), run in Docker with the same inputs and `--now`.
 - **Reported.** Both verdicts and every finding, copied, and the number of false stops before and after. Nothing is merged.
+
+## 2026-10-28 (cycle 3, L9) — Workspace package.json changes: where it stopped, and the owner's decisions on the release
+
+- **Stopped for the coordinator.** `workspaceManifestChanges` (packages/cli/src/security/workspace-manifests.ts) implements rules 1–5 above. Its tests cover the #161 and #162 shapes and each rule broken in turn. `ludion judge` does not call it yet.
+  - The call belongs in judge.ts and judge-cli.ts, which L1 (#168) changes, so L9 did not change them.
+  - judge.yml (protected) and action/read.sh copy only the root manifest and lockfile; they would also have to copy the changed workspace manifests.
+  - #161 and #162 were not judged again. Details: docs/bench/2026-10-28-l9-workspace-stop/.
+- **The owner's decisions (2026-10-28 21:44 JST, recorded here only; built later):**
+  - ludion-ai 0.1.x is deprecated when the new version is published, not before.
+  - The release commit comes after the gate passes. Another session reproduces the bundles' sha256 and checks them.
+  - The judge always gives an update of Ludion's own action to a person to judge.
+  - The Marketplace listing comes after the gate passes and the demo succeeds.
+  - Mode comment is checked on a test repository that the owner creates, Ludion-ai/ludion-sandbox.
+  - Four more decisions, each built in a separate protected-path PR, not in L9:
+    - publish with dist-tag `latest`;
+    - put LICENSE in the tarball;
+    - make action.yml and action/ protected paths before publishing;
+    - set the engines lower bound to Node 22.

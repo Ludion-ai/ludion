@@ -1,0 +1,50 @@
+# module-check.ts at commit ae59b19618283f1d23a7329e61b7fe81fb025afc, in Docker (node:24-slim image 55fb5f5a527e, --network none, --read-only, non-root).
+# Not the re-judgement (task step 4): only workspaceManifestChanges runs, on each changed workspace package.json.
+# Inputs, taken as judge.yml takes them: before = be8623912df7a6bddbd5c113db33b1eb18fd9acb, the first parent of refs/pull/161/merge (470a5542cc0b8b75787094be6dc3d6b4185a45c3) and of refs/pull/162/merge (6758c40c61df570b83e9301251822c39edbab4d7).
+# after = the PR heads, #161 b5014ddae044f02288232f13b5d1863a3089bdb2 and #162 eedb106d75331a390ef8ade0d2e0b20c74d729da; git diff between each head and its merge ref printed nothing.
+# Input files (git show <commit>:<path>), sha256:
+#   0779827517d749aca8451ac7beca5c6c6a1e677fc776c78ff7998b18cfe4763c *pr-161/before/package-lock.json
+#   0779827517d749aca8451ac7beca5c6c6a1e677fc776c78ff7998b18cfe4763c *pr-162/before/package-lock.json
+#   019e1289fdc3018dd0bbd57cfcc042112b03ffbf13d2fe867e1430e0714c2903 *pr-161/after/package-lock.json
+#   55082d3e271fb0492b6b39c28de4e482e2ac49c0bd006d4717776b7b07c73828 *pr-162/after/package-lock.json
+#   ec8028267d26f7066c4e68bf411d13db56521e7dc920e0e96f8b27aca0731404 *pr-161/after/apps/worker/package.json
+#   0e005cb227e9a4ebc0d8feb8944555e33a95e4b02c565008478c400fb2e0ef0e *pr-161/before/apps/worker/package.json
+#   f5b475b9ab2a2bf8493a4f9eacdaf6a44a5ad8ff2c56af8cd5f48dda23d2ed8c *pr-162/after/apps/site/package.json
+#   11c6bc60575bebf648f4e95059c5a6079f52feae3537a04474d0c951f9cf2f8a *pr-162/before/apps/site/package.json
+#   ea01f55c489b97aeabd8cff0e54c667b1948b0ba6b6aad44522c4a2a0365b927 *pr-161/after/package.json
+#   ea01f55c489b97aeabd8cff0e54c667b1948b0ba6b6aad44522c4a2a0365b927 *pr-161/before/package.json
+#   ea01f55c489b97aeabd8cff0e54c667b1948b0ba6b6aad44522c4a2a0365b927 *pr-162/after/package.json
+#   ea01f55c489b97aeabd8cff0e54c667b1948b0ba6b6aad44522c4a2a0365b927 *pr-162/before/package.json
+# started 2026-10-28T12:58:55Z, node v24.22.1
+# 0269838fd52ea60b6f75220aabb9d4f59c0c196d8dd786e8a1c6f2f28496caf7  packages/cli/src/security/workspace-manifests.ts
+# 664fb7425305cab9307fc7345c431e570428a836f37aea7d4735c831eff93778  packages/cli/src/security/judge.ts
+# fc53789129c976eb6bf94b3352c2b02178ea0c75778d1454810f0061a4fc6004  docs/bench/2026-10-28-l9-workspace-stop/scripts/module-check.ts
+== pr-161
+{
+  "files": [
+    "apps/worker/package.json",
+    "package-lock.json"
+  ],
+  "workspace_manifests": [
+    {
+      "file": "apps/worker/package.json",
+      "dir": "apps/worker",
+      "reasons": []
+    }
+  ]
+}
+== pr-162
+{
+  "files": [
+    "apps/site/package.json",
+    "package-lock.json"
+  ],
+  "workspace_manifests": [
+    {
+      "file": "apps/site/package.json",
+      "dir": "apps/site",
+      "reasons": []
+    }
+  ]
+}
+# finished 2026-10-28T12:58:56Z

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
@@ -443,7 +443,38 @@ describe("Recorder, review findings and failure paths", () => {
     expect(lines(dir, "captures").filter(r => r.type === "created").map(r => r.created)).toEqual([null, "2026-11-02T00:00:00.000Z"]);
   });
 
-  it("gives up each version still retried when its package is given up, and a version on its own after 60 attempts", async () => {
+  it("gives up each version still retried when its package is given up", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    const p = w.packuments["left-pad"];
+    p.versions["1.0.1"] = manifest("1.0.1");
+    p.time["1.0.1"] = "2026-10-29T01:00:00.000Z";
+    w.fail.add("https://registry.npmjs.org/left-pad/-/left-pad-1.0.1.tgz");
+    w.feed.push({ seq: 102, id: "left-pad" });
+    for (let i = 0; i < 5; i++) await rec.poll();
+    // Now the package read itself fails until the package is given up.
+    w.fail.add("https://registry.npmjs.org/left-pad");
+    for (let i = 0; i < 60; i++) await rec.poll();
+    expect(rec.state.pending).toEqual([]);
+    const gave = lines(dir, "captures").filter(r => r.type === "gave_up");
+    expect(gave.map(r => [r.version ?? null, r.reason])).toEqual([[null, "the package read kept failing"], ["1.0.1", "its package was given up"]]);
+  });
+
+  it("does not let a damaged known/ file hold the feed when a package is given up", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    const known = readdirSync(join(dir, "known"), { recursive: true }).map(String).find(f => f.endsWith(".json") && !f.includes("created"))!;
+    writeFileSync(join(dir, "known", known), "{not json");
+    w.feed.push({ seq: 102, id: "left-pad" });
+    for (let i = 0; i < 60; i++) await rec.poll();
+    expect(rec.state.pending).toEqual([]);
+    w.feed.push({ seq: 103, id: "watched-quiet" });
+    w.packuments["watched-quiet"] = { "dist-tags": {}, time: { created: "2025-01-01T00:00:00.000Z" }, versions: {} };
+    expect(await rec.poll()).toMatchObject({ seq: "103" });
+    expect(lines(dir, "captures").filter(r => r.type === "gave_up")).toHaveLength(1);
+  });
+
+  it("gives up a version on its own after 60 attempts", async () => {
     const { dir, w, rec } = setup();
     await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
     const p = w.packuments["left-pad"];

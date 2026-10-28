@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Typecheck, the recorder's tests, and four deliberate mutations, each run in Docker with no network
+# Typecheck, the recorder's tests, and six deliberate mutations, each run in Docker with no network
 # (node:24-slim pinned by digest, read-only root, user 1000). Each mutation must make a test fail; the file is
 # restored after each. Run from the repository root with a Linux node_modules volume:
 #   bash docs/bench/2026-10-29-shadow-recorder/scripts/check.sh ludion-ls-nm > docs/bench/2026-10-29-shadow-recorder/logs/check.log 2>&1
@@ -24,5 +24,7 @@ mutate "e-mail scrub off" 'return scrubText(value);' 'return value;'
 mutate "storage limit off" 'if (this.bytes + Buffer.byteLength(line) > this.cfg.maxBytes)' 'if (false)'
 mutate "integrity check off" '!== integrity) return { status: "integrity_mismatch"' '=== "never") return { status: "integrity_mismatch"'
 mutate "first sight never new" 'started !== null && time[v] !== undefined' 'false && time[v] !== undefined'
+mutate "give-up guard off" '} catch (e) { this.append("status", { type: "error", at: this.at(), name, error: `give up:' '} catch (e) { throw e; this.append("status", { type: "error", at: this.at(), name, error: `give up:'
+mutate "give-up version loop off" 'if ((x.tries ?? 0) > 0) { this.append("captures", { type: "gave_up", name, version: v' 'if (false) { this.append("captures", { type: "gave_up", name, version: v'
 rm "$F.orig"
 git diff --quiet -- "$F" && echo "recorder.ts restored"

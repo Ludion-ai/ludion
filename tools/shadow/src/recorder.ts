@@ -306,10 +306,13 @@ export class Recorder {
   /** Give up a package after MAX_TRIES failed polls: one record for it, and one for each of its versions still retried. */
   private giveUp(name: string, tries: number, result: "failed" | "incomplete") {
     this.append("captures", { type: "gave_up", name, fetched_at: this.at(), tries, reason: result === "failed" ? "the package read kept failing" : "a version's reads kept failing" });
-    const known = this.known(name);
-    if (!known) return;
-    for (const [v, x] of Object.entries(known.versions)) if ((x.tries ?? 0) > 0) { this.append("captures", { type: "gave_up", name, version: v, fetched_at: this.at(), tries: x.tries, reason: "its package was given up" }); x.tries = 0; }
-    this.writeAtomic(this.knownPath(name), JSON.stringify(known));
+    // Never let this hold the feed: a known/ file that cannot be read is an error line, and the name is still released.
+    try {
+      const known = this.known(name);
+      if (!known) return;
+      for (const [v, x] of Object.entries(known.versions)) if ((x.tries ?? 0) > 0) { this.append("captures", { type: "gave_up", name, version: v, fetched_at: this.at(), tries: x.tries, reason: "its package was given up" }); x.tries = 0; }
+      this.writeAtomic(this.knownPath(name), JSON.stringify(known));
+    } catch (e) { this.append("status", { type: "error", at: this.at(), name, error: `give up: ${String((e as Error).message).slice(0, 300)}` }); }
   }
 
   /** Read the feed from the stored position to its end, capturing every watched change. */

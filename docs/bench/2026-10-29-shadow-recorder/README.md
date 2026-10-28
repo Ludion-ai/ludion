@@ -24,7 +24,7 @@ The recorder from docs/bench/2026-10-28-shadow-design/README.md, sections 2.1 to
   - A failed read of a whole package is retried on the next poll. So is a failed read for a new version: its attestations, its tarball or a dependency's `created`.
   - After 60 failed capture attempts the recorder writes a `gave_up` record: for the version, or for the package and each of its versions still retried. A catch-up poll over several feed pages can count more than one attempt.
   - A version removed before its capture was complete gets a `gave_up` record at once, and stops the retries.
-  - A dependency the registry does not have is a `created` record with status 404, not a failure. It is read again for a later version that depends on it.
+  - A dependency the registry does not have is a `created` record with status 404, not a failure. It is read again on each later capture attempt of a version that depends on it: a retry, or a later version.
   - The feed position moves on once a page is handled.
   - One document can never hold the feed. An error on one package keeps only that package pending.
   - A dependency name that is not a valid npm name is logged and skipped.
@@ -77,10 +77,10 @@ Under the data directory:
 
 ## Tests
 
-`tools/shadow/test/recorder.test.ts` has 33 tests. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`:
+`tools/shadow/test/recorder.test.ts` has 35 tests. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`:
 - typecheck exit 0;
-- 33 of 33 passed;
-- four deliberate mutations, each making tests fail: e-mail scrubbing off, the storage limit off, the integrity check off, and first-sight new versions off.
+- 35 of 35 passed;
+- six deliberate mutations, each making tests fail: e-mail scrubbing off, the storage limit off, the integrity check off, first-sight new versions off, the give-up guard off, and the give-up of a package's versions off.
 
 The tests cover:
 - **e-mail removal**, including look-alikes, `mailto:`, non-ASCII addresses and addresses used as keys;
@@ -89,7 +89,7 @@ The tests cover:
 - **the feed:** the start position, every page of a long feed, and restart from the stored position;
 - **captures:** first-sight captures, including a version published after the feed start; new-version captures; removal recorded once, and deprecation; a package that is gone;
 - **refusals:** an integrity mismatch, a non-registry tarball, a tarball too large, one without sha512, and a gzip bomb;
-- **retries:** a failed package, and a failed attestation and tarball read. Giving up after 60 polls, and at once for a version removed mid-retry. A missing dependency recorded as a 404;
+- **retries:** a failed package, and a failed attestation and tarball read. Giving up after 60 capture attempts (a version on its own, and a package with the versions it still retried), and at once for a version removed mid-retry. A damaged `known/` file at give-up does not hold the feed. A missing dependency recorded as a 404;
 - **bad input:** a malformed dependency name and a malformed packument, neither of which holds the feed; names like `constructor`;
 - **the limit:** stopping at it, and staying stopped after a restart;
 - **the predecessor rule;**

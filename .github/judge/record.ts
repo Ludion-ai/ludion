@@ -1,11 +1,14 @@
 // Runs the judge on a PR's dependency files and records the result for judge-comment.yml (.github/workflows/judge.yml).
 // The judge is the base commit's build; the PR's package.json and package-lock.json are only read as data. The record
 // is undecidable unless the judge finished with a judgement: a failure is never recorded as a pass.
+// Only node's own modules load up front. The judge's renderer needs the base commit's node_modules, which a failed
+// read or install leaves missing, so it is loaded after the build, and the record still names the step that failed.
 import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { renderJudgement, type Judgement } from "../../packages/cli/src/security/judge.ts";
+import type { Judgement } from "../../packages/cli/src/security/judge.ts";
 
 const VERDICTS: Judgement["verdict"][] = ["stop", "wait", "ready_except_build", "undecidable"];
 /** The judge's exit code for each verdict (packages/cli/src/security/judge-cli.ts); 2 means it could not read the inputs. */
@@ -39,6 +42,8 @@ export function filesArgument(files: string[]): string {
 
 export type Meta = { pr: number; head_sha: string; base_sha: string; merge_sha: string; started_at: string };
 export type Run = { exitCode: number | null; stdout: string; stderr: string; error?: string; seconds: number };
+/** The judge's renderer (renderJudgement), passed in so that this file loads without node_modules. */
+export type Render = (judgement: Judgement) => string;
 export type JudgeRecord = Meta & {
   schema: 1;
   verdict: Judgement["verdict"];
@@ -55,7 +60,7 @@ export type JudgeRecord = Meta & {
 };
 
 /** The record of one judge run, or of one that never started (the second argument is then the reason). */
-export function recordOf(meta: Meta, run: Run | string, now = new Date()): JudgeRecord {
+export function recordOf(meta: Meta, run: Run | string, now = new Date(), render?: Render): JudgeRecord {
   const job_seconds = Math.max(0, now.getTime() - Date.parse(meta.started_at)) / 1000;
   const undecidable = (reason: string): JudgeRecord => ({
     schema: 1, ...meta, verdict: "undecidable", reason: fit(reason, REASON_LIMIT, "… (cut here; see the run log)"), finished_at: now.toISOString(),
@@ -68,7 +73,7 @@ export function recordOf(meta: Meta, run: Run | string, now = new Date()): Judge
   if (!judgement || typeof judgement !== "object" || judgement.schema !== 1 || !VERDICTS.includes(judgement.verdict)) return undecidable(`The judge exited ${run.exitCode} with output that is not a judgement.`);
   if (run.exitCode !== EXIT[judgement.verdict]) return undecidable(`The judge exited ${run.exitCode}, which does not match its verdict "${judgement.verdict}".`);
   let text: string;
-  try { text = renderJudgement(judgement); } catch (error) { return undecidable(`The judgement could not be rendered: ${error instanceof Error ? error.message : String(error)}`); }
+  try { if (!render) throw new Error("no renderer was loaded"); text = render(judgement); } catch (error) { return undecidable(`The judgement could not be rendered: ${error instanceof Error ? error.message : String(error)}`); }
   text = fit(text, TEXT_LIMIT, "… (cut here; the full judgement is in the run's judgement artifact)");
   return { schema: 1, ...meta, verdict: judgement.verdict, reason: null, finished_at: now.toISOString(), judge_seconds: run.seconds, job_seconds, judge_exit_code: run.exitCode, judgement, text };
 }
@@ -82,27 +87,41 @@ function meta(env: NodeJS.ProcessEnv): Meta {
 }
 
 /** Runs the base commit's build of the judge on the files the read step wrote. */
-function judged(m: Meta, input: string): JudgeRecord {
+async function judged(m: Meta, input: string): Promise<JudgeRecord> {
+  let render: Render;
+  try { ({ renderJudgement: render } = await import("../../packages/cli/src/security/judge.ts")); } catch (error) { return recordOf(m, `The judge's renderer could not be loaded: ${error instanceof Error ? error.message : String(error)}`); }
   let files: string;
   try { files = filesArgument(readFileSync(join(input, "files"), "utf8").split("\0").filter(Boolean)); } catch (error) { return recordOf(m, error instanceof Error ? error.message : String(error)); }
   const start = performance.now();
   const r = spawnSync(process.execPath, ["packages/cli/dist/cli.js", "judge", "--before", join(input, "before"), "--after", join(input, "after"), "--files", files, "--json"], { encoding: "utf8", timeout: 600_000, maxBuffer: 64 * 1024 * 1024 });
   const seconds = Math.round(performance.now() - start) / 1000;
-  return recordOf(m, { exitCode: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "", error: r.error?.message ?? (r.signal ? `stopped by ${r.signal}` : undefined), seconds });
+  return recordOf(m, { exitCode: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "", error: r.error?.message ?? (r.signal ? `stopped by ${r.signal}` : undefined), seconds }, new Date(), render);
+}
+
+/** Prints text that the PR and the registry partly control (#156's review, N2) between ::stop-commands:: and a random
+ * token, so that the runner reads no line of it as a workflow command, such as an annotation on the judge check. */
+export function printInert(text: string, log: (line: string) => void = console.log, token = `stop-${randomUUID()}`): void {
+  log(`::stop-commands::${token}`);
+  log(text);
+  log(`::${token}::`);
+}
+
+/** What the job log shows: the record without the judgement, then the judge's text, with workflow commands stopped. */
+export function printRecord(record: JudgeRecord, log: (line: string) => void = console.log, token?: string): void {
+  const { judgement: _, text, ...summary } = record;
+  printInert([JSON.stringify(summary, null, 2), ...(text ? [text] : [])].join("\n"), log, token);
 }
 
 /** Exit 0 when the judge gave a judgement (any verdict), 1 when it did not: the job's colour shows the judge's health. */
-function main(env: NodeJS.ProcessEnv): number {
+async function main(env: NodeJS.ProcessEnv): Promise<number> {
   const m = meta(env), out = env.RECORD ?? "";
   // The read step runs first: it finds the base commit that the build step then builds.
   const record = env.READ_OUTCOME !== "success" ? recordOf(m, "The PR's package.json and package-lock.json could not be read; see the run log.")
     : env.BUILD_OUTCOME !== "success" ? recordOf(m, "The judge could not be built from the base commit; see the run log.")
-    : judged(m, env.INPUT ?? "");
+    : await judged(m, env.INPUT ?? "");
   writeFileSync(out, `${JSON.stringify(record, null, 2)}\n`);
-  const { judgement: _, text, ...summary } = record;
-  console.log(JSON.stringify(summary, null, 2));
-  if (text) console.log(text);
+  printRecord(record);
   return record.judgement ? 0 : 1;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) process.exitCode = main(process.env);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) process.exitCode = await main(process.env);

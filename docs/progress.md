@@ -407,6 +407,10 @@ On GitHub, through the throwaway draft PR #159 (base `ci/judge-dogfood`; npm's l
 - #159 was then closed without merging, and its branch deleted.
 - judge-comment.yml has still not run on GitHub.
 
+## 2026-10-28 (cycle 2) — Dependabot for npm
+
+Added `.github/dependabot.yml`: npm version updates for the root directory, weekly, at most 5 open PRs. Decisions: "Dependabot feeds the judge". In Docker (python:3.14-slim), check-jsonschema 0.33.0's vendored Dependabot schema accepts the file; with `interval: fortnightly` it rejects it. Dependabot reads the file only from the default branch, so its first PRs come after the merge; nothing has run yet.
+
 ## 2026-10-28 — Packagist advisories in Composer plans
 
 Composer scans and plans now read Packagist's advisory API next to OSV and take the later fix. New tests: Packagist's later fix wins over OSV's, OSV's later fix is kept, a Packagist-only advisory is found, a fix landing in the next range moves on, unaffected and empty answers stay clean, no same-major fix and unreadable ranges block, and an outage, a missing field, an unrequested name, a record for another package and an invalid id all fail the scan; npm inventories do not query Packagist. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passed; packages tests 176 passed. The site build needs git and was not run in the container; CI runs the full suite.
@@ -473,10 +477,6 @@ Gate: **not met**. The delay gates are met: exploited 16.4h (n = 6), high 0h (n 
 - **Unverified.** Gate 2's provenance, scripts and publisher remain unverified for 1,140 of the 1,148 removed versions.
 - **Second execution.** A second, diagnostic execution (baafc36) only added the fixes behind each unknown, and gives identical counts.
 
-## 2026-10-28 (cycle 2) — Dependabot for npm
-
-Added `.github/dependabot.yml`: npm version updates for the root directory, weekly, at most 5 open PRs. Decisions: "Dependabot feeds the judge". In Docker (python:3.14-slim), check-jsonschema 0.33.0's vendored Dependabot schema accepts the file; with `interval: fortnightly` it rejects it. Dependabot reads the file only from the default branch, so its first PRs come after the merge; nothing has run yet.
-
 ## 2026-10-28 (cycle 2) — #151's post-merge review, and its fixes
 
 #151 was merged at f78c931, a docs-only commit after the last recorded review (b885de6). A fresh-context subagent reviewed the full diff 2c1c1e7..f78c931 after the merge: **APPROVE**, with three non-blocking findings. The verdict is on the PR (https://github.com/Ludion-ai/ludion/pull/151#issuecomment-6463525016, `reviewed-sha: f78c931ecd4a3bd46eb58483a0f8d52008d862c9`). This PR fixes them (decisions: "After #151's post-merge review"):
@@ -532,6 +532,10 @@ docs/bench/dogfood.
 - **The stops.** #161 stops on gate 4 only, because the PR also touches a workspace's package.json (apps/worker). #162 has the same gate 4 stop (apps/site) and two gate 2 stops: unist-util-visit-parents@6.1.0 and unist-util-visit@5.2.0 were published at or after T.
 - **The action.** Checked locally in Docker with gh stubbed (17 of 17), and live in mode judge on throwaway PR #169, which is closed. Mode comment has not run on GitHub.
 - **npm pack.** README.md, dist/cli.js and package.json. Nothing was published.
+
+## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
+
+The rules and the review follow-ups are in #166 (decisions: the entry of the same name). Checked in Docker at dd86e86, offline, with a read-only root, as a non-root user: typecheck exit 0; judge-workflow.test.ts 27 passed (20 before); packages 8 files, 237 passed; actionlint found nothing on both judge workflows; 8 mutations re-run one at a time, each caught. After #166's first review (B1), `protected-paths` passes only when the latest review of the current head approves; the checks of that fix are in the bench README. Raw output and details: docs/bench/2026-10-28-l3-protected/.
 
 ## 2026-10-28 (cycle 3) — Backtest v5: archives as install-script sources, and the disputed category
 

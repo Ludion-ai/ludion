@@ -20,11 +20,15 @@ The recorder from docs/bench/2026-10-28-shadow-design/README.md, sections 2.1 to
     - its registry predecessor, if not yet stored: the latest-published version lower by semver and published before it;
     - the first publish time of each dependency whose time is not yet stored (rule 2's `created`);
   - **afterwards:** new or changed `time` entries, `dist-tags` changes, each stored version's removal (once), and its deprecation.
-- **Retries.** A failed read of a whole package is retried on the next poll. So is a failed read for a new version: its attestations, its tarball or a dependency's `created`. After 60 failed polls the recorder writes a `gave_up` record for that version.
+- **Retries.**
+  - A failed read of a whole package is retried on the next poll. So is a failed read for a new version: its attestations, its tarball or a dependency's `created`.
+  - After 60 failed polls the recorder writes a `gave_up` record, for the version or the package.
+  - A version removed before its capture was complete gets a `gave_up` record at once, and stops the retries.
+  - A dependency the registry does not have is a `created` record with status 404, not a failure.
   - The feed position moves on once a page is handled.
   - One document can never hold the feed. An error on one package keeps only that package pending.
   - A dependency name that is not a valid npm name is logged and skipped.
-- **Reads OSV once per UTC day.** It reads OSV's npm `modified_id.csv` and stores every MAL- record modified since the last read, watched or not. The first read only sets the position. A record that cannot be read is an error line, and the day's read goes on.
+- **Reads OSV once per UTC day.** It reads OSV's npm `modified_id.csv` and stores every MAL- record modified since the last read, watched or not. The first read only sets the position. A record that cannot be read is an error line, and the day's read goes on. That record is read again on later polls, and given up with a record after 60.
 - **Writes a status line per poll**: the feed position, entries read, watched changes, names pending a retry, and bytes used.
 
 What is not stored:
@@ -34,6 +38,7 @@ What is not stored:
   - Addresses inside strings are replaced, including `mailto:` ones. Package specs and URLs that only look like addresses are left alone, such as `p@1.0.1`, `npm:x@1.0.0`, `git@github.com` in an `ssh://` URL, and scoped tarball URLs.
   - The publisher check the judge makes from `_npmUser.email` (`sharedPublisher`) is computed first and stored as a boolean.
   - **Not scrubbed:** attestation bundles (public Sigstore bundles, stored as served), the keys of `time` and `dist-tags`, and error snippets in status lines.
+  - **Known limits of the pattern.** It also removes look-alikes such as `react@next.js`. It misses an address followed by `_`, and anything that is not written as an address.
 
 **What leaves the machine:**
 - package names and versions, in registry URLs;
@@ -56,6 +61,10 @@ Under the data directory:
 - `status/<UTC day>.jsonl`: `start`, `feed_start`, `poll`, `osv`, `error` and `stopped` lines;
 - `known/`: per-name state, used to tell what is new.
 
+**For the replay.**
+- **Duplicates.** A crash between an append and the `known/` write can repeat a capture's records on the next poll. The replay must deduplicate them: by type, name, version and content, ignoring `fetched_at`.
+- **Timestamps.** `fetched_at` and the feed start come from the container's clock, and npm's `time` from npm's. A drift between them shifts the capture lag and the first-sight cut-off by that much.
+
 ## The watched list
 
 `tools/shadow/watched.json` was made by `node tools/shadow/src/watched.ts <sha>`, run in Docker (node:24-slim, user 1000, read-only root) on 2026-10-28T14:53:51.608Z.
@@ -65,19 +74,19 @@ Under the data directory:
 
 ## Tests
 
-`tools/shadow/test/recorder.test.ts` has 29 tests. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`:
+`tools/shadow/test/recorder.test.ts` has 32 tests. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`:
 - typecheck exit 0;
-- 29 of 29 passed;
+- 32 of 32 passed;
 - four deliberate mutations, each making tests fail: e-mail scrubbing off, the storage limit off, the integrity check off, and first-sight new versions off.
 
 The tests cover:
-- **e-mail removal**, including look-alikes and `mailto:`;
-- **OSV:** positions, a record that cannot be read, and one read a day;
+- **e-mail removal**, including look-alikes, `mailto:`, non-ASCII addresses and addresses used as keys;
+- **OSV:** positions, a record that cannot be read and is read again later, and one export read a day;
 - **the watched list;**
 - **the feed:** the start position, every page of a long feed, and restart from the stored position;
 - **captures:** first-sight captures, including a version published after the feed start; new-version captures; removal recorded once, and deprecation; a package that is gone;
 - **refusals:** an integrity mismatch, a non-registry tarball, a tarball too large, one without sha512, and a gzip bomb;
-- **retries:** a failed package, and a failed attestation and tarball read;
+- **retries:** a failed package, and a failed attestation and tarball read. Giving up after 60 polls, and at once for a version removed mid-retry. A missing dependency recorded as a 404;
 - **bad input:** a malformed dependency name and a malformed packument, neither of which holds the feed; names like `constructor`;
 - **the limit:** stopping at it, and staying stopped after a restart;
 - **the predecessor rule;**

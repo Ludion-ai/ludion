@@ -79,8 +79,11 @@ const setup = (maxBytes = 50_000_000) => {
 
 describe("scrub", () => {
   it("leaves versions, specs and URLs that only look like addresses", () => {
-    for (const text of ["left-pad@1.0.1", "npm:evil@1.0.0", "git+ssh://git@github.com/o/r.git", "https://registry.npmjs.org/@s/n/-/n-1.0.0.tgz", "use lodash@4.17.21 instead"]) expect(scrub(text)).toBe(text);
+    for (const text of ["left-pad@1.0.1", "npm:evil@1.0.0", "git+ssh://git@github.com/o/r.git", "git@github.com:org/repo.git", "https://registry.npmjs.org/@s/n/-/n-1.0.0.tgz", "use lodash@4.17.21 instead"]) expect(scrub(text)).toBe(text);
     expect(scrub("Alice <alice@example.com>")).toBe("Alice <[email removed]>");
+    expect(scrub("email:a@b.com")).toBe("email:[email removed]");
+    expect(scrub("jö@exämple.de")).toBe("[email removed]");
+    expect(scrub({ "bob@example.org": "x" })).toEqual({ "[email removed]": "x" });
   });
   it("drops email keys and replaces addresses inside strings, at any depth", () => {
     const out = JSON.stringify(scrub(manifest("1.0.0", { contributors: ["Bob <bob@example.org> (https://b.example)"], bugs: { email: "x@y.io", url: "u" } })));
@@ -377,7 +380,7 @@ describe("Recorder, review findings and failure paths", () => {
     expect(await rec.files("left-pad", "1.0.0", manifest("1.0.0", { dist: { ...manifest("1.0.0").dist, integrity: integrity(bomb) } }))).toMatchObject({ status: "unreadable" });
   });
 
-  it("keeps reading the day's OSV records when one cannot be read, and does not read them again that day", async () => {
+  it("keeps reading the day's OSV records when one cannot be read, reads the export once that day, and reads the failed record again later", async () => {
     const { dir, w, rec, tick } = setup();
     w.csv = "2026-10-28T23:00:00Z,MAL-2026-1\n"; await rec.osv();
     tick(86_400_000);
@@ -389,6 +392,48 @@ describe("Recorder, review findings and failure paths", () => {
     expect(JSON.stringify(lines(dir, "osv"))).not.toContain("someone@example.org");
     expect(lines(dir, "status").some(r => r.type === "error" && r.id === "MAL-2026-3")).toBe(true);
     expect(w.asked.filter(u => u.endsWith("modified_id.csv"))).toHaveLength(2);
+    w.osv["MAL-2026-3"] = { id: "MAL-2026-3" };
+    expect(await rec.osv()).toBe(1);
+    expect(lines(dir, "osv").map(r => r.id)).toEqual(["MAL-2026-2", "MAL-2026-3"]);
+    expect(rec.state.osv_retry).toEqual([]);
+  });
+
+  it("gives up the retries of a version removed before its capture was complete, once, and does not keep the package pending", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    const p = w.packuments["left-pad"];
+    p.versions["1.0.1"] = manifest("1.0.1");
+    p.time["1.0.1"] = "2026-10-29T01:00:00.000Z";
+    w.fail.add("https://registry.npmjs.org/left-pad/-/left-pad-1.0.1.tgz");
+    w.feed.push({ seq: 102, id: "left-pad" }); await rec.poll();
+    expect(rec.state.pending).toEqual(["left-pad"]);
+    delete p.versions["1.0.1"];
+    await rec.poll();
+    expect(rec.state.pending).toEqual([]);
+    await rec.poll();
+    const gave = lines(dir, "captures").filter(r => r.type === "gave_up");
+    expect(gave).toEqual([expect.objectContaining({ version: "1.0.1", reason: "removed before its capture was complete" })]);
+  });
+
+  it("gives up a package whose read keeps failing after 60 polls, with a record", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll();
+    w.fail.add("https://registry.npmjs.org/left-pad");
+    w.feed.push({ seq: 101, id: "left-pad" });
+    for (let i = 0; i < 60; i++) await rec.poll();
+    expect(rec.state.pending).toEqual([]);
+    expect(lines(dir, "captures").filter(r => r.type === "gave_up")).toEqual([expect.objectContaining({ name: "left-pad", tries: 60, reason: "the package read kept failing" })]);
+  });
+
+  it("records a dependency the registry does not have as a fact, without retrying it", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    const p = w.packuments["left-pad"];
+    p.versions["1.0.1"] = manifest("1.0.1", { dependencies: { "no-such-dep": "1.0.0" } });
+    p.time["1.0.1"] = "2026-10-29T01:00:00.000Z";
+    w.feed.push({ seq: 102, id: "left-pad" }); await rec.poll();
+    expect(rec.state.pending).toEqual([]);
+    expect(lines(dir, "captures").find(r => r.type === "created")).toMatchObject({ name: "no-such-dep", status: 404, created: null });
   });
 
   it("refuses a host outside the four allowed", async () => {

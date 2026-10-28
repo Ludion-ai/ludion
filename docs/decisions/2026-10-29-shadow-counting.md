@@ -1,6 +1,6 @@
 # 2026-10-29 — How the shadow's condition (b) is counted
 
-Dated for the night-v2 work of 2026-10-29 (first committed 2026-10-28 23:47 JST). Fixed before the shadow records anything. It is not changed after its results are seen, and nothing here changes the wait table or a gate's numbers.
+Dated for the night-v2 work of 2026-10-29 (first committed 2026-10-28 23:47 JST, in #175). Amended in #182, before any recording: sections 4, 6, 8 and 9 (prev published before V, the literal verdict's `dev`, what the recorder captures, and its retries). Fixed before the shadow records anything. It is not changed after its results are seen, and nothing here changes the wait table or a gate's numbers.
 
 Condition (b) is in docs/decisions/2026-10-28-release-gates-by-stage.md: four consecutive weeks of shadow operation, zero misses on versions that received a MAL- record, and at least 100 decided judgements. This file fixes how that is counted. The design is docs/bench/2026-10-28-shadow-design/README.md.
 
@@ -52,7 +52,7 @@ Condition (b) is in docs/decisions/2026-10-28-release-gates-by-stage.md: four co
 - **Combining.** A version's outcome in a row is missed if any scenario or prev misses it. Otherwise it is a capture gap if any is a capture gap. Otherwise it is stopped.
 
 **6. Malicious versions: confirmed, and the two disputed categories.** A version named by a MAL- record is checked against v5's disputed standard (docs/bench/2026-10-28-backtest-v5/definitions.md, section 3), with one addition: where the recorder captured V's file hashes, they must agree with the archives. A version that meets the standard is disputed. Disputed versions go into one of two categories:
-- **The run of identical code.** It is the versions before V back to O, the first version whose code equals V's under section 3's meaning. Each step compares a version with its predecessor. Here a predecessor is the latest-published version lower by semver, whether or not a record names it.
+- **The run of identical code.** It is the versions before V back to O, the first version whose code equals V's under section 3's meaning. Each step compares a version with its predecessor. Here a predecessor is the latest-published version lower by semver and published before it, whether or not a record names it.
 - **Record-omission candidate:** either
   - O was published after the earliest-published version of P that a MAL- record names, V excluded. If no other version is named, this condition is false; or
   - O declares an install script (preinstall, install or postinstall) that O's predecessor does not.
@@ -84,6 +84,6 @@ How they count:
   - the manifest and attestations of every version of that name the watched lockfiles hold (each possible prev), and of the version each dist-tag points to;
   - every version published at or after the recorder's feed start, captured as a new version. A name's first change seen is often a publish.
 - **For each new version V:** its manifest, attestations and file list, and its registry predecessor (section 4) if not yet stored. The predecessor is the latest-published version lower than V by semver that was **published before V**, as v5's prev_d is. The same rule gives each step of the run of identical code in section 6.
-- **For each dependency of V whose first publish time is not stored** (a package outside the watched set, or a watched one that has not changed yet): that time (`created`, rule 2).
-- **Retries.** A read that failed for a new version (its attestations, its tarball, or a dependency's `created`) is retried on the following polls. After 60 failed polls the recorder records that it gave up. That version's replay is then a capture gap.
+- **For each dependency of V whose first publish time is not stored** (a package outside the watched set, or a watched one that has not changed yet): that time (`created`, rule 2). A dependency the registry does not have is recorded as such (HTTP 404). The judge then has no `created` for it and stops, as it would live; that is not a capture gap.
+- **Retries.** A read that failed for a new version (its attestations, its tarball, or a dependency's `created`) is retried on the following polls. After 60 failed polls the recorder records that it gave up. That version's replay is then a capture gap. So is that of a version removed before its capture was complete, which is recorded as given up at once.
 - **Afterwards:** later changes to `time`, `dist-tags`, removal and deprecation of every stored version.

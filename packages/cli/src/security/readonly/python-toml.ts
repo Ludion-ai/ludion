@@ -15,15 +15,25 @@ export function parseToml(text: string, file: string): TomlTable {
   return new Reader(text, file).document();
 }
 
-/** Characters that would break a report line or hide text: controls, line separators, bidi and zero-width marks. */
-const UNSAFE = new RegExp("[\\x00-\\x1f\\x7f-\\x9f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2066-\\u2069\\ufeff]", "g");
+/**
+ * Characters that would break a report line or hide text: C0 and C1 controls, the soft hyphen, line and paragraph
+ * separators, bidi controls (U+061C, U+200E-F, U+202A-E, U+2066-9), zero-width and invisible format characters
+ * (U+180E, U+200B-D, U+2060-F, U+FEFF, U+FFF9-B), tag characters (U+E0000-7F, which can spell hidden text), and
+ * lone surrogates.
+ */
+const UNSAFE = new RegExp("[\\x00-\\x1f\\x7f-\\x9f\\xad\\u061c\\u180e\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u206f\\ufeff\\ufff9-\\ufffb\\u{e0000}-\\u{e007f}\\u{d800}-\\u{dfff}]", "gu");
+function escapeUnsafe(text: string): string {
+  return text.replace(UNSAFE, c => { const point = c.codePointAt(0)!; return point > 0xffff ? `\\u{${point.toString(16)}}` : `\\u${point.toString(16).padStart(4, "0")}`; });
+}
 /** File text bounded to max characters, with unsafe characters escaped, for errors and limitations. */
 export function clip(text: string, max = 200): string {
-  const cut = text.length > max ? `${text.slice(0, max)}…` : text;
-  return cut.replace(UNSAFE, c => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+  return text.length > max ? `${escapeUnsafe(text.slice(0, max))}…` : escapeUnsafe(text);
 }
-/** File text in quotes, bounded and escaped. */
-export function quoted(text: string, max = 60): string { return `"${clip(text.replace(/[\\"]/g, "\\$&"), max)}"`; }
+/** File text in quotes, bounded and escaped, with its own quotes and backslashes escaped. */
+export function quoted(text: string, max = 60): string {
+  const cut = text.length > max;
+  return `"${escapeUnsafe((cut ? text.slice(0, max) : text).replace(/[\\"]/g, "\\$&"))}${cut ? "…" : ""}"`;
+}
 
 const BARE_KEY = /[A-Za-z0-9_-]+/y;
 const TOKEN = /[0-9A-Za-z_+.:-]+/y;

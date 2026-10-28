@@ -532,9 +532,24 @@ describe("requirements.txt", () => {
     expect(result.project).toEqual(["the project at .", "the project at .", "the project at ."]);
     expect(result.limitations).toEqual([
       "requirements.txt includes other files with -r or -c (3 lines); they were not read.",
-      "requirements.txt: 1 requirement is not an exact name==version pin and was not checked: ./libs/y.",
-      "requirements.txt: 4 lines could not be read as a requirement or option and were not checked (line 7, 8, 9, 11).",
+      // pip's optparse ignores the stray word in "-e./libs/x extra" and installs ./libs/x.
+      "requirements.txt: 2 requirements are not an exact name==version pin and were not checked: ./libs/x, ./libs/y.",
+      "requirements.txt: 3 lines could not be read as a requirement or option and were not checked (line 7, 8, 9).",
     ]);
+  });
+
+  it("reads option lines as pip's optparse does, and lists those pip refuses", () => {
+    const accepted = parseRequirements([
+      "--edit .", "--requirem=base.txt", "-ihttps://pypi.org/simple", "--pypi-url https://pypi.org/simple", "--no-require-hashes",
+      "--only-final :all:", `--hash=${HASH}`, "-C key=value", "--pre flask==1.0.0", "six==1.16.0",
+    ].join("\n"));
+    expect(accepted).toEqual({ packages: [{ name: "six", version: "1.16.0", direct: true }], project: ["the project at ."], limitations: ["requirements.txt includes other files with -r or -c (1 line); they were not read."] });
+    // pip 26.2.1 refuses each of these lines (RequirementsFileParseError), so none may come back clean.
+    // --requ is ambiguous (--requirement, --require-hashes), so optparse refuses it.
+    const refused = ["--pre=1", "-f ./wheels\\ ", "--only-binary=:all:\\ ", "-i", "--pr", "--requ=base.txt", "--frobnicate", "-x foo", '--index-url "https://pypi.org/simple"'];
+    for (const line of refused) {
+      expect(parseRequirements(`${line}\nsix==1.16.0\n`).limitations, line).toEqual(["requirements.txt: 1 line could not be read as a requirement or option and was not checked (line 1)."]);
+    }
   });
 
   it("refuses more than 2,000 pins", () => {
@@ -671,6 +686,20 @@ describe("requirements.txt lines and encodings as pip reads them", () => {
     expect(result.limitations).toEqual([]);
   });
 
+  it("ends a continuation at a comment line, as pip does, so the next pin is kept", () => {
+    const result = parseRequirements("flask==1.0.0 \\\n# via x \\\nsix==1.16.0\n");
+    expect(ids(result.packages)).toEqual(["flask@1.0.0*", "six@1.16.0*"]);
+    expect(result.limitations).toEqual([]);
+  });
+
+  it("uses Python's whitespace for comments and stripping, as pip does", () => {
+    const space = (code: number) => String.fromCharCode(code);
+    const text = [`requests==2.19.0${space(0x3000)}# c`, `six==1.16.0${space(0x1f)}#c`, `${space(0x3000)}idna==2.7${space(0xa0)}`, `flask==1.0.0${space(0x2009)}# c`].join("\n");
+    const result = parseRequirements(text);
+    expect(ids(result.packages)).toEqual(["flask@1.0.0*", "idna@2.7*", "requests@2.19.0*", "six@1.16.0*"]);
+    expect(result.limitations).toEqual([]);
+  });
+
   it("joins backslash continuations as pip does, removing every backslash at either end", () => {
     const result = parseRequirements(`requests==2.19.0 \\\\\n    --hash=${HASH} \\\n    # via app\nsix==1.16.0\n`);
     expect(ids(result.packages)).toEqual(["requests@2.19.0*", "six@1.16.0*"]);
@@ -713,6 +742,49 @@ describe("bounded messages and deep input", () => {
     expect(limitation!.length).toBeLessThan(400);
     expect(limitation).not.toMatch(/[\n\r]/);
     expect(() => parseUvLock(`version = 1\n"${"y".repeat(5000)}\\u2028" = 1\n"${"y".repeat(5000)}\\u2028" = 2\n`)).toThrow(/^uv\.lock line 3: duplicate key "y+…"; the file was not read\.$/);
+  });
+
+  // One of each escaped range: controls, bidi controls, zero-width and invisible format characters, tag characters.
+  it.each([0x1b, 0x7f, 0x85, 0x9f, 0xad, 0x61c, 0x180e, 0x200b, 0x200e, 0x2028, 0x2029, 0x202a, 0x202e, 0x2060, 0x2064, 0x2066, 0x2069, 0x206a, 0x206f, 0xfeff, 0xfff9, 0xe0001, 0xe0041, 0xe007f])(
+    "escapes U+%s in a message instead of copying it",
+    code => {
+      const toml = `[project]\nname = "x"\ndependencies = ["\\U${code.toString(16).padStart(8, "0")}x"]\n`;
+      const [limitation] = readPython(project({ "pyproject.toml": toml }))!.limitations;
+      const escaped = code > 0xffff ? `\\u{${code.toString(16)}}` : `\\u${code.toString(16).padStart(4, "0")}`;
+      expect(limitation).toContain(`a requirement could not be read ("${escaped}x")`);
+      expect(limitation).not.toContain(String.fromCodePoint(code));
+    },
+  );
+
+  it("escapes quotes and backslashes in quoted file text", () => {
+    expect(() => parseToml('"a\\"b\\\\c" = 1\n"a\\"b\\\\c" = 2\n', "uv.lock")).toThrow('uv.lock line 2: duplicate key "a\\"b\\\\c"; the file was not read.');
+  });
+
+  // Each shape is 4 MiB, the reader's size cap; a quadratic step would take minutes to hours.
+  it.each([
+    ["a path then a run of [", `./${"[".repeat(4 * 1024 * 1024)}`],
+    ["an editable path then a run of [", `-e ./${"[".repeat(4 * 1024 * 1024)}`],
+    ["a VCS URL then a run of [", `git+https://x/${"[".repeat(4 * 1024 * 1024)}`],
+    ["an archive then a run of [", `x.whl;${"[".repeat(4 * 1024 * 1024)}`],
+    ["a run of .whl", `x${".whl".repeat(1024 * 1024)}x`],
+    ["an egg fragment then a run of -", `git+https://x#egg=a${"-".repeat(4 * 1024 * 1024)}`],
+    ["a hash option without a colon", `six==1.16.0 --hash=${"a".repeat(4 * 1024 * 1024)}`],
+    ["a coding cookie then a run of spaces", `# coding:${" ".repeat(4 * 1024 * 1024)}x`],
+    ["a pin then a run of spaces and a word", `six==${" ".repeat(4 * 1024 * 1024)}x`],
+  ])("reads a 4 MiB requirements.txt line made of %s in well under a second", (_label, text) => {
+    const start = performance.now();
+    try { parseRequirements(text); } catch { /* refusing is fine; only the time is measured */ }
+    expect(performance.now() - start).toBeLessThan(1000);
+  });
+
+  it.each([
+    ["digits then a letter", `a = ${"1".repeat(4 * 1024 * 1024)}x\n`],
+    ["digits then a dot", `a = ${"1".repeat(4 * 1024 * 1024)}.\n`],
+    ["a long bare key without a value", `${"k".repeat(4 * 1024 * 1024)}\n`],
+  ])("reads a 4 MiB TOML line made of %s in well under a second", (_label, text) => {
+    const start = performance.now();
+    expect(() => parseToml(text, "uv.lock")).toThrow(/^uv\.lock line 1: /);
+    expect(performance.now() - start).toBeLessThan(1000);
   });
 
   it("fails deep or very long input with an ordinary error, never a stack overflow", () => {

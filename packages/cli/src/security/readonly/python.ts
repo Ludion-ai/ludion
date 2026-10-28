@@ -35,7 +35,11 @@ function shown(value: unknown): string {
   return typeof value === "number" || typeof value === "boolean" ? String(value) : `a ${Array.isArray(value) ? "list" : typeof value}`;
 }
 function plural(n: number, one: string, many: string): string { return `${n} ${n === 1 ? one : many}`; }
-function reason(error: unknown): string { return clip((error instanceof Error ? error.message : String(error)).replace(/[.;]? ?(?:the file was not read\.)?$/, ""), 200); }
+function reason(error: unknown): string {
+  let text = error instanceof Error ? error.message : String(error);
+  for (const end of ["; the file was not read.", "."]) if (text.endsWith(end)) { text = text.slice(0, -end.length); break; }
+  return clip(text, 200);
+}
 /** Appends without spreading, so a list of any length cannot overflow the call stack. */
 function append<T>(target: T[], items: Iterable<T>): T[] { for (const item of items) target.push(item); return target; }
 
@@ -270,8 +274,48 @@ function namedRequirement(requirement: string): { name: string; rest: string } |
   return { name: normalizeName(name), rest };
 }
 
-/** Options that change where packages come from or how they build, but not which name and version a pin names. */
-const GLOBAL_OPTIONS = new Set(["-i", "--index-url", "--extra-index-url", "--no-index", "-f", "--find-links", "--trusted-host", "--pre", "--prefer-binary", "--require-hashes", "--only-binary", "--no-binary", "--use-feature"]);
+/**
+ * The options pip 26.2.1 reads in a requirements file (req_file.SUPPORTED_OPTIONS and SUPPORTED_OPTIONS_REQ), with
+ * whether each takes a value. Apart from -r, -c and -e, none changes which name and version a pin names.
+ */
+const LONG_OPTIONS = new Map<string, boolean>([
+  ["--index-url", true], ["--pypi-url", true], ["--extra-index-url", true], ["--no-index", false], ["--constraint", true],
+  ["--requirement", true], ["--editable", true], ["--find-links", true], ["--no-binary", true], ["--only-binary", true],
+  ["--prefer-binary", false], ["--require-hashes", false], ["--no-require-hashes", false], ["--pre", false],
+  ["--all-releases", true], ["--only-final", true], ["--trusted-host", true], ["--use-feature", true], ["--hash", true],
+  ["--config-settings", true],
+]);
+const SHORT_OPTIONS = new Map([["-i", "--index-url"], ["-c", "--constraint"], ["-r", "--requirement"], ["-e", "--editable"], ["-f", "--find-links"], ["-C", "--config-settings"]]);
+/**
+ * An option line read as pip's optparse reads it: long options by name or unique prefix, "--opt=value" or
+ * "--opt value", short options with the value attached or next; other words are ignored, as pip ignores them.
+ * Returns null where pip refuses the line (an unknown or ambiguous option, a value for a flag, a missing value) and
+ * where it needs shell quoting or escapes, which are not read here.
+ */
+function optionLine(content: string): { option: string; value?: string }[] | null {
+  if (/["'\\]/.test(content)) return null;
+  const tokens = content.split(/[ \t]+/), options: { option: string; value?: string }[] = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]!;
+    if (token === "--") break;
+    if (!token.startsWith("-") || token === "-") continue;
+    let option: string | undefined, value: string | undefined;
+    if (token.startsWith("--")) {
+      const eq = token.indexOf("="), typed = eq < 0 ? token : token.slice(0, eq);
+      value = eq < 0 ? undefined : token.slice(eq + 1);
+      const prefixed = [...LONG_OPTIONS.keys()].filter(name => name.startsWith(typed));
+      option = LONG_OPTIONS.has(typed) ? typed : prefixed.length === 1 ? prefixed[0] : undefined;
+    } else {
+      option = SHORT_OPTIONS.get(token.slice(0, 2));
+      value = token.length > 2 ? token.slice(2) : undefined;
+    }
+    if (!option) return null;
+    if (!LONG_OPTIONS.get(option)) { if (value !== undefined) return null; options.push({ option }); continue; }
+    if (value === undefined) { if (i + 1 >= tokens.length) return null; value = tokens[++i]; }
+    options.push({ option, value });
+  }
+  return options;
+}
 const EGG = /#egg=([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)/;
 
 /**
@@ -282,23 +326,21 @@ export function parseRequirements(text: string): PythonFile {
   const packages: ReadOnlyPackage[] = [], project: string[] = [], unpinned: string[] = [], markers: string[] = [], unreadable: number[] = [];
   let includes = 0;
   const local = (target: string, line: number): void => {
-    const path = target.replace(/\[[^\]]*\]$/, "");
-    if (path === "." || path === "./") project.push("the project at .");
+    // Anchored at both ends: "." or "./" with optional [extras]. An unanchored search would be quadratic on "[[[".
+    if (/^\.\/?(?:\[[^\]]*\])?$/.test(target)) project.push("the project at .");
     else { const egg = EGG.exec(target)?.[1]; unpinned.push(egg ? normalizeName(egg) : /^[A-Za-z0-9._/-]{1,80}$/.test(target) ? target : `a URL, VCS or path requirement (line ${line})`); }
   };
   for (const { line, content } of requirementLines(requirementsText(text))) {
-    const tokens = content.split(PY_SPACES);
     if (content.startsWith("-")) {
-      const flag = tokens[0]!.split("=")[0]!;
-      if (["-r", "--requirement", "-c", "--constraint"].includes(flag) || /^-[rc]\S/.test(flag)) includes++;
-      else if (flag === "-e" || flag === "--editable" || /^-e\S/.test(flag)) {
-        const separate = tokens[0] === "-e" || tokens[0] === "--editable";
-        const target = separate ? tokens[1] : tokens[0]!.replace(/^(?:-e|--editable=)/, "");
-        if (!target || tokens.length > (separate ? 2 : 1)) unreadable.push(line);
-        else local(target, line);
-      } else if (!GLOBAL_OPTIONS.has(flag)) unreadable.push(line);
+      const options = optionLine(content);
+      if (!options) { unreadable.push(line); continue; }
+      for (const { option, value } of options) {
+        if (option === "--requirement" || option === "--constraint") includes++;
+        else if (option === "--editable") local(value!, line);
+      }
       continue;
     }
+    const tokens = content.split(PY_SPACES);
     // As pip does: the requirement ends at the first token that starts with "-"; only --hash may follow it.
     const at = tokens.findIndex(t => t.startsWith("-"));
     const requirement = (at < 0 ? tokens : tokens.slice(0, at)).join(" "), options = at < 0 ? [] : tokens.slice(at);
@@ -330,9 +372,9 @@ export function parseRequirements(text: string): PythonFile {
   return { packages: [...collect(packages).values()], project, limitations };
 }
 
-/** A PEP 508 requirement's name; throws when the string does not start with one. */
+/** A PEP 508 requirement's name (PEP 508 whitespace is a space or a tab); throws when the string does not start with one. */
 function requirementName(value: TomlValue, file: string): string {
-  const name = typeof value === "string" ? /^\s*([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)/.exec(value)?.[1] : undefined;
+  const name = typeof value === "string" ? /^[ \t]*([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)/.exec(value)?.[1] : undefined;
   if (!name) throw new Error(`${file}: a requirement could not be read (${shown(value)}).`);
   return normalizeName(name);
 }

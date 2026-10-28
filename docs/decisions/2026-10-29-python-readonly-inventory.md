@@ -16,8 +16,17 @@
   - Lines split on `str.splitlines()` boundaries (CR, LF, VT, FF, FS, GS, RS, NEL, LS and PS).
   - Backslash continuations, comments and whitespace follow pip's rules, using Python's whitespace set. A differential against pip 26.2.1 `parse_requirements` on 24 crafted files gave identical pins.
   - Text that does not read the same as UTF-8 throws. That is a UTF-16 or UTF-32 file, NUL or undecodable bytes, or a PEP 263 coding cookie other than UTF-8; an ASCII-compatible cookie is allowed on pure ASCII text. Such a file is never read as one comment line.
+  - Option lines are read as pip's optparse reads them, using pip 26.2.1's option table: each option's arity, unique long-option prefixes, and short options with an attached value. Stray words are ignored, as pip ignores them.
+  - A line pip refuses is a limitation: an unknown or ambiguous option, a value given to a flag, or a missing value. So is a line that needs shell quoting or escapes, which is not read here.
 - **Environment markers are not evaluated.** Every locked package is listed for all environments, and requirements.txt pins that have markers are named in a limitation. This can over-report, never under-report.
 - **Other requirements files are named but not read.** These are any `*requirements*.txt` (such as `dev-requirements.txt`) and a `requirements/` directory, and they show up even when they are the only Python files in the project. `-r` and `-c` includes are not followed.
-- **Text copied from a file into an error or limitation is bounded and escaped.** It is cut to about 200 characters, with control, line-separator, bidi and zero-width characters escaped.
+- **Text copied from a file into an error or limitation is bounded and escaped.** It is cut to about 200 characters. These characters are escaped:
+  - C0 and C1 controls, and the soft hyphen;
+  - line and paragraph separators;
+  - bidi controls (U+061C, U+200E–F, U+202A–E, U+2066–9);
+  - zero-width and invisible format characters (U+180E, U+200B–D, U+2060–F, U+FEFF, U+FFF9–B);
+  - tag characters (U+E0000–7F);
+  - lone surrogates.
 - **Deep input fails with an ordinary error, not a stack overflow.** Key paths are capped at 32 parts, nesting at 32 levels, and nothing recurses or spreads over file-sized lists.
+- **Every regex over file text is anchored or linear.** It is checked by 4 MiB timing tests that must finish in under a second.
 - **OSV format, checked live on 2026-10-29.** OSV's PyPI matching normalizes names (`Jinja2`/`jinja2`, `python_multipart`/`Python.Multipart`) and PEP 440 versions (`2.19`/`2.19.0`/`2.19.0.0`, `3.2rc1`/`3.2.0rc1`, `1.13.0+cpu`). So versions are sent exactly as the lock writes them, and names in PEP 503 form.

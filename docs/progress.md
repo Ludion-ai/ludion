@@ -365,6 +365,25 @@ The first review asked for changes (decisions, "The judge on this repository"). 
 - the end-to-end run again judged @types/node 24.19.1 → 24.19.2 "ready except build", in 0.918 s;
 - actionlint: 0 errors in the two workflows.
 
+The second review asked for changes: the event's base SHA goes stale (decisions). After the fix (386f802), checked in Docker:
+
+- typecheck passes;
+- packages tests: 230 passed, with the workflow tests at 20;
+- each of 34 single breaks makes at least one test fail. These are the 26 above, with two rewritten for the changed lines, and 8 new ones:
+  - the before files, the file list or the build taken from the event's base;
+  - the base-branch check removed;
+  - the record naming the event's base;
+  - 39 hex digits plus a newline accepted as a SHA;
+  - PRs into other branches commented;
+  - tag characters kept.
+- actionlint: 0 errors in the two workflows.
+
+On GitHub, through the throwaway draft PR #159 (base `ci/judge-dogfood`; npm's lockfile-only update of @types/node 24.19.1 → 24.19.2), judge.yml ran from that PR's merge commit:
+
+- Run 40665174013, at head 13a361d: the job succeeded, 09:33:36–09:33:54 UTC.
+  - The record: `ready_except_build`, base 386f802 (the merge commit's first parent), judge 0.577 s, 12.781 s since the job started.
+  - In Docker, judge-comment.yml's schema accepted the downloaded record, and its comment rendered.
+
 ## 2026-10-28 — Packagist advisories in Composer plans
 
 Composer scans and plans now read Packagist's advisory API next to OSV and take the later fix. New tests: Packagist's later fix wins over OSV's, OSV's later fix is kept, a Packagist-only advisory is found, a fix landing in the next range moves on, unaffected and empty answers stay clean, no same-major fix and unreadable ranges block, and an outage, a missing field, an unrequested name, a record for another package and an invalid id all fail the scan; npm inventories do not query Packagist. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passed; packages tests 176 passed. The site build needs git and was not run in the container; CI runs the full suite.

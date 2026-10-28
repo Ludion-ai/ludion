@@ -699,17 +699,17 @@ Design weeks 1–2, "判定役 v0". `ludion judge --before <dir> --after <dir>` 
 The owner chose C1: the judge v0 runs on this repository's own dependency PRs, comments only, so it gets real data. Two workflows, split as the design's "Actions の権限分離" splits jobs:
 
 - **`judge.yml`** (`pull_request` when the root `package-lock.json` changes; `contents: read`, no secrets).
-  - The judge is built from the PR's base commit (`npm ci --ignore-scripts`, then the CLI's own build), never from the PR, because a PR here can change the judge itself.
-  - The PR is data. Its `package.json` and `package-lock.json` are copied out of its test merge commit with `git show`, and the changed files come from `git diff` between the base and that commit. Nothing from the PR is installed or run. The test merge commit must be exactly the event's head merged onto the event's base, or the record says undecidable.
+  - The judge is built from the base commit (`npm ci --ignore-scripts`, then the CLI's own build), never from the PR, because a PR here can change the judge itself.
+  - The PR is data. Its `package.json` and `package-lock.json` are copied out of its test merge commit with `git show`, and the changed files come from `git diff` between the base and that commit. Nothing from the PR is installed or run. The base commit is the test merge commit's first parent, and the second must be the event's head. The event's own base SHA is not used: GitHub sets it when the PR opens and does not update it when the base branch moves. The base commit must be in the last 50 commits of the base branch. Otherwise the record says undecidable.
   - The record (`.github/judge/record.ts`, uploaded as the `judgement` artifact) holds the PR number, the head SHA judged, the base and merge SHAs, the verdict, the judge's JSON and its rendered text, and how long it took (the judge alone, and since the job started).
   - It says undecidable from the first step on. Only a judge that exited with the code of a parseable judgement replaces it, with that judgement. A failed build, read or judge stays undecidable, never a pass.
   - The job fails when the judge gave no judgement, so its colour shows the judge's health, not the verdict.
 - **`judge-comment.yml`** (`workflow_run` of `judge`; `pull-requests: write`, `actions: read` and `contents: read`).
-  - It runs from the default branch and checks out nothing. It runs nothing from the PR or the repository, only `gh`, `jq`, `unzip` and `head`.
+  - It runs from the default branch and checks out nothing. It runs nothing from the PR or the repository, only `gh`, `jq`, `unzip`, `head` and `mkdir`. It comments only on PRs into the default branch, since a PR into another branch is judged by that branch's judge.yml.
   - The artifact is untrusted data. It must match the record's schema exactly: keys, types, lengths, and a verdict that agrees with the judge's own.
   - It comments only when the recorded head is both the run's head and the PR's current head, and the PR's head repository and branch are the run's; otherwise nothing.
   - One comment per PR, found by a marker and the `github-actions[bot]` author, updated by each new judgement. It starts with 「プレビュー：コメントのみ。この判定でマージは行われない。」 and says that v0 judges parts of gates 1, 2 and 4 and the wait, not gate 3. "Ready except build" is shown as 可, with the note that gate 3 was not run, so it is not a judgement that the update may be applied.
-  - The judge's text is an indented code block, cut so that the comment stays under GitHub's limit once indented. Control characters (C0 and C1), bidirectional marks and overrides, and zero-width characters are dropped. Nothing in it becomes Markdown, a mention or a line of its own, so no `reviewed-sha:` line can come from it.
+  - The judge's text is an indented code block, cut so that the comment stays under GitHub's limit once indented. Some characters are dropped: control characters (C0 and C1), the soft hyphen, bidirectional marks, overrides and isolates, zero-width and invisible format characters, line and paragraph separators, and tag characters. Nothing in it becomes Markdown, a mention or a line of its own, so no `reviewed-sha:` line can come from it.
 
 Chosen here:
 
@@ -750,6 +750,20 @@ Its non-blocking findings are fixed too:
 - the characters dropped.
 
 That review's comment ends with a `reviewed-sha:` line for 141d38e although it asks for changes. That head is no longer the PR's, so the line no longer counts.
+
+The second review (fresh context, https://github.com/Ludion-ai/ludion/pull/156#issuecomment-6465351754) found both round-1 fixes sound, and asked for changes again. Its blocking finding: the read step required the test merge commit's first parent to equal the event's base SHA. That SHA goes stale once the base branch moves, so after the first push nearly every judgement would have been undecidable. On #156 itself, the stored base was 3e2e350 while GitHub merged 44c0fb6 into 3418d55.
+
+The base now comes from the merge commit, as above, and tests pin it. A throwaway draft PR into this branch (#159) checks it on GitHub (progress).
+
+From that review's non-blocking findings:
+
+- a SHA must be exactly 40 hex digits;
+- the 300-file refusal says so;
+- PRs into other branches get no comment;
+- more invisible characters are dropped;
+- `mkdir` is named.
+
+Known and kept: when a later head no longer changes `package-lock.json`, judge.yml does not run, and the earlier comment stays. That comment names the head it judged.
 
 ## 2026-10-28 — Composer plans also read Packagist's advisories
 

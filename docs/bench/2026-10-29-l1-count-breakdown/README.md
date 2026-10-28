@@ -131,7 +131,7 @@ These are definition changes, for the owner. None is made or measured here.
 
 - **The narrower readings in "What this does not show".** These are the vitest configuration names (11 pairs) and the P2 and P1 seeds that name a package without using it. By recorded seed, the latter are about 50 pairs, counting every electron-builder.json seed as an exclusion.
 
-Even leaving out every one of these would not by itself bring 938 to 622 or less. These groups add up to at most about 280 pairs (138 + 38 + 41 in the D1-only repositories + 11 + about 50), and they overlap. The #186 review counted the union of the pairs these changes can touch, by recorded seed or chain: about 200 to 235 (up to 294 with a wider list of build tools). The gate needs 316 fewer. The 560 both runs count stay. (By recorded seed, the seven named build tools account for 139 pairs: vite also has one P6 seed, the vitepress-nested copy in badr-pdf.)
+Even leaving out every one of these would not by itself bring 938 to 622 or less. These groups add up to at most about 280 pairs (138 + 38 + 41 in the D1-only repositories + 11 + about 50), and they overlap. The #186 review counted the union of the pairs these changes can touch, by recorded seed or chain: about 200 to 235 (about 230 to 245 with a wider list of build tools, whose plain sum is at most 294). The gate needs 316 fewer. The 560 both runs count stay. (By recorded seed, the seven named build tools account for 139 pairs: vite also has one P6 seed, the vitepress-nested copy in badr-pdf.)
 
 ## Files
 

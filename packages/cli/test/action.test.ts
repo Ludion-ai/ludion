@@ -223,7 +223,7 @@ describe.skipIf(!(has("jq") && has("bash")) && !process.env.CI)("action/read.sh,
     writeFileSync(output, "");
     const r = spawnSync("bash", [path("action/read.sh")], { encoding: "utf8", env: { PATH: `${bin}:${process.env.PATH}`, FAKE: fake, GH_TOKEN: "x", REPO: "o/r", INPUT: input, HEAD_SHA: HEAD, MERGE_SHA: MERGE, BASE_REF: "main", GITHUB_OUTPUT: output } });
     const got = (side: string, p: string) => (existsSync(join(input, side, p)) ? readFileSync(join(input, side, p), "utf8") : null);
-    return { status: r.status, stderr: r.stderr, got, output: readFileSync(output, "utf8") };
+    return { status: r.status, stderr: r.stderr, stdout: r.stdout, got, output: readFileSync(output, "utf8") };
   }
   const roots = (ref: string) => ({ "package.json": `root ${ref}`, "package-lock.json": `lock ${ref}` });
   it("copies each changed */package.json on the sides whose commit has it, and nothing else", () => {
@@ -242,10 +242,12 @@ describe.skipIf(!(has("jq") && has("bash")) && !process.env.CI)("action/read.sh,
     expect(r.output).toBe(`base=${BASE}\n`);
   });
   it("stops on a path that cannot be copied as data, a file the API does not give, or 300 changed files", () => {
-    for (const bad of ["x/../package.json", "./package.json", "a//package.json"]) {
+    // Each is refused by the path check itself (its message, one workflow command), not by a file the stand-in lacks.
+    for (const bad of ["x/../package.json", "./package.json", "a//package.json", "x/../\n::notice::injected/package.json"]) {
       const r = readPr([{ filename: bad, status: "modified" }], { [BASE]: roots("base"), [MERGE]: roots("merge") });
       expect(r.status).toBe(1);
       expect(r.output).toBe("");
+      expect(r.stdout.split("\n").filter(l => l.startsWith("::"))).toEqual([`::error::The changed path ${bad.replace(/\n/g, "")} cannot be copied as data.`]);
     }
     const missing = readPr([{ filename: "apps/site/package.json", status: "modified" }], { [BASE]: roots("base"), [MERGE]: { ...roots("merge"), "apps/site/package.json": "m" } });
     expect([missing.status, missing.output]).toEqual([1, ""]);
@@ -281,7 +283,7 @@ describe.skipIf(!(has("git") && has("bash")) && !process.env.CI)("judge.yml's co
     writeFileSync(join(input, "files"), files.map(f => `${f}\0`).join(""));
     const r = spawnSync("bash", ["-c", `set -euo pipefail\n${loop}`], { cwd: repo, encoding: "utf8", env: { ...process.env, INPUT: input, base, MERGE_SHA: merge } });
     const got = (side: string, p: string) => (existsSync(join(input, side, p)) ? readFileSync(join(input, side, p), "utf8") : null);
-    return { status: r.status, stderr: r.stderr, got };
+    return { status: r.status, stderr: r.stderr, stdout: r.stdout, got };
   }
   it("copies each side that has the file", () => {
     const r = copy(["apps/new/package.json", "apps/old/package.json", "apps/site/package.json", "package-lock.json"]);
@@ -291,7 +293,11 @@ describe.skipIf(!(has("git") && has("bash")) && !process.env.CI)("judge.yml's co
     expect([r.got("before", "apps/old/package.json"), r.got("after", "apps/old/package.json")]).toEqual(["old base", null]);
   });
   it("stops on a path that cannot be copied as data", () => {
-    for (const bad of ["apps/../package.json", "./package.json", "apps//package.json"]) expect(copy([bad]).status).toBe(1);
+    for (const bad of ["apps/../package.json", "./package.json", "apps//package.json", "apps/../\n::notice::injected/package.json"]) {
+      const r = copy([bad]);
+      expect(r.status).toBe(1);
+      expect(r.stdout.split("\n").filter(l => l.startsWith("::"))).toEqual([`::error::The changed path ${bad.replace(/\n/g, "")} cannot be copied as data.`]);
+    }
   });
 });
 

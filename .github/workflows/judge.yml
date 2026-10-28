@@ -86,7 +86,7 @@ jobs:
           while IFS= read -r -d '' file; do
             case "$file" in */package.json) ;; *) continue ;; esac
             case "/${file}/" in
-              *//*|*/./*|*/../*) echo "::error::The changed path ${file} cannot be copied as data."; exit 1 ;;
+              *//*|*/./*|*/../*) echo "::error::The changed path ${file//[[:cntrl:]]/} cannot be copied as data."; exit 1 ;;
             esac
             mkdir -p "$INPUT/before/${file%/*}" "$INPUT/after/${file%/*}"
             if git cat-file -e "${base}:${file}" 2> /dev/null; then git show "${base}:${file}" > "$INPUT/before/${file}"; fi

@@ -52,7 +52,7 @@ jq -j '.files[]
 while IFS= read -r -d '' side && IFS= read -r -d '' file; do
   case "/${file}/" in
     *//*|*/./*|*/../*)
-      echo "::error::The changed path ${file} cannot be copied as data."
+      echo "::error::The changed path ${file//[[:cntrl:]]/} cannot be copied as data."
       exit 1
       ;;
   esac

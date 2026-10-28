@@ -29,6 +29,10 @@ on:
     paths: [package-lock.json]
 permissions:
   contents: read
+# A newer push cancels the judgement of an older head.
+concurrency:
+  group: ludion-judge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   judge:
     runs-on: ubuntu-latest
@@ -52,6 +56,10 @@ permissions:
   actions: read
   contents: read
   pull-requests: write
+# One comment run at a time per PR branch, so two runs cannot both post a comment.
+concurrency:
+  group: ludion-judge-comment-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
 jobs:
   comment:
     runs-on: ubuntu-latest
@@ -64,7 +72,7 @@ jobs:
 
 A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
 
-Limits: only the root package.json and package-lock.json are read; a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. Package names and versions are sent to OSV and the npm registry. No source is sent.
+Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 20 or later); only the root package.json and package-lock.json are read; a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. Package names and versions are sent to OSV and the npm registry. No source is sent.
 
 ## Run the source preview
 

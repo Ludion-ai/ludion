@@ -1,6 +1,6 @@
 # What `npm pack` puts in ludion-ai
 
-From `npm pack --dry-run --json` in packages/cli, run by `action-check/run.sh` in node:24-slim (image 55fb5f5a527e, Node v24.22.1, the npm it ships) on a copy of this branch after `npm ci --ignore-scripts` and `npm run build -w ludion-ai`. Raw output: `action-check/out/npm-pack-dry-run.json`, `action-check/out/npm-pack-files.txt`, `action-check/out/run-3.txt`.
+From `npm pack --dry-run --json` in packages/cli, run by `action-check/run.sh` in node:24-slim (image 55fb5f5a527e, `action-check/out/docker-image.txt`; Node v24.22.1, the npm it ships) on a copy of this branch after `npm ci --ignore-scripts` and `npm run build -w ludion-ai`. Raw output: `action-check/out/npm-pack-dry-run.json`, `action-check/out/npm-pack-files.txt`, `action-check/out/run-3.txt`.
 
 | Path in the tarball | Size (bytes) |
 | --- | --- |

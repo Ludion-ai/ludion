@@ -1,0 +1,3 @@
+package/README.md
+package/dist/cli.js
+package/package.json

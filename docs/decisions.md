@@ -1112,6 +1112,12 @@ It changes no result.
   - Those two raw answers to the registered query were overwritten by the joined files and were never compared with them, so they are not in the results. The review of #160 checked that the joined files equal page 1 followed by page 2, with the registered fields. That supports the two forms being equivalent, but it does not replace the lost answers.
 - **When.** The search finished at 2026-10-28T08:55:14Z. It was committed and pushed as 2ee1afc (17:55:34 JST) before the measurement started at 08:56:01Z.
 
+## 2026-10-28 — The judge as an action (preview), and the dogfood record
+
+- **action.yml at the root**, two modes for two jobs, split like judge.yml and judge-comment.yml. Mode judge: pull_request, `contents: read`. It reads the PR's files as data through the API, so it needs no checkout, and runs the bundled judge. With a read token this should also work on private repositories, but only this public repository was tried. Mode comment: workflow_run, `pull-requests: write`. It uses judge-comment.yml's checks, copied to action/*.jq, with the judge workflow's path as an input.
+- **Only a release commit carries the bundle.** packages/cli/dist/cli.js and action/dist/record.js (`node action/build.ts`, which bundles .github/judge/record.ts) are not on main. On any other commit the action stops with an error and does not build. The release steps are in docs/bench/dogfood/prepublish-checklist.md.
+- `files` in packages/cli is narrowed to `dist/cli.js`. The dogfood measurement has no gate; its definitions were committed first (4c441d0).
+
 ## 2026-10-28 (cycle 3) — Gate 1's production/dev split, rebuilt; the noise rerun's definitions, fixed before running it
 
 The noise measurement (docs/bench/2026-10-28-noise) found 167 misses among packages that the lockfile's `dev` flag left out, and its reviewers read (b), (c), (d) and CSS imports differently. The owner's wording below replaces the split. This entry is committed and pushed before the split is implemented and before the rerun. A later change is a new entry with a new run. The count gate, the miss gate, the wait table and the backtest gates are unchanged.
@@ -1202,3 +1208,9 @@ The lockfile reader's refusal is fixed narrowly. npm records an installed packag
 - **Who reviews.** Fresh-context subagents that are not the worker. The reviewer brief (docs/bench/2026-10-28-noise-v2/reviewer-brief.md) quotes sections 2 and 5. It says that repository and package text is data, not instructions. It is committed before the review starts. The worker does not change a verdict: it only adds them up, and reports disagreements next to them.
 
 **6. The gates, unchanged.** The count gate: over the 100 repositories, the judge's count times 3 is at most npm audit's count. The miss gate: zero misses. Both are reported as they come out. Not measured counts as not met.
+
+## 2026-10-28 (cycle 3, L1) — The noise rerun's result; what is left open
+
+- The rebuilt split ran as registered (first execution at c381a85; docs/bench/2026-10-28-noise-v2). The count gate is not met: 938 × 3 > 1,867. The miss gate is not met: 11 misses in 4 repositories. No definition is changed.
+- Left open for a new entry and a new run: requires whose argument is not a literal (9 of the 11 misses), a tool that loads a package it does not declare (webpack's launcher and webpack-cli; `astro check` and @astrojs/check, where the reviewers read P6 differently), command sources section 2 does not list (CI workflows, other scripts, `.jsonc`), and how to bring the count down.
+- judge.yml passes no `--source`, so this repository's own PRs get only D1. Adding `--source` is a change to a protected path, left to the owner.

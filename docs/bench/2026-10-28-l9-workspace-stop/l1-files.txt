@@ -1,0 +1,18 @@
+# git fetch origin, then: git diff --name-only origin/main...origin/lane/l1-applicability
+# at 2026-10-28T12:51:17Z; origin/main 75622bd6c08b2ef42eacebd12f42ce53f152aded, origin/lane/l1-applicability 1a532c074b5ea771b7588318d3a86dfb74d604c2, merge base be8623912df7a6bddbd5c113db33b1eb18fd9acb
+docs/bench/2026-10-28-noise-v2/result/noise.json
+docs/bench/2026-10-28-noise-v2/result/run.log
+docs/bench/2026-10-28-noise-v2/review/assignments.json
+docs/bench/2026-10-28-noise-v2/review/reviewer-prompt.md
+docs/bench/2026-10-28-noise-v2/reviewer-brief.md
+docs/bench/2026-10-28-noise-v2/scripts/assign.mjs
+docs/bench/2026-10-28-noise-v2/scripts/rerun.ts
+docs/bench/2026-10-28-noise-v2/scripts/sources.mjs
+docs/bench/2026-10-28-noise-v2/scripts/tally.mjs
+docs/bench/2026-10-28-noise-v2/sources-log.json
+docs/decisions.md
+packages/cli/src/cli.ts
+packages/cli/src/security/judge-cli.ts
+packages/cli/src/security/judge.ts
+packages/cli/src/security/production.ts
+packages/cli/test/production.test.ts

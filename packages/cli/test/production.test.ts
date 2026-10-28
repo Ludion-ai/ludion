@@ -169,19 +169,27 @@ describe("production images and commands", () => {
   });
   it("holds only the packages whose folders an image copies out of node_modules (L1c)", () => {
     const build = "FROM node:22 AS builder\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n";
-    const picked = `${build}FROM node:22-slim AS base\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules/pino-pretty ./node_modules/pino-pretty\nCOPY --from=builder /app/node_modules/@swc/helpers/ ./node_modules/@swc/helpers\nFROM base\nCMD ["node", "dist/a.js"]\n`;
-    expect(dockerImage(picked, false)).toMatchObject({ holds: false, held: ["pino-pretty", "@swc/helpers"] });
-    expect(dockerImage("FROM node:22\nCOPY node_modules/lodash ./node_modules/lodash\n", false)).toMatchObject({ holds: false, held: ["lodash"] });
+    const picked = `${build}FROM node:22-slim AS base\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules/pino-pretty ./node_modules/pino-pretty\nCOPY --from=builder /app/node_modules/@swc/helpers/ ./node_modules/@swc/helpers\nCOPY --from=builder /app/node_modules/a/node_modules/b ./b\nFROM base\nCMD ["node", "dist/a.js"]\n`;
+    expect(dockerImage(picked, false)).toMatchObject({ holds: false, held: ["node_modules/pino-pretty", "node_modules/@swc/helpers", "node_modules/a/node_modules/b"] });
+    expect(dockerImage("FROM node:22\nCOPY node_modules/lodash ./node_modules/lodash\n", false)).toMatchObject({ holds: false, held: ["node_modules/lodash"] });
     expect(dockerImage("FROM node:22\nCOPY node_modules/lodash ./node_modules/lodash\n", true)).toMatchObject({ holds: false, held: [] });
+    // JSON form and flags.
+    expect(dockerImage(`${build}FROM node:22-slim\nCOPY --from=builder --chown=1000:1000 --link ["/app/node_modules/foo", "./x"]\n`, false)).toMatchObject({ holds: false, held: ["node_modules/foo"] });
     // A stage copied whole passes on what it holds by name.
-    expect(dockerImage(`${build}FROM node:22 AS mid\nWORKDIR /app\nCOPY --from=builder /app/node_modules/lodash ./node_modules/lodash\nFROM node:22-slim\nCOPY --from=mid /app /app\n`, false)).toMatchObject({ holds: false, held: ["lodash"] });
+    expect(dockerImage(`${build}FROM node:22 AS mid\nWORKDIR /app\nCOPY --from=builder /app/node_modules/lodash ./node_modules/lodash\nFROM node:22-slim\nCOPY --from=mid /app /app\n`, false)).toMatchObject({ holds: false, held: ["node_modules/lodash"] });
+    // A folder copied out of a stage that put another package there holds that package too (#190 review, 3).
+    expect(dockerImage(`${build}FROM node:22 AS mid\nCOPY --from=builder /app/node_modules/lodash /app/node_modules/foo\nFROM node:22-slim\nCOPY --from=mid /app/node_modules/foo ./node_modules/foo\n`, false).held.sort()).toEqual(["node_modules/foo", "node_modules/lodash"]);
+    // From a stage that holds no devDependency (a global install), a folder holds none (#190 review, 5b).
+    expect(dockerImage("FROM node:22 AS g\nRUN npm install -g pm2\nFROM node:22-slim\nCOPY --from=g /usr/local/lib/node_modules/pm2 /usr/local/lib/node_modules/pm2\n", false)).toMatchObject({ holds: false, held: [] });
     // Anything that is not one package's folder still holds every devDependency: node_modules itself, a dot folder, a
     // wildcard, a scope alone, a path inside a package, or the working folder.
-    for (const source of ["/app/node_modules", "/app/node_modules/", "/app/node_modules/.bin", "/app/node_modules/.prisma", "/app/node_modules/@img*", "/app/node_modules/pino-*", "/app/node_modules/@scope", "/app/node_modules/a/b", "/app"]) {
+    for (const source of ["/app/node_modules", "/app/node_modules/", "/app/node_modules/.bin", "/app/node_modules/.prisma", "/app/node_modules/@img*", "/app/node_modules/pino-*", "/app/node_modules/@scope", "/app/node_modules/a/b", "/app/node_modules/a/node_modules", "/app", "/"]) {
       expect(dockerImage(`${build}FROM node:22-slim\nCOPY --from=builder ${source} ./x\n`, false).holds).toBe(true);
     }
+    // A package folder that is the stage's working folder is the whole working folder (#190 review, 1).
+    expect(dockerImage("FROM node:22 AS b\nWORKDIR /app/node_modules/foo\nCOPY package*.json ./\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/node_modules/foo /srv\n", false).holds).toBe(true);
     // A package folder copied together with something that holds devDependencies.
-    expect(dockerImage(`${build}FROM node:22-slim\nCOPY --from=builder /app/node_modules/lodash /app/node_modules ./node_modules\n`, false)).toMatchObject({ holds: true, held: ["lodash"] });
+    expect(dockerImage(`${build}FROM node:22-slim\nCOPY --from=builder /app/node_modules/lodash /app/node_modules ./node_modules\n`, false)).toMatchObject({ holds: true, held: ["node_modules/lodash"] });
     expect(dockerImage("FROM node:22\nCOPY node_modules/lodash . ./\n", false).holds).toBe(true);
     // ADD can unpack an archive, so a path under node_modules still holds every devDependency.
     expect(dockerImage(`${build}FROM node:22-slim\nADD --from=builder /app/node_modules/lodash ./node_modules/lodash\n`, false)).toMatchObject({ holds: true, held: [] });
@@ -194,7 +202,23 @@ describe("production images and commands", () => {
     expect(split.summary.images_with_dev).toEqual([]);
     expect(split.copies.get("node_modules/my-lodash")?.production).toBe(true);
     expect(split.copies.get("node_modules/lodash")?.production).toBe(false);
-    expect(productionSplit(aliased, image("generated")).summary.images_with_dev).toEqual(["Dockerfile"]);
+    const unknown = productionSplit(aliased, image("generated"));
+    expect(unknown.summary.images_with_dev).toEqual(["Dockerfile"]);
+    expect(unknown.copies.get("node_modules/lodash")?.why).toContain("copies a node_modules folder that matches no installed copy");
+    // A scoped folder, and one in a workspace's node_modules.
+    const ws = lockOf({ devDependencies: { "@s/a": "^1" } }, { "node_modules/@s/a": { dev: true }, "node_modules/c": { dev: true }, "packages/api/node_modules/foo": { dev: true } }, { "packages/api": { name: "api" } });
+    const both = productionSplit(ws, tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/node_modules/@s/a ./node_modules/@s/a\nCOPY --from=b /app/packages/api/node_modules/foo ./foo\n" }));
+    expect(both.summary.images_with_dev).toEqual([]);
+    expect([...both.devOnly]).toEqual(["c@1.0.0"]);
+  });
+  it("keeps D1 only when a held folder is a link, even if a nested copy shares its name (#190 review, 2)", () => {
+    const links = (extra: Record<string, unknown>) => lockOf({ devDependencies: { x: "^1" } }, { "node_modules/x": { dev: true }, "packages/ws-a/node_modules/tool": { dev: true }, ...extra }, { "packages/ws-a": { name: "ws-a" }, "node_modules/ws-a": { resolved: "packages/ws-a", link: true } });
+    const source = tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nCOPY . .\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/node_modules/ws-a ./node_modules/ws-a\n" });
+    for (const lock of [links({}), links({ "node_modules/x/node_modules/ws-a": { dev: true } })]) {
+      const split = productionSplit(lock, source);
+      expect(split.summary.images_with_dev).toEqual(["Dockerfile"]);
+      expect([...split.devOnly]).toEqual([]);
+    }
   });
   it("uses D2 when the image copies only package folders, and makes what it holds production (L1c)", () => {
     const dockerfile = "FROM node:22 AS builder\nWORKDIR /app\nRUN npm ci\nRUN npm run build\nFROM node:22-slim\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules/nodemon ./node_modules/nodemon\nCMD [\"node\", \"dist/a.js\"]\n";
@@ -209,15 +233,22 @@ describe("production images and commands", () => {
     const held = productionSplit(nested, tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /node_modules/a /node_modules/a\n" }));
     expect(held.copies.get("node_modules/a/node_modules/b")?.production).toBe(true);
     expect([...held.devOnly]).toEqual(["b@1.0.0"]);
-    // Without such a copy, the image still sends the split to D1 only.
+    // Without such a copy, the image still sends the split to D1 only; so does another Dockerfile that holds them.
     expect(productionSplit(app, appSource({ Dockerfile: dockerfile.replace("/app/node_modules/nodemon ./node_modules/nodemon", "/app/node_modules ./node_modules") })).summary.images_with_dev).toEqual(["Dockerfile"]);
+    expect(productionSplit(app, appSource({ "api/Dockerfile": dockerfile, Dockerfile: "FROM node:22\nRUN npm ci\nCMD node a.js\n" })).summary.images_with_dev).toEqual(["Dockerfile"]);
   });
-  it("collects what an image holds by name in linear time", () => {
+  it("collects what an image holds by name, and seeds held copies, in linear time", () => {
     const quick = (f: () => unknown) => { const t0 = performance.now(); f(); return performance.now() - t0; };
-    const chain = ["FROM node:22 AS a0", ...Array.from({ length: 16_000 }, (_, k) => `FROM a${k} AS a${k + 1}\nCOPY --from=a${k} /node_modules/p${k} /node_modules/p${k}\nCOPY --from=a${k} /app /app`), "FROM a16000"].join("\n");
+    const chain = ["FROM node:22 AS a0\nRUN npm ci", ...Array.from({ length: 16_000 }, (_, k) => `FROM a${k} AS a${k + 1}\nCOPY --from=a${k} /node_modules/p${k} /node_modules/p${k}\nCOPY --from=a${k} /app /app`), "FROM a16000"].join("\n");
     let image: ReturnType<typeof dockerImage> | null = null;
     expect(quick(() => { image = dockerImage(chain, false); })).toBeLessThan(1500);
     expect(image!.held.length).toBe(16_000);
+    // Many copies sharing one folder name, and many Dockerfiles each copying a folder.
+    const many: Record<string, Pkg> = { "node_modules/a": { dev: true } };
+    for (let k = 0; k < 20_000; k++) many[`node_modules/p${k}/node_modules/a`] = { dev: true };
+    const files: Record<string, string> = { "package.json": "{}" };
+    for (let k = 0; k < 2000; k++) files[`d${k}/Dockerfile`] = "FROM node:22 AS b\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /node_modules/a /node_modules/a\n";
+    expect(quick(() => productionSplit(lockOf({}, many), tree(files)))).toBeLessThan(3000);
   });
   it("ignores development Dockerfiles, and runs the production stage's commands", () => {
     const dev = appSource({ "Dockerfile.dev": "FROM node:22\nRUN npm install\nCMD npm run dev\n", ".devcontainer/Dockerfile": "FROM node:22\nRUN npm install\n" });

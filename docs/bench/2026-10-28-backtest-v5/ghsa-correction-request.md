@@ -20,7 +20,7 @@
 
 1. **0.1.1 was published in 2023, long before the compromise.**
    - The npm registry's `time` field gives 0.1.1 as 2023-02-28T09:46:00.601Z and 0.1.2 as 2025-11-24T05:49:00.347Z.
-   - 0.1.1 was published by `makoto_inoue`, a maintainer of the package who had published earlier versions. 0.1.2 was published by `davidchu` with npm 10.8.2.
+   - 0.1.1 was published by `makoto_inoue`, a maintainer of the package who had published earlier versions. 0.1.2 was published by `davidchu` with npm 10.8.2. The registry no longer serves either version's document, so both publishers come from archived copies of it: Software Heritage and ecosyste.ms for 0.1.1, ecosyste.ms for 0.1.2.
    - @ensdomains/ens-contracts 0.0.20 (2023-03-01, published by the same maintainer) to 0.0.22 declare `"@ensdomains/buffer": "^0.1.1"`. Until 0.1.2 appeared, that range could only resolve to 0.1.1.
 
 2. **The other sources name only 0.1.2.** In OSV's MAL-2025-190866 (which imports this advisory), amazon-inspector and google-open-source-security list only 0.1.2. Google's entry says the package "was compromised by the Sha1-Hulud: The Second Coming NPM worm". Only the ghsa-malware origin adds 0.1.1.

@@ -109,6 +109,33 @@ All nine P1 cases are in `scripts/` files. The first rule did not count those as
 - No miss came from a start script, a Dockerfile, a build tool's configuration, a bundler helper, a shipped runtime or a CSS import.
 - The price is the count: 938 production findings against npm audit's 1,867.
 
+## After #168's review: the reader fixed, and a second execution beside the result
+
+#168's fresh-context review found eight places where c381a85's `production.ts` left out a copy that section 2 calls production. Examples: a code file named `dockerfile-snippets.ts` was skipped as source; a type-only match swallowed the next import; `import(/* comment */ 'x')` was not read; a heredoc `RUN npm ci` was not seen as a full install.
+
+**The order of work.**
+- The fix and the second execution were registered first (docs/decisions.md, 1fa3d68, 22:13:58 JST).
+- The fixes went in 6c4f58e (22:18:43), with nine tests. Each test failed on c381a85's `production.ts` and passes on the fix (run in Docker: 9 failed and 25 passed on the old file; 34 passed on the new one).
+- An automated security review then flagged an exponential backtracking pattern in the import-call reader. That was fixed in f0d489e (22:23:09), after the second execution had started. The fix changes how the patterns backtrack, not what they match. A test reads crafted inputs in linear time.
+
+**The second execution**, reported beside the result and not instead of it:
+- It ran at 6c4f58e, 13:19:00Z–13:35:02Z, with the same script, sample, sources and image.
+- `result-fixed/run.log`'s blob hashes equal `git ls-tree 6c4f58e`. It ran detached (`docker run -d`), and it exited 0. No repository failed. One needed a second attempt (carlostighe/modalMap); the reason is not logged.
+- During the run, the worktree volume it had mounted read-only was re-synced for the tests above. `rerun.ts` reads from that volume only at start (its code, the first run's `noise.json`, semver's version), so the run was not affected. Its logged hashes are the ones read at start.
+
+| | The result (c381a85) | Second execution (6c4f58e) |
+| --- | --- | --- |
+| npm audit | 1,867 | 1,867 |
+| The judge's count | 938 | 938 |
+| Left out | 160 | 160 (the same 160) |
+| Misses (from the review's verdicts) | 11 in 4 repositories | 11 in 4 repositories |
+| Count gate | not met | not met |
+| Miss gate | not met | not met |
+
+- No row differs in its counts, its left-out list or which split it got.
+- `scripts/beside.mjs` (`result-fixed/beside-tally.json`) counts the second execution's misses from the review's verdicts, as registered. It found that every package the second execution leaves out was reviewed, and that its left-out list is a subset of the result's: here, the same list.
+- So none of the eight findings changed anything in this sample. They matter for repositories outside it.
+
 ## Both gates
 
 | Gate | Result |
@@ -140,3 +167,4 @@ An earlier version of this README took the JavaScript shims left in esbuild's an
 - `reviewer-brief.md`: committed before the review; quotes sections 1, 2 and 5 of the definitions.
 - `scripts/assign.mjs` and `review/assignments.json`: which packages each reviewer got, with the first run's verdict and evidence.
 - `review/reviewer-prompt.md`, `review/verdicts-N.json`, and `review/review-tally.json` (`scripts/tally.mjs`), which adds the verdicts up and changes none.
+- `result-fixed/`: the second execution (`noise.json`, `run.log`) and `beside-tally.json` (`scripts/beside.mjs`).

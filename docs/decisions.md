@@ -1234,3 +1234,4 @@ One addition goes beyond section 2's text, in the safe direction: an install wit
 - **The result stays the result.** The first execution at c381a85 (count 938, 11 misses) is the registered rerun.
 - **A second execution** at the fix commit, with the same script, sample, sources and image, is reported beside it, never instead of it. Its output goes to `docs/bench/2026-10-28-noise-v2/result-fixed/`.
 - Every fix only adds production, so its left-out list must be a subset of the result's. Its misses are counted from the review's verdicts for the packages it still leaves out. A left-out package that the review did not check counts as undecidable. No other review is run.
+- **Outcome.** The second execution (6c4f58e) gave the same numbers: the judge 938, the same 160 left out, 11 misses in 4 repositories. f0d489e later stopped the reader from backtracking exponentially on a crafted file, which an automated security review flagged. That changes no match.

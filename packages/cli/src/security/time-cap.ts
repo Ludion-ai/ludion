@@ -3,14 +3,42 @@
 // in the lockfile or have been published strictly before T (rule 1), and a new dependency whose package first appeared
 // less than the base wait before T stops the change (rule 2). The rules are one pure function, used by `ludion judge`
 // (npm, pnpm) and on `ludion patch` candidates (npm, Composer), with the release facts fetched below.
+// A version published at or after T may still move when it is the same release as a target (the same-release
+// exception, docs/decisions.md, "Rule 1's same-release exception").
 
 export type Release = { name: string; version: string };
+/**
+ * What the same-release exception compares: the publisher's account (null when unknown, or when the registry names no
+ * account, as for trusted publishing) and the provenance's source.
+ */
+export type ReleaseIdentity = { publisher: string | null; provenance: { repository: string | null; workflow: string | null; commit: string | null } | null };
+/** A version published at or after T that the exception allows, the target it belongs with, and why. */
+export type SameRelease = { version: string; target: string; basis: "provenance" | "publisher" };
+/** Without provenance, a sibling must be published at most this long after its target (and so after T). */
+export const SAME_RELEASE_MINUTES = 15;
+
+/**
+ * Is a version published at or after T the same release as a target? With provenance on both: the same repository,
+ * workflow and commit. Without provenance on either: the same publisher, the same version number, and at most 15 minutes
+ * after the target (T is the latest target, so also after T). Provenance on only one side, a record naming no
+ * repository, workflow or commit, or an unknown publisher: no.
+ */
+export function sameRelease(target: { version: string; published: number; identity: ReleaseIdentity }, other: { version: string; published: number; identity: ReleaseIdentity }, t: number): SameRelease["basis"] | null {
+  const a = target.identity.provenance, b = other.identity.provenance;
+  if (a && b) return a.repository && a.workflow && a.commit && a.repository === b.repository && a.workflow === b.workflow && a.commit === b.commit ? "provenance" : null;
+  if (a || b) return null;
+  const within = other.published >= t && other.published - target.published <= SAME_RELEASE_MINUTES * 60_000;
+  return target.identity.publisher && target.identity.publisher === other.identity.publisher && target.version === other.version && within ? "publisher" : null;
+}
+
 export type TimeCap = {
   /** T: the latest publish time of the targets; null when it cannot be known. */
   t: string | null;
   targets: string[];
-  /** Versions other than the targets, not in the lockfile before, published at or after T. */
+  /** Versions other than the targets, not in the lockfile before, published at or after T, and not the same release as a target. */
   after_t: string[];
+  /** Versions published at or after T that the same-release exception allows. */
+  same_release: SameRelease[];
   /** New dependencies whose package first appeared later than T minus the base wait. */
   young: string[];
   /** Why the cap could not be checked; each makes the change undecidable. */
@@ -28,10 +56,12 @@ export function timeCap(input: {
   newDependencies: string[];
   published: (name: string, version: string) => string | null | undefined;
   created: (name: string) => string | null | undefined;
+  /** Publisher and provenance per version, for the same-release exception; without it, nothing after T is allowed. */
+  identity?: (name: string, version: string) => ReleaseIdentity | undefined;
   /** The base wait of the change's urgency, before any extension. */
   waitHours: number;
 }): TimeCap {
-  const out: TimeCap = { t: null, targets: input.targets.map(r => `${r.name}@${r.version}`).sort(), after_t: [], young: [], undecidable: [], wait_hours: input.waitHours };
+  const out: TimeCap = { t: null, targets: input.targets.map(r => `${r.name}@${r.version}`).sort(), after_t: [], same_release: [], young: [], undecidable: [], wait_hours: input.waitHours };
   if (!input.targets.length) { out.undecidable.push("The change names no fixed package and no direct dependency, so T (the fix's publish time) is unknown."); return out; }
   let t = -Infinity;
   for (const r of input.targets) {
@@ -46,8 +76,16 @@ export function timeCap(input: {
     const id = `${r.name}@${r.version}`;
     if (targets.has(id) || input.locked.has(id)) continue;
     const at = Date.parse(input.published(r.name, r.version) ?? "");
-    if (!Number.isFinite(at)) out.undecidable.push(`${id} has no publish time; it cannot be checked against T.`);
-    else if (at >= t) out.after_t.push(id);
+    if (!Number.isFinite(at)) { out.undecidable.push(`${id} has no publish time; it cannot be checked against T.`); continue; }
+    if (at < t || out.after_t.includes(id) || out.same_release.some(s => s.version === id)) continue;
+    const identity = input.identity?.(r.name, r.version);
+    const sibling = identity && input.targets.map(target => {
+      const own = input.identity!(target.name, target.version);
+      const basis = own && sameRelease({ version: target.version, published: Date.parse(input.published(target.name, target.version)!), identity: own }, { version: r.version, published: at, identity }, t);
+      return basis ? { version: id, target: `${target.name}@${target.version}`, basis } : null;
+    }).find(s => s !== null);
+    if (sibling) out.same_release.push(sibling);
+    else out.after_t.push(id);
   }
   for (const name of [...new Set(input.newDependencies)].sort()) {
     const at = Date.parse(input.created(name) ?? "");
@@ -55,13 +93,15 @@ export function timeCap(input: {
     else if (at > t - input.waitHours * 3_600_000) out.young.push(`${name} (first published ${new Date(at).toISOString()})`);
   }
   out.after_t = [...new Set(out.after_t)].sort();
+  out.same_release.sort((a, b) => a.version.localeCompare(b.version));
   return out;
 }
 
-/** The cap as comment lines. Always shows the count, including 0. */
+/** The cap as comment lines. Always shows the count, including 0, and each version the same-release exception allows. */
 export function renderTimeCap(cap: TimeCap): string[] {
-  const lines = [`Published at or after T (${cap.t ?? "unknown"}, the fix's publish time): ${cap.t ? cap.after_t.length : "unknown"} version(s)`];
+  const lines = [`Published at or after T (${cap.t ?? "unknown"}, the fix's publish time): ${cap.t ? cap.after_t.length + cap.same_release.length : "unknown"} version(s)`];
   for (const v of cap.after_t) lines.push(`  ${v}`);
+  for (const s of cap.same_release) lines.push(`  ${s.version}: allowed, the same release as ${s.target} (${s.basis === "provenance" ? "provenance names the same repository, workflow and commit" : `no provenance; same publisher and version, at most ${SAME_RELEASE_MINUTES} minutes after it`})`);
   return lines;
 }
 

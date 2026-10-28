@@ -2,7 +2,7 @@
 // Pure: every fact comes in as data (registry, OSV, KEV), so the same rules run live and in the backtest.
 // v0 judges gates 1, 2 and 4 and the wait. Gate 3 (build and test) is not run here, so v0 never says "apply".
 import semver from "semver";
-import { renderTimeCap, timeCap, type TimeCap } from "./time-cap.ts";
+import { renderTimeCap, timeCap, type ReleaseIdentity, type TimeCap } from "./time-cap.ts";
 
 export type Urgency = "exploited" | "high" | "normal" | "low";
 /** Hours to wait after the newest publish in the diff (design, "待機時間"). */
@@ -32,8 +32,10 @@ export type VersionFacts = {
   present: boolean;
   deprecated: string | null;
   publisher: string | null;
+  /** The publisher names no single account (npm-facts.ts, sharedPublisher): trusted publishing's shared user, say. */
+  shared_publisher: boolean;
   /** Build provenance from the registry's attestations: null when the version has none. */
-  provenance: { repository: string | null; workflow: string | null } | null;
+  provenance: { repository: string | null; workflow: string | null; commit: string | null } | null;
   /** Which of preinstall, install, postinstall the version declares. */
   install_scripts: string[];
   dependencies: string[];
@@ -46,6 +48,9 @@ export type VersionFacts = {
   /** Other OSV advisories (vulnerabilities) naming this version. */
   advisories: string[];
 };
+
+/** What the same-release exception compares for a version: a shared publisher is no account, so unknown. */
+export const releaseIdentity = (f: VersionFacts): ReleaseIdentity => ({ publisher: f.shared_publisher ? null : f.publisher, provenance: f.provenance });
 
 /** The registry's own tarball URL for a version: the only `resolved` the judge accepts. */
 export function registryTarball(name: string, version: string): string {
@@ -413,7 +418,8 @@ export function judge(input: {
     if (newDeps.length) { add({ gate: 2, package: c.name, effect: "extend", message: `${c.name}@${c.to} adds dependencies: ${newDeps.join(", ")}.` }); extended = true; }
   }
 
-  // Rules 1 and 2: T is the fix's publish time (the changed direct dependencies' when nothing is fixed).
+  // Rules 1 and 2: T is the fix's publish time (the changed direct dependencies' when nothing is fixed). A version
+  // published at or after T that is the same release as a target is allowed; the wait above already counts from it.
   const locked = input.locked ?? new Set(changes.flatMap(c => c.from ? [`${c.name}@${c.from}`] : []));
   const lockedNames = new Set([...locked].map(id => id.slice(0, id.lastIndexOf("@"))));
   const fixedNames = new Set(fixes.map(f => f.package));
@@ -429,6 +435,7 @@ export function judge(input: {
     targets: targets.map(c => ({ name: c.name, version: c.to })), others: changes.map(c => ({ name: c.name, version: c.to })), locked, newDependencies,
     published: (name, version) => facts.get(`${name}@${version}`)?.published_at,
     created: name => created.get(name),
+    identity: (name, version) => { const f = facts.get(`${name}@${version}`); return f && releaseIdentity(f); },
     waitHours: WAIT_HOURS[urgency],
   });
   if (changes.length) {
@@ -456,7 +463,7 @@ export function judge(input: {
       "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
       "Obfuscated code and new network or process calls in the changed code are not inspected.",
       "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.",
-      "Provenance is read from the registry's attestation record; its Sigstore signature is not verified here.",
+      "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
       "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
       "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
       "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.",

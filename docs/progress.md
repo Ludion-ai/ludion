@@ -380,3 +380,9 @@ The owner kept the wait table and asked for the dependencies that move with a fi
 - A script bug that made removed versions unselectable was found in the first execution and corrected before the write-up. The definitions are unchanged.
 
 Gate: **not met** (1 missed and the unknowns, at every wait). The delay gates are met. The wait table is unchanged.
+
+## 2026-10-28 — Rule 1's same-release exception
+
+`time-cap.ts` `sameRelease()`: a version published at or after T may move with the fix when it is the same release as a target. With provenance, that means the same repository, workflow and commit. Without provenance, it means the same publisher account and version number, published at most 15 minutes after its target. Used by `ludion judge` (npm, pnpm) and `ludion patch` npm candidates; Composer is unchanged. Checked against the registry: `next@15.2.3` and `@next/env@15.2.3`, published 10 s apart, carry the same repository, workflow and commit, so the provenance branch allows the pair.
+
+The independent review of #151 asked for changes in round 1. Its one blocking finding: trusted publishing's shared "GitHub Actions" user matched across unrelated packages. Round 2 approved at 08aa452, and its non-blocking findings were handled too. Both rounds are recorded in docs/decisions.md as the amendment made before backtest v4. On the registry, the subject check passes on `next@15.2.3`, `@next/env@15.2.3` and `get-jwks@11.0.2`, and get-jwks's trusted publisher counts as no account. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passes; packages tests: 206 passed. The site build needs git and was not run in the container; CI runs the full suite.

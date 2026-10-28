@@ -31,21 +31,50 @@ const registryPath = (name: string) => {
   return name.startsWith("@") ? `@${encodeURIComponent(name.slice(1))}` : encodeURIComponent(name);
 };
 
-/** Repository and workflow from an SLSA provenance statement (v1 or v0.2), as the registry recorded it. */
-export function provenanceFrom(attestations: unknown): { repository: string | null; workflow: string | null } | null {
+const COMMIT = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
+const commitOf = (digest: unknown, key: string) => { const value = (digest as Record<string, unknown> | undefined)?.[key]; return typeof value === "string" && COMMIT.test(value) ? value : null; };
+/**
+ * A v0.2 source URI without its `@ref`: the first `@` after the host's first path slash starts the ref (owner and
+ * repository names have none; a tag such as `@scope/pkg@1.2.3` does).
+ */
+const withoutRef = (uri: string) => {
+  const u = uri.replace(/^git\+/, ""), path = u.indexOf("/", u.indexOf("://") + 3), at = path > 0 ? u.indexOf("@", path) : -1;
+  return at > path ? u.slice(0, at) : u;
+};
+/**
+ * Repository, workflow and source commit from an SLSA provenance statement (v1 or v0.2), as the registry recorded it.
+ * The commit is v1's first resolved dependency (`gitCommit`) or v0.2's config source (`sha1`). Given the version and
+ * its registry integrity, the statement must name that version and that tarball (its subject), or it is refused.
+ */
+export function provenanceFrom(attestations: unknown, subject?: { name: string; version: string; integrity: string | null }): { repository: string | null; workflow: string | null; commit: string | null } | null {
   const list = (attestations as { attestations?: unknown })?.attestations;
   if (!Array.isArray(list)) throw new Error("Invalid attestations record.");
   const slsa = list.find(a => typeof a?.predicateType === "string" && a.predicateType.startsWith("https://slsa.dev/provenance/"));
   if (!slsa) return null;
   const payload = slsa.bundle?.dsseEnvelope?.payload;
   if (typeof payload !== "string") throw new Error("Provenance attestation has no payload.");
-  const predicate = JSON.parse(Buffer.from(payload, "base64").toString("utf8"))?.predicate;
+  const statement = JSON.parse(Buffer.from(payload, "base64").toString("utf8"));
+  if (subject) {
+    const purl = `pkg:npm/${subject.name.replace(/^@/, "%40")}@${subject.version}`;
+    const sha512 = subject.integrity?.startsWith("sha512-") ? Buffer.from(subject.integrity.slice(7), "base64").toString("hex") : null;
+    if (!sha512 || !Array.isArray(statement?.subject) || !statement.subject.some((s: any) => s?.name === purl && s?.digest?.sha512 === sha512)) throw new Error(`The provenance statement does not name ${subject.name}@${subject.version} and its tarball.`);
+  }
+  const predicate = statement?.predicate;
   const workflow = predicate?.buildDefinition?.externalParameters?.workflow;
-  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null };
+  const resolved = predicate?.buildDefinition?.resolvedDependencies;
+  const v1Commit = Array.isArray(resolved) ? commitOf(resolved[0]?.digest, "gitCommit") : null;
+  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null, commit: v1Commit };
   const source = predicate?.invocation?.configSource;
-  if (source) return { repository: typeof source.uri === "string" ? source.uri.replace(/@.*$/, "").replace(/^git\+/, "") : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null };
-  return { repository: null, workflow: null };
+  if (source) return { repository: typeof source.uri === "string" ? withoutRef(source.uri) : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null, commit: commitOf(source.digest, "sha1") };
+  return { repository: null, workflow: null, commit: v1Commit };
 }
+
+/**
+ * Does the registry's user name no single account? npm trusted publishing records a shared user ("GitHub Actions",
+ * `npm-oidc-no-reply@github.com`, with `trustedPublisher`) for every package published that way. A name no npm account
+ * can have (uppercase, spaces) is treated the same, so another CI's shared user fails closed too.
+ */
+export const sharedPublisher = (npmUser: any) => !!npmUser?.trustedPublisher || (typeof npmUser?.email === "string" && npmUser.email.startsWith("npm-oidc-no-reply@")) || (typeof npmUser?.name === "string" && !/^[a-z0-9][a-z0-9._-]*$/.test(npmUser.name));
 
 /** Registry facts for the given versions of one package (one packument read, plus one attestation read per version). */
 export async function registryFacts(name: string, versions: string[], fetchFn: Fetch = fetch): Promise<Map<string, Omit<VersionFacts, "malicious" | "advisories">>> {
@@ -58,22 +87,24 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
     const published = typeof doc.time[version] === "string" ? doc.time[version] : null;
     if (!manifest) {
       // Unpublished: the registry keeps only its publish time. Nothing else about it can be compared.
-      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, provenance: null, install_scripts: [], dependencies: [], integrity: null, package_created: created });
+      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, shared_publisher: false, provenance: null, install_scripts: [], dependencies: [], integrity: null, package_created: created });
       continue;
     }
+    const integrity = typeof manifest.dist?.integrity === "string" ? manifest.dist.integrity : null;
     let provenance: VersionFacts["provenance"] = null;
     if (manifest.dist?.attestations) {
-      provenance = provenanceFrom(await boundedJson(fetchFn, `https://registry.npmjs.org/-/npm/v1/attestations/${registryPath(name)}@${encodeURIComponent(version)}`, {}, 4 * 1024 * 1024));
+      provenance = provenanceFrom(await boundedJson(fetchFn, `https://registry.npmjs.org/-/npm/v1/attestations/${registryPath(name)}@${encodeURIComponent(version)}`, {}, 4 * 1024 * 1024), { name, version, integrity });
     }
     facts.set(version, {
       published_at: published,
       present: true,
       deprecated: typeof manifest.deprecated === "string" && manifest.deprecated ? manifest.deprecated : null,
       publisher: typeof manifest._npmUser?.name === "string" ? manifest._npmUser.name : null,
+      shared_publisher: sharedPublisher(manifest._npmUser),
       provenance,
       install_scripts: installScripts(manifest.scripts),
       dependencies: Object.keys({ ...manifest.dependencies, ...manifest.optionalDependencies }).sort(),
-      integrity: typeof manifest.dist?.integrity === "string" ? manifest.dist.integrity : null,
+      integrity,
       package_created: created,
     });
   }

@@ -9,5 +9,5 @@ docs/bench/2026-10-29-shadow-recorder.
   - predecessors, and `created` for dependencies whose first publish time is not stored.
 
   It also stores OSV's new MAL- records daily, and stops at a storage limit.
-- **Tests.** 32, in Docker without network (logs/check.log). Four deliberate mutations were each caught.
+- **Tests.** 33, in Docker without network (logs/check.log). Four deliberate mutations were each caught.
 - **Not built.** The replay that judges captured versions, so there is no result for condition (b) yet. Production placement is the owner's choice.

@@ -434,6 +434,28 @@ describe("Recorder, review findings and failure paths", () => {
     w.feed.push({ seq: 102, id: "left-pad" }); await rec.poll();
     expect(rec.state.pending).toEqual([]);
     expect(lines(dir, "captures").find(r => r.type === "created")).toMatchObject({ name: "no-such-dep", status: 404, created: null });
+    // Published later: the next version that depends on it reads it again.
+    w.packuments["no-such-dep"] = { "dist-tags": {}, time: { created: "2026-11-02T00:00:00.000Z" }, versions: {} };
+    p.versions["1.0.2"] = manifest("1.0.2", { dependencies: { "no-such-dep": "1.0.0" } });
+    p.time["1.0.2"] = "2026-11-03T00:00:00.000Z";
+    w.tarballs.set("1.0.2", ball("1.0.2"));
+    w.feed.push({ seq: 103, id: "left-pad" }); await rec.poll();
+    expect(lines(dir, "captures").filter(r => r.type === "created").map(r => r.created)).toEqual([null, "2026-11-02T00:00:00.000Z"]);
+  });
+
+  it("gives up each version still retried when its package is given up, and a version on its own after 60 attempts", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    const p = w.packuments["left-pad"];
+    p.versions["1.0.1"] = manifest("1.0.1");
+    p.time["1.0.1"] = "2026-10-29T01:00:00.000Z";
+    w.fail.add("https://registry.npmjs.org/left-pad/-/left-pad-1.0.1.tgz");
+    w.feed.push({ seq: 102, id: "left-pad" });
+    for (let i = 0; i < 60; i++) await rec.poll();
+    expect(rec.state.pending).toEqual([]);
+    const gave = lines(dir, "captures").filter(r => r.type === "gave_up");
+    expect(gave.some(r => r.version === "1.0.1")).toBe(true);
+    expect(JSON.stringify(lines(dir, "captures").filter(r => r.type === "version" && r.version === "1.0.1").length)).toBe("60");
   });
 
   it("refuses a host outside the four allowed", async () => {

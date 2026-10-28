@@ -22,9 +22,9 @@ The recorder from docs/bench/2026-10-28-shadow-design/README.md, sections 2.1 to
   - **afterwards:** new or changed `time` entries, `dist-tags` changes, each stored version's removal (once), and its deprecation.
 - **Retries.**
   - A failed read of a whole package is retried on the next poll. So is a failed read for a new version: its attestations, its tarball or a dependency's `created`.
-  - After 60 failed polls the recorder writes a `gave_up` record, for the version or the package.
+  - After 60 failed capture attempts the recorder writes a `gave_up` record: for the version, or for the package and each of its versions still retried. A catch-up poll over several feed pages can count more than one attempt.
   - A version removed before its capture was complete gets a `gave_up` record at once, and stops the retries.
-  - A dependency the registry does not have is a `created` record with status 404, not a failure.
+  - A dependency the registry does not have is a `created` record with status 404, not a failure. It is read again for a later version that depends on it.
   - The feed position moves on once a page is handled.
   - One document can never hold the feed. An error on one package keeps only that package pending.
   - A dependency name that is not a valid npm name is logged and skipped.
@@ -38,7 +38,10 @@ What is not stored:
   - Addresses inside strings are replaced, including `mailto:` ones. Package specs and URLs that only look like addresses are left alone, such as `p@1.0.1`, `npm:x@1.0.0`, `git@github.com` in an `ssh://` URL, and scoped tarball URLs.
   - The publisher check the judge makes from `_npmUser.email` (`sharedPublisher`) is computed first and stored as a boolean.
   - **Not scrubbed:** attestation bundles (public Sigstore bundles, stored as served), the keys of `time` and `dist-tags`, and error snippets in status lines.
-  - **Known limits of the pattern.** It also removes look-alikes such as `react@next.js`. It misses an address followed by `_`, and anything that is not written as an address.
+  - **Known limits of the pattern.** It also removes look-alikes such as `react@next.js`.
+    - It misses an address followed by `_`, `:` or `-`, one after `/`, and punycode top-level domains (`xn--`).
+    - Two object keys that both scrub to `[email removed]` become one.
+    - It also misses anything that is not written as an address.
 
 **What leaves the machine:**
 - package names and versions, in registry URLs;
@@ -55,7 +58,7 @@ The recorder refuses any host other than registry.npmjs.org, replicate.npmjs.com
 ## Data layout
 
 Under the data directory:
-- `state.json`: the feed position and start, the OSV position and day, the pending names, and `stopped`;
+- `state.json`: the feed position and start, the OSV position and day, the pending names and their failure counts, OSV records to read again, and `stopped`;
 - `captures/<UTC day>.jsonl`: `baseline`, `change`, `version` (reason `new`, `retry`, `lockfile` or `predecessor`), `deprecation`, `created`, `gave_up` and `gone` records;
 - `osv/<UTC day>.jsonl`: MAL- records;
 - `status/<UTC day>.jsonl`: `start`, `feed_start`, `poll`, `osv`, `error` and `stopped` lines;
@@ -74,9 +77,9 @@ Under the data directory:
 
 ## Tests
 
-`tools/shadow/test/recorder.test.ts` has 32 tests. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`:
+`tools/shadow/test/recorder.test.ts` has 33 tests. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`:
 - typecheck exit 0;
-- 32 of 32 passed;
+- 33 of 33 passed;
 - four deliberate mutations, each making tests fail: e-mail scrubbing off, the storage limit off, the integrity check off, and first-sight new versions off.
 
 The tests cover:

@@ -176,7 +176,8 @@ export class Recorder {
       }
       // The record first, then the marker that suppresses a re-read: a crash in between only causes a second read.
       if (!this.append("captures", record)) return false;
-      this.writeAtomic(this.createdPath(name), JSON.stringify(record));
+      // A 404 is not kept as a marker: the package may be published later, and a later version must read it again.
+      if (!("status" in record)) this.writeAtomic(this.createdPath(name), JSON.stringify(record));
       return true;
     } catch (e) {
       this.append("status", { type: "error", at: this.at(), name, url, error: String((e as Error).message).slice(0, 300) });
@@ -302,6 +303,15 @@ export class Recorder {
     return Object.values(versions).some(x => !x.removed && (x.tries ?? 0) > 0) ? "incomplete" : "ok";
   }
 
+  /** Give up a package after MAX_TRIES failed polls: one record for it, and one for each of its versions still retried. */
+  private giveUp(name: string, tries: number, result: "failed" | "incomplete") {
+    this.append("captures", { type: "gave_up", name, fetched_at: this.at(), tries, reason: result === "failed" ? "the package read kept failing" : "a version's reads kept failing" });
+    const known = this.known(name);
+    if (!known) return;
+    for (const [v, x] of Object.entries(known.versions)) if ((x.tries ?? 0) > 0) { this.append("captures", { type: "gave_up", name, version: v, fetched_at: this.at(), tries: x.tries, reason: "its package was given up" }); x.tries = 0; }
+    this.writeAtomic(this.knownPath(name), JSON.stringify(known));
+  }
+
   /** Read the feed from the stored position to its end, capturing every watched change. */
   async poll(): Promise<{ entries: number; watched: number; seq: string | null }> {
     const summary = { entries: 0, watched: 0, seq: this.state.seq };
@@ -329,7 +339,7 @@ export class Recorder {
         if (this.state.stopped) return summary;
         if (result === "ok") { delete this.state.failures[name]; continue; }
         const tries = (this.state.failures[name] ?? 0) + 1;
-        if (tries >= MAX_TRIES) { this.append("captures", { type: "gave_up", name, fetched_at: this.at(), tries, reason: result === "failed" ? "the package read kept failing" : "a version's reads kept failing" }); delete this.state.failures[name]; continue; }
+        if (tries >= MAX_TRIES) { this.giveUp(name, tries, result); delete this.state.failures[name]; continue; }
         this.state.failures[name] = tries;
         failed.push(name);
       }

@@ -197,8 +197,8 @@ describe("production images and commands", () => {
       expect(dockerImage(`FROM node:22 AS b\nWORKDIR ${workdir}\nCOPY package*.json ./\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b ${source} /srv\n`, false).holds).toBe(true);
     }
     expect(dockerImage("FROM node:22\nCOPY x/.. /app\n", false).holds).toBe(true);
-    // A WORKDIR that holds a variable is kept as written, and a relative source still matches the working folder as
-    // written (#190 third delta review, 1, 2).
+    // A WORKDIR that holds a variable matches as written (it may be absolute) and joined (it may be relative), and a
+    // relative source still matches the working folder as written (#190 third delta review, 1, 2; automated review of 2b85143).
     for (const [base, source] of [["WORKDIR /app\nFROM base AS builder\nARG APP_DIR=/usr/src/app\nWORKDIR $APP_DIR", "$APP_DIR"], ["WORKDIR /app\nFROM base AS builder\nWORKDIR ${APP_DIR}", "${APP_DIR}/"], ["WORKDIR /srv\nWORKDIR app\nFROM base AS builder", "app"], ["WORKDIR /app\nFROM base AS builder\nARG SUB=s\nWORKDIR $SUB", "/app"]]) {
       expect(dockerImage(`FROM node:22 AS base\n${base}\nCOPY package*.json ./\nRUN npm ci\nFROM node:22-slim\nCOPY --from=builder ${source} /x\n`, false).holds).toBe(true);
     }

@@ -1,0 +1,1601 @@
+{
+  "run": {
+    "started_at": "2026-10-28T11:54:24.328Z",
+    "ended_at": "2026-10-28T11:55:39.616Z",
+    "smoke": "@ensdomains/buffer@0.1.1",
+    "blobs": {
+      "tools/backtest/src/malicious-v5.ts": "95f60e297019ac1f721bad99461db4247e426b2c",
+      "tools/backtest/src/archives-v5.ts": "835452a38182d97e0f856c92f8f2706a657575fa",
+      "packages/cli/src/security/judge.ts": "e32c2b8bb5bc5d8c9958735bd0a4d92fb1ad1fca",
+      "packages/cli/src/security/npm-facts.ts": "8289c4e208a4cda1dc215032df95ba56f1912262",
+      "packages/cli/src/security/time-cap.ts": "4fb4608234c42d0597a65eb10452f22d0d602575"
+    },
+    "semver": "7.8.5",
+    "node": "v24.22.1"
+  },
+  "method": "docs/bench/2026-10-28-backtest-v5/definitions.md; the header of tools/backtest/src/malicious-v5.ts.",
+  "denominator": 1,
+  "fixes": {
+    "events": 5851,
+    "with_registry_time": 5594,
+    "left_out": {
+      "not_served": 8,
+      "unreadable": 2,
+      "no_publish_time": 247
+    },
+    "in_some_window": 1348,
+    "with_exception": {
+      "resolved": 0,
+      "stopped_by_rule1": 0,
+      "with_unknown_branch": 0,
+      "tree_versions": {
+        "median": null,
+        "max": 0
+      }
+    },
+    "without_exception": {
+      "resolved": 0,
+      "stopped_by_rule1": 0,
+      "with_unknown_branch": 0,
+      "tree_versions": {
+        "median": null,
+        "max": 0
+      }
+    }
+  },
+  "v4_reproduced": {
+    "differences": 48,
+    "first": [
+      "@ensdomains/buffer@0.1.1 with_exception exploited conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception exploited conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception exploited conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception exploited optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception exploited optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception exploited optimistic primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception high conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception high conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception high conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception high optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception high optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception high optimistic primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception normal conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception normal conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception normal conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception normal optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception normal optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception normal optimistic primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception low conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception low conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception low conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception low optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception low optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 with_exception low optimistic primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception exploited conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception exploited conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception exploited conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception exploited optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception exploited optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception exploited optimistic primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception high conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception high conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception high conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception high optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception high optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception high optimistic primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception normal conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception normal conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception normal conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception normal optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception normal optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception normal optimistic primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception low conservative a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception low conservative b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception low conservative primary: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception low optimistic a: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception low optimistic b: stopped (v4: missed)",
+      "@ensdomains/buffer@0.1.1 without_exception low optimistic primary: stopped (v4: missed)"
+    ]
+  },
+  "by_urgency": {
+    "with_exception": {
+      "exploited": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "high": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "normal": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "low": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "high": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "normal": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "low": {
+        "conservative": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "a": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          },
+          "b": {
+            "stopped": 1,
+            "missed": 0,
+            "unknown": 0
+          }
+        }
+      }
+    }
+  },
+  "stop_rate_interval": {
+    "with_exception": {
+      "exploited": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      },
+      "high": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      },
+      "normal": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      },
+      "low": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      },
+      "high": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      },
+      "normal": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      },
+      "low": {
+        "conservative": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        },
+        "optimistic": {
+          "lower": "1 / 1",
+          "upper": "1 / 1"
+        }
+      }
+    }
+  },
+  "gate_every_malicious_version_stopped": {
+    "with_exception": "met",
+    "without_exception": "met"
+  },
+  "stops_by_signal": {
+    "with_exception": {
+      "exploited": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    }
+  },
+  "v4_stops_by_signal_reproduced": {
+    "with_exception": {
+      "exploited": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_registry": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_ecosyste.ms": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts_software_heritage": {
+          "fires": 0,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 0,
+          "alone": 0
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1,
+          "alone": 1
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    }
+  },
+  "changes_from_v4_with_exception": {
+    "exploited": {
+      "moved": 0,
+      "from_to": {},
+      "by_stop_source": {},
+      "versions": []
+    },
+    "high": {
+      "moved": 0,
+      "from_to": {},
+      "by_stop_source": {},
+      "versions": []
+    },
+    "normal": {
+      "moved": 0,
+      "from_to": {},
+      "by_stop_source": {},
+      "versions": []
+    },
+    "low": {
+      "moved": 0,
+      "from_to": {},
+      "by_stop_source": {},
+      "versions": []
+    }
+  },
+  "install_scripts": {
+    "source_of_v_fact": {
+      "ecosyste.ms": 1
+    },
+    "ecosystems_for_removed_v": {
+      "read": 1,
+      "held_with_scripts_key": 1,
+      "held_without_scripts_key": 0,
+      "not_held": 0,
+      "unreadable": 0
+    },
+    "v_declares_any": 0,
+    "fires": {
+      "a": 0,
+      "b": 0,
+      "either": 0
+    },
+    "prev_names_unreadable": []
+  },
+  "software_heritage": {
+    "for_install_scripts": {
+      "read": 0,
+      "held": 0,
+      "not_held_or_unreadable": []
+    },
+    "for_disputed": 1
+  },
+  "disputed": {
+    "funnel": {
+      "disputed": 1
+    },
+    "count": 1,
+    "by_urgency": {
+      "disputed": {
+        "exploited": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "high": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "normal": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "low": {
+          "conservative": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 1,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        }
+      },
+      "others": {
+        "exploited": {
+          "conservative": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "high": {
+          "conservative": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "normal": {
+          "conservative": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "low": {
+          "conservative": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          },
+          "optimistic": {
+            "primary": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "a": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            },
+            "b": {
+              "stopped": 0,
+              "missed": 0,
+              "unknown": 0
+            }
+          }
+        }
+      }
+    },
+    "versions": [
+      {
+        "version": "@ensdomains/buffer@0.1.1",
+        "id": "MAL-2025-190866",
+        "published": "2023-02-28T09:46:00.601Z",
+        "step": "disputed",
+        "disputed": true,
+        "prev_d": "0.1.0",
+        "evidence": {
+          "copies": [
+            {
+              "source": "ecosyste.ms",
+              "shasum": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "integrity": "sha512-92SfSiNS8XorgU7OUBHo/i1ZU7JV7iz/6bKuLPNVsMxV79/eI7fJR6jfJJc40zAHjs3ha+Xo965Idomlq3rqnw==",
+              "unpackedSize": 2096683
+            },
+            {
+              "source": "software-heritage",
+              "shasum": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "integrity": "sha512-92SfSiNS8XorgU7OUBHo/i1ZU7JV7iz/6bKuLPNVsMxV79/eI7fJR6jfJJc40zAHjs3ha+Xo965Idomlq3rqnw==",
+              "unpackedSize": 2096683
+            }
+          ],
+          "artifact": {
+            "length": 284259,
+            "filename": "buffer-0.1.1.tgz",
+            "checksums": {
+              "sha1": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "sha256": "f8472508ce11fa05d3642ea6695d2b1dac5821415d96087a0d8db4cd61ba4d24"
+            },
+            "url": "https://registry.npmjs.org/@ensdomains/buffer/-/buffer-0.1.1.tgz"
+          },
+          "swh_visit": "2023-03-23T20:17:15.177000+00:00",
+          "swh_root": "3d9e48db08c991644ad0eba0475ca1fbd9ecc047",
+          "files": 21,
+          "inert_or_removed": [
+            "cache/solidity-files-cache.json",
+            "package-lock.json",
+            "removed: build/contracts/Buffer.json",
+            "removed: build/contracts/Migrations.json"
+          ]
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      }
+    ]
+  },
+  "requests": {
+    "ecosystems": {
+      "requests": 1,
+      "unreadable": 0
+    },
+    "jsdelivr": {
+      "requests": 2,
+      "unreadable": 0
+    },
+    "registry": {
+      "requests": 1,
+      "unreadable": 0
+    },
+    "registry-tarball": {
+      "requests": 1,
+      "unreadable": 0
+    },
+    "swh": {
+      "requests": 20,
+      "unreadable": 0
+    }
+  },
+  "rule2_note": "Rule 2 cannot fire on P: every P in the denominator has a legitimate version at least 7 days before V, and the longest base wait is 168h.",
+  "rows": [
+    {
+      "id": "MAL-2025-190866",
+      "name": "@ensdomains/buffer",
+      "version": "0.1.1",
+      "published": "2023-02-28T09:46:00.601Z",
+      "previous": "0.1.0",
+      "present": false,
+      "previous_present": true,
+      "record_hours": {
+        "conservative": 24006.8,
+        "optimistic": 24006.8
+      },
+      "facts": {
+        "provenance": {
+          "regression": false,
+          "source": "unverified"
+        },
+        "newDeps": {
+          "added": false,
+          "source": "unverified"
+        },
+        "scripts": {
+          "added": false,
+          "source": "unverified"
+        },
+        "publisher": {
+          "changed": false,
+          "source": "unverified"
+        }
+      },
+      "scripts": {
+        "names": [],
+        "source": "ecosyste.ms"
+      },
+      "other_stops": {
+        "a": [],
+        "b": []
+      },
+      "with_exception": {
+        "outcomes": {
+          "exploited": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          },
+          "high": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          },
+          "normal": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          },
+          "low": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          }
+        },
+        "reasons": {
+          "exploited": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          },
+          "high": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          },
+          "normal": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          },
+          "low": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          }
+        },
+        "selecting": {
+          "a": [],
+          "b": []
+        },
+        "unverified": {
+          "a": [],
+          "b": []
+        },
+        "selections_in_rule1_stopped_trees": {
+          "a": 0,
+          "b": 0
+        },
+        "unknown_because": {}
+      },
+      "without_exception": {
+        "outcomes": {
+          "exploited": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          },
+          "high": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          },
+          "normal": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          },
+          "low": {
+            "conservative": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            },
+            "optimistic": {
+              "a": "stopped",
+              "b": "stopped",
+              "primary": "stopped"
+            }
+          }
+        },
+        "reasons": {
+          "exploited": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          },
+          "high": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          },
+          "normal": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          },
+          "low": {
+            "other": [],
+            "requery": false,
+            "not_selected": true,
+            "only_rule1_trees": false
+          }
+        },
+        "selecting": {
+          "a": [],
+          "b": []
+        },
+        "unverified": {
+          "a": [],
+          "b": []
+        },
+        "selections_in_rule1_stopped_trees": {
+          "a": 0,
+          "b": 0
+        },
+        "unknown_because": {}
+      },
+      "disputed": {
+        "step": "disputed",
+        "disputed": true,
+        "prev_d": "0.1.0",
+        "evidence": {
+          "copies": [
+            {
+              "source": "ecosyste.ms",
+              "shasum": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "integrity": "sha512-92SfSiNS8XorgU7OUBHo/i1ZU7JV7iz/6bKuLPNVsMxV79/eI7fJR6jfJJc40zAHjs3ha+Xo965Idomlq3rqnw==",
+              "unpackedSize": 2096683
+            },
+            {
+              "source": "software-heritage",
+              "shasum": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "integrity": "sha512-92SfSiNS8XorgU7OUBHo/i1ZU7JV7iz/6bKuLPNVsMxV79/eI7fJR6jfJJc40zAHjs3ha+Xo965Idomlq3rqnw==",
+              "unpackedSize": 2096683
+            }
+          ],
+          "artifact": {
+            "length": 284259,
+            "filename": "buffer-0.1.1.tgz",
+            "checksums": {
+              "sha1": "6c275ba7e457e935405b67876f1f0d980c8baa63",
+              "sha256": "f8472508ce11fa05d3642ea6695d2b1dac5821415d96087a0d8db4cd61ba4d24"
+            },
+            "url": "https://registry.npmjs.org/@ensdomains/buffer/-/buffer-0.1.1.tgz"
+          },
+          "swh_visit": "2023-03-23T20:17:15.177000+00:00",
+          "swh_root": "3d9e48db08c991644ad0eba0475ca1fbd9ecc047",
+          "files": 21,
+          "inert_or_removed": [
+            "cache/solidity-files-cache.json",
+            "package-lock.json",
+            "removed: build/contracts/Buffer.json",
+            "removed: build/contracts/Migrations.json"
+          ]
+        }
+      }
+    }
+  ]
+}

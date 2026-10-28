@@ -1,0 +1,261 @@
+[
+ {
+  "repo": "palindsay/label_maker",
+  "sha": "1c982fddb42c1f1952abf67e3aae97336c80c2c6",
+  "finished": true,
+  "packages": [
+   {
+    "name": "brace-expansion",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/brace-expansion@5.0.7 (GHSA-mh99-v99m-4gvg >=4.0.0 <5.0.8, and the later ranges) and node_modules/glob/node_modules/brace-expansion@2.1.2 (GHSA-mh99-v99m-4gvg >=2.0.0 <2.1.3); GHSA-q2hr-2g5m-vwhr ranges confirmed on api.github.com. Both copies dev in package-lock.json. Only path from the root: devDependency @vitest/coverage-v8@3.2.7 (D1, @vitest/*) -> test-exclude@7.0.2 -> minimatch@10.2.5 -> brace-expansion@5.0.7, and test-exclude -> glob@10.5.0 -> glob/node_modules/minimatch@9.0.9 -> brace-expansion@2.1.2; a lockfile BFS from the root that avoids D1 packages reaches neither copy. No P-rule reaches them: lockfile closure from P0 (html-to-image, jsqr, pdfjs-dist, react, react-dom, zod), P1/P2 (vite.config.ts imports/names vite, @vitejs/plugin-react, vitest, jsdom) and P3 (typescript, vite) does not include them; build \"tsc --noEmit && vite build\"; no start script; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   }
+  ]
+ },
+ {
+  "repo": "mirabhakta/ai-repo-inspector-mira-bhakta",
+  "sha": "1b7decc19ef87cd15bc0cccedeaba8ce3e75d411",
+  "finished": true,
+  "packages": [
+   {
+    "name": "@vitest/mocker",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/@vitest/mocker@4.1.10, GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11 and GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12 (both confirmed on api.github.com). dev in lockfile. @vitest/* is a D1 test-runner package; its only parent is node_modules/vitest@4.1.10, a root devDependency test runner. vitest appears only in test/report.test.ts (test file) and the \"test\" script; source imports are only @modelcontextprotocol/sdk and zod; build \"tsc -p tsconfig.json\" (typescript, P3); no start script; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "vitest",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/vitest@4.1.10, GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. dev in lockfile; declared in root devDependencies; D1 test runner. Used only by test/report.test.ts and the \"test\" script; not imported by non-test source, no build tool config exists that names it, not reached from the production copies (@modelcontextprotocol/sdk, zod and their dependencies) or typescript (P3); No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   }
+  ]
+ },
+ {
+  "repo": "Heuller/gelo-e-fogo-rpg",
+  "sha": "608aadf265300416582c4b298087e3c4b11a6902",
+  "finished": true,
+  "packages": [
+   {
+    "name": "@vitest/mocker",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/@vitest/mocker@3.2.7, GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. dev in lockfile; @vitest/* D1 package; only parent node_modules/vitest@3.2.7 (root devDependency test runner). vitest is mentioned only in vitest.config.ts (test-runner config, not source), *.test.ts / __tests__ files, docs and CI. Build \"next build\" (vercel.json buildCommand \"npm run build\") and start \"next start\" run next (P0); P2 files next.config.mjs, postcss.config.mjs, tailwind.config.ts name next, tailwindcss, autoprefixer only; closure from P0/P1/P2/P3 does not reach it; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "tinypool",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/tinypool@1.1.1, GHSA-85c8-ppgw-ccpr <2.1.2 (confirmed) and GHSA-5gmw-xhrv-c9v3 <=2.1.0. dev in lockfile. Its only parent is node_modules/vitest@3.2.7 (root devDependency, D1 test runner); BFS from the root avoiding D1 packages does not reach it. Not imported by any source file, not named by next.config.mjs/postcss.config.mjs/tailwind.config.ts, not run by build/start, not reached from production copies; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "vitest",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/vitest@3.2.7, GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. dev in lockfile; declared in root devDependencies; D1 test runner. Only test files, vitest.config.ts (excluded test-runner config) and the \"test\" script use it; build/start use next only; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   }
+  ]
+ },
+ {
+  "repo": "mikesimone/tab-automator",
+  "sha": "ac528d36a38879260a003d23929e3191eae26a38",
+  "finished": true,
+  "packages": [
+   {
+    "name": "@vitest/mocker",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/@vitest/mocker@4.0.18, GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. dev. @vitest/* D1 package; only parent node_modules/vitest@4.0.18 (root devDependency; also reached via @vitest/ui and @vitest/coverage-v8, both D1). Source imports (130 source files scanned): @crxjs/vite-plugin, @vitejs/plugin-vue, daisyui, lz-string, mitt, pinia, vite, vue, vuedraggable (playwright-core, imported in scripts/docs-images/*.mjs, is not installed). vite.config.ts imports/names vite, @vitejs/plugin-vue, @crxjs/vite-plugin only; postcss.config.js names tailwindcss, autoprefixer; tailwind.config.js requires daisyui; vitest.config.ts (environment jsdom) is test-runner config. Build \"rm -rf ./dist && vite build\"; no start script; closure from all of these and P3 (typescript, vite) does not reach it; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "ajv",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/ajv@6.12.6, GHSA-2g4f-4pwh-qvx6 <6.14.0. dev. Parents: @eslint/eslintrc@2.1.4 and eslint@8.57.1; every path from the root passes through eslint/@eslint/*/@typescript-eslint/*/eslint-plugin-*/vue-eslint-parser (D1 linters); BFS avoiding D1 packages does not reach it. Not imported, not named by vite/postcss/tailwind config, not run by build; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "brace-expansion",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: 1.1.12 copies (GHSA-f886-m6hf-6m8v <1.1.13 etc.) at @eslint/eslintrc/, @humanwhocodes/config-array/, eslint-plugin-import/, eslint/, glob/ node_modules, and node_modules/brace-expansion@2.0.2 (>=2.0.0 <2.0.3). All dev. The five 1.1.12 copies are D1: BFS from the root avoiding D1 packages reaches none of them (all paths through eslint/@eslint/eslintrc/eslint-plugin-import and other linters). The 2.0.2 copy is reached without a D1 package via root devDependency vue-tsc@2.2.12 -> @vue/language-core@2.2.12 -> minimatch@9.0.5 -> brace-expansion@2.0.2 (also via @typescript-eslint/typescript-estree), so D2: source read (130 files); no source import of brace-expansion/minimatch/vue-tsc/@vue/language-core; vue-tsc runs only in the \"tsc\" script, which is not a build/start script; build \"rm -rf ./dist && vite build\"; vite.config.ts names vite, @vitejs/plugin-vue, @crxjs/vite-plugin; not reached by lockfile closure from P0 (lz-string, mitt, pinia, vue, vuedraggable), P1/P2 copies or P3 (typescript, vite); not P3/P4; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git), so no image holds devDependencies."
+   },
+   {
+    "name": "fflate",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/fflate@0.8.2, GHSA-px8p-9vwx-vf98 >=0.8.0 <0.8.3. dev. Only parent @vitest/ui@4.0.18 (root devDependency, D1 @vitest/*); BFS avoiding D1 packages does not reach it. Not imported/named/run by build; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "flatted",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/flatted@3.3.3, GHSA-25h7-pfq9-p65f <3.4.0. dev. Parents: @vitest/ui@4.0.18 (D1) and flat-cache@3.2.0 (reached only from the eslint stack); BFS from the root avoiding D1 packages does not reach it. Not imported/named/run by build; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "js-yaml",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/js-yaml@4.1.1, GHSA-52cp-r559-cp3m >=4.0.0 <4.3.0 etc. dev. Parents @eslint/eslintrc@2.1.4 and eslint@8.57.1 only; every path passes through D1 linters. Not imported/named/run by build; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "lodash",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/lodash@4.17.23, GHSA-r5fr-rjxr-66jc >=4.0.0 <=4.17.23. dev. Only parent vue-eslint-parser@9.4.3 (D1 list), reached from root devDependencies vue-eslint-parser, eslint-plugin-vue, @vue/eslint-config-typescript (all D1). Not imported, not named, not run; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "minimatch",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: 3.1.2 copies (GHSA-3ppc-4f35-3m26 <3.1.3) at @eslint/eslintrc/, @humanwhocodes/config-array/, eslint-plugin-import/, eslint/, glob/ node_modules (D1: reached only through eslint tooling), and node_modules/minimatch@9.0.5 (>=9.0.0 <9.0.6), reached without D1 via vue-tsc@2.2.12 -> @vue/language-core@2.2.12 -> minimatch@9.0.5. D2: source read; minimatch/vue-tsc/@vue/language-core not imported by any source file, not named by vite.config.ts/postcss.config.js/tailwind.config.js; vue-tsc only in the non-build \"tsc\" script; build \"vite build\" (vite is P3; its closure does not reach it); not reached from P0/P1/P2/P3 copies; not P3/P4; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "vitest",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/vitest@4.0.18, GHSA-5xrq-8626-4rwp >=4.0.0 <4.1.0 and GHSA-82fw-gwwq-j7x9. dev; root devDependency; D1 test runner. Used only by test/coverage scripts and vitest.config.ts (excluded); not imported by non-test source, vite.config.ts does not name it; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "ws",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: node_modules/ws@8.19.0, GHSA-58qx-3vcg-4xpx >=8.0.0 <8.20.1. dev. Only parent jsdom@27.4.0 (root devDependency, not a D1 package), so D2: source read; jsdom appears only in vitest.config.ts (\"environment: jsdom\", excluded test-runner config) and package.json; neither ws nor jsdom is imported by source, named by vite/postcss/tailwind config, or run by build (\"vite build\") or any start script; not reached from P0/P1/P2/P3 copies; not P3/P4; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   }
+  ]
+ },
+ {
+  "repo": "mazyu36/langfuse-with-aws-cdk",
+  "sha": "5c9a6b7158caa9fdcbcea9600eadf704cbf65dba",
+  "finished": true,
+  "packages": [
+   {
+    "name": "@babel/core",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/@babel/core@7.28.4, GHSA-4x5r-pxfx-6jf8 <=7.29.0. dev. Parents are jest/babel tooling (ts-jest@29.4.15, babel-jest@30.5.2, @jest/transform, jest-config, jest-snapshot, istanbul-lib-instrument, @babel/plugin-syntax-*); the only root dependencies reaching it are ts-jest and jest (D1); BFS avoiding D1 packages does not reach it. Source (bin/, lib/; 14 files) imports only aws-cdk-lib and constructs; no build tool configuration exists (no babel config); closure from P3 (@babel/helpers, typescript) does not reach it; build \"tsc\"; no start script; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git) (ECS services use public registry images via ecs.ContainerImage.fromRegistry in lib/constructs/services/*.ts)."
+   },
+   {
+    "name": "@humanfs/node",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/@humanfs/node@0.16.6, GHSA-p498-v437-472g <0.16.8. dev. Only parent eslint@10.12.0; every root path goes through eslint/@eslint/js/typescript-eslint/@typescript-eslint/* (D1). Not imported or run by build; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "baseline-browser-mapping",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/baseline-browser-mapping@2.8.4, GHSA-w5vr-8v7q-w6rv >=2.0.0 <2.11.0. dev. Only parent browserslist@4.26.2, reached only from jest/ts-jest; BFS avoiding D1 packages does not reach it. Not imported/named/run; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "brace-expansion",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/brace-expansion@5.0.9 (GHSA-6j4f-fj2g-mc7p >=4.0.0 <5.0.10) and node_modules/test-exclude/node_modules/brace-expansion@2.1.4 (>=2.0.0 <2.1.5), both dev. The production copy node_modules/aws-cdk-lib/node_modules/brace-expansion@5.0.12 (not dev, P0) is outside every range (GHSA-q2hr-2g5m-vwhr first patched 5.0.12, confirmed on api.github.com). 5.0.9: parent node_modules/minimatch@10.2.6, root dependencies reaching it jest, ts-jest, eslint, typescript-eslint, @typescript-eslint/*, @eslint/js only; 2.1.4: parent test-exclude/node_modules/glob/node_modules/minimatch@9.0.9, reached only from jest/ts-jest. BFS avoiding D1 packages reaches neither. No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "browserslist",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/browserslist@4.26.2, GHSA-c83g-rgw3-j3cx <=4.28.6. dev. Parents @babel/helper-compilation-targets and update-browserslist-db; reached only from jest and ts-jest (D1). No build tool config names it; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "deepmerge",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/deepmerge@4.3.1, GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. dev. Only parent jest-config@30.5.2 (D1 jest-*). Not imported/named/run; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   },
+   {
+    "name": "diff",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: node_modules/diff@4.0.2, GHSA-73rr-hh4g-fpgx >=4.0.0 <4.0.4. dev. Reached without D1 via root devDependency ts-node@10.9.2 -> diff@4.0.2, so D2: whole source read (bin/*.ts, lib/**/*.ts; eslint/jest configs and test/ excluded); diff and ts-node are not imported by any source file; no P2 build tool configuration exists (tsconfig.json has no jsxImportSource); build \"tsc\" (typescript P3); no start/prestart/poststart; ts-node runs only in cdk.json \"app\": \"npx ts-node --prefer-ts-exts bin/langfuse-with-aws-cdk.ts\" (CDK synth on the developer/CI machine; cdk.json is not among the P5 command files, noted for the worker); not reached from production copies aws-cdk-lib, constructs, globals; not P3/P4; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git); deployed containers are public images (fromRegistry langfuse/langfuse, langfuse/langfuse-worker, clickhouse/clickhouse-server)."
+   },
+   {
+    "name": "picomatch",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D1",
+    "evidence": "In range: node_modules/jest-util/node_modules/picomatch@4.0.3 (GHSA-3v7f-55p6-f55p >=4.0.0 <4.0.4) and node_modules/picomatch@2.3.1 (<2.3.2), both dev; the four 4.0.7 copies are outside the range (confirmed on api.github.com). 4.0.3: parent jest-util@30.5.1 (D1 jest-*); 2.3.1: parent anymatch@3.1.3, reached only from jest/ts-jest. BFS avoiding D1 packages reaches neither. No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git)."
+   }
+  ]
+ },
+ {
+  "repo": "Wealcoder/animation-addons-for-elementor",
+  "sha": "85a2e47d669096e05b0ace71f95ae93a7c29ff17",
+  "finished": true,
+  "packages": [
+   {
+    "name": "trim-newlines",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range only: node_modules/trim-newlines@1.0.0, GHSA-7p7h-4mm5-852v <3.0.1 (confirmed on api.github.com: < 3.0.1, and = 4.0.0). The production copies npm-package-json-lint/node_modules/trim-newlines@3.0.1 and stylelint/node_modules/trim-newlines@3.0.1 (reached from @wordpress/scripts, imported in webpack.config.js) are 3.0.1, outside the range. The 1.0.0 copy (dev) has the only path root devDependency gulp-js-prettify@0.1.0 -> gulp-util@2.2.20 -> dateformat@1.0.12 -> meow@3.7.0 -> trim-newlines@1.0.0 (none D1), so D2: source read (about 1065 source files); gulp-js-prettify, gulp-util, dateformat, meow, trim-newlines are not imported anywhere (gulpfile.js requires gulp, gulp-babel, gulp-eslint, gulp-terser, gulp-rename, @mr-hope/gulp-sass, gulp-clean-css, gulp-autoprefixer, gulp-sourcemaps, gulp-mode, gulp-rtlcss, gulp-zip; gulp-js-prettify appears only in a gulpfile.js:34 comment and in package.json devDependencies) and not named by gulpfile.js/webpack.config.js/postcss.config.js; build (\"gulp clean:atomic && wp-scripts build && gulp ...\") and start (\"concurrently ... wp-scripts start ... gulp ...\") run gulp, @wordpress/scripts and concurrently, whose lockfile closure (with P0/P1/P2/P3) does not reach meow@3.7.0 or trim-newlines@1.0.0; not P3/P4; No Dockerfile/Containerfile, compose file, Procfile, fly.toml or similar exists in the repository (find over the whole tree outside node_modules/.git); the plugin zip task (gulpfile.js, task zip) excludes node_modules/**."
+   }
+  ]
+ },
+ {
+  "repo": "Yil00/databastion",
+  "sha": "3aa768e106558d38b3e65d2184a3c1d98092fe98",
+  "finished": true,
+  "packages": [
+   {
+    "name": "undici",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: node_modules/undici@7.29.1, GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1 (confirmed on api.github.com). dev in the root package-lock.json. The root package.json (\"Release tooling\") declares only devDependencies release-it@21.1.1 and @release-it/conventional-changelog; undici is only an \"overrides\" pin; its only parent is release-it@21.1.1 (not D1), so D2: source read; undici and release-it are not imported by any source file; root scripts are release, release:dry, bump (no start/build); no P2 file names them (console/next.config.ts and console/postcss.config.mjs belong to console, whose own pnpm-lock.yaml tree is separate and does not contain this copy); not P3/P4. Production Dockerfiles checked: console/Dockerfile final stage \"runtime\" (distroless) copies node_modules only from prod-deps (\"pnpm install --frozen-lockfile --prod\"), plus .next/standalone, .next/static and named files, so it does not hold devDependencies; agent/Dockerfile (Rust; final stage copies only the binary and a folder); dev/openldap, dev/cas and dev/postgres Dockerfiles have no npm/pnpm install and copy no node_modules or build-context root. Compose commands run the console/agent images (web, worker, migrate, bootstrap-admin, enroll, run) or database/IdP servers, none release-it/undici."
+   }
+  ]
+ },
+ {
+  "repo": "developer3000S/OmniRouteRus",
+  "sha": "6874cc4408cdd0c46010b4401501d7e0669b0caf",
+  "finished": true,
+  "packages": [
+   {
+    "name": "brace-expansion",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: 5.0.6 copies (GHSA-3jxr-9vmj-r5cp >=3.0.0 <5.0.7, confirmed) at @typescript-eslint/typescript-estree/, glob/, test-exclude/ node_modules, and node_modules/brace-expansion@1.1.13 (<1.1.16); all dev. The typescript-estree copy and the 1.1.13 copy (parent minimatch@3.1.5) are reached only through eslint/eslint-config-next/typescript-eslint (D1). glob copy: root devDependency glob@13.0.6 -> minimatch@10.2.5; test-exclude copy: root devDependency c8@11.0.0 -> test-exclude@8.0.0 -> minimatch@10.2.5 (c8 is not in the D1 lists), so D2: source read (1773 source files); glob, c8, test-exclude, minimatch, brace-expansion are not imported by any source file (a quoted \"glob\" appears only in tests/unit/claude-code-parity.test.ts); c8 runs only in the test:coverage/coverage:* scripts; build \"node scripts/build/build-next-isolated.mjs\", start \"node scripts/dev/run-next.mjs start\", open-sse has no scripts; electron/package.json start/build run electron/electron-builder, which are not in the root lockfile; next.config.mjs and postcss.config.mjs do not name them; lockfile closure from P0, P1 (including the vitest/prettier/typescript/@playwright/test imports), P2 and P3 (root and open-sse) does not reach these copies. Production Dockerfiles: Dockerfile final stage runner-cli (FROM runner-base) copies from builder only public, .next/static, .next/standalone, the single package folders node_modules/@swc/helpers, pino-abstract-transport, pino-pretty, split2, and named files (not node_modules or /app as a whole), and its only npm install is -g; so it does not hold devDependencies. .qwen/tmp/Dockerfile.debug (name not dev-marked) has a final stage that is a bare FROM node:26.2.0-trixie-slim with no instructions. Compose/fly.toml run redis-server, node healthcheck.mjs, node run-standalone.mjs."
+   },
+   {
+    "name": "joi",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: node_modules/joi@18.2.1, GHSA-6w3j-5fw6-r9vr >=18.0.0 <18.2.5 (confirmed). dev. Only parent wait-on@9.0.10 (root devDependency, not D1). D2: source read; joi and wait-on are not imported anywhere; wait-on runs only in the \"electron:dev\" script (package.json:76), not a start/build script; start/build run node on repository scripts whose imports were scanned; not named by next.config.mjs/postcss.config.mjs; not reached from production copies; not P3/P4; the Dockerfile final stage runner-cli does not hold devDependencies (see brace-expansion), and .qwen/tmp/Dockerfile.debug has an empty final stage."
+   },
+   {
+    "name": "shell-quote",
+    "in_range": "yes",
+    "production_relevant": "no",
+    "criterion": "D2",
+    "evidence": "In range: node_modules/shell-quote@1.8.3, GHSA-w7jw-789q-3m8p >=1.1.0 <=1.8.3 (confirmed). dev. Only parent concurrently@9.2.1 (root devDependency, not D1). D2: source read; shell-quote and concurrently are not imported; concurrently runs only in the \"electron:dev\" script (package.json:76), not start/build; not named by build tool configs; not reached from production copies; not P3/P4; no production Dockerfile final stage holds devDependencies (runner-cli copies only named package folders and build output; Dockerfile.debug final stage is empty); compose/fly.toml commands do not run it."
+   }
+  ]
+ }
+]

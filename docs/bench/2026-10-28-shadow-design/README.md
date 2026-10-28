@@ -41,14 +41,14 @@ As of 2026-10-28, read from main's records (docs/progress.md and the bench READM
 
 **2.2 Capture.** For each changed watched name, the shadow makes the same reads as the judge's `registryFacts` (packages/cli/src/security/npm-facts.ts), right after the change is seen:
 - the full packument, `registry.npmjs.org/<name>`. The abbreviated document (`application/vnd.npm.install-v1+json`) has no `time`, checked on `semver`, and rule 1 and `package_created` need `time`;
-- for each version new since the last capture, `/-/npm/v1/attestations/<name>@<version>` when `dist.attestations` is present.
+- for every version it stores a manifest for (below), `/-/npm/v1/attestations/<name>@<version>` when `dist.attestations` is present.
 
 What is stored, per capture:
 - `fetched_at`, the URL, the HTTP status, and the response's sha256;
 - the packument's `dist-tags`, and its `time`: in full at the first capture of a name, then only the entries that are new or changed;
 - the manifest as served, minus e-mail addresses, for: each new version; on a name's first change, every version of it that the watched lockfiles hold (each possible prev) and each dist-tag's version; and each new version's registry predecessor (docs/decisions/2026-10-29-shadow-counting.md, section 9). Every `email` key is dropped and addresses inside strings are replaced (`_npmUser`, `maintainers`, `author` and the like). `shared_publisher` is computed at capture with the judge's `sharedPublisher` and stored next to the name, with the commit of the code that computed it. This keeps the judge's input without republishing addresses;
-- the attestation bundle as served;
-- for each dependency of a new version outside the watched set: its first publish time (rule 2's `created`), once per package;
+- the attestation bundle of each stored version, as served;
+- for each dependency of a new version whose first publish time is not stored: that time (rule 2's `created`), once per package;
 - **the file list of V's tarball**: each path, size and sha256. The tarball is downloaded from the registry and checked against `dist.integrity`. It is never extracted to disk, run or stored. Only the list is kept. This is what the disputed check in 2.7 needs from the moment of publication: v5 found that jsDelivr's CDN answers 404 for the files of removed versions, so the archives may not hold them later. Tarballs above a size limit are not hashed, and that is recorded.
 
 No tarball is stored: the judge compares the lockfile's integrity with `dist.integrity`, which the manifest carries. Later changes to a captured document are captured the same way, so the store also holds when a version was deprecated or disappeared. That is what the re-query at a wait's end needs.
@@ -66,7 +66,7 @@ Measured today: 7,660 distinct names. **Ludion-ai/ludion-sandbox is an empty rep
 - **The rows.** One judgement per urgency row (exploited, high, normal, low), as the backtests do.
   - `judge()` takes urgency only from its fixes (`urgencyOf`), so the replay gives it a synthetic fix for P from prev to V. The fix's `kev` or `severity` sets the exploited and high rows; marking the change dev sets the low row. V becomes the time cap's target.
   - So rule 2's threshold is WAIT_HOURS of the row, and the wait is the judge's own: the row's wait, 24h for exploited without comparable provenance, or max(2 × that wait, 72h) when extended.
-- **When.** At the judge's own `wait_until`: the newest publish in the change plus that wait, not V's publish time plus the wait. A same-release sibling published after V moves it. The re-query sees only MAL- records published by then, and captures taken before then.
+- **When.** At the judge's own `wait_until`: the newest publish in the change plus that wait, not V's publish time plus the wait. (In this replay the change holds only P@V, so the newest publish is V's.) The re-query sees only MAL- records published by then, and captures taken before then.
 - **The scenarios.**
   - (b): P locked at prev, updated to V.
   - (a): V added as a new direct dependency. A new package has no `from`, so a fix cannot set its urgency, and (a) is judged only in the normal and low rows.
@@ -147,6 +147,7 @@ Each line is arithmetic on section 4's measurements, not a measurement of the sh
 | `time` maps: the first capture of each watched name, and the new entries after it | not measured (the `time` maps were not sized). Not in the 15.3 MB above | — |
 | Registry reads per day | about 968 packuments + 794 attestations at most | one packument per change event, attestations at 82.0% |
 | Tarball downloads per day, for the file lists (2.2) | about 968, size not measured; only the lists are stored | one per new version |
+| First-change seed (manifests and attestations of each changed name's locked and dist-tag versions) | about 7,300 versions, about 115 MB, over four weeks; at most about 25,300 versions, about 400 MB, if every watched name changes | 86 of the 300 sampled names published in 28 days (28.7%): 0.287 × (17,673 locked + 7,660 dist-tag versions) × 15.8 KB; the upper bound without the 0.287 |
 | Packument download per day | about 82 MB at the median size, 1.36 GB at the p90 size. Neither is a bound: names that publish often may have large packuments (not measured), and the mean was not measured | 968 × 84.5 KB; 968 × 1.41 MB; not stored |
 | Feed reads per day | about 122,000 entries, 12.7 MB | 1.41/s × 86,400 × 104.6 bytes; low confidence |
 | OSV per day | 8.7 MB of `modified_id.csv`, about 35 record reads | 976 / 28 |

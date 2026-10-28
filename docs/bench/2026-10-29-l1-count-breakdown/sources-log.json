@@ -1,0 +1,914 @@
+{
+ "fetched_at": "2026-10-28T15:24:17.029Z",
+ "repositories": [
+  {
+   "repo": "Rafi-SBM/PySan",
+   "sha": "26767d2af321aece388ececd853f4819ec3221d0",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "384f3ab856027520f742cca71c4afdd7e376fa47f4dd3d91c54249ce22239476",
+   "archive_bytes": 107468,
+   "files": 67
+  },
+  {
+   "repo": "Kmaina32/Varban-Markets",
+   "sha": "89cdc0df1af2ac21965e6978f35edb3ef6cb4c42",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d714f8316d64e132d6b7259c121ccd3e55b8aa0eb21cab03f0b0e1806ec1b8aa",
+   "archive_bytes": 13752918,
+   "files": 366
+  },
+  {
+   "repo": "SteinOA/DSSA-Tale-Mac",
+   "sha": "c9a47300b462d4f23710459a944507f9c959d465",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "607dd7f0cf747ca50d000d98575ccee901a94ace966cf4ab4c4db759bf385e3a",
+   "archive_bytes": 29677789,
+   "files": 1894
+  },
+  {
+   "repo": "bm-hien/is-this-code-safe",
+   "sha": "2a6288938c09a5f4c24c05c507fc7b53f087d77c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b8c01af1525aec679f45adef65d1dd134afe4b67b53cbf7e3176dd00acf4498f",
+   "archive_bytes": 3389494,
+   "files": 136
+  },
+  {
+   "repo": "cofob/design-system",
+   "sha": "6e1c42d66655665ab4f4b59f09225ef93406a435",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "3b95e2a9c4d56c0ffa17da3c0659814e7b27b1ce1c4e6c59700e978131b40685",
+   "archive_bytes": 49586759,
+   "files": 3334
+  },
+  {
+   "repo": "jasperyeo/jasper-oktavina-wedding",
+   "sha": "fd75e3f66b6fdb00f14db5532f640f8e20e1bb52",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "f06e8e35c93b76eed9a75ff1c91cecd8c4dc7af3f2d4a7c51a1815edc0ded00f",
+   "archive_bytes": 454102863,
+   "files": 256
+  },
+  {
+   "repo": "Sylonin/xposed-newx-patches",
+   "sha": "fe578ab933af0bb5a9e01533c30907fd778ac23b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "44689b081486bdcb6e786dbaee12cf9f8459cca402b789492c7198a609d5f1df",
+   "archive_bytes": 179464,
+   "files": 67
+  },
+  {
+   "repo": "aniru-dh21/snap-validate",
+   "sha": "2482ba5e2418e163968205ae8e20a4b3cea7c2a3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "913c2d0e39f065c1a5ad47deb660f5ef333178be1e0d7e74f3ea68351dfeada9",
+   "archive_bytes": 114286,
+   "files": 44
+  },
+  {
+   "repo": "MorpheApp/morphe-patcher",
+   "sha": "c3363f717344c74fb3f160f8c788022981d3110f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "5162f5248273c79eab34be0fa226880cbbe28ef1ec0d56046d7b5b256e761bfa",
+   "archive_bytes": 444861,
+   "files": 181
+  },
+  {
+   "repo": "itsdarklikehell/my-resume",
+   "sha": "8ae8c354fbf3ca7cb8182cefca778f1abba2e4b1",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "abcb9776c69f5254ca7d4a47bc4940cddab23bd18b27e35fc55fd300ef1369b1",
+   "archive_bytes": 2028169,
+   "files": 63
+  },
+  {
+   "repo": "staticdesigner/modevue",
+   "sha": "a5c491ff16d18a1d3649d4fa21af02aec905d251",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b2535bc6091fdb99d913f0ad1ebed30c4bbdafd82b38752b5c4d730bc8300fdb",
+   "archive_bytes": 3938019,
+   "files": 99
+  },
+  {
+   "repo": "wefio/NodeMemoryGraph",
+   "sha": "cd193624f10d72b69b010ca70de5d61c6f8cd09d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "83be1991923e4572dc3f0c64c6190ea13c13ba88f8cfeccfa110dd2fa9bd443d",
+   "archive_bytes": 5376149,
+   "files": 2275
+  },
+  {
+   "repo": "yaeouk-rajab/pulsewatch-mobile",
+   "sha": "797d1398fd706220cfbf47e387409e95dfdb1107",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "18f2e52013216dff4eb1d4d85ec93261c4e94a855fa40fb712de8d93deacdbdb",
+   "archive_bytes": 1048608,
+   "files": 70
+  },
+  {
+   "repo": "mbadr5858/badr-pdf",
+   "sha": "ec472a6ea0726105088fb0c1536dfbfcaa57cd7d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "1343ef8da7d5bb2d75a40f899b437ef87a4bb465d829d075fe26ab8371c38309",
+   "archive_bytes": 152167579,
+   "files": 1725
+  },
+  {
+   "repo": "padosoft/eval-harness-admin",
+   "sha": "7c2617ce7baa8edbd076a1562a54674d1a2e8562",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "0b8a69611764b405b5b5bb810b2f34531154aabae8a0ca4716f3e80287d56b42",
+   "archive_bytes": 1421869,
+   "files": 88
+  },
+  {
+   "repo": "developer3000S/OmniRouteRus",
+   "sha": "6874cc4408cdd0c46010b4401501d7e0669b0caf",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9e426e3b551cfdf7b80432c6958e7aa9d9ad19a23baa207f1a52f90f5c37f9a8",
+   "archive_bytes": 30207493,
+   "files": 4394
+  },
+  {
+   "repo": "mrBettazzi/nuxt-myweb",
+   "sha": "917e96c34deee92c167f3b07fd194425090e6b0e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e0ba69f20e4b0417380b6527ae86081ec06fb2870aebb759084d98c9b8ddbadc",
+   "archive_bytes": 227719,
+   "files": 23
+  },
+  {
+   "repo": "shiiizuku/document-management-tracking-system",
+   "sha": "1a20cbb3a879e826654e0556412c1d534e8b6936",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "32c973fee7494630918b9faad63fe6fb25ff99b14102f2ddc09031397e6442b6",
+   "archive_bytes": 16439451,
+   "files": 1449
+  },
+  {
+   "repo": "wangyufengsky/qq-agents",
+   "sha": "4143fe2cae4faea4a2f63aa41784272e6662a6e4",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "031aabe071e76bd6d99bb3446b05fca43302b3705e6ffae9dd1a3dc2144f986e",
+   "archive_bytes": 2309348,
+   "files": 336
+  },
+  {
+   "repo": "microsoft/vscode-ts-file-path-support",
+   "sha": "dde70fb77b2ca4c5fe9b00272a9902e0360763b6",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b370552f4550e3da302118a63cfe097f6aa06a26232efd349fa13a01e4fcb874",
+   "archive_bytes": 454643,
+   "files": 48
+  },
+  {
+   "repo": "lalidiaz/node-store-api",
+   "sha": "975d0dc048f399e66be47a6fb3ae9f4ee0eed39c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a399d0237f7706c4043f4d647096d086a85e7eb468ea3b8a9e8da415ed6fc744",
+   "archive_bytes": 50601,
+   "files": 14
+  },
+  {
+   "repo": "airalab/robonomics.network",
+   "sha": "c8b14da0c05f9e52ec6f49311db1ea657199736b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "6407a2e535a63c1d3082aa15cbceb5277e0eb66e86fded8f872100d05d70c606",
+   "archive_bytes": 942131297,
+   "files": 2273
+  },
+  {
+   "repo": "donkirkby/python-zendo",
+   "sha": "483ef789aca2d7b0f0cf332651ab54c0f827a76c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "dec55285337e8fb164d77a21c487eaa277f9b3c93a890a8a69827fe3a689f2c7",
+   "archive_bytes": 9313272,
+   "files": 58
+  },
+  {
+   "repo": "akshaydhadwal745/lens-camera",
+   "sha": "79c72e96b93e971a8b7337a68cdab12bd431aa6e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4ed481ebb6ae27cb0f576a12f9b82564e28156a52f5b7d5fd8c611d1ecdebb4d",
+   "archive_bytes": 28802292,
+   "files": 667
+  },
+  {
+   "repo": "Blackshield-Company/openshield-desktop",
+   "sha": "1803691d2ed0c35aa6be614f93d8f519d80f0f5f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "67c833d17dafcaba8286af7bd336a10130203703d8e1c0f2d54d2a6d1df0624a",
+   "archive_bytes": 969907,
+   "files": 137
+  },
+  {
+   "repo": "RoxyAPI/ai-spiritual-companion",
+   "sha": "9762bd624cd0e4f7ce1fd4d433984df239e03c90",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "71f95bb508167700b1e34699210d42bd791aa0d10af821a2ed2f0b5d3c03be44",
+   "archive_bytes": 4260088,
+   "files": 148
+  },
+  {
+   "repo": "shimi-lynx/mogledge",
+   "sha": "dc960ef2fd271abe1a82aedc375bec9fd996b610",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "f57c1b3ba34ead2f8911f45cff32df80c55394d6529ba27051610ba0867523f2",
+   "archive_bytes": 6649090,
+   "files": 874
+  },
+  {
+   "repo": "PM-Shawn/Abu-Cowork",
+   "sha": "f01c2a7aab54d236c4e41b676e0074db2eff61d7",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e80cb5dc4833e618f9a8e5d1b7f10db0749a04afa20394fa7e2a7988bc03faf4",
+   "archive_bytes": 49352738,
+   "files": 3968
+  },
+  {
+   "repo": "datagrowth/sobre-abierto",
+   "sha": "798f67f26e6ae08fd47d8a477264bc35ea29f28e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "6a1e17d3d36c59580d038071d625ab92dfb6aec29797088e7448e7e904e77f2f",
+   "archive_bytes": 3867918,
+   "files": 1379
+  },
+  {
+   "repo": "KisaesDevLab/Vibe-MyBooks",
+   "sha": "0bd0ec9f028c0dbfa067a9b5fe3a3c73c6806265",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "2fc91329c1a6aabe67648f25258dab77ce0deb7bb30c1ec076cdcd8a4adf6e25",
+   "archive_bytes": 16217179,
+   "files": 3200
+  },
+  {
+   "repo": "nmagera07/family-site",
+   "sha": "0a4374dbe00e82dcd3445269d28d817ed52be235",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a032d654a47d97048f72ee4f9b0a649a3ccbb1aa84b7cac44fa958eed47680b8",
+   "archive_bytes": 17776827,
+   "files": 163
+  },
+  {
+   "repo": "toddmedema/electrify",
+   "sha": "31fc6890e160a9b9e0ef61416cbf4e1f6334f76b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "065de254dbaaa781b0500931798ec944319ca6e2d394a46e6a0675f5bec2eb2f",
+   "archive_bytes": 18178829,
+   "files": 1651
+  },
+  {
+   "repo": "enonic/app-explorer",
+   "sha": "b747314e90a82fe9d3698da1f1f93ab267cd40ff",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7b25c91aa5468c6836c61a6c089530f0644d60374d161f669057df0d786bbb70",
+   "archive_bytes": 539020,
+   "files": 581
+  },
+  {
+   "repo": "carlostighe/modalMap",
+   "sha": "06b1c49404c7852aca81317e8f865c187a4f6222",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "07b1c1a266fb3224e2ac1962da12810ce57d68179932c4b01983395042f4b647",
+   "archive_bytes": 383813,
+   "files": 21
+  },
+  {
+   "repo": "louiseka/cove-ui",
+   "sha": "0e0966d953ed4e6e677e0fd24be56d8262bb9697",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "80ee018a06d2d7b950a08c4e0a40cd44f441216132c14d428aafc9e0d698b89e",
+   "archive_bytes": 1674247,
+   "files": 72
+  },
+  {
+   "repo": "Desvelao/party-game",
+   "sha": "967e28a9749e9bd0dae1c908e5c5197399b91a75",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "1127c2902d706dc1596120bab8bb5a8a634a837b075b8f2d2a7d24ba2ff6e0dd",
+   "archive_bytes": 1265886,
+   "files": 816
+  },
+  {
+   "repo": "Dhanush1376/Akula-s-Kitchen",
+   "sha": "7f4265c82c5543886f44c352a70f835af1911d53",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "34347002a4adf433ab68aa0e7d1ba14cf469b5676ea9bcbca83092260d1ecb94",
+   "archive_bytes": 17217874,
+   "files": 1267
+  },
+  {
+   "repo": "mahaliahr/phd-live",
+   "sha": "4aa0276db19c91cc0c382199fb1bf54382a31b1b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "033e8aa273b16f4f775bef1b1749792b367ed53d021bf310664c19cfecf99a34",
+   "archive_bytes": 28606907,
+   "files": 749
+  },
+  {
+   "repo": "newtonlorenz/benchledger",
+   "sha": "f6e500b55026204eac06a520abe832b8cec50ac1",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9d4aafb2faa1ce15aa0d196d3fb523223d69f542fcb95f6c64c2cff6680e7e69",
+   "archive_bytes": 3219933,
+   "files": 571
+  },
+  {
+   "repo": "NSWSESMembers/Lighthouse",
+   "sha": "b42557d50fe53cce168133f09191ef9a7b7029c4",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8c3ee05f34f1d475e932da79737a81256d099c6e2e5744af417cc0d2dedee07d",
+   "archive_bytes": 9767731,
+   "files": 728
+  },
+  {
+   "repo": "eliflo1/certivue-marketing",
+   "sha": "3b9daeae4e1d52f7b1d18497d6129c282b354808",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4f178ad1cf8bcd93d54ad4227f0039e2cae58865c50ff48f0cee6e5f599f10f3",
+   "archive_bytes": 84823,
+   "files": 33
+  },
+  {
+   "repo": "Palladin-io/palladin-agent",
+   "sha": "9c5733c74621bf1615f8c70159fe0ac71c68b5c3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e5e62380fe370e5b017a85a76924e0170d9fc323628bd69d419ca0ea06b78f9c",
+   "archive_bytes": 1246899,
+   "files": 583
+  },
+  {
+   "repo": "ruddyribera-ops/pria-app",
+   "sha": "7dcc3ac1f715c4335071dc66d5e9c0c73dc7e98b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d6d5b69b1f516cb27fdaef0244ba7c7c40b73b78187dee37f421a89e3efdb002",
+   "archive_bytes": 10586808,
+   "files": 602
+  },
+  {
+   "repo": "ivanagas/writeconcise",
+   "sha": "edf10af31dca1900afeea436357ff18e674153f6",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a09ec2b614951393f6b655a093d3a4806a21fc24da1a27f255e376f91c752aa9",
+   "archive_bytes": 449886,
+   "files": 25
+  },
+  {
+   "repo": "bwhyte21/ProjectAniTracker",
+   "sha": "c6b07f065e81e5b9672b6ad85f0cb67a2448c77a",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4b0cc255dd245b34c35f595735cb6e7ead365c02c5955396bae924648f02c597",
+   "archive_bytes": 329306,
+   "files": 121
+  },
+  {
+   "repo": "evanwon/tastemaker-site",
+   "sha": "347064c36bf9b1a5a7eda1d8414e72e3f539cebf",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b724a267acca2ae32d5c19c15a5e493d59adf68ed35eb28aa0139f86897dd45f",
+   "archive_bytes": 24258,
+   "files": 11
+  },
+  {
+   "repo": "Nickpavlenk0/chess-studio",
+   "sha": "25c13cd2e2d277c3e62bb79c16e5f116ae9620b3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "6d088d4f77aca49309b9ff9a09cd8d2254e3d52190385572cf2621f2269e59d3",
+   "archive_bytes": 1080936,
+   "files": 81
+  },
+  {
+   "repo": "karyna4k/100-days-css",
+   "sha": "77f67b5a1da66ed4ab9437e4e2a131fe9f63c73d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "699976d2a11522892e0452d6d6ce121af1fc85d2521e7b84d84b92392b7be004",
+   "archive_bytes": 107911,
+   "files": 14
+  },
+  {
+   "repo": "jadwalit-jpg/Jadwal",
+   "sha": "8bbd3c18b5383cca89589be1a3faa193fb361bbc",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e2311e22c25ad3de1d71bb0bf8b08ff4ad30dba7f5cdfa835a5fda60799cb462",
+   "archive_bytes": 2487179,
+   "files": 801
+  },
+  {
+   "repo": "kratus66/CodeAI-Academy",
+   "sha": "dc140ecd59035dade5fdab627a9bb28d78388727",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9c0642c91ad96860842bfc0765d6f6c3f992aa9bf377d60457f493139b975a3b",
+   "archive_bytes": 841968,
+   "files": 265
+  },
+  {
+   "repo": "Armor-test/uptime-kuma",
+   "sha": "dbb6bfec2e042c1d5c90604316da7328692845b2",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9db6b5934b0263b9e866c50afc7568dc36e011c997d5522a71cee703af5d00da",
+   "archive_bytes": 2202477,
+   "files": 792
+  },
+  {
+   "repo": "logicalgnosis/logicalgnosis.github.io",
+   "sha": "9b276d8c9909186cba63159c9aed417f1f081d67",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4f2b05d5d88079882a25ba36d5a2a1b29675ec1383e8eaa8dd3b97ce5548263c",
+   "archive_bytes": 42942363,
+   "files": 426
+  },
+  {
+   "repo": "KHY90/JMAirAgentFront",
+   "sha": "67e71f480e928ee2397d44ff3517ad929701551d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7c008947364dd0adaa269d530cc41c29b0a11e13c51557a518fae92806bb1d2e",
+   "archive_bytes": 2704350,
+   "files": 129
+  },
+  {
+   "repo": "TKExternalAffairs/website",
+   "sha": "0a2b44c832e405e7290f542399fff32e1372abbf",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "af5d6102b7ea787b40b2a596caffedaeb502b39a2a99fea906541b18a2c823b1",
+   "archive_bytes": 28584036,
+   "files": 142
+  },
+  {
+   "repo": "ASIL-E-Hatake/vscode-games",
+   "sha": "c8ceddb7f0c53e21a1e47a02f143d03118df8ba5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a65a2766b04fef51f58d67d5fce513181c0889e44ad5cd7093036dced43ee3f9",
+   "archive_bytes": 27465335,
+   "files": 1007
+  },
+  {
+   "repo": "clorth0/EQEmu",
+   "sha": "2096d84c937590bde30e551e91c79256199547bb",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4f09ca79811e29f481f41a171df8a8d88ebe5f5a3fca0b312aef59d60bffd072",
+   "archive_bytes": 107600,
+   "files": 36
+  },
+  {
+   "repo": "AlbusKavaliro/AntiXss",
+   "sha": "80200fbbebf5b3ea1d2df66465a6180b5b71c6ee",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b63349519a21cf7ae1a1fece226a267534762368a969f551a752037ed46c4ecd",
+   "archive_bytes": 388367,
+   "files": 161
+  },
+  {
+   "repo": "JDonoghue-UL/my-astro-blog",
+   "sha": "5cad1368683125e884fdfd99d960d274121f12a2",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "63551745d46e75f06b954637b52c4b10fe953a93a2de74edc25afab154d7856e",
+   "archive_bytes": 1986083,
+   "files": 59
+  },
+  {
+   "repo": "TonyVoorhees/TonyVoorhees.github.io",
+   "sha": "95455c1eb68c112244c30fb7c6dec502ab8f28cc",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "fc728f3722170e2ed6f94c3600e4948953254a0b669bd4bf54b8722d1ecb6109",
+   "archive_bytes": 30671503,
+   "files": 186
+  },
+  {
+   "repo": "kkd927/kmux",
+   "sha": "380c8b48c865d517d0192a5bcf88bc9831de8e4f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "f6462e89b17704936f6df1e0bf4ab479e0ab9c44e4a35355038094c3f8b5b234",
+   "archive_bytes": 11558900,
+   "files": 702
+  },
+  {
+   "repo": "KirishimaAmenatsu/web_site_guide",
+   "sha": "2a063cf995a0a290856fb88f1c6f5e38b38e0c85",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "35dbef7c4de645c831638240fcdbdad7c5270e1a158e50c50331f4391c848695",
+   "archive_bytes": 31546953,
+   "files": 73
+  },
+  {
+   "repo": "chadheise/blog",
+   "sha": "47c383f03e569b89c4262aec8ebead3adf959270",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8d2c51e18d9a586553c2c13043322e4e264753e593d28b3be56078de52723f17",
+   "archive_bytes": 1857729553,
+   "files": 1323
+  },
+  {
+   "repo": "nikolanovoselec/codeflare",
+   "sha": "2cb0b3c156549720fbdf9bac99811e5f021e38ad",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "cf1afcdfd308a5ce3db688e0601fe9a7d4b8401acb77c6c81faa496d6cd5768e",
+   "archive_bytes": 33787586,
+   "files": 2242
+  },
+  {
+   "repo": "hitchhikers42/zanotam-proxy",
+   "sha": "b795e11012601f03a47f5cc19e3222036ec8f755",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "033f7b90878ab3e72a5bdae8409b61417c2ad4992984bc9e93f53a006fd9369d",
+   "archive_bytes": 3011668,
+   "files": 10
+  },
+  {
+   "repo": "ELDIABLO2020/bannersin48",
+   "sha": "be212e83019de95362bdb2f89e6d4172cf6ae9da",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "2e426206ab7d63be91cff35935374937a424a0f5755e5d0c6c0ffc58c2cb2fb9",
+   "archive_bytes": 7582581,
+   "files": 456
+  },
+  {
+   "repo": "bmesuere/licence-quest",
+   "sha": "419ec78038985503dd28edee6072876a1d86f9c1",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "87fff1dc078629524b9b6b32bbf7336a37bf27d0594bba68fcc88091ddbbec85",
+   "archive_bytes": 2272761,
+   "files": 43
+  },
+  {
+   "repo": "PatricRc/haber",
+   "sha": "b1f3d27cda04ae7178ac3425d2c905fb140875b9",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "03243c0cf3267200a89c5906479b480e69c6e72818bc7537fc9368b95856636f",
+   "archive_bytes": 1254264,
+   "files": 18
+  },
+  {
+   "repo": "derekantrican/derekantrican.github.io",
+   "sha": "f81de9d32fd51859e2c971e54bf94f92afa6db34",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7e5066201f835bbd1c34b227b82b64a8f1d2432142157d4a87c0554a623cf568",
+   "archive_bytes": 30485376,
+   "files": 110
+  },
+  {
+   "repo": "ShokooBid/PocketLedger",
+   "sha": "77c18e4667b8f17091bbf6f846c2eb47eabdcfed",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "ad1d3222419495227f297e6a7586c356c1359c8d9627920328908083cbdcd09b",
+   "archive_bytes": 267429,
+   "files": 126
+  },
+  {
+   "repo": "bdizzz/downtown-mars",
+   "sha": "6791e1e949d1285b04461c481884358bb996dca3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e8e29abfb85152eda6693a71d4bf03c469e6552124b5839bb845b687df0ef9ee",
+   "archive_bytes": 9428243,
+   "files": 512
+  },
+  {
+   "repo": "mapleclose/rocket-feast-website",
+   "sha": "763c64d8a17c0e5f2b37010ecce31b92869801ec",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "276a6f3b4b0d848565d66ed6aea897ae3535751414a56abf36592e790f799d32",
+   "archive_bytes": 513040,
+   "files": 236
+  },
+  {
+   "repo": "guola/socratic-rush",
+   "sha": "711c62d23d7f6c94469c00d794dffbeaefba0448",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "3e8d8f8b58ab37e0a9af1bbda73de5bf983a9c2ab769e48085ec5a8c2ea3997d",
+   "archive_bytes": 531718,
+   "files": 139
+  },
+  {
+   "repo": "thomas40510/PS-Generator",
+   "sha": "40249596e2ff614c47e20334cae588f6a8ebf1b9",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "289f2dca0e5d736effd751b3c6465d97b7e54cf4bce4723ec91a9e98ae2f46fc",
+   "archive_bytes": 202963,
+   "files": 22
+  },
+  {
+   "repo": "fastagent-sh/fastagent",
+   "sha": "dbeaf9f516ffd4ee343a81153e901d0e1d49feff",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "2aa917da97be6ff1a05c53fe4a02567d1922f22d3f5fca5d9a0e2c64b680ad4d",
+   "archive_bytes": 2020323,
+   "files": 495
+  },
+  {
+   "repo": "securityonionsolutions-com/securityonionsolutions-com.github.io",
+   "sha": "56bd68b6128e1ccf2d21beb9c3c4bc66fc13f35a",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "fa2277b067484de59ddec69e2d884a92ae08f907ad9e57ed8627958882130961",
+   "archive_bytes": 78704142,
+   "files": 369
+  },
+  {
+   "repo": "verygoodplugins/mcp-automem",
+   "sha": "a44ecada0630e902791a5ee3fef07071833dd496",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "02496cf3b6efec47a619a2f44418efad97fc0f60d703b9049b24056cd73556e3",
+   "archive_bytes": 7029612,
+   "files": 243
+  },
+  {
+   "repo": "ayush-that/cobalt-landing-page",
+   "sha": "9d31e2bc5c9211508f2009171c7634ab3980afc8",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "54b09093180bbbad8320e408df508b74de88e3d289c600b65bfc02af169099d5",
+   "archive_bytes": 333405,
+   "files": 38
+  },
+  {
+   "repo": "Renhuai123/ziwei-doushu",
+   "sha": "ff9a1470ebe652e57b9d690f5d01db9a04f47aae",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d59c4e36a6f9419d85c01b9cc7166559d39af77ab154fadfbc3d6b2b2bad4b5e",
+   "archive_bytes": 1922593,
+   "files": 122
+  },
+  {
+   "repo": "nschema-org/NSchema.Docs",
+   "sha": "478e1fdb58146fb74ddac8b0376f794bd2133412",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "68e468ad0b27575c6ea997f2b7e92edce224989066a51b756a784df534eb4217",
+   "archive_bytes": 365168,
+   "files": 236
+  },
+  {
+   "repo": "CDCgov/dibbs-query-connector",
+   "sha": "1ed649ff10961ad0709366bb8e5a74ed336862dc",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "735ecfa502fd904739977958967b26d42307b69e74b39ccd510864a6f80fae01",
+   "archive_bytes": 10423080,
+   "files": 549
+  },
+  {
+   "repo": "halain/adminpro-angular",
+   "sha": "46586cd94c4d97e2ef7f8d2f061b15fe24839f62",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "95b2da1e756267355429e8933850601fa8c046d1c8462eb777d7bd93e60ccb7c",
+   "archive_bytes": 6668507,
+   "files": 803
+  },
+  {
+   "repo": "aydabd/cacad",
+   "sha": "73741e3ba653ef6551185963f766dfd7a44d389e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d18329ca105db8ef1bfb7d530c528d7554e54063db6dc29ded77a3075cee80e3",
+   "archive_bytes": 100101,
+   "files": 222
+  },
+  {
+   "repo": "kyubey1228/ore-meshi",
+   "sha": "535c5df5806b66f04b1cb3ead50dd48f05bce257",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "ee00d71730bc1c247a2fd27f44966ef66093b0a167d58141ea455cb2966a529a",
+   "archive_bytes": 2633060,
+   "files": 547
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "sha": "167d1601aea3c727f76c178cfd64649a0a96d5af",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "1622a9cecd524494d7ea569b21afcdd3cb0083423f4bbe6dcd0c38606838140d",
+   "archive_bytes": 4105836,
+   "files": 1397
+  },
+  {
+   "repo": "tranhatam-collab/tueban-platform",
+   "sha": "f6187fa956ec46beb50826a155939a0ea3c8bde3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "bb32806f98a10e0c9a4f5f90fa2422e670a07f6ad767dd12610e2bf35621fe6c",
+   "archive_bytes": 50483,
+   "files": 60
+  },
+  {
+   "repo": "Vithanco/vscode-vithanco",
+   "sha": "167cc7eeeede9dbbce06a705825e4a63abeb3afc",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "6b87d96ab9c5f92de3a80e10bb8e469ada4c1603080c6282ae6c187a2b25d3b2",
+   "archive_bytes": 53047,
+   "files": 16
+  },
+  {
+   "repo": "korbonits/korbonits.github.io",
+   "sha": "c308a2f1c93117297859d9f709156247b0eda195",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "0b29231dcb95ef6bbd07e9a111fe26d413e08c5be9274a65eccac103232e1918",
+   "archive_bytes": 67010084,
+   "files": 175
+  },
+  {
+   "repo": "Azure/api-management-developer-portal",
+   "sha": "46ac32b15e223b1eef73e3ef3bbe3e62a9808980",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "bdeeeffea1e0ac1a6d0c3d29eeb8341f1220e370c3ba527a48dbd8d400ce236f",
+   "archive_bytes": 10348554,
+   "files": 1208
+  },
+  {
+   "repo": "chirag127/oz-chrome",
+   "sha": "a62ec0264acf2f2eed92113b97e122cd70b2c53a",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "6461a4ae37364ae51b79ebb8b1e20b4cc6d655dca5fe3d654ffa49686044a547",
+   "archive_bytes": 52441,
+   "files": 15
+  },
+  {
+   "repo": "sMorrison26/Portfolio",
+   "sha": "2cd4fbd99ef99e7bb74de89baefd522d3c485782",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d6124e6c75aa55214112acdb1716eec5e88d791424f3b59a9b92edaa00111539",
+   "archive_bytes": 28744425,
+   "files": 115
+  },
+  {
+   "repo": "Galane-dev/shesha-config-diff",
+   "sha": "a53d7edf36e25d5e32e5a28429ef516eaa0fd38f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "2421664b58e3b393e49caf91425047c9140ddff31685a8395f6636cc3cece251",
+   "archive_bytes": 232732,
+   "files": 125
+  },
+  {
+   "repo": "BROCKUGANDA/permitzero",
+   "sha": "ec3862cd251c3754f4461849fc2b464047dc4ce6",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a63ef44bcb84416fb999acbd1844c0cc37983e7da80187603319a010e6aaede8",
+   "archive_bytes": 685806,
+   "files": 349
+  },
+  {
+   "repo": "Gray-Ghost-Data-Consultants-LLC/grayghostdata-website",
+   "sha": "6e31e9eedf4fe674edfb0257d6ee53dd16408acc",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "2e3b958229b7f3f5fdf352b0c2078af9b3a1713650d5aa12934c235811537afc",
+   "archive_bytes": 3431039,
+   "files": 274
+  },
+  {
+   "repo": "paritytech/triangle-js-sdks",
+   "sha": "c7fcf98e87e4e95661b2f49d834b68c3a5ffc74f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "5d59564c97320d22a818e38f18a361b12e3965e7912791c372f8e8699ccaa632",
+   "archive_bytes": 2227861,
+   "files": 488
+  },
+  {
+   "repo": "clay-good/roughlogic.com",
+   "sha": "92cebbce3a4901160fa311a01745cb7505aee139",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a8781db5a7ece57a1f5719133f8184b2643d9916377f3c5a8fe92c6bf236fd0b",
+   "archive_bytes": 18830801,
+   "files": 2871
+  },
+  {
+   "repo": "epam/statgpt-portal-frontend",
+   "sha": "bcccb590cac7f15e7cd4a69b8fa4181acf62d49f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9375e9379dba5ab2c7c3c52ce0f97c1cb9462722d2f79311fe1bdd374f234e49",
+   "archive_bytes": 1209779,
+   "files": 1007
+  },
+  {
+   "repo": "frioux/woodworking-tools",
+   "sha": "47c23bc88966efadc4b25c16f47fcad11176b5e5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "363527694ccb0c485b6176d829e6adef95ae1c3ee625742596bd36e1d20029f5",
+   "archive_bytes": 722244,
+   "files": 42
+  },
+  {
+   "repo": "acekyd/acekyd",
+   "sha": "6f12af9d35bd13b0f20a3d5271b7c11644226151",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "940ac683bc54290f6cd0b4f92f2869f4aba0e6ca1f52798b88df3476ae1328c5",
+   "archive_bytes": 51923264,
+   "files": 195
+  },
+  {
+   "repo": "GSA/ngx-uswds",
+   "sha": "abc4d2e312ab811ca5f0bb83c0fba0fd8d1c8141",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "6cf67637c95423bb3f7e4859057c03b2e98f2c64e034c03317d2f1f2f93a12ba",
+   "archive_bytes": 813501,
+   "files": 459
+  },
+  {
+   "repo": "eitaar/eitaar.dev-v5",
+   "sha": "9f33aaacd5e5e0199472c202aba9ddac048e3e0b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b65803475f5d1121f0900e7cbd797e7c529583af6785a5cb9066c6420f84f9e4",
+   "archive_bytes": 2780434,
+   "files": 63
+  },
+  {
+   "repo": "JakeWharton/jakewharton.com",
+   "sha": "c660e5960d205157ad6f5f50fc8eae7e93eb4116",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8c9cbb7a51e4fd92f18d559853cee642a24709574497d1222f2758a50b0d48cf",
+   "archive_bytes": 48307643,
+   "files": 337
+  }
+ ]
+}

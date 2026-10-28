@@ -1,0 +1,1026 @@
+{
+ "note": "Beside the result, never instead of it.",
+ "noise": "/b/2026-10-29-l1c/result-new/noise.json",
+ "production_ts_blob": "153da2ff893ae10cdd2de19629135b2f41c532e3",
+ "measured_total": 998,
+ "recomputed_total": 998,
+ "changed": [],
+ "repos": [
+  {
+   "repo": "joelmale/nexusVTT",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "apps/codex/services/doc-api/Dockerfile",
+     "apps/codex/services/doc-processor/Dockerfile",
+     "apps/codex/services/doc-websocket/Dockerfile",
+     "apps/vtt/docker/backend.Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "multi-protocol-flow/multi-protocol-flow-executor",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "DLsnows/Sonic_Bridge",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "nextcloud/notes",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "nwtgck/naidan",
+   "measured": 22,
+   "recomputed": 22,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "federicoscimone/HomeTab",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "egallmann/ste-runtime",
+   "measured": 14,
+   "recomputed": 14,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "sexcme5/llm-chat-app-template",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "W8SOJIB/W8OmniRouteTermux-Modedd",
+   "measured": 41,
+   "recomputed": 41,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile",
+     "docker/devin-bridge/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "bilalix/arabic-reshaper-app",
+   "measured": 8,
+   "recomputed": 8,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "trstnk/aws-cli-agent",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "bota-dev/app-sdk",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "lerna/lerna",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "budieprof/lascodia-trading-engine-admin-ui",
+   "measured": 14,
+   "recomputed": 14,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "kyoresuas/import-ladder",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jacwohlen/administra",
+   "measured": 8,
+   "recomputed": 8,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ShujaatAzim/Tippi-legacy",
+   "measured": 31,
+   "recomputed": 31,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Brutusjam/projekt-status",
+   "measured": 26,
+   "recomputed": 26,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "shute1102/task-dashboard",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "plutus21tech/compass",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "SonyaMoisset/TOH_ANGULAR7",
+   "measured": 39,
+   "recomputed": 39,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "monoscope-tech/monoscope",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile.deps"
+    ]
+   }
+  },
+  {
+   "repo": "davidtech2026-ops/mobile-money",
+   "measured": 37,
+   "recomputed": 37,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "hyeoniverse/web-portfolio-hyeoniverse",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "fegome90-cmd/skill_fabrik",
+   "measured": 10,
+   "recomputed": 10,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "camsanchez33/green-reserve",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "sirloinbh/dev-career-portfolio",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "stefanseeger/ts-page-object",
+   "measured": 52,
+   "recomputed": 52,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Dynamsoft/mobile-web-capture",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "HillsboroLLC/jaspen",
+   "measured": 15,
+   "recomputed": 15,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "backend/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "guim31/gladys-habitica",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "STRML/strml.net",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Prithvi-ra-j/NutriLift",
+   "measured": 21,
+   "recomputed": 21,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "iansduncan-oss/web-push-lite",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "stop-bullshit/luckyh-cloud-web",
+   "measured": 26,
+   "recomputed": 26,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "paul-mueser/bingo-homepage",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "olufemid/task-dashboard",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "DarkStarStrix/Allanatrix",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "pendulumdev/arc-wordpress",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Aiyeesha/Aicha-Imene-DAHOUMANE-Portfolio.dev",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "curvefi/docs",
+   "measured": 17,
+   "recomputed": 17,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Aturm4/bumbars",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "timmson/agile-impact-map",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "SaraAboElenien/gahezlak-v2",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "xln-0/Arbora",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Accsimplify/obsidian-copy-contents",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jonbon0987/CampaignManager",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "measured": 14,
+   "recomputed": 14,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "StackOverflowIsBetterThanAnyAI/clash-of-clans-api",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "nrelab/nrelab.github.io",
+   "measured": 38,
+   "recomputed": 38,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jeni0101/OpenClaw-WeChat-Codex",
+   "measured": 17,
+   "recomputed": 17,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "3liz/lizmap-web-client",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "DoveLi-Gu/dsh-showcase",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "futugyou/angular-project",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "opencast/studio",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ccnmtl/specialneedsvisit-pack",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "bobthebob58/HVL-INTERAKTIV",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "PeWu/topola",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "asirihewage/npm-nullcode",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "roberjo/aws-testing",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "corndogit/maimai-score-tracker",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "leivadev/tender-management-system",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "hakatashi/solid-start-firebase-template",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "pradeepsalamon/NexaGen",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mattruby/supabase-worker-previews",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "yuanyu90221/webpack-demo-dir",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "pietro1704/youtube-webos-pietro",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "google-wallet/save-to-google-pay-button",
+   "measured": 43,
+   "recomputed": 43,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Vegadarkk/joutiya",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "dgrammatiko/on-a-diet",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "oscarlea/aluraflix",
+   "measured": 41,
+   "recomputed": 41,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Egoushka/oura-mcp-app",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "noa10/mataresit",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Reeti05Agarwal/NeoPwnsPolitely",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "thealirazadev/shopify-bulk-editor",
+   "measured": 25,
+   "recomputed": 25,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "AlfWuxy/focus-log-planner",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Zafiro-0/bjtu-self-service-web",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "TangoMan75/calculatrice-salaire-net",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "VantageInc/image-sorter",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "andrewwsou/valorant-tracker",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "adulbrich/eecs-capstone",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "stringologytimes/StringologyTimes",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Luckystrike561/terrarium",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "hikaru90/owlery",
+   "measured": 22,
+   "recomputed": 22,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jonorl/fugazzeta",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "server/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "baditaflorin/meshtrack-studio",
+   "measured": 10,
+   "recomputed": 10,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "AeonusOvO/claude-dock-control-panel",
+   "measured": 19,
+   "recomputed": 19,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "palindsay/label_maker",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Focalyst-Chintan/focalyst",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mirabhakta/ai-repo-inspector-mira-bhakta",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Heuller/gelo-e-fogo-rpg",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "fdamianenriquez/AgentIntake",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "kulykovoleksii/board",
+   "measured": 19,
+   "recomputed": 19,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "wesleysoares1983/Princelegal",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "abhx31/amrutham-backend",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mikesimone/tab-automator",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mazyu36/langfuse-with-aws-cdk",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jbpratt/pi-experiments",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Wealcoder/animation-addons-for-elementor",
+   "measured": 59,
+   "recomputed": 59,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Yil00/databastion",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  }
+ ]
+}

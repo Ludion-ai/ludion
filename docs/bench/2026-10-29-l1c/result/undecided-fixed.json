@@ -1,0 +1,1618 @@
+{
+ "note": "Probes, not definitions: each variant turns one fallback off; 'dropped' is what that fallback alone makes production.",
+ "rerun_total": 938,
+ "counts": {
+  "base": 935,
+  "image": 927,
+  "incomplete": 935,
+  "any_copy": 935,
+  "nested_declared": 934,
+  "nested_locked": 934,
+  "bin_nested": 935,
+  "peer": 910,
+  "optional": 932
+ },
+ "changed_from_rerun": [
+  {
+   "repo": "developer3000S/OmniRouteRus",
+   "name": "brace-expansion",
+   "now": "left out"
+  },
+  {
+   "repo": "developer3000S/OmniRouteRus",
+   "name": "joi",
+   "now": "left out"
+  },
+  {
+   "repo": "developer3000S/OmniRouteRus",
+   "name": "shell-quote",
+   "now": "left out"
+  }
+ ],
+ "variants": {
+  "image": {
+   "what": "D1 only because a production Dockerfile's final stage holds devDependencies (D2 not used)",
+   "dropped": 8,
+   "pairs": [
+    {
+     "repo": "ruddyribera-ops/pria-app",
+     "name": "shell-quote"
+    },
+    {
+     "repo": "ruddyribera-ops/pria-app",
+     "name": "undici"
+    },
+    {
+     "repo": "jadwalit-jpg/Jadwal",
+     "name": "basic-ftp"
+    },
+    {
+     "repo": "jadwalit-jpg/Jadwal",
+     "name": "extract-zip"
+    },
+    {
+     "repo": "jadwalit-jpg/Jadwal",
+     "name": "fast-copy"
+    },
+    {
+     "repo": "jadwalit-jpg/Jadwal",
+     "name": "tmp"
+    },
+    {
+     "repo": "jadwalit-jpg/Jadwal",
+     "name": "uuid"
+    },
+    {
+     "repo": "jadwalit-jpg/Jadwal",
+     "name": "zod"
+    }
+   ]
+  },
+  "incomplete": {
+   "what": "D1 only because the source tree is incomplete (D2 not used)",
+   "dropped": 0,
+   "pairs": []
+  },
+  "any_copy": {
+   "what": "an import that no node_modules up the file's path resolves seeds every installed copy of that name",
+   "dropped": 0,
+   "pairs": []
+  },
+  "nested_declared": {
+   "what": "a file in a folder with its own package.json that is not a lockfile folder (not the root or a workspace), importing a name that package.json declares",
+   "dropped": 1,
+   "pairs": [
+    {
+     "repo": "ruddyribera-ops/pria-app",
+     "name": "zod"
+    }
+   ]
+  },
+  "nested_locked": {
+   "what": "as nested_declared, and that folder's own package-lock.json installs the name at its own node_modules",
+   "dropped": 1,
+   "pairs": [
+    {
+     "repo": "ruddyribera-ops/pria-app",
+     "name": "zod"
+    }
+   ]
+  },
+  "bin_nested": {
+   "what": "a command's bin name seeds copies nested inside another package's node_modules, which are not on the script's PATH",
+   "dropped": 0,
+   "pairs": []
+  },
+  "peer": {
+   "what": "following peerDependencies from a production copy",
+   "dropped": 25,
+   "pairs": [
+    {
+     "repo": "jasperyeo/jasper-oktavina-wedding",
+     "name": "engine.io"
+    },
+    {
+     "repo": "jasperyeo/jasper-oktavina-wedding",
+     "name": "follow-redirects"
+    },
+    {
+     "repo": "mbadr5858/badr-pdf",
+     "name": "sharp"
+    },
+    {
+     "repo": "shiiizuku/document-management-tracking-system",
+     "name": "undici"
+    },
+    {
+     "repo": "PM-Shawn/Abu-Cowork",
+     "name": "happy-dom"
+    },
+    {
+     "repo": "newtonlorenz/benchledger",
+     "name": "undici"
+    },
+    {
+     "repo": "Armor-test/uptime-kuma",
+     "name": "decode-uri-component"
+    },
+    {
+     "repo": "guola/socratic-rush",
+     "name": "react-server-dom-webpack"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "adm-zip"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "ajv"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "flatted"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "form-data"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "lodash"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "minimatch"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "qs"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "request"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "semver"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "tmp"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "tough-cookie"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "ws"
+    },
+    {
+     "repo": "halain/adminpro-angular",
+     "name": "xml2js"
+    },
+    {
+     "repo": "BilLogic/uno-blueprint",
+     "name": "undici"
+    },
+    {
+     "repo": "Azure/api-management-developer-portal",
+     "name": "immutable"
+    },
+    {
+     "repo": "paritytech/triangle-js-sdks",
+     "name": "probe-image-size"
+    },
+    {
+     "repo": "acekyd/acekyd",
+     "name": "immutable"
+    }
+   ]
+  },
+  "optional": {
+   "what": "following optionalDependencies from a production copy",
+   "dropped": 3,
+   "pairs": [
+    {
+     "repo": "chirag127/oz-chrome",
+     "name": "sharp"
+    },
+    {
+     "repo": "paritytech/triangle-js-sdks",
+     "name": "probe-image-size"
+    },
+    {
+     "repo": "paritytech/triangle-js-sdks",
+     "name": "undici"
+    }
+   ]
+  }
+ },
+ "bundled_only": {
+  "what": "counted packages whose every vulnerable production copy is inBundle",
+  "pairs": [
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "bl"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "brace-expansion"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "chownr"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "es5-ext"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "extend"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "form-data"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "fstream"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "hawk"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "hoek"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "is-my-json-valid"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "json-schema"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "jsonpointer"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "minimatch"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "npm-user-validate"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "request"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "sshpk"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "stringstream"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "tar"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "tough-cookie"
+   },
+   {
+    "repo": "carlostighe/modalMap",
+    "name": "tunnel-agent"
+   }
+  ]
+ },
+ "repos": [
+  {
+   "repo": "Rafi-SBM/PySan",
+   "rerun": 10,
+   "base": 10,
+   "image": 10,
+   "incomplete": 10,
+   "any_copy": 10,
+   "nested_declared": 10,
+   "nested_locked": 10,
+   "bin_nested": 10,
+   "peer": 10,
+   "optional": 10
+  },
+  {
+   "repo": "Kmaina32/Varban-Markets",
+   "rerun": 22,
+   "base": 22,
+   "image": 22,
+   "incomplete": 22,
+   "any_copy": 22,
+   "nested_declared": 22,
+   "nested_locked": 22,
+   "bin_nested": 22,
+   "peer": 22,
+   "optional": 22
+  },
+  {
+   "repo": "SteinOA/DSSA-Tale-Mac",
+   "rerun": 20,
+   "base": 20,
+   "image": 20,
+   "incomplete": 20,
+   "any_copy": 20,
+   "nested_declared": 20,
+   "nested_locked": 20,
+   "bin_nested": 20,
+   "peer": 20,
+   "optional": 20
+  },
+  {
+   "repo": "bm-hien/is-this-code-safe",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "cofob/design-system",
+   "rerun": 19,
+   "base": 19,
+   "image": 19,
+   "incomplete": 19,
+   "any_copy": 19,
+   "nested_declared": 19,
+   "nested_locked": 19,
+   "bin_nested": 19,
+   "peer": 19,
+   "optional": 19
+  },
+  {
+   "repo": "jasperyeo/jasper-oktavina-wedding",
+   "rerun": 16,
+   "base": 16,
+   "image": 16,
+   "incomplete": 16,
+   "any_copy": 16,
+   "nested_declared": 16,
+   "nested_locked": 16,
+   "bin_nested": 16,
+   "peer": 14,
+   "optional": 16
+  },
+  {
+   "repo": "Sylonin/xposed-newx-patches",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "aniru-dh21/snap-validate",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "MorpheApp/morphe-patcher",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "itsdarklikehell/my-resume",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "staticdesigner/modevue",
+   "rerun": 10,
+   "base": 10,
+   "image": 10,
+   "incomplete": 10,
+   "any_copy": 10,
+   "nested_declared": 10,
+   "nested_locked": 10,
+   "bin_nested": 10,
+   "peer": 10,
+   "optional": 10
+  },
+  {
+   "repo": "wefio/NodeMemoryGraph",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "yaeouk-rajab/pulsewatch-mobile",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "mbadr5858/badr-pdf",
+   "rerun": 14,
+   "base": 14,
+   "image": 14,
+   "incomplete": 14,
+   "any_copy": 14,
+   "nested_declared": 14,
+   "nested_locked": 14,
+   "bin_nested": 14,
+   "peer": 13,
+   "optional": 14
+  },
+  {
+   "repo": "padosoft/eval-harness-admin",
+   "rerun": 5,
+   "base": 5,
+   "image": 5,
+   "incomplete": 5,
+   "any_copy": 5,
+   "nested_declared": 5,
+   "nested_locked": 5,
+   "bin_nested": 5,
+   "peer": 5,
+   "optional": 5
+  },
+  {
+   "repo": "developer3000S/OmniRouteRus",
+   "rerun": 32,
+   "base": 29,
+   "image": 29,
+   "incomplete": 29,
+   "any_copy": 29,
+   "nested_declared": 29,
+   "nested_locked": 29,
+   "bin_nested": 29,
+   "peer": 29,
+   "optional": 29
+  },
+  {
+   "repo": "mrBettazzi/nuxt-myweb",
+   "rerun": 8,
+   "base": 8,
+   "image": 8,
+   "incomplete": 8,
+   "any_copy": 8,
+   "nested_declared": 8,
+   "nested_locked": 8,
+   "bin_nested": 8,
+   "peer": 8,
+   "optional": 8
+  },
+  {
+   "repo": "shiiizuku/document-management-tracking-system",
+   "rerun": 12,
+   "base": 12,
+   "image": 12,
+   "incomplete": 12,
+   "any_copy": 12,
+   "nested_declared": 12,
+   "nested_locked": 12,
+   "bin_nested": 12,
+   "peer": 11,
+   "optional": 12
+  },
+  {
+   "repo": "wangyufengsky/qq-agents",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "microsoft/vscode-ts-file-path-support",
+   "rerun": 4,
+   "base": 4,
+   "image": 4,
+   "incomplete": 4,
+   "any_copy": 4,
+   "nested_declared": 4,
+   "nested_locked": 4,
+   "bin_nested": 4,
+   "peer": 4,
+   "optional": 4
+  },
+  {
+   "repo": "lalidiaz/node-store-api",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "airalab/robonomics.network",
+   "rerun": 32,
+   "base": 32,
+   "image": 32,
+   "incomplete": 32,
+   "any_copy": 32,
+   "nested_declared": 32,
+   "nested_locked": 32,
+   "bin_nested": 32,
+   "peer": 32,
+   "optional": 32
+  },
+  {
+   "repo": "donkirkby/python-zendo",
+   "rerun": 14,
+   "base": 14,
+   "image": 14,
+   "incomplete": 14,
+   "any_copy": 14,
+   "nested_declared": 14,
+   "nested_locked": 14,
+   "bin_nested": 14,
+   "peer": 14,
+   "optional": 14
+  },
+  {
+   "repo": "akshaydhadwal745/lens-camera",
+   "rerun": 5,
+   "base": 5,
+   "image": 5,
+   "incomplete": 5,
+   "any_copy": 5,
+   "nested_declared": 5,
+   "nested_locked": 5,
+   "bin_nested": 5,
+   "peer": 5,
+   "optional": 5
+  },
+  {
+   "repo": "Blackshield-Company/openshield-desktop",
+   "rerun": 6,
+   "base": 6,
+   "image": 6,
+   "incomplete": 6,
+   "any_copy": 6,
+   "nested_declared": 6,
+   "nested_locked": 6,
+   "bin_nested": 6,
+   "peer": 6,
+   "optional": 6
+  },
+  {
+   "repo": "RoxyAPI/ai-spiritual-companion",
+   "rerun": 4,
+   "base": 4,
+   "image": 4,
+   "incomplete": 4,
+   "any_copy": 4,
+   "nested_declared": 4,
+   "nested_locked": 4,
+   "bin_nested": 4,
+   "peer": 4,
+   "optional": 4
+  },
+  {
+   "repo": "shimi-lynx/mogledge",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "PM-Shawn/Abu-Cowork",
+   "rerun": 17,
+   "base": 17,
+   "image": 17,
+   "incomplete": 17,
+   "any_copy": 17,
+   "nested_declared": 17,
+   "nested_locked": 17,
+   "bin_nested": 17,
+   "peer": 16,
+   "optional": 17
+  },
+  {
+   "repo": "datagrowth/sobre-abierto",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "KisaesDevLab/Vibe-MyBooks",
+   "rerun": 6,
+   "base": 6,
+   "image": 6,
+   "incomplete": 6,
+   "any_copy": 6,
+   "nested_declared": 6,
+   "nested_locked": 6,
+   "bin_nested": 6,
+   "peer": 6,
+   "optional": 6
+  },
+  {
+   "repo": "nmagera07/family-site",
+   "rerun": 19,
+   "base": 19,
+   "image": 19,
+   "incomplete": 19,
+   "any_copy": 19,
+   "nested_declared": 19,
+   "nested_locked": 19,
+   "bin_nested": 19,
+   "peer": 19,
+   "optional": 19
+  },
+  {
+   "repo": "toddmedema/electrify",
+   "rerun": 5,
+   "base": 5,
+   "image": 5,
+   "incomplete": 5,
+   "any_copy": 5,
+   "nested_declared": 5,
+   "nested_locked": 5,
+   "bin_nested": 5,
+   "peer": 5,
+   "optional": 5
+  },
+  {
+   "repo": "enonic/app-explorer",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "carlostighe/modalMap",
+   "rerun": 38,
+   "base": 38,
+   "image": 38,
+   "incomplete": 38,
+   "any_copy": 38,
+   "nested_declared": 38,
+   "nested_locked": 38,
+   "bin_nested": 38,
+   "peer": 38,
+   "optional": 38
+  },
+  {
+   "repo": "louiseka/cove-ui",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "Desvelao/party-game",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "Dhanush1376/Akula-s-Kitchen",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "mahaliahr/phd-live",
+   "rerun": 10,
+   "base": 10,
+   "image": 10,
+   "incomplete": 10,
+   "any_copy": 10,
+   "nested_declared": 10,
+   "nested_locked": 10,
+   "bin_nested": 10,
+   "peer": 10,
+   "optional": 10
+  },
+  {
+   "repo": "newtonlorenz/benchledger",
+   "rerun": 8,
+   "base": 8,
+   "image": 8,
+   "incomplete": 8,
+   "any_copy": 8,
+   "nested_declared": 8,
+   "nested_locked": 8,
+   "bin_nested": 8,
+   "peer": 7,
+   "optional": 8
+  },
+  {
+   "repo": "NSWSESMembers/Lighthouse",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "eliflo1/certivue-marketing",
+   "rerun": 15,
+   "base": 15,
+   "image": 15,
+   "incomplete": 15,
+   "any_copy": 15,
+   "nested_declared": 15,
+   "nested_locked": 15,
+   "bin_nested": 15,
+   "peer": 15,
+   "optional": 15
+  },
+  {
+   "repo": "Palladin-io/palladin-agent",
+   "rerun": 6,
+   "base": 6,
+   "image": 6,
+   "incomplete": 6,
+   "any_copy": 6,
+   "nested_declared": 6,
+   "nested_locked": 6,
+   "bin_nested": 6,
+   "peer": 6,
+   "optional": 6
+  },
+  {
+   "repo": "ruddyribera-ops/pria-app",
+   "rerun": 21,
+   "base": 21,
+   "image": 19,
+   "incomplete": 21,
+   "any_copy": 21,
+   "nested_declared": 20,
+   "nested_locked": 20,
+   "bin_nested": 21,
+   "peer": 21,
+   "optional": 21
+  },
+  {
+   "repo": "ivanagas/writeconcise",
+   "rerun": 6,
+   "base": 6,
+   "image": 6,
+   "incomplete": 6,
+   "any_copy": 6,
+   "nested_declared": 6,
+   "nested_locked": 6,
+   "bin_nested": 6,
+   "peer": 6,
+   "optional": 6
+  },
+  {
+   "repo": "bwhyte21/ProjectAniTracker",
+   "rerun": 12,
+   "base": 12,
+   "image": 12,
+   "incomplete": 12,
+   "any_copy": 12,
+   "nested_declared": 12,
+   "nested_locked": 12,
+   "bin_nested": 12,
+   "peer": 12,
+   "optional": 12
+  },
+  {
+   "repo": "evanwon/tastemaker-site",
+   "rerun": 8,
+   "base": 8,
+   "image": 8,
+   "incomplete": 8,
+   "any_copy": 8,
+   "nested_declared": 8,
+   "nested_locked": 8,
+   "bin_nested": 8,
+   "peer": 8,
+   "optional": 8
+  },
+  {
+   "repo": "Nickpavlenk0/chess-studio",
+   "rerun": 3,
+   "base": 3,
+   "image": 3,
+   "incomplete": 3,
+   "any_copy": 3,
+   "nested_declared": 3,
+   "nested_locked": 3,
+   "bin_nested": 3,
+   "peer": 3,
+   "optional": 3
+  },
+  {
+   "repo": "karyna4k/100-days-css",
+   "rerun": 3,
+   "base": 3,
+   "image": 3,
+   "incomplete": 3,
+   "any_copy": 3,
+   "nested_declared": 3,
+   "nested_locked": 3,
+   "bin_nested": 3,
+   "peer": 3,
+   "optional": 3
+  },
+  {
+   "repo": "jadwalit-jpg/Jadwal",
+   "rerun": 9,
+   "base": 9,
+   "image": 3,
+   "incomplete": 9,
+   "any_copy": 9,
+   "nested_declared": 9,
+   "nested_locked": 9,
+   "bin_nested": 9,
+   "peer": 9,
+   "optional": 9
+  },
+  {
+   "repo": "kratus66/CodeAI-Academy",
+   "rerun": 20,
+   "base": 20,
+   "image": 20,
+   "incomplete": 20,
+   "any_copy": 20,
+   "nested_declared": 20,
+   "nested_locked": 20,
+   "bin_nested": 20,
+   "peer": 20,
+   "optional": 20
+  },
+  {
+   "repo": "Armor-test/uptime-kuma",
+   "rerun": 32,
+   "base": 32,
+   "image": 32,
+   "incomplete": 32,
+   "any_copy": 32,
+   "nested_declared": 32,
+   "nested_locked": 32,
+   "bin_nested": 32,
+   "peer": 31,
+   "optional": 32
+  },
+  {
+   "repo": "logicalgnosis/logicalgnosis.github.io",
+   "rerun": 4,
+   "base": 4,
+   "image": 4,
+   "incomplete": 4,
+   "any_copy": 4,
+   "nested_declared": 4,
+   "nested_locked": 4,
+   "bin_nested": 4,
+   "peer": 4,
+   "optional": 4
+  },
+  {
+   "repo": "KHY90/JMAirAgentFront",
+   "rerun": 3,
+   "base": 3,
+   "image": 3,
+   "incomplete": 3,
+   "any_copy": 3,
+   "nested_declared": 3,
+   "nested_locked": 3,
+   "bin_nested": 3,
+   "peer": 3,
+   "optional": 3
+  },
+  {
+   "repo": "TKExternalAffairs/website",
+   "rerun": 5,
+   "base": 5,
+   "image": 5,
+   "incomplete": 5,
+   "any_copy": 5,
+   "nested_declared": 5,
+   "nested_locked": 5,
+   "bin_nested": 5,
+   "peer": 5,
+   "optional": 5
+  },
+  {
+   "repo": "ASIL-E-Hatake/vscode-games",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "clorth0/EQEmu",
+   "rerun": 7,
+   "base": 7,
+   "image": 7,
+   "incomplete": 7,
+   "any_copy": 7,
+   "nested_declared": 7,
+   "nested_locked": 7,
+   "bin_nested": 7,
+   "peer": 7,
+   "optional": 7
+  },
+  {
+   "repo": "AlbusKavaliro/AntiXss",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "JDonoghue-UL/my-astro-blog",
+   "rerun": 4,
+   "base": 4,
+   "image": 4,
+   "incomplete": 4,
+   "any_copy": 4,
+   "nested_declared": 4,
+   "nested_locked": 4,
+   "bin_nested": 4,
+   "peer": 4,
+   "optional": 4
+  },
+  {
+   "repo": "TonyVoorhees/TonyVoorhees.github.io",
+   "rerun": 5,
+   "base": 5,
+   "image": 5,
+   "incomplete": 5,
+   "any_copy": 5,
+   "nested_declared": 5,
+   "nested_locked": 5,
+   "bin_nested": 5,
+   "peer": 5,
+   "optional": 5
+  },
+  {
+   "repo": "kkd927/kmux",
+   "rerun": 21,
+   "base": 21,
+   "image": 21,
+   "incomplete": 21,
+   "any_copy": 21,
+   "nested_declared": 21,
+   "nested_locked": 21,
+   "bin_nested": 21,
+   "peer": 21,
+   "optional": 21
+  },
+  {
+   "repo": "KirishimaAmenatsu/web_site_guide",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "chadheise/blog",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "nikolanovoselec/codeflare",
+   "rerun": 5,
+   "base": 5,
+   "image": 5,
+   "incomplete": 5,
+   "any_copy": 5,
+   "nested_declared": 5,
+   "nested_locked": 5,
+   "bin_nested": 5,
+   "peer": 5,
+   "optional": 5
+  },
+  {
+   "repo": "hitchhikers42/zanotam-proxy",
+   "rerun": 12,
+   "base": 12,
+   "image": 12,
+   "incomplete": 12,
+   "any_copy": 12,
+   "nested_declared": 12,
+   "nested_locked": 12,
+   "bin_nested": 12,
+   "peer": 12,
+   "optional": 12
+  },
+  {
+   "repo": "ELDIABLO2020/bannersin48",
+   "rerun": 11,
+   "base": 11,
+   "image": 11,
+   "incomplete": 11,
+   "any_copy": 11,
+   "nested_declared": 11,
+   "nested_locked": 11,
+   "bin_nested": 11,
+   "peer": 11,
+   "optional": 11
+  },
+  {
+   "repo": "bmesuere/licence-quest",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "PatricRc/haber",
+   "rerun": 3,
+   "base": 3,
+   "image": 3,
+   "incomplete": 3,
+   "any_copy": 3,
+   "nested_declared": 3,
+   "nested_locked": 3,
+   "bin_nested": 3,
+   "peer": 3,
+   "optional": 3
+  },
+  {
+   "repo": "derekantrican/derekantrican.github.io",
+   "rerun": 19,
+   "base": 19,
+   "image": 19,
+   "incomplete": 19,
+   "any_copy": 19,
+   "nested_declared": 19,
+   "nested_locked": 19,
+   "bin_nested": 19,
+   "peer": 19,
+   "optional": 19
+  },
+  {
+   "repo": "ShokooBid/PocketLedger",
+   "rerun": 5,
+   "base": 5,
+   "image": 5,
+   "incomplete": 5,
+   "any_copy": 5,
+   "nested_declared": 5,
+   "nested_locked": 5,
+   "bin_nested": 5,
+   "peer": 5,
+   "optional": 5
+  },
+  {
+   "repo": "bdizzz/downtown-mars",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "mapleclose/rocket-feast-website",
+   "rerun": 6,
+   "base": 6,
+   "image": 6,
+   "incomplete": 6,
+   "any_copy": 6,
+   "nested_declared": 6,
+   "nested_locked": 6,
+   "bin_nested": 6,
+   "peer": 6,
+   "optional": 6
+  },
+  {
+   "repo": "guola/socratic-rush",
+   "rerun": 15,
+   "base": 15,
+   "image": 15,
+   "incomplete": 15,
+   "any_copy": 15,
+   "nested_declared": 15,
+   "nested_locked": 15,
+   "bin_nested": 15,
+   "peer": 14,
+   "optional": 15
+  },
+  {
+   "repo": "thomas40510/PS-Generator",
+   "rerun": 49,
+   "base": 49,
+   "image": 49,
+   "incomplete": 49,
+   "any_copy": 49,
+   "nested_declared": 49,
+   "nested_locked": 49,
+   "bin_nested": 49,
+   "peer": 49,
+   "optional": 49
+  },
+  {
+   "repo": "fastagent-sh/fastagent",
+   "rerun": 3,
+   "base": 3,
+   "image": 3,
+   "incomplete": 3,
+   "any_copy": 3,
+   "nested_declared": 3,
+   "nested_locked": 3,
+   "bin_nested": 3,
+   "peer": 3,
+   "optional": 3
+  },
+  {
+   "repo": "securityonionsolutions-com/securityonionsolutions-com.github.io",
+   "rerun": 12,
+   "base": 12,
+   "image": 12,
+   "incomplete": 12,
+   "any_copy": 12,
+   "nested_declared": 12,
+   "nested_locked": 12,
+   "bin_nested": 12,
+   "peer": 12,
+   "optional": 12
+  },
+  {
+   "repo": "verygoodplugins/mcp-automem",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "ayush-that/cobalt-landing-page",
+   "rerun": 3,
+   "base": 3,
+   "image": 3,
+   "incomplete": 3,
+   "any_copy": 3,
+   "nested_declared": 3,
+   "nested_locked": 3,
+   "bin_nested": 3,
+   "peer": 3,
+   "optional": 3
+  },
+  {
+   "repo": "Renhuai123/ziwei-doushu",
+   "rerun": 2,
+   "base": 2,
+   "image": 2,
+   "incomplete": 2,
+   "any_copy": 2,
+   "nested_declared": 2,
+   "nested_locked": 2,
+   "bin_nested": 2,
+   "peer": 2,
+   "optional": 2
+  },
+  {
+   "repo": "nschema-org/NSchema.Docs",
+   "rerun": 12,
+   "base": 12,
+   "image": 12,
+   "incomplete": 12,
+   "any_copy": 12,
+   "nested_declared": 12,
+   "nested_locked": 12,
+   "bin_nested": 12,
+   "peer": 12,
+   "optional": 12
+  },
+  {
+   "repo": "CDCgov/dibbs-query-connector",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "halain/adminpro-angular",
+   "rerun": 22,
+   "base": 22,
+   "image": 22,
+   "incomplete": 22,
+   "any_copy": 22,
+   "nested_declared": 22,
+   "nested_locked": 22,
+   "bin_nested": 22,
+   "peer": 9,
+   "optional": 22
+  },
+  {
+   "repo": "aydabd/cacad",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "kyubey1228/ore-meshi",
+   "rerun": 17,
+   "base": 17,
+   "image": 17,
+   "incomplete": 17,
+   "any_copy": 17,
+   "nested_declared": 17,
+   "nested_locked": 17,
+   "bin_nested": 17,
+   "peer": 17,
+   "optional": 17
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "rerun": 4,
+   "base": 4,
+   "image": 4,
+   "incomplete": 4,
+   "any_copy": 4,
+   "nested_declared": 4,
+   "nested_locked": 4,
+   "bin_nested": 4,
+   "peer": 3,
+   "optional": 4
+  },
+  {
+   "repo": "tranhatam-collab/tueban-platform",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "Vithanco/vscode-vithanco",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "korbonits/korbonits.github.io",
+   "rerun": 11,
+   "base": 11,
+   "image": 11,
+   "incomplete": 11,
+   "any_copy": 11,
+   "nested_declared": 11,
+   "nested_locked": 11,
+   "bin_nested": 11,
+   "peer": 11,
+   "optional": 11
+  },
+  {
+   "repo": "Azure/api-management-developer-portal",
+   "rerun": 44,
+   "base": 44,
+   "image": 44,
+   "incomplete": 44,
+   "any_copy": 44,
+   "nested_declared": 44,
+   "nested_locked": 44,
+   "bin_nested": 44,
+   "peer": 43,
+   "optional": 44
+  },
+  {
+   "repo": "chirag127/oz-chrome",
+   "rerun": 12,
+   "base": 12,
+   "image": 12,
+   "incomplete": 12,
+   "any_copy": 12,
+   "nested_declared": 12,
+   "nested_locked": 12,
+   "bin_nested": 12,
+   "peer": 12,
+   "optional": 11
+  },
+  {
+   "repo": "sMorrison26/Portfolio",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "Galane-dev/shesha-config-diff",
+   "rerun": 1,
+   "base": 1,
+   "image": 1,
+   "incomplete": 1,
+   "any_copy": 1,
+   "nested_declared": 1,
+   "nested_locked": 1,
+   "bin_nested": 1,
+   "peer": 1,
+   "optional": 1
+  },
+  {
+   "repo": "BROCKUGANDA/permitzero",
+   "rerun": 6,
+   "base": 6,
+   "image": 6,
+   "incomplete": 6,
+   "any_copy": 6,
+   "nested_declared": 6,
+   "nested_locked": 6,
+   "bin_nested": 6,
+   "peer": 6,
+   "optional": 6
+  },
+  {
+   "repo": "Gray-Ghost-Data-Consultants-LLC/grayghostdata-website",
+   "rerun": 12,
+   "base": 12,
+   "image": 12,
+   "incomplete": 12,
+   "any_copy": 12,
+   "nested_declared": 12,
+   "nested_locked": 12,
+   "bin_nested": 12,
+   "peer": 12,
+   "optional": 12
+  },
+  {
+   "repo": "paritytech/triangle-js-sdks",
+   "rerun": 15,
+   "base": 15,
+   "image": 15,
+   "incomplete": 15,
+   "any_copy": 15,
+   "nested_declared": 15,
+   "nested_locked": 15,
+   "bin_nested": 15,
+   "peer": 14,
+   "optional": 13
+  },
+  {
+   "repo": "clay-good/roughlogic.com",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "epam/statgpt-portal-frontend",
+   "rerun": 14,
+   "base": 14,
+   "image": 14,
+   "incomplete": 14,
+   "any_copy": 14,
+   "nested_declared": 14,
+   "nested_locked": 14,
+   "bin_nested": 14,
+   "peer": 14,
+   "optional": 14
+  },
+  {
+   "repo": "frioux/woodworking-tools",
+   "rerun": 0,
+   "base": 0,
+   "image": 0,
+   "incomplete": 0,
+   "any_copy": 0,
+   "nested_declared": 0,
+   "nested_locked": 0,
+   "bin_nested": 0,
+   "peer": 0,
+   "optional": 0
+  },
+  {
+   "repo": "acekyd/acekyd",
+   "rerun": 47,
+   "base": 47,
+   "image": 47,
+   "incomplete": 47,
+   "any_copy": 47,
+   "nested_declared": 47,
+   "nested_locked": 47,
+   "bin_nested": 47,
+   "peer": 46,
+   "optional": 47
+  },
+  {
+   "repo": "GSA/ngx-uswds",
+   "rerun": 15,
+   "base": 15,
+   "image": 15,
+   "incomplete": 15,
+   "any_copy": 15,
+   "nested_declared": 15,
+   "nested_locked": 15,
+   "bin_nested": 15,
+   "peer": 15,
+   "optional": 15
+  },
+  {
+   "repo": "eitaar/eitaar.dev-v5",
+   "rerun": 13,
+   "base": 13,
+   "image": 13,
+   "incomplete": 13,
+   "any_copy": 13,
+   "nested_declared": 13,
+   "nested_locked": 13,
+   "bin_nested": 13,
+   "peer": 13,
+   "optional": 13
+  }
+ ]
+}

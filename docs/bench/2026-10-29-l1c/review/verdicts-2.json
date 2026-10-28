@@ -1,0 +1,422 @@
+[
+  {
+    "repo": "davidtech2026-ops/mobile-money",
+    "sha": "2509c13cd1b28c284661726ea7a4d214828f72a1",
+    "finished": true,
+    "packages": [
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/fast-uri 3.1.5 (lockfile dev), in range of GHSA-333x-w4r6-6crp >=3.0.0 <3.1.9 (and others listed). Paths from root lockfile (project '.' only): (.) > @stryker-mutator/core|@stryker-mutator/jest-runner|@stryker-mutator/typescript-checker > ajv > fast-uri, and (.) > @commitlint/cli > @commitlint/load > @commitlint/config-validator > ajv > fast-uri. Stryker is not on D1's lists, so D1 does not hold; D2: no source file imports fast-uri, ajv or @stryker-mutator/* (stryker named only in package.json test:mutation scripts and stryker.conf.json, a JSON file that is neither source nor a P2 file; commitlint only in .husky/commit-msg and commitlint.config.js, both excluded). No P2 config names them; not P3/P4. Production commands: start 'node dist/src/index.js', build 'tsc' (typescript has no deps), Dockerfile builder RUN 'npm ci --ignore-scripts' + 'npm run build', docker-compose commands 'npx tsx ...' and redis-server; none reaches them. Closure from P0/P1/P2/P3 copies does not reach the copy. Dockerfiles: ./Dockerfile final stage 'production' copies node_modules only from stage 'deps' (NODE_ENV=production, npm ci --omit=dev), dist and package.json from builder, and public/ - holds no devDependencies; ingest-node/Dockerfile final stage copies node_modules from 'deps' (npm ci --omit=dev); ingest-go/Dockerfile has no Node; Dockerfile.dev is dev-marked."
+      },
+      {
+        "name": "handlebars",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/handlebars 4.7.9 (lockfile dev), in range of GHSA-xw65-4hp5-5hc7 / GHSA-8r5x-fm3f-whwj >=4.0.0 <=4.7.9. Only path: (.) > ts-jest > handlebars; ts-jest is a root devDependency on D1's test-runner list. Not mentioned anywhere outside the lockfile; no P-rule reaches it (Dockerfiles as for fast-uri: production stages copy node_modules only from npm ci --omit=dev stages)."
+      }
+    ]
+  },
+  {
+    "repo": "hyeoniverse/web-portfolio-hyeoniverse",
+    "sha": "74ca18c7b3e05c59573b395870d5e4ed8a182f07",
+    "finished": true,
+    "packages": [
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Copies: node_modules/undici 7.29.1 (dev) in range of GHSA-4qv8-2p9j-2685 etc. >=7.0.0 <7.30.1; node_modules/isomorphic-dompurify/node_modules/undici 8.12.2 (not dev, production by P0) is outside every listed range (<7.30.1). The in-range copy's paths: (.) > jsdom > undici, (.) > vitest > jsdom > undici, (.) > @testing-library/jest-dom > vitest > jsdom > undici. jsdom is not on D1's lists, so D2: jsdom appears only in vitest.config.ts:11 (test-runner config, excluded) and src/__tests__/* (tests); undici is mentioned nowhere outside the lockfile; no source import of either; next.config.ts names next and @next/bundle-analyzer only. No Dockerfile. Commands: prebuild 'node scripts/*.mjs' and 'tsx scripts/*.ts', build 'next build', start 'next start'; vercel.json has no buildCommand. Closure from P0/P1/P2/P3 copies does not reach node_modules/undici."
+      }
+    ]
+  },
+  {
+    "repo": "fegome90-cmd/skill_fabrik",
+    "sha": "39351b858b23049186b446a0d82309802620ca81",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@babel/core",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@babel/core 7.28.5 (dev), in range of GHSA-4x5r-pxfx-6jf8 <=7.29.0. Reached only from root devDependencies jest, ts-jest, @jest/globals; a search from every non-D1 declared dependency that avoids D1 packages does not reach it, so every path passes through a test runner. Not imported by the source; no P2 file names it (no .babelrc/babel.config); not reached from any P0/P1/P2/P3 copy. Repository has no Dockerfile (root lockfile has only project '.')."
+      },
+      {
+        "name": "baseline-browser-mapping",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/baseline-browser-mapping 2.8.22 (dev), in range of GHSA-w5vr-8v7q-w6rv >=2.0.0 <2.11.0. Reached only via jest/ts-jest/@jest/globals (through @babel/core > browserslist); every path passes through a D1 test runner. Not imported, not named by a build config, not reached from a production copy; no Dockerfile."
+      },
+      {
+        "name": "basic-ftp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/basic-ftp 5.0.5 (dev), in range of GHSA-5rq4-664w-9x2c <5.2.0. Only path: (.) > pm2 > @pm2/agent > proxy-agent > pac-proxy-agent > get-uri > basic-ftp (pm2 is a root devDependency, not D1). D2: no Dockerfile in the repository; no source import of pm2 or anything on the path (the source runs a pm2 on PATH via execSync in packages/skills-cli/src/commands/pm2.ts:44,65 and packages/mcp-adapters/src/pm2/index.ts:50, which tells users to install pm2 globally - not an import or a production command under section 2); no P2 file names it; start scripts are 'node ...', build scripts tsc/pnpm --filter ... build; ecosystem configs (scripts/pm2/ecosystem.config.cjs, packages/daemon/ecosystem.config.js) run 'node dist/...'; mcp-local/docker-compose.yml only runs redis/postgres/chroma images; packages/daemon 'cluster:start: pm2 start' is not a start/build script. Closure from P0/P1/P2/P3 copies does not reach it."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Copies 1.1.12 at node_modules/{@eslint/eslintrc,@humanwhocodes/config-array,eslint,glob,test-exclude}/node_modules/brace-expansion (in range GHSA-f886-m6hf-6m8v <1.1.13) and node_modules/brace-expansion 2.0.2 (in range >=2.0.0 <2.0.3), all dev. Reached only from eslint, @typescript-eslint/eslint-plugin, @typescript-eslint/parser, jest, ts-jest, @jest/globals; for every copy a search that avoids D1 packages from the non-D1 declared dependencies does not reach it. Not imported; not reached from a production copy; no Dockerfile."
+      },
+      {
+        "name": "browserslist",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/browserslist 4.27.0 (dev), in range of GHSA-c83g-rgw3-j3cx <=4.28.6. Reached only via jest/ts-jest/@jest/globals (@babel/core > @babel/helper-compilation-targets); every path passes through a D1 test runner. Not imported or named by a build config; no Dockerfile."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/deepmerge 4.3.1 (dev), in range of GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Reached only from jest and ts-jest (via jest-config); every path passes through a D1 test runner. Not imported; no Dockerfile."
+      },
+      {
+        "name": "flatted",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/flatted 3.3.3 (dev), in range of GHSA-25h7-pfq9-p65f <3.4.0. Reached only from eslint, @typescript-eslint/eslint-plugin, @typescript-eslint/parser (eslint > file-entry-cache > flat-cache > flatted); every path passes through a D1 linter. Not imported; no Dockerfile."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/follow-redirects 1.15.11 (dev), in range of GHSA-r4q5-vmmm-2653 <=1.15.11. Only path: (.) > pm2 > @pm2/js-api > extrareqp2 > follow-redirects. D2 facts as for basic-ftp: no Dockerfile, pm2 and the path not imported (execSync of a global pm2 is not an import), no build config names them, no start/build/ecosystem/compose command runs pm2, not reached from a P0/P1/P2/P3 copy."
+      },
+      {
+        "name": "handlebars",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/handlebars 4.7.8 (dev), in range of GHSA-3mfm-83xf-c92r >=4.0.0 <=4.7.8. Only path: (.) > ts-jest > handlebars (ts-jest is a D1 test runner, root devDependency). Not imported; no Dockerfile."
+      },
+      {
+        "name": "ip-address",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/ip-address 10.0.1 (dev), in range of GHSA-v2v4-37r5-5v8g <=10.1.0. Paths only through pm2: (.) > pm2 > @pm2/agent > proxy-agent > socks-proxy-agent > socks > ip-address (and a second pm2 path). D2 facts as for basic-ftp: no Dockerfile, no import of pm2 or ip-address, no build config or production command runs them, not reached from a production copy."
+      },
+      {
+        "name": "lodash",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/lodash 4.17.21 (dev), in range of GHSA-r5fr-rjxr-66jc >=4.0.0 <=4.17.23. Paths: (.) > pm2 > @pm2/io > async > lodash (non-D1) and via @commitlint/cli. D2: no source file imports lodash (not in the source's import list), pm2 not imported, no build config names it, no production command runs pm2, no Dockerfile, not reached from a P0/P1/P2/P3 copy."
+      },
+      {
+        "name": "minimatch",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Copies 3.1.2 at node_modules/{@eslint/eslintrc,@humanwhocodes/config-array,eslint,glob,test-exclude}/node_modules/minimatch (in range GHSA-3ppc-4f35-3m26 <3.1.3) and node_modules/minimatch 9.0.3 (in range >=9.0.0 <9.0.6), all dev. Reached only from eslint, @typescript-eslint/*, jest, ts-jest, @jest/globals; no non-D1 path reaches any copy. Not imported; no Dockerfile."
+      },
+      {
+        "name": "pm2",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/pm2 6.0.13 (dev, root devDependency), in range of GHSA-x5gf-qvw8-r2rm <7.0.0 (OSV: introduced 0, fixed 7.0.0). Not D1. D2: whole source read; no import of 'pm2' anywhere; the source shells out to a pm2 on PATH (packages/skills-cli/src/commands/pm2.ts:44 'pm2 --version', :46 says install with npm install -g pm2; packages/mcp-adapters/src/pm2/index.ts:50), which section 2 does not count as an import; no prestart/start/poststart or build script runs pm2 (packages/daemon/package.json:14 'cluster:start' is not one, and packages/daemon has its own lockfile); ecosystem.config files list 'node' scripts; no Procfile or Dockerfile; compose runs only images; not named in P2 files; not reached from a production copy."
+      },
+      {
+        "name": "systeminformation",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/systeminformation 5.27.11 (dev, optional), in range of GHSA-wphj-fx3q-84ch <5.27.14. Only path: (.) > pm2 > pm2-sysmonit > systeminformation. D2 facts as for pm2: no Dockerfile, no import, no build config or production command runs pm2 or it, not reached from a production copy."
+      }
+    ]
+  },
+  {
+    "repo": "stefanseeger/ts-page-object",
+    "sha": "7b0361a3e309a321f80f4aae2e920783aa5d6bc2",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@tootallnate/once",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/@tootallnate/once 2.0.0 (dev), in range of GHSA-vpq2-c234-7xj6 <2.0.1. Paths: (.) > @angular/cli > pacote > npm-registry-fetch > make-fetch-happen > http-proxy-agent > @tootallnate/once (non-D1), and via jest-environment-jsdom / jest-preset-angular (jsdom > http-proxy-agent). D2: no Dockerfile; @angular/cli is only a devDependency in package.json:39, not imported, not named in any P2 file (project.json/nx.json/.babelrc/babel.config.json name @angular-devkit/build-angular, @nrwl/* and nx; workspace.json is not a P2 file and does not mention it); build script 'nx run-many --all --target=build' runs nx and the P2-named executors, whose dependencies do not reach it; no start script; closure from P0/P1/P2/P3 copies (incl. jest.preset.js importing @nrwl/jest) does not reach it."
+      },
+      {
+        "name": "http-cache-semantics",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/http-cache-semantics 4.1.1 (dev), in range of GHSA-ch52-4w7c-c8xp <=4.2.0. Only from @angular/cli: (.) > @angular/cli > pacote > npm-registry-fetch > make-fetch-happen > http-cache-semantics. D2 facts as for @tootallnate/once: no Dockerfile, @angular/cli not imported or named by build config, build runs nx executors that do not reach it."
+      },
+      {
+        "name": "ip",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/ip 2.0.0 (dev), in range of GHSA-78xj-cgh5-2h22 =2.0.0 and GHSA-2p57-rm9w-gvfp <=2.0.1. Only from @angular/cli: (.) > @angular/cli > pacote > npm-registry-fetch > make-fetch-happen > socks-proxy-agent > socks > ip. D2 facts as for @tootallnate/once."
+      },
+      {
+        "name": "pacote",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/pacote 13.6.2 (dev), in range of GHSA-w4pp-8pjf-rmxw >=11.2.7 <21.5.1 (OSV confirms). Only path (.) > @angular/cli > pacote. D2 facts as for @tootallnate/once: no Dockerfile, no import or build-config naming of pacote or @angular/cli, no start script, build (nx run-many) does not reach it."
+      },
+      {
+        "name": "tough-cookie",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/tough-cookie 4.1.2 (dev), in range of GHSA-72xf-g2v4-qvf3 <4.1.3. Reached only from root devDependencies jest-environment-jsdom and jest-preset-angular (> jsdom > tough-cookie); both match D1's 'jest-*', and no non-D1 path reaches it. Mentioned only in jest config/test-setup (excluded) besides package.json."
+      }
+    ]
+  },
+  {
+    "repo": "guim31/gladys-habitica",
+    "sha": "143fbd76819356e70ff451850a656fcd0fa26bf6",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/brace-expansion 5.0.7 (dev), in range of GHSA-mh99-v99m-4gvg >=4.0.0 <5.0.8. Paths: (.) > eslint > minimatch > brace-expansion and (.) > eslint > @eslint/config-array > minimatch > brace-expansion (also via @eslint/js and eslint-config-prettier > eslint); all through D1 linters. Not imported (source imports only @gladysassistant/integration-sdk). Dockerfile single stage runs 'npm ci --omit=dev', sets NODE_ENV=production, copies only index.js, src and the manifest json."
+      }
+    ]
+  },
+  {
+    "repo": "STRML/strml.net",
+    "sha": "f507114a51543c6c2a4e06d69a502a0611e834a0",
+    "finished": true,
+    "packages": [
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "none",
+        "evidence": "Only copy node_modules/body-parser 2.3.0 (dev), in range of GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0 (OSV confirms). Path: (.) > webpack-dev-server > express > body-parser; webpack-dev-server is reached from root devDependencies webpack-dev-server and webpack-cli (webpack-cli 7.2.3 declares peerDependencies webpack-dev-server ^5||^6). No Dockerfile, no start script, no source import. build = 'webpack': the bin 'webpack' belongs only to node_modules/webpack 5.111.1, which declares no dependency or peer on webpack-cli (peerDependenciesMeta only), so the literal P6 reading makes only webpack production; but webpack's bin runs webpack-cli, and if that counts as 'what the build runs' (section 2's (c)), following webpack-cli's declared peer webpack-dev-server makes this copy production. webpack.config.js names only 'babel-loader' (devServer is an unquoted key). Cannot decide between the two readings."
+      },
+      {
+        "name": "launch-editor",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "none",
+        "evidence": "Only copy node_modules/launch-editor 2.14.1 (dev), in range of GHSA-698v-4r3x-3vcv <=2.14.1 (OSV: fixed 2.14.2). Path: (.) > webpack-dev-server > launch-editor. Same question as body-parser: build 'webpack' runs webpack-cli through webpack's bin; webpack-cli declares webpack-dev-server as a peer. Literal bin-name reading: not production; reading 'what the build runs' to include webpack-cli: production."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "none",
+        "evidence": "Only copy node_modules/qs 6.16.0 (dev), in range of GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0 (OSV: fixed 6.16.1). Path: (.) > webpack-dev-server > express > qs. Same question as body-parser (webpack bin -> webpack-cli -> peer webpack-dev-server)."
+      },
+      {
+        "name": "shell-quote",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "none",
+        "evidence": "Only copy node_modules/shell-quote 1.10.0 (dev), in range of GHSA-pqg4-j6r4-53mv >=1.8.4 <1.11.0 (OSV confirms). Path: (.) > webpack-dev-server > launch-editor > shell-quote. Same question as body-parser."
+      }
+    ]
+  },
+  {
+    "repo": "iansduncan-oss/web-push-lite",
+    "sha": "05f404804272ec7d2a7c1149f053a6dc737446e4",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 3.2.7 (dev), in range of GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. On D1's list (@vitest/*) and reached only via the root devDependency vitest. No Dockerfile; scripts build 'tsc', test 'vitest run'; src/index.ts has no bare imports."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/tinypool 1.1.1 (dev), in range of GHSA-5gmw-xhrv-c9v3 <=2.1.0. Only path (.) > vitest > tinypool (vitest is a D1 test runner). Not mentioned outside the lockfile; no Dockerfile."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest 3.2.7 (dev), in range of GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Root devDependency on D1's test-runner list; imported only by test/index.test.ts and vitest.config.ts (excluded); run only by the test script."
+      }
+    ]
+  },
+  {
+    "repo": "stop-bullshit/luckyh-cloud-web",
+    "sha": "3488ef4103ccbd09aa9291e9adf595971e5a1076",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 4.1.10 (dev), in range of GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. On D1's list (@vitest/*), reached via vitest, @vitest/ui, @vitest/coverage-v8, @testing-library/jest-dom only; no non-D1 path. Dockerfile final stage is nginx:alpine copying only /app/dist and deploy/nginx.conf (no devDependencies)."
+      },
+      {
+        "name": "happy-dom",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/happy-dom 20.11.2 (dev, root devDependency), in range of GHSA-834v-8h66-3h79 >=17.0.0 <=21.0.3 (OSV: fixed 21.0.4). Not D1. D2: named only in vitest.config.ts:13 (test config, excluded); no source import; not reached from a production copy (closure from P0/P1/P2/P3 plus @umijs/max and cross-env, which the start script 'cross-env ... max dev' and build 'max build' run, does not reach it). Dockerfile: build stage npm ci + npm run build; final stage nginx:alpine copies only /app/dist (holds no devDependencies)."
+      },
+      {
+        "name": "mockjs",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "none",
+        "evidence": "Only copy node_modules/mockjs 1.1.0 (dev), in range of GHSA-mh8j-9jvh-gjf6 <=1.1.0 (OSV: last_affected 1.1.0). Paths: (.) > mockjs and (.) > @umijs/max-plugin-openapi > @umijs/openapi > mockjs. Not imported by the source (only 'declare module' in src/typings.d.ts, a type declaration). But config/config.ts:194 is Umi's build configuration for 'max build' (the build script and the Dockerfile build stage) and names plugins: ['@umijs/max-plugin-openapi', ...]; config/config.ts is not in P2's file list, so the literal reading does not make the plugin production, while section 2's (c) ('what a build tool's configuration names ... is production') would, and following its dependencies reaches mockjs. Cannot decide."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/undici 8.10.0 (dev), in range of GHSA-pmjh-fq2x-6v4x >=8.0.0 <8.10.2 and others. Paths: (.) > jsdom > undici (jsdom root devDependency, not D1) and via vitest/@vitest/*/@testing-library/jest-dom. D2: jsdom and undici are mentioned only in package.json; no source import; not named by a P2 file (tailwind.config.js only content globs); start/build run cross-env and @umijs/max, which do not reach it; Dockerfile final stage nginx copies only /app/dist."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest 4.1.10 (dev), in range of GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Root devDependency on D1's test-runner list; run only by test scripts; no non-D1 path reaches it."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/zod 4.4.3 (dev), in range of GHSA-mrhx-c7xc-m3w5 <4.6.6. Only paths: (.) > react-doctor > eslint-plugin-react-hooks > zod and (.) > react-doctor > eslint-plugin-react-hooks > zod-validation-error > zod; every path passes through eslint-plugin-react-hooks (D1 'eslint-*'). No source import of zod (the source's import list has none); react-doctor runs only in the 'doctor' script and a CI workflow."
+      }
+    ]
+  },
+  {
+    "repo": "olufemid/task-dashboard",
+    "sha": "114d238ad6054abee1463c2d760a1cb63d17dffb",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 3.2.4 (dev), in range of GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. On D1's list (@vitest/*), reached only via root devDependency vitest. No Dockerfile; start 'vite --port 3000', build 'vite build'; vite.config.mjs names @vitejs/plugin-react, @tailwindcss/vite, 'jsdom' - closure from these does not reach it."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/tinypool 1.1.1 (dev), in range of GHSA-5gmw-xhrv-c9v3 <=2.1.0. Only path (.) > vitest > tinypool (D1 test runner). Not mentioned outside the lockfile."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest 3.2.4 (dev), in range of GHSA-5xrq-8626-4rwp <3.2.6 and GHSA-82fw-gwwq-j7x9. Root devDependency on D1's list; imported only by *.test.jsx files; run only by the test script."
+      }
+    ]
+  },
+  {
+    "repo": "DarkStarStrix/Allanatrix",
+    "sha": "ae86774cdd7afcc9694272308e90283bcda509fe",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 4.1.10 (dev), in range of GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. On D1's list (@vitest/*), reached only via root devDependency vitest."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/postcss-selector-parser 6.0.10 (dev), in range of GHSA-rj75-hqrm-r3gf <6.1.5. Only path (.) > @tailwindcss/typography > postcss-selector-parser (root devDependency, not D1). D2: @tailwindcss/typography appears only in package.json:68 - no @plugin in client/src/index.css (it @imports tailwindcss and tw-animate-css only), no tailwind config, vite.config.ts imports @tailwindcss/vite, @vitejs/plugin-react, vite, vite-plugin-manus-runtime only; build 'vite build && esbuild server/index.ts ...', start 'NODE_ENV=production node dist/index.js'; no Dockerfile; closure from P0/P1/P2/P3 copies does not reach it."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest 4.1.10 (dev), in range of GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Root devDependency on D1's list; not run by start/build; no non-D1 path."
+      }
+    ]
+  },
+  {
+    "repo": "Aiyeesha/Aicha-Imene-DAHOUMANE-Portfolio.dev",
+    "sha": "b437d11e5c2c170ccd04bd6dcb0511b29d1d80c1",
+    "finished": true,
+    "packages": [
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/deepmerge 4.3.1 (dev), in range of GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Paths only (.) > jest > @jest/core|jest-cli > jest-config > deepmerge and (.) > ts-jest > jest > ...; all through D1 test runners. Not mentioned outside the lockfile; no Dockerfile; build 'next build --webpack', start 'next start'; closure from production copies does not reach it."
+      }
+    ]
+  },
+  {
+    "repo": "timmson/agile-impact-map",
+    "sha": "3f2fa385585d7b9dcb13bdbcbc8ec5d7134c6960",
+    "finished": true,
+    "packages": [
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "none",
+        "evidence": "Only copy node_modules/body-parser 2.3.0 (dev), in range of GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0. Path (.) > webpack-dev-server > express > body-parser (webpack-dev-server 6.0.0 is a root devDependency). package.json start = 'npx webpack serve --mode development': section 2's (d) says a start script counts whatever it runs, a development server included, and 'webpack serve' runs the webpack-dev-server dev server (through webpack-cli 4.9.2); but by bin name / first word the command names only webpack (bin 'webpack' -> node_modules/webpack 5.105.0), which does not declare webpack-dev-server. webpack.config.js names mini-css-extract-plugin, css-loader, sass-loader, babel-loader, @babel/preset-env only. No Dockerfile. Cannot decide which reading applies."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/deepmerge 4.3.1 (dev), in range of GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Reached only from root devDependency jest (jest-config > deepmerge); no non-D1 path. Not mentioned outside the lockfile."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "none",
+        "evidence": "Only copy node_modules/qs 6.15.3 (dev), in range of GHSA-x5fp-wj9c-mxmx >=6.14.2 <=6.15.3 and GHSA-6pq8-jhm2-2vcw. Path (.) > webpack-dev-server > express > qs. Same question as body-parser: start 'npx webpack serve' runs the webpack-dev-server dev server, but by bin name only webpack is named."
+      }
+    ]
+  },
+  {
+    "repo": "SaraAboElenien/gahezlak-v2",
+    "sha": "32f27cab4b2619f0a4ee564b139ebe8a82cdaef5",
+    "finished": true,
+    "packages": [
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Root lockfile copy node_modules/follow-redirects 1.16.0 (dev), in range of GHSA-q3jh-wrc6-jgq8 >=1.16.0 <1.16.1 (OSV confirms). Only path (.) > mongodb-memory-server > mongodb-memory-server-core > follow-redirects (root devDependency, not D1). D2: mongodb-memory-server is used only in backend/tests/*, backend/vitest.config.mts and e2e/harness/serve.ts (tests/test config); root package.json has no start/build scripts (only prepare/format/lint/test/e2e); render.yaml services build and start inside rootDir backend and frontend, each with its own lockfile (npm ci --include=dev && npm run build = tsc / tsc -b && vite build; npm start = node dist/server.js / tsx server/index.ts), none running mongodb-memory-server; no Dockerfile or Procfile; closure from production copies does not reach it."
+      }
+    ]
+  }
+]

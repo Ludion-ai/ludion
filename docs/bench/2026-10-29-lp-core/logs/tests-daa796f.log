@@ -1,0 +1,50 @@
+# Merge head daa796f (5cbb40d + origin/main ff9df3a), copied with git archive into a Docker volume; npm ci --ignore-scripts with network, then --network none --read-only --tmpfs /tmp:exec, user node.
+== v24.22.1 jq-1.6 head=archive
+typecheck exit=0
+ ✓  node  packages/cli/test/judge-workflow.test.ts (27 tests) 1625ms
+     ✓ reject a record that is not exactly the schema  340ms
+     ✓ fails, posting nothing, when the record does not match the schema or names another PR or head  336ms
+ ✓  node  packages/cli/test/protected-paths-workflow.test.ts (11 tests) 3855ms
+     ✓ passes on an approving review of the current head with the label, whatever the case or decoration  446ms
+     ✓ does not approve on a first line that says not to, asks for changes, or does not begin with APPROVE  842ms
+     ✓ reads reviewed-sha only on the last line, after trailing blanks and \r  438ms
+     ✓ reads only comments by the owner, a member or a collaborator  655ms
+     ✓ treats an empty or missing body as no review, without breaking the check  436ms
+ Test Files  2 passed (2)
+      Tests  38 passed (38)
+== node project, packages and tools
+ Test Files  13 passed (13)
+      Tests  365 passed (365)
+== mutations
+every comment read, whoever wrote it | Tests 1 failed | 10 passed (11)
+CONTRIBUTOR also read | Tests 1 failed | 10 passed (11)
+association compared without case | Tests 1 failed | 10 passed (11)
+reviewed-sha on any line | Tests 1 failed | 10 passed (11)
+text allowed after the SHA | Tests 1 failed | 10 passed (11)
+reviewed-sha anywhere in the last line | Tests 1 failed | 10 passed (11)
+trailing blanks not trimmed | Tests 1 failed | 10 passed (11)
+missing body not defaulted | Tests 1 failed | 10 passed (11)
+APPROVE anywhere on the first line | Tests 1 failed | 10 passed (11)
+APPROVED counted as APPROVE | Tests 1 failed | 10 passed (11)
+APPROVE matched in upper case only | Tests 1 failed | 10 passed (11)
+NOT and REQUEST matched in upper case only | Tests 2 failed | 9 passed (11)
+NOT not excluded | Tests 2 failed | 9 passed (11)
+REQUEST not excluded | Tests 1 failed | 10 passed (11)
+decoration * _ ` not read as spaces | Tests 1 failed | 10 passed (11)
+strikethrough read as decoration | Tests 1 failed | 10 passed (11)
+leading # and > not removed | Tests 1 failed | 10 passed (11)
+APPROVE on any line | Tests 1 failed | 10 passed (11)
+every review counted as approving | Tests 4 failed | 7 passed (11)
+the first review of the head decides | Tests 1 failed | 10 passed (11)
+any approval of the head counts | Tests 1 failed | 10 passed (11)
+label check passes on an empty answer | Tests 1 failed | 10 passed (11)
+action/ not protected | Tests 1 failed | 10 passed (11)
+action.yml not protected | Tests 1 failed | 10 passed (11)
+pipefail off | Tests 1 failed | 10 passed (11)
+caught 25 of 25
+restored | Tests 11 passed (11)
+== actionlint, --network none, read-only
+1.7.12
+installed by building from source
+built with go1.26.1 compiler for linux/amd64
+actionlint exit=0

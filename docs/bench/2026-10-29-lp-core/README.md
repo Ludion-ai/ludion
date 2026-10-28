@@ -18,6 +18,8 @@ In Docker: image `ludion-c3-test:latest` (node:24-slim with jq 1.6, git, bash; v
 - actionlint 1.7.12 on protected-paths.yml, `--network none`, read-only: exit 0, no findings.
 - Mutations of protected-paths.yml, one at a time with `mutate.mjs` (each restored): 25 of 25 fail at least one test. The first run caught 23 of 25: "APPROVE on any line" (the first line replaced by all lines joined) and "pipefail off" passed every test. Two tests were added (an `APPROVE` on the second line under an empty or other first line; a failed `gh` call stops the script before any later `::error::`), and the second run caught all 25. The log holds the second run.
 
+Again at the merge head daa796f (5cbb40d + origin/main ff9df3a, 2026-10-29 06:00 JST), the same way: typecheck exit 0; the two workflow test files 38 passed; node project 13 files, 365 passed (main has added tests since); mutations 25 of 25 caught; actionlint 1.7.12 exit 0. Raw output: `logs/tests-daa796f.log`. The commit after daa796f adds only that log and this paragraph.
+
 ### The new `REVIEWS` on real comments
 
 `gh api repos/Ludion-ai/ludion/issues/N/comments?per_page=100` for #156, #158, #166 and #170 (every comment is by `Ludion-ai`, `OWNER`), under jq 1.6 and jq 1.7.1 (the runners' version): both give the same lines. Raw output, for main's program (`old.jq`) and the new one (`reviews.jq`, cut from the workflow): `logs/real-comments.log`.

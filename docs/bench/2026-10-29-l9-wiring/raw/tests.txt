@@ -1,0 +1,89 @@
+# started 2026-10-28T15:23:48Z, node v24.22.1, HEAD 4cfc1893db23ff2f05cb5787489a864af0c2d8fe
+== npm run typecheck
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+typecheck exit 0
+== npx vitest run --project node
+
+ RUN  v4.1.12 /w
+
+ ❯ |node| apps/site/test/knowledge.test.ts (0 test)
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 3ms
+ ✓ |node| packages/sandbox/test/guard.test.ts (3 tests) 21ms
+ ✓ |node| apps/site/test/discovery.test.ts (3 tests) 5ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 6ms
+ ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 12ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (11 tests) 85ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 47ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (19 tests) 44ms
+ ✓ |node| packages/cli/test/security.test.ts (33 tests) 62ms
+ ✓ |node| packages/cli/test/judge.test.ts (63 tests) 72ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (63 tests) 130ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 298ms
+ ✓ |node| packages/cli/test/production.test.ts (42 tests) 644ms
+     ✓ reads #168's delta-review inputs in linear time: each took seconds when quadratic  313ms
+ ✓ |node| .claude/hooks/guard.test.ts (39 tests) 955ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| apps/site/test/knowledge.test.ts [ apps/site/test/knowledge.test.ts ]
+Error: spawnSync git ENOENT
+ ❯ apps/site/test/knowledge.test.ts:8:14
+      6| import { en } from "../src/strings/en.ts";
+      7|
+      8| const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { e…
+       |              ^
+      9|
+     10| describe("security preview claims", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 14 passed (15)
+      Tests  349 passed | 13 skipped (362)
+   Start at  15:23:49
+   Duration  1.23s (transform 2.01s, setup 0ms, import 2.74s, tests 2.38s, environment 2ms)
+
+vitest exit 1
+== npm run build
+build exit 1
+npm error workspace @ludion/site@0.0.0
+npm error location /w/apps/site
+npm error command failed
+npm error command sh -c astro build
+
+== node mutate.mjs (module)
+killed   always agrees (failed tests: 12)
+killed   rule 1 off (any folder) (failed tests: 2)
+killed   rule 1 after only (failed tests: 1)
+killed   rule 1 glob loosened (failed tests: 1)
+killed   rule 1 non-plain dir (failed tests: 2)
+killed   rule 2 off (failed tests: 1)
+killed   rule 3 sides off (failed tests: 2)
+killed   rule 3 overrides off (failed tests: 1)
+killed   rule 3 manifestChanges off (failed tests: 4)
+killed   rule 4 before off (failed tests: 1)
+killed   rule 4 after off (failed tests: 2)
+killed   rule 5 off (failed tests: 1)
+killed   missing list not empty (failed tests: 1)
+killed   key order counts (failed tests: 1)
+survived: 0 of 14
+== node mutate-wiring.mjs
+killed   agreeing files still stop (failed tests: 4)
+killed   any read file agrees (failed tests: 6)
+killed   an unread file agrees (failed tests: 1)
+killed   files not in the PR's list count (failed tests: 1)
+killed   reasons not stopped on (failed tests: 6)
+killed   an unread file not undecidable (failed tests: 1)
+killed   an unread file not stopped on (failed tests: 2)
+killed   no info line (failed tests: 3)
+killed   not passed to judge() (failed tests: 1)
+killed   an unreadable side agrees (failed tests: 2)
+killed   no plain-folder check before reading (failed tests: 1)
+killed   every listed file read (failed tests: 9)
+killed   the lockfile's before side used for after (failed tests: 6)
+killed   an unparsable file read as empty object (failed tests: 1)
+survived: 0 of 14
+# finished 2026-10-28T15:24:27Z

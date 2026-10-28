@@ -1,6 +1,7 @@
 #!/bin/sh
-# In Docker, on the volume /w: typecheck (root and worker), the CLI tests, the full node test project, the build,
-# the module's mutants (L9's 2026-10-28 mutate.mjs) and the wiring's mutants.
+# In Docker, on the volume /w (HOME on a tmpfs for astro; the image has no git, so apps/site/test/knowledge.test.ts,
+# which runs git, cannot run here and is left to CI): typecheck, the node tests, the build, the module's mutants
+# (L9's 2026-10-28 mutate.mjs) and the wiring's mutants.
 set -u
 cd /w
 echo "# started $(date -u +%Y-%m-%dT%H:%M:%SZ), node $(node -v), HEAD $(cat /s/HEAD 2>/dev/null || echo unknown)"

@@ -1,5 +1,7 @@
 # L9: the judge's gate 4 stop on workspace package.json changes
 
+Continued in docs/bench/2026-10-29-l9-wiring (the wiring and the re-judgement). The decisions recorded in docs/decisions.md below moved, unchanged, to docs/decisions/2026-10-29-l9-workspace-package-json.md.
+
 Task: a Dependabot update of a workspace's dependency (apps/worker, apps/site, ...) changes that workspace's `package.json`. The judge v0 allows only the root `package.json` and the lockfile, so gate 4 stops it (#161, #162; docs/decisions.md, "Known limits" of the judge on this repository). Such a change should not be a gate 4 stop reason when it agrees with the lockfile change; a change that does not agree still stops.
 
 **State: stopped for the coordinator.** The rule is built and tested as a module, but `ludion judge` does not call it. The call belongs in two files that L1 (#168) also changes, and L9 leaves those to the coordinator (below). So #161 and #162 have **not** been judged again (task step 4), and the judge's verdicts on them are unchanged.

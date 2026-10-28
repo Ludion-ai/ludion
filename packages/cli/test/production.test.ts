@@ -183,6 +183,18 @@ describe("production images and commands", () => {
     // A package folder copied together with something that holds devDependencies.
     expect(dockerImage(`${build}FROM node:22-slim\nCOPY --from=builder /app/node_modules/lodash /app/node_modules ./node_modules\n`, false)).toMatchObject({ holds: true, held: ["lodash"] });
     expect(dockerImage("FROM node:22\nCOPY node_modules/lodash . ./\n", false).holds).toBe(true);
+    // ADD can unpack an archive, so a path under node_modules still holds every devDependency.
+    expect(dockerImage(`${build}FROM node:22-slim\nADD --from=builder /app/node_modules/lodash ./node_modules/lodash\n`, false)).toMatchObject({ holds: true, held: [] });
+    expect(dockerImage("FROM node:22\nADD node_modules/deps.tgz ./node_modules/\n", false)).toMatchObject({ holds: true, held: [] });
+  });
+  it("finds a held folder by its install path, so an alias counts, and keeps D1 only for a folder it cannot find (L1c)", () => {
+    const aliased = lockOf({ devDependencies: { "my-lodash": "npm:lodash@^4" } }, { "node_modules/my-lodash": { dev: true, name: "lodash" }, "node_modules/lodash": { dev: true, version: "2.0.0" } });
+    const image = (folder: string) => tree({ "package.json": "{}", Dockerfile: `FROM node:22 AS b\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/node_modules/${folder} ./node_modules/${folder}\n` });
+    const split = productionSplit(aliased, image("my-lodash"));
+    expect(split.summary.images_with_dev).toEqual([]);
+    expect(split.copies.get("node_modules/my-lodash")?.production).toBe(true);
+    expect(split.copies.get("node_modules/lodash")?.production).toBe(false);
+    expect(productionSplit(aliased, image("generated")).summary.images_with_dev).toEqual(["Dockerfile"]);
   });
   it("uses D2 when the image copies only package folders, and makes what it holds production (L1c)", () => {
     const dockerfile = "FROM node:22 AS builder\nWORKDIR /app\nRUN npm ci\nRUN npm run build\nFROM node:22-slim\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules/nodemon ./node_modules/nodemon\nCMD [\"node\", \"dist/a.js\"]\n";

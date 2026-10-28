@@ -352,7 +352,8 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
       const sources = parts.filter(p => !p.startsWith("--")).slice(0, -1);
       const strip = (p: string) => p.replace(/\/+$/, "") || "/";
       // One package's folder out of node_modules holds that package (and what is nested in it), not every devDependency.
-      const folders = sources.map(packageFolder), others = sources.filter((_, k) => folders[k] === null);
+      // Not for ADD, which can unpack an archive.
+      const folders = sources.map(s => op === "COPY" ? packageFolder(s) : null), others = sources.filter((_, k) => folders[k] === null);
       if (from !== undefined) {
         const source = named.get(from.toLowerCase()) ?? (/^\d+$/.test(from) ? stages[Number(from)] : undefined);
         if (source) {
@@ -462,6 +463,15 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
   /** The project folders: the root and every workspace folder, with their package.json fields from the lockfile. */
   const folders = Object.entries(lock).filter(([path, item]) => !path.includes("node_modules/") && item && typeof item === "object" && !item.link).map(([path, item]) => ({ dir: path ? `${path}/` : "", item }));
   const seeds = new Map<string, string>();
+  /** Install paths by their last folder name (`node_modules/a/node_modules/@s/b` under `@s/b`), built when first needed. */
+  let byFolder: Map<string, string[]> | null = null;
+  const folderPaths = () => {
+    if (!byFolder) {
+      byFolder = new Map();
+      for (const e of entries) { const f = e.path.slice(e.path.lastIndexOf("node_modules/") + "node_modules/".length); byFolder.set(f, [...(byFolder.get(f) ?? []), e.path]); }
+    }
+    return byFolder;
+  };
   const seed = (e: LockEntry | undefined, why: string) => { if (e && !seeds.has(e.path)) seeds.set(e.path, why); };
   /** What a file at `file` loads for `name`: the nearest node_modules up its path, else every installed copy of that name. */
   const seedFrom = (file: string, name: string | null, why: string) => {
@@ -506,10 +516,17 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       const dockerfileText = DOCKERFILE.test(file) && !/(^|\/)\.devcontainer\//.test(file) ? text(file) : null;
       if (dockerfileText !== null && /^[ \t]*FROM[ \t]/im.test(dockerfileText) && !base.replace(/dockerfile|containerfile/ig, " ").split(/[\s._-]+/).some(w => /^(dev|development|test|tests|ci|e2e)$/i.test(w))) {
         const image = dockerImage(dockerfileText, ignores(`${dir}.dockerignore`) || ignores(`${file}.dockerignore`) || ignores(".dockerignore"));
-        if (image.holds) imagesWithDev.push(file);
-        // D2: what the production image holds is not dev-only. Every installed copy of a held name, and every copy
-        // nested in one of those.
-        const held = new Set(image.held.flatMap(n => (byName.get(n) ?? []).map(e => e.path)));
+        // D2: what the production image holds is not dev-only: every installed copy in a held folder (by its folder name,
+        // so an alias counts), and every copy nested in one. A held folder that is no installed copy's leaves the image
+        // holding devDependencies, as before.
+        const held = new Set<string>();
+        let unknown = false;
+        for (const f of image.held) {
+          const at = folderPaths().get(f) ?? [];
+          if (!at.length) unknown = true;
+          for (const p of at) held.add(p);
+        }
+        if (image.holds || unknown) imagesWithDev.push(file);
         if (held.size) for (const e of entries) for (let p = e.path; ;) {
           if (held.has(p)) { seed(e, `held by ${file}'s final stage, which copies its package folder (or one it is nested in) out of node_modules`); break; }
           const up = p.lastIndexOf("/node_modules/");

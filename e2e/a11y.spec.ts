@@ -14,7 +14,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 
     test("axe finds no violations on any page", async ({ page, request }) => {
       const pages = await allPages(request);
-      // One test walks every page, and every lesson adds one: give each page its own few seconds.
+      // One test walks every page: give each page its own few seconds.
       test.setTimeout(30_000 + pages.length * 5_000);
       for (const path of pages) {
         await page.goto(path);
@@ -29,10 +29,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 }
 
 test("no page scrolls sideways, from 320 px up (WCAG 1.4.10, reflow)", async ({ page, request }) => {
-  // Every page, since one lesson's long name is enough to widen its page: durable_objects.code_update_strategy on a
-  // phone, a long flag in the narrow claim column beside a lesson's panel at 1024 px. The share cards are fixed
-  // 1200×630 images and left out.
-  const pages = (await allPages(request)).filter((path) => !path.startsWith("/bench/og/"));
+  const pages = await allPages(request);
   const widths = [320, 390, 768, 1024];
   test.setTimeout(30_000 + pages.length * widths.length * 3_000);
   for (const width of widths) {
@@ -52,7 +49,6 @@ test("every page names its public URL as canonical", async ({ page, request }) =
   for (const path of pages) {
     if (path === "/no-such-page/") continue;
     await page.goto(path);
-    // Lesson and list pages: the trailing-slash URL. Teacher pages: /@<login>, which serves 200 directly.
     expect(await page.locator('link[rel="canonical"]').getAttribute("href"), path).toBe(`https://ludion.ai${path}`);
   }
 });

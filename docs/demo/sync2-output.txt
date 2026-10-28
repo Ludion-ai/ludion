@@ -1,1 +1,0 @@
-ludion: 1 lesson for this project. Wrote .ludion/lessons.md, CLAUDE.md.

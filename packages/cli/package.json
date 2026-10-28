@@ -25,11 +25,9 @@
     "build": "node build.ts"
   },
   "devDependencies": {
-    "@ludion/core": "*",
     "@types/semver": "^7.7.1",
     "@xmldom/xmldom": "^0.9.12",
     "esbuild": "^0.28.2",
-    "semver": "^7.8.5",
-    "undici": "^8.11.2"
+    "semver": "^7.8.5"
   }
 }

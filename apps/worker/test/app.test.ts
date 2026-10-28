@@ -9,56 +9,30 @@ function locationPath(res: Response): string {
   return new URL(res.headers.get("Location")!, "https://ludion.ai").pathname;
 }
 
-interface IndexJson {
-  lessons: { id: string; teacher: string }[];
-  teachers: Record<string, { login: string }>;
-}
-
-async function builtIndex(): Promise<IndexJson> {
-  const res = await get("/index.json");
-  expect(res.status).toBe(200);
-  return res.json();
-}
-
 describe("worker", () => {
-  it("serves index.json to any origin", async () => {
-    const res = await get("/index.json");
-    expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
-    expect((await res.json() as { version: number }).version).toBe(1);
+  it("serves the home page", async () => {
+    const res = await get("/");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Content-Type")).toContain("text/html");
   });
 
-  it("redirects every lesson page in the index to /start/ (lesson pages were removed)", async () => {
-    const { lessons } = await builtIndex();
-    for (const l of lessons) {
-      const res = await get(`/lessons/${l.id}/`, { redirect: "manual" });
-      expect(res.status, l.id).toBe(301);
-      expect(locationPath(res), l.id).toBe("/start/");
+  it("answers the ended 0.1.x lesson and MCP endpoints with a 410 that says why, to any origin", async () => {
+    for (const [path, method] of [["/index.json", "GET"], ["/index/subjects.json", "GET"], ["/index/vitest.json", "GET"], ["/mcp", "POST"], ["/mcp", "GET"], ["/mcp/x", "GET"]] as const) {
+      const res = await get(path, { method, ...(method === "POST" ? { body: "{}" } : {}) });
+      expect(res.status, path).toBe(410);
+      expect(res.headers.get("Access-Control-Allow-Origin"), path).toBe("*");
+      const body = await res.json() as { error: string; message: string };
+      expect(body.error, path).toBe("ended");
+      expect(body.message, path).toContain("https://ludion.ai");
     }
   });
 
-  it("redirects a lesson URL without the trailing slash straight to /start/ with a 301", async () => {
-    const { lessons } = await builtIndex();
-    if (lessons.length === 0) return;
-    const res = await get(`/lessons/${lessons[0]!.id}`, { redirect: "manual" });
-    expect(res.status).toBe(301);
-    expect(locationPath(res)).toBe("/start/");
-  });
-
-  it("redirects /@<login> in any case to /start/ (teacher pages were removed)", async () => {
-    const { teachers } = await builtIndex();
-    for (const { login } of Object.values(teachers)) {
-      for (const variant of [login, login.toUpperCase(), `${login.toLowerCase()}/`]) {
-        const res = await get(`/@${variant}`, { redirect: "manual" });
-        expect(res.status, variant).toBe(301);
-        expect(locationPath(res), variant).toBe("/start/");
-      }
+  it("redirects old lesson pages and /@<login> to /start/", async () => {
+    for (const path of ["/lessons/01M4N4KZ0QT41TY27SW0E683RX/", "/@ludion-ai", "/@Ludion-AI/", "/vitest/"]) {
+      const res = await get(path, { redirect: "manual" });
+      expect(res.status, path).toBe(301);
+      expect(locationPath(res), path).toBe("/start/");
     }
-  });
-
-  it("redirects an unknown teacher to /start/ (teacher pages were removed)", async () => {
-    const res = await get("/@nobody-has-this-login-0", { redirect: "manual" });
-    expect(res.status).toBe(301);
-    expect(locationPath(res)).toBe("/start/");
   });
 
   it("gives the 404 page for an invalid login or an unknown page", async () => {
@@ -69,17 +43,17 @@ describe("worker", () => {
     }
   });
 
-  it("sets nosniff on Worker responses and static assets", async () => {
-    const { teachers } = await builtIndex();
-    const login = Object.values(teachers)[0]?.login ?? "nobody";
-    for (const path of ["/", "/index.json", `/@${login}`, "/@nobody-has-this-login-0"]) {
-      expect((await get(path)).headers.get("X-Content-Type-Options"), path).toBe("nosniff");
-    }
+  it("serves build.json, the deploy check's marker", async () => {
+    const res = await get("/build.json");
+    expect(res.status).toBe(200);
+    expect(Number.isFinite(Date.parse((await res.json() as { built_at: string }).built_at))).toBe(true);
   });
 
-  it("sends HSTS for a year on every response, without includeSubDomains or preload", async () => {
-    for (const path of ["/", "/index.json", "/mcp", "/@nobody-has-this-login-0"]) {
-      expect((await get(path)).headers.get("Strict-Transport-Security"), path).toBe("max-age=31536000");
+  it("sets nosniff and a year of HSTS (no includeSubDomains or preload) on every response", async () => {
+    for (const path of ["/", "/index.json", "/mcp", "/@ludion-ai", "/no-such-page/"]) {
+      const res = await get(path, { redirect: "manual" });
+      expect(res.headers.get("X-Content-Type-Options"), path).toBe("nosniff");
+      expect(res.headers.get("Strict-Transport-Security"), path).toBe("max-age=31536000");
     }
   });
 });

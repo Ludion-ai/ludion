@@ -22,12 +22,8 @@ const RUN_ARGV = /\[\s*["']run["']|\.push\(\s*["']run["']|`run`|`run /;
 const DOCKER_SPAWN = /(?:spawnSync|execFileSync|spawn|execFile)\(\s*["']docker["']/;
 const DOCKER_EXEC = /\bexec(?:Sync)?\(\s*[`'"][^`'"]*docker run/;
 
-/**
- * The only files that may spawn docker, each with the one function allowed to build a `run` argv.
- * The security commands have their own builder: application tests, not lesson code.
- */
+/** The only files that may spawn docker, each with the one function allowed to build a `run` argv. */
 const RUN_BUILDERS: Readonly<Record<string, string>> = {
-  "tools/verify/src/docker.ts": "buildDockerRunArgs",
   "packages/sandbox/src/docker.ts": "runArgs",
 };
 
@@ -93,11 +89,11 @@ function scanDockerSources(files: readonly ScanFile[]): ScanHit[] {
 
 function sourceTree(): ScanFile[] {
   const files: ScanFile[] = [];
-  const roots = [join(REPO, "tools", "verify", "src")].filter((root) => existsSync(root));
-  const packages = join(REPO, "packages");
-  if (existsSync(packages)) {
-    for (const name of readdirSync(packages)) {
-      const src = join(packages, name, "src");
+  // Every package and app, and the repo's own tools.
+  const roots = [join(REPO, "tools")];
+  for (const parent of ["packages", "apps"]) {
+    for (const name of readdirSync(join(REPO, parent))) {
+      const src = join(REPO, parent, name, "src");
       if (existsSync(src) && statSync(src).isDirectory()) roots.push(src);
     }
   }
@@ -118,7 +114,6 @@ describe("docker run construction", () => {
     const hits = scanDockerSources(sourceTree());
     expect(hits.filter((hit) => !isDockerSource(hit.path))).toEqual([]);
     for (const [path, name] of Object.entries(RUN_BUILDERS)) {
-      if (!existsSync(join(REPO, path))) continue;
       const text = readFileSync(join(REPO, path), "utf8");
       const builder = exportedFunction(text, name);
       expect(text.slice(builder.at, builder.end)).toMatch(/\[\s*"run"/);
@@ -129,8 +124,6 @@ describe("docker run construction", () => {
         expect(offset).toBeLessThan(builder.end);
       }
     }
-    // The security sandbox must exist; only the legacy verifier may disappear.
-    expect(existsSync(join(REPO, "packages/sandbox/src/docker.ts"))).toBe(true);
   });
 
   it("catches a synthetic docker spawn, a run argv, and a template, and allows a version probe", () => {
@@ -166,8 +159,12 @@ describe("docker run construction", () => {
     expect(scanDockerSources([
       { path: "packages/sandbox/src/docker.ts", text: 'spawn("docker", ["container", "run", "--privileged", image]);\n' },
       { path: "packages/sandbox/src/docker.ts", text: 'execSync("docker run --privileged x");\n' },
-      { path: "tools/verify/src/docker.ts", text: 'spawnSync("docker", ["exec", "x", "sh"]);\n' },
+      { path: "packages/sandbox/src/docker.ts", text: 'spawnSync("docker", ["exec", "x", "sh"]);\n' },
     ]).map((hit) => hit.reason)).toEqual(["docker spawn", "exec docker run", "docker spawn"]);
+    // The removed legacy verifier is no longer a builder.
+    expect(scanDockerSources([
+      { path: "tools/verify/src/docker.ts", text: 'spawnSync("docker", ["run", "--rm"]);\n' },
+    ]).map((hit) => hit.reason)).toEqual(["run argv", "docker spawn"]);
   });
 
   it("bounds a builder function at its own closing brace, not at the next export", () => {

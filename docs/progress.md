@@ -265,6 +265,7 @@ Local verification: typecheck, workspace and sample builds pass; 714 tests passe
 `docs/design.md` (security fixes applied automatically, npm first) is the plan from here. `security/multi-ecosystem` was only on one machine; it is now pushed. Main at `3bd1de1` is frozen as the tag `archive/lessons-2026-10-27`, so the cleanup's deletions can be undone from it.
 
 Local check of this branch at `0d7fdbb` (Windows, Node 24.19): typecheck and build pass; vitest 714 passed / 8 skipped.
+
 ## 2026-10-27 — Security Docker runner extracted
 
 Added `packages/cli/src/security/docker.ts` and switched `patch.ts` to it; the generated test argv is identical to the previous security phase of `buildDockerRunArgs`. New unit tests cover the exact argv, refusal of unsafe names, tags instead of image IDs and flag-like or empty test argv, the image-command allowlist, exit/output handling, name-only kill on timeout, spawn errors and the output cap. The `docker run` guard was tightened to explicit builder files and functions; a deliberate run argv outside `runArgs` was confirmed to fail it, then removed.
@@ -283,6 +284,10 @@ Kept, with the reason: the now-unused security branch of `buildDockerRunArgs` in
 
 ## 2026-10-28 — `packages/sandbox` (cleanup PR-B)
 
-Moved the security Docker runner, the public-address fetch and the container-start guard into `packages/sandbox`; `dependency-patch.ts` now runs its tests through `runContainer` with its tool, like `patch.ts`. New tests: the exact argv for each tool, refusal of an unknown tool before anything starts, and `runContainer` passing only the tool through.
+Moved the security Docker runner, the public-address fetch and the container-start guard into `packages/sandbox`; `dependency-patch.ts` now runs its tests through `runContainer`, like `patch.ts`, passing its tool. New tests: the exact argv for each tool, refusal of an unknown tool before anything starts, and `runContainer` passing only the tool through.
 
 Local, Windows, Node 24.19, Docker 29.9.2: typecheck and build pass; vitest 727 passed / 8 skipped. Real Docker, validation only (no `--apply`), on temporary copies of the examples with the built CLI: `php-security` 8.4.26 → 8.4.27, baseline and candidate passed, `validated` (10 s); `npm-security` lodash 4.17.20 → 4.18.0, known matches 5 → 0, baseline and candidate passed through the npm tool flags, `validated` (23 s). Application smoke tests, not exploit regressions.
+
+## 2026-10-28 — Legacy deleted (cleanup PR-C)
+
+About 2,900 files removed, docs from 65 MB to the security evidence only. CLI bundle 1,956,307 → 373,363 bytes. Checks, local, Windows, Node 24.19: typecheck pass; build pass; vitest 179 passed / 1 skipped; Playwright + axe on every page, light and dark, mobile reflow and contrast: 30 passed / 1 skipped (port 8797, so another session's dev server could not answer). Built CLI: `ludion sync` prints that it ended (exit 2); real Docker, validation only, temporary copy of `examples/php-security`: 8.4.26 → 8.4.27 `validated`. Worker: 410 `ended` on `/index.json`, `/index/*`, `/mcp`; `/@ludion-ai` and old lesson URLs 301 to `/start/`.

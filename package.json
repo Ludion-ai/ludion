@@ -11,14 +11,10 @@
     "apps/*"
   ],
   "scripts": {
-    "verify": "node tools/verify/src/cli.ts",
-    "verify:pr": "node tools/verify/src/pr-cli.ts",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json",
-    "build": "npm run build --workspaces --if-present",
-    "gen:validator": "node packages/core/scripts/gen-validator.ts",
-    "gen:capability-schema": "node packages/capability/scripts/gen-json-schema.ts"
+    "build": "npm run build --workspaces --if-present"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

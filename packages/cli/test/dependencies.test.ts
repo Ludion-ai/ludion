@@ -146,8 +146,11 @@ describe("dependency patch gates and recoverable application", () => {
   });
   it.each([false, true])("applies both dependency files only under explicit policy (apply=%s)", async apply => {
     const root = fixture(), before = snapshot(root);
-    const result = await patchDependencies(root, apply, { client: client(), command: fakeCommand(), testRun: async () => {} });
+    const tools: string[] = [];
+    const result = await patchDependencies(root, apply, { client: client(), command: fakeCommand(), testRun: async (_name, _image, _command, _timeout, tool) => { tools.push(tool); } });
     expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
+    // Baseline and candidate tests both run with the npm tool's fixed scratch directories.
+    expect(tools).toEqual(["npm", "npm"]);
     expect(result.receipt?.after?.findings).toEqual([]);
     expect(result.receipt?.files).toHaveLength(2);
     if (apply) expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).dependencies.lodash).toBe(">=4.17.21 <5.0.0");

@@ -15,17 +15,16 @@ for (const [from, target] of redirects) {
   });
 }
 
-test("the lesson index is still JSON", async ({ request }) => {
-  for (const path of ["/index.json", "/index/subjects.json"]) {
+test("the ended 0.1.x lesson and MCP endpoints answer 410 with the reason", async ({ request }) => {
+  for (const path of ["/index.json", "/index/subjects.json", "/mcp"]) {
     const response = await request.get(path);
-    expect(response.status(), path).toBe(200);
-    expect(response.headers()["content-type"] ?? "", path).toContain("json");
-    expect(await response.json()).toBeTruthy();
+    expect(response.status(), path).toBe(410);
+    expect((await response.json()).error, path).toBe("ended");
   }
 });
 
 // Teacher pages were removed. Under wrangler dev, /@ludion-ai returns 301 Location /start/ and the redirect is not followed.
-test("/@ludion-ai redirects to sync setup", async ({ request }) => {
+test("/@ludion-ai redirects to setup", async ({ request }) => {
   const response = await request.get("/@ludion-ai", { maxRedirects: 0 });
   expect(response.status()).toBe(301);
   expect(pathnameOf(response.headers().location ?? "")).toBe("/start/");

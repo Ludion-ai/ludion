@@ -1,1 +1,0 @@
-- vitest >=5.0.0 changed the default of `extends`. Projects defined with an inline configuration inherit options from the root-level configuration. Silent: code written for older versions still runs, without an error. (installed: vitest 5.0.3)

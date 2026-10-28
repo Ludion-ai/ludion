@@ -1,6 +1,6 @@
 import type { APIRequestContext } from "@playwright/test";
 
-/** The public pages. Lesson and bench pages are gone; the optional request keeps older callers type-safe. */
+/** The public pages. The optional request keeps older callers type-safe. */
 export function allPages(_request?: APIRequestContext): string[] {
   return ["/", "/start/", "/no-such-page/"];
 }

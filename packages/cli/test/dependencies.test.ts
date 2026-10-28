@@ -286,6 +286,13 @@ describe("the smallest fix (docs/design.md)", () => {
     writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" } }));
     expect(JSON.parse(changedManifest(root, "npm", [fix("semver", "5.7.0", "5.7.2"), fix("semver", "6.1.1", "6.3.1")], true)).overrides).toEqual({ "semver@5.7.0": "5.7.2", "semver@6.1.1": "6.3.1" });
     expect(() => changedManifest(root, "npm", [fix("lodash", "4.17.20", "4.17.21"), fix("lodash", "3.10.0", "3.10.2")], true)).toThrow("More than one installed version of lodash");
+    // A nested override of the same name also decides its version.
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" }, overrides: { parent: { minimist: "1.2.6" } } }));
+    expect(() => changedManifest(root, "npm", [fix("minimist", "1.2.5", "1.2.8")], true)).toThrow("already overrides minimist");
+    // The vulnerable copy is nested under a direct dependency whose own copy is fine: review, not a raised requirement.
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { semver: "^6.0.0" } }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": {}, "node_modules/semver": { version: "6.3.1" }, "node_modules/x/node_modules/semver": { version: "5.7.0" } } }));
+    expect(() => changedManifest(root, "npm", [fix("semver", "5.7.0", "5.7.2")], true)).toThrow("nested copy of a direct dependency");
   });
   it("resolves npm and Composer candidates for the planned packages only, never a blanket update", () => {
     const npm = resolverDockerfile("npm", `node@${DIGEST}`, true, false, [fix("lodash", "4.17.20", "4.17.21")]);

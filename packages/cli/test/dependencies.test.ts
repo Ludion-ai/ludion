@@ -3,12 +3,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import semver from "semver";
-import { acquisitionPolicy, applyFiles, changedPackages, compatible, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals } from "../src/security/dependency-patch.ts";
+import { acquisitionPolicy, applyFiles, candidateTimeCap, changedPackages, compatible, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals } from "../src/security/dependency-patch.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl } from "../src/security/acquisition.ts";
 import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, type Inventory } from "../src/security/inventory.ts";
 import { OsvClient, type Advisory } from "../src/security/osv.ts";
 import { privateState, snapshot } from "../src/security/project.ts";
 import { scanProject } from "../src/security/scan.ts";
+import { packagistReleases, renderTimeCap } from "../src/security/time-cap.ts";
 
 const DIGEST = `sha256:${"a".repeat(64)}`;
 const lock = (version = "4.17.20") => ({ lockfileVersion: 3, packages: { "": { dependencies: { lodash: version } }, "node_modules/lodash": { version, resolved: `https://registry.npmjs.org/lodash/-/lodash-${version}.tgz` } } });
@@ -27,6 +28,16 @@ function client(candidateVulnerable = false): OsvClient {
     const queries = JSON.parse(String(init?.body)).queries;
     return response({ results: queries.map((q: any) => q.version === "4.17.20" || candidateVulnerable ? { vulns: [{ id: advisory.id }] } : {}) });
   });
+}
+/** registry.npmjs.org for the time cap: lodash 4.17.21 (the fix) and any extra versions given. */
+function registry(extra: Record<string, { created: string; versions: Record<string, string> }> = {}): typeof fetch {
+  const docs: Record<string, { created: string; versions: Record<string, string> }> = { lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z" } }, ...extra };
+  return async url => {
+    const name = decodeURIComponent(String(url).replace("https://registry.npmjs.org/", ""));
+    const doc = docs[name];
+    if (!doc) return new Response("", { status: 404 });
+    return response({ time: { created: doc.created, ...doc.versions }, versions: Object.fromEntries(Object.keys(doc.versions).map(v => [v, { dependencies: {} }])) });
+  };
 }
 const pom = '<project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>example</groupId><artifactId>app</artifactId><version>1.0</version><properties><text.version>1.9</text.version></properties><dependencies><dependency><groupId>org.apache.commons</groupId><artifactId>commons-text</artifactId><version>${text.version}</version></dependency></dependencies></project>';
 
@@ -144,7 +155,7 @@ function fakeCommand() {
 describe("dependency patch gates and recoverable application", () => {
   it("refuses a lookalike official registry in tool-image evidence", async () => {
     const root = fixture(), before = snapshot(root), command = fakeCommand();
-    const result = await patchDependencies(root, true, { client: client(), command: async args => args.includes("{{json .RepoDigests}}") ? JSON.stringify([`dockerXio/library/node@${DIGEST}`]) : command(args), testRun: async () => {} });
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: async args => args.includes("{{json .RepoDigests}}") ? JSON.stringify([`dockerXio/library/node@${DIGEST}`]) : command(args), testRun: async () => {} });
     expect(result.receipt?.outcome).toBe("failed");
     expect(result.receipt?.reason).toContain("digest is unavailable");
     expect(snapshot(root)).toBe(before);
@@ -152,7 +163,7 @@ describe("dependency patch gates and recoverable application", () => {
   it.each([false, true])("applies both dependency files only under explicit policy (apply=%s)", async apply => {
     const root = fixture(), before = snapshot(root);
     const tools: string[] = [];
-    const result = await patchDependencies(root, apply, { client: client(), command: fakeCommand(), testRun: async (_name, _image, _command, _timeout, tool) => { tools.push(tool); } });
+    const result = await patchDependencies(root, apply, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async (_name, _image, _command, _timeout, tool) => { tools.push(tool); } });
     expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
     // Baseline and candidate tests both run with the npm tool's fixed scratch directories.
     expect(tools).toEqual(["npm", "npm"]);
@@ -164,22 +175,22 @@ describe("dependency patch gates and recoverable application", () => {
   });
   it.each([1, 2])("keeps source unchanged when baseline/candidate test %s fails", async at => {
     const root = fixture(), before = snapshot(root); let count = 0;
-    const result = await patchDependencies(root, true, { client: client(), command: fakeCommand(), testRun: async () => { if (++count === at) throw new Error("failure"); } });
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { if (++count === at) throw new Error("failure"); } });
     expect(result.receipt?.outcome).toBe("failed"); expect(snapshot(root)).toBe(before);
   });
   it("refuses an application-compatible candidate that still has advisory findings", async () => {
     const root = fixture(), before = snapshot(root);
-    const result = await patchDependencies(root, true, { client: client(true), command: fakeCommand(), testRun: async () => {} });
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(true), command: fakeCommand(), testRun: async () => {} });
     expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.reason).toContain("still contains"); expect(snapshot(root)).toBe(before);
   });
   it.each([false, true])("rejects source mutations even when not applying (apply=%s)", async apply => {
     const root = fixture(); let count = 0;
-    const result = await patchDependencies(root, apply, { client: client(), command: fakeCommand(), testRun: async () => { if (++count === 2) mkdirSync(join(root, "new-empty-directory")); } });
+    const result = await patchDependencies(root, apply, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { if (++count === 2) mkdirSync(join(root, "new-empty-directory")); } });
     expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.reason).toContain("Project changed");
   });
   it("does not apply after a received stop request", async () => {
     const root = fixture(), before = snapshot(root), abort = new AbortController(); let count = 0;
-    const result = await patchDependencies(root, true, { signal: abort.signal, client: client(), command: fakeCommand(), testRun: async () => { if (++count === 2) abort.abort(); } });
+    const result = await patchDependencies(root, true, { signal: abort.signal, fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { if (++count === 2) abort.abort(); } });
     expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.reason).toContain("cancelled"); expect(snapshot(root)).toBe(before);
   });
   it("rolls back our first file if writing the second fails and records a journal", () => {
@@ -326,7 +337,7 @@ describe("the smallest fix (docs/design.md)", () => {
     (withOther.packages as Record<string, unknown>)["node_modules/other"] = { version: "1.0.0", resolved: "https://registry.npmjs.org/other/-/other-1.0.0.tgz" };
     writeFileSync(join(root, "package-lock.json"), JSON.stringify(withOther));
     const before = snapshot(root);
-    const result = await patchDependencies(root, true, { client: client(), command: fakeCommand(), testRun: async () => {} });
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });
     expect(result.receipt?.outcome).toBe("failed");
     expect(result.receipt?.reason).toContain("moved packages that were not planned (other@1.0.0)");
     expect(result.receipt?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }, { name: "other", from: ["1.0.0"], to: [] }]);
@@ -339,7 +350,7 @@ describe("the smallest fix (docs/design.md)", () => {
       { ecosystem: "npm", name: "lodash", version: "4.17.21", direct: true }, { ecosystem: "npm", name: "a", version: "1.0.0", direct: false }, { ecosystem: "npm", name: "new-dep", version: "0.1.0", direct: false } ] };
     expect(changedPackages(base, next)).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }, { name: "new-dep", from: [], to: ["0.1.0"] }]);
     const root = fixture(), command = fakeCommand();
-    const result = await patchDependencies(root, false, { client: client(), testRun: async () => {}, command: async args => {
+    const result = await patchDependencies(root, false, { fetchFn: registry(), client: client(), testRun: async () => {}, command: async args => {
       const output = await command(args);
       const out = args.find(a => a.startsWith("type=local,dest="));
       if (out?.endsWith("candidate-export")) writeFileSync(join(out.slice("type=local,dest=".length), "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "^4.17.21" } }));
@@ -347,7 +358,7 @@ describe("the smallest fix (docs/design.md)", () => {
     } });
     expect(result.receipt?.outcome).toBe("failed");
     expect(result.receipt?.reason).toContain("changed the manifest beyond the planned fix");
-    const ok = await patchDependencies(fixture(), false, { client: client(), command: fakeCommand(), testRun: async () => {} });
+    const ok = await patchDependencies(fixture(), false, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });
     expect(ok.receipt?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }]);
   });
   it("keeps only the properties the online Maven model uses, and refuses dependency-plugin parameter names", () => {
@@ -414,5 +425,56 @@ describe("Composer plans also read Packagist's advisories", () => {
     const seen: string[] = [];
     await withSources(null, { advisories: [] }, seen).scan(inventory(fixture(), "npm"));
     expect(seen.some(u => u.includes("packagist"))).toBe(false);
+  });
+});
+
+describe("the time cap on candidates", () => {
+  const inv = (ecosystem: "npm" | "composer", packages: [string, string][]): Inventory => ({ ecosystem, files: [], scope: "locked_dependencies", limitations: [], packages: packages.map(([name, version]) => ({ ecosystem, name, version, direct: false })) });
+  const plan = [{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: ["GHSA-test-0001"] }];
+  it("stops a version the candidate adds that was published at or after the fix, and a young new package", async () => {
+    const before = inv("npm", [["lodash", "4.17.20"], ["old", "1.0.0"]]);
+    const fetchFn = registry({
+      old: { created: "2015-01-01T00:00:00Z", versions: { "1.0.0": "2015-01-01T00:00:00Z", "1.1.0": "2021-02-20T15:42:16.891Z" } },
+      fresh: { created: "2021-02-19T00:00:00Z", versions: { "1.0.0": "2021-02-19T00:00:00Z" } },
+      settled: { created: "2020-01-01T00:00:00Z", versions: { "2.0.0": "2021-01-01T00:00:00Z" } },
+    });
+    const cap = await candidateTimeCap("npm", before, inv("npm", [["lodash", "4.17.21"], ["old", "1.0.0"], ["old", "1.1.0"], ["fresh", "1.0.0"], ["settled", "2.0.0"]]), plan, fetchFn);
+    expect(cap).toMatchObject({ t: "2021-02-20T15:42:16.891Z", targets: ["lodash@4.17.21"], after_t: ["old@1.1.0"], young: ["fresh (first published 2021-02-19T00:00:00.000Z)"], undecidable: [], wait_hours: 168 });
+    const clean = await candidateTimeCap("npm", before, inv("npm", [["lodash", "4.17.21"], ["old", "1.0.0"], ["settled", "2.0.0"]]), plan, fetchFn);
+    expect(clean).toMatchObject({ after_t: [], young: [], undecidable: [] });
+    expect(renderTimeCap(clean)).toEqual(["Published at or after T (2021-02-20T15:42:16.891Z, the fix's publish time): 0 version(s)"]);
+  });
+  it("is undecidable when a time is missing, and a failed registry read fails the candidate", async () => {
+    const before = inv("npm", [["lodash", "4.17.20"]]);
+    const noTime = registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z" } } });
+    expect((await candidateTimeCap("npm", before, inv("npm", [["lodash", "4.17.21"]]), plan, noTime)).undecidable).toEqual(["lodash@4.17.21 has no publish time, so T is unknown."]);
+    await expect(candidateTimeCap("npm", before, inv("npm", [["lodash", "4.17.21"], ["gone", "1.0.0"]]), plan, registry())).rejects.toThrow("HTTP 404");
+    const root = fixture(), snap = snapshot(root);
+    const result = await patchDependencies(root, true, { fetchFn: noTime, client: client(), command: fakeCommand(), testRun: async () => {} });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("The time cap could not be checked: lodash@4.17.21 has no publish time");
+    expect(snapshot(root)).toBe(snap);
+  });
+  it("reads Packagist's minified metadata for Composer release times and requirements", async () => {
+    const p2 = (name: string, list: unknown[]) => response({ minified: "composer/2.0", packages: { [name]: list } });
+    const fetchFn: typeof fetch = async url => {
+      const u = String(url);
+      if (u.endsWith("/p2/vendor/lib.json")) return p2("vendor/lib", [
+        { name: "vendor/lib", version: "v2.0.1", time: "2026-05-01T00:00:00+00:00", require: { php: ">=8.1", "vendor/new": "^1.0", "vendor/dep": "^1.0" } },
+        { version: "v2.0.0", time: "2026-01-01T00:00:00+00:00", require: { php: ">=8.1", "vendor/dep": "^1.0" } },
+        { version: "v1.0.0", time: "2025-01-01T00:00:00+00:00", require: "__unset" },
+      ]);
+      if (u.endsWith("/p2/vendor/dep.json")) return p2("vendor/dep", [{ name: "vendor/dep", version: "1.1.0", time: "2026-05-02T00:00:00+00:00" }, { version: "1.0.0", time: "2024-01-01T00:00:00+00:00" }]);
+      if (u.endsWith("/p2/vendor/new.json")) return p2("vendor/new", [{ name: "vendor/new", version: "1.0.0", time: "2026-04-28T00:00:00+00:00" }]);
+      return new Response("", { status: 404 });
+    };
+    const releases = await packagistReleases("vendor/lib", fetchFn);
+    expect(releases.created).toBe("2025-01-01T00:00:00.000Z");
+    expect(releases.requires.get("2.0.0")).toEqual(["vendor/dep"]);
+    expect(releases.requires.get("1.0.0")).toEqual([]);
+    const cap = await candidateTimeCap("composer", inv("composer", [["vendor/lib", "2.0.0"], ["vendor/dep", "1.0.0"], ["vendor/new", "1.0.0"]]), inv("composer", [["vendor/lib", "2.0.1"], ["vendor/dep", "1.0.0"], ["vendor/dep", "1.1.0"], ["vendor/new", "1.0.0"]]), [{ name: "vendor/lib", from: "2.0.0", to: "2.0.1", advisories: ["PKSA-x"] }], fetchFn);
+    // vendor/new was already locked, is newly required by the fix, and first appeared 3 days before T: younger than 168h.
+    expect(cap).toMatchObject({ t: "2026-05-01T00:00:00.000Z", after_t: ["vendor/dep@1.1.0"], young: ["vendor/new (first published 2026-04-28T00:00:00.000Z)"], undecidable: [] });
+    await expect(packagistReleases("../etc/passwd", fetchFn)).rejects.toThrow("Invalid Composer package name");
   });
 });

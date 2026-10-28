@@ -2,6 +2,7 @@
 // Pure: every fact comes in as data (registry, OSV, KEV), so the same rules run live and in the backtest.
 // v0 judges gates 1, 2 and 4 and the wait. Gate 3 (build and test) is not run here, so v0 never says "apply".
 import semver from "semver";
+import { renderTimeCap, timeCap, type TimeCap } from "./time-cap.ts";
 
 export type Urgency = "exploited" | "high" | "normal" | "low";
 /** Hours to wait after the newest publish in the diff (design, "待機時間"). */
@@ -38,6 +39,8 @@ export type VersionFacts = {
   dependencies: string[];
   /** The registry's sha512 integrity for the version's tarball. */
   integrity: string | null;
+  /** When the package itself first appeared (time-cap.ts, firstPublish); absent when not read. */
+  package_created?: string | null;
   /** OSV MAL- records naming this version. */
   malicious: string[];
   /** Other OSV advisories (vulnerabilities) naming this version. */
@@ -68,6 +71,8 @@ export type Judgement = {
   findings: Finding[];
   /** Exposure-time evidence: when the newest fixing version was published, and when this judgement saw it. */
   exposure: { fix_published_at: string | null; detected_at: string };
+  /** Rules 1 and 2 (docs/decisions.md, "Moving dependencies are capped at the fix's publish time"). */
+  time_cap: TimeCap;
   not_checked: string[];
 };
 
@@ -174,6 +179,11 @@ export function lockDiff(before: LockEntry[], after: LockEntry[]): Change[] {
     add(now, gone, now.name === gone.name ? gone.version : null, now.name === gone.name ? null : `${gone.name}@${gone.version}`);
   }
   return [...changes.values()].sort((a, b) => a.name.localeCompare(b.name) || semver.compare(a.to, b.to) || a.path.localeCompare(b.path));
+}
+
+/** Packages the project itself declares: the root's and the workspace folders' dependencies of every kind. */
+export function declaredByProject(lockText: string): string[] {
+  return [...new Set(consumers(lockText).filter(c => c.path === "" || !c.path.includes("node_modules/")).flatMap(c => c.requires))].sort();
 }
 
 /** Something that requires packages: the project root, a workspace folder, or an installed package. */
@@ -316,6 +326,14 @@ export function judge(input: {
   errors?: string[];
   /** package.json before and after, when it changed: only registry dependency specs may change. */
   manifest?: { before: unknown; after: unknown };
+  /** `name@version` of everything in the lockfile before the change; by default the replaced versions. */
+  locked?: Set<string>;
+  /** Packages the project declares directly: the time cap's targets when the change fixes no advisory. */
+  direct?: string[];
+  /** First publish per package name, for new dependencies (rule 2). A missing name is undecidable. */
+  created?: Map<string, string | null>;
+  /** pnpm-lock.yaml changes are read as name@version sets: gate 4's per-entry checks are not implemented for them. */
+  lockfile?: "package-lock" | "pnpm-lock";
 }): Judgement {
   const { changes, facts, fixes, now } = input;
   const findings: Finding[] = [];
@@ -330,16 +348,18 @@ export function judge(input: {
 
   // Gate 4: one revertible change to the dependency files only, with every added version pinned to the registry's own
   // tarball and hash for exactly that name and version.
-  if (input.files === null || !input.files.includes("package-lock.json")) {
-    add({ gate: 4, effect: "info", message: input.files === null ? "The PR's changed files were not given (--files), so gate 4 could not check that only package.json and package-lock.json change." : "The given changed files do not include package-lock.json, although the lockfile changed." });
+  const lockName = input.lockfile === "pnpm-lock" ? "pnpm-lock.yaml" : "package-lock.json";
+  if (input.files === null || !input.files.includes(lockName)) {
+    add({ gate: 4, effect: "info", message: input.files === null ? `The PR's changed files were not given (--files), so gate 4 could not check that only package.json and ${lockName} change.` : `The given changed files do not include ${lockName}, although the lockfile changed.` });
     undecidable = true;
   } else {
-    const unexpected = input.files.filter(f => !["package.json", "package-lock.json"].includes(f));
-    if (unexpected.length) add({ gate: 4, effect: "stop", message: `The change also touches ${unexpected.join(", ")}; a dependency update must change only package.json and package-lock.json.` });
+    const unexpected = input.files.filter(f => !["package.json", lockName].includes(f));
+    if (unexpected.length) add({ gate: 4, effect: "stop", message: `The change also touches ${unexpected.join(", ")}; a dependency update must change only package.json and ${lockName}.` });
   }
+  if (input.lockfile === "pnpm-lock") { add({ gate: 4, effect: "info", message: "pnpm-lock.yaml is read as the set of versions it adds: each entry's tarball and hash, and what each dependent loads, are not checked for pnpm." }); undecidable = true; }
   if (input.manifest) for (const message of manifestChanges(input.manifest.before, input.manifest.after)) add({ gate: 4, effect: "stop", message });
   for (const link of input.links ?? []) add({ gate: 4, effect: "stop", message: `${link}: a link to a local directory that is new or points elsewhere, instead of a registry package.` });
-  const entries: LockEntry[] = input.entries ?? changes.map(c => ({ path: c.path, name: c.name, version: c.to, dev: c.dev, resolved: c.resolved, integrity: c.integrity }));
+  const entries: LockEntry[] = input.lockfile === "pnpm-lock" ? [] : input.entries ?? changes.map(c => ({ path: c.path, name: c.name, version: c.to, dev: c.dev, resolved: c.resolved, integrity: c.integrity }));
   for (const e of entries) {
     const where = `${e.name}@${e.version} at ${e.path}`;
     if (e.bundled) { add({ gate: 4, package: e.name, effect: "stop", message: `${where} is bundled inside its parent and has no registry tarball of its own; a change to a bundled dependency needs review.` }); continue; }
@@ -393,6 +413,30 @@ export function judge(input: {
     if (newDeps.length) { add({ gate: 2, package: c.name, effect: "extend", message: `${c.name}@${c.to} adds dependencies: ${newDeps.join(", ")}.` }); extended = true; }
   }
 
+  // Rules 1 and 2: T is the fix's publish time (the changed direct dependencies' when nothing is fixed).
+  const locked = input.locked ?? new Set(changes.flatMap(c => c.from ? [`${c.name}@${c.from}`] : []));
+  const lockedNames = new Set([...locked].map(id => id.slice(0, id.lastIndexOf("@"))));
+  const fixedNames = new Set(fixes.map(f => f.package));
+  let targets = changes.filter(c => fixedNames.has(c.name));
+  if (!targets.length) targets = changes.filter(c => (input.direct ?? []).includes(c.name));
+  const newDependencies = changes.flatMap(c => {
+    const next = facts.get(`${c.name}@${c.to}`), prev = c.from ? facts.get(`${c.name}@${c.from}`) : undefined;
+    return [...(next && prev?.present ? next.dependencies.filter(d => !prev.dependencies.includes(d)) : []), ...(lockedNames.has(c.name) ? [] : [c.name])];
+  });
+  const created = new Map(input.created ?? []);
+  for (const [id, f] of facts) if (f.package_created !== undefined && !created.has(id.slice(0, id.lastIndexOf("@")))) created.set(id.slice(0, id.lastIndexOf("@")), f.package_created);
+  const cap = timeCap({
+    targets: targets.map(c => ({ name: c.name, version: c.to })), others: changes.map(c => ({ name: c.name, version: c.to })), locked, newDependencies,
+    published: (name, version) => facts.get(`${name}@${version}`)?.published_at,
+    created: name => created.get(name),
+    waitHours: WAIT_HOURS[urgency],
+  });
+  if (changes.length) {
+    for (const reason of cap.undecidable) { add({ gate: 2, effect: "stop", message: `Time cap: ${reason}` }); undecidable = true; }
+    for (const id of cap.after_t) add({ gate: 2, package: id.slice(0, id.lastIndexOf("@")), effect: "stop", message: `${id} was published at or after the fix (T = ${cap.t}); only versions already locked or published before T may move with it.` });
+    for (const young of cap.young) add({ gate: 2, effect: "stop", message: `New dependency ${young}: the package first appeared less than ${cap.wait_hours}h before the fix (T = ${cap.t}).` });
+  }
+
   let wait = WAIT_HOURS[urgency];
   if (urgency === "exploited" && !comparable) wait = EXPLOITED_UNCOMPARABLE_HOURS;
   if (extended) wait = Math.max(wait * 2, EXTENDED_MIN_HOURS);
@@ -407,6 +451,7 @@ export function judge(input: {
     schema: 1, judged_at: now.toISOString(), verdict, urgency, wait_hours: wait, newest_publish: newest, wait_until: waitUntil,
     changes, fixes, findings,
     exposure: { fix_published_at: fixing.at(-1) ?? null, detected_at: now.toISOString() },
+    time_cap: cap,
     not_checked: [
       "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
       "Obfuscated code and new network or process calls in the changed code are not inspected.",
@@ -422,7 +467,7 @@ export function judge(input: {
 /** The judgement as a PR comment. Plain text; every reason is shown. */
 export function renderJudgement(j: Judgement): string {
   const head = { stop: "Ludion judgement: STOP — not applied automatically", wait: `Ludion judgement: wait until ${j.wait_until}`, ready_except_build: "Ludion judgement: gates 1, 2 and 4 found nothing and the wait is over — build/test gate not run (v0)", undecidable: "Ludion judgement: undecidable — not applied automatically" }[j.verdict];
-  const lines = [head, `Urgency: ${j.urgency} · wait ${j.wait_hours}h from the newest publish (${j.newest_publish ?? "unknown"})`];
+  const lines = [head, `Urgency: ${j.urgency} · wait ${j.wait_hours}h from the newest publish (${j.newest_publish ?? "unknown"})`, ...renderTimeCap(j.time_cap)];
   lines.push(`Changed packages (${j.changes.length}):`);
   for (const c of j.changes) lines.push(`  ${c.name} ${c.from ?? "(new)"} → ${c.to}${c.dev ? " (dev)" : ""}${c.replaced ? ` (replaces ${c.replaced} at ${c.path})` : ""}`);
   if (j.fixes.length) lines.push(`Fixes: ${[...new Set(j.fixes.map(f => f.id))].join(", ")}`);

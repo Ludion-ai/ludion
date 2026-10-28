@@ -9,4 +9,8 @@ The rule and the definitions are docs/decisions/2026-10-29-l9-workspace-package-
 - **A path that is not a plain workspace folder** is not read at all; the rule's first reason is given.
 - **A file that is not valid JSON** is read as missing content: rule 3's reason (not a JSON object on both sides), a stop.
 - **pnpm** is unchanged: no workspace file is read, and the changed-files stop stays.
+- **After the review of #174** (comment 6473296446, at 90401ed: approved, nothing blocking). Two findings tighten the rule, and neither loosens it:
+  - rule 2 counts only the lockfile's own entries (`Object.hasOwn`): a folder named `__proto__` was otherwise "recorded" by `Object.prototype`;
+  - in rule 1, a `*` does not match a segment that starts with a dot (npm's workspace globs skip dot folders); a literal entry still does.
+- **`overrides` in a workspace.** The definitions say it stops. The code stops when it changes: an unchanged one changes nothing npm installs, because npm reads overrides only at the root. The definitions are not edited.
 - **Callers.** judge.yml and action/read.sh copy only the root manifest and lockfile on main today. Until LP-rest (#185) copies the changed `*/package.json` files, this judge, run by judge.yml, finds the workspace file unreadable. The verdict on a PR like #161 becomes `undecidable` instead of `stop`; neither passes. #185 copies each changed `*/package.json` on each side whose commit has it, which is what this wiring reads.

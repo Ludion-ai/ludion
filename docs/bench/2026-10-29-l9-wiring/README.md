@@ -8,7 +8,10 @@ Definitions: docs/decisions/2026-10-29-l9-workspace-package-json.md, fixed befor
 
 - `packages/cli/src/security/judge-cli.ts`: `workspaceManifests` reads each changed `<dir>/package.json` on both sides and calls `workspaceManifestChanges`. `judgeCli` passes the result to `judge()`.
 - `packages/cli/src/security/judge.ts`: `judge()` takes `workspaces`. An agreeing file leaves the changed-files stop, and one info line names it. Otherwise each reason stops. A side that could not be read is undecidable.
-- `packages/cli/test/workspace-manifests.test.ts`: 11 more tests, 19 in all:
+- `packages/cli/src/security/workspace-manifests.ts`, after the review (#174, comment 6473296446, at 90401ed, which approved with no blocking finding). Both changes only tighten the rule:
+  - rule 2 reads only the lockfile's own entries, so a folder named `__proto__` is not recorded by `Object.prototype`;
+  - a `*` in `workspaces` does not match a segment that starts with a dot.
+- `packages/cli/test/workspace-manifests.test.ts`: 11 more tests, 19 in all (cases for the two review fixes were added to the rule 1 and rule 2 tests; temporary folders are removed after the tests):
   - #161's and #162's shapes on disk, judged with and without the rule: the agreeing file is no stop, and the findings are otherwise equal;
   - an agreeing file next to another changed file still stops on the other one;
   - five disagreeing cases stop (a range the lockfile does not record, a new install script, a spec outside the registry, a file that is not JSON, a folder the root's `workspaces` do not name);
@@ -21,16 +24,17 @@ Definitions: docs/decisions/2026-10-29-l9-workspace-package-json.md, fixed befor
 
 All in Docker. Scripts are in `scripts/`; the outputs are in `raw/`.
 
-- **Tests** (`raw/tests.txt`, `scripts/run.sh`, node:24-slim, `--network none`, `--read-only`, non-root, at 4cfc189):
+- **Tests** (`raw/tests.txt`, `scripts/run.sh`, node:24-slim, `--network none`, `--read-only`, non-root, at b8215bd):
   - `npm run typecheck`: exit 0.
   - `vitest run --project node`: Test Files 1 failed | 14 passed (15); Tests 349 passed | 13 skipped (362). The failed file is `apps/site/test/knowledge.test.ts`, `spawnSync git ENOENT`: the image has no git. `npm run build` failed the same way (astro, `spawnSync git ENOENT`).
-  - Both were run again in the same image with git added and a throwaway repository of the same files (`raw/site.txt`, `scripts/site.sh`): knowledge.test.ts 5 passed, build exit 0.
+  - Both were run again in the same image with git added and a throwaway repository of the same files (`raw/site.txt`, `scripts/site.sh`, at b8215bd): knowledge.test.ts 5 passed, build exit 0.
 - **Mutations** (`raw/tests.txt`). Each mutant must make a test in workspace-manifests.test.ts fail.
   - The module's 14 (2026-10-28 `mutate.mjs`): survived 0 of 14.
-  - The wiring's 14 (`scripts/mutate-wiring.mjs`, 8 in judge.ts, 6 in judge-cli.ts): survived 0 of 14.
+  - The wiring's 17 (`scripts/mutate-wiring.mjs`: 8 in judge.ts, 6 in judge-cli.ts, 3 undoing the review fixes): survived 0 of 17. At 6207c43, before the last test was added, the mutant that undoes the own-entry check on the before side survived (1 of 16); the test of a `__proto__` record on one side only (b8215bd) kills it.
 - **Re-judgement of #161 and #162** (`raw/inputs.txt`, `raw/judgements/`, `raw/compare.txt`; `scripts/extract.sh`, `judge.sh`, `compare.mjs`).
   - **Inputs.** As judge.yml takes them, with each changed `<dir>/package.json` added on both sides. #161: merge 470a554, base be86239, head b5014dd. #162: merge 6758c40, base be86239, head eedb106. These are the heads the PRs had; Dependabot was not asked to rebase (the comment was not posted, below).
   - **Judges.** Fixed: this branch at 4cfc189, dist/cli.js sha256 6015c723…0872. Unfixed: main at 3b6ed1c, sha256 bccbfd45…1d70. Both ran in node:24-slim, `--read-only`, non-root, with network for the registry and OSV. Same inputs, `--now 2026-10-28T15:27:03Z`.
+  - **Again after the review fixes** (`raw/judgements-b8215bd/`, `raw/compare-b8215bd.txt`). Fixed at b8215bd (sha256 3eb9b8b9…46a5) and main at 3b6ed1c, same inputs and `--now`. All four judgements are byte for byte the same as the 4cfc189 run's. The table below holds for both.
 
 | PR | Unfixed verdict | Fixed verdict | False stops, unfixed → fixed | Other differences |
 | --- | --- | --- | --- | --- |

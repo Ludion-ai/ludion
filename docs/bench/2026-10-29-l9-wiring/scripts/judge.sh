@@ -1,8 +1,10 @@
 #!/bin/sh
 # In Docker: build each judge (fixed = /w, unfixed = /m, main) and run both on the same inputs with the same --now,
 # as judge.yml runs it (--before, --after, --files, --json; no --source). The judge reads the registry and OSV.
+# Usage: sh judge.sh <--now> <main SHA built in /m>
 set -u
 NOW="$1"
+echo "# fixed /w at $(cat /s/HEAD 2>/dev/null || echo unknown), unfixed /m at ${2:-unknown}, --now $NOW"
 for tree in /w /m; do
   (cd "$tree" && npm run build --workspace ludion-ai >/tmp/build.log 2>&1; echo "# build $tree exit $? sha256 $(sha256sum packages/cli/dist/cli.js | cut -d' ' -f1)")
 done

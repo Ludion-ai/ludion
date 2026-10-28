@@ -1,4 +1,4 @@
-# started 2026-10-28T15:23:48Z, node v24.22.1, HEAD 4cfc1893db23ff2f05cb5787489a864af0c2d8fe
+# started 2026-10-28T15:36:06Z, node v24.22.1, HEAD b8215bd2b6926318deb8b9eb66e286fdc26eb6d4
 == npm run typecheck
 
 > typecheck
@@ -9,22 +9,23 @@ typecheck exit 0
 
  RUN  v4.1.12 /w
 
- ❯ |node| apps/site/test/knowledge.test.ts (0 test)
- ✓ |node| apps/site/test/build.test.ts (2 tests) 3ms
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 5ms
  ✓ |node| packages/sandbox/test/guard.test.ts (3 tests) 21ms
  ✓ |node| apps/site/test/discovery.test.ts (3 tests) 5ms
  ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 6ms
+ ❯ |node| apps/site/test/knowledge.test.ts (0 test)
  ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 12ms
- ✓ |node| packages/sandbox/test/docker.test.ts (11 tests) 85ms
- ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 47ms
- ✓ |node| packages/cli/test/workspace-manifests.test.ts (19 tests) 44ms
- ✓ |node| packages/cli/test/security.test.ts (33 tests) 62ms
- ✓ |node| packages/cli/test/judge.test.ts (63 tests) 72ms
- ✓ |node| packages/cli/test/dependencies.test.ts (63 tests) 130ms
- ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 298ms
- ✓ |node| packages/cli/test/production.test.ts (42 tests) 644ms
-     ✓ reads #168's delta-review inputs in linear time: each took seconds when quadratic  313ms
- ✓ |node| .claude/hooks/guard.test.ts (39 tests) 955ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (11 tests) 89ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 44ms
+ ✓ |node| packages/cli/test/security.test.ts (33 tests) 58ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (19 tests) 47ms
+ ✓ |node| packages/cli/test/judge.test.ts (63 tests) 74ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (63 tests) 129ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 283ms
+ ✓ |node| packages/cli/test/production.test.ts (42 tests) 743ms
+     ✓ reads #168's delta-review inputs in linear time: each took seconds when quadratic  300ms
+     ✓ reads an import call after any number of comments, and a stylesheet list that continues on the next line  317ms
+ ✓ |node| .claude/hooks/guard.test.ts (39 tests) 958ms
 
 ⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
 
@@ -43,8 +44,8 @@ Error: spawnSync git ENOENT
 
  Test Files  1 failed | 14 passed (15)
       Tests  349 passed | 13 skipped (362)
-   Start at  15:23:49
-   Duration  1.23s (transform 2.01s, setup 0ms, import 2.74s, tests 2.38s, environment 2ms)
+   Start at  15:36:07
+   Duration  1.13s (transform 1.70s, setup 0ms, import 2.54s, tests 2.47s, environment 1ms)
 
 vitest exit 1
 == npm run build
@@ -85,5 +86,8 @@ killed   no plain-folder check before reading (failed tests: 1)
 killed   every listed file read (failed tests: 9)
 killed   the lockfile's before side used for after (failed tests: 6)
 killed   an unparsable file read as empty object (failed tests: 1)
-survived: 0 of 14
-# finished 2026-10-28T15:24:27Z
+killed   a * matches a dot folder (failed tests: 1)
+killed   inherited keys count as records (before) (failed tests: 1)
+killed   inherited keys count as records (after) (failed tests: 1)
+survived: 0 of 17
+# finished 2026-10-28T15:36:36Z

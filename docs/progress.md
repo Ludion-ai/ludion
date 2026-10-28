@@ -386,3 +386,21 @@ Gate: **not met** (1 missed and the unknowns, at every wait). The delay gates ar
 `time-cap.ts` `sameRelease()`: a version published at or after T may move with the fix when it is the same release as a target. With provenance, that means the same repository, workflow and commit. Without provenance, it means the same publisher account and version number, published at most 15 minutes after its target. Used by `ludion judge` (npm, pnpm) and `ludion patch` npm candidates; Composer is unchanged. Checked against the registry: `next@15.2.3` and `@next/env@15.2.3`, published 10 s apart, carry the same repository, workflow and commit, so the provenance branch allows the pair.
 
 The independent review of #151 asked for changes in round 1. Its one blocking finding: trusted publishing's shared "GitHub Actions" user matched across unrelated packages. Round 2 approved at 08aa452, and its non-blocking findings were handled too. Both rounds are recorded in docs/decisions.md as the amendment made before backtest v4. On the registry, the subject check passes on `next@15.2.3`, `@next/env@15.2.3` and `get-jwks@11.0.2`, and get-jwks's trusted publisher counts as no account. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passes; packages tests: 206 passed. The site build needs git and was not run in the container; CI runs the full suite.
+
+## 2026-10-28 — Backtest v4: rule 1 with the same-release exception
+
+The definitions were committed before either script ran: e995557 at 15:04 JST (#150), and the stricter amendments 08aa452 and 17b55b7 (#151). Scripts: `tools/backtest/src/fixes-v4.ts` and `malicious-v4.ts` (5ef3a5f). They ran in Docker from 15:37 to 15:48 JST. Data: v3's OSV export, registry and deps.dev, read 2026-10-28. Each result is computed with and without the exception on the same data; without it, the run reproduces v3's numbers exactly. Results and raw data: docs/bench/2026-10-28-backtest-v4/.
+
+Gate: **not met**. The delay gates are met: exploited 16.4h (n = 6), high 0h (n = 21), normal 41.5h (n = 138). "Every malicious version stopped" is not met at any wait:
+
+| Wait | Stopped | Missed | Unknown |
+| --- | --- | --- | --- |
+| 12h and 24h | 990 of 1,148 | 1 | 157 |
+| 72h | 1,052 | 1 | 95 |
+| 168h | 1,071 | 1 | 76 |
+
+- **Genuine fixes.** The exception removes all 29 of rule 1's stops on the 200 genuine fixes, 14 of which rule 1 stopped alone. It allowed 69 versions in 30 updates: 29 through provenance with the same repository, workflow and commit, and 1 through the publisher branch (@apollo/composition). 14 updates go from stop to ready (except build). Stops drop from 49 to 35, and the 15 remaining former rule-1 stops are next releases stopped by today's deprecation.
+- **Malicious, what the exception let in.** Nothing: no malicious version was allowed as a sibling, and none is selected only because the exception unblocked a tree. The 7 versions published before the T of a fix that selects them are v3's 7. The miss is the same, @ensdomains/buffer 0.1.1 (a 2023 version, record in 2025); the other six are caught by the re-query.
+- **Malicious, what the exception changed.** loliloli 1.0.108 (12h to 72h) and @alexcolls/nuxt-ux 0.6.2 (72h) go from stopped to unknown, not missed. n8n fix trees that rule 1 stopped now resolve with branches the registry no longer serves, and the registered rule counts those as unknown.
+- **Unverified.** Gate 2's provenance, scripts and publisher remain unverified for 1,140 of the 1,148 removed versions.
+- **Second execution.** A second, diagnostic execution (baafc36) only added the fixes behind each unknown, and gives identical counts.

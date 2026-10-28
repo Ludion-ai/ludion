@@ -1,20 +1,20 @@
-commit: 9493b47ecaadbbb42f5980e36486f34ca8c8b019  recorder.ts blob: c43c84b7b3da5e1324f028ab12fb449877761abb  test blob: 885157fff6c153a7adccef379044ce54019fa5f4
+commit: 88b1895c37ca15da1b657c967cc2ffe43ac2f2ee  recorder.ts blob: 5e6c0abe20fc9d0fe335a81f277a9fb714657877  test blob: 7e038269c32e90264dc157e18efb24e0bf688581
 == typecheck
 tsc_exit=0
 == tests
- [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/recorder.test.ts [2m([22m[2m32 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/recorder.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 100[2mms[22m[39m
 [2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
-[2m      Tests [22m [1m[32m32 passed[39m[22m[90m (32)[39m
+[2m      Tests [22m [1m[32m33 passed[39m[22m[90m (33)[39m
 == mutation: e-mail scrub off
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
-[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m28 passed[39m[22m[90m (32)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m29 passed[39m[22m[90m (33)[39m
 == mutation: storage limit off
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
-[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m30 passed[39m[22m[90m (32)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m31 passed[39m[22m[90m (33)[39m
 == mutation: integrity check off
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m31 passed[39m[22m[90m (32)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m32 passed[39m[22m[90m (33)[39m
 == mutation: first sight never new
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m31 passed[39m[22m[90m (32)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m32 passed[39m[22m[90m (33)[39m
 recorder.ts restored

@@ -9,7 +9,7 @@ import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, regularFile, rootPath, snapshot, type DependencyConfig } from "./project.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
-import { WAIT_HOURS } from "./judge.ts";
+import { releaseIdentity, WAIT_HOURS } from "./judge.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
@@ -88,12 +88,17 @@ export async function candidateTimeCap(ecosystem: "npm" | "composer", before: In
   };
   const cap = timeCap(input);
   if (ecosystem !== "npm" || !cap.after_t.length) return cap;
-  // Publisher and provenance only for the planned versions and those published at or after T.
+  // Publisher and provenance only for the planned versions and those published at or after T. A failed read keeps the
+  // first cap (T and the count) and makes it undecidable.
   const identities = new Map<string, ReleaseIdentity>();
   const wanted = [...input.targets.map(p => `${p.name}@${p.version}`), ...cap.after_t];
-  for (const name of new Set(wanted.map(id => id.slice(0, id.lastIndexOf("@"))))) {
-    const versions = wanted.filter(id => id.slice(0, id.lastIndexOf("@")) === name).map(id => id.slice(id.lastIndexOf("@") + 1));
-    for (const [version, f] of await registryFacts(name, versions, fetchFn)) identities.set(`${name}@${version}`, { publisher: f.publisher, provenance: f.provenance && { repository: f.provenance.repository, commit: f.provenance.commit } });
+  try {
+    for (const name of new Set(wanted.map(id => id.slice(0, id.lastIndexOf("@"))))) {
+      const versions = wanted.filter(id => id.slice(0, id.lastIndexOf("@")) === name).map(id => id.slice(id.lastIndexOf("@") + 1));
+      for (const [version, f] of await registryFacts(name, versions, fetchFn)) identities.set(`${name}@${version}`, releaseIdentity({ ...f, malicious: [], advisories: [] }));
+    }
+  } catch (error) {
+    return { ...cap, undecidable: [...cap.undecidable, `The publisher and provenance for the same-release check could not be read: ${(error instanceof Error ? error.message : String(error)).slice(0, 300)}`] };
   }
   return timeCap({ ...input, identity: (name, version) => identities.get(`${name}@${version}`) });
 }

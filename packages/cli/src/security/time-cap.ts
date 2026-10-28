@@ -7,23 +7,27 @@
 // exception, docs/decisions.md, "Rule 1's same-release exception").
 
 export type Release = { name: string; version: string };
-/** What the same-release exception compares: the registry's publisher and the provenance's source. */
-export type ReleaseIdentity = { publisher: string | null; provenance: { repository: string | null; commit: string | null } | null };
+/**
+ * What the same-release exception compares: the publisher's account (null when unknown, or when the registry names no
+ * account, as for trusted publishing) and the provenance's source.
+ */
+export type ReleaseIdentity = { publisher: string | null; provenance: { repository: string | null; workflow: string | null; commit: string | null } | null };
 /** A version published at or after T that the exception allows, the target it belongs with, and why. */
 export type SameRelease = { version: string; target: string; basis: "provenance" | "publisher" };
-/** Without provenance, a sibling must be published at most this long after T. */
+/** Without provenance, a sibling must be published at most this long after its target (and so after T). */
 export const SAME_RELEASE_MINUTES = 15;
 
 /**
- * Is a version published at or after T the same release as a target? With provenance on both: the same repository and
- * the same commit. Without provenance on either: the same publisher, the same version number, and at most 15 minutes
- * after T. Provenance on only one side, a record naming no repository or commit, or an unknown publisher: no.
+ * Is a version published at or after T the same release as a target? With provenance on both: the same repository,
+ * workflow and commit. Without provenance on either: the same publisher, the same version number, and at most 15 minutes
+ * after the target (T is the latest target, so also after T). Provenance on only one side, a record naming no
+ * repository, workflow or commit, or an unknown publisher: no.
  */
-export function sameRelease(target: { version: string; identity: ReleaseIdentity }, other: { version: string; published: number; identity: ReleaseIdentity }, t: number): SameRelease["basis"] | null {
+export function sameRelease(target: { version: string; published: number; identity: ReleaseIdentity }, other: { version: string; published: number; identity: ReleaseIdentity }, t: number): SameRelease["basis"] | null {
   const a = target.identity.provenance, b = other.identity.provenance;
-  if (a && b) return a.repository && a.commit && a.repository === b.repository && a.commit === b.commit ? "provenance" : null;
+  if (a && b) return a.repository && a.workflow && a.commit && a.repository === b.repository && a.workflow === b.workflow && a.commit === b.commit ? "provenance" : null;
   if (a || b) return null;
-  const within = other.published >= t && other.published - t <= SAME_RELEASE_MINUTES * 60_000;
+  const within = other.published >= t && other.published - target.published <= SAME_RELEASE_MINUTES * 60_000;
   return target.identity.publisher && target.identity.publisher === other.identity.publisher && target.version === other.version && within ? "publisher" : null;
 }
 
@@ -77,7 +81,7 @@ export function timeCap(input: {
     const identity = input.identity?.(r.name, r.version);
     const sibling = identity && input.targets.map(target => {
       const own = input.identity!(target.name, target.version);
-      const basis = own && sameRelease({ version: target.version, identity: own }, { version: r.version, published: at, identity }, t);
+      const basis = own && sameRelease({ version: target.version, published: Date.parse(input.published(target.name, target.version)!), identity: own }, { version: r.version, published: at, identity }, t);
       return basis ? { version: id, target: `${target.name}@${target.version}`, basis } : null;
     }).find(s => s !== null);
     if (sibling) out.same_release.push(sibling);
@@ -97,7 +101,7 @@ export function timeCap(input: {
 export function renderTimeCap(cap: TimeCap): string[] {
   const lines = [`Published at or after T (${cap.t ?? "unknown"}, the fix's publish time): ${cap.t ? cap.after_t.length + cap.same_release.length : "unknown"} version(s)`];
   for (const v of cap.after_t) lines.push(`  ${v}`);
-  for (const s of cap.same_release) lines.push(`  ${s.version}: allowed, the same release as ${s.target} (${s.basis === "provenance" ? "provenance names the same repository and commit" : `no provenance; same publisher and version, at most ${SAME_RELEASE_MINUTES} minutes after T`})`);
+  for (const s of cap.same_release) lines.push(`  ${s.version}: allowed, the same release as ${s.target} (${s.basis === "provenance" ? "provenance names the same repository, workflow and commit" : `no provenance; same publisher and version, at most ${SAME_RELEASE_MINUTES} minutes after it`})`);
   return lines;
 }
 

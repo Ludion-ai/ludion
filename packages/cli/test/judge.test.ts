@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { provenanceFrom } from "../src/security/npm-facts.ts";
 import { pnpmChanges } from "../src/security/judge-cli.ts";
-import { firstPublish, renderTimeCap } from "../src/security/time-cap.ts";
+import { firstPublish, renderTimeCap, timeCap } from "../src/security/time-cap.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
 const url = (name: string, version: string) => `https://registry.npmjs.org/${name}/-/${name}-${version}.tgz`;
@@ -12,7 +12,7 @@ const lockOf = (packages: Record<string, { version: string; dev?: boolean }>) =>
 });
 const COMMIT = "535e26d3c69de49df8bd17618a424cbe65ec897b";
 const PROV = { repository: "https://github.com/acme/lib", workflow: ".github/workflows/release.yml", commit: COMMIT };
-const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z", ...over });
+const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", trusted_publisher: false, provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z", ...over });
 /** A package from another repository and release than lib, so it is never lib's sibling. */
 const depFact = (over: Partial<VersionFacts> = {}) => fact({ provenance: { repository: "https://github.com/acme/dep-a", workflow: ".github/workflows/release.yml", commit: "1".repeat(40) }, ...over });
 const change = (over: Partial<Change> = {}): Change => ({ path: "node_modules/lib", name: "lib", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("lib", "1.0.1"), integrity: INTEGRITY, replaced: null, ...over });
@@ -187,12 +187,12 @@ describe("rule 1's same-release exception", () => {
     facts: new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact(fix)], ["lib-env@1.0.0", fact()], [`lib-env@${to}`, fact(next)]]),
     fixes: [fixHigh], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), locked: new Set(["lib@1.0.0", "lib-env@1.0.0"]),
   });
-  it("allows a sibling whose provenance names the same repository and commit, at any time and any version", () => {
+  it("allows a sibling whose provenance names the same repository, workflow and commit, at any time and any version", () => {
     const result = sibling({ published_at: "2026-10-03T00:00:00Z" }, {}, "2.0.0");
     expect(result.time_cap.after_t).toEqual([]);
     expect(result.time_cap.same_release).toEqual([{ version: "lib-env@2.0.0", target: "lib@1.0.1", basis: "provenance" }]);
     expect(result.findings.filter(f => f.effect === "stop")).toEqual([]);
-    expect(renderJudgement(result)).toContain("Published at or after T (2026-10-01T00:00:00.000Z, the fix's publish time): 1 version(s)\n  lib-env@2.0.0: allowed, the same release as lib@1.0.1 (provenance names the same repository and commit)");
+    expect(renderJudgement(result)).toContain("Published at or after T (2026-10-01T00:00:00.000Z, the fix's publish time): 1 version(s)\n  lib-env@2.0.0: allowed, the same release as lib@1.0.1 (provenance names the same repository, workflow and commit)");
   });
   it("counts the wait from the newest sibling", () => {
     const result = sibling({ published_at: "2026-10-01T00:10:00Z" });
@@ -202,7 +202,10 @@ describe("rule 1's same-release exception", () => {
   it.each([
     ["another commit", { provenance: { ...PROV, commit: "0".repeat(40) } }, {}],
     ["another repository", { provenance: { ...PROV, repository: "https://github.com/evil/lib" } }, {}],
+    ["another workflow", { provenance: { ...PROV, workflow: ".github/workflows/pr.yml" } }, {}],
     ["a record without a commit", { provenance: { ...PROV, commit: null } }, { provenance: { ...PROV, commit: null } }],
+    ["a record without a repository", { provenance: { ...PROV, repository: null } }, { provenance: { ...PROV, repository: null } }],
+    ["a record without a workflow", { provenance: { ...PROV, workflow: null } }, { provenance: { ...PROV, workflow: null } }],
     ["provenance on the sibling only", {}, { provenance: null }],
     ["provenance on the fix only", { provenance: null }, {}],
   ])("stops a sibling with %s", (_name, next, fix) => {
@@ -222,7 +225,31 @@ describe("rule 1's same-release exception", () => {
     // An unknown publisher (on either side) never matches.
     expect(at("2026-10-01T00:00:05Z", { publisher: null }).after_t).toEqual(["lib-env@1.0.1"]);
     expect(sibling({ ...none, published_at: "2026-10-01T00:00:05Z", publisher: null }, { ...none, publisher: null }).time_cap.after_t).toEqual(["lib-env@1.0.1"]);
-    expect(renderTimeCap(at("2026-10-01T00:00:05Z"))[1]).toBe("  lib-env@1.0.1: allowed, the same release as lib@1.0.1 (no provenance; same publisher and version, at most 15 minutes after T)");
+    expect(renderTimeCap(at("2026-10-01T00:00:05Z"))[1]).toBe("  lib-env@1.0.1: allowed, the same release as lib@1.0.1 (no provenance; same publisher and version, at most 15 minutes after it)");
+  });
+  it("does not count npm trusted publishing's shared user as the same publisher", () => {
+    // Both read "GitHub Actions" (npm-oidc-no-reply@github.com), whoever's repository published them.
+    const shared = { provenance: null, publisher: "GitHub Actions", trusted_publisher: true };
+    expect(sibling({ ...shared, published_at: "2026-10-01T00:00:05Z" }, shared).time_cap.after_t).toEqual(["lib-env@1.0.1"]);
+    // Without the flag the same names would match: the flag is what stops it.
+    expect(sibling({ ...shared, trusted_publisher: false, published_at: "2026-10-01T00:00:05Z" }, { ...shared, trusted_publisher: false }).time_cap.same_release).toHaveLength(1);
+  });
+  it("with several targets, counts the 15 minutes from the matched target, not only from T", () => {
+    // old@2.1.0 was fixed a month before T (lib@1.0.1); old-helper@2.1.0 by old's publisher 5 minutes after T is no sibling of it.
+    const changes = [change(), change({ path: "node_modules/old", name: "old", from: "2.0.0", to: "2.1.0", resolved: url("old", "2.1.0") }), change({ path: "node_modules/old-helper", name: "old-helper", from: "2.0.0", to: "2.1.0", resolved: url("old-helper", "2.1.0") })];
+    const none = { provenance: null, publisher: "bob" };
+    const facts = new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()], ["old@2.0.0", fact(none)], ["old@2.1.0", fact({ ...none, published_at: "2026-09-01T00:00:00Z" })], ["old-helper@2.0.0", fact(none)], ["old-helper@2.1.0", fact({ ...none, published_at: "2026-10-01T00:05:00Z" })]]);
+    const result = judge({ changes, facts, fixes: [fixHigh, { ...fixHigh, package: "old" }], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), locked: new Set(["lib@1.0.0", "old@2.0.0", "old-helper@2.0.0"]) });
+    expect(result.time_cap.t).toBe("2026-10-01T00:00:00.000Z");
+    expect(result.time_cap.after_t).toEqual(["old-helper@2.1.0"]);
+  });
+  it("allows nothing after T for a version without publisher and provenance facts", () => {
+    const base = { targets: [{ name: "lib", version: "1.0.1" }], others: [{ name: "lib-env", version: "1.0.1" }], locked: new Set<string>(), newDependencies: [], created: () => null, waitHours: 24, published: () => "2026-10-01T00:00:00Z" };
+    const known = { publisher: "alice", provenance: null };
+    expect(timeCap({ ...base, identity: name => name === "lib" ? known : undefined }).after_t).toEqual(["lib-env@1.0.1"]);
+    expect(timeCap({ ...base, identity: name => name === "lib" ? undefined : known }).after_t).toEqual(["lib-env@1.0.1"]);
+    expect(timeCap(base).after_t).toEqual(["lib-env@1.0.1"]);
+    expect(timeCap({ ...base, identity: () => known }).same_release).toHaveLength(1);
   });
   it("leaves rule 2 as it is: a young new sibling still stops", () => {
     const fresh = change({ path: "node_modules/lib-new", name: "lib-new", from: null, to: "1.0.1", resolved: url("lib-new", "1.0.1") });
@@ -435,6 +462,21 @@ describe("provenance records", () => {
   it("reads the repository, workflow and source commit from SLSA v1 and v0.2 statements", () => {
     expect(provenanceFrom(v1([{ uri: "git+https://github.com/acme/lib@refs/heads/main", digest: { gitCommit: COMMIT } }]))).toEqual(PROV);
     expect(provenanceFrom(v02({ sha1: COMMIT }))).toEqual(PROV);
+  });
+  it("refuses a statement that does not name the version and its tarball, when asked to check", () => {
+    const hex = Buffer.from(INTEGRITY.slice(7), "base64").toString("hex");
+    const signed = (subject: unknown) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: encode({ subject, predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/acme/lib", path: ".github/workflows/release.yml" } }, resolvedDependencies: [{ digest: { gitCommit: COMMIT } }] } } }) } } }] });
+    const want = { name: "@acme/lib", version: "1.0.1", integrity: INTEGRITY };
+    expect(provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.1", digest: { sha512: hex } }]), want)).toEqual(PROV);
+    expect(() => provenanceFrom(signed([{ name: "pkg:npm/%40acme/other@1.0.1", digest: { sha512: hex } }]), want)).toThrow("does not name @acme/lib@1.0.1");
+    expect(() => provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.0", digest: { sha512: hex } }]), want)).toThrow("does not name");
+    expect(() => provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.1", digest: { sha512: "f".repeat(128) } }]), want)).toThrow("does not name");
+    expect(() => provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.1", digest: { sha512: hex } }]), { ...want, integrity: null })).toThrow("does not name");
+  });
+  it("keeps a v0.2 source URI's user part and drops only its ref", () => {
+    const uri = (u: string) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v0.2", bundle: { dsseEnvelope: { payload: encode({ predicate: { invocation: { configSource: { uri: u, entryPoint: "x.yml" } } } }) } } }] });
+    expect(provenanceFrom(uri("git+https://github.com/acme/lib@refs/tags/v1.0.1"))?.repository).toBe("https://github.com/acme/lib");
+    expect(provenanceFrom(uri("git+https://bot@github.com/acme/lib"))?.repository).toBe("https://bot@github.com/acme/lib");
   });
   it("names no commit when the statement has none or it is not a git hash", () => {
     expect(provenanceFrom(v1(undefined))?.commit).toBeNull();

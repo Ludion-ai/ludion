@@ -824,3 +824,13 @@ What the exception gives up: an attacker who holds the publisher's account and p
    - how many of those would have been stopped without it.
 
    On the malicious side, listed one by one: every V the exception allowed, or whose selection it made possible through a tree it unblocked; every V selected by a fix published after V; and every V whose exception check was unverified.
+
+**Amended before backtest v4 ran.** These come from the independent review of #151 (2026-10-28), and each makes the exception stricter:
+
+- **The publisher must be an account.** npm trusted publishing records one shared user, "GitHub Actions" (`npm-oidc-no-reply@github.com`, with `trustedPublisher`), for every package published that way. Such a publisher counts as unknown and never matches. Gate 2's publisher comparison is unchanged.
+- **With provenance, the workflow must match too**: the repository, the workflow and the commit. This is what "built by the same workflow from the same commit" above says. A different workflow in the same repository, a `pull_request_target` job say, could otherwise publish from the fix's commit.
+- **Without provenance, the 15 minutes also count from the matched target's own publish.** With several targets, T is the latest one. A version published 5 minutes after T is no sibling of a target fixed a month earlier.
+- **The provenance statement's subject must name the version and its tarball**: `pkg:npm/<name>@<version>` with the registry's sha512 integrity. Otherwise the lookup fails, which is undecidable. The Sigstore signature, and the repository and commit in its certificate, are still not verified. So the exception rests on the registry's checks at publish time, as gate 2's provenance comparison does.
+- **A failed read keeps the receipt's count.** If `ludion patch` cannot read a publisher or provenance, the receipt keeps T and the count, and the cap is undecidable.
+
+Backtest v4 uses the exception as amended here.

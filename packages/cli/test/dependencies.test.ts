@@ -446,7 +446,8 @@ describe("the time cap on candidates", () => {
   });
   it("lets an npm sibling of the same release move, from the registry's publisher and provenance", async () => {
     const commit = "535e26d3c69de49df8bd17618a424cbe65ec897b";
-    const statement = (sha: string) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: Buffer.from(JSON.stringify({ predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/lodash/lodash", path: ".github/workflows/release.yml" } }, resolvedDependencies: [{ digest: { gitCommit: sha } }] } } })).toString("base64") } } }] });
+    const integrity = "sha512-" + "B".repeat(86) + "==", sha512 = Buffer.from(integrity.slice(7), "base64").toString("hex");
+    const statement = (name: string, version: string, sha: string) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: Buffer.from(JSON.stringify({ subject: [{ name: `pkg:npm/${name}@${version}`, digest: { sha512 } }], predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/lodash/lodash", path: ".github/workflows/release.yml" } }, resolvedDependencies: [{ digest: { gitCommit: sha } }] } } })).toString("base64") } } }] });
     // No provenance: lodash.sib@4.17.21 10 s after the fix, lodash.late@4.17.21 16 minutes after, same publisher and
     // version. lodash.prov@1.0.0: an hour after, with provenance from `commit`.
     const times: Record<string, Record<string, string>> = {
@@ -456,14 +457,14 @@ describe("the time cap on candidates", () => {
       "lodash.prov": { "0.9.0": "2020-08-13T16:54:00.000Z", "1.0.0": "2021-02-20T16:42:16.891Z" },
     };
     /** The fix's provenance commit, or null when the fix has none. */
-    const fetchFn = (fixCommit: string | null): typeof fetch => async url => {
+    const fetchFn = (fixCommit: string | null, attestationStatus = 200): typeof fetch => async url => {
       const u = decodeURIComponent(String(url));
       const att = /\/-\/npm\/v1\/attestations\/(.+)@([^@]+)$/.exec(u);
-      if (att) return response(statement(att[1] === "lodash" ? fixCommit! : commit));
+      if (att) return attestationStatus === 200 ? response(statement(att[1]!, att[2]!, att[1] === "lodash" ? fixCommit! : commit)) : new Response("", { status: attestationStatus });
       const name = u.replace("https://registry.npmjs.org/", "");
       if (!times[name]) return new Response("", { status: 404 });
       const attested = (v: string) => (name === "lodash" && v === "4.17.21" && fixCommit !== null) || (name === "lodash.prov" && v === "1.0.0");
-      return response({ time: { created: "2012-04-23T16:37:11.912Z", ...times[name] }, versions: Object.fromEntries(Object.keys(times[name]!).map(v => [v, { dependencies: {}, _npmUser: { name: "bnjmn" }, dist: attested(v) ? { attestations: { url: "x" } } : {} }])) });
+      return response({ time: { created: "2012-04-23T16:37:11.912Z", ...times[name] }, versions: Object.fromEntries(Object.keys(times[name]!).map(v => [v, { dependencies: {}, _npmUser: { name: "bnjmn" }, dist: { integrity, ...(attested(v) ? { attestations: { url: "x" } } : {}) } }])) });
     };
     const before = inv("npm", [["lodash", "4.17.20"], ["lodash.sib", "4.17.20"], ["lodash.late", "4.17.20"], ["lodash.prov", "0.9.0"]]);
     const after = inv("npm", [["lodash", "4.17.21"], ["lodash.sib", "4.17.21"], ["lodash.late", "4.17.21"], ["lodash.prov", "1.0.0"]]);
@@ -477,6 +478,11 @@ describe("the time cap on candidates", () => {
     expect(built.after_t).toEqual(["lodash.late@4.17.21", "lodash.sib@4.17.21"]);
     // From another commit: everything after T stops.
     expect((await candidateTimeCap("npm", before, after, plan, fetchFn("0".repeat(40)))).after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0", "lodash.sib@4.17.21"]);
+    // The attestation read fails: undecidable, and the receipt still has T and the count.
+    const failed = await candidateTimeCap("npm", before, after, plan, fetchFn(commit, 500));
+    expect(failed.t).toBe("2021-02-20T15:42:16.891Z");
+    expect(failed.after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0", "lodash.sib@4.17.21"]);
+    expect(failed.undecidable).toEqual([expect.stringContaining("The publisher and provenance for the same-release check could not be read: registry.npmjs.org answered HTTP 500")]);
   });
   it("lets nothing published at or after T move in a Composer candidate", async () => {
     const p2 = (name: string, list: unknown[]) => response({ minified: "composer/2.0", packages: { [name]: list } });

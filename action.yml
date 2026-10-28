@@ -1,0 +1,133 @@
+# Ludion's judge for npm dependency PRs, as a GitHub Action (README.md, "Getting started").
+# Preview: comments only. Nothing is merged, and the judgement is not a required check.
+#
+# Two modes, for two jobs in two workflows, split like this repository's judge.yml and judge-comment.yml:
+#   mode: judge    on pull_request, with `contents: read` only. Reads the PR's package.json and package-lock.json as
+#                  data through the API, runs the judge bundled in this action, and uploads the record as an artifact.
+#                  Nothing from the PR is checked out, installed or run.
+#   mode: comment  on workflow_run after the judge workflow, with `pull-requests: write`. Checks the artifact as
+#                  untrusted data and posts it as one comment per PR, updated by each new judgement. It runs nothing
+#                  from the PR or the artifact.
+#
+# Pin this action by a release commit's full SHA. Only a release commit carries the bundled judge
+# (packages/cli/dist/cli.js and action/dist/record.js, built by action/build.ts); any other commit stops with an error.
+name: Ludion judge (preview)
+description: "Preview: comments only, nothing is merged. Judges npm dependency PRs on parts of gates 1, 2 and 4 and the wait; gate 3 is not run."
+author: Ludion
+branding:
+  icon: shield
+  color: gray-dark
+
+inputs:
+  mode:
+    description: "judge (the read-only job, on pull_request) or comment (the job that posts, on workflow_run)."
+    required: true
+  judge-workflow:
+    description: "mode comment: the path of the workflow that runs mode judge. Only that workflow's runs are posted."
+    required: false
+    default: .github/workflows/ludion-judge.yml
+
+runs:
+  using: composite
+  steps:
+    - name: Check the mode, the event and the tools
+      id: start
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        EVENT: ${{ github.event_name }}
+        RECORD: ${{ runner.temp }}/ludion/judgement.json
+        PR: ${{ github.event.pull_request.number }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        MERGE_SHA: ${{ github.sha }}
+      run: bash "$GITHUB_ACTION_PATH/action/start.sh"
+
+    # mode judge
+
+    - name: Check that this commit of the action carries the bundled judge
+      id: bundle
+      if: ${{ inputs.mode == 'judge' }}
+      shell: bash
+      run: |
+        for file in packages/cli/dist/cli.js action/dist/record.js; do
+          if [ ! -f "$GITHUB_ACTION_PATH/$file" ]; then
+            echo "::error::This commit of the action has no bundled judge (${file}). Pin a release commit's SHA."
+            exit 1
+          fi
+        done
+
+    # The base is the test merge commit's first parent: the event's base SHA is set when the PR opens and is not
+    # updated when the base branch moves. That commit must be on the base branch.
+    - name: Read the PR's package.json and package-lock.json as data
+      id: read
+      if: ${{ inputs.mode == 'judge' && steps.bundle.outcome == 'success' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO: ${{ github.repository }}
+        INPUT: ${{ runner.temp }}/ludion/input
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        MERGE_SHA: ${{ github.sha }}
+        BASE_REF: ${{ github.event.pull_request.base.ref }}
+      run: bash "$GITHUB_ACTION_PATH/action/read.sh"
+
+    # Also after a failed read, so the record says which step failed; not after a cancel.
+    - name: Judge
+      if: ${{ inputs.mode == 'judge' && !cancelled() && steps.bundle.outcome == 'success' }}
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        RECORD: ${{ runner.temp }}/ludion/judgement.json
+        INPUT: ${{ runner.temp }}/ludion/input
+        STARTED_AT: ${{ steps.start.outputs.at }}
+        PR: ${{ github.event.pull_request.number }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        BASE_SHA: ${{ steps.read.outputs.base || github.event.pull_request.base.sha }}
+        MERGE_SHA: ${{ github.sha }}
+        BUILD_OUTCOME: success
+        READ_OUTCOME: ${{ steps.read.outcome }}
+      run: node action/dist/record.js
+
+    - name: Summary
+      if: ${{ inputs.mode == 'judge' && always() && steps.start.outcome == 'success' }}
+      shell: bash
+      env:
+        RECORD: ${{ runner.temp }}/ludion/judgement.json
+      run: |
+        {
+          echo "**プレビュー：コメントのみ。マージは行わない。** Preview: comments only; nothing is merged."
+          echo
+          jq -r '"Verdict: `\(.verdict)` · head `\(.head_sha)` · judge \(.judge_seconds // "unknown") s, job \(.job_seconds // "unknown") s"' "$RECORD"
+          echo
+          echo "The full judgement is in this run's log and its ludion-judgement artifact; the comment job posts it on the PR."
+        } >> "$GITHUB_STEP_SUMMARY"
+
+    - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      if: ${{ inputs.mode == 'judge' && always() && steps.start.outcome == 'success' }}
+      with:
+        name: ludion-judgement
+        path: ${{ runner.temp }}/ludion/judgement.json
+        if-no-files-found: error
+        # A re-run of the job replaces the record instead of failing on the name.
+        overwrite: true
+        retention-days: 90
+
+    # mode comment
+
+    - name: Check the judgement and post it
+      if: ${{ inputs.mode == 'comment' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO: ${{ github.repository }}
+        JUDGE_WORKFLOW: ${{ inputs.judge-workflow }}
+        RUN_EVENT: ${{ github.event.workflow_run.event }}
+        RUN_PATH: ${{ github.event.workflow_run.path }}
+        RUN_ID: ${{ github.event.workflow_run.id }}
+        RUN_HEAD: ${{ github.event.workflow_run.head_sha }}
+        RUN_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+        RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        RUN_URL: ${{ github.event.workflow_run.html_url }}
+        CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+      run: bash "$GITHUB_ACTION_PATH/action/comment.sh"

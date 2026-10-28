@@ -11,6 +11,61 @@ Ludion detects known fixes, acquires dependencies, tests the original and update
 
 Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP, same-tag OS-image rebuilds, EOL certification and automatic production deployment remain unsupported. An empty result is not a security guarantee. Missing metadata and incomplete inventories remain visible.
 
+## Getting started: judge your npm dependency PRs
+
+**プレビュー：コメントのみ。マージは行わない。** Preview: comments only; nothing is merged.
+
+The judge reads a dependency PR's package.json and package-lock.json (from Dependabot, Renovate or a person) and comments on the PR with what it found. It checks parts of gates 1, 2 and 4 and the wait (docs/design.md). It does not build or test anything (gate 3), so it never says a PR can be applied, and its output lists what it did not check. It is not a required check unless you make it one.
+
+**Not released yet.** No release commit exists yet. The action needs a release commit, because only that carries the bundled judge; at any other commit it stops with an error. When one is published, pin its full 40-character SHA (not a tag or branch) in both workflows.
+
+Add two workflows. The first judges with read access only and runs nothing from the PR:
+
+```yaml
+# .github/workflows/ludion-judge.yml
+name: ludion-judge
+on:
+  pull_request:
+    paths: [package-lock.json]
+permissions:
+  contents: read
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: Ludion-ai/ludion@<release commit SHA>
+        with:
+          mode: judge
+```
+
+The second posts the result. It runs from your default branch after each judge run, checks the result as untrusted data, and keeps one comment per PR up to date:
+
+```yaml
+# .github/workflows/ludion-judge-comment.yml
+name: ludion-judge-comment
+on:
+  workflow_run:
+    workflows: [ludion-judge]
+    types: [completed]
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: Ludion-ai/ludion@<the same release commit SHA>
+        with:
+          mode: comment
+```
+
+A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
+
+Limits: only the root package.json and package-lock.json are read; a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. Package names and versions are sent to OSV and the npm registry. No source is sent.
+
 ## Run the source preview
 
 The published npm ludion-ai 0.1.4 release is the earlier lesson product, which ended on 2026-10-28. These commands require building this repository, Node 24 and a local Docker daemon; no npm release is implied.

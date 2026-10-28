@@ -1,0 +1,31 @@
+[
+  {
+    "id": "ludion-ai@0.3.0-preview.1",
+    "name": "ludion-ai",
+    "version": "0.3.0-preview.1",
+    "size": 103266,
+    "unpackedSize": 448506,
+    "shasum": "38b44952ebb5fc4868b25491a998e8166ddf58c2",
+    "integrity": "sha512-jbNuhahcTWsx4qPyE1wMq6LqlXeboUIJTS+TWLdMuYy70CRj3WLD3y0iJYoLx5CQRYMjaoqXgJ+eWMT5uiMrEw==",
+    "filename": "ludion-ai-0.3.0-preview.1.tgz",
+    "files": [
+      {
+        "path": "README.md",
+        "size": 9277,
+        "mode": 493
+      },
+      {
+        "path": "dist/cli.js",
+        "size": 438457,
+        "mode": 493
+      },
+      {
+        "path": "package.json",
+        "size": 772,
+        "mode": 493
+      }
+    ],
+    "entryCount": 3,
+    "bundled": []
+  }
+]

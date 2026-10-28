@@ -9,7 +9,7 @@
     "ludion-ai": "dist/cli.js"
   },
   "files": [
-    "dist",
+    "dist/cli.js",
     "README.md"
   ],
   "engines": {

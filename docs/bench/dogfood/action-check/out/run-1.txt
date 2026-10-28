@@ -1,0 +1,103 @@
+debconf: delaying package configuration, since apt-utils is not installed
+
+== build: npm ci, the CLI bundle and the action's record bundle
+
+> ludion-ai@0.3.0-preview.1 build
+> node build.ts
+
+Wrote dist/cli.js
+Wrote action/dist/record.js
+v24.22.1
+7a9adf10833ebe54acbc66ff3bf71edb45bf4d351200da0f5bf0b8f4ffcbd384  packages/cli/dist/cli.js
+0cfdb12da1bb25659b26382ed02a5086c00a49f821db7de0fd661e7f3c8d0234  action/dist/record.js
+
+== npm pack
+npm notice
+npm notice package: ludion-ai@0.3.0-preview.1
+npm notice Tarball Contents
+npm notice 7.0kB README.md
+npm notice 438.5kB dist/cli.js
+npm notice 765B package.json
+npm notice Tarball Details
+npm notice name: ludion-ai
+npm notice version: 0.3.0-preview.1
+npm notice filename: ludion-ai-0.3.0-preview.1.tgz
+npm notice package size: 102.3 kB
+npm notice unpacked size: 446.3 kB
+npm notice shasum: 5f9fab6c788f721e9e07fdbebfb33a3f8895e445
+npm notice integrity: sha512-abeqA2uA7w6PE[...]uxuqZXx02yehQ==
+npm notice total files: 3
+npm notice
+package/README.md
+package/dist/cli.js
+package/package.json
+ok   the package is README.md, dist/cli.js and package.json
+
+== mode judge on PR #161
+{
+  "schema": 1,
+  "pr": 161,
+  "head_sha": "b5014ddae044f02288232f13b5d1863a3089bdb2",
+  "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
+  "merge_sha": "470a5542cc0b8b75787094be6dc3d6b4185a45c3",
+  "started_at": "2026-10-28T11:45:34.724Z",
+  "verdict": "stop",
+  "reason": null,
+  "finished_at": "2026-10-28T11:45:35.815Z",
+  "judge_seconds": 0.968,
+  "job_seconds": 1.091,
+  "judge_exit_code": 1
+}
+Ludion judgement: STOP — not applied automatically
+Urgency: normal · wait 72h from the newest publish (2026-10-25T07:19:30.732Z)
+Published at or after T (2026-10-25T07:19:30.732Z, the fix's publish time): 0 version(s)
+Changed packages (1):
+  hono 4.13.13 → 4.13.14
+  [stop] gate 4: The change also touches apps/worker/package.json; a dependency update must change only package.json and package-lock.json.
+Not checked:
+  - Gate 3 (build and tests of old and new versions) is not run by the judge v0.
+  - Obfuscated code and new network or process calls in the changed code are not inspected.
+  - Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.
+  - Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.
+  - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).
+  - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.
+  - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.
+Exposure: fix published n/a · seen 2026-10-28T11:45:34.888Z
+ok   record.js exits 0 (a judgement)
+ok   the verdict is stop
+ok   the changed files are the two the merge changes
+ok   the record matches valid.jq
+
+== mode comment: first post
+Posted the judgement comment on PR #161 (b5014ddae044f02288232f13b5d1863a3089bdb2).
+ok   exit 0
+ok   one POST to issues/161/comments
+ok   the comment starts with the marker and the preview line
+ok   the comment names the verdict 停止 (stop)
+ok   the judge text is indented
+
+== mode comment: a re-judgement updates the same comment
+Updated the judgement comment on PR #161 (b5014ddae044f02288232f13b5d1863a3089bdb2).
+ok   exit 0
+ok   one PATCH of comment 42, no second POST
+
+== mode comment: a head that changes .github/ is refused
+Posted the judgement comment on PR #161 (b5014ddae044f02288232f13b5d1863a3089bdb2).
+ok   exit 0, posted as 判定不能 without the judge's text
+
+== mode comment: a record that does not match the schema is not posted
+::error::The judgement does not match its schema. Nothing posted.
+ok   exit 1, nothing written
+
+== mode comment: another workflow's run is not posted
+::error::Run 1 is of .github/workflows/other.yml, not of .github/workflows/ludion-judge.yml (the judge-workflow input). Nothing posted.
+ok   exit 1, nothing written
+
+== mode judge: a file the API cannot give makes the record undecidable
+ok   record.js exits 1, verdict undecidable, reason names the read
+
+== mode judge: pull_request_target is refused
+ok   start.sh fails, no record
+
+== result
+all checks passed

@@ -66,7 +66,8 @@ export type FixedAdvisory = { id: string; package: string; from: string; to: str
 /**
  * The fixes that count as the change's own: per advisory, package and vulnerable version, the smallest version it
  * changed to. A larger one reached the same way (a dependent that now loads a newer nested copy, say) is a passenger:
- * it neither sets T, anchors a sibling nor sets the urgency, and rule 1 checks it like any other version.
+ * it neither sets T, anchors a sibling nor dates the exposure, and rule 1 checks it like any other version. (Urgency
+ * still counts it: see urgencyOf.)
  */
 export function ownFixes(fixes: FixedAdvisory[]): FixedAdvisory[] {
   const smallest = new Map<string, FixedAdvisory>();

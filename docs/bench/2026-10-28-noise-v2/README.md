@@ -115,8 +115,9 @@ All nine P1 cases are in `scripts/` files. The first rule did not count those as
 
 **The order of work.**
 - The fix and the second execution were registered first (docs/decisions.md, 1fa3d68, 22:13:58 JST).
-- The fixes went in 6c4f58e (22:18:43), with nine tests. Each test failed on c381a85's `production.ts` and passes on the fix (run in Docker: 9 failed and 25 passed on the old file; 34 passed on the new one).
-- An automated security review then flagged an exponential backtracking pattern in the import-call reader. That was fixed in f0d489e (22:23:09), after the second execution had started. The fix changes how the patterns backtrack, not what they match. A test reads crafted inputs in linear time.
+- The fixes went in 6c4f58e (22:18:43), with nine tests. Each test failed on c381a85's `production.ts` and passed on the fix. Run in Docker with 6c4f58e's test file: 9 failed and 25 passed on the old file, and 34 passed on the new one.
+- An automated security review then flagged an exponential backtracking pattern in the import-call reader. That was fixed in f0d489e (22:23:09), after the second execution had started. The fix changes how the patterns backtrack, not what they match.
+- f0d489e's subject and an earlier version of this README said the reader was linear. #168's delta review showed it was not: the import-call, type-only and YAML readers were still quadratic on crafted input. See the next section.
 
 **The second execution**, reported beside the result and not instead of it:
 - It ran at 6c4f58e, 13:19:00Z–13:35:02Z, with the same script, sample, sources and image.
@@ -134,7 +135,56 @@ All nine P1 cases are in `scripts/` files. The first rule did not count those as
 
 - No row differs in its counts, its left-out list or which split it got.
 - `scripts/beside.mjs` (`result-fixed/beside-tally.json`) counts the second execution's misses from the review's verdicts, as registered. It found that every package the second execution leaves out was reviewed, and that its left-out list is a subset of the result's: here, the same list.
-- So none of the eight findings changed anything in this sample. They matter for repositories outside it.
+- So none of the eight findings changed a count or a left-out package in this sample. One repository's number of dev-only versions changed (Azure/api-management-developer-portal, 121 → 118), with no vulnerable package among them. The findings matter for repositories outside the sample.
+
+## After #168's delta review: three regressions fixed, the reader made linear, and a third execution
+
+#168's delta review (at 93d778b) found three cases where 6c4f58e left out what c381a85 had counted and section 2 calls production:
+- **A.** A stylesheet import clause ran across lines, so Sass's indented syntax and Stylus lost unquoted imports.
+- **B.** A type-only brace list could swallow a real import.
+- **C.** Here-strings (`<<<`) and shifts (`1<<2`) were read as heredocs, which could hide a later `COPY` of devDependencies.
+
+So the 1fa3d68 premise, that every fix only adds production, did not hold. `beside.mjs` checks the subset rather than assuming it, and for the second execution the check held. The review also timed quadratic paths on crafted input: about 7 s at 40,000 repetitions, and hours at the 16 MiB read limit.
+
+**The order of work.**
+- The fixes and a third execution were registered first (docs/decisions.md, 938d82d, 22:48:04 JST).
+- The fixes went in 9313aa2 (23:00:15):
+  - Each stylesheet clause ends at a line break unless the line ends with a comma, and c381a85's reading is kept beside it.
+  - A type-only brace list cannot hold quotes, semicolons or braces.
+  - A heredoc needs `<<` as its own word and a closing line.
+  - Import calls find comment ends by binary search over positions listed once, and read each whitespace run and specifier position once.
+  - The YAML readers, the heredoc's closing line and the `FROM` chain use loops and lookups.
+  - The pnpm comment says no split is made.
+- **The tests.** The A–C tests fail on 6c4f58e's `production.ts`: 3 failed, and the pnpm test passed (it exercises judge.ts). At 9313aa2, production.test.ts has 40 tests, all passing.
+- **What "linear" rests on now.** A test runs the review's crafted inputs at 40,000 repetitions, a crafted call at 1 MB of whitespace and 1 MB of an unclosed string, and a 16,000-stage `FROM` chain. Each must finish under 1 to 1.5 s, and in Docker the whole file took 308 ms. That is a bound on these inputs, not a proof for every input.
+- **The third execution** ran at 9313aa2, from its own volume (`ludion-l1-run3`) that nothing else wrote to during the run. Its output is in `result-final/`.
+
+- It ran detached at 9313aa2, 14:00:45Z–14:16:17Z, and exited 0. No repository failed or needed a second attempt.
+- `result-final/run.log`'s blob hashes equal `git ls-tree 9313aa2`.
+- Claude Code stopped the `docker wait` that watched it because the host was low on memory. The container kept running and was not restarted.
+
+| | The result (c381a85) | Second (6c4f58e) | Third (9313aa2) |
+| --- | --- | --- | --- |
+| npm audit | 1,867 | 1,867 | 1,867 |
+| The judge's count | 938 | 938 | 938 |
+| Left out | 160 | 160 (the same) | 160 (the same) |
+| Misses (from the review's verdicts) | 11 in 4 repositories | 11 in 4 repositories | 11 in 4 repositories |
+| Count gate | not met | not met | not met |
+| Miss gate | not met | not met | not met |
+
+- No row differs from the result in its counts, its left-out list or which split it got. As in the second execution, one repository's number of dev-only versions changed (Azure/api-management-developer-portal, 121 → 118).
+- `result-final/beside-tally.json`: every left-out package was reviewed, the list is the result's own, and none dropped out.
+- JakeWharton/jakewharton.com, beside the sample: npm audit 23, the judge 15, nothing left out.
+
+**After the third execution.** An automated security review flagged two more ways to hide an import:
+- more than 16 comments before an import call's specifier;
+- a stylesheet list continued on the next line.
+
+9cd7ebc fixes both:
+- The comment skip has no cap. Where skipping ends is remembered for every position passed, so it stays linear.
+- Each stylesheet clause is read both as written and line by line, never past the next at-rule.
+
+These changes only add readings to 9313aa2's. So, on this sample, 9cd7ebc's left-out list can only be the same as the third execution's or smaller, and its count the same or larger. It was not run on the sample. At 9cd7ebc, production.test.ts has 41 tests, all passing.
 
 ## Both gates
 
@@ -168,3 +218,4 @@ An earlier version of this README took the JavaScript shims left in esbuild's an
 - `scripts/assign.mjs` and `review/assignments.json`: which packages each reviewer got, with the first run's verdict and evidence.
 - `review/reviewer-prompt.md`, `review/verdicts-N.json`, and `review/review-tally.json` (`scripts/tally.mjs`), which adds the verdicts up and changes none.
 - `result-fixed/`: the second execution (`noise.json`, `run.log`) and `beside-tally.json` (`scripts/beside.mjs`).
+- `result-final/`: the third execution, laid out the same way.

@@ -1,0 +1,1582 @@
+{
+ "counts": {
+  "left_out": 160,
+  "reused_yes": 0,
+  "to_review": 160,
+  "by_first_run": {
+   "no": 160
+  }
+ },
+ "reused_yes": [],
+ "groups": [
+  {
+   "group": 1,
+   "rows": [
+    1,
+    25
+   ],
+   "items": 33,
+   "repositories": [
+    {
+     "row": 1,
+     "repo": "Rafi-SBM/PySan",
+     "sha": "26767d2af321aece388ececd853f4819ec3221d0",
+     "items": [
+      {
+       "name": "@eslint/plugin-kit",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@eslint/plugin-kit@0.3.2 (dev) [OSV GHSA-xffm-g5w8-qvg7 SEMVER [0, <0.3.4); npm GHSA-xffm-g5w8-qvg7 <0.3.4]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency eslint@9.29.0 > @eslint/plugin-kit@0.3.2 (also via typescript-eslint/eslint-plugin-react-*). Lint only (scripts.lint `eslint .`, eslint.config.js). Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "@humanfs/node",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@humanfs/node@0.16.6 (dev) [OSV GHSA-p498-v437-472g SEMVER [0, <0.16.8); npm GHSA-p498-v437-472g <0.16.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > @humanfs/node@0.16.6. Lint only (scripts.lint, eslint.config.js). Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "ajv",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/ajv@6.12.6 (dev) [OSV GHSA-2g4f-4pwh-qvx6 SEMVER [0, <6.14.0); npm GHSA-2g4f-4pwh-qvx6 <6.14.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > ajv@6.12.6. Lint only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/brace-expansion@1.1.12 (dev) [OSV GHSA-3jxr-9vmj-r5cp SEMVER [0, <1.1.16); npm GHSA-f886-m6hf-6m8v <1.1.13]. Out of range: node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.12, node_modules/glob/node_modules/brace-expansion@2.1.7, node_modules/test-exclude/node_modules/brace-expansion@5.0.12. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > minimatch@3.1.2 > brace-expansion@1.1.12 (lint). Other copies (5.0.12, 2.1.7) are out of range. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "flatted",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/flatted@3.3.3 (dev) [OSV GHSA-25h7-pfq9-p65f SEMVER [0, <3.4.0); npm GHSA-25h7-pfq9-p65f <3.4.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > file-entry-cache > flat-cache > flatted@3.3.3. Lint cache only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/js-yaml@4.1.0 (dev) [OSV GHSA-2883-xcg3-v3hh SEMVER [4.0.0, <4.3.2); npm GHSA-mh29-5h37-fv8m >=4.0.0 <4.1.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > @eslint/eslintrc@3.3.1 > js-yaml@4.1.0. Lint only. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "minimatch",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/minimatch@3.1.2 (dev) [OSV GHSA-23c5-xmqv-rm74 SEMVER [0, <3.1.4); npm GHSA-3ppc-4f35-3m26 <3.1.3]. Out of range: node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch@10.2.6, node_modules/glob/node_modules/minimatch@9.0.9, node_modules/test-exclude/node_modules/minimatch@10.2.6. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.29.0 > minimatch@3.1.2. Lint only. Other copies (10.2.6, 9.0.9) are out of range. Production of PySan is a static site: .github/workflows/deploy.yml runs `npm run build` (tsc -b && vite build) and uploads dist to GitHub Pages; package.json has no start script and there is no Dockerfile/Procfile. Shipped code is src/ (main.tsx, App.tsx, components, hooks, lib); its only non-test bare imports are react and react-dom; no shipped file imports this package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 5,
+     "repo": "cofob/design-system",
+     "sha": "6e1c42d66655665ab4f4b59f09225ef93406a435",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest/node_modules/@vitest/mocker@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: packages/* devDependency vitest@3.2.7 > @vitest/mocker@3.2.7. Test only (workspace scripts.test `vitest run`). Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/brace-expansion@5.0.7 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [4.0.0, <5.0.10); npm GHSA-mh99-v99m-4gvg >=4.0.0 <5.0.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependencies eslint@10.7.0 / typescript-eslint > minimatch@10.2.5 > brace-expansion@5.0.7. Lint only. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "colord",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/colord@2.9.3 (dev) [OSV GHSA-2wm5-q62r-hmrv SEMVER [0, <2.9.4); npm GHSA-2wm5-q62r-hmrv <2.9.4]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency stylelint@16.26.1 > colord@2.9.3. Lint only (scripts.lint stylelint). Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/fast-uri@3.1.4 (dev) [OSV GHSA-333x-w4r6-6crp SEMVER [3.0.0, <3.1.9); npm GHSA-7p8r-x3mc-p8w7 >=3.0.0 <3.1.5]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Paths: stylelint@16.26.1 > table > ajv@8.20.0 > fast-uri@3.1.4 (lint); apps/showroom devDependency @astrojs/check > @astrojs/language-server > volar-service-yaml > yaml-language-server > ajv > fast-uri (type check run before astro build). Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/tinypool@1.1.1 (dev) [OSV GHSA-5gmw-xhrv-c9v3 SEMVER [0, <2.1.1); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > tinypool@1.1.1. Test only. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/undici@7.28.0 (dev) [OSV GHSA-2gqq-gqf2-x968 SEMVER [7.1.0, <7.29.1); npm GHSA-8xcm-r25x-g524 >=7.0.0 <7.29.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency wrangler@4.112.0 > miniflare@4.20260714.0 > undici@7.28.0. wrangler is only used by scripts.deploy:showroom (`wrangler pages deploy`), a deploy tool; nothing imports undici. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Workspace devDependency vitest@3.2.7; imported only by tests/*.test.ts, *.test.tsx and vitest.config.ts files. Production of cofob/design-system is the npm packages packages/design-system-* (scripts/publish-npm.mjs publishes packages/design-system-* only; changesets in .github/workflows/release.yml) and the static showroom (apps/showroom/astro.config.mjs output: \"static\", deployed by scripts.deploy:showroom `wrangler pages deploy apps/showroom/dist`). No start script, Dockerfile or Procfile. No published package source or showroom source imports this package (grep; references are only in package.json, tests, vitest configs, lint configs or examples/sveltekit).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 7,
+     "repo": "Sylonin/xposed-newx-patches",
+     "sha": "fe578ab933af0bb5a9e01533c30907fd778ac23b",
+     "items": [
+      {
+       "name": "ip-address",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/ip-address@10.7.2 (dev) [OSV GHSA-rxp7-6hxx-x8q5 SEMVER [0, <10.7.4); npm GHSA-rxp7-6hxx-x8q5 <=10.7.3]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/npm@13.2.0 > npm@11.21.1 > make-fetch-happen > @npmcli/agent > socks-proxy-agent > socks@2.8.9 > ip-address@10.7.2. Release tooling only. xposed-newx-patches is a Gradle/Kotlin project; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs semantic-release (cycjimmy/semantic-release-action) after `npm install`, and .releaserc uses @semantic-release/exec to run gradlew. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/undici@6.29.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [4.0.0, <6.29.1); npm GHSA-4qv8-2p9j-2685 >=6.5.0 <6.29.1]. Out of range: node_modules/@actions/http-client/node_modules/undici@6.29.1, node_modules/undici@7.30.1. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/npm > npm@11.21.1 > node-gyp@12.4.0 > undici@6.29.0. Release tooling only. Copies 6.29.1 and 7.30.1 are out of range. xposed-newx-patches is a Gradle/Kotlin project; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs semantic-release (cycjimmy/semantic-release-action) after `npm install`, and .releaserc uses @semantic-release/exec to run gradlew. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 8,
+     "repo": "aniru-dh21/snap-validate",
+     "sha": "2482ba5e2418e163968205ae8e20a4b3cea7c2a3",
+     "items": [
+      {
+       "name": "deepmerge",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/deepmerge@4.3.1 (dev) [OSV GHSA-gcqx-w48m-w2h4 SEMVER [4.2.0, <=4.3.1); npm GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency jest@30.5.2 > @jest/core > jest-config@30.5.2 > deepmerge@4.3.1 (scripts.test jest). snap-validate is a library: package.json main src/index.js, exports esm/index.mjs, files src/ esm/ types/; src/ and esm/ do not import deepmerge (grep); scripts.build is an echo; no start, Dockerfile or Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 9,
+     "repo": "MorpheApp/morphe-patcher",
+     "sha": "c3363f717344c74fb3f160f8c788022981d3110f",
+     "items": [
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/brace-expansion@5.0.9 (dev) [OSV GHSA-6j4f-fj2g-mc7p SEMVER [4.0.0, <5.0.10); npm GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/npm@13.2.0 > npm@11.21.0 > minimatch@10.2.5 > brace-expansion@5.0.9. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "handlebars",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/handlebars@4.7.9 (dev) [OSV GHSA-8r5x-fm3f-whwj SEMVER [4.0.0, <4.7.10); npm GHSA-xw65-4hp5-5hc7 >=4.0.0 <=4.7.9]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release@25.0.9 > @semantic-release/commit-analyzer > conventional-changelog-writer@8.4.0 > handlebars@4.7.9 (release-note templating). Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "http-cache-semantics",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/http-cache-semantics@4.2.0 (dev) [OSV GHSA-ch52-4w7c-c8xp SEMVER [0, <=4.2.0); npm GHSA-ch52-4w7c-c8xp <=4.2.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release > @semantic-release/npm > npm@11.21.0 > make-fetch-happen > http-cache-semantics@4.2.0. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "ip-address",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/ip-address@10.5.0 (dev) [OSV GHSA-2vr4-cq9g-pvrc SEMVER [10.2.0, <10.5.1); npm GHSA-rpw4-54j3-4h4q <=10.5.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release > @semantic-release/npm > npm@11.21.0 > make-fetch-happen > @npmcli/agent > socks-proxy-agent > socks > ip-address@10.5.0. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "postcss-selector-parser",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/postcss-selector-parser@7.1.4 (dev) [OSV GHSA-rj75-hqrm-r3gf SEMVER [7.0.0, <7.1.6); npm GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: semantic-release > @semantic-release/npm > npm@11.21.0 > @npmcli/arborist > @npmcli/query > postcss-selector-parser@7.1.4. Release tooling only. morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@actions/http-client/node_modules/undici@6.29.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [4.0.0, <6.29.1); npm GHSA-4qv8-2p9j-2685 >=6.5.0 <6.29.1]; node_modules/npm/node_modules/undici@6.28.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [4.0.0, <6.29.1); npm GHSA-3wwx-pv8p-q78v >=6.25.0 <6.28.1]; node_modules/undici@7.30.0 (dev) [OSV GHSA-2m5v-pch6-74hx SEMVER [7.0.0, <7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Copies: @semantic-release/npm > @actions/core > @actions/http-client > undici@6.29.0; @semantic-release/npm > npm@11.21.0 > node-gyp > undici@6.28.0; @semantic-release/github@12.0.10 > undici@7.30.0. All under semantic-release (release tooling). morphe-patcher is a Gradle/Kotlin library; package.json has only semantic-release devDependencies and no scripts; .github/workflows/release.yml runs `npm exec semantic-release` after `npm install`. No JS is shipped; no start/Dockerfile/Procfile; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 10,
+     "repo": "itsdarklikehell/my-resume",
+     "sha": "8ae8c354fbf3ca7cb8182cefca778f1abba2e4b1",
+     "items": [
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/tinypool@0.8.4 (dev) [OSV GHSA-5gmw-xhrv-c9v3 SEMVER [0, <2.1.1); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@1.6.1 > tinypool@0.8.4 (also html-validate > vitest). Test only (scripts.test). my-resume is deployed by .github/workflows/static.yml, which uploads the repository as-is (path \".\", no install or build step) to GitHub Pages (DEPLOY.md agrees). scripts.build `vite build` is not used by the deployment; no start script, Dockerfile or Procfile; repo-wide grep finds no import of this package outside vite.config.js/package.json.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest@1.6.1 (dev) [OSV GHSA-5xrq-8626-4rwp SEMVER [0, <3.2.6); npm GHSA-5xrq-8626-4rwp <3.2.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vitest@1.6.1; scripts.test only; no test or source file imports it outside package.json. my-resume is deployed by .github/workflows/static.yml, which uploads the repository as-is (path \".\", no install or build step) to GitHub Pages (DEPLOY.md agrees). scripts.build `vite build` is not used by the deployment; no start script, Dockerfile or Procfile; repo-wide grep finds no import of this package outside vite.config.js/package.json.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 14,
+     "repo": "mbadr5858/badr-pdf",
+     "sha": "ec472a6ea0726105088fb0c1536dfbfcaa57cd7d",
+     "items": [
+      {
+       "name": "tar",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@capacitor/assets/node_modules/tar@6.2.1 (dev) [OSV GHSA-23hp-3jrh-7fpw SEMVER [0, <7.5.19); npm GHSA-34x7-hfp2-rc4v <7.5.7]. Out of range: node_modules/tar@7.5.22. No in-range copy is non-dev in the lockfile (criterion a does not hold). In-range copy node_modules/@capacitor/assets/node_modules/tar@6.2.1 via @capacitor/assets@3.0.5 > @capacitor/cli@5.7.8 > tar (dev asset CLI). Copy tar@7.5.22 is out of range. Production of badr-pdf (BentoPDF) is a static site: Dockerfile builder stage runs `npm run build:with-docs` and the final stage is nginx (CMD [\"nginx\",\"-g\",\"daemon off;\"]); vercel.json buildCommand `npm run build:with-docs`, outputDirectory dist; .github/workflows/pages.yml uploads dist.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 16,
+     "repo": "developer3000S/OmniRouteRus",
+     "sha": "6874cc4408cdd0c46010b4401501d7e0669b0caf",
+     "items": [
+      {
+       "name": "@babel/core",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@babel/core@7.29.0 (dev) [OSV GHSA-4x5r-pxfx-6jf8 SEMVER [0, <7.29.6); npm GHSA-4x5r-pxfx-6jf8 <=7.29.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: root devDependency eslint-config-next@16.2.6 > eslint-plugin-react-hooks@7.0.1 > @babel/core@7.29.0. Lint only. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "@humanfs/node",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@humanfs/node@0.16.7 (dev) [OSV GHSA-p498-v437-472g SEMVER [0, <0.16.8); npm GHSA-p498-v437-472g <0.16.8]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint@9.39.5 > @humanfs/node@0.16.7 (also eslint-config-next, typescript-eslint). Lint only. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "browserslist",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/browserslist@4.28.2 (dev) [OSV GHSA-73wf-gq98-2v4g SEMVER [0, <4.28.7); npm GHSA-c83g-rgw3-j3cx <=4.28.6]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: eslint-config-next > eslint-plugin-react-hooks@7.0.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets > browserslist@4.28.2. Lint only. Production of OmniRouteRus is the Next.js standalone server (Dockerfile: `npm run build -- --webpack`, CMD [\"node\",\"dev/run-standalone.mjs\"]; fly.toml process `node run-standalone.mjs`; scripts.start `node scripts/dev/run-next.mjs start`) and the published CLI (bin/). The runtime config next.config.mjs imports only next-intl/plugin and fumadocs-mdx/next. A repo-wide grep finds no import/require of glob, wait-on, concurrently, vite, vitest, @babel/core, shell-quote, joi, minimatch, brace-expansion, browserslist, eslint, c8 or typescript-eslint except in eslint.config.mjs, vitest.config.ts, vitest.mcp.config.ts and test files; there is no babel config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 20,
+     "repo": "microsoft/vscode-ts-file-path-support",
+     "sha": "dde70fb77b2ca4c5fe9b00272a9902e0360763b6",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker@4.1.11 (dev) [OSV GHSA-qxg6-89mg-rqv8 SEMVER [2.1.0-beta.7, <4.1.12); npm GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@4.1.11 > @vitest/mocker@4.1.11. Test only (language-service-plugin scripts.test). vscode-ts-file-path-support ships a VS Code extension and a TS server plugin bundled by rollup (vscode-extension/rollup.config.mjs, language-service-plugin/rollup.config.mjs); the .vsix is produced by `vsce package` (vscode-extension scripts.build-package). Neither workspace declares runtime dependencies; repo-wide grep finds no import of this package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 25,
+     "repo": "Blackshield-Company/openshield-desktop",
+     "sha": "1803691d2ed0c35aa6be614f93d8f519d80f0f5f",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > @vitest/mocker@3.2.7 (also @testing-library/svelte > vitest). Test only. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/tinypool@1.1.1 (dev) [OSV GHSA-5gmw-xhrv-c9v3 SEMVER [0, <2.1.1); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Path: vitest@3.2.7 > tinypool@1.1.1. Test only. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest@3.2.7 (dev) [OSV GHSA-82fw-gwwq-j7x9 SEMVER [2.1.0, <4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. No in-range copy is non-dev in the lockfile (criterion a does not hold). Root devDependency vitest@3.2.7; imported only by tests/*.test.ts and vitest.config.ts. Production of openshield-desktop is a Tauri app bundling the SvelteKit static build: src-tauri/tauri.conf.json beforeBuildCommand `npm run build` (vite build), frontendDist ../build; svelte.config.js uses adapter-static (SPA fallback).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": 2,
+   "rows": [
+    26,
+    43
+   ],
+   "items": 32,
+   "repositories": [
+    {
+     "row": 26,
+     "repo": "RoxyAPI/ai-spiritual-companion",
+     "sha": "9762bd624cd0e4f7ce1fd4d433984df239e03c90",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@vitest/mocker@4.1.11 (dev). GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12 and GHSA-xp26-3454-mjgp >=4.1.11 <4.1.12 (npm and OSV agree). Path: root devDependency vitest > @vitest/mocker (lockfile parent: node_modules/vitest only). vitest is imported only by tests/*.test.ts and vitest.config.mts and run by the test/test:drift scripts. No production loader: package.json scripts.start is 'next start'; no Dockerfile, Procfile or deployment config; workflows are automerge.yml, ci.yml and spec-drift.yml only; next.config.ts, proxy.ts and src/ never reference vitest or @vitest/mocker.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 27,
+     "repo": "shimi-lynx/mogledge",
+     "sha": "dc960ef2fd271abe1a82aedc375bec9fd996b610",
+     "items": [
+      {
+       "name": "basic-ftp",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/basic-ftp@5.3.1 (dev). GHSA-c475-qrg2-pj4r: npm <=6.2.0, OSV <6.2.1. Path: root devDependency @wdio/cli (also @wdio/mocha-framework, @wdio/tauri-service > webdriverio) > @wdio/utils > @puppeteer/browsers > proxy-agent > pac-proxy-agent > get-uri > basic-ftp. @wdio/* is referenced only by tests/e2e/*.spec.ts, tests/e2e/wdio.conf.ts, tsconfig.json types and the test:e2e script ('wdio run'). No production loader: this is a Tauri desktop app whose src-tauri/tauri.conf.json has beforeBuildCommand 'npm run build' (vp check && vp build) and frontendDist '../dist'; there is no start script, Dockerfile, Procfile or deployment config; src/ has no @wdio, webdriverio or puppeteer import.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "deepmerge-ts",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@wdio/tauri-service/node_modules/deepmerge-ts@7.1.6 (dev), GHSA-ggr8-5vv4-36mx <8.0.0. node_modules/deepmerge-ts@8.0.2 is out of range. Path: root devDependency @wdio/tauri-service > webdriverio > @wdio/config / @wdio/utils / webdriver > deepmerge-ts. These are WebdriverIO e2e test tools, used only from tests/e2e (wdio.conf.ts and the specs). No production loader, as for basic-ftp: Tauri app with frontendDist ../dist, no start, Dockerfile or deployment config, and no src/ import.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "extract-zip",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/extract-zip@2.0.1 (dev). GHSA-7pqw-9j4j-h8q3 and GHSA-jmr9-qjv8-65gv are both <=2.0.1. Path: root devDependency @wdio/cli / @wdio/mocha-framework / @wdio/tauri-service > ... > @wdio/utils > @puppeteer/browsers > extract-zip. Used for the e2e test browser download only. No production loader, as for basic-ftp.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 28,
+     "repo": "PM-Shawn/Abu-Cowork",
+     "sha": "f01c2a7aab54d236c4e41b676e0074db2eff61d7",
+     "items": [
+      {
+       "name": "@babel/core",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@babel/core@7.29.0 (dev). GHSA-4x5r-pxfx-6jf8: npm <=7.29.0, OSV <7.29.6. Path: root devDependency eslint-plugin-react-hooks > @babel/core; its only other parent is a peer edge from @babel/helper-module-transforms. eslint-plugin-react-hooks is imported only by eslint.config.js:3. Production is the Electron package. electron-builder.yml 'files' whitelists electron/**, dist-electron-spike/** and a fixed list of node_modules (node-pty, electron-updater, builder-util-runtime, fs-extra, semver, debug, ms, sax, graceful-fs, jsonfile, universalify, js-yaml, yaml, argparse, lazy-val, lodash.*, tiny-typed-emitter, fflate, undici), and 'extraResources' holds the bundled sidecar and runtimes. No src/, electron/ or sidecar/ file imports @babel/core.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "@humanfs/node",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@humanfs/node@0.16.7 (dev). GHSA-p498-v437-472g <0.16.8. Path: root devDependency eslint > @humanfs/node (also through @eslint/js and the typescript-eslint plugins). eslint is used by eslint.config.js, the lint script and scripts/eslintDesignRules.test.ts only. Not in the electron-builder.yml files list, and no shipped import.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "baseline-browser-mapping",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/baseline-browser-mapping@2.10.0 (dev). GHSA-w5vr-8v7q-w6rv >=2.0.0 <2.11.0. Path: root devDependency eslint-plugin-react-hooks > @babel/core > @babel/helper-compilation-targets > browserslist > baseline-browser-mapping. Lint only (eslint.config.js:3). No shipped import and no production command.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "browserslist",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/browserslist@4.28.1 (dev). GHSA-73wf-gq98-2v4g and GHSA-c83g-rgw3-j3cx: npm <=4.28.6, OSV <4.28.7. Path: root devDependency eslint-plugin-react-hooks > @babel/core > @babel/helper-compilation-targets > browserslist. Lint only. No shipped import and no production command.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "flatted",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/flatted@3.3.3 (dev). GHSA-25h7-pfq9-p65f <3.4.0; GHSA-rf6f-7fwh-wjgh: npm <=3.4.1, OSV <3.4.2. Path: root devDependency eslint > file-entry-cache > flat-cache > flatted. Lint cache only. No shipped import, not packaged, and no production command.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 33,
+     "repo": "enonic/app-explorer",
+     "sha": "b747314e90a82fe9d3698da1f1f93ab267cd40ff",
+     "items": [
+      {
+       "name": "deepmerge",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/deepmerge@4.3.1 (dev). GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Path: root devDependency jest > @jest/core (or jest-cli) > jest-config > deepmerge; also @enonic/mock-xp > jest. jest and @enonic/mock-xp are used only by *.test.ts files, jest.config.mjs and the test/cov scripts. Production is the Enonic XP app built by Gradle (enonic-gradle.yml) from the tsdown and vite builds, and none of them import deepmerge.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 34,
+     "repo": "carlostighe/modalMap",
+     "sha": "06b1c49404c7852aca81317e8f865c187a4f6222",
+     "items": [
+      {
+       "name": "cross-spawn",
+       "first_run": "no",
+       "first_evidence": "In range: only node_modules/webpack-cli/node_modules/cross-spawn@6.0.5 (dev), GHSA-3xgq-45jj-v275 <6.0.6. node_modules/cross-spawn@7.0.6 (non-dev, via chroma-js > cross-env and eslint) and execa/node_modules/cross-spawn@6.0.6 are out of range. Path: root devDependency webpack-cli@3.3.11 > cross-spawn. A grep of every .js file in webpack-cli@3.3.11 (unpkg) finds no require of cross-spawn, so it is never loaded, not even by the start or build scripts. No shipped import (js/ has none).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "loader-utils",
+       "first_run": "no",
+       "first_evidence": "In range: only node_modules/webpack-cli/node_modules/loader-utils@1.2.3 (dev), with GHSA-76p3-8jx3-jpfq <1.4.1 and GHSA-3rfm-jhwj-7488 / GHSA-hhq3-ff78-jv3g >=1.0.0 <1.4.2. node_modules/loader-utils@1.4.2 (non-dev, via html-webpack-plugin) and raw-loader's 2.0.4 are out of range. Path: root devDependency webpack-cli@3.3.11 > loader-utils. webpack-cli requires it only at bin/utils/convert-argv.js:248, inside the --plugin argument handling (convert-argv.js:525), and no script passes --plugin. No shipped import.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "sync-exec",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/sync-exec@0.6.2 (dev, peer). GHSA-38h8-x697-gh8q <=0.6.2. Path: root devDependency manifest-revision-webpack-plugin > sync-exec (peer). manifest-revision-webpack-plugin is never required: webpack.config.js has no reference, and the only mention is package.json:46. No script or shipped code loads it.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 35,
+     "repo": "louiseka/cove-ui",
+     "sha": "0e0966d953ed4e6e677e0fd24be56d8262bb9697",
+     "items": [
+      {
+       "name": "zod",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/zod@4.3.6 (dev). GHSA-mrhx-c7xc-m3w5 <4.6.6. Paths: root devDependency eslint-plugin-react-hooks > zod; eslint-plugin-react-hooks > zod-validation-error > zod. eslint-plugin-react-hooks is imported only by eslint.config.js:3, and no file in the repo imports zod. Production is the static 'tsc -b && vite build' output: there is no start script, Dockerfile or deployment config, and the only workflow is ci.yml.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 36,
+     "repo": "Desvelao/party-game",
+     "sha": "967e28a9749e9bd0dae1c908e5c5197399b91a75",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@vitest/mocker@2.1.9 (dev). GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11; GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Path: root devDependency vitest > @vitest/mocker. Tests only. Production images install without dev dependencies: Dockerfile:26 'npm ci --omit=dev' with CMD node dist/server.js (line 50), and docker/Dockerfile.bot:25 '--omit=dev' with CMD node dist/bot-main.js. package.json start is 'node dist/server.js', and the packages.yml packages also use 'npm ci --omit=dev'.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/tinypool@1.1.1 (dev). GHSA-5gmw-xhrv-c9v3 <=2.1.0; GHSA-85c8-ppgw-ccpr <2.1.2. Path: root devDependency vitest > tinypool. Test runner only. No production loader, as for @vitest/mocker.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/vitest@2.1.9 (root devDependency). GHSA-5xrq-8626-4rwp <3.2.6; GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Imported only by *.test.ts files. No production loader, as for @vitest/mocker.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 37,
+     "repo": "Dhanush1376/Akula-s-Kitchen",
+     "sha": "7f4265c82c5543886f44c352a70f835af1911d53",
+     "items": [
+      {
+       "name": "@eslint/plugin-kit",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@eslint/plugin-kit@0.2.8 (dev). GHSA-xffm-g5w8-qvg7 <0.3.4. Path: root devDependency eslint@9 > @eslint/plugin-kit. The root lockfile holds only the root dev tooling (concurrently, eslint, husky, lint-staged, prettier). backend/ and frontend/ have their own package.json and package-lock.json. Production images build from those directories: docker-compose.yml contexts ./backend and ./frontend; backend/Dockerfile runs 'npm ci --omit=dev' and CMD npm run start:pm2 (backend/ecosystem.config.js script ./dist/server.js); backend/railway.json uses that Dockerfile; frontend is nginx static plus frontend/vercel.json. None of them uses the root node_modules.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/brace-expansion@1.1.15 (dev). In range of GHSA-3jxr-9vmj-r5cp <1.1.16, GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-6j4f-fj2g-mc7p <1.1.19, GHSA-qhr7-859c-m2p7 <1.1.20 and GHSA-q2hr-2g5m-vwhr <1.1.21. Path: root devDependency eslint > minimatch > brace-expansion (also via @eslint/config-array and @eslint/eslintrc). Lint only. No production loader, as for @eslint/plugin-kit: backend and frontend images are built from their own directories and lockfiles.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/js-yaml@4.2.0 (dev). GHSA-52cp-r559-cp3m >=4.0.0 <4.3.0; GHSA-5p4m-2wfm-xmqj <4.3.1; GHSA-2883-xcg3-v3hh <4.3.2. Path: root devDependency eslint > @eslint/eslintrc > js-yaml. Lint only. No backend or frontend file imports js-yaml. No production loader, as for @eslint/plugin-kit.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "shell-quote",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/shell-quote@1.8.3 (dev). GHSA-w7jw-789q-3m8p >=1.1.0 <=1.8.3; GHSA-395f-4hp3-45gv <=1.8.4. Path: root devDependency concurrently > shell-quote. concurrently is used only by the root 'dev' script (frontend:dev plus backend:dev). Production runs pm2 on backend/dist/server.js and nginx/Vercel for the frontend (backend/Dockerfile, ecosystem.config.js, frontend/Dockerfile, vercel.json).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 38,
+     "repo": "mahaliahr/phd-live",
+     "sha": "4aa0276db19c91cc0c382199fb1bf54382a31b1b",
+     "items": [
+      {
+       "name": "compression",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/compression@1.8.1 (dev). GHSA-vc2v-76pw-4v95 <1.8.2. Path: root devDependency serve > compression. 'serve' is used by no script, workflow or deployment config; its only mention is package.json:25. Production is a static site: netlify.toml [build] command 'npm install && npm run build', publish 'dist'; vercel.json buildCommand 'npm run build', outputDirectory 'dist', with 'npm run start' listed only as devCommand. There is no functions directory.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 39,
+     "repo": "newtonlorenz/benchledger",
+     "sha": "f6e500b55026204eac06a520abe832b8cec50ac1",
+     "items": [
+      {
+       "name": "@modelcontextprotocol/sdk",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@modelcontextprotocol/sdk@1.30.0 (root devDependency). In range of six advisories, e.g. GHSA-f897-62hf-6gxq >=1.10.0 <1.30.1, GHSA-6qxp-vccf-f47h >=1.12.0 <1.31.0 and GHSA-22jm-h49p-29qw >=1.24.0 <1.32.0. Imported only by tests: apps/mcp/src/discovery-schema.test.ts:4, apps/server/src/mcp-client.test.ts:2-3, mcp-host-client.test.ts:6-7 and stock-approval-parity.test.ts:2-3. apps/mcp/package.json depends only on workspace packages. Production: deploy/Dockerfile runs npm ci, npm run build, then 'npm prune --omit=dev', and CMD [\"node\", \"apps/server/dist/main.js\"] (apps/server start 'node dist/main.js').",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "body-parser",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/body-parser@2.3.0 (dev). GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0. Path: root devDependency @modelcontextprotocol/sdk > express > body-parser. The SDK is used only in tests (see @modelcontextprotocol/sdk), and no file imports express. The server is Fastify (apps/server/package.json). Pruned by deploy/Dockerfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "hono",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/hono@4.13.7 (dev). GHSA-5r4p-p66f-jhc7 >=4.12.4 <4.13.11. Path: root devDependency @modelcontextprotocol/sdk > hono (also > @hono/node-server > hono, peer). Test-only SDK, and no file imports hono. Pruned by deploy/Dockerfile 'npm prune --omit=dev'.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "ip-address",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/ip-address@10.7.3 (dev). GHSA-rxp7-6hxx-x8q5: npm <=10.7.3, OSV <10.7.4. Path: root devDependency @modelcontextprotocol/sdk > express-rate-limit > ip-address. Test-only SDK. Pruned from production (deploy/Dockerfile).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "proxy-addr",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/proxy-addr@2.0.7 (dev). GHSA-jqcg-44mw-7w3h >=1.1.0 <2.0.8. Path: root devDependency @modelcontextprotocol/sdk > express > proxy-addr. Test-only SDK. Pruned from production (deploy/Dockerfile).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "qs",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/qs@6.16.0 (dev). GHSA-6pq8-jhm2-2vcw: npm >=6.7.0 <=6.16.0, OSV <6.16.1. Path: root devDependency @modelcontextprotocol/sdk > express > qs (and > body-parser > qs). Test-only SDK. Pruned from production (deploy/Dockerfile).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 41,
+     "repo": "eliflo1/certivue-marketing",
+     "sha": "3b9daeae4e1d52f7b1d18497d6129c282b354808",
+     "items": [
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/brace-expansion@5.0.6 (dev). GHSA-3jxr-9vmj-r5cp >=3.0.0 <5.0.7, plus GHSA-mh99-v99m-4gvg, GHSA-rgw5-rvv9-x895, GHSA-6j4f-fj2g-mc7p, GHSA-qhr7-859c-m2p7 and GHSA-q2hr-2g5m-vwhr (>=4.0.0 <5.0.8 .. <5.0.12). Path: root devDependency eslint > minimatch > brace-expansion (also @eslint/config-array, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh), all used only by eslint.config.js. The copy is dev-only, so astro does not reach it. Production is the static 'astro build' output; there is no start script, Dockerfile, workflow or deployment config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 42,
+     "repo": "Palladin-io/palladin-agent",
+     "sha": "9c5733c74621bf1615f8c70159fe0ac71c68b5c3",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@vitest/mocker@4.1.11 (dev). GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12; GHSA-xp26-3454-mjgp >=4.1.11 <4.1.12. Path: root and packages/openclaw-plugin devDependency vitest > @vitest/mocker. vitest is imported only by tests/** and packages/openclaw-plugin/src/index.test.ts and vitest.config.ts; packaging/npm/release-scripts.security.mjs:93 mentions it only as fixture text. Production is the CLI bin dist/bin/palladin.js, built by tsc (scripts.build; start 'node dist/bin/palladin.js'), and it does not import vitest.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 43,
+     "repo": "ruddyribera-ops/pria-app",
+     "sha": "7dcc3ac1f715c4335071dc66d5e9c0c73dc7e98b",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/vitest/node_modules/@vitest/mocker@4.1.7 (dev). GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11; GHSA-qxg6-89mg-rqv8 <4.1.12. Path: root devDependency vitest > @vitest/mocker. Tests only. Production: railway.toml startCommand 'npm start' = 'NODE_ENV=production tsx server.js'. server.js imports express and ./server/src/* and serves dist/ with express.static; Dockerfile.frontend serves dist with nginx. Neither loads vitest.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/vitest@4.1.7 (root devDependency). GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Tests only. Not loaded by the railway.toml 'npm start' (tsx server.js), and not part of the Dockerfile.frontend nginx image.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": 3,
+   "rows": [
+    45,
+    65
+   ],
+   "items": 37,
+   "repositories": [
+    {
+     "row": 45,
+     "repo": "bwhyte21/ProjectAniTracker",
+     "sha": "c6b07f065e81e5b9672b6ad85f0cb67a2448c77a",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/@vitest/mocker@5.0.1 (dev). GHSA-qxg6-89mg-rqv8 >=5.0.0-beta.1 <5.0.3; GHSA-xp26-3454-mjgp >=5.0.0-rc.2 <5.0.3. Path: root devDependency vitest > @vitest/mocker. vitest is imported only by tests/unit/*.test.ts and vitest.config.ts. Production is the Tauri app bundling the 'tsc && vite build' output (scripts tauri; release.yml); there is no start, Dockerfile or server.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "happy-dom",
+       "first_run": "no",
+       "first_evidence": "Installed node_modules/happy-dom@20.14.5 (root devDependency). GHSA-834v-8h66-3h79 >=17.0.0 <=21.0.3. Used only as the test environment in vitest.config.ts:13. No shipped import. Production is the Tauri app built from vite output.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 50,
+     "repo": "kratus66/CodeAI-Academy",
+     "sha": "dc140ecd59035dade5fdab627a9bb28d78388727",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker@2.1.9 (dev) vs GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11 and GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12 (OSV agrees). Path: devDependency vitest@2.1.9 of apps/api, apps/web, packages/shared > @vitest/mocker@2.1.9. vitest is imported only by *.spec.ts(x) files, apps/api/vitest.config.ts, apps/web/vitest.config.mts, apps/web/vitest.setup.ts, packages/shared/vitest.config.ts. No production loader: apps/api/package.json scripts.start 'node dist/main.js', apps/web/package.json scripts.start 'next start -p 3000', root package.json has no start; no Dockerfile or Procfile; docker-compose.yml runs only postgres:16-alpine; apps/web/next.config.mjs sets only reactStrictMode/poweredByHeader.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/tinypool@1.1.1 (dev) vs GHSA-5gmw-xhrv-c9v3 <=2.1.0 and GHSA-85c8-ppgw-ccpr <2.1.2. Path: devDependency vitest@2.1.9 > tinypool@1.1.1 (test runner; vitest imported only in *.spec.* and vitest configs). Start commands 'node dist/main.js' and 'next start -p 3000'; no Dockerfile/Procfile; docker-compose.yml only postgres.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest@2.1.9 (dev) vs GHSA-5xrq-8626-4rwp <3.2.6 and GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Direct devDependency of apps/api, apps/web, packages/shared; imported only by test files (e.g. apps/api/src/config/env.spec.ts:1, apps/web/src/lib/api-client.spec.ts:3) and vitest.config.ts/.mts, vitest.setup.ts; scripts test/test:watch only. Start commands 'node dist/main.js' and 'next start -p 3000'; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 51,
+     "repo": "Armor-test/uptime-kuma",
+     "sha": "dbb6bfec2e042c1d5c90604316da7328692845b2",
+     "items": [
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/fast-uri@3.1.5 (dev) vs GHSA-5jgf-p345-68v8 >=3.1.3 <3.1.6 and other GHSA ranges >=3.0.0 <3.1.6..3.1.9. Path: devDependency stylelint@15.11.0 (and stylelint-config-*) > table@6.9.0 > ajv@8.20.0 > fast-uri (lint). No source import; production docker/dockerfile:21 npm ci --omit=dev, :42 CMD node server/server.js.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "joi",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/joi@17.13.6 (dev) vs GHSA-wr44-6hxh-3jwq <17.13.8 and GHSA-6h2x-m376-mqjq >=17.2.0 <17.13.7. Path: devDependency wait-on@7.2.0 > joi; wait-on used only in package.json scripts.dev. No source import; production CMD node server/server.js with --omit=dev.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/js-yaml@4.3.1 (dev) vs GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. Paths: eslint@8.14.0 > js-yaml; stylelint@15.11.0 > cosmiconfig@8.3.6 > js-yaml; all 10 direct entries reaching it are eslint/stylelint packages (lint). No source import; production CMD node server/server.js with npm ci --omit=dev.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "playwright",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/playwright@1.39.0 (dev) vs GHSA-7mvr-c777-76hp <1.55.1. Path: devDependency @playwright/test@1.39.0 > playwright; used by config/playwright.config.js:1 and test/e2e specs (scripts test-e2e, playwright-codegen). The server uses the separate production package playwright-core, not playwright; no file outside tests requires 'playwright'. Production CMD node server/server.js with --omit=dev.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "postcss-selector-parser",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/postcss-selector-parser@6.1.4 (dev) vs GHSA-rj75-hqrm-r3gf <6.1.5. Paths: eslint-plugin-vue@8.7.1, eslint-plugin-vue-scoped-css@2.7.2, stylelint@15.11.0 > postcss-selector-parser (lint). Not reached by vue or any package imported by src/. Production CMD node server/server.js with --omit=dev.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "shell-quote",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/shell-quote@1.10.0 (dev) vs GHSA-pqg4-j6r4-53mv >=1.8.4 <1.11.0. Path: devDependency concurrently@7.6.0 > shell-quote; concurrently used only in scripts.dev. Production CMD node server/server.js with --omit=dev.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 53,
+     "repo": "KHY90/JMAirAgentFront",
+     "sha": "67e71f480e928ee2397d44ff3517ad929701551d",
+     "items": [
+      {
+       "name": "@eslint/plugin-kit",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@eslint/plugin-kit@0.2.7 (dev) vs GHSA-xffm-g5w8-qvg7 <0.3.4. Path: devDependencies eslint@9.21.0 and eslint-config-next@15.2.4 > eslint > @eslint/plugin-kit (lint). No production loader: package.json scripts.start 'next start'; no Dockerfile, Procfile or deploy config; next.config.ts, middleware.ts and src/ import none of these.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "ajv",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/ajv@6.12.6 (dev) vs GHSA-2g4f-4pwh-qvx6 <6.14.0. Paths: devDependency @eslint/eslintrc@3.3.0 > ajv; eslint@9.21.0 > ajv. Only importer is eslint.config.mjs:3 (@eslint/eslintrc). start 'next start'; no Dockerfile/Procfile/deploy config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 55,
+     "repo": "ASIL-E-Hatake/vscode-games",
+     "sha": "c8ceddb7f0c53e21a1e47a02f143d03118df8ba5",
+     "items": [
+      {
+       "name": "@azure/msal-node",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@azure/msal-node@6.0.1 (dev) vs GHSA-xcx6-jx8p-x3h5 >=5.0.0-beta.0 <7.1.0. Path: devDependency @vscode/vsce@4.0.0 > @azure/identity@4.14.0 > @azure/msal-node (extension packaging/publishing tool, scripts.package 'vsce package --no-dependencies'). Shipped code is dist/extension.js and dist/webview/*.js bundled by esbuild.mjs from src/extension.ts and src/features/*/webview/main.ts; no file imports these packages. No start script, Dockerfile or Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "qs",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/qs@6.16.0 (dev) vs GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0. Path: devDependency @vscode/vsce@4.0.0 > typed-rest-client@1.8.11 > qs (packaging tool). Not imported by src/; extension packaged with --no-dependencies; no start/Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 56,
+     "repo": "clorth0/EQEmu",
+     "sha": "2096d84c937590bde30e551e91c79256199547bb",
+     "items": [
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: @typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.7 vs GHSA-mh99-v99m-4gvg >=4.0.0 <5.0.8, GHSA-rgw5-rvv9-x895 >=4.0.0 <5.0.9 and others <5.0.10..5.0.12; node_modules/brace-expansion@1.1.16 vs <1.1.17..<1.1.21 (all dev). Paths: eslint-config-next@16.2.10 > typescript-eslint@8.64.0 > typescript-estree > minimatch@10.2.5; eslint@9.39.5 / eslint-plugin-import > minimatch@3.1.5 (lint). Only importer eslint.config.mjs:1-3. start 'next start'; no Dockerfile, Procfile or deploy config; postcss.config.mjs uses @tailwindcss/postcss only.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "browserslist",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/browserslist@4.28.6 (dev) vs GHSA-c83g-rgw3-j3cx <=4.28.6 and GHSA-73wf-gq98-2v4g <=4.28.6. Path: eslint-config-next@16.2.10 > eslint-plugin-react-hooks@7.1.1 > @babel/core@7.29.7 > @babel/helper-compilation-targets > browserslist (lint). No source import; start 'next start'; no Dockerfile/Procfile/deploy config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/js-yaml@4.3.0 (dev) vs GHSA-5p4m-2wfm-xmqj >=4.0.0 <4.3.1 and GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. Path: eslint@9.39.5 > @eslint/eslintrc@3.3.6 > js-yaml (lint). start 'next start'; no Dockerfile/Procfile/deploy config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "zod",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/zod@4.4.3 (dev) vs GHSA-mrhx-c7xc-m3w5 <4.6.6. Path: eslint-config-next@16.2.10 > eslint-plugin-react-hooks@7.1.1 > zod (lint). app/ and lib/ do not import zod. start 'next start'; no Dockerfile/Procfile/deploy config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 57,
+     "repo": "AlbusKavaliro/AntiXss",
+     "sha": "80200fbbebf5b3ea1d2df66465a6180b5b71c6ee",
+     "items": [
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/brace-expansion@5.0.9 (dev) vs GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12, GHSA-qhr7-859c-m2p7 >=4.0.0 <5.0.11, GHSA-6j4f-fj2g-mc7p >=4.0.0 <5.0.10. Path: devDependency semantic-release@25.0.9 (also via @semantic-release/changelog, @semantic-release/git) > @semantic-release/npm@13.1.5 > npm@11.19.1 > minimatch@10.2.5 > brace-expansion. Release tooling only: the repository is a .NET library with no JS/TS source; package.json has only release devDependencies and no scripts; npm runs in .github/workflows/release.yml.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "http-cache-semantics",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/http-cache-semantics@4.2.0 (dev) vs GHSA-ch52-4w7c-c8xp <=4.2.0. Path: semantic-release@25.0.9 > @semantic-release/npm@13.1.5 > npm@11.19.1 > make-fetch-happen@15.0.6 > http-cache-semantics (release tooling). No JS source, no start, no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "ip-address",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/ip-address@10.5.0 (dev) vs GHSA-rpw4-54j3-4h4q <=10.5.0, GHSA-2vr4-cq9g-pvrc >=10.2.0 <=10.5.0, GHSA-j6r3-76f7-8jcv / GHSA-h3mg-xc3c-68pw <=10.7.0, GHSA-rxp7-6hxx-x8q5 <=10.7.3. Path: semantic-release > @semantic-release/npm > npm@11.19.1 > make-fetch-happen > @npmcli/agent@4.0.2 > socks-proxy-agent@8.0.5 > socks@2.8.9 > ip-address (release tooling). No JS source, no start, no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "postcss-selector-parser",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/postcss-selector-parser@7.1.4 (dev) vs GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6. Path: semantic-release > @semantic-release/npm > npm@11.19.1 > @npmcli/arborist@9.9.1 > @npmcli/query@5.0.0 > postcss-selector-parser (release tooling). No JS source, no start, no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/npm/node_modules/undici@6.28.0 (dev) vs GHSA-3wwx-pv8p-q78v >=6.25.0 <6.28.1, GHSA-r53p-7pc4-xj5r <6.28.1 and others <6.29.1; @actions/http-client/node_modules/undici@6.29.1 and undici@7.30.1 are outside the listed ranges. Path: semantic-release > @semantic-release/npm > npm@11.19.1 > node-gyp@12.4.0 > undici@6.28.0 (release tooling). No JS source, no start, no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 59,
+     "repo": "TonyVoorhees/TonyVoorhees.github.io",
+     "sha": "95455c1eb68c112244c30fb7c6dec502ab8f28cc",
+     "items": [
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/fast-uri@3.1.7 (dev) vs GHSA-hrr3-gc8f-f4qj >=3.0.0 <3.1.8, GHSA-w74x-v6f9-j3xg / GHSA-xhq7-xmqj-769h / GHSA-333x-w4r6-6crp >=3.0.0 <3.1.9, GHSA-wjr9-j795-jxcr >=3.1.3 <3.1.9. Path: devDependency @astrojs/check@0.9.10 > @astrojs/language-server@2.16.16 > volar-service-yaml@0.0.71 > yaml-language-server@1.23.0 > ajv@8.20.0 > fast-uri (type-check CLI, not even in scripts). No source import; astro.config.mjs does not load it; scripts dev/build/preview/astro, no start; static site deployed by .github/workflows/deploy.yml; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 60,
+     "repo": "kkd927/kmux",
+     "sha": "380c8b48c865d517d0192a5bcf88bc9831de8e4f",
+     "items": [
+      {
+       "name": "@grpc/grpc-js",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@grpc/grpc-js@1.14.4 (dev) vs GHSA-m9gg-hp2v-232j and GHSA-f596-whhp-79r4 >=1.14.0 <1.14.5. Path: devDependencies testcontainers@12.0.4 / @testcontainers/toxiproxy@12.0.4 > dockerode@5.0.1 > @grpc/grpc-js; imported only by tests/ssh/harness/*.ts. Not in the packaged app (electron-builder.yml), no start/Dockerfile for the app.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "@humanfs/node",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@humanfs/node@0.16.7 (dev) vs GHSA-p498-v437-472g <0.16.8. Path: eslint@9.39.4 (and @typescript-eslint/*, eslint-config-prettier) > @humanfs/node (lint; eslint.config.js). Not imported by apps/desktop/src or packages/*; no start/Dockerfile for the app.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 64,
+     "repo": "hitchhikers42/zanotam-proxy",
+     "sha": "b795e11012601f03a47f5cc19e3222036ec8f755",
+     "items": [
+      {
+       "name": "aws-sdk",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/aws-sdk@2.1354.0 (dev) vs GHSA-j965-2qgj-vjmq >=2.0.0 <=3.0.0. Root devDependency, imported by no file in the repository and absent from the committed browser bundle src/public/dist/proxy.js (module paths scanned). Server: scripts.server 'nodemon src/server'; src/server/index.js requires ./server; src/server/server.js requires only express, path, cors and serves src/public statically. No start script, Dockerfile, Procfile or deploy config.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "get-func-name",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/get-func-name@2.0.0 (dev) vs GHSA-4q6p-r6v2-jvc5 <2.0.1. Path: devDependency chai@4.2.0 > get-func-name (test library; no test files in the repo). Not imported; not in proxy.js; server requires only express, path, cors. No start/Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "serialize-javascript",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/serialize-javascript@7.1.2 (dev) vs GHSA-m5mm-p8h7-m29v <7.1.3. Path: devDependency mocha@12.0.2 > serialize-javascript (test runner). Not imported; not in proxy.js; server requires only express, path, cors. No start/Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "uuid",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/aws-sdk/node_modules/uuid@8.0.0 (dev) vs GHSA-w5hq-g745-h8pq <11.1.1. Path: devDependency aws-sdk@2.1354.0 > uuid; aws-sdk is not imported anywhere. The 'uuid' text in proxy.js is faker's faker.random.uuid, not this package. Server requires only express, path, cors; no start/Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 65,
+     "repo": "ELDIABLO2020/bannersin48",
+     "sha": "be212e83019de95362bdb2f89e6d4172cf6ae9da",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker@2.1.9 (dev) vs GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11 and GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Path: devDependency vitest@2.1.9 of frontend and packages/* > @vitest/mocker; vitest imported only by *.test.ts and frontend/vitest.config.ts. Production: deploy/docker-compose.prod.yml builds backend/Dockerfile (prod-deps stage keeps only 'npm ls -w backend --omit=dev', Dockerfile:92-101; CMD node dist/src/main.js :163) and frontend/Dockerfile (Next standalone, CMD node server.js :89); backend start 'node dist/src/main.js', frontend start 'next start'; frontend/vercel.json runs npm run build.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "deepmerge",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/deepmerge@4.3.1 (dev) vs GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Path: backend devDependencies jest@29.7.0 / ts-jest > @jest/core > jest-config > deepmerge (tests). Not imported by backend/src or frontend; backend Docker image installs only the --omit=dev tree (backend/Dockerfile:92-101), CMD node dist/src/main.js.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "glob",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/glob@10.3.10 (dev) vs GHSA-5j98-mcp5-4vw2 >=10.2.0 <10.5.0; frontend/node_modules/glob@13.0.6 (prod) and the 7.2.3 copies are outside the range. Path: frontend devDependency eslint-config-next@14.2.35 > @next/eslint-plugin-next > glob@10.3.10 (lint). No shipped import; Docker CMDs node dist/src/main.js and node server.js.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "handlebars",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/handlebars@4.7.9 (dev) vs GHSA-xw65-4hp5-5hc7 / GHSA-8r5x-fm3f-whwj >=4.0.0 <=4.7.9 and GHSA-p8wg-vrv2-v86f >=3.0.0 <=4.7.9. Path: backend devDependency ts-jest@29.4.11 > handlebars (tests). Not imported by backend/src; backend image uses only the --omit=dev tree; CMD node dist/src/main.js.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/tinypool@1.1.1 (dev) vs GHSA-5gmw-xhrv-c9v3 <=2.1.0 and GHSA-85c8-ppgw-ccpr <2.1.2. Path: vitest@2.1.9 > tinypool (tests). No shipped import; Docker CMDs node dist/src/main.js and node server.js.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest@2.1.9 (dev) vs GHSA-5xrq-8626-4rwp <3.2.6 and GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. devDependency of frontend and packages/*; imported only by *.test.ts files and frontend/vitest.config.ts. Docker CMDs node dist/src/main.js and node server.js.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": 4,
+   "rows": [
+    66,
+    86
+   ],
+   "items": 40,
+   "repositories": [
+    {
+     "row": 66,
+     "repo": "bmesuere/licence-quest",
+     "sha": "419ec78038985503dd28edee6072876a1d86f9c1",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker@3.2.7 (dev) vs GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11 and GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Path: devDependency vitest@3.2.7 > @vitest/mocker; vitest imported only by tests/*.test.ts (tests/data.test.ts:1 etc.). Production: static 'tsc -b && vite build' deployed by .github/workflows/deploy.yml (npm ci, npm test, npm run build); no start script, Dockerfile or Procfile; worker/ has its own package.json outside the root lockfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/tinypool@1.1.1 (dev) vs GHSA-5gmw-xhrv-c9v3 <=2.1.0 and GHSA-85c8-ppgw-ccpr <2.1.2. Path: vitest@3.2.7 > tinypool (tests). No start/Dockerfile/Procfile; static deploy via .github/workflows/deploy.yml.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest@3.2.7 (dev) vs GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Root devDependency imported only by tests/*.test.ts; scripts test/test:watch. No start/Dockerfile/Procfile; static deploy.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 67,
+     "repo": "PatricRc/haber",
+     "sha": "b1f3d27cda04ae7178ac3425d2c905fb140875b9",
+     "items": [
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: @typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.9 vs GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12, GHSA-qhr7-859c-m2p7 >=4.0.0 <5.0.11, GHSA-6j4f-fj2g-mc7p >=4.0.0 <5.0.10; node_modules/brace-expansion@1.1.18 vs <1.1.21, <1.1.20, <1.1.19 (all dev). Paths: eslint-config-next@16.2.6 > typescript-eslint@8.67.0 > typescript-estree > minimatch@10.2.6; eslint@9.39.4 / eslint-plugin-import > minimatch@3.1.5 (lint). Only importer eslint.config.mjs:1-3. start 'next start'; .github/workflows/pages.yml runs npm ci and npm run build; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/js-yaml@4.3.1 (dev) vs GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. Path: eslint@9.39.4 > @eslint/eslintrc@3.3.6 > js-yaml (lint). start 'next start'; pages.yml build only; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "zod",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/zod@4.4.3 (dev) vs GHSA-mrhx-c7xc-m3w5 <4.6.6. Path: eslint-config-next@16.2.6 > eslint-plugin-react-hooks@7.1.1 > zod (lint). app/ does not import zod. start 'next start'; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 71,
+     "repo": "mapleclose/rocket-feast-website",
+     "sha": "763c64d8a17c0e5f2b37010ecce31b92869801ec",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker@4.1.11 (dev) vs GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12 and GHSA-xp26-3454-mjgp >=4.1.11 <4.1.12. Path: devDependency vitest@4.1.11 > @vitest/mocker; vitest imported only by src/app/api/auth/mcp-login/mcp-login-proxy.test.ts:2 and route.test.ts:2. start 'next start'; no Dockerfile/Procfile; hosted via AWS Amplify (.github/workflows/amplify-status.yml) with next build.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/js-yaml@4.2.0 (dev) vs GHSA-52cp-r559-cp3m >=4.0.0 <4.3.0, GHSA-5p4m-2wfm-xmqj >=4.0.0 <4.3.1, GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. Path: devDependency postcss-loader@8.2.1 > cosmiconfig@9.0.0 > js-yaml (build-time config loading). No source imports it or postcss-loader; start 'next start'; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 72,
+     "repo": "guola/socratic-rush",
+     "sha": "711c62d23d7f6c94469c00d794dffbeaefba0448",
+     "items": [
+      {
+       "name": "@babel/core",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@babel/core@7.29.0 (dev) vs GHSA-4x5r-pxfx-6jf8 <=7.29.0. Only path: devDependency eslint-config-next@16.3.4 > eslint-plugin-react-hooks@7.1.1 > @babel/core (lint; eslint.config.mjs). Not reached by vinext, wrangler or any shipped import. start runs wrangler dev, which does not depend on it; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: @typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.6 and node_modules/brace-expansion@1.1.14 (dev) vs GHSA-3jxr-9vmj-r5cp, GHSA-mh99-v99m-4gvg, GHSA-rgw5-rvv9-x895, GHSA-q2hr-2g5m-vwhr, GHSA-qhr7-859c-m2p7, GHSA-6j4f-fj2g-mc7p. Paths: eslint-config-next@16.3.4 > typescript-eslint > typescript-estree > minimatch@10.2.5; eslint@9.39.4 / eslint-plugin-import > minimatch@3.1.5 (lint). No shipped import; start (wrangler dev) does not reach it.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/js-yaml@4.1.1 (dev) vs GHSA-h67p-54hq-rp68 >=4.0.0 <=4.1.1, GHSA-52cp-r559-cp3m <4.3.0, GHSA-5p4m-2wfm-xmqj <4.3.1, GHSA-2883-xcg3-v3hh <4.3.2. Path: eslint@9.39.4 > @eslint/eslintrc@3.3.5 > js-yaml (lint). No shipped import; start (wrangler dev) does not reach it; no Dockerfile/Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 74,
+     "repo": "fastagent-sh/fastagent",
+     "sha": "dbeaf9f516ffd4ee343a81153e901d0e1d49feff",
+     "items": [
+      {
+       "name": "body-parser",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/body-parser@2.3.0 (dev) in GHSA-27r3-jxmh-p828 [2.0.0,2.4.0). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. Path: express (dev) 5.2.1 > body-parser 2.3.0. express is imported only by test/embedding.test.ts:15.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ajv/node_modules/fast-uri@3.1.8 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-w74x-v6f9-j3xg [3.0.0,3.1.9) (+2 more) | node_modules/fast-uri@4.2.1 (dev) in GHSA-333x-w4r6-6crp [4.0.0,4.2.3); GHSA-w74x-v6f9-j3xg [4.0.0,4.2.3) (+2 more). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. Paths: fastify (dev) 5.12.5 > @fastify/ajv-compiler 4.0.6 > fast-uri 4.2.1, and > ajv 8.20.0 > fast-uri 3.1.8 (also fast-json-stringify 7.0.1). fastify is imported only by test/embedding.test.ts:16.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "fastify",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fastify@5.12.5 (dev) in GHSA-389g-gv7q-r4x8 [5.12.2,5.12.6). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. Direct devDependency fastify 5.12.5; imported only by test/embedding.test.ts:16 (a test of embedding fastagent in a host app).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@earendil-works/pi-coding-agent/node_modules/undici@8.10.2 (dev) in GHSA-2m5v-pch6-74hx [8.0.0,8.12.2); GHSA-4qv8-2p9j-2685 [8.0.0,8.12.2) (+6 more). Not in range: node_modules/undici@8.12.3 (not dev). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. The in-range copy is node_modules/@earendil-works/pi-coding-agent/node_modules/undici 8.10.2, path @earendil-works/pi-coding-agent (dev) 1.3.0 > undici 8.10.2. pi-coding-agent appears in src only in comments (src/locked-file.ts:4,68; src/harnesses/models/login.ts:254). The copy shipped code loads (src/proxy.ts:3, src/deploy/agentcore/shell.ts:22) is node_modules/undici 8.12.3, outside every range.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 77,
+     "repo": "ayush-that/cobalt-landing-page",
+     "sha": "9d31e2bc5c9211508f2009171c7634ab3980afc8",
+     "items": [
+      {
+       "name": "ajv",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ajv@6.12.6 (dev) in GHSA-2g4f-4pwh-qvx6 [0,6.14.0). Shipped code: src/ (main.tsx, App.tsx, components/) and index.html, bundled by scripts.build `tsc -b && vite build` with vite.config.ts (plugins: react() only). Its bare imports are react, react-dom, @mui/material, @mui/icons-material, @emotion/react, @emotion/cache (dependencies); no lockfile runtime edge from them reaches these copies. No start script (only dev `vite` and preview `vite preview`), no Dockerfile, Procfile or deployment configuration. Path: eslint (dev) 9.37.0 > ajv 6.12.6 (also @eslint/eslintrc 3.3.1). Lint only (scripts.lint, eslint.config.js).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 79,
+     "repo": "nschema-org/NSchema.Docs",
+     "sha": "478e1fdb58146fb74ddac8b0376f794bd2133412",
+     "items": [
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.4 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-5jgf-p345-68v8 [3.1.3,3.1.6) (+9 more). Production is a static site: netlify.toml build command `npm run build` (astro build), publish `dist`. scripts.start is `astro dev`, which does not load @astrojs/check (that is the `astro check` command, scripts.check). Shipped/imported packages (astro, @astrojs/starlight, starlight-changelogs, starlight-versions, starlight-links-validator in astro.config.mjs) have no lockfile runtime edge to these copies. Path: @astrojs/check (dev) 0.9.9 > @astrojs/language-server 2.16.10 > volar-service-yaml 0.0.70 > yaml-language-server 1.20.0 > ajv 8.20.0 > fast-uri 3.1.4. Type-check tooling only.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "yaml",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/yaml-language-server/node_modules/yaml@2.7.1 (dev) in GHSA-48c2-rrv3-qjmp [2.0.0,2.8.3). Not in range: node_modules/yaml@2.9.0 (not dev). Production is a static site: netlify.toml build command `npm run build` (astro build), publish `dist`. scripts.start is `astro dev`, which does not load @astrojs/check (that is the `astro check` command, scripts.check). Shipped/imported packages (astro, @astrojs/starlight, starlight-changelogs, starlight-versions, starlight-links-validator in astro.config.mjs) have no lockfile runtime edge to these copies. The in-range copy node_modules/yaml-language-server/node_modules/yaml 2.7.1 comes only from @astrojs/check (dev) 0.9.9 > @astrojs/language-server 2.16.10 > volar-service-yaml 0.0.70 > yaml-language-server 1.20.0 > yaml 2.7.1 (type-check tooling). The copy shipped code reaches (starlight-versions 0.9.0 > yaml, node_modules/yaml 2.9.0) is outside the range.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 80,
+     "repo": "CDCgov/dibbs-query-connector",
+     "sha": "1ed649ff10961ad0709366bb8e5a74ed336862dc",
+     "items": [
+      {
+       "name": "deepmerge",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/deepmerge@4.3.1 (dev) in GHSA-gcqx-w48m-w2h4 [4.2.0,4.3.1]. Path: jest (dev) 30.5.2 > @jest/core 30.5.2 > jest-config 30.5.2 > deepmerge 4.3.1 (its only dependent). No file outside the lockfile names deepmerge, jest-config or @jest/core (grep). Production: Dockerfile runner stage copies .next/standalone and runs CMD [\"/app/start.sh\"], start.sh ends `node server.js`; scripts.start `node .next/standalone/server.js`; next.config.mjs output \"standalone\" traces only server-required files. Tests run only through jest scripts.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 81,
+     "repo": "halain/adminpro-angular",
+     "sha": "46586cd94c4d97e2ef7f8d2f061b15fe24839f62",
+     "items": [
+      {
+       "name": "diff",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/diff@4.0.2 (dev) in GHSA-73rr-hh4g-fpgx [4.0.0,4.0.4). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: ts-node (dev) 10.9.2 > diff 4.0.2 (also tslint 6.1.3). ts-node is required by the protractor e2e config (e2e/protractor.conf.js:23); tslint by lint. Neither is a production command.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 82,
+     "repo": "aydabd/cacad",
+     "sha": "73741e3ba653ef6551185963f766dfd7a44d389e",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@vitest/mocker@4.1.11 (dev) in GHSA-qxg6-89mg-rqv8 [2.1.0-beta.7,4.1.12); GHSA-xp26-3454-mjgp [4.1.11,4.1.12). Path: vitest (dev) 4.1.11 > @vitest/mocker 4.1.11 (its only dependent). vitest is referenced only by vitest.config.ts and src/**/*.test.ts (src/cli.test.ts, src/contracts.test.ts, src/generators/*.test.ts, src/validators/bbr.test.ts). Shipped: bin/exports dist/cli.js and dist/contracts/* (tsc output, scripts.build); no start script, Dockerfile, Procfile or deployment configuration.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 84,
+     "repo": "BilLogic/uno-blueprint",
+     "sha": "167d1601aea3c727f76c178cfd64649a0a96d5af",
+     "items": [
+      {
+       "name": "body-parser",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/body-parser@2.3.0 (dev) in GHSA-27r3-jxmh-p828 [2.0.0,2.4.0). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > express 5.2.1 > body-parser 2.3.0. shadcn is dev tooling: its stylesheet reaches the app only as a committed copy (src/styles/shadcn-tailwind.css, imported at src/styles/tailwind.config.css:108) that the dev script scripts/vendor-shadcn-css.mjs (scripts.vendor:shadcn-css) rewrites from the installed package; shipped code never imports the shadcn package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "deepmerge",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/deepmerge@4.3.1 (dev) in GHSA-gcqx-w48m-w2h4 [4.2.0,4.3.1]. Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > deepmerge 4.3.1 (its only dependent). Component CLI tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.8 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-w74x-v6f9-j3xg [3.0.0,3.1.9) (+2 more). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > ajv 8.20.0 > fast-uri 3.1.8 (also ajv-formats' and conf's ajv). CLI tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "hono",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/hono@4.13.7 (dev) in GHSA-5r4p-p66f-jhc7 [4.12.4,4.13.11). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > hono 4.13.7 (also @hono/node-server 2.1.1). CLI tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "ip-address",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ip-address@10.7.2 (dev) in GHSA-rxp7-6hxx-x8q5 [0,10.7.4). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > socks 2.8.9 > ip-address 10.7.2 (also express-rate-limit 8.6.2 under @modelcontextprotocol/sdk). CLI tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "qs",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/qs@6.16.0 (dev) in GHSA-6pq8-jhm2-2vcw [6.7.0,6.16.1). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > express 5.2.1 > qs 6.16.0 (also body-parser). CLI tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 85,
+     "repo": "tranhatam-collab/tueban-platform",
+     "sha": "f6187fa956ec46beb50826a155939a0ea3c8bde3",
+     "items": [
+      {
+       "name": "sharp",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/sharp@0.34.5 (dev) in GHSA-f88m-g3jw-g9cj [0,0.35.0); GHSA-rgj7-g3m4-5g8c [0,0.35.4) (+1 more). Production is a Cloudflare Worker: wrangler.jsonc main apps/api/src/index.ts, deployed by scripts.deploy:worker `wrangler deploy`, which bundles the Worker with esbuild; the web app is static HTML/CSS/JS in apps/web/public. apps/api/src has no bare imports (no npm package is bundled into the Worker). No start script, Dockerfile or Procfile; scripts/*.sh are empty. Path: wrangler (dev) 4.71.0 > miniflare 4.20260301.1 > sharp 0.34.5. miniflare is the local simulator for `wrangler dev` (scripts.dev:worker); nothing in the Worker imports sharp.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@7.18.2 (dev) in GHSA-2gqq-gqf2-x968 [7.1.0,7.29.1); GHSA-2jfj-6hjv-fm6j [7.0.0,7.29.1) (+30 more). Production is a Cloudflare Worker: wrangler.jsonc main apps/api/src/index.ts, deployed by scripts.deploy:worker `wrangler deploy`, which bundles the Worker with esbuild; the web app is static HTML/CSS/JS in apps/web/public. apps/api/src has no bare imports (no npm package is bundled into the Worker). No start script, Dockerfile or Procfile; scripts/*.sh are empty. Path: wrangler (dev) 4.71.0 > miniflare 4.20260301.1 > undici 7.18.2. Local simulator / CLI tooling; the Worker bundles no npm package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "ws",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ws@8.18.0 (dev) in GHSA-58qx-3vcg-4xpx [8.0.0,8.20.1); GHSA-96hv-2xvq-fx4p [8.0.0,8.21.0). Production is a Cloudflare Worker: wrangler.jsonc main apps/api/src/index.ts, deployed by scripts.deploy:worker `wrangler deploy`, which bundles the Worker with esbuild; the web app is static HTML/CSS/JS in apps/web/public. apps/api/src has no bare imports (no npm package is bundled into the Worker). No start script, Dockerfile or Procfile; scripts/*.sh are empty. Path: wrangler (dev) 4.71.0 > miniflare 4.20260301.1 > ws 8.18.0. Local simulator tooling; the Worker bundles no npm package.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 86,
+     "repo": "Vithanco/vscode-vithanco",
+     "sha": "167cc7eeeede9dbbce06a705825e4a63abeb3afc",
+     "items": [
+      {
+       "name": "@azure/msal-node",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@azure/msal-node@5.1.5 (dev) in GHSA-xcx6-jx8p-x3h5 [5.0.0-beta.0,7.1.0). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > @azure/identity 4.13.1 > @azure/msal-node 5.1.5. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/brace-expansion@1.1.14 (dev) in GHSA-3jxr-9vmj-r5cp [0,1.1.16); GHSA-6j4f-fj2g-mc7p [0,1.1.19) (+4 more) | node_modules/glob/node_modules/brace-expansion@5.0.5 (dev) in GHSA-3jxr-9vmj-r5cp [3.0.0,5.0.7); GHSA-6j4f-fj2g-mc7p [4.0.0,5.0.10) (+5 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Paths: @vscode/vsce (dev) 3.9.1 > minimatch 3.1.5 > brace-expansion 1.1.14, and vsce > glob 11.1.0 > minimatch 10.2.5 > brace-expansion 5.0.5. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.2 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-4c8g-83qw-93j6 [3.0.0,3.1.3) (+9 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > @secretlint/node 10.2.2 > @secretlint/config-loader 10.2.2 > ajv 8.20.0 > fast-uri 3.1.2. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "form-data",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/form-data@4.0.5 (dev) in GHSA-hmw2-7cc7-3qxx [4.0.0,4.0.6). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > form-data 4.0.5. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/js-yaml@4.1.1 (dev) in GHSA-2883-xcg3-v3hh [4.0.0,4.3.2); GHSA-52cp-r559-cp3m [4.0.0,4.3.0) (+2 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > @secretlint/node 10.2.2 > @secretlint/config-loader 10.2.2 > rc-config-loader 4.1.4 > js-yaml 4.1.1 (also @textlint/linter-formatter). Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "linkify-it",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/linkify-it@5.0.0 (dev) in GHSA-22p9-wv53-3rq4 [0,5.0.1); GHSA-v245-v573-v5vm [0,5.0.2). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > markdown-it 14.1.1 > linkify-it 5.0.0. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "markdown-it",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/markdown-it@14.1.1 (dev) in GHSA-253c-mchw-3w2r [0,14.3.1); GHSA-6v5v-wf23-fmfq [0,14.2.0) (+3 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > markdown-it 14.1.1 (its only dependent). src/extension.ts:3 imports it as a type only, which esbuild erases; at run time the extension receives VS Code's own markdown-it instance (package.json contributes markdown.markdownItPlugins), and node_modules is excluded from the .vsix.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "qs",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/qs@6.15.1 (dev) in GHSA-4mjr-xmp4-gh2g [2.2.5,6.16.0); GHSA-6pq8-jhm2-2vcw [6.7.0,6.16.1) (+2 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > typed-rest-client 1.8.11 > qs 6.15.1. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tmp",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/tmp@0.2.5 (dev) in GHSA-ph9p-34f9-6g65 [0,0.2.6). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > tmp 0.2.5. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@7.25.0 (dev) in GHSA-2gqq-gqf2-x968 [7.1.0,7.29.1); GHSA-2jfj-6hjv-fm6j [7.0.0,7.29.1) (+27 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > cheerio 1.2.0 > undici 7.25.0. Release tooling.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": 5,
+   "rows": [
+    87,
+    98
+   ],
+   "items": 18,
+   "repositories": [
+    {
+     "row": 87,
+     "repo": "korbonits/korbonits.github.io",
+     "sha": "c308a2f1c93117297859d9f709156247b0eda195",
+     "items": [
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.7 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-hrr3-gc8f-f4qj [3.0.0,3.1.8) (+3 more). Path: @commitlint/cli (dev) 20.5.0 > @commitlint/load 20.5.0 > @commitlint/config-validator 20.5.0 > ajv 8.18.0 > fast-uri 3.1.7 (ajv's only dependent). Commit-message linting. Production per netlify.toml: build `node scripts/build-embeddings.js && npm run build` (astro build + pagefind), publish dist, functions in netlify/functions (track.js imports only @supabase/supabase-js) and edge functions; no shipped file imports ajv, fast-uri or @commitlint (imports scan of src/, netlify/, public/). No start script, Dockerfile or Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 88,
+     "repo": "Azure/api-management-developer-portal",
+     "sha": "46ac32b15e223b1eef73e3ef3bbe3e62a9808980",
+     "items": [
+      {
+       "name": "fast-uri",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.0.6 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-4c8g-83qw-93j6 [3.0.0,3.1.3) (+10 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Its only dependent is node_modules/compression-webpack-plugin/node_modules/ajv 8.17.1: compression-webpack-plugin (dev) 11.1.0 > schema-utils 4.3.0 > ajv 8.17.1 > fast-uri 3.0.6. compression-webpack-plugin is not used by any webpack config (it appears only in package.json), so nothing loads this copy.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "flatted",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/flatted@3.2.5 (dev) in GHSA-25h7-pfq9-p65f [0,3.4.0); GHSA-rf6f-7fwh-wjgh [0,3.4.2). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: eslint (dev) 8.45.0 > file-entry-cache 6.0.1 > flat-cache 3.0.4 > flatted 3.2.5. Lint only (scripts.lint, .github/workflows/eslint.yml).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "playwright",
+       "first_run": "no",
+       "first_evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/playwright@1.40.1 (dev) in GHSA-7mvr-c777-76hp [0,1.55.1). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Direct devDependency playwright 1.40.1 (with @playwright/test); used only by tests (playwright.config.ts, tests/) and CI (.github/workflows/test.yml).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 89,
+     "repo": "chirag127/oz-chrome",
+     "sha": "a62ec0264acf2f2eed92113b97e122cd70b2c53a",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker 3.2.7 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11), GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11, GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Production: Path: root devDependency vitest > @vitest/mocker. vitest runs only the `test` script (package.json:26) on src/index.test.ts:1; no shipped file imports it; not reachable from astro or from anything shipped; no production start command, Dockerfile, Procfile or deploy config. Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "tinypool",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/tinypool 1.1.1 (dev) in range: OSV GHSA-5gmw-xhrv-c9v3 range[0,2.1.1), GHSA-85c8-ppgw-ccpr range[0,2.1.2); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0, GHSA-85c8-ppgw-ccpr <2.1.2. Production: Path: root devDependency vitest > tinypool. vitest runs only the `test` script (package.json:26) on src/index.test.ts:1; no shipped file imports it; not reachable from astro or from anything shipped; no production start command, Dockerfile, Procfile or deploy config. Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest 3.2.7 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Production: Path: root devDependency vitest 3.2.7. vitest runs only the `test` script (package.json:26) on src/index.test.ts:1; no shipped file imports it; not reachable from astro or from anything shipped; no production start command, Dockerfile, Procfile or deploy config. Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 92,
+     "repo": "BROCKUGANDA/permitzero",
+     "sha": "ec3862cd251c3754f4461849fc2b464047dc4ce6",
+     "items": [
+      {
+       "name": "esbuild",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@esbuild-kit/core-utils/node_modules/esbuild 0.18.20 (dev) in range: OSV GHSA-67mh-4wv8-2f99 range[0,0.25.0); npm GHSA-67mh-4wv8-2f99 <=0.24.2 | node_modules/drizzle-kit/node_modules/esbuild 0.19.12 (dev) in range: OSV GHSA-67mh-4wv8-2f99 range[0,0.25.0); npm GHSA-67mh-4wv8-2f99 <=0.24.2 | node_modules/esbuild 0.28.2 (not dev): not in range of any listed advisory. Production: In-range copies are dev-only: packages/db devDependency drizzle-kit > esbuild (node_modules/drizzle-kit/node_modules/esbuild 0.19.12) and drizzle-kit > @esbuild-kit/esm-loader > @esbuild-kit/core-utils > esbuild (0.18.20). drizzle-kit appears only in packages/db/package.json:36; db scripts run `tsx src/cli.ts` and db:generate only echoes; nothing imports drizzle-kit (grep). The non-dev copy node_modules/esbuild 0.28.2 that tsx loads in production is outside the range (<=0.24.2). Production: infra/docker/Dockerfile api/worker/migrate images install with `npm ci --omit=dev` (line 48) and run tsx (lines 69, 74, 82); the web image is the Next standalone trace (line 93). vitest is imported only by test files (apps/*/test, packages/*/test) and vitest.config.ts, and run by `test` scripts and the compose `verify` service (infra/docker-compose.yml, profile test, a release gate). No shipped file imports the package (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 93,
+     "repo": "Gray-Ghost-Data-Consultants-LLC/grayghostdata-website",
+     "sha": "6e31e9eedf4fe674edfb0257d6ee53dd16408acc",
+     "items": [
+      {
+       "name": "brace-expansion",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@eslint/config-array/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/@eslint/eslintrc/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/brace-expansion 5.0.8 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[4.0.0,5.0.10), GHSA-q2hr-2g5m-vwhr range[4.0.0,5.0.12), GHSA-qhr7-859c-m2p7 range[4.0.0,5.0.11), GHSA-rgw5-rvv9-x895 range[4.0.0,5.0.9); npm GHSA-rgw5-rvv9-x895 >=4.0.0 <5.0.9, GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12, GHSA-qhr7-859c-m2p7 >=4.0.0 <5.0.11, GHSA-6j4f-fj2g-mc7p >=4.0.0 <5.0.10 | node_modules/eslint-plugin-import/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/eslint-plugin-jsx-a11y/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/eslint-plugin-react/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/eslint/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19. Production: Paths (all dev): eslint > minimatch > brace-expansion (eslint/node_modules copy 1.1.16), eslint > @eslint/config-array > minimatch and eslint > @eslint/eslintrc > minimatch (1.1.16 copies), eslint-config-next > eslint-plugin-import / eslint-plugin-jsx-a11y / eslint-plugin-react > minimatch (1.1.16 copies), eslint-config-next > typescript-eslint > @typescript-eslint/typescript-estree > minimatch > brace-expansion (root 5.0.8). ESLint runs only in `lint` (package.json:9, eslint.config.mjs:2 imports eslint-config-next); next.config.js:21-23 sets eslint.ignoreDuringBuilds. Production is `next build` / `next start` (package.json:7-8, vercel.json buildCommand next build, output standalone), and no shipped file imports eslint, minimatch, js-yaml or brace-expansion (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "js-yaml",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/js-yaml 4.3.0 (dev) in range: OSV GHSA-2883-xcg3-v3hh range[4.0.0,4.3.2), GHSA-5p4m-2wfm-xmqj range[4.0.0,4.3.1); npm GHSA-5p4m-2wfm-xmqj >=4.0.0 <4.3.1, GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. Production: Paths: root devDependency eslint > @eslint/eslintrc > js-yaml; eslint-config-next > [peer]eslint > @eslint/eslintrc > js-yaml. ESLint runs only in `lint` (package.json:9, eslint.config.mjs:2 imports eslint-config-next); next.config.js:21-23 sets eslint.ignoreDuringBuilds. Production is `next build` / `next start` (package.json:7-8, vercel.json buildCommand next build, output standalone), and no shipped file imports eslint, minimatch, js-yaml or brace-expansion (grep).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 94,
+     "repo": "paritytech/triangle-js-sdks",
+     "sha": "c7fcf98e87e4e95661b2f49d834b68c3a5ffc74f",
+     "items": [
+      {
+       "name": "postcss-selector-parser",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/postcss-selector-parser 7.1.4 (dev) in range: OSV GHSA-rj75-hqrm-r3gf range[7.0.0,7.1.6); npm GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6. Production: Path: packages/host-papp-react-ui devDependency typescript-plugin-css-modules (a TypeScript editor language-service plugin) > postcss-modules-local-by-default > postcss-selector-parser 7.1.4. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "zod",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/zod 4.4.3 (dev) in range: OSV GHSA-mrhx-c7xc-m3w5 range[0,4.6.6); npm GHSA-mrhx-c7xc-m3w5 <4.6.6. Production: Path: root devDependency knip > zod (unused-code linter, knip.config.ts:1). Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 95,
+     "repo": "clay-good/roughlogic.com",
+     "sha": "92cebbce3a4901160fa311a01745cb7505aee139",
+     "items": [
+      {
+       "name": "undici",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/undici 7.29.1 (dev) in range: OSV GHSA-2m5v-pch6-74hx range[7.0.0,7.30.1), GHSA-4qv8-2p9j-2685 range[7.0.0,7.30.1), GHSA-4w7w-5xrc-9h26 range[7.0.0,7.30.1), GHSA-55wc-3pg8-jfw6 range[7.15.0,7.30.1), GHSA-9fm3-97px-rjf6 range[7.0.0,7.30.1), GHSA-f72v-6w45-q472 range[7.15.0,7.30.1), GHSA-qrxm-fqhp-jwvm range[7.0.0,7.30.1), GHSA-xjj6-f33q-929c range[7.18.0,7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1, GHSA-f72v-6w45-q472 >=7.15.0 <7.30.1, GHSA-xjj6-f33q-929c >=7.18.0 <7.30.1, GHSA-4w7w-5xrc-9h26 >=7.0.0 <7.30.1, GHSA-2m5v-pch6-74hx >=7.0.0 <7.30.1, GHSA-qrxm-fqhp-jwvm >=7.0.0 <7.30.1, GHSA-9fm3-97px-rjf6 >=7.0.0 <7.30.1, GHSA-55wc-3pg8-jfw6 >=7.15.0 <7.30.1. Production: Path: root devDependency wrangler > miniflare > undici 7.29.1. wrangler is the release CLI for the report Worker (docs/calculator-reports.md:114 `npx --no-install wrangler deploy`); the deployed Worker entry report-worker.mjs (wrangler.jsonc `main`) imports only ./tools-data.js (report-worker.mjs:4). The site is static (package.json description; build `node scripts/build.mjs`, package.json:19); mcp/server.mjs and mcp/catalog.mjs import only node: builtins and repo files; grep finds no undici or miniflare import outside the lockfile and comments; no start script, Dockerfile or Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 96,
+     "repo": "epam/statgpt-portal-frontend",
+     "sha": "bcccb590cac7f15e7cd4a69b8fa4181acf62d49f",
+     "items": [
+      {
+       "name": "zod",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/zod 4.4.3 (dev) in range: OSV GHSA-mrhx-c7xc-m3w5 range[0,4.6.6); npm GHSA-mrhx-c7xc-m3w5 <4.6.6. Production: Path: root devDependency eslint-config-next > eslint-plugin-react-hooks > zod 4.4.3 (lint only). Not reachable from @nx/next or any shipped import (lockfile walk, grep); production image and published libs do not include it (Dockerfile:29, :36 --omit=dev).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 97,
+     "repo": "frioux/woodworking-tools",
+     "sha": "47c23bc88966efadc4b25c16f47fcad11176b5e5",
+     "items": [
+      {
+       "name": "ajv",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/ajv 6.12.6 (dev) in range: OSV GHSA-2g4f-4pwh-qvx6 range[0,6.14.0); npm GHSA-2g4f-4pwh-qvx6 <6.14.0 | node_modules/html-validate/node_modules/ajv 8.17.1 (dev) in range: OSV GHSA-2g4f-4pwh-qvx6 range[7.0.0-alpha.0,8.18.0); npm GHSA-2g4f-4pwh-qvx6 >=7.0.0-alpha.0 <8.18.0. Production: Paths: root devDependency eslint > ajv 6.12.6; root devDependency html-validate > ajv 8.17.1 (html-validate/node_modules copy). Both run only in `lint` (package.json:9). The shipped site is static HTML/JS whose modules import only local files (frame-designer/frame-ui.js:1-2, drawer-designer/drawer-ui.js:1-2, milk-paint/milk-paint-ui.js:1, rocker-model/rocker-ui.js:10-11); the deploy job uploads the checkout without installing dependencies (.github/workflows/ci.yml:36-46); no build step, start script, Dockerfile or Procfile.",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    },
+    {
+     "row": 98,
+     "repo": "acekyd/acekyd",
+     "sha": "6f12af9d35bd13b0f20a3d5271b7c11644226151",
+     "items": [
+      {
+       "name": "@vitest/mocker",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/@vitest/mocker 4.1.10 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11), GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11, GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency vitest > @vitest/mocker; vitest runs only `test` (package.json:8) on composables/readingTime.test.ts:1. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "sharp",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/sharp 0.35.3 (dev) in range: OSV GHSA-rgj7-g3m4-5g8c range[0,0.35.4), GHSA-wq5f-xc86-pv6w range[0,0.35.5); npm GHSA-rgj7-g3m4-5g8c <0.35.4, GHSA-wq5f-xc86-pv6w <0.35.5. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency sharp 0.35.3, used only by scripts/generate-og-cards.mjs:12 (the `og:cards` build script); no image module is installed. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      },
+      {
+       "name": "vitest",
+       "first_run": "no",
+       "first_evidence": "In range: node_modules/vitest 4.1.10 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency vitest; runs only `test` (package.json:8) on composables/readingTime.test.ts:1. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local).",
+       "first_criterion": "none",
+       "first_in_range": "yes"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

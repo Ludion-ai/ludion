@@ -1,0 +1,234 @@
+[
+  {
+    "repo": "korbonits/korbonits.github.io",
+    "sha": "c308a2f1c93117297859d9f709156247b0eda195",
+    "finished": true,
+    "packages": [
+      {
+        "name": "fast-uri",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: the only copy node_modules/fast-uri 3.1.7 (dev) is in OSV GHSA-333x-w4r6-6crp [3.0.0,3.1.9) (re-fetched from api.osv.dev) and npm GHSA-hrr3-gc8f-f4qj >=3.0.0 <3.1.8 (+3 more). D1: lockfile reverse walk gives its only dependent node_modules/ajv, and its only ancestors are @commitlint/cli > @commitlint/load > @commitlint/config-validator / @commitlint/resolve-extends > ajv; every path starts at root devDependency @commitlint/cli (package.json:30), on D1's linter list (@commitlint/*). Section-2 additions checked, none applies: grep over every file (lockfile excluded) finds ajv/fast-uri/commitlint only in package.json devDependencies and overrides; import scan of all 43 section-2 source files finds no import of them; the only P2 file astro.config.mjs names astro, @astrojs/sitemap, remark-math, rehype-katex; P6 build (package.json:10 astro build && pagefind) and netlify.toml:6 command (node scripts/build-embeddings.js && npm run build) run astro and pagefind; no start/prestart/poststart script, Dockerfile, Procfile or compose file; not P3/P4; a closure from every P0-P6 seed over dependencies/optionalDependencies/peerDependencies does not reach it."
+      }
+    ]
+  },
+  {
+    "repo": "Azure/api-management-developer-portal",
+    "sha": "46ac32b15e223b1eef73e3ef3bbe3e62a9808980",
+    "finished": true,
+    "packages": [
+      {
+        "name": "fast-uri",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: only copy node_modules/fast-uri 3.0.6 (dev), OSV GHSA-333x-w4r6-6crp [3.0.0,3.1.9) and npm GHSA-4c8g-83qw-93j6 >=3.0.0 <3.1.3 (+10). Not D1: its only dependent is node_modules/compression-webpack-plugin/node_modules/ajv 8.17.1 (every other ajv copy is 6.x or uses uri-js), ancestors only compression-webpack-plugin (root devDependency, package.json:52) > its nested schema-utils 4.3.0 / ajv-keywords > ajv; compression-webpack-plugin is not a D1 package. D2: whole source tree read (990 section-2 source files); no Dockerfile, compose, Procfile or other deploy file in the repository. No import: grep finds compression-webpack-plugin/schema-utils/fast-uri only in package.json:52 (and unrelated DecompressionStream). No build tool configuration names it: the P2 files webpack.build/designer/develop/function/mockStaticData/publisher/runtime/staticData.js and postcss.config.js name autoprefixer, buffer, copy-webpack-plugin, css-loader, html-loader, ifdef-loader, mini-css-extract-plugin, postcss-loader, querystring-es3, raw-loader, sass-loader, stream-browserify, terser-webpack-plugin, ts-loader, webpack, webpack-merge. Commands: P5 start (package.json:14) runs webpack-dev-server with webpack.develop.js, P6 build (package.json:15) runs webpack; following webpack-dev-server, webpack and every other production copy over dependencies/optional/peer edges does not reach the nested ajv or fast-uri. Not P3/P4. Section-2 additions checked, none applies."
+      },
+      {
+        "name": "flatted",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/flatted 3.2.5 (dev), OSV GHSA-25h7-pfq9-p65f [0,3.4.0) and GHSA-rf6f-7fwh-wjgh [0,3.4.2); npm <3.4.0 and <=3.4.1. D1: dependent flat-cache 3.0.4 < file-entry-cache 6.0.1 < eslint; all ancestors are eslint, @typescript-eslint/* and @eslint-community/eslint-utils, so every path from the root's declared dependencies passes through eslint (root devDependency, package.json:55) or @typescript-eslint/* (D1 linter list). Section-2 additions checked, none applies: eslint is mentioned only in .eslintrc.cjs (lint rc, not source), package.json and .github/workflows/eslint.yml; no source import, no P2 file names any ancestor, eslint runs only from the lint script (package.json:28), not from start/build; no Dockerfile; not P3/P4; not reached from any production copy (closure over dependencies/optional/peer edges)."
+      },
+      {
+        "name": "playwright",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/playwright 1.40.1 (dev), OSV/npm GHSA-7mvr-c777-76hp [0,1.55.1). D1: playwright is on D1's test-runner list and is declared in the root devDependencies (package.json:64); its other dependent is @playwright/test (also D1). Section-2 additions checked, none applies: every import of playwright/@playwright/test is under tests/e2e/ (a tests folder) or in playwright.config.ts (test-runner config), both outside section 2's source; no P2 file names it; it runs only from .github/workflows/test.yml, not from start/build; no Dockerfile; not P3/P4; not reached from any production copy."
+      }
+    ]
+  },
+  {
+    "repo": "chirag127/oz-chrome",
+    "sha": "a62ec0264acf2f2eed92113b97e122cd70b2c53a",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/@vitest/mocker 3.2.7 (dev), OSV GHSA-82fw-gwwq-j7x9 [2.1.0,4.1.11) and GHSA-qxg6-89mg-rqv8 [2.1.0-beta.7,4.1.12) (re-fetched). D1: on the test-runner list (@vitest/*), and its only dependent is vitest, a root devDependency (package.json:40). Section-2 additions checked, none applies: the repository has 16 files; vitest is imported only by src/index.test.ts:1 (test file); the only P2 file tsup.config.ts imports tsup and names astro; P6 build (package.json:25) runs tsup; no start script, Dockerfile or deploy file; not P3/P4; following astro, tsup, typescript (P3) and vite (P3) does not reach it."
+      },
+      {
+        "name": "tinypool",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/tinypool 1.1.1 (dev), OSV GHSA-5gmw-xhrv-c9v3 [0,2.1.1) and GHSA-85c8-ppgw-ccpr [0,2.1.2) (re-fetched). D1: its only dependent is vitest, root devDependency (package.json:40), on D1's test-runner list, so every path passes through vitest. Section-2 additions checked, none applies: no file names tinypool (grep); vitest imported only by src/index.test.ts:1; tsup.config.ts (only P2 file) names tsup and astro; build runs tsup only; no start script, Dockerfile or deploy file; not P3/P4; not reached from any production copy."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/vitest 3.2.7 (dev), OSV/npm GHSA-82fw-gwwq-j7x9 [2.1.0,4.1.11). D1: on the test-runner list and declared in the root devDependencies (package.json:40). Section-2 additions checked, none applies: imported only by src/index.test.ts:1 (test file); run only by the test script (package.json:26); no vitest config, no P2 file names it (tsup.config.ts names tsup, astro); build runs tsup; no start script, Dockerfile or deploy file; not P3/P4; no production copy depends on it."
+      }
+    ]
+  },
+  {
+    "repo": "BROCKUGANDA/permitzero",
+    "sha": "ec3862cd251c3754f4461849fc2b464047dc4ce6",
+    "finished": true,
+    "packages": [
+      {
+        "name": "esbuild",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Not reused: esbuild is on P3's list, a condition section 5 names, so this is a new verdict. In range: node_modules/@esbuild-kit/core-utils/node_modules/esbuild 0.18.20 (dev) and node_modules/drizzle-kit/node_modules/esbuild 0.19.12 (dev), OSV/npm GHSA-67mh-4wv8-2f99 [0,0.25.0) (re-fetched); node_modules/esbuild 0.28.2 (not dev) is out of range. P3: the lockfile has only these three copies, so the root and all 13 workspace folders resolve node_modules/esbuild 0.28.2; the nested copies are not P3. The nested copies are reached only through drizzle-kit 0.30.6 (packages/db devDependency, packages/db/package.json:36) > esbuild, and drizzle-kit > @esbuild-kit/esm-loader > @esbuild-kit/core-utils > esbuild; drizzle-kit is not a D1 package. D2: whole tree read (146 section-2 source files); grep finds drizzle-kit only at packages/db/package.json:36 and esbuild/esbuild-kit nowhere outside the lockfile; no drizzle config; P2 files (apps/web/next.config.ts, postcss.config.mjs, tailwind.config.ts) do not name them; P5 start scripts run tsx (apps/api, apps/worker) and next (apps/web); P6 build runs next build; Dockerfile CMDs (infra/docker/Dockerfile:69, :74, :82) run tsx; P6 RUNs of the stages web copies from (web-build :42 npm run build -w @permitzero/web, build :38 npm run typecheck = tsc in each workspace, deps-full :34 npm ci) run none of them; infra/docker-compose.yml verify command (line 170, npx vitest run) makes vitest production, and following it does not reach them; workspace imports (@permitzero/db etc.) follow dependencies only, not packages/db's devDependencies. Production image: the final stage web (Dockerfile:87-93) is FROM node:22-alpine and copies only .next/standalone and .next/static from web-build, so it does not hold devDependencies; the api/worker/migrate stages copy node_modules from deps-prod (npm ci --omit=dev, :48, :53); .dockerignore ignores node_modules. No P-rule makes the nested copies production."
+      }
+    ]
+  },
+  {
+    "repo": "Gray-Ghost-Data-Consultants-LLC/grayghostdata-website",
+    "sha": "6e31e9eedf4fe674edfb0257d6ee53dd16408acc",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: six copies 1.1.16 (node_modules/@eslint/config-array/, @eslint/eslintrc/, eslint/, eslint-plugin-import/, eslint-plugin-jsx-a11y/, eslint-plugin-react/ node_modules/brace-expansion) in GHSA-mh99-v99m-4gvg [0,1.1.17) etc., and node_modules/brace-expansion 5.0.8 in GHSA-rgw5-rvv9-x895 [4.0.0,5.0.9) (re-fetched); all dev. D1: each copy's only dependent is the minimatch next to it, and the ancestor sets contain only eslint, @eslint/*, @eslint-community/eslint-utils, eslint-config-next, eslint-plugin-*, eslint-import-resolver-typescript, typescript-eslint and @typescript-eslint/* (the root minimatch serves @typescript-eslint/typescript-estree); every path from the root's declared dependencies passes through eslint or eslint-config-next (devDependencies, package.json:95-96) or typescript-eslint/@typescript-eslint/*, all on D1's linter list. Section-2 additions checked, none applies: eslint-config-next is imported only by eslint.config.mjs:2 (linter config, not source); no source file imports any ancestor (grep: eslint appears elsewhere only in comments and next.config.js:21 as an object key); P2 files next.config.js, postcss.config.js, tailwind.config.ts name next, autoprefixer, tailwindcss, tailwindcss-animate; P5 start and P6 build/postbuild (package.json:7-8, :10; vercel.json buildCommand next build) run next and next-sitemap, and linters a build runs are excluded from P6 anyway; no Dockerfile; not P3/P4; next's peers and every other production copy do not reach them."
+      },
+      {
+        "name": "js-yaml",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/js-yaml 4.3.0 (dev), OSV GHSA-5p4m-2wfm-xmqj [4.0.0,4.3.1) and GHSA-2883-xcg3-v3hh [4.0.0,4.3.2) (re-fetched). D1: only dependent @eslint/eslintrc; ancestors only eslint, @eslint/eslintrc, @eslint-community/eslint-utils, eslint-config-next, eslint-plugin-*, eslint-import-resolver-typescript, typescript-eslint, @typescript-eslint/*; every path passes through eslint or eslint-config-next (root devDependencies, package.json:95-96) or another D1 linter package. Section-2 additions checked, none applies: no file names js-yaml (grep, lockfile excluded); eslint-config-next imported only by eslint.config.mjs:2 (linter config); no P2 file, start, build, postbuild or vercel.json command names or runs an ancestor; no Dockerfile; not P3/P4; not reached from any production copy."
+      }
+    ]
+  },
+  {
+    "repo": "paritytech/triangle-js-sdks",
+    "sha": "c7fcf98e87e4e95661b2f49d834b68c3a5ffc74f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "postcss-selector-parser",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: only copy node_modules/postcss-selector-parser 7.1.4 (dev), OSV/npm GHSA-rj75-hqrm-r3gf [7.0.0,7.1.6) (re-fetched). Not D1: dependents postcss-modules-local-by-default and postcss-modules-scope, whose only dependent is typescript-plugin-css-modules (packages/host-papp-react-ui devDependency, package.json:51), a TypeScript editor plugin not on D1's lists. D2: whole tree read (262 section-2 source files), no Dockerfile or deploy file. typescript-plugin-css-modules appears only in packages/host-papp-react-ui/tsconfig.json:8 and tsconfig.storybook.json:9 ('plugins'), which are not P2 files (tsconfig counts only for jsxImportSource) and not imports; no source or stylesheet imports it or postcss-modules-*/postcss-selector-parser (grep). P2 files (nx.json, both project.json, both vite.config.ts, .storybook/main.ts and preview.tsx) name @nx/*, nx, storybook, @storybook/react(-vite), @vitejs/plugin-react, babel-plugin-react-compiler, vite, vite-plugin-dts, vite-plugin-wasm, vitest and workspaces, none of which reaches it; P6 build (package.json:12 nx run-many -t build) runs nx, tsc (@nx/js/typescript) and the project.json build targets npm run build = vite build (host-papp-react-ui/package.json:29); no start scripts; vite (P3) and the workspace's own dependencies do not reach it. Section-2 additions checked, none applies."
+      },
+      {
+        "name": "zod",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: only copy node_modules/zod 4.4.3 (dev), OSV/npm GHSA-mrhx-c7xc-m3w5 [0,4.6.6) (re-fetched). Not D1: its only dependent is knip (root devDependency, package.json:43), which is not on D1's lists. D2: whole tree read, no Dockerfile or deploy file. knip.config.ts is section-2 source, but its line 1 is 'import type { KnipConfig } from knip', a type-only import, which section 2 excludes; grep finds knip elsewhere only in package.json:20 (the knip script) and docs; no P2 file names knip or zod; no build command runs knip (build = nx run-many -t build: tsc and vite build); no start script; not P3/P4; no production copy depends on knip or zod. Section-2 additions checked, none applies."
+      }
+    ]
+  },
+  {
+    "repo": "clay-good/roughlogic.com",
+    "sha": "92cebbce3a4901160fa311a01745cb7505aee139",
+    "finished": true,
+    "packages": [
+      {
+        "name": "undici",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: only copy node_modules/undici 7.29.1 (dev), OSV GHSA-2m5v-pch6-74hx [7.0.0,7.30.1) and 7 more (re-fetched two). Not D1: only path is root devDependency wrangler (package.json:11) > miniflare > undici; wrangler is not on D1's lists. D2: whole tree read (270 section-2 source files), no Dockerfile, compose, Procfile or other deploy file, and no .github workflow mentions wrangler. No source file imports wrangler, miniflare or undici (grep: only comments, docs and file-name strings in scripts/build.mjs:252 and scripts/check-wiring.mjs:82); report-worker.mjs, the Worker entry, imports no installed package. The one node_modules path, wrangler.jsonc:2 \"$schema\": \"node_modules/wrangler/config-schema.json\", is in a .jsonc file, which is neither a section-2 source file nor one of P2's build tool configuration files, so it is not an import under section 2 (noted as the one point a reader could weigh differently). No P2 files exist; P6 build (package.json:19) runs node scripts/build.mjs; no start script; wrangler deploy appears only in docs/calculator-reports.md; not P3/P4; the only production copies reached by imports (@playwright/test via scripts/capture-readme-shots.mjs:17) do not reach it. Section-2 additions checked, none applies."
+      }
+    ]
+  },
+  {
+    "repo": "epam/statgpt-portal-frontend",
+    "sha": "bcccb590cac7f15e7cd4a69b8fa4181acf62d49f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "zod",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/zod 4.4.3 (dev), OSV/npm GHSA-mrhx-c7xc-m3w5 [0,4.6.6) (re-fetched). D1: dependents are node_modules/eslint-config-next/node_modules/eslint-plugin-react-hooks 7.1.1 (dependencies) and zod-validation-error 4.0.2 (peer), whose only dependent is that same nested plugin; the only ancestors are eslint-config-next 16.2.12 (root devDependency, package.json:99) and those two, so every path passes through eslint-config-next (D1 linter list, eslint-*). Section-2 additions checked, none applies: zod appears in no repository file (grep); eslint-plugin-react-hooks is imported only by eslint.config.mjs:8 (linter config) and that root copy 5.2.0 has no zod dependency; jest.preset.js is source and requires @nx/jest, and nx.json names eslint (so both are production), but neither reaches zod; P2 files (next.config.js, project.json files, vite.config.ts files, .storybook/*, tailwind/postcss configs, nx.json) do not name an ancestor; P5 start (package.json:11 nx serve) and P6 build (package.json:10) run nx, next, vite and tailwindcss, and next 16.3.8 does not lint during build (linters a build runs are excluded from P6 anyway); Dockerfile final stage runner (lines 21-45) copies only /app/dist/apps/portals-example and package-lock.json from builder and installs with npm install --omit=dev (line 36), so it does not hold devDependencies; CMD (line 45) runs next; not P3/P4; not reached from any production copy."
+      }
+    ]
+  },
+  {
+    "repo": "frioux/woodworking-tools",
+    "sha": "47c23bc88966efadc4b25c16f47fcad11176b5e5",
+    "finished": true,
+    "packages": [
+      {
+        "name": "ajv",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/ajv 6.12.6 (dev) in OSV/npm GHSA-2g4f-4pwh-qvx6 [0,6.14.0) and node_modules/html-validate/node_modules/ajv 8.17.1 (dev) in [7.0.0-alpha.0,8.18.0) (re-fetched). Copy 6.12.6: D1, its dependents are eslint and @eslint/eslintrc, every path from the root's devDependencies passes through eslint (package.json:13). Copy 8.17.1: html-validate (package.json:15) > ajv (and html-validate's nested @sidvind/better-ajv-errors peer); html-validate is not on D1's lists, so D2: whole tree read (43 files, 20 section-2 source files, all importing only relative files), no Dockerfile or deploy file, no P2 file, no start/build/generate/export script, html-validate and eslint run only from lint (package.json:9) and eslint.config.js is linter config; no production copy exists that reaches either copy; not P3/P4. D2 holds for both copies. Section-2 additions checked, none applies."
+      }
+    ]
+  },
+  {
+    "repo": "acekyd/acekyd",
+    "sha": "6f12af9d35bd13b0f20a3d5271b7c11644226151",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/@vitest/mocker 4.1.10 (dev), OSV GHSA-82fw-gwwq-j7x9 [2.1.0,4.1.11) and GHSA-qxg6-89mg-rqv8 [2.1.0-beta.7,4.1.12) (re-fetched). D1: on the test-runner list (@vitest/*); its only dependent is vitest, root devDependency (package.json:25). Section-2 additions checked, none applies: vitest is imported only by composables/readingTime.test.ts:1 (test file); P2 files nuxt.config.ts, app.config.ts, tailwind.config.js name @nuxt/content, @nuxtjs/tailwindcss, nuxt-gtag, nuxt-disqus, tailwindcss, @tailwindcss/typography, @fortawesome/fontawesome-svg-core, not vitest; P6 build/generate (package.json:4, :6) run nuxt; no start script, Dockerfile or deploy file; not P3/P4; not reached from any production copy."
+      },
+      {
+        "name": "sharp",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "P1",
+        "evidence": "Not reused: section 2 counts an import from a non-test file the first rule did not count as shipped code. In range: only copy node_modules/sharp 0.35.3 (dev, root devDependency package.json:23), OSV GHSA-rgj7-g3m4-5g8c [0,0.35.4) and GHSA-wq5f-xc86-pv6w [0,0.35.5) (re-fetched); npm <0.35.4, <0.35.5. P1: scripts/generate-og-cards.mjs (a section-2 source file: .mjs, not under a test folder, not a test or linter config) does const require = createRequire(import.meta.url) (line 11) and const sharp = require(process.env.SHARP_PATH || 'sharp') (line 12), a require() of the package sharp; the nearest node_modules from scripts/ is the root, so the imported copy is node_modules/sharp 0.35.3. The script is run by package.json:9 og:cards and writes the OG cards into public/og/ used by pages/posts/[...slug].vue:119. The first run itself cited this file as the user."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: only copy node_modules/vitest 4.1.10 (dev), OSV/npm GHSA-82fw-gwwq-j7x9 [2.1.0,4.1.11) (re-fetched). D1: on the test-runner list and declared in the root devDependencies (package.json:25). Section-2 additions checked, none applies: imported only by composables/readingTime.test.ts:1 (test file), run only by the test script (package.json:8); no vitest config; no P2 file names it; build/generate run nuxt; no start script, Dockerfile or deploy file; not P3/P4; no production copy depends on it (its only ancestor is the root package)."
+      }
+    ]
+  }
+]

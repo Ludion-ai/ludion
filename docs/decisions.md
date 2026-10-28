@@ -1118,6 +1118,13 @@ It changes no result.
 - **Only a release commit carries the bundle.** packages/cli/dist/cli.js and action/dist/record.js (`node action/build.ts`, which bundles .github/judge/record.ts) are not on main. On any other commit the action stops with an error and does not build. The release steps are in docs/bench/dogfood/prepublish-checklist.md.
 - `files` in packages/cli is narrowed to `dist/cli.js`. The dogfood measurement has no gate; its definitions were committed first (4c441d0).
 
+## 2026-10-28 (cycle 3) — Backtest v5: archives as signal sources, and the disputed category
+
+Fixed before the run; the full text is docs/bench/2026-10-28-backtest-v5/definitions.md, committed with this entry. The gates and the wait table are unchanged.
+- **Sources.** ecosyste.ms (the copy of a version's registry document) and Software Heritage (the archived files of its tarball) are sources for install scripts when the registry no longer lists a version. The order is the registry, then ecosyste.ms, then Software Heritage. Software Heritage is read only where its answer can change an outcome or the category below, because of its rate limit. Everything else is v4's: no archive resolves trees, and provenance, publisher and new dependencies stay registry, else deps.dev.
+- **Disputed (係争中).** A version named malicious for which the registry's hash and two independent archives (Software Heritage and jsDelivr, tied to that hash) show that its code equals the immediately preceding legitimate version's. Disputed versions stay in the malicious denominator, and are also counted apart. **This category was decided after seeing v4's results**: it follows the cycle-2 investigation of @ensdomains/buffer 0.1.1, and the meaning of "code" was written after reading that version's diff.
+- **Genuine side.** Carried over from v4 unchanged: under the judge's rules, no fact about a version the registry does not list can change a genuine verdict.
+
 ## 2026-10-28 (cycle 3) — Gate 1's production/dev split, rebuilt; the noise rerun's definitions, fixed before running it
 
 The noise measurement (docs/bench/2026-10-28-noise) found 167 misses among packages that the lockfile's `dev` flag left out, and its reviewers read (b), (c), (d) and CSS imports differently. The owner's wording below replaces the split. This entry is committed and pushed before the split is implemented and before the rerun. A later change is a new entry with a new run. The count gate, the miss gate, the wait table and the backtest gates are unchanged.

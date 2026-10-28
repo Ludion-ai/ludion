@@ -1,0 +1,1163 @@
+5851 npm fixed versions in GHSA records, 2391 packages
+fix packages 500/2391
+fix packages 1000/2391
+fix packages 1500/2391
+fix packages 2000/2391
+facts 200/1148
+facts 400/1148
+facts 600/1148
+facts 800/1148
+facts 1000/1148
+fixes with a registry time: 5594; in some V's window: 4963; published after some V - 24h: 5399
+trees 100/5399 (0 min, 4694 packages, 0 attestations)
+trees 200/5399 (0 min, 5243 packages, 0 attestations)
+trees 300/5399 (0 min, 5972 packages, 0 attestations)
+trees 400/5399 (0 min, 6467 packages, 0 attestations)
+trees 500/5399 (0 min, 6987 packages, 0 attestations)
+trees 600/5399 (0 min, 7333 packages, 0 attestations)
+trees 700/5399 (0 min, 7869 packages, 0 attestations)
+trees 800/5399 (0 min, 8338 packages, 0 attestations)
+trees 900/5399 (0 min, 8580 packages, 0 attestations)
+trees 1000/5399 (0 min, 8801 packages, 0 attestations)
+trees 1100/5399 (0 min, 9322 packages, 0 attestations)
+trees 1200/5399 (0 min, 9762 packages, 0 attestations)
+trees 1300/5399 (0 min, 10090 packages, 0 attestations)
+trees 1400/5399 (0 min, 10487 packages, 0 attestations)
+trees 1500/5399 (0 min, 10888 packages, 0 attestations)
+trees 1600/5399 (0 min, 11292 packages, 0 attestations)
+trees 1700/5399 (0 min, 11514 packages, 0 attestations)
+trees 1800/5399 (0 min, 12232 packages, 0 attestations)
+trees 1900/5399 (0 min, 12618 packages, 5 attestations)
+trees 2000/5399 (0 min, 12959 packages, 13 attestations)
+trees 2100/5399 (0 min, 13507 packages, 31 attestations)
+trees 2200/5399 (0 min, 13539 packages, 33 attestations)
+trees 2300/5399 (0 min, 14187 packages, 47 attestations)
+trees 2400/5399 (1 min, 14721 packages, 75 attestations)
+trees 2500/5399 (1 min, 14965 packages, 103 attestations)
+trees 2600/5399 (1 min, 15194 packages, 151 attestations)
+trees 2700/5399 (1 min, 15349 packages, 203 attestations)
+trees 2800/5399 (1 min, 15691 packages, 275 attestations)
+trees 2900/5399 (1 min, 16079 packages, 329 attestations)
+trees 3000/5399 (1 min, 16502 packages, 400 attestations)
+trees 3100/5399 (1 min, 16616 packages, 505 attestations)
+trees 3200/5399 (1 min, 16726 packages, 608 attestations)
+trees 3300/5399 (1 min, 17016 packages, 761 attestations)
+trees 3400/5399 (1 min, 17313 packages, 877 attestations)
+trees 3500/5399 (1 min, 17433 packages, 977 attestations)
+trees 3600/5399 (1 min, 17519 packages, 1070 attestations)
+trees 3700/5399 (1 min, 17591 packages, 1163 attestations)
+trees 3800/5399 (1 min, 17661 packages, 1210 attestations)
+trees 3900/5399 (1 min, 18003 packages, 1400 attestations)
+trees 4000/5399 (1 min, 18157 packages, 1481 attestations)
+trees 4100/5399 (1 min, 18359 packages, 1638 attestations)
+trees 4200/5399 (1 min, 18458 packages, 1754 attestations)
+trees 4300/5399 (1 min, 18594 packages, 1874 attestations)
+trees 4400/5399 (1 min, 18705 packages, 1962 attestations)
+trees 4500/5399 (1 min, 18820 packages, 2074 attestations)
+trees 4600/5399 (1 min, 19026 packages, 2210 attestations)
+trees 4700/5399 (1 min, 19227 packages, 2325 attestations)
+trees 4800/5399 (1 min, 19401 packages, 2477 attestations)
+trees 4900/5399 (1 min, 19529 packages, 2633 attestations)
+trees 5000/5399 (1 min, 19574 packages, 2783 attestations)
+trees 5100/5399 (1 min, 19616 packages, 2842 attestations)
+trees 5200/5399 (1 min, 19648 packages, 2979 attestations)
+trees 5300/5399 (1 min, 19696 packages, 3053 attestations)
+{
+  "generated_at": "2026-10-28T07:57:23.836Z",
+  "method": "See the header of tools/backtest/src/malicious-v4.ts and docs/decisions.md, \"Rule 1's same-release exception, and backtest v4's definitions\".",
+  "denominator": 1148,
+  "fixes": {
+    "events": 5851,
+    "with_registry_time": 5594,
+    "left_out": {
+      "not_served": 8,
+      "unreadable": 2,
+      "no_publish_time": 247
+    },
+    "in_some_window": 4963,
+    "with_exception": {
+      "resolved": 5399,
+      "stopped_by_rule1": 43,
+      "with_unknown_branch": 610,
+      "tree_versions": {
+        "median": 21,
+        "max": 2771
+      }
+    },
+    "without_exception": {
+      "resolved": 5399,
+      "stopped_by_rule1": 494,
+      "with_unknown_branch": 603,
+      "tree_versions": {
+        "median": 20,
+        "max": 2771
+      }
+    }
+  },
+  "exception": {
+    "trees_where_it_allowed_a_version": 521,
+    "allowed_versions": {
+      "provenance": 992,
+      "publisher": 439
+    },
+    "trees_rule1_stops_only_without_it": 451,
+    "trees_with_an_unverified_check": 3,
+    "malicious_versions_it_allowed": 0,
+    "malicious_versions_selected_only_with_it": 0,
+    "malicious_versions_stopped_without_it_but_not_with_it": {
+      "exploited": [
+        "loliloli@1.0.108"
+      ],
+      "high": [
+        "loliloli@1.0.108"
+      ],
+      "normal": [
+        "loliloli@1.0.108",
+        "@alexcolls/nuxt-ux@0.6.2"
+      ],
+      "low": []
+    }
+  },
+  "by_urgency": {
+    "with_exception": {
+      "exploited": {
+        "conservative": {
+          "primary": {
+            "stopped": 990,
+            "missed": 1,
+            "unknown": 157
+          },
+          "a": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          },
+          "b": {
+            "stopped": 990,
+            "missed": 1,
+            "unknown": 157
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1012,
+            "missed": 1,
+            "unknown": 135
+          },
+          "a": {
+            "stopped": 1082,
+            "missed": 1,
+            "unknown": 65
+          },
+          "b": {
+            "stopped": 1012,
+            "missed": 1,
+            "unknown": 135
+          }
+        }
+      },
+      "high": {
+        "conservative": {
+          "primary": {
+            "stopped": 990,
+            "missed": 1,
+            "unknown": 157
+          },
+          "a": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          },
+          "b": {
+            "stopped": 990,
+            "missed": 1,
+            "unknown": 157
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1012,
+            "missed": 1,
+            "unknown": 135
+          },
+          "a": {
+            "stopped": 1082,
+            "missed": 1,
+            "unknown": 65
+          },
+          "b": {
+            "stopped": 1012,
+            "missed": 1,
+            "unknown": 135
+          }
+        }
+      },
+      "normal": {
+        "conservative": {
+          "primary": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          },
+          "a": {
+            "stopped": 1068,
+            "missed": 1,
+            "unknown": 79
+          },
+          "b": {
+            "stopped": 1052,
+            "missed": 1,
+            "unknown": 95
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1082,
+            "missed": 1,
+            "unknown": 65
+          },
+          "a": {
+            "stopped": 1082,
+            "missed": 1,
+            "unknown": 65
+          },
+          "b": {
+            "stopped": 1082,
+            "missed": 1,
+            "unknown": 65
+          }
+        }
+      },
+      "low": {
+        "conservative": {
+          "primary": {
+            "stopped": 1071,
+            "missed": 1,
+            "unknown": 76
+          },
+          "a": {
+            "stopped": 1071,
+            "missed": 1,
+            "unknown": 76
+          },
+          "b": {
+            "stopped": 1071,
+            "missed": 1,
+            "unknown": 76
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "a": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "b": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          }
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "conservative": {
+          "primary": {
+            "stopped": 991,
+            "missed": 1,
+            "unknown": 156
+          },
+          "a": {
+            "stopped": 1054,
+            "missed": 1,
+            "unknown": 93
+          },
+          "b": {
+            "stopped": 991,
+            "missed": 1,
+            "unknown": 156
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1013,
+            "missed": 1,
+            "unknown": 134
+          },
+          "a": {
+            "stopped": 1083,
+            "missed": 1,
+            "unknown": 64
+          },
+          "b": {
+            "stopped": 1013,
+            "missed": 1,
+            "unknown": 134
+          }
+        }
+      },
+      "high": {
+        "conservative": {
+          "primary": {
+            "stopped": 991,
+            "missed": 1,
+            "unknown": 156
+          },
+          "a": {
+            "stopped": 1054,
+            "missed": 1,
+            "unknown": 93
+          },
+          "b": {
+            "stopped": 991,
+            "missed": 1,
+            "unknown": 156
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1013,
+            "missed": 1,
+            "unknown": 134
+          },
+          "a": {
+            "stopped": 1083,
+            "missed": 1,
+            "unknown": 64
+          },
+          "b": {
+            "stopped": 1013,
+            "missed": 1,
+            "unknown": 134
+          }
+        }
+      },
+      "normal": {
+        "conservative": {
+          "primary": {
+            "stopped": 1054,
+            "missed": 1,
+            "unknown": 93
+          },
+          "a": {
+            "stopped": 1069,
+            "missed": 1,
+            "unknown": 78
+          },
+          "b": {
+            "stopped": 1054,
+            "missed": 1,
+            "unknown": 93
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1083,
+            "missed": 1,
+            "unknown": 64
+          },
+          "a": {
+            "stopped": 1083,
+            "missed": 1,
+            "unknown": 64
+          },
+          "b": {
+            "stopped": 1083,
+            "missed": 1,
+            "unknown": 64
+          }
+        }
+      },
+      "low": {
+        "conservative": {
+          "primary": {
+            "stopped": 1071,
+            "missed": 1,
+            "unknown": 76
+          },
+          "a": {
+            "stopped": 1071,
+            "missed": 1,
+            "unknown": 76
+          },
+          "b": {
+            "stopped": 1071,
+            "missed": 1,
+            "unknown": 76
+          }
+        },
+        "optimistic": {
+          "primary": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "a": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          },
+          "b": {
+            "stopped": 1085,
+            "missed": 1,
+            "unknown": 62
+          }
+        }
+      }
+    }
+  },
+  "gate_every_malicious_version_stopped": {
+    "with_exception": "not met",
+    "without_exception": "not met"
+  },
+  "stops_by_signal": {
+    "with_exception": {
+      "exploited": {
+        "stopped": 990,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 984,
+          "alone": 983
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 990,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 984,
+          "alone": 983
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1052,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1046,
+          "alone": 1045
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1071,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1065,
+          "alone": 1064
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    },
+    "without_exception": {
+      "exploited": {
+        "stopped": 991,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 985,
+          "alone": 984
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "high": {
+        "stopped": 991,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 985,
+          "alone": 984
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "normal": {
+        "stopped": 1054,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1048,
+          "alone": 1047
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      },
+      "low": {
+        "stopped": 1071,
+        "provenance_regression": {
+          "fires": 0,
+          "alone": 0
+        },
+        "install_scripts": {
+          "fires": 1,
+          "alone": 0
+        },
+        "re_query": {
+          "fires": 6,
+          "alone": 6
+        },
+        "not_selected_by_any_fix": {
+          "fires": 1065,
+          "alone": 1064
+        },
+        "of_which_selected_only_in_trees_rule1_stops": {
+          "fires": 0,
+          "alone": 0
+        }
+      }
+    }
+  },
+  "signal_sources": {
+    "provenance": {
+      "unverified": 1140,
+      "registry": 8
+    },
+    "new_dependencies": {
+      "unverified": 1140,
+      "registry": 8
+    },
+    "install_scripts": {
+      "unverified": 1140,
+      "registry": 8
+    },
+    "publisher": {
+      "unverified": 1140,
+      "registry": 8
+    }
+  },
+  "signal_fires": {
+    "provenance_regression": 0,
+    "new_dependencies": 0,
+    "install_scripts_added": 1,
+    "publisher_changed": 2,
+    "rule2_could_fire_on_p": 0
+  },
+  "rule2_note": "Rule 2 cannot fire on P: every P in the denominator has a legitimate version at least 7 days before V, and the longest base wait is 168h.",
+  "listed": {
+    "allowed_by_the_exception": [],
+    "selected_only_with_the_exception": [],
+    "published_before_t_of_a_selecting_fix": [
+      {
+        "id": "MAL-2025-190866",
+        "name": "@ensdomains/buffer",
+        "version": "0.1.1",
+        "published": "2023-02-28T09:46:00.601Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 24006.8,
+          "optimistic": 24006.8
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 1,
+            "b": 1
+          },
+          "without_exception": {
+            "a": 1,
+            "b": 1
+          }
+        },
+        "first_selecting_fix": {
+          "a": {
+            "fix": "@ensdomains/ens-contracts@0.0.22",
+            "advisory": "GHSA-rrxv-q8m4-wch3",
+            "t": "2023-07-10T00:06:21.278Z",
+            "hours_after_v": 3158.3,
+            "v_before_t": true,
+            "judged_at": "2023-07-10T00:06:21.278Z"
+          },
+          "b": {
+            "fix": "@ensdomains/ens-contracts@0.0.22",
+            "advisory": "GHSA-rrxv-q8m4-wch3",
+            "t": "2023-07-10T00:06:21.278Z",
+            "hours_after_v": 3158.3,
+            "v_before_t": true,
+            "judged_at": "2023-07-10T00:06:21.278Z"
+          }
+        },
+        "outcome_with_exception": {
+          "exploited": "missed",
+          "high": "missed",
+          "normal": "missed",
+          "low": "missed"
+        },
+        "outcome_without_exception": {
+          "exploited": "missed",
+          "high": "missed",
+          "normal": "missed",
+          "low": "missed"
+        }
+      },
+      {
+        "id": "MAL-2025-46974",
+        "name": "debug",
+        "version": "4.4.2",
+        "published": "2025-09-08T13:12:39.973Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 1.2,
+          "optimistic": 1.2
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 6,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 5,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": {
+            "fix": "prebid.js@10.10.0",
+            "advisory": "GHSA-jwq7-6j4r-2f92",
+            "t": "2025-09-08T13:41:52.793Z",
+            "hours_after_v": 0.5,
+            "v_before_t": true,
+            "judged_at": "2025-09-08T13:41:52.793Z"
+          },
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      },
+      {
+        "id": "MAL-2025-46972",
+        "name": "color-name",
+        "version": "2.0.1",
+        "published": "2025-09-08T13:15:12.330Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 1.8,
+          "optimistic": 1.8
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 3,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 3,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": {
+            "fix": "color-string@2.1.2",
+            "advisory": "GHSA-286p-vc9p-p5qv",
+            "t": "2025-09-13T16:27:05.782Z",
+            "hours_after_v": 123.2,
+            "v_before_t": true,
+            "judged_at": "2025-09-13T16:27:05.782Z"
+          },
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      },
+      {
+        "id": "MAL-2025-46977",
+        "name": "is-arrayish",
+        "version": "0.3.3",
+        "published": "2025-09-08T13:15:29.824Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 2,
+          "optimistic": 2
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 1,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 1,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": {
+            "fix": "simple-swizzle@0.2.4",
+            "advisory": "GHSA-9g9j-rggx-7fmg",
+            "t": "2025-09-13T16:19:21.071Z",
+            "hours_after_v": 123.1,
+            "v_before_t": true,
+            "judged_at": "2025-09-13T16:19:21.071Z"
+          },
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      },
+      {
+        "id": "MAL-2025-46975",
+        "name": "error-ex",
+        "version": "1.3.3",
+        "published": "2025-09-08T13:16:05.782Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 1.8,
+          "optimistic": 1.8
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 1,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 1,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": {
+            "fix": "flowise@3.0.6",
+            "advisory": "GHSA-3gcm-f6qx-ff7p",
+            "t": "2025-09-15T11:14:40.720Z",
+            "hours_after_v": 166,
+            "v_before_t": true,
+            "judged_at": "2025-09-15T11:14:40.720Z"
+          },
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      },
+      {
+        "id": "MAL-2025-46978",
+        "name": "simple-swizzle",
+        "version": "0.2.3",
+        "published": "2025-09-08T13:19:05.292Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 1.9,
+          "optimistic": 1.9
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 1,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 1,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": {
+            "fix": "@meshconnect/web-link-sdk@3.3.2",
+            "advisory": "GHSA-vh3f-qppr-j97f",
+            "t": "2025-09-10T16:07:24.977Z",
+            "hours_after_v": 50.8,
+            "v_before_t": true,
+            "judged_at": "2025-09-10T16:07:24.977Z"
+          },
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      },
+      {
+        "id": "MAL-2025-190643",
+        "name": "@asyncapi/specs",
+        "version": "6.10.1",
+        "published": "2025-11-24T03:11:02.779Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 8.4,
+          "optimistic": 8.4
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 3,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 2,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": {
+            "fix": "@orval/mcp@7.18.0",
+            "advisory": "GHSA-mwr6-3gp8-9jmj",
+            "t": "2026-01-10T14:17:48.014Z",
+            "hours_after_v": 1139.1,
+            "v_before_t": true,
+            "judged_at": "2026-01-10T14:17:56.076Z"
+          },
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        }
+      }
+    ],
+    "exception_check_unverified": [],
+    "stopped_only_without_the_exception": [
+      {
+        "id": "MAL-2025-190629",
+        "name": "loliloli",
+        "version": "1.0.108",
+        "published": "2025-11-07T21:59:02.538Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 402.2,
+          "optimistic": 390.9
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 0,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 0,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": null,
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "unknown",
+          "high": "unknown",
+          "normal": "unknown",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "stopped",
+          "high": "stopped",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "unknown_because": {
+          "exploited": {
+            "fixes": 5,
+            "stopped_by_rule1_without_exception": 5,
+            "first": [
+              {
+                "fix": "n8n@1.119.2",
+                "t": "2025-11-14T16:49:53.152Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "n8n@1.120.3",
+                "t": "2025-11-14T16:52:15.825Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "n8n@1.121.0",
+                "t": "2025-11-18T08:08:54.615Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              }
+            ],
+            "from_unverified_selection": false
+          },
+          "high": {
+            "fixes": 5,
+            "stopped_by_rule1_without_exception": 5,
+            "first": [
+              {
+                "fix": "n8n@1.119.2",
+                "t": "2025-11-14T16:49:53.152Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "n8n@1.120.3",
+                "t": "2025-11-14T16:52:15.825Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "n8n@1.121.0",
+                "t": "2025-11-18T08:08:54.615Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              }
+            ],
+            "from_unverified_selection": false
+          },
+          "normal": {
+            "fixes": 3,
+            "stopped_by_rule1_without_exception": 3,
+            "first": [
+              {
+                "fix": "n8n@1.119.2",
+                "t": "2025-11-14T16:49:53.152Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "n8n@1.120.3",
+                "t": "2025-11-14T16:52:15.825Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "n8n@1.121.0",
+                "t": "2025-11-18T08:08:54.615Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              }
+            ],
+            "from_unverified_selection": false
+          }
+        }
+      },
+      {
+        "id": "MAL-2025-191186",
+        "name": "@alexcolls/nuxt-ux",
+        "version": "0.6.2",
+        "published": "2025-11-24T11:34:54.113Z",
+        "present": false,
+        "record_hours": {
+          "conservative": 161,
+          "optimistic": 12.7
+        },
+        "selecting_fixes": {
+          "with_exception": {
+            "a": 0,
+            "b": 0
+          },
+          "without_exception": {
+            "a": 0,
+            "b": 0
+          }
+        },
+        "first_selecting_fix": {
+          "a": null,
+          "b": null
+        },
+        "outcome_with_exception": {
+          "exploited": "unknown",
+          "high": "unknown",
+          "normal": "unknown",
+          "low": "stopped"
+        },
+        "outcome_without_exception": {
+          "exploited": "unknown",
+          "high": "unknown",
+          "normal": "stopped",
+          "low": "stopped"
+        },
+        "unknown_because": {
+          "exploited": {
+            "fixes": 2,
+            "stopped_by_rule1_without_exception": 1,
+            "first": [
+              {
+                "fix": "n8n@1.121.3",
+                "t": "2025-11-26T14:24:22.161Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "@budibase/server@3.23.32",
+                "t": "2025-11-28T11:02:59.220Z",
+                "stopped_without_exception": false,
+                "unknown_without_exception": true
+              }
+            ],
+            "from_unverified_selection": false
+          },
+          "high": {
+            "fixes": 2,
+            "stopped_by_rule1_without_exception": 1,
+            "first": [
+              {
+                "fix": "n8n@1.121.3",
+                "t": "2025-11-26T14:24:22.161Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              },
+              {
+                "fix": "@budibase/server@3.23.32",
+                "t": "2025-11-28T11:02:59.220Z",
+                "stopped_without_exception": false,
+                "unknown_without_exception": true
+              }
+            ],
+            "from_unverified_selection": false
+          },
+          "normal": {
+            "fixes": 1,
+            "stopped_by_rule1_without_exception": 1,
+            "first": [
+              {
+                "fix": "n8n@1.121.3",
+                "t": "2025-11-26T14:24:22.161Z",
+                "stopped_without_exception": true,
+                "unknown_without_exception": true
+              }
+            ],
+            "from_unverified_selection": false
+          }
+        }
+      }
+    ]
+  }
+}

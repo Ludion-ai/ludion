@@ -125,7 +125,7 @@ Checked:
 - The packages whose exact name and version the files state. Only each name and version is sent to OSV, and the match is OSV's. Withdrawn advisories are left out.
 - For each match: the advisory id, its summary and the fixed versions OSV lists for that package, copied as they are.
 - Names must be valid for their ecosystem (PEP 508 names without extras, Go module paths or stdlib and toolchain, crates.io names); anything else stops the check with an error. A PyPI package listed under several spellings is looked up once (PEP 503).
-- RustSec advisories marked informational (unmaintained, unsound, notice) are listed as informational. They do not count as vulnerabilities for the status or the exit code, unless the record names a CVE.
+- RustSec advisories marked unmaintained or notice are listed as informational, and do not count as vulnerabilities for the status or the exit code. One with a CVE or GHSA alias, or whose OSV entries for the crate are not all marked, counts as a vulnerability. Unsound ones always count.
 
 Not checked:
 
@@ -133,7 +133,7 @@ Not checked:
 - Anything that cannot be read as an exact name and version (an unpinned or ranged requirement, a Git, path or URL source, a Go replace directive, an unknown file format version) is listed as `Incomplete:` and the result is `incomplete`, never clean.
 - Files in subdirectories. Nothing is installed, resolved, built or run, and whether vulnerable code is reached is not checked.
 
-Exit codes are scan's own: 1 when an advisory matches, 2 when a result is incomplete or a check fails, 0 otherwise. `--json` also gives each match's `fixed_versions`.
+Exit codes are scan's own: 1 when a vulnerability matches, 2 when a result is incomplete or a check fails, 0 otherwise. An informational-only match exits 0. `--json` also gives each match's `kind` and `fixed_versions`.
 
 ## Validation and acquisition boundaries
 

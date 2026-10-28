@@ -22,7 +22,7 @@ export type DependencyScan = {
 };
 /**
  * OSV matched this exact name and version. fixed_versions are OSV's own strings, for display only: never compared.
- * kind "informational" is a RustSec notice (unmaintained, unsound, notice): listed, but not counted as a vulnerability.
+ * kind "informational" is a RustSec unmaintained or notice record: listed, but not counted as a vulnerability.
  */
 export type ReadOnlyFinding = { package: ReadOnlyPackage; advisory: Advisory; fixed_versions: string[] } & ({ kind: "vulnerability" } | { kind: "informational"; informational: string });
 /** An ecosystem Ludion reads but does not patch: findings only, no plan and no apply. */
@@ -56,13 +56,15 @@ const VALID_NAME: Record<string, (name: string) => boolean> = {
 /** PEP 503: PyPI names compare case-insensitively, with runs of -, _ and . equal. */
 const pep503 = (name: string) => name.toLowerCase().replace(/[-_.]+/g, "-");
 const sameName = (ecosystem: string, a: string, b: string) => ecosystem === "PyPI" ? pep503(a) === pep503(b) : a === b;
-const RUSTSEC_INFORMATIONAL = ["unmaintained", "unsound", "notice"];
+/** "unsound" is not here: an unsound API is a memory-safety bug, and counts as a vulnerability. */
+const RUSTSEC_INFORMATIONAL = ["unmaintained", "notice"];
 /**
- * RustSec's informational kind for this package, or null when the advisory counts as a vulnerability. Every OSV entry
- * for the package must carry a known kind, and a record that names a CVE counts as a vulnerability whatever it says.
+ * RustSec's informational kind for this package, or null when the advisory counts as a vulnerability. Only a RUSTSEC
+ * record can be informational, every OSV entry for the package must carry an informational kind, and a record with a
+ * CVE or GHSA alias counts as a vulnerability whatever it says (OSV may not have that alias's own record yet).
  */
 function informational(advisory: Advisory, ecosystem: string, name: string): string | null {
-  if (ecosystem !== "crates.io" || [advisory.id, ...advisory.aliases].some(id => /^CVE-/i.test(id))) return null;
+  if (ecosystem !== "crates.io" || !/^RUSTSEC-/.test(advisory.id) || advisory.aliases.some(id => /^(CVE|GHSA)-/i.test(id))) return null;
   const kinds = advisory.affected.filter(a => a.package.ecosystem === ecosystem && sameName(ecosystem, a.package.name, name)).map(a => {
     const specific = a.database_specific;
     const kind = specific && typeof specific === "object" && !Array.isArray(specific) ? (specific as Record<string, unknown>).informational : undefined;
@@ -216,14 +218,14 @@ export class OsvClient {
       const advisory = this.cache.get(id)!;
       if (advisory.withdrawn) continue;
       const fixed_versions = fixedVersions(advisory, ecosystem, pkg.name), kind = informational(advisory, ecosystem, pkg.name);
-      findings.push(kind ? { package: pkg, advisory, fixed_versions, kind: "informational", informational: kind } : { package: pkg, advisory, fixed_versions, kind: "vulnerability" });
+      findings.push(kind !== null ? { package: pkg, advisory, fixed_versions, kind: "informational", informational: kind } : { package: pkg, advisory, fixed_versions, kind: "vulnerability" });
     }
     return {
       schema: 1, checked_at: new Date().toISOString(), source: "https://osv.dev",
       status: findings.some(f => f.kind === "vulnerability") ? "vulnerabilities_found" : inventory.limitations.length ? "incomplete" : "no_known_vulnerabilities",
       inventory, findings,
       fixed_versions_note: `Each finding's fixed_versions are the fixed versions OSV gives for that ${ecosystem} package, copied as plain strings for display. Ludion does not compare them with the installed version, so it does not say which one applies or whether one is newer.`,
-      note: `Read-only: Ludion reports known advisories for this ecosystem but does not plan or apply updates. Only the exact package names and versions read from the files are looked up; no match is not a security guarantee. Package names and versions are sent to OSV; source is not.${ecosystem === "crates.io" ? " RustSec's informational advisories (unmaintained, unsound, notice) are listed with kind \"informational\" and do not count as vulnerabilities, unless they name a CVE." : ""}`,
+      note: `Read-only: Ludion reports known advisories for this ecosystem but does not plan or apply updates. Only the exact package names and versions read from the files are looked up; no match is not a security guarantee. Package names and versions are sent to OSV; source is not.${ecosystem === "crates.io" ? " RustSec advisories marked unmaintained or notice are listed with kind \"informational\" and do not count as vulnerabilities, unless they have a CVE or GHSA alias. Unsound ones count as vulnerabilities." : ""}`,
     };
   }
 }

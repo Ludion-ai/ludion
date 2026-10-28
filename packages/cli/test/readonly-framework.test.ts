@@ -163,49 +163,68 @@ describe("RustSec informational advisories are listed apart from vulnerabilities
   const atty = { name: "atty", version: "0.2.14", direct: true };
   const crates = (limitations: string[] = []): ReadOnlyInventory => ({ ecosystem: "crates.io", files: ["Cargo.lock"], scope: "locked", packages: [atty], limitations });
   // As OSV writes them (checked live: RUSTSEC-2024-0375, RUSTSEC-2021-0145, GHSA-g98v-hv3f-hcfr).
-  const rustsec = (id: string, informational: unknown, aliases: string[] = [], extra: Record<string, unknown>[] = []) => ({
+  const rustsec = (id: string, informational: unknown, aliases: string[] = [], extra: Record<string, unknown>[] = [], crate = "atty") => ({
     id, summary: `${id} summary`, aliases,
-    affected: [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [{ type: "SEMVER", events: [{ introduced: "0.0.0-0" }] }], database_specific: { categories: [], cvss: null, informational } }, ...extra],
+    affected: [{ package: { ecosystem: "crates.io", name: crate }, ranges: [{ type: "SEMVER", events: [{ introduced: "0.0.0-0" }] }], database_specific: { categories: [], cvss: null, informational } }, ...extra],
   });
   const records = {
     "RUSTSEC-2024-0375": rustsec("RUSTSEC-2024-0375", "unmaintained"),
     "RUSTSEC-2021-0145": rustsec("RUSTSEC-2021-0145", "unsound", ["GHSA-g98v-hv3f-hcfr"]),
     "GHSA-g98v-hv3f-hcfr": { ...rustsec("GHSA-g98v-hv3f-hcfr", undefined, ["RUSTSEC-2021-0145"]), affected: [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [{ type: "SEMVER", events: [{ introduced: "0" }, { last_affected: "0.2.14" }] }], database_specific: { source: "https://github.com/github/advisory-database" } }] },
     "RUSTSEC-2020-0036": rustsec("RUSTSEC-2020-0036", "unmaintained", ["CVE-2019-25010", "GHSA-jq66-xh47-j9f3"]),
+    // Live: salsa 0.28.0's use-after-free, marked unsound, whose alias GHSA-xc3w-55vh-cw3w OSV does not have.
+    "RUSTSEC-2026-0308": rustsec("RUSTSEC-2026-0308", "unsound", ["GHSA-xc3w-55vh-cw3w"], [], "salsa"),
     "RUSTSEC-2099-0001": rustsec("RUSTSEC-2099-0001", "something-new"),
     "RUSTSEC-2099-0002": rustsec("RUSTSEC-2099-0002", "unmaintained", [], [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [], database_specific: { informational: null } }]),
     "RUSTSEC-2099-0003": rustsec("RUSTSEC-2099-0003", "notice", [], [{ package: { ecosystem: "crates.io", name: "other" }, ranges: [] }]),
+    "RUSTSEC-2099-0004": rustsec("RUSTSEC-2099-0004", "unsound"),
+    "RUSTSEC-2099-0005": rustsec("RUSTSEC-2099-0005", "unmaintained", ["GHSA-aaaa-bbbb-cccc"]),
+    // OSV returned it for atty, but its only entry names another crate.
+    "RUSTSEC-2099-0006": rustsec("RUSTSEC-2099-0006", "notice", [], [], "other"),
+    "GHSA-2099-0007-aaaa": { ...rustsec("GHSA-2099-0007-aaaa", "unmaintained"), id: "GHSA-2099-0007-aaaa" },
   };
   const scan = (ids: string[], inventory = crates()) => osv({ "atty@0.2.14": ids }, records).scanReadOnly(inventory);
 
-  it("does not count unmaintained, unsound or notice records as vulnerabilities", async () => {
-    const result = await scan(["RUSTSEC-2024-0375", "RUSTSEC-2021-0145", "RUSTSEC-2099-0003"]);
-    expect(result.findings.map(f => [f.advisory.id, f.kind, f.kind === "informational" ? f.informational : null])).toEqual([["RUSTSEC-2024-0375", "informational", "unmaintained"], ["RUSTSEC-2021-0145", "informational", "unsound"], ["RUSTSEC-2099-0003", "informational", "notice"]]);
+  it("does not count unmaintained or notice records without a CVE or GHSA alias as vulnerabilities", async () => {
+    const result = await scan(["RUSTSEC-2024-0375", "RUSTSEC-2099-0003"]);
+    expect(result.findings.map(f => [f.advisory.id, f.kind, f.kind === "informational" ? f.informational : null])).toEqual([["RUSTSEC-2024-0375", "informational", "unmaintained"], ["RUSTSEC-2099-0003", "informational", "notice"]]);
     expect(result.status).toBe("no_known_vulnerabilities");
     expect(result.note).toContain('kind "informational"');
     expect((await scan(["RUSTSEC-2024-0375"], crates(["Cargo.toml: a git dependency is not checked."]))).status).toBe("incomplete");
   });
   it("still counts a vulnerability next to them, and lists both", async () => {
-    const result = await scan(["GHSA-g98v-hv3f-hcfr", "RUSTSEC-2021-0145"]);
-    expect(result.findings.map(f => [f.advisory.id, f.kind])).toEqual([["GHSA-g98v-hv3f-hcfr", "vulnerability"], ["RUSTSEC-2021-0145", "informational"]]);
+    const result = await scan(["GHSA-g98v-hv3f-hcfr", "RUSTSEC-2024-0375"]);
+    expect(result.findings.map(f => [f.advisory.id, f.kind])).toEqual([["GHSA-g98v-hv3f-hcfr", "vulnerability"], ["RUSTSEC-2024-0375", "informational"]]);
     expect(result.status).toBe("vulnerabilities_found");
     expect(readOnlyText("crates.io", result).slice(0, 3)).toEqual([
       "crates.io: 1 package versions · 1 advisory matches · 1 informational · vulnerabilities_found",
       "  atty@0.2.14 · GHSA-g98v-hv3f-hcfr · GHSA-g98v-hv3f-hcfr summary · OSV lists no fixed version",
-      "  Informational (unsound, not counted as a vulnerability): atty@0.2.14 · RUSTSEC-2021-0145 · RUSTSEC-2021-0145 summary · OSV lists no fixed version",
+      "  Informational (unmaintained, not counted as a vulnerability): atty@0.2.14 · RUSTSEC-2024-0375 · RUSTSEC-2024-0375 summary · OSV lists no fixed version",
     ]);
+  });
+  it("counts an unsound record whose GHSA alias OSV does not have as a vulnerability (salsa 0.28.0)", async () => {
+    const salsa: ReadOnlyInventory = { ...crates(), packages: [{ name: "salsa", version: "0.28.0", direct: true }] };
+    const result = await osv({ "salsa@0.28.0": ["RUSTSEC-2026-0308"] }, records).scanReadOnly(salsa);
+    expect(result.findings.map(f => [f.advisory.id, f.kind])).toEqual([["RUSTSEC-2026-0308", "vulnerability"]]);
+    expect(result.status).toBe("vulnerabilities_found");
   });
   it.each([
     ["names a CVE", "RUSTSEC-2020-0036"],
+    ["is unsound and has a GHSA alias", "RUSTSEC-2021-0145"],
+    ["is unsound, with no alias", "RUSTSEC-2099-0004"],
+    ["is unmaintained and has a GHSA alias", "RUSTSEC-2099-0005"],
     ["has a kind Ludion does not know", "RUSTSEC-2099-0001"],
     ["is informational for only one of the package's entries", "RUSTSEC-2099-0002"],
+    ["has no entry for the queried crate", "RUSTSEC-2099-0006"],
+    ["is not a RUSTSEC record", "GHSA-2099-0007-aaaa"],
   ])("counts a record that %s as a vulnerability", async (_name, id) => {
     const result = await scan([id]);
     expect(result.findings.map(f => f.kind)).toEqual(["vulnerability"]); expect(result.status).toBe("vulnerabilities_found");
   });
   it("reads the informational kind for crates.io only", async () => {
-    const pypiRecord = { ...record("PYSEC-2026-9"), aliases: [], affected: [{ package: { ecosystem: "PyPI", name: "django" }, ranges: [], database_specific: { informational: "unmaintained" } }] };
-    const result = await osv({ "django@3.2.0": ["PYSEC-2026-9"] }, { "PYSEC-2026-9": pypiRecord }).scanReadOnly(pypi([django]));
+    // A RUSTSEC id on purpose, so only the ecosystem rule decides.
+    const pypiRecord = { ...record("RUSTSEC-2099-0008"), aliases: [], affected: [{ package: { ecosystem: "PyPI", name: "django" }, ranges: [], database_specific: { informational: "unmaintained" } }] };
+    const result = await osv({ "django@3.2.0": ["RUSTSEC-2099-0008"] }, { "RUSTSEC-2099-0008": pypiRecord }).scanReadOnly(pypi([django]));
     expect(result.findings[0]!.kind).toBe("vulnerability");
   });
   it("leaves an informational-only project clean in scan, and a vulnerability still needs attention", async () => {

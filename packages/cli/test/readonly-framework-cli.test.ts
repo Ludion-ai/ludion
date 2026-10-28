@@ -15,7 +15,8 @@ const { securityCli } = await import("../src/security/cli.ts");
 
 const response = (value: unknown) => new Response(JSON.stringify(value));
 const informational = { id: "RUSTSEC-2024-0375", summary: "atty is unmaintained", aliases: [], affected: [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [{ type: "SEMVER", events: [{ introduced: "0.0.0-0" }] }], database_specific: { informational: "unmaintained" } }] };
-const vulnerability = { id: "GHSA-g98v-hv3f-hcfr", summary: "Potential unaligned read", aliases: ["RUSTSEC-2021-0145"], affected: [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [{ type: "SEMVER", events: [{ introduced: "0" }, { last_affected: "0.2.14" }] }] }] };
+// OSV's own cleanup strips C0 characters only; the C1 CSI (U+009B) must not reach the terminal either.
+const vulnerability = { id: "GHSA-g98v-hv3f-hcfr", summary: "Potential\u009bunaligned read",aliases: ["RUSTSEC-2021-0145"], affected: [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [{ type: "SEMVER", events: [{ introduced: "0" }, { last_affected: "0.2.14" }] }] }] };
 function osv(records: { id: string }[]) {
   vi.stubGlobal("fetch", async (url: string) => {
     const id = decodeURIComponent(String(url).split("/vulns/")[1] ?? "");
@@ -49,6 +50,8 @@ describe("ludion scan with a registered read-only reader", () => {
   it("exits 1 on a vulnerability and 2 on an incomplete inventory, as the other scans do", async () => {
     state.read = () => atty(); osv([informational, vulnerability]);
     expect(await securityCli("scan", ["--dir", project()])).toBe(1);
+    expect(out).toContain("  atty@0.2.14 · GHSA-g98v-hv3f-hcfr · Potential unaligned read · OSV lists no fixed version");
+    expect(out.join("\n")).not.toMatch(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/);
     state.read = () => atty(["Cargo.toml: a git dependency is not checked."]); osv([informational]);
     expect(await securityCli("scan", ["--dir", project()])).toBe(2);
     expect(out).toContain("  Incomplete: Cargo.toml: a git dependency is not checked.");

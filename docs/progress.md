@@ -522,3 +522,11 @@ docs/bench/2026-10-28-noise. The definitions were fixed before the run: d29b1e7,
 - **One judge failure.** The judge's lockfile reader refused one repository's lockfile (an unexpected `packages/` path under `node_modules`). That repository was excluded and reported by cause.
 
 The design's noise gate is **not met**. The judge's production/dev split (the lockfile's `dev` flag) cannot by itself decide "loaded in production". No definition is changed.
+
+## 2026-10-28 (cycle 3) — Backtest v5: archives as install-script sources, and the disputed category
+
+docs/bench/2026-10-28-backtest-v5. The definitions were committed at 23ab295 and the scripts at cadac0b, both pushed before the run. The execution ran 11:56:25Z–12:55:30Z, and its output was committed unchanged (f05e30f). v4 is reproduced with 0 differences.
+- **Gate: not met.** At 12h and 24h, 1,039 / 1 / 108 (stopped / missed / unknown of 1,148); at 72h, 1,065 / 1 / 82; at 168h, 1,078 / 1 / 69. As an interval: 90.51%–99.91%, 92.77%–99.91% and 93.90%–99.91% (v4: 86.24%, 91.64%, 93.29% at the lower bound). The delay gates are v4's, carried over and met.
+- **What moved.** ecosyste.ms's copies of removed versions show install scripts, which moves 49 / 13 / 7 versions (24h / 72h / 168h) from unknown to stopped. Software Heritage held 1 of the 35 versions it was read for, and it changed nothing.
+- **Disputed: 2.** @ensdomains/buffer 0.1.1, still the one miss, and freo-design-system 1.0.4 (stopped). Both stay in the denominator. A draft correction request for the GitHub Advisory Database is in the folder; it has not been sent.
+- **Anomaly.** jsDelivr's CDN answers 404 for the files of removed versions it still lists, so 988 versions failed the disputed check closed (README, "Anomalies").

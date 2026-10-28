@@ -14,6 +14,7 @@
 //   docker run --rm --read-only --user 1000:1000 --tmpfs /tmp -e HOME=/tmp -v <worktree>:/w:ro -v <out>:/out \
 //     node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 node /w/tools/backtest/src/noise.ts /out --commit <sha>
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -195,7 +196,12 @@ if (npmVersion !== NPM_VERSION) throw new Error(`npm ${npmVersion} is not the re
 const started = new Date().toISOString();
 /** The console, also kept in <out>/run.log: a stopped execution is reported with its log. */
 const log = (line: string) => { console.log(line); appendFileSync(join(outDir!, "run.log"), `${new Date().toISOString()} ${line}\n`); };
-if (commit !== null) log(`start at ${started}, commit ${commit}, npm ${npmVersion}, node ${process.version}`);
+/** Git blob hashes of the code that runs, so `git ls-tree <commit>` can check the logged commit. */
+const blobs = Object.fromEntries(["tools/backtest/src/noise.ts", "packages/cli/src/security/judge.ts", "packages/cli/src/security/npm-facts.ts"].map(path => {
+  const content = readFileSync(new URL(`../../../${path}`, import.meta.url));
+  return [path, createHash("sha1").update(`blob ${content.length}\0`).update(content).digest("hex")];
+}));
+if (commit !== null) log(`start at ${started}, commit ${commit}, npm ${npmVersion}, node ${process.version}, blobs ${JSON.stringify(blobs)}`);
 
 if (flag === "--local") {
   if (!localDir) throw new Error("--local needs a directory.");
@@ -242,7 +248,7 @@ if (flag === "--local") {
   const causes: Record<string, number> = {};
   for (const x of excluded) causes[x.cause] = (causes[x.cause] ?? 0) + 1;
   writeFileSync(join(outDir, "noise.json"), JSON.stringify({
-    started, finished: new Date().toISOString(), npm: npmVersion, node: process.version, day: DAY, sample: SAMPLE,
+    started, finished: new Date().toISOString(), commit, blobs, npm: npmVersion, node: process.version, day: DAY, sample: SAMPLE,
     repositories: rows.length, candidates: all.length, considered,
     totals: { npm_audit: npmTotal, judge_production: judgeTotal, npm_audit_omit_dev: sum(r => r.npm_omit_dev_total), npm_audit_direct: sum(r => r.npm.direct.length), left_out: sum(r => r.left_out.length) },
     count_gate: { rule: "judge_production <= npm_audit / 3", met: rows.length === SAMPLE && judgeTotal * 3 <= npmTotal },

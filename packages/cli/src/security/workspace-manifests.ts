@@ -14,7 +14,10 @@ export function workspaceDir(file: string): string | null {
   return dir.split("/").every(plainSegment) ? dir : null;
 }
 
-/** Whether the root manifest's `workspaces` (an array of strings) matches `dir`: literal segments and a whole-segment `*` only. */
+/**
+ * Whether the root manifest's `workspaces` (an array of strings) matches `dir`: literal segments and a whole-segment `*`
+ * only. A `*` does not match a segment that starts with a dot.
+ */
 function declaredWorkspace(root: unknown, dir: string): boolean {
   const patterns = (root as { workspaces?: unknown } | null)?.workspaces;
   if (!Array.isArray(patterns)) return false;
@@ -22,7 +25,7 @@ function declaredWorkspace(root: unknown, dir: string): boolean {
   return patterns.some(pattern => {
     if (typeof pattern !== "string") return false;
     const have = pattern.replace(/^\.\//, "").replace(/\/$/, "").split("/");
-    return have.length === want.length && have.every((s, i) => s === "*" || (plainSegment(s) && s === want[i]));
+    return have.length === want.length && have.every((s, i) => s === "*" || (plainSegment(s) && s === want[i])) && have.every((s, i) => s !== "*" || !want[i]!.startsWith("."));
   });
 }
 
@@ -53,7 +56,8 @@ export function workspaceManifestChanges(input: {
   const dir = workspaceDir(file);
   if (dir === null) return [`${file} is not the package.json of a plain workspace folder.`];
   if (!declaredWorkspace(input.root.before, dir) || !declaredWorkspace(input.root.after, dir)) return [`${dir} is not a workspace that the root package.json's "workspaces" names (literal folders and a whole-segment * only), before and after.`];
-  const recordBefore = input.lock.before[dir], recordAfter = input.lock.after[dir];
+  // The lockfile's own entries only: a folder named like an Object.prototype key (__proto__) is not a record.
+  const recordBefore = Object.hasOwn(input.lock.before, dir) ? input.lock.before[dir] : undefined, recordAfter = Object.hasOwn(input.lock.after, dir) ? input.lock.after[dir] : undefined;
   if (!isObject(recordBefore) || !isObject(recordAfter)) return [`The lockfile does not record the workspace ${dir} both before and after.`];
   if (!isObject(before) || !isObject(after)) return [`${file} is not a JSON object on both sides (before and after).`];
 

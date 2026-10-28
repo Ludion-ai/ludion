@@ -1,8 +1,8 @@
-// Mutation check of the wiring: each mutant of judge.ts or judge-cli.ts must make at least one test in
+// Mutation check of the wiring: each mutant of judge.ts, judge-cli.ts (or the review fixes in workspace-manifests.ts) must make at least one test in
 // workspace-manifests.test.ts fail. Run in Docker on a writable copy (/w); the original is restored at the end.
 import { readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
-const JUDGE = "/w/packages/cli/src/security/judge.ts", CLI = "/w/packages/cli/src/security/judge-cli.ts";
+const JUDGE = "/w/packages/cli/src/security/judge.ts", CLI = "/w/packages/cli/src/security/judge-cli.ts", RULE = "/w/packages/cli/src/security/workspace-manifests.ts";
 const mutants = [
   [JUDGE, "agreeing files still stop", "&& !agreeing.includes(f));", ");"],
   [JUDGE, "any read file agrees", "w.reasons?.length === 0 &&", "w.reasons !== null &&"],
@@ -18,6 +18,9 @@ const mutants = [
   [CLI, "every listed file read", "file !== \"package.json\" && file.endsWith(\"/package.json\")", "file !== \"package.json\""],
   [CLI, "the lockfile's before side used for after", "after: packages(lock.after)", "after: packages(lock.before)"],
   [CLI, "an unparsable file read as empty object", "catch { return undefined; }", "catch { return {}; }"],
+  // The review's two findings on the rule (#174, comment 6473296446).
+  [RULE, "a * matches a dot folder", ` && have.every((s, i) => s !== "*" || !want[i]!.startsWith("."))`, ""],
+  [RULE, "inherited keys count as records", "Object.hasOwn(input.lock.before, dir) ? input.lock.before[dir] : undefined", "input.lock.before[dir]"],
 ];
 let survived = 0;
 for (const [file, name, from, to] of mutants) {

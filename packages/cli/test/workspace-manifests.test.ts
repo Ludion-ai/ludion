@@ -1,7 +1,7 @@
-import { mkdirSync, mkdtempSync, renameSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { allChanges, judge, lockEntries, lockEntryChanges, type Change, type Judgement, type VersionFacts } from "../src/security/judge.ts";
 import { judgeCli, workspaceManifests } from "../src/security/judge-cli.ts";
 import { workspaceDir, workspaceManifestChanges } from "../src/security/workspace-manifests.ts";
@@ -71,11 +71,19 @@ describe("a workspace package.json that does not agree with the lockfile stops",
       expect(pr161({ root: { before: root, after: root } }), JSON.stringify(workspaces)).toEqual([expect.stringContaining("is not a workspace that the root package.json")]);
     }
     expect(pr161({ root: { before: { ...ROOT, workspaces: ["packages/*"] }, after: ROOT } })).toEqual([expect.stringContaining("is not a workspace that the root package.json")]);
+    // A * does not match a dot folder, even one the lockfile records; a literal entry does.
+    const hidden = (lock: Record<string, unknown>) => ({ ...lock, "apps/.hidden": lock["apps/worker"] });
+    const dotted = (root: unknown) => pr161({ file: "apps/.hidden/package.json", root: { before: root, after: root }, lock: { before: hidden(workerLock("^4.13.13", "4.13.13")), after: hidden(workerLock("^4.13.14", "4.13.14")) } });
+    expect(dotted(ROOT)).toEqual([expect.stringContaining("is not a workspace that the root package.json")]);
+    expect(dotted({ ...ROOT, workspaces: ["apps/.hidden"] })).toEqual([]);
   });
   it("rule 2: a workspace the lockfile does not record before and after", () => {
     const { "apps/worker": _, ...unrecorded } = workerLock("^4.13.13", "4.13.13");
     expect(pr161({ lock: { before: unrecorded, after: workerLock("^4.13.14", "4.13.14") } })).toEqual(["The lockfile does not record the workspace apps/worker both before and after."]);
     expect(pr161({ lock: { before: workerLock("^4.13.13", "4.13.13"), after: { ...unrecorded, "node_modules/hono": tarball("hono", "4.13.14") } } })).toEqual(["The lockfile does not record the workspace apps/worker both before and after."]);
+    // A folder named like an Object.prototype key is recorded only by the lockfile's own entry.
+    const root = { ...ROOT, workspaces: ["*"] }, empty = { name: "x", version: "0.0.0" };
+    expect(pr161({ file: "__proto__/package.json", before: empty, after: empty, root: { before: root, after: root }, lock: { before: unrecorded, after: unrecorded } })).toEqual(["The lockfile does not record the workspace __proto__ both before and after."]);
   });
   it("rule 3: a side that is missing or not an object, a field other than the dependency lists, a spec outside the registry, overrides", () => {
     expect(pr161({ before: undefined })).toEqual(["apps/worker/package.json is not a JSON object on both sides (before and after)."]);
@@ -109,8 +117,11 @@ const factsOf = (changes: Change[]) => {
 const lockText = (packages: Record<string, unknown>) => JSON.stringify({ name: "ludion-repo", lockfileVersion: 3, requires: true, packages });
 type Side = { manifest?: unknown; lock: Record<string, unknown> };
 /** Two checkouts on disk with the root manifest, the lockfile and the workspace's package.json (a side may leave it out). */
+const temporary: string[] = [];
+afterAll(() => { for (const dir of temporary) rmSync(dir, { recursive: true, force: true }); });
 function checkouts(file: string, sides: { before: Side; after: Side }) {
   const dirs = { before: mkdtempSync(join(tmpdir(), "ludion-l9-before-")), after: mkdtempSync(join(tmpdir(), "ludion-l9-after-")) };
+  temporary.push(dirs.before, dirs.after);
   for (const side of ["before", "after"] as const) {
     writeFileSync(join(dirs[side], "package.json"), JSON.stringify(ROOT));
     writeFileSync(join(dirs[side], "package-lock.json"), lockText(sides[side].lock));

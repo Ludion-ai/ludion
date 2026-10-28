@@ -298,6 +298,23 @@ CLAUDE.md, README wording ("An empty result is not a security guarantee", from #
 
 Round 1 review of this PR (REQUEST CHANGES): CLAUDE.md read design targets as current behaviour. It now states the goal as a goal and lists what is not built yet (gate 2, waits, lockfile-diff checks, minimal candidates, exposure timestamps, apply setting), with the rule not to describe the preview as gated, waited or minimal until each lands; plus the reviewer's non-blocking clarifications. Also added from #140's review: the decisions note on which six files' final versions are only in main's history, a production check of `/index/subjects.json`, and a container-start guard that scans every `.ts/.mts/.cts/.js/.mjs/.cjs` file in the repository except unit-test folders, build output and installed packages.
 
+## 2026-10-28 (cycle 2) — CLAUDE.md's built list updated
+
+Only CLAUDE.md's built and not-built paragraph changed (decisions: "CLAUDE.md's built and not-built list catches up"). Each added fact was checked against main at 3e2e350:
+
+- `time-cap.ts`: `timeCap` and `sameRelease`, with its 15 minutes;
+- `dependency-patch.ts`: `candidateTimeCap` for npm and Composer, with the exception's facts read for npm only;
+- `osv.ts`: Packagist's advisories in Composer planning;
+- docs/bench/2026-10-28-backtest-v4: 1 missed at every wait, and 157, 157, 95 and 76 unknown.
+
+Since 3e2e350, main has merged #154 and #155. Neither changed `packages/`, `apps/` or CLAUDE.md.
+
+No code changed. No test reads CLAUDE.md, so none was run.
+
+The first review (fresh context) asked for changes, with two blocking findings: the judge v0 overstated as all of gate 2, and Composer's release dates. Both are fixed (decisions: the same entry). Also checked: `judge.ts` lists the code inspection under "not checked", `time-cap.ts` skips the targets and reads Packagist's `time`, and `dependency-patch.ts` re-scans the candidate for advisories.
+
+The second review asked for changes too, with one blocking finding: "the waits" included a project's own stricter wait. Checked: `projectWait` appears only in `judge.ts`; `judge-cli.ts` does not pass it. Also checked: `osv.ts` keeps every ID OSV returns, MAL- included, so patch's re-scan stops on one. Fixed as recorded in decisions.
+
 ## 2026-10-28 — The smallest fix for npm and Composer
 
 Candidates move only the planned packages (decisions, same date). Real Docker, built CLI, temporary copies of the examples:

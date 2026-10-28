@@ -13,6 +13,7 @@ What this PR changes and why: docs/decisions/2026-10-29-records-one-file-each.md
 | progress.md | 562 | 88004 | 50 | 558 | 4 | true | true |
 
 - Before this PR is merged, main is merged again and `split.sh <that main commit>` is run again, so that entries other PRs add to the two files before then move too, and no file name is taken twice.
+- Main merged again on 2026-10-29 (ff9df3a, 0602128): `git rev-parse ff9df3a:docs/decisions.md` and `:docs/progress.md` give the same blobs as at e72301d (98180563…, 44706be2…), so `split.sh` was not run again; the merge had no conflict, so no file name is taken twice. Tests at the merge: `logs/tests-0602128.txt`.
 
 ## Checks
 

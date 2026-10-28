@@ -1,0 +1,11 @@
+# Dependabot version updates for npm, weekly, at most 5 open PRs at a time (docs/decisions.md, "Dependabot feeds the
+# judge"). They give the judge on this repository (.github/workflows/judge.yml, comments only) real dependency PRs.
+# This file only lets Dependabot open PRs; nothing here merges them.
+version: 2
+updates:
+  - package-ecosystem: npm
+    # The root lockfile, the one judge.yml judges; the workspaces are locked in it. examples/ are fixtures.
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5

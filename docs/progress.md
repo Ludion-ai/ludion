@@ -407,6 +407,10 @@ Gate: **not met**. The delay gates are met: exploited 16.4h (n = 6), high 0h (n 
 - **Unverified.** Gate 2's provenance, scripts and publisher remain unverified for 1,140 of the 1,148 removed versions.
 - **Second execution.** A second, diagnostic execution (baafc36) only added the fixes behind each unknown, and gives identical counts.
 
+## 2026-10-28 (cycle 2) — Dependabot for npm
+
+Added `.github/dependabot.yml`: npm version updates for the root directory, weekly, at most 5 open PRs. Decisions: "Dependabot feeds the judge". In Docker (python:3.14-slim), check-jsonschema 0.33.0's vendored Dependabot schema accepts the file; with `interval: fortnightly` it rejects it. Dependabot reads the file only from the default branch, so its first PRs come after the merge; nothing has run yet.
+
 ## 2026-10-28 (cycle 2) — #151's post-merge review, and its fixes
 
 #151 was merged at f78c931, a docs-only commit after the last recorded review (b885de6). A fresh-context subagent reviewed the full diff 2c1c1e7..f78c931 after the merge: **APPROVE**, with three non-blocking findings. The verdict is on the PR (https://github.com/Ludion-ai/ludion/pull/151#issuecomment-6463525016, `reviewed-sha: f78c931ecd4a3bd46eb58483a0f8d52008d862c9`). This PR fixes them (decisions: "After #151's post-merge review"):

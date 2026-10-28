@@ -383,7 +383,7 @@ Gate: **not met** (1 missed and the unknowns, at every wait). The delay gates ar
 
 ## 2026-10-28 — Rule 1's same-release exception
 
-#151 changed `time-cap.ts` (`sameRelease()` and the `same_release` list), `npm-facts.ts` (publisher, shared-publisher and provenance facts, the source commit, the statement's subject check), `judge.ts` (passes those facts to the cap; the "not checked" line), `dependency-patch.ts` (`ludion patch` reads them for the planned versions and those after T; its targets are the plan's own versions), their tests (`judge.test.ts`, `dependencies.test.ts`), and docs/decisions.md and this file. (Corrected 2026-10-28, cycle 2: this paragraph used to name only `time-cap.ts`.)
+#151 changed `time-cap.ts` (`sameRelease()` and the `same_release` list), `npm-facts.ts` (the shared-publisher fact, the provenance source commit, the statement's subject check), `judge.ts` (passes those facts to the cap; the "not checked" line), `dependency-patch.ts` (`ludion patch` reads them for the planned versions and those after T; its targets are the plan's own versions), their tests (`judge.test.ts`, `dependencies.test.ts`), and docs/decisions.md and this file. (Corrected 2026-10-28, cycle 2: this paragraph used to name only `time-cap.ts`.)
 
 `sameRelease()`: a version published at or after T may move with the fix when it is the same release as a target. With provenance, that means the same repository, workflow and commit. Without provenance, it means the same publisher account and version number, published at most 15 minutes after its target. Used by `ludion judge` (npm, pnpm) and `ludion patch` npm candidates; Composer is unchanged. Checked against the registry: `next@15.2.3` and `@next/env@15.2.3`, published 10 s apart, carry the same repository, workflow and commit, so the provenance branch allows the pair.
 
@@ -411,8 +411,13 @@ Gate: **not met**. The delay gates are met: exploited 16.4h (n = 6), high 0h (n 
 
 #151 was merged at f78c931, a docs-only commit after the last recorded review (b885de6). A fresh-context subagent reviewed the full diff 2c1c1e7..f78c931 after the merge: **APPROVE**, with three non-blocking findings. The verdict is on the PR (https://github.com/Ludion-ai/ludion/pull/151#issuecomment-6463525016, `reviewed-sha: f78c931ecd4a3bd46eb58483a0f8d52008d862c9`). This PR fixes them (decisions: "After #151's post-merge review"):
 
-- The judge's rule-1 targets are now the fixing versions, not every changed copy of a fixed package's name. Urgency counts the same way.
+- The judge's rule-1 targets are now the change's own fixing versions (`ownFixes`): per advisory, package and vulnerable version, the smallest version it changed to. They used to be every changed copy of a fixed package's name. Urgency and the exposure date count the same way.
 - The residual risk for `ludion patch` is stated correctly: it has no wait and no re-query.
 - The publisher-name comments and tests now say what the code does.
 
-Local run in Docker (node:24-slim; `npm ci` with network, then no network, read-only root, non-root): typecheck passes; packages tests: 208 passed. The new target test fails with the old name-based rule (checked on a copy). The site build needs git and was not run in the container; CI runs the full suite. The backtests were not rerun: their updates hold one copy of the fixed package, so the change should not move them, but that is not checked.
+The PR's own review asked for changes in round 1 (https://github.com/Ludion-ai/ludion/pull/153#issuecomment-6463758266). Its blocking finding: the first version keyed targets by the fixing version only. A dependent that moves from the vulnerable root copy to a newer nested copy gives that copy the vulnerable `from` through the resolution diff, so it stayed a target. Fixed with `ownFixes`; the case is tested through `allChanges` and `gatherFacts` (stubbed fetch). Also from round 1:
+- the exposure date uses the same match;
+- a delta review is enough only for PRs without protected paths;
+- a wrong fact in the #151 file list is removed.
+
+Local run in Docker (node:24-slim; `npm ci` with network, then no network, read-only root, non-root): typecheck passes; packages tests: 210 passed. The new target, urgency and `allChanges` tests fail with the earlier rules (checked on a copy). The site build needs git and was not run in the container; CI runs the full suite. The backtests were not rerun: their updates hold one copy of the fixed package, so the change should not move them, but that is not checked.

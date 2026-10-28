@@ -174,11 +174,11 @@ export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, als
     for (const name of next && prev?.present ? next.dependencies.filter(d => !prev.dependencies.includes(d)) : []) if (!created.has(name)) created.set(name, (await npmReleases(name, fetchFn)).created);
   }
   // A fix: an advisory on the version before that no longer names the version after.
-  const fixed: { id: string; package: string; to: string }[] = [];
+  const fixed: { id: string; package: string; from: string; to: string }[] = [];
   for (const c of changes) {
     if (!c.from) continue;
     const after = new Set(ids.get(`${c.name}@${c.to}`) ?? []);
-    for (const id of ids.get(`${c.name}@${c.from}`) ?? []) if (!id.startsWith("MAL-") && !after.has(id)) fixed.push({ id, package: c.name, to: c.to });
+    for (const id of ids.get(`${c.name}@${c.from}`) ?? []) if (!id.startsWith("MAL-") && !after.has(id)) fixed.push({ id, package: c.name, from: c.from, to: c.to });
   }
   const records = new Map<string, { aliases: string[]; severity: string | null }>();
   for (const id of new Set(fixed.map(f => f.id))) {
@@ -194,7 +194,7 @@ export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, als
   const fixes = fixed.map(f => {
     const r = records.get(f.id)!;
     const cveScores = r.aliases.map(a => epss.get(a)).filter((s): s is number => s !== undefined);
-    return { id: f.id, package: f.package, to: f.to, aliases: r.aliases, severity: r.severity, kev: r.aliases.some(a => kev.has(a)), epss: cveScores.length ? Math.max(...cveScores) : null };
+    return { id: f.id, package: f.package, from: f.from, to: f.to, aliases: r.aliases, severity: r.severity, kev: r.aliases.some(a => kev.has(a)), epss: cveScores.length ? Math.max(...cveScores) : null };
   });
   return { facts, fixes, created };
 }

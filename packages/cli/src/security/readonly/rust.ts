@@ -1,6 +1,7 @@
-import { lstatSync, readdirSync } from "node:fs";
+import { lstatSync } from "node:fs";
 import { join } from "node:path";
 import { textFile } from "../inventory.ts";
+import { literalMembers } from "./members.ts";
 import { isTable, parseToml, type TomlTable } from "./python-toml.ts";
 import type { ReadOnlyInventory, ReadOnlyPackage } from "./types.ts";
 
@@ -296,34 +297,15 @@ function declaredCrates(doc: TomlTable): { names: string[]; unread: number } {
   }
   return { names: [...names], unread };
 }
-const GLOB = /[*?[\]]/;
-/**
- * A workspace's member directories from [workspace] members: literal paths and the `dir/*` pattern Cargo projects use.
- * Other patterns are counted, not guessed. Excluded paths are dropped. Paths are checked as project files when read.
- */
-function memberDirectories(workspace: TomlTable, list: (dir: string) => string[]): { dirs: string[]; patterns: number; invalid: number } {
-  const members = workspace.members, exclude = Array.isArray(workspace.exclude) ? workspace.exclude.filter((e): e is string => typeof e === "string").map(e => e.replace(/\/+$/, "")) : [];
-  const dirs: string[] = [];
-  let patterns = 0, invalid = 0;
-  if (members !== undefined && !Array.isArray(members)) return { dirs, patterns, invalid: 1 };
-  for (const member of members ?? []) {
-    if (typeof member !== "string" || !member || member.length > 500 || member.startsWith("/") || member.includes("\\") || member.split("/").includes("..")) { invalid++; continue; }
-    const path = member.replace(/\/+$/, "");
-    const star = /^(?:(.*)\/)?\*$/.exec(path);
-    if (star && !GLOB.test(star[1] ?? "")) for (const name of list(star[1] ?? "")) dirs.push(star[1] ? `${star[1]}/${name}` : name);
-    else if (GLOB.test(path)) patterns++;
-    else dirs.push(path);
-  }
-  return { dirs: [...new Set(dirs)].filter(d => !exclude.includes(d)), patterns, invalid };
-}
 type Lock = { members: string[] | null; names: string[] };
-type Members = { list: (dir: string) => string[]; read: (path: string) => string | null };
+/** Reads a project file (a workspace member's Cargo.toml), or null when it cannot be read. */
+type ReadMember = (path: string) => string | null;
 /**
  * Whether a Cargo.lock is the lock of the Cargo.toml beside it. Cargo builds a workspace member with the lock at its
  * workspace root; a lock lists its workspace's packages as members (packages without a source) and every crate any of
  * them declares. Nothing from a Cargo.toml is printed but validated crate names and counts.
  */
-export function cargoManifestLimitations(text: string, lock: Lock, members: Members): string[] {
+export function cargoManifestLimitations(text: string, lock: Lock, readMember: ReadMember): string[] {
   const doc = cargoToml(text, "Cargo.toml");
   if (typeof doc === "string") return [`${doc}, so whether Cargo.lock is its lock was not checked.`];
   const pkg = doc.package, workspace = doc.workspace;
@@ -331,7 +313,8 @@ export function cargoManifestLimitations(text: string, lock: Lock, members: Memb
   if (!pkg && !workspace) return ["Cargo.toml has neither [package] nor [workspace], so whether Cargo.lock is its lock was not checked."];
   const limitations: string[] = [];
   if (pkg?.workspace !== undefined && !workspace) limitations.push("Cargo.toml names another directory as its workspace root (package.workspace). Cargo builds it with the Cargo.lock at that root, so the Cargo.lock here may not be the one in use.");
-  const isMember = (name: string) => !lock.members?.length || lock.members.includes(name);
+  const lockMembers = new Set(lock.members ?? []);
+  const isMember = (name: string) => !lockMembers.size || lockMembers.has(name);
   if (pkg) {
     const name = typeof pkg.name === "string" && ANY_NAME.test(pkg.name) ? pkg.name : null;
     if (name === null) limitations.push("Cargo.toml's [package] has no valid name, so whether Cargo.lock is its lock was not checked.");
@@ -344,21 +327,20 @@ export function cargoManifestLimitations(text: string, lock: Lock, members: Memb
     if (missing.length) limitations.push(`Cargo.lock does not list ${missing.length === 1 ? "1 crate" : `${missing.length} crates`} that Cargo.toml declares, so it may be out of date and ${missing.length === 1 ? "that crate was" : "they were"} not checked ${named(missing.map(show))}`);
     if (declared.unread) limitations.push(`Cargo.toml has ${declared.unread === 1 ? "1 dependency entry" : `${declared.unread} dependency entries`} Ludion could not read, so ${declared.unread === 1 ? "it was" : "they were"} not compared with Cargo.lock.`);
   }
-  // A workspace's members must be the lock's members: their names come from their own Cargo.toml.
+  // A workspace's members must be the lock's members. Only literal member paths are read (no pattern is expanded), for
+  // the package name in their own Cargo.toml; anything else is one limitation.
   if (workspace && lock.members !== null) {
-    const { dirs, patterns, invalid } = memberDirectories(workspace, members.list);
-    const names: string[] = [];
-    let unreadable = 0;
-    if (dirs.length > 1000) limitations.push("Cargo.toml's workspace has more than 1,000 members, so they were not compared with Cargo.lock.");
-    else for (const dir of dirs) {
-      const text = members.read(`${dir}/Cargo.toml`), member = text === null ? null : cargoToml(text, "member Cargo.toml");
+    const { dirs, unchecked } = literalMembers(workspace.members, workspace.exclude);
+    const missing: string[] = [];
+    let unreadable = unchecked;
+    for (const dir of dirs) {
+      const text = readMember(`${dir}/Cargo.toml`), member = text === null ? null : cargoToml(text, "member Cargo.toml");
       const name = member && typeof member !== "string" && isTable(member.package) && typeof member.package.name === "string" && ANY_NAME.test(member.package.name) ? member.package.name : null;
-      if (name === null) unreadable++; else names.push(name);
+      if (name === null) unreadable = true; else if (!isMember(name)) missing.push(name);
     }
-    const missing = names.filter(n => !isMember(n));
-    if (missing.length) limitations.push(`Cargo.lock lists no workspace member named ${missing.map(show).join(", ").slice(0, 600)} (members of Cargo.toml's [workspace]), so it may be another project's lock or out of date.`);
-    if (unreadable) limitations.push(`${unreadable === 1 ? "1 workspace member's Cargo.toml" : `${unreadable} workspace members' Cargo.toml files`} could not be read or name no package, so ${unreadable === 1 ? "it was" : "they were"} not compared with Cargo.lock.`);
-    if (patterns || invalid) limitations.push(`Cargo.toml's [workspace] members include ${patterns + invalid === 1 ? "1 entry" : `${patterns + invalid} entries`} Ludion does not expand, so ${patterns + invalid === 1 ? "it was" : "they were"} not compared with Cargo.lock.`);
+    if (missing.length === 1) limitations.push(`Cargo.lock lists no workspace member named ${show(missing[0]!)} (a member of Cargo.toml's [workspace]), so it may be another project's lock or out of date.`);
+    else if (missing.length) limitations.push(`Cargo.lock lists none of these members of Cargo.toml's [workspace], so it may be another project's lock or out of date ${named(missing.map(show))}`);
+    if (unreadable) limitations.push("Cargo.toml's workspace members given by pattern or exclude, more than 1,000 of them, or ones whose Cargo.toml could not be read were not checked against Cargo.lock.");
   }
   return limitations;
 }
@@ -371,13 +353,8 @@ export function readRust(root: string): ReadOnlyInventory | null {
     const { packages, limitations, members, names } = cargoLock(textFile(root, "Cargo.lock"));
     if (!present(root, "Cargo.toml")) return { ecosystem: "crates.io", files: ["Cargo.lock"], scope: RUST_SCOPE, packages, limitations };
     // Workspace member manifests are read for their package names only (regular files inside the project, 4 MiB cap).
-    const list = (dir: string) => {
-      const path = join(root, dir);
-      const stat = lstatSync(path, { throwIfNoEntry: false });
-      return stat?.isDirectory() ? readdirSync(path).filter(name => !name.startsWith(".") && lstatSync(join(path, name)).isDirectory() && present(path, `${name}/Cargo.toml`)).sort() : [];
-    };
     const read = (path: string) => { try { return textFile(root, path); } catch { return null; } };
-    limitations.push(...cargoManifestLimitations(textFile(root, "Cargo.toml"), { members, names }, { list, read }));
+    limitations.push(...cargoManifestLimitations(textFile(root, "Cargo.toml"), { members, names }, read));
     return { ecosystem: "crates.io", files: ["Cargo.lock", "Cargo.toml"], scope: RUST_SCOPE, packages, limitations };
   }
   if (!present(root, "Cargo.toml")) return null;

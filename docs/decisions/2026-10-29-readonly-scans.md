@@ -16,17 +16,23 @@
 - **Registration.** Python, Go and Rust are registered with `PYTHON_FILES`, `GO_FILES` and `RUST_FILES`. `PYTHON_FILES` also names Pipfile, which the Python reader reads on its own, and setup.py and setup.cfg, which it never reads. A project whose only Python file is another requirements file (requirements-dev.txt) is not scanned, because no registered name is present.
 - **Never clean when dependencies are declared where Ludion does not read** (#189 reviews). Fail closed, not by a list of tools. A list of seven tools missed Briefcase, workspace roots, tox and cibuildwheel, and over-reporting is the accepted direction.
   - Without a lock Ludion reads (uv.lock, poetry.lock or Pipfile.lock), pyproject.toml is always a limitation, even with only `[tool.black]`.
-  - Beside a lock, any key at any depth of a `[tool.*]` table other than `[tool.poetry]` and `[tool.uv]` whose name contains "depend", "require", "deps" or "members" is a limitation. That includes ruff's `required-version`.
+  - Beside a lock, a `[tool.*]` key whose name contains "depend", "require", "deps", "members" or "legacy_tox_ini" is a limitation. That includes ruff's `required-version`.
+    - The walk covers tables, arrays of tables and inline arrays. It stops eight levels deep, and that stop is itself a limitation.
+    - `[tool.uv]` is exempt only beside uv.lock, and `[tool.poetry]` only beside poetry.lock.
   - setup.py is always a limitation.
-  - setup.cfg is read for its section headers only, as configparser finds them: `[options]` or `[options.extras_require]` is a limitation, and tool sections alone add nothing.
+  - setup.cfg is read for its section headers only, as configparser finds them. A header that names "options", once whitespace and control characters are removed and case is ignored, is a limitation; setuptools reads every such section. Tool sections alone add nothing.
+- **No expansion of workspace members** (#189 round 3). Expanding `dir/*` was quadratic in members × exclude and unbounded in repeated patterns, so it was removed.
+  - Cargo's `[workspace]` and uv's `[tool.uv.workspace]` members are read as literal paths only: deduplicated, at most 1,000, and inside the project.
+  - A pattern, an `exclude` list, more than 1,000 members, or a member whose manifest cannot be read gives one limitation.
+  - It is linear: a 4 MiB members and exclude list takes about 0.3 s.
 - **A lock must be its manifest's** (#189 review). Each reader reads the manifest beside the lock it reads.
-  - uv.lock: a limitation when it has no project package, when it does not name pyproject.toml's project, or when pyproject.toml cannot be read.
+  - uv.lock: a limitation when it has no project package, when it does not name pyproject.toml's project, or when pyproject.toml cannot be read. Also when it lacks a `[tool.uv] dev-dependencies` name (compared like `[dependency-groups]`), or a literal `[tool.uv.workspace]` member's package.
   - poetry.lock, Pipfile.lock and uv.lock: a limitation when they do not list a requirement the manifest declares, other than the project itself. An unreadable manifest is a limitation even beside an empty lock.
   - poetry.lock's lock-version is read by one predicate for parsing and for this comparison ("02.0" is 2.0).
   - Cargo.lock: a limitation in any of these cases:
     - Cargo.toml's package is not among the lock's workspace members;
     - a crate that Cargo.toml's dependency tables declare is missing from the lock. The tables are `[dependencies]`, `[dev-dependencies]` and `[build-dependencies]`, also under `[target.*]`. Crates compare by `package` for a rename (also through `[workspace.dependencies]`), with `-`/`_` and case alike;
-    - a `[workspace]` member is not one of the lock's members. Members are literal paths and `dir/*`, with `exclude` honoured, and each name comes from the member's own Cargo.toml. Other patterns, and members that cannot be read, are limitations too;
+    - a literal `[workspace]` member, named in its own Cargo.toml, is not one of the lock's members;
     - Cargo.toml names another workspace root (`package.workspace`);
     - Cargo.toml cannot be read.
 

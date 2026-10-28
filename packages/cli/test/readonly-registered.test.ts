@@ -230,7 +230,16 @@ describe("a Python project whose dependencies Ludion does not read is never clea
     ["[options]", "[metadata]\nname = app\n\n[options]\ninstall_requires =\n    requests==2.19.0\n", "[options]"],
     ["[options.extras_require]", "[options.extras_require]\ntest = pytest\n", "[options.extras_require]"],
     ["both", "[options]\nsetup_requires = wheel\n[options.extras_require]\ntest = pytest\n", "[options], [options.extras_require]"],
-    ["a header configparser still reads: indented, other case, a trailing comment", "  [Options] ; dependencies\ntests_require = pytest\n", "[options]"],
+    ["a header configparser still reads: indented, other case, a trailing comment", "  [Options] ; dependencies\ntests_require = pytest\n", "[Options]"],
+    // setuptools takes every section that starts with "options"; Python's strip() also removes U+001C and U+0085.
+    ["[options.] and [options..extras_require]", "[options.]\ninstall_requires = a\n[options..extras_require]\nb = c\n", "[options.], [options..extras_require]"],
+    ["[optionsextras_require]", "[optionsextras_require]\nb = c\n", "[optionsextras_require]"],
+    ["a header behind U+001C or U+0085", "\u001c[options]\ninstall_requires = a\n\u0085[options.extras_require]\nb = c\n", "[options], [options.extras_require]"],
+    ["[options.packages.find] (over-reported: any options section counts)", "[options.packages.find]\nwhere = src\n", "[options.packages.find]"],
+    // The rule is "contains options once whitespace and control characters are removed", which over-reports by design.
+    ["[my options] and [o p t i o n s]", "[my options]\na = b\n[o p t i o n s]\nc = d\n", "[my options], [o p t i o n s]"],
+    // configparser reads CR-only line ends too: the header is on the second line.
+    ["CR-only line ends", "x = 1\r[options]\rinstall_requires = a\r", "[options]"],
   ])("setup.cfg with %s gives a limitation", async (_name, text, sections) => {
     const result = await check({ "setup.cfg": text });
     expect(result.inventory.files).toEqual(["setup.cfg"]);
@@ -238,22 +247,69 @@ describe("a Python project whose dependencies Ludion does not read is never clea
     expect(result.status).toBe("incomplete");
   });
   it("a setup.cfg holding only tool sections adds nothing", async () => {
-    const result = await check({ "setup.cfg": "[flake8]\nmax-line-length = 100\n\n[isort]\nprofile = black\n\n[tool:pytest]\naddopts = -q\n\n[metadata]\nname = app\n\n[options.packages.find]\nwhere = src\n" });
+    const result = await check({ "setup.cfg": "[flake8]\nmax-line-length = 100\n\n[isort]\nprofile = black\n\n[tool:pytest]\naddopts = -q\n\n[metadata]\nname = app\n" });
     expect(result.inventory.limitations).toEqual([]);
     expect(result.status).toBe("no_known_vulnerabilities");
   });
-  it("beside a lock, tool settings other than Poetry's and uv's that may declare dependencies give a limitation", async () => {
-    const uv = { "uv.lock": UV_LOCK, "pyproject.toml": '[project]\nname = "app"\nversion = "0.1.0"\ndependencies = ["requests"]\n' };
-    const with_ = (extra: string) => check({ ...uv, "pyproject.toml": `${uv["pyproject.toml"]}\n${extra}` });
-    expect((await with_('[tool.briefcase.app.t]\nrequires = ["six==1.16.0"]\n')).inventory.limitations).toEqual([TOOLS("[tool.briefcase.app.t] requires")]);
-    expect((await with_('[tool.tox.env.test]\ndeps = ["pytest"]\n')).inventory.limitations).toEqual([TOOLS("[tool.tox.env.test] deps")]);
-    expect((await with_('[tool.cibuildwheel]\ntest-requires = ["pytest"]\n')).inventory.limitations).toEqual([TOOLS("[tool.cibuildwheel] test-requires")]);
-    expect((await with_('[tool.hatch.envs.default.workspace]\nmembers = ["packages/*"]\n')).inventory.limitations).toEqual([TOOLS("[tool.hatch.envs.default.workspace] members")]);
-    // uv's own settings are in uv.lock, and plain tool settings declare nothing.
-    expect((await with_('[tool.uv]\ndev-dependencies = ["pytest"]\n\n[tool.uv.workspace]\nmembers = ["packages/*"]\n\n[tool.black]\nline-length = 100\n')).inventory.limitations).toEqual([]);
-    // Poetry's are read with poetry.lock.
+  it("beside Pipfile.lock only, pyproject.toml's dynamic dependencies are a limitation", async () => {
+    const result = await check({ "Pipfile.lock": JSON.stringify({ _meta: { "pipfile-spec": 6 }, default: {} }), Pipfile: "[packages]\n", "pyproject.toml": '[project]\nname = "app"\ndynamic = ["dependencies"]\n' });
+    expect(result.inventory.limitations).toEqual(["pyproject.toml declares dependencies dynamically and no lock file (uv.lock, poetry.lock) pins them; unpinned project requirements were not checked and their versions were not guessed."]);
+  });
+});
+
+describe("beside a lock, tool settings no lock read here covers are a limitation (#189 reviews)", () => {
+  const uv = { "uv.lock": UV_LOCK, "pyproject.toml": '[project]\nname = "app"\nversion = "0.1.0"\ndependencies = ["requests"]\n' };
+  const with_ = async (extra: string) => (await check({ ...uv, "pyproject.toml": `${uv["pyproject.toml"]}\n${extra}` })).inventory.limitations;
+  it.each([
+    ["Briefcase requires", '[tool.briefcase.app.t]\nrequires = ["six==1.16.0"]\n', "[tool.briefcase.app.t] requires"],
+    ["tox deps", '[tool.tox.env.test]\ndeps = ["pytest"]\n', "[tool.tox.env.test] deps"],
+    ["tox legacy_tox_ini", '[tool.tox]\nlegacy_tox_ini = """\n[testenv]\ndeps = requests==2.19.0\n"""\n', "[tool.tox] legacy_tox_ini"],
+    ["cibuildwheel test-requires", '[tool.cibuildwheel]\ntest-requires = ["pytest"]\n', "[tool.cibuildwheel] test-requires"],
+    ["an array of tables (W1)", '[[tool.cibuildwheel.overrides]]\nselect = "cp38-*"\ntest-requires = ["requests==2.19.0"]\n', "[tool.cibuildwheel.overrides] test-requires"],
+    ["an inline array of tables (W2)", '[tool.x]\nenvs = [{ deps = ["requests==2.19.0"] }]\n', "[tool.x.envs] deps"],
+    ["Hatch workspace members", '[tool.hatch.envs.default.workspace]\nmembers = ["packages/*"]\n', "[tool.hatch.envs.default.workspace] members"],
+    ["eight table levels", '[tool.a.b.c.d.e.f]\nrequires = ["x"]\n', "[tool.a.b.c.d.e.f] requires"],
+    ["nine table levels (W4): the walk stops and says so", '[tool.a.b.c.d.e.f.g.h]\nrequires = ["x"]\n', "[tool.a.b.c.d.e.f.g] (nested deeper than Ludion reads)"],
+  ])("%s", async (_name, extra, setting) => {
+    expect(await with_(extra)).toEqual([TOOLS(setting)]);
+  });
+  it("uv's settings are covered beside uv.lock only, and Poetry's beside poetry.lock only", async () => {
+    expect(await with_('[tool.uv]\nconstraint-dependencies = ["idna<4"]\n\n[tool.black]\nline-length = 100\n')).toEqual([]);
     const poetry = await check({ "poetry.lock": POETRY(["requests", "pytest"]), "pyproject.toml": `${DECLARES}\n[tool.poetry.group.dev.dependencies]\npytest = "*"\n\n[tool.pdm.dev-dependencies]\ntest = ["six"]\n` });
     expect(poetry.inventory.limitations).toEqual([TOOLS("[tool.pdm] dev-dependencies")]);
+    const pipenv = { Pipfile: '[packages]\nsix = "==1.16.0"\n', "Pipfile.lock": JSON.stringify({ _meta: { "pipfile-spec": 6 }, default: { six: { version: "==1.16.0" } } }) };
+    // B1: a Pipenv project whose pyproject.toml has [tool.uv] dev-dependencies, and no uv.lock.
+    expect((await check({ ...pipenv, "pyproject.toml": '[tool.black]\nline-length = 100\n\n[tool.uv]\ndev-dependencies = ["requests==2.19.0"]\n' })).inventory.limitations).toEqual([TOOLS("[tool.uv] dev-dependencies")]);
+    // B2 and B2b: round 2's uv workspace root beside an empty Pipfile.lock, or an empty poetry.lock.
+    const workspace = { "pyproject.toml": '[tool.uv.workspace]\nmembers = ["packages/*"]\n', "packages/a/pyproject.toml": DECLARES };
+    expect((await check({ ...workspace, "Pipfile.lock": JSON.stringify({ _meta: { "pipfile-spec": 6 }, default: {} }) })).inventory.limitations).toEqual([TOOLS("[tool.uv.workspace] members")]);
+    expect((await check({ ...workspace, "poetry.lock": POETRY([]) })).inventory.limitations).toEqual([TOOLS("[tool.uv.workspace] members")]);
+    // Poetry's settings beside a lock that is not poetry.lock fall under the rule too.
+    expect((await check({ ...pipenv, "pyproject.toml": '[tool.poetry.group.dev.dependencies]\npytest = "*"\n' })).inventory.limitations).toEqual([
+      "pyproject.toml declares 1 requirement and no lock file (uv.lock, poetry.lock) pins them; unpinned project requirements were not checked and their versions were not guessed.",
+      TOOLS("[tool.poetry.group.dev] dependencies"),
+    ]);
+    // B3: a Poetry project with [tool.uv] dev-dependencies and no uv.lock.
+    expect((await check({ "poetry.lock": POETRY(["six"]), "pyproject.toml": '[tool.poetry.dependencies]\nsix = "*"\n\n[tool.uv]\ndev-dependencies = ["requests==2.19.0"]\n' })).inventory.limitations).toEqual([TOOLS("[tool.uv] dev-dependencies")]);
+  });
+});
+
+describe("uv.lock against [tool.uv] (#189 reviews, N9 and N12)", () => {
+  const app = '[project]\nname = "app"\nversion = "0.1.0"\ndependencies = ["requests"]\n';
+  it("[tool.uv] dev-dependencies are compared like [dependency-groups]", async () => {
+    expect((await check({ "uv.lock": UV_LOCK, "pyproject.toml": `${app}\n[tool.uv]\ndev-dependencies = ["urllib3"]\n` })).inventory.limitations).toEqual([]);
+    expect((await check({ "uv.lock": UV_LOCK, "pyproject.toml": `${app}\n[tool.uv]\ndev-dependencies = ["pytest>=8"]\n` })).inventory.limitations).toEqual([expect.stringMatching(/^uv\.lock does not list 1 requirement that pyproject\.toml declares.*: pytest\.$/)]);
+  });
+  const WS_LOCK = UV_LOCK.replace("requires-python = \">=3.10\"\n", "requires-python = \">=3.10\"\n\n[manifest]\nmembers = [\"app\", \"member\"]\n") + '\n[[package]]\nname = "member"\nversion = "1.0.0"\nsource = { editable = "packages/member" }\n';
+  it("literal [tool.uv.workspace] members must be uv.lock's project packages; patterns and exclude are not expanded", async () => {
+    const root = (members: string, extra = "") => `${app}\n[tool.uv.workspace]\nmembers = ${members}\n${extra}`;
+    const member = (name: string) => `[project]\nname = "${name}"\nversion = "1.0.0"\n`;
+    expect((await check({ "uv.lock": WS_LOCK, "pyproject.toml": root('["packages/member"]'), "packages/member/pyproject.toml": member("member") })).inventory.limitations).toEqual([]);
+    expect((await check({ "uv.lock": UV_LOCK, "pyproject.toml": root('["packages/member"]'), "packages/member/pyproject.toml": member("member") })).inventory.limitations).toEqual(['uv.lock does not lock 1 workspace member that [tool.uv.workspace] names, so it may be out of date and that member was not checked: "member".']);
+    const unchecked = "pyproject.toml's [tool.uv.workspace] members given by pattern or exclude, more than 1,000 of them, or ones whose pyproject.toml could not be read were not checked against uv.lock.";
+    expect((await check({ "uv.lock": WS_LOCK, "pyproject.toml": root('["packages/*"]'), "packages/member/pyproject.toml": member("member") })).inventory.limitations).toEqual([unchecked]);
+    expect((await check({ "uv.lock": WS_LOCK, "pyproject.toml": root('["packages/member"]', 'exclude = ["packages/old"]\n'), "packages/member/pyproject.toml": member("member") })).inventory.limitations).toEqual([unchecked]);
+    expect((await check({ "uv.lock": WS_LOCK, "pyproject.toml": root('["packages/missing"]') })).inventory.limitations).toEqual([unchecked]);
   });
 });
 
@@ -311,15 +367,44 @@ describe("a lock must be the lock of the manifest beside it (#189 review, findin
     expect((await check({ "Cargo.lock": lock, "Cargo.toml": `${APP}\n[dependencies]\nSerde-Json = "1"\n` })).inventory.limitations).toEqual([]);
     expect(await rust(`${APP}\n[dependencies]\n"bad name" = "1"\n`)).toEqual(["Cargo.toml has 1 dependency entry Ludion could not read, so it was not compared with Cargo.lock."]);
   });
-  it("a workspace's members must be the lock's members (RN2)", async () => {
-    const workspace = (members: string, exclude = "") => `[workspace]\nmembers = ${members}\n${exclude}resolver = "2"\n`;
-    expect(await rust(workspace('["app"]'), { "app/Cargo.toml": APP })).toEqual([]);
-    expect(await rust(workspace('["crates/*"]'), { "crates/app/Cargo.toml": APP, "crates/notes/README.md": "" })).toEqual([]);
-    expect(await rust(workspace('["crates/zzz"]'), { "crates/zzz/Cargo.toml": '[package]\nname = "zzz"\nversion = "0.1.0"\n' })).toEqual([`Cargo.lock lists no workspace member named "zzz" (members of Cargo.toml's [workspace]), so it may be another project's lock or out of date.`]);
-    expect(await rust(workspace('["crates/*"]', 'exclude = ["crates/old"]\n'), { "crates/app/Cargo.toml": APP, "crates/old/Cargo.toml": '[package]\nname = "old"\nversion = "0.1.0"\n' })).toEqual([]);
-    expect(await rust(workspace('["missing"]'))).toEqual(["1 workspace member's Cargo.toml could not be read or name no package, so it was not compared with Cargo.lock."]);
-    expect(await rust(workspace('["crates/a*", "../outside"]'))).toEqual(["Cargo.toml's [workspace] members include 2 entries Ludion does not expand, so they were not compared with Cargo.lock."]);
+  const workspace = (members: string, exclude = "") => `[workspace]\nmembers = ${members}\n${exclude}resolver = "2"\n`;
+  const UNCHECKED = "Cargo.toml's workspace members given by pattern or exclude, more than 1,000 of them, or ones whose Cargo.toml could not be read were not checked against Cargo.lock.";
+  it("literal workspace members must be the lock's members (RN2); nothing is expanded", async () => {
+    expect(await rust(workspace('["app", "./app/", "app"]'), { "app/Cargo.toml": APP })).toEqual([]);
+    expect(await rust(workspace('["crates/zzz"]'), { "crates/zzz/Cargo.toml": '[package]\nname = "zzz"\nversion = "0.1.0"\n' })).toEqual([`Cargo.lock lists no workspace member named "zzz" (a member of Cargo.toml's [workspace]), so it may be another project's lock or out of date.`]);
+    expect(await rust(workspace('["crates/y", "crates/z"]'), { "crates/y/Cargo.toml": '[package]\nname = "y"\n', "crates/z/Cargo.toml": '[package]\nname = "z"\n' })).toEqual([`Cargo.lock lists none of these members of Cargo.toml's [workspace], so it may be another project's lock or out of date (2): "y", "z".`]);
+    // A pattern, an exclude list, an unsafe path or an unreadable member: one limitation, nothing guessed.
+    expect(await rust(workspace('["crates/*"]'), { "crates/app/Cargo.toml": APP })).toEqual([UNCHECKED]);
+    expect(await rust(workspace('["app"]', 'exclude = ["old"]\n'), { "app/Cargo.toml": APP })).toEqual([UNCHECKED]);
+    expect(await rust(workspace('["../outside"]'))).toEqual([UNCHECKED]);
+    expect(await rust(workspace('["missing"]'))).toEqual([UNCHECKED]);
+    expect(await rust(workspace('"app"'))).toEqual([UNCHECKED]);
   });
+  it("a member path with a glob character is never read, even when a directory has that very name", async () => {
+    expect(await rust(workspace('["crates/*"]'), { "crates/*/Cargo.toml": APP })).toEqual([UNCHECKED]);
+  });
+  it("duplicate members count once toward the 1,000", async () => {
+    expect(await rust(workspace(`[${Array.from({ length: 1500 }, () => '"app"').join(", ")}]`), { "app/Cargo.toml": APP })).toEqual([]);
+    // 1,000 distinct members and then a repeat of one: still 1,000.
+    const files = Object.fromEntries(Array.from({ length: 1000 }, (_, i) => [`m${i}/Cargo.toml`, APP]));
+    expect(await rust(workspace(`[${Array.from({ length: 1000 }, (_, i) => `"m${i}"`).join(", ")}, "m0"]`), files)).toEqual([]);
+  });
+  it("more than 1,000 literal members are read no further, and say so", async () => {
+    const members = Array.from({ length: 1001 }, (_, i) => `"m${i}"`).join(", ");
+    const files = Object.fromEntries(Array.from({ length: 1001 }, (_, i) => [`m${i}/Cargo.toml`, `[package]\nname = "app"\n`]));
+    expect(await rust(workspace(`[${members}]`), files)).toEqual([UNCHECKED]);
+    // 1,000 are all read and compared.
+    expect(await rust(workspace(`[${members.split(", ").slice(0, 1000).join(", ")}]`), files)).toEqual([]);
+  });
+  it("a 4 MiB members and exclude list is linear", async () => {
+    const entries = (prefix: string, n: number) => Array.from({ length: n }, (_, i) => `"${prefix}${i}"`).join(",");
+    const manifest = `[workspace]\nmembers = [${entries("", 240_000)}]\nexclude = [${entries("x", 200_000)}]\n`;
+    expect(manifest.length).toBeGreaterThan(3_900_000);
+    expect(manifest.length).toBeLessThan(4 * 1024 * 1024);
+    const started = Date.now();
+    expect(await rust(manifest)).toEqual([UNCHECKED]);
+    expect(Date.now() - started).toBeLessThan(4000);
+  }, 20_000);
 });
 
 describe("ludion scan with the registered readers", () => {

@@ -6,6 +6,7 @@
 import { existsSync, lstatSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { textFile } from "../inventory.ts";
+import { literalMembers } from "./members.ts";
 import { clip, isTable, parseToml, quoted, type TomlTable, type TomlValue } from "./python-toml.ts";
 import type { ReadOnlyInventory, ReadOnlyPackage } from "./types.ts";
 
@@ -446,35 +447,56 @@ export function pyprojectName(text: string): string | null {
   return name === null ? null : normalizeName(name);
 }
 
-/**
- * Settings under [tool.*] that may declare dependencies a lock beside pyproject.toml does not cover: every key, at any
- * depth, whose name contains "depend", "require", "deps" or "members", in any tool table but [tool.poetry] (read
- * with poetry.lock) and [tool.uv] (locked into uv.lock). Matched by key name, not by a list of tools, so an unknown
- * tool over-reports (ruff's required-version too) rather than hides (Briefcase's requires, tox's deps).
- */
-export function toolDependencySettings(text: string): string[] {
-  const tool = parseToml(text, "pyproject.toml").tool, found: string[] = [];
-  const walk = (table: TomlTable, path: string[]) => {
-    for (const [key, value] of Object.entries(table)) {
-      if (/depend|require|deps|members/i.test(key)) found.push(`[${path.map(p => clip(p, 40)).join(".")}] ${clip(key, 40)}`);
-      else if (isTable(value) && path.length < 8) walk(value, [...path, key]);
-    }
-  };
-  if (isTable(tool)) for (const [name, settings] of Object.entries(tool)) if (name !== "poetry" && name !== "uv" && isTable(settings)) walk(settings, ["tool", name]);
-  return found;
+/** [tool.uv]'s dev-dependencies (names, as [dependency-groups] are read) and its workspace table. Throws when unreadable. */
+export function uvSettings(text: string): { dev: string[]; workspace: TomlTable | undefined } {
+  const tool = parseToml(text, "pyproject.toml").tool;
+  const uv = isTable(tool) ? tool.uv : undefined;
+  if (uv === undefined) return { dev: [], workspace: undefined };
+  if (!isTable(uv)) throw new Error("pyproject.toml: [tool.uv] is not a table.");
+  if (uv.workspace !== undefined && !isTable(uv.workspace)) throw new Error("pyproject.toml: [tool.uv.workspace] is not a table.");
+  return { dev: stringList(uv["dev-dependencies"], "pyproject.toml", "[tool.uv] dev-dependencies"), workspace: uv.workspace };
 }
 
+/** Key names that may declare dependencies under a tool's settings (tox's legacy_tox_ini holds a whole tox.ini). */
+const DEPENDENCY_KEY = /depend|require|deps|members|legacy_tox_ini/i;
+/** Below this many table levels the walk stops, and says so: a setting is never skipped silently. */
+const TOOL_DEPTH = 8;
 /**
- * The setuptools sections a setup.cfg has that declare dependencies: [options] (install_requires, setup_requires,
- * tests_require) and [options.extras_require]. Only section headers are read, as configparser reads them; a setup.cfg
- * holding only tool sections ([flake8], [isort], [tool:pytest]) declares nothing.
+ * Settings under [tool.*] that may declare dependencies a lock beside pyproject.toml does not cover: every key whose
+ * name matches DEPENDENCY_KEY, in tables, arrays of tables and inline arrays, in every tool table except those named
+ * in `covered` ("uv" beside uv.lock, "poetry" beside poetry.lock). Matched by key name, not by a list of tools, so an
+ * unknown tool over-reports (ruff's required-version too) rather than hides (Briefcase's requires, tox's deps).
+ */
+export function toolDependencySettings(text: string, covered: string[] = []): string[] {
+  const tool = parseToml(text, "pyproject.toml").tool, found: string[] = [];
+  const at = (path: string[]) => `[${path.map(p => clip(p, 40)).join(".")}]`;
+  const visit = (value: TomlValue, path: string[]): void => {
+    if (Array.isArray(value)) { for (const item of value) visit(item, path); return; }
+    if (!isTable(value)) return;
+    if (path.length >= TOOL_DEPTH) { if (Object.keys(value).length) found.push(`${at(path)} (nested deeper than Ludion reads)`); return; }
+    for (const [key, inner] of Object.entries(value)) {
+      if (DEPENDENCY_KEY.test(key)) found.push(`${at(path)} ${clip(key, 40)}`);
+      else visit(inner, [...path, key]);
+    }
+  };
+  if (isTable(tool)) for (const [name, settings] of Object.entries(tool)) if (!covered.includes(name)) visit(settings, ["tool", name]);
+  return [...new Set(found)];
+}
+
+/** Python's str.strip() whitespace and the control characters around it (configparser strips each line). */
+const CFG_SPACE = /^[\s\x00-\x1f\x7f-\x9f]+|[\s\x00-\x1f\x7f-\x9f]+$/g;
+/**
+ * The setuptools sections of a setup.cfg: every section header that names options once whitespace and control
+ * characters are removed and case ignored ([options], [options.extras_require], [options.], ...), since setuptools
+ * reads install_requires, setup_requires, tests_require and extras_require from them. Only headers are read, as
+ * configparser finds them; a setup.cfg holding only tool sections ([flake8], [isort], [tool:pytest]) declares nothing.
  */
 export function setupCfgDependencySections(text: string): string[] {
   const found = new Set<string>();
   for (const line of text.split(/\r\n|[\n\r]/)) {
     // configparser's SECTCRE, \[(?P<header>.+)\], matched at the start of the stripped line: up to its last "]".
-    const header = /^\[(.+)\]/.exec(line.trim())?.[1]?.trim().toLowerCase();
-    if (header === "options" || header === "options.extras_require") found.add(`[${header}]`);
+    const header = /^\[(.+)\]/.exec(line.replace(CFG_SPACE, ""))?.[1];
+    if (header !== undefined && header.replace(/[\s\x00-\x1f\x7f-\x9f]/g, "").toLowerCase().includes("options")) found.add(clip(`[${header.trim()}]`, 60));
   }
   return [...found];
 }
@@ -557,9 +579,23 @@ export function readPython(root: string): ReadOnlyInventory | null {
     if (has("pyproject.toml")) {
       const manifest = read("pyproject.toml");
       try {
-        const declared = pyprojectRequirements(manifest).names, own = pyprojectName(manifest);
+        const declared = pyprojectRequirements(manifest).names, own = pyprojectName(manifest), settings = uvSettings(manifest);
         if (own !== null && uv.project.length && !uv.project.includes(own)) limitations.push(`uv.lock does not lock pyproject.toml's project ${quoted(own, 60)} (its project packages are ${list(uv.project)}), so it may be another project's lock; what pyproject.toml declares was not compared with it.`);
-        else unlocked("uv.lock", lockedNames(text, "uv.lock"), "pyproject.toml", declared, own);
+        // [tool.uv] dev-dependencies are locked like [dependency-groups]: one uv.lock does not list makes it stale.
+        else unlocked("uv.lock", lockedNames(text, "uv.lock"), "pyproject.toml", [...declared, ...settings.dev], own);
+        // Workspace members (literal paths only) must be uv.lock's project packages, by the name in their own pyproject.toml.
+        if (settings.workspace) {
+          const { dirs, unchecked } = literalMembers(settings.workspace.members, settings.workspace.exclude);
+          const missing: string[] = [];
+          let unreadable = unchecked;
+          for (const dir of dirs) {
+            let name: string | null = null;
+            try { name = pyprojectName(textFile(root, `${dir}/pyproject.toml`)); } catch { /* counted as unreadable below */ }
+            if (name === null) unreadable = true; else if (!uv.project.includes(name)) missing.push(name);
+          }
+          if (missing.length) limitations.push(`uv.lock does not lock ${plural(missing.length, "workspace member", "workspace members")} that [tool.uv.workspace] names, so it may be out of date and ${missing.length === 1 ? "that member was" : "they were"} not checked: ${list(missing.map(n => quoted(n, 60)))}.`);
+          if (unreadable) limitations.push("pyproject.toml's [tool.uv.workspace] members given by pattern or exclude, more than 1,000 of them, or ones whose pyproject.toml could not be read were not checked against uv.lock.");
+        }
       } catch (error) {
         limitations.push(`pyproject.toml could not be read (${reason(error)}), so whether uv.lock is its lock was not checked.`);
       }
@@ -585,10 +621,12 @@ export function readPython(root: string): ReadOnlyInventory | null {
       limitations.push(`pyproject.toml could not be read (${reason(error)}); any requirements it declares were not checked.`);
     }
   }
-  // Beside a lock: dependencies that tools other than Poetry and uv declare are in no lock read here.
+  // Beside a lock: what tools declare is in no lock read here, except uv's settings beside uv.lock and Poetry's beside
+  // poetry.lock (beside any other lock, they fall under this rule too).
   if (has("pyproject.toml") && locks.length) {
     let unread: string[] = [];
-    try { unread = toolDependencySettings(read("pyproject.toml")); } catch { /* an unreadable pyproject.toml is already a limitation above */ }
+    const covered = [...(has("uv.lock") ? ["uv"] : []), ...(has("poetry.lock") ? ["poetry"] : [])];
+    try { unread = toolDependencySettings(read("pyproject.toml"), covered); } catch { /* an unreadable pyproject.toml is already a limitation above */ }
     if (unread.length) limitations.push(`pyproject.toml has tool settings that may declare dependencies no lock read here covers; they were not checked: ${list(unread)}.`);
   }
   if (has("Pipfile") && !has("Pipfile.lock")) {

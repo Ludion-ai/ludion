@@ -16,3 +16,10 @@ There is no gate in this measurement: it records what the judge did, with no pas
   - from the PR: its `created_at`, and the comment's `created_at` and `updated_at`.
 - **Raw data.** Everything the table copies is saved under `raw/`: the run logs (`gh run view --log`), the comment bodies and timestamps, and the API answers. Logs match `*.log` in .gitignore and are added with `git add -f`.
 - **Not measured here.** Whether a verdict is right, exposure time (nothing here applies a fix), and human minutes.
+
+## Files
+
+- `results.md`: the table, from `raw/`.
+- `npm-pack.md`: what `npm pack` puts in ludion-ai.
+- `prepublish-checklist.md`: what must be true before the npm package or the action is released, and the live check of the action (#169).
+- `action-check/`: the local check of action.yml in Docker, with gh stubbed (`run.sh`, `prepare.sh`, `gh-stub.sh`, outputs in `out/`).

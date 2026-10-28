@@ -150,7 +150,7 @@ Not checked:
 - Anything that cannot be read as an exact name and version (an unpinned or ranged requirement, a Git, path or URL source, a Go replace directive, an unknown file format version) is listed as `Incomplete:` and the result is `incomplete`, never clean.
 - Whether a lock is up to date beyond those checks: the lock is the inventory, and a manifest's version ranges are not compared with it.
 - Files in subdirectories and go.sum are not read, and give no limitation. The exception is a literal workspace member's Cargo.toml or pyproject.toml, read for its package name only. go.work is not read, and gives a limitation.
-- pyproject.toml's `[build-system] requires` (build-time requirements) is not read. Neither are tool configuration files outside pyproject.toml (tox.ini, hatch.toml, noxfile.py, pixi.toml); they give no limitation. Requirements files other than requirements.txt give a limitation, but a project whose only Python file is one of them is not scanned.
+- pyproject.toml's `[build-system] requires` (build-time requirements) and `[tool.poetry.requires-plugins]` (Poetry's own plugins, which poetry.lock does not lock) are not read. Neither are tool configuration files outside pyproject.toml (tox.ini, hatch.toml, noxfile.py, pixi.toml); they give no limitation. Requirements files other than requirements.txt give a limitation, but a project whose only Python file is one of them is not scanned.
 - Nothing is installed, resolved, built or run, and whether vulnerable code is reached is not checked.
 
 Exit codes are scan's own: 1 when a vulnerability matches, 2 when a result is incomplete or a check fails, 0 otherwise. An informational-only match exits 0. `--json` also gives each match's `kind` and `fixed_versions`.

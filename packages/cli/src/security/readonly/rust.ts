@@ -218,7 +218,7 @@ function cargoLock(text: string): { packages: ReadOnlyPackage[]; limitations: st
   tables.filter(t => t.header === "patch.unused").forEach((t, n) => entry(t, `[[patch.unused]] #${n + 1}`, false));
   // Indexed once, so each id is a constant number of lookups (Cargo's lookup_id in src/resolver/encode.rs). Cargo
   // compares sources without the locked commit (#fragment) that git sources carry.
-  const bare = (source: string) => source.replace(/#.*$/s, "");
+  const bare = (source: string) => { const at = source.indexOf("#"); return at < 0 ? source : source.slice(0, at); };
   const versions = new Map<string, Set<string>>(), groups = new Map<string, { all: Entry[]; paths: Entry[] }>(), exact = new Map<string, Entry>();
   for (const e of entries) {
     const key = `${e.name}\0${e.version}\0${e.source === null ? "" : `+${bare(e.source)}`}`;

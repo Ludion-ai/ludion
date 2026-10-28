@@ -483,8 +483,12 @@ export function toolDependencySettings(text: string, covered: string[] = []): st
   return [...new Set(found)];
 }
 
-/** Python's str.strip() whitespace and the control characters around it (configparser strips each line). */
-const CFG_SPACE = /^[\s\x00-\x1f\x7f-\x9f]+|[\s\x00-\x1f\x7f-\x9f]+$/g;
+/**
+ * The leading run of Python's str.strip() whitespace and control characters (configparser strips each line). Only the
+ * leading run is removed, with a start-anchored pattern: a trailing `[...]+$` is quadratic in a line's inner
+ * whitespace, and is not needed, because a header ends at its last "]" whatever follows it.
+ */
+const CFG_LEADING_SPACE = /^[\s\x00-\x1f\x7f-\x9f]+/;
 /**
  * The setuptools sections of a setup.cfg: every section header that names options once whitespace and control
  * characters are removed and case ignored ([options], [options.extras_require], [options.], ...), since setuptools
@@ -495,7 +499,7 @@ export function setupCfgDependencySections(text: string): string[] {
   const found = new Set<string>();
   for (const line of text.split(/\r\n|[\n\r]/)) {
     // configparser's SECTCRE, \[(?P<header>.+)\], matched at the start of the stripped line: up to its last "]".
-    const header = /^\[(.+)\]/.exec(line.replace(CFG_SPACE, ""))?.[1];
+    const header = /^\[(.+)\]/.exec(line.replace(CFG_LEADING_SPACE, ""))?.[1];
     if (header !== undefined && header.replace(/[\s\x00-\x1f\x7f-\x9f]/g, "").toLowerCase().includes("options")) found.add(clip(`[${header.trim()}]`, 60));
   }
   return [...found];

@@ -47,13 +47,16 @@ function lex(raw: string, line: number): { tokens: Token[]; comment?: string } {
       tokens.push({ text, kind: "string" });
       continue;
     }
-    let text = "";
+    // One slice per word, and the Unicode test only outside printable ASCII (which has no C or Z characters), so a
+    // 4 MiB word stays well under a second.
+    const start = i;
     while (i < raw.length && !" \t\r()[]{},".includes(raw[i]!) && !raw.startsWith("//", i)) {
       if (raw.startsWith("/*", i)) fail(line, "go.mod files must use // comments");
-      if (/[\p{C}\p{Z}]/u.test(raw[i]!)) fail(line, "unexpected character");
-      text += raw[i++];
+      const code = raw.charCodeAt(i);
+      if ((code < 0x21 || code > 0x7e) && /[\p{C}\p{Z}]/u.test(raw[i]!)) fail(line, "unexpected character");
+      i++;
     }
-    tokens.push({ text, kind: "word" });
+    tokens.push({ text: raw.slice(start, i), kind: "word" });
   }
   return { tokens };
 }
@@ -123,10 +126,16 @@ function moduleVersion(token: Token | undefined, line: number): string {
  * optionally "-unstable"). A suffix Go rejects ("/v1", "/v0", "/v2.1", a gopkg.in path without .vN) is an error.
  */
 function pathMajor(path: string, line: number): string {
-  const major = path.startsWith("gopkg.in/") ? /\.v(?:0|[1-9]\d*(?:-unstable)?)$/.exec(path)?.[0] : (() => {
-    const suffix = /\/v([0-9.]+)$/.exec(path);
-    if (!suffix) return "";
-    return /^[1-9]\d*$/.test(suffix[1]!) && suffix[1] !== "1" ? suffix[0] : undefined;
+  // String code, not an end-anchored regex (/\.v(...)$/ is quadratic in principle). Only the last ".v" or "/v" can
+  // start the suffix: what follows it may not contain another "." or "/".
+  const major = path.startsWith("gopkg.in/") ? (() => {
+    const at = path.lastIndexOf(".v"), rest = at < 0 ? "" : path.slice(at + 2);
+    const digits = rest.endsWith("-unstable") ? rest.slice(0, -"-unstable".length) : rest;
+    return at >= 0 && (rest === "0" || /^[1-9]\d*$/.test(digits)) ? path.slice(at) : undefined;
+  })() : (() => {
+    const at = path.lastIndexOf("/v"), rest = at < 0 ? "" : path.slice(at + 2);
+    if (!rest || !/^[0-9.]+$/.test(rest)) return "";
+    return /^[1-9]\d*$/.test(rest) && rest !== "1" ? path.slice(at) : undefined;
   })();
   if (major === undefined) fail(line, `invalid module path ${shown(path)} (its major-version suffix is not one Go accepts)`);
   return major!;

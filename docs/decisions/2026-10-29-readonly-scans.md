@@ -24,7 +24,12 @@
 - **No expansion of workspace members** (#189 round 3). Expanding `dir/*` was quadratic in members × exclude and unbounded in repeated patterns, so it was removed.
   - Cargo's `[workspace]` and uv's `[tool.uv.workspace]` members are read as literal paths only: deduplicated, at most 1,000, and inside the project.
   - A pattern, an `exclude` list, more than 1,000 members, or a member whose manifest cannot be read gives one limitation.
-  - It is linear: a 4 MiB members and exclude list takes about 0.3 s.
+  - It is linear in the input's length. That covers both the number of entries and the length of one entry: exclude entries are never read, and member entries are trimmed with string code. A 4 MiB members and exclude list takes about 0.3 s, and so does one 4 MiB exclude entry.
+- **No quadratic pattern over file text** (#189 round 4). Two end-anchored runs were quadratic in one long string: `[\s…]+$` in setup.cfg header handling, and `/\/+$/` on exclude entries.
+  - Every regex in readonly/*.ts that runs on file text was audited. Each one with an end-anchored quantified run is now string code or a start-anchored pattern: the setup.cfg leading strip, the Go major-version suffixes, the Cargo source `#fragment`, and the member trims.
+  - The remaining unanchored patterns begin with a literal, or have no quantified run, or run on input already capped in length (Go paths at 300 characters, PEP 440 versions at 100, names at 200).
+  - readonly-redos.test.ts feeds each such function a 4 MiB adversarial string and requires under a second.
+  - The Go lexer now slices each word once instead of concatenating it character by character, so a 4 MiB word takes 0.09 s, not 0.5 s.
 - **A lock must be its manifest's** (#189 review). Each reader reads the manifest beside the lock it reads.
   - uv.lock: a limitation when it has no project package, when it does not name pyproject.toml's project, or when pyproject.toml cannot be read. Also when it lacks a `[tool.uv] dev-dependencies` name (compared like `[dependency-groups]`), or a literal `[tool.uv.workspace]` member's package.
   - poetry.lock, Pipfile.lock and uv.lock: a limitation when they do not list a requirement the manifest declares, other than the project itself. An unreadable manifest is a limitation even beside an empty lock.

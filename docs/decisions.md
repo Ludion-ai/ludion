@@ -670,14 +670,16 @@ It adds as built:
 - rules 1 and 2;
 - the same-release exception, in its strict form as implemented;
 - Packagist's advisories in Composer planning;
-- that the judge v0 is the parts of gates 1, 2 and 4 the paragraph lists, and the wait.
+- that the judge v0 is the parts of gates 1, 2 and 4 the paragraph lists, and the table's wait.
 
 It adds as not built:
 
 - gate 2's inspection for obfuscated code and new network or process calls, which nothing does;
 - gate 3 in `ludion judge`;
-- automatic merge;
-- the backtest gate, which is not met: backtest v4 still misses one malicious version, and unknowns remain.
+- a project's own stricter wait;
+- automatic merge.
+
+Its closing sentence now says the backtest gate is not met: backtest v4 still misses one malicious version, and unknowns remain.
 
 Chosen here:
 
@@ -697,7 +699,16 @@ From the review's non-blocking findings:
 - the exception lets a version past rule 1 only;
 - in `ludion patch`, the advisory re-scan also checks the lockfile diff.
 
-The rest stays in this file and is not repeated in CLAUDE.md: `ludion patch`'s 168h wait, the unverified Sigstore signature, and the provenance branch's lack of a time limit.
+The rest stays in this file and is not repeated in CLAUDE.md: rule 2's 168h threshold in `ludion patch` (patch has no wait), the unverified Sigstore signature, and the provenance branch's lack of a time limit.
+
+The second review (fresh context) asked for changes too (https://github.com/Ludion-ai/ludion/pull/158#issuecomment-6464944682). Its blocking finding: "the waits" claimed a project's own stricter wait, which `judge()` accepts as `projectWait` but no caller passes and nothing reads from a project. The paragraph now lists that wait as not built and says the judge has the table's waits.
+
+From its non-blocking findings:
+
+- the not-built clause names what `ludion patch` does check over the lockfile diff: rules 1 and 2, its OSV re-scan (which also finds MAL- records, so MAL- is no longer listed as missing there), and its removal and major-version checks;
+- this entry calls 168h rule 2's threshold, since patch has no wait.
+
+Left as it is: "T, the fix's publish time" does not add that, with no fix, T comes from the changed direct dependencies. "Moving dependencies are capped at the fix's publish time" says so.
 
 The entries stay where they are, beside the earlier CLAUDE.md entries. Appending at the end of these files would collide with the other open PRs that append there, and every conflict on a protected PR costs a new review.
 

@@ -129,8 +129,27 @@ export function detectEcosystems(root: string): Ecosystem[] {
   return found;
 }
 
-/** Change declared direct versions only. Package managers resolve the dependency graph; no hand-written lockfile surgery. */
-export function changedManifest(root: string, ecosystem: Ecosystem, changes: Change[]): string {
+/**
+ * A direct requirement raised to the fixed version in the project's own style: an exact pin stays exact, ^ stays ^ and
+ * ~x.y.z stays ~, with the fixed version as the new floor. Any other style (ranges, wildcards, ||) needs review.
+ */
+export function raisedRequirement(name: string, spec: unknown, to: string): string {
+  if (!semver.valid(to) || semver.prerelease(to)) throw new Error("An exact stable fixed-version floor is required.");
+  const text = typeof spec === "string" ? spec.trim() : "";
+  if (/^=?v?\d+\.\d+\.\d+$/.test(text)) return to;
+  if (/^\^v?\d+(?:\.\d+){0,2}$/.test(text)) return `^${to}`;
+  // ~ only with all three parts: Composer's ~1.2 allows <2.0, so ~1.2.5 would narrow it.
+  if (/^~v?\d+\.\d+\.\d+$/.test(text)) return `~${to}`;
+  throw new Error(`${name}'s requirement ${JSON.stringify(spec)} is not an exact version, ^ or ~; raising it keeps its meaning only with review.`);
+}
+
+/**
+ * Change declared direct versions only. Package managers resolve the dependency graph; no hand-written lockfile surgery.
+ * pinned (npm only) is the first resolution step: direct fixes as exact versions and transitive fixes as overrides, so
+ * npm records exactly the fixed version. The final manifest then keeps the project's own requirement style, and a
+ * second lockfile-only install keeps the recorded versions because they satisfy it.
+ */
+export function changedManifest(root: string, ecosystem: Ecosystem, changes: Change[], pinned = false): string {
   if (ecosystem === "maven") {
     const pom = parsePom(textFile(root, "pom.xml"));
     if (pom.limitations.length) throw new Error(pom.limitations.join(" "));
@@ -156,12 +175,32 @@ export function changedManifest(root: string, ecosystem: Ecosystem, changes: Cha
     return new XMLSerializer().serializeToString(pom.document);
   }
   const name = MANIFESTS[ecosystem][0], manifest = jsonFile(root, name);
-  for (const group of ecosystem === "npm" ? ["dependencies", "devDependencies", "optionalDependencies"] : ["require", "require-dev"]) {
+  const groups = ecosystem === "npm" ? ["dependencies", "devDependencies", "optionalDependencies"] : ["require", "require-dev"];
+  // Several vulnerable versions of one transitive npm name each get their own scoped override. A direct requirement,
+  // or a Composer package, has one version to raise.
+  const repeated = changes.map(c => c.name).filter((n, i, all) => all.indexOf(n) !== i)
+    .filter(n => ecosystem !== "npm" || groups.some(group => manifest[group]?.[n] !== undefined));
+  if (repeated.length) throw new Error(`More than one installed version of ${[...new Set(repeated)].join(", ")} needs a fix; that needs review.`);
+  const direct = new Set<string>();
+  for (const group of groups) {
     for (const change of changes) if (manifest[group]?.[change.name] !== undefined) {
-      const version = semver.valid(change.to);
-      if (!version) throw new Error("An exact stable fixed-version floor is required.");
-      const upper = semver.major(version) === 0 ? `0.${semver.minor(version) + 1}.0` : `${semver.major(version) + 1}.0.0`;
-      manifest[group][change.name] = `>=${change.to} <${upper}`;
+      const raised = raisedRequirement(change.name, manifest[group][change.name], change.to);
+      manifest[group][change.name] = pinned ? change.to : raised;
+      direct.add(change.name);
+    }
+  }
+  if (pinned && ecosystem === "npm") {
+    const transitive = changes.filter(c => !direct.has(c.name));
+    if (transitive.length) {
+      const overrides = manifest.overrides ?? {};
+      if (typeof overrides !== "object" || Array.isArray(overrides)) throw new Error("Invalid npm overrides.");
+      const own = Object.keys(overrides);
+      for (const change of transitive) {
+        if (own.some(key => key === change.name || key.startsWith(`${change.name}@`))) throw new Error(`The project already overrides ${change.name}; the fix needs review.`);
+        // Scoped to the vulnerable version: other installed versions of the same name keep their own resolution.
+        overrides[`${change.name}@${change.from}`] = change.to;
+      }
+      manifest.overrides = overrides;
     }
   }
   return `${JSON.stringify(manifest, null, 2)}\n`;

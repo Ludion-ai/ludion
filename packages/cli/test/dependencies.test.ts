@@ -3,9 +3,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import semver from "semver";
-import { acquisitionPolicy, applyFiles, compatible, patchDependencies, resolverDockerfile } from "../src/security/dependency-patch.ts";
+import { acquisitionPolicy, applyFiles, changedPackages, compatible, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals } from "../src/security/dependency-patch.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl } from "../src/security/acquisition.ts";
-import { changedManifest, inventory, mavenGraph, parsePom, type Inventory } from "../src/security/inventory.ts";
+import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, type Inventory } from "../src/security/inventory.ts";
 import { OsvClient, type Advisory } from "../src/security/osv.ts";
 import { privateState, snapshot } from "../src/security/project.ts";
 import { scanProject } from "../src/security/scan.ts";
@@ -127,10 +127,15 @@ function fakeCommand() {
     if (out) {
       const dest = out.slice("type=local,dest=".length), context = args.at(-1)!;
       const manifest = JSON.parse(readFileSync(join(context, "manifests/package.json"), "utf8"));
-      writeFileSync(join(dest, "package.json"), JSON.stringify(manifest));
-      // Baseline must be byte-identical; candidate represents npm's produced resolution.
-      if (dest.endsWith("baseline-export")) writeFileSync(join(dest, "package-lock.json"), readFileSync(join(context, "manifests/package-lock.json")));
-      else writeFileSync(join(dest, "package-lock.json"), JSON.stringify(lock(semver.minVersion(manifest.dependencies.lodash)!.version)));
+      // Baseline must be byte-identical. The candidate is what npm leaves: the final manifest, copied over the pinned
+      // one, and a lockfile at the pinned (exact, fixed) version.
+      if (dest.endsWith("baseline-export")) {
+        writeFileSync(join(dest, "package.json"), JSON.stringify(manifest));
+        writeFileSync(join(dest, "package-lock.json"), readFileSync(join(context, "manifests/package-lock.json")));
+      } else {
+        writeFileSync(join(dest, "package.json"), readFileSync(join(context, "manifests/ludion-final-package.json")));
+        writeFileSync(join(dest, "package-lock.json"), JSON.stringify(lock(semver.minVersion(manifest.dependencies.lodash)!.version)));
+      }
     }
     return "";
   };
@@ -153,7 +158,7 @@ describe("dependency patch gates and recoverable application", () => {
     expect(tools).toEqual(["npm", "npm"]);
     expect(result.receipt?.after?.findings).toEqual([]);
     expect(result.receipt?.files).toHaveLength(2);
-    if (apply) expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).dependencies.lodash).toBe(">=4.17.21 <5.0.0");
+    if (apply) expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).dependencies.lodash).toBe("4.17.21");
     else expect(snapshot(root)).toBe(before);
     expect(existsSync(join(root, ".ludion/security/patch.lock"))).toBe(false);
   });
@@ -210,7 +215,7 @@ describe("review regressions: public acquisition boundaries and compatibility", 
     expect(resolverDockerfile("maven", `maven@${DIGEST}`, false)).toContain('"--settings","/app/ludion-settings.xml"');
   });
   it("requires the npm version that enforces direct and transitive source restrictions", () => {
-    const file = resolverDockerfile("npm", `node@${DIGEST}`, true);
+    const file = resolverDockerfile("npm", `node@${DIGEST}`, true, false, [{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: ["A"] }]);
     expect(file).toContain('"npm@12.2.1"');
     expect(file.indexOf('"chown","-R","65534:65534","/tmp/npm"')).toBeLessThan(file.indexOf("USER 65534:65534"));
     for (const flag of ["--ignore-scripts", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none"]) expect(file).toContain(flag);
@@ -247,5 +252,103 @@ describe("review regressions: public acquisition boundaries and compatibility", 
     vi.stubGlobal("fetch", async () => response({ "8.4.27": { date: "21 Oct 2026", tags: ["security"] } }));
     try { const result = await scanProject(root); expect(result.checks[0]?.ecosystem).toBe("php"); expect(result.status).toBe("attention_required"); }
     finally { vi.unstubAllGlobals(); }
+  });
+});
+
+describe("the smallest fix (docs/design.md)", () => {
+  const fix = (name: string, from: string, to: string) => ({ name, from, to, advisories: ["A"] });
+  it("keeps the project's requirement style and raises only its floor", () => {
+    expect(raisedRequirement("a", "4.17.20", "4.17.21")).toBe("4.17.21");
+    expect(raisedRequirement("a", "=v4.17.20", "4.17.21")).toBe("4.17.21");
+    expect(raisedRequirement("a", "^4.17.0", "4.17.21")).toBe("^4.17.21");
+    expect(raisedRequirement("a", "^5.4", "5.4.54")).toBe("^5.4.54");
+    expect(raisedRequirement("a", "~1.2.3", "1.2.5")).toBe("~1.2.5");
+    for (const spec of [">=1.0.0 <2.0.0", "1.x", "*", "^1.0.0 || ^2.0.0", "~1.2", "latest", 7, undefined]) {
+      expect(() => raisedRequirement("a", spec, "1.2.5"), String(spec)).toThrow(/review/);
+    }
+    expect(() => raisedRequirement("a", "^1.0.0", "1.2.5-beta.1")).toThrow("stable");
+  });
+  it("pins npm direct fixes exactly and transitive ones as overrides only in the first resolution step", () => {
+    const root = fixture();
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" }, overrides: { other: "1.0.0" } }));
+    const plan = [fix("lodash", "4.17.20", "4.17.21"), fix("minimist", "1.2.5", "1.2.8")];
+    const pinned = JSON.parse(changedManifest(root, "npm", plan, true)), final = JSON.parse(changedManifest(root, "npm", plan));
+    expect(pinned.dependencies.lodash).toBe("4.17.21");
+    // Scoped to the vulnerable version, so another installed minimist keeps its own resolution.
+    expect(pinned.overrides).toEqual({ other: "1.0.0", "minimist@1.2.5": "1.2.8" });
+    expect(final.dependencies.lodash).toBe("^4.17.21");
+    expect(final.overrides).toEqual({ other: "1.0.0" });
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" }, overrides: { minimist: "1.2.6" } }));
+    expect(() => changedManifest(root, "npm", plan, true)).toThrow("already overrides minimist");
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" }, overrides: { "minimist@^1.2.0": "1.2.6" } }));
+    expect(() => changedManifest(root, "npm", plan, true)).toThrow("already overrides minimist");
+    // Two vulnerable versions of a transitive name: one scoped override each. Of a direct name: review.
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "t", dependencies: { lodash: "^4.17.0" } }));
+    expect(JSON.parse(changedManifest(root, "npm", [fix("semver", "5.7.0", "5.7.2"), fix("semver", "6.1.1", "6.3.1")], true)).overrides).toEqual({ "semver@5.7.0": "5.7.2", "semver@6.1.1": "6.3.1" });
+    expect(() => changedManifest(root, "npm", [fix("lodash", "4.17.20", "4.17.21"), fix("lodash", "3.10.0", "3.10.2")], true)).toThrow("More than one installed version of lodash");
+  });
+  it("resolves npm and Composer candidates for the planned packages only, never a blanket update", () => {
+    const npm = resolverDockerfile("npm", `node@${DIGEST}`, true, false, [fix("lodash", "4.17.20", "4.17.21")]);
+    expect(npm).not.toContain('"update"');
+    const steps = [...npm.matchAll(/^RUN (\[.*\])$/gm)].map(m => JSON.parse(m[1]!) as string[]).filter(a => a[0] === "npm" || a[0] === "cp" || a[0] === "rm");
+    expect(steps.map(a => a.slice(0, 3))).toEqual([
+      ["npm", "install", "--global"], ["npm", "install", "--package-lock-only"], ["cp", NPM_FINAL_MANIFEST, "package.json"],
+      ["npm", "install", "--package-lock-only"], ["rm", NPM_FINAL_MANIFEST], ["npm", "ci", "--ignore-scripts"],
+    ]);
+    expect(resolverDockerfile("npm", `node@${DIGEST}`, false)).not.toContain("--package-lock-only");
+    const composer = resolverDockerfile("composer", `composer@${DIGEST}`, true, false, [fix("symfony/http-foundation", "5.4.0", "5.4.54")]);
+    expect(composer).toContain('"composer","update","--with-dependencies","--minimal-changes"');
+    // Packages only after --, so no planned coordinate can be read as an option.
+    expect(composer).toContain('"--no-progress","--","symfony/http-foundation:5.4.54"]');
+    expect(composer).not.toContain("--with-all-dependencies");
+    expect(() => resolverDockerfile("npm", `node@${DIGEST}`, true)).toThrow("planned fix");
+    expect(() => resolverDockerfile("composer", `composer@${DIGEST}`, true, false, [fix("--with-all-dependencies", "1", "2")])).toThrow();
+    expect(() => resolverDockerfile("npm", `node@${DIGEST}`, true, false, [fix("lodash", "4.17.20", "latest")])).toThrow();
+  });
+  it("stops when the candidate moves a package version that no planned fix replaces", async () => {
+    const base: Inventory = { ecosystem: "npm", files: [], scope: "locked_dependencies", limitations: [], packages: [
+      { ecosystem: "npm", name: "semver", version: "5.7.0", direct: false }, { ecosystem: "npm", name: "semver", version: "6.1.1", direct: false } ] };
+    const plan = [fix("semver", "5.7.0", "5.7.2")];
+    const scoped: Inventory = { ...base, packages: [{ ...base.packages[0]!, version: "5.7.2" }, base.packages[1]!, { ecosystem: "npm", name: "new-dep", version: "1.0.0", direct: false }] };
+    expect(unplannedRemovals(base, scoped, plan)).toEqual([]);
+    // The global-override failure: the other semver drifts to the newest 6.x.
+    const drifted: Inventory = { ...base, packages: [{ ...base.packages[0]!, version: "5.7.2" }, { ...base.packages[1]!, version: "6.3.1" }] };
+    expect(unplannedRemovals(base, drifted, plan)).toEqual(["semver@6.1.1"]);
+    // The project also has a package no fix touches; the fake npm's candidate lockfile drops it.
+    const root = fixture(), withOther = lock();
+    (withOther.packages as Record<string, unknown>)["node_modules/other"] = { version: "1.0.0", resolved: "https://registry.npmjs.org/other/-/other-1.0.0.tgz" };
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(withOther));
+    const before = snapshot(root);
+    const result = await patchDependencies(root, true, { client: client(), command: fakeCommand(), testRun: async () => {} });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("moved packages that were not planned (other@1.0.0)");
+    expect(result.receipt?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }, { name: "other", from: ["1.0.0"], to: [] }]);
+    expect(snapshot(root)).toBe(before);
+  });
+  it("records every changed package, planned or not, and refuses a manifest the package manager rewrote", async () => {
+    const base: Inventory = { ecosystem: "npm", files: [], scope: "locked_dependencies", limitations: [], packages: [
+      { ecosystem: "npm", name: "lodash", version: "4.17.20", direct: true }, { ecosystem: "npm", name: "a", version: "1.0.0", direct: false } ] };
+    const next: Inventory = { ...base, packages: [
+      { ecosystem: "npm", name: "lodash", version: "4.17.21", direct: true }, { ecosystem: "npm", name: "a", version: "1.0.0", direct: false }, { ecosystem: "npm", name: "new-dep", version: "0.1.0", direct: false } ] };
+    expect(changedPackages(base, next)).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }, { name: "new-dep", from: [], to: ["0.1.0"] }]);
+    const root = fixture(), command = fakeCommand();
+    const result = await patchDependencies(root, false, { client: client(), testRun: async () => {}, command: async args => {
+      const output = await command(args);
+      const out = args.find(a => a.startsWith("type=local,dest="));
+      if (out?.endsWith("candidate-export")) writeFileSync(join(out.slice("type=local,dest=".length), "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "^4.17.21" } }));
+      return output;
+    } });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("changed the manifest beyond the planned fix");
+    const ok = await patchDependencies(fixture(), false, { client: client(), command: fakeCommand(), testRun: async () => {} });
+    expect(ok.receipt?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }]);
+  });
+  it("keeps only the properties the online Maven model uses, and refuses dependency-plugin parameter names", () => {
+    const withProps = (props: string, version = "${text.version}") => pom.replace("<properties><text.version>1.9</text.version></properties>", `<properties>${props}</properties>`).replace("<version>${text.version}</version>", `<version>${version}</version>`);
+    const safe = acquisitionPom(withProps("<text.version>${base}</text.version><base>1.9</base><excludes>org.yaml:*</excludes><scope>test</scope>"));
+    expect(safe).toContain("<text.version>"); expect(safe).toContain("<base>1.9</base>");
+    expect(safe).not.toContain("excludes"); expect(safe).not.toContain("<scope>");
+    expect(acquisitionPom(withProps("<excludes>org.yaml:*</excludes>", "1.9"))).not.toContain("properties");
+    expect(() => acquisitionPom(withProps("<excludes>1.9</excludes>", "${excludes}"))).toThrow("dependency-plugin parameter");
   });
 });

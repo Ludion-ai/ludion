@@ -90,17 +90,20 @@ function scanDockerSources(files: readonly ScanFile[]): ScanHit[] {
 function sourceTree(): ScanFile[] {
   const files: ScanFile[] = [];
   // The whole repository's script sources. Unit test folders hold the synthetic cases below; build output and
-  // installed packages are not ours (dist/ bundles the sandbox itself).
-  const skip = new Set(["node_modules", ".git", "dist", ".astro", ".wrangler", "test", "tests", "test-results", "playwright-report"]);
-  const walk = (dir: string): void => {
+  // installed packages are not ours (dist/ bundles the sandbox itself). Output and test folders are skipped only
+  // outside source: a folder of that name under any src/ is scanned like the rest.
+  const anywhere = new Set(["node_modules", ".git"]);
+  const atRoot = new Set([".wrangler", "test-results", "playwright-report"]);
+  const outsideSrc = new Set(["dist", ".astro", "test", "tests"]);
+  const walk = (dir: string, inSrc: boolean): void => {
     for (const name of readdirSync(dir)) {
-      if (skip.has(name)) continue;
+      if (anywhere.has(name) || (dir === REPO && atRoot.has(name)) || (!inSrc && outsideSrc.has(name))) continue;
       const path = join(dir, name);
-      if (statSync(path).isDirectory()) walk(path);
-      else if (/\.[cm]?[jt]s$/.test(name) && !/\.test\.[cm]?[jt]s$/.test(name)) files.push({ path, text: readFileSync(path, "utf8") });
+      if (statSync(path).isDirectory()) walk(path, inSrc || name === "src");
+      else if (/\.(?:[cm]?[jt]s|[jt]sx|astro)$/.test(name) && !/\.test\.[cm]?[jt]sx?$/.test(name)) files.push({ path, text: readFileSync(path, "utf8") });
     }
   };
-  walk(REPO);
+  walk(REPO, false);
   return files;
 }
 
@@ -108,7 +111,7 @@ describe("docker run construction", () => {
   it("starts a run argument list only inside a builder function", () => {
     const tree = sourceTree();
     // The scan reaches scripts outside packages: plain JavaScript, root config and the repository's tools.
-    for (const path of ["tools/check-production.ts", "playwright.config.ts", ".claude/hooks/guard.mjs", "packages/cli/build.ts"]) {
+    for (const path of ["tools/check-production.ts", "playwright.config.ts", ".claude/hooks/guard.mjs", "packages/cli/build.ts", "apps/site/src/pages/index.astro"]) {
       expect(tree.some((file) => repoPath(file.path) === path), path).toBe(true);
     }
     const hits = scanDockerSources(tree);

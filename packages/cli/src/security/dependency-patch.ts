@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve, sep } from "node:path";
 import semver from "semver";
 import { runContainer, runDockerImageCommand, type Tool } from "../../../sandbox/src/docker.ts";
-import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenGraph, parsePom, textFile, type Ecosystem, type Inventory } from "./inventory.ts";
+import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenGraph, packageEntry, parsePom, textFile, type Change, type Ecosystem, type Inventory } from "./inventory.ts";
 import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, regularFile, rootPath, snapshot, type DependencyConfig } from "./project.ts";
@@ -19,8 +19,36 @@ export type DependencyReceipt = {
   files: { path: string; before_hash: string; after_hash: string }[];
   reason?: string; recovery_journal?: string;
   archives?: ArchiveEvidence[];
+  /** Every package whose installed versions differ between baseline and candidate, planned or not. */
+  changed_packages?: PackageChange[];
 };
+export type PackageChange = { name: string; from: string[]; to: string[] };
+/** The final manifest beside the pinned one in the npm candidate context (see resolverDockerfile). */
+export const NPM_FINAL_MANIFEST = "ludion-final-package.json";
 type Dependencies = { client?: OsvClient; fetchFn?: typeof fetch; signal?: AbortSignal; command?: typeof runDockerImageCommand; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number, tool: Tool) => Promise<void> };
+
+/** Packages whose set of installed versions differs between two inventories, sorted by name. */
+export function changedPackages(before: Inventory, after: Inventory): PackageChange[] {
+  const versions = (inventory: Inventory) => {
+    const map = new Map<string, string[]>();
+    for (const p of inventory.packages) map.set(p.name, [...(map.get(p.name) ?? []), p.version].sort());
+    return map;
+  };
+  const a = versions(before), b = versions(after);
+  return [...new Set([...a.keys(), ...b.keys()])].sort()
+    .map(name => ({ name, from: a.get(name) ?? [], to: b.get(name) ?? [] }))
+    .filter(c => c.from.join("\0") !== c.to.join("\0"));
+}
+
+/**
+ * Baseline package versions that the candidate no longer has although no planned fix replaces them. A smallest-fix
+ * candidate may add packages (a fixed version's new dependencies) but must not move anything else.
+ */
+export function unplannedRemovals(before: Inventory, after: Inventory, plan: Change[]): string[] {
+  const kept = new Set(after.packages.map(p => `${p.name}\0${p.version}`));
+  const planned = new Set(plan.map(c => `${c.name}\0${c.from}`));
+  return before.packages.filter(p => !kept.has(`${p.name}\0${p.version}`) && !planned.has(`${p.name}\0${p.version}`)).map(p => `${p.name}@${p.version}`);
+}
 
 export function compatible(before: Inventory, after: Inventory): void {
   for (const pkg of before.packages) {
@@ -81,8 +109,22 @@ export function acquisitionPolicy(root: string, ecosystem: Ecosystem): void {
   }
 }
 
-export function resolverDockerfile(ecosystem: Ecosystem, image: string, candidate: boolean, inventoryOnly = false): string {
+/**
+ * The candidate moves only the planned packages (docs/design.md: the smallest fix, nothing else). npm: a lockfile-only
+ * install from the pinned manifest records exactly the fixed versions, a second one from the final manifest keeps them,
+ * then `npm ci` installs that lockfile. Composer: `update` of the planned packages at their fixed versions, with
+ * --minimal-changes. Planned names and versions are inventory coordinates, never options.
+ */
+export function resolverDockerfile(ecosystem: Ecosystem, image: string, candidate: boolean, inventoryOnly = false, plan: Change[] = []): string {
   const run = (args: string[]) => `RUN ${JSON.stringify(args)}\n`;
+  if (candidate && ecosystem !== "maven") {
+    if (!plan.length) throw new Error("A candidate needs at least one planned fix.");
+    for (const change of plan) {
+      packageEntry(ecosystem, change.name, change.to, false);
+      if (!/^\d/.test(change.to)) throw new Error("Planned fixed versions must start with a digit.");
+    }
+  }
+  const npmFlags = ["--ignore-scripts", "--no-audit", "--no-fund", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none", "--registry=https://registry.npmjs.org"];
   let text = `FROM ${image} AS resolve\nUSER root\nRUN mkdir -p /app /opt/ludion-m2 && chown -R 65534:65534 /app /opt/ludion-m2\nWORKDIR /app\nENV HOME=/tmp COMPOSER_HOME=/tmp/composer MAVEN_CONFIG=/tmp/maven NPM_CONFIG_CACHE=/tmp/npm\n`;
   if (ecosystem === "npm") {
     text += run(["npm", "install", "--global", "npm@12.2.1", "--ignore-scripts", "--no-audit", "--no-fund", "--registry=https://registry.npmjs.org"]);
@@ -91,9 +133,15 @@ export function resolverDockerfile(ecosystem: Ecosystem, image: string, candidat
   text += "COPY --chown=65534:65534 manifests/ ./\nUSER 65534:65534\n";
   if (ecosystem === "npm") {
     text += run(["node", "-e", "if(require('/usr/local/lib/node_modules/npm/package.json').version!=='12.2.1')process.exit(1)"]);
-    text += run(["npm", candidate ? "update" : "ci", "--ignore-scripts", "--no-audit", "--no-fund", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none", "--registry=https://registry.npmjs.org"]);
+    if (candidate) {
+      text += run(["npm", "install", "--package-lock-only", ...npmFlags]);
+      text += run(["cp", NPM_FINAL_MANIFEST, "package.json"]);
+      text += run(["npm", "install", "--package-lock-only", ...npmFlags]);
+      text += run(["rm", NPM_FINAL_MANIFEST]);
+    }
+    text += run(["npm", "ci", ...npmFlags]);
   }
-  else if (ecosystem === "composer" && candidate) text += run(["composer", "update", "--no-install", "--no-plugins", "--no-scripts", "--no-interaction", "--prefer-dist", "--no-progress", "--with-all-dependencies"]);
+  else if (ecosystem === "composer" && candidate) text += run(["composer", "update", "--with-dependencies", "--minimal-changes", "--no-install", "--no-plugins", "--no-scripts", "--no-interaction", "--prefer-dist", "--no-progress", "--", ...plan.map(c => `${c.name}:${c.to}`)]);
   else {
     const goal = "org.apache.maven.plugins:maven-dependency-plugin:3.11.0:";
     if (ecosystem === "maven") {
@@ -212,14 +260,19 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     receipt.tool_image = `${requested.split("@")[0]}@${String(resolved).split("@")[1]}`;
     let baselineInventory = initial;
     let candidateFiles: { path: string; before: string; after: string }[] = [];
+    let finalManifest = "";
     for (const label of ["baseline", "candidate"] as const) {
       active();
       const context = join(temp, label), manifests = join(context, "manifests"), exported = join(temp, `${label}-export`), app = join(temp, `${label}-app`);
       mkdirSync(manifests, { recursive: true }); mkdirSync(exported); mkdirSync(app);
       for (const file of MANIFESTS[ecosystem]) writeFileSync(join(manifests, file), textFile(source, file));
-      if (label === "candidate") writeFileSync(join(manifests, MANIFESTS[ecosystem][0]), changedManifest(source, ecosystem, scan.plan));
+      if (label === "candidate") {
+        finalManifest = changedManifest(source, ecosystem, scan.plan);
+        writeFileSync(join(manifests, MANIFESTS[ecosystem][0]), ecosystem === "npm" ? changedManifest(source, ecosystem, scan.plan, true) : finalManifest);
+        if (ecosystem === "npm") writeFileSync(join(manifests, NPM_FINAL_MANIFEST), finalManifest);
+      }
       if (ecosystem === "maven") prepareMavenManifest(manifests, readFileSync(join(manifests, "pom.xml"), "utf8"));
-      writeFileSync(join(context, "Dockerfile"), resolverDockerfile(ecosystem, receipt.tool_image, label === "candidate"));
+      writeFileSync(join(context, "Dockerfile"), resolverDockerfile(ecosystem, receipt.tool_image, label === "candidate", false, scan.plan));
       const cache = `ludion-cache-${id}-${label}`; images.push(cache);
       // Online phase contains manifests only, never application files or host credentials. Scripts/plugins are disabled where supported.
       await command(["build", "--network=default", "--pull=false", "--target", "resolve", "--tag", cache, context], 600_000); active();
@@ -248,6 +301,12 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         for (const file of MANIFESTS[ecosystem]) if (textFile(exported, file) !== textFile(source, file)) throw new Error("Baseline acquisition changed a dependency file.");
         baselineInventory = resolvedInventory;
       } else {
+        if (ecosystem !== "maven" && textFile(exported, MANIFESTS[ecosystem][0]) !== finalManifest) throw new Error("The package manager changed the manifest beyond the planned fix.");
+        receipt.changed_packages = changedPackages(baselineInventory, resolvedInventory);
+        if (ecosystem !== "maven") {
+          const moved = unplannedRemovals(baselineInventory, resolvedInventory, scan.plan);
+          if (moved.length) throw new Error(`The candidate also moved packages that were not planned (${moved.slice(0, 10).join(", ")}${moved.length > 10 ? ", ..." : ""}); that needs review.`);
+        }
         compatible(baselineInventory, resolvedInventory);
         receipt.after = await client.scan(resolvedInventory); active();
         if (receipt.after.findings.length || receipt.after.inventory.limitations.length) throw new Error("Candidate still contains known advisory findings or incomplete inventory; no source changes applied.");

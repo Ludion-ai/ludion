@@ -7,13 +7,39 @@ import { hash } from "./php.ts";
 
 export const MAVEN_SETTINGS = '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"><mirrors><mirror><id>ludion-central</id><mirrorOf>*</mirrorOf><url>https://repo.maven.apache.org/maven2</url></mirror></mirrors></settings>';
 
-/** Online Maven sees dependency declarations only. The original build/plugin/report model is used only offline. */
+/**
+ * Maven also reads plugin parameters from project properties, so a property named like one of the dependency plugin's
+ * parameters (excludes, scope, ...) could filter the resolved tree and hide a vulnerable package.
+ */
+const PLUGIN_PARAMETERS = new Set(["includes", "excludes", "scope", "verbose", "tokens", "outputType", "outputFile", "outputEncoding", "outputScope", "appendOutput", "skip", "silent", "outputDirectory", "excludeTransitive", "includeScope", "excludeScope", "includeGroupIds", "excludeGroupIds", "includeArtifactIds", "excludeArtifactIds", "includeTypes", "excludeTypes", "includeClassifiers", "excludeClassifiers"]);
+
+/**
+ * Online Maven sees dependency declarations only. The original build/plugin/report model is used only offline.
+ * Properties are kept only when the dependency model refers to them, directly or through other kept properties.
+ */
 export function acquisitionPom(original: string): string {
   const parsed = parsePom(original);
   const document = new DOMParser().parseFromString('<project xmlns="http://maven.apache.org/POM/4.0.0"/>', 'application/xml');
-  const allowed = new Set(["modelVersion", "groupId", "artifactId", "version", "packaging", "properties", "dependencies", "dependencyManagement"]);
-  for (const node of Array.from(parsed.project.childNodes)) {
-    if (node.nodeType === 1 && allowed.has((node as any).localName)) document.documentElement!.appendChild(document.importNode(node, true));
+  const allowed = new Set(["modelVersion", "groupId", "artifactId", "version", "packaging", "dependencies", "dependencyManagement"]);
+  const elements = Array.from(parsed.project.childNodes).filter(node => node.nodeType === 1);
+  const kept = elements.filter(node => allowed.has((node as any).localName));
+  const properties = elements.find(node => (node as any).localName === "properties");
+  const values = new Map<string, string>();
+  for (const node of Array.from(properties?.childNodes ?? [])) if (node.nodeType === 1) values.set((node as any).localName, node.textContent ?? "");
+  const used = new Set<string>(), pending = kept.map(node => node.textContent ?? "");
+  while (pending.length) {
+    for (const [, name] of pending.pop()!.matchAll(/\$\{([^}]+)\}/g)) {
+      if (!name || used.has(name) || !values.has(name)) continue;
+      if (PLUGIN_PARAMETERS.has(name) || name.startsWith("mdep.")) throw new Error(`Maven property ${name} is also a dependency-plugin parameter; it needs review.`);
+      used.add(name); pending.push(values.get(name)!);
+    }
+  }
+  const root = document.documentElement!;
+  for (const node of kept) root.appendChild(document.importNode(node, true));
+  if (used.size) {
+    const element = document.createElementNS(root.namespaceURI, "properties");
+    for (const node of Array.from(properties!.childNodes)) if (node.nodeType === 1 && used.has((node as any).localName)) element.appendChild(document.importNode(node, true));
+    root.appendChild(element);
   }
   return new XMLSerializer().serializeToString(document);
 }

@@ -33,12 +33,12 @@ Condition (b) is in docs/decisions/2026-10-28-release-gates-by-stage.md: four co
   - `facts` and `created`: from the recorder's captures only;
   - `advisories`: empty. Non-MAL OSV ids are not captured, and leaving them out only removes stops;
   - `locked`: a scenario input, not a capture. In (b) it is {P@prev}; in (a) it is empty, so rule 2 checks P itself;
-  - `projectWait`: none.
+  - `projectWait`, `split` and `extraneous` (added to `judge()` by #168): not given. `split` only adds an info finding, and `extraneous` only adds stops for a project's own lockfile, which a replay does not have.
 - **When.** The judgement is made at the judge's own `wait_until`, the newest publish in the change plus the row's wait. That wait is the judge's own `wait_hours`: WAIT_HOURS[u], or 24h for exploited when the versions cannot be compared, or max(2 × that wait, 72h) when an extend finding applies. `now` is one millisecond after `wait_until`. The replay's facts are those of the last capture before that moment, and include a MAL- record only if it was published by then.
   - Facts taken later can extend the wait: a predecessor that stops being listed, say.
   - So `wait_until` is first computed from V's first capture. It is then recomputed with the facts as of that moment until it no longer moves. Extensions only lengthen the wait, so this ends.
 - **The scenarios.**
-  - **(b), an update:** P is locked at prev and updated to V. prev is each distinct version of P in the watched lockfiles that is lower than V. If there is none, prev is the latest-published version of P lower than V by semver: the registry's predecessor. A later-published backport is never used, because it would make the judge stop on a downgrade.
+  - **(b), an update:** P is locked at prev and updated to V. prev is each distinct version of P in the watched lockfiles that is lower than V. If there is none, prev is the latest-published version of P lower than V by semver and published before V: the registry's predecessor. A later-published backport is never used, because it would make the judge stop on a downgrade.
   - **(a), a new package:** V is added as a new direct dependency, with `direct: [P]` so that T is V's publish time.
     - A fix needs a `from`, and a new package has none, so the synthetic fix cannot set urgency here.
     - (a) is therefore judged only in the rows the judge itself gives a new package: normal (production) and low (dev).
@@ -76,10 +76,14 @@ How they count:
 - every capture gap;
 - every undecidable verdict;
 - per-row and per-scenario outcomes;
-- the judge's literal verdict, with its own urgency at its own `wait_until`. The counted outcome is a per-row counterfactual, like the backtests' (apart from (a)'s two rows, section 4), not the judge's literal verdict.
+- the judge's literal verdict, with its own urgency at its own `wait_until`. The change is taken as production (`dev: false`), so that urgency is normal: the shadow has no single project whose split would decide it. The counted outcome is a per-row counterfactual, like the backtests' (apart from (a)'s two rows, section 4), not the judge's literal verdict.
 
 **9. What the recorder must capture for this.** Otherwise every replay would be a capture gap.
-- **On the first change of a watched name:** the full `time` map, and the manifest and attestations of every version of that name the watched lockfiles hold (each possible prev). Also the version each dist-tag points to.
-- **For each new version V:** its manifest, attestations and file list. Also its registry predecessor (section 4), if not yet stored.
-- **For each dependency of V outside the watched set:** the package's first publish time (`created`, rule 2), unless already stored.
+- **On the first change of a watched name:**
+  - the full `time` map;
+  - the manifest and attestations of every version of that name the watched lockfiles hold (each possible prev), and of the version each dist-tag points to;
+  - every version published at or after the recorder's feed start, captured as a new version. A name's first change seen is often a publish.
+- **For each new version V:** its manifest, attestations and file list, and its registry predecessor (section 4) if not yet stored. The predecessor is the latest-published version lower than V by semver that was **published before V**, as v5's prev_d is. The same rule gives each step of the run of identical code in section 6.
+- **For each dependency of V whose first publish time is not stored** (a package outside the watched set, or a watched one that has not changed yet): that time (`created`, rule 2).
+- **Retries.** A read that failed for a new version (its attestations, its tarball, or a dependency's `created`) is retried on the following polls. After 60 failed polls the recorder records that it gave up. That version's replay is then a capture gap.
 - **Afterwards:** later changes to `time`, `dist-tags`, removal and deprecation of every stored version.

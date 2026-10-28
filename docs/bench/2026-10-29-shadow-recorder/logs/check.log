@@ -1,0 +1,20 @@
+commit: 33ec85e9674a9d014e605bfe0384d442d61d47f7  recorder.ts blob: b6ad7b45b40da9ad331b1ba781c0dbf33c2ea447  test blob: ffa8467600749173af4db0c6a7d33a7b69ab61d5
+== typecheck
+tsc_exit=0
+== tests
+ [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/recorder.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 74[2mms[22m[39m
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m29 passed[39m[22m[90m (29)[39m
+== mutation: e-mail scrub off
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 16 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m16 failed[39m[22m[2m | [22m[1m[32m13 passed[39m[22m[90m (29)[39m
+== mutation: storage limit off
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m27 passed[39m[22m[90m (29)[39m
+== mutation: integrity check off
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m28 passed[39m[22m[90m (29)[39m
+== mutation: first sight never new
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m28 passed[39m[22m[90m (29)[39m
+recorder.ts restored

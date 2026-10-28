@@ -32,18 +32,25 @@ export type Config = {
   maxTarballBytes?: number;
   maxUnpackedBytes?: number;
 };
-type State = { seq: string | null; osv_since: string | null; osv_day: string | null; pending: string[]; stopped: string | null };
-type Known = { time: Record<string, string>; dist_tags: Record<string, string>; versions: Record<string, { deprecated: string | null; integrity: string | null }> };
+type State = { seq: string | null; feed_started_at: string | null; osv_since: string | null; osv_day: string | null; pending: string[]; stopped: string | null };
+/** Per stored version: `tries` counts captures still incomplete (a sub-read failed); 0 when complete or given up. */
+type Known = { time: Record<string, string>; dist_tags: Record<string, string>; versions: Record<string, { deprecated: string | null; integrity: string | null; removed?: boolean; tries?: number }> };
+type Reason = "new" | "retry" | "lockfile" | "predecessor";
+/** Give up re-reading a version's attestations, tarball or dependency times after this many polls; that is recorded. */
+const MAX_TRIES = 60;
+const isObject = (v: unknown): v is Record<string, any> => !!v && typeof v === "object" && !Array.isArray(v);
 
 const HOSTS = new Set(["registry.npmjs.org", "replicate.npmjs.com", "api.osv.dev", "osv-vulnerabilities.storage.googleapis.com"]);
 const NAME = /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i;
 const regPath = (name: string) => { if (!NAME.test(name) || name.length > 214) throw new Error(`Invalid npm package name: ${name}`); return name.startsWith("@") ? `@${encodeURIComponent(name.slice(1))}` : encodeURIComponent(name); };
 const sha256 = (b: Buffer | string) => createHash("sha256").update(b).digest("hex");
-const EMAIL = /[^\s<>"'(),;:]+@[^\s<>"'(),;:]+\.[^\s<>"'(),;:]+/g;
+// An address: a local part not preceded by a URL, path or spec character, and a domain whose last label is alphabetic.
+// So `p@1.0.1`, `npm:x@1.0.0`, `git@github.com` inside `ssh://` URLs and scoped tarball URLs are left alone.
+const EMAIL = /(?<![\w.%+\-/@:])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}(?![\w@-])/g;
 
 /** A copy of a registry document with every e-mail address removed: `email` keys dropped, addresses in strings replaced. */
 export function scrub(value: unknown): unknown {
-  if (typeof value === "string") return value.replace(EMAIL, "[email removed]");
+  if (typeof value === "string") return value.replace(/mailto:[^\s"'<>]+/gi, "mailto:[email removed]").replace(EMAIL, "[email removed]");
   if (Array.isArray(value)) return value.map(scrub);
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).filter(([k]) => k.toLowerCase() !== "email").map(([k, v]) => [k, scrub(v)]));
   return value;
@@ -93,7 +100,8 @@ export class Recorder {
     this.cfg = { fetchFn: fetch, now: () => new Date(), maxTarballBytes: 50 * 1024 * 1024, maxUnpackedBytes: 256 * 1024 * 1024, ...cfg };
     mkdirSync(cfg.dir, { recursive: true });
     const statePath = join(cfg.dir, "state.json");
-    this.state = existsSync(statePath) ? JSON.parse(readFileSync(statePath, "utf8")) : { seq: null, osv_since: null, osv_day: null, pending: [], stopped: null };
+    this.state = existsSync(statePath) ? JSON.parse(readFileSync(statePath, "utf8")) : { seq: null, feed_started_at: null, osv_since: null, osv_day: null, pending: [], stopped: null };
+    this.state.feed_started_at ??= null;
     this.bytes = dirBytes(cfg.dir);
   }
 
@@ -150,17 +158,20 @@ export class Recorder {
   }
 
   private createdPath(name: string) { const h = sha256(name); return join(this.cfg.dir, "known", "created", h.slice(0, 2), `${h}.json`); }
-  /** The first publish time of a package outside the watched set (rule 2's `created`), stored once. */
-  async created(name: string): Promise<object | null> {
-    const url = `https://registry.npmjs.org/${regPath(name)}`;
+  /** The first publish time of a package whose time is not stored (rule 2's `created`): its record, appended, or null. */
+  async created(name: string): Promise<boolean> {
+    let url = "";
     try {
+      url = `https://registry.npmjs.org/${regPath(name)}`;
       const { doc, sha256: bodySha } = await this.json(url, 64 * 1024 * 1024);
-      const created = typeof doc?.time === "object" && doc.time ? firstPublish(doc.time) : null;
+      const created = isObject(doc?.time) ? firstPublish(doc.time) : null;
+      // The record first, then the marker that suppresses a re-read: a crash in between only causes a second read.
+      if (!this.append("captures", { type: "created", name, fetched_at: this.at(), url, body_sha256: bodySha, created })) return false;
       this.writeAtomic(this.createdPath(name), JSON.stringify({ created }));
-      return { type: "created", name, fetched_at: this.at(), url, body_sha256: bodySha, created };
+      return true;
     } catch (e) {
       this.append("status", { type: "error", at: this.at(), name, url, error: String((e as Error).message).slice(0, 300) });
-      return null;
+      return false;
     }
   }
   private knownPath(name: string) { const h = sha256(name); return join(this.cfg.dir, "known", h.slice(0, 2), `${h}.json`); }
@@ -186,73 +197,97 @@ export class Recorder {
     } catch (e) { return { status: "unreadable", error: String((e as Error).message).slice(0, 300) }; }
   }
 
-  /** One version's record: the manifest without e-mail addresses, the publisher check, attestations, and file list. */
-  async version(name: string, version: string, manifest: any, reason: "new" | "lockfile" | "predecessor") {
-    let attestations: object | null = null;
+  /**
+   * One version's record: the manifest without e-mail addresses, the publisher check, attestations, and (for a new
+   * version) the file list. `complete` is false when a read that may succeed later failed: attestations the manifest
+   * lists that did not answer 200, or a tarball read error.
+   */
+  async version(name: string, version: string, manifest: any, reason: Reason): Promise<{ record: object; complete: boolean }> {
+    let attestations: { status: number | "error" } & Record<string, unknown> | null = null;
     if (manifest?.dist?.attestations) {
       const url = `https://registry.npmjs.org/-/npm/v1/attestations/${regPath(name)}@${encodeURIComponent(version)}`;
       try { const r = await this.get(url, 4 * 1024 * 1024); attestations = { url, status: r.status, sha256: r.body ? sha256(r.body) : null, body: r.status === 200 && r.body ? JSON.parse(r.body.toString("utf8")) : null }; }
       catch (e) { attestations = { url, status: "error", error: String((e as Error).message).slice(0, 300) }; }
     }
+    const files = reason === "new" || reason === "retry" ? await this.files(name, version, manifest) as { status: string } : null;
     return {
-      type: "version", name, version, reason, fetched_at: this.at(),
-      shared_publisher: sharedPublisher(manifest?._npmUser), manifest: scrub(manifest), attestations,
-      files: reason === "new" ? await this.files(name, version, manifest) : null,
+      record: { type: "version", name, version, reason, fetched_at: this.at(), shared_publisher: sharedPublisher(manifest?._npmUser), manifest: scrub(manifest), attestations, files },
+      complete: (!attestations || attestations.status === 200) && files?.status !== "error",
     };
   }
 
-  /** Read one watched package now and store what changed since its last capture. */
-  async capture(name: string): Promise<boolean> {
-    const url = `https://registry.npmjs.org/${regPath(name)}`;
-    let doc: any, bodySha: string;
-    try { ({ doc, sha256: bodySha } = await this.json(url, 64 * 1024 * 1024)); }
+  /**
+   * Read one watched package now and store what changed since its last capture. "failed": nothing stored, retry the
+   * whole capture. "incomplete": stored, but a version's sub-read failed and is retried on the next poll.
+   */
+  async capture(name: string): Promise<"ok" | "failed" | "incomplete"> {
+    let url = "", doc: any, bodySha: string;
+    try { url = `https://registry.npmjs.org/${regPath(name)}`; ({ doc, sha256: bodySha } = await this.json(url, 64 * 1024 * 1024)); }
     catch (e) {
       const status = (e as { status?: number }).status;
-      if (status === 404) return this.append("captures", { type: "gone", name, fetched_at: this.at(), url, status });
+      if (status === 404) return this.append("captures", { type: "gone", name, fetched_at: this.at(), url, status }) ? "ok" : "failed";
       this.append("status", { type: "error", at: this.at(), name, url, error: String((e as Error).message).slice(0, 300) });
-      return false;
+      return "failed";
     }
-    if (typeof doc?.versions !== "object" || typeof doc?.time !== "object") { this.append("status", { type: "error", at: this.at(), name, url, error: "not a packument" }); return false; }
+    if (!isObject(doc) || !isObject(doc.versions) || !isObject(doc.time)) { this.append("status", { type: "error", at: this.at(), name, url, error: "not a packument" }); return "failed"; }
     const before = this.known(name);
     const time: Record<string, string> = Object.fromEntries(Object.entries(doc.time).filter(([, v]) => typeof v === "string")) as Record<string, string>;
-    const tags: Record<string, string> = doc["dist-tags"] ?? {};
-    const listed = Object.keys(doc.versions);
+    const tags: Record<string, string> = isObject(doc["dist-tags"]) ? doc["dist-tags"] : {};
+    const listed = Object.keys(doc.versions).filter(v => isObject(doc.versions[v]));
     const versions: Known["versions"] = { ...(before?.versions ?? {}) };
-    const records: object[] = [];
     const head = { name, fetched_at: this.at(), url, body_sha256: bodySha };
-    const timeDelta = Object.fromEntries(Object.entries(time).filter(([k, v]) => before?.time[k] !== v));
-    if (!before) records.push({ type: "baseline", ...head, dist_tags: tags, time });
-    else records.push({ type: "change", ...head, dist_tags: JSON.stringify(tags) === JSON.stringify(before.dist_tags) ? null : tags, time: timeDelta, removed: Object.keys(before.versions).filter(v => !doc.versions[v]) });
-    const fresh = before ? listed.filter(v => !Object.hasOwn(before.time, v)) : [];
-    // On first sight: the versions the watched lockfiles hold, and the newest per dist-tag (the predecessors to come).
-    const wanted = new Map<string, "new" | "lockfile" | "predecessor">();
-    if (!before) { for (const v of this.watched.get(name) ?? []) if (doc.versions[v]) wanted.set(v, "lockfile"); for (const v of Object.values(tags)) if (doc.versions[v] && !wanted.has(v)) wanted.set(v, "predecessor"); }
+    const removed = Object.keys(versions).filter(v => !versions[v]!.removed && !Object.hasOwn(doc.versions, v));
+    const records: object[] = [before
+      ? { type: "change", ...head, dist_tags: JSON.stringify(tags) === JSON.stringify(before.dist_tags) ? null : tags, time: Object.fromEntries(Object.entries(time).filter(([k, v]) => before.time[k] !== v)), removed }
+      : { type: "baseline", ...head, dist_tags: tags, time }];
+    for (const v of removed) versions[v]!.removed = true;
+    // New: not in the stored time map; on first sight, published at or after the feed start (so a name's first change
+    // seen being a publish is captured as new, with its file list, predecessor and dependency times).
+    const started = this.state.feed_started_at;
+    const fresh = before ? listed.filter(v => !Object.hasOwn(before.time, v)) : listed.filter(v => started !== null && time[v] !== undefined && time[v]! >= started);
+    const wanted = new Map<string, Reason>();
+    for (const v of fresh) wanted.set(v, "new");
+    for (const v of listed) if ((versions[v]?.tries ?? 0) > 0 && !wanted.has(v)) wanted.set(v, "retry");
+    // On first sight: the versions the watched lockfiles hold (each possible prev), and each dist-tag's version.
+    if (!before) { for (const v of this.watched.get(name) ?? []) if (Object.hasOwn(doc.versions, v) && !wanted.has(v)) wanted.set(v, "lockfile"); for (const v of Object.values(tags)) if (Object.hasOwn(doc.versions, v) && !wanted.has(v)) wanted.set(v, "predecessor"); }
     for (const v of fresh) {
-      wanted.set(v, "new");
       // The registry's predecessor for the replay, if not stored yet: the latest-published version lower than it by
-      // semver (a backport published later is never a predecessor).
+      // semver and published before it.
       const prior = predecessor(listed, time, v);
       if (prior && !Object.hasOwn(versions, prior) && !wanted.has(prior)) wanted.set(prior, "predecessor");
     }
-    for (const [v, reason] of wanted) records.push(await this.version(name, v, doc.versions[v], reason));
+    const incomplete = new Set<string>();
+    for (const [v, reason] of wanted) {
+      const { record, complete } = await this.version(name, v, doc.versions[v], reason);
+      records.push(record);
+      if (!complete) incomplete.add(v);
+    }
+    for (const r of records) if (!this.append("captures", r)) return "failed";
     // Rule 2 needs when each new dependency's package first appeared: read it once for any package whose time is not stored.
-    for (const v of fresh) {
+    for (const [v, reason] of wanted) {
+      if (reason !== "new" && reason !== "retry") continue;
       const m = doc.versions[v];
-      for (const dep of Object.keys({ ...(m?.dependencies ?? {}), ...(m?.optionalDependencies ?? {}) })) {
-        if (!NAME.test(dep) || existsSync(this.knownPath(dep)) || existsSync(this.createdPath(dep))) continue;
-        const r = await this.created(dep);
-        if (r) records.push(r);
+      for (const dep of Object.keys({ ...(isObject(m.dependencies) ? m.dependencies : {}), ...(isObject(m.optionalDependencies) ? m.optionalDependencies : {}) })) {
+        if (!NAME.test(dep) || dep.length > 214) { this.append("status", { type: "error", at: this.at(), name, version: v, error: `dependency name not read: ${dep.slice(0, 80)}` }); continue; }
+        if (existsSync(this.knownPath(dep)) || existsSync(this.createdPath(dep))) continue;
+        if (!(await this.created(dep))) { if (this.state.stopped) return "failed"; incomplete.add(v); }
       }
     }
-    for (const v of wanted.keys()) versions[v] = { deprecated: null, integrity: doc.versions[v]?.dist?.integrity ?? null };
-    // Deprecation of a stored version, recorded when it changes.
-    for (const v of Object.keys(versions)) {
-      const now = typeof doc.versions[v]?.deprecated === "string" && doc.versions[v].deprecated ? doc.versions[v].deprecated : null;
-      if (doc.versions[v] && (versions[v]!.deprecated !== now || (wanted.has(v) && now))) { records.push({ type: "deprecation", name, version: v, fetched_at: this.at(), deprecated: now }); versions[v]!.deprecated = now; }
+    const tail: object[] = [];
+    for (const v of wanted.keys()) {
+      const tries = incomplete.has(v) ? (versions[v]?.tries ?? 0) + 1 : 0;
+      if (tries >= MAX_TRIES) tail.push({ type: "gave_up", name, version: v, fetched_at: this.at(), tries });
+      versions[v] = { deprecated: versions[v]?.deprecated ?? null, integrity: doc.versions[v]?.dist?.integrity ?? null, tries: tries >= MAX_TRIES ? 0 : tries };
     }
-    for (const r of records) if (!this.append("captures", r)) return false;
+    // Deprecation of a stored version, recorded when it changes (and on its first capture, when set).
+    for (const v of Object.keys(versions)) {
+      if (!Object.hasOwn(doc.versions, v)) continue;
+      const dep = doc.versions[v]?.deprecated, now = typeof dep === "string" && dep ? dep : null;
+      if (versions[v]!.deprecated !== now) { tail.push({ type: "deprecation", name, version: v, fetched_at: this.at(), deprecated: now }); versions[v]!.deprecated = now; }
+    }
+    for (const r of tail) if (!this.append("captures", r)) return "failed";
     this.writeAtomic(this.knownPath(name), JSON.stringify({ time, dist_tags: tags, versions } satisfies Known));
-    return true;
+    return Object.values(versions).some(x => (x.tries ?? 0) > 0) ? "incomplete" : "ok";
   }
 
   /** Read the feed from the stored position to its end, capturing every watched change. */
@@ -262,6 +297,7 @@ export class Recorder {
     if (this.state.seq === null) {
       const { doc } = await this.json("https://replicate.npmjs.com/", 1024 * 1024);
       this.state.seq = String(doc.update_seq);
+      this.state.feed_started_at = this.at();
       this.saveState();
       this.append("status", { type: "feed_start", at: this.at(), seq: this.state.seq });
       return { ...summary, seq: this.state.seq };
@@ -274,9 +310,14 @@ export class Recorder {
       summary.watched += names.size;
       const failed: string[] = [];
       for (const name of names) {
-        if (!(await this.capture(name))) { if (this.state.stopped) return summary; failed.push(name); }
+        // One document can never hold the feed: any error keeps that name pending, and the others go on.
+        let result: "ok" | "failed" | "incomplete";
+        try { result = await this.capture(name); }
+        catch (e) { this.append("status", { type: "error", at: this.at(), name, error: String((e as Error).message).slice(0, 300) }); result = "failed"; }
+        if (this.state.stopped) return summary;
+        if (result !== "ok") failed.push(name);
       }
-      // Failed names are retried on the next poll; the feed position moves on only after every other capture is stored.
+      // Failed or incomplete names are retried on the next poll; the feed position moves on once the page is handled.
       this.state.pending = failed;
       if (doc.last_seq === undefined || doc.last_seq === null) throw new Error("The feed answered without last_seq.");
       const moved = String(doc.last_seq) !== this.state.seq;
@@ -299,8 +340,11 @@ export class Recorder {
     // The first read only sets the position: records modified before the recorder started are not the shadow's.
     if (this.state.osv_since !== null) {
       for (const { id, modified } of ids) {
-        const { doc, sha256: bodySha } = await this.json(`https://api.osv.dev/v1/vulns/${encodeURIComponent(id)}`, 4 * 1024 * 1024);
-        if (!this.append("osv", { type: "osv", id, modified, fetched_at: this.at(), sha256: bodySha, record: doc })) return stored;
+        // A record that cannot be read is an error line, and the day's read goes on: it is not retried every minute.
+        let read;
+        try { read = await this.json(`https://api.osv.dev/v1/vulns/${encodeURIComponent(id)}`, 4 * 1024 * 1024); }
+        catch (e) { this.append("status", { type: "error", at: this.at(), id, error: `osv: ${String((e as Error).message).slice(0, 300)}` }); continue; }
+        if (!this.append("osv", { type: "osv", id, modified, fetched_at: this.at(), sha256: read.sha256, record: scrub(read.doc) })) return stored;
         stored++;
       }
     }

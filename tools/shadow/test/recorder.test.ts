@@ -78,6 +78,10 @@ const setup = (maxBytes = 50_000_000) => {
 };
 
 describe("scrub", () => {
+  it("leaves versions, specs and URLs that only look like addresses", () => {
+    for (const text of ["left-pad@1.0.1", "npm:evil@1.0.0", "git+ssh://git@github.com/o/r.git", "https://registry.npmjs.org/@s/n/-/n-1.0.0.tgz", "use lodash@4.17.21 instead"]) expect(scrub(text)).toBe(text);
+    expect(scrub("Alice <alice@example.com>")).toBe("Alice <[email removed]>");
+  });
   it("drops email keys and replaces addresses inside strings, at any depth", () => {
     const out = JSON.stringify(scrub(manifest("1.0.0", { contributors: ["Bob <bob@example.org> (https://b.example)"], bugs: { email: "x@y.io", url: "u" } })));
     expect(out).not.toMatch(/@example|x@y\.io/);
@@ -273,3 +277,122 @@ describe("Recorder", () => {
   });
 });
 
+describe("Recorder, review findings and failure paths", () => {
+  it("captures a version published after the feed start as new on a name's first sight, with its file list and predecessor", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll();
+    const p = w.packuments["left-pad"];
+    p.versions["1.0.1"] = manifest("1.0.1", { dependencies: { "brand-new-dep": "^1.0.0" } });
+    p.time["1.0.1"] = "2026-10-29T00:00:30.000Z";
+    p["dist-tags"].latest = "1.0.1";
+    w.packuments["brand-new-dep"] = { "dist-tags": {}, time: { created: "2026-10-28T12:00:00.000Z" }, versions: {} };
+    w.feed.push({ seq: 101, id: "left-pad" });
+    expect(await rec.poll()).toMatchObject({ seq: "101" });
+    const recs = lines(dir, "captures");
+    expect(recs.filter(r => r.type === "version").map(r => [r.version, r.reason, r.files?.status ?? null])).toEqual([["1.0.1", "new", "hashed"], ["0.9.0", "lockfile", null], ["1.0.0", "predecessor", null]]);
+    expect(recs.find(r => r.type === "created")).toMatchObject({ name: "brand-new-dep", created: "2026-10-28T12:00:00.000Z" });
+  });
+
+  it("does not let a malformed dependency name or a malformed packument hold the feed", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    const p = w.packuments["left-pad"];
+    p.versions["1.0.1"] = manifest("1.0.1", { dependencies: { ["a".repeat(215)]: "1.0.0" } });
+    p.time["1.0.1"] = "2026-10-29T01:00:00.000Z";
+    w.packuments["other"] = { versions: null, time: {} };
+    const r2 = new Recorder({ dir, maxBytes: 50_000_000, fetchFn: rec.cfg.fetchFn, watched: { "left-pad": ["0.9.0"], other: [] }, now: () => new Date("2026-10-29T02:00:00Z") });
+    w.feed.push({ seq: 102, id: "left-pad" }, { seq: 103, id: "other" });
+    expect(await r2.poll()).toMatchObject({ seq: "103" });
+    expect(r2.state.pending).toEqual(["other"]);
+    expect(lines(dir, "captures").some(r => r.type === "version" && r.version === "1.0.1")).toBe(true);
+    expect(lines(dir, "status").some(r => r.type === "error" && /dependency name not read/.test(r.error))).toBe(true);
+  });
+
+  it("retries a version whose attestations or tarball could not be read, and records the complete capture", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    const p = w.packuments["left-pad"];
+    p.versions["1.0.1"] = manifest("1.0.1", { dist: { ...manifest("1.0.1").dist, attestations: { url: "x" } } });
+    p.time["1.0.1"] = "2026-10-29T01:00:00.000Z";
+    const att = "https://registry.npmjs.org/-/npm/v1/attestations/left-pad@1.0.1", tarball = "https://registry.npmjs.org/left-pad/-/left-pad-1.0.1.tgz";
+    w.fail.add(att); w.fail.add(tarball);
+    w.feed.push({ seq: 102, id: "left-pad" });
+    await rec.poll();
+    expect(rec.state.pending).toEqual(["left-pad"]);
+    w.fail.clear();
+    await rec.poll();
+    expect(rec.state.pending).toEqual([]);
+    const v = lines(dir, "captures").filter(r => r.type === "version" && r.version === "1.0.1");
+    expect(v.map(r => [r.reason, r.attestations.status, r.files.status])).toEqual([["new", "error", "error"], ["retry", 200, "hashed"]]);
+  });
+
+  it("records removal once, not again in every later change", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    delete w.packuments["left-pad"].versions["0.9.0"];
+    w.feed.push({ seq: 102, id: "left-pad" }); await rec.poll();
+    w.packuments["left-pad"].time.modified = "2026-10-29T05:00:00.000Z";
+    w.feed.push({ seq: 103, id: "left-pad" }); await rec.poll();
+    expect(lines(dir, "captures").filter(r => r.type === "change").map(r => r.removed)).toEqual([["0.9.0"], []]);
+  });
+
+  it("records a package the registry no longer has as gone", async () => {
+    const { dir, w, rec } = setup();
+    await rec.poll();
+    delete w.packuments["left-pad"];
+    w.feed.push({ seq: 101, id: "left-pad" });
+    await rec.poll();
+    expect(lines(dir, "captures")).toEqual([expect.objectContaining({ type: "gone", name: "left-pad", status: 404 })]);
+    expect(rec.state.pending).toEqual([]);
+  });
+
+  it("reads every page of a long feed", async () => {
+    const { w, rec } = setup();
+    await rec.poll();
+    for (let i = 1; i <= 10_001; i++) w.feed.push({ seq: 100 + i, id: `pkg-${i}` });
+    expect(await rec.poll()).toMatchObject({ entries: 10_001, seq: "10101" });
+  });
+
+  it("stays stopped after a restart once the limit was reached", async () => {
+    const { dir, w, rec } = setup(600);
+    await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
+    expect(rec.state.stopped).toBeTruthy();
+    const again = new Recorder({ dir, maxBytes: 600, fetchFn: rec.cfg.fetchFn, watched: { "left-pad": [] } });
+    const before = dirBytes(dir);
+    expect(await again.poll()).toMatchObject({ entries: 0 });
+    expect(dirBytes(dir)).toBe(before);
+  });
+
+  it("gives no file list for a tarball over the size limit or without a sha512 integrity", async () => {
+    const { rec } = setup();
+    expect(await rec.files("left-pad", "1.0.0", manifest("1.0.0", { dist: { ...manifest("1.0.0").dist, unpackedSize: 10 ** 12 } }))).toMatchObject({ status: "too_large" });
+    expect(await rec.files("left-pad", "1.0.0", manifest("1.0.0", { dist: { ...manifest("1.0.0").dist, integrity: "sha1-abc" } }))).toMatchObject({ status: "no_sha512_integrity" });
+  });
+
+  it("refuses an archive that inflates past the unpacked limit", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "shadow-")), { w, fetchFn } = world();
+    const bomb = gzipSync(Buffer.alloc(4 * 1024 * 1024));
+    w.tarballs.set("1.0.0", bomb);
+    const rec = new Recorder({ dir, maxBytes: 50_000_000, fetchFn, watched: {}, maxUnpackedBytes: 1024 * 1024 });
+    expect(await rec.files("left-pad", "1.0.0", manifest("1.0.0", { dist: { ...manifest("1.0.0").dist, integrity: integrity(bomb) } }))).toMatchObject({ status: "unreadable" });
+  });
+
+  it("keeps reading the day's OSV records when one cannot be read, and does not read them again that day", async () => {
+    const { dir, w, rec, tick } = setup();
+    w.csv = "2026-10-28T23:00:00Z,MAL-2026-1\n"; await rec.osv();
+    tick(86_400_000);
+    w.csv = "2026-10-29T12:00:00Z,MAL-2026-3\n2026-10-29T11:00:00Z,MAL-2026-2\n";
+    w.osv["MAL-2026-2"] = { id: "MAL-2026-2", credits: [{ name: "x", contact: ["mailto:someone@example.org"] }] };
+    expect(await rec.osv()).toBe(1);
+    expect(await rec.osv()).toBe(0);
+    expect(lines(dir, "osv").map(r => r.id)).toEqual(["MAL-2026-2"]);
+    expect(JSON.stringify(lines(dir, "osv"))).not.toContain("someone@example.org");
+    expect(lines(dir, "status").some(r => r.type === "error" && r.id === "MAL-2026-3")).toBe(true);
+    expect(w.asked.filter(u => u.endsWith("modified_id.csv"))).toHaveLength(2);
+  });
+
+  it("refuses a host outside the four allowed", async () => {
+    const { rec } = setup();
+    await expect((rec as any).get("https://example.com/x", 100)).rejects.toThrow(/Refused host/);
+  });
+});

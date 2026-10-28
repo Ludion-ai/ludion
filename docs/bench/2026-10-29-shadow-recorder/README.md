@@ -1,24 +1,39 @@
 # The shadow's recorder (2026-10-29, LS)
 
-The recorder from docs/bench/2026-10-28-shadow-design/README.md, sections 2.1 to 2.4. It records; it judges nothing. The replay (sections 2.5 to 2.7) is not built. How condition (b) will be counted is fixed in docs/decisions/2026-10-29-shadow-counting.md, before any recording. This is a source preview tool, not a production service: **where the shadow runs in production is the owner's choice (design, section 6) and is not made here.**
+The recorder from docs/bench/2026-10-28-shadow-design/README.md, sections 2.1 to 2.4. It records; it judges nothing.
+- **Not built.** The replay (design, sections 2.5 to 2.7).
+- **Fixed first.** How condition (b) will be counted, and what the recorder must capture for it: docs/decisions/2026-10-29-shadow-counting.md, sections 4 and 9. That was decided before any recording.
+- **Not a production service.** This is a source preview tool. Where the shadow runs in production is the owner's choice (design, section 6), and it is not made here.
 
 ## What it does
 
 `tools/shadow/src/recorder.ts`, every minute:
-- **Follows the feed.** It reads `https://replicate.npmjs.com/registry/_changes` from its stored position to the end. On its first run it only takes the feed's current position: nothing before the start is read.
+- **Follows the feed.** It reads `https://replicate.npmjs.com/registry/_changes` from its stored position to the end. On its first run it takes only the feed's current position, and records that moment as the feed start. Nothing before it is read.
 - **Captures each watched package that changed.** For each change in the frozen watched list (`tools/shadow/watched.json`), it reads the packument and stores:
-  - on a name's first change: the full `time` map and `dist-tags`. Also the manifest and attestations of every version the watched lockfiles hold for that name, and of each dist-tag's version;
-  - for each version new since the last capture: its manifest and attestations, and the file list of its registry tarball (path, size, sha256), checked against `dist.integrity`;
-  - also, for each new version: its registry predecessor (the latest-published version lower by semver), and the first publish time of each dependency outside the watched set (rule 2's `created`);
-  - afterwards: new or changed `time` entries, `dist-tags` changes, and the removal and deprecation of every stored version.
-- **Reads OSV once per UTC day.** It reads OSV's npm `modified_id.csv` and stores every MAL- record modified since the last read, watched or not. The first read only sets the position.
+  - **on a name's first change:**
+    - the full `time` map and `dist-tags`;
+    - the manifest and attestations of every version the watched lockfiles hold for that name, and of each dist-tag's version;
+    - every version published at or after the feed start, captured as new;
+  - **for each new version:**
+    - its manifest and attestations;
+    - the file list of its registry tarball (path, size, sha256), checked against `dist.integrity`;
+    - its registry predecessor, if not yet stored: the latest-published version lower by semver and published before it;
+    - the first publish time of each dependency whose time is not yet stored (rule 2's `created`);
+  - **afterwards:** new or changed `time` entries, `dist-tags` changes, each stored version's removal (once), and its deprecation.
+- **Retries.** A failed read of a whole package is retried on the next poll. So is a failed read for a new version: its attestations, its tarball or a dependency's `created`. After 60 failed polls the recorder writes a `gave_up` record for that version.
+  - The feed position moves on once a page is handled.
+  - One document can never hold the feed. An error on one package keeps only that package pending.
+  - A dependency name that is not a valid npm name is logged and skipped.
+- **Reads OSV once per UTC day.** It reads OSV's npm `modified_id.csv` and stores every MAL- record modified since the last read, watched or not. The first read only sets the position. A record that cannot be read is an error line, and the day's read goes on.
 - **Writes a status line per poll**: the feed position, entries read, watched changes, names pending a retry, and bytes used.
 
-What is never stored:
-- the tarball itself. It is read into memory, checked against its integrity and hashed, never extracted to disk, never run;
-- e-mail addresses. Every `email` key is dropped, and addresses inside strings are replaced. The publisher check the judge makes from `_npmUser.email` (`sharedPublisher`) is computed first and stored as a boolean.
-
-Attestation bundles are stored as served (Sigstore bundles, public).
+What is not stored:
+- **The tarball.** It is read into memory and checked against its integrity, and inflated in memory under a 256 MB limit. It is hashed, never extracted to disk and never run.
+- **E-mail addresses in manifests and OSV records.**
+  - Every `email` key is dropped.
+  - Addresses inside strings are replaced, including `mailto:` ones. Package specs and URLs that only look like addresses are left alone, such as `p@1.0.1`, `npm:x@1.0.0`, `git@github.com` in an `ssh://` URL, and scoped tarball URLs.
+  - The publisher check the judge makes from `_npmUser.email` (`sharedPublisher`) is computed first and stored as a boolean.
+  - **Not scrubbed:** attestation bundles (public Sigstore bundles, stored as served), the keys of `time` and `dist-tags`, and error snippets in status lines.
 
 **What leaves the machine:**
 - package names and versions, in registry URLs;
@@ -27,16 +42,16 @@ Attestation bundles are stored as served (Sigstore bundles, public).
 
 The recorder refuses any host other than registry.npmjs.org, replicate.npmjs.com, api.osv.dev and osv-vulnerabilities.storage.googleapis.com, and follows no redirects.
 
-**Failures.**
-- A package whose read fails is kept in `pending` and retried on the next poll. The feed position still moves on.
-- A failed poll or OSV read is a status line. The next poll retries.
-- **The storage limit.** Before each write the recorder checks the data directory's size. When the next line would pass the limit, it writes one `stopped` line and records nothing more. The process stays up, idle, so a restart policy does not start it again.
+**The storage limit.**
+- **What is counted.** The recorder keeps a running count of the data directory's bytes, read from disk at start.
+- **The stop.** Before each append it checks that the line still fits under the limit. If not, it writes one `stopped` line and records nothing more, and it stays stopped after a restart. The process stays up, idle, so a restart policy does not start it again.
+- **Overshoot.** The per-package `known/` files and `state.json` are rewritten without that check, so the limit can be passed by about one such file.
 
 ## Data layout
 
 Under the data directory:
-- `state.json`: the feed position, the OSV position and day, the pending names, and `stopped`;
-- `captures/<UTC day>.jsonl`: `baseline`, `change`, `version`, `deprecation`, `created` and `gone` records;
+- `state.json`: the feed position and start, the OSV position and day, the pending names, and `stopped`;
+- `captures/<UTC day>.jsonl`: `baseline`, `change`, `version` (reason `new`, `retry`, `lockfile` or `predecessor`), `deprecation`, `created`, `gave_up` and `gone` records;
 - `osv/<UTC day>.jsonl`: MAL- records;
 - `status/<UTC day>.jsonl`: `start`, `feed_start`, `poll`, `osv`, `error` and `stopped` lines;
 - `known/`: per-name state, used to tell what is new.
@@ -50,23 +65,24 @@ Under the data directory:
 
 ## Tests
 
-`tools/shadow/test/recorder.test.ts` has 17 tests, run in Docker with no network. They cover:
-- e-mail removal;
-- OSV positions;
-- the watched list;
-- the start position;
-- first-sight and new-version captures;
-- the integrity mismatch and non-registry tarball refusals;
-- removal and deprecation;
-- retrying a failed name;
-- restart from the stored position;
-- names like `constructor`;
-- stopping at the limit;
-- the predecessor rule;
-- `created` for dependencies outside the watched set;
-- the allowed hosts.
+`tools/shadow/test/recorder.test.ts` has 29 tests. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`:
+- typecheck exit 0;
+- 29 of 29 passed;
+- four deliberate mutations, each making tests fail: e-mail scrubbing off, the storage limit off, the integrity check off, and first-sight new versions off.
 
-Three deliberate mutations were each caught by a failing test: e-mail scrubbing, the limit check and the integrity check.
+The tests cover:
+- **e-mail removal**, including look-alikes and `mailto:`;
+- **OSV:** positions, a record that cannot be read, and one read a day;
+- **the watched list;**
+- **the feed:** the start position, every page of a long feed, and restart from the stored position;
+- **captures:** first-sight captures, including a version published after the feed start; new-version captures; removal recorded once, and deprecation; a package that is gone;
+- **refusals:** an integrity mismatch, a non-registry tarball, a tarball too large, one without sha512, and a gzip bomb;
+- **retries:** a failed package, and a failed attestation and tarball read;
+- **bad input:** a malformed dependency name and a malformed packument, neither of which holds the feed; names like `constructor`;
+- **the limit:** stopping at it, and staying stopped after a restart;
+- **the predecessor rule;**
+- **`created`** for dependencies whose time is not stored;
+- **hosts:** a refused host, and the allowed hosts.
 
 ## How it is run on the owner's PC
 
@@ -76,7 +92,8 @@ The code is pinned to the merge commit: `git archive <merge sha>` of the files i
 docker run -d --name ludion-shadow-recorder --restart unless-stopped --read-only --tmpfs /tmp \
   --user 1000:1000 --memory 2g --cpus 1 --cap-drop ALL --security-opt no-new-privileges -e HOME=/tmp \
   -v C:/dev/ludion-shadow-data/app/<sha>:/app:ro -v C:/dev/ludion-shadow-data/data:/data \
-  node:24-slim node /app/tools/shadow/src/recorder.ts /data 1900000000 <sha>
+  node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 \
+  node /app/tools/shadow/src/recorder.ts /data 1900000000 <sha>
 ```
 
 - **The limit.** 1,900,000,000 bytes for the data directory, so that the whole folder stays under 2 GB with the code beside it.

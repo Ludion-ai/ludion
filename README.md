@@ -72,7 +72,7 @@ jobs:
 
 A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
 
-Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 20 or later); only the root package.json and package-lock.json are read; a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. Package names and versions are sent to OSV and the npm registry. No source is sent.
+Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 22 or later); only the root package.json and package-lock.json, and each changed */package.json, are read (the judge does not use the changed workspace package.json files yet, so a PR that changes one still stops on gate 4); a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. Package names and versions are sent to OSV and the npm registry. No source is sent.
 
 ## Run the source preview
 

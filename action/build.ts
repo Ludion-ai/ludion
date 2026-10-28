@@ -7,7 +7,7 @@ await build({
   entryPoints: [".github/judge/record.ts"],
   bundle: true,
   platform: "node",
-  target: "node20",
+  target: "node22",
   format: "esm",
   outfile: "action/dist/record.js",
   // Some bundled CommonJS dependencies call require(); give the ESM bundle one (as packages/cli/build.ts does).

@@ -609,6 +609,14 @@ Reuse: existing Astro design and components, CLI bundle/distribution, capability
 
 No new service, account, secret or paid API is required. The security CLI uses php.net metadata and Docker official images. Docker test execution is offline; failures never imply safety. The public npm package is not republished by this change. CLAUDE.md is updated so later work follows the authorized pivot; its protected-file PR review/owner-merge rule remains.
 
+
+## 2026-10-27 — Shared security workflow across package ecosystems
+
+Expand the same scan/patch/watch pipeline to public npm package-lock, Composer and standalone Maven. Reuse the existing lockfile parser and Docker runner; OSV supplies package advisories, php.net remains the runtime source. Report unsupported and partial inventories instead of inferring safety. A saved patch policy selects one ecosystem; scanning may cover several. No new service or account.
+
+Separate manifest-only acquisition from offline application execution. Pin npm12 with non-registry dependencies blocked; install Composer from redirect-checked pinned archives entirely offline with source references removed; strip Maven's online model to dependencies and use a fixed Central mirror. Baseline and candidate must pass the unchanged application test, candidate inventory must have no known findings, and source/config must remain unchanged. Apply source files only, preserving majors, with recovery journals for multi-file writes. Central Docker scratch paths are fixed per tool.
+
+Reuse the existing site UI and expose the actual four-ecosystem scope and exclusions. Remove Chromium installation from the production deploy workflow because the static build no longer generates browser-rendered bench cards; PR browser checks remain. The npm package remains unpublished. Security smoke tests demonstrate application behavior, not exploit regression coverage.
 ## 2026-10-27 — Security commands own their Docker boundary
 
 The legacy lesson/capability code is being removed in stages: first give the security commands their own Docker access, then stop the legacy assistant-context delivery, then delete the legacy packages. This step moves only what the security commands use into `packages/cli/src/security/docker.ts`: image pull/build/inspect/rm, the hardened test `docker run` argv (unchanged flag for flag), and the timed container runner with name-only kill. `patch.ts` no longer imports `packages/capability` or `tools/verify`. The old copies stay until the legacy code is deleted, so lesson verification and in-flight security branches keep working.

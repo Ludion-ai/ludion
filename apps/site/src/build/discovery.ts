@@ -11,22 +11,18 @@ export function sitemap({ site, builtAt }: { site: string; builtAt: string }): s
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
 }
 
-/** Machine-readable product description. Legacy data remains available for existing clients. */
+/** Product scope for agents and machine clients. */
 export function llmsTxt(site: string): string {
-  return `# Ludion
+ return `# Ludion
 
-> Security updates without following every advisory. The source preview finds official PHP Docker security releases, tests an update, and can patch the Dockerfile.
+> One workflow for security updates across PHP Docker, npm, Composer and Maven.
 
-Supported scope: one-stage official PHP Docker images with an exact stable version and flavor. Same-branch updates only. Builds and application tests run offline in Docker. Automatic production deployment, live server inventory, Java and EOL certification are not supported. A missing update is not evidence that a project is secure.
+Source preview: detect known advisories, acquire dependencies separately, test old/new application images offline, recheck the candidate and apply only under --apply policy. The published npm 0.1.4 release remains the earlier product.
 
-## Use it
+Coverage: exact single-stage official PHP Docker images; public npm package-lock v2/v3; Composer lockfiles with supported pinned public ZIP archives; standalone Maven resolved dependency graphs via public Central. Parents/profiles/modules/extensions, custom registries, major upgrades and unsupported offline builds require review. Yarn/pnpm discovery is partial. Python, Go, Rust, Gradle, live server inventory and automatic production deployment are unsupported. A missing update is not evidence that a project is secure. Package coordinates are sent to OSV; application source is not uploaded to Ludion.
 
-- [Try the source preview](${site}/start/): build this source revision; use ludion init, scan, patch and watch.
-- The published npm 0.1.4 release still contains the legacy sync and teach commands.
-
-## Legacy compatibility
-
-- [index.json](${site}/index.json): legacy lesson data for existing clients, not a vulnerability database.
+- [Try the source preview](${site}/start/): init, scan, patch and watch.
+- [index.json](${site}/index.json): legacy lesson data, not a vulnerability database.
 - [subjects.json](${site}/index/subjects.json): legacy sync subjects.
 `;
 }

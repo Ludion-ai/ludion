@@ -27,8 +27,8 @@ describe("being found", () => {
 
   it("describes the security source preview and labels old endpoints as legacy", () => {
     const txt = llmsTxt("https://ludion.ai");
-    expect(txt).toContain("Security updates without following every advisory");
-    expect(txt).toContain("Automatic production deployment, live server inventory, Java and EOL certification are not supported");
+    expect(txt).toContain("One workflow for security updates across PHP Docker, npm, Composer and Maven.");
+    expect(txt).toContain("Python, Go, Rust, Gradle, live server inventory and automatic production deployment are unsupported.");
     expect(txt).toContain("not a vulnerability database");
     expect(txt).toContain("https://ludion.ai/index.json");
     expect(txt).toContain("https://ludion.ai/start/");

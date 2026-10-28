@@ -474,18 +474,26 @@ export function ensureViteScratchDirs(nodeModules: string): void {
   }
 }
 
-export type SecurityDockerRunOptions = { phase: "security"; name: string; image: string; command: readonly string[] };
+export type SecurityDockerRunOptions = { phase: "security"; name: string; image: string; command: readonly string[]; tool?: "npm" | "composer" | "maven" };
 
 export function buildDockerRunArgs(opts: DockerRunOptions | SecurityDockerRunOptions): string[] {
   if (opts === null || typeof opts !== "object" || Array.isArray(opts)) throw new Error("Docker options must be an object.");
   // Application security checks use an immutable, locally built image ID, with no bind mounts or caller-supplied flags.
   // The existing lesson/install policy below stays unchanged.
   if (opts.phase === "security") {
-    for (const key of Object.keys(opts)) if (!["phase", "name", "image", "command"].includes(key)) throw new Error(`Unknown security docker option ${key}.`);
+    for (const key of Object.keys(opts)) if (!["phase", "name", "image", "command", "tool"].includes(key)) throw new Error(`Unknown security docker option ${key}.`);
     requireName(opts.name);
     if (typeof opts.image !== "string" || !/^sha256:[a-f0-9]{64}$/.test(opts.image)) throw new Error("Security tests require an immutable local image ID.");
     if (!Array.isArray(opts.command) || !opts.command.length || !opts.command.every(a => typeof a === "string" && a.length > 0 && a.length <= 2000 && !a.includes("\0")) || opts.command[0]!.startsWith("-")) throw new Error("Expected a nonempty application test argv.");
-    return ["run", "--rm", "--name", opts.name, "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534", "--cpus", "1", "--memory", "512m", "--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m", "--entrypoint", opts.command[0]!, opts.image, ...opts.command.slice(1)];
+    if (opts.tool !== undefined && !["npm", "composer", "maven"].includes(opts.tool)) throw new Error("Unsupported security test tool.");
+    const args = ["run", "--rm", "--name", opts.name, "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534", "--cpus", "1", "--memory", "512m", "--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m"];
+    // Fixed, container-only scratch locations. No host mounts or caller-selected writable paths.
+    if (opts.tool === "npm") for (const dir of ["/app/node_modules/.vite", "/app/node_modules/.vite-temp"]) args.push("--tmpfs", `${dir}:rw,noexec,nosuid,nodev,size=32m,mode=1777`);
+    if (opts.tool === "composer") args.push("--tmpfs", "/app/.phpunit.cache:rw,noexec,nosuid,nodev,size=32m,mode=1777");
+    if (opts.tool === "maven") args.push("--tmpfs", "/app/target:rw,noexec,nosuid,nodev,size=256m,mode=1777");
+    if (opts.tool) args.push("--env", "HOME=/tmp");
+    args.push("--entrypoint", opts.command[0]!, opts.image, ...opts.command.slice(1));
+    return args;
   }
   for (const key of Object.keys(opts)) {
     if (!ALLOWED_OPTIONS.has(key)) throw new Error(`Unknown docker option ${key}.`);

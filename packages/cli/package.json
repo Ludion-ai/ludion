@@ -1,7 +1,7 @@
 {
   "name": "ludion-ai",
-  "version": "0.2.0-preview.1",
-  "description": "Detect, validate and apply PHP Docker security updates. Source preview; legacy assistant-context commands remain compatible.",
+  "version": "0.3.0-preview.1",
+  "description": "One security-update workflow for PHP Docker, npm, Composer and Maven. Source preview with offline application validation.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -24,12 +24,12 @@
   "scripts": {
     "build": "node build.ts"
   },
-  "dependencies": {},
   "devDependencies": {
     "@ludion/core": "*",
+    "@types/semver": "^7.7.1",
+    "@xmldom/xmldom": "^0.9.12",
     "esbuild": "^0.28.2",
     "semver": "^7.8.5",
-    "undici": "^8.11.2",
-    "@types/semver": "^7.7.1"
+    "undici": "^8.11.2"
   }
 }

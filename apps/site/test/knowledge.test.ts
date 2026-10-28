@@ -11,13 +11,16 @@ describe("security preview claims", () => {
   it("distinguishes an update, no match, unavailable metadata and unsupported input", () => {
     expect(en.home.guard.states.map(s => s.id)).toEqual(["update", "no-match", "unknown", "unsupported"]);
     expect(en.home.guard.states.find(s => s.id === "no-match")?.detail).toContain("not a guarantee");
-    expect(en.home.guard.note).toContain("not the version deployed");
+    expect(en.home.guard.note).toContain("Dependency advisories come from OSV");
+    expect(en.home.supported).toHaveLength(4);
+    expect(en.home.supportedNote).toContain("Yarn/pnpm discovery is partial");
   });
   it("does not present illustrations or source updates as completed production remediation", () => {
     expect(en.home.isolate.scope).toContain("not a completed update");
     expect(en.home.receipt.scope).toContain("not a run result");
     expect(en.home.receipt.notDeployed).toBe("Not changed");
-    expect(en.home.coverage).toContain("automatic production deployment are not supported");
+    expect(en.home.coverage).toContain("production deployment stays with your release process");
+    expect(en.home.supportedNote).toContain("automatic production deployment are not supported");
   });
   it("retains explicit application validation and user policy before source changes", () => {
     expect(en.home.isolate.applyDetail).toContain("--apply");

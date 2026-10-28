@@ -3,7 +3,7 @@
 // reports the judgement as undecidable, never as a pass. Only package names, versions and
 // advisory ids leave the machine.
 import { installScripts, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
-import { npmReleases } from "./time-cap.ts";
+import { firstPublish, npmReleases } from "./time-cap.ts";
 
 type Fetch = typeof fetch;
 
@@ -52,7 +52,7 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
   const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);
   if (!doc || typeof doc !== "object" || typeof doc.versions !== "object" || typeof doc.time !== "object") throw new Error(`Invalid registry document for ${name}.`);
   const facts = new Map<string, Omit<VersionFacts, "malicious" | "advisories">>();
-  const created = typeof doc.time.created === "string" ? doc.time.created : null;
+  const created = firstPublish(doc.time);
   for (const version of versions) {
     const manifest = doc.versions[version];
     const published = typeof doc.time[version] === "string" ? doc.time[version] : null;

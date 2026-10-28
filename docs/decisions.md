@@ -744,6 +744,8 @@ The rerun did not meet the malicious gate (docs/bench/2026-10-28-backtest-rerun)
 
 **Rule 2: a young new dependency stops.** The dependencies are the names a changed version declares that the version it replaces did not, plus packages new to the lockfile. For each, its package's first publish is read: npm `time.created`, Composer the earliest release time. The change stops when that first publish is later than T minus the base wait of the change's urgency (the table's wait before any extension). An unknown first publish makes the change undecidable. Older new dependencies still extend the wait as before. `ludion patch` computes no urgency for Composer, so it uses the longest wait, 168h.
 
+First publish is the earliest of `time.created` and every version's publish time. An unpublished and re-created package gets a new `created` while its old versions keep their times (found while writing backtest v3, before it ran).
+
 **Rule 3: the judgement always shows the count.** The comment always shows T and the number of versions published at or after T, including when it is 0. The `ludion patch` receipt records the same.
 
 ## 2026-10-28 — Backtest v3: definitions fixed before running it

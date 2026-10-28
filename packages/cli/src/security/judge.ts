@@ -39,7 +39,7 @@ export type VersionFacts = {
   dependencies: string[];
   /** The registry's sha512 integrity for the version's tarball. */
   integrity: string | null;
-  /** When the package itself was first published (the registry's `time.created`); absent when not read. */
+  /** When the package itself first appeared (time-cap.ts, firstPublish); absent when not read. */
   package_created?: string | null;
   /** OSV MAL- records naming this version. */
   malicious: string[];

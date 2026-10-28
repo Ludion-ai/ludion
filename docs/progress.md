@@ -307,7 +307,11 @@ Only CLAUDE.md's built and not-built paragraph changed (decisions: "CLAUDE.md's 
 - `osv.ts`: Packagist's advisories in Composer planning;
 - docs/bench/2026-10-28-backtest-v4: 1 missed at every wait, and 157, 157, 95 and 76 unknown.
 
+Since 3e2e350, main has merged #154 and #155. Neither changed `packages/`, `apps/` or CLAUDE.md.
+
 No code changed. No test reads CLAUDE.md, so none was run.
+
+The first review (fresh context) asked for changes, with two blocking findings: the judge v0 overstated as all of gate 2, and Composer's release dates. Both are fixed (decisions: the same entry). Also checked: `judge.ts` lists the code inspection under "not checked", `time-cap.ts` skips the targets and reads Packagist's `time`, and `dependency-patch.ts` re-scans the candidate for advisories.
 
 ## 2026-10-28 — The smallest fix for npm and Composer
 

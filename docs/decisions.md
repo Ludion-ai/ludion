@@ -670,10 +670,11 @@ It adds as built:
 - rules 1 and 2;
 - the same-release exception, in its strict form as implemented;
 - Packagist's advisories in Composer planning;
-- that the judge v0 covers gates 1, 2 and 4 and the wait.
+- that the judge v0 is the parts of gates 1, 2 and 4 the paragraph lists, and the wait.
 
 It adds as not built:
 
+- gate 2's inspection for obfuscated code and new network or process calls, which nothing does;
 - gate 3 in `ludion judge`;
 - automatic merge;
 - the backtest gate, which is not met: backtest v4 still misses one malicious version, and unknowns remain.
@@ -684,6 +685,21 @@ Chosen here:
 - **One fact already in the list had become false and is corrected.** "patch receipts list them, nothing judges them" stopped being true when rules 1 and 2 began to check every version a `ludion patch` candidate adds. The list now says the other checks over the lockfile diff are not built outside the judge.
 - **The exception's publisher condition is stated narrowly.** CLAUDE.md says trusted publishing's shared user never matches, not that every shared CI user fails to match: a shared account with a plain lowercase name still counts as an account ("After #151's post-merge review").
 - **The judge workflow on this repository (#156) is not listed.** It is not merged, and it is a use of the judge, not a product feature.
+
+The first review of #158 asked for changes (https://github.com/Ludion-ai/ludion/pull/158#issuecomment-6464728362). Its two blocking findings were sentences stronger than the code:
+
+- "The judge v0 is gates 1, 2 and 4" also covered gate 2's code inspection, which is built nowhere. The paragraph now lists that inspection as not built. It calls the judge v0 the parts of gates 1, 2 and 4 that it lists, and the wait.
+- "Published before T" did not hold for Composer, whose release date comes from Packagist and is set by the author, so a backdated release passes. The paragraph now says so.
+
+From the review's non-blocking findings:
+
+- rules 1 and 2 check every version a change adds besides the fix itself;
+- the exception lets a version past rule 1 only;
+- in `ludion patch`, the advisory re-scan also checks the lockfile diff.
+
+The rest stays in this file and is not repeated in CLAUDE.md: `ludion patch`'s 168h wait, the unverified Sigstore signature, and the provenance branch's lack of a time limit.
+
+The entries stay where they are, beside the earlier CLAUDE.md entries. Appending at the end of these files would collide with the other open PRs that append there, and every conflict on a protected PR costs a new review.
 
 ## 2026-10-28 — The smallest fix for npm and Composer
 

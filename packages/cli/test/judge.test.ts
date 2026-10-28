@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { provenanceFrom } from "../src/security/npm-facts.ts";
+import { pnpmChanges } from "../src/security/judge-cli.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
 const url = (name: string, version: string) => `https://registry.npmjs.org/${name}/-/${name}-${version}.tgz`;
@@ -9,7 +10,7 @@ const lockOf = (packages: Record<string, { version: string; dev?: boolean }>) =>
   packages: { "": { name: "app" }, ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { version: p.version, resolved: url(path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...(p.dev ? { dev: true } : {}) }])) },
 });
 const PROV = { repository: "https://github.com/acme/lib", workflow: ".github/workflows/release.yml" };
-const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], ...over });
+const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z", ...over });
 const change = (over: Partial<Change> = {}): Change => ({ path: "node_modules/lib", name: "lib", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("lib", "1.0.1"), integrity: INTEGRITY, replaced: null, ...over });
 const fixHigh: FixedAdvisory = { id: "GHSA-aaaa-bbbb-cccc", package: "lib", aliases: ["CVE-2026-1"], severity: "CRITICAL", kev: false, epss: null };
 const run = (next: Partial<VersionFacts>, prev: Partial<VersionFacts> = {}, opts: { fixes?: FixedAdvisory[]; now?: string; changes?: Change[]; files?: string[] | null } = {}) => judge({
@@ -105,9 +106,54 @@ describe("gate 2 and the wait", () => {
   it("counts the wait from the newest publish in the diff, not just the target", () => {
     const changes = [change(), change({ path: "node_modules/dep-a", name: "dep-a", from: "1.0.0", to: "1.1.0", resolved: url("dep-a", "1.1.0") })];
     const facts = new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()], ["dep-a@1.0.0", fact()], ["dep-a@1.1.0", fact({ published_at: "2026-10-05T00:00:00Z" })]]);
-    const result = judge({ changes, facts, fixes: [fixHigh], files: ["package-lock.json"], now: new Date("2026-10-05T12:00:00Z") });
+    // dep-a@1.1.0 is newer than the fix, but already in the lockfile (another path), so the cap lets it move.
+    const result = judge({ changes, facts, fixes: [fixHigh], files: ["package-lock.json"], now: new Date("2026-10-05T12:00:00Z"), locked: new Set(["lib@1.0.0", "dep-a@1.0.0", "dep-a@1.1.0"]) });
     expect(result.newest_publish).toBe("2026-10-05T00:00:00Z");
     expect(result.verdict).toBe("wait");
+  });
+  it("stops a version newer than the fix that was not in the lockfile, and always shows the count", () => {
+    const passenger = (published_at: string) => {
+      const changes = [change(), change({ path: "node_modules/dep-a", name: "dep-a", from: "1.0.0", to: "1.1.0", resolved: url("dep-a", "1.1.0") })];
+      const facts = new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()], ["dep-a@1.0.0", fact()], ["dep-a@1.1.0", fact({ published_at })]]);
+      return judge({ changes, facts, fixes: [fixHigh], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), locked: new Set(["lib@1.0.0", "dep-a@1.0.0"]) });
+    };
+    // Published after the fix (T = 2026-10-01), and at the same instant: both stop.
+    for (const at of ["2026-10-05T00:00:00Z", "2026-10-01T00:00:00Z"]) {
+      const late = passenger(at);
+      expect(late.verdict).toBe("stop");
+      expect(late.time_cap.after_t).toEqual(["dep-a@1.1.0"]);
+      expect(late.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: expect.stringContaining("dep-a@1.1.0 was published at or after the fix (T = 2026-10-01T00:00:00.000Z)") }));
+      expect(renderJudgement(late)).toContain("Published at or after T (2026-10-01T00:00:00.000Z, the fix's publish time): 1 version(s)\n  dep-a@1.1.0");
+    }
+    const early = passenger("2026-09-30T23:59:59Z");
+    expect(early.verdict).toBe("ready_except_build");
+    expect(renderJudgement(early)).toContain("Published at or after T (2026-10-01T00:00:00.000Z, the fix's publish time): 0 version(s)");
+  });
+  it("takes the changed direct dependencies as targets when nothing is fixed, and is undecidable without any", () => {
+    const changes = [change(), change({ path: "node_modules/dep-a", name: "dep-a", from: "1.0.0", to: "1.1.0", resolved: url("dep-a", "1.1.0") })];
+    const facts = new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()], ["dep-a@1.0.0", fact()], ["dep-a@1.1.0", fact({ published_at: "2026-10-03T00:00:00Z" })]]);
+    const base = { changes, facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") };
+    expect(judge({ ...base, direct: ["lib"] }).time_cap).toMatchObject({ t: "2026-10-01T00:00:00.000Z", after_t: ["dep-a@1.1.0"] });
+    expect(judge({ ...base, direct: ["lib", "dep-a"] }).verdict).toBe("ready_except_build");
+    const none = judge(base);
+    expect(none.verdict).toBe("undecidable");
+    expect(renderJudgement(none)).toContain("Published at or after T (unknown, the fix's publish time): unknown version(s)");
+  });
+  it("stops on a new dependency whose package is younger than the base wait at T; an older one only extends", () => {
+    const run = (created: string | null | undefined) => judge({
+      changes: [change()], fixes: [fixHigh], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"),
+      facts: new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact({ dependencies: ["dep-a", "fresh"] })]]),
+      created: created === undefined ? new Map() : new Map([["fresh", created]]),
+    });
+    // High urgency: base wait 24h before T = 2026-10-01.
+    const young = run("2026-09-30T00:00:01Z");
+    expect(young.verdict).toBe("stop");
+    expect(young.time_cap.young).toEqual(["fresh (first published 2026-09-30T00:00:01.000Z)"]);
+    const old = run("2026-09-30T00:00:00Z");
+    expect(old.time_cap.young).toEqual([]);
+    expect(old.findings).toContainEqual(expect.objectContaining({ effect: "extend", message: expect.stringContaining("adds dependencies: fresh") }));
+    expect(run(null).verdict).toBe("undecidable");
+    expect(run(undefined).verdict).toBe("undecidable");
   });
   it("checks every changed package: a clean target does not hide a malicious passenger", () => {
     const changes = [change(), change({ path: "node_modules/passenger", name: "passenger", from: "2.0.0", to: "2.0.1", resolved: url("passenger", "2.0.1") })];
@@ -124,7 +170,7 @@ describe("gate 2 and the wait", () => {
   });
   it("treats a new package as uncomparable: longer wait, and a stop if it runs install scripts", () => {
     const fresh = change({ path: "node_modules/fresh", name: "fresh", from: null, to: "1.0.0", resolved: url("fresh", "1.0.0") });
-    const base = { changes: [fresh], fixes: [], files: ["package-lock.json"], now: new Date("2026-10-02T00:00:00Z") };
+    const base = { changes: [fresh], fixes: [], files: ["package-lock.json"], now: new Date("2026-10-02T00:00:00Z"), direct: ["fresh"] };
     expect(judge({ ...base, facts: new Map([["fresh@1.0.0", fact()]]) }).wait_hours).toBe(144);
     expect(judge({ ...base, facts: new Map([["fresh@1.0.0", fact({ install_scripts: ["postinstall"] })]]) }).verdict).toBe("stop");
   });
@@ -151,7 +197,7 @@ describe("gate 4 and urgency", () => {
     const facts = new Map([["lodash@4.17.21", fact()], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["bar@2.0.0", fact()]]);
     const verdict = (beforeText: string, afterText: string) => {
       const before = lockEntries(beforeText), after = lockEntries(afterText);
-      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], direct: [...new Set([...facts.keys()].map(id => id.slice(0, id.lastIndexOf("@"))))], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
     };
     // (A) lodash keeps its version but points at another package; only foo is a version change.
     const a = verdict(lock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/foo": { version: "1.0.0" } }), lock({ "node_modules/lodash": { version: "4.17.21", ...evil }, "node_modules/foo": { version: "1.0.1" } }));
@@ -170,7 +216,7 @@ describe("gate 4 and urgency", () => {
     const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["evil-pkg@1.0.0", fact()]]);
     const verdict = (beforeText: string, afterText: string) => {
       const before = lockEntries(beforeText), after = lockEntries(afterText);
-      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package.json", "package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], direct: [...new Set([...facts.keys()].map(id => id.slice(0, id.lastIndexOf("@"))))], files: ["package.json", "package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
     };
     // (A) The root copy goes down to the vulnerable version a nested copy already had.
     const a = verdict(
@@ -196,7 +242,7 @@ describe("gate 4 and urgency", () => {
     const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["a@1.0.0", fact()], ["evil-pkg@1.0.0", fact()]]);
     const run = (b: string, a: string) => {
       const before = lockEntries(b), after = lockEntries(a);
-      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+      return judge({ changes: lockDiff(before, after), entries: lockEntryChanges(before, after), facts, fixes: [], direct: [...new Set([...facts.keys()].map(id => id.slice(0, id.lastIndexOf("@"))))], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
     };
     const base = { "node_modules/a": { version: "1.0.0" }, "node_modules/a/node_modules/lodash": { version: "4.17.21" }, "node_modules/foo": { version: "1.0.0" } };
     const down = run(lock({ ...base, "node_modules/lodash": { version: "4.17.20" } }), lock({ "node_modules/a": { version: "1.0.0" }, "node_modules/lodash": { version: "4.17.20" }, "node_modules/foo": { version: "1.0.1" } }));
@@ -218,7 +264,7 @@ describe("gate 4 and urgency", () => {
     }
     expect(manifestChanges(before, { ...before, overrides: { foo: "github:evil/foo" } })).toEqual(["package.json overrides point outside the npm registry."]);
     const result = run({}, {}, { now: "2027-01-01T00:00:00Z" });
-    expect(judge({ changes: result.changes, facts: new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()]]), fixes: [], files: ["package.json", "package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), manifest: { before, after: { ...before, scripts: { preinstall: "sh x" } } } }).verdict).toBe("stop");
+    expect(judge({ changes: result.changes, facts: new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()]]), fixes: [], direct: ["lib"], files: ["package.json", "package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), manifest: { before, after: { ...before, scripts: { preinstall: "sh x" } } } }).verdict).toBe("stop");
   });
   it("refuses lockfile keys that are not plain install paths, and stops on bundled dependencies", () => {
     for (const key of ["node_modules/../x/node_modules/lodash", "node_modules\\lodash", "node_modules//lodash"]) {
@@ -240,7 +286,7 @@ describe("gate 4 and urgency", () => {
       ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { resolved: url(p.name ?? path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...p }])),
     } });
     const facts = new Map([["lodash@4.17.21", fact()], ["lodash@4.17.20", fact({ advisories: ["GHSA-x"] })], ["lodash@3.10.1", fact({ advisories: ["GHSA-old"] })], ["foo@1.0.0", fact()], ["foo@1.0.1", fact()], ["evil-pkg@1.0.0", fact()], ["a@1.0.0", fact()], ["a@1.0.1", fact()], ["x@1.0.0", fact()]]);
-    const verdict = (b: string, a: string) => judge({ changes: allChanges(b, a), entries: lockEntryChanges(lockEntries(b), lockEntries(a)), facts, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    const verdict = (b: string, a: string) => judge({ changes: allChanges(b, a), entries: lockEntryChanges(lockEntries(b), lockEntries(a)), facts, fixes: [], direct: [...new Set([...facts.keys()].map(id => id.slice(0, id.lastIndexOf("@"))))], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
     const a = { version: "1.0.0", dependencies: { lodash: "*" } };
     const common = { "node_modules/a": a, "node_modules/lodash": { version: "4.17.21" }, "node_modules/x": { version: "1.0.0", dependencies: { lodash: "^3.0.0", "evil-pkg": "1.0.0" } }, "node_modules/x/node_modules/lodash": { version: "3.10.1" }, "node_modules/x/node_modules/evil-pkg": { version: "1.0.0" } };
     // (A) A new copy under a shadows the root lodash with an older, vulnerable major that was already installed.
@@ -287,7 +333,7 @@ describe("gate 4 and urgency", () => {
     expect(e3.findings.some(f => f.effect === "stop" && f.message.includes("instead of lodash@4.17.21"))).toBe(true);
     // (F) the moved a@1.0.0 now loads lodash 5.0.0, which another version of a loaded and which has an advisory 4.17.21 did not.
     const f5 = new Map([...facts, ["lodash@5.0.0", fact({ advisories: ["GHSA-five"] })]]);
-    const verdictF = (b: string, a2: string) => judge({ changes: allChanges(b, a2), entries: lockEntryChanges(lockEntries(b), lockEntries(a2)), facts: f5, fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
+    const verdictF = (b: string, a2: string) => judge({ changes: allChanges(b, a2), entries: lockEntryChanges(lockEntries(b), lockEntries(a2)), facts: f5, fixes: [], direct: [...new Set([...f5.keys()].map(id => id.slice(0, id.lastIndexOf("@"))))], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
     const old5 = { "node_modules/x/node_modules/a": { version: "0.9.0", dependencies: { lodash: "*" } }, "node_modules/x/node_modules/a/node_modules/lodash": { version: "5.0.0" } };
     const f = verdictF(lock({ ...common, ...old5, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...old5, "node_modules/y/node_modules/a": a, "node_modules/y/node_modules/lodash": { version: "5.0.0" }, "node_modules/foo": { version: "1.0.1" } }));
     expect(f.verdict).toBe("stop");
@@ -334,5 +380,20 @@ describe("provenance records", () => {
     expect(provenanceFrom({ attestations: [{ predicateType: "https://github.com/npm/attestation/tree/main/specs/publish/v0.1" }] })).toBeNull();
     expect(() => provenanceFrom({})).toThrow("Invalid");
     expect(() => provenanceFrom({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: {} }] })).toThrow("payload");
+  });
+});
+
+describe("pnpm-lock.yaml changes", () => {
+  it("reads the versions a pnpm lockfile adds and applies the time cap, but is never ready", () => {
+    const before = ["lockfileVersion: '9.0'", "packages:", "  lib@1.0.0:", "    resolution: {integrity: x}", "  dep-a@1.0.0:", "    resolution: {integrity: x}"].join("\n");
+    const after = ["lockfileVersion: '9.0'", "packages:", "  lib@1.0.1:", "    resolution: {integrity: x}", "  dep-a@1.0.0:", "    resolution: {integrity: x}", "  dep-a@1.1.0:", "    resolution: {integrity: x}"].join("\n");
+    const { changes, locked } = pnpmChanges(before, after);
+    expect(changes.map(c => [c.name, c.from, c.to])).toEqual([["dep-a", "1.0.0", "1.1.0"], ["lib", "1.0.0", "1.0.1"]]);
+    const facts = new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()], ["dep-a@1.0.0", fact()], ["dep-a@1.1.0", fact({ published_at: "2026-10-02T00:00:00Z" })]]);
+    const result = judge({ changes, facts, fixes: [fixHigh], files: ["pnpm-lock.yaml"], now: new Date("2027-01-01T00:00:00Z"), locked, lockfile: "pnpm-lock" });
+    expect(result.verdict).toBe("undecidable");
+    expect(result.time_cap.after_t).toEqual(["dep-a@1.1.0"]);
+    expect(result.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: expect.stringContaining("dep-a@1.1.0 was published at or after the fix") }));
+    expect(result.findings).toContainEqual(expect.objectContaining({ gate: 4, message: expect.stringContaining("not checked for pnpm") }));
   });
 });

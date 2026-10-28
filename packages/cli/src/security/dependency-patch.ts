@@ -9,6 +9,8 @@ import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, regularFile, rootPath, snapshot, type DependencyConfig } from "./project.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
+import { WAIT_HOURS } from "./judge.ts";
+import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type Releases, type TimeCap } from "./time-cap.ts";
 
 export type DependencyReceipt = {
   schema: 1; id: string; ecosystem: Ecosystem; scope: "dependency_files_only_not_deployed";
@@ -21,6 +23,8 @@ export type DependencyReceipt = {
   archives?: ArchiveEvidence[];
   /** Every package whose installed versions differ between baseline and candidate, planned or not. */
   changed_packages?: PackageChange[];
+  /** Rules 1 and 2 of the time cap on the candidate (npm and Composer). */
+  time_cap?: TimeCap;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
 /** The final manifest beside the pinned one in the npm candidate context (see resolverDockerfile). */
@@ -48,6 +52,37 @@ export function unplannedRemovals(before: Inventory, after: Inventory, plan: Cha
   const kept = new Set(after.packages.map(p => `${p.name}\0${p.version}`));
   const planned = new Set(plan.map(c => `${c.name}\0${c.from}`));
   return before.packages.filter(p => !kept.has(`${p.name}\0${p.version}`) && !planned.has(`${p.name}\0${p.version}`)).map(p => `${p.name}@${p.version}`);
+}
+
+/**
+ * The time cap on a candidate (docs/decisions.md, "Moving dependencies are capped at the fix's publish time"). T is the
+ * latest publish time of the planned packages' new versions. Every other version the candidate adds must have been
+ * published before T, and a package new to the lockfile, or newly required by a planned package, must have first
+ * appeared at least the wait before T. `ludion patch` computes no urgency, so the longest wait (168h) applies.
+ */
+export async function candidateTimeCap(ecosystem: "npm" | "composer", before: Inventory, after: Inventory, plan: Change[], fetchFn: typeof fetch = fetch): Promise<TimeCap> {
+  const locked = new Set(before.packages.map(p => `${p.name}@${p.version}`)), lockedNames = new Set(before.packages.map(p => p.name));
+  const added = after.packages.filter(p => !locked.has(`${p.name}@${p.version}`));
+  const planned = new Set(plan.map(c => c.name));
+  const releases = new Map<string, Releases>();
+  const read = async (name: string) => {
+    if (!releases.has(name)) releases.set(name, await (ecosystem === "npm" ? npmReleases : packagistReleases)(name, fetchFn));
+    return releases.get(name)!;
+  };
+  for (const name of new Set(added.map(p => p.name))) await read(name);
+  const newDependencies = added.filter(p => !lockedNames.has(p.name)).map(p => p.name);
+  for (const p of added.filter(p => planned.has(p.name))) {
+    const r = await read(p.name), from = before.packages.filter(b => b.name === p.name).map(b => r.requires.get(composerVersion(b.version)));
+    const now = r.requires.get(composerVersion(p.version)) ?? [];
+    newDependencies.push(...now.filter(d => !from.some(f => f?.includes(d))));
+  }
+  for (const name of new Set(newDependencies)) await read(name);
+  return timeCap({
+    targets: added.filter(p => planned.has(p.name)), others: added, locked, newDependencies,
+    published: (name, version) => releases.get(name)?.published.get(composerVersion(version)),
+    created: name => releases.get(name)?.created,
+    waitHours: WAIT_HOURS.low,
+  });
 }
 
 export function compatible(before: Inventory, after: Inventory): void {
@@ -306,6 +341,11 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         if (ecosystem !== "maven") {
           const moved = unplannedRemovals(baselineInventory, resolvedInventory, scan.plan);
           if (moved.length) throw new Error(`The candidate also moved packages that were not planned (${moved.slice(0, 10).join(", ")}${moved.length > 10 ? ", ..." : ""}); that needs review.`);
+        }
+        if (ecosystem !== "maven") {
+          const cap = receipt.time_cap = await candidateTimeCap(ecosystem, baselineInventory, resolvedInventory, scan.plan, deps.fetchFn); active();
+          if (cap.undecidable.length) throw new Error(`The time cap could not be checked: ${cap.undecidable.slice(0, 5).join(" ")}`);
+          if (cap.after_t.length || cap.young.length) throw new Error(`The candidate breaks the time cap. ${renderTimeCap(cap).join(" ")}${cap.young.length ? ` New dependencies first published less than ${cap.wait_hours}h before T: ${cap.young.join(", ")}.` : ""}`);
         }
         compatible(baselineInventory, resolvedInventory);
         receipt.after = await client.scan(resolvedInventory); active();

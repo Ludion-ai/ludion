@@ -3,6 +3,7 @@
 // reports the judgement as undecidable, never as a pass. Only package names, versions and
 // advisory ids leave the machine.
 import { installScripts, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
+import { npmReleases } from "./time-cap.ts";
 
 type Fetch = typeof fetch;
 
@@ -51,12 +52,13 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
   const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);
   if (!doc || typeof doc !== "object" || typeof doc.versions !== "object" || typeof doc.time !== "object") throw new Error(`Invalid registry document for ${name}.`);
   const facts = new Map<string, Omit<VersionFacts, "malicious" | "advisories">>();
+  const created = typeof doc.time.created === "string" ? doc.time.created : null;
   for (const version of versions) {
     const manifest = doc.versions[version];
     const published = typeof doc.time[version] === "string" ? doc.time[version] : null;
     if (!manifest) {
       // Unpublished: the registry keeps only its publish time. Nothing else about it can be compared.
-      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, provenance: null, install_scripts: [], dependencies: [], integrity: null });
+      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, provenance: null, install_scripts: [], dependencies: [], integrity: null, package_created: created });
       continue;
     }
     let provenance: VersionFacts["provenance"] = null;
@@ -72,6 +74,7 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
       install_scripts: installScripts(manifest.scripts),
       dependencies: Object.keys({ ...manifest.dependencies, ...manifest.optionalDependencies }).sort(),
       integrity: typeof manifest.dist?.integrity === "string" ? manifest.dist.integrity : null,
+      package_created: created,
     });
   }
   return facts;
@@ -114,7 +117,7 @@ export async function epssScores(cves: string[], fetchFn: Fetch = fetch): Promis
 }
 
 /** Everything the judge needs for one lockfile change, fetched live. */
-export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, also: { name: string; version: string }[] = []): Promise<{ facts: Map<string, VersionFacts>; fixes: FixedAdvisory[] }> {
+export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, also: { name: string; version: string }[] = []): Promise<{ facts: Map<string, VersionFacts>; fixes: FixedAdvisory[]; created: Map<string, string | null> }> {
   const wanted = new Map<string, Set<string>>();
   const want = (name: string, version: string) => { const set = wanted.get(name) ?? new Set<string>(); set.add(version); wanted.set(name, set); };
   for (const c of changes) { want(c.name, c.to); if (c.from) want(c.name, c.from); }
@@ -129,6 +132,13 @@ export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, als
       const all = ids.get(`${name}@${version}`) ?? [];
       facts.set(`${name}@${version}`, { ...fact, malicious: all.filter(id => id.startsWith("MAL-")), advisories: all.filter(id => !id.startsWith("MAL-")) });
     }
+  }
+  // The first publish of every package a changed version newly declares (the time cap's rule 2).
+  const created = new Map<string, string | null>();
+  for (const [id, f] of facts) created.set(id.slice(0, id.lastIndexOf("@")), f.package_created ?? null);
+  for (const c of changes) {
+    const next = facts.get(`${c.name}@${c.to}`), prev = c.from ? facts.get(`${c.name}@${c.from}`) : undefined;
+    for (const name of next && prev?.present ? next.dependencies.filter(d => !prev.dependencies.includes(d)) : []) if (!created.has(name)) created.set(name, (await npmReleases(name, fetchFn)).created);
   }
   // A fix: an advisory on the version before that no longer names the version after.
   const fixed: { id: string; package: string }[] = [];
@@ -153,5 +163,5 @@ export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, als
     const cveScores = r.aliases.map(a => epss.get(a)).filter((s): s is number => s !== undefined);
     return { id: f.id, package: f.package, aliases: r.aliases, severity: r.severity, kev: r.aliases.some(a => kev.has(a)), epss: cveScores.length ? Math.max(...cveScores) : null };
   });
-  return { facts, fixes };
+  return { facts, fixes, created };
 }

@@ -2,7 +2,7 @@
 
 **Status: a design and an estimate.** Where the shadow runs in production needs the owner's approval, so section 6 gives the options without choosing one. The only thing that ran for this document is a one-off measurement of public data, which feeds the estimates (section 4).
 
-**Later.** The recorder (sections 2.1 to 2.4) is built in a separate PR, and runs on the owner's PC until the owner chooses a place. The replay (2.5 to 2.7) is not built. How (b) is counted is fixed in docs/decisions/2026-10-29-shadow-counting.md, before any recording.
+**Later.** The recorder (sections 2.1 to 2.4) is being built in a separate PR, and will run on the owner's PC until the owner chooses a place. The replay (2.5 to 2.7) is not built. How (b) is counted is fixed in docs/decisions/2026-10-29-shadow-counting.md, before any recording.
 
 The release conditions this shadow serves were fixed first, in docs/decisions/2026-10-28-release-gates-by-stage.md (first committed to docs/decisions.md as cdea65e, 2026-10-28 22:49:56 JST). They were decided after seeing v5's results (オーナー決定 2026-10-28 22:46 JST). The wait table and the gates' numeric criteria are unchanged.
 
@@ -46,8 +46,9 @@ As of 2026-10-28, read from main's records (docs/progress.md and the bench READM
 What is stored, per capture:
 - `fetched_at`, the URL, the HTTP status, and the response's sha256;
 - the packument's `dist-tags`, and its `time`: in full at the first capture of a name, then only the entries that are new or changed;
-- for each new or changed version, the manifest as served, minus e-mail addresses: `_npmUser.email` and `maintainers[].email` are dropped. `shared_publisher` is computed at capture with the judge's `sharedPublisher` and stored next to the name, with the commit of the code that computed it. This keeps the judge's input without republishing addresses;
+- the manifest as served, minus e-mail addresses, for: each new version; on a name's first change, every version of it that the watched lockfiles hold (each possible prev) and each dist-tag's version; and each new version's registry predecessor (docs/decisions/2026-10-29-shadow-counting.md, section 9). Every `email` key is dropped and addresses inside strings are replaced (`_npmUser`, `maintainers`, `author` and the like). `shared_publisher` is computed at capture with the judge's `sharedPublisher` and stored next to the name, with the commit of the code that computed it. This keeps the judge's input without republishing addresses;
 - the attestation bundle as served;
+- for each dependency of a new version outside the watched set: its first publish time (rule 2's `created`), once per package;
 - **the file list of V's tarball**: each path, size and sha256. The tarball is downloaded from the registry and checked against `dist.integrity`. It is never extracted to disk, run or stored. Only the list is kept. This is what the disputed check in 2.7 needs from the moment of publication: v5 found that jsDelivr's CDN answers 404 for the files of removed versions, so the archives may not hold them later. Tarballs above a size limit are not hashed, and that is recorded.
 
 No tarball is stored: the judge compares the lockfile's integrity with `dist.integrity`, which the manifest carries. Later changes to a captured document are captured the same way, so the store also holds when a version was deprecated or disappeared. That is what the re-query at a wait's end needs.
@@ -63,7 +64,7 @@ Measured today: 7,660 distinct names. **Ludion-ai/ludion-sandbox is an empty rep
 
 **2.5 Replay.** A MAL- record that names a watched package's version V starts a replay. **How each judgement is made and counted is fixed in docs/decisions/2026-10-29-shadow-counting.md**: what follows only summarises it.
 - **The rows.** One judgement per urgency row (exploited, high, normal, low), as the backtests do.
-  - `judge()` takes urgency only from its fixes (`urgencyOf`), so the replay gives it a synthetic fix for P from prev to V. The fix's `kev` or `severity` makes `urgencyOf` return the row's urgency, and V becomes the time cap's target.
+  - `judge()` takes urgency only from its fixes (`urgencyOf`), so the replay gives it a synthetic fix for P from prev to V. The fix's `kev` or `severity` sets the exploited and high rows; marking the change dev sets the low row. V becomes the time cap's target.
   - So rule 2's threshold is WAIT_HOURS of the row, and the wait is the judge's own: the row's wait, 24h for exploited without comparable provenance, or max(2 × that wait, 72h) when extended.
 - **When.** At the judge's own `wait_until`: the newest publish in the change plus that wait, not V's publish time plus the wait. A same-release sibling published after V moves it. The re-query sees only MAL- records published by then, and captures taken before then.
 - **The scenarios.**
@@ -73,9 +74,9 @@ Measured today: 7,660 distinct names. **Ludion-ai/ludion-sandbox is an empty rep
   - `stop`, or `undecidable` with every input captured, is stopped.
   - `ready_except_build` is missed.
   - A missing input means the judge is not run; that is a **capture gap**, counted as a miss. This covers V removed before its first capture, or a missing predecessor or `created`.
-- **Also shown, not counted.** The judge's literal verdict with its own urgency. The counted outcome is a per-row counterfactual, as in the backtests.
+- **Also shown, not counted.** The judge's literal verdict with its own urgency. The counted outcome is a per-row counterfactual, like the backtests', except that (a) has no exploited or high row here (which is laxer than the backtests in that one place).
 
-This framing is harsher than the backtests in one way. A malicious version reaches a project here through a direct update to it, as a Dependabot version update proposes. The backtests' most frequent stop, "no fix selects it" (1,033 of 1,039 stops at 24h in v5), does not apply.
+This framing is harsher than the backtests in one way (and laxer in the one place above). A malicious version reaches a project here through a direct update to it, as a Dependabot version update proposes. The backtests' most frequent stop, "no fix selects it" (1,033 of 1,039 stops at 24h in v5), does not apply.
 
 **2.6 Judging every captured version, for the count.** Condition (b) needs at least 100 decided judgements. So every captured version is also judged in scenario (b) against one prev: the highest version below it in the watched lockfiles, else the registry's predecessor. "Decided" is `stop` or `ready_except_build` in all four rows. The estimate in section 5 is about 27,000 captured versions in four weeks, so the count itself is not the hard part.
 
@@ -177,7 +178,7 @@ The npm registry's rate limits for these reads are **not known**: no public numb
 
 - **A hijacked publisher with no provenance change** passes every stop condition. Only the wait and the re-query catch it (design.md, "関門2が見逃すもの"). The shadow measures exactly that, but only on records that appear.
 - **Few cases.** Most four-week windows hold no MAL- record naming a watched package (section 4). Then (b)'s miss half is met with no case, and that says little.
-- **Late records.** A record published after the window plus 168h is outside (b), as proposed. Records keep coming for years, and the store keeps the data to replay them.
+- **Late records.** A record published after the window plus 336h is outside (b). Records keep coming for years, and the store keeps the data to replay them.
 - **Versions removed before the first capture.** Malicious versions are often removed within an hour (design.md, chalk and debug). Every one the shadow misses is a capture gap, and it counts as a miss under section 3.
 - **Gate 3 and gate 1's OS, SAPI and configuration checks** are not built, so `ready_except_build` is the closest the judge comes to "would apply".
 

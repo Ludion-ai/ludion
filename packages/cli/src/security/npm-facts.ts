@@ -33,10 +33,13 @@ const registryPath = (name: string) => {
 
 const COMMIT = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
 const commitOf = (digest: unknown, key: string) => { const value = (digest as Record<string, unknown> | undefined)?.[key]; return typeof value === "string" && COMMIT.test(value) ? value : null; };
-/** A v0.2 source URI without its trailing `@ref`: only an `@` after the host's first path slash is a ref. */
+/**
+ * A v0.2 source URI without its `@ref`: the first `@` after the host's first path slash starts the ref (owner and
+ * repository names have none; a tag such as `@scope/pkg@1.2.3` does).
+ */
 const withoutRef = (uri: string) => {
-  const u = uri.replace(/^git\+/, ""), path = u.indexOf("/", u.indexOf("://") + 3), at = u.lastIndexOf("@");
-  return path > 0 && at > path ? u.slice(0, at) : u;
+  const u = uri.replace(/^git\+/, ""), path = u.indexOf("/", u.indexOf("://") + 3), at = path > 0 ? u.indexOf("@", path) : -1;
+  return at > path ? u.slice(0, at) : u;
 };
 /**
  * Repository, workflow and source commit from an SLSA provenance statement (v1 or v0.2), as the registry recorded it.
@@ -66,8 +69,12 @@ export function provenanceFrom(attestations: unknown, subject?: { name: string; 
   return { repository: null, workflow: null, commit: v1Commit };
 }
 
-/** npm trusted publishing records the shared "GitHub Actions" user, which names no account. */
-export const trustedPublisher = (npmUser: any) => !!npmUser?.trustedPublisher || npmUser?.email === "npm-oidc-no-reply@github.com";
+/**
+ * Does the registry's user name no single account? npm trusted publishing records a shared user ("GitHub Actions",
+ * `npm-oidc-no-reply@github.com`, with `trustedPublisher`) for every package published that way. A name no npm account
+ * can have (uppercase, spaces) is treated the same, so another CI's shared user fails closed too.
+ */
+export const sharedPublisher = (npmUser: any) => !!npmUser?.trustedPublisher || (typeof npmUser?.email === "string" && npmUser.email.startsWith("npm-oidc-no-reply@")) || (typeof npmUser?.name === "string" && !/^[a-z0-9][a-z0-9._-]*$/.test(npmUser.name));
 
 /** Registry facts for the given versions of one package (one packument read, plus one attestation read per version). */
 export async function registryFacts(name: string, versions: string[], fetchFn: Fetch = fetch): Promise<Map<string, Omit<VersionFacts, "malicious" | "advisories">>> {
@@ -80,7 +87,7 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
     const published = typeof doc.time[version] === "string" ? doc.time[version] : null;
     if (!manifest) {
       // Unpublished: the registry keeps only its publish time. Nothing else about it can be compared.
-      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, trusted_publisher: false, provenance: null, install_scripts: [], dependencies: [], integrity: null, package_created: created });
+      facts.set(version, { published_at: published, present: false, deprecated: null, publisher: null, shared_publisher: false, provenance: null, install_scripts: [], dependencies: [], integrity: null, package_created: created });
       continue;
     }
     const integrity = typeof manifest.dist?.integrity === "string" ? manifest.dist.integrity : null;
@@ -93,7 +100,7 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
       present: true,
       deprecated: typeof manifest.deprecated === "string" && manifest.deprecated ? manifest.deprecated : null,
       publisher: typeof manifest._npmUser?.name === "string" ? manifest._npmUser.name : null,
-      trusted_publisher: trustedPublisher(manifest._npmUser),
+      shared_publisher: sharedPublisher(manifest._npmUser),
       provenance,
       install_scripts: installScripts(manifest.scripts),
       dependencies: Object.keys({ ...manifest.dependencies, ...manifest.optionalDependencies }).sort(),

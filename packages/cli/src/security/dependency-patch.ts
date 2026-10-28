@@ -80,8 +80,10 @@ export async function candidateTimeCap(ecosystem: "npm" | "composer", before: In
     newDependencies.push(...now.filter(d => !from.some(f => f?.includes(d))));
   }
   for (const name of new Set(newDependencies)) await read(name);
+  // The targets are the plan's own versions, so another copy of a planned package can neither set T nor anchor a sibling.
+  const plannedTo = new Set(plan.map(c => `${c.name}@${composerVersion(c.to)}`));
   const input = {
-    targets: added.filter(p => planned.has(p.name)), others: added, locked, newDependencies,
+    targets: added.filter(p => plannedTo.has(`${p.name}@${composerVersion(p.version)}`)), others: added, locked, newDependencies,
     published: (name: string, version: string) => releases.get(name)?.published.get(composerVersion(version)),
     created: (name: string) => releases.get(name)?.created,
     waitHours: WAIT_HOURS.low,

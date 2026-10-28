@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
-import { provenanceFrom } from "../src/security/npm-facts.ts";
+import { provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
 import { pnpmChanges } from "../src/security/judge-cli.ts";
 import { firstPublish, renderTimeCap, timeCap } from "../src/security/time-cap.ts";
 
@@ -12,7 +12,7 @@ const lockOf = (packages: Record<string, { version: string; dev?: boolean }>) =>
 });
 const COMMIT = "535e26d3c69de49df8bd17618a424cbe65ec897b";
 const PROV = { repository: "https://github.com/acme/lib", workflow: ".github/workflows/release.yml", commit: COMMIT };
-const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", trusted_publisher: false, provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z", ...over });
+const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z", ...over });
 /** A package from another repository and release than lib, so it is never lib's sibling. */
 const depFact = (over: Partial<VersionFacts> = {}) => fact({ provenance: { repository: "https://github.com/acme/dep-a", workflow: ".github/workflows/release.yml", commit: "1".repeat(40) }, ...over });
 const change = (over: Partial<Change> = {}): Change => ({ path: "node_modules/lib", name: "lib", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("lib", "1.0.1"), integrity: INTEGRITY, replaced: null, ...over });
@@ -229,10 +229,10 @@ describe("rule 1's same-release exception", () => {
   });
   it("does not count npm trusted publishing's shared user as the same publisher", () => {
     // Both read "GitHub Actions" (npm-oidc-no-reply@github.com), whoever's repository published them.
-    const shared = { provenance: null, publisher: "GitHub Actions", trusted_publisher: true };
+    const shared = { provenance: null, publisher: "GitHub Actions", shared_publisher: true };
     expect(sibling({ ...shared, published_at: "2026-10-01T00:00:05Z" }, shared).time_cap.after_t).toEqual(["lib-env@1.0.1"]);
     // Without the flag the same names would match: the flag is what stops it.
-    expect(sibling({ ...shared, trusted_publisher: false, published_at: "2026-10-01T00:00:05Z" }, { ...shared, trusted_publisher: false }).time_cap.same_release).toHaveLength(1);
+    expect(sibling({ ...shared, shared_publisher: false, published_at: "2026-10-01T00:00:05Z" }, { ...shared, shared_publisher: false }).time_cap.same_release).toHaveLength(1);
   });
   it("with several targets, counts the 15 minutes from the matched target, not only from T", () => {
     // old@2.1.0 was fixed a month before T (lib@1.0.1); old-helper@2.1.0 by old's publisher 5 minutes after T is no sibling of it.
@@ -477,6 +477,16 @@ describe("provenance records", () => {
     const uri = (u: string) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v0.2", bundle: { dsseEnvelope: { payload: encode({ predicate: { invocation: { configSource: { uri: u, entryPoint: "x.yml" } } } }) } } }] });
     expect(provenanceFrom(uri("git+https://github.com/acme/lib@refs/tags/v1.0.1"))?.repository).toBe("https://github.com/acme/lib");
     expect(provenanceFrom(uri("git+https://bot@github.com/acme/lib"))?.repository).toBe("https://bot@github.com/acme/lib");
+    // A monorepo tag with "@" in it: the ref starts at the first "@" after the host.
+    expect(provenanceFrom(uri("git+https://github.com/acme/lib@refs/tags/@acme/lib@1.2.3"))?.repository).toBe("https://github.com/acme/lib");
+  });
+  it("counts trusted publishing's shared user, and any name no npm account can have, as no account", () => {
+    expect(sharedPublisher({ name: "GitHub Actions", email: "npm-oidc-no-reply@github.com", trustedPublisher: { id: "github", oidcConfigId: "oidc:x" } })).toBe(true);
+    expect(sharedPublisher({ name: "gitlab-ci", trustedPublisher: { id: "gitlab" } })).toBe(true);
+    expect(sharedPublisher({ name: "ci-bot", email: "npm-oidc-no-reply@gitlab.com" })).toBe(true);
+    expect(sharedPublisher({ name: "Release Bot" })).toBe(true);
+    expect(sharedPublisher({ name: "bnjmn", email: "b@example.com" })).toBe(false);
+    expect(sharedPublisher(undefined)).toBe(false);
   });
   it("names no commit when the statement has none or it is not a git hash", () => {
     expect(provenanceFrom(v1(undefined))?.commit).toBeNull();

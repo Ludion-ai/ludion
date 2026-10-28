@@ -32,8 +32,8 @@ export type VersionFacts = {
   present: boolean;
   deprecated: string | null;
   publisher: string | null;
-  /** Published through npm trusted publishing, whose shared user names no account. */
-  trusted_publisher: boolean;
+  /** The publisher names no single account (npm-facts.ts, sharedPublisher): trusted publishing's shared user, say. */
+  shared_publisher: boolean;
   /** Build provenance from the registry's attestations: null when the version has none. */
   provenance: { repository: string | null; workflow: string | null; commit: string | null } | null;
   /** Which of preinstall, install, postinstall the version declares. */
@@ -49,8 +49,8 @@ export type VersionFacts = {
   advisories: string[];
 };
 
-/** What the same-release exception compares for a version: a trusted-publishing user is no account, so unknown. */
-export const releaseIdentity = (f: VersionFacts): ReleaseIdentity => ({ publisher: f.trusted_publisher ? null : f.publisher, provenance: f.provenance });
+/** What the same-release exception compares for a version: a shared publisher is no account, so unknown. */
+export const releaseIdentity = (f: VersionFacts): ReleaseIdentity => ({ publisher: f.shared_publisher ? null : f.publisher, provenance: f.provenance });
 
 /** The registry's own tarball URL for a version: the only `resolved` the judge accepts. */
 export function registryTarball(name: string, version: string): string {

@@ -456,15 +456,18 @@ describe("the time cap on candidates", () => {
       "lodash.late": { "4.17.20": "2020-08-13T16:54:00.000Z", "4.17.21": "2021-02-20T15:58:16.891Z" },
       "lodash.prov": { "0.9.0": "2020-08-13T16:54:00.000Z", "1.0.0": "2021-02-20T16:42:16.891Z" },
     };
-    /** The fix's provenance commit, or null when the fix has none. */
-    const fetchFn = (fixCommit: string | null, attestationStatus = 200): typeof fetch => async url => {
+    /**
+     * The fix's provenance commit (null: none), the attestation endpoint's status, the publisher every version records,
+     * and the package lodash.prov's statement names (another one, to test the subject check).
+     */
+    const fetchFn = (fixCommit: string | null, attestationStatus = 200, npmUser: object = { name: "bnjmn" }, provSubject = "lodash.prov"): typeof fetch => async url => {
       const u = decodeURIComponent(String(url));
       const att = /\/-\/npm\/v1\/attestations\/(.+)@([^@]+)$/.exec(u);
-      if (att) return attestationStatus === 200 ? response(statement(att[1]!, att[2]!, att[1] === "lodash" ? fixCommit! : commit)) : new Response("", { status: attestationStatus });
+      if (att) return attestationStatus === 200 ? response(statement(att[1] === "lodash.prov" ? provSubject : att[1]!, att[2]!, att[1] === "lodash" ? fixCommit! : commit)) : new Response("", { status: attestationStatus });
       const name = u.replace("https://registry.npmjs.org/", "");
       if (!times[name]) return new Response("", { status: 404 });
       const attested = (v: string) => (name === "lodash" && v === "4.17.21" && fixCommit !== null) || (name === "lodash.prov" && v === "1.0.0");
-      return response({ time: { created: "2012-04-23T16:37:11.912Z", ...times[name] }, versions: Object.fromEntries(Object.keys(times[name]!).map(v => [v, { dependencies: {}, _npmUser: { name: "bnjmn" }, dist: { integrity, ...(attested(v) ? { attestations: { url: "x" } } : {}) } }])) });
+      return response({ time: { created: "2012-04-23T16:37:11.912Z", ...times[name] }, versions: Object.fromEntries(Object.keys(times[name]!).map(v => [v, { dependencies: {}, _npmUser: npmUser, dist: { integrity, ...(attested(v) ? { attestations: { url: "x" } } : {}) } }])) });
     };
     const before = inv("npm", [["lodash", "4.17.20"], ["lodash.sib", "4.17.20"], ["lodash.late", "4.17.20"], ["lodash.prov", "0.9.0"]]);
     const after = inv("npm", [["lodash", "4.17.21"], ["lodash.sib", "4.17.21"], ["lodash.late", "4.17.21"], ["lodash.prov", "1.0.0"]]);
@@ -483,6 +486,18 @@ describe("the time cap on candidates", () => {
     expect(failed.t).toBe("2021-02-20T15:42:16.891Z");
     expect(failed.after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0", "lodash.sib@4.17.21"]);
     expect(failed.undecidable).toEqual([expect.stringContaining("The publisher and provenance for the same-release check could not be read: registry.npmjs.org answered HTTP 500")]);
+    // A statement naming another package: refused, so undecidable.
+    expect((await candidateTimeCap("npm", before, after, plan, fetchFn(commit, 200, { name: "bnjmn" }, "lodash.other"))).undecidable).toEqual([expect.stringContaining("does not name lodash.prov@1.0.0 and its tarball")]);
+    // Trusted publishing's shared user, as the registry records it: no account, so the publisher branch allows nothing.
+    const oidc = { name: "GitHub Actions", email: "npm-oidc-no-reply@github.com", trustedPublisher: { id: "github", oidcConfigId: "oidc:x" } };
+    const shared = await candidateTimeCap("npm", before, after, plan, fetchFn(null, 200, oidc));
+    expect(shared.same_release).toEqual([]);
+    expect(shared.after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0", "lodash.sib@4.17.21"]);
+  });
+  it("takes only the plan's own versions as targets, so another copy of a planned package is checked against T", async () => {
+    const fetchFn = registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z", "4.17.30": "2026-01-01T00:00:00Z" } } });
+    const cap = await candidateTimeCap("npm", inv("npm", [["lodash", "4.17.20"]]), inv("npm", [["lodash", "4.17.21"], ["lodash", "4.17.30"]]), plan, fetchFn);
+    expect(cap).toMatchObject({ t: "2021-02-20T15:42:16.891Z", targets: ["lodash@4.17.21"], after_t: ["lodash@4.17.30"] });
   });
   it("lets nothing published at or after T move in a Composer candidate", async () => {
     const p2 = (name: string, list: unknown[]) => response({ minified: "composer/2.0", packages: { [name]: list } });

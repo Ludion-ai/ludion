@@ -833,4 +833,15 @@ What the exception gives up: an attacker who holds the publisher's account and p
 - **The provenance statement's subject must name the version and its tarball**: `pkg:npm/<name>@<version>` with the registry's sha512 integrity. Otherwise the lookup fails, which is undecidable. The Sigstore signature, and the repository and commit in its certificate, are still not verified. So the exception rests on the registry's checks at publish time, as gate 2's provenance comparison does.
 - **A failed read keeps the receipt's count.** If `ludion patch` cannot read a publisher or provenance, the receipt keeps T and the count, and the cap is undecidable.
 
+Round 2 of the review approved. Its non-blocking findings were handled before the run as follows:
+
+- **More publishers count as no account.** Besides `trustedPublisher`, so does any `npm-oidc-no-reply@` email, and any name no npm account can have (uppercase or spaces). Another CI's shared user then fails closed.
+- **`ludion patch`'s targets are the plan's own versions** (name and fixed version). Another added copy of a planned package can neither set T nor anchor a sibling.
+- **A v0.2 source URI's ref starts at the first `@` after the host.** A tag such as `@scope/pkg@1.2.3` no longer leaves part of the ref in the repository.
+
+Two limits are kept:
+
+- **A statement that does not name its version makes the whole judgement undecidable**, because the subject check also covers gate 2's comparison of every changed version. That happens with a qualified purl, or a subject formatted another way. On the registry, `next@15.2.3`, `@next/env@15.2.3` and `get-jwks@11.0.2` pass the check.
+- **The ref and the triggering event are not compared.** A `pull_request_target` or `workflow_run` run of the same workflow records the base commit while it builds other code. So does a statement whose claims are not bound to its certificate. Comparing `externalParameters.workflow.ref` and the event, or reading the repository and commit from the certificate's extensions, is later hardening.
+
 Backtest v4 uses the exception as amended here.

@@ -22,7 +22,7 @@ Again at the merge head daa796f (5cbb40d + origin/main ff9df3a, 2026-10-29 06:00
 
 ### The new `REVIEWS` on real comments
 
-`gh api repos/Ludion-ai/ludion/issues/N/comments?per_page=100` for #156, #158, #166 and #170 (every comment is by `Ludion-ai`, `OWNER`), under jq 1.6 and jq 1.7.1 (the runners' version): both give the same lines. Raw output, for main's program (`old.jq`) and the new one (`reviews.jq`, cut from the workflow): `logs/real-comments.log`.
+`gh api repos/Ludion-ai/ludion/issues/N/comments?per_page=100` for #156, #158, #166 and #170 (every comment is by `Ludion-ai`, `OWNER`), under jq 1.6 and jq 1.7.1: both give the same lines. The check itself does not run either: `gh api --jq` uses gh's built-in gojq (Go's RE2 regexp), and the tests use the image's jq 1.6. The first review of 5cbb40d (PR comment 6472555777) ran the `REVIEWS` block over 33 probe bodies under jq 1.6, jq 1.7.1 and gojq 0.12.17; gojq differs on six, five of them reading no review or no approval where jq reads one, and the sixth (`APPROVEé`) approving under gojq only. Raw output, for main's program (`old.jq`) and the new one (`reviews.jq`, cut from the workflow): `logs/real-comments.log`.
 
 | PR | Lines | `approve` |
 | --- | --- | --- |

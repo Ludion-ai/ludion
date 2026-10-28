@@ -128,6 +128,42 @@ ${pkg("app", "0.1.0", { dependencies: [`hyper 0.14.0 (${git})`, "reqwest"] })}${
     expect(parseCargoLock(text.replace(`hyper 0.14.0 (${git})`, `hyper 0.14.0 (${CRATES})`)).packages[0]).toEqual({ name: "hyper", version: "0.14.0", direct: true });
     expect(() => parseCargoLock(text.replace(`hyper 0.14.0 (${git})`, "hyper 0.14.0"))).toThrow("matches more than one [[package]]");
   });
+  it("follows Cargo when an id without a source matches a path crate and a crates.io crate of the same version", () => {
+    // Cargo writes this when a workspace member shares a name and version with a crates.io crate in the graph.
+    const text = `version = 3\n\n${pkg("app", "0.1.0", { dependencies: ["foo 0.1.0", `foo 0.1.0 (${CRATES})`] })}${pkg("foo", "0.1.0")}${pkg("foo", "0.1.0", { source: CRATES, checksum: sum("a") })}${pkg("other", "1.0.0", { dependencies: ["foo"] })}`;
+    expect(parseCargoLock(text)).toEqual({ packages: [{ name: "foo", version: "0.1.0", direct: true }], limitations: [] });
+    const withoutRegistryId = text.replace(` "foo 0.1.0 (${CRATES})",\n`, "");
+    expect(withoutRegistryId).not.toBe(text);
+    expect(parseCargoLock(withoutRegistryId).packages).toEqual([{ name: "foo", version: "0.1.0", direct: false }]);
+    // Two path crates of one name and version leave an id without a source ambiguous, as in Cargo.
+    const twoPaths = `${text}${pkg("foo", "0.1.0", { source: "path+file:///src/foo" })}`;
+    expect(() => parseCargoLock(twoPaths)).toThrow('app 0.1.0 depends on "foo 0.1.0", which matches more than one [[package]].');
+  });
+  it("accepts git branches with parentheses, which Cargo writes unencoded before v4", () => {
+    const git = "git+https://github.com/example/b?branch=fix(1)";
+    const text = `version = 3\n\n${pkg("app", "0.1.0", { dependencies: [`b 1.0.0 (${git})`, "c"] })}${pkg("b", "1.0.0", { source: `${git}#${"c".repeat(40)}` })}${pkg("b", "1.0.0", { source: CRATES, checksum: sum("b") })}${pkg("c", "1.0.0", { source: CRATES, checksum: sum("c"), dependencies: [`b 1.0.0 (${CRATES})`] })}`;
+    expect(parseCargoLock(text)).toEqual({
+      packages: [{ name: "b", version: "1.0.0", direct: false }, { name: "c", version: "1.0.0", direct: true }],
+      limitations: ["Crates from git sources are outside crates.io advisory coverage and were not checked (1): b 1.0.0."],
+    });
+  });
+  it("resolves direct dependencies in linear time, whatever the shape of a hostile lock file", () => {
+    // The review's input: 57,000 same-name path crates and one member listing an id 160,000 times (4 MB).
+    let paths = "version = 4\n\n";
+    for (let k = 0; k < 57000; k++) paths += `[[package]]\nname="x"\nversion="0.0.${k}"\n`;
+    paths += `[[package]]\nname="a"\nversion="0.0.0"\ndependencies=[\n${'"x 0.0.1",\n'.repeat(160000)}]\n`;
+    // Many sources for one name and version, each listed by source.
+    let sources = "version = 3\n\n";
+    for (let k = 0; k < 20000; k++) sources += `[[package]]\nname="x"\nversion="1.0.0"\nsource="git+https://example.com/r${k}#${"a".repeat(40)}"\n`;
+    sources += `[[package]]\nname="a"\nversion="0.0.0"\ndependencies=[\n${Array.from({ length: 20000 }, (_, k) => `"x 1.0.0 (git+https://example.com/r${k})",\n`).join("")}]\n`;
+    for (const text of [paths, sources]) {
+      expect(text.length).toBeLessThan(4 * 1024 * 1024);
+      const started = performance.now();
+      const result = parseCargoLock(text);
+      expect(performance.now() - started).toBeLessThan(1000);
+      expect(result.packages).toEqual([]);
+    }
+  });
   it("bounds the list of crates it names", () => {
     const names = Array.from({ length: 12 }, (_, n) => `forked${n}`);
     const text = `version = 4\n\n${pkg("app", "0.1.0", { dependencies: names })}${names.map(n => pkg(n, "1.0.0", { source: `git+https://example.com/${n}#${"f".repeat(40)}` })).join("")}`;
@@ -177,13 +213,16 @@ describe("malformed Cargo.lock never becomes a partial result", () => {
     ["dependencies that are not an array", one(`name = "serde"\nversion = "1.0.0"\ndependencies = "libc"\n`), "dependencies must be an array of strings"],
     ["an invalid crate name", one(`name = "ser de"\nversion = "1.0.0"\n`), 'invalid crate name "ser de"'],
     ["a non-ASCII crates.io name", one(`name = "sérde"\nversion = "1.0.0"\nsource = "${CRATES}"\n`), "not a valid crates.io crate name"],
-    ["an unsupported source protocol", one(`name = "serde"\nversion = "1.0.0"\nsource = "unknown+https://example.com"\n`), 'unsupported source "unknown+https://example.com"'],
-    ["a source with no protocol", one(`name = "serde"\nversion = "1.0.0"\nsource = "https://example.com"\n`), "unsupported source"],
-    ["a checksum that is not SHA-256", one(`name = "serde"\nversion = "1.0.0"\nchecksum = "abc"\n`), "checksum is not a SHA-256 hex digest"],
-    ["a package id with an unbracketed source", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["serde 1.0.0 ${CRATES}"]\n`), "invalid package id"],
-    ["a package id with a range", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["serde ^1.0"]\n`), 'invalid package id "serde ^1.0"'],
-    ["an empty package id", one(`name = "app"\nversion = "1.0.0"\ndependencies = [""]\n`), 'invalid package id ""'],
-    ["a package listed twice", `version = 3\n\n${pkg("serde", "1.0.0", { source: CRATES })}${pkg("serde", "1.0.0", { source: CRATES })}`, "serde 1.0.0 (\"registry+https://github.com/rust-lang/crates.io-index\") is listed twice"],
+    ["an unsupported source protocol", one(`name = "serde"\nversion = "1.0.0"\nsource = "unknown+https://example.com"\n`), '"serde" at line 3: it has an unsupported source (Cargo writes git+, registry+, sparse+ and path+ sources).'],
+    ["a source with no protocol", one(`name = "serde"\nversion = "1.0.0"\nsource = "https://example.com"\n`), "it has an unsupported source"],
+    ["a checksum that is not SHA-256", one(`name = "serde"\nversion = "1.0.0"\nsource = "${CRATES}"\nchecksum = "abc"\n`), "checksum is not a SHA-256 hex digest"],
+    ["a checksum without a source", one(`name = "time"\nversion = "0.1.43"\nchecksum = "${sum("a")}"\n`), '"time" at line 3: it has a checksum but no source, which Cargo never writes (its source line may have been removed).'],
+    ["a package id with an unbracketed source", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["serde 1.0.0 ${CRATES}"]\n`), 'dependencies[0] is not a valid package id (the source for "serde 1.0.0" is not in parentheses)'],
+    ["a package id with a range", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["libc", "serde ^1.0"]\n`), 'dependencies[1] is not a valid package id (the version for "serde" is not an exact semver version)'],
+    ["an empty package id", one(`name = "app"\nversion = "1.0.0"\ndependencies = [""]\n`), "dependencies[0] is not a valid package id (its crate name is invalid)"],
+    ["a [replace] id with an unsupported source", one(`name = "foo"\nversion = "1.0.0"\nsource = "${CRATES}"\nreplace = "foo 1.0.0 (ssh://example.com/foo)"\n`), 'replace for "foo 1.0.0" has an unsupported source'],
+    ["a package listed twice", `version = 3\n\n${pkg("serde", "1.0.0", { source: CRATES })}${pkg("serde", "1.0.0", { source: CRATES })}`, "Invalid Cargo.lock: serde 1.0.0 from crates.io is listed twice."],
+    ["a path crate listed twice", `version = 3\n\n${pkg("app", "1.0.0")}${pkg("app", "1.0.0")}`, "Invalid Cargo.lock: app 1.0.0 from no source (the project itself) is listed twice."],
     ["an unterminated string", one(`name = "serde\nversion = "1.0.0"\n`), "line 4: unterminated string"],
     ["an unterminated array", one(`name = "app"\nversion = "1.0.0"\ndependencies = [\n "serde",\n`), "unterminated array"],
     ["an array of non-strings", one(`name = "app"\nversion = "1.0.0"\ndependencies = [1]\n`), "arrays may contain only strings"],
@@ -201,12 +240,45 @@ describe("malformed Cargo.lock never becomes a partial result", () => {
     ["an unknown array table", `${V3}[[packages]]\nname = "x"\n`, 'unsupported table "[[packages]]"'],
     ["a broken header", `${V3}[[package]\n`, "invalid table header"],
     ["[metadata] twice", `${V1}[metadata]\n`, "[metadata] appears twice"],
-    ["a [metadata] value that is not a string", `${V1}"checksum x" = 1\n`, 'must be a string'],
+    ["a [metadata] value that is not a string", `${V1}"checksum x" = 1\n`, "[metadata] at line 27: every value must be a string."],
+    ["a duplicate quoted key", `${V1}"checksum libc 0.2.80 (${CRATES})" = "x"\n`, "line 31: duplicate key a quoted key."],
     ["an unknown top-level key", `version = 3\nresolver = "2"\n`, 'unsupported top-level key "resolver"'],
     ["a format version that is not an integer", `version = "3"\n`, "the format version must be an integer"],
   ])("throws on %s", (_label, text, message) => {
     expect(() => parseCargoLock(text)).toThrow(message);
     expect(() => parseCargoLock(text)).toThrow("Invalid Cargo.lock");
+  });
+});
+
+describe("sources can carry credentials, so no message contains any part of one", () => {
+  const SECRET = "s3cr3t-example-token";
+  const fork = `git+https://bot:${SECRET}@github.com/acme/private-fork`;
+  const one = (body: string) => `version = 3\n\n[[package]]\n${body}`;
+  it.each([
+    ["a package listed twice", `version = 3\n\n${pkg("fork", "1.0.0", { source: `${fork}#${"a".repeat(40)}` })}${pkg("fork", "1.0.0", { source: `${fork}#${"b".repeat(40)}` })}`, "Invalid Cargo.lock: fork 1.0.0 from a git source is listed twice."],
+    ["an id that matches no package", `${pkg("app", "0.1.0", { dependencies: [`fork 1.0.0 (${fork})`] })}${pkg("fork", "1.0.0", { source: `${fork}?branch=master#${"a".repeat(40)}` })}`, 'Invalid Cargo.lock: app 0.1.0 depends on "fork 1.0.0" from a git source, which matches no [[package]].'],
+    ["an id with an unsupported protocol", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["fork 1.0.0 (ssh://bot:${SECRET}@host/x)"]\n`), 'dependencies[0] for "fork 1.0.0" has an unsupported source'],
+    ["an id with an unbracketed source", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["fork 1.0.0 ${fork}"]\n`), "is not in parentheses"],
+    ["a source where the version belongs", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["fork ${fork}"]\n`), 'the version for "fork" is not an exact semver version'],
+    ["a source as the whole id", one(`name = "app"\nversion = "1.0.0"\ndependencies = ["${fork}"]\n`), "its crate name is invalid"],
+    ["a package source with an unsupported protocol", one(`name = "fork"\nversion = "1.0.0"\nsource = "ssh://bot:${SECRET}@host/x"\n`), "it has an unsupported source"],
+    ["a package source with whitespace", one(`name = "fork"\nversion = "1.0.0"\nsource = "${fork} x"\n`), "it has an unsupported source"],
+    ["a package source over 2,000 characters", one(`name = "fork"\nversion = "1.0.0"\nsource = "${fork}/${"a".repeat(2100)}"\n`), "it has an unsupported source"],
+    ["a [replace] id that is not valid", one(`name = "fork"\nversion = "1.0.0"\nsource = "${CRATES}"\nreplace = "fork 1.0.0 ${fork}"\n`), "replace is not a valid package id"],
+    ["a v1 [metadata] key with a value that is not a string", `${V1}"checksum fork 1.0.0 (${fork})" = 1\n`, "every value must be a string"],
+    ["a duplicate v1 [metadata] key", `${V1}"checksum fork 1.0.0 (${fork})" = "a"\n"checksum fork 1.0.0 (${fork})" = "b"\n`, "duplicate key a quoted key"],
+    ["a quoted top-level key", `version = 3\n"${fork}" = "x"\n`, "unsupported top-level key a quoted key"],
+    ["a quoted key without =", `version = 3\n"${fork}" 1\n`, "expected = after a quoted key"],
+    ["a quoted package key", one(`name = "fork"\nversion = "1.0.0"\n"${fork}" = "x"\n`), "unsupported key a quoted key"],
+  ])("throws on %s without the source", (_label, text, message) => {
+    let thrown = "";
+    try { parseCargoLock(text); } catch (error) { thrown = (error as Error).message; }
+    expect(thrown).toContain(message);
+    for (const part of [SECRET, "bot:", "@github.com", "@host", "https://", "ssh://", "acme"]) expect(thrown).not.toContain(part);
+  });
+  it("names a credentialed git crate in its limitation by name and version only", () => {
+    const { limitations } = parseCargoLock(`version = 3\n\n${pkg("app", "0.1.0", { dependencies: ["fork"] })}${pkg("fork", "1.0.0", { source: `${fork}#${"a".repeat(40)}` })}`);
+    expect(limitations).toEqual(["Crates from git sources are outside crates.io advisory coverage and were not checked (1): fork 1.0.0."]);
   });
 });
 

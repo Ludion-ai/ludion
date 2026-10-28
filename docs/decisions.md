@@ -1112,6 +1112,12 @@ It changes no result.
   - Those two raw answers to the registered query were overwritten by the joined files and were never compared with them, so they are not in the results. The review of #160 checked that the joined files equal page 1 followed by page 2, with the registered fields. That supports the two forms being equivalent, but it does not replace the lost answers.
 - **When.** The search finished at 2026-10-28T08:55:14Z. It was committed and pushed as 2ee1afc (17:55:34 JST) before the measurement started at 08:56:01Z.
 
+## 2026-10-28 — The judge as an action (preview), and the dogfood record
+
+- **action.yml at the root**, two modes for two jobs, split like judge.yml and judge-comment.yml. Mode judge: pull_request, `contents: read`. It reads the PR's files as data through the API, so it needs no checkout, and runs the bundled judge. With a read token this should also work on private repositories, but only this public repository was tried. Mode comment: workflow_run, `pull-requests: write`. It uses judge-comment.yml's checks, copied to action/*.jq, with the judge workflow's path as an input.
+- **Only a release commit carries the bundle.** packages/cli/dist/cli.js and action/dist/record.js (`node action/build.ts`, which bundles .github/judge/record.ts) are not on main. On any other commit the action stops with an error and does not build. The release steps are in docs/bench/dogfood/prepublish-checklist.md.
+- `files` in packages/cli is narrowed to `dist/cli.js`. The dogfood measurement has no gate; its definitions were committed first (4c441d0).
+
 ## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
 
 The owner chose E1 and E2. CLAUDE.md and docs/protected-paths.md now say that every review is posted on its PR ending `reviewed-sha:`, and that a review with no such record is never reported. CLAUDE.md also says that agents never merge a dependency-update PR (Dependabot, Renovate and the like), nor any PR an agent did not open. The same protected PR (#166) handles #156's findings N1–N7, #158's N1–N8 (N8, the length, is left as that review allows) and #157's findings 5 and 6. After #166's first review (B1), the required `protected-paths` check passes only when the latest review of the current head approves on its first line. The two Dependabot entries above were moved, unchanged, to follow the judge's entries. How each finding was handled: docs/bench/2026-10-28-l3-protected/README.md.

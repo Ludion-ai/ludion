@@ -1,0 +1,2 @@
+7a9adf10833ebe54acbc66ff3bf71edb45bf4d351200da0f5bf0b8f4ffcbd384  packages/cli/dist/cli.js
+0cfdb12da1bb25659b26382ed02a5086c00a49f821db7de0fd661e7f3c8d0234  action/dist/record.js

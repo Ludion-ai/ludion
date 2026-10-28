@@ -523,6 +523,16 @@ docs/bench/2026-10-28-noise. The definitions were fixed before the run: d29b1e7,
 
 The design's noise gate is **not met**. The judge's production/dev split (the lockfile's `dev` flag) cannot by itself decide "loaded in production". No definition is changed.
 
+## 2026-10-28 (cycle 3, L4) — Dogfood record, and the action prepared (not released)
+
+docs/bench/dogfood.
+- **Judged.** 3 dependency PRs (#161 stop, #162 stop, #163 ready_except_build) in 5 judge attempts. judge_seconds ranged from 0.629 to 5.637 and job_seconds from 12.742 to 21.72.
+- **Step 1 checked.** On #161, re-runs 2 and 3 logged `Updated the judgement comment`: one comment, 6467253162.
+- **Not judged.** #164 and #165 had no judge run; the cause is not known.
+- **The stops.** #161 stops on gate 4 only, because the PR also touches a workspace's package.json (apps/worker). #162 has the same gate 4 stop (apps/site) and two gate 2 stops: unist-util-visit-parents@6.1.0 and unist-util-visit@5.2.0 were published at or after T.
+- **The action.** Checked locally in Docker with gh stubbed (17 of 17), and live in mode judge on throwaway PR #169, which is closed. Mode comment has not run on GitHub.
+- **npm pack.** README.md, dist/cli.js and package.json. Nothing was published.
+
 ## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
 
 The rules and the review follow-ups are in #166 (decisions: the entry of the same name). Checked in Docker at dd86e86, offline, with a read-only root, as a non-root user: typecheck exit 0; judge-workflow.test.ts 27 passed (20 before); packages 8 files, 237 passed; actionlint found nothing on both judge workflows; 8 mutations re-run one at a time, each caught. After #166's first review (B1), `protected-paths` passes only when the latest review of the current head approves; the checks of that fix are in the bench README. Raw output and details: docs/bench/2026-10-28-l3-protected/.

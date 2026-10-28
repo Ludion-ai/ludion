@@ -313,3 +313,21 @@ describe("after #168's review: what section 2 calls production is not left out",
     expect(left(["babel-plugin-x"], { "package.json": JSON.stringify({ babel: { presets: [["env", { note: "it's" }]], plugins: ["x"] } }) })).not.toContain("babel-plugin-x@1.0.0");
   });
 });
+
+describe("crafted files cannot make the reader backtrack without end", () => {
+  const quick = (f: () => unknown) => { const t0 = performance.now(); f(); return performance.now() - t0; };
+  it("reads many comments in an import call, many unquoted array items and long blank runs in linear time", () => {
+    expect(quick(() => codeSpecifiers(`import(${"/**/".repeat(5000)} x`))).toBeLessThan(1000);
+    expect(codeSpecifiers(`import(${"/* a */".repeat(3)}'ok')`)).toEqual(["ok"]);
+    const lock = lockOf({ devDependencies: { x: "^1" } }, { "node_modules/x": { dev: true } });
+    const files = {
+      "ecosystem.config.js": `module.exports = { apps: [{ script: [${'"a" '.repeat(5000)}`,
+      "docker-compose.yml": `${" ".repeat(200_000)}-${" ".repeat(200_000)}x`,
+      Dockerfile: `FROM node:22${"\n".repeat(200_000)}`,
+      ".dockerignore": " \n".repeat(200_000),
+      "netlify.toml": " \n".repeat(200_000),
+      "src/a.js": "",
+    };
+    expect(quick(() => productionSplit(lock, tree(files)))).toBeLessThan(3000);
+  });
+});

@@ -103,8 +103,10 @@ export function packageOf(specifier: string, builtins = true): string | null {
   return name;
 }
 
-/** Comments that may stand between `import(` or `require(` and the specifier. */
-const CALL_COMMENTS = String.raw`(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)*`;
+// Comments that may stand between `import(` or `require(` and the specifier. A block comment's body cannot hold its
+// own closing star-slash, so each comment matches one way only and a crafted file cannot make the match backtrack
+// exponentially.
+const CALL_COMMENTS = String.raw`(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/\s*|\/\/[^\n]*\n\s*)*`;
 const CALL = new RegExp(String.raw`\b(?:import|require(?:\.resolve)?)\s*\(\s*${CALL_COMMENTS}(["'\x60])([^"'\x60\n$]+)\1`, "g");
 /**
  * Module specifiers a code file loads: every `from "x"`, `import "x"`, `import()`, `require()` and `require.resolve()`
@@ -289,7 +291,8 @@ function fileCommands(file: string, text: string): string[] {
     // A pm2 ecosystem file: `script: 'x'`, `args: ['a', 'b']`, anywhere on a line, and each object's script with its args.
     const out: string[] = [];
     const value = (m: RegExpMatchArray) => m[3] ?? m[4]!.replace(/["'`,]/g, " ");
-    const pair = /\b(\w+)\s*:\s*(?:(["'`])([^"'`\n]*)\2|\[((?:\s*["'`][^"'`\n]*["'`]\s*,?\s*)*)\])/g;
+    // Each array item is a quoted string, then spaces and at most one comma: one way to match, so no runaway backtracking.
+    const pair = /\b(\w+)\s*:\s*(?:(["'`])([^"'`\n]*)\2|\[\s*((?:["'`][^"'`\n]*["'`]\s*(?:,\s*)?)*)\])/g;
     for (const m of text.matchAll(pair)) if (COMMAND_KEY.test(m[1]!)) out.push(value(m));
     for (const o of text.matchAll(/\{[^{}]*\}/g)) {
       const found = new Map([...o[0].matchAll(pair)].map(m => [m[1]!, value(m)]));
@@ -300,7 +303,8 @@ function fileCommands(file: string, text: string): string[] {
   const toml = /\.toml$/i.test(file), out: string[] = [], lines = text.split(/\r?\n/);
   const indent = (l: string) => l.length - l.trimStart().length;
   lines.forEach((line, i) => {
-    const m = /^\s*-?\s*["']?([\w.-]+)["']?\s*[:=]\s*(.*?)\s*,?\s*$/.exec(line);
+    const m = /^[ \t]*(?:-[ \t]*)?["']?([\w.-]+)["']?[ \t]*[:=][ \t]*(.*)$/.exec(line);
+    if (m) m[2] = m[2]!.trim().replace(/,$/, "").trim();
     if (!m || !(toml || COMMAND_KEY.test(m[1]!))) return;
     // A YAML block scalar (`command: >` or `|`): the more-indented lines after it.
     if (/^[>|][+-]?\d*$/.test(m[2]!)) {
@@ -360,7 +364,7 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
   if (source) {
     const has = new Set(source.files);
     const text = (file: string) => { const t = source.read(file); if (t === null) incomplete ??= `${file} could not be read`; return t; };
-    const ignores = (path: string) => { const t = has.has(path) ? source.read(path) : null; return t !== null && /^\s*(\*\*\/|\/|\.\/)?node_modules(\/\*{0,2})?\/?\s*$/m.test(t); };
+    const ignores = (path: string) => { const t = has.has(path) ? source.read(path) : null; return t !== null && /^[ \t]*(\*\*\/|\/|\.\/)?node_modules(\/\*{0,2})?\/?[ \t]*\r?$/m.test(t); };
     for (const file of source.files) {
       const base = file.split("/").at(-1)!, dir = file.slice(0, file.length - base.length);
       if (base === "package.json") {
@@ -376,7 +380,7 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       }
       // A Dockerfile is a file so named with a FROM line; any other file so named (src/dockerfile.ts) is read below as usual.
       const dockerfileText = DOCKERFILE.test(file) && !/(^|\/)\.devcontainer\//.test(file) ? text(file) : null;
-      if (dockerfileText !== null && /^\s*FROM\s/im.test(dockerfileText) && !base.replace(/dockerfile|containerfile/ig, " ").split(/[\s._-]+/).some(w => /^(dev|development|test|tests|ci|e2e)$/i.test(w))) {
+      if (dockerfileText !== null && /^[ \t]*FROM[ \t]/im.test(dockerfileText) && !base.replace(/dockerfile|containerfile/ig, " ").split(/[\s._-]+/).some(w => /^(dev|development|test|tests|ci|e2e)$/i.test(w))) {
         const image = dockerImage(dockerfileText, ignores(`${dir}.dockerignore`) || ignores(`${file}.dockerignore`) || ignores(".dockerignore"));
         if (image.holds) imagesWithDev.push(file);
         for (const c of image.production) production.push({ from: file, text: c });
@@ -389,7 +393,7 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       if (/(^|\/)vercel\.json$/i.test(file)) {
         try { const v = JSON.parse(text(file) ?? "null"); if (typeof v?.buildCommand === "string") build.push({ from: file, text: v.buildCommand }); } catch { /* not JSON */ }
       }
-      if (/(^|\/)netlify\.toml$/i.test(file)) for (const m of (text(file) ?? "").matchAll(/^\s*command\s*=\s*["'](.+)["']\s*$/gm)) build.push({ from: file, text: m[1]! });
+      if (/(^|\/)netlify\.toml$/i.test(file)) for (const m of (text(file) ?? "").matchAll(/^[ \t]*command[ \t]*=[ \t]*["'](.+)["'][ \t]*\r?$/gm)) build.push({ from: file, text: m[1]! });
       if (BUILD_CONFIG.test(file)) {
         const t = text(file);
         if (t !== null) for (const n of configNames(t, /babel/i.test(base) ? "babel" : /postcss/i.test(base) ? "postcss" : "other")) seedFrom(file, n, `named by ${file}, a build tool's configuration`);

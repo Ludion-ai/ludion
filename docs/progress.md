@@ -539,4 +539,4 @@ docs/bench/dogfood.
 - Count: the judge 938 against npm audit 1,867. 2,814 > 1,867, so **not met** (the first run had 560, met). npm audit's numbers did not change. The rebuilt split on the first run's own OSV results also gives 938.
 - Misses: 160 left out, every one a first-run "no". Five fresh-context reviewers gave 11 yes, 149 no (137 reused) and 0 undecidable: **11 misses in 4 repositories**, so **not met** (the first run had 167 misses in 32 repositories). Every first-run "yes" and "undecidable" is now counted.
 - JakeWharton/jakewharton.com's lockfile now reads.
-- One reviewer ran `npm ci` on the host by mistake. No install script ran (docs/bench/2026-10-28-noise-v2/README.md).
+- One reviewer ran `npm ci` on the host by mistake, on Ludion's own lockfile. npm's log shows that esbuild's and workerd's postinstall scripts ran (exit 0); every tarball came from the local cache. An earlier version of this entry said no install script ran; that was wrong (docs/bench/2026-10-28-noise-v2/README.md).

@@ -17,7 +17,7 @@ The first noise measurement (docs/bench/2026-10-28-noise) found 167 misses among
 **How the rerun ran.**
 - In Docker: node:24-slim@sha256:55fb5f5a…, npm 11.19.1, a read-only root, a non-root user, no forwarded environment, the sources read-only.
 - `result/run.log`'s first line records the commit and the git blob hashes of `rerun.ts`, `production.ts`, `judge.ts`, `npm-facts.ts`, `time-cap.ts` and the first run's `noise.json` (semver 7.8.5). They equal `git ls-tree c381a85`.
-- It ran once. No repository needed a second attempt, and none failed.
+- It ran once, and no repository failed. One repository needed a second attempt: Galane-dev/shesha-config-diff (row 91, `"attempts": 2`). `rerun.ts` retries on any error without logging it, so why its first attempt failed is not recorded. (#168's review found this; an earlier version of this README said no repository needed a second attempt.)
 - One event during the run: at about 12:03Z, Claude Code stopped the docker client that streamed the run's output, because the host was low on memory. The container kept running, and `run.log` has every line from start to `done`. Nothing was restarted.
 - `scripts/sources.mjs` ran from the working tree before it was committed in c381a85, and was not changed afterwards. Its first invocation stopped at once, before fetching anything, because the new volume's root was not writable by the non-root user (EACCES). The volume's owner was set, and the second invocation fetched all 101.
 
@@ -105,7 +105,7 @@ All nine P1 cases are in `scripts/` files. The first rule did not count those as
 
 **What this shows about the judge.**
 - Under the rebuilt split, all 167 first-run misses are counted.
-- The remaining misses come from how the judge reads an import: literal string arguments only.
+- The 11 misses the review found come from how the judge reads an import: it reads only literal string arguments. #168's review also found literal imports that the c381a85 reader missed; see "After #168's review" below.
 - No miss came from a start script, a Dockerfile, a build tool's configuration, a bundler helper, a shipped runtime or a CSS import.
 - The price is the count: 938 production findings against npm audit's 1,867.
 
@@ -118,14 +118,20 @@ All nine P1 cases are in `scripts/` files. The first rule did not count those as
 
 Both must hold, so the noise measurement **does not meet** the design's gate. Against the first run: misses 167 → 11 and repositories with a miss 32 → 4, while the count went from met (560) to not met (938). No definition is changed here. Whether to read non-literal requires, which would add some of these packages to the count, and how to bring the count down, are new decisions with a new run.
 
-**One anomaly during the review.** Group 1's reviewer reported that one of its host-side commands, built with `eval`, ran `npm ci` in this worktree on Ludion's own `package-lock.json` by mistake (21:32:45 JST). That broke the rule that project commands run only in Docker. What was checked afterwards:
+**One anomaly during the review: install scripts ran on the host.** Group 1's reviewer ran `npm ci` in this worktree by mistake (21:32:25–21:32:45 JST), on Ludion's own `package-lock.json`, through a host-side command it had built with `eval`. That broke the rule that project commands run only in Docker. Its report said npm skipped esbuild's and workerd's install scripts. That is wrong.
+
+npm's own debug log (`npm-cache/_logs/2026-10-28T12_32_25_025Z-debug-0.log`, npm 11.17.0) shows:
+- `info run esbuild@0.28.2 postinstall node_modules/esbuild node install.js` and `info run workerd@1.20261023.1 postinstall node_modules/workerd node install.js`, both ending `{ code: 0, signal: null }`. So both install scripts ran on the host.
+- npm only warned afterwards that they are "not yet covered by allowScripts".
+- Every tarball came from the local npm cache ("cache hit"). The only network request in the log is npm's bulk advisory query (`POST …/security/advisories/bulk`).
+
+Also checked:
 - No tracked file changed.
 - `node_modules` is ignored by git, and the Docker checks use their own volume.
 - Ludion's own package.json files declare no lifecycle scripts.
-- esbuild's and workerd's binaries are still the JavaScript shims from their tarballs, so their install scripts did not run.
 - No reviewed repository's code ran.
 
-The folder `node_modules` is still in the worktree.
+An earlier version of this README took the JavaScript shims left in esbuild's and workerd's bin folders as evidence that the scripts did not run. #168's review pointed out that esbuild's install.js leaves the shim in place on Windows, and npm's log then showed the scripts had run. The folder `node_modules` is still in the worktree.
 
 ## Files
 

@@ -20,7 +20,7 @@ The wait table, the backtest gates and how unknowns are counted are unchanged.
 **How the measurement ran.**
 - In Docker: node:24-slim@sha256:55fb5f5a…, npm 11.19.1, a read-only root, a non-root user, no forwarded environment.
 - `run.log`'s first line records the commit and the git blob hashes of `noise.ts`, `judge.ts`, `npm-facts.ts` and `time-cap.ts` (semver 7.8.5).
-- It ran once. No repository needed a second attempt.
+- It ran once. None of the 100 included repositories needed a second attempt. One excluded repository (JakeWharton/jakewharton.com) failed all three, on the judge's lockfile reader.
 
 **What was read and fetched.**
 - The search answers came from `gh api graphql`, run on the host with gh's own credentials. No token entered a container.
@@ -30,7 +30,7 @@ The wait table, the backtest gates and how unknowns are counted are unchanged.
 
 ## Sample
 
-- **The search.** 24 hourly searches of 2026-10-27 found 1,364 distinct repositories (`search/`).
+- **The search.** 24 hourly searches of 2026-10-27 returned 2,400 PRs in 1,414 distinct repositories. 1,364 of those repositories have a PR that counts: by the dependabot app, on a `dependabot/npm_and_yarn/` branch. 84 PR results had other branch prefixes (`search/`).
 - **The order.** Round-robin by rank. 256 repositories were considered before 100 were included.
 - **Excluded,** by cause:
   - no root lockfile: 114;
@@ -91,7 +91,7 @@ The wait table, the backtest gates and how unknowns are counted are unchanged.
 **Where the reviewers read the rule differently.** This is reported, not changed: the worker adds verdicts up and reports disagreements next to them (decisions, section 4). Each difference moves verdicts between yes, undecidable and no. Yes and undecidable both count as misses.
 
 - **(b) "imports a package whose runtime dependencies reach it".**
-  - Read as the imported package's declared dependencies, it makes everything under an imported framework production-relevant. Groups 1 to 4 applied it that way: SvelteKit's runtime (group 1), graphiql's markdown-it (group 2), vinext and `agents`' MCP SDK (group 3), and Nuxt (group 4).
+  - Read as the imported package's declared dependencies, it makes everything under an imported framework production-relevant. Groups 1, 3 and 4 applied it that way, for example SvelteKit's runtime (group 1), vinext and `agents`' MCP SDK (group 3), and Nuxt (group 4). It was not applied uniformly: group 3 marked kmux's `undici`, reached through electron's install-only dependency, undecidable on the same question.
   - Group 5 found it conflicts with "not production-relevant" when every path is build-only, and marked 58 such packages undecidable: Nuxt and @nuxt/content's build dependencies, Storybook's, astro's and @nx/next's.
 - **(d) a `start` script that runs a development server.**
   - Group 1 applied (d) literally: `ng serve` (vite, piscina, fast-uri) and `nodemon` (semver), 4 yes.
@@ -111,10 +111,12 @@ The wait table, the backtest gates and how unknowns are counted are unchanged.
 
 So the gate would not be met under any of the readings above.
 
-**What this shows about the judge.** Gate 1's split is the lockfile's `dev` flag. It leaves out packages that a production build or runtime takes from devDependencies:
-- front-end bundles;
-- desktop apps that ship their runtime;
-- servers started through dev-installed tools.
+**What this shows about the judge.** Gate 1's split is the lockfile's `dev` flag.
+- Some yes verdicts are packages that a production build or runtime takes from devDependencies:
+  - front-end bundles;
+  - desktop apps that ship their runtime;
+  - servers started through dev-installed tools.
+- Many other misses count only because of the rule's wording ((b)'s declared-dependency reach, (d)'s `start`) or because they are undecidable. The reviewers' evidence for 88 of the 102 undecidable verdicts (group 5's 58, the 13 shadcn CSS imports and Azure's 17) shows no shipped code loading the package. At least 14 yes verdicts say the same (ore-meshi's 9, jasper-oktavina-wedding's 3, openshield-desktop's cookie, uptime-kuma's `@vue/server-renderer`).
 
 "Loaded in production" cannot be decided from the `dev` flag alone. No definition is changed here; deciding how gate 1 should judge this is a design question.
 

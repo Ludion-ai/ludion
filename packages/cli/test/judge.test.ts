@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
-import { provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
+import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
+import { gatherFacts, provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
 import { pnpmChanges } from "../src/security/judge-cli.ts";
 import { firstPublish, renderTimeCap, timeCap } from "../src/security/time-cap.ts";
 
@@ -16,7 +16,7 @@ const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at
 /** A package from another repository and release than lib, so it is never lib's sibling. */
 const depFact = (over: Partial<VersionFacts> = {}) => fact({ provenance: { repository: "https://github.com/acme/dep-a", workflow: ".github/workflows/release.yml", commit: "1".repeat(40) }, ...over });
 const change = (over: Partial<Change> = {}): Change => ({ path: "node_modules/lib", name: "lib", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("lib", "1.0.1"), integrity: INTEGRITY, replaced: null, ...over });
-const fixHigh: FixedAdvisory = { id: "GHSA-aaaa-bbbb-cccc", package: "lib", aliases: ["CVE-2026-1"], severity: "CRITICAL", kev: false, epss: null };
+const fixHigh: FixedAdvisory = { id: "GHSA-aaaa-bbbb-cccc", package: "lib", from: "1.0.0", to: "1.0.1", aliases: ["CVE-2026-1"], severity: "CRITICAL", kev: false, epss: null };
 const run = (next: Partial<VersionFacts>, prev: Partial<VersionFacts> = {}, opts: { fixes?: FixedAdvisory[]; now?: string; changes?: Change[]; files?: string[] | null } = {}) => judge({
   changes: opts.changes ?? [change()],
   facts: new Map([["lib@1.0.0", fact({ published_at: "2026-09-01T00:00:00Z", ...prev })], ["lib@1.0.1", fact(next)]]),
@@ -239,9 +239,73 @@ describe("rule 1's same-release exception", () => {
     const changes = [change(), change({ path: "node_modules/old", name: "old", from: "2.0.0", to: "2.1.0", resolved: url("old", "2.1.0") }), change({ path: "node_modules/old-helper", name: "old-helper", from: "2.0.0", to: "2.1.0", resolved: url("old-helper", "2.1.0") })];
     const none = { provenance: null, publisher: "bob" };
     const facts = new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()], ["old@2.0.0", fact(none)], ["old@2.1.0", fact({ ...none, published_at: "2026-09-01T00:00:00Z" })], ["old-helper@2.0.0", fact(none)], ["old-helper@2.1.0", fact({ ...none, published_at: "2026-10-01T00:05:00Z" })]]);
-    const result = judge({ changes, facts, fixes: [fixHigh, { ...fixHigh, package: "old" }], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), locked: new Set(["lib@1.0.0", "old@2.0.0", "old-helper@2.0.0"]) });
+    const result = judge({ changes, facts, fixes: [fixHigh, { ...fixHigh, package: "old", from: "2.0.0", to: "2.1.0" }], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), locked: new Set(["lib@1.0.0", "old@2.0.0", "old-helper@2.0.0"]) });
     expect(result.time_cap.t).toBe("2026-10-01T00:00:00.000Z");
     expect(result.time_cap.after_t).toEqual(["old-helper@2.1.0"]);
+  });
+  it("takes only the fixing version as a target: a newer copy of the fixed package added alongside neither sets T nor anchors a sibling", () => {
+    // lib 1.0.0 → 1.0.1 is the fix (T = 2026-10-01). The same change adds foo's own lib@2.5.0, a week after the fix.
+    const copy = change({ path: "node_modules/foo/node_modules/lib", from: null, to: "2.5.0", resolved: url("lib", "2.5.0") });
+    const sibling = change({ path: "node_modules/lib-env", name: "lib-env", from: "2.4.0", to: "2.5.0", resolved: url("lib-env", "2.5.0") });
+    const late = { provenance: null, publisher: "bob", published_at: "2026-10-08T00:00:00Z" };
+    const facts = new Map([["lib@1.0.0", fact()], ["lib@1.0.1", fact()], ["lib@2.5.0", fact(late)], ["lib-env@2.4.0", fact({ provenance: null, publisher: "bob" })], ["lib-env@2.5.0", fact({ ...late, published_at: "2026-10-08T00:01:00Z" })]]);
+    const result = judge({ changes: [change(), copy, sibling], facts, fixes: [fixHigh], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), locked: new Set(["lib@1.0.0", "lib-env@2.4.0"]) });
+    expect(result.time_cap.t).toBe("2026-10-01T00:00:00.000Z");
+    expect(result.time_cap.after_t).toEqual(["lib-env@2.5.0", "lib@2.5.0"]);
+    expect(result.time_cap.same_release).toEqual([]);
+    expect(result.verdict).toBe("stop");
+  });
+  it("counts urgency only from the fixing version, not from another copy of its name", () => {
+    const devFix = change({ dev: true });
+    const prodCopy = change({ path: "node_modules/foo/node_modules/lib", from: "2.0.0", to: "2.0.1", resolved: url("lib", "2.0.1") });
+    expect(urgencyOf([{ ...fixHigh, kev: true }], [devFix, prodCopy])).toBe("normal");
+    expect(urgencyOf([{ ...fixHigh, kev: true, from: "2.0.0", to: "2.0.1" }], [devFix, prodCopy])).toBe("exploited");
+    // A dependent that moves off the vulnerable 1.0.0 in production ends a production exposure: its fix counts for
+    // urgency, though it is no target (ownFixes).
+    const loaded = change({ path: "node_modules/foo/node_modules/lib", from: "1.0.0", to: "2.5.0", resolved: url("lib", "2.5.0") });
+    expect(urgencyOf([{ ...fixHigh, kev: true }, { ...fixHigh, kev: true, to: "2.5.0" }], [devFix, loaded])).toBe("exploited");
+    // A production copy that was never vulnerable, moving to the fixed version number, does not match the fix.
+    const neverVulnerable = change({ path: "node_modules/foo/node_modules/lib", from: "0.9.0", to: "1.0.1", resolved: url("lib", "1.0.1") });
+    expect(urgencyOf([{ ...fixHigh, kev: true }], [devFix, neverVulnerable])).toBe("normal");
+  });
+  it("keeps, per advisory, package and vulnerable version, only the smallest version it changed to", () => {
+    const lineTwo = { ...fixHigh, from: "2.0.0", to: "2.0.1" };
+    expect(ownFixes([fixHigh, { ...fixHigh, to: "2.5.0" }, lineTwo])).toEqual([fixHigh, lineTwo]);
+    expect(ownFixes([{ ...fixHigh, to: "2.5.0" }, fixHigh])).toEqual([fixHigh]);
+    // Another advisory on the same versions is its own fix.
+    expect(ownFixes([fixHigh, { ...fixHigh, id: "GHSA-dddd-eeee-ffff", to: "2.5.0" }])).toHaveLength(2);
+  });
+  it("does not let a dependent's newly loaded copy of the fixed package set T (through allChanges and gatherFacts)", async () => {
+    // Before: root lib@1.0.0 (GHSA-x), loaded by foo@1.0.0. After: root lib@1.0.1 (the fix, 2026-10-01); foo@2.0.0 now
+    // loads its own lib@2.5.0, published a week after the fix.
+    const entry = (name: string, version: string, deps?: Record<string, string>) => ({ version, resolved: url(name, version), integrity: INTEGRITY, ...(deps ? { dependencies: deps } : {}) });
+    const before = JSON.stringify({ lockfileVersion: 3, packages: { "": { name: "app", dependencies: { lib: "^1.0.0", foo: "^1.0.0" } }, "node_modules/lib": entry("lib", "1.0.0"), "node_modules/foo": entry("foo", "1.0.0", { lib: "^1.0.0" }) } });
+    const after = JSON.stringify({ lockfileVersion: 3, packages: { "": { name: "app", dependencies: { lib: "^1.0.1", foo: "^2.0.0" } }, "node_modules/lib": entry("lib", "1.0.1"), "node_modules/foo": entry("foo", "2.0.0", { lib: "^2.0.0" }), "node_modules/foo/node_modules/lib": entry("lib", "2.5.0") } });
+    const changes = allChanges(before, after);
+    expect(changes.filter(c => c.name === "lib").map(c => `${c.from}→${c.to}`).sort()).toEqual(["1.0.0→1.0.1", "1.0.0→2.5.0", "null→2.5.0"]);
+    const time: Record<string, Record<string, string>> = { lib: { created: "2020-01-01T00:00:00Z", "1.0.0": "2026-09-01T00:00:00Z", "1.0.1": "2026-10-01T00:00:00Z", "2.5.0": "2026-10-08T00:00:00Z" }, foo: { created: "2020-01-01T00:00:00Z", "1.0.0": "2026-09-01T00:00:00Z", "2.0.0": "2026-10-05T00:00:00Z" } };
+    const fetchFn = (async (input: string | URL | Request, init?: RequestInit) => {
+      const u = String(input);
+      const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+      if (u === "https://api.osv.dev/v1/querybatch") {
+        const queries = JSON.parse(String(init?.body)).queries as { package: { name: string }; version: string }[];
+        return json({ results: queries.map(q => ({ vulns: q.package.name === "lib" && q.version === "1.0.0" ? [{ id: "GHSA-aaaa-bbbb-cccc" }] : [] })) });
+      }
+      if (u === "https://api.osv.dev/v1/vulns/GHSA-aaaa-bbbb-cccc") return json({ id: "GHSA-aaaa-bbbb-cccc", aliases: [], database_specific: { severity: "HIGH" } });
+      if (u.includes("known_exploited_vulnerabilities")) return json({ vulnerabilities: [] });
+      const name = u.split("/").at(-1)!;
+      if (u.startsWith("https://registry.npmjs.org/") && time[name]) return json({ name, time: time[name], versions: Object.fromEntries(Object.keys(time[name]!).filter(v => v !== "created").map(v => [v, { name, version: v, _npmUser: { name: "bob" }, dist: { integrity: INTEGRITY } }])) });
+      return new Response("not found", { status: 404 });
+    }) as typeof fetch;
+    const { facts, fixes } = await gatherFacts(changes, fetchFn);
+    // gatherFacts records both changes away from the vulnerable 1.0.0; only the smallest is the change's own fix.
+    expect(fixes.map(f => `${f.package}@${f.from}→${f.to}`).sort()).toEqual(["lib@1.0.0→1.0.1", "lib@1.0.0→2.5.0"]);
+    expect(ownFixes(fixes).map(f => f.to)).toEqual(["1.0.1"]);
+    const result = judge({ changes, entries: lockEntryChanges(lockEntries(before), lockEntries(after)), facts, fixes, files: ["package.json", "package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), manifest: { before: JSON.parse(before).packages[""], after: JSON.parse(after).packages[""] } });
+    expect(result.time_cap.t).toBe("2026-10-01T00:00:00.000Z");
+    expect(result.time_cap.after_t).toEqual(["foo@2.0.0", "lib@2.5.0"]);
+    expect(result.exposure.fix_published_at).toBe("2026-10-01T00:00:00Z");
+    expect(result.verdict).toBe("stop");
   });
   it("allows nothing after T for a version without publisher and provenance facts", () => {
     const base = { targets: [{ name: "lib", version: "1.0.1" }], others: [{ name: "lib-env", version: "1.0.1" }], locked: new Set<string>(), newDependencies: [], created: () => null, waitHours: 24, published: () => "2026-10-01T00:00:00Z" };
@@ -480,11 +544,16 @@ describe("provenance records", () => {
     // A monorepo tag with "@" in it: the ref starts at the first "@" after the host.
     expect(provenanceFrom(uri("git+https://github.com/acme/lib@refs/tags/@acme/lib@1.2.3"))?.repository).toBe("https://github.com/acme/lib");
   });
-  it("counts trusted publishing's shared user, and any name no npm account can have, as no account", () => {
+  it("counts trusted publishing's shared user, and any name outside [a-z0-9][a-z0-9._-]*, as no account", () => {
     expect(sharedPublisher({ name: "GitHub Actions", email: "npm-oidc-no-reply@github.com", trustedPublisher: { id: "github", oidcConfigId: "oidc:x" } })).toBe(true);
     expect(sharedPublisher({ name: "gitlab-ci", trustedPublisher: { id: "gitlab" } })).toBe(true);
     expect(sharedPublisher({ name: "ci-bot", email: "npm-oidc-no-reply@gitlab.com" })).toBe(true);
     expect(sharedPublisher({ name: "Release Bot" })).toBe(true);
+    // Real lowercase names outside the pattern lose the publisher branch too (fail closed).
+    expect(sharedPublisher({ name: "-bot" })).toBe(true);
+    expect(sharedPublisher({ name: "_bot" })).toBe(true);
+    expect(sharedPublisher({ name: "bob!" })).toBe(true);
+    expect(sharedPublisher({ name: "b.o_b-1" })).toBe(false);
     expect(sharedPublisher({ name: "bnjmn", email: "b@example.com" })).toBe(false);
     expect(sharedPublisher(undefined)).toBe(false);
   });

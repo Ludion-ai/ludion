@@ -1,0 +1,154 @@
+{
+  "checked_at": "2026-10-27T13:08:44.145Z",
+  "scope": "Application smoke tests and advisory rechecks, not exploit regressions or production deployment",
+  "cases": [
+    {
+      "ecosystem": "npm",
+      "exit_code": 0,
+      "outcome": "applied",
+      "before_findings": 5,
+      "after_findings": 0,
+      "baseline_passed": true,
+      "candidate_passed": true,
+      "versions_before": [
+        {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.17.20",
+          "direct": true
+        }
+      ],
+      "versions_after": [
+        {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.18.1",
+          "direct": true
+        }
+      ],
+      "source_before": {
+        "package.json": "5f06b60108f7dab73b1302c174fa144eb2380c642cc0585f9d453b80a58ea3b4",
+        "package-lock.json": "a8c770712e9ba4df86a4494e7c7e236661d2dca2813e3eae4b06c6a7d4e51fa0"
+      },
+      "source_after": {
+        "package.json": "1d4d60f3285e4863db6641b8d736559270abef20ba568af2aff0ef282644ae35",
+        "package-lock.json": "048ce61b746c9567a38bf0dbf5fe2eb3b963f207442da33506f2e58fbcc00226"
+      },
+      "duration_ms": 24844
+    },
+    {
+      "ecosystem": "composer",
+      "exit_code": 0,
+      "outcome": "applied",
+      "before_findings": 2,
+      "after_findings": 0,
+      "baseline_passed": true,
+      "candidate_passed": true,
+      "versions_before": [
+        {
+          "ecosystem": "composer",
+          "name": "symfony/deprecation-contracts",
+          "version": "3.7.1",
+          "direct": false
+        },
+        {
+          "ecosystem": "composer",
+          "name": "symfony/http-foundation",
+          "version": "5.4.0",
+          "direct": true
+        },
+        {
+          "ecosystem": "composer",
+          "name": "symfony/polyfill-mbstring",
+          "version": "1.43.0",
+          "direct": false
+        },
+        {
+          "ecosystem": "composer",
+          "name": "symfony/polyfill-php80",
+          "version": "1.43.0",
+          "direct": false
+        }
+      ],
+      "versions_after": [
+        {
+          "ecosystem": "composer",
+          "name": "symfony/deprecation-contracts",
+          "version": "3.7.1",
+          "direct": false
+        },
+        {
+          "ecosystem": "composer",
+          "name": "symfony/http-foundation",
+          "version": "5.4.54",
+          "direct": true
+        },
+        {
+          "ecosystem": "composer",
+          "name": "symfony/polyfill-mbstring",
+          "version": "1.43.0",
+          "direct": false
+        },
+        {
+          "ecosystem": "composer",
+          "name": "symfony/polyfill-php80",
+          "version": "1.43.0",
+          "direct": false
+        }
+      ],
+      "source_before": {
+        "composer.json": "961ce2359e2e16cbb0dd53f1837a98163a6bc9a5e2a8ca9b4c72a2e70283ba01",
+        "composer.lock": "ad44b691adf1429b5f5bf201207d7b78efe487fbd7a0f4e5351009b67eb49b0e"
+      },
+      "source_after": {
+        "composer.json": "eaa66b83642e5d393678dca685d7778e9099b2389cfdddff7c2f8bd2b75c15f6",
+        "composer.lock": "67b6abf6567e13e988518b730f19dd5ee531f15f0da14989bc304a122d31989c"
+      },
+      "duration_ms": 40306
+    },
+    {
+      "ecosystem": "maven",
+      "exit_code": 0,
+      "outcome": "applied",
+      "before_findings": 2,
+      "after_findings": 0,
+      "baseline_passed": true,
+      "candidate_passed": true,
+      "versions_before": [
+        {
+          "ecosystem": "maven",
+          "name": "org.apache.commons:commons-text",
+          "version": "1.9",
+          "direct": true
+        },
+        {
+          "ecosystem": "maven",
+          "name": "org.apache.commons:commons-lang3",
+          "version": "3.11",
+          "direct": false
+        }
+      ],
+      "versions_after": [
+        {
+          "ecosystem": "maven",
+          "name": "org.apache.commons:commons-text",
+          "version": "1.10.0",
+          "direct": true
+        },
+        {
+          "ecosystem": "maven",
+          "name": "org.apache.commons:commons-lang3",
+          "version": "3.18.0",
+          "direct": false
+        }
+      ],
+      "source_before": {
+        "pom.xml": "20863c897756d9dbb947b4e99bfee862df31822a9110d15c61937f564acf6b35"
+      },
+      "source_after": {
+        "pom.xml": "7c553e2aa327fc4d0650e53db7ee9fc4e9ba33e45ae9037c7062db3fc092b815"
+      },
+      "duration_ms": 23681
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+---
+import { en } from "../strings/en.ts";
+---
+<section class="coverage-section wrap" id="coverage" aria-labelledby="coverage-heading">
+  <h2 id="coverage-heading">Know the supported scope.</h2>
+  <div class="coverage-table" role="region" aria-label="Supported ecosystems" tabindex="0">
+    <table>
+      <thead><tr><th scope="col">Your stack</th><th scope="col">Detect</th><th scope="col">Validate &amp; apply</th><th scope="col">Current boundary</th></tr></thead>
+      <tbody>{en.home.supported.map(row => <tr><th scope="row">{row.name}</th><td>{row.detect}</td><td>{row.apply}</td><td>{row.scope}</td></tr>)}</tbody>
+    </table>
+  </div>
+  <p>{en.home.supportedNote}</p>
+</section>
+<style>
+  .coverage-section { padding-block:64px; border-top:1px solid var(--rule); max-width:1120px; }
+  h2 { font-size:clamp(26px,3vw,36px); font-weight:460; letter-spacing:-.035em; margin-bottom:30px; }
+  .coverage-table { max-width:100%; overflow-x:auto; border:1px solid var(--rule); border-radius:10px; }
+  table { width:100%; border-collapse:collapse; text-align:left; font-size:13px; line-height:1.6; }
+  th,td { padding:18px; border-bottom:1px solid var(--rule); vertical-align:top; overflow-wrap:anywhere; }
+  thead th { background:var(--paper-2); font-weight:500; }
+  tbody th { font-weight:500; min-width:9em; }
+  tbody tr:last-child>* { border-bottom:0; }
+  td { color:var(--muted); }
+  p { margin:22px 0 0; color:var(--muted); font-size:13px; line-height:1.75; max-width:80ch; }
+  @media(max-width:640px) {
+    .coverage-section { padding-block:40px; }
+    table { min-width:640px; }
+    th,td { padding:14px; }
+  }
+</style>

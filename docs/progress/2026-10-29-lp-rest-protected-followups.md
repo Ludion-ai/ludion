@@ -1,0 +1,9 @@
+## 2026-10-29 (LP-rest) — Records one file each; the action in judge-comment.yml's order; workspace package.json passed; LICENSE, Node 22, packed modes; Dependabot off examples/
+
+docs/bench/2026-10-29-lp-rest; decisions: docs/decisions/2026-10-29-records-one-file-each.md and docs/decisions/2026-10-29-lp-rest-followups.md. A protected-path PR: it is not approved or merged by the session that opened it.
+- **The move.** The rule was committed (db3c6db) before the move ran. On main e72301d: decisions.md, 1269 lines, into 65 files (1263 lines) and 6 lines kept in its index; progress.md, 562 lines, into 50 files (558 lines) and 4 kept. Put back together, both give the old files byte for byte.
+- **Tests** (Docker, at 0150b8e): typecheck exit 0; the CLI build exit 0; `npx vitest run --project node packages` 10 files, 297 passed (297). The new action.test.ts has 14 tests. Mutations: 11, each killed by failing tests (baseline 45 passed).
+- **The action check** (Docker, at 6accc46, PR #161's files, gh stubbed): all checks passed. The comment job finds the PR, reads the head's changes, and never lists the artifact of a refused head; the changed apps/worker/package.json is read on both sides; the record is `stop`. Node 22.23.4: `stop`, schema ok.
+- **The package.** 4 files (LICENSE, README.md, dist/cli.js, package.json), each 0644; integrity `sha512-MRftccSP…idsw==`. A second pack after setting the files to 0755 and building again gave the same tarball sha256 (`9f3cfb02…c50d`). publish.yml still expects 3 files, so a publish now stops at that check until the owner adds `package/LICENSE`.
+- **Not shown.** Whether Dependabot stops opening security PRs on examples/ (seen only after this is on main); the judge's use of the workspace files (L9, #174); publish.yml's tarball on GitHub's runner.
+- docs/bench/2026-10-28-l3-protected/README.md now names its two merge-head logs (tests-385cf73.log, tests-9f3fe4e.log), with their results.

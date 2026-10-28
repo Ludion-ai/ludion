@@ -346,7 +346,8 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (!stage) continue;
     const command = arg.startsWith("[") ? (() => { try { return (JSON.parse(arg) as string[]).join(" "); } catch { return arg; } })() : arg;
     if ((op === "ENV" || op === "ARG") && /\bNODE_ENV\b/.test(arg)) stage.production = /\bNODE_ENV(\s*=\s*|\s+)["']?production\b/.test(arg);
-    if (op === "WORKDIR") stage.workdir = arg.replace(/^["']|["']$/g, "");
+    // A relative WORKDIR is relative to the one before it.
+    if (op === "WORKDIR") { const w = arg.replace(/^["']|["']$/g, ""); stage.workdir = w.startsWith("/") ? w : `${stage.workdir.replace(/\/+$/, "")}/${w}`; }
     if (op === "CMD" || op === "ENTRYPOINT") stage.commands.push(command);
     if (op === "RUN") {
       stage.commands.push(command); stage.runs.push(command);
@@ -360,8 +361,13 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (op === "COPY" || op === "ADD") {
       const parts = wordsOf(arg), from = parts.find(p => /^--from=/i.test(p))?.slice(7);
       const sources = parts.filter(p => !p.startsWith("--")).slice(0, -1);
-      // A path as a folder: no repeated or trailing slashes and no `.` segments; "" is the root (or the context's root).
-      const folderOf = (p: string) => p.replace(/\/+/g, "/").replace(/(^|\/)\.(?=\/|$)/g, "").replace(/\/+$/, "");
+      // A path as a folder from the root (a COPY --from path is read from the stage's root): empty and `.` segments
+      // dropped, `..` resolved and clamped at the root, as Docker does. "" is the root (or the build context's root).
+      const folderOf = (p: string) => {
+        const out: string[] = [];
+        for (const s of p.split("/")) { if (s === "..") out.pop(); else if (s !== "" && s !== ".") out.push(s); }
+        return out.length ? `/${out.join("/")}` : "";
+      };
       // One package's folder out of node_modules holds that package (and what is nested in it), not every devDependency.
       // Not for ADD, which can unpack an archive. The root, the working folder or a folder above it still holds them,
       // whatever its path.
@@ -490,12 +496,12 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
   const seeds = new Map<string, string>();
   /** node_modules paths that are links (workspaces, `file:`). A COPY follows the link, so such a folder is not known. */
   const linked = new Set(Object.keys(lock).filter(p => p.includes("node_modules/") && lock[p]?.link));
-  /** Install and link paths by their part from the first node_modules on (`packages/api/node_modules/a` under `node_modules/a`), built when first needed. */
+  /** Install and link paths by their part from the first whole node_modules segment on (`packages/api/node_modules/a` under `node_modules/a`), built when first needed. */
   let byFolder: Map<string, string[]> | null = null;
   const folderPaths = () => {
     if (!byFolder) {
       const map = new Map<string, string[]>();
-      for (const p of [...entries.map(e => e.path), ...linked]) add(map, p.slice(p.indexOf("node_modules/")), p);
+      for (const p of [...entries.map(e => e.path), ...linked]) add(map, p.slice(p.startsWith("node_modules/") ? 0 : p.indexOf("/node_modules/") + 1), p);
       byFolder = map;
     }
     return byFolder;

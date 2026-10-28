@@ -192,6 +192,11 @@ describe("production images and commands", () => {
     for (const [workdir, source] of [["/app/node_modules/foo/sub", "/app/node_modules/foo"], ["/app/server", "/app"], ["/app", "/app/."], ["/app", "/app//"], ["/app", "//"], ["/app", "/."]]) {
       expect(dockerImage(`FROM node:22 AS b\nWORKDIR ${workdir}\nCOPY package*.json ./\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b ${source} /srv\n`, false).holds).toBe(true);
     }
+    // `..` resolved as Docker does, and a relative WORKDIR after an absolute one (#190 second delta review, 2, 3).
+    for (const [workdir, source] of [["/app", "/app/sub/.."], ["/app", "/.."], ["/app", "../"], ["/srv/../app", "/app"], ["/srv\nWORKDIR app", "/srv/app"], ["/srv\nWORKDIR app", "/srv"]]) {
+      expect(dockerImage(`FROM node:22 AS b\nWORKDIR ${workdir}\nCOPY package*.json ./\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b ${source} /srv\n`, false).holds).toBe(true);
+    }
+    expect(dockerImage("FROM node:22\nCOPY x/.. /app\n", false).holds).toBe(true);
     expect(dockerImage("FROM node:22\nCOPY / /app\n", false).holds).toBe(true);
     expect(dockerImage("FROM node:22\nCOPY / /app\n", true).holds).toBe(false);
     // A package folder copied together with something that holds devDependencies.
@@ -216,6 +221,11 @@ describe("production images and commands", () => {
     const both = productionSplit(ws, tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/node_modules/@s/a ./node_modules/@s/a\nCOPY --from=b /app/packages/api/node_modules/foo ./foo\n" }));
     expect(both.summary.images_with_dev).toEqual([]);
     expect([...both.devOnly]).toEqual(["c@1.0.0"]);
+    // A project folder whose name ends in node_modules: its copy is found at that path (#190 second delta review, 1).
+    const xnm = lockOf({ devDependencies: { a: "^1", c: "^1" } }, { "node_modules/a": { dev: true }, "node_modules/c": { dev: true }, "xnode_modules/node_modules/a": { dev: true, version: "2.0.0" } }, { xnode_modules: { name: "x" } });
+    const odd = productionSplit(xnm, tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nCOPY . .\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/xnode_modules/node_modules/a ./x\n" }));
+    expect(odd.copies.get("xnode_modules/node_modules/a")?.production).toBe(true);
+    expect(odd.devOnly.has("a@2.0.0")).toBe(false);
   });
   it("keeps D1 only when a held folder is a link, even if a nested copy shares its name (#190 review, 2)", () => {
     const links = (extra: Record<string, unknown>) => lockOf({ devDependencies: { x: "^1" } }, { "node_modules/x": { dev: true }, "packages/ws-a/node_modules/tool": { dev: true }, ...extra }, { "packages/ws-a": { name: "ws-a" }, "node_modules/ws-a": { resolved: "packages/ws-a", link: true } });

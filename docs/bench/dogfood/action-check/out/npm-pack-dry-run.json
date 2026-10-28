@@ -3,15 +3,15 @@
     "id": "ludion-ai@0.3.0-preview.1",
     "name": "ludion-ai",
     "version": "0.3.0-preview.1",
-    "size": 103266,
-    "unpackedSize": 448506,
-    "shasum": "38b44952ebb5fc4868b25491a998e8166ddf58c2",
-    "integrity": "sha512-jbNuhahcTWsx4qPyE1wMq6LqlXeboUIJTS+TWLdMuYy70CRj3WLD3y0iJYoLx5CQRYMjaoqXgJ+eWMT5uiMrEw==",
+    "size": 103455,
+    "unpackedSize": 449014,
+    "shasum": "6ff164d9ae89cfbbddc7ac93330f1ac41cc428d8",
+    "integrity": "sha512-tv69FMIYq9x/dFEytZzGwlh9srLj6Mu2+WlKuy3G+0z4RrSGvu6VI7Vs0wWBGA3HoMTZdopTH7aLTKXRsYWm3A==",
     "filename": "ludion-ai-0.3.0-preview.1.tgz",
     "files": [
       {
         "path": "README.md",
-        "size": 9277,
+        "size": 9785,
         "mode": 493
       },
       {

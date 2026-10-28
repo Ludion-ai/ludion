@@ -4,12 +4,12 @@
   "head_sha": "b5014ddae044f02288232f13b5d1863a3089bdb2",
   "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
   "merge_sha": "470a5542cc0b8b75787094be6dc3d6b4185a45c3",
-  "started_at": "2026-10-28T11:51:48.796Z",
+  "started_at": "2026-10-28T12:04:31.246Z",
   "verdict": "stop",
   "reason": null,
-  "finished_at": "2026-10-28T11:51:51.926Z",
-  "judge_seconds": 2.993,
-  "job_seconds": 3.13,
+  "finished_at": "2026-10-28T12:04:32.254Z",
+  "judge_seconds": 0.884,
+  "job_seconds": 1.008,
   "judge_exit_code": 1
 }
 Ludion judgement: STOP — not applied automatically
@@ -26,4 +26,4 @@ Not checked:
   - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).
   - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.
   - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.
-Exposure: fix published n/a · seen 2026-10-28T11:51:48.979Z
+Exposure: fix published n/a · seen 2026-10-28T12:04:31.406Z

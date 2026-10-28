@@ -15,13 +15,13 @@ Nothing here has been published. This is what must be true, and who does it, bef
 
 ## The action: action.yml
 
-- [x] Mode judge runs with `contents: read` only, reads the PR's files as data through the API, and runs nothing from the PR. Mode comment runs in a separate workflow_run job with `pull-requests: write` and judge-comment.yml's checks (schema, head, `.github/` refusal, default branch, sanitised body). Local check: action-check/out/run-3.txt, 17 checks passed.
-- [x] The bundles build the same twice: three builds in this session gave the same sha256 for packages/cli/dist/cli.js and action/dist/record.js (npm-pack.md).
+- [x] Mode judge runs with `contents: read` only, reads the PR's files as data through the API, and runs nothing from the PR. Mode comment runs in a separate workflow_run job with `pull-requests: write` and judge-comment.yml's checks (schema, head, `.github/` refusal, default branch, sanitised body). Local check: action-check/out/run-4.txt, 17 checks passed.
+- [x] The bundles build the same twice: four builds in this session gave the same sha256 for packages/cli/dist/cli.js and action/dist/record.js (npm-pack.md).
 - [x] The only action it uses (upload-artifact) is pinned by commit SHA, the one judge.yml uses.
 - [x] Node 20, the floor start.sh accepts: mode judge on #161's files gave `stop` and a record that matches valid.jq (action-check/node20.sh, out/node20.txt, node:20.19.2-bookworm). Runs in GitHub used Node 24 (from the runner).
 - [x] The README's workflows have the same concurrency as judge.yml (a newer push cancels) and judge-comment.yml (one comment run at a time per PR branch, so two runs cannot both post).
 - [x] Live run of mode judge on GitHub, pinned by a full SHA: see "Live check" below.
-- [ ] Live run of mode comment: not possible without a workflow on the default branch (workflow_run runs from there). It was checked locally only, with gh stubbed (run-3.txt). Before release, check it on a repository the owner approves, or by switching this repository's judge-comment.yml to the action (a protected PR).
+- [ ] Live run of mode comment: not possible without a workflow on the default branch (workflow_run runs from there). It was checked locally only, with gh stubbed (run-4.txt). Before release, check it on a repository the owner approves, or by switching this repository's judge-comment.yml to the action (a protected PR).
 - [ ] Release commit: from a commit on main, build in Docker (`npm ci --ignore-scripts`, `npm run build -w ludion-ai`, `node action/build.ts`), force-add packages/cli/dist/cli.js and action/dist/record.js, and commit them on a release branch (never main). Tag it. A second person rebuilds from the same main commit and compares both sha256 values before the SHA is announced. Today this is by hand; a workflow that does it would be a protected change.
 - [ ] Announce the SHA with its tag. Users should check the SHA is the tag's commit in Ludion-ai/ludion, since GitHub also resolves `owner/repo@sha` for commits that exist only in a fork.
 - [ ] Marketplace listing: not done, and needs the owner.
@@ -35,4 +35,4 @@ Throwaway draft PR #169 (closed, not merged; its branch test/action-l4-live was 
 - The record: verdict `undecidable`, `judge_exit_code` 1, `judge_seconds` 0.461, `job_seconds` 5.472, base be86239, merge c898f37. The PR changes no lockfile, so the judge found no added version (`[info] gate 1: The lockfile change adds no package version.`). Real dependency PRs only reach the judge through the `paths: [package-lock.json]` filter.
 - Artifact `ludion-judgement`: 1496 bytes. The record matches valid.jq (`raw/live-169/valid-check.txt`, jq 1.6 in Docker).
 
-This shows the action resolves by SHA, the composite steps and their conditions run, the API reads work with a read-only token, and the artifact is uploaded. It does not show mode comment on GitHub (above), or a judgement of a real dependency change through the action. That second part was checked locally on #161's files (run-3.txt).
+This shows the action resolves by SHA, the composite steps and their conditions run, the API reads work with a read-only token, and the artifact is uploaded. It does not show mode comment on GitHub (above), or a judgement of a real dependency change through the action. That second part was checked locally on #161's files (run-4.txt).

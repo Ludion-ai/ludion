@@ -3,7 +3,7 @@
 
 Ludion 判定役 v0（npm）による参考表示で、必須チェックではない。判定するのは関門1・2・4の一部と待機だけで（実装した範囲と「Not checked」は判定役の出力にある）、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。
 
-判定: **停止**（`stop`） · 判定した head `b5014ddae044f02288232f13b5d1863a3089bdb2` · 判定にかかった時間: 判定役 2.993 秒、ジョブ開始から 3.13 秒 · [実行ログ](https://github.com/Ludion-ai/ludion/actions/runs/1)
+判定: **停止**（`stop`） · 判定した head `b5014ddae044f02288232f13b5d1863a3089bdb2` · 判定にかかった時間: 判定役 0.884 秒、ジョブ開始から 1.008 秒 · [実行ログ](https://github.com/Ludion-ai/ludion/actions/runs/1)
 
 判定役の出力:
 
@@ -21,6 +21,6 @@ Ludion 判定役 v0（npm）による参考表示で、必須チェックでは�
       - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).
       - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.
       - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.
-    Exposure: fix published n/a · seen 2026-10-28T11:51:48.979Z
+    Exposure: fix published n/a · seen 2026-10-28T12:04:31.406Z
 
 

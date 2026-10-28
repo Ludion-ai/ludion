@@ -1,0 +1,103 @@
+# Ludion judges this repository's own dependency PRs (docs/decisions.md, "The judge on this repository").
+# Comments only: this job records a judgement as an artifact, judge-comment.yml posts it, nothing is merged.
+# Not a required check.
+#
+# The PR is data, never code: the judge is built from the base commit, and only the PR's package.json and
+# package-lock.json are read, with git show, from its test merge commit. Nothing from the PR is installed or run.
+# The record says "undecidable" from the first step on; only a judge that finished replaces it.
+# A pull_request run takes this file from the PR itself, so a PR that edits .github/ could forge the artifact:
+# judge-comment.yml refuses the result of any PR that changes .github/.
+name: judge
+
+on:
+  pull_request:
+    paths:
+      - package-lock.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: judge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PR: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      # The test merge commit (refs/pull/N/merge): head merged onto base.
+      MERGE_SHA: ${{ github.sha }}
+    steps:
+      - name: Record "undecidable" until the judge finishes
+        id: start
+        env:
+          RECORD: ${{ runner.temp }}/judgement.json
+          INITIAL: |
+            {schema: 1, pr: $pr, head_sha: $head, base_sha: $base, merge_sha: $merge, started_at: $at,
+             verdict: "undecidable", reason: "The judge did not finish; see the run log.", finished_at: null,
+             judge_seconds: null, job_seconds: null, judge_exit_code: null, judgement: null, text: null}
+        run: |
+          set -euo pipefail
+          at=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)
+          echo "at=${at}" >> "$GITHUB_OUTPUT"
+          jq -n --argjson pr "$PR" --arg head "$HEAD_SHA" --arg base "$BASE_SHA" --arg merge "$MERGE_SHA" --arg at "$at" "$INITIAL" > "$RECORD"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+
+      # The base commit's own dependencies, with no install scripts; the PR's are never installed.
+      - name: Build the judge from the base commit
+        id: build
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build --workspace ludion-ai
+
+      - name: Read the PR's package.json and package-lock.json as data
+        id: read
+        env:
+          INPUT: ${{ runner.temp }}/judge-input
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=2 origin "+${MERGE_SHA}:refs/ludion/merge"
+          read -r _ first second rest <<< "$(git rev-list --parents -n 1 "$MERGE_SHA")"
+          if [ "$first" != "$BASE_SHA" ] || [ "$second" != "$HEAD_SHA" ] || [ -n "${rest:-}" ]; then
+            echo "::error::The test merge commit ${MERGE_SHA} is not head ${HEAD_SHA} merged onto base ${BASE_SHA}."
+            exit 1
+          fi
+          mkdir -p "$INPUT/before" "$INPUT/after"
+          for file in package.json package-lock.json; do
+            git show "${BASE_SHA}:${file}" > "$INPUT/before/${file}"
+            git show "${MERGE_SHA}:${file}" > "$INPUT/after/${file}"
+          done
+          git diff --no-renames --name-only -z "$BASE_SHA" "$MERGE_SHA" > "$INPUT/files"
+
+      # Also after a failed step, so the record says which step failed; not after a cancel (a newer push, usually).
+      - name: Judge
+        if: ${{ !cancelled() }}
+        env:
+          RECORD: ${{ runner.temp }}/judgement.json
+          INPUT: ${{ runner.temp }}/judge-input
+          STARTED_AT: ${{ steps.start.outputs.at }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          READ_OUTCOME: ${{ steps.read.outcome }}
+        run: node .github/judge/record.ts
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: judgement
+          path: ${{ runner.temp }}/judgement.json
+          if-no-files-found: error
+          retention-days: 90

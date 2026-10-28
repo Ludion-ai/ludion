@@ -694,6 +694,41 @@ Design weeks 1–2, "判定役 v0". `ludion judge --before <dir> --after <dir>` 
 - Provenance is read from the registry's attestation record; its Sigstore bundle is not verified in v0.
 - Exit codes: 0 ready except build, 3 wait, 1 stop or undecidable, 2 when the inputs cannot be read.
 
+## 2026-10-28 (cycle 2) — The judge on this repository
+
+The owner chose C1: the judge v0 runs on this repository's own dependency PRs, comments only, so it gets real data. Two workflows, split as the design's "Actions の権限分離" splits jobs:
+
+- **`judge.yml`** (`pull_request` when the root `package-lock.json` changes; `contents: read`, no secrets).
+  - The judge is built from the PR's base commit (`npm ci --ignore-scripts`, then the CLI's own build), never from the PR, because a PR here can change the judge itself.
+  - The PR is data. Its `package.json` and `package-lock.json` are copied out of its test merge commit with `git show`, and the changed files come from `git diff` between the base and that commit. Nothing from the PR is installed or run. The test merge commit must be exactly the event's head merged onto the event's base, or the record says undecidable.
+  - The record (`.github/judge/record.ts`, uploaded as the `judgement` artifact) holds the PR number, the head SHA judged, the base and merge SHAs, the verdict, the judge's JSON and its rendered text, and how long it took (the judge alone, and since the job started).
+  - It says undecidable from the first step on. Only a judge that exited with the code of a parseable judgement replaces it, with that judgement. A failed build, read or judge stays undecidable, never a pass.
+  - The job fails when the judge gave no judgement, so its colour shows the judge's health, not the verdict.
+- **`judge-comment.yml`** (`workflow_run` of `judge`; `pull-requests: write` and `actions: read`).
+  - It runs from the default branch and checks out nothing. It runs nothing from the PR or the repository, only `gh`, `jq` and `unzip`.
+  - The artifact is untrusted data. It must match the record's schema exactly: keys, types, lengths, and a verdict that agrees with the judge's own.
+  - It comments only when the recorded head is both the run's head and the PR's current head; otherwise nothing.
+  - One comment per PR, found by a marker and the `github-actions[bot]` author, updated by each new judgement. It starts with 「プレビュー：コメントのみ。この判定でマージは行われない。」 and says that v0 judges gates 1, 2 and 4 and the wait, not gate 3.
+  - The judge's text is an indented code block, with control and bidirectional characters dropped. Nothing in it becomes Markdown, a mention or a line of its own, so no `reviewed-sha:` line can come from it.
+
+Chosen here:
+
+- **`actions: read` besides `pull-requests: write`.** The task names `pull-requests: write` only, but reading another run's artifact needs `actions: read`. It is the only other permission, and it is read-only.
+- **A PR that changes `.github/` gets a fixed "undecidable".** A `pull_request` run takes its workflow file from the PR, so such a PR could rewrite `judge.yml` and upload any record. judge-comment.yml then posts a fixed notice instead of the record's text. So it does for a PR with 3,000 or more changed files, whose file list GitHub cuts off. The run must also be `judge.yml`'s by path, not only by workflow name.
+- **The trigger is the root `package-lock.json` only.** The judge reads one project root. `examples/npm-security/package-lock.json` is a fixture and is not judged.
+- **Every action is pinned by commit SHA**: checkout v7.0.1, setup-node v7.1.0, upload-artifact v7.0.2. The comment job uses none. The existing workflows keep their tags; they are not changed here.
+- **Not a required check.** Nothing here changes branch protection.
+- **actionlint** 1.7.12 (with shellcheck) was run in Docker by hand. CI does not run it.
+
+Known limits:
+
+- A Dependabot update of a workspace's dependency (packages/cli, apps/site, ...) changes that workspace's `package.json`. The judge v0 allows only the root `package.json` and the lockfile, so gate 4 stops it. The judge is not changed here; the dogfood records will show how often that happens.
+- `workflow_run` runs only from the default branch, so judge-comment.yml cannot run before this is merged.
+- That a Dependabot PR's `workflow_run` gets a write token comes from GitHub's docs, which recommend this two-workflow split for Dependabot PRs. It has not been seen on this repository yet.
+- A "wait" is judged again only when the PR changes or the job is re-run. Nothing schedules the re-query when the wait ends.
+
+The weekly measurement (docs/bench/dogfood/) starts after this is merged.
+
 ## 2026-10-28 — Composer plans also read Packagist's advisories
 
 The owner asked that Composer planning read Packagist's advisories as well as OSV, and take the later of the two fixed versions. Packagist's advisory API (`https://packagist.org/api/security-advisories/`, the source `composer audit` uses) carries FriendsOfPHP and vendor feeds, which can be published before OSV has them or end a range at a later fix.

@@ -341,6 +341,20 @@ Round 7 review of #143 (REQUEST CHANGES): a moved dependent was excused when ano
 
 Round 8 review of #143 (REQUEST CHANGES): a moved dependent was compared only with the highest earlier target, so a target equal to it hid new advisories. Now it is compared with each earlier target that differs. Local: typecheck and build pass; vitest 220 passed / 1 skipped.
 
+## 2026-10-28 (cycle 2) — The judge on this repository's PRs
+
+Added `.github/workflows/judge.yml`, `.github/workflows/judge-comment.yml`, `.github/judge/record.ts` and `packages/cli/test/judge-workflow.test.ts` (16 tests). Decisions: "The judge on this repository".
+
+Checked in Docker (node:24-slim with jq 1.6; `npm ci` with network, then no network, read-only root, non-root):
+
+- Typecheck passes. Packages tests: 226 passed (210 before, plus the 16 new ones). `apps/site/test/knowledge.test.ts` does not load there because the image has no git; CI runs it.
+- Each of 14 single breaks makes at least one of the 16 tests fail, and all pass again once it is undone. The breaks: a write permission in either job; a checkout or npm in the comment job; the run-head check removed; extra keys accepted by the schema; the judge's text not indented; the judge built from the PR head; install scripts allowed; an action pinned by tag; the upload skipped after a failure; and a timeout, a mismatched exit code or unparseable output recorded as anything but undecidable.
+- End to end on this repository's lockfile, with npm's lockfile-only update of @types/node 24.19.1 → 24.19.2 as the PR: the record script ran the built judge in 1.094 s, with the verdict "ready except build". judge-comment.yml's schema accepted the record, and its comment rendered.
+- A change to `packages/cli/package.json` alone (no lockfile change) was recorded as undecidable.
+- actionlint 1.7.12 (Docker, with shellcheck): 0 errors in the two new workflows. `publish.yml` has one existing info-level shellcheck note (SC2016), not changed here.
+
+Not run: judge-comment.yml on GitHub, since `workflow_run` runs only from the default branch.
+
 ## 2026-10-28 — Packagist advisories in Composer plans
 
 Composer scans and plans now read Packagist's advisory API next to OSV and take the later fix. New tests: Packagist's later fix wins over OSV's, OSV's later fix is kept, a Packagist-only advisory is found, a fix landing in the next range moves on, unaffected and empty answers stay clean, no same-major fix and unreadable ranges block, and an outage, a missing field, an unrequested name, a record for another package and an invalid id all fail the scan; npm inventories do not query Packagist. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passed; packages tests 176 passed. The site build needs git and was not run in the container; CI runs the full suite.

@@ -1,0 +1,93 @@
+# started 2026-10-28T15:36:06Z, node v24.22.1, HEAD b8215bd2b6926318deb8b9eb66e286fdc26eb6d4
+== npm run typecheck
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+typecheck exit 0
+== npx vitest run --project node
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 5ms
+ ✓ |node| packages/sandbox/test/guard.test.ts (3 tests) 21ms
+ ✓ |node| apps/site/test/discovery.test.ts (3 tests) 5ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 6ms
+ ❯ |node| apps/site/test/knowledge.test.ts (0 test)
+ ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 12ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (11 tests) 89ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 44ms
+ ✓ |node| packages/cli/test/security.test.ts (33 tests) 58ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (19 tests) 47ms
+ ✓ |node| packages/cli/test/judge.test.ts (63 tests) 74ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (63 tests) 129ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 283ms
+ ✓ |node| packages/cli/test/production.test.ts (42 tests) 743ms
+     ✓ reads #168's delta-review inputs in linear time: each took seconds when quadratic  300ms
+     ✓ reads an import call after any number of comments, and a stylesheet list that continues on the next line  317ms
+ ✓ |node| .claude/hooks/guard.test.ts (39 tests) 958ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| apps/site/test/knowledge.test.ts [ apps/site/test/knowledge.test.ts ]
+Error: spawnSync git ENOENT
+ ❯ apps/site/test/knowledge.test.ts:8:14
+      6| import { en } from "../src/strings/en.ts";
+      7|
+      8| const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { e…
+       |              ^
+      9|
+     10| describe("security preview claims", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 14 passed (15)
+      Tests  349 passed | 13 skipped (362)
+   Start at  15:36:07
+   Duration  1.13s (transform 1.70s, setup 0ms, import 2.54s, tests 2.47s, environment 1ms)
+
+vitest exit 1
+== npm run build
+build exit 1
+npm error workspace @ludion/site@0.0.0
+npm error location /w/apps/site
+npm error command failed
+npm error command sh -c astro build
+
+== node mutate.mjs (module)
+killed   always agrees (failed tests: 12)
+killed   rule 1 off (any folder) (failed tests: 2)
+killed   rule 1 after only (failed tests: 1)
+killed   rule 1 glob loosened (failed tests: 1)
+killed   rule 1 non-plain dir (failed tests: 2)
+killed   rule 2 off (failed tests: 1)
+killed   rule 3 sides off (failed tests: 2)
+killed   rule 3 overrides off (failed tests: 1)
+killed   rule 3 manifestChanges off (failed tests: 4)
+killed   rule 4 before off (failed tests: 1)
+killed   rule 4 after off (failed tests: 2)
+killed   rule 5 off (failed tests: 1)
+killed   missing list not empty (failed tests: 1)
+killed   key order counts (failed tests: 1)
+survived: 0 of 14
+== node mutate-wiring.mjs
+killed   agreeing files still stop (failed tests: 4)
+killed   any read file agrees (failed tests: 6)
+killed   an unread file agrees (failed tests: 1)
+killed   files not in the PR's list count (failed tests: 1)
+killed   reasons not stopped on (failed tests: 6)
+killed   an unread file not undecidable (failed tests: 1)
+killed   an unread file not stopped on (failed tests: 2)
+killed   no info line (failed tests: 3)
+killed   not passed to judge() (failed tests: 1)
+killed   an unreadable side agrees (failed tests: 2)
+killed   no plain-folder check before reading (failed tests: 1)
+killed   every listed file read (failed tests: 9)
+killed   the lockfile's before side used for after (failed tests: 6)
+killed   an unparsable file read as empty object (failed tests: 1)
+killed   a * matches a dot folder (failed tests: 1)
+killed   inherited keys count as records (before) (failed tests: 1)
+killed   inherited keys count as records (after) (failed tests: 1)
+survived: 0 of 17
+# finished 2026-10-28T15:36:36Z

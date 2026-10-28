@@ -1,0 +1,12 @@
+== pr-161: verdict stop -> ready_except_build; findings 2 -> 2
+changed-files stops (false stops counted per file): unfixed ["The change also touches apps/worker/package.json; a dependency update must change only package.json and package-lock.json."], fixed []
+  only unfixed: {"gate":4,"effect":"stop","message":"The change also touches apps/worker/package.json; a dependency update must change only package.json and package-lock.json."}
+  only fixed:   {"gate":4,"effect":"info","message":"apps/worker/package.json: a workspace's dependency lists change, and before and after they equal the lockfile's record of that workspace."}
+== pr-162: verdict stop -> stop; findings 8 -> 8
+changed-files stops (false stops counted per file): unfixed ["The change also touches apps/site/package.json; a dependency update must change only package.json and package-lock.json."], fixed []
+  only unfixed: {"gate":4,"effect":"stop","message":"The change also touches apps/site/package.json; a dependency update must change only package.json and package-lock.json."}
+  only fixed:   {"gate":4,"effect":"info","message":"apps/site/package.json: a workspace's dependency lists change, and before and after they equal the lockfile's record of that workspace."}
+pr-161 fixed identical to the 4cfc189 run
+pr-161 unfixed identical to the 4cfc189 run
+pr-162 fixed identical to the 4cfc189 run
+pr-162 unfixed identical to the 4cfc189 run

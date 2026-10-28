@@ -359,3 +359,60 @@ describe("the smallest fix (docs/design.md)", () => {
     expect(() => acquisitionPom(withProps("<excludes>1.9</excludes>", "${excludes}"))).toThrow("dependency-plugin parameter");
   });
 });
+
+describe("Composer plans also read Packagist's advisories", () => {
+  const installed = (version = "5.4.10"): Inventory => ({ ecosystem: "composer", files: ["composer.lock"], scope: "locked", limitations: [], packages: [{ ecosystem: "composer", name: "symfony/http-foundation", version, direct: true }] });
+  const osvFixed = (fixed: string | null) => ({ ...advisory, id: "GHSA-osv1-osv1-osv1", affected: [{ package: { ecosystem: "Packagist", name: "symfony/http-foundation" }, ranges: [{ events: fixed ? [{ fixed }] : [] }] }] });
+  const pksa = (id: string, affectedVersions: string, extra: Record<string, unknown> = {}) => ({ advisoryId: id, packageName: "symfony/http-foundation", title: "Example", affectedVersions, cve: "CVE-2026-0002", sources: [{ name: "GitHub", remoteId: "GHSA-r925-mgvr-h9cc" }], ...extra });
+  function withSources(osv: ReturnType<typeof osvFixed> | null, packagist: unknown, seen: string[] = []): OsvClient {
+    return new OsvClient(async url => {
+      seen.push(String(url));
+      if (String(url).startsWith("https://packagist.org/")) return packagist instanceof Response ? packagist : response(packagist);
+      if (String(url).includes("/vulns/")) return response(osv);
+      return response({ results: [osv ? { vulns: [{ id: osv.id }] } : {}] });
+    });
+  }
+
+  it("takes Packagist's later fix when OSV's fixed version is still affected there", async () => {
+    const seen: string[] = [];
+    const result = await withSources(osvFixed("5.4.46"), { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=5.4.1,<5.4.54|>=6.0.1,<6.1.0")] } }, seen).scan(installed());
+    expect(result.plan).toEqual([{ name: "symfony/http-foundation", from: "5.4.10", to: "5.4.54", advisories: ["GHSA-osv1-osv1-osv1", "PKSA-aaaa-bbbb-cccc"] }]);
+    expect(result.sources).toEqual(["https://osv.dev", "https://packagist.org/api/security-advisories/"]);
+    expect(seen.find(u => u.startsWith("https://packagist.org/"))).toBe("https://packagist.org/api/security-advisories/?packages[]=symfony%2Fhttp-foundation");
+    expect(result.findings[1]!.advisory.aliases).toEqual(["CVE-2026-0002", "GHSA-r925-mgvr-h9cc"]);
+  });
+  it("keeps OSV's fix when it is the later one, and finds advisories only Packagist has", async () => {
+    expect((await withSources(osvFixed("5.4.60"), { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=5.4.1,<5.4.54")] } }).scan(installed())).plan[0]?.to).toBe("5.4.60");
+    const only = await withSources(null, { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.4.0,<5.4.54")] } }).scan(installed());
+    expect(only.status).toBe("vulnerabilities_found"); expect(only.plan[0]?.to).toBe("5.4.54");
+    // A fix that lands in the next range of the same advisory moves on to that range's end.
+    expect((await withSources(null, { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.2.9")] } }).scan(installed("5.0.3"))).plan[0]?.to).toBe("5.2.9");
+  });
+  it("ignores advisories that do not affect the installed version and reports a clean empty answer", async () => {
+    const result = await withSources(null, { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=6.0.0,<6.4.14")] } }).scan(installed());
+    expect(result.status).toBe("no_known_vulnerabilities"); expect(result.plan).toEqual([]);
+    expect((await withSources(null, { advisories: [] }).scan(installed())).status).toBe("no_known_vulnerabilities");
+  });
+  it("blocks when Packagist leaves no same-major fix or writes a range Ludion cannot read", async () => {
+    const open = await withSources(osvFixed("5.4.46"), { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=5.4.1")] } }).scan(installed());
+    expect(open.plan).toEqual([]); expect(open.blocked.join(" ")).toContain("Packagist lists 5.4.46 as affected");
+    const major = await withSources(null, { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=5.0.0,<6.0.0")] } }).scan(installed());
+    expect(major.plan).toEqual([]); expect(major.blocked).toHaveLength(1);
+    const odd = await withSources(null, { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-bbbb-cccc", ">=5.4.0-beta1,<5.4.54")] } }).scan(installed());
+    expect(odd.status).toBe("incomplete"); expect(odd.blocked.join(" ")).toContain("cannot read");
+  });
+  it.each([
+    ["an outage", new Response("", { status: 503 })],
+    ["a missing advisories field", { other: 1 }],
+    ["a name that was not asked for", { advisories: { "evil/other": [] } }],
+    ["a record for another package", { advisories: { "symfony/http-foundation": [{ ...pksa("PKSA-aaaa-bbbb-cccc", "<5.4.54"), packageName: "evil/other" }] } }],
+    ["an invalid advisory id", { advisories: { "symfony/http-foundation": [pksa("../../x", "<5.4.54")] } }],
+  ])("never treats %s as a clean Packagist answer", async (_label, body) => {
+    await expect(withSources(null, body).scan(installed())).rejects.toThrow(/Packagist/);
+  });
+  it("does not ask Packagist about npm or Maven inventories", async () => {
+    const seen: string[] = [];
+    await withSources(null, { advisories: [] }, seen).scan(inventory(fixture(), "npm"));
+    expect(seen.some(u => u.includes("packagist"))).toBe(false);
+  });
+});

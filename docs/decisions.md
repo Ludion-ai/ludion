@@ -1117,3 +1117,31 @@ It changes no result.
 - **action.yml at the root**, two modes for two jobs, split like judge.yml and judge-comment.yml. Mode judge: pull_request, `contents: read`. It reads the PR's files as data through the API, so it needs no checkout, and runs the bundled judge. With a read token this should also work on private repositories, but only this public repository was tried. Mode comment: workflow_run, `pull-requests: write`. It uses judge-comment.yml's checks, copied to action/*.jq, with the judge workflow's path as an input.
 - **Only a release commit carries the bundle.** packages/cli/dist/cli.js and action/dist/record.js (`node action/build.ts`, which bundles .github/judge/record.ts) are not on main. On any other commit the action stops with an error and does not build. The release steps are in docs/bench/dogfood/prepublish-checklist.md.
 - `files` in packages/cli is narrowed to `dist/cli.js`. The dogfood measurement has no gate; its definitions were committed first (4c441d0).
+
+## 2026-10-28 (cycle 3, L9) — Workspace package.json changes in the judge's gate 4: definitions, fixed before any re-judgement
+
+A Dependabot update of a workspace's dependency changes that workspace's `package.json`, and gate 4 stops it ("The change also touches apps/worker/package.json", #161; apps/site, #162). These definitions are committed before any re-judgement. The gate criteria and the wait table are not changed.
+
+**The rule.** A changed file other than the root `package.json` and the lockfile still stops gate 4, except `<dir>/package.json` when it agrees with the lockfile. It agrees when all five hold:
+1. `<dir>` is a plain relative folder (segments of letters, digits and `@._-`, no `.` or `..`, no `node_modules`). A `workspaces` entry of the root `package.json` matches it, before and after. Only literal segments and a `*` that is a whole segment are matched. Any other pattern (`**`, `?`, `[`, `{`, `!`, a `*` inside a segment) matches nothing.
+2. Both lockfiles record that workspace: `packages["<dir>"]` exists before and after.
+3. The `package.json` exists on both sides and is a JSON object. Only its dependency lists (`dependencies`, `devDependencies`, `optionalDependencies`, `peerDependencies`) differ, and every changed spec is a registry range or an `npm:` alias of one, as for the root. `overrides` in a workspace stops: npm reads overrides only at the root, so the lockfile cannot show them.
+4. Before and after, each of the four lists equals the same list in the lockfile's record of that workspace. A missing list counts as empty.
+5. In the lockfile's record of that workspace, only the four lists change.
+
+The rest is judged as before: the lockfile diff, gate 2, the wait, and gate 4's tarball, hash and link checks. A workspace `package.json` that cannot be read (the caller did not pass it) is undecidable, not agreeing.
+
+**What is counted.**
+- **A false stop (誤停止):** a file named by gate 4's changed-files stop that is a workspace `package.json` agreeing with the lockfile (1–5). It is counted per file.
+- **A correct stop:** a file named by that stop that is not a workspace `package.json`, or one that fails any of 1–5.
+- **Not counted either way:** stops for other reasons. This measures gate 4's changed-files stop, not whether a verdict is right.
+- **No correct stop may disappear.** With the same inputs and `--now`, the fixed judge's findings must equal the unfixed judge's, except two: each agreeing workspace file is gone from the changed-files stop (the stop is gone when no file is left), and an info line names the agreeing files. Any other difference is reported as it is. Each run fetches registry facts, so a difference in them is reported, not explained away.
+
+**The tests (task step 3).** Fixtures shaped like #161 (one workspace range, one locked version changes) and #162 (one workspace range, many locked versions change):
+- when the workspace file agrees, there is no gate 4 changed-files stop;
+- when it does not, there is one: each of 1–5 is broken in turn.
+
+**The re-judgement (task step 4).**
+- **Inputs.** #161 and #162, at the head SHAs they have when it runs, which are recorded. Inputs are taken as judge.yml takes them: `before` from the first parent of `refs/pull/N/merge`, `after` from that merge commit, `--files` from `git diff --no-renames --name-only` between them. Each changed `<dir>/package.json` is added on both sides.
+- **Judges.** The fixed judge and the unfixed judge (main at that time), run in Docker with the same inputs and `--now`.
+- **Reported.** Both verdicts and every finding, copied, and the number of false stops before and after. Nothing is merged.

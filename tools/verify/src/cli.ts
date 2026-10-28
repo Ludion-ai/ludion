@@ -6,7 +6,7 @@ import { parseArgs } from "node:util";
 import { activeSet, validateLesson } from "@ludion/core";
 import { pullImages, runInDocker } from "./docker.ts";
 import { collectLessonFiles, loadBaseLessons, runtimesIn } from "./files.ts";
-import { createSafeFetch } from "./safe-fetch.ts";
+import { createSafeFetch } from "../../../packages/sandbox/src/safe-fetch.ts";
 import { countByStatus, labelsOf, printResults } from "./report.ts";
 import { verifyLesson, type LessonResult } from "./verify.ts";
 

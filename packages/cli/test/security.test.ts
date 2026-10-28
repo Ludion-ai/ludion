@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { compare, parseReleases, phpImage, replaceImage, scanPhp } from "../src/security/php.ts";
 import { DEFAULT_CONFIG, readConfig, snapshot } from "../src/security/project.ts";
 import { patchProject, type Command } from "../src/security/patch.ts";
-import { runArgs } from "../src/security/docker.ts";
+import { runArgs } from "../../sandbox/src/docker.ts";
 
 const SOURCE = "FROM php:8.4.25-cli-alpine\nWORKDIR /app\nCOPY . .\n";
 const releases = {

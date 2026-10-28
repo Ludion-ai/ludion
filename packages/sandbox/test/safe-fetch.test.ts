@@ -2,7 +2,6 @@ import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import type { LookupAddress } from "node:dns";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { checkSource } from "@ludion/core";
 import { BlockedAddressError, createSafeFetch, guardedLookup, isPublicAddress } from "../src/safe-fetch.ts";
 
 type Resolver = Parameters<typeof guardedLookup>[0];
@@ -74,10 +73,10 @@ describe("createSafeFetch", () => {
   });
   afterAll(() => new Promise<void>((ok) => server.close(() => ok())));
 
-  it("makes verify fail for a name that resolves to a private address", async () => {
+  it("fails a request to a name that resolves to a private address", async () => {
     const safeFetch = createSafeFetch(guardedLookup(scripted(["10.1.2.3"])));
-    const r = await checkSource("https://intranet-alias.example.org/", "anything here", safeFetch);
-    expect(r).toEqual({ found: false, reason: expect.stringContaining("resolves to 10.1.2.3, which is not a public address") });
+    const err = await safeFetch("https://intranet-alias.example.org/").then(() => null, (e: Error) => e);
+    expect((err?.cause as Error | undefined)?.message).toBe("intranet-alias.example.org resolves to 10.1.2.3, which is not a public address");
   });
 
   it("connects to exactly the address the lookup checked", async () => {

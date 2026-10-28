@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { closeSync, existsSync, lstatSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { runContainer, runDockerImageCommand } from "./docker.ts";
+import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
 

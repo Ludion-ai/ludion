@@ -9,7 +9,7 @@ import { compileLessonSchema } from "./base-schema.ts";
 import { pullImages, runInDocker } from "./docker.ts";
 import { parseNameStatus, planChanges, verifyPullRequest, type PullRequestAuthor } from "./pr.ts";
 import { countByStatus, labelsOf, printResults, stepSummary } from "./report.ts";
-import { createSafeFetch } from "./safe-fetch.ts";
+import { createSafeFetch } from "../../../packages/sandbox/src/safe-fetch.ts";
 import { runtimesIn } from "./files.ts";
 import { lockfileSha256AtHead, verifierProvenance, verifierRootFromModule } from "./verifier-deps.ts";
 import type { LessonFile } from "./verify.ts";

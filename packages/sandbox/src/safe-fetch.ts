@@ -1,10 +1,11 @@
-// Fetch for source checks that can only reach public addresses.
+// Fetch that can only reach public addresses.
 // The name is resolved inside the connection's own lookup, checked there, and the socket connects to exactly
 // the checked address. There is no second resolution, so DNS rebinding cannot swap in a private address.
 import { lookup as dnsLookup, type LookupAddress } from "node:dns";
 import { BlockList, isIP } from "node:net";
 import { Agent, fetch as undiciFetch } from "undici";
-import type { FetchFn } from "@ludion/core";
+
+export type FetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 
 const blockedV4 = new BlockList();
 for (const [net, prefix] of [

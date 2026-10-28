@@ -1,5 +1,6 @@
 import semver from "semver";
 import { OSV_NAMES, type Package, type Inventory, type Change, type Ecosystem } from "./inventory.ts";
+import { affects, packagistAdvisories, PACKAGIST_ADVISORIES } from "./packagist.ts";
 
 export function comparableVersion(version: string, ecosystem: Ecosystem): string | null {
   if (ecosystem === "maven") {
@@ -12,7 +13,9 @@ export function comparableVersion(version: string, ecosystem: Ecosystem): string
 export type Advisory = { id: string; summary: string; aliases: string[]; affected: { package: { ecosystem: string; name: string }; ranges?: { events?: { fixed?: string }[] }[] }[]; withdrawn?: string };
 export type Finding = { package: Package; advisory: Advisory };
 export type DependencyScan = {
-  schema: 1; checked_at: string; source: "https://osv.dev"; status: "vulnerabilities_found" | "no_known_vulnerabilities" | "incomplete";
+  schema: 1; checked_at: string; source: "https://osv.dev";
+  /** Every advisory source read: OSV, and Packagist's advisory API when the inventory has Composer packages. */
+  sources: string[]; status: "vulnerabilities_found" | "no_known_vulnerabilities" | "incomplete";
   inventory: Inventory; findings: Finding[]; plan: Change[]; blocked: string[];
   note: string;
 };
@@ -83,7 +86,15 @@ export class OsvClient {
       const advisory = this.cache.get(id)!;
       if (!advisory.withdrawn) findings.push({ package: pkg, advisory });
     }
-    const blocked: string[] = [], planned = new Map<string, Change>();
+    // Composer: Packagist's advisories too. Planning takes the later fix of the two sources for each package.
+    const blocked: string[] = [], unreadable: string[] = [], planned = new Map<string, Change>();
+    const composer = inventory.packages.filter(p => p.ecosystem === "composer");
+    const packagist = composer.length ? await packagistAdvisories(this.fetchFn, [...new Set(composer.map(p => p.name))]) : [];
+    const packagistFor = (name: string) => packagist.filter(a => a.advisory.affected[0]!.package.name === name);
+    for (const pkg of composer) for (const item of packagistFor(pkg.name)) {
+      if (!item.constraint) unreadable.push(`${pkg.name}@${pkg.version}: Packagist advisory ${item.advisory.id} has affected versions Ludion cannot read; review it by hand.`);
+      else if (affects(item.constraint, pkg.version)) findings.push({ package: pkg, advisory: item.advisory });
+    }
     for (const finding of findings) {
       const { package: pkg, advisory } = finding;
       const current = comparableVersion(pkg.version, pkg.ecosystem);
@@ -92,6 +103,19 @@ export class OsvClient {
       const key = `${pkg.name}\0${pkg.version}`, previous = planned.get(key), candidate = fixed[0]!;
       planned.set(key, { name: pkg.name, from: pkg.version, to: previous && semver.gt(comparableVersion(previous.to, pkg.ecosystem)!, candidate.version) ? previous.to : candidate.raw, advisories: [...new Set([...(previous?.advisories ?? []), advisory.id])] });
     }
-    return { schema: 1, checked_at: new Date().toISOString(), source: "https://osv.dev", status: findings.length ? "vulnerabilities_found" : inventory.limitations.length ? "incomplete" : "no_known_vulnerabilities", inventory, findings, plan: [...planned.values()], blocked: [...new Set(blocked)], note: "Known advisories for the recorded package inventory only. No match is not a security guarantee. Coordinates are sent to OSV; source is not. Major-version fixes, unresolved inventory and unsupported builds require review." };
+    // A planned Composer version that Packagist still lists as affected moves to the end of that range, or is blocked.
+    for (const [key, change] of planned) {
+      if (!composer.some(p => p.name === change.name)) continue;
+      const from = comparableVersion(change.from, "composer")!;
+      for (let round = 0; ; round++) {
+        const to = comparableVersion(change.to, "composer")!;
+        const still = packagistFor(change.name).filter(a => a.constraint && affects(a.constraint, to));
+        if (!still.length) break;
+        const next = still.flatMap(a => a.constraint!.filter(alternative => affects([alternative], to)).flatMap(alternative => alternative.filter(t => t.op === "<").map(t => t.version))).filter(v => semver.gt(v, to) && semver.major(v) === semver.major(from) && (semver.major(from) !== 0 || semver.minor(v) === semver.minor(from))).sort(semver.compare);
+        if (round >= 20 || !next.length) { planned.delete(key); blocked.push(`${change.name}@${change.from}: Packagist lists ${change.to} as affected (${still.map(a => a.advisory.id).join(", ")}) and gives no supported same-major fixed version.`); break; }
+        change.to = next.at(-1)!; change.advisories = [...new Set([...change.advisories, ...still.map(a => a.advisory.id)])];
+      }
+    }
+    return { schema: 1, checked_at: new Date().toISOString(), source: "https://osv.dev", sources: composer.length ? ["https://osv.dev", PACKAGIST_ADVISORIES] : ["https://osv.dev"], status: findings.length ? "vulnerabilities_found" : inventory.limitations.length || unreadable.length ? "incomplete" : "no_known_vulnerabilities", inventory, findings, plan: [...planned.values()], blocked: [...new Set([...unreadable, ...blocked])], note: "Known advisories for the recorded package inventory only. No match is not a security guarantee. Package names and versions are sent to OSV, and Composer package names to Packagist; source is not. Major-version fixes, unresolved inventory and unsupported builds require review." };
   }
 }

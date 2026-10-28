@@ -273,14 +273,36 @@ const RUNNER = /^(npm|yarn|pnpm|bun|npx|bunx|pnpx|run-s|run-p|npm-run-all2?|conc
 const EXECUTES = /^(npx|bunx|pnpx|dlx|exec|x)$/;
 const LOADS = new Set(["-r", "--require", "--import", "--loader", "--experimental-loader"]);
 
-type Image = { holds: boolean; production: string[]; build: string[] };
+type Image = { holds: boolean; held: string[]; production: string[]; build: string[] };
 /**
- * A Dockerfile: whether its final stage holds devDependencies, the commands of its final stage and the stages it is
+ * A COPY source that is one package's folder in node_modules: its install path from the first node_modules on
+ * (`/app/node_modules/@scope/name` is `node_modules/@scope/name`, `/app/node_modules/a/node_modules/b` is
+ * `node_modules/a/node_modules/b`). Anything else (node_modules itself, `.bin`, `.prisma`, a wildcard, a path inside a
+ * package) is null.
+ */
+function packageFolder(source: string): string | null {
+  if (/[*?[\]]/.test(source)) return null;
+  const parts = source.replace(/\/+$/, "").split("/"), at = parts.indexOf("node_modules");
+  if (at < 0) return null;
+  const out: string[] = [];
+  for (let i = at; i < parts.length;) {
+    if (parts[i] !== "node_modules") return null;
+    const scoped = parts[i + 1]?.startsWith("@") ? 2 : 1, name = parts.slice(i + 1, i + 1 + scoped).join("/");
+    if (parts.length < i + 1 + scoped || !/^(@[\w-][\w.-]*\/)?[\w-][\w.-]*$/.test(name)) return null;
+    out.push(`node_modules/${name}`);
+    i += 1 + scoped;
+  }
+  return out.join("/");
+}
+/**
+ * A Dockerfile: whether its final stage holds devDependencies, the package folders (install paths, see packageFolder) it
+ * holds because it copies only those folders out of node_modules, the commands of its final stage and the stages it is
  * built FROM (P5), and the RUN commands of the stages it copies from (P6). `ignoresNodeModules`: the build context's
  * .dockerignore leaves node_modules out.
  */
 export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
-  type Stage = { name: string | null; from: Stage | null; holds: boolean; production: boolean; workdir: string; runs: string[]; commands: string[]; copies: Stage[] };
+  /** `named`: the stage holds package folders, its own or through `heldFrom` (kept as each is added, so it is O(1)). */
+  type Stage = { name: string | null; from: Stage | null; holds: boolean; held: string[]; heldFrom: Stage[]; named: boolean; production: boolean; workdir: string; workdirAsWritten: string; runs: string[]; commands: string[]; copies: Stage[] };
   const stages: Stage[] = [];
   const install = /\b(npm\s+(ci|install|i)\b|yarn(\s+install)?\s*($|--|-)|pnpm\s+(install|i)\b|bun\s+(install|i)\b)/;
   const global = /(^|\s)(-g|--global)(\s|$)|\byarn\s+global\b/;
@@ -315,7 +337,7 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (op === "FROM") {
       const f = /^(?:--\S+\s+)*(\S+)(?:\s+AS\s+(\S+))?/i.exec(arg);
       const parent = named.get((f?.[1] ?? "").toLowerCase()) ?? null;
-      const stage: Stage = { name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, production: parent?.production ?? false, workdir: parent?.workdir ?? "/", runs: [], commands: [], copies: [] };
+      const stage: Stage = { name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, held: [], heldFrom: parent ? [parent] : [], named: parent?.named ?? false, production: parent?.production ?? false, workdir: parent?.workdir ?? "/", workdirAsWritten: parent?.workdirAsWritten ?? "/", runs: [], commands: [], copies: [] };
       stages.push(stage);
       if (stage.name !== null && !named.has(stage.name.toLowerCase())) named.set(stage.name.toLowerCase(), stage);
       continue;
@@ -324,7 +346,13 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (!stage) continue;
     const command = arg.startsWith("[") ? (() => { try { return (JSON.parse(arg) as string[]).join(" "); } catch { return arg; } })() : arg;
     if ((op === "ENV" || op === "ARG") && /\bNODE_ENV\b/.test(arg)) stage.production = /\bNODE_ENV(\s*=\s*|\s+)["']?production\b/.test(arg);
-    if (op === "WORKDIR") stage.workdir = arg.replace(/^["']|["']$/g, "");
+    // Two readings of the working folder, and a source matching either counts: as written (main's reading), and a
+    // relative WORKDIR resolved against the one before it. A variable that holds an absolute path matches as written.
+    if (op === "WORKDIR") {
+      const w = arg.replace(/^["']|["']$/g, "");
+      stage.workdir = w.startsWith("/") ? w : `${stage.workdir.replace(/\/+$/, "")}/${w}`;
+      stage.workdirAsWritten = w;
+    }
     if (op === "CMD" || op === "ENTRYPOINT") stage.commands.push(command);
     if (op === "RUN") {
       stage.commands.push(command); stage.runs.push(command);
@@ -338,18 +366,47 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (op === "COPY" || op === "ADD") {
       const parts = wordsOf(arg), from = parts.find(p => /^--from=/i.test(p))?.slice(7);
       const sources = parts.filter(p => !p.startsWith("--")).slice(0, -1);
+      // A path as a folder from the root (a COPY --from path is read from the stage's root): empty and `.` segments
+      // dropped, `..` resolved and clamped at the root, as Docker does. "" is the root (or the build context's root).
+      const folderOf = (p: string) => {
+        const out: string[] = [];
+        for (const s of p.split("/")) { if (s === "..") out.pop(); else if (s !== "" && s !== ".") out.push(s); }
+        return out.length ? `/${out.join("/")}` : "";
+      };
+      // One package's folder out of node_modules holds that package (and what is nested in it), not every devDependency.
+      // Not for ADD, which can unpack an archive. The root, the working folder or a folder above it still holds them,
+      // whatever its path.
+      const folders = sources.map(s => op === "COPY" ? packageFolder(s) : null);
       const strip = (p: string) => p.replace(/\/+$/, "") || "/";
+      const holdsAll = (s: string, k: number, source: Stage | null) => {
+        if (folders[k] === null && /node_modules/.test(s)) return true;
+        // The text as written against the working folder as written, as before.
+        if (source !== null && (/^(\.|\.\/|\/)$/.test(s) || strip(s) === strip(source.workdirAsWritten))) return true;
+        const n = folderOf(s);
+        if (n === "" || source === null) return n === "";
+        return [source.workdir, source.workdirAsWritten].some(workdir => { const w = folderOf(workdir); return n === w || w.startsWith(`${n}/`); });
+      };
       if (from !== undefined) {
         const source = named.get(from.toLowerCase()) ?? (/^\d+$/.test(from) ? stages[Number(from)] : undefined);
         if (source) {
           stage.copies.push(source);
-          if (sources.some(s => /node_modules/.test(s) || /^(\.|\.\/|\/)$/.test(s) || strip(s) === strip(source.workdir))) stage.holds ||= source.holds;
+          if (sources.some((s, k) => holdsAll(s, k, source))) { stage.holds ||= source.holds; stage.heldFrom.push(source); stage.named ||= source.named; }
+          // A folder from a stage that holds devDependencies or package folders: that folder, and whatever that stage
+          // holds by name (it may have copied another package there). From any other stage it holds no devDependency.
+          if ((source.holds || source.named) && folders.some(f => f !== null)) {
+            for (const f of folders) if (f !== null) stage.held.push(f);
+            stage.heldFrom.push(source);
+            stage.named = true;
+          }
         }
-      } else if (!ignoresNodeModules && sources.some(s => /node_modules/.test(s) || /^(\.|\.\/)$/.test(s))) stage.holds = true;
+      } else if (!ignoresNodeModules) {
+        for (const f of folders) if (f !== null) { stage.held.push(f); stage.named = true; }
+        if (sources.some((s, k) => holdsAll(s, k, null))) stage.holds = true;
+      }
     }
   }
   const last = stages.at(-1);
-  if (!last) return { holds: false, production: [], build: [] };
+  if (!last) return { holds: false, held: [], production: [], build: [] };
   // Each stage is visited once, by loops, so a long FROM chain costs linear time and no recursion.
   const own: Stage[] = [], seen = new Set<Stage>();
   for (let at: Stage | null = last; at && !seen.has(at); at = at.from) { seen.add(at); own.push(at); }
@@ -361,7 +418,13 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
       queue.push(...at.copies);
     }
   }
-  return { holds: last.holds, production, build };
+  // What the final stage holds by name: its own folder copies and those of the stages it inherits, each stage once.
+  const held = new Set<string>(), inherited = new Set<Stage>([last]), walk = [last];
+  for (let q = 0; q < walk.length; q++) {
+    for (const name of walk[q]!.held) held.add(name);
+    for (const s of walk[q]!.heldFrom) if (!inherited.has(s)) { inherited.add(s); walk.push(s); }
+  }
+  return { holds: last.holds, held: [...held], production, build };
 }
 
 /** Production commands in a command file (Procfile, compose, render, fly, pm2 ecosystem, …). TOML gives every value. */
@@ -430,14 +493,32 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
   const lock = readLock(lockText);
   const entries = lockEntries(lockText), byPath = new Map(entries.map(e => [e.path, e]));
   const byName = new Map<string, LockEntry[]>(), bins = new Map<string, LockEntry[]>();
+  // Arrays grow in place, so many copies of one name cost linear time.
+  const add = <T>(map: Map<string, T[]>, key: string, value: T) => { const at = map.get(key); if (at) at.push(value); else map.set(key, [value]); };
   for (const e of entries) {
-    byName.set(e.name, [...(byName.get(e.name) ?? []), e]);
+    add(byName, e.name, e);
     const bin = lock[e.path]?.bin;
-    for (const b of typeof bin === "string" ? [e.name.split("/").at(-1)!] : bin && typeof bin === "object" ? Object.keys(bin) : []) bins.set(b, [...(bins.get(b) ?? []), e]);
+    for (const b of typeof bin === "string" ? [e.name.split("/").at(-1)!] : bin && typeof bin === "object" ? Object.keys(bin) : []) add(bins, b, e);
   }
   /** The project folders: the root and every workspace folder, with their package.json fields from the lockfile. */
   const folders = Object.entries(lock).filter(([path, item]) => !path.includes("node_modules/") && item && typeof item === "object" && !item.link).map(([path, item]) => ({ dir: path ? `${path}/` : "", item }));
   const seeds = new Map<string, string>();
+  /** node_modules paths that are links (workspaces, `file:`). A COPY follows the link, so such a folder is not known. */
+  const linked = new Set(Object.keys(lock).filter(p => p.includes("node_modules/") && lock[p]?.link));
+  /** Install and link paths by their part from the first whole node_modules segment on (`packages/api/node_modules/a` under `node_modules/a`), built when first needed. */
+  let byFolder: Map<string, string[]> | null = null;
+  const folderPaths = () => {
+    if (!byFolder) {
+      const map = new Map<string, string[]>();
+      for (const p of [...entries.map(e => e.path), ...linked]) add(map, p.slice(p.startsWith("node_modules/") ? 0 : p.indexOf("/node_modules/") + 1), p);
+      byFolder = map;
+    }
+    return byFolder;
+  };
+  /** The lockfile paths a held folder (`node_modules/a`, see packageFolder) is: at that path in the root or in a project folder. */
+  const heldPaths = (f: string) => folderPaths().get(f) ?? [];
+  /** Whether a path, or a package folder it is nested in, is a link: a COPY of it follows the link. */
+  const throughLink = (p: string) => { for (let q = p; ; ) { if (linked.has(q)) return true; const up = q.lastIndexOf("/node_modules/"); if (up < 0) return false; q = q.slice(0, up); } };
   const seed = (e: LockEntry | undefined, why: string) => { if (e && !seeds.has(e.path)) seeds.set(e.path, why); };
   /** What a file at `file` loads for `name`: the nearest node_modules up its path, else every installed copy of that name. */
   const seedFrom = (file: string, name: string | null, why: string) => {
@@ -458,7 +539,7 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
   for (const { dir } of folders) for (const name of HELPERS) seed(resolveFrom(byPath, dir, name), `a bundler helper library, resolved from ${dir || "the root"}`);
 
   let incomplete = source?.incomplete ?? null;
-  const imagesWithDev: string[] = [];
+  const imagesWithDev: string[] = [], unmatchedImages = new Set<string>(), heldBy = new Map<string, string>();
   const scripts = new Map<string, Record<string, unknown>>();
   const production: { from: string; text: string }[] = [], build: { from: string; text: string }[] = [];
   if (source) {
@@ -482,7 +563,17 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       const dockerfileText = DOCKERFILE.test(file) && !/(^|\/)\.devcontainer\//.test(file) ? text(file) : null;
       if (dockerfileText !== null && /^[ \t]*FROM[ \t]/im.test(dockerfileText) && !base.replace(/dockerfile|containerfile/ig, " ").split(/[\s._-]+/).some(w => /^(dev|development|test|tests|ci|e2e)$/i.test(w))) {
         const image = dockerImage(dockerfileText, ignores(`${dir}.dockerignore`) || ignores(`${file}.dockerignore`) || ignores(".dockerignore"));
+        // D2: what the production image holds is not dev-only. A held folder is the installed copy at that install path in
+        // the root or a project folder (by path, so an alias counts); it and what is nested in it are seeded after this
+        // loop. A held folder that is a link, or no installed copy's, sends the split to D1 only, as before.
         if (image.holds) imagesWithDev.push(file);
+        let unmatched = false;
+        for (const f of image.held) {
+          const at = heldPaths(f);
+          if (!at.length || at.some(throughLink)) unmatched = true;
+          else for (const p of at) if (!heldBy.has(p)) heldBy.set(p, file);
+        }
+        if (unmatched && !image.holds) { imagesWithDev.push(file); unmatchedImages.add(file); }
         for (const c of image.production) production.push({ from: file, text: c });
         for (const c of image.build) build.push({ from: `${file} (a stage it copies from)`, text: c });
       }
@@ -505,6 +596,14 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       if (t === null) continue;
       for (const s of [...codeSpecifiers(t), ...styleSpecifiers(t)]) seedFrom(file, packageOf(s), `imported by ${file}`);
       for (const n of nodeModulesPaths(t)) seedFrom(file, n, `named by a node_modules path in ${file}`);
+    }
+    // Every copy in a folder a production image holds, nested ones included: one pass for all Dockerfiles.
+    if (heldBy.size) for (const e of entries) for (let p = e.path; ;) {
+      const file = heldBy.get(p);
+      if (file !== undefined) { seed(e, `held by ${file}'s final stage, which copies its package folder (or one it is nested in) out of node_modules`); break; }
+      const up = p.lastIndexOf("/node_modules/");
+      if (up < 0) break;
+      p = p.slice(0, up);
     }
   } else if (manifest && typeof manifest === "object" && (manifest as any).scripts && typeof (manifest as any).scripts === "object") {
     scripts.set("", (manifest as any).scripts);
@@ -588,7 +687,7 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
     return reached;
   };
   if (!ruleB) {
-    const because = !source ? "the source tree was not given" : incomplete !== null ? `the source tree is incomplete: ${incomplete}` : `the final stage of ${imagesWithDev.join(", ")} holds devDependencies`;
+    const because = !source ? "the source tree was not given" : incomplete !== null ? `the source tree is incomplete: ${incomplete}` : imagesWithDev.map(f => unmatchedImages.has(f) ? `the final stage of ${f} copies a node_modules folder that matches no installed copy` : `the final stage of ${f} holds devDependencies`).join(", and ");
     for (const [e, why] of declared) if (!devTool(e.name)) seed(e, `${why}, not a test runner, linter, formatter or @types package, and ${because}`);
     const reachable = close(declared);
     for (const e of entries) if (!reachable.has(e.path)) seed(e, `reached from no declared dependency, and ${because}`);

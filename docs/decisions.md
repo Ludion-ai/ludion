@@ -1111,3 +1111,10 @@ It changes no result.
   - All 24 hours were fetched this way, including hours 00 and 01, which had answered once at 100.
   - Those two raw answers to the registered query were overwritten by the joined files and were never compared with them, so they are not in the results. The review of #160 checked that the joined files equal page 1 followed by page 2, with the registered fields. That supports the two forms being equivalent, but it does not replace the lost answers.
 - **When.** The search finished at 2026-10-28T08:55:14Z. It was committed and pushed as 2ee1afc (17:55:34 JST) before the measurement started at 08:56:01Z.
+
+## 2026-10-28 (cycle 3) — Backtest v5: archives as signal sources, and the disputed category
+
+Fixed before the run; the full text is docs/bench/2026-10-28-backtest-v5/definitions.md, committed with this entry. The gates and the wait table are unchanged.
+- **Sources.** ecosyste.ms (the copy of a version's registry document) and Software Heritage (the archived files of its tarball) are sources for install scripts when the registry no longer lists a version. The order is the registry, then ecosyste.ms, then Software Heritage. Software Heritage is read only where its answer can change an outcome or the category below, because of its rate limit. Everything else is v4's: no archive resolves trees, and provenance, publisher and new dependencies stay registry, else deps.dev.
+- **Disputed (係争中).** A version named malicious for which the registry's hash and two independent archives (Software Heritage and jsDelivr, tied to that hash) show that its code equals the immediately preceding legitimate version's. Disputed versions stay in the malicious denominator, and are also counted apart. **This category was decided after seeing v4's results**: it follows the cycle-2 investigation of @ensdomains/buffer 0.1.1, and the meaning of "code" was written after reading that version's diff.
+- **Genuine side.** Carried over from v4 unchanged: under the judge's rules, no fact about a version the registry does not list can change a genuine verdict.

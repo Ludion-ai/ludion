@@ -313,7 +313,7 @@ const result = {
     resolved_stopped_by_rule1: results.filter(x => x.stopped).length, resolved_with_unknown_branch: results.filter(x => x.unknown).length,
     tree_versions: { median: results.map(x => x.nodes).sort((a, b) => a - b)[Math.floor(results.length / 2)] ?? null, max: Math.max(0, ...results.map(x => x.nodes)) } },
   by_urgency: byUrgency,
-  gate_every_malicious_version_stopped: URGENCIES.every(u => byUrgency[u]!.conservative.primary.stopped === rows.length) ? "met" : "not met",
+  gate_every_malicious_version_stopped: URGENCIES.every(u => byUrgency[u]!.conservative!.primary!.stopped === rows.length) ? "met" : "not met",
   signal_sources: { provenance: sources("provenance"), new_dependencies: sources("newDeps"), install_scripts: sources("scripts"), publisher: sources("publisher") },
   signal_fires: {
     provenance_regression: out.filter(x => x.facts.provenance.regression).length,

@@ -1,6 +1,6 @@
 # Judge backtest v4: rule 1's same-release exception (2026-10-28)
 
-The owner's instruction after v3's genuine-fix results: add an exception to rule 1 for siblings of the same release, before looking at the malicious results, and run both sides with the same rules. The rule and this run's definitions are in docs/decisions.md, "Rule 1's same-release exception, and backtest v4's definitions". The implementation is #151 (`packages/cli/src/security/time-cap.ts`, `sameRelease`). The wait table is unchanged.
+The owner's instruction after v3's genuine-fix results: add an exception to rule 1 for siblings of the same release, before looking at the malicious results, and run both sides with the same rules. The rule and this run's definitions are in docs/decisions.md, "Rule 1's same-release exception, and backtest v4's definitions". The implementation is #151 (`sameRelease` in `packages/cli/src/security/time-cap.ts`, with the facts it reads in `npm-facts.ts`, `judge.ts` and `dependency-patch.ts`). The wait table is unchanged.
 
 ## When things were fixed, and what had been seen
 
@@ -15,7 +15,7 @@ The owner's instruction after v3's genuine-fix results: add an exception to rule
 | Diagnostic field (changes no outcome) | baafc36 | 15:50:21 |
 | Diagnostic execution | at baafc36 | 15:50:32–15:52:04 |
 
-All three definition commits were pushed before either script ran. The amendments only made the exception stricter.
+All four definition commits (e995557, 08aa452, 17b55b7 and f78c931) were pushed before either script ran; f78c931's CI started at 15:36:11. The amendments only made the exception stricter. (Corrected 2026-10-28, cycle 2: this sentence said "three" and the first one named only `time-cap.ts`.)
 
 Disclosure: v3's malicious run had already finished (committed 14:50 JST, summarised in #149's description) when the owner's task was written at 14:53. This session read #149's description before writing the definitions: 7 of 1,148 versions selected, 1 missed, 156 unknown at 24h. It did not read v3's per-version malicious results until the definitions were committed. The exception's terms are the owner's. The details chosen here are listed in the decisions entry.
 

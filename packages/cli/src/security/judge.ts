@@ -32,7 +32,7 @@ export type VersionFacts = {
   present: boolean;
   deprecated: string | null;
   publisher: string | null;
-  /** The publisher names no single account (npm-facts.ts, sharedPublisher): trusted publishing's shared user, say. */
+  /** The publisher counts as no account (npm-facts.ts, sharedPublisher): trusted publishing's shared user, say. */
   shared_publisher: boolean;
   /** Build provenance from the registry's attestations: null when the version has none. */
   provenance: { repository: string | null; workflow: string | null; commit: string | null } | null;
@@ -57,8 +57,8 @@ export function registryTarball(name: string, version: string): string {
   return `https://registry.npmjs.org/${name}/-/${name.split("/").at(-1)}-${version}.tgz`;
 }
 
-/** A known advisory the change fixes, with what is known about its urgency. */
-export type FixedAdvisory = { id: string; package: string; aliases: string[]; severity: string | null; kev: boolean; epss: number | null };
+/** A known advisory the change fixes, with what is known about its urgency. `to` is the changed version that fixes it. */
+export type FixedAdvisory = { id: string; package: string; to: string; aliases: string[]; severity: string | null; kev: boolean; epss: number | null };
 
 export type Finding = { gate: 1 | 2 | 4 | "wait"; package?: string; effect: "stop" | "extend" | "info"; message: string };
 
@@ -299,12 +299,13 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
 
 /** Urgency of the change: from the advisories it fixes, and whether any fixed package is used in production. */
 export function urgencyOf(fixes: FixedAdvisory[], changes: Change[], epssHigh = 0.1): Urgency {
-  const fixed = fixes.filter(f => changes.some(c => c.name === f.package));
-  // A fix's urgency counts only for the packages it fixes: a dev-only fix does not hurry a production passenger.
-  const fixing = changes.filter(c => fixed.some(f => f.package === c.name) && !c.dev);
+  const fixes_ = (c: Change, f: FixedAdvisory) => c.name === f.package && c.to === f.to;
+  const fixed = fixes.filter(f => changes.some(c => fixes_(c, f)));
+  // A fix's urgency counts only for the versions it fixes: a dev-only fix does not hurry a production passenger.
+  const fixing = changes.filter(c => fixed.some(f => fixes_(c, f)) && !c.dev);
   if (!changes.some(c => !c.dev)) return "low";
   if (!fixing.length) return "normal";
-  const urgent = fixed.filter(f => fixing.some(c => c.name === f.package));
+  const urgent = fixed.filter(f => fixing.some(c => fixes_(c, f)));
   if (urgent.some(f => f.kev)) return "exploited";
   if (urgent.some(f => f.severity?.toUpperCase() === "CRITICAL" || (f.epss !== null && f.epss >= epssHigh))) return "high";
   return "normal";
@@ -422,8 +423,10 @@ export function judge(input: {
   // published at or after T that is the same release as a target is allowed; the wait above already counts from it.
   const locked = input.locked ?? new Set(changes.flatMap(c => c.from ? [`${c.name}@${c.from}`] : []));
   const lockedNames = new Set([...locked].map(id => id.slice(0, id.lastIndexOf("@"))));
-  const fixedNames = new Set(fixes.map(f => f.package));
-  let targets = changes.filter(c => fixedNames.has(c.name));
+  // The targets are the fixing versions themselves: another copy of a fixed package, added in the same change, neither
+  // sets T nor anchors a sibling (as in `ludion patch`).
+  const fixedVersions = new Set(fixes.map(f => `${f.package}@${f.to}`));
+  let targets = changes.filter(c => fixedVersions.has(`${c.name}@${c.to}`));
   if (!targets.length) targets = changes.filter(c => (input.direct ?? []).includes(c.name));
   const newDependencies = changes.flatMap(c => {
     const next = facts.get(`${c.name}@${c.to}`), prev = c.from ? facts.get(`${c.name}@${c.from}`) : undefined;

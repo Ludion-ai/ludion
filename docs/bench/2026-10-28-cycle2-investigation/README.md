@@ -42,7 +42,7 @@ Investigation only. No definition, gate, wait or counting rule is changed, and b
   - jsDelivr's byte totals equal `unpackedSize`:
     - 0.1.0: 1,842,489, the registry's figure;
     - 0.1.1 and 0.1.2: 2,096,683 and 12,259,267, ecosyste.ms's figures, since the registry no longer lists either version.
-  - The recorded entry counts (32 for 0.1.1, 34 for 0.1.2) exceed the file counts (21, 23) by the yarn-packed tarball's directory entries: 10 folders and `package/`.
+  - The recorded entry counts (32 for 0.1.1, 34 for 0.1.2) exceed the file counts (21, 23) by 11: the tarball's directory entries, 10 folders and `package/`. 0.1.1 was published with `yarn publish` (its `pub` script). 0.1.2 is the worm's repack, published with npm 10.8.2, and that it kept the same directory entries is an inference from the arithmetic.
 - **0.1.0 → 0.1.1.** Every `.js` and `.sol` file is unchanged. The changes:
   - added: `package-lock.json` (863,199 bytes, data that npm ignores in a dependency);
   - removed: `build/contracts/Buffer.json` and `build/contracts/Migrations.json`;
@@ -115,7 +115,7 @@ Investigation only. No definition, gate, wait or counting rule is changed, and b
 | ecosyste.ms | 8 with dependencies, and the publisher and attestation facts for the 3 unverified checks | 2 / 0 / 1 | keeps registry metadata for versions it indexed while they were listed. Its records carry a creation and an update date, not the date of each field (0.1.2's record was created 69.8 s after publication and last updated 2025-11-25) |
 | jsDelivr | 6 (`package.json`) | 0 / 0 / 0 alone | serves files of versions someone requested before removal |
 | ecosyste.ms + jsDelivr | 13 (buffer 0.1.1 is in both), plus the 3 unverified checks | 2 / 0 / 1 | |
-| Software Heritage | holds buffer 0.1.1 (visit 2023-03-23). Holds none of the 7 keys behind the most unknowns. Every visit page was read back to each publish time: none has a visit within 60 days after publication, and the first snapshot after publication holds none of them (`unknowns/swh-blockers.json`) | not estimated beyond that | the anonymous rate limit is 120 requests an hour, so the other keys were not checked |
+| Software Heritage | holds buffer 0.1.1 (visit 2023-03-23). Holds none of the 7 keys behind the most unknowns. Every visit page was read back to each publish time: none has a visit within 60 days after publication, and the first snapshot after publication holds none of them (`unknowns/swh-blockers.json`; its `first_visit` is the earliest visit read, not the origin's first, since reading stops once a page reaches before the publish time) | not estimated beyond that | the anonymous rate limit is 120 requests an hour, so the other keys were not checked |
 | OSV records | no dependency data | 0 | per-source version lists and times only |
 | Security vendor reports | no dependency lists | 0 under the current definitions | they describe payloads in prose; using them would infer facts, a definition change |
 | Wayback Machine, npmmirror, yarn's registry, unpkg | 0 for buffer 0.1.1, the case checked (`unknowns/status-and-osv.json`) | 0 | the Wayback Machine has no capture of the registry document; the mirrors answer 404, as the registry and deps.dev do |

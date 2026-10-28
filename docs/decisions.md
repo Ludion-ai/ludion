@@ -835,7 +835,7 @@ What the exception gives up: an attacker who holds the publisher's account and p
 
 Round 2 of the review approved. Its non-blocking findings were handled before the run as follows:
 
-- **More publishers count as no account.** Besides `trustedPublisher`, so does any `npm-oidc-no-reply@` email, and any name no npm account can have (uppercase or spaces). Another CI's shared user then fails closed.
+- **More publishers count as no account.** Besides `trustedPublisher`, so does any `npm-oidc-no-reply@` email. So does any name that is not lowercase letters, digits, `.`, `_` and `-` beginning with a letter or digit: uppercase or spaces, for example. Another CI's shared user then fails closed. The few real accounts with other lowercase characters (a leading `_` or `-`, or `!~*'()`) lose the publisher branch too; that also fails closed.
 - **`ludion patch`'s targets are the plan's own versions** (name and fixed version). Another added copy of a planned package can neither set T nor anchor a sibling.
 - **A v0.2 source URI's ref starts at the first `@` after the host.** A tag such as `@scope/pkg@1.2.3` no longer leaves part of the ref in the repository.
 

@@ -25,6 +25,8 @@ Nothing here has been published. This is what must be true, and who does it, bef
 - [ ] Release commit: from a commit on main, build in Docker (`npm ci --ignore-scripts`, `npm run build -w ludion-ai`, `node action/build.ts`), force-add packages/cli/dist/cli.js and action/dist/record.js, and commit them on a release branch (never main). Tag it. A second person rebuilds from the same main commit and compares both sha256 values before the SHA is announced. Today this is by hand; a workflow that does it would be a protected change.
 - [ ] Announce the SHA with its tag. Users should check the SHA is the tag's commit in Ludion-ai/ludion, since GitHub also resolves `owner/repo@sha` for commits that exist only in a fork.
 - [ ] Marketplace listing: not done, and needs the owner.
+- [ ] Updates to Ludion itself in users' repositories (a new action SHA, or a new ludion-ai version) must go through the same wait and provenance checks and never be auto-merged (CLAUDE.md). Today only the README asks for a review; nothing checks such an update. Decide before release how that is enforced or stated.
+- [ ] Node floor: start.sh accepts Node 20 (checked), but Node 20 reached end of life on 2026-04-30. Decide whether to raise it to 22.
 - [ ] Add action.yml and action/ to docs/protected-paths.md before the first release: users run this code with a `pull-requests: write` token. That is a protected PR.
 
 ## Live check

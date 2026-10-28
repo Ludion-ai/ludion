@@ -100,7 +100,7 @@ runs:
           echo
           jq -r '"Verdict: `\(.verdict)` · head `\(.head_sha)` · judge \(.judge_seconds // "unknown") s, job \(.job_seconds // "unknown") s"' "$RECORD"
           echo
-          echo "The full judgement is in this run's log and its ludion-judgement artifact; the comment job posts it on the PR."
+          echo "Gate 3 (build and tests) is not run, so no verdict here means the PR can be applied. The full judgement is in this run's log and its ludion-judgement artifact; the comment job posts it on the PR."
         } >> "$GITHUB_STEP_SUMMARY"
 
     - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

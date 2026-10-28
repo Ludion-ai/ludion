@@ -116,7 +116,7 @@ So the gate would not be met under any of the readings above.
   - front-end bundles;
   - desktop apps that ship their runtime;
   - servers started through dev-installed tools.
-- Many other misses count only because of the rule's wording ((b)'s declared-dependency reach, (d)'s `start`) or because they are undecidable. The reviewers' evidence for 88 of the 102 undecidable verdicts (group 5's 58, the 13 shadcn CSS imports and Azure's 17) shows no shipped code loading the package. At least 14 yes verdicts say the same (ore-meshi's 9, jasper-oktavina-wedding's 3, openshield-desktop's cookie, uptime-kuma's `@vue/server-renderer`).
+- Many other misses count only because of the rule's wording ((b)'s declared-dependency reach, (d)'s `start`) or because they are undecidable. The reviewers' evidence for 88 of the 102 undecidable verdicts (group 5's 58, the 13 shadcn CSS imports and Azure's 17) shows no shipped code loading the package. At least 13 yes verdicts say the same: ore-meshi's 9, jasper-oktavina-wedding's 3 and openshield-desktop's cookie. For uptime-kuma's `@vue/server-renderer`, whether the browser bundle contains it was not checked.
 
 "Loaded in production" cannot be decided from the `dev` flag alone. No definition is changed here; deciding how gate 1 should judge this is a design question.
 

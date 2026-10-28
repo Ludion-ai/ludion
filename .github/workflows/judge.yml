@@ -54,10 +54,6 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           persist-credentials: false
 
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .node-version
-
       # The base is the test merge commit's first parent: the event's base SHA is set when the PR opens and is not
       # updated when the base branch moves. That commit must be on the base branch; the judge is built from it.
       - name: Read the PR's package.json and package-lock.json as data
@@ -86,6 +82,13 @@ jobs:
           git diff --no-renames --name-only -z "$base" "$MERGE_SHA" > "$INPUT/files"
           git checkout --quiet --detach "$base"
           echo "base=${base}" >> "$GITHUB_OUTPUT"
+
+      # Node from the base commit's .node-version, once the read step has checked that commit out (#156's review, N4).
+      # Also after a failed read, for the record script.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: .node-version
 
       # The base commit's own dependencies, with no install scripts; the PR's are never installed.
       - name: Build the judge from the base commit

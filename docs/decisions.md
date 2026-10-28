@@ -816,6 +816,51 @@ From that review's non-blocking findings:
 
 Known and kept: when a later head no longer changes `package-lock.json`, judge.yml does not run, and the earlier comment stays. That comment names the head it judged.
 
+## 2026-10-28 (cycle 2) — Dependabot feeds the judge
+
+The owner chose C1. With it, `.github/dependabot.yml` gives the judge on this repository (judge.yml, from the designer's C-1) real dependency PRs. There was no Dependabot configuration before. It covers npm version updates, checked weekly, with at most 5 open PRs at a time.
+
+Chosen here:
+
+- **`directory: /` only.** That is the root lockfile, the one judge.yml judges; the workspaces are locked in it. `examples/npm-security` is a fixture and is left alone.
+- **Everything else is Dependabot's default**: the day of the week, one PR per dependency (no groups), the default cooldown for version updates (3 days since 2026-07-14; design, "既存ツールとの差"), and the default versioning strategy and labels.
+- **The limit of 5 is on version updates.** Security updates are a repository setting, and the limit does not count them.
+- **The file only lets Dependabot open PRs.** Nothing in it merges one.
+
+## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
+
+The owner chose E1 and E2 (cycle 3). One protected PR carries both rules and the non-blocking findings of #156 (N1–N7) and #158 (N1–N8), and #157's findings 5 and 6. The earlier entries are left as they were written and reviewed; where this entry corrects one, it says so. The two Dependabot entries were moved, unchanged, next to the judge's (#157's finding 5).
+
+The rules, now in CLAUDE.md ("Every change goes through a PR") and docs/protected-paths.md:
+
+- **Every review is recorded on its PR** (E1). Every review, protected path or not, is posted as a comment on its PR ending `reviewed-sha: <the head SHA reviewed>`, and a review with no such record on GitHub is never reported as a review. "Every review is recorded on its PR" above left writing this into the two protected files to the owner.
+- **Agents never merge a dependency-update PR** (E2): Dependabot, Renovate and the like, whatever CI says. CLAUDE.md's "Other PRs may auto-merge only with green CI" covered them before (#157's review, finding 1). The same sentence carries E2's other half, in force since the cycle 3 instructions: agents merge no PR an agent did not open. docs/protected-paths.md says that its check does not block dependency updates but agents still do not merge them, and that a dependency file under a protected path is protected (`packages/sandbox/package.json`, #157's finding 2).
+
+#156's findings:
+
+- **N1, the build from the base.** An order check now fails when either part is missing (`at()` in the test), so none passes on -1. The test pins the two checkouts (the event's base and `git checkout --quiet --detach "$base"`), forbids a checkout that names `HEAD_SHA`, `MERGE_SHA`, `refs/ludion/merge`, `head.sha` or `github.sha`, and pins the base branch's refspec and `BASE_REF`. The review's mutations now fail tests. Until this, #156's PR body overstated the tests ("the build from it"); the body is left as reviewed and corrected here.
+- **N2, workflow commands in the log.** record.ts prints the record and the judge's text between `::stop-commands::<random token>` and `::<token>::`, as protected-paths.yml does for file names.
+- **N3, the failed step.** record.ts loads only node's own modules up front (the judgement type is a type-only import). The judge's renderer is imported after the build. A failed read or `npm ci` is now recorded with that step, not as "the judge did not finish".
+- **N4, Node from the base.** setup-node runs after the read step (also after a failed read, for the record script), so `.node-version` comes from the base the judge is built from. "The event's own base SHA is not used" in "The judge on this repository" is narrowed: it is used for the first checkout, which the read step replaces, and in the record until the read step finds the base.
+- **N5, a late re-run.** A re-run reuses its event and so its test merge commit. Once the base branch is 50 or more commits past that commit's base, the re-run is undecidable, and the old merge commit may no longer be fetchable. To judge such a PR again, update it (for Dependabot, `@dependabot rebase`), which makes a new event. The code is not changed.
+- **N6, the refusal before the artifact.** judge-comment.yml finds the PR from GitHub: the open PRs from the run's head owner and branch into the default branch, of which exactly one must come from the run's head repository and branch and be at the run's head. It then reads what that head changes (`compare/<default branch>...<run head>`), and only when that head is not refused does it list, download and parse the artifact. The record must then name the same PR and head. So a refused head's artifact is never downloaded, and that head gets its fixed notice even when its run left no record. A PR that moved on posts nothing, without reading the artifact. A test runs the script with bash against a stand-in for `gh`.
+- **N7, #156's PR body.** "0.918 s now" was measured at 44c0fb6, not at the merged head; that head was checked live instead (0.577 s and 0.701 s). Corrected here.
+
+#158's findings, on CLAUDE.md's line 5:
+
+- **N1.** "`judge()` takes one as an input, but no caller passes it and nothing reads it from the project".
+- **N2 and N4.** Rule 2's threshold is "the urgency's base wait (168h in `ludion patch`)", and the Composer note covers both dates and both rules.
+- **N3.** What `ludion patch` checks over the lockfile diff includes its acquisition policy's checks on where each package comes from (npm: registry tarballs only, no links; Composer: public zip archives). "Only" is gone.
+- **N5.** "the waits of the design's wait table (not its weekly batching)".
+- **N6.** The account of #158's second review left out that its N5 (the closing sentence's own paragraph) and N6 (the PR description) were handled, and that its optional "weekly" note and its note on "A stricter project wait wins" were not. The first is now N5 above. The second: "A stricter project wait wins" in "The judge v0 (npm)" is true of `judge()` only; no caller passes one.
+- **N7.** The cycle-2 CLAUDE.md entry says "nothing judges them" "stopped being true when rules 1 and 2 began". The candidate's OSV re-scan, which stops on MAL- records too, came with #138, before that phrase was written in #142. So it was not true when written, and is clearly false since rules 1 and 2.
+- **N8.** Line 5 is not shortened: the qualifiers are what make it true, as the review says. These edits lengthen it a little.
+
+#157's findings:
+
+- **5.** The two Dependabot entries now follow the judge's entries, here and in progress.md.
+- **6.** `.github/dependabot.yml`'s comment names judge.yml, which exists since #156 was merged. Nothing to change.
+
 ## 2026-10-28 — Composer plans also read Packagist's advisories
 
 The owner asked that Composer planning read Packagist's advisories as well as OSV, and take the later of the two fixed versions. Packagist's advisory API (`https://packagist.org/api/security-advisories/`, the source `composer audit` uses) carries FriendsOfPHP and vendor feeds, which can be published before OSV has them or end a range at a later fix.
@@ -967,17 +1012,6 @@ Two limits are kept:
 - **The ref and the triggering event are not compared.** A `pull_request_target` or `workflow_run` run of the same workflow records the base commit while it builds other code. So does a statement whose claims are not bound to its certificate. Comparing `externalParameters.workflow.ref` and the event, or reading the repository and commit from the certificate's extensions, is later hardening.
 
 Backtest v4 uses the exception as amended here.
-
-## 2026-10-28 (cycle 2) — Dependabot feeds the judge
-
-The owner chose C1. With it, `.github/dependabot.yml` gives the judge on this repository (judge.yml, from the designer's C-1) real dependency PRs. There was no Dependabot configuration before. It covers npm version updates, checked weekly, with at most 5 open PRs at a time.
-
-Chosen here:
-
-- **`directory: /` only.** That is the root lockfile, the one judge.yml judges; the workspaces are locked in it. `examples/npm-security` is a fixture and is left alone.
-- **Everything else is Dependabot's default**: the day of the week, one PR per dependency (no groups), the default cooldown for version updates (3 days since 2026-07-14; design, "既存ツールとの差"), and the default versioning strategy and labels.
-- **The limit of 5 is on version updates.** Security updates are a repository setting, and the limit does not count them.
-- **The file only lets Dependabot open PRs.** Nothing in it merges one.
 
 ## 2026-10-28 — After #151's post-merge review
 

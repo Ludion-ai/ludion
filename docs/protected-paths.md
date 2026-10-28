@@ -12,7 +12,7 @@ PRs that change any of these paths are not auto-merged (CLAUDE.md, "Every change
 - `ludion.config.json`, `wrangler.jsonc`
 - this file, `docs/protected-paths.md`
 
-Dependency files (`package.json`, lockfiles) are not protected paths, so dependency updates are not blocked. Instead, every new dependency is checked by security before it is added.
+Dependency files (`package.json`, lockfiles) outside the paths above are not protected paths, so this check does not block dependency updates. Instead, every new dependency is checked by security before it is added. Agents still never merge a dependency-update PR (Dependabot, Renovate and the like), whatever its checks say, nor any PR an agent did not open (CLAUDE.md, "Every change goes through a PR").
 
 The required check `protected-paths` (`.github/workflows/protected-paths.yml`) fails such a PR until **both** are true for the PR's current head:
 
@@ -26,6 +26,10 @@ The required check `protected-paths` (`.github/workflows/protected-paths.yml`) f
 3. After both, the `review-approved` label is added, with a comment naming the reviewer, the verdict comment, and who approved.
 
 Any push changes the head SHA, so an earlier `reviewed-sha:` stops counting by itself. Steps 1 and 2 must be repeated for the new head; the label can stay. Comments do not start the check, so after posting the new `reviewed-sha:` line, re-run the failed `protected-paths` run (or remove and re-add the label).
+
+## Every review is recorded on its PR
+
+Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and ends with the line `reviewed-sha: <the head SHA it reviewed>`. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review. For a PR that touches no protected path, a later review may cover only what changed since the last one, when it says so; a protected PR's review always reads the full diff at the current head, as above.
 
 ## What this does and does not guarantee
 

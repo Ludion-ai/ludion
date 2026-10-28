@@ -535,7 +535,7 @@ docs/bench/dogfood.
 
 ## 2026-10-28 (cycle 3, L1) — Gate 1's split rebuilt; the noise rerun: count not met, misses not met
 
-- Definitions pushed before any implementation (77f905a). `production.ts`, `ludion judge --source`, and the lockfile reader's skip of npm's extraneous folders (c381a85; 16 new tests). The rerun's first execution at c381a85: 100 of 100 repositories, none failed.
+- Definitions pushed before any implementation (77f905a). `production.ts`, `ludion judge --source`, and the lockfile reader's skip of npm's extraneous folders (c381a85; 25 new tests). The rerun's first execution at c381a85: 100 of 100 repositories, none failed.
 - Count: the judge 938 against npm audit 1,867. 2,814 > 1,867, so **not met** (the first run had 560, met). npm audit's numbers did not change. The rebuilt split on the first run's own OSV results also gives 938.
 - Misses: 160 left out, every one a first-run "no". Five fresh-context reviewers gave 11 yes, 149 no (137 reused) and 0 undecidable: **11 misses in 4 repositories**, so **not met** (the first run had 167 misses in 32 repositories). Every first-run "yes" and "undecidable" is now counted.
 - JakeWharton/jakewharton.com's lockfile now reads.

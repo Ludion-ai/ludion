@@ -20,7 +20,7 @@ const [osvDir, outFile, size = "200"] = process.argv.slice(2);
 if (!osvDir || !outFile) throw new Error("Usage: node tools/backtest/src/fixes.ts <osv-npm-dir> <out.json> [sample-size]");
 const SAMPLE = Number(size);
 
-type Candidate = { id: string; name: string; fixed: string; key: string };
+type Candidate = { id: string; name: string; fixed: string; key: string; advisoryPublished: string };
 const candidates: Candidate[] = [];
 for (const file of readdirSync(osvDir)) {
   if (!file.startsWith("GHSA-")) continue;
@@ -31,7 +31,7 @@ for (const file of readdirSync(osvDir)) {
     for (const range of affected.ranges ?? []) for (const event of range.events ?? []) {
       if (typeof event.fixed !== "string" || !semver.valid(event.fixed) || semver.prerelease(event.fixed)) continue;
       const key = createHash("sha256").update(`${record.id}\0${affected.package.name}\0${event.fixed}`).digest("hex");
-      candidates.push({ id: record.id, name: affected.package.name, fixed: event.fixed, key });
+      candidates.push({ id: record.id, name: affected.package.name, fixed: event.fixed, key, advisoryPublished: record.published });
     }
   }
 }
@@ -57,7 +57,7 @@ async function times(name: string): Promise<Record<string, string> | null> {
   return out;
 }
 
-type Row = { id: string; name: string; from: string; to: string; fix_published: string; verdict: string; urgency: string; wait_hours: number; delay_hours: number | null; stops: string[]; extends: string[] };
+type Row = { id: string; name: string; from: string; to: string; fix_published: string; advisory_published: string; added_delay_hours: number | null; verdict: string; urgency: string; wait_hours: number; delay_hours: number | null; stops: string[]; extends: string[] };
 const rows: Row[] = [], skipped: Record<string, number> = { fix_not_published_2025: 0, no_earlier_version: 0, registry: 0, facts: 0, duplicate: 0 };
 const seen = new Set<string>();
 for (const c of candidates) {
@@ -76,7 +76,10 @@ for (const c of candidates) {
   const result = judge({ changes: [change], facts: gathered.facts, fixes: gathered.fixes, files: ["package-lock.json"], now: new Date("2100-01-01T00:00:00Z") });
   const stops = result.findings.filter(f => f.effect === "stop" && f.gate !== 4).map(f => f.message);
   rows.push({
-    id: c.id, name: c.name, from, to: c.fixed, fix_published: published, verdict: stops.length ? "stop" : "ready_except_build",
+    id: c.id, name: c.name, from, to: c.fixed, fix_published: published, advisory_published: c.advisoryPublished,
+    // Ludion's added delay (docs/decisions.md, "Backtest rerun"): max(0, fix publish + wait - advisory publish).
+    added_delay_hours: stops.length ? null : Math.max(0, Math.round((Date.parse(published) + result.wait_hours * 3_600_000 - Date.parse(c.advisoryPublished)) / 360_000) / 10),
+    verdict: stops.length ? "stop" : "ready_except_build",
     urgency: result.urgency, wait_hours: result.wait_hours, delay_hours: stops.length ? null : result.wait_hours,
     stops, extends: result.findings.filter(f => f.effect === "extend").map(f => f.message),
   });
@@ -95,6 +98,11 @@ const result = {
   stopped: count(r => r.verdict === "stop"),
   extended: count(r => r.extends.length > 0),
   by_urgency: Object.fromEntries(["exploited", "high", "normal", "low"].map(u => [u, count(r => r.urgency === u)])),
+  added_delay_by_urgency: Object.fromEntries(["exploited", "high", "normal", "low"].map(u => {
+    const d = rows.filter(r => r.urgency === u && r.added_delay_hours !== null).map(r => r.added_delay_hours!).sort((a, b) => a - b);
+    return [u, { n: d.length, median: d[Math.floor(d.length / 2)] ?? null, p90: d[Math.floor(d.length * 0.9)] ?? null, stopped: count(r => r.urgency === u && r.verdict === "stop") }];
+  })),
+  advisory_before_fix: count(r => Date.parse(r.advisory_published) < Date.parse(r.fix_published)),
   stop_reasons: [...rows.flatMap(r => r.stops.map(s => s.replace(/^\S+ /, "").replace(/[\d.]+/g, "#").slice(0, 60))).reduce((m, s) => m.set(s, (m.get(s) ?? 0) + 1), new Map<string, number>())].sort((a, b) => b[1] - a[1]),
   caveats: [
     "Deprecation, provenance and publisher are today's registry facts, not those of the time; a later deprecation counts as a stop.",

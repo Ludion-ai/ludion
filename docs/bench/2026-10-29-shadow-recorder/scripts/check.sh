@@ -20,7 +20,7 @@ mutate() {
   run "npx vitest run tools/shadow 2>&1 | grep -E 'Tests '"
   cp "$F.orig" "$F"
 }
-mutate "e-mail scrub off" 'return value.replace(/mailto:' 'return value; value.replace(/mailto:'
+mutate "e-mail scrub off" 'return scrubText(value);' 'return value;'
 mutate "storage limit off" 'if (this.bytes + Buffer.byteLength(line) > this.cfg.maxBytes)' 'if (false)'
 mutate "integrity check off" '!== integrity) return { status: "integrity_mismatch"' '=== "never") return { status: "integrity_mismatch"'
 mutate "first sight never new" 'started !== null && time[v] !== undefined' 'false && time[v] !== undefined'

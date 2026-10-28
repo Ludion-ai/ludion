@@ -94,8 +94,9 @@ function judged(m: Meta, input: string): JudgeRecord {
 /** Exit 0 when the judge gave a judgement (any verdict), 1 when it did not: the job's colour shows the judge's health. */
 function main(env: NodeJS.ProcessEnv): number {
   const m = meta(env), out = env.RECORD ?? "";
-  const record = env.BUILD_OUTCOME !== "success" ? recordOf(m, "The judge could not be built from the base commit; see the run log.")
-    : env.READ_OUTCOME !== "success" ? recordOf(m, "The PR's package.json and package-lock.json could not be read; see the run log.")
+  // The read step runs first: it finds the base commit that the build step then builds.
+  const record = env.READ_OUTCOME !== "success" ? recordOf(m, "The PR's package.json and package-lock.json could not be read; see the run log.")
+    : env.BUILD_OUTCOME !== "success" ? recordOf(m, "The judge could not be built from the base commit; see the run log.")
     : judged(m, env.INPUT ?? "");
   writeFileSync(out, `${JSON.stringify(record, null, 2)}\n`);
   const { judgement: _, text, ...summary } = record;

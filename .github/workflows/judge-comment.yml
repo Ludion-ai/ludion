@@ -46,7 +46,7 @@ jobs:
           # The record's schema (.github/judge/record.ts), applied to the slurped artifact. The text limit counts the
           # four spaces the comment adds to each line, so the comment stays under GitHub's 65,536 characters.
           VALID: |
-            def sha: type == "string" and length == 40 and test("^[0-9a-f]+$");
+            def sha: type == "string" and length == 40 and test("^[0-9a-f]{40}$");
             def time: type == "string" and (contains("\n") | not) and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,3})?Z$");
             def seconds: . == null or (type == "number" and . >= 0 and . < 86400);
             def text($n): type == "string" and length + 4 * (split("\n") | length) <= $n;
@@ -69,10 +69,11 @@ jobs:
             (.files | length) >= 300
             or any(.files[]; (.filename | startswith(".github/")) or ((.previous_filename // "") | startswith(".github/")))
           # The comment. The judge's text is shown as an indented code block, so nothing in it is read as Markdown,
-          # a mention or a line of its own (such as reviewed-sha:). Control characters (C0 and C1), bidirectional
-          # marks and overrides, and zero-width characters are dropped; tabs become spaces.
+          # a mention or a line of its own (such as reviewed-sha:). Dropped: control characters (C0, C1), the soft
+          # hyphen, bidirectional marks, overrides and isolates, zero-width and invisible format characters, line and
+          # paragraph separators, and tag characters. Tabs become spaces.
           BODY: |
-            def hidden: (. < 32 and . != 10) or (. >= 127 and . <= 159) or . == 1564 or (. >= 8203 and . <= 8207) or (. >= 8234 and . <= 8238) or (. >= 8288 and . <= 8297) or . == 65279;
+            def hidden: (. < 32 and . != 10) or (. >= 127 and . <= 159) or . == 173 or . == 1564 or . == 6158 or (. >= 8203 and . <= 8207) or (. >= 8232 and . <= 8238) or (. >= 8288 and . <= 8303) or . == 65279 or (. >= 917504 and . <= 917631);
             def clean: explode | map(if . == 9 then 32 else . end | select(hidden | not)) | implode;
             def block: clean | split("\n") | map("    " + .) | join("\n");
             def named: {stop: "停止", wait: "待機", ready_except_build: "可（関門3は未実施のため、適用してよいという判定ではない）", undecidable: "判定不能"}[.];
@@ -83,7 +84,7 @@ jobs:
               "Ludion 判定役 v0（npm）による参考表示で、必須チェックではない。判定するのは関門1・2・4の一部と待機だけで（実装した範囲と「Not checked」は判定役の出力にある）、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。",
               "",
               (if $refused then
-                "判定: **判定不能**（`undecidable`） · この PR の head は .github/ を変更している。判定ジョブはワークフロー定義を PR から読むため、その結果は信用しない。 · head `\($r.head_sha)` · [実行ログ](\($run))"
+                "判定: **判定不能**（`undecidable`） · この PR の head は .github/ を変更している、または変更ファイルが 300 以上で確かめられない。判定ジョブはワークフロー定義を PR から読むため、その結果は信用しない。 · head `\($r.head_sha)` · [実行ログ](\($run))"
               else
                 "判定: **\($r.verdict | named)**（`\($r.verdict)`） · 判定した head `\($r.head_sha)` · 判定にかかった時間: 判定役 \($r.judge_seconds // "不明") 秒、ジョブ開始から \($r.job_seconds // "不明") 秒 · [実行ログ](\($run))",
                 "",
@@ -126,10 +127,15 @@ jobs:
             echo "::error::The judgement names head ${head}, but run ${RUN_ID} was for ${RUN_HEAD}. Nothing posted."
             exit 1
           fi
-          info=$(gh api "repos/${REPO}/pulls/${pr}" --jq '"\(.state) \(.head.sha) \(.base.ref) \(.head.repo.full_name // "-") \(.head.ref)"')
-          read -r state current base_ref head_repo head_ref <<< "$info"
+          info=$(gh api "repos/${REPO}/pulls/${pr}" --jq '"\(.state) \(.head.sha) \(.base.ref) \(.base.repo.default_branch) \(.head.repo.full_name // "-") \(.head.ref)"')
+          read -r state current base_ref default_branch head_repo head_ref <<< "$info"
           if [ "$state" != "open" ] || [ "$current" != "$head" ]; then
             echo "PR #${pr} is ${state} at ${current}; this judgement is for ${head}. Nothing posted."
+            exit 0
+          fi
+          # A PR into another branch was judged by that branch's judge.yml.
+          if [ "$base_ref" != "$default_branch" ]; then
+            echo "PR #${pr} is into ${base_ref}, not ${default_branch}. Nothing posted."
             exit 0
           fi
           if [ "$head_repo" != "$RUN_REPO" ] || [ "$head_ref" != "$RUN_BRANCH" ]; then

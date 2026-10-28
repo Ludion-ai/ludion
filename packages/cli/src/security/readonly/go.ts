@@ -8,11 +8,12 @@ import type { ReadOnlyInventory, ReadOnlyPackage } from "./types.ts";
  * `// indirect` marks the ones the main module does not import itself. go.sum is not the inventory: it also holds
  * checksums of modules outside the build list. The Go distribution is two OSV packages, `stdlib` (the standard library
  * compiled into the program) and `toolchain` (cmd/go and the other commands run at build time), both at the version on
- * go.mod's toolchain line. Module versions are kept exactly as go.mod writes them (OSV matches them with or without the
- * leading v, pseudo-versions and +incompatible included); the toolchain's "go" prefix is dropped, since OSV does not match
- * "go1.22.5" as a stdlib version.
+ * go.mod's toolchain line. That line is not necessarily the Go that builds (a minimum under GOTOOLCHAIN=auto, ignored
+ * under GOTOOLCHAIN=local), so checking it always adds a limitation. Module versions are kept exactly as go.mod writes
+ * them (OSV matches them with or without the leading v, pseudo-versions and +incompatible included); the toolchain's
+ * "go" prefix is dropped, since OSV does not match "go1.22.5" as a stdlib version.
  */
-export const GO_SCOPE = "go.mod require list, the module build list since Go 1.17 (go.sum was not used as the inventory: it also records modules outside the build list), plus the Go standard library and go command (OSV packages stdlib and toolchain) at the version on go.mod's toolchain line. That line is the minimum toolchain under the default GOTOOLCHAIN=auto; a newer installed Go, or a GOTOOLCHAIN setting, builds instead.";
+export const GO_SCOPE = "go.mod require list, the module build list since Go 1.17 (go.sum was not used as the inventory: it also records modules outside the build list), plus the Go standard library and go command (OSV packages stdlib and toolchain) at the version on go.mod's toolchain line. That line is a minimum under GOTOOLCHAIN=auto and is ignored under GOTOOLCHAIN=local, so the Go that builds may be another version; the limitations always say so.";
 
 type Token = { text: string; kind: "word" | "string" | "punct" };
 type Directive = { verb: string; args: Token[]; comment?: string; line: number };
@@ -64,7 +65,8 @@ const KNOWN_VERBS = new Set([...BLOCK_VERBS, "go", "toolchain"]);
 function directives(text: string): Directive[] {
   const out: Directive[] = [];
   let block: { verb: string; line: number } | undefined;
-  for (const [index, raw] of text.replace(/^﻿/, "").split("\n").entries()) {
+  // No byte-order mark: Go rejects one ("unexpected input character"), and the lexer does too.
+  for (const [index, raw] of text.split("\n").entries()) {
     const line = index + 1, { tokens, comment } = lex(raw, line);
     if (!tokens.length) continue;
     if (block) {
@@ -116,6 +118,34 @@ function moduleVersion(token: Token | undefined, line: number): string {
   if (version.length > 128 || !MODULE_VERSION.test(version)) fail(line, `invalid module version ${shown(version)} (expected a full version such as v1.2.3)`);
   return version;
 }
+/**
+ * Go's module.SplitPathVersion: a path's major-version suffix, "" for none, "/vN" (N >= 2) or gopkg.in's ".vN" (any N,
+ * optionally "-unstable"). A suffix Go rejects ("/v1", "/v0", "/v2.1", a gopkg.in path without .vN) is an error.
+ */
+function pathMajor(path: string, line: number): string {
+  const major = path.startsWith("gopkg.in/") ? /\.v(?:0|[1-9]\d*(?:-unstable)?)$/.exec(path)?.[0] : (() => {
+    const suffix = /\/v([0-9.]+)$/.exec(path);
+    if (!suffix) return "";
+    return /^[1-9]\d*$/.test(suffix[1]!) && suffix[1] !== "1" ? suffix[0] : undefined;
+  })();
+  if (major === undefined) fail(line, `invalid module path ${shown(path)} (its major-version suffix is not one Go accepts)`);
+  return major!;
+}
+/** Go's module.CheckPathMajor: v0/v1 (or +incompatible) without a suffix, otherwise the suffix's major version. */
+function checkPathMajor(path: string, version: string, line: number): void {
+  const major = pathMajor(path, line).replace(/^(\.v.*)-unstable$/, "$1"), actual = /^v\d+/.exec(version)![0];
+  // Go allows an old pseudo-version bug: v0.0.0- pseudo-versions for gopkg.in .v1 paths.
+  if (version.startsWith("v0.0.0-") && major === ".v1") return;
+  const expected = major === "" ? "v0 or v1" : major.slice(1);
+  if (major === "" ? actual === "v0" || actual === "v1" || version.endsWith("+incompatible") : actual === expected) return;
+  fail(line, `invalid version ${version} for ${path}: should be ${expected}, not ${actual}`);
+}
+/** A module path and version, as require and exclude take them. */
+function moduleVersionOf(path: Token | undefined, version: Token | undefined, line: number): [string, string] {
+  const p = modulePath(path, line), v = moduleVersion(version, line);
+  checkPathMajor(p, v, line);
+  return [p, v];
+}
 /** Go's own test: the line's comment is exactly "indirect", or starts with "indirect;". */
 function isIndirect(comment: string | undefined): boolean {
   const fields = comment?.trim().split(/\s+/).filter(Boolean) ?? [];
@@ -129,12 +159,15 @@ const PRUNING = "before Go 1.17 the require list need not name every module the 
 /**
  * The inventory one go.mod declares. Replaced requirements are left out and listed in limitations: a local directory
  * is not a published version, and a module replacement is not substituted (neither the original, which the build does
- * not use, nor the replacement is checked). exclude and retract do not change the inventory and are only validated.
- * Malformed lines throw; an unknown directive is ignored and listed.
+ * not use, nor the replacement is checked). A requirement on a version go.mod itself excludes is dropped by Go, so it
+ * is left out and listed too; other excludes, and retract, do not change the inventory and are only validated.
+ * Malformed lines, and anything else Go's parser rejects that Ludion checks for, throw; unknown directives are ignored
+ * and listed in one bounded limitation.
  */
 export function parseGoMod(text: string): { packages: ReadOnlyPackage[]; limitations: string[] } {
   let module: string | undefined, go: string | undefined, toolchain: string | undefined;
   const required = new Map<string, { version: string; direct: boolean }>();
+  const excluded = new Set<string>(); // "path\0version"
   // "path\0version" or "path\0" -> the replacement "path version", or null for a local directory, whose path is
   // compared (same) to find conflicting replacements but never reported.
   const replaced = new Map<string, { target: string | null; same: string }>();
@@ -161,19 +194,25 @@ export function parseGoMod(text: string): { packages: ReadOnlyPackage[]; limitat
         break;
       case "require": {
         count(2, "require <module path> <version>");
-        const path = modulePath(args[0], line), version = moduleVersion(args[1], line);
+        const [path, version] = moduleVersionOf(args[0], args[1], line);
         if (required.has(path)) fail(line, `${path} is required more than once`);
+        // Bounds the inventory, and with it every per-module limitation.
+        if (required.size >= 2000) fail(line, "more than 2,000 requirements; the advisory scan is capped at 2,000 package versions");
         required.set(path, { version, direct: !isIndirect(comment) });
         break;
       }
-      case "exclude":
+      case "exclude": {
         count(2, "exclude <module path> <version>");
-        modulePath(args[0], line); moduleVersion(args[1], line);
+        const [path, version] = moduleVersionOf(args[0], args[1], line);
+        excluded.add(`${path}\0${version}`);
         break;
+      }
       case "replace": {
         const arrow = args[1]?.kind === "word" && args[1].text === "=>" ? 1 : 2;
         if (args.length < arrow + 2 || args.length > arrow + 3 || args[arrow]?.kind !== "word" || args[arrow]!.text !== "=>") fail(line, "expected replace <module path> [<version>] => <module path> <version> | <directory>");
         const from = modulePath(args[0], line), fromVersion = arrow === 2 ? moduleVersion(args[1], line) : "";
+        // As in Go, the replaced side's path and version must agree on the major version; the replacement's need not.
+        if (fromVersion) checkPathMajor(from, fromVersion, line); else pathMajor(from, line);
         const to = argument(args[arrow + 1], line);
         let target: string | null;
         if (isDirectoryPath(to)) {
@@ -215,7 +254,10 @@ export function parseGoMod(text: string): { packages: ReadOnlyPackage[]; limitat
   for (const [path, { version, direct }] of required) {
     // Go: a replacement for this exact version wins over one for every version of the module.
     const key = replaced.has(`${path}\0${version}`) ? `${path}\0${version}` : `${path}\0`;
-    if (replaced.has(key)) {
+    if (excluded.has(`${path}\0${version}`)) {
+      // Go prints "dropping requirement on excluded version" and leaves the module out of the build list.
+      limitations.push(`${path} ${version} is excluded by go.mod's own exclude directive, so Go drops this requirement; it was left out, and any other version Go might use instead was not checked.`);
+    } else if (replaced.has(key)) {
       const { target } = replaced.get(key)!;
       limitations.push(target === null
         ? `${path} ${version} is replaced by a local directory; its code is not a published module version, so it was not checked.`
@@ -230,20 +272,26 @@ export function parseGoMod(text: string): { packages: ReadOnlyPackage[]; limitat
   else if (goVersion![0] === 1 && goVersion![1]! < 17) limitations.push(`go.mod declares go ${go}; ${PRUNING}.`);
 
   const release = toolchain === undefined ? null : RELEASE_TOOLCHAIN.exec(toolchain);
-  const stdlib = "so the Go standard library and go command (stdlib, toolchain) were not checked";
-  if (toolchain === undefined) limitations.push(`go.mod has no toolchain line${go === undefined ? "" : `; its go ${go} line is a minimum, not the toolchain in use`}. The Go toolchain in use is unknown, ${stdlib}.`);
-  else if (toolchain === "default") limitations.push(`go.mod says toolchain default, so the Go toolchain in use is unknown, ${stdlib}.`);
-  else if (!release) limitations.push(`go.mod's toolchain ${toolchain} is not a release name of the form goX.Y.Z, ${stdlib}.`);
+  const unchecked = (why: string) => limitations.push(`${why} The Go toolchain in use is unknown, so the Go standard library and go command (stdlib, toolchain) were not checked.`);
+  if (toolchain === undefined) unchecked(`go.mod has no toolchain line${go === undefined ? "." : `, and its go ${go} line is a minimum, not the toolchain in use.`}`);
+  else if (toolchain === "default") unchecked("go.mod says toolchain default, which names no version.");
+  else if (!release) unchecked(`go.mod's toolchain ${toolchain} is not a release name of the form goX.Y.Z.`);
   else {
     // A go line of 1.22 or 1.22rc1 is older than 1.22.0, so comparing the numbers alone is enough.
     const version = release.slice(1, 4).map(Number), differs = goVersion ? version.findIndex((n, i) => n !== goVersion[i]) : -1;
-    if (differs !== -1 && version[differs]! < goVersion![differs]!) limitations.push(`go.mod's toolchain ${toolchain} is older than its go ${go} line, so the Go toolchain in use is unknown, ${stdlib}.`);
+    if (differs !== -1 && version[differs]! < goVersion![differs]!) unchecked(`go.mod's toolchain ${toolchain} is older than its go ${go} line.`);
     else {
       const plain = version.join(".");
       packages.push({ name: "stdlib", version: plain, direct: true }, { name: "toolchain", version: plain, direct: true });
+      // Even then the line is not the Go that builds, so a clean stdlib result is never complete.
+      limitations.push(`stdlib and toolchain were checked at ${plain}, go.mod's toolchain line, but that line is only a minimum under GOTOOLCHAIN=auto and is ignored under GOTOOLCHAIN=local (which the official golang Docker images set). The Go that actually builds may be another version, whose standard library and go command advisories may be missing.`);
     }
   }
-  for (const [verb, line] of unknown) limitations.push(`go.mod directive ${verb} (line ${line}) is not one Ludion reads; it was ignored and may change the build.`);
+  if (unknown.size) {
+    const named = [...unknown].slice(0, 10).map(([verb, line]) => `${verb} (line ${line})`).join(", ");
+    const more = unknown.size > 10 ? `, and ${unknown.size - 10} more` : "";
+    limitations.push(`go.mod has ${unknown.size === 1 ? "a directive" : `${unknown.size} directives`} Ludion does not read: ${named}${more}. ${unknown.size === 1 ? "It was" : "They were"} ignored and may change the build.`);
+  }
   if (packages.length > 2000) throw new Error("Advisory scan exceeds 2,000 distinct installed package versions.");
   return { packages, limitations };
 }

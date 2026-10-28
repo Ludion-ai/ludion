@@ -388,6 +388,11 @@ export function judge(input: {
   split?: SplitSummary;
   /** Skipped extraneous lockfile folders (lockExtraneous) that are added, removed or changed. */
   extraneous?: string[];
+  /**
+   * Changed workspace package.json files (workspace-manifests.ts) with why each is more than the lockfile's dependency
+   * update: no reasons when it agrees, null when a side could not be read.
+   */
+  workspaces?: { file: string; reasons: string[] | null }[];
 }): Judgement {
   const { changes, facts, fixes, now } = input;
   const findings: Finding[] = [];
@@ -408,8 +413,17 @@ export function judge(input: {
     add({ gate: 4, effect: "info", message: input.files === null ? `The PR's changed files were not given (--files), so gate 4 could not check that only package.json and ${lockName} change.` : `The given changed files do not include ${lockName}, although the lockfile changed.` });
     undecidable = true;
   } else {
-    const unexpected = input.files.filter(f => !["package.json", lockName].includes(f));
+    // A workspace's package.json may change too, but only as the lockfile records it
+    // (docs/decisions/2026-10-29-l9-workspace-package-json.md).
+    const agreeing = (input.workspaces ?? []).filter(w => w.reasons?.length === 0 && input.files!.includes(w.file)).map(w => w.file);
+    const unexpected = input.files.filter(f => !["package.json", lockName].includes(f) && !agreeing.includes(f));
     if (unexpected.length) add({ gate: 4, effect: "stop", message: `The change also touches ${unexpected.join(", ")}; a dependency update must change only package.json and ${lockName}.` });
+    for (const { file, reasons } of input.workspaces ?? []) {
+      if (!input.files.includes(file)) continue;
+      if (reasons === null) { add({ gate: 4, effect: "stop", message: `${file} could not be read both before and after the change, so whether it agrees with the lockfile is undecidable.` }); undecidable = true; }
+      else for (const message of reasons) add({ gate: 4, effect: "stop", message });
+    }
+    if (agreeing.length) add({ gate: 4, effect: "info", message: `${agreeing.join(", ")}: a workspace's dependency lists change, and before and after they equal the lockfile's record of that workspace.` });
   }
   if (input.lockfile === "pnpm-lock") { add({ gate: 4, effect: "info", message: "pnpm-lock.yaml is read as the set of versions it adds: each entry's tarball and hash, and what each dependent loads, are not checked for pnpm." }); undecidable = true; }
   if (input.manifest) for (const message of manifestChanges(input.manifest.before, input.manifest.after)) add({ gate: 4, effect: "stop", message });

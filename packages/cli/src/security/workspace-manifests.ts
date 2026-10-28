@@ -1,6 +1,6 @@
 // Gate 4 and a workspace's own package.json. Dependabot changes it when it updates that workspace's dependency; the
-// change is a dependency update only when it agrees with the lockfile (docs/decisions.md, "Workspace package.json
-// changes in the judge's gate 4").
+// change is a dependency update only when it agrees with the lockfile
+// (docs/decisions/2026-10-29-l9-workspace-package-json.md).
 import { manifestChanges } from "./judge.ts";
 
 const GROUPS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];

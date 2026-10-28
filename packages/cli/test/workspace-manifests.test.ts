@@ -1,4 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { mkdirSync, mkdtempSync, renameSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { describe, expect, it, vi } from "vitest";
+import { allChanges, judge, lockEntries, lockEntryChanges, type Change, type Judgement, type VersionFacts } from "../src/security/judge.ts";
+import { judgeCli, workspaceManifests } from "../src/security/judge-cli.ts";
 import { workspaceDir, workspaceManifestChanges } from "../src/security/workspace-manifests.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
@@ -92,5 +97,123 @@ describe("a workspace package.json that does not agree with the lockfile stops",
     const lockAfter = workerLock("^4.13.14", "4.13.14");
     const record = { ...lockAfter["apps/worker"], bin: { worker: "x.js" } };
     expect(pr161({ lock: { before: workerLock("^4.13.13", "4.13.13"), after: { ...lockAfter, "apps/worker": record } } })).toEqual(['The lockfile\'s record of apps/worker changes "bin", which is not a dependency list.']);
+  });
+});
+
+// The judge with the rule wired in (judge-cli.ts reads the files, judge.ts leaves agreeing ones out of gate 4's
+// changed-files stop): the same checkouts judged with and without it differ only in that stop and one info line.
+const factsOf = (changes: Change[]) => {
+  const one = (name: string, published_at: string): VersionFacts => ({ published_at, present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: { repository: `https://github.com/acme/${name}`, workflow: ".github/workflows/release.yml", commit: "1".repeat(40) }, install_scripts: [], dependencies: [], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z" });
+  return new Map(changes.flatMap(c => [[`${c.name}@${c.to}`, one(c.name, "2026-10-01T00:00:00Z")] as const, ...(c.from ? [[`${c.name}@${c.from}`, one(c.name, "2026-09-01T00:00:00Z")] as const] : [])]));
+};
+const lockText = (packages: Record<string, unknown>) => JSON.stringify({ name: "ludion-repo", lockfileVersion: 3, requires: true, packages });
+type Side = { manifest?: unknown; lock: Record<string, unknown> };
+/** Two checkouts on disk with the root manifest, the lockfile and the workspace's package.json (a side may leave it out). */
+function checkouts(file: string, sides: { before: Side; after: Side }) {
+  const dirs = { before: mkdtempSync(join(tmpdir(), "ludion-l9-before-")), after: mkdtempSync(join(tmpdir(), "ludion-l9-after-")) };
+  for (const side of ["before", "after"] as const) {
+    writeFileSync(join(dirs[side], "package.json"), JSON.stringify(ROOT));
+    writeFileSync(join(dirs[side], "package-lock.json"), lockText(sides[side].lock));
+    const manifest = sides[side].manifest;
+    if (manifest === undefined) continue;
+    mkdirSync(join(dirs[side], dirname(file)), { recursive: true });
+    writeFileSync(join(dirs[side], file), typeof manifest === "string" ? manifest : JSON.stringify(manifest));
+  }
+  return dirs;
+}
+function judgeBoth(file: string, sides: { before: Side; after: Side }, files = ["package-lock.json", file]) {
+  const dirs = checkouts(file, sides);
+  const lock = { before: lockText(sides.before.lock), after: lockText(sides.after.lock) };
+  const workspaces = workspaceManifests(dirs.before, dirs.after, files, { before: ROOT, after: ROOT }, lock);
+  const changes = allChanges(lock.before, lock.after);
+  const input = {
+    changes, entries: lockEntryChanges(lockEntries(lock.before), lockEntries(lock.after)), facts: factsOf(changes), fixes: [], files, now: new Date("2027-01-01T00:00:00Z"),
+    locked: new Set(lockEntries(lock.before).map(e => `${e.name}@${e.version}`)), created: new Map(changes.map(c => [c.name, "2020-01-01T00:00:00Z"])), direct: changes.map(c => c.name),
+  };
+  return { workspaces, unfixed: judge(input), fixed: judge({ ...input, workspaces }) };
+}
+const touches = (j: Judgement) => j.findings.filter(f => f.gate === 4 && f.effect === "stop" && f.message.startsWith("The change also touches"));
+const SHAPE_161 = { before: { manifest: worker("^4.13.13"), lock: workerLock("^4.13.13", "4.13.13") }, after: { manifest: worker("^4.13.14"), lock: workerLock("^4.13.14", "4.13.14") } };
+const SHAPE_162 = { before: { manifest: site("^7.3.6"), lock: siteLock("^7.3.6", SITE_BEFORE) }, after: { manifest: site("^7.4.2"), lock: siteLock("^7.4.2", SITE_AFTER) } };
+const otherWorker = (range: string, version: string) => ({ ...workerLock(range, version), "other/worker": workerLock(range, version)["apps/worker"] });
+
+describe("the judge with workspace package.json files", () => {
+  it.each([["#161", "apps/worker/package.json", SHAPE_161], ["#162", "apps/site/package.json", SHAPE_162]] as const)("%s's shape: an agreeing file is no gate 4 stop, and nothing else changes", (_pr, file, shape) => {
+    const { workspaces, unfixed, fixed } = judgeBoth(file, shape);
+    expect(workspaces).toEqual([{ file, reasons: [] }]);
+    expect(touches(unfixed)).toEqual([expect.objectContaining({ message: expect.stringContaining(`touches ${file};`) })]);
+    expect(unfixed.verdict).toBe("stop");
+    expect(touches(fixed)).toEqual([]);
+    expect(fixed.verdict).toBe("ready_except_build");
+    const info = { gate: 4, effect: "info", message: `${file}: a workspace's dependency lists change, and before and after they equal the lockfile's record of that workspace.` };
+    const sorted = (findings: unknown[]) => findings.map(f => JSON.stringify(f)).sort();
+    expect(sorted(fixed.findings)).toEqual(sorted([...unfixed.findings.filter(f => !touches(unfixed).includes(f)), info]));
+  });
+  it("keeps the stop for other files next to an agreeing one", () => {
+    const { fixed } = judgeBoth("apps/worker/package.json", SHAPE_161, ["package-lock.json", "apps/worker/package.json", "apps/worker/src/index.ts"]);
+    expect(touches(fixed).map(f => f.message)).toEqual([expect.stringContaining("touches apps/worker/src/index.ts;")]);
+    expect(fixed.verdict).toBe("stop");
+  });
+  it.each([
+    ["a range the lockfile does not record", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, lock: workerLock("^4.13.13", "4.13.14") } }, "is not the lockfile's record of apps/worker"],
+    ["a new install script", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, manifest: { ...worker("^4.13.14"), scripts: { postinstall: "node x.js" } } } }, 'changes "scripts"'],
+    ["a spec outside the registry", "apps/worker/package.json", { ...SHAPE_161, after: { manifest: worker("github:evil/hono"), lock: workerLock("github:evil/hono", "4.13.14") } }, "not a registry range"],
+    ["a file that is not JSON", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, manifest: "{ not json" } }, "is not a JSON object on both sides"],
+    ["a folder the root's workspaces do not name", "other/worker/package.json", { before: { manifest: worker("^4.13.13"), lock: otherWorker("^4.13.13", "4.13.13") }, after: { manifest: worker("^4.13.14"), lock: otherWorker("^4.13.14", "4.13.14") } }, "is not a workspace that the root package.json"],
+  ] as const)("stops %s, with the file still in the changed-files stop", (_name, file, shape, reason) => {
+    const { workspaces, fixed } = judgeBoth(file, shape);
+    expect(workspaces).toEqual([{ file, reasons: [expect.stringContaining(reason)] }]);
+    expect(touches(fixed)).toEqual([expect.objectContaining({ message: expect.stringContaining(`touches ${file};`) })]);
+    expect(fixed.findings).toContainEqual({ gate: 4, effect: "stop", message: expect.stringContaining(reason) });
+    expect(fixed.findings.some(f => f.effect === "info" && f.message.includes("equal the lockfile's record"))).toBe(false);
+    expect(fixed.verdict).toBe("stop");
+  });
+  it("is undecidable when a side was not given or is not a regular file (judge.yml gives neither side today)", () => {
+    for (const shape of [{ ...SHAPE_161, before: { lock: SHAPE_161.before.lock } }, { ...SHAPE_161, after: { lock: SHAPE_161.after.lock } }, { before: { lock: SHAPE_161.before.lock }, after: { lock: SHAPE_161.after.lock } }]) {
+      const { workspaces, fixed } = judgeBoth("apps/worker/package.json", shape);
+      expect(workspaces).toEqual([{ file: "apps/worker/package.json", reasons: null }]);
+      expect(touches(fixed)).toHaveLength(1);
+      expect(fixed.findings).toContainEqual({ gate: 4, effect: "stop", message: "apps/worker/package.json could not be read both before and after the change, so whether it agrees with the lockfile is undecidable." });
+      expect(fixed.verdict).toBe("undecidable");
+    }
+    const dirs = checkouts("apps/worker/package.json", SHAPE_161);
+    const real = join(dirs.after, "apps/worker/real.json");
+    renameSync(join(dirs.after, "apps/worker/package.json"), real);
+    symlinkSync(real, join(dirs.after, "apps/worker/package.json"));
+    const lock = { before: lockText(SHAPE_161.before.lock), after: lockText(SHAPE_161.after.lock) };
+    expect(workspaceManifests(dirs.before, dirs.after, ["package-lock.json", "apps/worker/package.json"], { before: ROOT, after: ROOT }, lock)).toEqual([{ file: "apps/worker/package.json", reasons: null }]);
+  });
+  it("is wired into ludion judge (offline: every lookup fails, so the verdict is undecidable either way)", async () => {
+    const cli = async (shape: { before: Side; after: Side }) => {
+      const dirs = checkouts("apps/worker/package.json", shape);
+      const lines: string[] = [];
+      vi.stubGlobal("fetch", async () => { throw new Error("offline"); });
+      const log = vi.spyOn(console, "log").mockImplementation((line: string) => { lines.push(line); });
+      try { await judgeCli(["--before", dirs.before, "--after", dirs.after, "--files", "package-lock.json,apps/worker/package.json", "--now", "2027-01-01T00:00:00Z", "--json"]); }
+      finally { log.mockRestore(); vi.unstubAllGlobals(); }
+      return JSON.parse(lines.join("\n")) as Judgement;
+    };
+    const agreeing = await cli(SHAPE_161);
+    expect(touches(agreeing)).toEqual([]);
+    expect(agreeing.findings).toContainEqual(expect.objectContaining({ gate: 4, effect: "info", message: expect.stringContaining("apps/worker/package.json: a workspace's dependency lists change") }));
+    const scripts = await cli({ ...SHAPE_161, after: { ...SHAPE_161.after, manifest: { ...worker("^4.13.14"), scripts: { postinstall: "node x.js" } } } });
+    expect(touches(scripts)).toHaveLength(1);
+    expect(scripts.findings).toContainEqual(expect.objectContaining({ gate: 4, effect: "stop", message: expect.stringContaining('changes "scripts"') }));
+    const missing = await cli({ ...SHAPE_161, after: { lock: SHAPE_161.after.lock } });
+    expect(missing.findings).toContainEqual(expect.objectContaining({ gate: 4, effect: "stop", message: expect.stringContaining("could not be read both before and after") }));
+  });
+  it("reads no file outside a plain workspace folder, and only listed package.json files", () => {
+    const dirs = checkouts("apps/worker/package.json", SHAPE_161);
+    const lock = { before: lockText(SHAPE_161.before.lock), after: lockText(SHAPE_161.after.lock) };
+    expect(workspaceManifests(dirs.before, dirs.after, ["package-lock.json", "../apps/worker/package.json", "node_modules/hono/package.json"], { before: ROOT, after: ROOT }, lock)).toEqual([
+      { file: "../apps/worker/package.json", reasons: [expect.stringContaining("is not the package.json of a plain workspace folder")] },
+      { file: "node_modules/hono/package.json", reasons: [expect.stringContaining("is not the package.json of a plain workspace folder")] },
+    ]);
+    expect(workspaceManifests(dirs.before, dirs.after, ["package.json", "package-lock.json", "apps/worker/src/index.ts"], { before: ROOT, after: ROOT }, lock)).toEqual([]);
+    expect(workspaceManifests(dirs.before, dirs.after, null, { before: ROOT, after: ROOT }, lock)).toEqual([]);
+    // An agreeing file that the PR's changed files do not list is ignored.
+    const changes = allChanges(lock.before, lock.after);
+    const result = judge({ changes, facts: factsOf(changes), fixes: [], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), workspaces: [{ file: "apps/worker/package.json", reasons: [] }] });
+    expect(result.findings.some(f => f.gate === 4)).toBe(false);
   });
 });

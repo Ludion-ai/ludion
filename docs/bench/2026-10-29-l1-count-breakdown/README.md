@@ -12,9 +12,13 @@ The noise rerun (docs/bench/2026-10-28-noise-v2, #168) did not meet the count ga
 
 - `scripts/breakdown.ts` recomputes the split (`productionSplit`) for each of the 100 repositories from its package-lock.json, package.json and source tree at the recorded SHA. It reads the version of production.ts given to it, once at c381a85 (the code that produced 938) and once at main (3b6ed1c, which has #168's later reader fixes). The vulnerable versions are the rerun's own OSV results from `result/noise.json`. Nothing is queried, and no project code runs.
 - **The check.** For every vulnerable package in every row, the recomputed production flag must equal the rerun's. Both versions gave 938, with 0 mismatches (`mismatches: []` in both outputs). main's reasons differ from c381a85's in one (repository, package) pair (the recorded seed path), and in no count.
-- **The sources** were fetched again into a new volume (`ludion-l1b-src`) with the rerun's own `scripts/sources.mjs`, unchanged, in Docker: 101 of 101. Every archive's SHA-256 and file count equal the rerun's `sources-log.json` (101 of 101; this folder's `sources-log.json` is the new log). The earlier L1 volumes were not used.
+- **The sources** were fetched again into a new volume (`ludion-l1b-src`) with the rerun's own `scripts/sources.mjs`, unchanged, in Docker: 101 of 101. Every archive's SHA-256 and file count equal the rerun's `sources-log.json` (101 of 101; this folder's `sources-log.json` is the new log). Its `fetched_at`, 2026-10-28T15:24Z, is UTC: 2026-10-29 00:24 JST. The earlier L1 volumes were not used.
 - **How it ran.** In Docker: node:24-slim@sha256:55fb5f5a…, a read-only root, a non-root user, no network, no forwarded environment, the sources read-only. `scripts/render.mjs` (also in Docker) writes `packages.md` from the c381a85 output.
-- **What a reason is.** production.ts records one `why` for each production copy. It is either a rule's reason (the "seed") or "a dependency of X at P, which is production". The breakdown follows that chain from the vulnerable copy up to its seed. A copy reached from several seeds keeps the first one the code found, in this order: P0, P4, P3, then the source files in path order, then P5 and P6 commands, then the D1-only fallback. A seed also keeps only its first reason. `rules_reaching` lists the rules of every seed that reaches the copy through production copies, each seed by its recorded reason only, so it can miss a second rule that also applies to the same seed.
+- **What a reason is.** production.ts records one `why` for each production copy. It is either a rule's reason (the "seed") or "a dependency of X at P, which is production". The breakdown follows that chain from the vulnerable copy up to its seed.
+  - Following is a breadth-first search from all seeds at once. So a copy reached from several seeds keeps the reason of the nearest one, the one with the fewest dependency steps.
+  - Ties go to the seed added first, in this order: P0 and P4 for each entry, then P3, then the source files in path order, then P5 and P6 commands, then the D1-only fallback.
+  - A seed keeps only its first reason.
+  - A package with several vulnerable production copies is classified by the first of them in lockfile order. `rules_reaching` lists the rules of every seed that reaches the copy through production copies, each seed by its recorded reason only, so it can miss a second rule that also applies to the same seed.
 
 ## Where the 378 come from
 
@@ -88,11 +92,21 @@ The full list, and every added package with its first-run and rerun counts and i
 The question is whether the code makes a copy production when section 2's text does not. Each kind of seed among the 378 was compared with section 2:
 
 - **P3.** vite, esbuild, rollup and webpack are in section 2's P3 list. Section 2 follows their declared dependencies, so vite's postcss, nanoid and source-map-js are production.
-- **P2.** Every P2 seed is a quoted string, or a `node_modules/<name>` path, in a file section 2 lists as a build tool's configuration. Some name a package in order to keep it out of the output: tsup's `external` naming astro (8 pairs), electron-builder's `"!**/node_modules/app-builder-lib/**"` exclusions (`files`), and a `test.environment: "jsdom"` in `vite.config.ts`. Section 2 counts a quoted name, whatever it says about the package, so these count.
-- **P1.** Every P1 seed is a literal import or a `node_modules/` path in a file section 2 calls source:
+- **P2.** Every P2 seed is a quoted string, or a `node_modules/<name>` path, in a file section 2 lists as a build tool's configuration. That includes `vite.config.ts` importing `vitest/config`: vite.config.ts is a P2 file, and its P2 seed is added before its P1 one. Section 2 counts a quoted name, whatever it says about the package. Several P2 seeds name a package without using it:
+  - names that keep a package out of the output: tsup's `external` naming astro (8 pairs), electron-builder's `"!**/node_modules/app-builder-lib/**"` exclusions (`files`);
+  - test settings: `test.environment: "jsdom"` in `vite.config.ts`;
+  - JSON object keys: angular.json's `"glob": "**/*"` (1 pair) and nx.json's generator defaults `"@nx/react": {` (3 pairs). The code reads keys in every JSON configuration. Section 2 says "in PostCSS configuration also an object key", which can be read to mean keys elsewhere are not names;
+  - a project's or target's own name that equals a package: `apps/storybook/project.json`'s `"name": "storybook"` and nx.json's `"serveStorybookTargetName": "storybook"` (2 pairs);
+  - type-only references: `/** @type {import('@sveltejs/kit').Config} */` (3 pairs), `import('postcss-load-config')` in a JSDoc comment (1), and `/// <reference types="vitest/config" />` or `types='vitest'` (3). Section 2 excludes `import type` from imports, but P2's "named" has no such exception;
+  - `$schema` paths into node_modules: `./node_modules/@angular/cli/lib/config/schema.json` in angular.json (the 12 @angular/cli pairs, in 2 repositories) and `./node_modules/nx/schemas/…` in nx.json (5). Section 2's "An import" counts a node_modules path in a build tool's configuration.
+
+  Counts are by recorded seed. Another seed of the same rule may also reach some of these pairs. The reviewer of #186 found these kinds; the counts are theirs.
+- **P1.** Every P1 seed is a literal import or a `node_modules/` path in a file section 2 calls source, or a `node_modules/` path in a package.json script, which section 2's "An import" also counts:
   - stylesheets importing shadcn;
-  - build configuration (`vite.config.ts` importing `vitest/config`);
+  - build configuration that is not a P2 file (`drizzle.config.ts` importing drizzle-kit);
   - scripts (`scripts/build.js`, `build/*.ts`);
+  - package.json scripts: `wrangler` in `start`, `node_modules/mocha/bin/_mocha` in `test` (the latter also reached by P2, P3 and P5, so it changes no count);
+  - a generated file that embeds a lockfile as a string: `src/lib/agent-seed.generated.ts` in nikolanovoselec/codeflare (body-parser and fast-uri, P1 only);
   - files whose names look like tests but are not in section 2's list: `test.setup.ts`, `test-mocks.ts`, `test-browser-setup.ts`, `.vscode-test.mjs`;
   - test-runner configurations with an extra name part: `vitest.integration.config.ts`, `vitest.enterprise.config.ts`, `vitest.ssh.config.ts`, `vitest.extension.config.ts`. The code reads section 2's "`.config` files of `vitest`" as `vitest.config.*`, `vitest.conf.*` and `vitest.workspace.*` only.
 
@@ -104,8 +118,8 @@ The question is whether the code makes a copy production when section 2's text d
 
 **What this does not show.**
 - The vitest config files with an extra name part are a reading, not an error. Reading them as test-runner configuration would leave out 11 pairs. That would be a narrower definition chosen after seeing the result, so it is not made here.
-- The same holds for exclusion lists and `external`. Section 2 has no "named in order to be left out".
-- This check covers the 378 additions. The 560 that both runs count were not checked again: the first run's rule counted them, and section 2 keeps everything that rule counted (P0 and the following are unchanged).
+- The same holds for every P2 and P1 seed listed above that names a package without using it: exclusion lists and `external`, JSON keys outside PostCSS, a project's or target's own name, type-only references, `$schema` paths, and a lockfile embedded in a generated file. Section 2 has no "named in order to be left out" or "named only as a type". Narrowing any of them now would be choosing a narrower definition after seeing the result.
+- This check covers the 378 additions. The 560 that both runs count were not checked again. The first run's split was the lockfile's `dev` flag alone, with no following. Section 2's P0 keeps every copy that flag counted, and following only adds copies. (The 3 P0-recorded additions exist because following through peer and optional dependencies is new.) No name was newly left out.
 
 ## What would change the count
 
@@ -115,7 +129,9 @@ These are definition changes, for the owner. None is made or measured here.
 - **Following the dependencies of build tools.** vite (43 pairs), nuxt (30), @angular-devkit/build-angular and @angular/cli (32), webpack-dev-server (14), @11ty/eleventy (9) and @nuxt/content (10) account for 138 of the 378 pairs. Section 2's "Following" makes everything they depend on production, whether it reaches the output or not.
 - **Test runners imported by build configuration or helper files.** vitest seeds account for 38 pairs (P1 22, P2 13, P5 3).
 
-Even leaving out every one of these would not by itself bring 938 to 622 or less. The pairs overlap, the count is per repository and package name, and the 560 both runs count stay.
+- **The narrower readings in "What this does not show".** These are the vitest configuration names (11 pairs) and the P2 and P1 seeds that name a package without using it. By recorded seed, the latter are about 50 pairs, counting every electron-builder.json seed as an exclusion.
+
+Even leaving out every one of these would not by itself bring 938 to 622 or less. These groups add up to at most about 280 pairs (138 + 38 + 41 in the D1-only repositories + 11 + about 50), and they overlap. The gate needs 316 fewer. The 560 both runs count stay.
 
 ## Files
 

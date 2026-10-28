@@ -103,38 +103,44 @@ export function packageOf(specifier: string, builtins = true): string | null {
   return name;
 }
 
-/**
- * The literal specifier of each `import(…)`, `require(…)` and `require.resolve(…)` call, after any whitespace and up to
- * 16 comments. Linear on any file: where comments end is found by binary search over positions listed once, and each
- * whitespace run and each specifier position is read once, however many calls (inside one comment, say) reach it.
- */
-function callSpecifiers(text: string): string[] {
-  const out: string[] = [], quoted = /(["'\x60])([^"'\x60\n$]+)\1/y;
+/** The first position at or after `from` where `token` occurs (-1: none), by binary search over positions listed once. */
+function finder(text: string): (token: string, from: number) => number {
   const positions = new Map<string, number[]>();
-  const next = (token: string, from: number) => {
+  return (token, from) => {
     let at = positions.get(token);
     if (!at) { at = []; for (let i = text.indexOf(token); i >= 0; i = text.indexOf(token, i + 1)) at.push(i); positions.set(token, at); }
     let lo = 0, hi = at.length;
     while (lo < hi) { const mid = (lo + hi) >> 1; if (at[mid]! >= from) hi = mid; else lo = mid + 1; }
     return at[lo] ?? -1;
   };
-  const spaceEnd = new Map<number, number>(), specifierAt = new Map<number, string | null>();
-  const skipSpace = (p: number) => {
-    const known = spaceEnd.get(p);
-    if (known !== undefined) return known;
-    let q = p;
-    while (q < text.length && /\s/.test(text[q]!)) q++;
-    spaceEnd.set(p, q);
-    return q;
+}
+
+/**
+ * The literal specifier of each `import(…)`, `require(…)` and `require.resolve(…)` call, after any whitespace and any
+ * number of comments. Linear on any file: where a comment ends is a lookup, where skipping from a position ends is
+ * remembered for every position passed, and each specifier position is read once, however many calls reach it.
+ */
+function callSpecifiers(text: string): string[] {
+  const out: string[] = [], quoted = /(["'\x60])([^"'\x60\n$]+)\1/y, next = finder(text);
+  const settled = new Map<number, number>(), specifierAt = new Map<number, string | null>();
+  const skip = (start: number) => {
+    const path: number[] = [];
+    let p = start, end = settled.get(p);
+    while (end === undefined) {
+      path.push(p);
+      let q = p;
+      while (q < text.length && /\s/.test(text[q]!)) q++;
+      const close = text.startsWith("/*", q) ? next("*/", q + 2) : text.startsWith("//", q) ? next("\n", q + 2) : -1;
+      // An unclosed comment, or no comment: the specifier, if any, starts here.
+      if (close < 0) { end = q; break; }
+      p = text.startsWith("/*", q) ? close + 2 : close + 1;
+      end = settled.get(p);
+    }
+    for (const at of path) settled.set(at, end);
+    return end;
   };
   for (const m of text.matchAll(/\b(?:import|require(?:\.resolve)?)\s*\(/g)) {
-    let p = m.index! + m[0].length;
-    for (let k = 0; k <= 16; k++) {
-      p = skipSpace(p);
-      if (text.startsWith("/*", p)) { const end = next("*/", p + 2); if (end < 0) break; p = end + 2; }
-      else if (text.startsWith("//", p)) { const end = next("\n", p + 2); if (end < 0) break; p = end + 1; }
-      else break;
-    }
+    const p = skip(m.index! + m[0].length);
     if (!specifierAt.has(p)) { quoted.lastIndex = p; specifierAt.set(p, quoted.exec(text)?.[2] ?? null); }
     const specifier = specifierAt.get(p);
     if (specifier) out.push(specifier);
@@ -157,26 +163,33 @@ export function codeSpecifiers(text: string): string[] {
 }
 /**
  * What a stylesheet (or a component's <style>) imports: every item of an @import, @use, @forward, @plugin or
- * @reference list, and url(~…). A clause ends at `;`, `{`, `}`, the next `@` outside quotes, or a line break unless
- * the line ends with a comma; a Less option such as `(reference)` is skipped. c381a85's reading (the first item) is
- * kept beside it.
+ * @reference list, and url(~…). A clause ends at `;`, `{`, `}` or the next `@` outside quotes, and is read twice: as
+ * written, and ending at a line break unless the line ends with a comma (Sass's indented syntax, Stylus). A Less option
+ * such as `(reference)` is skipped. c381a85's reading (the first item) is kept beside them.
  */
 export function styleSpecifiers(text: string): string[] {
-  const out: string[] = [];
-  for (const m of text.matchAll(/@(?:import|use|forward|plugin|reference)[ \t]+/g)) {
-    let p = m.index! + m[0].length, clause = "";
-    while (p < text.length && clause.length < 4000) {
+  const out: string[] = [], next = finder(text);
+  /** The clause from `p`; with `lines`, a line break ends it unless the line ends with a comma (Sass's indented syntax, Stylus). */
+  const clauseAt = (start: number, limit: number, lines: boolean) => {
+    let p = start, clause = "", lastSolid = "";
+    while (p < limit && clause.length < 4000) {
       const c = text[p]!;
       if (c === '"' || c === "'") {
-        const end = text.indexOf(c, p + 1), nl = text.indexOf("\n", p + 1);
-        if (end < 0 || (nl >= 0 && nl < end)) break;
-        clause += text.slice(p, end + 1); p = end + 1; continue;
+        const end = next(c, p + 1), nl = next("\n", p + 1);
+        if (end < 0 || end >= limit || (nl >= 0 && nl < end)) break;
+        clause += text.slice(p, end + 1); p = end + 1; lastSolid = c; continue;
       }
       if (c === ";" || c === "{" || c === "}" || c === "@") break;
-      if (c === "\n" && !clause.trimEnd().endsWith(",")) break;
+      if (c === "\n" && lines && lastSolid !== ",") break;
+      if (!/\s/.test(c)) lastSolid = c;
       clause += c; p++;
     }
-    clause = clause.replace(/^\s*\([^)]*\)\s*/, "");
+    return clause.replace(/^\s*\([^)]*\)\s*/, "");
+  };
+  // Both readings are kept: a list that runs across lines in CSS, and one item per line in the indented syntaxes. A
+  // clause never runs into the next at-rule, even inside quotes, so the whole file is read in linear time.
+  const rules = [...text.matchAll(/@(?:import|use|forward|plugin|reference)\s+/g)];
+  for (const [i, m] of rules.entries()) for (const clause of [true, false].map(lines => clauseAt(m.index! + m[0].length, rules[i + 1]?.index ?? text.length, lines))) {
     const quoted = [...clause.matchAll(/["']([^"'\n]+)["']/g)].map(q => q[1]!), urls = [...clause.matchAll(/url\(\s*["']?([^"')\s]+)/g)].map(u => u[1]!);
     if (quoted.length || urls.length) out.push(...quoted, ...urls);
     else { const bare = /^\s*([^\s,;]+)/.exec(clause); if (bare) out.push(bare[1]!); }

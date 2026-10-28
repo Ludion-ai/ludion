@@ -5,7 +5,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 const result = JSON.parse(readFileSync("/b/result/noise.json", "utf8"));
-const fixed = JSON.parse(readFileSync("/b/result-fixed/noise.json", "utf8"));
+// The folder of the execution to tally beside the result: result-fixed (6c4f58e) or result-final (9313aa2).
+const folder = process.argv[2] ?? "result-fixed";
+const fixed = JSON.parse(readFileSync(`/b/${folder}/noise.json`, "utf8"));
 const verdicts = new Map();
 for (let g = 1; g <= 5; g++) for (const r of JSON.parse(readFileSync(`/b/review/verdicts-${g}.json`, "utf8"))) for (const p of r.packages) verdicts.set(`${r.repo}\0${p.name}`, { ...p, sha: r.sha });
 const before = new Set(result.rows.flatMap(r => r.left_out.map(l => `${r.repo}\0${l.name}`)));

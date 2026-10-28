@@ -364,6 +364,16 @@ describe("after #168's delta review: what c381a85 counted is not lost", () => {
     expect(dockerImage("FROM node:22 AS deps\nRUN npm ci\nFROM node:22-slim\nRUN cat <<EOF\nno end\nCOPY --from=deps /node_modules ./node_modules\n", false).holds).toBe(true);
     expect(dockerImage("FROM node:22\nRUN <<-EOT\n  npm ci\n  EOT\nCMD node a.js\n", false).holds).toBe(true);
   });
+  it("reads an import call after any number of comments, and a stylesheet list that continues on the next line", () => {
+    const quick = (f: () => unknown) => { const t0 = performance.now(); f(); return performance.now() - t0; };
+    expect(codeSpecifiers(`require(${"/* c */ ".repeat(40)}'deep')`)).toEqual(["deep"]);
+    expect(codeSpecifiers(`import(${"// c\n".repeat(40)}"deep")`)).toEqual(["deep"]);
+    expect(styleSpecifiers("@import \"a\"\n  , \"b\";")).toEqual(expect.arrayContaining(["a", "b"]));
+    expect(styleSpecifiers("@import\n  \"foo\";")).toContain("foo");
+    expect(quick(() => codeSpecifiers(`${"require(/**/".repeat(40_000)}'x')`))).toBeLessThan(1000);
+    expect(quick(() => styleSpecifiers(`@import "x ${"@import \"y ".repeat(40_000)}`))).toBeLessThan(1000);
+    expect(quick(() => styleSpecifiers(`${"@import 'a', ".repeat(40_000)}`))).toBeLessThan(1000);
+  });
   it("says in the comment that pnpm gets no split", () => {
     const fact: VersionFacts = { published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: null, install_scripts: [], dependencies: [], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z" };
     const j = judge({ changes: [], facts: new Map([["a@1.0.0", fact]]), fixes: [], files: ["pnpm-lock.yaml"], now: new Date("2026-10-28T00:00:00Z"), lockfile: "pnpm-lock", split: { source: "pnpm", incomplete: null, images_with_dev: [] } });

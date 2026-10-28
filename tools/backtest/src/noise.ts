@@ -14,7 +14,7 @@
 //   docker run --rm --read-only --user 1000:1000 --tmpfs /tmp -e HOME=/tmp -v <worktree>:/w:ro -v <out>:/out \
 //     node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 node /w/tools/backtest/src/noise.ts /out
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { lockEntries } from "../../../packages/cli/src/security/judge.ts";
@@ -189,6 +189,9 @@ const median = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); retu
 const npmVersion = spawnSync("npm", ["--version"], { encoding: "utf8" }).stdout.trim();
 if (npmVersion !== NPM_VERSION) throw new Error(`npm ${npmVersion} is not the registered ${NPM_VERSION}; run in node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205.`);
 const started = new Date().toISOString();
+/** The console, also kept in <out>/run.log: a stopped execution is reported with its log. */
+const log = (line: string) => { console.log(line); appendFileSync(join(outDir!, "run.log"), `${new Date().toISOString()} ${line}\n`); };
+if (flag !== "--local") log(`start at ${started}, npm ${npmVersion}, node ${process.version}`);
 
 if (flag === "--local") {
   if (!localDir) throw new Error("--local needs a directory.");
@@ -202,7 +205,7 @@ if (flag === "--local") {
   for (const c of all) {
     if (rows.length >= SAMPLE) break;
     considered++;
-    const skip = (cause: string, reason: string, counts: Partial<Excluded> = {}) => { excluded.push({ repo: c.repo, pr: c.pr, cause, reason, ...counts }); console.log(`skip ${c.repo}: ${cause}: ${reason}`); };
+    const skip = (cause: string, reason: string, counts: Partial<Excluded> = {}) => { excluded.push({ repo: c.repo, pr: c.pr, cause, reason, ...counts }); log(`skip ${c.repo}: ${cause}: ${reason}`); };
     if (owners.has(c.owner)) { skip("owner", "another repository of the same owner is already in the sample"); continue; }
     if (c.fork) { skip("fork", "fork"); continue; }
     if (c.archived) { skip("archived", "archived"); continue; }
@@ -228,7 +231,7 @@ if (flag === "--local") {
     if (row.npm.total < 1 && row.ludion.production.length + row.ludion.dev_only.length === 0) { skip("nothing named", "neither npm audit nor OSV names an installed package", { npm_total: row.npm.total, judge_count: row.ludion.count }); continue; }
     owners.add(c.owner);
     rows.push(row);
-    console.log(`${rows.length} ${c.repo}: npm ${row.npm.total}, judge ${row.ludion.count}`);
+    log(`${rows.length} ${c.repo}: npm ${row.npm.total}, judge ${row.ludion.count}`);
   }
   const sum = (f: (r: Row) => number) => rows.reduce((s, r) => s + f(r), 0);
   const npmTotal = sum(r => r.npm.total), judgeTotal = sum(r => r.ludion.count);
@@ -244,11 +247,14 @@ if (flag === "--local") {
     also_shown: {
       judge_over_npm_direct: sum(r => r.npm.direct.length) ? judgeTotal / sum(r => r.npm.direct.length) : null,
       judge_over_npm_omit_dev: sum(r => r.npm_omit_dev_total) ? judgeTotal / sum(r => r.npm_omit_dev_total) : null,
-      per_repository_ratio_median: median(rows.filter(r => r.npm.total > 0).map(r => r.ludion.count / r.npm.total)),
+      // npm audit 0 with a judge count above 0 is the worst case for the judge: it sorts as infinite, not left out.
+      per_repository_ratio_median: (m => m === Infinity ? "infinite" : m)(median(rows.filter(r => r.npm.total > 0 || r.ludion.count > 0).map(r => r.npm.total > 0 ? r.ludion.count / r.npm.total : Infinity))),
+      repositories_without_a_ratio: rows.filter(r => r.npm.total === 0 && r.ludion.count === 0).length,
+      repositories_npm_zero_judge_above_zero: rows.filter(r => r.npm.total === 0 && r.ludion.count > 0).length,
       repositories_at_or_below_a_third: rows.filter(r => r.ludion.count * 3 <= r.npm.total).length,
     },
     exclusions_by_cause: causes,
     rows, excluded,
   }, null, 2));
-  console.log(`done: ${rows.length} repositories, npm audit ${npmTotal}, judge ${judgeTotal}, considered ${considered}`, JSON.stringify(causes));
+  log(`done: ${rows.length} repositories, npm audit ${npmTotal}, judge ${judgeTotal}, considered ${considered} ${JSON.stringify(causes)}`);
 }

@@ -868,7 +868,7 @@ From 2026-10-28 (cycle 2), every PR's review is posted as a comment on that PR, 
 
 ## 2026-10-28 — Noise measurement: definitions fixed before running it
 
-Design, "ロードマップと検証ゲート", gate 2 (ノイズ測定), and the weeks 1–2 gate "通知3分の1以下". These definitions are committed and pushed before the run, and are not changed after seeing results. A later change is a new entry with a new run. The saved search answers are committed and pushed before the measurement runs. The first complete execution at the registered commit is the result; a later execution is reported beside it, never instead of it. The wait table, the backtest gates and how unknowns are counted are not changed by this entry.
+Design, "ロードマップと検証ゲート", gate 2 (ノイズ測定), and the weeks 1–2 gate "通知3分の1以下". These definitions are committed and pushed before the run, and are not changed after seeing results. A later change is a new entry with a new run. The saved search answers are committed and pushed before the measurement runs. The first execution started at the registered commit is the result. If it stops before finishing, it is reported with its reason and its log (`run.log`, which keeps every printed line), and the next execution is the result. Any other execution is reported beside the result, never instead of it. The wait table, the backtest gates and how unknowns are counted are not changed by this entry.
 
 **What is measured.** The judge's gate 1 today is: the installed version is in an advisory's range, and the package is production rather than dev-only. Its OS, SAPI and configuration conditions are not built. The production/dev split is the lockfile's `dev` flag: a version counts as dev-only only when every installed copy of it is dev (judge.ts). That is the same signal `npm audit --omit=dev` reads, so that count is recorded next to it.
 
@@ -951,14 +951,14 @@ Design, "ロードマップと検証ゲート", gate 2 (ノイズ測定), and th
 
 **Disclosure.** Before this entry, the script was smoke-tested on two owned checkouts, which are in no sample: examples/npm-security (npm audit 1, judge 1) and this repository's root lockfile (0 and 0). The search query's syntax was checked on 2026-10-20, a day outside the window. That check printed 3 PRs' times, authors and branch prefixes, and the day's total of 49,629.
 
-**Amended before the run** (round 1 of #155's review; nothing had run on the sample). Each amendment closes a choice that could otherwise be made after seeing data, and none makes a gate easier to pass:
+**Amended before the run** (rounds 1 and 2 of #155's review; nothing had run on the sample). Each amendment closes a choice that could otherwise be made after seeing data. One narrows a literal reading of the first text: under the first text, an in-range dev copy next to an out-of-range production copy was a miss, and under (a) as amended it is not. Every other amendment is stricter or changes no gate. The amendments:
 - the production command criterion (d), and shipped code defined by what runs or is loaded in production;
 - a package that fits neither list is undecidable;
 - inclusion when npm audit **or** OSV names an installed package, not npm audit alone;
-- the first complete execution is the result, the search is committed first, and three attempts per repository;
+- the first execution started is the result (a stopped one is reported with its `run.log`), the search is committed first, and each repository gets three attempts;
 - the left-out list gives every reason, every installed copy, and npm's nodes and ranges;
 - in range by either source, and (a) needs an in-range non-dev copy;
-- the extra ratios and the per-repository view;
+- the extra ratios and the per-repository view. In the median, a repository with npm audit 0 and a judge count above 0 counts as infinite, not left out;
 - the exclusions by cause, lockfile v1 under "not measured", the frame of the rule-of-three bound, and what a pass means;
 - npm's version enforced, and the image pinned by digest;
 - the reviewer brief committed before the review.

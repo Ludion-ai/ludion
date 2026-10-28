@@ -47,9 +47,11 @@ You are a fresh-context reviewer. You are not the worker who ran the measurement
   - the judge's production list and dev-only list;
   - `left_out`: one entry per package to check, with every reason that applies, OSV's ids and versions, npm's advisories and nodes, and every installed copy (path, version, dev flag).
 - **The source.** Each repository at its recorded SHA, extracted from GitHub's archive and never run, in the Docker volume `ludion-noise-src`, at `/src/<owner>__<repo>/`. Read it only through Docker, with no network and read-only:
-  - `docker run --rm --network none -v ludion-noise-src:/src:ro node:24-slim grep -rn --include=*.js --include=*.ts --include=*.tsx --include=*.jsx --include=*.mjs --include=*.cjs --include=*.vue --include=*.svelte -e "<pattern>" /src/<owner>__<repo>`
+  - `docker run --rm --network none -v ludion-noise-src:/src:ro node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 grep -rn -e "<pattern>" /src/<owner>__<repo>`
+  - Search every file type, with no `--include` filter: imports can sit in `.mts`, `.cts`, `.astro`, `.html` and other files.
+  - For (d), also read `Dockerfile*`, `Procfile`, the `package.json` scripts, and any deployment configuration (`*.json`, `*.yml`, `*.yaml`, `*.toml`).
   - `cat`, `ls` and `find` work the same way.
-  - Write scripts to your own folder in the job's tmp directory and run them as `docker run ... node:24-slim node /s/<script>`, never on the host.
+  - Write scripts to your own folder in the job's tmp directory and run them as `docker run ... node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 node /s/<script>`, never on the host.
   - The root `package-lock.json` in the source holds the dependency edges (`packages[path].dependencies`).
 - **The advisories.** Read them from OSV (`https://api.osv.dev/v1/vulns/<id>`) or GitHub's advisory API (`https://api.github.com/advisories/<GHSA id>`), and from npm's advisory URL in the row. Package manifests and code come from the npm registry (`https://registry.npmjs.org/<name>/<version>`).
 
@@ -72,3 +74,4 @@ For each assigned repository, one JSON object:
 - A "no" needs the dependency path and the files that show no production loader: package.json `scripts.start`, Dockerfile, Procfile, deployment configuration, the source folders, and the build configuration.
 - If you cannot finish a repository, set `"finished": false`. Every package you did not check is then undecidable.
 - When unsure, say "undecidable". It counts as a miss, which is the safe side.
+- The tally: a package is a miss when `production_relevant` is "yes" or "undecidable". A repository with `"finished": false` counts every package you did not check as undecidable.

@@ -197,10 +197,12 @@ const started = new Date().toISOString();
 /** The console, also kept in <out>/run.log: a stopped execution is reported with its log. */
 const log = (line: string) => { console.log(line); appendFileSync(join(outDir!, "run.log"), `${new Date().toISOString()} ${line}\n`); };
 /** Git blob hashes of the code that runs, so `git ls-tree <commit>` can check the logged commit. */
-const blobs = Object.fromEntries(["tools/backtest/src/noise.ts", "packages/cli/src/security/judge.ts", "packages/cli/src/security/npm-facts.ts"].map(path => {
+const blobs: Record<string, string> = Object.fromEntries(["tools/backtest/src/noise.ts", "packages/cli/src/security/judge.ts", "packages/cli/src/security/npm-facts.ts", "packages/cli/src/security/time-cap.ts"].map(path => {
   const content = readFileSync(new URL(`../../../${path}`, import.meta.url));
   return [path, createHash("sha1").update(`blob ${content.length}\0`).update(content).digest("hex")];
 }));
+// semver comes from the mounted node_modules (pinned by the lockfile): its version, not a blob hash.
+blobs["node_modules/semver (version)"] = JSON.parse(readFileSync(new URL("../../../node_modules/semver/package.json", import.meta.url), "utf8")).version;
 if (commit !== null) log(`start at ${started}, commit ${commit}, npm ${npmVersion}, node ${process.version}, blobs ${JSON.stringify(blobs)}`);
 
 if (flag === "--local") {

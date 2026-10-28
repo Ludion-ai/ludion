@@ -158,7 +158,7 @@ describe("production images and commands", () => {
     const omitted = "FROM node:22\nENV NODE_ENV=production\nRUN npm ci\nCOPY dist ./dist\n";
     expect(dockerImage(omitted, false).holds).toBe(false);
     const staged = "FROM node:22 AS build\nWORKDIR /app\nRUN npm ci\nRUN npx vite build\nFROM nginx\nCOPY --from=build /app/dist /usr/share/nginx/html\n";
-    expect(dockerImage(staged, false)).toEqual({ holds: false, production: [], build: ["npm ci", "npx vite build"] });
+    expect(dockerImage(staged, false)).toEqual({ holds: false, held: [], production: [], build: ["npm ci", "npx vite build"] });
   });
   it("finds devDependencies copied from a stage, or from a build context that keeps node_modules", () => {
     expect(dockerImage("FROM node:22 AS deps\nWORKDIR /app\nRUN npm ci\nFROM node:22-slim\nCOPY --from=deps /app/node_modules ./node_modules\n", false).holds).toBe(true);
@@ -166,6 +166,46 @@ describe("production images and commands", () => {
     expect(dockerImage("FROM node:22\nCOPY . .\n", false).holds).toBe(true);
     expect(dockerImage("FROM node:22\nCOPY . .\n", true).holds).toBe(false);
     expect(dockerImage("FROM node:22\nRUN npm install -g pm2\n", false).holds).toBe(false);
+  });
+  it("holds only the packages whose folders an image copies out of node_modules (L1c)", () => {
+    const build = "FROM node:22 AS builder\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n";
+    const picked = `${build}FROM node:22-slim AS base\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules/pino-pretty ./node_modules/pino-pretty\nCOPY --from=builder /app/node_modules/@swc/helpers/ ./node_modules/@swc/helpers\nFROM base\nCMD ["node", "dist/a.js"]\n`;
+    expect(dockerImage(picked, false)).toMatchObject({ holds: false, held: ["pino-pretty", "@swc/helpers"] });
+    expect(dockerImage("FROM node:22\nCOPY node_modules/lodash ./node_modules/lodash\n", false)).toMatchObject({ holds: false, held: ["lodash"] });
+    expect(dockerImage("FROM node:22\nCOPY node_modules/lodash ./node_modules/lodash\n", true)).toMatchObject({ holds: false, held: [] });
+    // A stage copied whole passes on what it holds by name.
+    expect(dockerImage(`${build}FROM node:22 AS mid\nWORKDIR /app\nCOPY --from=builder /app/node_modules/lodash ./node_modules/lodash\nFROM node:22-slim\nCOPY --from=mid /app /app\n`, false)).toMatchObject({ holds: false, held: ["lodash"] });
+    // Anything that is not one package's folder still holds every devDependency: node_modules itself, a dot folder, a
+    // wildcard, a scope alone, a path inside a package, or the working folder.
+    for (const source of ["/app/node_modules", "/app/node_modules/", "/app/node_modules/.bin", "/app/node_modules/.prisma", "/app/node_modules/@img*", "/app/node_modules/pino-*", "/app/node_modules/@scope", "/app/node_modules/a/b", "/app"]) {
+      expect(dockerImage(`${build}FROM node:22-slim\nCOPY --from=builder ${source} ./x\n`, false).holds).toBe(true);
+    }
+    // A package folder copied together with something that holds devDependencies.
+    expect(dockerImage(`${build}FROM node:22-slim\nCOPY --from=builder /app/node_modules/lodash /app/node_modules ./node_modules\n`, false)).toMatchObject({ holds: true, held: ["lodash"] });
+    expect(dockerImage("FROM node:22\nCOPY node_modules/lodash . ./\n", false).holds).toBe(true);
+  });
+  it("uses D2 when the image copies only package folders, and makes what it holds production (L1c)", () => {
+    const dockerfile = "FROM node:22 AS builder\nWORKDIR /app\nRUN npm ci\nRUN npm run build\nFROM node:22-slim\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules/nodemon ./node_modules/nodemon\nCMD [\"node\", \"dist/a.js\"]\n";
+    const split = productionSplit(app, appSource({ Dockerfile: dockerfile }));
+    expect(split.summary.images_with_dev).toEqual([]);
+    expect(split.copies.get("node_modules/nodemon")).toMatchObject({ production: true, why: expect.stringContaining("held by Dockerfile's final stage") });
+    // nodemon's own dependency is followed; the rest is D2 as without the image.
+    expect(split.copies.get("node_modules/semver")?.production).toBe(true);
+    expect(devOnly(app, appSource({ Dockerfile: dockerfile }))).toEqual(devOnly(app, appSource()).filter(v => v !== "nodemon@1.0.0" && v !== "semver@1.0.0"));
+    // A copy nested in a held package is held too; another copy of the same name is not.
+    const nested = lockOf({ devDependencies: { a: "^1", b: "^1" } }, { "node_modules/a": { dev: true }, "node_modules/a/node_modules/b": { dev: true, version: "2.0.0" }, "node_modules/b": { dev: true } });
+    const held = productionSplit(nested, tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /node_modules/a /node_modules/a\n" }));
+    expect(held.copies.get("node_modules/a/node_modules/b")?.production).toBe(true);
+    expect([...held.devOnly]).toEqual(["b@1.0.0"]);
+    // Without such a copy, the image still sends the split to D1 only.
+    expect(productionSplit(app, appSource({ Dockerfile: dockerfile.replace("/app/node_modules/nodemon ./node_modules/nodemon", "/app/node_modules ./node_modules") })).summary.images_with_dev).toEqual(["Dockerfile"]);
+  });
+  it("collects what an image holds by name in linear time", () => {
+    const quick = (f: () => unknown) => { const t0 = performance.now(); f(); return performance.now() - t0; };
+    const chain = ["FROM node:22 AS a0", ...Array.from({ length: 16_000 }, (_, k) => `FROM a${k} AS a${k + 1}\nCOPY --from=a${k} /node_modules/p${k} /node_modules/p${k}\nCOPY --from=a${k} /app /app`), "FROM a16000"].join("\n");
+    let image: ReturnType<typeof dockerImage> | null = null;
+    expect(quick(() => { image = dockerImage(chain, false); })).toBeLessThan(1500);
+    expect(image!.held.length).toBe(16_000);
   });
   it("ignores development Dockerfiles, and runs the production stage's commands", () => {
     const dev = appSource({ "Dockerfile.dev": "FROM node:22\nRUN npm install\nCMD npm run dev\n", ".devcontainer/Dockerfile": "FROM node:22\nRUN npm install\n" });

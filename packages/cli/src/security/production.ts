@@ -273,14 +273,26 @@ const RUNNER = /^(npm|yarn|pnpm|bun|npx|bunx|pnpx|run-s|run-p|npm-run-all2?|conc
 const EXECUTES = /^(npx|bunx|pnpx|dlx|exec|x)$/;
 const LOADS = new Set(["-r", "--require", "--import", "--loader", "--experimental-loader"]);
 
-type Image = { holds: boolean; production: string[]; build: string[] };
+type Image = { holds: boolean; held: string[]; production: string[]; build: string[] };
 /**
- * A Dockerfile: whether its final stage holds devDependencies, the commands of its final stage and the stages it is
- * built FROM (P5), and the RUN commands of the stages it copies from (P6). `ignoresNodeModules`: the build context's
- * .dockerignore leaves node_modules out.
+ * A COPY source that is one package's folder in node_modules (`/app/node_modules/@scope/name`): that package's name.
+ * Anything else (node_modules itself, `.bin`, `.prisma`, a wildcard) is null.
+ */
+function packageFolder(source: string): string | null {
+  if (/[*?[\]]/.test(source)) return null;
+  const parts = source.replace(/\/+$/, "").split("/"), at = parts.lastIndexOf("node_modules");
+  const rest = at < 0 ? [] : parts.slice(at + 1);
+  const name = rest.length === 1 ? rest[0]! : rest.length === 2 && rest[0]!.startsWith("@") ? rest.join("/") : null;
+  return name !== null && /^(@[\w-][\w.-]*\/)?[\w-][\w.-]*$/.test(name) ? name : null;
+}
+/**
+ * A Dockerfile: whether its final stage holds devDependencies, the packages it holds by name because it copies only
+ * their folders out of node_modules, the commands of its final stage and the stages it is built FROM (P5), and the RUN
+ * commands of the stages it copies from (P6). `ignoresNodeModules`: the build context's .dockerignore leaves
+ * node_modules out.
  */
 export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
-  type Stage = { name: string | null; from: Stage | null; holds: boolean; production: boolean; workdir: string; runs: string[]; commands: string[]; copies: Stage[] };
+  type Stage = { name: string | null; from: Stage | null; holds: boolean; held: string[]; heldFrom: Stage[]; production: boolean; workdir: string; runs: string[]; commands: string[]; copies: Stage[] };
   const stages: Stage[] = [];
   const install = /\b(npm\s+(ci|install|i)\b|yarn(\s+install)?\s*($|--|-)|pnpm\s+(install|i)\b|bun\s+(install|i)\b)/;
   const global = /(^|\s)(-g|--global)(\s|$)|\byarn\s+global\b/;
@@ -315,7 +327,7 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (op === "FROM") {
       const f = /^(?:--\S+\s+)*(\S+)(?:\s+AS\s+(\S+))?/i.exec(arg);
       const parent = named.get((f?.[1] ?? "").toLowerCase()) ?? null;
-      const stage: Stage = { name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, production: parent?.production ?? false, workdir: parent?.workdir ?? "/", runs: [], commands: [], copies: [] };
+      const stage: Stage = { name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, held: [], heldFrom: parent ? [parent] : [], production: parent?.production ?? false, workdir: parent?.workdir ?? "/", runs: [], commands: [], copies: [] };
       stages.push(stage);
       if (stage.name !== null && !named.has(stage.name.toLowerCase())) named.set(stage.name.toLowerCase(), stage);
       continue;
@@ -339,17 +351,23 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
       const parts = wordsOf(arg), from = parts.find(p => /^--from=/i.test(p))?.slice(7);
       const sources = parts.filter(p => !p.startsWith("--")).slice(0, -1);
       const strip = (p: string) => p.replace(/\/+$/, "") || "/";
+      // One package's folder out of node_modules holds that package (and what is nested in it), not every devDependency.
+      const folders = sources.map(packageFolder), others = sources.filter((_, k) => folders[k] === null);
       if (from !== undefined) {
         const source = named.get(from.toLowerCase()) ?? (/^\d+$/.test(from) ? stages[Number(from)] : undefined);
         if (source) {
           stage.copies.push(source);
-          if (sources.some(s => /node_modules/.test(s) || /^(\.|\.\/|\/)$/.test(s) || strip(s) === strip(source.workdir))) stage.holds ||= source.holds;
+          for (const name of folders) if (name !== null) stage.held.push(name);
+          if (others.some(s => /node_modules/.test(s) || /^(\.|\.\/|\/)$/.test(s) || strip(s) === strip(source.workdir))) { stage.holds ||= source.holds; stage.heldFrom.push(source); }
         }
-      } else if (!ignoresNodeModules && sources.some(s => /node_modules/.test(s) || /^(\.|\.\/)$/.test(s))) stage.holds = true;
+      } else if (!ignoresNodeModules) {
+        for (const name of folders) if (name !== null) stage.held.push(name);
+        if (others.some(s => /node_modules/.test(s) || /^(\.|\.\/)$/.test(s))) stage.holds = true;
+      }
     }
   }
   const last = stages.at(-1);
-  if (!last) return { holds: false, production: [], build: [] };
+  if (!last) return { holds: false, held: [], production: [], build: [] };
   // Each stage is visited once, by loops, so a long FROM chain costs linear time and no recursion.
   const own: Stage[] = [], seen = new Set<Stage>();
   for (let at: Stage | null = last; at && !seen.has(at); at = at.from) { seen.add(at); own.push(at); }
@@ -361,7 +379,13 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
       queue.push(...at.copies);
     }
   }
-  return { holds: last.holds, production, build };
+  // What the final stage holds by name: its own folder copies and those of the stages it inherits, each stage once.
+  const held = new Set<string>(), inherited = new Set<Stage>([last]), walk = [last];
+  for (let q = 0; q < walk.length; q++) {
+    for (const name of walk[q]!.held) held.add(name);
+    for (const s of walk[q]!.heldFrom) if (!inherited.has(s)) { inherited.add(s); walk.push(s); }
+  }
+  return { holds: last.holds, held: [...held], production, build };
 }
 
 /** Production commands in a command file (Procfile, compose, render, fly, pm2 ecosystem, …). TOML gives every value. */
@@ -483,6 +507,15 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       if (dockerfileText !== null && /^[ \t]*FROM[ \t]/im.test(dockerfileText) && !base.replace(/dockerfile|containerfile/ig, " ").split(/[\s._-]+/).some(w => /^(dev|development|test|tests|ci|e2e)$/i.test(w))) {
         const image = dockerImage(dockerfileText, ignores(`${dir}.dockerignore`) || ignores(`${file}.dockerignore`) || ignores(".dockerignore"));
         if (image.holds) imagesWithDev.push(file);
+        // D2: what the production image holds is not dev-only. Every installed copy of a held name, and every copy
+        // nested in one of those.
+        const held = new Set(image.held.flatMap(n => (byName.get(n) ?? []).map(e => e.path)));
+        if (held.size) for (const e of entries) for (let p = e.path; ;) {
+          if (held.has(p)) { seed(e, `held by ${file}'s final stage, which copies its package folder (or one it is nested in) out of node_modules`); break; }
+          const up = p.lastIndexOf("/node_modules/");
+          if (up < 0) break;
+          p = p.slice(0, up);
+        }
         for (const c of image.production) production.push({ from: file, text: c });
         for (const c of image.build) build.push({ from: `${file} (a stage it copies from)`, text: c });
       }

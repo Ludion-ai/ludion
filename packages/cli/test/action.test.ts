@@ -256,8 +256,10 @@ describe.skipIf(!(has("jq") && has("bash")) && !process.env.CI)("action/read.sh,
 
 // judge.yml's loop over the changed files, run by bash in a git repository with two commits.
 describe.skipIf(!(has("git") && has("bash")) && !process.env.CI)("judge.yml's copy of the changed */package.json files", () => {
-  const run = block(JUDGE, "run").split("\n");
-  const loop = run.slice(run.findIndex(l => l.startsWith("while IFS= read -r -d '' file; do")), run.findIndex(l => l.startsWith('done < "$INPUT/files"')) + 1).join("\n");
+  const lines = JUDGE.split("\n");
+  const from = lines.findIndex(l => l.trim() === "while IFS= read -r -d '' file; do"), to = lines.findIndex(l => l.trim() === 'done < "$INPUT/files"');
+  const loop = lines.slice(from, to + 1).map(l => l.slice(lines[from]!.search(/\S/))).join("\n");
+  it("is in judge.yml's read step", () => expect([from > 0, to > from]).toEqual([true, true]));
   const repo = join(temp, "git"), git = (...args: string[]) => spawnSync("git", ["-C", repo, ...args], { encoding: "utf8" }).stdout.trim();
   mkdirSync(join(repo, "apps", "site"), { recursive: true });
   mkdirSync(join(repo, "apps", "old"), { recursive: true });

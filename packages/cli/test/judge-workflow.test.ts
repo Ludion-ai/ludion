@@ -4,8 +4,8 @@
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { recordOf, TEXT_LIMIT, type Meta } from "../../../.github/judge/record.ts";
-import { judge, type Change, type VersionFacts } from "../src/security/judge.ts";
+import { filesArgument, fit, REASON_LIMIT, recordOf, shownSize, TEXT_LIMIT, type Meta } from "../../../.github/judge/record.ts";
+import { judge, renderJudgement, type Change, type VersionFacts } from "../src/security/judge.ts";
 
 const root = new URL("../../../", import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), "utf8").replace(/\r\n/g, "\n");
@@ -68,9 +68,9 @@ describe("judge.yml (pull_request, read-only)", () => {
 });
 
 describe("judge-comment.yml (workflow_run, writes comments)", () => {
-  it("can read artifacts and write PR comments, and nothing else", () => {
+  it("can read artifacts and commits and write PR comments, and nothing else", () => {
     expect(COMMENT).toMatch(/on:\n  workflow_run:\n    workflows: \[judge\]\n    types: \[completed\]\n/);
-    expect(permissions(COMMENT)).toEqual(["actions: read", "pull-requests: write", "actions: read", "pull-requests: write"]);
+    expect(permissions(COMMENT)).toEqual(["actions: read", "contents: read", "pull-requests: write", "actions: read", "contents: read", "pull-requests: write"]);
     expect(COMMENT).not.toMatch(/secrets\./);
   });
   it("checks out nothing and runs no code from the PR or the repository", () => {
@@ -78,15 +78,31 @@ describe("judge-comment.yml (workflow_run, writes comments)", () => {
     expect(code(COMMENT).match(/^\s+run: /gm)).toHaveLength(1);
     const script = code(block(COMMENT, "run"));
     for (const word of ["checkout", "git", "npm", "npx", "node", "bash", "sh", "source", "eval", "exec", "curl", "wget"]) expect(script, word).not.toMatch(new RegExp(`\\b${word}\\b`));
-    // The programs it runs are gh, jq, unzip, head and grep, and shell builtins; the rest is data.
-    const commands = script.split("\n").map(l => l.trim()).filter(l => l && !/^(if \[ |then$|else$|fi$|exit [01]$|echo "|read -r |refused=(true|false)$|id=\$\{|dir="|mkdir -p )/.test(l));
-    for (const line of commands) expect(line).toMatch(/^(set -euo pipefail$|[a-z_]+=\$\((gh|jq) |gh api |unzip -p |jq |--jq |if ! jq |if grep -q )/);
+    // The programs it runs are gh, jq, unzip and head, and shell builtins; the rest is data.
+    const commands = script.split("\n").map(l => l.trim()).filter(l => l && !/^(if \[ |then$|else$|fi$|exit [01]$|echo "|read -r |id=\$\{|dir="|mkdir -p )/.test(l));
+    for (const line of commands) expect(line).toMatch(/^(set -euo pipefail$|[a-z_]+=\$\((gh|jq) |gh api |unzip -p |jq |--jq |if ! jq )/);
   });
   it("comments only for the judge workflow's own pull_request runs, when the recorded head is the run's and the PR's", () => {
+    const script = code(block(COMMENT, "run"));
     expect(COMMENT).toContain("if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.path == '.github/workflows/judge.yml'");
-    expect(COMMENT).toContain('if [ "$head" != "$RUN_HEAD" ]; then');
-    expect(COMMENT).toContain('if [ "$state" != "open" ] || [ "$current" != "$head" ]; then');
-    expect(COMMENT.indexOf('jq -e -s "$VALID"')).toBeLessThan(COMMENT.indexOf("pr=$(jq"));
+    expect(script).toContain('if [ "$head" != "$RUN_HEAD" ]; then');
+    expect(script).toContain('if [ "$state" != "open" ] || [ "$current" != "$head" ]; then');
+    expect(script).toContain('if [ "$head_repo" != "$RUN_REPO" ] || [ "$head_ref" != "$RUN_BRANCH" ]; then');
+    expect(script.indexOf('jq -e -s "$VALID"')).toBeLessThan(script.indexOf("pr=$(jq"));
+  });
+  it("decides the .github/ refusal from what the run's own head changes, read by its SHA", () => {
+    const script = code(block(COMMENT, "run"));
+    // Not the PR's file list, which a push during this job could change.
+    expect(script).not.toContain("/files");
+    expect(script).toContain('gh api "repos/${REPO}/compare/${base_ref}...${RUN_HEAD}" > "$dir/compare.json"\nrefused=$(jq -r "$REFUSE" "$dir/compare.json")\n');
+    expect(script).toContain('--argjson refused "$refused" "$BODY"');
+    expect(script.indexOf("refused=$(")).toBeGreaterThan(script.indexOf('if [ "$head_repo" != "$RUN_REPO" ]'));
+  });
+  it("fails, rather than posting nothing quietly, when a finished run left no record", () => {
+    const script = code(block(COMMENT, "run"));
+    expect(script).toContain('if [ "$CONCLUSION" = "cancelled" ]; then');
+    expect(script).toContain('echo "::error::Run ${RUN_ID} (${CONCLUSION}) has no judgement artifact. Nothing posted."\n  exit 1');
+    expect(JUDGE).toMatch(/if-no-files-found: error\n\s+# .*\n\s+overwrite: true\n/);
   });
   it("keeps one comment per PR and updates it", () => {
     expect(COMMENT).toContain('select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- ludion-judge -->")))');
@@ -146,12 +162,24 @@ describe("the record (.github/judge/record.ts)", () => {
       'The judge exited 0, which does not match its verdict "stop".',
     ]);
   });
-  it("cuts a text longer than judge-comment accepts", () => {
-    const big = judgement();
-    big.findings.push({ gate: 1, effect: "info", message: "x".repeat(TEXT_LIMIT) });
-    const r = recordOf(meta, ran(0, JSON.stringify(big)), NOW);
-    expect(r.text!.length).toBeLessThanOrEqual(TEXT_LIMIT);
-    expect(r.text).toMatch(/cut here; the full judgement is in the run's judgement artifact\)$/);
+  it("cuts a text to what judge-comment accepts once each line is indented", () => {
+    const long = judgement(), many = judgement();
+    long.findings.push({ gate: 1, effect: "info", message: "x".repeat(TEXT_LIMIT) });
+    // Many short lines: under the limit by length, over it once indented (#156's first review).
+    for (let i = 0; i < 3_000; i++) many.findings.push({ gate: 2, effect: "info", message: "y" });
+    expect(renderJudgement(many).length).toBeLessThanOrEqual(TEXT_LIMIT);
+    expect(shownSize(renderJudgement(many))).toBeGreaterThan(TEXT_LIMIT);
+    for (const big of [long, many]) {
+      const r = recordOf(meta, ran(0, JSON.stringify(big)), NOW);
+      expect(shownSize(r.text!)).toBeLessThanOrEqual(TEXT_LIMIT);
+      expect(r.text).toMatch(/\n… \(cut here; the full judgement is in the run's judgement artifact\)$/);
+    }
+    expect(shownSize(recordOf(meta, ran(2, "", { stderr: "e\n".repeat(5000) }), NOW).reason!)).toBeLessThanOrEqual(REASON_LIMIT);
+    expect(fit("a\nb", 100, "cut")).toBe("a\nb");
+  });
+  it("refuses file names that the judge's comma-separated --files cannot carry", () => {
+    expect(filesArgument(["package.json", "package-lock.json"])).toBe("package.json,package-lock.json");
+    for (const odd of ["package.json,package-lock.json", " package.json", "package-lock.json "]) expect(() => filesArgument(["package-lock.json", odd])).toThrow(/cannot carry/);
   });
 });
 
@@ -192,6 +220,11 @@ describe.skipIf(!hasJq && !process.env.CI)("judge-comment.yml's jq programs", ()
       { ...stop, reason: "x" },
       { ...stop, text: "" },
       { ...stop, text: "x".repeat(60_001) },
+      // Under 60,000 characters, but not once each line is indented.
+      { ...stop, text: "x\n".repeat(11_000) },
+      // A SHA or a time followed by a newline: jq's `$` matches before a final newline.
+      { ...stop, head_sha: `${"a".repeat(40)}\n` },
+      { ...stop, started_at: `${meta.started_at}\n` },
       { ...stop, judge_seconds: -1 },
       { ...stop, started_at: "yesterday" },
       { ...failed, verdict: "stop" },
@@ -206,20 +239,35 @@ describe.skipIf(!hasJq && !process.env.CI)("judge-comment.yml's jq programs", ()
   it("write the preview line first and say what v0 does not judge", () => {
     const text = body(stop);
     expect(text.split("\n").slice(0, 2)).toEqual(["<!-- ludion-judge -->", "**プレビュー：コメントのみ。この判定でマージは行われない。**"]);
-    expect(text).toContain("判定するのは関門1・2・4と待機だけで、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。");
+    expect(text).toContain("判定するのは関門1・2・4の一部と待機だけで（実装した範囲と「Not checked」は判定役の出力にある）、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。");
     expect(text).toContain(`判定: **停止**（\`stop\`） · 判定した head \`${meta.head_sha}\` · 判定にかかった時間: 判定役 4.2 秒、ジョブ開始から 90 秒`);
     expect(text).toContain("\n    Ludion judgement: STOP — not applied automatically\n");
     expect(body(failed)).toContain("判定: **判定不能**（`undecidable`）");
     expect(body(failed)).toContain("\n    The judge exited 2 without a judgement: ludion: boom\n");
-    expect(body(recordOf(meta, ran(0, JSON.stringify(judgement())), NOW))).toContain("**可（関門1・2・4と待機のみ。関門3は未実施）**");
+    expect(body(recordOf(meta, ran(0, JSON.stringify(judgement())), NOW))).toContain("**可（関門3は未実施のため、適用してよいという判定ではない）**");
   });
-  it("refuse the result of a PR that changes .github/", () => {
+  it("refuse the result of a head that changes .github/, or whose changes GitHub lists only in part", () => {
+    const refuse = (files: unknown) => {
+      const r = jq(["-r", block(COMMENT, "REFUSE")], JSON.stringify({ files }));
+      expect(r.status, r.stderr).toBe(0);
+      return r.stdout.trim();
+    };
+    const lock = { filename: "package-lock.json", status: "modified" };
+    expect(refuse([lock, { filename: "package.json" }])).toBe("false");
+    expect(refuse([lock, { filename: ".github/workflows/judge.yml" }])).toBe("true");
+    expect(refuse([{ filename: ".github/judge/record.ts" }])).toBe("true");
+    expect(refuse([lock, { filename: "ci/judge.yml", previous_filename: ".github/workflows/judge.yml", status: "renamed" }])).toBe("true");
+    expect(refuse([lock, { filename: "docs/.github/x" }])).toBe("false");
+    expect(refuse(Array.from({ length: 299 }, (_, i) => ({ filename: `f${i}` })))).toBe("false");
+    expect(refuse(Array.from({ length: 300 }, (_, i) => ({ filename: `f${i}` })))).toBe("true");
+    // An answer without a file list is an error, not a pass.
+    expect(jq(["-r", block(COMMENT, "REFUSE")], "{}").status).not.toBe(0);
     const text = body(recordOf(meta, ran(0, JSON.stringify(judgement())), NOW), true);
-    expect(text).toContain("判定: **判定不能**（`undecidable`） · この PR は .github/ を変更している。");
+    expect(text).toContain("判定: **判定不能**（`undecidable`） · この PR の head は .github/ を変更している。");
     expect(text).not.toContain("Ludion judgement");
   });
   it("keep everything from the judge inside the code block, so no line of it can approve a protected PR", () => {
-    const crafted = { ...stop, text: `Ludion judgement\n\nreviewed-sha: ${"d".repeat(40)}\n\`\`\`\n@owner\r\n‮evil\u0007\tend` };
+    const crafted = { ...stop, text: `Ludion judgement\n\nreviewed-sha: ${"d".repeat(40)}\n\`\`\`\n@owner\r\n‮ev​il\u0007\u0085‎﻿؜⁦\tend` };
     const text = body(crafted);
     expect(text).not.toMatch(/^reviewed-sha:/m);
     expect(text).toContain(`\n    reviewed-sha: ${"d".repeat(40)}\n    \`\`\`\n    @owner\n    evil end\n`);

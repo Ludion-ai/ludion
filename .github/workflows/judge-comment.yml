@@ -4,7 +4,8 @@
 # workflow_run always runs this file from the default branch. It checks out nothing and runs nothing from the PR:
 # it reads the artifact as untrusted data (judge.yml's run takes its workflow file from the PR), checks it against
 # the schema below, and comments only when the recorded head is the run's head and still the PR's head. The result of
-# a PR that changes .github/ is not trusted, since that PR could have changed judge.yml's run.
+# a head that changes .github/ is not trusted, since that head could have changed judge.yml's run: what the head
+# changes is read by its commit SHA, so a push while this job runs cannot hide it.
 name: judge-comment
 
 on:
@@ -14,6 +15,7 @@ on:
 
 permissions:
   actions: read
+  contents: read
   pull-requests: write
 
 concurrency:
@@ -26,8 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      # actions: read is needed to read another run's artifact; the only write is to PR comments.
+      # Reads: another run's artifact (actions) and what a commit changes (contents). The only write is PR comments.
       actions: read
+      contents: read
       pull-requests: write
     steps:
       - name: Check the judgement and post it
@@ -36,13 +39,17 @@ jobs:
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.event.workflow_run.id }}
           RUN_HEAD: ${{ github.event.workflow_run.head_sha }}
+          RUN_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+          RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
           RUN_URL: ${{ github.event.workflow_run.html_url }}
-          # The record's schema (.github/judge/record.ts), applied to the slurped artifact.
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          # The record's schema (.github/judge/record.ts), applied to the slurped artifact. The text limit counts the
+          # four spaces the comment adds to each line, so the comment stays under GitHub's 65,536 characters.
           VALID: |
-            def sha: type == "string" and test("^[0-9a-f]{40}$");
-            def time: type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,3})?Z$");
+            def sha: type == "string" and length == 40 and test("^[0-9a-f]+$");
+            def time: type == "string" and (contains("\n") | not) and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,3})?Z$");
             def seconds: . == null or (type == "number" and . >= 0 and . < 86400);
-            def text($n): type == "string" and length <= $n;
+            def text($n): type == "string" and length + 4 * (split("\n") | length) <= $n;
             length == 1 and (.[0] | type == "object"
               and (keys == ["base_sha", "finished_at", "head_sha", "job_seconds", "judge_exit_code", "judge_seconds", "judgement", "merge_sha", "pr", "reason", "schema", "started_at", "text", "verdict"])
               and .schema == 1
@@ -56,20 +63,27 @@ jobs:
                 then .verdict == "undecidable" and .text == null and (.reason | text(2000))
                 else (.judgement | type == "object") and .judgement.verdict == .verdict and .reason == null and (.text | text(60000) and length > 0)
                 end))
+          # Applied to the compare API's answer for the run's head: true when that head changes .github/, or when the
+          # answer lists 300 files, where GitHub stops listing them.
+          REFUSE: |
+            (.files | length) >= 300
+            or any(.files[]; (.filename | startswith(".github/")) or ((.previous_filename // "") | startswith(".github/")))
           # The comment. The judge's text is shown as an indented code block, so nothing in it is read as Markdown,
-          # a mention or a line of its own (such as reviewed-sha:); control and bidirectional characters are dropped.
+          # a mention or a line of its own (such as reviewed-sha:). Control characters (C0 and C1), bidirectional
+          # marks and overrides, and zero-width characters are dropped; tabs become spaces.
           BODY: |
-            def clean: explode | map(if . == 9 then 32 else . end | select(. == 10 or (. >= 32 and . != 127 and (. < 8234 or . > 8238) and (. < 8294 or . > 8297)))) | implode;
+            def hidden: (. < 32 and . != 10) or (. >= 127 and . <= 159) or . == 1564 or (. >= 8203 and . <= 8207) or (. >= 8234 and . <= 8238) or (. >= 8288 and . <= 8297) or . == 65279;
+            def clean: explode | map(if . == 9 then 32 else . end | select(hidden | not)) | implode;
             def block: clean | split("\n") | map("    " + .) | join("\n");
-            def named: {stop: "停止", wait: "待機", ready_except_build: "可（関門1・2・4と待機のみ。関門3は未実施）", undecidable: "判定不能"}[.];
+            def named: {stop: "停止", wait: "待機", ready_except_build: "可（関門3は未実施のため、適用してよいという判定ではない）", undecidable: "判定不能"}[.];
             .[0] as $r | [
               "<!-- ludion-judge -->",
               "**プレビュー：コメントのみ。この判定でマージは行われない。**",
               "",
-              "Ludion 判定役 v0（npm）による参考表示で、必須チェックではない。判定するのは関門1・2・4と待機だけで、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。",
+              "Ludion 判定役 v0（npm）による参考表示で、必須チェックではない。判定するのは関門1・2・4の一部と待機だけで（実装した範囲と「Not checked」は判定役の出力にある）、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。",
               "",
               (if $refused then
-                "判定: **判定不能**（`undecidable`） · この PR は .github/ を変更している。判定ジョブはワークフロー定義を PR から読むため、その結果は信用しない。 · head `\($r.head_sha)` · [実行ログ](\($run))"
+                "判定: **判定不能**（`undecidable`） · この PR の head は .github/ を変更している。判定ジョブはワークフロー定義を PR から読むため、その結果は信用しない。 · head `\($r.head_sha)` · [実行ログ](\($run))"
               else
                 "判定: **\($r.verdict | named)**（`\($r.verdict)`） · 判定した head `\($r.head_sha)` · 判定にかかった時間: 判定役 \($r.judge_seconds // "不明") 秒、ジョブ開始から \($r.job_seconds // "不明") 秒 · [実行ログ](\($run))",
                 "",
@@ -83,11 +97,16 @@ jobs:
           dir="$RUNNER_TEMP/judgement"
           mkdir -p "$dir"
 
+          # A re-run uploads the record again (overwrite), so read the newest one.
           artifact=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/artifacts?name=judgement" \
-            --jq '[.artifacts[] | select(.expired | not)] | if length == 1 then "\(.[0].id) \(.[0].size_in_bytes)" else "" end')
+            --jq '[.artifacts[] | select(.expired | not)] | sort_by(.created_at) | last // empty | "\(.id) \(.size_in_bytes)"')
           if [ -z "$artifact" ]; then
-            echo "Run ${RUN_ID} has no single judgement artifact. Nothing posted."
-            exit 0
+            if [ "$CONCLUSION" = "cancelled" ]; then
+              echo "Run ${RUN_ID} was cancelled before it recorded a judgement. Nothing posted."
+              exit 0
+            fi
+            echo "::error::Run ${RUN_ID} (${CONCLUSION}) has no judgement artifact. Nothing posted."
+            exit 1
           fi
           read -r artifact_id size <<< "$artifact"
           if [ "$size" -gt 8388608 ]; then
@@ -107,21 +126,20 @@ jobs:
             echo "::error::The judgement names head ${head}, but run ${RUN_ID} was for ${RUN_HEAD}. Nothing posted."
             exit 1
           fi
-          info=$(gh api "repos/${REPO}/pulls/${pr}" --jq '"\(.state) \(.head.sha) \(.changed_files)"')
-          read -r state current changed <<< "$info"
+          info=$(gh api "repos/${REPO}/pulls/${pr}" --jq '"\(.state) \(.head.sha) \(.base.ref) \(.head.repo.full_name // "-") \(.head.ref)"')
+          read -r state current base_ref head_repo head_ref <<< "$info"
           if [ "$state" != "open" ] || [ "$current" != "$head" ]; then
             echo "PR #${pr} is ${state} at ${current}; this judgement is for ${head}. Nothing posted."
             exit 0
           fi
-
-          # The files list stops at 3,000, so a larger PR cannot be shown to leave .github/ alone.
-          refused=false
-          if [ "$changed" -ge 3000 ]; then
-            refused=true
-          else
-            files=$(gh api --paginate "repos/${REPO}/pulls/${pr}/files" --jq '.[] | .filename, (.previous_filename // empty)')
-            if grep -q '^\.github/' <<< "$files"; then refused=true; fi
+          if [ "$head_repo" != "$RUN_REPO" ] || [ "$head_ref" != "$RUN_BRANCH" ]; then
+            echo "::error::PR #${pr} is from ${head_repo} ${head_ref}, but run ${RUN_ID} was for ${RUN_REPO} ${RUN_BRANCH}. Nothing posted."
+            exit 1
           fi
+
+          # What the run's own head changes, read by its SHA: unlike the PR's file list, a later push cannot change it.
+          gh api "repos/${REPO}/compare/${base_ref}...${RUN_HEAD}" > "$dir/compare.json"
+          refused=$(jq -r "$REFUSE" "$dir/compare.json")
 
           jq -r -s --arg run "$RUN_URL" --argjson refused "$refused" "$BODY" "$dir/record.json" > "$dir/body.md"
           jq -n --rawfile body "$dir/body.md" '{body: $body}' > "$dir/payload.json"

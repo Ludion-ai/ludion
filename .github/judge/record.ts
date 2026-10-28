@@ -10,8 +10,32 @@ import { renderJudgement, type Judgement } from "../../packages/cli/src/security
 const VERDICTS: Judgement["verdict"][] = ["stop", "wait", "ready_except_build", "undecidable"];
 /** The judge's exit code for each verdict (packages/cli/src/security/judge-cli.ts); 2 means it could not read the inputs. */
 const EXIT: Record<Judgement["verdict"], number> = { ready_except_build: 0, wait: 3, stop: 1, undecidable: 1 };
-/** judge-comment.yml accepts at most this much text (GitHub's comment limit is 65,536 characters). */
+/** judge-comment.yml accepts at most this much text, counted as shown (GitHub's comment limit is 65,536 characters). */
 export const TEXT_LIMIT = 60_000;
+export const REASON_LIMIT = 2_000;
+
+/** A text's size once judge-comment.yml shows it as a code block, four spaces before each line. */
+export const shownSize = (text: string) => text.length + 4 * text.split("\n").length;
+/** Cuts a text at a line, where it can, so that it is at most `limit` as shown, and ends it with `note`. */
+export function fit(text: string, limit: number, note: string): string {
+  if (shownSize(text) <= limit) return text;
+  let budget = limit - shownSize(note);
+  const kept: string[] = [];
+  for (const line of text.split("\n")) {
+    // Each kept line costs its length, its newline and its four spaces.
+    if (line.length + 5 > budget) { if (budget > 5) kept.push(line.slice(0, budget - 5)); break; }
+    kept.push(line);
+    budget -= line.length + 5;
+  }
+  return [...kept, note].join("\n");
+}
+
+/** The judge's --files value. A name with a comma or surrounding spaces would not survive its comma-separated list. */
+export function filesArgument(files: string[]): string {
+  const odd = files.filter(f => f.includes(",") || f !== f.trim());
+  if (odd.length) throw new Error(`Changed file names that the judge's --files list cannot carry: ${odd.slice(0, 5).map(f => JSON.stringify(f)).join(", ")}.`);
+  return files.join(",");
+}
 
 export type Meta = { pr: number; head_sha: string; base_sha: string; merge_sha: string; started_at: string };
 export type Run = { exitCode: number | null; stdout: string; stderr: string; error?: string; seconds: number };
@@ -34,7 +58,7 @@ export type JudgeRecord = Meta & {
 export function recordOf(meta: Meta, run: Run | string, now = new Date()): JudgeRecord {
   const job_seconds = Math.max(0, now.getTime() - Date.parse(meta.started_at)) / 1000;
   const undecidable = (reason: string): JudgeRecord => ({
-    schema: 1, ...meta, verdict: "undecidable", reason: reason.slice(0, 2000), finished_at: now.toISOString(),
+    schema: 1, ...meta, verdict: "undecidable", reason: fit(reason, REASON_LIMIT, "… (cut here; see the run log)"), finished_at: now.toISOString(),
     judge_seconds: typeof run === "string" ? null : run.seconds, job_seconds, judge_exit_code: typeof run === "string" ? null : run.exitCode, judgement: null, text: null,
   });
   if (typeof run === "string") return undecidable(run);
@@ -45,7 +69,7 @@ export function recordOf(meta: Meta, run: Run | string, now = new Date()): Judge
   if (run.exitCode !== EXIT[judgement.verdict]) return undecidable(`The judge exited ${run.exitCode}, which does not match its verdict "${judgement.verdict}".`);
   let text: string;
   try { text = renderJudgement(judgement); } catch (error) { return undecidable(`The judgement could not be rendered: ${error instanceof Error ? error.message : String(error)}`); }
-  if (text.length > TEXT_LIMIT) text = `${text.slice(0, TEXT_LIMIT - 100)}\n… (cut here; the full judgement is in the run's judgement artifact)`;
+  text = fit(text, TEXT_LIMIT, "… (cut here; the full judgement is in the run's judgement artifact)");
   return { schema: 1, ...meta, verdict: judgement.verdict, reason: null, finished_at: now.toISOString(), judge_seconds: run.seconds, job_seconds, judge_exit_code: run.exitCode, judgement, text };
 }
 
@@ -57,19 +81,22 @@ function meta(env: NodeJS.ProcessEnv): Meta {
   return { pr, head_sha: sha("HEAD_SHA"), base_sha: sha("BASE_SHA"), merge_sha: sha("MERGE_SHA"), started_at: env.STARTED_AT! };
 }
 
+/** Runs the base commit's build of the judge on the files the read step wrote. */
+function judged(m: Meta, input: string): JudgeRecord {
+  let files: string;
+  try { files = filesArgument(readFileSync(join(input, "files"), "utf8").split("\0").filter(Boolean)); } catch (error) { return recordOf(m, error instanceof Error ? error.message : String(error)); }
+  const start = performance.now();
+  const r = spawnSync(process.execPath, ["packages/cli/dist/cli.js", "judge", "--before", join(input, "before"), "--after", join(input, "after"), "--files", files, "--json"], { encoding: "utf8", timeout: 600_000, maxBuffer: 64 * 1024 * 1024 });
+  const seconds = Math.round(performance.now() - start) / 1000;
+  return recordOf(m, { exitCode: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "", error: r.error?.message ?? (r.signal ? `stopped by ${r.signal}` : undefined), seconds });
+}
+
 /** Exit 0 when the judge gave a judgement (any verdict), 1 when it did not: the job's colour shows the judge's health. */
 function main(env: NodeJS.ProcessEnv): number {
-  const m = meta(env), input = env.INPUT ?? "", out = env.RECORD ?? "";
-  let record: JudgeRecord;
-  if (env.BUILD_OUTCOME !== "success") record = recordOf(m, "The judge could not be built from the base commit; see the run log.");
-  else if (env.READ_OUTCOME !== "success") record = recordOf(m, "The PR's package.json and package-lock.json could not be read; see the run log.");
-  else {
-    const files = readFileSync(join(input, "files"), "utf8").split("\0").filter(Boolean);
-    const start = performance.now();
-    const r = spawnSync(process.execPath, ["packages/cli/dist/cli.js", "judge", "--before", join(input, "before"), "--after", join(input, "after"), "--files", files.join(","), "--json"], { encoding: "utf8", timeout: 600_000, maxBuffer: 64 * 1024 * 1024 });
-    const seconds = Math.round(performance.now() - start) / 1000;
-    record = recordOf(m, { exitCode: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "", error: r.error?.message ?? (r.signal ? `stopped by ${r.signal}` : undefined), seconds });
-  }
+  const m = meta(env), out = env.RECORD ?? "";
+  const record = env.BUILD_OUTCOME !== "success" ? recordOf(m, "The judge could not be built from the base commit; see the run log.")
+    : env.READ_OUTCOME !== "success" ? recordOf(m, "The PR's package.json and package-lock.json could not be read; see the run log.")
+    : judged(m, env.INPUT ?? "");
   writeFileSync(out, `${JSON.stringify(record, null, 2)}\n`);
   const { judgement: _, text, ...summary } = record;
   console.log(JSON.stringify(summary, null, 2));

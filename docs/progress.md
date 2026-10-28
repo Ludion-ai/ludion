@@ -355,6 +355,16 @@ Checked in Docker (node:24-slim with jq 1.6; `npm ci` with network, then no netw
 
 Not run: judge-comment.yml on GitHub, since `workflow_run` runs only from the default branch.
 
+CI at 141d38e: `test` passed (vitest 281 passed; Playwright and axe 30 passed and 1 skipped).
+
+The first review asked for changes (decisions, "The judge on this repository"). After the fixes, checked the same way in Docker:
+
+- typecheck passes;
+- packages tests: 229 passed, with the workflow tests at 19;
+- each of 26 single breaks makes at least one test fail: the 14 above, and 12 for the fixes (the refusal removed, its pattern or its 300-file limit changed, the PR's file list used instead of the compare API, the head repository check removed, a SHA with a final newline accepted, the indentation left out of the text limit, a zero-width character kept, a missing record passed quietly, no overwrite on a re-run, the text not cut, and comma file names passed through);
+- the end-to-end run again judged @types/node 24.19.1 → 24.19.2 "ready except build", in 0.918 s;
+- actionlint: 0 errors in the two workflows.
+
 ## 2026-10-28 — Packagist advisories in Composer plans
 
 Composer scans and plans now read Packagist's advisory API next to OSV and take the later fix. New tests: Packagist's later fix wins over OSV's, OSV's later fix is kept, a Packagist-only advisory is found, a fix landing in the next range moves on, unaffected and empty answers stay clean, no same-major fix and unreadable ranges block, and an outage, a missing field, an unrequested name, a record for another package and an invalid id all fail the scan; npm inventories do not query Packagist. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passed; packages tests 176 passed. The site build needs git and was not run in the container; CI runs the full suite.

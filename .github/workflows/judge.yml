@@ -100,4 +100,6 @@ jobs:
           name: judgement
           path: ${{ runner.temp }}/judgement.json
           if-no-files-found: error
+          # A re-run of this job replaces the record instead of failing on the name.
+          overwrite: true
           retention-days: 90

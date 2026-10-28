@@ -1,8 +1,8 @@
 // The registered readers end to end: real Python, Go and Rust readers through scanProject and the CLI, with OSV as a
 // fake fetch (no network). Each reader's own parsing is tested in readonly-python/go/rust.test.ts.
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { securityCli } from "../src/security/cli.ts";
 import { OsvClient } from "../src/security/osv.ts";
@@ -101,7 +101,7 @@ const PYTHON = { "uv.lock": UV_LOCK, "pyproject.toml": '[project]\nname = "app"\
 const RUST = { "Cargo.lock": CARGO_LOCK, "Cargo.toml": '[package]\nname = "app"\nversion = "0.1.0"\n\n[dependencies]\natty = "0.2"\n' };
 function project(files: Record<string, string>): string {
   const root = mkdtempSync(join(tmpdir(), "ludion-readonly-registered-"));
-  for (const [name, text] of Object.entries(files)) writeFileSync(join(root, name), text);
+  for (const [name, text] of Object.entries(files)) { mkdirSync(dirname(join(root, name)), { recursive: true }); writeFileSync(join(root, name), text); }
   return root;
 }
 const readOnly = (check: Awaited<ReturnType<typeof scanProject>>["checks"][number]) => {
@@ -189,37 +189,71 @@ const SETUPTOOLS = '[build-system]\nrequires = ["setuptools>=61"]\nbuild-backend
 const DECLARES = '[project]\nname = "app"\nversion = "0.1.0"\ndependencies = ["requests==2.19.0"]\n';
 const POETRY = (packages: string[]) => `${packages.map(name => `[[package]]\nname = "${name}"\nversion = "1.0.0"\ndescription = ""\noptional = false\npython-versions = "*"\nfiles = []\n\n`).join("")}[metadata]\nlock-version = "2.0"\npython-versions = "^3.10"\ncontent-hash = "${"c".repeat(64)}"\n`;
 
-describe("a Python project whose dependencies Ludion does not read is never clean (#189 review, finding 1)", () => {
+const NO_LOCK = "pyproject.toml has no lock file Ludion reads (uv.lock, poetry.lock or Pipfile.lock); any dependencies it or its tools declare were not checked.";
+const SETUP_PY = "setup.py can declare dependencies (install_requires and extras_require passed to setup()) that Ludion does not read; they were not checked.";
+const SETUP_CFG = (sections: string) => `setup.cfg has ${sections}, where setuptools reads install_requires, setup_requires, tests_require and extras_require; Ludion does not read them, so they were not checked.`;
+const TOOLS = (settings: string) => `pyproject.toml has tool settings that may declare dependencies no lock read here covers; they were not checked: ${settings}.`;
+const BRIEFCASE = '[build-system]\nrequires = ["briefcase"]\n\n[tool.briefcase]\nproject_name = "T"\nbundle = "org.example"\nversion = "0.0.1"\n\n[tool.briefcase.app.t]\nformal_name = "T"\nsources = ["t"]\nrequires = ["requests==2.19.0"]\n';
+
+describe("a Python project whose dependencies Ludion does not read is never clean (#189 reviews)", () => {
+  // Without a lock Ludion reads, pyproject.toml is always a limitation: no list of tools decides it.
+  it.each([
+    ["Briefcase's [tool.briefcase.app.*] requires", BRIEFCASE],
+    ["a [tool.uv.workspace] root", '[tool.uv.workspace]\nmembers = ["packages/*"]\n'],
+    ["a [tool.rye.workspace] root", '[tool.rye]\nmanaged = true\n\n[tool.rye.workspace]\nmembers = ["packages/*"]\n'],
+    ["Hatch workspace members", '[project]\nname = "app"\n\n[tool.hatch.envs.default.workspace]\nmembers = ["packages/*"]\n'],
+    ["tox deps", '[tool.tox.env.test]\ndeps = ["requests==2.19.0"]\ncommands = [["pytest"]]\n'],
+    ["cibuildwheel test-requires", '[tool.cibuildwheel]\ntest-requires = ["requests==2.19.0"]\n'],
+    ["[tool.uv] dev-dependencies", '[project]\nname = "app"\nversion = "0.1.0"\n\n[tool.uv]\ndev-dependencies = ["requests==2.19.0"]\n'],
+    ["[project] dependencies", DECLARES],
+    ["a black-only pyproject.toml", "[tool.black]\nline-length = 100\n"],
+  ])("pyproject.toml with %s and no lock", async (_name, text) => {
+    const result = await check({ "pyproject.toml": text });
+    expect(result.status).toBe("incomplete");
+    expect(result.inventory.limitations).toEqual([NO_LOCK]);
+    // requirements.txt is not a lock of it.
+    expect((await check({ "pyproject.toml": text, "requirements.txt": "six==1.16.0\n" })).inventory.limitations).toEqual([NO_LOCK]);
+  });
   it("a setuptools project: pyproject.toml with only [build-system], plus setup.py and setup.cfg", async () => {
     const result = await check({ "pyproject.toml": SETUPTOOLS, "setup.py": 'from setuptools import setup\nsetup(install_requires=["requests==2.19.0"])\n', "setup.cfg": "[options]\ninstall_requires =\n    requests==2.19.0\n" });
     expect(result.status).toBe("incomplete");
     expect(result.inventory.packages).toEqual([]);
-    expect(result.inventory.limitations).toEqual([
-      "setup.py can declare dependencies (install_requires and extras_require passed to setup()) that Ludion does not read; they were not checked.",
-      "setup.cfg can declare dependencies ([options] install_requires and [options.extras_require]) that Ludion does not read; they were not checked.",
-    ]);
+    expect(result.inventory.limitations).toEqual([NO_LOCK, SETUP_PY, SETUP_CFG("[options]")]);
     expect(result.report.status).toBe("attention_required");
   });
-  it.each([["setup.py", "from setuptools import setup\nsetup()\n"], ["setup.cfg", "[metadata]\nname = app\n"]])("%s alone makes the Python reader run and say so", async (file, text) => {
-    const result = await check({ [file]: text });
+  it("setup.py alone makes the Python reader run and say so", async () => {
+    const result = await check({ "setup.py": "from setuptools import setup\nsetup()\n" });
     expect(result.status).toBe("incomplete");
-    expect(result.inventory.limitations).toEqual([expect.stringMatching(new RegExp(`^${file.replace(".", "\\.")} can declare dependencies`))]);
+    expect(result.inventory.limitations).toEqual([SETUP_PY]);
   });
   it.each([
-    ["[tool.uv] dev-dependencies", '[project]\nname = "app"\nversion = "0.1.0"\n\n[tool.uv]\ndev-dependencies = ["requests==2.19.0"]\n'],
-    ["[tool.pdm] dev-dependencies", '[project]\nname = "app"\n\n[tool.pdm.dev-dependencies]\ntest = ["requests==2.19.0"]\n'],
-    ["[tool.hatch.envs.default] dependencies", '[project]\nname = "app"\n\n[tool.hatch.envs.default]\ndependencies = ["requests==2.19.0"]\n'],
-    ["[tool.flit.metadata] requires", '[tool.flit.metadata]\nmodule = "app"\nrequires = ["requests==2.19.0"]\n'],
-    ["[tool.setuptools.dynamic] dependencies", '[project]\nname = "app"\ndynamic = ["version"]\n\n[tool.setuptools.dynamic]\ndependencies = { file = ["requirements.in"] }\n'],
-  ])("pyproject.toml with %s and no lock", async (setting, text) => {
-    const result = await check({ "pyproject.toml": text });
+    ["[options]", "[metadata]\nname = app\n\n[options]\ninstall_requires =\n    requests==2.19.0\n", "[options]"],
+    ["[options.extras_require]", "[options.extras_require]\ntest = pytest\n", "[options.extras_require]"],
+    ["both", "[options]\nsetup_requires = wheel\n[options.extras_require]\ntest = pytest\n", "[options], [options.extras_require]"],
+    ["a header configparser still reads: indented, other case, a trailing comment", "  [Options] ; dependencies\ntests_require = pytest\n", "[options]"],
+  ])("setup.cfg with %s gives a limitation", async (_name, text, sections) => {
+    const result = await check({ "setup.cfg": text });
+    expect(result.inventory.files).toEqual(["setup.cfg"]);
+    expect(result.inventory.limitations).toEqual([SETUP_CFG(sections)]);
     expect(result.status).toBe("incomplete");
-    expect(result.inventory.limitations).toEqual([`pyproject.toml has dependency settings this reader does not read, and no lock file (uv.lock, poetry.lock) pins them; they were not checked: ${setting}.`]);
   });
-  it("only a pyproject.toml with no dependency settings and no setup.py or setup.cfg adds nothing", async () => {
-    const result = await check({ "pyproject.toml": SETUPTOOLS });
+  it("a setup.cfg holding only tool sections adds nothing", async () => {
+    const result = await check({ "setup.cfg": "[flake8]\nmax-line-length = 100\n\n[isort]\nprofile = black\n\n[tool:pytest]\naddopts = -q\n\n[metadata]\nname = app\n\n[options.packages.find]\nwhere = src\n" });
     expect(result.inventory.limitations).toEqual([]);
     expect(result.status).toBe("no_known_vulnerabilities");
+  });
+  it("beside a lock, tool settings other than Poetry's and uv's that may declare dependencies give a limitation", async () => {
+    const uv = { "uv.lock": UV_LOCK, "pyproject.toml": '[project]\nname = "app"\nversion = "0.1.0"\ndependencies = ["requests"]\n' };
+    const with_ = (extra: string) => check({ ...uv, "pyproject.toml": `${uv["pyproject.toml"]}\n${extra}` });
+    expect((await with_('[tool.briefcase.app.t]\nrequires = ["six==1.16.0"]\n')).inventory.limitations).toEqual([TOOLS("[tool.briefcase.app.t] requires")]);
+    expect((await with_('[tool.tox.env.test]\ndeps = ["pytest"]\n')).inventory.limitations).toEqual([TOOLS("[tool.tox.env.test] deps")]);
+    expect((await with_('[tool.cibuildwheel]\ntest-requires = ["pytest"]\n')).inventory.limitations).toEqual([TOOLS("[tool.cibuildwheel] test-requires")]);
+    expect((await with_('[tool.hatch.envs.default.workspace]\nmembers = ["packages/*"]\n')).inventory.limitations).toEqual([TOOLS("[tool.hatch.envs.default.workspace] members")]);
+    // uv's own settings are in uv.lock, and plain tool settings declare nothing.
+    expect((await with_('[tool.uv]\ndev-dependencies = ["pytest"]\n\n[tool.uv.workspace]\nmembers = ["packages/*"]\n\n[tool.black]\nline-length = 100\n')).inventory.limitations).toEqual([]);
+    // Poetry's are read with poetry.lock.
+    const poetry = await check({ "poetry.lock": POETRY(["requests", "pytest"]), "pyproject.toml": `${DECLARES}\n[tool.poetry.group.dev.dependencies]\npytest = "*"\n\n[tool.pdm.dev-dependencies]\ntest = ["six"]\n` });
+    expect(poetry.inventory.limitations).toEqual([TOOLS("[tool.pdm] dev-dependencies")]);
   });
 });
 
@@ -234,6 +268,8 @@ describe("a lock must be the lock of the manifest beside it (#189 review, findin
     ["P8: a poetry.lock from another project", { "poetry.lock": POETRY(["six"]), "pyproject.toml": DECLARES }, [/^poetry\.lock does not list 1 requirement that pyproject\.toml declares.*: requests\.$/]],
     ["P9: an empty poetry.lock beside an unparseable pyproject.toml", { "poetry.lock": POETRY([]), "pyproject.toml": "[project\n" }, [/^poetry\.lock: pyproject\.toml could not be read/]],
     ["P13: an empty Pipfile.lock", { "Pipfile.lock": JSON.stringify({ _meta: { "pipfile-spec": 6 }, default: {}, develop: {} }), Pipfile: '[packages]\nrequests = "*"\n' }, [/^Pipfile\.lock does not list 1 requirement that Pipfile declares.*: requests\.$/]],
+    // Poetry reads lock-version "02.0" as 2.0, and so does the reader: the comparison must run for it too.
+    ["an empty poetry.lock with lock-version \"02.0\"", { "poetry.lock": POETRY([]).replace('lock-version = "2.0"', 'lock-version = "02.0"'), "pyproject.toml": DECLARES }, [/^poetry\.lock does not list 1 requirement that pyproject\.toml declares.*: requests\.$/]],
   ])("%s gives a limitation", async (_name, files, expected) => {
     const result = await check(files);
     // Incomplete, or vulnerabilities_found where the lock still lists requests 2.19.0: never a clean result.
@@ -257,8 +293,32 @@ describe("a lock must be the lock of the manifest beside it (#189 review, findin
     expect(result.inventory.limitations.join(" ")).not.toContain("s3cret");
     expect(result.status).toBe("vulnerabilities_found");
   });
-  it("a virtual workspace root's Cargo.toml beside its Cargo.lock adds nothing", async () => {
-    expect((await check({ "Cargo.lock": CARGO_LOCK, "Cargo.toml": '[workspace]\nmembers = ["app"]\nresolver = "2"\n' })).inventory.limitations).toEqual([]);
+  const rust = async (manifest: string, extra: Record<string, string> = {}) => (await check({ "Cargo.lock": CARGO_LOCK, "Cargo.toml": manifest, ...extra })).inventory.limitations;
+  const APP = '[package]\nname = "app"\nversion = "0.1.0"\n';
+  it("a crate Cargo.toml declares that Cargo.lock does not list means a stale lock (RN1), in every dependency table", async () => {
+    expect(await rust(`${APP}\n[dependencies]\natty = "0.2"\nsmallvec = "=0.6.9"\n`)).toEqual(['Cargo.lock does not list 1 crate that Cargo.toml declares, so it may be out of date and that crate was not checked (1): "smallvec".']);
+    expect(await rust(`${APP}\n[dev-dependencies]\ntempfile = "3"\n\n[build-dependencies]\ncc = "1"\n\n[target.'cfg(unix)'.dependencies]\nnix = "0.27"\n`)).toEqual(['Cargo.lock does not list 3 crates that Cargo.toml declares, so it may be out of date and they were not checked (3): "tempfile", "cc", "nix".']);
+    // Nothing but the crate's name: a git dependency's URL can carry a token.
+    const secret = await rust(`${APP}\n[dependencies.private]\ngit = "https://user:s3cret@example.com/private.git"\n`);
+    expect(secret).toEqual(['Cargo.lock does not list 1 crate that Cargo.toml declares, so it may be out of date and that crate was not checked (1): "private".']);
+    expect(secret.join(" ")).not.toContain("s3cret");
+  });
+  it("a renamed or inherited dependency is compared by the package it names, and - and _ compare alike", async () => {
+    expect(await rust(`${APP}\n[dependencies]\nmy-atty = { package = "atty", version = "0.2" }\nlibc = { version = "0.2", optional = true }\n`)).toEqual([]);
+    expect(await rust(`${APP}\n[workspace]\n\n[workspace.dependencies]\nterm = { package = "atty", version = "0.2" }\n\n[dependencies]\nterm = { workspace = true }\n`)).toEqual([]);
+    // crates.io does not allow two names that differ only in - and _ (or case), and Cargo.lock records the published one.
+    const lock = CARGO_LOCK.replace('name = "libc"', 'name = "serde_json"');
+    expect((await check({ "Cargo.lock": lock, "Cargo.toml": `${APP}\n[dependencies]\nSerde-Json = "1"\n` })).inventory.limitations).toEqual([]);
+    expect(await rust(`${APP}\n[dependencies]\n"bad name" = "1"\n`)).toEqual(["Cargo.toml has 1 dependency entry Ludion could not read, so it was not compared with Cargo.lock."]);
+  });
+  it("a workspace's members must be the lock's members (RN2)", async () => {
+    const workspace = (members: string, exclude = "") => `[workspace]\nmembers = ${members}\n${exclude}resolver = "2"\n`;
+    expect(await rust(workspace('["app"]'), { "app/Cargo.toml": APP })).toEqual([]);
+    expect(await rust(workspace('["crates/*"]'), { "crates/app/Cargo.toml": APP, "crates/notes/README.md": "" })).toEqual([]);
+    expect(await rust(workspace('["crates/zzz"]'), { "crates/zzz/Cargo.toml": '[package]\nname = "zzz"\nversion = "0.1.0"\n' })).toEqual([`Cargo.lock lists no workspace member named "zzz" (members of Cargo.toml's [workspace]), so it may be another project's lock or out of date.`]);
+    expect(await rust(workspace('["crates/*"]', 'exclude = ["crates/old"]\n'), { "crates/app/Cargo.toml": APP, "crates/old/Cargo.toml": '[package]\nname = "old"\nversion = "0.1.0"\n' })).toEqual([]);
+    expect(await rust(workspace('["missing"]'))).toEqual(["1 workspace member's Cargo.toml could not be read or name no package, so it was not compared with Cargo.lock."]);
+    expect(await rust(workspace('["crates/a*", "../outside"]'))).toEqual(["Cargo.toml's [workspace] members include 2 entries Ludion does not expand, so they were not compared with Cargo.lock."]);
   });
 });
 
@@ -287,6 +347,10 @@ describe("ludion scan with the registered readers", () => {
     expect(await scan(files, { "PyPI:requests@2.19.0": ["GHSA-x84v-xcm2-53pg"] })).toBe(2);
     expect(out).toContain("PyPI: 0 package versions · 0 advisory matches · incomplete");
     expect(out).toContain("  Incomplete: setup.py can declare dependencies (install_requires and extras_require passed to setup()) that Ludion does not read; they were not checked.");
+  });
+  it("a setup.cfg that only configures flake8 does not make a clean npm project incomplete (exit 0)", async () => {
+    expect(await scan({ ...NPM, "setup.cfg": "[flake8]\nmax-line-length = 100\n" }, {})).toBe(0);
+    expect(out).toContain("PyPI: 0 package versions · 0 advisory matches · no_known_vulnerabilities");
   });
   it("Go: exit 2 when nothing matches (the toolchain limitation), exit 1 on a stdlib match", async () => {
     expect(await scan({ "go.mod": GO_MOD }, {}, "--ecosystem", "go")).toBe(2);

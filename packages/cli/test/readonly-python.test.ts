@@ -638,14 +638,16 @@ describe("readPython", () => {
   });
 
   it("does not guess versions for pyproject.toml or Pipfile requirements without a lock file", () => {
+    // #189: without a lock Ludion reads, a pyproject.toml is always a limitation, whatever its tables hold.
+    const noLock = "pyproject.toml has no lock file Ludion reads (uv.lock, poetry.lock or Pipfile.lock); any dependencies it or its tools declare were not checked.";
     const declared = readPython(project({ "pyproject.toml": '[project]\nname = "x"\ndependencies = ["requests>=2", "jinja2"]\n' }))!;
-    expect(declared).toEqual({ ecosystem: "PyPI", files: ["pyproject.toml"], scope: "no_locked_or_pinned_packages", packages: [], limitations: ["pyproject.toml declares 2 requirements and no lock file (uv.lock, poetry.lock) pins them; unpinned project requirements were not checked and their versions were not guessed."] });
-    expect(readPython(project({ "pyproject.toml": '[project]\nname = "x"\ndynamic = ["dependencies"]\n' }))!.limitations[0]).toMatch(/^pyproject\.toml declares dependencies dynamically/);
+    expect(declared).toEqual({ ecosystem: "PyPI", files: ["pyproject.toml"], scope: "no_locked_or_pinned_packages", packages: [], limitations: [noLock] });
+    expect(readPython(project({ "pyproject.toml": '[project]\nname = "x"\ndynamic = ["dependencies"]\n' }))!.limitations).toEqual([noLock]);
     expect(readPython(project({ "pyproject.toml": "[project]\nname = 'x'\nversion = 1.0.0\n" }))!.limitations).toEqual(["pyproject.toml could not be read (pyproject.toml line 3: unsupported value \"1.0.0\" (dates, special and non-decimal numbers are not read)); any requirements it declares were not checked."]);
     expect(readPython(project({ Pipfile: '[packages]\nrequests = "*"\n' }))!.limitations).toEqual(["Pipfile declares 1 package and there is no Pipfile.lock; unpinned requirements were not checked and their versions were not guessed."]);
-    // A pyproject.toml holding only tool settings declares nothing to check.
+    // Even a pyproject.toml holding only tool settings: requirements.txt is not a lock of it.
     const toolOnly = readPython(project({ "pyproject.toml": "[tool.ruff]\nline-length = 100\n", "requirements.txt": "requests==2.19.0\n" }))!;
-    expect(toolOnly.limitations).toEqual([]);
+    expect(toolOnly.limitations).toEqual([noLock]);
     expect(toolOnly.files).toEqual(["requirements.txt", "pyproject.toml"]);
   });
 

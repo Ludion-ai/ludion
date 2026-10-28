@@ -140,6 +140,12 @@ export function parseUvLock(text: string): PythonFile {
 }
 
 const POETRY_TOP = new Set(["package", "metadata", "extras"]);
+/** lock-version 1.x or 2.x, read as Poetry reads it ("02.0" is 2.0). One predicate for parsing and for lockedNames. */
+function poetryLockKnown(lock: TomlTable): boolean {
+  const version = isTable(lock.metadata) ? lock.metadata["lock-version"] : undefined;
+  const major = typeof version === "string" && /^\d+\.\d+$/.test(version) ? Number(version.split(".")[0]) : NaN;
+  return major === 1 || major === 2;
+}
 /**
  * poetry.lock (lock-version 1.x or 2.x): packages from PyPI or a legacy (simple index) source are the inventory;
  * git, directory, file and url sources are limitations. Direct comes from pyproject.toml's names when given.
@@ -147,8 +153,7 @@ const POETRY_TOP = new Set(["package", "metadata", "extras"]);
 export function parsePoetryLock(text: string, direct: Set<string> | null = null): PythonFile {
   const lock = parseToml(text, "poetry.lock");
   const version = isTable(lock.metadata) ? lock.metadata["lock-version"] : undefined;
-  const major = typeof version === "string" && /^\d+\.\d+$/.test(version) ? Number(version.split(".")[0]) : NaN;
-  if (major !== 1 && major !== 2) return { packages: [], project: [], limitations: [`poetry.lock has lock-version ${shown(version)}; this reader knows 1.x and 2.x only, so its packages were not read.`] };
+  if (!poetryLockKnown(lock)) return { packages: [], project: [], limitations: [`poetry.lock has lock-version ${shown(version)}; this reader knows 1.x and 2.x only, so its packages were not read.`] };
   const packages: ReadOnlyPackage[] = [], unknown: string[] = [], invalid: string[] = [], local: string[] = [];
   for (const entry of lockPackages(lock.package, "poetry.lock")) {
     const name = lockName(entry, "poetry.lock"), source = entry.source;
@@ -441,29 +446,43 @@ export function pyprojectName(text: string): string | null {
   return name === null ? null : normalizeName(name);
 }
 
-/** Packaging tools whose own pyproject.toml settings can declare dependencies that pyprojectRequirements does not read. */
-const UNREAD_TOOLS = ["uv", "pdm", "hatch", "flit", "rye", "pixi", "setuptools"];
 /**
- * Dependency settings in pyproject.toml that this reader does not read: under [tool.uv], [tool.pdm], [tool.hatch],
- * [tool.flit], [tool.rye], [tool.pixi] and [tool.setuptools], every key naming dependencies or requirements
- * ([tool.uv] dev-dependencies, [tool.hatch.envs.test] dependencies, [tool.flit.metadata] requires, ...).
+ * Settings under [tool.*] that may declare dependencies a lock beside pyproject.toml does not cover: every key, at any
+ * depth, whose name contains "depend", "require", "deps" or "members", in any tool table but [tool.poetry] (read
+ * with poetry.lock) and [tool.uv] (locked into uv.lock). Matched by key name, not by a list of tools, so an unknown
+ * tool over-reports (ruff's required-version too) rather than hides (Briefcase's requires, tox's deps).
  */
-export function unreadDependencySettings(text: string): string[] {
+export function toolDependencySettings(text: string): string[] {
   const tool = parseToml(text, "pyproject.toml").tool, found: string[] = [];
   const walk = (table: TomlTable, path: string[]) => {
     for (const [key, value] of Object.entries(table)) {
-      if (/depend|requires/i.test(key)) found.push(`[${path.map(p => clip(p, 40)).join(".")}] ${clip(key, 40)}`);
+      if (/depend|require|deps|members/i.test(key)) found.push(`[${path.map(p => clip(p, 40)).join(".")}] ${clip(key, 40)}`);
       else if (isTable(value) && path.length < 8) walk(value, [...path, key]);
     }
   };
-  if (isTable(tool)) for (const name of UNREAD_TOOLS) { const settings = tool[name]; if (isTable(settings)) walk(settings, ["tool", name]); }
+  if (isTable(tool)) for (const [name, settings] of Object.entries(tool)) if (name !== "poetry" && name !== "uv" && isTable(settings)) walk(settings, ["tool", name]);
   return found;
+}
+
+/**
+ * The setuptools sections a setup.cfg has that declare dependencies: [options] (install_requires, setup_requires,
+ * tests_require) and [options.extras_require]. Only section headers are read, as configparser reads them; a setup.cfg
+ * holding only tool sections ([flake8], [isort], [tool:pytest]) declares nothing.
+ */
+export function setupCfgDependencySections(text: string): string[] {
+  const found = new Set<string>();
+  for (const line of text.split(/\r\n|[\n\r]/)) {
+    // configparser's SECTCRE, \[(?P<header>.+)\], matched at the start of the stripped line: up to its last "]".
+    const header = /^\[(.+)\]/.exec(line.trim())?.[1]?.trim().toLowerCase();
+    if (header === "options" || header === "options.extras_require") found.add(`[${header}]`);
+  }
+  return [...found];
 }
 
 /** Every package name a uv.lock or poetry.lock lists, whatever its source; null for a lock format this reader does not read. */
 function lockedNames(text: string, file: "uv.lock" | "poetry.lock"): Set<string> | null {
   const lock = parseToml(text, file);
-  if (file === "uv.lock" ? lock.version !== 1 : !(isTable(lock.metadata) && typeof lock.metadata["lock-version"] === "string" && /^[12]\.\d+$/.test(lock.metadata["lock-version"]))) return null;
+  if (file === "uv.lock" ? lock.version !== 1 : !poetryLockKnown(lock)) return null;
   return new Set(lockPackages(file === "uv.lock" ? lock.package ?? lock.distribution : lock.package, file).map(entry => lockName(entry, file)));
 }
 /** Every package name a Pipfile.lock (spec 6) lists, in any category; null for another spec. */
@@ -554,16 +573,23 @@ export function readPython(root: string): ReadOnlyInventory | null {
     pins.packages = pins.packages.filter(p => !packages.has(`${p.name}\0${p.version}`));
     add(pins);
   }
-  // A manifest no lock covers: its requirements are a limitation, their versions are not guessed.
   if (has("pyproject.toml") && !has("uv.lock") && !has("poetry.lock")) {
     const text = read("pyproject.toml");
     try {
-      const declared = pyprojectRequirements(text), unread = unreadDependencySettings(text);
-      if (declared.names.length || declared.dynamic) limitations.push(`pyproject.toml declares ${declared.dynamic ? "dependencies dynamically" : plural(declared.names.length, "requirement", "requirements")} and no lock file (uv.lock, poetry.lock) pins them; unpinned project requirements were not checked and their versions were not guessed.`);
-      if (unread.length) limitations.push(`pyproject.toml has dependency settings this reader does not read, and no lock file (uv.lock, poetry.lock) pins them; they were not checked: ${list(unread)}.`);
+      const declared = pyprojectRequirements(text);
+      // No lock at all: whatever pyproject.toml or any tool's table in it declares is unread. This fails closed by
+      // design: a list of tools would miss the next one (Briefcase's requires, a workspace's members, tox's deps).
+      if (!has("Pipfile.lock")) limitations.push("pyproject.toml has no lock file Ludion reads (uv.lock, poetry.lock or Pipfile.lock); any dependencies it or its tools declare were not checked.");
+      else if (declared.names.length || declared.dynamic) limitations.push(`pyproject.toml declares ${declared.dynamic ? "dependencies dynamically" : plural(declared.names.length, "requirement", "requirements")} and no lock file (uv.lock, poetry.lock) pins them; unpinned project requirements were not checked and their versions were not guessed.`);
     } catch (error) {
       limitations.push(`pyproject.toml could not be read (${reason(error)}); any requirements it declares were not checked.`);
     }
+  }
+  // Beside a lock: dependencies that tools other than Poetry and uv declare are in no lock read here.
+  if (has("pyproject.toml") && locks.length) {
+    let unread: string[] = [];
+    try { unread = toolDependencySettings(read("pyproject.toml")); } catch { /* an unreadable pyproject.toml is already a limitation above */ }
+    if (unread.length) limitations.push(`pyproject.toml has tool settings that may declare dependencies no lock read here covers; they were not checked: ${list(unread)}.`);
   }
   if (has("Pipfile") && !has("Pipfile.lock")) {
     const text = read("Pipfile");
@@ -575,9 +601,12 @@ export function readPython(root: string): ReadOnlyInventory | null {
     }
   }
   if (others.length) limitations.push(`Only requirements.txt is read; other requirements files were not checked: ${list(others)}.`);
-  // Never a clean result: setup.py is a program and setup.cfg its configuration, and neither is read.
+  // setup.py is a program: never read, always a limitation. setup.cfg is read for its section headers only.
   if (has("setup.py")) limitations.push("setup.py can declare dependencies (install_requires and extras_require passed to setup()) that Ludion does not read; they were not checked.");
-  if (has("setup.cfg")) limitations.push("setup.cfg can declare dependencies ([options] install_requires and [options.extras_require]) that Ludion does not read; they were not checked.");
+  if (has("setup.cfg")) {
+    const sections = setupCfgDependencySections(read("setup.cfg"));
+    if (sections.length) limitations.push(`setup.cfg has ${list(sections)}, where setuptools reads install_requires, setup_requires, tests_require and extras_require; Ludion does not read them, so they were not checked.`);
+  }
   const scope: string[] = [];
   if (locks.length) scope.push(`locked_registry_packages (${locks.join(", ")})`);
   if (has("requirements.txt")) scope.push("exact_pins_in_requirements_txt");

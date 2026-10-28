@@ -14,11 +14,23 @@
     - a record with no entry for the queried crate;
     - a record with a CVE or GHSA alias. OSV can lack the alias's own record: live, salsa 0.28.0's RUSTSEC-2026-0308 and stable-vec 0.4.0's RUSTSEC-2026-0267 are `unsound` with a GHSA alias that OSV returns 404 for. RUSTSEC-2020-0036 (failure, "unmaintained") names CVE-2019-25010.
 - **Registration.** Python, Go and Rust are registered with `PYTHON_FILES`, `GO_FILES` and `RUST_FILES`. `PYTHON_FILES` also names Pipfile, which the Python reader reads on its own, and setup.py and setup.cfg, which it never reads. A project whose only Python file is another requirements file (requirements-dev.txt) is not scanned, because no registered name is present.
-- **Never clean when dependencies are declared where Ludion does not read** (#189 review). setup.py and setup.cfg always give a limitation. Without a lock, pyproject.toml gives one when it declares dependencies, or when it has a key naming dependencies or requirements under the settings of uv, PDM, Hatch, Flit, Rye, Pixi or setuptools. Only a pyproject.toml with neither, and no setup.py or setup.cfg, adds nothing.
+- **Never clean when dependencies are declared where Ludion does not read** (#189 reviews). Fail closed, not by a list of tools. A list of seven tools missed Briefcase, workspace roots, tox and cibuildwheel, and over-reporting is the accepted direction.
+  - Without a lock Ludion reads (uv.lock, poetry.lock or Pipfile.lock), pyproject.toml is always a limitation, even with only `[tool.black]`.
+  - Beside a lock, any key at any depth of a `[tool.*]` table other than `[tool.poetry]` and `[tool.uv]` whose name contains "depend", "require", "deps" or "members" is a limitation. That includes ruff's `required-version`.
+  - setup.py is always a limitation.
+  - setup.cfg is read for its section headers only, as configparser finds them: `[options]` or `[options.extras_require]` is a limitation, and tool sections alone add nothing.
 - **A lock must be its manifest's** (#189 review). Each reader reads the manifest beside the lock it reads.
   - uv.lock: a limitation when it has no project package, when it does not name pyproject.toml's project, or when pyproject.toml cannot be read.
   - poetry.lock, Pipfile.lock and uv.lock: a limitation when they do not list a requirement the manifest declares, other than the project itself. An unreadable manifest is a limitation even beside an empty lock.
-  - Cargo.lock: a limitation when Cargo.toml's package is not among the lock's workspace members, when Cargo.toml names another workspace root (`package.workspace`), or when Cargo.toml cannot be read. Only a validated package name and a line number are printed, since dependency entries can carry credentials.
+  - poetry.lock's lock-version is read by one predicate for parsing and for this comparison ("02.0" is 2.0).
+  - Cargo.lock: a limitation in any of these cases:
+    - Cargo.toml's package is not among the lock's workspace members;
+    - a crate that Cargo.toml's dependency tables declare is missing from the lock. The tables are `[dependencies]`, `[dev-dependencies]` and `[build-dependencies]`, also under `[target.*]`. Crates compare by `package` for a rename (also through `[workspace.dependencies]`), with `-`/`_` and case alike;
+    - a `[workspace]` member is not one of the lock's members. Members are literal paths and `dir/*`, with `exclude` honoured, and each name comes from the member's own Cargo.toml. Other patterns, and members that cannot be read, are limitations too;
+    - Cargo.toml names another workspace root (`package.workspace`);
+    - Cargo.toml cannot be read.
+
+    Only validated crate names, counts and a line number are printed, since dependency entries can carry credentials.
   - Versions are not compared with the manifest's ranges.
 - **Unsupported list.** Unchanged while no reader is registered (requirements.txt, pyproject.toml, go.mod, Cargo.lock, build.gradle, build.gradle.kts). A file leaves it only when a registered reader ran for it; that reader's check (a result or an error) then reports it. build.gradle(.kts) stay unsupported.
 - **Nothing dropped silently.** A reader that returns no inventory while one of its files is present, or an inventory of another ecosystem, gives an error check. A present file that the reader neither lists in `files` nor names in a limitation gets the limitation "<file> is present but was not read." d575c5d had a `COVERED_BY` exception for a manifest beside a lock the reader read. It was dropped once the readers read those manifests themselves. Every present file is read before the reader runs and compared after the OSV lookup, so a change during the scan gives an error, as for the other inventories.

@@ -15,6 +15,16 @@ export function parseToml(text: string, file: string): TomlTable {
   return new Reader(text, file).document();
 }
 
+/** Characters that would break a report line or hide text: controls, line separators, bidi and zero-width marks. */
+const UNSAFE = new RegExp("[\\x00-\\x1f\\x7f-\\x9f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2066-\\u2069\\ufeff]", "g");
+/** File text bounded to max characters, with unsafe characters escaped, for errors and limitations. */
+export function clip(text: string, max = 200): string {
+  const cut = text.length > max ? `${text.slice(0, max)}…` : text;
+  return cut.replace(UNSAFE, c => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+}
+/** File text in quotes, bounded and escaped. */
+export function quoted(text: string, max = 60): string { return `"${clip(text.replace(/[\\"]/g, "\\$&"), max)}"`; }
+
 const BARE_KEY = /[A-Za-z0-9_-]+/y;
 const TOKEN = /[0-9A-Za-z_+.:-]+/y;
 const INTEGER = /^[+-]?(?:0|[1-9](?:_?\d)*)$/;
@@ -41,12 +51,12 @@ class Reader {
   constructor(text: string, file: string) {
     this.text = text;
     this.file = file;
-    if (text.startsWith("﻿")) this.at = 1;
+    if (text.startsWith("\uFEFF")) this.at = 1;
   }
 
   private fail(message: string): never {
     const line = this.text.slice(0, this.at).split("\n").length;
-    throw new Error(`${this.file} line ${line}: ${message}; the file was not read.`);
+    throw new Error(`${this.file} line ${line}: ${clip(message, 300)}; the file was not read.`);
   }
   private table(): TomlTable { return Object.create(null) as TomlTable; }
   private peek(): string | undefined { return this.text[this.at]; }
@@ -103,6 +113,7 @@ class Reader {
     for (;;) {
       this.spaces();
       if (this.peek() !== ".") return path;
+      if (path.length >= 32) this.fail("a key has more than 32 parts");
       this.at++;
       this.spaces();
       path.push(this.key());
@@ -117,13 +128,13 @@ class Reader {
     this.spaces();
     if (!this.text.startsWith(many ? "]]" : "]", this.at)) this.fail("unclosed table header");
     this.at += many ? 2 : 1;
-    const name = path.join(".");
+    const name = quoted(path.join("."));
     let table = this.root;
     for (const key of path.slice(0, -1)) table = this.descend(table, key, name);
     const last = path.at(-1)!;
     const existing = table[last];
     if (many) {
-      if (existing !== undefined && !(Array.isArray(existing) && this.tableArrays.has(existing))) this.fail(`[[${name}]] redefines a value that is not an array of tables`);
+      if (existing !== undefined && !(Array.isArray(existing) && this.tableArrays.has(existing))) this.fail(`array of tables ${name} redefines a value that is not an array of tables`);
       const list = (existing ?? []) as TomlValue[];
       if (existing === undefined) { this.tableArrays.add(list); table[last] = list; }
       const created = this.table();
@@ -137,7 +148,7 @@ class Reader {
       table[last] = created;
       return created;
     }
-    if (!isTable(existing) || this.frozen.has(existing) || this.defined.has(existing) || this.dotted.has(existing)) this.fail(`table [${name}] is defined more than once`);
+    if (!isTable(existing) || this.frozen.has(existing) || this.defined.has(existing) || this.dotted.has(existing)) this.fail(`table ${name} is defined more than once`);
     this.defined.add(existing);
     return existing;
   }
@@ -146,7 +157,7 @@ class Reader {
     const existing = table[key];
     if (existing === undefined) { const created = this.table(); table[key] = created; return created; }
     if (Array.isArray(existing) && this.tableArrays.has(existing)) return existing.at(-1) as TomlTable;
-    if (!isTable(existing) || this.frozen.has(existing)) this.fail(`[${name}] extends a value that is not a table`);
+    if (!isTable(existing) || this.frozen.has(existing)) this.fail(`table ${name} extends a value that is not a table`);
     return existing;
   }
 
@@ -163,10 +174,10 @@ class Reader {
       const existing = table[key];
       if (existing === undefined) { const created = this.table(); this.dotted.add(created); table[key] = created; table = created; }
       else if (isTable(existing) && this.dotted.has(existing) && !this.frozen.has(existing)) table = existing;
-      else this.fail(`${path.join(".")} extends a value that is already defined`);
+      else this.fail(`key ${quoted(path.join("."))} extends a value that is already defined`);
     }
     const last = path.at(-1)!;
-    if (table[last] !== undefined) this.fail(`duplicate key ${JSON.stringify(path.join("."))}`);
+    if (table[last] !== undefined) this.fail(`duplicate key ${quoted(path.join("."))}`);
     table[last] = value;
   }
 
@@ -183,7 +194,7 @@ class Reader {
     let value: TomlValue;
     if (token === "true" || token === "false") value = token === "true";
     else if (INTEGER.test(token) || FLOAT.test(token)) value = Number(token.replace(/_/g, ""));
-    else this.fail(`unsupported value ${JSON.stringify(token.slice(0, 40))} (dates, special and non-decimal numbers are not read)`);
+    else this.fail(`unsupported value ${quoted(token, 40)} (dates, special and non-decimal numbers are not read)`);
     this.at += token.length;
     return value;
   }
@@ -297,9 +308,13 @@ class Reader {
     this.freeze(table);
     return table;
   }
+  /** Marks an inline table and every table or array inside it as complete, without recursion. */
   private freeze(value: TomlValue): void {
-    if (typeof value !== "object" || this.frozen.has(value)) return;
-    this.frozen.add(value);
-    for (const inner of Array.isArray(value) ? value : Object.values(value)) this.freeze(inner);
+    const pending: TomlValue[] = [value];
+    for (let next = pending.pop(); next !== undefined; next = pending.pop()) {
+      if (typeof next !== "object" || this.frozen.has(next)) continue;
+      this.frozen.add(next);
+      for (const inner of Array.isArray(next) ? next : Object.values(next)) pending.push(inner);
+    }
   }
 }

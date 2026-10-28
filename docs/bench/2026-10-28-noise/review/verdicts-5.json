@@ -1,0 +1,833 @@
+[
+  {
+    "repo": "chirag127/oz-chrome",
+    "sha": "a62ec0264acf2f2eed92113b97e122cd70b2c53a",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker 3.2.7 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11), GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11, GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Production: Path: root devDependency vitest > @vitest/mocker. vitest runs only the `test` script (package.json:26) on src/index.test.ts:1; no shipped file imports it; not reachable from astro or from anything shipped; no production start command, Dockerfile, Procfile or deploy config. Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here."
+      },
+      {
+        "name": "astro",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/astro 6.4.8 (dev) in range: OSV GHSA-26w7-cxv4-gfx2 range[0,7.2.8), GHSA-376h-93r7-7g6f range[0,7.2.4), GHSA-4g3v-8h47-v7g6 range[2.9.0,7.1.0), GHSA-7pw4-f3q4-r2p2 range[3.10.0,7.0.4), GHSA-98hj-9722-w3j8 range[0,7.3.2), GHSA-f48w-9m4c-m7f5 range[0,7.0.6); npm GHSA-f48w-9m4c-m7f5 <7.0.6, GHSA-7pw4-f3q4-r2p2 >=3.10.0 <7.0.4, GHSA-4g3v-8h47-v7g6 >=2.9.0 <=7.0.9, GHSA-26w7-cxv4-gfx2 <7.2.8, GHSA-376h-93r7-7g6f <=7.2.3, GHSA-98hj-9722-w3j8 <7.3.2. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency + required peer astro 6.4.8 (dev:true). Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package."
+      },
+      {
+        "name": "devalue",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/devalue 5.9.0 (dev) in range: OSV GHSA-4q55-j62x-fr9h range[0,5.9.3), GHSA-9rgm-9g3h-6x36 range[0,5.9.2), GHSA-hx4r-w6wj-j8fg range[0,5.9.3), GHSA-j22f-vq7h-c4qm range[5.1.0,5.9.3), GHSA-mcm9-63f2-9j32 range[0,5.9.3), GHSA-r9w8-h9r3-54w4 range[0,5.9.3), GHSA-wf3x-273g-mvxv range[1.0.0,5.9.3), GHSA-x5rw-q4pp-hg5g range[5.8.0,5.9.3); npm GHSA-9rgm-9g3h-6x36 <5.9.1, GHSA-j22f-vq7h-c4qm >=5.1.0 <=5.9.2, GHSA-hx4r-w6wj-j8fg <=5.9.2, GHSA-mcm9-63f2-9j32 <=5.9.2, GHSA-wf3x-273g-mvxv >=1.0.0 <=5.9.2, GHSA-x5rw-q4pp-hg5g >=5.8.0 <=5.9.2, GHSA-4q55-j62x-fr9h <=5.9.2, GHSA-r9w8-h9r3-54w4 <=5.9.2. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > devalue. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "esbuild",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/esbuild 0.27.7 (dev) in range: OSV GHSA-g7r4-m6w7-qqqr range[0.27.3,0.28.1); npm GHSA-g7r4-m6w7-qqqr >=0.27.3 <0.28.1. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > esbuild; also tsup > esbuild and vitest > vite > esbuild (build/test tools). Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "http-cache-semantics",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/http-cache-semantics 4.2.0 (dev) in range: OSV GHSA-ch52-4w7c-c8xp range[0,4.2.0]; npm GHSA-ch52-4w7c-c8xp <=4.2.0. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > http-cache-semantics. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "js-yaml",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/js-yaml 4.3.1 (dev) in range: OSV GHSA-2883-xcg3-v3hh range[4.0.0,4.3.2); npm GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > js-yaml. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "nanoid",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/nanoid 3.3.17 (dev) in range: OSV GHSA-2v37-7h3g-55p8 range[0,3.3.18); npm GHSA-2v37-7h3g-55p8 <3.3.18. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > vite > postcss > nanoid; also tsup > [peer]postcss > nanoid, vitest > vite > postcss > nanoid. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "sharp",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/sharp 0.34.5 (dev) in range: OSV GHSA-f88m-g3jw-g9cj range[0,0.35.0), GHSA-rgj7-g3m4-5g8c range[0,0.35.4), GHSA-wq5f-xc86-pv6w range[0,0.35.5); npm GHSA-f88m-g3jw-g9cj <0.35.0, GHSA-rgj7-g3m4-5g8c <0.35.4, GHSA-wq5f-xc86-pv6w <0.35.5. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > [optional dep] sharp. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "smol-toml",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/smol-toml 1.7.1 (dev) in range: OSV GHSA-r4xh-jqrq-34v2 range[0,1.9.0); npm GHSA-r4xh-jqrq-34v2 <=1.8.0. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > smol-toml. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "source-map-js",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/source-map-js 1.2.1 (dev) in range: OSV GHSA-68fv-2mgg-jv7q range[1.0.0,1.2.2); npm GHSA-68fv-2mgg-jv7q >=1.0.0 <1.2.2. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > magicast > source-map-js; also tsup > [peer]postcss > source-map-js, vitest > vite > postcss > source-map-js. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "svgo",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/svgo 4.0.2 (dev) in range: OSV GHSA-4vpr-x523-8j87 range[4.0.0,4.1.0), GHSA-w27v-7q3p-w38r range[4.0.0,4.1.0); npm GHSA-4vpr-x523-8j87 >=4.0.0 <4.1.0, GHSA-w27v-7q3p-w38r >=4.0.0 <4.1.0. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > svgo. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/tinypool 1.1.1 (dev) in range: OSV GHSA-5gmw-xhrv-c9v3 range[0,2.1.1), GHSA-85c8-ppgw-ccpr range[0,2.1.2); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0, GHSA-85c8-ppgw-ccpr <2.1.2. Production: Path: root devDependency vitest > tinypool. vitest runs only the `test` script (package.json:26) on src/index.test.ts:1; no shipped file imports it; not reachable from astro or from anything shipped; no production start command, Dockerfile, Procfile or deploy config. Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/vite 7.3.6 (dev) in range: OSV GHSA-587h-7wmj-h5pm range[7.0.0,7.3.7), GHSA-698v-4r3x-3vcv range[7.0.0,7.3.7), GHSA-9jrq-w75r-8gcw range[7.0.0,7.3.7), GHSA-r825-w8mm-5pxw range[7.0.0,7.3.7), GHSA-rq7h-c2jc-7f22 range[7.0.0,7.3.7); npm GHSA-698v-4r3x-3vcv >=7.0.0 <=7.3.6, GHSA-r825-w8mm-5pxw >=7.0.0 <=7.3.6, GHSA-587h-7wmj-h5pm >=7.0.0 <=7.3.6, GHSA-9jrq-w75r-8gcw >=7.0.0 <=7.3.6, GHSA-rq7h-c2jc-7f22 >=7.0.0 <=7.3.6. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > vite; also vitest > vite. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest 3.2.7 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Production: Path: root devDependency vitest 3.2.7. vitest runs only the `test` script (package.json:26) on src/index.test.ts:1; no shipped file imports it; not reachable from astro or from anything shipped; no production start command, Dockerfile, Procfile or deploy config. Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/zod 4.4.3 (dev) in range: OSV GHSA-mrhx-c7xc-m3w5 range[0,4.6.6); npm GHSA-mrhx-c7xc-m3w5 <4.6.6. Production: Repo is a published Astro component library: package.json `files` dist+src (line 20), exports src/components/Oz*.astro; no start script, Dockerfile, Procfile or deploy config (only .github/dependabot.yml). dist/index.js is built by tsup from src/index.ts (tsup.config.ts: entry src/index.ts, external astro), which imports nothing. The .astro components import only ../index.js and each other (OzFooter.astro:5, OzHeader.astro:6, OzToolShell.astro:10-12) but use the Astro global (OzHeader.astro:9, OzFooter.astro:11, OzToolShell.astro:15) and are compiled and rendered by the consumer's astro; astro is a required peerDependency (package.json peerDependencies astro >=4.0.0, optional:false) and a devDependency here. Path: root devDependency/peer astro > zod. Whether (b) holds is undecidable: no shipped file imports 'astro' literally and the lockfile's copy never ships (consumers resolve their own astro), yet the shipped components cannot render without astro and the package declares it as a required peer, so by the letter shipped code requires astro and astro's runtime (manifest) dependencies reach this package. No file in the repo imports it (grep of src/, tsup.config.ts, docs/index.html)."
+      }
+    ]
+  },
+  {
+    "repo": "sMorrison26/Portfolio",
+    "sha": "2cd4fbd99ef99e7bb74de89baefd522d3c485782",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "Galane-dev/shesha-config-diff",
+    "sha": "a53d7edf36e25d5e32e5a28429ef516eaa0fd38f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici 7.30.0 (dev) in range: OSV GHSA-2m5v-pch6-74hx range[7.0.0,7.30.1), GHSA-4qv8-2p9j-2685 range[7.0.0,7.30.1), GHSA-4w7w-5xrc-9h26 range[7.0.0,7.30.1), GHSA-55wc-3pg8-jfw6 range[7.15.0,7.30.1), GHSA-9fm3-97px-rjf6 range[7.0.0,7.30.1), GHSA-f72v-6w45-q472 range[7.15.0,7.30.1), GHSA-qrxm-fqhp-jwvm range[7.0.0,7.30.1), GHSA-xjj6-f33q-929c range[7.18.0,7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1, GHSA-f72v-6w45-q472 >=7.15.0 <7.30.1, GHSA-xjj6-f33q-929c >=7.18.0 <7.30.1, GHSA-4w7w-5xrc-9h26 >=7.0.0 <7.30.1, GHSA-2m5v-pch6-74hx >=7.0.0 <7.30.1, GHSA-qrxm-fqhp-jwvm >=7.0.0 <7.30.1, GHSA-9fm3-97px-rjf6 >=7.0.0 <7.30.1, GHSA-55wc-3pg8-jfw6 >=7.15.0 <7.30.1. Production: Paths: root devDependency jsdom 29.0.1 > undici; root devDependency vitest > [peer]jsdom > undici. jsdom is only the vitest test environment (vite.config.ts:11 `environment: 'jsdom'`); grep finds no undici or jsdom import anywhere except package.json:54 and vite.config.ts:11. Production is the static dist from `tsc -b && vite build` (package.json:17) deployed by .github/workflows/deploy-pages.yml:35,43 (path: dist); no start script, Dockerfile or Procfile; `preview` (vite preview, package.json:21) is not used by the deploy workflow and does not load jsdom."
+      }
+    ]
+  },
+  {
+    "repo": "BROCKUGANDA/permitzero",
+    "sha": "ec3862cd251c3754f4461849fc2b464047dc4ce6",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker 3.2.7 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11), GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11, GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Production: Paths: root devDependency vitest > @vitest/mocker; apps/api and apps/worker devDependency vitest > @vitest/mocker; @vitest/coverage-v8 > [peer]vitest. Production: infra/docker/Dockerfile api/worker/migrate images install with `npm ci --omit=dev` (line 48) and run tsx (lines 69, 74, 82); the web image is the Next standalone trace (line 93). vitest is imported only by test files (apps/*/test, packages/*/test) and vitest.config.ts, and run by `test` scripts and the compose `verify` service (infra/docker-compose.yml, profile test, a release gate). No shipped file imports the package (grep)."
+      },
+      {
+        "name": "esbuild",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@esbuild-kit/core-utils/node_modules/esbuild 0.18.20 (dev) in range: OSV GHSA-67mh-4wv8-2f99 range[0,0.25.0); npm GHSA-67mh-4wv8-2f99 <=0.24.2 | node_modules/drizzle-kit/node_modules/esbuild 0.19.12 (dev) in range: OSV GHSA-67mh-4wv8-2f99 range[0,0.25.0); npm GHSA-67mh-4wv8-2f99 <=0.24.2 | node_modules/esbuild 0.28.2 (not dev): not in range of any listed advisory. Production: In-range copies are dev-only: packages/db devDependency drizzle-kit > esbuild (node_modules/drizzle-kit/node_modules/esbuild 0.19.12) and drizzle-kit > @esbuild-kit/esm-loader > @esbuild-kit/core-utils > esbuild (0.18.20). drizzle-kit appears only in packages/db/package.json:36; db scripts run `tsx src/cli.ts` and db:generate only echoes; nothing imports drizzle-kit (grep). The non-dev copy node_modules/esbuild 0.28.2 that tsx loads in production is outside the range (<=0.24.2). Production: infra/docker/Dockerfile api/worker/migrate images install with `npm ci --omit=dev` (line 48) and run tsx (lines 69, 74, 82); the web image is the Next standalone trace (line 93). vitest is imported only by test files (apps/*/test, packages/*/test) and vitest.config.ts, and run by `test` scripts and the compose `verify` service (infra/docker-compose.yml, profile test, a release gate). No shipped file imports the package (grep)."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/tinypool 1.1.1 (dev) in range: OSV GHSA-5gmw-xhrv-c9v3 range[0,2.1.1), GHSA-85c8-ppgw-ccpr range[0,2.1.2); npm GHSA-5gmw-xhrv-c9v3 <=2.1.0, GHSA-85c8-ppgw-ccpr <2.1.2. Production: Paths: vitest > tinypool (root, apps/api, apps/worker devDependency vitest). Production: infra/docker/Dockerfile api/worker/migrate images install with `npm ci --omit=dev` (line 48) and run tsx (lines 69, 74, 82); the web image is the Next standalone trace (line 93). vitest is imported only by test files (apps/*/test, packages/*/test) and vitest.config.ts, and run by `test` scripts and the compose `verify` service (infra/docker-compose.yml, profile test, a release gate). No shipped file imports the package (grep)."
+      },
+      {
+        "name": "uuid",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/uuid 8.3.2 (dev) in range: OSV GHSA-w5hq-g745-h8pq range[0,11.1.1); npm GHSA-w5hq-g745-h8pq <11.1.1. Production: Path: root devDependency autocannon > hyperid > uuid 8.3.2. autocannon is imported only by scripts/load-test.mjs:34 and scripts/load-sweep.mjs:38 (load-test scripts, package.json load:test/load:sweep). Production: infra/docker/Dockerfile api/worker/migrate images install with `npm ci --omit=dev` (line 48) and run tsx (lines 69, 74, 82); the web image is the Next standalone trace (line 93). vitest is imported only by test files (apps/*/test, packages/*/test) and vitest.config.ts, and run by `test` scripts and the compose `verify` service (infra/docker-compose.yml, profile test, a release gate). No shipped file imports the package (grep)."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest 3.2.7 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Production: Paths: root devDependency vitest; apps/api and apps/worker devDependency vitest. Production: infra/docker/Dockerfile api/worker/migrate images install with `npm ci --omit=dev` (line 48) and run tsx (lines 69, 74, 82); the web image is the Next standalone trace (line 93). vitest is imported only by test files (apps/*/test, packages/*/test) and vitest.config.ts, and run by `test` scripts and the compose `verify` service (infra/docker-compose.yml, profile test, a release gate). No shipped file imports the package (grep)."
+      }
+    ]
+  },
+  {
+    "repo": "Gray-Ghost-Data-Consultants-LLC/grayghostdata-website",
+    "sha": "6e31e9eedf4fe674edfb0257d6ee53dd16408acc",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@eslint/config-array/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/@eslint/eslintrc/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/brace-expansion 5.0.8 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[4.0.0,5.0.10), GHSA-q2hr-2g5m-vwhr range[4.0.0,5.0.12), GHSA-qhr7-859c-m2p7 range[4.0.0,5.0.11), GHSA-rgw5-rvv9-x895 range[4.0.0,5.0.9); npm GHSA-rgw5-rvv9-x895 >=4.0.0 <5.0.9, GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12, GHSA-qhr7-859c-m2p7 >=4.0.0 <5.0.11, GHSA-6j4f-fj2g-mc7p >=4.0.0 <5.0.10 | node_modules/eslint-plugin-import/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/eslint-plugin-jsx-a11y/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/eslint-plugin-react/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19 | node_modules/eslint/node_modules/brace-expansion 1.1.16 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-mh99-v99m-4gvg range[0,1.1.17), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20), GHSA-rgw5-rvv9-x895 range[0,1.1.18); npm GHSA-mh99-v99m-4gvg <1.1.17, GHSA-rgw5-rvv9-x895 <1.1.18, GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19. Production: Paths (all dev): eslint > minimatch > brace-expansion (eslint/node_modules copy 1.1.16), eslint > @eslint/config-array > minimatch and eslint > @eslint/eslintrc > minimatch (1.1.16 copies), eslint-config-next > eslint-plugin-import / eslint-plugin-jsx-a11y / eslint-plugin-react > minimatch (1.1.16 copies), eslint-config-next > typescript-eslint > @typescript-eslint/typescript-estree > minimatch > brace-expansion (root 5.0.8). ESLint runs only in `lint` (package.json:9, eslint.config.mjs:2 imports eslint-config-next); next.config.js:21-23 sets eslint.ignoreDuringBuilds. Production is `next build` / `next start` (package.json:7-8, vercel.json buildCommand next build, output standalone), and no shipped file imports eslint, minimatch, js-yaml or brace-expansion (grep)."
+      },
+      {
+        "name": "js-yaml",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/js-yaml 4.3.0 (dev) in range: OSV GHSA-2883-xcg3-v3hh range[4.0.0,4.3.2), GHSA-5p4m-2wfm-xmqj range[4.0.0,4.3.1); npm GHSA-5p4m-2wfm-xmqj >=4.0.0 <4.3.1, GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. Production: Paths: root devDependency eslint > @eslint/eslintrc > js-yaml; eslint-config-next > [peer]eslint > @eslint/eslintrc > js-yaml. ESLint runs only in `lint` (package.json:9, eslint.config.mjs:2 imports eslint-config-next); next.config.js:21-23 sets eslint.ignoreDuringBuilds. Production is `next build` / `next start` (package.json:7-8, vercel.json buildCommand next build, output standalone), and no shipped file imports eslint, minimatch, js-yaml or brace-expansion (grep)."
+      }
+    ]
+  },
+  {
+    "repo": "paritytech/triangle-js-sdks",
+    "sha": "c7fcf98e87e4e95661b2f49d834b68c3a5ffc74f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker 4.1.11 (dev) in range: OSV GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12), GHSA-xp26-3454-mjgp range[4.1.11,4.1.12); npm GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12, GHSA-xp26-3454-mjgp >=4.1.11 <4.1.12. Production: Paths: root devDependency vitest > @vitest/mocker; @nx/vite > @nx/vitest > [peer]vitest > @vitest/mocker. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "axios",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/axios 1.18.1 (dev) in range: OSV GHSA-3pq3-5fj3-cg6v range[1.13.0,1.20.0), GHSA-44g4-m2mj-wpvx range[1.15.0,1.20.0), GHSA-4hqw-qxg8-jxx2 range[1.12.0,1.20.0), GHSA-542g-h47m-68v8 range[1.13.0,1.20.0), GHSA-9fr6-4gfg-395g range[1.0.0,1.20.0), GHSA-c29m-xwm3-cm6r range[1.16.1,1.20.0), GHSA-j8rh-479h-cp32 range[1.0.0,1.20.0), GHSA-m8m8-qj5v-23w3 range[1.15.2,1.20.0), GHSA-mghh-pgcx-3jjj range[1.15.0,1.20.0), GHSA-r4gj-5m52-g5wh range[1.17.0,1.20.0), GHSA-vh66-26gq-q6x8 range[1.7.0,1.20.0), GHSA-x97p-jq2g-jp4f range[1.15.1,1.20.0); npm GHSA-vh66-26gq-q6x8 >=1.7.0 <1.20.0, GHSA-9fr6-4gfg-395g >=1.0.0 <1.20.0, GHSA-c29m-xwm3-cm6r >=1.16.1 <1.20.0, GHSA-mghh-pgcx-3jjj >=1.15.0 <1.20.0, GHSA-x97p-jq2g-jp4f >=1.15.1 <1.20.0, GHSA-3pq3-5fj3-cg6v >=1.13.0 <1.20.0, GHSA-542g-h47m-68v8 >=1.13.0 <1.20.0, GHSA-j8rh-479h-cp32 >=1.0.0 <1.20.0, GHSA-4hqw-qxg8-jxx2 >=1.12.0 <1.20.0, GHSA-m8m8-qj5v-23w3 >=1.15.2 <1.20.0, GHSA-44g4-m2mj-wpvx >=1.15.0 <1.20.0, GHSA-r4gj-5m52-g5wh >=1.17.0 <1.20.0. Production: Paths: root devDependency nx > axios; @nx/* > @nx/devkit > [peer]nx > axios. nx is the build/release runner (package.json:12 build, release). Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/brace-expansion 5.0.9 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[4.0.0,5.0.10), GHSA-q2hr-2g5m-vwhr range[4.0.0,5.0.12), GHSA-qhr7-859c-m2p7 range[4.0.0,5.0.11); npm GHSA-q2hr-2g5m-vwhr >=4.0.0 <5.0.12, GHSA-qhr7-859c-m2p7 >=4.0.0 <5.0.11, GHSA-6j4f-fj2g-mc7p >=4.0.0 <5.0.10 | node_modules/stylus/node_modules/brace-expansion 1.1.18 (dev) in range: OSV GHSA-6j4f-fj2g-mc7p range[0,1.1.19), GHSA-q2hr-2g5m-vwhr range[0,1.1.21), GHSA-qhr7-859c-m2p7 range[0,1.1.20); npm GHSA-q2hr-2g5m-vwhr <1.1.21, GHSA-qhr7-859c-m2p7 <1.1.20, GHSA-6j4f-fj2g-mc7p <1.1.19. Production: Paths: 5.0.9 via eslint > minimatch, nx > brace-expansion, @nx/* > @nx/devkit > minimatch, typescript-eslint > @typescript-eslint/typescript-estree > minimatch, @storybook/react-vite > ... > glob > minimatch; 1.1.18 (stylus copy) via vite > [peer]stylus > glob > minimatch and packages/host-papp-react-ui devDependency typescript-plugin-css-modules > [optional]stylus. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "electron",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/electron 44.1.0 (dev) in range: OSV GHSA-2p8c-gr87-2676 range[44.0.0-alpha.1,44.3.0), GHSA-3qxv-5xgr-q7w9 range[44.0.0-alpha.1,44.4.3), GHSA-98mx-cjp9-gchm range[44.0.0-alpha.1,44.1.1), GHSA-997q-gvvc-jwmx range[44.0.0-alpha.1,44.3.0), GHSA-fw47-9c62-h3vw range[44.0.0-alpha.1,44.3.0), GHSA-h3v5-h239-pg29 range[44.0.0-alpha.1,44.4.3), GHSA-jr5w-w6x2-84p9 range[44.0.0-alpha.1,44.9.1), GHSA-x562-297c-g43g range[44.0.0-alpha.1,44.5.0); npm GHSA-fw47-9c62-h3vw >=44.0.0-alpha.1 <44.3.0, GHSA-2p8c-gr87-2676 >=44.0.0-alpha.1 <44.3.0, GHSA-x562-297c-g43g >=44.0.0-alpha.1 <44.5.0, GHSA-98mx-cjp9-gchm >=44.0.0-alpha.1 <44.1.1, GHSA-3qxv-5xgr-q7w9 >=44.0.0-alpha.1 <44.4.3, GHSA-h3v5-h239-pg29 >=44.0.0-alpha.1 <44.4.3, GHSA-997q-gvvc-jwmx >=44.0.0-alpha.1 <44.3.0, GHSA-jr5w-w6x2-84p9 >=44.0.0-alpha.1 <44.9.1. Production: Path: packages/host-container devDependency electron 44.1.0. Its only use is `import type { WebviewTag } from 'electron'` (packages/host-container/src/createWebviewProvider.ts:3), which TypeScript erases; electron is not in host-container's dependencies and not in its dist. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/fast-uri 3.1.6 (dev) in range: OSV GHSA-333x-w4r6-6crp range[3.0.0,3.1.9), GHSA-58mr-gqgx-xq4g versions-list/range[3.1.6,3.1.7), GHSA-hrr3-gc8f-f4qj range[3.0.0,3.1.8), GHSA-qw65-cvwx-89v3 range[3.0.0,3.1.7), GHSA-w74x-v6f9-j3xg range[3.0.0,3.1.9), GHSA-wjr9-j795-jxcr range[3.1.3,3.1.9), GHSA-xhq7-xmqj-769h range[3.0.0,3.1.9); npm GHSA-qw65-cvwx-89v3 >=3.0.0 <3.1.7, GHSA-58mr-gqgx-xq4g =3.1.6, GHSA-hrr3-gc8f-f4qj >=3.0.0 <3.1.8, GHSA-w74x-v6f9-j3xg >=3.0.0 <3.1.9, GHSA-xhq7-xmqj-769h >=3.0.0 <3.1.9, GHSA-wjr9-j795-jxcr >=3.1.3 <3.1.9, GHSA-333x-w4r6-6crp >=3.0.0 <3.1.9. Production: Path: root devDependency @nx/vite > ajv > fast-uri. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/follow-redirects 1.16.0 (dev) in range: OSV GHSA-8r9p-f939-6h3c range[1.16.0,1.16.1), GHSA-q3jh-wrc6-jgq8 range[1.16.0,1.16.1); npm GHSA-q3jh-wrc6-jgq8 >=1.16.0 <1.16.1, GHSA-8r9p-f939-6h3c >=1.16.0 <1.16.1. Production: Paths: root devDependency nx > follow-redirects; @nx/* > @nx/devkit > [peer]nx > follow-redirects. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "nx",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/nx 23.1.2 (dev) in range: OSV GHSA-hrvq-x7jp-36xv range[23.0.0,23.2.1); npm GHSA-hrvq-x7jp-36xv >=23.0.0 <23.2.1. Production: Path: root devDependency nx (build/release runner, package.json:12, release.yaml). Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/postcss-selector-parser 7.1.4 (dev) in range: OSV GHSA-rj75-hqrm-r3gf range[7.0.0,7.1.6); npm GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6. Production: Path: packages/host-papp-react-ui devDependency typescript-plugin-css-modules (a TypeScript editor language-service plugin) > postcss-modules-local-by-default > postcss-selector-parser 7.1.4. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "probe-image-size",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/probe-image-size 7.3.0 (dev) in range: OSV GHSA-gjj5-9665-rwrc range[0,7.4.0); npm GHSA-gjj5-9665-rwrc <=7.3.0. Production: Paths: vite > [peer]less > [optional]probe-image-size; packages/host-papp-react-ui devDependency typescript-plugin-css-modules > less > [optional]probe-image-size. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "smol-toml",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/nx/node_modules/smol-toml 1.6.1 (dev) in range: OSV GHSA-7w5x-hrqm-74c2 range[0,1.7.1), GHSA-r4xh-jqrq-34v2 range[0,1.9.0); npm GHSA-7w5x-hrqm-74c2 <=1.7.0, GHSA-r4xh-jqrq-34v2 <=1.8.0 | node_modules/smol-toml 1.8.0 (dev) in range: OSV GHSA-r4xh-jqrq-34v2 range[0,1.9.0); npm GHSA-r4xh-jqrq-34v2 <=1.8.0. Production: Paths: root devDependency nx > smol-toml (nx/node_modules copy 1.6.1); root devDependency knip > smol-toml (1.8.0). Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "source-map-js",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/source-map-js 1.2.1 (dev) in range: OSV GHSA-68fv-2mgg-jv7q range[1.0.0,1.2.2); npm GHSA-68fv-2mgg-jv7q >=1.0.0 <1.2.2. Production: Paths: root devDependency vite > postcss > source-map-js; typescript-plugin-css-modules > source-map-js. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "storybook",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/storybook 10.5.10 (dev) in range: OSV GHSA-f2ph-cmg5-wxc8 range[10.0.0,10.6.2), GHSA-px85-f4q5-jh77 range[10.0.0,10.6.2); npm GHSA-f2ph-cmg5-wxc8 >=10.0.0 <10.6.2, GHSA-px85-f4q5-jh77 >=10.0.0 <10.6.2. Production: Paths: root devDependency storybook; @storybook/react-vite > [peer]storybook; @nx/storybook > [peer]storybook. Used by the `storybook:papp` dev script and packages/host-papp-react-ui/.storybook, not deployed or published. Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici 7.29.0 (dev) in range: OSV GHSA-2gqq-gqf2-x968 range[7.1.0,7.29.1), GHSA-2jfj-6hjv-fm6j range[7.0.0,7.29.1), GHSA-2m5v-pch6-74hx range[7.0.0,7.30.1), GHSA-3wwx-pv8p-q78v range[7.28.0,7.29.1), GHSA-3xpg-4rpp-hhhm range[7.15.0,7.29.1), GHSA-4qv8-2p9j-2685 range[7.0.0,7.30.1), GHSA-4w7w-5xrc-9h26 range[7.0.0,7.30.1), GHSA-55wc-3pg8-jfw6 range[7.15.0,7.30.1), GHSA-8436-99hf-9mmv range[7.0.0,7.29.1), GHSA-9fm3-97px-rjf6 range[7.0.0,7.30.1), GHSA-f72v-6w45-q472 range[7.15.0,7.30.1), GHSA-pmjh-fq2x-6v4x range[7.11.0,7.29.1), GHSA-qrxm-fqhp-jwvm range[7.0.0,7.30.1), GHSA-r53p-7pc4-xj5r range[7.0.0,7.29.1), GHSA-rfgv-xxqx-mfg5 range[7.0.0,7.29.1), GHSA-rx4f-c7p8-82vq range[7.0.0,7.29.1), GHSA-w293-vg96-wgc3 range[7.24.1,7.29.1), GHSA-xjj6-f33q-929c range[7.18.0,7.30.1); npm GHSA-3wwx-pv8p-q78v >=7.28.0 <7.29.1, GHSA-pmjh-fq2x-6v4x >=7.11.0 <7.29.1, GHSA-r53p-7pc4-xj5r >=7.0.0 <7.29.1, GHSA-rfgv-xxqx-mfg5 >=7.0.0 <7.29.1, GHSA-3xpg-4rpp-hhhm >=7.15.0 <7.29.1, GHSA-2jfj-6hjv-fm6j >=7.0.0 <7.29.1, GHSA-2gqq-gqf2-x968 >=7.1.0 <7.29.1, GHSA-w293-vg96-wgc3 >=7.24.1 <7.29.1, GHSA-8436-99hf-9mmv >=7.0.0 <7.29.1, GHSA-rx4f-c7p8-82vq >=7.0.0 <7.29.1, GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1, GHSA-f72v-6w45-q472 >=7.15.0 <7.30.1, GHSA-xjj6-f33q-929c >=7.18.0 <7.30.1, GHSA-4w7w-5xrc-9h26 >=7.0.0 <7.30.1, GHSA-2m5v-pch6-74hx >=7.0.0 <7.30.1, GHSA-qrxm-fqhp-jwvm >=7.0.0 <7.30.1, GHSA-9fm3-97px-rjf6 >=7.0.0 <7.30.1, GHSA-55wc-3pg8-jfw6 >=7.15.0 <7.30.1. Production: Path: packages/host-container devDependency electron > @electron/get > [optional]undici 7.29.0 (electron's binary download at install). electron itself is only a type import (createWebviewProvider.ts:3). Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vite 8.2.2 (dev) in range: OSV GHSA-587h-7wmj-h5pm range[8.2.0,8.2.4), GHSA-698v-4r3x-3vcv range[8.2.0,8.2.4), GHSA-9jrq-w75r-8gcw range[8.2.0,8.2.4), GHSA-r825-w8mm-5pxw range[8.2.0,8.2.4), GHSA-rq7h-c2jc-7f22 range[8.2.0,8.2.4), GHSA-vfpm-58rq-9qcg range[8.2.0,8.2.4); npm GHSA-698v-4r3x-3vcv >=8.2.0 <=8.2.3, GHSA-r825-w8mm-5pxw >=8.2.0 <=8.2.3, GHSA-587h-7wmj-h5pm >=8.2.0 <=8.2.3, GHSA-9jrq-w75r-8gcw >=8.2.0 <=8.2.3, GHSA-rq7h-c2jc-7f22 >=8.2.0 <=8.2.3, GHSA-vfpm-58rq-9qcg >=8.2.0 <=8.2.3. Production: Paths: root devDependency vite; @nx/vite, @storybook/react-vite, @vitejs/plugin-react, vite-plugin-dts, vitest, vite-plugin-wasm > [peer]vite. Build tool in library mode (see context). Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/zod 4.4.3 (dev) in range: OSV GHSA-mrhx-c7xc-m3w5 range[0,4.6.6); npm GHSA-mrhx-c7xc-m3w5 <4.6.6. Production: Path: root devDependency knip > zod (unused-code linter, knip.config.ts:1). Repo publishes @novasamatech/* libraries (each package.json `files`: dist, README.md) with .github/workflows/release.yaml (`npx nx release publish`); no app, start script, Dockerfile, Procfile or deploy config, and Storybook is never deployed (only the `storybook:papp` dev script). Builds: tsc via @nx/js/typescript (nx.json plugins) and vite library mode for packages/host-papp-react-ui (vite.config.ts:21 externalizes every bare import, :26 lib) and packages/substrate-slot-sr25519-wasm (vite.config.ts:9 lib); library mode adds no vite runtime helper. Grep: this package and its parents are imported only by tests (*.spec.ts), vitest.config.ts, vitest.setup.ts, eslint.config.js, knip.config.ts, .storybook/* and *.stories.tsx (type-only); no workspace `dependencies` edge reaches it (lockfile)."
+      }
+    ]
+  },
+  {
+    "repo": "clay-good/roughlogic.com",
+    "sha": "92cebbce3a4901160fa311a01745cb7505aee139",
+    "finished": true,
+    "packages": [
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/undici 7.29.1 (dev) in range: OSV GHSA-2m5v-pch6-74hx range[7.0.0,7.30.1), GHSA-4qv8-2p9j-2685 range[7.0.0,7.30.1), GHSA-4w7w-5xrc-9h26 range[7.0.0,7.30.1), GHSA-55wc-3pg8-jfw6 range[7.15.0,7.30.1), GHSA-9fm3-97px-rjf6 range[7.0.0,7.30.1), GHSA-f72v-6w45-q472 range[7.15.0,7.30.1), GHSA-qrxm-fqhp-jwvm range[7.0.0,7.30.1), GHSA-xjj6-f33q-929c range[7.18.0,7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1, GHSA-f72v-6w45-q472 >=7.15.0 <7.30.1, GHSA-xjj6-f33q-929c >=7.18.0 <7.30.1, GHSA-4w7w-5xrc-9h26 >=7.0.0 <7.30.1, GHSA-2m5v-pch6-74hx >=7.0.0 <7.30.1, GHSA-qrxm-fqhp-jwvm >=7.0.0 <7.30.1, GHSA-9fm3-97px-rjf6 >=7.0.0 <7.30.1, GHSA-55wc-3pg8-jfw6 >=7.15.0 <7.30.1. Production: Path: root devDependency wrangler > miniflare > undici 7.29.1. wrangler is the release CLI for the report Worker (docs/calculator-reports.md:114 `npx --no-install wrangler deploy`); the deployed Worker entry report-worker.mjs (wrangler.jsonc `main`) imports only ./tools-data.js (report-worker.mjs:4). The site is static (package.json description; build `node scripts/build.mjs`, package.json:19); mcp/server.mjs and mcp/catalog.mjs import only node: builtins and repo files; grep finds no undici or miniflare import outside the lockfile and comments; no start script, Dockerfile or Procfile."
+      }
+    ]
+  },
+  {
+    "repo": "epam/statgpt-portal-frontend",
+    "sha": "bcccb590cac7f15e7cd4a69b8fa4181acf62d49f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@vitest/mocker 4.1.11 (dev) in range: OSV GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12), GHSA-xp26-3454-mjgp range[4.1.11,4.1.12); npm GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12, GHSA-xp26-3454-mjgp >=4.1.11 <4.1.12. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/react > [optional]@nx/vite > [peer]vitest > @vitest/mocker (lockfile; through @nx/vite and vitest, a test runner). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/body-parser 1.20.8 (dev) in range: OSV GHSA-27r3-jxmh-p828 range[0,1.20.9); npm GHSA-27r3-jxmh-p828 <1.20.9. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/react > express > body-parser 1.20.8 (lockfile; through @nx/react's dev-server express). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/deepmerge 4.3.1 (dev) in range: OSV GHSA-gcqx-w48m-w2h4 range[4.2.0,4.3.1]; npm GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/webpack > fork-ts-checker-webpack-plugin > deepmerge (lockfile; through @nx/webpack). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/fast-uri 3.1.8 (dev) in range: OSV GHSA-333x-w4r6-6crp range[3.0.0,3.1.9), GHSA-w74x-v6f9-j3xg range[3.0.0,3.1.9), GHSA-wjr9-j795-jxcr range[3.1.3,3.1.9), GHSA-xhq7-xmqj-769h range[3.0.0,3.1.9); npm GHSA-w74x-v6f9-j3xg >=3.0.0 <3.1.9, GHSA-xhq7-xmqj-769h >=3.0.0 <3.1.9, GHSA-wjr9-j795-jxcr >=3.1.3 <3.1.9, GHSA-333x-w4r6-6crp >=3.0.0 <3.1.9. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/webpack > ajv > fast-uri (lockfile; through @nx/webpack). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/follow-redirects 1.16.0 (dev) in range: OSV GHSA-8r9p-f939-6h3c range[1.16.0,1.16.1), GHSA-q3jh-wrc6-jgq8 range[1.16.0,1.16.1); npm GHSA-q3jh-wrc6-jgq8 >=1.16.0 <1.16.1, GHSA-8r9p-f939-6h3c >=1.16.0 <1.16.1. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/devkit > [peer]nx > follow-redirects (lockfile; through the nx CLI). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "launch-editor",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/launch-editor 2.14.1 (dev) in range: OSV GHSA-587h-7wmj-h5pm range[0,2.14.2), GHSA-698v-4r3x-3vcv range[0,2.14.2), GHSA-r825-w8mm-5pxw range[0,2.14.2); npm GHSA-698v-4r3x-3vcv <=2.14.1, GHSA-r825-w8mm-5pxw <=2.14.1, GHSA-587h-7wmj-h5pm <=2.14.1. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/webpack > webpack-dev-server > launch-editor (lockfile; through webpack-dev-server). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/qs 6.16.0 (dev) in range: OSV GHSA-6pq8-jhm2-2vcw range[6.7.0,6.16.1); npm GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/react > express > qs (lockfile; through @nx/react's dev-server express). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "serialize-javascript",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/serialize-javascript 7.1.0 (dev) in range: OSV GHSA-m5mm-p8h7-m29v range[0,7.1.3); npm GHSA-m5mm-p8h7-m29v <7.1.3. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > copy-webpack-plugin > serialize-javascript (lockfile; through copy-webpack-plugin). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "storybook",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/storybook 10.5.7 (dev) in range: OSV GHSA-f2ph-cmg5-wxc8 range[10.0.0,10.6.2), GHSA-px85-f4q5-jh77 range[10.0.0,10.6.2); npm GHSA-f2ph-cmg5-wxc8 >=10.0.0 <10.6.2, GHSA-px85-f4q5-jh77 >=10.0.0 <10.6.2. Production: Paths: root devDependencies storybook, @storybook/addon-a11y, @storybook/addon-docs, @storybook/react-vite, eslint-plugin-storybook, storybook-addon-pseudo-states > [peer]storybook. Used by apps/storybook (project.json targets `storybook dev` and `storybook build` to dist/storybook) and *.stories.tsx files (type-only imports of @storybook/react-vite). Not reachable from @nx/next (lockfile walk); not in the Docker image (Dockerfile:29 copies only dist/apps/portals-example) nor in the published libs (vite library builds); no file in the repo builds or deploys Storybook for production (.github/workflows/release.yml:19-23 calls epam/ai-dial-ci node_release.yml with docker build off and npm publish on; the root `build` script, package.json:10, runs the `build` targets, not build-storybook); no shipped import (grep)."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/undici 7.29.1 (dev) in range: OSV GHSA-2m5v-pch6-74hx range[7.0.0,7.30.1), GHSA-4qv8-2p9j-2685 range[7.0.0,7.30.1), GHSA-4w7w-5xrc-9h26 range[7.0.0,7.30.1), GHSA-55wc-3pg8-jfw6 range[7.15.0,7.30.1), GHSA-9fm3-97px-rjf6 range[7.0.0,7.30.1), GHSA-f72v-6w45-q472 range[7.15.0,7.30.1), GHSA-qrxm-fqhp-jwvm range[7.0.0,7.30.1), GHSA-xjj6-f33q-929c range[7.18.0,7.30.1); npm GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1, GHSA-f72v-6w45-q472 >=7.15.0 <7.30.1, GHSA-xjj6-f33q-929c >=7.18.0 <7.30.1, GHSA-4w7w-5xrc-9h26 >=7.0.0 <7.30.1, GHSA-2m5v-pch6-74hx >=7.0.0 <7.30.1, GHSA-qrxm-fqhp-jwvm >=7.0.0 <7.30.1, GHSA-9fm3-97px-rjf6 >=7.0.0 <7.30.1, GHSA-55wc-3pg8-jfw6 >=7.15.0 <7.30.1. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/react > @nx/module-federation > @module-federation/enhanced > @module-federation/dts-plugin > undici 7.29.1 (lockfile; through @nx/module-federation). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/vite 8.0.16 (dev) in range: OSV GHSA-587h-7wmj-h5pm range[8.0.0,8.1.6), GHSA-698v-4r3x-3vcv range[8.0.0,8.1.6), GHSA-9jrq-w75r-8gcw range[8.0.0,8.1.6), GHSA-r825-w8mm-5pxw range[8.0.0,8.1.6), GHSA-rq7h-c2jc-7f22 range[8.0.0,8.1.6); npm GHSA-698v-4r3x-3vcv >=8.0.0 <=8.1.5, GHSA-r825-w8mm-5pxw >=8.0.0 <=8.1.5, GHSA-587h-7wmj-h5pm >=8.0.0 <=8.1.5, GHSA-9jrq-w75r-8gcw >=8.0.0 <=8.1.5, GHSA-rq7h-c2jc-7f22 >=8.0.0 <=8.1.5. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/react > [optional]@nx/vite > [peer]vite (lockfile; through @nx/vite; vite is also the library build tool (libs/*/vite.config.ts, library mode)). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "webpack-dev-middleware",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/webpack-dev-middleware 7.4.5 (dev) in range: OSV GHSA-g84c-rxfj-3j2c range[0,7.4.6); npm: not in npm's range. Production: (b) by its letter: the runtime configuration apps/portals-example/next.config.js:19 requires '@nx/next' (root devDependency 22.7.12), and @nx/next's runtime dependencies reach it: @nx/next > @nx/webpack > webpack-dev-server > webpack-dev-middleware 7.4.5 (lockfile; through webpack-dev-server). Against that, the production image (Dockerfile:29, :36, :45) runs `next start` on dist/apps/portals-example built by @nx/next:build, which rewrites that require to copied helpers (@nx/next@22.7.12 src/executors/build/lib/create-next-config-file.js:29-45) whose production-server branch requires no dev dependency (plugins/with-nx.js:98-105), and the generated package.json drops root devDependencies (nx@22.7.12 dist/src/plugins/js/package-json/create-package-json.js:20, 53-54, 211-215) before `npm install --omit=dev` (Dockerfile:36). The chain runs through build/dev-only tooling, and no shipped file imports the package (grep). package.json:11 `start` is `nx serve portals-example` (a development server by default, project.json serve defaultConfiguration development), not the Docker CMD. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/zod 4.4.3 (dev) in range: OSV GHSA-mrhx-c7xc-m3w5 range[0,4.6.6); npm GHSA-mrhx-c7xc-m3w5 <4.6.6. Production: Path: root devDependency eslint-config-next > eslint-plugin-react-hooks > zod 4.4.3 (lint only). Not reachable from @nx/next or any shipped import (lockfile walk, grep); production image and published libs do not include it (Dockerfile:29, :36 --omit=dev)."
+      }
+    ]
+  },
+  {
+    "repo": "frioux/woodworking-tools",
+    "sha": "47c23bc88966efadc4b25c16f47fcad11176b5e5",
+    "finished": true,
+    "packages": [
+      {
+        "name": "ajv",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/ajv 6.12.6 (dev) in range: OSV GHSA-2g4f-4pwh-qvx6 range[0,6.14.0); npm GHSA-2g4f-4pwh-qvx6 <6.14.0 | node_modules/html-validate/node_modules/ajv 8.17.1 (dev) in range: OSV GHSA-2g4f-4pwh-qvx6 range[7.0.0-alpha.0,8.18.0); npm GHSA-2g4f-4pwh-qvx6 >=7.0.0-alpha.0 <8.18.0. Production: Paths: root devDependency eslint > ajv 6.12.6; root devDependency html-validate > ajv 8.17.1 (html-validate/node_modules copy). Both run only in `lint` (package.json:9). The shipped site is static HTML/JS whose modules import only local files (frame-designer/frame-ui.js:1-2, drawer-designer/drawer-ui.js:1-2, milk-paint/milk-paint-ui.js:1, rocker-model/rocker-ui.js:10-11); the deploy job uploads the checkout without installing dependencies (.github/workflows/ci.yml:36-46); no build step, start script, Dockerfile or Procfile."
+      }
+    ]
+  },
+  {
+    "repo": "acekyd/acekyd",
+    "sha": "6f12af9d35bd13b0f20a3d5271b7c11644226151",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@babel/core",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@babel/core 7.28.3 (dev) in range: OSV GHSA-4x5r-pxfx-6jf8 range[0,7.29.6); npm GHSA-4x5r-pxfx-6jf8 <=7.29.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/vite-builder > @vitejs/plugin-vue-jsx > @babel/core (lockfile), through @nuxt/vite-builder (bundler). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "@fastify/busboy",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@fastify/busboy 3.2.0 (dev) in range: OSV GHSA-gxm5-99cw-xjw9 range[0,3.2.2), GHSA-x8mw-p69m-v3mx range[1.0.0,3.2.1), GHSA-xjh9-v7x6-24jw range[3.1.0,3.2.1); npm GHSA-xjh9-v7x6-24jw >=3.1.0 <3.2.1, GHSA-x8mw-p69m-v3mx >=1.0.0 <3.2.1, GHSA-gxm5-99cw-xjw9 <3.2.2. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > @netlify/dev-utils > @whatwg-node/server > @whatwg-node/fetch > @whatwg-node/node-fetch > @fastify/busboy (lockfile), through @netlify/dev-utils (Netlify local-dev utilities). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "@nuxt/devtools",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@nuxt/devtools 2.6.3 (dev) in range: OSV GHSA-279x-mwfv-vcqv range[0,3.3.1), GHSA-xmq3-q5pm-rp26 range[0,2.6.4); npm GHSA-xmq3-q5pm-rp26 <2.6.4, GHSA-279x-mwfv-vcqv <3.3.1. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/devtools (lockfile), through the devtools module, which nuxt adds only when devtools is enabled (nuxt@3.18.1 dist/index.mjs:5816-5821) and which serves the dev UI. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "@nuxtjs/mdc",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@nuxtjs/mdc 0.9.5 (dev) in range: OSV GHSA-cj6r-rrr9-fg82 range[0,0.17.2), GHSA-j82m-pc2v-2484 range[0,0.13.3), GHSA-mxm6-v9r6-r94c range[0,0.22.1); npm GHSA-j82m-pc2v-2484 <=0.13.2, GHSA-cj6r-rrr9-fg82 <0.17.2, GHSA-mxm6-v9r6-r94c <0.22.1. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency @nuxt/content > @nuxtjs/mdc 0.9.5. Shipped server routes import '#content/server' (server/routes/rss.xml.ts:1, sitemap.xml.ts:1, llms.txt.ts:1) -> @nuxt/content@2.13.4 dist/runtime/server/storage.js:6 -> transformers/index.js:4 -> transformers/markdown.js:1 `import { parseMarkdown } from \"@nuxtjs/mdc/runtime\"`; pages/posts/[...slug].vue:42 renders <ContentDoc> through mdc."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker 4.1.10 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11), GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11, GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency vitest > @vitest/mocker; vitest runs only `test` (package.json:8) on composables/readingTime.test.ts:1. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local)."
+      },
+      {
+        "name": "browserslist",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/browserslist 4.25.4 (dev) in range: OSV GHSA-73wf-gq98-2v4g range[0,4.28.7), GHSA-c83g-rgw3-j3cx range[0,4.28.7); npm GHSA-c83g-rgw3-j3cx <=4.28.6, GHSA-73wf-gq98-2v4g <=4.28.6. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/vite-builder > autoprefixer > browserslist (lockfile), through @nuxt/vite-builder. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "colord",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/colord 2.9.3 (dev) in range: OSV GHSA-2wm5-q62r-hmrv range[0,2.9.4); npm GHSA-2wm5-q62r-hmrv <2.9.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/vite-builder > cssnano > cssnano-preset-default > postcss-colormin > colord (lockfile), through the CSS minifier in @nuxt/vite-builder. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/deepmerge 4.3.1 (dev) in range: OSV GHSA-gcqx-w48m-w2h4 range[4.2.0,4.3.1]; npm GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @rollup/plugin-node-resolve > deepmerge (lockfile), through Nitro's rollup bundling. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "defu",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/defu 6.1.4 (dev) in range: OSV GHSA-737v-mqg7-c878 range[0,6.1.5); npm GHSA-737v-mqg7-c878 <=6.1.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: nuxt > defu 6.1.4 (also @nuxt/content, nuxt-gtag, nuxt-disqus > defu). The nuxt runtime imports it (nuxt@3.18.1 dist/pages/runtime/page.js:3), the generated app config merges app.config.ts with defuFn from 'defu' (nuxt dist/index.mjs:6372), and @nuxt/content's server runtime imports it (dist/runtime/server/storage.js:4)."
+      },
+      {
+        "name": "devalue",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/devalue 5.3.2 (dev) in range: OSV GHSA-33hq-fvwr-56pm range[0,5.6.3), GHSA-4q55-j62x-fr9h range[0,5.9.3), GHSA-8qm3-746x-r74r range[0,5.6.3), GHSA-9rgm-9g3h-6x36 range[0,5.9.2), GHSA-cfw5-2vxh-hr84 range[0,5.6.4), GHSA-g2pg-6438-jwpf range[5.1.0,5.6.2), GHSA-hx4r-w6wj-j8fg range[0,5.9.3), GHSA-j22f-vq7h-c4qm range[5.1.0,5.9.3), GHSA-mcm9-63f2-9j32 range[0,5.9.3), GHSA-mwv9-gp5h-frr4 range[4.0.0,5.6.4), GHSA-r9w8-h9r3-54w4 range[0,5.9.3), GHSA-vw5p-8cq8-m7mv range[5.3.0,5.6.2), GHSA-wf3x-273g-mvxv range[1.0.0,5.9.3); npm GHSA-g2pg-6438-jwpf >=5.1.0 <5.6.2, GHSA-vw5p-8cq8-m7mv >=5.3.0 <=5.6.1, GHSA-33hq-fvwr-56pm <=5.6.2, GHSA-8qm3-746x-r74r <=5.6.2, GHSA-cfw5-2vxh-hr84 <5.6.4, GHSA-mwv9-gp5h-frr4 >=4.0.0 <5.6.4, GHSA-9rgm-9g3h-6x36 <5.9.1, GHSA-j22f-vq7h-c4qm >=5.1.0 <=5.9.2, GHSA-hx4r-w6wj-j8fg <=5.9.2, GHSA-mcm9-63f2-9j32 <=5.9.2, GHSA-wf3x-273g-mvxv >=1.0.0 <=5.9.2, GHSA-4q55-j62x-fr9h <=5.9.2, GHSA-r9w8-h9r3-54w4 <=5.9.2. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: nuxt > devalue 5.3.2. The nuxt server renderer serializes the payload with devalue (nuxt@3.18.1 dist/core/runtime/nitro/utils/renderer/payload.js:3 `import { stringify, uneval } from \"devalue\"`), bundled into the Nitro output."
+      },
+      {
+        "name": "diff",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/diff 8.0.2 (dev) in range: OSV GHSA-73rr-hh4g-fpgx range[6.0.0,8.0.3); npm GHSA-73rr-hh4g-fpgx >=6.0.0 <8.0.3. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/devtools > @nuxt/devtools-wizard > diff (lockfile), through @nuxt/devtools (dev only). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "extract-zip",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/extract-zip 2.0.1 (dev) in range: OSV GHSA-7pqw-9j4j-h8q3 range[0,2.0.1], GHSA-jmr9-qjv8-65gv range[0,2.0.1]; npm GHSA-jmr9-qjv8-65gv <=2.0.1, GHSA-7pqw-9j4j-h8q3 <=2.0.1. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > extract-zip (lockfile), through Netlify function packaging tooling. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "h3",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/h3 1.15.4 (dev) in range: OSV GHSA-22cc-p3c6-wpvm range[0,1.15.6), GHSA-4hxc-9384-m385 range[0,1.15.9), GHSA-72gr-qfp7-vwhw range[0,1.15.9), GHSA-mp2g-9vg9-f4cg range[0,1.15.5), GHSA-wr4h-v87w-p3r7 range[0,1.15.6); npm GHSA-wr4h-v87w-p3r7 <1.15.6, GHSA-4hxc-9384-m385 <1.15.9, GHSA-72gr-qfp7-vwhw <=1.15.8, GHSA-22cc-p3c6-wpvm <1.15.6, GHSA-mp2g-9vg9-f4cg <=1.15.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: nuxt > h3 1.15.4. Shipped server routes call h3's defineEventHandler (server/routes/rss.xml.ts:4, sitemap.xml.ts:3, llms.txt.ts:5), and the nuxt app runtime imports h3 (nuxt@3.18.1 dist/app/composables/error.js:1)."
+      },
+      {
+        "name": "immutable",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/immutable 5.1.3 (dev) in range: OSV GHSA-v56q-mh7h-f735 range[5.0.0-beta.1,5.1.8), GHSA-wf6x-7x77-mvgw range[5.0.0,5.1.5), GHSA-xvcm-6775-5m9r range[5.0.0-beta.1,5.1.8); npm GHSA-wf6x-7x77-mvgw >=5.0.0 <5.1.5, GHSA-xvcm-6775-5m9r >=5.0.0-beta.1 <5.1.8, GHSA-v56q-mh7h-f735 >=5.0.0-beta.1 <5.1.8. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency sass > immutable (sass is the build-time SCSS compiler; sass-loader is a devDependency); the other paths reach it only through vite's optional peer sass. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local)."
+      },
+      {
+        "name": "koa",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/koa 2.16.2 (dev) in range: OSV GHSA-7gcc-r8m5-44qm range[0,2.16.4), GHSA-g8mr-fgfg-5qpc range[2.16.2,2.16.3); npm GHSA-g8mr-fgfg-5qpc >=2.16.2 <2.16.3, GHSA-7gcc-r8m5-44qm <2.16.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency @nuxtjs/tailwindcss > tailwind-config-viewer > koa; @nuxtjs/tailwindcss is a build module listed only in nuxt.config.ts:3 and tailwind-config-viewer is its dev-time viewer. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local)."
+      },
+      {
+        "name": "launch-editor",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/launch-editor 2.11.1 (dev) in range: OSV GHSA-587h-7wmj-h5pm range[0,2.14.2), GHSA-698v-4r3x-3vcv range[0,2.14.2), GHSA-r825-w8mm-5pxw range[0,2.14.2), GHSA-v6wh-96g9-6wx3 range[0,2.14.1); npm GHSA-v6wh-96g9-6wx3 <=2.14.0, GHSA-698v-4r3x-3vcv <=2.14.1, GHSA-r825-w8mm-5pxw <=2.14.1, GHSA-587h-7wmj-h5pm <=2.14.1. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/devtools > launch-editor (lockfile), through @nuxt/devtools (dev only). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "lodash",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/lodash 4.17.21 (dev) in range: OSV GHSA-f23m-r3pf-42rh range[0,4.18.0), GHSA-r5fr-rjxr-66jc range[4.0.0,4.18.0), GHSA-xxjr-mmjv-4gpg range[4.0.0,4.17.23); npm GHSA-r5fr-rjxr-66jc >=4.0.0 <=4.17.23, GHSA-f23m-r3pf-42rh <=4.17.23, GHSA-xxjr-mmjv-4gpg >=4.0.0 <=4.17.22. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > archiver > archiver-utils > lodash (lockfile), through Nitro's output archiver. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "lodash-es",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/lodash-es 4.17.21 (dev) in range: OSV GHSA-f23m-r3pf-42rh range[0,4.18.0), GHSA-r5fr-rjxr-66jc range[4.0.0,4.18.0), GHSA-xxjr-mmjv-4gpg range[4.0.0,4.17.23); npm GHSA-r5fr-rjxr-66jc >=4.0.0 <=4.17.23, GHSA-f23m-r3pf-42rh <=4.17.23, GHSA-xxjr-mmjv-4gpg >=4.0.0 <=4.17.22. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > @netlify/dev-utils > netlify > lodash-es (lockfile), through @netlify/dev-utils. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "mdast-util-to-hast",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/mdast-util-to-hast 13.2.0 (dev) in range: OSV GHSA-4fh9-h7wg-q85m range[13.0.0,13.2.1); npm GHSA-4fh9-h7wg-q85m >=13.0.0 <13.2.1. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: @nuxt/content > @nuxtjs/mdc > mdast-util-to-hast 13.2.0. Same chain as @nuxtjs/mdc: shipped server routes import '#content/server' -> storage.js:6 -> transformers/markdown.js:1 -> @nuxtjs/mdc@0.9.5 dist/runtime/parser/index.js:3 imports remark-rehype, which converts mdast with mdast-util-to-hast; storage.js:162 parses content at runtime when it is not cached."
+      },
+      {
+        "name": "nanotar",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/nanotar 0.2.0 (dev) in range: OSV GHSA-92fh-27vv-894w range[0,0.2.0]; npm GHSA-92fh-27vv-894w <=0.2.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nanotar (lockfile), through nuxt's build engine (imported only by nuxt@3.18.1 dist/index.mjs:54, not by its app runtime). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "nitropack",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range: node_modules/nitropack 2.12.4 (dev) in range: OSV GHSA-5w89-w975-hf9q range[0,2.13.4), GHSA-9phm-9p8f-hw5m range[0,2.13.4); npm GHSA-5w89-w975-hf9q <2.13.4, GHSA-9phm-9p8f-hw5m <2.13.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: nuxt > nitropack 2.12.4. server/api/links.get.ts:158 uses Nitro's runtime defineCachedEventHandler, and `nuxt build` bundles nitropack's runtime (server, cache, storage) into the server output that runs in production."
+      },
+      {
+        "name": "node-forge",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/node-forge 1.3.1 (dev) in range: OSV GHSA-2328-f5f3-gj25 range[0,1.4.0), GHSA-554w-wpv2-vw27 range[0,1.3.2), GHSA-5gfm-wpxj-wjgq range[0,1.3.2), GHSA-5m6q-g25r-mvwx range[0,1.4.0), GHSA-65ch-62r8-g69g range[0,1.3.2), GHSA-86w9-cpqp-85rv range[0,1.4.0], GHSA-ppp5-5v6c-4jwp range[0,1.4.0), GHSA-q67f-28xg-22rw range[0,1.4.0); npm GHSA-554w-wpv2-vw27 <1.3.2, GHSA-5gfm-wpxj-wjgq <1.3.2, GHSA-65ch-62r8-g69g <1.3.2, GHSA-2328-f5f3-gj25 <=1.3.3, GHSA-q67f-28xg-22rw <1.4.0, GHSA-5m6q-g25r-mvwx <1.4.0, GHSA-ppp5-5v6c-4jwp <1.4.0, GHSA-86w9-cpqp-85rv <=1.4.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports @nuxt/content (server/routes/rss.xml.ts:1 '#content/server', pages/posts/[...slug].vue:42 <ContentDoc>), and its runtime (manifest) dependencies reach it: @nuxt/content > listhen > node-forge (also nuxt > @nuxt/cli > listhen > node-forge) (lockfile), through listhen, the dev server (@nuxt/content dist/module.mjs:5). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "nuxt",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/nuxt 3.18.1 (dev) in range: OSV GHSA-48hr-524c-v5w3 range[3.1.0,3.21.10), GHSA-534h-c3cw-v3h9 range[3.18.0,3.21.7), GHSA-6gq8-jgmh-3ffp range[3.11.0,3.21.4), GHSA-934w-87qh-qr26 range[3.0.0,3.21.7), GHSA-9473-5f9j-94wq range[3.4.0,3.21.10), GHSA-9pgf-384g-p7mv range[3.1.0,3.21.10), GHSA-c9cv-mq2m-ppp3 range[3.5.0,3.21.7), GHSA-fx6j-w5w5-h468 range[3.4.3,3.21.6), GHSA-g8wj-3cr3-6w7v range[3.1.0,3.21.6), GHSA-hg3f-28rg-4jxj range[3.11.0,3.21.6), GHSA-hxcr-hm88-mpq6 range[3.1.0,3.21.10), GHSA-jjm6-p2m9-9w4x range[0,4.6.0), GHSA-m3q2-p4fw-w38m range[0,3.21.7), GHSA-mm7m-92g8-7m47 range[3.11.0,3.21.7), GHSA-p6jq-8vc4-79f6 range[3.6.0,3.19.0), GHSA-vjh5-4x84-xrqp range[3.0.0,null], GHSA-xfq5-w38q-pc2x range[3.13.0,4.6.2); npm GHSA-p6jq-8vc4-79f6 >=3.6.0 <3.19.0, GHSA-mm7m-92g8-7m47 >=3.11.0 <3.21.7, GHSA-hg3f-28rg-4jxj >=3.11.0 <=3.21.5, GHSA-g8wj-3cr3-6w7v >=3.1.0 <=3.21.5, GHSA-fx6j-w5w5-h468 >=3.4.3 <=3.21.5, GHSA-hxcr-hm88-mpq6 >=3.1.0 <3.21.10, GHSA-48hr-524c-v5w3 >=3.1.0 <3.21.10, GHSA-9pgf-384g-p7mv >=3.1.0 <3.21.10, GHSA-9473-5f9j-94wq >=3.4.0 <3.21.10, GHSA-934w-87qh-qr26 >=3.0.0 <3.21.7, GHSA-m3q2-p4fw-w38m <3.21.7, GHSA-c9cv-mq2m-ppp3 >=3.5.0 <3.21.7, GHSA-534h-c3cw-v3h9 >=3.18.0 <3.21.7, GHSA-vjh5-4x84-xrqp >=3.0.0 <4.0.0, GHSA-xfq5-w38q-pc2x >=3.13.0 <4.6.2, GHSA-jjm6-p2m9-9w4x <4.6.0, GHSA-6gq8-jgmh-3ffp >=3.11.0 <3.21.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency nuxt 3.18.1. Shipped code calls the Nuxt runtime (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData, pages/links.vue:306 useFetch); nuxt/dist/app is bundled into the client and server output."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/qs 6.14.0 (dev) in range: OSV GHSA-4mjr-xmp4-gh2g range[2.2.5,6.16.0), GHSA-6pq8-jhm2-2vcw range[6.7.0,6.16.1), GHSA-6rw7-vpxm-498p range[0,6.14.1), GHSA-q8mj-m7cp-5q26 range[6.11.1,6.15.2), GHSA-w7fw-mjwx-w883 range[6.7.0,6.14.2); npm GHSA-w7fw-mjwx-w883 >=6.7.0 <=6.14.1, GHSA-6rw7-vpxm-498p <6.14.1, GHSA-q8mj-m7cp-5q26 >=6.11.1 <=6.15.1, GHSA-4mjr-xmp4-gh2g >=2.2.5 <6.16.0, GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > @netlify/dev-utils > netlify > qs (lockfile), through @netlify/dev-utils. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "rollup",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/rollup 4.50.0 (dev) in range: OSV GHSA-mw96-cpmx-2vgc range[4.0.0,4.59.0); npm GHSA-mw96-cpmx-2vgc >=4.0.0 <4.59.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > rollup (lockfile), through Nitro's bundler. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "serialize-javascript",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/serialize-javascript 6.0.1 (dev) in range: OSV GHSA-5c6j-r48x-rmvq range[0,7.0.3), GHSA-76p7-773f-r4q5 range[6.0.0,6.0.2), GHSA-m5mm-p8h7-m29v range[0,7.1.3), GHSA-qj8w-gfj5-8c6v range[5.0.0,7.0.5); npm GHSA-5c6j-r48x-rmvq <=7.0.2, GHSA-qj8w-gfj5-8c6v >=5.0.0 <7.0.5, GHSA-76p7-773f-r4q5 >=6.0.0 <6.0.2, GHSA-m5mm-p8h7-m29v <7.1.3. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @rollup/plugin-terser > serialize-javascript (lockfile), through the terser minifier plugin. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "sharp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/sharp 0.35.3 (dev) in range: OSV GHSA-rgj7-g3m4-5g8c range[0,0.35.4), GHSA-wq5f-xc86-pv6w range[0,0.35.5); npm GHSA-rgj7-g3m4-5g8c <0.35.4, GHSA-wq5f-xc86-pv6w <0.35.5. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency sharp 0.35.3, used only by scripts/generate-og-cards.mjs:12 (the `og:cards` build script); no image module is installed. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local)."
+      },
+      {
+        "name": "shell-quote",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/shell-quote 1.8.3 (dev) in range: OSV GHSA-395f-4hp3-45gv range[0,1.9.0), GHSA-w7jw-789q-3m8p range[1.1.0,1.8.4); npm GHSA-w7jw-789q-3m8p >=1.1.0 <=1.8.3, GHSA-395f-4hp3-45gv <=1.8.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/devtools > launch-editor > shell-quote (lockfile), through @nuxt/devtools (dev only). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "simple-git",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/simple-git 3.28.0 (dev) in range: OSV GHSA-858h-whjf-mvg5 range[0,4.0.0), GHSA-g4wm-2vf7-vfgr range[0,4.0.0), GHSA-hffm-xvc3-vprc range[0,3.36.0), GHSA-jcxm-m3jx-f287 range[0,3.32.0), GHSA-r275-fr43-pm7q range[3.15.0,3.32.3), GHSA-x6jw-m9v5-85vh range[3.15.0,4.0.1); npm GHSA-jcxm-m3jx-f287 <3.32.0, GHSA-r275-fr43-pm7q >=3.15.0 <3.32.3, GHSA-hffm-xvc3-vprc <3.36.0, GHSA-x6jw-m9v5-85vh >=3.15.0 <4.0.1, GHSA-g4wm-2vf7-vfgr <=3.36.0, GHSA-858h-whjf-mvg5 <=3.36.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/devtools > simple-git (lockfile), through @nuxt/devtools (dev only). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "socket.io-parser",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/socket.io-parser 4.2.4 (dev) in range: OSV GHSA-2m8v-j782-fhvr range[4.0.0,4.2.7), GHSA-677m-j7p3-52f9 range[4.0.0,4.2.6); npm GHSA-677m-j7p3-52f9 >=4.0.0 <4.2.6, GHSA-2m8v-j782-fhvr >=4.0.0 <4.2.7. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports @nuxt/content (server/routes/rss.xml.ts:1 '#content/server', pages/posts/[...slug].vue:42 <ContentDoc>), and its runtime (manifest) dependencies reach it: @nuxt/content > socket.io-client > socket.io-parser (lockfile), through socket.io-client, which @nuxt/content@2.13.4's dist never imports. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "svgo",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/svgo 4.0.0 (dev) in range: OSV GHSA-2p49-hgcm-8545 range[4.0.0,4.0.2), GHSA-4vpr-x523-8j87 range[4.0.0,4.1.0), GHSA-w27v-7q3p-w38r range[4.0.0,4.1.0), GHSA-xpqw-6gx7-v673 versions-list/range[4.0.0,4.0.1); npm GHSA-xpqw-6gx7-v673 =4.0.0, GHSA-2p49-hgcm-8545 >=4.0.0 <4.0.2, GHSA-4vpr-x523-8j87 >=4.0.0 <4.1.0, GHSA-w27v-7q3p-w38r >=4.0.0 <4.1.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/vite-builder > cssnano > cssnano-preset-default > postcss-svgo > svgo (lockfile), through the CSS minifier in @nuxt/vite-builder. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "tar",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/tar 7.4.3 (dev) in range: OSV GHSA-23hp-3jrh-7fpw range[0,7.5.19), GHSA-34x7-hfp2-rc4v range[0,7.5.7), GHSA-83g3-92jg-28cx range[0,7.5.8), GHSA-8qq5-rm4j-mr97 range[0,7.5.3), GHSA-8x88-c5mf-7j5w range[0,7.5.18), GHSA-9ppj-qmqm-q256 range[0,7.5.11), GHSA-gvwx-54wh-qm9j range[0,7.5.17), GHSA-qffp-2rhf-9h96 range[0,7.5.10), GHSA-r292-9mhp-454m range[0,7.5.21), GHSA-r6q2-hw4h-h46w range[0,7.5.4), GHSA-vmf3-w455-68vh range[0,7.5.16), GHSA-w8wr-v893-vjvp range[0,7.5.18); npm GHSA-34x7-hfp2-rc4v <7.5.7, GHSA-8qq5-rm4j-mr97 <=7.5.2, GHSA-83g3-92jg-28cx <7.5.8, GHSA-qffp-2rhf-9h96 <=7.5.9, GHSA-9ppj-qmqm-q256 <=7.5.10, GHSA-r6q2-hw4h-h46w <=7.5.3, GHSA-vmf3-w455-68vh <=7.5.15, GHSA-w8wr-v893-vjvp <=7.5.17, GHSA-23hp-3jrh-7fpw <=7.5.18, GHSA-8x88-c5mf-7j5w <=7.5.17, GHSA-gvwx-54wh-qm9j <=7.5.16, GHSA-r292-9mhp-454m <=7.5.20. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @vercel/nft > @mapbox/node-pre-gyp > tar (lockfile), through @vercel/nft (build-time file tracing). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "tmp",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/tmp 0.2.5 (dev) in range: OSV GHSA-ph9p-34f9-6g65 range[0,0.2.6); npm GHSA-ph9p-34f9-6g65 <0.2.6. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > @netlify/zip-it-and-ship-it > tmp-promise > tmp (lockfile), through @netlify/zip-it-and-ship-it (function packaging). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "toml",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/toml 3.0.0 (dev) in range: OSV GHSA-4qx8-w7c3-pj3p range[0,5.0.1), GHSA-82x6-q7mm-w9cf range[0,4.2.0), GHSA-9j65-hcg3-gc64 range[0,5.0.1), GHSA-9qmh-m7c6-f92p range[0,5.0.1), GHSA-h895-cgqg-jf52 range[0,5.0.1), GHSA-v5mp-jgw5-2x6j range[0,4.1.2); npm GHSA-82x6-q7mm-w9cf <4.2.0, GHSA-v5mp-jgw5-2x6j <4.1.2, GHSA-4qx8-w7c3-pj3p <=5.0.0, GHSA-9j65-hcg3-gc64 <=5.0.0, GHSA-9qmh-m7c6-f92p <=5.0.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > @netlify/zip-it-and-ship-it > toml (lockfile), through @netlify/zip-it-and-ship-it (function packaging). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "unhead",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range: node_modules/nuxt/node_modules/unhead 2.0.14 (dev) in range: OSV GHSA-5339-hvwr-7582 range[0,2.1.11), GHSA-95h2-gj7x-gx9w range[0,2.1.13), GHSA-g5xx-pwrp-g3fv range[0,2.1.11); npm GHSA-5339-hvwr-7582 <=2.1.10, GHSA-g5xx-pwrp-g3fv <=2.1.10, GHSA-95h2-gj7x-gx9w <2.1.13 | node_modules/unhead 1.11.20 (dev) in range: OSV GHSA-5339-hvwr-7582 range[0,2.1.11), GHSA-95h2-gj7x-gx9w range[0,2.1.13), GHSA-g5xx-pwrp-g3fv range[0,2.1.11); npm GHSA-5339-hvwr-7582 <=2.1.10, GHSA-g5xx-pwrp-g3fv <=2.1.10, GHSA-95h2-gj7x-gx9w <2.1.13. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). In-range copy node_modules/nuxt/node_modules/unhead 2.0.14, path nuxt > @unhead/vue > unhead, is loaded by nuxt's head runtime (nuxt@3.18.1 dist/head/runtime/plugins/unhead.js:1 '@unhead/vue/client', dist/core/runtime/nitro/utils/renderer/app.js:1 '@unhead/vue/server'); nuxt.config.ts app.head is rendered through it. (The root copy 1.11.20, @nuxt/content > @vueuse/head > @unhead/vue > unhead, is not imported by @nuxt/content's dist.)"
+      },
+      {
+        "name": "uuid",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/uuid 11.1.0 (dev) in range: OSV GHSA-w5hq-g745-h8pq range[0,11.1.1); npm GHSA-w5hq-g745-h8pq <11.1.1. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > @netlify/dev-utils > uuid (lockfile), through @netlify/dev-utils. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/vite 7.1.3 (dev) in range: OSV GHSA-4w7w-66w2-5vf9 range[7.0.0,7.3.2), GHSA-587h-7wmj-h5pm range[7.0.0,7.3.7), GHSA-698v-4r3x-3vcv range[7.0.0,7.3.7), GHSA-93m4-6634-74q7 range[7.1.0,7.1.11), GHSA-9jrq-w75r-8gcw range[7.0.0,7.3.7), GHSA-fx2h-pf6j-xcff range[7.0.0,7.3.5), GHSA-g4jq-h2w9-997c range[7.1.0,7.1.5), GHSA-jqfw-vq24-v9c3 range[7.1.0,7.1.5), GHSA-p9ff-h696-f583 range[7.0.0,7.3.2), GHSA-r825-w8mm-5pxw range[7.0.0,7.3.7), GHSA-rq7h-c2jc-7f22 range[7.0.0,7.3.7), GHSA-v2wj-q39q-566r range[7.1.0,7.3.2), GHSA-v6wh-96g9-6wx3 range[7.0.0,7.3.5); npm GHSA-g4jq-h2w9-997c >=7.1.0 <=7.1.4, GHSA-jqfw-vq24-v9c3 >=7.1.0 <=7.1.4, GHSA-93m4-6634-74q7 >=7.1.0 <=7.1.10, GHSA-4w7w-66w2-5vf9 >=7.0.0 <=7.3.1, GHSA-v2wj-q39q-566r >=7.1.0 <=7.3.1, GHSA-p9ff-h696-f583 >=7.0.0 <=7.3.1, GHSA-v6wh-96g9-6wx3 >=7.0.0 <=7.3.4, GHSA-698v-4r3x-3vcv >=7.0.0 <=7.3.6, GHSA-r825-w8mm-5pxw >=7.0.0 <=7.3.6, GHSA-587h-7wmj-h5pm >=7.0.0 <=7.3.6, GHSA-9jrq-w75r-8gcw >=7.0.0 <=7.3.6, GHSA-rq7h-c2jc-7f22 >=7.0.0 <=7.3.6, GHSA-fx2h-pf6j-xcff >=7.0.0 <=7.3.4. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > @nuxt/devtools > [peer]vite (and nuxt > @nuxt/vite-builder > vite); also vitest > vite (lockfile), through the bundler/dev server. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/vitest 4.1.10 (dev) in range: OSV GHSA-82fw-gwwq-j7x9 range[2.1.0,4.1.11); npm GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). Path: root devDependency vitest; runs only `test` (package.json:8) on composables/readingTime.test.ts:1. Not reachable from the packages shipped code imports (nuxt, @nuxt/content, nuxt-gtag, nuxt-disqus, @fortawesome/*) through their dependencies, optional dependencies or required peers (lockfile walk); no shipped file imports it (grep); no production command runs it (Nitro output; `preview`/`dev` are local)."
+      },
+      {
+        "name": "ws",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/engine.io-client/node_modules/ws 8.17.1 (dev) in range: OSV GHSA-58qx-3vcg-4xpx range[8.0.0,8.20.1), GHSA-96hv-2xvq-fx4p range[8.0.0,8.21.0); npm GHSA-58qx-3vcg-4xpx >=8.0.0 <8.20.1, GHSA-96hv-2xvq-fx4p >=8.0.0 <8.21.0 | node_modules/ws 8.18.3 (dev) in range: OSV GHSA-58qx-3vcg-4xpx range[8.0.0,8.20.1), GHSA-96hv-2xvq-fx4p range[8.0.0,8.21.0); npm GHSA-58qx-3vcg-4xpx >=8.0.0 <8.20.1, GHSA-96hv-2xvq-fx4p >=8.0.0 <8.21.0. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports @nuxt/content (server/routes/rss.xml.ts:1 '#content/server', pages/posts/[...slug].vue:42 <ContentDoc>), and its runtime (manifest) dependencies reach it: @nuxt/content > ws 8.18.3 (also nuxt > @nuxt/devtools > ws) and @nuxt/content > socket.io-client > engine.io-client > ws 8.17.1 (lockfile), through @nuxt/content's dev WebSocketServer (dist/module.mjs:14) and the unused socket.io-client. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/zod 3.25.76 (dev) in range: OSV GHSA-mrhx-c7xc-m3w5 range[0,4.6.6); npm GHSA-mrhx-c7xc-m3w5 <4.6.6. Production: Nuxt 3 app (nuxt 3.18.1 and @nuxt/content 2.13.4 are devDependencies) built with `nuxt build` (package.json:4) and run as a Nitro server on Netlify: server/api/links.get.ts:158 defineCachedEventHandler reads runtime config/env (nuxt.config.ts:80-82), and pages/links.vue:306 calls useFetch('/api/links', { server: true }). (b) by its letter: shipped code imports nuxt (plugins/fontawesome.js:14 defineNuxtPlugin, pages/posts/[...slug].vue:65 useAsyncData; nuxt runtime bundled into the output), and nuxt's runtime (manifest) dependencies reach it: nuxt > nitropack > @netlify/functions > @netlify/zip-it-and-ship-it > zod (lockfile), through @netlify/zip-it-and-ship-it (function packaging). Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and nothing in the code shows the Nitro production output loading it. The rule does not say which governs, so undecidable."
+      }
+    ]
+  },
+  {
+    "repo": "GSA/ngx-uswds",
+    "sha": "abc4d2e312ab811ca5f0bb83c0fba0fd8d1c8141",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@modelcontextprotocol/sdk",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@modelcontextprotocol/sdk 1.30.0 (dev) in range: OSV GHSA-22jm-h49p-29qw range[1.24.0,1.32.0), GHSA-46jr-4wx8-v453 range[1.3.0,1.32.0), GHSA-6prh-2h8m-c8cw range[0,1.32.0), GHSA-6qxp-vccf-f47h range[1.12.0,1.31.0), GHSA-f897-62hf-6gxq range[1.10.0,1.30.1), GHSA-rvq5-wwqv-78pq range[1.6.0,1.32.0); npm GHSA-6qxp-vccf-f47h >=1.12.0 <1.31.0, GHSA-22jm-h49p-29qw >=1.24.0 <1.32.0, GHSA-6prh-2h8m-c8cw <1.32.0, GHSA-46jr-4wx8-v453 >=1.3.0 <1.32.0, GHSA-rvq5-wwqv-78pq >=1.6.0 <1.32.0, GHSA-f897-62hf-6gxq >=1.10.0 <1.30.1. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). Path: root devDependency @angular/cli > @modelcontextprotocol/sdk 1.30.0 (the CLI's MCP server). Reached from @storybook/angular only through its optional peer @angular/cli (peerDependenciesMeta optional), so not through the required dependencies of anything shipped code imports (lockfile walk from @storybook/angular, storybook, @storybook/addon-docs/-a11y/-links, @storybook/react); @angular/cli (ng) runs build, lint and test scripts only; no shipped file imports it (grep); no production command runs it."
+      },
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/@vitest/mocker 4.1.11 (dev) in range: OSV GHSA-qxg6-89mg-rqv8 range[2.1.0-beta.7,4.1.12), GHSA-xp26-3454-mjgp range[4.1.11,4.1.12); npm GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12, GHSA-xp26-3454-mjgp >=4.1.11 <4.1.12. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). Paths: root devDependency vitest > @vitest/mocker; @vitest/coverage-v8 > [peer]vitest; @angular/build > [optional peer]vitest. vitest is the unit-test runner (spec files, e.g. projects/uswds-components/src/lib/util/util.spec.ts:1); not reachable through required edges from anything shipped code imports (lockfile walk); no shipped import; no production command."
+      },
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/body-parser 2.3.0 (dev) in range: OSV GHSA-27r3-jxmh-p828 range[2.0.0,2.4.0); npm GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0 | node_modules/webpack-dev-server/node_modules/body-parser 1.20.6 (dev) in range: OSV GHSA-27r3-jxmh-p828 range[0,1.20.9); npm GHSA-27r3-jxmh-p828 <1.20.9. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > [peer]@angular-devkit/build-angular > webpack-dev-server > express > body-parser (webpack-dev-server copy 1.20.6); the root copy 2.3.0 is reached only via @compodoc/compodoc and @angular/cli (lockfile), through webpack-dev-server. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/deepmerge 4.3.1 (dev) in range: OSV GHSA-gcqx-w48m-w2h4 range[4.2.0,4.3.1]; npm GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > @storybook/builder-webpack5 > fork-ts-checker-webpack-plugin > deepmerge (lockfile), through @storybook/builder-webpack5. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "http-cache-semantics",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/http-cache-semantics 4.2.0 (dev) in range: OSV GHSA-ch52-4w7c-c8xp range[0,4.2.0]; npm GHSA-ch52-4w7c-c8xp <=4.2.0. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). Path: root devDependency @angular/cli > pacote > npm-registry-fetch > make-fetch-happen > http-cache-semantics. Reached from @storybook/angular only through its optional peer @angular/cli (peerDependenciesMeta optional), so not through the required dependencies of anything shipped code imports (lockfile walk from @storybook/angular, storybook, @storybook/addon-docs/-a11y/-links, @storybook/react); @angular/cli (ng) runs build, lint and test scripts only; no shipped file imports it (grep); no production command runs it."
+      },
+      {
+        "name": "ip-address",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/ip-address 10.7.2 (dev) in range: OSV GHSA-rxp7-6hxx-x8q5 range[0,10.7.4); npm GHSA-rxp7-6hxx-x8q5 <=10.7.3. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). Path: root devDependency @angular/cli > @modelcontextprotocol/sdk > express-rate-limit > ip-address. Reached from @storybook/angular only through its optional peer @angular/cli (peerDependenciesMeta optional), so not through the required dependencies of anything shipped code imports (lockfile walk from @storybook/angular, storybook, @storybook/addon-docs/-a11y/-links, @storybook/react); @angular/cli (ng) runs build, lint and test scripts only; no shipped file imports it (grep); no production command runs it."
+      },
+      {
+        "name": "piscina",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/piscina 5.2.0 (dev) in range: OSV GHSA-67c8-pqhq-4rmx range[5.0.0,5.3.2); npm GHSA-67c8-pqhq-4rmx >=5.0.0 <5.3.2. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > [peer]@angular-devkit/build-angular > piscina (also @angular/build > piscina, ng-packagr > piscina) (lockfile), through the Angular build worker pool. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/qs 6.15.3 (dev) in range: OSV GHSA-4mjr-xmp4-gh2g range[2.2.5,6.16.0), GHSA-6pq8-jhm2-2vcw range[6.7.0,6.16.1), GHSA-x5fp-wj9c-mxmx range[6.14.2,6.16.0); npm GHSA-x5fp-wj9c-mxmx >=6.14.2 <=6.15.3, GHSA-4mjr-xmp4-gh2g >=2.2.5 <6.16.0, GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > [peer]@angular-devkit/build-angular > webpack-dev-server > express > qs 6.15.3 (lockfile), through webpack-dev-server. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "storybook",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range: node_modules/storybook 10.6.0 (dev) in range: OSV GHSA-f2ph-cmg5-wxc8 range[10.0.0,10.6.2), GHSA-px85-f4q5-jh77 range[10.0.0,10.6.2); npm GHSA-f2ph-cmg5-wxc8 >=10.0.0 <10.6.2, GHSA-px85-f4q5-jh77 >=10.0.0 <10.6.2. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). Path: root devDependency storybook 10.6.0. Shipped story and manager code import it (breadcrumb.stories.ts:4 'storybook/actions', .storybook/manager.js:1 'storybook/manager-api'), and the Storybook build puts storybook's manager and preview runtime into storybook-static, which deploy-github-pages.yml:22-29 publishes."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/node-gyp/node_modules/undici 6.28.0 (dev) in range: OSV GHSA-2m5v-pch6-74hx range[4.0.0,6.29.1), GHSA-3wwx-pv8p-q78v range[6.25.0,6.28.1), GHSA-4qv8-2p9j-2685 range[6.5.0,6.29.1), GHSA-9fm3-97px-rjf6 range[5.15.0,6.29.1), GHSA-qrxm-fqhp-jwvm range[4.2.1,6.29.1), GHSA-r53p-7pc4-xj5r range[0,6.28.1), GHSA-rfgv-xxqx-mfg5 range[6.7.0,6.28.1), GHSA-xjj6-f33q-929c range[6.23.0,6.29.1); npm GHSA-3wwx-pv8p-q78v >=6.25.0 <6.28.1, GHSA-r53p-7pc4-xj5r <6.28.1, GHSA-rfgv-xxqx-mfg5 >=6.7.0 <6.28.1, GHSA-4qv8-2p9j-2685 >=6.5.0 <6.29.1, GHSA-xjj6-f33q-929c >=6.23.0 <6.29.1, GHSA-2m5v-pch6-74hx >=4.0.0 <6.29.1, GHSA-qrxm-fqhp-jwvm >=4.2.1 <6.29.1, GHSA-9fm3-97px-rjf6 >=5.15.0 <6.29.1 | node_modules/undici 7.29.0 (dev) in range: OSV GHSA-2m5v-pch6-74hx range[7.0.0,7.30.1), GHSA-3wwx-pv8p-q78v range[7.28.0,7.29.1), GHSA-4qv8-2p9j-2685 range[7.0.0,7.30.1), GHSA-9fm3-97px-rjf6 range[7.0.0,7.30.1), GHSA-qrxm-fqhp-jwvm range[7.0.0,7.30.1), GHSA-r53p-7pc4-xj5r range[7.0.0,7.29.1), GHSA-rfgv-xxqx-mfg5 range[7.0.0,7.29.1), GHSA-xjj6-f33q-929c range[7.18.0,7.30.1), GHSA-2gqq-gqf2-x968 range[7.1.0,7.29.1), GHSA-2jfj-6hjv-fm6j range[7.0.0,7.29.1), GHSA-3xpg-4rpp-hhhm range[7.15.0,7.29.1), GHSA-4w7w-5xrc-9h26 range[7.0.0,7.30.1), GHSA-55wc-3pg8-jfw6 range[7.15.0,7.30.1), GHSA-8436-99hf-9mmv range[7.0.0,7.29.1), GHSA-f72v-6w45-q472 range[7.15.0,7.30.1), GHSA-pmjh-fq2x-6v4x range[7.11.0,7.29.1), GHSA-rx4f-c7p8-82vq range[7.0.0,7.29.1), GHSA-w293-vg96-wgc3 range[7.24.1,7.29.1); npm GHSA-3wwx-pv8p-q78v >=7.28.0 <7.29.1, GHSA-pmjh-fq2x-6v4x >=7.11.0 <7.29.1, GHSA-r53p-7pc4-xj5r >=7.0.0 <7.29.1, GHSA-rfgv-xxqx-mfg5 >=7.0.0 <7.29.1, GHSA-3xpg-4rpp-hhhm >=7.15.0 <7.29.1, GHSA-2jfj-6hjv-fm6j >=7.0.0 <7.29.1, GHSA-2gqq-gqf2-x968 >=7.1.0 <7.29.1, GHSA-w293-vg96-wgc3 >=7.24.1 <7.29.1, GHSA-8436-99hf-9mmv >=7.0.0 <7.29.1, GHSA-rx4f-c7p8-82vq >=7.0.0 <7.29.1, GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1, GHSA-f72v-6w45-q472 >=7.15.0 <7.30.1, GHSA-xjj6-f33q-929c >=7.18.0 <7.30.1, GHSA-4w7w-5xrc-9h26 >=7.0.0 <7.30.1, GHSA-2m5v-pch6-74hx >=7.0.0 <7.30.1, GHSA-qrxm-fqhp-jwvm >=7.0.0 <7.30.1, GHSA-9fm3-97px-rjf6 >=7.0.0 <7.30.1, GHSA-55wc-3pg8-jfw6 >=7.15.0 <7.30.1. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > [peer]@angular-devkit/build-angular > @angular/build > undici 7.29.0 (the node-gyp copy 6.28.0 is reached only via @angular/cli) (lockfile), through @angular/build. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "uuid",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/sockjs/node_modules/uuid 8.3.2 (dev) in range: OSV GHSA-w5hq-g745-h8pq range[0,11.1.1); npm GHSA-w5hq-g745-h8pq <11.1.1 | node_modules/uuid 14.0.1 (dev): not in range of any listed advisory. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > [peer]@angular-devkit/build-angular > webpack-dev-server > sockjs > uuid (sockjs copy 8.3.2; the root copy 14.0.1 is not in range) (lockfile), through webpack-dev-server. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/vite 7.3.6 (dev) in range: OSV GHSA-587h-7wmj-h5pm range[7.0.0,7.3.7), GHSA-698v-4r3x-3vcv range[7.0.0,7.3.7), GHSA-9jrq-w75r-8gcw range[7.0.0,7.3.7), GHSA-r825-w8mm-5pxw range[7.0.0,7.3.7), GHSA-rq7h-c2jc-7f22 range[7.0.0,7.3.7); npm GHSA-698v-4r3x-3vcv >=7.0.0 <=7.3.6, GHSA-r825-w8mm-5pxw >=7.0.0 <=7.3.6, GHSA-587h-7wmj-h5pm >=7.0.0 <=7.3.6, GHSA-9jrq-w75r-8gcw >=7.0.0 <=7.3.6, GHSA-rq7h-c2jc-7f22 >=7.0.0 <=7.3.6. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > [peer]@angular-devkit/build-angular > @angular/build > vite 7.3.6 (also vitest > vite) (lockfile), through @angular/build's dev server. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "webpack-dev-middleware",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "b",
+        "evidence": "In range: node_modules/@storybook/angular/node_modules/webpack-dev-middleware 6.1.3 (dev) in range: OSV GHSA-g84c-rxfj-3j2c range[0,7.4.6); npm GHSA-g84c-rxfj-3j2c <7.4.5 | node_modules/webpack-dev-middleware 7.4.5 (dev) in range: OSV GHSA-g84c-rxfj-3j2c range[0,7.4.6); npm: not in npm's range. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). (b) by its letter: shipped story code imports @storybook/angular, whose runtime dependencies (manifest, required peers included) reach it: @storybook/angular > @storybook/builder-webpack5 > webpack-dev-middleware (6.1.3) and @storybook/angular > [peer]@angular-devkit/build-angular > webpack-dev-middleware (7.4.5); `storybook dev` in package.json:6 `start` loads the builder's dev middleware (lockfile), through the Storybook/Angular dev servers. Against that, the chain runs through build/dev-only tooling, no shipped file imports the package (grep), and the deployed storybook-static is a static bundle that does not contain it as far as the build config shows. The rule does not say which governs, so undecidable."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range: node_modules/zod 4.3.6 (dev) in range: OSV GHSA-mrhx-c7xc-m3w5 range[0,4.6.6); npm GHSA-mrhx-c7xc-m3w5 <4.6.6. Production: Production outputs: the npm library built by ng-packagr (`build:components`; .github/workflows/publish.yml:155, 209) and the public Storybook site: .github/workflows/deploy-github-pages.yml:22-29 runs `npm run build-storybook` (angular.json:117-125, builder @storybook/angular:build-storybook) and deploys storybook-static to gh-pages. Stories bundled into that site import runtime APIs from '@storybook/angular' (e.g. src/app/components/breadcrumb/breadcrumb.stories.ts:1 moduleMetadata) and 'storybook/actions' (:4); .storybook/manager.js:1 imports 'storybook/manager-api'; .storybook/preview.js:1 imports '@storybook/addon-docs/angular'. package.json:6 `start` runs `storybook dev` (a local dev server; production is the static site). Path: root devDependency @angular/cli > zod 4.3.6. Reached from @storybook/angular only through its optional peer @angular/cli (peerDependenciesMeta optional), so not through the required dependencies of anything shipped code imports (lockfile walk from @storybook/angular, storybook, @storybook/addon-docs/-a11y/-links, @storybook/react); @angular/cli (ng) runs build, lint and test scripts only; no shipped file imports it (grep); no production command runs it."
+      }
+    ]
+  },
+  {
+    "repo": "eitaar/eitaar.dev-v5",
+    "sha": "9f33aaacd5e5e0199472c202aba9ddac048e3e0b",
+    "finished": true,
+    "packages": []
+  }
+]

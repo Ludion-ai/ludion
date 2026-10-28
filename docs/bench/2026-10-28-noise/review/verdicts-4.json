@@ -1,0 +1,827 @@
+[
+  {
+    "repo": "thomas40510/PS-Generator",
+    "sha": "40249596e2ff614c47e20334cae588f6a8ebf1b9",
+    "finished": true,
+    "packages": []
+  },
+  {
+    "repo": "fastagent-sh/fastagent",
+    "sha": "dbeaf9f516ffd4ee343a81153e901d0e1d49feff",
+    "finished": true,
+    "packages": [
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/body-parser@2.3.0 (dev) in GHSA-27r3-jxmh-p828 [2.0.0,2.4.0). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. Path: express (dev) 5.2.1 > body-parser 2.3.0. express is imported only by test/embedding.test.ts:15."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ajv/node_modules/fast-uri@3.1.8 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-w74x-v6f9-j3xg [3.0.0,3.1.9) (+2 more) | node_modules/fast-uri@4.2.1 (dev) in GHSA-333x-w4r6-6crp [4.0.0,4.2.3); GHSA-w74x-v6f9-j3xg [4.0.0,4.2.3) (+2 more). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. Paths: fastify (dev) 5.12.5 > @fastify/ajv-compiler 4.0.6 > fast-uri 4.2.1, and > ajv 8.20.0 > fast-uri 3.1.8 (also fast-json-stringify 7.0.1). fastify is imported only by test/embedding.test.ts:16."
+      },
+      {
+        "name": "fastify",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fastify@5.12.5 (dev) in GHSA-389g-gv7q-r4x8 [5.12.2,5.12.6). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. Direct devDependency fastify 5.12.5; imported only by test/embedding.test.ts:16 (a test of embedding fastagent in a host app)."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@earendil-works/pi-coding-agent/node_modules/undici@8.10.2 (dev) in GHSA-2m5v-pch6-74hx [8.0.0,8.12.2); GHSA-4qv8-2p9j-2685 [8.0.0,8.12.2) (+6 more). Not in range: node_modules/undici@8.12.3 (not dev). No production loader: package.json has no start script; the shipped code is src/ compiled by tsc (scripts.build) into dist/, bin fastagent -> dist/cli.js; no Dockerfile, Procfile or deployment configuration in the repository (the containers it generates for agents install @fastagent-sh/fastagent from npm, i.e. only its dependencies: src/deploy/container.ts:187-222). Bare imports in src/ are its dependencies (undici, hono, @hono/node-server, effect, @earendil-works/pi-ai, pi-durable, chord, yaml, ...); none of express, fastify or @earendil-works/pi-coding-agent is imported, and the lockfile shows no runtime (dependencies/optional/peer) edge from any imported package to these copies. The in-range copy is node_modules/@earendil-works/pi-coding-agent/node_modules/undici 8.10.2, path @earendil-works/pi-coding-agent (dev) 1.3.0 > undici 8.10.2. pi-coding-agent appears in src only in comments (src/locked-file.ts:4,68; src/harnesses/models/login.ts:254). The copy shipped code loads (src/proxy.ts:3, src/deploy/agentcore/shell.ts:22) is node_modules/undici 8.12.3, outside every range."
+      }
+    ]
+  },
+  {
+    "repo": "securityonionsolutions-com/securityonionsolutions-com.github.io",
+    "sha": "56bd68b6128e1ccf2d21beb9c3c4bc66fc13f35a",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@nuxt/nitro-server",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@nuxt/nitro-server@4.5.2 (dev) in GHSA-vjh5-4x84-xrqp [4.2.0,4.6.2)|[3.20.0,inf). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through the runtime dependencies of nuxt, which shipped code imports: nuxt 4.5.2 > @nuxt/nitro-server 4.5.2 (lockfile packages[node_modules/nuxt].dependencies). Rule (b) is applied as written; whether this code runs in the generated site is not shown."
+      },
+      {
+        "name": "@simple-git/argv-parser",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@simple-git/argv-parser@1.1.1 (dev) in GHSA-v5rq-49vh-5v5c [0,2.0.1). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > @nuxt/devtools 3.4.1 > simple-git 3.36.0 > @simple-git/argv-parser 1.1.1. Rule (b) applied as written; devtools code is not shown to run in production."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/deepmerge@4.3.1 (dev) in GHSA-gcqx-w48m-w2h4 [4.2.0,4.3.1]. Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > @nuxt/nitro-server 4.5.2 > nitropack 2.13.4 > @rollup/plugin-node-resolve 16.0.3 > deepmerge 4.3.1. Rule (b) applied as written; this is build tooling inside nitropack."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/follow-redirects@1.16.0 (dev) in GHSA-8r9p-f939-6h3c [1.16.0,1.16.1); GHSA-q3jh-wrc6-jgq8 [1.16.0,1.16.1). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Path: axios (dev) 1.20.0 > follow-redirects 1.16.0 (its only dependent). axios is required only by update_content.js:2, a content-refresh script (scripts.update_content) that writes JSON into content/; it is not reachable from nuxt or from any import in the shipped app (no runtime edge in the lockfile). No production command runs it."
+      },
+      {
+        "name": "launch-editor",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/launch-editor@2.14.1 (dev) in GHSA-587h-7wmj-h5pm [0,2.14.2); GHSA-698v-4r3x-3vcv [0,2.14.2) (+1 more). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > @nuxt/devtools 3.4.1 > launch-editor 2.14.1. Rule (b) applied as written."
+      },
+      {
+        "name": "node-forge",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/node-forge@1.4.0 (dev) in GHSA-86w9-cpqp-85rv [0,1.4.0]. Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > @nuxt/cli 3.37.0 > listhen 1.10.1 > node-forge 1.4.0. Rule (b) applied as written."
+      },
+      {
+        "name": "nuxt",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/nuxt@4.5.2 (dev) in GHSA-jjm6-p2m9-9w4x [0,4.6.0); GHSA-vjh5-4x84-xrqp [4.0.0,4.6.2)|[3.0.0,inf) (+1 more). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Shipped code imports nuxt (auto-imported defineNuxtPlugin/useRuntimeConfig/useRouter, files above). Also (c): nuxt build/generate puts nuxt/dist/app runtime into the output."
+      },
+      {
+        "name": "serialize-javascript",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/serialize-javascript@7.1.0 (dev) in GHSA-m5mm-p8h7-m29v [0,7.1.3). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > @nuxt/nitro-server 4.5.2 > nitropack 2.13.4 > @rollup/plugin-terser 1.0.0 > serialize-javascript 7.1.0. Rule (b) applied as written."
+      },
+      {
+        "name": "seroval",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/seroval@1.6.2 (dev) in GHSA-jp82-f5mq-hwhp [0,1.6.3). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > @nuxt/vite-builder 4.5.2 > seroval 1.6.2. Rule (b) applied as written."
+      },
+      {
+        "name": "simple-git",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/simple-git@3.36.0 (dev) in GHSA-858h-whjf-mvg5 [0,4.0.0); GHSA-g4wm-2vf7-vfgr [0,4.0.0) (+1 more). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > @nuxt/devtools 3.4.1 > simple-git 3.36.0. Rule (b) applied as written."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@8.11.2 (dev) in GHSA-2m5v-pch6-74hx [8.0.0,8.12.2); GHSA-4qv8-2p9j-2685 [8.0.0,8.12.2) (+6 more). Shipped code: the Nuxt app (pages/, components/, layouts/, plugins/, lib/), built by scripts.build `nuxt build` / scripts.generate `nuxt generate` with nuxt.config.ts. It uses Nuxt runtime APIs that Nuxt auto-imports from the nuxt package's app runtime (#app -> node_modules/nuxt/dist/app): plugins/gtag.js:3,6 (defineNuxtPlugin, useRuntimeConfig), plugins/view360.js:3, plugins/reveal.js:1, lib/sos.js:28 (useRouter). nuxt is declared in devDependencies (^4; lockfile nuxt 4.5.2, dev). No start script, Dockerfile, Procfile or deployment configuration in the repository. Reached through nuxt's runtime dependencies: nuxt 4.5.2 > undici 8.11.2 (direct dependency of nuxt). Rule (b) applied as written."
+      }
+    ]
+  },
+  {
+    "repo": "verygoodplugins/mcp-automem",
+    "sha": "a44ecada0630e902791a5ee3fef07071833dd496",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@vitest/mocker@4.1.11 (dev) in GHSA-qxg6-89mg-rqv8 [2.1.0-beta.7,4.1.12); GHSA-xp26-3454-mjgp [4.1.11,4.1.12). Path: vitest (dev) 4.1.11 > @vitest/mocker 4.1.11 (its only dependent). vitest is referenced only by *.test.ts files (src/**/*.test.ts, tests/), vitest.config.ts, vitest.integration.config.ts, vitest.extension.config.ts and package.json test scripts. Production: scripts.start `node dist/index.js` and bin dist/index.js (tsc output of src/); no Dockerfile, Procfile or deployment configuration."
+      }
+    ]
+  },
+  {
+    "repo": "ayush-that/cobalt-landing-page",
+    "sha": "9d31e2bc5c9211508f2009171c7634ab3980afc8",
+    "finished": true,
+    "packages": [
+      {
+        "name": "ajv",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ajv@6.12.6 (dev) in GHSA-2g4f-4pwh-qvx6 [0,6.14.0). Shipped code: src/ (main.tsx, App.tsx, components/) and index.html, bundled by scripts.build `tsc -b && vite build` with vite.config.ts (plugins: react() only). Its bare imports are react, react-dom, @mui/material, @mui/icons-material, @emotion/react, @emotion/cache (dependencies); no lockfile runtime edge from them reaches these copies. No start script (only dev `vite` and preview `vite preview`), no Dockerfile, Procfile or deployment configuration. Path: eslint (dev) 9.37.0 > ajv 6.12.6 (also @eslint/eslintrc 3.3.1). Lint only (scripts.lint, eslint.config.js)."
+      },
+      {
+        "name": "glob",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/glob@10.4.5 (dev) in GHSA-5j98-mcp5-4vw2 [10.2.0,10.5.0). Shipped code: src/ (main.tsx, App.tsx, components/) and index.html, bundled by scripts.build `tsc -b && vite build` with vite.config.ts (plugins: react() only). Its bare imports are react, react-dom, @mui/material, @mui/icons-material, @emotion/react, @emotion/cache (dependencies); no lockfile runtime edge from them reaches these copies. No start script (only dev `vite` and preview `vite preview`), no Dockerfile, Procfile or deployment configuration. Path: tailwindcss (dev) 3.4.18 > sucrase 3.35.0 > glob 10.4.5. Used by the Tailwind CSS build (postcss.config.js, tailwind.config.js); produces CSS only."
+      },
+      {
+        "name": "rollup",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/rollup@4.52.4 (dev) in GHSA-mw96-cpmx-2vgc [4.0.0,4.59.0). Shipped code: src/ (main.tsx, App.tsx, components/) and index.html, bundled by scripts.build `tsc -b && vite build` with vite.config.ts (plugins: react() only). Its bare imports are react, react-dom, @mui/material, @mui/icons-material, @emotion/react, @emotion/cache (dependencies); no lockfile runtime edge from them reaches these copies. No start script (only dev `vite` and preview `vite preview`), no Dockerfile, Procfile or deployment configuration. Path: vite (dev) 6.3.6 > rollup 4.52.4. Bundler inside vite build; no shipped import and no production command. The build configuration does not show rollup inserting code of its own into the output (any interop helper it emits depends on the module graph and is not shown by the configuration), so (c) is not met."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/vite@6.3.6 (dev) in GHSA-4w7w-66w2-5vf9 [0,6.4.2); GHSA-587h-7wmj-h5pm [0,6.4.4) (+8 more). Shipped code: src/ (main.tsx, App.tsx, components/) and index.html, bundled by scripts.build `tsc -b && vite build` with vite.config.ts (plugins: react() only). Its bare imports are react, react-dom, @mui/material, @mui/icons-material, @emotion/react, @emotion/cache (dependencies); no lockfile runtime edge from them reaches these copies. No start script (only dev `vite` and preview `vite preview`), no Dockerfile, Procfile or deployment configuration. The production build `vite build` (scripts.build) puts vite's own code into the output: index.html:14 has <script type=\"module\" src=\"/src/main.tsx\">, vite.config.ts does not set build.modulePreload, and vite 6.3.6 then injects its modulepreload polyfill, the source of its own polyfill function (vite dist/node/chunks/dep-Bu492Fnd.js:35964-35986 polyfill.toString(); :36506-36508 import added to the HTML entry; :45956-45957 default modulePreload.polyfill true)."
+      }
+    ]
+  },
+  {
+    "repo": "Renhuai123/ziwei-doushu",
+    "sha": "ff9a1470ebe652e57b9d690f5d01db9a04f47aae",
+    "finished": true,
+    "packages": [
+      {
+        "name": "postcss-selector-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/postcss-selector-parser@6.1.4 (dev) in GHSA-rj75-hqrm-r3gf [0,6.1.5). Path: tailwindcss (dev) 3.4.19 > postcss-selector-parser 6.1.4 (also postcss-nested 6.2.0). Used only by the CSS build (postcss.config.js plugins tailwindcss, autoprefixer; app/globals.css @tailwind directives), which outputs CSS. Shipped imports (next, react, framer-motion, iztro, lunar-javascript, html2canvas, clsx, @vercel/analytics, @vercel/speed-insights, ...) have no lockfile runtime edge to it; tailwind.config.ts is build configuration. Production: scripts.start `next start` (next is a dependency) serves the built output; next.config.js only sets transpilePackages; no Dockerfile/Procfile; .github/workflows/ci.yml is CI."
+      }
+    ]
+  },
+  {
+    "repo": "nschema-org/NSchema.Docs",
+    "sha": "478e1fdb58146fb74ddac8b0376f794bd2133412",
+    "finished": true,
+    "packages": [
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.4 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-5jgf-p345-68v8 [3.1.3,3.1.6) (+9 more). Production is a static site: netlify.toml build command `npm run build` (astro build), publish `dist`. scripts.start is `astro dev`, which does not load @astrojs/check (that is the `astro check` command, scripts.check). Shipped/imported packages (astro, @astrojs/starlight, starlight-changelogs, starlight-versions, starlight-links-validator in astro.config.mjs) have no lockfile runtime edge to these copies. Path: @astrojs/check (dev) 0.9.9 > @astrojs/language-server 2.16.10 > volar-service-yaml 0.0.70 > yaml-language-server 1.20.0 > ajv 8.20.0 > fast-uri 3.1.4. Type-check tooling only."
+      },
+      {
+        "name": "yaml",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/yaml-language-server/node_modules/yaml@2.7.1 (dev) in GHSA-48c2-rrv3-qjmp [2.0.0,2.8.3). Not in range: node_modules/yaml@2.9.0 (not dev). Production is a static site: netlify.toml build command `npm run build` (astro build), publish `dist`. scripts.start is `astro dev`, which does not load @astrojs/check (that is the `astro check` command, scripts.check). Shipped/imported packages (astro, @astrojs/starlight, starlight-changelogs, starlight-versions, starlight-links-validator in astro.config.mjs) have no lockfile runtime edge to these copies. The in-range copy node_modules/yaml-language-server/node_modules/yaml 2.7.1 comes only from @astrojs/check (dev) 0.9.9 > @astrojs/language-server 2.16.10 > volar-service-yaml 0.0.70 > yaml-language-server 1.20.0 > yaml 2.7.1 (type-check tooling). The copy shipped code reaches (starlight-versions 0.9.0 > yaml, node_modules/yaml 2.9.0) is outside the range."
+      }
+    ]
+  },
+  {
+    "repo": "CDCgov/dibbs-query-connector",
+    "sha": "1ed649ff10961ad0709366bb8e5a74ed336862dc",
+    "finished": true,
+    "packages": [
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/deepmerge@4.3.1 (dev) in GHSA-gcqx-w48m-w2h4 [4.2.0,4.3.1]. Path: jest (dev) 30.5.2 > @jest/core 30.5.2 > jest-config 30.5.2 > deepmerge 4.3.1 (its only dependent). No file outside the lockfile names deepmerge, jest-config or @jest/core (grep). Production: Dockerfile runner stage copies .next/standalone and runs CMD [\"/app/start.sh\"], start.sh ends `node server.js`; scripts.start `node .next/standalone/server.js`; next.config.mjs output \"standalone\" traces only server-required files. Tests run only through jest scripts."
+      }
+    ]
+  },
+  {
+    "repo": "halain/adminpro-angular",
+    "sha": "46586cd94c4d97e2ef7f8d2f061b15fe24839f62",
+    "finished": true,
+    "packages": [
+      {
+        "name": "adm-zip",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/adm-zip@0.5.10 (dev) in GHSA-7q85-xj36-vmfc [0,0.6.1); GHSA-8238-w5pm-2374 [0,0.6.1) (+6 more). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: protractor (dev) 7.0.0 > webdriver-manager 12.1.9 > adm-zip 0.5.10. e2e tooling (angular.json adminpro-e2e, e2e/)."
+      },
+      {
+        "name": "ajv",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/har-validator/node_modules/ajv@6.12.6 (dev) in GHSA-2g4f-4pwh-qvx6 [0,6.14.0). Not in range: node_modules/@angular-devkit/build-angular/node_modules/ajv@8.18.0 (dev), node_modules/@angular-devkit/build-webpack/node_modules/ajv@8.18.0 (dev), node_modules/ajv@8.20.0 (dev). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. The in-range copy node_modules/har-validator/node_modules/ajv 6.12.6 comes from protractor (dev) 7.0.0 > webdriver-manager 12.1.9 > request 2.88.2 > har-validator 5.1.5 > ajv 6.12.6 (e2e tooling)."
+      },
+      {
+        "name": "diff",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/diff@4.0.2 (dev) in GHSA-73rr-hh4g-fpgx [4.0.0,4.0.4). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: ts-node (dev) 10.9.2 > diff 4.0.2 (also tslint 6.1.3). ts-node is required by the protractor e2e config (e2e/protractor.conf.js:23); tslint by lint. Neither is a production command."
+      },
+      {
+        "name": "flatted",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/flatted@3.3.1 (dev) in GHSA-25h7-pfq9-p65f [0,3.4.0); GHSA-rf6f-7fwh-wjgh [0,3.4.2). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: karma (dev) 6.4.4 > log4js 6.9.1 > flatted 3.3.1. Unit-test runner (src/karma.conf.js, ng test)."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/follow-redirects@1.15.6 (dev) in GHSA-r4q5-vmmm-2653 [0,1.16.0). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Paths: karma (dev) 6.4.4 > http-proxy 1.18.1 > follow-redirects 1.15.6, and @angular-devkit/build-angular (dev) 21.2.28 > http-proxy-middleware 3.0.7 > http-proxy. The dev server loads http-proxy-middleware only for a proxy config (build-angular src/tools/webpack/configs/dev-server.js:163-166 returns undefined without proxyConfig; webpack-dev-server 5.2.6 lib/Server.js:2304-2305); angular.json sets none."
+      },
+      {
+        "name": "form-data",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/form-data@2.3.3 (dev) in GHSA-fjxv-7rqg-78g4 [0,2.5.4); GHSA-hmw2-7cc7-3qxx [0,2.5.6). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: protractor (dev) 7.0.0 > webdriver-manager 12.1.9 > request 2.88.2 > form-data 2.3.3 (e2e tooling)."
+      },
+      {
+        "name": "lodash",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/lodash@4.17.21 (dev) in GHSA-f23m-r3pf-42rh [0,4.18.0); GHSA-r5fr-rjxr-66jc [4.0.0,4.18.0) (+1 more). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: karma (dev) 6.4.4 > lodash 4.17.21 (its only dependent). Unit-test runner."
+      },
+      {
+        "name": "minimatch",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/karma/node_modules/glob/node_modules/minimatch@3.1.2 (dev) in GHSA-23c5-xmqv-rm74 [0,3.1.4); GHSA-3ppc-4f35-3m26 [0,3.1.3) (+1 more) | node_modules/minimatch@3.0.4 (dev) in GHSA-23c5-xmqv-rm74 [0,3.1.4); GHSA-3ppc-4f35-3m26 [0,3.1.3) (+2 more). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Paths: karma (dev) 6.4.4 > minimatch 3.0.4 (also glob 7.1.3, tslint, karma-coverage-istanbul-reporter) and karma > glob 7.2.3 > minimatch 3.1.2. Test and lint tooling."
+      },
+      {
+        "name": "picomatch",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/picomatch@2.3.1 (dev) in GHSA-3v7f-55p6-f55p [0,2.3.2); GHSA-c2c7-rcm5-vvqj [0,2.3.2). Not in range: node_modules/@angular-devkit/architect/node_modules/picomatch@4.0.7 (dev), node_modules/@angular-devkit/build-angular/node_modules/picomatch@4.0.4 (dev), node_modules/@angular-devkit/build-webpack/node_modules/picomatch@4.0.4 (dev), node_modules/@angular-devkit/schematics/node_modules/picomatch@4.0.7 (dev), node_modules/@angular/cli/node_modules/picomatch@4.0.7 (dev), node_modules/@parcel/watcher/node_modules/picomatch@4.0.7 (dev), node_modules/@schematics/angular/node_modules/picomatch@4.0.7 (dev), node_modules/tinyglobby/node_modules/picomatch@4.0.7 (dev). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. The in-range copy node_modules/picomatch 2.3.1 has dependents micromatch 4.0.8 (via @angular-devkit/build-angular > http-proxy-middleware 3.0.7, loaded only with a proxy config, see follow-redirects) and anymatch 3.1.3 / readdirp 3.6.0 (via chokidar 3.6.0 from karma; the dev server would use chokidar only for static watching, and build-angular sets static: false, dev-server.js:102). No shipped import reaches it."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/request/node_modules/qs@6.5.3 (dev) in GHSA-4mjr-xmp4-gh2g [2.2.5,6.16.0); GHSA-6rw7-vpxm-498p [0,6.14.1). Not in range: node_modules/qs@6.16.2 (dev). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. The in-range copy node_modules/request/node_modules/qs 6.5.3 comes from protractor (dev) 7.0.0 > webdriver-manager 12.1.9 > request 2.88.2 > qs 6.5.3 (e2e tooling). node_modules/qs 6.16.2 is outside the range."
+      },
+      {
+        "name": "request",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/request@2.88.2 (dev) in GHSA-p8p7-x288-28g6 [0,2.88.2]. No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: protractor (dev) 7.0.0 > webdriver-manager 12.1.9 > request 2.88.2 (e2e driver download tooling)."
+      },
+      {
+        "name": "semver",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/semver@5.5.1 (dev) in GHSA-c2qf-rxjj-qqgw [2.0.0-alpha,5.7.2). Not in range: node_modules/@angular-devkit/build-angular/node_modules/semver@7.7.4 (dev), node_modules/@angular/cli/node_modules/semver@7.8.5 (dev), node_modules/@angular/compiler-cli/node_modules/semver@7.8.5 (dev), node_modules/@babel/core/node_modules/semver@6.3.1 (dev), node_modules/@babel/helper-compilation-targets/node_modules/semver@6.3.1 (dev), node_modules/@babel/helper-create-class-features-plugin/node_modules/semver@6.3.1 (dev), node_modules/@babel/helper-create-regexp-features-plugin/node_modules/semver@6.3.1 (dev), node_modules/@babel/plugin-transform-runtime/node_modules/semver@6.3.1 (dev), node_modules/@babel/preset-env/node_modules/semver@6.3.1 (dev), node_modules/babel-plugin-polyfill-corejs2/node_modules/semver@6.3.1 (dev), node_modules/css-loader/node_modules/semver@7.8.5 (dev), node_modules/istanbul-lib-instrument/node_modules/semver@7.8.5 (dev), node_modules/istanbul-lib-source-maps/node_modules/semver@5.7.2 (dev), node_modules/make-dir/node_modules/semver@7.5.4 (dev), node_modules/npm-package-arg/node_modules/semver@7.8.5 (dev), node_modules/postcss-loader/node_modules/semver@7.8.5 (dev). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. The in-range copy node_modules/semver 5.5.1 is depended on by tslint (dev) 6.1.3, webdriver-manager 12.1.9 (protractor) and semver-dsl 1.0.1 (codelyzer, lint). Lint and e2e tooling."
+      },
+      {
+        "name": "tmp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/karma/node_modules/tmp@0.2.3 (dev) in GHSA-52f5-9888-hmc6 [0,0.2.4); GHSA-ph9p-34f9-6g65 [0,0.2.6) | node_modules/selenium-webdriver/node_modules/tmp@0.0.30 (dev) in GHSA-52f5-9888-hmc6 [0,0.2.4); GHSA-ph9p-34f9-6g65 [0,0.2.6). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Paths: karma (dev) 6.4.4 > tmp 0.2.3 and protractor (dev) 7.0.0 > selenium-webdriver 3.6.0 > tmp 0.0.30. Test tooling."
+      },
+      {
+        "name": "tough-cookie",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/tough-cookie@2.5.0 (dev) in GHSA-72xf-g2v4-qvf3 [0,4.1.3). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: protractor (dev) 7.0.0 > webdriver-manager 12.1.9 > request 2.88.2 > tough-cookie 2.5.0 (e2e tooling)."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@7.29.1 (dev) in GHSA-2m5v-pch6-74hx [7.0.0,7.30.1); GHSA-4qv8-2p9j-2685 [7.0.0,7.30.1) (+6 more). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: @angular-devkit/build-angular (dev) 21.2.28 > @angular/build 21.2.28 > undici 7.29.1. @angular/build loads undici only in src/tools/vite/plugins/ssr-ssl-plugin.js:74 (Vite SSR dev server), not used by this webpack browser builder; build-time tooling, not in the output."
+      },
+      {
+        "name": "uuid",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/sockjs/node_modules/uuid@8.3.2 (dev) in GHSA-w5hq-g745-h8pq [0,11.1.1) | node_modules/uuid@3.4.0 (dev) in GHSA-w5hq-g745-h8pq [0,11.1.1). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Paths: @angular-devkit/build-angular (dev) > webpack-dev-server 5.2.6 > sockjs 0.3.24 > uuid 8.3.2 (sockjs is loaded only for webSocketServer type \"sockjs\", webpack-dev-server lib/Server.js:1650; build-angular passes ws options without that type) and protractor > webdriver-manager > request 2.88.2 > uuid 3.4.0 (e2e tooling)."
+      },
+      {
+        "name": "webpack-dev-middleware",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/webpack-dev-middleware@7.4.5 (dev) in GHSA-g84c-rxfj-3j2c [0,7.4.6). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: @angular-devkit/build-angular (dev) 21.2.28 > webpack-dev-middleware 7.4.5 (also webpack-dev-server 5.2.6). Development server middleware for `ng serve`; see the start-command note above (README calls it the dev server, and the serve target fails the dev-server schema in this checkout). Not in the build output."
+      },
+      {
+        "name": "ws",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ws@8.17.1 (dev) in GHSA-58qx-3vcg-4xpx [8.0.0,8.20.1); GHSA-96hv-2xvq-fx4p [8.0.0,8.21.0). Not in range: node_modules/engine.io/node_modules/ws@8.21.3 (dev), node_modules/webpack-dev-server/node_modules/ws@8.22.0 (dev). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. The in-range copy node_modules/ws 8.17.1 comes from karma (dev) 6.4.4 > socket.io 4.8.4 > socket.io-adapter 2.5.5 > ws 8.17.1 (unit-test runner). The dev server's copy (webpack-dev-server/node_modules/ws 8.22.0) and engine.io's (8.21.3) are outside the ranges."
+      },
+      {
+        "name": "xml2js",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/xml2js@0.4.23 (dev) in GHSA-776f-qx25-q3cc [0,0.5.0). No production loader: no Dockerfile, Procfile or deployment configuration; README.md documents `ng serve` as the dev server and `ng build --prod` for the production build (static dist/adminpro). scripts.start is `ng serve`; in this checkout angular.json serve options name only \"browserTarget\", which the installed @angular-devkit/build-angular 21.2.28 dev-server schema rejects (src/builders/dev-server/schema.json:133-134: additionalProperties false, required buildTarget), so the start command does not reach webpack-dev-server. Shipped code (src/main.ts, src/polyfills.ts, src/app) imports @angular/*, rxjs, core-js, zone.js, ng2-charts, web-animations-js, classlist.js; no lockfile runtime edge from them reaches the in-range copies. Path: protractor (dev) 7.0.0 > selenium-webdriver 3.6.0 > xml2js 0.4.23 (also webdriver-manager). e2e tooling."
+      }
+    ]
+  },
+  {
+    "repo": "aydabd/cacad",
+    "sha": "73741e3ba653ef6551185963f766dfd7a44d389e",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@vitest/mocker@4.1.11 (dev) in GHSA-qxg6-89mg-rqv8 [2.1.0-beta.7,4.1.12); GHSA-xp26-3454-mjgp [4.1.11,4.1.12). Path: vitest (dev) 4.1.11 > @vitest/mocker 4.1.11 (its only dependent). vitest is referenced only by vitest.config.ts and src/**/*.test.ts (src/cli.test.ts, src/contracts.test.ts, src/generators/*.test.ts, src/validators/bbr.test.ts). Shipped: bin/exports dist/cli.js and dist/contracts/* (tsc output, scripts.build); no start script, Dockerfile, Procfile or deployment configuration."
+      }
+    ]
+  },
+  {
+    "repo": "kyubey1228/ore-meshi",
+    "sha": "535c5df5806b66f04b1cb3ead50dd48f05bce257",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@hono/node-server",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@hono/node-server@1.19.9 (dev) in GHSA-92pp-h63x-v22m [0,1.19.13); GHSA-frvp-7c67-39w9 [0,1.19.15) (+1 more). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > @modelcontextprotocol/sdk 1.30.0 > @hono/node-server 1.19.9."
+      },
+      {
+        "name": "@modelcontextprotocol/sdk",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@modelcontextprotocol/sdk@1.30.0 (dev) in GHSA-22jm-h49p-29qw [1.24.0,1.32.0); GHSA-46jr-4wx8-v453 [1.3.0,1.32.0) (+4 more). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > @modelcontextprotocol/sdk 1.30.0."
+      },
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/body-parser@2.3.0 (dev) in GHSA-27r3-jxmh-p828 [2.0.0,2.4.0). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > @modelcontextprotocol/sdk 1.30.0 > express 5.2.1 > body-parser 2.3.0."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@ts-morph/common/node_modules/brace-expansion@5.0.9 (dev) in GHSA-6j4f-fj2g-mc7p [4.0.0,5.0.10); GHSA-q2hr-2g5m-vwhr [4.0.0,5.0.12) (+1 more) | node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.9 (dev) in GHSA-6j4f-fj2g-mc7p [4.0.0,5.0.10); GHSA-q2hr-2g5m-vwhr [4.0.0,5.0.12) (+1 more) | node_modules/brace-expansion@1.1.18 (dev) in GHSA-6j4f-fj2g-mc7p [0,1.1.19); GHSA-q2hr-2g5m-vwhr [0,1.1.21) (+1 more). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > ts-morph 26.0.0 > @ts-morph/common 0.27.0 > minimatch 10.2.6 > node_modules/@ts-morph/common/node_modules/brace-expansion 5.0.9 (in range). The other in-range copies (typescript-estree's 5.0.9 via eslint-config-next, and root 1.1.18 via eslint) are lint-only."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.7 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-hrr3-gc8f-f4qj [3.0.0,3.1.8) (+3 more). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > @modelcontextprotocol/sdk 1.30.0 > ajv 8.20.0 > fast-uri 3.1.7. (@hookform/resolvers lists ajv only as an optional peer and is not imported by src.)"
+      },
+      {
+        "name": "hono",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/hono@4.11.4 (dev) in GHSA-26pp-8wgv-hjvm [0,4.12.12); GHSA-2gcr-mfcq-wcc3 [0,4.12.21) (+36 more). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > @modelcontextprotocol/sdk 1.30.0 > hono 4.11.4."
+      },
+      {
+        "name": "proxy-addr",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/proxy-addr@2.0.7 (dev) in GHSA-jqcg-44mw-7w3h [1.1.0,2.0.8). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > @modelcontextprotocol/sdk 1.30.0 > express 5.2.1 > proxy-addr 2.0.7."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/qs@6.16.0 (dev) in GHSA-6pq8-jhm2-2vcw [6.7.0,6.16.1). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > @modelcontextprotocol/sdk 1.30.0 > express 5.2.1 > qs 6.16.0."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "b",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@7.29.1 (dev) in GHSA-2m5v-pch6-74hx [7.0.0,7.30.1); GHSA-4qv8-2p9j-2685 [7.0.0,7.30.1) (+6 more). Shipped code imports shadcn: src/app/globals.css:3 `@import \"shadcn/tailwind.css\";` (globals.css is imported by src/app/layout.tsx and compiled into the production CSS by `next build --webpack`, scripts.build; production scripts.start `next start`). shadcn is declared in devDependencies (^4.21.0; lockfile shadcn 4.21.0, dev). Rule (b) counts an imported devDependency whose runtime dependencies reach the package. The import is CSS-only; no shadcn JavaScript is shown to run in production, and the verdict follows the rule as written. Path from the imported package: shadcn 4.21.0 > undici 7.29.1."
+      }
+    ]
+  },
+  {
+    "repo": "BilLogic/uno-blueprint",
+    "sha": "167d1601aea3c727f76c178cfd64649a0a96d5af",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@vitest/mocker@4.1.11 (dev) in GHSA-qxg6-89mg-rqv8 [2.1.0-beta.7,4.1.12); GHSA-xp26-3454-mjgp [4.1.11,4.1.12). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: vitest (dev) 4.1.11 > @vitest/mocker 4.1.11 (its only dependent). Test runner (scripts.test, vite.config.ts test block)."
+      },
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/body-parser@2.3.0 (dev) in GHSA-27r3-jxmh-p828 [2.0.0,2.4.0). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > express 5.2.1 > body-parser 2.3.0. shadcn is dev tooling: its stylesheet reaches the app only as a committed copy (src/styles/shadcn-tailwind.css, imported at src/styles/tailwind.config.css:108) that the dev script scripts/vendor-shadcn-css.mjs (scripts.vendor:shadcn-css) rewrites from the installed package; shipped code never imports the shadcn package."
+      },
+      {
+        "name": "deepmerge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/deepmerge@4.3.1 (dev) in GHSA-gcqx-w48m-w2h4 [4.2.0,4.3.1]. Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > deepmerge 4.3.1 (its only dependent). Component CLI tooling."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.8 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-w74x-v6f9-j3xg [3.0.0,3.1.9) (+2 more). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > ajv 8.20.0 > fast-uri 3.1.8 (also ajv-formats' and conf's ajv). CLI tooling."
+      },
+      {
+        "name": "hono",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/hono@4.13.7 (dev) in GHSA-5r4p-p66f-jhc7 [4.12.4,4.13.11). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > hono 4.13.7 (also @hono/node-server 2.1.1). CLI tooling."
+      },
+      {
+        "name": "ip-address",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ip-address@10.7.2 (dev) in GHSA-rxp7-6hxx-x8q5 [0,10.7.4). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > socks 2.8.9 > ip-address 10.7.2 (also express-rate-limit 8.6.2 under @modelcontextprotocol/sdk). CLI tooling."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/qs@6.16.0 (dev) in GHSA-6pq8-jhm2-2vcw [6.7.0,6.16.1). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: shadcn (dev) 4.18.0 > @modelcontextprotocol/sdk 1.32.1 > express 5.2.1 > qs 6.16.0 (also body-parser). CLI tooling."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@7.30.0 (dev) in GHSA-2m5v-pch6-74hx [7.0.0,7.30.1); GHSA-4qv8-2p9j-2685 [7.0.0,7.30.1) (+6 more). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. Path: jsdom (dev) 29.1.1 > undici 7.30.0 (also shadcn 4.18.0 and @dotenvx/dotenvx 1.75.1). jsdom is the test environment for component tests."
+      },
+      {
+        "name": "vite",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/vite@8.2.1 (dev) in GHSA-587h-7wmj-h5pm [8.2.0,8.2.4); GHSA-698v-4r3x-3vcv [8.2.0,8.2.4) (+4 more). Production is a static SPA: netlify.toml build `npm run build` (`tsc -b && vite build`), publish dist; no start script (preview is `vite preview`), no Dockerfile/Procfile; supabase/ holds SQL only. Shipped code is src/ (non-test files) and index.html; its bare imports are dependencies (react, @base-ui/react, @supabase/supabase-js, @tanstack/react-query, @shadcn/react, zod, ...) and CSS imports tailwindcss, tw-animate-css, @fontsource-variable/* and a vendored ./shadcn-tailwind.css (src/styles/tailwind.config.css:8,105,108,113-114); vitest, vite, jsdom and @testing-library are imported only by *.test.* files, and scripts/overlay.mjs (a Vite plugin, build tooling) names vite only in a JSDoc type (:144). No lockfile runtime edge from a shipped import reaches the dev copies below. The production build `vite build` puts vite's own code into the output: shipped src/components/editor/agent/TranscriptRow.tsx:42 has a dynamic import(), vite.config.ts sets no build.modulePreload override, and vite 8.2.1 wraps dynamic imports with its preload helper, whose code is vite's own preload function (vite dist/node/chunks/node.js:28850-28855 getPreloadCode -> preload.toString(); passed to the build import-analysis plugin at :29079)."
+      }
+    ]
+  },
+  {
+    "repo": "tranhatam-collab/tueban-platform",
+    "sha": "f6187fa956ec46beb50826a155939a0ea3c8bde3",
+    "finished": true,
+    "packages": [
+      {
+        "name": "esbuild",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/esbuild@0.27.3 (dev) in GHSA-g7r4-m6w7-qqqr [0.27.3,0.28.1). Production is a Cloudflare Worker: wrangler.jsonc main apps/api/src/index.ts, deployed by scripts.deploy:worker `wrangler deploy`, which bundles the Worker with esbuild; the web app is static HTML/CSS/JS in apps/web/public. apps/api/src has no bare imports (no npm package is bundled into the Worker). No start script, Dockerfile or Procfile; scripts/*.sh are empty. Path: wrangler (dev) 4.71.0 > esbuild 0.27.3. The deploy build puts esbuild's runtime helper into the deployed Worker: wrangler 4.71.0 bundles with keepNames: config.keep_names ?? true (wrangler-dist/cli.js:280420), wrangler.jsonc does not set keep_names, and with keepNames esbuild injects its __defProp/__name helper for named functions such as apps/api/src/lib/json.ts:8 `export function json`. (The helper text comes from esbuild's runtime in its platform binary, an optional dependency of the esbuild package.)"
+      },
+      {
+        "name": "sharp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/sharp@0.34.5 (dev) in GHSA-f88m-g3jw-g9cj [0,0.35.0); GHSA-rgj7-g3m4-5g8c [0,0.35.4) (+1 more). Production is a Cloudflare Worker: wrangler.jsonc main apps/api/src/index.ts, deployed by scripts.deploy:worker `wrangler deploy`, which bundles the Worker with esbuild; the web app is static HTML/CSS/JS in apps/web/public. apps/api/src has no bare imports (no npm package is bundled into the Worker). No start script, Dockerfile or Procfile; scripts/*.sh are empty. Path: wrangler (dev) 4.71.0 > miniflare 4.20260301.1 > sharp 0.34.5. miniflare is the local simulator for `wrangler dev` (scripts.dev:worker); nothing in the Worker imports sharp."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@7.18.2 (dev) in GHSA-2gqq-gqf2-x968 [7.1.0,7.29.1); GHSA-2jfj-6hjv-fm6j [7.0.0,7.29.1) (+30 more). Production is a Cloudflare Worker: wrangler.jsonc main apps/api/src/index.ts, deployed by scripts.deploy:worker `wrangler deploy`, which bundles the Worker with esbuild; the web app is static HTML/CSS/JS in apps/web/public. apps/api/src has no bare imports (no npm package is bundled into the Worker). No start script, Dockerfile or Procfile; scripts/*.sh are empty. Path: wrangler (dev) 4.71.0 > miniflare 4.20260301.1 > undici 7.18.2. Local simulator / CLI tooling; the Worker bundles no npm package."
+      },
+      {
+        "name": "ws",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ws@8.18.0 (dev) in GHSA-58qx-3vcg-4xpx [8.0.0,8.20.1); GHSA-96hv-2xvq-fx4p [8.0.0,8.21.0). Production is a Cloudflare Worker: wrangler.jsonc main apps/api/src/index.ts, deployed by scripts.deploy:worker `wrangler deploy`, which bundles the Worker with esbuild; the web app is static HTML/CSS/JS in apps/web/public. apps/api/src has no bare imports (no npm package is bundled into the Worker). No start script, Dockerfile or Procfile; scripts/*.sh are empty. Path: wrangler (dev) 4.71.0 > miniflare 4.20260301.1 > ws 8.18.0. Local simulator tooling; the Worker bundles no npm package."
+      }
+    ]
+  },
+  {
+    "repo": "Vithanco/vscode-vithanco",
+    "sha": "167cc7eeeede9dbbce06a705825e4a63abeb3afc",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@azure/msal-node",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/@azure/msal-node@5.1.5 (dev) in GHSA-xcx6-jx8p-x3h5 [5.0.0-beta.0,7.1.0). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > @azure/identity 4.13.1 > @azure/msal-node 5.1.5. Release tooling."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/brace-expansion@1.1.14 (dev) in GHSA-3jxr-9vmj-r5cp [0,1.1.16); GHSA-6j4f-fj2g-mc7p [0,1.1.19) (+4 more) | node_modules/glob/node_modules/brace-expansion@5.0.5 (dev) in GHSA-3jxr-9vmj-r5cp [3.0.0,5.0.7); GHSA-6j4f-fj2g-mc7p [4.0.0,5.0.10) (+5 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Paths: @vscode/vsce (dev) 3.9.1 > minimatch 3.1.5 > brace-expansion 1.1.14, and vsce > glob 11.1.0 > minimatch 10.2.5 > brace-expansion 5.0.5. Release tooling."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.2 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-4c8g-83qw-93j6 [3.0.0,3.1.3) (+9 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > @secretlint/node 10.2.2 > @secretlint/config-loader 10.2.2 > ajv 8.20.0 > fast-uri 3.1.2. Release tooling."
+      },
+      {
+        "name": "form-data",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/form-data@4.0.5 (dev) in GHSA-hmw2-7cc7-3qxx [4.0.0,4.0.6). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > form-data 4.0.5. Release tooling."
+      },
+      {
+        "name": "js-yaml",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/js-yaml@4.1.1 (dev) in GHSA-2883-xcg3-v3hh [4.0.0,4.3.2); GHSA-52cp-r559-cp3m [4.0.0,4.3.0) (+2 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > @secretlint/node 10.2.2 > @secretlint/config-loader 10.2.2 > rc-config-loader 4.1.4 > js-yaml 4.1.1 (also @textlint/linter-formatter). Release tooling."
+      },
+      {
+        "name": "linkify-it",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/linkify-it@5.0.0 (dev) in GHSA-22p9-wv53-3rq4 [0,5.0.1); GHSA-v245-v573-v5vm [0,5.0.2). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > markdown-it 14.1.1 > linkify-it 5.0.0. Release tooling."
+      },
+      {
+        "name": "markdown-it",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/markdown-it@14.1.1 (dev) in GHSA-253c-mchw-3w2r [0,14.3.1); GHSA-6v5v-wf23-fmfq [0,14.2.0) (+3 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > markdown-it 14.1.1 (its only dependent). src/extension.ts:3 imports it as a type only, which esbuild erases; at run time the extension receives VS Code's own markdown-it instance (package.json contributes markdown.markdownItPlugins), and node_modules is excluded from the .vsix."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/qs@6.15.1 (dev) in GHSA-4mjr-xmp4-gh2g [2.2.5,6.16.0); GHSA-6pq8-jhm2-2vcw [6.7.0,6.16.1) (+2 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > typed-rest-client 1.8.11 > qs 6.15.1. Release tooling."
+      },
+      {
+        "name": "tmp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/tmp@0.2.5 (dev) in GHSA-ph9p-34f9-6g65 [0,0.2.6). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > tmp 0.2.5. Release tooling."
+      },
+      {
+        "name": "undici",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/undici@7.25.0 (dev) in GHSA-2gqq-gqf2-x968 [7.1.0,7.29.1); GHSA-2jfj-6hjv-fm6j [7.0.0,7.29.1) (+27 more). Shipped code is the extension bundle out/extension.js (package.json main), built by scripts.build `node esbuild.config.mjs production` from src/extension.ts (bundle, external vscode). src imports only vscode, node:crypto, ./renderer (which imports ../../website/Package from outside this repository and ../VGraphWasm.wasm) and `import type MarkdownIt from 'markdown-it'` (src/extension.ts:3, type-only, erased). .vscodeignore excludes node_modules/** and scripts.package runs `vsce package --no-dependencies`; @vscode/vsce is the packaging/publishing tool (scripts.package, release.sh). Extensions have no start command, Dockerfile or Procfile. Path: @vscode/vsce (dev) 3.9.1 > cheerio 1.2.0 > undici 7.25.0. Release tooling."
+      }
+    ]
+  },
+  {
+    "repo": "korbonits/korbonits.github.io",
+    "sha": "c308a2f1c93117297859d9f709156247b0eda195",
+    "finished": true,
+    "packages": [
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.1.7 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-hrr3-gc8f-f4qj [3.0.0,3.1.8) (+3 more). Path: @commitlint/cli (dev) 20.5.0 > @commitlint/load 20.5.0 > @commitlint/config-validator 20.5.0 > ajv 8.18.0 > fast-uri 3.1.7 (ajv's only dependent). Commit-message linting. Production per netlify.toml: build `node scripts/build-embeddings.js && npm run build` (astro build + pagefind), publish dist, functions in netlify/functions (track.js imports only @supabase/supabase-js) and edge functions; no shipped file imports ajv, fast-uri or @commitlint (imports scan of src/, netlify/, public/). No start script, Dockerfile or Procfile."
+      }
+    ]
+  },
+  {
+    "repo": "Azure/api-management-developer-portal",
+    "sha": "46ac32b15e223b1eef73e3ef3bbe3e62a9808980",
+    "finished": true,
+    "packages": [
+      {
+        "name": "ajv",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/ajv@6.12.6 (dev) in GHSA-2g4f-4pwh-qvx6 [0,6.14.0) | node_modules/ajv-formats/node_modules/ajv@8.9.0 (dev) in GHSA-2g4f-4pwh-qvx6 [7.0.0-alpha.0,8.18.0) | node_modules/compression-webpack-plugin/node_modules/ajv@8.17.1 (dev) in GHSA-2g4f-4pwh-qvx6 [7.0.0-alpha.0,8.18.0) | node_modules/copy-webpack-plugin/node_modules/ajv@8.9.0 (dev) in GHSA-2g4f-4pwh-qvx6 [7.0.0-alpha.0,8.18.0) | node_modules/mini-css-extract-plugin/node_modules/ajv@8.9.0 (dev) in GHSA-2g4f-4pwh-qvx6 [7.0.0-alpha.0,8.18.0) | node_modules/webpack-dev-middleware/node_modules/ajv@8.10.0 (dev) in GHSA-2g4f-4pwh-qvx6 [7.0.0-alpha.0,8.18.0) | node_modules/webpack-dev-server/node_modules/ajv@8.9.0 (dev) in GHSA-2g4f-4pwh-qvx6 [7.0.0-alpha.0,8.18.0). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Paths: webpack-dev-server (dev) 4.15.1 > schema-utils 4.0.0 > ajv 8.9.0 (required at load, webpack-dev-server lib/Server.js:9), webpack-dev-middleware 5.3.4 > schema-utils > ajv 8.10.0, copy-webpack-plugin / mini-css-extract-plugin (dev, used by webpack.designer.js) > schema-utils 4.0.0 > ajv 8.9.0, compression-webpack-plugin > ajv 8.17.1, eslint (dev) > ajv 6.12.6. Loaded by the start command; not in the build output."
+      },
+      {
+        "name": "body-parser",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/body-parser@1.20.3 (dev) in GHSA-27r3-jxmh-p828 [0,1.20.9); GHSA-v422-hmwv-36x6 [0,1.20.6). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > express 4.21.2 > body-parser 1.20.3; the dev server creates its express app at startup (lib/Server.js:241, 1946-1948)."
+      },
+      {
+        "name": "browserslist",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/browserslist@4.24.4 (dev) in GHSA-73wf-gq98-2v4g [0,4.28.7); GHSA-c83g-rgw3-j3cx [0,4.28.7). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: autoprefixer (dev) 10.4.21 > browserslist 4.24.4 (also webpack, update-browserslist-db). postcss.config.js requires autoprefixer, run by postcss-loader when the start command compiles the designer config's .scss entries (webpack.designer.js). Build-time CSS processing; nothing of it is in the output JS."
+      },
+      {
+        "name": "compression",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/compression@1.8.1 (dev) in GHSA-vc2v-76pw-4v95 [0,1.8.2). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > compression 1.8.1; loaded by the dev server because compress defaults to true (lib/Server.js:1057-1058, 2201-2202)."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/fast-uri@3.0.6 (dev) in GHSA-333x-w4r6-6crp [3.0.0,3.1.9); GHSA-4c8g-83qw-93j6 [3.0.0,3.1.3) (+10 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Its only dependent is node_modules/compression-webpack-plugin/node_modules/ajv 8.17.1: compression-webpack-plugin (dev) 11.1.0 > schema-utils 4.3.0 > ajv 8.17.1 > fast-uri 3.0.6. compression-webpack-plugin is not used by any webpack config (it appears only in package.json), so nothing loads this copy."
+      },
+      {
+        "name": "flatted",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/flatted@3.2.5 (dev) in GHSA-25h7-pfq9-p65f [0,3.4.0); GHSA-rf6f-7fwh-wjgh [0,3.4.2). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: eslint (dev) 8.45.0 > file-entry-cache 6.0.1 > flat-cache 3.0.4 > flatted 3.2.5. Lint only (scripts.lint, .github/workflows/eslint.yml)."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/follow-redirects@1.15.9 (dev) in GHSA-r4q5-vmmm-2653 [0,1.16.0). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > http-proxy-middleware 2.0.9 > http-proxy 1.18.1 > follow-redirects 1.15.9. The dev server requires http-proxy-middleware only when a proxy is configured (lib/Server.js:2226-2227); webpack.develop.js devServer sets only hot and historyApiFallback, and serve-website passes no proxy."
+      },
+      {
+        "name": "http-proxy-middleware",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/http-proxy-middleware@2.0.9 (dev) in GHSA-64mm-vxmg-q3vj [0.16.0,2.0.10). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > http-proxy-middleware 2.0.9; required only when a proxy is configured (lib/Server.js:2226-2227), which no config here does."
+      },
+      {
+        "name": "immutable",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/immutable@4.0.0 (dev) in GHSA-v56q-mh7h-f735 [4.0.0-rc.1,4.3.9); GHSA-wf6x-7x77-mvgw [4.0.0-rc.1,4.3.8) (+1 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: sass (dev) 1.67.0 > immutable 4.0.0; sass-loader runs sass when the start command compiles the .scss entries of webpack.designer.js. Build-time only; output is CSS."
+      },
+      {
+        "name": "launch-editor",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/launch-editor@2.6.0 (dev) in GHSA-587h-7wmj-h5pm [0,2.14.2); GHSA-698v-4r3x-3vcv [0,2.14.2) (+3 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > launch-editor 2.6.0; the dev server loads it on /webpack-dev-server/open-editor requests (lib/Server.js:2085-2088)."
+      },
+      {
+        "name": "nanoid",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/nanoid@3.3.11 (dev) in GHSA-28wg-ghj8-5hjv [0,3.3.16); GHSA-2v37-7h3g-55p8 [0,3.3.18) (+1 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: postcss 8.4.33 > nanoid 3.3.11 (postcss via autoprefixer, postcss-loader, css-loader, all dev); loaded when the start command compiles .scss. Not in the output."
+      },
+      {
+        "name": "node-forge",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/node-forge@1.3.1 (dev) in GHSA-2328-f5f3-gj25 [0,1.4.0); GHSA-554w-wpv2-vw27 [0,1.3.2) (+6 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > selfsigned 2.1.1 > node-forge 1.3.1. selfsigned is required only for an https server without certificates (lib/Server.js:1247); no config sets server/https."
+      },
+      {
+        "name": "path-to-regexp",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/path-to-regexp@0.1.12 (dev) in GHSA-37ch-88jc-xwx2 [0,0.1.13). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > express 4.21.2 > path-to-regexp 0.1.12; express is loaded by the dev server at startup (lib/Server.js:1946-1948)."
+      },
+      {
+        "name": "playwright",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/playwright@1.40.1 (dev) in GHSA-7mvr-c777-76hp [0,1.55.1). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Direct devDependency playwright 1.40.1 (with @playwright/test); used only by tests (playwright.config.ts, tests/) and CI (.github/workflows/test.yml)."
+      },
+      {
+        "name": "postcss",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/postcss@8.4.33 (dev) in GHSA-6g55-p6wh-862q [0,8.5.12); GHSA-fxqj-rqcc-2cmp [0,8.5.23) (+2 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Paths: autoprefixer / postcss-loader / css-loader (dev) > postcss 8.4.33 (peer-resolved root copy); loaded when the start command compiles .scss (webpack.designer.js rules). Build-time only; output is CSS."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/postcss-selector-parser@6.0.6 (dev) in GHSA-rj75-hqrm-r3gf [0,6.1.5). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: css-loader (dev) 6.8.1 > postcss-modules-local-by-default 4.0.3 / postcss-modules-scope 3.0.0 > postcss-selector-parser 6.0.6; loaded by css-loader when the start command compiles .scss."
+      },
+      {
+        "name": "proxy-addr",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/proxy-addr@2.0.7 (dev) in GHSA-jqcg-44mw-7w3h [1.1.0,2.0.8). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > express 4.21.2 > proxy-addr 2.0.7; express is loaded by the dev server at startup."
+      },
+      {
+        "name": "qs",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/qs@6.13.0 (dev) in GHSA-4mjr-xmp4-gh2g [2.2.5,6.16.0); GHSA-6pq8-jhm2-2vcw [6.7.0,6.16.1) (+3 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > express 4.21.2 > qs 6.13.0; express is loaded by the dev server at startup."
+      },
+      {
+        "name": "serialize-javascript",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/serialize-javascript@6.0.2 (dev) in GHSA-5c6j-r48x-rmvq [0,7.0.3); GHSA-m5mm-p8h7-m29v [0,7.1.3) (+1 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: copy-webpack-plugin (dev) 11.0.0 > serialize-javascript 6.0.2 (required at load, copy-webpack-plugin dist/index.js:9); webpack.designer.js and webpack.runtime.js require CopyWebpackPlugin, so the start command loads it (also terser-webpack-plugin, compression-webpack-plugin, mocha). Build-time only."
+      },
+      {
+        "name": "shell-quote",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/shell-quote@1.8.0 (dev) in GHSA-395f-4hp3-45gv [0,1.9.0); GHSA-w7jw-789q-3m8p [1.1.0,1.8.4). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > launch-editor 2.6.0 > shell-quote 1.8.0; loaded with launch-editor on open-editor requests (lib/Server.js:2085-2088)."
+      },
+      {
+        "name": "source-map-js",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/source-map-js@1.0.2 (dev) in GHSA-68fv-2mgg-jv7q [1.0.0,1.2.2). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Paths: postcss 8.4.33 > source-map-js 1.0.2 and sass (dev) 1.67.0 > source-map-js 1.0.2; loaded when the start command compiles .scss. Build-time only."
+      },
+      {
+        "name": "webpack",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "c",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/webpack@5.88.2 (dev) in GHSA-38r7-794h-5758 [5.49.0,5.104.0); GHSA-4vvj-4cpr-p986 [5.0.0-alpha.0,5.94.0) (+1 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Direct devDependency webpack 5.88.2 builds every production artifact (webpack.build.js via scripts.build, webpack.runtime.js, webpack.publisher.js, webpack.function.js), and each emitted bundle (dist/designer, dist/runtime scripts/theme.js and serviceWorker.js, dist/publisher, dist/function) carries webpack's own runtime (module registry / __webpack_require__ bootstrap)."
+      },
+      {
+        "name": "webpack-dev-middleware",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/webpack-dev-middleware@5.3.4 (dev) in GHSA-g84c-rxfj-3j2c [0,7.4.6). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > webpack-dev-middleware 5.3.4; loaded by the dev server (lib/Server.js:2032-2033)."
+      },
+      {
+        "name": "webpack-dev-server",
+        "in_range": "yes",
+        "production_relevant": "undecidable",
+        "criterion": "d",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/webpack-dev-server@4.15.1 (dev) in GHSA-4v9v-hfq4-rm2v [0,5.2.1); GHSA-79cf-xcqc-c78w [0,5.2.4) (+4 more). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Direct devDependency webpack-dev-server 4.15.1; scripts.start runs it (also scripts.serve-website / serve-designer via `webpack serve`)."
+      },
+      {
+        "name": "websocket-driver",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "none",
+        "evidence": "In range (OSV records fetched from api.osv.dev, checked against the lockfile versions): node_modules/websocket-driver@0.7.4 (dev) in GHSA-mp7j-qc5w-4988 [0,0.7.5); GHSA-xv26-6w52-cph6 [0,0.7.5). Shipped code (src/, examples/, community/, js/; non-spec files) is bundled by webpack: scripts.build webpack.build.js (designer, designer runtime, publisher, publisher runtime), webpack.runtime.js, webpack.publisher.js, webpack.function.js (Azure Function, scripts.deploy-function). A static reachability check from every bare import in that code over lockfile dependency/optional/peer edges reaches none of the 25 left-out copies; mocha, chai, sinon, fake-indexeddb, playwright are imported only by *.spec.ts / tests. scripts.start is `webpack-dev-server --open --config webpack.develop.js`: the rule lists package.json start as a production start command, while the repository marks it as the local designer development server (webpack.develop.js: mode \"development\", devtool inline-source-map, devServer hot; auth/authenticator.js interactive sign-in \"developer/manual mode\"). Packages that start command runs or loads are therefore marked undecidable (d); the published site itself is generated by `npm run publish` and hosted as static files (scripts.serve-website is a local `webpack serve` preview used by CI test.yml). Path: webpack-dev-server (dev) 4.15.1 > sockjs 0.3.24 > websocket-driver 0.7.4. sockjs is loaded only for webSocketServer type \"sockjs\" (lib/Server.js:1750-1752, lib/servers/SockJSServer.js:3); no config sets it, so the default ws server is used (lib/servers/WebsocketServer.js:3)."
+      }
+    ]
+  }
+]

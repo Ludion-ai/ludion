@@ -347,10 +347,10 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     const command = arg.startsWith("[") ? (() => { try { return (JSON.parse(arg) as string[]).join(" "); } catch { return arg; } })() : arg;
     if ((op === "ENV" || op === "ARG") && /\bNODE_ENV\b/.test(arg)) stage.production = /\bNODE_ENV(\s*=\s*|\s+)["']?production\b/.test(arg);
     // Two readings of the working folder, and a source matching either counts: as written (main's reading), and a
-    // relative WORKDIR resolved against the one before it, unless it holds a variable (which may be absolute).
+    // relative WORKDIR resolved against the one before it. A variable that holds an absolute path matches as written.
     if (op === "WORKDIR") {
       const w = arg.replace(/^["']|["']$/g, "");
-      stage.workdir = w.startsWith("/") || w.includes("$") ? w : `${stage.workdir.replace(/\/+$/, "")}/${w}`;
+      stage.workdir = w.startsWith("/") ? w : `${stage.workdir.replace(/\/+$/, "")}/${w}`;
       stage.workdirAsWritten = w;
     }
     if (op === "CMD" || op === "ENTRYPOINT") stage.commands.push(command);

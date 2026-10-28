@@ -477,8 +477,8 @@ describe.skipIf(!(hasJq && has("bash") && has("unzip", "-v")) && !process.env.CI
   });
 });
 
-// protected-paths.yml's script against a stand-in for gh: every review ends with reviewed-sha, so only an approving
-// one may pass the check (#166's review, B1).
+// protected-paths.yml's script against a stand-in for gh: every review ends with reviewed-sha, so the check passes
+// only when the latest review of the head approves (#166's review, B1).
 describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml's script, against a stand-in for gh", () => {
   const CHECK = read(".github/workflows/protected-paths.yml"), HEAD = "a".repeat(40), OLD = "b".repeat(40);
   const GH = [
@@ -513,7 +513,7 @@ describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml
     writeFileSync(join(fake, "comments.json"), JSON.stringify(comments.map(body => ({ body }))));
     const r = spawnSync("bash", ["-c", block(CHECK, "run")], {
       encoding: "utf8",
-      env: { PATH: `${bin}:${process.env.PATH}`, FAKE: fake, GH_TOKEN: "x", REPO: "o/r", PR: "7", LABEL: "review-approved", APPROVING: block(CHECK, "APPROVING") },
+      env: { PATH: `${bin}:${process.env.PATH}`, FAKE: fake, GH_TOKEN: "x", REPO: "o/r", PR: "7", LABEL: "review-approved", REVIEWS: block(CHECK, "REVIEWS") },
     });
     return { status: r.status, out: r.stdout + r.stderr };
   }
@@ -529,11 +529,18 @@ describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml
     for (const verdict of ["Review of #7 (fresh context, full diff at x): REQUEST_CHANGES", "**Independent review** (fresh-context subagent, at x): **REQUEST CHANGES**", "Review of #7: REQUEST CHANGES (I would APPROVE once B1 is fixed)", "Not a review"]) {
       const r = check([review("Review of #7: APPROVE", OLD), review(verdict, HEAD)]);
       expect(r.status, r.out).toBe(1);
-      expect(r.out).toContain("No approving review says");
+      expect(r.out).toContain(`The latest review that says "reviewed-sha: ${HEAD}" does not approve`);
     }
   });
   it("does not count an APPROVE that is not on the first line", () => {
     const r = check([review("Review of #7 (fresh context, full diff at x)", HEAD).replace("Findings.", "APPROVE")]);
     expect(r.status, r.out).toBe(1);
+  });
+  it("lets the latest review of the current head decide", () => {
+    const approve = review("Review of #7: APPROVE", HEAD), request = review("Review of #7: REQUEST CHANGES", HEAD);
+    const later = check([approve, request, review("Review of #7: APPROVE", OLD)]);
+    expect(later.status, later.out).toBe(1);
+    const again = check([request, approve]);
+    expect(again.status, again.out).toBe(0);
   });
 });

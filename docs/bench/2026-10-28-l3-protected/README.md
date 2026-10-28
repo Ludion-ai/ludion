@@ -40,7 +40,7 @@ The rules, now in CLAUDE.md ("Every change goes through a PR") and docs/protecte
 
 The fresh-context review at 39500a4 (https://github.com/Ludion-ai/ludion/pull/166#issuecomment-6468106957) asked for changes:
 
-- **B1.** With "every review ends with `reviewed-sha:`, whatever its verdict" and "the label can stay", a review that asks for changes of the current head turned the required `protected-paths` check green, because protected-paths.yml counted the line in any comment. Fixed with the review's option (a): protected-paths.yml now counts the line only in a comment whose first line has the word `APPROVE` and not `REQUEST` (the jq program `APPROVING`). The first lines of earlier reviews (#151 to #160) have two forms, "Review of #N (…): APPROVE" and "**Independent review** (…): **APPROVE**, with …"; both count, and both forms of "REQUEST CHANGES" do not. docs/protected-paths.md says so in its list, in step 1 and under what the check guarantees. New tests run protected-paths.yml's script with bash against a stand-in for `gh`: both approving forms pass; a request for changes at the current head fails although an older head was approved and the label stayed; an `APPROVE` that is not on the first line does not count.
+- **B1.** With "every review ends with `reviewed-sha:`, whatever its verdict" and "the label can stay", a review that asks for changes of the current head turned the required `protected-paths` check green, because protected-paths.yml counted the line in any comment. Fixed with the review's option (a): protected-paths.yml now takes the latest comment with a `reviewed-sha:` line for the current head, and passes only when that comment's first line has the word `APPROVE` and not `REQUEST` (the jq program `REVIEWS`). The first version of this fix (36dca96) counted any approving comment; an automated security review of that commit pointed out that a later review of the same head asking for changes was then ignored, so the latest review now decides. Limiting comments to reviewer accounts is not possible: every agent posts from the same account, which is why the check is a process gate (docs/protected-paths.md). The first lines of earlier reviews (#151 to #160) have two forms, "Review of #N (…): APPROVE" and "**Independent review** (…): **APPROVE**, with …"; both count, and both forms of "REQUEST CHANGES" do not. docs/protected-paths.md says so in its list, in step 1 and under what the check guarantees. New tests run protected-paths.yml's script with bash against a stand-in for `gh`: both approving forms pass; a request for changes at the current head fails although an older head was approved and the label stayed; an `APPROVE` that is not on the first line does not count; of two reviews of the current head, the later one decides, either way.
 - **N1.** The PR body named decisions.md for records that are in this README; the PR body is corrected. The decisions.md summary said it "fixes" #158's N8, which is left; it now says so.
 - **N2.** The narrowing for #156's N4 now covers a read step that fails before its checkout (above).
 - **N3, N5.** Behaviour changes the review called harmless (a refused head gets its notice even after a cancelled run; a PR that is gone ends with exit 0). Kept.
@@ -88,18 +88,22 @@ The same head, copied with `git archive` into a Docker volume; `npm ci --ignore-
 
 The first version of #166 put this record in the middle of decisions.md and progress.md. The cycle 3 instructions ask for only a few lines at the end of each, with the details under docs/bench/, so it moved here. The two Dependabot entries stay where #166 moved them (#157's finding 5).
 
-### After the B1 fix
+### After the B1 fix (the latest review of the head decides)
 
-The working tree with the B1 fix, copied into a new Docker volume, `npm ci --ignore-scripts` with network, then `--network none --read-only --tmpfs /tmp:exec`, user `node`, with `check-b1.sh`. Raw output: `logs/tests-b1.log`.
+The working tree with the fix, copied into a Docker volume after `npm ci --ignore-scripts` (with network), then `--network none --read-only --tmpfs /tmp:exec`, user `node`, with `check-b1.sh`. Raw output: `logs/tests-b1.log` (it replaces that of 36dca96's first version of the fix, whose tests were 30 and 240 passed).
 
 - `npm run typecheck`: exit 0.
-- judge-workflow.test.ts: 30 passed (30), 3 of them new for protected-paths.yml; `npx vitest run --project node packages`: 8 files, 240 passed (240).
+- judge-workflow.test.ts: 31 passed (31), 4 of them for protected-paths.yml; `npx vitest run --project node packages`: 8 files, 241 passed (241).
 - actionlint 1.7.12 on protected-paths.yml, judge.yml and judge-comment.yml: exit 0, no output.
 - Mutations of protected-paths.yml, one at a time, each caught:
 
   | Mutation | judge-workflow.test.ts |
   | --- | --- |
-  | every comment counted again (`--jq ".[].body"`) | 2 failed, 28 passed |
-  | `REQUEST` not excluded | 1 failed, 29 passed |
-  | `APPROVE` anywhere in the comment, not only on its first line | 1 failed, 29 passed |
-  | after restoring | 30 passed |
+  | every review counted as approving | 3 failed, 28 passed |
+  | `REQUEST` not excluded | 1 failed, 30 passed |
+  | `APPROVE` anywhere in the comment, not only on its first line | 1 failed, 30 passed |
+  | the first review of the head decides, not the latest | 1 failed, 30 passed |
+  | any approval of the head counts | 1 failed, 30 passed |
+  | after restoring | 31 passed |
+
+- `REVIEWS` on the real comments of #156 and #158 (`gh api …/issues/N/comments?per_page=100`), under jq 1.7.1 and jq 1.6, gives the same lines: for #156 `other 141d38e…`, `other 44c0fb6…`, `approve 9610889…`; for #158 `other 40b36c0…`, `other 427347c…`, `approve 0372f44…`. The REQUEST CHANGES reviews read as `other`, and each PR's merged head as `approve`.

@@ -17,7 +17,7 @@ Dependency files (`package.json`, lockfiles) outside the paths above are not pro
 The required check `protected-paths` (`.github/workflows/protected-paths.yml`) fails such a PR until **both** are true for the PR's current head:
 
 - the PR has the `review-approved` label, and
-- an approving review comment contains a line `reviewed-sha: <full 40-character head SHA>`. A comment approves when its first line has the word `APPROVE` and not `REQUEST`; the line of any other review does not count.
+- the latest PR comment with a line `reviewed-sha: <full 40-character head SHA>` approves. A comment approves when its first line has the word `APPROVE` and not `REQUEST`. So a review that does not approve the current head, posted after one that did, fails the check again.
 
 ## How a protected PR gets approved
 
@@ -25,7 +25,7 @@ The required check `protected-paths` (`.github/workflows/protected-paths.yml`) f
 2. The owner (or 社長 on the owner's behalf) approves the merge.
 3. After both, the `review-approved` label is added, with a comment naming the reviewer, the verdict comment, and who approved.
 
-Any push changes the head SHA, so an earlier `reviewed-sha:` stops counting by itself. Steps 1 and 2 must be repeated for the new head; the label can stay, since only an approving review of the current head passes the check. Comments do not start the check, so after posting the new `reviewed-sha:` line, re-run the failed `protected-paths` run (or remove and re-add the label).
+Any push changes the head SHA, so an earlier `reviewed-sha:` stops counting by itself. Steps 1 and 2 must be repeated for the new head; the label can stay, since only an approval in the latest review of the current head passes the check. Comments do not start the check, so after posting the new `reviewed-sha:` line, re-run the failed `protected-paths` run (or remove and re-add the label).
 
 ## Every review is recorded on its PR
 
@@ -37,4 +37,4 @@ Every agent pushes from the same GitHub account, and GitHub does not let an acco
 
 - The check's definition comes from the base branch (`pull_request_target`), so a PR cannot change it to pass itself.
 - The check never checks out or runs PR code, and its token can only read.
-- An approval written for an older head never counts for a newer one, and a review that does not approve never counts.
+- An approval written for an older head never counts for a newer one, and a later review of the same head that does not approve undoes it.

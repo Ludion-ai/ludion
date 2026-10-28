@@ -1,0 +1,15 @@
+{
+ "swh_files": 21,
+ "jsdelivr_files": 21,
+ "identical_sha256": 21,
+ "only_swh": [],
+ "only_jsdelivr": [],
+ "differing": [],
+ "meta": {
+  "name": "0.1.1",
+  "message": "Synthetic release for NPM source package @ensdomains/buffer version 0.1.1\n",
+  "date": "2023-02-28T09:46:00+00:00",
+  "author": "",
+  "target_type": "directory"
+ }
+}

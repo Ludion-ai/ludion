@@ -1,0 +1,67 @@
+{
+ "keys": {
+  "total": 86,
+  "by_kind": {
+   "version removed (time kept)": 59,
+   "unparseable spec": 23,
+   "package not served": 1,
+   "same-release check unverified": 3
+  },
+  "covered": {
+   "deps.dev": 0,
+   "ecosyste.ms": 11,
+   "jsDelivr": 6,
+   "ecosyste.ms + jsDelivr": 16
+  }
+ },
+ "per_urgency": {
+  "exploited": {
+   "unknown": 157,
+   "with_unparseable_spec": 44,
+   "with_package_not_served": 3,
+   "only_removed_or_unverified": 113,
+   "cleared_upper_bound": {
+    "deps.dev": 0,
+    "ecosyste.ms": 2,
+    "jsDelivr": 0,
+    "ecosyste.ms + jsDelivr": 2
+   }
+  },
+  "high": {
+   "unknown": 157,
+   "with_unparseable_spec": 44,
+   "with_package_not_served": 3,
+   "only_removed_or_unverified": 113,
+   "cleared_upper_bound": {
+    "deps.dev": 0,
+    "ecosyste.ms": 2,
+    "jsDelivr": 0,
+    "ecosyste.ms + jsDelivr": 2
+   }
+  },
+  "normal": {
+   "unknown": 95,
+   "with_unparseable_spec": 41,
+   "with_package_not_served": 3,
+   "only_removed_or_unverified": 54,
+   "cleared_upper_bound": {
+    "deps.dev": 0,
+    "ecosyste.ms": 0,
+    "jsDelivr": 0,
+    "ecosyste.ms + jsDelivr": 0
+   }
+  },
+  "low": {
+   "unknown": 76,
+   "with_unparseable_spec": 39,
+   "with_package_not_served": 3,
+   "only_removed_or_unverified": 37,
+   "cleared_upper_bound": {
+    "deps.dev": 0,
+    "ecosyste.ms": 1,
+    "jsDelivr": 0,
+    "ecosyste.ms + jsDelivr": 1
+   }
+  }
+ }
+}

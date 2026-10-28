@@ -1,0 +1,163 @@
+# Cycle 2 investigations: the one miss, the unknowns, and the stop-rate interval (2026-10-28)
+
+Investigation only. No definition, gate, wait or counting rule is changed, and backtest v4's results stand as published (docs/bench/2026-10-28-backtest-v4). All lookups are public reads (OSV, the npm registry, deps.dev, ecosyste.ms, jsDelivr, Software Heritage, the GitHub advisory API), made in Docker (node:24-slim) on 2026-10-28. Nothing downloaded was run. The scripts are in `scripts/`, the raw answers in `ensdomains-buffer/` and `unknowns/`.
+
+## 1. The miss: @ensdomains/buffer 0.1.1
+
+**The record.**
+- MAL-2025-190866: `published` 2025-11-24T16:31:47Z, `modified` 2025-11-26T00:08:10.790441Z. Alias GHSA-f9pq-63hg-w434.
+- Its sources (`database_specific.malicious-packages-origins`):
+
+  | Source | Versions | Modified |
+  | --- | --- | --- |
+  | amazon-inspector | 0.1.2 | 2025-11-24T16:31:47Z |
+  | ghsa-malware | 0.1.2, 0.1.1 | 2025-11-24T17:09:19Z (imported 17:23:27Z) |
+  | google-open-source-security | 0.1.2 | 2025-11-25T00:16:49Z |
+
+  Only GitHub's malware advisory names 0.1.1. Google's says the package "was compromised by the Sha1-Hulud: The Second Coming NPM worm".
+- GHSA-f9pq-63hg-w434 (GitHub's API): published 2025-11-24T17:02:05Z, updated 17:09:19Z, ranges `= 0.1.1` and `= 0.1.2`, no patched version.
+
+**The versions** (registry `time`):
+
+| Version | Published | On the registry today | Publisher (`_npmUser`) |
+| --- | --- | --- | --- |
+| 0.1.0 | 2022-03-30T02:19:38.944Z | yes | nickjohnson |
+| 0.1.1 | 2023-02-28T09:46:00.601Z | no (tarball 404) | makoto_inoue (Software Heritage, ecosyste.ms) |
+| 0.1.2 | 2025-11-24T05:49:00.347Z | no | davidchu (ecosyste.ms) |
+| 0.1.3 | 2025-11-25T08:06:41.545Z | yes | leeondamiky |
+
+**Was 0.1.1 malicious when it was published? No evidence that it was.**
+- **Its metadata,** in two records (`ensdomains-buffer/swh-0.1.1-metadata.json` and `ecosystems-0.1.1.json`):
+  - Software Heritage's copy of the npm manifest, discovered 2023-03-23T20:17:15Z (format `replicate-npm-package-json`). It has:
+    - integrity `sha512-92SfSiNS8XorgU7OUBHo/i1ZU7JV7iz/6bKuLPNVsMxV79/eI7fJR6jfJJc40zAHjs3ha+Xo965Idomlq3rqnw==`;
+    - shasum `6c275ba7e457e935405b67876f1f0d980c8baa63`;
+    - `_npmUser` makoto_inoue;
+    - scripts `test`, `lint`, `build`, `prepublishOnly` and `pub`, with no preinstall, install or postinstall;
+    - no runtime dependencies.
+  - ecosyste.ms's record (created 2023-02-28T11:58:26Z, last updated 2025-11-23T00:02:32Z, the day before 0.1.2 existed) has the same integrity, shasum, publisher and scripts. It also gives 2,096,683 bytes unpacked, 32 entries and no attestations.
+- **Its files, from two independent archives:**
+  - jsDelivr still serves the version's files. Its copy of 0.1.0 equals the registry's 0.1.0 tarball in all 22 files.
+  - Software Heritage archived 0.1.1 in a visit on 2023-03-23. Its 21 files have the same sha256 as jsDelivr's 21.
+  - Software Heritage's record of the original artifact (`original-artifacts-json`) gives `buffer-0.1.1.tgz` from the registry's tarball URL, 284,259 bytes, with sha1 `6c275ba7…`. That equals the registry's `dist.shasum` above. So Software Heritage's copy is tied to the tarball the registry published through sha1, though not through the sha512 integrity. Whether its loader checked the checksum while downloading is not checked here.
+  - jsDelivr's byte totals equal `unpackedSize`:
+    - 0.1.0: 1,842,489, the registry's figure;
+    - 0.1.1 and 0.1.2: 2,096,683 and 12,259,267, ecosyste.ms's figures, since the registry no longer lists either version.
+  - The recorded entry counts (32 for 0.1.1, 34 for 0.1.2) exceed the file counts (21, 23) by 11: the tarball's directory entries, 10 folders and `package/`. 0.1.1 was published with `yarn publish` (its `pub` script). 0.1.2 is the worm's repack, published with npm 10.8.2, and that it kept the same directory entries is an inference from the arithmetic.
+- **0.1.0 → 0.1.1.** Every `.js` and `.sol` file is unchanged. The changes:
+  - added: `package-lock.json` (863,199 bytes, data that npm ignores in a dependency);
+  - removed: `build/contracts/Buffer.json` and `build/contracts/Migrations.json`;
+  - changed: `package.json` (version 0.1.0 → 0.1.1; `@nomiclabs/hardhat-truffle5` moved from dependencies to devDependencies) and `cache/solidity-files-cache.json`, the Solidity compiler cache (1,759 → 1,751 bytes).
+- **0.1.1 → 0.1.2,** the worm:
+  - added: `setup_bun.js` (4,960 bytes) and `bun_environment.js` (10,157,586 bytes);
+  - `package.json` gains `"preinstall": "node setup_bun.js"`;
+  - published by davidchu with npm 10.8.2.
+
+**Which fix selected it, and how.**
+- **The fix:** @ensdomains/ens-contracts 0.0.22, the fixed event of GHSA-rrxv-q8m4-wch3 (introduced 0, fixed 0.0.22; advisory published 2023-08-01T19:48:31Z), with T = 2023-07-10T00:06:21.278Z, 3,158.3 hours after 0.1.1.
+- **The path:** a direct runtime dependency of ens-contracts. ens-contracts declares `"@ensdomains/buffer": "^0.1.1"` from 0.0.20 (2023-03-01T08:35:38Z, published by makoto_inoue, the publisher of buffer 0.1.1) through 0.0.22. Versions 0.0.15–0.0.19 declare `^0.0.13`.
+- **Was it already in the lockfile before the fix?**
+  - From 0.0.20 or 0.0.21, the versions just before the fix: yes. `^0.1.1` could only resolve to 0.1.1 until 0.1.2 appeared on 2025-11-24. So the update to 0.0.22 leaves buffer unchanged, and the judge does not judge an unchanged entry.
+  - From 0.0.19 or earlier: no. buffer moves from 0.0.13 to 0.1.1, so the update brings it in.
+  - The backtest's two scenarios are (a) P not in the lockfile and (b) P locked at prev (0.1.0, which `^0.1.1` does not satisfy). Neither is "already locked at V", so both count the update as bringing 0.1.1 in.
+
+**Did the MAL- record exist when Ludion would have judged?**
+- No. The judgement time is T + w. With w from 12h up to 336h (an extended low wait), that is 2023-07-10 to 2023-07-24 at the latest.
+- The record was published on 2025-11-24, about 2.4 years later. So the re-query could not stop it, and this is not a bug.
+- **Timing detail.** The backtest's conservative time for this version is the record's `published` (24,006.8 hours after V). ghsa-malware, the only source that names 0.1.1, shows a modified time 37 minutes 32 seconds later.
+  - The rule for "may have been added later" (malicious-v2.ts) looks at publish times, not at which source names which version.
+  - That does not change this outcome.
+
+**Could a signal readable then have stopped it?** None of the stop signals could. These are the facts readable at the judgement time, reconstructed from Software Heritage's 2023-03-23 copy of the manifest, ecosyste.ms and the registry:
+
+| Signal | 0.1.0 (prev) | 0.1.1 | Effect |
+| --- | --- | --- | --- |
+| Provenance | none (deps.dev: no SLSA, no attestations) | none | no regression, no stop |
+| Install scripts | none | none | no stop |
+| New dependencies | `@nomiclabs/hardhat-truffle5` | none | no extension |
+| Publisher | nickjohnson | makoto_inoue (a listed maintainer, publisher of 0.0.11–0.0.13) | extends the wait in (b); does not stop |
+| Rule 1 | — | published before T | allowed |
+| Rule 2 | package created 2018 | — | not young |
+| Deprecation, gate 1 advisories | — | none then | no stop |
+
+**Reading.** Public evidence indicates 0.1.1 was a legitimate release that one source added to a 2025 record about 0.1.2. By the registered definition it still counts as missed. Treating it otherwise, for example by requiring that a version be named by more than one source or be malicious by content, would be a new definition and a new run.
+
+## 2. Sources for removed versions, and how many unknowns each could clear
+
+**What makes a version unknown.** A diagnostic copy of `malicious-v4.ts` (`scripts/diag-block.ts`, not committed as a tool) ran offline on v4's cache and reproduced v4's counts exactly (990 / 1 / 157 at 24h, 1,071 / 1 / 76 at 168h). It lists the unreadable keys behind each unknown version: only 86 distinct keys.
+
+| Kind | Keys | What it is |
+| --- | --- | --- |
+| Removed version (time kept) | 59 | chosen as the highest version before T; its dependencies cannot be read |
+| Unparseable spec | 23 | dist-tags (`next`, `beta`, `insiders`, `development`) and invalid ranges (`=>0.20.0 <1`) |
+| Same-release check unverified | 3 | @mistralai/mistralai 2.2.2–2.2.4, removed |
+| Package not served | 1 | @notamitgamer/mojic |
+
+- 13 of the 59 removed keys are named by MAL- records.
+- Removed versions top the list of keys behind the most unknowns. They are not all known malicious. The OSV ids come from a query on 2026-10-28 (`unknowns/status-and-osv.json`):
+
+  | Key | Unknown versions (of 157, 24h) | OSV records |
+  | --- | --- | --- |
+  | rc@1.3.9 (the 2021 hijack, live for hours) | 155 | GHSA-g2q5-5433-rhrf (malware advisory; no MAL- record) |
+  | pinkie@2.0.5 | 146 | none |
+  | device-detector-js@3.11.4 | 141 | none |
+  | error-ex@1.3.3 (2025) | 130 | GHSA-6jp5-hh4c-8c5h, MAL-2025-46975 |
+  | colors@1.4.2 (the 2022 sabotage) | 74 | GHSA-5rqg-jm4f-cqx7, GHSA-gh88-3pxp-6fm8 |
+
+  Next come coa@2.1.3 (the 2021 hijack, GHSA-73qr-pfmq-6rp8, 60) and is-extglob@1.1.3 (no record, 57).
+- Each unknown version has a median of 4 such keys, and up to 67.
+- 44 of the 157 have an unparseable spec. None of the sources checked records what a dist-tag pointed to at T, so these are a definition question rather than missing data.
+
+**Per source.** Each figure is an upper bound: a version that becomes readable can have unreadable dependencies of its own. Nothing was resolved or judged.
+
+| Source | Removed keys it has (of 59) | Unknowns cleared through tree data (24h / 72h / 168h) | Notes |
+| --- | --- | --- | --- |
+| deps.dev API | 0 | 0 / 0 / 0 | also has none of the 1,140 removed malicious versions (v3, v4). BigQuery snapshots need a Google Cloud account; not checked |
+| ecosyste.ms | 8 with dependencies, and the publisher and attestation facts for the 3 unverified checks | 2 / 0 / 1 | keeps registry metadata for versions it indexed while they were listed. Its records carry a creation and an update date, not the date of each field (0.1.2's record was created 69.8 s after publication and last updated 2025-11-25) |
+| jsDelivr | 6 (`package.json`) | 0 / 0 / 0 alone | serves files of versions someone requested before removal |
+| ecosyste.ms + jsDelivr | 13 (buffer 0.1.1 is in both), plus the 3 unverified checks | 2 / 0 / 1 | |
+| Software Heritage | holds buffer 0.1.1 (visit 2023-03-23). Holds none of the 7 keys behind the most unknowns. Every visit page was read back to each publish time: none has a visit within 60 days after publication, and the first snapshot after publication holds none of them (`unknowns/swh-blockers.json`; its `first_visit` is the earliest visit read, not the origin's first, since reading stops once a page reaches before the publish time) | not estimated beyond that | the anonymous rate limit is 120 requests an hour, so the other keys were not checked |
+| OSV records | no dependency data | 0 | per-source version lists and times only |
+| Security vendor reports | no dependency lists | 0 under the current definitions | they describe payloads in prose; using them would infer facts, a definition change |
+| Wayback Machine, npmmirror, yarn's registry, unpkg | 0 for buffer 0.1.1, the case checked (`unknowns/status-and-osv.json`) | 0 | the Wayback Machine has no capture of the registry document; the mirrors answer 404, as the registry and deps.dev do |
+| Libraries.io open data (a 2020 dump) | not checked | not estimated | a bulk download, not an API read |
+
+If every removed version were readable, a perfect archive, at most 113 / 54 / 37 unknowns would clear. The rest stay unknown because of unparseable specs or the one package not served.
+
+**A second way to clear unknowns: gate 2 signals from ecosyste.ms.**
+- In v4's outcome rule, another gate 2 stop (install scripts added, provenance regression) comes before "unknown".
+- ecosyste.ms has metadata for 122 of the 157 unknown versions (24h).
+- For 44 of them, it shows an install script that the previous version did not declare. The previous version's scripts come from the registry cache, else from ecosyste.ms.
+- So up to 44 / 8 / 2 unknowns (24h / 72h / 168h) would become stopped, if ecosyste.ms were accepted as a source for that signal. Another 44 / 28 / 23 cannot be decided that way.
+- Across the denominator, ecosyste.ms holds metadata for 32 of a fixed sample of 50 of the 1,140 removed versions, today unverified for every gate 2 signal.
+- Accepting a third-party record of registry metadata is a new definition and a new run. Its integrity cannot be checked against a tarball that no longer exists.
+
+## 3. Backtest v4 as a stop-rate interval
+
+From docs/bench/2026-10-28-backtest-v4 (primary result, conservative timing, with the exception), out of 1,148:
+- lower bound: every unknown counted as missed;
+- upper bound: every unknown counted as stopped.
+
+The one missed version stays missed in both.
+
+| Wait | Stopped | Missed | Unknown | Lower bound | Upper bound |
+| --- | --- | --- | --- | --- | --- |
+| 12h and 24h | 990 | 1 | 157 | 990 / 1,148 = 86.24% | 1,147 / 1,148 = 99.91% |
+| 72h | 1,052 | 1 | 95 | 1,052 / 1,148 = 91.64% | 1,147 / 1,148 = 99.91% |
+| 168h | 1,071 | 1 | 76 | 1,071 / 1,148 = 93.29% | 1,147 / 1,148 = 99.91% |
+
+Optimistic timing, shown, not used: 1,012 / 1 / 135 at 24h (88.15%–99.91%), 1,082 / 1 / 65 at 72h (94.25%–99.91%), 1,085 / 1 / 62 at 168h (94.51%–99.91%). Percentages are rounded to two decimals; the fractions are exact.
+
+## How the scripts ran
+
+Each script in `scripts/` ran in Docker (node:24-slim) as a non-root user (`--user 1000:1000`), with the folders it names mounted:
+- `/out`, `/e` and `/d` hold its inputs and outputs.
+- `/s` holds the scripts.
+- `/cache` is a copy of backtest v4's registry cache.
+- `/osv` is the same OSV export.
+- `/w` is a scratch copy of the worktree with its `node_modules`.
+
+The paths inside the scripts are the container's. Scripts that only read ran with a read-only root. `analyze.mjs` extracts the registry's 0.1.0 tarball into a tmpfs `/tmp`. Scripts that compare files ran with `--network none`.
+
+`diag.sh` builds the diagnostic copy of `malicious-v4.ts` in `/w`, never in the repository. It ran offline (`--network none`) with the cache copy mounted writable. One attestation lookup that was not in the cache failed (next@13.5.0); its stderr is in `unknowns/diag-stderr.txt`. Its printed summary (`unknowns/diag-stdout.txt`) has the same counts as v4. The full rerun output (6.8 MB) is not committed.
+
+`status-and-osv.json` records the HTTP statuses behind the "removed" and "not mirrored" statements, and the OSV ids of the top keys.

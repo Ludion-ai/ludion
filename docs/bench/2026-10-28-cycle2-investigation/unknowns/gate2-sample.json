@@ -1,0 +1,463 @@
+{
+ "checked_at": "2026-10-28T08:08:30.975Z",
+ "removed": 1140,
+ "sample": 50,
+ "step": 22,
+ "with_metadata": 32,
+ "rows": [
+  {
+   "key": "hyperterm-hipster@1.0.3",
+   "published": "2017-02-21T09:37:56.399Z",
+   "status": 200,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "loliloli@1.0.97",
+   "published": "2024-06-26T10:17:38.647Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": null,
+   "publisher": "vcheckzen"
+  },
+  {
+   "key": "@react-native-aria/checkbox@0.2.11",
+   "published": "2025-06-07T00:42:15.536Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [],
+   "publisher": "rayan1810"
+  },
+  {
+   "key": "@toptal/davinci-monorepo@12.1.1",
+   "published": "2025-07-20T14:40:19.089Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall",
+    "postinstall"
+   ],
+   "publisher": "talbot"
+  },
+  {
+   "key": "@toptal/picasso-logo@2.1.9",
+   "published": "2025-07-20T14:49:56.443Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall",
+    "postinstall"
+   ],
+   "publisher": "talbot"
+  },
+  {
+   "key": "@nx/js@21.5.0",
+   "published": "2025-08-26T22:32:00.114Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "postinstall"
+   ],
+   "publisher": "jameshenry"
+  },
+  {
+   "key": "color@5.0.1",
+   "published": "2025-09-08T13:16:24.320Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [],
+   "publisher": "qix"
+  },
+  {
+   "key": "react-jsonschema-form-conditionals@0.3.18",
+   "published": "2025-09-14T17:58:52.453Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [],
+   "publisher": "techsupportrxnt"
+  },
+  {
+   "key": "@hestjs/eslint-config@0.1.2",
+   "published": "2025-09-14T20:45:55.044Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "postinstall"
+   ],
+   "publisher": "aqz23678"
+  },
+  {
+   "key": "@art-ws/di-node@2.0.13",
+   "published": "2025-09-15T05:21:18.849Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@art-ws/http-server@2.0.24",
+   "published": "2025-09-15T08:56:16.966Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [],
+   "publisher": "art-ws"
+  },
+  {
+   "key": "@nativescript-community/ui-material-bottom-navigation@7.2.74",
+   "published": "2025-09-15T10:47:39.889Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@nativescript-community/sentry@4.6.43",
+   "published": "2025-09-15T19:58:45.065Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "ember-headless-table@2.1.6",
+   "published": "2025-09-16T01:22:11.061Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "loliloli@1.0.107",
+   "published": "2025-09-25T20:33:48.826Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": null,
+   "publisher": "vcheckzen"
+  },
+  {
+   "key": "@asyncapi/generator-helpers@0.2.1",
+   "published": "2025-11-24T03:10:10.596Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "asyncapi-bot"
+  },
+  {
+   "key": "@asyncapi/web-component@2.6.6",
+   "published": "2025-11-24T03:10:46.562Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "asyncapi-bot"
+  },
+  {
+   "key": "korea-administrative-area-geo-json-util@1.0.7",
+   "published": "2025-11-24T03:26:30.900Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "zeallat"
+  },
+  {
+   "key": "@asyncapi/diff@0.5.2",
+   "published": "2025-11-24T03:58:51.948Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "asyncapi-bot"
+  },
+  {
+   "key": "@posthog/web-dev-server@1.0.5",
+   "published": "2025-11-24T04:08:49.122Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "timgl"
+  },
+  {
+   "key": "@actbase/react-daum-postcode@1.0.5",
+   "published": "2025-11-24T04:10:53.575Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "seung-juv"
+  },
+  {
+   "key": "@postman/postman-mcp-server@2.4.10",
+   "published": "2025-11-24T05:04:45.991Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "postman-web-platform-functional-account"
+  },
+  {
+   "key": "@postman/mcp-ui-client@5.5.3",
+   "published": "2025-11-24T05:13:21.821Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "rollup-plugin-httpfile@0.2.1",
+   "published": "2025-11-24T05:43:11.877Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@ensdomains/offchain-resolver-contracts@0.2.2",
+   "published": "2025-11-24T05:49:02.084Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "davidchu"
+  },
+  {
+   "key": "@zapier/zapier-sdk@0.15.5",
+   "published": "2025-11-24T05:50:54.731Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "zapier-engineering"
+  },
+  {
+   "key": "create-hardhat3-app@1.1.2",
+   "published": "2025-11-24T06:23:23.671Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "mcp-use@1.4.2",
+   "published": "2025-11-24T06:45:49.381Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "pederzh"
+  },
+  {
+   "key": "orbit-soap@0.43.13",
+   "published": "2025-11-24T07:44:19.963Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "barbarosso"
+  },
+  {
+   "key": "@trigo/keycloak-api@1.3.1",
+   "published": "2025-11-24T07:51:21.062Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "create-hardhat3-app@1.1.4",
+   "published": "2025-11-24T09:17:44.313Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "jquery-bindings@1.1.2",
+   "published": "2025-11-24T10:04:46.407Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "tiaanduplessis"
+  },
+  {
+   "key": "valid-south-african-id@1.0.3",
+   "published": "2025-11-24T10:05:32.449Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "tiaanduplessis"
+  },
+  {
+   "key": "@lessondesk/material-icons@1.0.3",
+   "published": "2025-11-24T10:06:05.474Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "tiaanduplessis"
+  },
+  {
+   "key": "react-keycloak-context@1.0.8",
+   "published": "2025-11-24T10:06:41.193Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "tiaanduplessis"
+  },
+  {
+   "key": "template-lib@1.1.3",
+   "published": "2025-11-24T10:07:05.899Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "tiaanduplessis"
+  },
+  {
+   "key": "kill-port@2.0.3",
+   "published": "2025-11-24T10:20:06.607Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "pico-uid@1.0.4",
+   "published": "2025-11-24T10:23:20.264Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@varsityvibe/validation-schemas@0.6.8",
+   "published": "2025-11-24T10:23:33.396Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "tiaanduplessis"
+  },
+  {
+   "key": "@clausehq/flows-step-sendgridemail@0.1.14",
+   "published": "2025-11-24T10:27:49.627Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@voiceflow/serverless-plugin-typescript@2.1.7",
+   "published": "2025-11-24T11:18:33.659Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@voiceflow/slate-serializer@1.7.3",
+   "published": "2025-11-24T11:18:39.939Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "pmvrmc"
+  },
+  {
+   "key": "@voiceflow/voiceflow-types@3.32.45",
+   "published": "2025-11-24T11:18:48.999Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "pmvrmc"
+  },
+  {
+   "key": "@voiceflow/metrics@1.5.2",
+   "published": "2025-11-24T11:20:09.513Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "vf-serviceaccount"
+  },
+  {
+   "key": "@voiceflow/general-types@3.2.23",
+   "published": "2025-11-24T11:20:17.336Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "jsonsurge@1.0.7",
+   "published": "2025-11-24T12:08:40.789Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "gauravmishra0"
+  },
+  {
+   "key": "ids-enterprise-ng@20.1.6",
+   "published": "2025-11-24T14:01:19.446Z",
+   "status": 200,
+   "metadata": true,
+   "install_scripts": [
+    "preinstall"
+   ],
+   "publisher": "tmcconechy"
+  },
+  {
+   "key": "tavily-module@1.0.1",
+   "published": "2025-11-24T15:53:10.316Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@oku-ui/primitives-nuxt@0.3.1",
+   "published": "2025-11-24T16:44:01.389Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  },
+  {
+   "key": "@oku-ui/motion-nuxt@0.2.2",
+   "published": "2025-11-24T16:44:26.036Z",
+   "status": 404,
+   "metadata": false,
+   "install_scripts": null,
+   "publisher": null
+  }
+ ]
+}

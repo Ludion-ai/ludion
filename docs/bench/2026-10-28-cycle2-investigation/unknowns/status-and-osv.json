@@ -1,0 +1,107 @@
+{
+ "checked_at": "2026-10-28T08:27:42.379Z",
+ "statuses": [
+  {
+   "url": "https://registry.npmjs.org/@ensdomains/buffer/-/buffer-0.1.1.tgz",
+   "status": 404,
+   "final_url": "https://registry.npmjs.org/@ensdomains/buffer/-/buffer-0.1.1.tgz",
+   "bytes": 21,
+   "body_if_small": "{\"error\":\"Not found\"}"
+  },
+  {
+   "url": "https://registry.npmjs.org/@ensdomains%2fbuffer/0.1.1",
+   "status": 404,
+   "final_url": "https://registry.npmjs.org/@ensdomains%2fbuffer/0.1.1",
+   "bytes": 26,
+   "body_if_small": "\"version not found: 0.1.1\""
+  },
+  {
+   "url": "https://api.deps.dev/v3/systems/npm/packages/%40ensdomains%2Fbuffer/versions/0.1.1",
+   "status": 404,
+   "final_url": "https://api.deps.dev/v3/systems/npm/packages/%40ensdomains%2Fbuffer/versions/0.1.1",
+   "bytes": 17,
+   "body_if_small": "version not found"
+  },
+  {
+   "url": "https://registry.npmmirror.com/@ensdomains/buffer/0.1.1",
+   "status": 404,
+   "final_url": "https://registry.npmmirror.com/@ensdomains/buffer/0.1.1",
+   "bytes": 58,
+   "body_if_small": "{\"error\":\"[NOT_FOUND] @ensdomains/buffer@0.1.1 not found\"}"
+  },
+  {
+   "url": "https://registry.npmmirror.com/@ensdomains/buffer/-/buffer-0.1.1.tgz",
+   "status": 404,
+   "final_url": "https://cdn.npmmirror.com/packages/%40ensdomains/buffer/0.1.1/buffer-0.1.1.tgz",
+   "bytes": 416
+  },
+  {
+   "url": "https://registry.yarnpkg.com/@ensdomains/buffer/-/buffer-0.1.1.tgz",
+   "status": 404,
+   "final_url": "https://registry.yarnpkg.com/@ensdomains/buffer/-/buffer-0.1.1.tgz",
+   "bytes": 21,
+   "body_if_small": "{\"error\":\"Not found\"}"
+  },
+  {
+   "url": "https://unpkg.com/@ensdomains/buffer@0.1.1/package.json",
+   "status": 404,
+   "final_url": "https://unpkg.com/@ensdomains/buffer@0.1.1/package.json",
+   "bytes": 51,
+   "body_if_small": "Package version not found: @ensdomains/buffer@0.1.1"
+  },
+  {
+   "url": "https://web.archive.org/cdx/search/cdx?url=registry.npmjs.org/@ensdomains/buffer&output=json&limit=50",
+   "status": 200,
+   "final_url": "https://web.archive.org/cdx/search/cdx?url=registry.npmjs.org/@ensdomains/buffer&output=json&limit=50",
+   "bytes": 3,
+   "body_if_small": "[]\n"
+  },
+  {
+   "url": "https://web.archive.org/cdx/search/cdx?url=registry.npmjs.org/@ensdomains%2fbuffer&output=json&limit=50",
+   "status": 200,
+   "final_url": "https://web.archive.org/cdx/search/cdx?url=registry.npmjs.org/@ensdomains%2fbuffer&output=json&limit=50",
+   "bytes": 3,
+   "body_if_small": "[]\n"
+  }
+ ],
+ "osv_ids_for_top_keys": [
+  {
+   "key": "rc@1.3.9",
+   "ids": [
+    "GHSA-g2q5-5433-rhrf"
+   ]
+  },
+  {
+   "key": "pinkie@2.0.5",
+   "ids": []
+  },
+  {
+   "key": "device-detector-js@3.11.4",
+   "ids": []
+  },
+  {
+   "key": "error-ex@1.3.3",
+   "ids": [
+    "GHSA-6jp5-hh4c-8c5h",
+    "MAL-2025-46975"
+   ]
+  },
+  {
+   "key": "colors@1.4.2",
+   "ids": [
+    "GHSA-5rqg-jm4f-cqx7",
+    "GHSA-gh88-3pxp-6fm8"
+   ]
+  },
+  {
+   "key": "coa@2.1.3",
+   "ids": [
+    "GHSA-73qr-pfmq-6rp8"
+   ]
+  },
+  {
+   "key": "is-extglob@1.1.3",
+   "ids": []
+  }
+ ]
+}

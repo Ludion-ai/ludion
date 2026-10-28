@@ -1,0 +1,2 @@
+next@13.5.0: Error: https://registry.npmjs.org/-/npm/v1/attestations/next@13.5.0: no response
+diag: 86 keys {"version removed (time kept)":59,"unparseable spec":23,"package not served":1,"same-release check unverified":3}

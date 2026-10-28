@@ -411,18 +411,6 @@ On GitHub, through the throwaway draft PR #159 (base `ci/judge-dogfood`; npm's l
 
 Added `.github/dependabot.yml`: npm version updates for the root directory, weekly, at most 5 open PRs. Decisions: "Dependabot feeds the judge". In Docker (python:3.14-slim), check-jsonschema 0.33.0's vendored Dependabot schema accepts the file; with `interval: fortnightly` it rejects it. Dependabot reads the file only from the default branch, so its first PRs come after the merge; nothing has run yet.
 
-## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
-
-CLAUDE.md and docs/protected-paths.md now say that every review is recorded on its PR with `reviewed-sha:` and that agents never merge a dependency-update PR, nor any PR an agent did not open. #156's, #158's and #157's remaining findings are fixed (decisions: "Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews").
-
-Checked in Docker (node:24-slim with jq 1.6 and unzip; `npm ci --ignore-scripts` with network, then `--network none`, read-only root, non-root):
-
-- `npm run typecheck`: exit 0.
-- `packages/cli/test/judge-workflow.test.ts`: 27 passed (20 before). The new ones run record.ts with no packages next to it, print a crafted text, and run judge-comment.yml's script with bash against a stand-in for `gh` (posting, updating, a refused head, a PR that moved on, records that do not match).
-- `npx vitest run --project node packages`: 8 files, 237 passed.
-- Mutations, one at a time: all 19 fail at least one test. They include each of #156's review's uncaught mutations (a checkout of `"$HEAD_SHA"`, `"$MERGE_SHA"` or `refs/ludion/merge` before the build, and a base-branch fetch of `${HEAD_SHA}`), text printed outside the stop markers, judge.ts imported up front, a refused head's artifact read, and the record's PR and head not compared.
-- actionlint 1.7.12 on judge.yml and judge-comment.yml: no findings.
-
 ## 2026-10-28 — Packagist advisories in Composer plans
 
 Composer scans and plans now read Packagist's advisory API next to OSV and take the later fix. New tests: Packagist's later fix wins over OSV's, OSV's later fix is kept, a Packagist-only advisory is found, a fix landing in the next range moves on, unaffected and empty answers stay clean, no same-major fix and unreadable ranges block, and an outage, a missing field, an unrequested name, a record for another package and an invalid id all fail the scan; npm inventories do not query Packagist. Local run in Docker (node:24-slim, no network, read-only root, non-root): typecheck passed; packages tests 176 passed. The site build needs git and was not run in the container; CI runs the full suite.
@@ -534,3 +522,7 @@ docs/bench/2026-10-28-noise. The definitions were fixed before the run: d29b1e7,
 - **One judge failure.** The judge's lockfile reader refused one repository's lockfile (an unexpected `packages/` path under `node_modules`). That repository was excluded and reported by cause.
 
 The design's noise gate is **not met**. The judge's production/dev split (the lockfile's `dev` flag) cannot by itself decide "loaded in production". No definition is changed.
+
+## 2026-10-28 (cycle 3) — Two rules into CLAUDE.md; the follow-ups to #156, #157 and #158's reviews
+
+The rules and the review follow-ups are in #166 (decisions: the entry of the same name). Checked in Docker at dd86e86, offline, with a read-only root, as a non-root user: typecheck exit 0; judge-workflow.test.ts 27 passed (20 before); packages 8 files, 237 passed; actionlint found nothing on both judge workflows; 8 mutations re-run one at a time, each caught. Raw output and details: docs/bench/2026-10-28-l3-protected/.

@@ -260,9 +260,13 @@ describe("rule 1's same-release exception", () => {
     const prodCopy = change({ path: "node_modules/foo/node_modules/lib", from: "2.0.0", to: "2.0.1", resolved: url("lib", "2.0.1") });
     expect(urgencyOf([{ ...fixHigh, kev: true }], [devFix, prodCopy])).toBe("normal");
     expect(urgencyOf([{ ...fixHigh, kev: true, from: "2.0.0", to: "2.0.1" }], [devFix, prodCopy])).toBe("exploited");
-    // A newer copy that a dependent now loads instead of the vulnerable 1.0.0 is a passenger: no urgency from it.
+    // A dependent that moves off the vulnerable 1.0.0 in production ends a production exposure: its fix counts for
+    // urgency, though it is no target (ownFixes).
     const loaded = change({ path: "node_modules/foo/node_modules/lib", from: "1.0.0", to: "2.5.0", resolved: url("lib", "2.5.0") });
-    expect(urgencyOf([{ ...fixHigh, kev: true }, { ...fixHigh, kev: true, to: "2.5.0" }], [devFix, loaded])).toBe("normal");
+    expect(urgencyOf([{ ...fixHigh, kev: true }, { ...fixHigh, kev: true, to: "2.5.0" }], [devFix, loaded])).toBe("exploited");
+    // A production copy that was never vulnerable, moving to the fixed version number, does not match the fix.
+    const neverVulnerable = change({ path: "node_modules/foo/node_modules/lib", from: "0.9.0", to: "1.0.1", resolved: url("lib", "1.0.1") });
+    expect(urgencyOf([{ ...fixHigh, kev: true }], [devFix, neverVulnerable])).toBe("normal");
   });
   it("keeps, per advisory, package and vulnerable version, only the smallest version it changed to", () => {
     const lineTwo = { ...fixHigh, from: "2.0.0", to: "2.0.1" };

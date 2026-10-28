@@ -317,8 +317,10 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
 
 /** Urgency of the change: from the advisories it fixes, and whether any fixed package is used in production. */
 export function urgencyOf(fixes: FixedAdvisory[], changes: Change[], epssHigh = 0.1): Urgency {
-  const fixes_ = (c: Change, f: FixedAdvisory) => c.name === f.package && c.to === f.to;
-  const fixed = ownFixes(fixes).filter(f => changes.some(c => fixes_(c, f)));
+  // Every fix counts here, not only the change's own (ownFixes): a dependent that moves off the vulnerable version in
+  // production ends a production exposure. Matching `from` keeps out copies that were never vulnerable.
+  const fixes_ = (c: Change, f: FixedAdvisory) => c.name === f.package && c.from === f.from && c.to === f.to;
+  const fixed = fixes.filter(f => changes.some(c => fixes_(c, f)));
   // A fix's urgency counts only for the versions it fixes: a dev-only fix does not hurry a production passenger.
   const fixing = changes.filter(c => fixed.some(f => fixes_(c, f)) && !c.dev);
   if (!changes.some(c => !c.dev)) return "low";

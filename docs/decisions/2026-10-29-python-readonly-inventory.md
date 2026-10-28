@@ -1,0 +1,13 @@
+# 2026-10-29: Read-only Python inventory
+
+`packages/cli/src/security/readonly/python.ts` reads exact Python package versions for OSV's PyPI ecosystem. It does not patch, plan or run project code, and nothing calls it yet.
+
+- **Lock files are the inventory.** Every lock present (`uv.lock`, `poetry.lock`, `Pipfile.lock`) is read and the packages are combined. Combining several locks can only add packages to check, so it can miss nothing. `requirements.txt` adds its exact `name==version` pins.
+- **Only registry packages are checked.** In uv, these are packages with a `registry` source. In Poetry, PyPI or a `legacy` index. In Pipfile.lock, an exact `==` version. Git, URL, path and directory sources are listed as limitations, and so are editable packages other than the project itself: an editable checkout can be third-party code.
+- **The project itself is skipped and named in `scope`.** That is uv's editable or virtual package at `.`, the members in `[manifest] members`, a `"path": "."` entry in Pipfile.lock, and `.` or `-e .` in requirements.txt. OSV has no advisories for it.
+- **Unknown lock format versions are not read.** These are uv `version` other than 1, Poetry `lock-version` with a major other than 1 or 2, and `pipfile-spec` other than 6. The file contributes no packages and one limitation.
+- **A TOML line the reader cannot parse fails the whole file**, with the file name and line number. The reader handles a strict subset of TOML that matches `tomllib` on real uv 0.11 and Poetry 1.8 and 2.4 locks. Skipping a line could hide a name, version or source. A pyproject.toml or Pipfile that cannot be read only loses the direct marks (nothing is marked direct). If no lock file exists, that failure becomes a limitation instead.
+- **Requirements without a lock are not guessed.** pyproject.toml or a Pipfile that declares requirements but has no lock produces one limitation. A pyproject.toml with only tool settings declares nothing, so it adds none.
+- **Environment markers are not evaluated.** Every locked package is listed for all environments, and requirements.txt pins that have markers are named in a limitation. This can over-report, never under-report.
+- **Other requirements files are named but not read.** These are `requirements*.txt` and a `requirements/` directory, and they show up even when they are the only Python files in the project. `-r` and `-c` includes are not followed.
+- **OSV format, checked live on 2026-10-29.** OSV's PyPI matching normalizes names (`Jinja2`/`jinja2`, `python_multipart`/`Python.Multipart`) and PEP 440 versions (`2.19`/`2.19.0`/`2.19.0.0`, `3.2rc1`/`3.2.0rc1`, `1.13.0+cpu`). So versions are sent exactly as the lock writes them, and names in PEP 503 form.

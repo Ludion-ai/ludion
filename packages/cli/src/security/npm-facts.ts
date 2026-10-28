@@ -31,8 +31,13 @@ const registryPath = (name: string) => {
   return name.startsWith("@") ? `@${encodeURIComponent(name.slice(1))}` : encodeURIComponent(name);
 };
 
-/** Repository and workflow from an SLSA provenance statement (v1 or v0.2), as the registry recorded it. */
-export function provenanceFrom(attestations: unknown): { repository: string | null; workflow: string | null } | null {
+const COMMIT = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
+const commitOf = (digest: unknown, key: string) => { const value = (digest as Record<string, unknown> | undefined)?.[key]; return typeof value === "string" && COMMIT.test(value) ? value : null; };
+/**
+ * Repository, workflow and source commit from an SLSA provenance statement (v1 or v0.2), as the registry recorded it.
+ * The commit is v1's first resolved dependency (`gitCommit`) or v0.2's config source (`sha1`).
+ */
+export function provenanceFrom(attestations: unknown): { repository: string | null; workflow: string | null; commit: string | null } | null {
   const list = (attestations as { attestations?: unknown })?.attestations;
   if (!Array.isArray(list)) throw new Error("Invalid attestations record.");
   const slsa = list.find(a => typeof a?.predicateType === "string" && a.predicateType.startsWith("https://slsa.dev/provenance/"));
@@ -41,10 +46,12 @@ export function provenanceFrom(attestations: unknown): { repository: string | nu
   if (typeof payload !== "string") throw new Error("Provenance attestation has no payload.");
   const predicate = JSON.parse(Buffer.from(payload, "base64").toString("utf8"))?.predicate;
   const workflow = predicate?.buildDefinition?.externalParameters?.workflow;
-  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null };
+  const resolved = predicate?.buildDefinition?.resolvedDependencies;
+  const v1Commit = Array.isArray(resolved) ? commitOf(resolved[0]?.digest, "gitCommit") : null;
+  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null, commit: v1Commit };
   const source = predicate?.invocation?.configSource;
-  if (source) return { repository: typeof source.uri === "string" ? source.uri.replace(/@.*$/, "").replace(/^git\+/, "") : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null };
-  return { repository: null, workflow: null };
+  if (source) return { repository: typeof source.uri === "string" ? source.uri.replace(/@.*$/, "").replace(/^git\+/, "") : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null, commit: commitOf(source.digest, "sha1") };
+  return { repository: null, workflow: null, commit: v1Commit };
 }
 
 /** Registry facts for the given versions of one package (one packument read, plus one attestation read per version). */

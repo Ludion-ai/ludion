@@ -444,6 +444,51 @@ describe("the time cap on candidates", () => {
     expect(clean).toMatchObject({ after_t: [], young: [], undecidable: [] });
     expect(renderTimeCap(clean)).toEqual(["Published at or after T (2021-02-20T15:42:16.891Z, the fix's publish time): 0 version(s)"]);
   });
+  it("lets an npm sibling of the same release move, from the registry's publisher and provenance", async () => {
+    const commit = "535e26d3c69de49df8bd17618a424cbe65ec897b";
+    const statement = (sha: string) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: Buffer.from(JSON.stringify({ predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/lodash/lodash", path: ".github/workflows/release.yml" } }, resolvedDependencies: [{ digest: { gitCommit: sha } }] } } })).toString("base64") } } }] });
+    // No provenance: lodash.sib@4.17.21 10 s after the fix, lodash.late@4.17.21 16 minutes after, same publisher and
+    // version. lodash.prov@1.0.0: an hour after, with provenance from `commit`.
+    const times: Record<string, Record<string, string>> = {
+      lodash: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z" },
+      "lodash.sib": { "4.17.20": "2020-08-13T16:54:00.000Z", "4.17.21": "2021-02-20T15:42:26.891Z" },
+      "lodash.late": { "4.17.20": "2020-08-13T16:54:00.000Z", "4.17.21": "2021-02-20T15:58:16.891Z" },
+      "lodash.prov": { "0.9.0": "2020-08-13T16:54:00.000Z", "1.0.0": "2021-02-20T16:42:16.891Z" },
+    };
+    /** The fix's provenance commit, or null when the fix has none. */
+    const fetchFn = (fixCommit: string | null): typeof fetch => async url => {
+      const u = decodeURIComponent(String(url));
+      const att = /\/-\/npm\/v1\/attestations\/(.+)@([^@]+)$/.exec(u);
+      if (att) return response(statement(att[1] === "lodash" ? fixCommit! : commit));
+      const name = u.replace("https://registry.npmjs.org/", "");
+      if (!times[name]) return new Response("", { status: 404 });
+      const attested = (v: string) => (name === "lodash" && v === "4.17.21" && fixCommit !== null) || (name === "lodash.prov" && v === "1.0.0");
+      return response({ time: { created: "2012-04-23T16:37:11.912Z", ...times[name] }, versions: Object.fromEntries(Object.keys(times[name]!).map(v => [v, { dependencies: {}, _npmUser: { name: "bnjmn" }, dist: attested(v) ? { attestations: { url: "x" } } : {} }])) });
+    };
+    const before = inv("npm", [["lodash", "4.17.20"], ["lodash.sib", "4.17.20"], ["lodash.late", "4.17.20"], ["lodash.prov", "0.9.0"]]);
+    const after = inv("npm", [["lodash", "4.17.21"], ["lodash.sib", "4.17.21"], ["lodash.late", "4.17.21"], ["lodash.prov", "1.0.0"]]);
+    // The fix without provenance: the publisher branch allows lodash.sib only; provenance on one side does not count.
+    const plain = await candidateTimeCap("npm", before, after, plan, fetchFn(null));
+    expect(plain.same_release).toEqual([{ version: "lodash.sib@4.17.21", target: "lodash@4.17.21", basis: "publisher" }]);
+    expect(plain.after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0"]);
+    // The fix with provenance from the same commit: lodash.prov only; the siblings without provenance stop.
+    const built = await candidateTimeCap("npm", before, after, plan, fetchFn(commit));
+    expect(built.same_release).toEqual([{ version: "lodash.prov@1.0.0", target: "lodash@4.17.21", basis: "provenance" }]);
+    expect(built.after_t).toEqual(["lodash.late@4.17.21", "lodash.sib@4.17.21"]);
+    // From another commit: everything after T stops.
+    expect((await candidateTimeCap("npm", before, after, plan, fetchFn("0".repeat(40)))).after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0", "lodash.sib@4.17.21"]);
+  });
+  it("lets nothing published at or after T move in a Composer candidate", async () => {
+    const p2 = (name: string, list: unknown[]) => response({ minified: "composer/2.0", packages: { [name]: list } });
+    const fetchFn: typeof fetch = async url => {
+      const u = String(url);
+      if (u.endsWith("/p2/vendor/lib.json")) return p2("vendor/lib", [{ name: "vendor/lib", version: "2.0.1", time: "2026-05-01T00:00:00+00:00" }, { version: "2.0.0", time: "2026-01-01T00:00:00+00:00" }]);
+      if (u.endsWith("/p2/vendor/lib-sib.json")) return p2("vendor/lib-sib", [{ name: "vendor/lib-sib", version: "2.0.1", time: "2026-05-01T00:00:05+00:00" }, { version: "2.0.0", time: "2026-01-01T00:00:00+00:00" }]);
+      return new Response("", { status: 404 });
+    };
+    const cap = await candidateTimeCap("composer", inv("composer", [["vendor/lib", "2.0.0"], ["vendor/lib-sib", "2.0.0"]]), inv("composer", [["vendor/lib", "2.0.1"], ["vendor/lib-sib", "2.0.1"]]), [{ name: "vendor/lib", from: "2.0.0", to: "2.0.1", advisories: ["PKSA-x"] }], fetchFn);
+    expect(cap).toMatchObject({ after_t: ["vendor/lib-sib@2.0.1"], same_release: [] });
+  });
   it("is undecidable when a time is missing, and a failed registry read fails the candidate", async () => {
     const before = inv("npm", [["lodash", "4.17.20"]]);
     const noTime = registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z" } } });

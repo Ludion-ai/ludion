@@ -33,7 +33,7 @@ export type VersionFacts = {
   deprecated: string | null;
   publisher: string | null;
   /** Build provenance from the registry's attestations: null when the version has none. */
-  provenance: { repository: string | null; workflow: string | null } | null;
+  provenance: { repository: string | null; workflow: string | null; commit: string | null } | null;
   /** Which of preinstall, install, postinstall the version declares. */
   install_scripts: string[];
   dependencies: string[];
@@ -413,7 +413,8 @@ export function judge(input: {
     if (newDeps.length) { add({ gate: 2, package: c.name, effect: "extend", message: `${c.name}@${c.to} adds dependencies: ${newDeps.join(", ")}.` }); extended = true; }
   }
 
-  // Rules 1 and 2: T is the fix's publish time (the changed direct dependencies' when nothing is fixed).
+  // Rules 1 and 2: T is the fix's publish time (the changed direct dependencies' when nothing is fixed). A version
+  // published at or after T that is the same release as a target is allowed; the wait above already counts from it.
   const locked = input.locked ?? new Set(changes.flatMap(c => c.from ? [`${c.name}@${c.from}`] : []));
   const lockedNames = new Set([...locked].map(id => id.slice(0, id.lastIndexOf("@"))));
   const fixedNames = new Set(fixes.map(f => f.package));
@@ -429,6 +430,10 @@ export function judge(input: {
     targets: targets.map(c => ({ name: c.name, version: c.to })), others: changes.map(c => ({ name: c.name, version: c.to })), locked, newDependencies,
     published: (name, version) => facts.get(`${name}@${version}`)?.published_at,
     created: name => created.get(name),
+    identity: (name, version) => {
+      const f = facts.get(`${name}@${version}`);
+      return f && { publisher: f.publisher, provenance: f.provenance && { repository: f.provenance.repository, commit: f.provenance.commit } };
+    },
     waitHours: WAIT_HOURS[urgency],
   });
   if (changes.length) {

@@ -10,7 +10,8 @@ import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, regularFile, rootPath, snapshot, type DependencyConfig } from "./project.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
 import { WAIT_HOURS } from "./judge.ts";
-import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type Releases, type TimeCap } from "./time-cap.ts";
+import { registryFacts } from "./npm-facts.ts";
+import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
 export type DependencyReceipt = {
   schema: 1; id: string; ecosystem: Ecosystem; scope: "dependency_files_only_not_deployed";
@@ -59,6 +60,8 @@ export function unplannedRemovals(before: Inventory, after: Inventory, plan: Cha
  * latest publish time of the planned packages' new versions. Every other version the candidate adds must have been
  * published before T, and a package new to the lockfile, or newly required by a planned package, must have first
  * appeared at least the wait before T. `ludion patch` computes no urgency, so the longest wait (168h) applies.
+ * npm: a version published at or after T may move when it is the same release as a planned version (publisher and
+ * provenance read from the registry). Composer: Packagist has neither, so nothing published at or after T may move.
  */
 export async function candidateTimeCap(ecosystem: "npm" | "composer", before: Inventory, after: Inventory, plan: Change[], fetchFn: typeof fetch = fetch): Promise<TimeCap> {
   const locked = new Set(before.packages.map(p => `${p.name}@${p.version}`)), lockedNames = new Set(before.packages.map(p => p.name));
@@ -77,12 +80,22 @@ export async function candidateTimeCap(ecosystem: "npm" | "composer", before: In
     newDependencies.push(...now.filter(d => !from.some(f => f?.includes(d))));
   }
   for (const name of new Set(newDependencies)) await read(name);
-  return timeCap({
+  const input = {
     targets: added.filter(p => planned.has(p.name)), others: added, locked, newDependencies,
-    published: (name, version) => releases.get(name)?.published.get(composerVersion(version)),
-    created: name => releases.get(name)?.created,
+    published: (name: string, version: string) => releases.get(name)?.published.get(composerVersion(version)),
+    created: (name: string) => releases.get(name)?.created,
     waitHours: WAIT_HOURS.low,
-  });
+  };
+  const cap = timeCap(input);
+  if (ecosystem !== "npm" || !cap.after_t.length) return cap;
+  // Publisher and provenance only for the planned versions and those published at or after T.
+  const identities = new Map<string, ReleaseIdentity>();
+  const wanted = [...input.targets.map(p => `${p.name}@${p.version}`), ...cap.after_t];
+  for (const name of new Set(wanted.map(id => id.slice(0, id.lastIndexOf("@"))))) {
+    const versions = wanted.filter(id => id.slice(0, id.lastIndexOf("@")) === name).map(id => id.slice(id.lastIndexOf("@") + 1));
+    for (const [version, f] of await registryFacts(name, versions, fetchFn)) identities.set(`${name}@${version}`, { publisher: f.publisher, provenance: f.provenance && { repository: f.provenance.repository, commit: f.provenance.commit } });
+  }
+  return timeCap({ ...input, identity: (name, version) => identities.get(`${name}@${version}`) });
 }
 
 export function compatible(before: Inventory, after: Inventory): void {

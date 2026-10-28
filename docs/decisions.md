@@ -865,3 +865,70 @@ Backtest v4 uses the exception as amended here.
 ## 2026-10-28 — Every review is recorded on its PR
 
 From 2026-10-28 (cycle 2), every PR's review is posted as a comment on that PR, protected path or not. The comment holds the verdict and its findings, and ends with `reviewed-sha: <the head SHA reviewed>`. A review with no such comment on GitHub is not reported as a review. A review made after a merge is posted on the merged PR. A push after a review needs a new review of the new head. For a PR that touches no protected path, a delta review is enough when it says what it covered. A protected PR follows docs/protected-paths.md unchanged: the full diff at the current head, every time. This entry does not relax that process. CLAUDE.md and docs/protected-paths.md are protected paths, so this rule is recorded here and not in them; adding it there is left to the owner.
+
+## 2026-10-28 — Noise measurement: definitions fixed before running it
+
+Design, "ロードマップと検証ゲート", gate 2 (ノイズ測定), and the weeks 1–2 gate "通知3分の1以下". These definitions are committed and pushed before the run, and are not changed after seeing results. A later change is a new entry with a new run. The wait table, the backtest gates and how unknowns are counted are not changed by this entry.
+
+**What is measured.** The judge's gate 1 today is: the installed version is in an advisory's range, and the package is production rather than dev-only. Its OS, SAPI and configuration conditions are not built. The production/dev split is the lockfile's `dev` flag: a version counts as dev-only only when every installed copy of it is dev (judge.ts). That is the same signal `npm audit --omit=dev` reads, so that count is recorded next to it.
+
+**1. Sample.**
+- **The search.** 24 GitHub searches, one per UTC hour of 2026-10-27, each `is:pr is:public author:app/dependabot label:javascript created:<hour> sort:created-desc`. Each takes the first 100 results, with the query in `tools/backtest/src/noise.ts` (`SEARCH`), run with `gh api graphql`. The raw answers are saved and committed.
+- **The order.** Rank 1 of every hour (00 to 23), then rank 2 of every hour, and so on. Only PRs by the `dependabot` app whose branch starts with `dependabot/npm_and_yarn/` count. Each repository comes once, at its first position.
+- **Inclusion.** In that order, a repository is included when all of these hold:
+  - no repository of the same owner is in the sample yet;
+  - it is not a fork and not archived;
+  - its default branch's head has `package.json` and `package-lock.json` at the root;
+  - the lockfile is at most 50 MB and is lockfileVersion 2 or 3;
+  - both counts below can be computed;
+  - npm audit reports at least one vulnerability, so every repository has something to check.
+
+  The first 100 included repositories are the sample. Every repository considered and why it was left out is recorded.
+- **The snapshot.** The default branch head the search returned (its commit SHA is recorded), root `package.json` and `package-lock.json` only. Workspaces are measured through the root lockfile. A Dependabot PR in a subdirectory does not change what is measured.
+
+**2. The two counts, per repository.** Both are computed in Docker (node:24-slim). Neither runs project code.
+- **npm audit's count.** `npm audit --package-lock-only --json` (npm 11.19.1) runs in a directory that holds only the two files. It has its own npmrc: the public registry, scripts off. The count is `metadata.vulnerabilities.total`, the number npm prints. That includes packages counted only because they depend on a vulnerable one. Also recorded, but not used for the gate:
+  - npm's directly vulnerable packages (an advisory in `via`);
+  - the same count with `--omit=dev`.
+- **The judge's count.** The installed packages come from `lockEntries`, the judge's own lockfile reader. Each distinct name@version is looked up with `osvIds`, the judge's own OSV query (names and versions only). The count is the number of distinct package names that have at least one production version named by at least one OSV record (a vulnerability or a MAL- record).
+
+**3. The count gate.** Over the 100 repositories, the sum of the judge's counts is at most one third of the sum of npm audit's counts. Fewer than 100 included repositories fails the gate.
+
+**4. The check for misses.**
+- **What is checked.** For each repository: every package that npm audit lists as directly vulnerable, or that OSV names, and that the judge's count leaves out. These are the "left out" list in the output. Each is left out for one of two reasons: every installed copy is dev, or OSV names no record for the installed versions while npm audit does.
+- **Who checks.** Fresh-context reviewers (subagents that are not the worker), never the worker. Each reviewer gets the repository list and the output, and checks every left-out package against primary sources:
+  - the advisory: the GHSA or OSV record's affected ranges against the installed versions in the lockfile;
+  - the code: the repository's source at the recorded SHA, its lockfile's dependency edges, and the packages' manifests and code where needed.
+- **Production-relevant.** A left-out package is production-relevant (a miss) when an installed version is in the advisory's affected range, and any of these holds:
+  - (a) some installed copy of it is not dev in the lockfile;
+  - (b) the repository's shipped code imports or requires it, or imports a package whose runtime dependencies reach it. Shipped code is the application's or library's own source that runs in production or is bundled for the browser, including when the imported package is declared in devDependencies. Tests, configuration, and build, lint or release scripts are not shipped code;
+  - (c) the build puts its code into the production output: runtime helpers or polyfills injected by a transpiler or bundler, say. The repository's build configuration must show this.
+- **Not production-relevant.** Every path to it goes through tooling used only at build, test, lint or release time, and no shipped code imports it.
+- **Undecidable.** A package the reviewer cannot decide is undecidable, and undecidable counts as a miss. A repository the reviewer cannot finish counts every unchecked package as undecidable.
+- **The worker's part.** The worker does not change a reviewer's verdict. The worker only adds verdicts up, and reports any disagreement next to them.
+- **How it is done.**
+  - Each repository's source at the recorded SHA is read from GitHub's archive of that commit, extracted in Docker and never run.
+  - Reviewers get the repositories in sample order, in groups.
+  - For each left-out package, a reviewer records three things: whether an installed version is in range, whether it is production-relevant (yes, no or undecidable), and the evidence (file and line, or the dependency path).
+  - The verdicts are committed with the results.
+
+**5. The miss gate.** Zero misses over the 100 repositories. Also reported:
+- the number of repositories with at least one miss;
+- with 0 of 100, the rule-of-three upper bound on the per-repository miss rate, 3/100 (about 3%, 95%).
+
+**6. Both gates must hold.** Not measured counts as not met.
+
+**Not measured.**
+- Vulnerabilities that neither npm's advisory database nor OSV lists.
+- Whether a vulnerable code path is reachable or exploitable.
+- OS, SAPI and configuration conditions (not built).
+- Whether a repository is deployed at all.
+- Lockfiles other than the root package-lock.json (pnpm, yarn, subdirectories).
+
+**Outputs.** docs/bench/2026-10-28-noise/:
+- the saved searches;
+- `noise.json`: every row, its counts and left-out list, the exclusions, and the totals;
+- the reviewers' verdicts;
+- a README with both gates.
+
+**Disclosure.** Before this entry, the script was smoke-tested on two owned checkouts, which are in no sample: examples/npm-security (npm audit 1, judge 1) and this repository's root lockfile (0 and 0). The search query's syntax was checked on 2026-10-20, a day outside the window. That check printed 3 PRs' times, authors and branch prefixes, and the day's total of 49,629.

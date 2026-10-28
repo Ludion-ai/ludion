@@ -1,0 +1,105 @@
+{
+ "result": {
+  "npm_audit": 1867,
+  "judge_production": 938,
+  "left_out": 160
+ },
+ "fixed": {
+  "npm_audit": 1867,
+  "judge_production": 938,
+  "npm_audit_omit_dev": 927,
+  "npm_audit_direct": 1087,
+  "left_out": 160,
+  "count_gate": {
+   "rule": "judge_production <= npm_audit / 3",
+   "met": false
+  },
+  "splits": {
+   "source_read": 90,
+   "image_holds_dev": 9,
+   "incomplete": 1,
+   "not_given": 0
+  },
+  "failed": 0
+ },
+ "not_in_result": [],
+ "unreviewed": [],
+ "misses": [
+  {
+   "repo": "carlostighe/modalMap",
+   "name": "cross-spawn",
+   "verdict": "yes",
+   "criterion": "P6"
+  },
+  {
+   "repo": "carlostighe/modalMap",
+   "name": "loader-utils",
+   "verdict": "yes",
+   "criterion": "P6"
+  },
+  {
+   "repo": "ASIL-E-Hatake/vscode-games",
+   "name": "@azure/msal-node",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "ASIL-E-Hatake/vscode-games",
+   "name": "qs",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "name": "body-parser",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "name": "deepmerge",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "name": "fast-uri",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "name": "hono",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "name": "ip-address",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "BilLogic/uno-blueprint",
+   "name": "qs",
+   "verdict": "yes",
+   "criterion": "P1"
+  },
+  {
+   "repo": "acekyd/acekyd",
+   "name": "sharp",
+   "verdict": "yes",
+   "criterion": "P1"
+  }
+ ],
+ "no_longer_left_out": [],
+ "totals": {
+  "left_out": 160,
+  "misses": 11,
+  "repositories_with_a_miss": 4,
+  "miss_gate_met": false,
+  "subset_of_result": true,
+  "unreviewed": 0,
+  "no_longer_left_out": 0
+ }
+}

@@ -1,0 +1,381 @@
+[
+  {
+    "repo": "RoxyAPI/ai-spiritual-companion",
+    "sha": "9762bd624cd0e4f7ce1fd4d433984df239e03c90",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker@4.1.11 (lockfile dev). OSV query for 4.1.11 returns GHSA-qxg6-89mg-rqv8 and GHSA-xp26-3454-mjgp (npm >=2.1.0-beta.7 <4.1.12; >=4.1.11 <4.1.12). D1: an @vitest/* test runner package; its only parent is node_modules/vitest and the only path is <root> devDependency vitest (package.json:60) > @vitest/mocker. None of section 2's added conditions applies: vitest is imported only by tests/*.test.ts (test folder) and vitest.config.mts:2 (test runner config, not source); no source file imports vitest or @vitest/mocker; the P2 files next.config.ts and postcss.config.mjs name neither; the P3 copies (tslib, @babel/helpers, @swc/helpers, typescript, vite, rolldown) do not reach it (its only ancestor is vitest); vitest runs only from test/test:drift (package.json:14-15); start is 'next start' and build 'next build' (package.json:7-8); no Dockerfile, Procfile, compose or platform config in the tree."
+      }
+    ]
+  },
+  {
+    "repo": "shimi-lynx/mogledge",
+    "sha": "dc960ef2fd271abe1a82aedc375bec9fd996b610",
+    "finished": true,
+    "packages": [
+      {
+        "name": "basic-ftp",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/basic-ftp@5.3.1 (dev). OSV returns GHSA-c475-qrg2-pj4r for 5.3.1 (npm <=6.2.0). Its only parent is get-uri; its ancestors are get-uri, pac-proxy-agent, proxy-agent, @puppeteer/browsers, webdriver, webdriverio, expect-webdriverio and @wdio/{utils,config,globals,runner,local-runner,cli,mocha-framework,tauri-service}. D1: every path from the root's declared dependencies passes through @wdio/* or webdriverio (test runners), e.g. <root> > @wdio/tauri-service (devDependency, package.json:39) > webdriverio > webdriver > @wdio/config > @wdio/utils > @puppeteer/browsers > proxy-agent > pac-proxy-agent > get-uri > basic-ftp; with the D1 packages removed, no path from a project folder reaches it. None of section 2's added conditions applies: @wdio/* is imported only under tests/e2e/ (test folder; wdio.conf.ts and *.spec.ts); no source file, vite.config.ts (the only P2 file) or script names basic-ftp or any ancestor, except test:e2e 'wdio run' (package.json:11); build is 'vp check && vp build' (vite-plus, not an ancestor); no start script; no Dockerfile, compose, Procfile or platform config; the P3 copies (tslib, @babel/runtime, esbuild, vite) do not reach it; no P4 package."
+      },
+      {
+        "name": "deepmerge-ts",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/@wdio/tauri-service/node_modules/deepmerge-ts@7.1.6 (dev); OSV returns GHSA-ggr8-5vv4-36mx for 7.1.6 (npm <8.0.0). node_modules/deepmerge-ts@8.0.2 is out of range (OSV returns nothing). The 7.1.6 copy's parents are the nested @wdio/config, @wdio/utils and webdriver under @wdio/tauri-service; ancestors are only @wdio/*, webdriver, webdriverio and expect-webdriverio. D1: every path passes through @wdio/* or webdriverio, e.g. <root> > @wdio/tauri-service (devDependency, package.json:39) > webdriverio > webdriver > @wdio/config > deepmerge-ts. None of section 2's added conditions applies (as for basic-ftp: wdio only in tests/e2e, no build, start or Docker use, nothing in vite.config.ts, no P3/P4 reach)."
+      },
+      {
+        "name": "extract-zip",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/extract-zip@2.0.1 (dev). OSV returns GHSA-7pqw-9j4j-h8q3 and GHSA-jmr9-qjv8-65gv for 2.0.1 (npm <=2.0.1 both). Only parent @puppeteer/browsers; ancestors are the same WebdriverIO chain as basic-ftp. D1: every path passes through @wdio/* or webdriverio, e.g. <root> > @wdio/tauri-service (devDependency) > webdriverio > webdriver > @wdio/config > @wdio/utils > @puppeteer/browsers > extract-zip. None of section 2's added conditions applies (as for basic-ftp; extract-zip is named nowhere outside the lockfile)."
+      }
+    ]
+  },
+  {
+    "repo": "PM-Shawn/Abu-Cowork",
+    "sha": "f01c2a7aab54d236c4e41b676e0074db2eff61d7",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@babel/core",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@babel/core@7.29.0 (dev). OSV returns GHSA-4x5r-pxfx-6jf8 for 7.29.0 (npm <=7.29.0). Parents: eslint-plugin-react-hooks (dependency) and @babel/helper-module-transforms (peer; itself only reached from @babel/core). D1: the only path from the root is devDependency eslint-plugin-react-hooks (a linter, eslint-*) > @babel/core; @vitejs/plugin-react in this lockfile does not depend on @babel/core. None of section 2's added conditions applies: eslint-plugin-react-hooks is imported only by eslint.config.js:3 (linter config, not source); no source file (including scripts/*, electron/*, abu-browser-bridge/, abu-chrome-extension/) imports @babel/core, @babel/helper-module-transforms or eslint-plugin-react-hooks; the P2 files vite.config.ts and electron-builder.yml name none of them; the P3 copies (tslib, @babel/runtime, @babel/helpers, typescript, esbuild, vite, rolldown) and P4 electron do not reach it; no build, start or Docker command runs it (no Dockerfile in the tree)."
+      },
+      {
+        "name": "@humanfs/node",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@humanfs/node@0.16.7 (dev). OSV returns GHSA-p498-v437-472g (npm <0.16.8). Only parent eslint; ancestors are eslint, @eslint/js, @eslint-community/eslint-utils, typescript-eslint, @typescript-eslint/{eslint-plugin,parser,type-utils,utils}, eslint-plugin-react-hooks and eslint-plugin-react-refresh, all D1 linters, e.g. <root> > eslint (devDependency) > @humanfs/node. None of section 2's added conditions applies: eslint is imported only by eslint.config.js:6 (linter config) and scripts/eslintDesignRules.test.ts:3 (test file); run only by the lint script; no source, build config, build or start command, P3 or P4 copy reaches it; no Dockerfile."
+      },
+      {
+        "name": "baseline-browser-mapping",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/baseline-browser-mapping@2.10.0 (dev). OSV returns GHSA-w5vr-8v7q-w6rv (npm >=2.0.0 <2.11.0). Only parent browserslist; ancestors browserslist, update-browserslist-db, @babel/helper-compilation-targets, @babel/core, @babel/helper-module-transforms, eslint-plugin-react-hooks. D1: the only path is <root> > eslint-plugin-react-hooks (devDependency, linter) > @babel/core > @babel/helper-compilation-targets > browserslist > baseline-browser-mapping. None of section 2's added conditions applies (as for @babel/core: no import, no build config naming, no build/start command, no P3/P4 reach, no Dockerfile)."
+      },
+      {
+        "name": "browserslist",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/browserslist@4.28.1 (dev). OSV returns GHSA-73wf-gq98-2v4g and GHSA-c83g-rgw3-j3cx (npm <=4.28.6). Parents @babel/helper-compilation-targets and update-browserslist-db (peer, itself a dependency of browserslist only); no other lockfile package depends on browserslist. D1: only path <root> > eslint-plugin-react-hooks (devDependency, linter) > @babel/core > @babel/helper-compilation-targets > browserslist. None of section 2's added conditions applies (as for @babel/core; browserslist is named nowhere outside the lockfile)."
+      },
+      {
+        "name": "flatted",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/flatted@3.3.3 (dev). OSV returns GHSA-25h7-pfq9-p65f (npm <3.4.0) and GHSA-rf6f-7fwh-wjgh (npm <=3.4.1). Only parent flat-cache; path <root> > eslint (devDependency) > file-entry-cache > flat-cache > flatted, and every other ancestor is an eslint/typescript-eslint package (D1). None of section 2's added conditions applies (as for @humanfs/node)."
+      }
+    ]
+  },
+  {
+    "repo": "enonic/app-explorer",
+    "sha": "b747314e90a82fe9d3698da1f1f93ab267cd40ff",
+    "finished": true,
+    "packages": [
+      {
+        "name": "deepmerge",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/deepmerge@4.3.1 (dev). OSV returns GHSA-gcqx-w48m-w2h4 (npm >=4.2.0 <=4.3.1). Only parent jest-config; ancestors jest-config, @jest/core, jest-cli, jest, @enonic/mock-xp. D1: every path from the root passes through jest: <root> > jest (devDependency, package.json:87) > @jest/core (or jest-cli) > jest-config > deepmerge, and <root> > @enonic/mock-xp (package.json:65) > jest > ... > deepmerge. None of section 2's added conditions applies: @enonic/mock-xp is imported only by test/mocks/*.ts (test folder) and *.test.ts files (src/main/resources/webapp/documents/authorize.ts:72 is a comment); jest appears only in jest.config.mjs (test runner config), test/tsconfig.json types and the test/cov scripts; the P2 files (tsdown.config.mts, src/explorer/tsdown.config.mts, src/webcrawler/task/tsdown.config.mts, src/webcrawler/form/vite.config.ts) name none of them; build scripts run tsdown, vite, precompress and concurrently; P3 copies do not reach it; no Dockerfile or deployment config (production is built by Gradle)."
+      }
+    ]
+  },
+  {
+    "repo": "carlostighe/modalMap",
+    "sha": "06b1c49404c7852aca81317e8f865c187a4f6222",
+    "finished": true,
+    "packages": [
+      {
+        "name": "cross-spawn",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "P6",
+        "evidence": "In range: only node_modules/webpack-cli/node_modules/cross-spawn@6.0.5 (dev); OSV returns GHSA-3xgq-45jj-v275 for 6.0.5 (npm <6.0.6). node_modules/cross-spawn@7.0.6 and node_modules/execa/node_modules/cross-spawn@6.0.6 are out of range (OSV returns nothing). A condition section 2 adds applies (a build command running its parent), so the first-run 'no' is not reused. The build script 'NODE_ENV=production webpack --progress --colors -p' (package.json:7) runs webpack@5.104.1's bin, and webpack's bin/webpack.js (read as data from unpkg) runs the installed webpack-cli's bin: lines 108-113 define cli {package: 'webpack-cli', binName: 'webpack-cli'}, 79-94 runCli requires pkg.bin['webpack-cli'], 192 calls runCli(cli). The start script (package.json:8) runs it too: webpack-watch 'webpack --mode development --watch' (:10) and serve 'webpack-dev-server' (:9; webpack-dev-server@6.0.0 bin/webpack-dev-server.js:86-92,165 also runs webpack-cli). So node_modules/webpack-cli@3.3.11 (dev) is run by the build (P6) and start (P5), and following its declared dependency 'cross-spawn: 6.0.5' resolves to node_modules/webpack-cli/node_modules/cross-spawn, production whatever webpack-cli does with it at run time (the first run's 'never required by webpack-cli' is not a reason under section 2). Reading note: by a strict bin-name match the word 'webpack' names only the webpack package, and webpack declares webpack-cli only in peerDependenciesMeta (optional), not peerDependencies; under that reading the copy is still not shown dev-only (webpack-cli is not a D1 package, and D2 fails because a build command runs it), so it would be undecidable. A miss either way."
+      },
+      {
+        "name": "loader-utils",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "P6",
+        "evidence": "In range: only node_modules/webpack-cli/node_modules/loader-utils@1.2.3 (dev); OSV returns GHSA-3rfm-jhwj-7488, GHSA-76p3-8jx3-jpfq and GHSA-hhq3-ff78-jv3g for 1.2.3 (npm <1.4.1; >=1.0.0 <1.4.2; >=1.0.0 <1.4.2). node_modules/loader-utils@1.4.2 and node_modules/raw-loader/node_modules/loader-utils@2.0.4 are out of range (OSV returns nothing). As for cross-spawn: the build 'webpack ... -p' (package.json:7) and start (package.json:8-10) run webpack-cli@3.3.11 through webpack@5.104.1's bin/webpack.js (lines 79-94, 108-113, 192) and webpack-dev-server@6.0.0's bin (86-92, 165); webpack-cli declares 'loader-utils: 1.2.3', which resolves to node_modules/webpack-cli/node_modules/loader-utils, so following makes it production even though webpack-cli only requires it in its --plugin handling (first run's reason, not one under section 2). Same reading note as cross-spawn: under a strict bin-name reading it is undecidable rather than yes; a miss either way."
+      },
+      {
+        "name": "sync-exec",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/sync-exec@0.6.2 (dev, peer). OSV returns GHSA-38h8-x697-gh8q (npm <=0.6.2). Its only parent is manifest-revision-webpack-plugin@0.4.1 (peerDependencies sync-exec), a root devDependency (package.json:46) with no other parent. Not D1, so D2: the whole tree was read (22 files, 9 source files: js/*.js, css/style.css, index.html, webpack.config.js); no file imports or names sync-exec or manifest-revision-webpack-plugin outside package.json:46; webpack.config.js (the only P2 file) requires webpack, html-webpack-plugin and mini-css-extract-plugin and names css-loader, raw-loader, url-loader, file-loader, babel-loader and @babel/preset-env, not these; neither package has a bin, and no build or start command runs them; not P3/P4; not reached from any production copy; no Dockerfile, compose or platform config. None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "louiseka/cove-ui",
+    "sha": "0e0966d953ed4e6e677e0fd24be56d8262bb9697",
+    "finished": true,
+    "packages": [
+      {
+        "name": "zod",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/zod@4.3.6 (dev). OSV returns GHSA-mrhx-c7xc-m3w5 (npm <4.6.6). Parents eslint-plugin-react-hooks (dependency) and zod-validation-error (peer; itself only a dependency of eslint-plugin-react-hooks). D1: every path is <root> > eslint-plugin-react-hooks (devDependency, linter) > zod or > zod-validation-error > zod. None of section 2's added conditions applies: eslint-plugin-react-hooks is imported only by eslint.config.js:3 (linter config); no file imports zod or zod-validation-error; vite.config.ts (the only P2 file, which imports vitest/config) names none of them, and vitest does not reach zod; the P3 copies (@babel/runtime, @babel/helpers, typescript, vite, rollup, rolldown) do not reach it; build 'tsc -b && vite build'; no start script, Dockerfile or deployment config."
+      }
+    ]
+  },
+  {
+    "repo": "Desvelao/party-game",
+    "sha": "967e28a9749e9bd0dae1c908e5c5197399b91a75",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker@2.1.9 (dev). OSV returns GHSA-82fw-gwwq-j7x9 and GHSA-qxg6-89mg-rqv8 (npm >=2.1.0 <4.1.11; >=2.1.0-beta.7 <4.1.12). D1: @vitest/* package, only path <root> > vitest (devDependency, package.json:58) > @vitest/mocker. None of section 2's added conditions applies: vitest is imported only by *.test.ts files and vitest.config.ts:1 (test runner config); templates/game/server/index.test.ts.tpl is not a code file; src/core/client/vite.config.ts (the only P2 file) does not name vitest; build scripts run vite, esbuild and tsx, start 'node dist/server.js'; the production Dockerfile's runtime stage copies node_modules from prod-deps, which runs 'npm ci --omit=dev' (Dockerfile:26,38), and only dist from build (39), CMD node dist/server.js (50); docker/Dockerfile.bot likewise (:25 --omit=dev, :36-37, CMD :47); docker/Dockerfile.dev is dev-marked; the docker-compose.yml commands run dev:server, dev:client, bot:server and loadtest (tsx, vite), not vitest; vitest runs only from the test script and CI; P3 copies (typescript, esbuild, vite, rollup) do not reach it."
+      },
+      {
+        "name": "tinypool",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/tinypool@1.1.1 (dev). OSV returns GHSA-5gmw-xhrv-c9v3 and GHSA-85c8-ppgw-ccpr (npm <=2.1.0; <2.1.2). Only parent vitest; D1 by path: <root> > vitest (devDependency) > tinypool. None of section 2's added conditions applies (as for @vitest/mocker; tinypool is named nowhere outside the lockfile)."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest@2.1.9 (dev), a root devDependency (package.json:58). OSV returns GHSA-5xrq-8626-4rwp and GHSA-82fw-gwwq-j7x9 (npm <3.2.6; >=2.1.0 <4.1.11). D1: a test runner declared in devDependencies. None of section 2's added conditions applies (as for @vitest/mocker: only test files and vitest.config.ts import it, no build config names it, no build, start, compose or production Dockerfile command runs it, production images install with --omit=dev)."
+      }
+    ]
+  },
+  {
+    "repo": "Dhanush1376/Akula-s-Kitchen",
+    "sha": "7f4265c82c5543886f44c352a70f835af1911d53",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@eslint/plugin-kit",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@eslint/plugin-kit@0.2.8 (dev) in the root lockfile (153 entries, root tooling only; backend/ and frontend/ are not workspaces). OSV returns GHSA-xffm-g5w8-qvg7 (npm <0.3.4). D1: an @eslint/* linter package, path <root> > eslint (devDependency, package.json:18) > @eslint/plugin-kit. None of section 2's added conditions applies: no source file anywhere (backend/, frontend/ included) imports eslint or @eslint/*; frontend/vite.config.js (the only P2 file) names neither; root build 'npm run build:all' runs frontend 'vite build' (+ postbuild node scripts) and backend 'tsc'; production Dockerfiles do not hold devDependencies (backend/Dockerfile final stage 'npm ci --omit=dev' :23, copies only dist and src/templates :25,32, global pm2; frontend/Dockerfile final stage is nginx copying dist :21); docker-compose.yml has no commands; no P3/P4 reach."
+      },
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/brace-expansion@1.1.15 (dev). OSV returns GHSA-3jxr-9vmj-r5cp, GHSA-6j4f-fj2g-mc7p, GHSA-mh99-v99m-4gvg, GHSA-q2hr-2g5m-vwhr, GHSA-qhr7-859c-m2p7, GHSA-rgw5-rvv9-x895 (npm <1.1.16 .. <1.1.21). Only parent minimatch; ancestors minimatch, @eslint/config-array, @eslint/eslintrc, @eslint-community/eslint-utils, eslint. D1: every path passes through eslint, e.g. <root> > eslint (devDependency) > minimatch > brace-expansion. None of section 2's added conditions applies: no source file imports minimatch, brace-expansion or eslint; nothing else as for @eslint/plugin-kit."
+      },
+      {
+        "name": "js-yaml",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/js-yaml@4.2.0 (dev). OSV returns GHSA-2883-xcg3-v3hh, GHSA-52cp-r559-cp3m, GHSA-5p4m-2wfm-xmqj (npm >=4.0.0 <4.3.0 / <4.3.1 / <4.3.2). Only parent @eslint/eslintrc; D1: <root> > eslint (devDependency) > @eslint/eslintrc > js-yaml, every path through eslint. None of section 2's added conditions applies: js-yaml is named in no file outside the lockfile, and nothing else applies as for @eslint/plugin-kit."
+      },
+      {
+        "name": "shell-quote",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/shell-quote@1.8.3 (dev). OSV returns GHSA-395f-4hp3-45gv and GHSA-w7jw-789q-3m8p (npm <=1.8.4; >=1.1.0 <=1.8.3). Only parent concurrently, a root devDependency (package.json:17) and not a D1 package, so D2: the source tree was read; no source file imports concurrently or shell-quote ('concurrently' appears only in comments and docs); frontend/vite.config.js names neither; concurrently runs only from the root 'dev' script (package.json:9); no start/prestart/poststart runs it (root has none; backend start 'node dist/server.js'); build 'npm run build:all' runs vite and tsc in frontend/ and backend/; neither is P3/P4; not reached from a production copy; production Dockerfiles do not hold devDependencies (backend/Dockerfile:23 npm ci --omit=dev in the final stage, which copies only dist and templates; frontend/Dockerfile final stage nginx with dist only), backend/railway.json uses that Dockerfile, ecosystem.config.js runs ./dist/server.js, docker-compose.yml has no commands, frontend/vercel.json has no buildCommand. None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "mahaliahr/phd-live",
+    "sha": "4aa0276db19c91cc0c382199fb1bf54382a31b1b",
+    "finished": true,
+    "packages": [
+      {
+        "name": "compression",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/compression@1.8.1 (dev). OSV returns GHSA-vc2v-76pw-4v95 (npm <1.8.2). Only parent serve@14.2.6, a root devDependency (package.json:25) with no other parent; not D1, so D2: the source tree was read; no source file imports serve or compression (the other matches are prose in notes); there are no P2 files; start 'npm run dev' (package.json:10) runs prebuild (node src/site/get-theme.js, npx sass) and 'npx @11ty/eleventy --serve' (:9; '--serve' is Eleventy's flag, and @11ty/eleventy does not reach compression); build 'rm -rf dist && npx @11ty/eleventy' (:8); netlify.toml command 'npm install && npm run build', vercel.json buildCommand 'npm run build' (devCommand 'npm run start' also runs no serve); neither package is P3/P4; not reached from a production copy; no Dockerfile in the tree. None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "newtonlorenz/benchledger",
+    "sha": "f6e500b55026204eac06a520abe832b8cec50ac1",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@modelcontextprotocol/sdk",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/@modelcontextprotocol/sdk@1.30.0 (dev), a root devDependency (package.json:30) and no workspace's dependency. OSV returns GHSA-22jm-h49p-29qw, GHSA-46jr-4wx8-v453, GHSA-6prh-2h8m-c8cw, GHSA-6qxp-vccf-f47h, GHSA-f897-62hf-6gxq, GHSA-rvq5-wwqv-78pq (e.g. npm >=1.10.0 <1.30.1). Not D1, so D2: the source tree was read; it is imported only by test files (apps/mcp/src/discovery-schema.test.ts:4, apps/server/src/mcp-client.test.ts:2-3, mcp-host-client.test.ts:6-7, stock-approval-parity.test.ts:2-3); apps/web/vite.config.ts (the only P2 file) does not name it; no build or start command runs it (builds are tsc and vite build; starts are node dist/main.js); not P3/P4; its only parent is the root; deploy/Dockerfile (the only Dockerfile; compose.example.yml builds it) runs npm ci, npm run build and 'npm prune --omit=dev' in the build stage (lines 7-9), and the runtime stage copies node_modules from it after the prune (18) plus apps/ and packages/ (19-20; .dockerignore ignores **/node_modules), so no production final stage holds devDependencies; CMD node apps/server/dist/main.js (24). None of section 2's added conditions applies."
+      },
+      {
+        "name": "body-parser",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/body-parser@2.3.0 (dev). OSV returns GHSA-27r3-jxmh-p828 (npm >=2.0.0 <2.4.0). Only parent express; ancestors express, express-rate-limit (peer edge back to express), @modelcontextprotocol/sdk, root devDependencies. D2 as for @modelcontextprotocol/sdk: no file imports body-parser, express, express-rate-limit or the SDK outside tests (a search for these specifiers finds nothing); the server is Fastify; no build config, build or start command, P3/P4 copy or production copy reaches them; the production image is pruned with --omit=dev (deploy/Dockerfile:9,18). None of section 2's added conditions applies."
+      },
+      {
+        "name": "hono",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/hono@4.13.7 (dev). OSV returns GHSA-5r4p-p66f-jhc7 (npm >=4.12.4 <4.13.11). Parents @modelcontextprotocol/sdk (dependency) and @hono/node-server (peer; itself a dependency of the SDK only). D2 as for @modelcontextprotocol/sdk: no file imports hono or @hono/node-server; not named, run, P3/P4 or reached from a production copy; pruned from the production image (deploy/Dockerfile:9,18). None of section 2's added conditions applies."
+      },
+      {
+        "name": "ip-address",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/ip-address@10.7.3 (dev). OSV returns GHSA-rxp7-6hxx-x8q5 (npm <=10.7.3). Only parent express-rate-limit, reached only from the root devDependency @modelcontextprotocol/sdk. D2 as for @modelcontextprotocol/sdk (no import of ip-address or express-rate-limit, nothing names or runs them, pruned from the production image). None of section 2's added conditions applies."
+      },
+      {
+        "name": "proxy-addr",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/proxy-addr@2.0.7 (dev). OSV returns GHSA-jqcg-44mw-7w3h (npm >=1.1.0 <2.0.8). Only parent express, reached only through the root devDependency @modelcontextprotocol/sdk. D2 as for body-parser. None of section 2's added conditions applies."
+      },
+      {
+        "name": "qs",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/qs@6.16.0 (dev). OSV returns GHSA-6pq8-jhm2-2vcw (npm >=6.7.0 <=6.16.0). Parents express and body-parser, reached only through the root devDependency @modelcontextprotocol/sdk. No file imports qs (the only matches are bytes inside PNGs). D2 as for body-parser. None of section 2's added conditions applies."
+      }
+    ]
+  },
+  {
+    "repo": "eliflo1/certivue-marketing",
+    "sha": "3b9daeae4e1d52f7b1d18497d6129c282b354808",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/brace-expansion@5.0.6 (dev). OSV returns GHSA-3jxr-9vmj-r5cp, GHSA-6j4f-fj2g-mc7p, GHSA-mh99-v99m-4gvg, GHSA-q2hr-2g5m-vwhr, GHSA-qhr7-859c-m2p7, GHSA-rgw5-rvv9-x895 (npm >=3.0.0 <5.0.7 .. >=4.0.0 <5.0.12). Only parent minimatch; ancestors minimatch, @eslint/config-array, @eslint-community/eslint-utils, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh. D1: every path passes through eslint, e.g. <root> > eslint (devDependency) > minimatch > brace-expansion; astro and the other dependencies do not reach it. None of section 2's added conditions applies: the eslint packages are imported only by eslint.config.js (linter config); no file imports minimatch or brace-expansion; astro.config.mjs and vite.config.js (P2) name none of them; build 'astro build'; no start, Dockerfile, workflow or deployment config; P3 copies do not reach it."
+      }
+    ]
+  },
+  {
+    "repo": "Palladin-io/palladin-agent",
+    "sha": "9c5733c74621bf1615f8c70159fe0ac71c68b5c3",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker@4.1.11 (dev). OSV returns GHSA-qxg6-89mg-rqv8 and GHSA-xp26-3454-mjgp (npm >=2.1.0-beta.7 <4.1.12; >=4.1.11 <4.1.12). D1: @vitest/* package; only parent vitest, which is declared only in devDependencies of the root (package.json:82) and packages/openclaw-plugin (package.json:29). The source imports @palladin/cli (the root package) from packages/*/src/server.ts, but following uses dependencies, optionalDependencies and peerDependencies, not devDependencies, so it does not reach vitest. None of section 2's added conditions applies: vitest is imported only by tests/** (tests/helpers/sensitive-assert.ts is under tests/), *.test.ts and the two vitest.config.ts files (test runner config); packaging/npm/release-scripts.security.mjs:93 holds the fixture object property scripts: { test: 'vitest run' }, not an import or a package.json script; no P2 files; build runs tsc, npm --prefix ... run build (tsc) and esbuild; start 'node dist/bin/palladin.js' (package.json:54); the *.Dockerfile files (packaging/linux/tests/containers, security/lifecycle/qa-alpine.Dockerfile) install OS packages or a global npm only and copy nothing, so none holds devDependencies; P3 copies (tslib, typescript, esbuild, vite, rolldown) do not reach it."
+      }
+    ]
+  },
+  {
+    "repo": "ruddyribera-ops/pria-app",
+    "sha": "7dcc3ac1f715c4335071dc66d5e9c0c73dc7e98b",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest/node_modules/@vitest/mocker@4.1.7 (dev). OSV returns GHSA-82fw-gwwq-j7x9 and GHSA-qxg6-89mg-rqv8 (npm >=2.1.0 <4.1.11; >=2.1.0-beta.7 <4.1.12). Not reused: a condition section 2 adds applies, a production stage holding devDependencies: server/Dockerfile (production by name; built by docker-compose.yml pria-backend) has a single stage that runs 'npm ci' without --omit=dev (line 4), sets NODE_ENV=development and never prunes, so only D1 can show copies dev-only here. The first run's evidence did not cover it. New verdict, D1: @vitest/* package whose only parent is node_modules/vitest, a test runner declared in the root devDependencies (package.json:70); path <root> > vitest > @vitest/mocker. No P-rule makes either production: vitest is imported only by test files and vitest.config.ts / server/vitest.config.ts (test runner config); src/test-helpers.tsx has only an @vitest-environment comment and imports react, @testing-library/react, @tanstack/react-query, react-router-dom; src/test-setup.ts is a test setup file; vite.config.ts (P2) imports vite, @vitejs/plugin-react and vite-plugin-pwa only; railway.toml startCommand 'npm start' = 'NODE_ENV=production tsx server.js' and buildCommand 'npm run build' = 'vite build'; Dockerfile.frontend and frontend.Dockerfile final stages are nginx with dist only; server/Dockerfile runs npx tsc and CMD node dist/index.js; P3 copies do not reach it."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest@4.1.7 (dev), a root devDependency (package.json:70). OSV returns GHSA-82fw-gwwq-j7x9 (npm >=2.1.0 <4.1.11). Not reused because server/Dockerfile's final stage holds devDependencies (line 4 'npm ci' without --omit=dev, NODE_ENV=development, no prune), a condition section 2 adds. New verdict, D1: a test runner declared in devDependencies, and no P-rule makes it production: no source import (only test files and the vitest.config.ts files), no build config naming it, no build, start, railway.toml or Dockerfile command running it, not P3/P4, and no production copy declares it."
+      }
+    ]
+  }
+]

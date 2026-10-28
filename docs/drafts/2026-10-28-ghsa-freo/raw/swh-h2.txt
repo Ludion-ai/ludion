@@ -1,0 +1,19 @@
+HTTP/1.1 200 OK
+Age: 0
+Allow: HEAD, OPTIONS, OPTIONS, GET
+Content-Length: 483
+Content-Type: application/json
+Cross-Origin-Opener-Policy: same-origin
+Date: Wed, 28 Oct 2026 14:14:02 GMT
+Referrer-Policy: same-origin
+Strict-Transport-Security: max-age=15768000;
+Vary: Accept, origin, Cookie
+Via: 1.1 varnish (Varnish/7.1)
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Ratelimit-Limit: 120
+X-Ratelimit-Remaining: 119
+X-Ratelimit-Reset: 1793200442
+X-Varnish: 1002115096
+Connection: close
+

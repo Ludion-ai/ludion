@@ -1,0 +1,412 @@
+[
+  {
+    "repo": "bwhyte21/ProjectAniTracker",
+    "sha": "c6b07f065e81e5b9672b6ad85f0cb67a2448c77a",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/@vitest/mocker@5.0.1 (lockfile dev), only copy; GHSA-qxg6-89mg-rqv8 >=5.0.0-beta.1 <5.0.3, GHSA-xp26-3454-mjgp >=5.0.0-rc.2 <5.0.3. D1: an @vitest/* package whose only dependent is node_modules/vitest, a root devDependency (test runner). Section 2's additions checked, none applies: 55 source files read; vitest/@vitest are imported only by vitest.config.ts (test-runner config, excluded) and tests/unit/*.test.ts; the only build tool config, vite.config.ts, names vite, @vitejs/plugin-react, @tailwindcss/vite, @tanstack/router-plugin and ws; build 'tsc && vite build' (src-tauri/tauri.conf.json beforeBuildCommand 'npm run build'); no start/prestart/poststart, Dockerfile, Procfile or compose file; closure over dependencies/optional/peer edges from P0, P1 (including the dev package shadcn now production via the stylesheet import src/index.css:3), P2 and P3 (vite, typescript, esbuild, rollup) does not reach it."
+      },
+      {
+        "name": "happy-dom",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/happy-dom@20.14.5 (dev), only copy; GHSA-834v-8h66-3h79 >=17.0.0 <=21.0.3. Root devDependency, not on D1's lists, so D2: source tree read (55 source files) and no import; named only in vitest.config.ts:13 ('environment: \"happy-dom\"'), a test-runner config that is neither source nor a P2 file, and not in vite.config.ts; build runs tsc and vite only; no start script, Dockerfile, Procfile or compose; not P3/P4; its dependents are the root folder and vitest (peer), and no production copy (P0, P1 incl. shadcn from src/index.css, P2, P3) reaches it. No Dockerfile, so no final stage holds devDependencies. First-run 'no' stands."
+      }
+    ]
+  },
+  {
+    "repo": "kratus66/CodeAI-Academy",
+    "sha": "dc140ecd59035dade5fdab627a9bb28d78388727",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/@vitest/mocker@2.1.9 (dev), only copy; GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11, GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. D1: @vitest/* package, only dependent node_modules/vitest, a devDependency of apps/api, apps/web and packages/shared. None of section 2's additions applies: 137 non-test source files read, none imports vitest/@vitest/tinypool (only *.spec.* files, vitest.config.* and apps/web/vitest.setup.ts); P2 files apps/web/next.config.mjs, postcss.config.mjs, tailwind.config.ts name next, tailwindcss, autoprefixer; build commands (root prebuild/build -> packages/shared 'tsc -p tsconfig.build.json', apps/api 'nest build', apps/web 'next build') and start commands ('node dist/main.js', 'next start -p 3000') run @nestjs/cli, next, typescript; no Dockerfile/Procfile; docker-compose.yml runs only postgres:16-alpine with no command; closure from P0, P1, P2, P3 (incl. vite resolved per folder) and those commands does not reach it."
+      },
+      {
+        "name": "tinypool",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/tinypool@1.1.1 (dev), only copy; GHSA-5gmw-xhrv-c9v3 <=2.1.0, GHSA-85c8-ppgw-ccpr <2.1.2. D1: only dependent is node_modules/vitest (devDependency of apps/api, apps/web, packages/shared; test runner), so every path passes through vitest. Same repository facts as @vitest/mocker: not imported by source, not named by a build tool config, not run by build/start commands, no Dockerfile/Procfile, compose only postgres; not reached from any production copy. First-run 'no' stands."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/vitest@2.1.9 (dev), only copy; GHSA-5xrq-8626-4rwp <3.2.6, GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. D1: a test runner declared in devDependencies of apps/api, apps/web and packages/shared. Imported only by test files (e.g. apps/api/src/config/env.spec.ts:1) and vitest.config.ts/.mts, vitest.setup.ts (excluded); scripts test/test:watch only; not named by next/postcss/tailwind configs; no P5/P6 command runs it; no Dockerfile/Procfile; no production copy depends on or peers it (closure checked). First-run 'no' stands."
+      }
+    ]
+  },
+  {
+    "repo": "Armor-test/uptime-kuma",
+    "sha": "dbb6bfec2e042c1d5c90604316da7328692845b2",
+    "finished": true,
+    "packages": [
+      {
+        "name": "fast-uri",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/fast-uri@3.1.5 (dev), only copy; e.g. GHSA-5jgf-p345-68v8 >=3.1.3 <3.1.6, GHSA-333x-w4r6-6crp >=3.0.0 <3.1.9. D1: only dependent node_modules/table/node_modules/ajv; every path is root devDependency stylelint (or stylelint-config-standard/-prettier > stylelint) > table > ajv@8 > fast-uri. Repository facts (section 2's additions checked): 511 non-test source files read, including extra/ release and helper scripts, whose newly production dev imports (@actions/github, aedes, dns2, node-ssh, cheerio, tar, ...) do not reach it; config/vite.config.js names @vitejs/plugin-vue, vite, rollup-plugin-visualizer, vite-plugin-compression, postcss-scss, postcss-rtlcss, tmp; build 'vite build --config ./config/vite.config.js'; start 'npm run start-server' -> 'node server/server.js'; ecosystem.config.js runs ./server/server.js; compose.yaml and docker/docker-compose-dev.yml are image-only. docker/dockerfile's final stage upload-artifact (:95) copies /app from build, where 'npm ci --omit=dev' (:21) ran and 'COPY . .' (:22) excludes node_modules via root .dockerignore '/node_modules' (:2), so no final stage holds devDependencies; pr-test2 ('npm ci' :86, CMD 'npm run start-pr-test') is a separate PR-test target, not the final stage nor in its FROM/--from chain. Other Dockerfiles (debian-base, builder-go, extra/uptime-kuma-push, test/test-radius) install no npm devDependencies in a final stage."
+      },
+      {
+        "name": "joi",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/joi@17.13.6 (dev), only copy; GHSA-wr44-6hxh-3jwq <17.13.8, GHSA-6h2x-m376-mqjq >=17.2.0 <17.13.7. Only path: root devDependency wait-on > joi (wait-on is not a D1 package), so D2: source tree read and no import of joi or wait-on; not named in config/vite.config.js; wait-on runs only in scripts.dev ('concurrently -k -r \"wait-on tcp:3000 && ...\"'), which is not a start/build script (start -> node server/server.js; build -> vite build), and in no production stage's RUN/CMD (only pr-test2's CMD reaches 'npm run dev', and pr-test2 is not the final stage or its ancestor); not P3/P4; not reached from any production copy (closure checked). No production Dockerfile's final stage holds devDependencies (see fast-uri)."
+      },
+      {
+        "name": "js-yaml",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/js-yaml@4.3.1 (dev), only copy; GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. D1: dependents are @eslint/eslintrc, eslint and cosmiconfig (from stylelint); every path from the root's declared dependencies passes through eslint, eslint-*, @typescript-eslint/*, @eslint-community/* or stylelint (e.g. devDependencies > eslint > @eslint/eslintrc > js-yaml; stylelint > cosmiconfig > js-yaml); no non-D1 path exists. No source file imports js-yaml, it is not named by a build config, not run by P5/P6, not reached from a production copy; no final stage holds devDependencies."
+      },
+      {
+        "name": "playwright",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/playwright@1.39.0 (dev), only copy; GHSA-7mvr-c777-76hp <1.55.1. D1: playwright is on the test-runner list; only dependent @playwright/test (root devDependency). Used by config/playwright.config.js (excluded) and test/e2e specs; scripts test-e2e/playwright-* only. The server requires the separate production package playwright-core (server/monitor-types/real-browser-monitor-type.js:2), and following from playwright-core does not reach playwright. No other import, build config naming, P5/P6 command, or production-stage devDependencies."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/postcss-selector-parser@6.1.4 (dev), only copy; GHSA-rj75-hqrm-r3gf <6.1.5. D1: dependents stylelint, @csstools/selector-specificity (peer, itself under stylelint), eslint-plugin-vue and eslint-plugin-vue-scoped-css; all paths from root devDependencies pass through stylelint/stylelint-config-*/eslint-plugin-*. Not reached from production copies including the P2-named postcss-rtlcss/postcss-scss, vite, @vitejs/plugin-vue and vue (closure checked); not imported by src/ or any source file; no P5/P6 command or production stage holding devDependencies."
+      },
+      {
+        "name": "shell-quote",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/shell-quote@1.10.0 (dev), only copy; GHSA-pqg4-j6r4-53mv >=1.8.4 <1.11.0. Only path: root devDependency concurrently > shell-quote (concurrently not on D1's lists), so D2: source read and no import of shell-quote or concurrently; not named in config/vite.config.js; concurrently runs only in scripts.dev, not in start ('node server/server.js'), build ('vite build'), ecosystem.config.js, compose files, or any RUN/CMD of docker/dockerfile's final stage chain; not P3/P4; not reached from any production copy. No production Dockerfile's final stage holds devDependencies."
+      }
+    ]
+  },
+  {
+    "repo": "KHY90/JMAirAgentFront",
+    "sha": "67e71f480e928ee2397d44ff3517ad929701551d",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@eslint/plugin-kit",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/@eslint/plugin-kit@0.2.7 (dev), only copy; GHSA-xffm-g5w8-qvg7 <0.3.4. D1: an @eslint/* package whose only dependent is eslint (root devDependency; also via eslint-config-next > ... > eslint). None of section 2's additions applies: 107 source files read (src/, middleware.ts, next.config.ts, postcss/tailwind configs); eslint.config.mjs (linter config, excluded) is the only importer of eslint packages; P2 files name next, tailwindcss, autoprefixer, postcss-load-config, none reaching it; scripts build 'next build', start 'next start'; no Dockerfile, Procfile or deploy config; not reached from any production copy."
+      },
+      {
+        "name": "ajv",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/ajv@6.12.6 (dev), only copy; GHSA-2g4f-4pwh-qvx6 <6.14.0. D1: only dependents @eslint/eslintrc (root devDependency) and eslint; every path passes through @eslint/* or eslint. Only importer of @eslint/eslintrc is eslint.config.mjs:3 (linter config, excluded). Not named by next.config.ts, postcss.config.js/.mjs or tailwind.config.ts; build 'next build', start 'next start'; no Dockerfile/Procfile/deploy config; not reached from production copies (tailwindcss, postcss-load-config, next and its peers checked)."
+      }
+    ]
+  },
+  {
+    "repo": "ASIL-E-Hatake/vscode-games",
+    "sha": "c8ceddb7f0c53e21a1e47a02f143d03118df8ba5",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@azure/msal-node",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "P1",
+        "evidence": "node_modules/@azure/msal-node@6.0.1 (dev), only copy; GHSA-xcx6-jx8p-x3h5 >=5.0.0-beta.0 <7.1.0 (OSV: introduced 5.0.0-beta.0, fixed 7.1.0). P1 with following: scripts/test-package.ts:26 builds the path node_modules/@vscode/vsce/vsce (join('node_modules', '@vscode', 'vsce', 'vsce')) and :27 runs it (execFileSync('node', [vsceBin, 'ls', '--no-dependencies'])). scripts/test-package.ts is source under section 2 (scripts/ is not a test folder and the name matches no test pattern), and the first rule counted only the dist/ bundles; a node_modules/<package> path in a source file is an import, so node_modules/@vscode/vsce@4.0.0 is production, and following its dependencies: @vscode/vsce > @azure/identity@4.14.0 > @azure/msal-node@6.0.1. Section 2 condition that applies: an import from a non-test file the first rule did not count. Note for the tally: the path is assembled with path.join from literal segments, so a reader matching only the literal text 'node_modules/' misses it; read that way the package would be D2 'no' (no other import, no build tool config, build 'npm run clean && npm run build:content && node esbuild.mjs --production' runs tsx/esbuild only, vsce only in the 'package' script, no start, Dockerfile or Procfile). I count it under 'when in doubt, production'."
+      },
+      {
+        "name": "qs",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "P1",
+        "evidence": "node_modules/qs@6.16.0 (dev), only copy; GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0 (OSV: introduced 6.7.0, fixed 6.16.1). P1 with following: scripts/test-package.ts:26-27 references and runs node_modules/@vscode/vsce/vsce (path.join of literal segments) from a non-test source file, making node_modules/@vscode/vsce@4.0.0 production; following its dependencies: @vscode/vsce > typed-rest-client@1.8.11 > qs@6.16.0. Same caveat as @azure/msal-node: if a path built with path.join is not counted as an import, the verdict would be D2 'no' (vsce otherwise only in the 'package' script; no start, Dockerfile, Procfile or other path to qs)."
+      }
+    ]
+  },
+  {
+    "repo": "clorth0/EQEmu",
+    "sha": "2096d84c937590bde30e551e91c79256199547bb",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Two copies, both dev and in range: node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion@5.0.7 (GHSA-mh99-v99m-4gvg >=4.0.0 <5.0.8 and later ranges) and node_modules/brace-expansion@1.1.16 (GHSA-mh99-v99m-4gvg <1.1.17). D1 for both: 5.0.7 only via root devDependency eslint-config-next > typescript-eslint > @typescript-eslint/typescript-estree > minimatch@10 > brace-expansion; 1.1.16 only via eslint (or eslint-config-next > eslint) > @eslint/config-array > minimatch@3 > brace-expansion; no non-D1 path. None of section 2's additions applies: 22 source files read (app/, lib/, next.config.ts, postcss.config.mjs); eslint.config.mjs excluded as linter config; P2 names next and @tailwindcss/postcss; app/globals.css:1 imports tailwindcss (no dependencies); build 'next build', start 'next start'; no Dockerfile, Procfile or deploy config; not reached from production copies."
+      },
+      {
+        "name": "browserslist",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/browserslist@4.28.6 (dev), only copy; GHSA-c83g-rgw3-j3cx <=4.28.6, GHSA-73wf-gq98-2v4g <=4.28.6. D1: only path is root devDependency eslint-config-next > eslint-plugin-react-hooks > @babel/core > @babel/helper-compilation-targets > browserslist (update-browserslist-db is its own peer back-edge). Not reached from production copies (next, @tailwindcss/postcss, tailwindcss, typescript; no autoprefixer path); not imported or named; build/start run next only; no Dockerfile/Procfile/deploy config."
+      },
+      {
+        "name": "js-yaml",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/js-yaml@4.3.0 (dev), only copy; GHSA-5p4m-2wfm-xmqj >=4.0.0 <4.3.1, GHSA-2883-xcg3-v3hh >=4.0.0 <4.3.2. D1: only dependent @eslint/eslintrc; paths eslint (or eslint-config-next > ... > eslint) > @eslint/eslintrc > js-yaml. Not imported by source, not named by next.config.ts/postcss.config.mjs, not run by build/start, no Dockerfile/Procfile/deploy config, not reached from production copies."
+      },
+      {
+        "name": "zod",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/zod@4.4.3 (dev), only copy; GHSA-mrhx-c7xc-m3w5 <4.6.6. D1: paths root devDependency eslint-config-next > eslint-plugin-react-hooks > zod, and > zod-validation-error (peer) > zod. app/ and lib/ do not import zod; not named by build configs; build/start run next only; no Dockerfile/Procfile/deploy config; not reached from production copies."
+      }
+    ]
+  },
+  {
+    "repo": "AlbusKavaliro/AntiXss",
+    "sha": "80200fbbebf5b3ea1d2df66465a6180b5b71c6ee",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/npm/node_modules/brace-expansion@5.0.9 (dev), only copy; GHSA-6j4f-fj2g-mc7p >=4.0.0 <5.0.10 (and <5.0.11, <5.0.12). Path: root devDependency semantic-release (also @semantic-release/changelog, @semantic-release/git) > @semantic-release/npm > npm@11.19.1 > minimatch > brace-expansion; no D1 package on it, so D2. Repository facts: a .NET library; all 162 files outside .git read by type (.cs, .json, .yml, .md, .props, .csproj, ...), none is code, stylesheet or markup, so nothing imports it; package.json has only devDependencies, no scripts, and a 'release' field (not a babel/postcss field); no build tool config, Dockerfile, Procfile, compose, vercel.json or netlify.toml; semantic-release runs only in .github/workflows/release.yml, which is not a P5/P6 command source; not P3/P4; no production copy reaches it."
+      },
+      {
+        "name": "http-cache-semantics",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/npm/node_modules/http-cache-semantics@4.2.0 (dev), only copy; GHSA-ch52-4w7c-c8xp <=4.2.0. Path: semantic-release > @semantic-release/npm > npm@11.19.1 > make-fetch-happen > http-cache-semantics (release tooling, not D1). D2 with the same repository facts: no JS/CSS/HTML source, no scripts, no build config, no Dockerfile/Procfile/compose, not P3/P4, not reached from a production copy."
+      },
+      {
+        "name": "ip-address",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/npm/node_modules/ip-address@10.5.0 (dev), only copy; GHSA-rpw4-54j3-4h4q <=10.5.0, GHSA-rxp7-6hxx-x8q5 <=10.7.3 and others. Path: semantic-release > @semantic-release/npm > npm@11.19.1 > make-fetch-happen > @npmcli/agent > socks-proxy-agent > socks > ip-address. D2: no source files, no scripts, no build config, no Dockerfile/Procfile/compose, not P3/P4, not reached from a production copy."
+      },
+      {
+        "name": "postcss-selector-parser",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/npm/node_modules/postcss-selector-parser@7.1.4 (dev), only copy; GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6. Path: semantic-release > @semantic-release/npm > npm@11.19.1 > @npmcli/arborist > @npmcli/query > postcss-selector-parser. D2: no source files (so no stylesheet or other import), no scripts, no build config, no Dockerfile/Procfile/compose, not P3/P4, not reached from a production copy."
+      },
+      {
+        "name": "undici",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In range: node_modules/npm/node_modules/undici@6.28.0 (dev) vs GHSA-r53p-7pc4-xj5r <6.28.1, GHSA-2m5v-pch6-74hx >=4.0.0 <6.29.1 and others; path semantic-release > @semantic-release/npm > npm@11.19.1 > node-gyp > undici. Other copies, also dev: node_modules/@actions/http-client/node_modules/undici@6.29.1 (via @semantic-release/npm > @actions/core > @actions/http-client) and node_modules/undici@7.30.1 (via @semantic-release/github), outside the listed ranges and dev-only by the same facts. D2: no source files, no scripts, no build config, no Dockerfile/Procfile/compose, not P3/P4, not reached from a production copy."
+      }
+    ]
+  },
+  {
+    "repo": "TonyVoorhees/TonyVoorhees.github.io",
+    "sha": "95455c1eb68c112244c30fb7c6dec502ab8f28cc",
+    "finished": true,
+    "packages": [
+      {
+        "name": "fast-uri",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/fast-uri@3.1.7 (dev), only copy; GHSA-hrr3-gc8f-f4qj >=3.0.0 <3.1.8, GHSA-333x-w4r6-6crp >=3.0.0 <3.1.9 and others. Only path: root devDependency @astrojs/check > @astrojs/language-server > volar-service-yaml > yaml-language-server > ajv > fast-uri (ajv's other dependents ajv-draft-04/ajv-i18n are peers under the same tree); @astrojs/check is not on D1's lists, so D2: 92 source files read, none imports @astrojs/check, ajv or fast-uri; astro.config.mjs names astro, @tailwindcss/vite, @astrojs/alpinejs, @astrojs/mdx, @astrojs/sitemap only; src/styles/global.css imports tailwindcss; astro@7.3.2 (production) declares no dependency or peer on @astrojs/check (peer only @astrojs/markdown-remark); scripts dev/build ('astro build')/preview/astro, no start; .github/workflows/deploy.yml runs npm ci and npm run build; no Dockerfile/Procfile; not P3/P4; not reached from a production copy."
+      }
+    ]
+  },
+  {
+    "repo": "kkd927/kmux",
+    "sha": "380c8b48c865d517d0192a5bcf88bc9831de8e4f",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@grpc/grpc-js",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/@grpc/grpc-js@1.14.4 (dev), only copy; GHSA-m9gg-hp2v-232j and GHSA-f596-whhp-79r4 >=1.14.0 <1.14.5. Path: root devDependencies testcontainers / @testcontainers/toxiproxy > dockerode > @grpc/grpc-js (not D1), so D2: 308 non-test source files read; testcontainers/dockerode/@grpc are referenced only by tests/ssh/harness/*.ts (test folder); the newly production imports and node_modules paths in scripts/ (@playwright/test, playwright via path.resolve('node_modules','playwright','cli.js'), electron-builder via package-linux.mjs, electron, node-pty, js-yaml, @tailwindcss/oxide, app-builder-lib, @electron/notarize/osx-sign, tsx), P2 configs (apps/desktop/electron.vite.config.ts, electron-builder.yml, postcss.config.mjs), P3, P4 electron, and build commands (tsc, tsup, electron-vite, node scripts/generate-streamdown-tailwind-source.mjs, scripts/build-remote-runtime.mjs -> docker/cargo) do not reach it (closure checked); no start/prestart/poststart in any package.json. Dockerfiles: remote/kmuxd/Dockerfile.linux-musl final stage 'artifact' is FROM scratch copying a Rust binary (:23-24), tests/ssh/image/Dockerfile installs apt packages only; neither holds devDependencies."
+      },
+      {
+        "name": "@humanfs/node",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/@humanfs/node@0.16.7 (dev), only copy; GHSA-p498-v437-472g <0.16.8. D1: only dependent eslint; paths root devDependencies eslint / @typescript-eslint/* / eslint-config-prettier > eslint > @humanfs/node. eslint.config.js is linter config (excluded); not imported by apps/desktop/src, packages/* or scripts/; not named by build configs; not run by build commands; not reached from production copies; no final stage holds devDependencies (see @grpc/grpc-js)."
+      }
+    ]
+  },
+  {
+    "repo": "hitchhikers42/zanotam-proxy",
+    "sha": "b795e11012601f03a47f5cc19e3222036ec8f755",
+    "finished": true,
+    "packages": [
+      {
+        "name": "aws-sdk",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/aws-sdk@2.1354.0 (dev), only copy; GHSA-j965-2qgj-vjmq >=2.0.0 <=3.0.0. Root devDependency, not D1, so D2: all 6 source files read (index.jsx, webpack.config.js, src/server/index.js, src/server/server.js, src/public/index.html, committed bundle src/public/dist/proxy.js); none contains 'aws-sdk' (grep count 0; proxy.js's node_modules/ module paths name axios, webpack, react etc., which are now production but do not reach it); webpack.config.js names babel-loader, @babel/preset-react, @babel/preset-env only; scripts dev/prod (webpack) and server (nodemon src/server), no start/build; no Dockerfile/Procfile/deploy config; not P3/P4; not reached from production copies (P3 webpack, @babel/runtime, core-js, regenerator-runtime checked)."
+      },
+      {
+        "name": "get-func-name",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/get-func-name@2.0.0 (dev), only copy; GHSA-4q6p-r6v2-jvc5 <2.0.1. Only path: root devDependency chai > get-func-name; chai is not on D1's lists, so D2: no source file imports chai or get-func-name (the 'chai' matches in proxy.js are words like 'chain'); not named by webpack.config.js; no start/build command; no Dockerfile/Procfile; not P3/P4; not reached from a production copy."
+      },
+      {
+        "name": "serialize-javascript",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/serialize-javascript@7.1.2 (dev), only copy; GHSA-m5mm-p8h7-m29v <7.1.3. D1: only dependent mocha (root devDependency, test runner): devDependencies > mocha > serialize-javascript. In this lockfile no webpack/terser-webpack-plugin entry depends on it, so the P3 webpack closure does not reach it; not imported or named; no start/build command; no Dockerfile/Procfile."
+      },
+      {
+        "name": "uuid",
+        "first_run": "no",
+        "reused": true,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "node_modules/aws-sdk/node_modules/uuid@8.0.0 (dev), the only uuid copy; GHSA-w5hq-g745-h8pq <11.1.1. Only path: root devDependency aws-sdk > uuid (not D1), so D2: aws-sdk is not production (see aws-sdk); no source file imports uuid and proxy.js has no node_modules/uuid path (its 'uuid' text is faker.random.uuid); not named; no start/build command; no Dockerfile/Procfile; not P3/P4."
+      }
+    ]
+  },
+  {
+    "repo": "ELDIABLO2020/bannersin48",
+    "sha": "be212e83019de95362bdb2f89e6d4172cf6ae9da",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/@vitest/mocker@2.1.9 (dev), only copy; GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11, GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12. Not reused because I cannot tell whether a production stage holds devDependencies: backend/Dockerfile's runtime stage copies node_modules from prod-deps (:145), and prod-deps ('npm ci -w backend --omit=dev' :96) copies node_modules/.prisma/ from build (:116), which ran 'npm ci' without --omit=dev (:50), and extracts the prisma CLI closure from build (:117-118); frontend/Dockerfile's runtime copies .next/standalone (traced node_modules) from build, which ran 'npm ci' without --omit=dev (:38). New verdict D1, valid in either reading: @vitest/* whose only dependent is vitest (devDependency of frontend, packages/api-client, packages/design-tokens, packages/shared). Closure computed with every non-D1 declared dependency of all six project folders as production, plus P0-P6 (prisma from compose migrate command and the build stage's RUN, tsx from design-tokens build, next, typescript, msw imported by packages/api-client/src/mocks, P2 next/@serwist/next/tailwindcss/autoprefixer), does not reach it."
+      },
+      {
+        "name": "deepmerge",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/deepmerge@4.3.1 (dev), only copy; GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. Not reused (cannot tell whether a production stage holds devDependencies; see @vitest/mocker). D1: only dependent jest-config; paths backend devDependencies jest / ts-jest > (jest-cli | @jest/core | create-jest) > jest-config > deepmerge, all through jest-* / ts-jest. Not reached even with every non-D1 declared dependency of every project folder treated as production; not imported by backend/src or frontend; not named by build configs; not run by build or production commands."
+      },
+      {
+        "name": "glob",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In range: node_modules/glob@10.3.10 (dev) vs GHSA-5j98-mcp5-4vw2 >=10.2.0 <10.5.0. frontend/node_modules/glob@13.0.6 is production (P0, via @serwist/next) but outside the range; the 7.2.3 copies (under @jest/reporters, flat-cache, jest-config, jest-runtime, test-exclude) are outside it too. Not reused (cannot tell whether a production stage holds devDependencies; see @vitest/mocker). D1 for 10.3.10: only path frontend devDependency eslint-config-next > @next/eslint-plugin-next > glob (@<scope>/eslint-plugin* is a linter). Not reached in the worst-case closure (every non-D1 declared dependency production); not imported; not named; not run by a build or production command."
+      },
+      {
+        "name": "handlebars",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/handlebars@4.7.9 (dev), only copy; GHSA-xw65-4hp5-5hc7 / GHSA-8r5x-fm3f-whwj >=4.0.0 <=4.7.9, GHSA-p8wg-vrv2-v86f >=3.0.0 <=4.7.9. Not reused (cannot tell whether a production stage holds devDependencies; see @vitest/mocker). D1: only path backend devDependency ts-jest > handlebars. Not reached in the worst-case closure; not imported by backend/src or any source; not named by build configs; backend build 'tsc -p tsconfig.build.json', start 'node dist/src/main.js', Docker CMD 'node dist/src/main.js' do not run it."
+      },
+      {
+        "name": "tinypool",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/tinypool@1.1.1 (dev), only copy; GHSA-5gmw-xhrv-c9v3 <=2.1.0, GHSA-85c8-ppgw-ccpr <2.1.2. Not reused (cannot tell whether a production stage holds devDependencies; see @vitest/mocker). D1: only dependent vitest (devDependency of frontend and packages/*). Not reached in the worst-case closure; not imported, named or run by a build or production command."
+      },
+      {
+        "name": "vitest",
+        "first_run": "no",
+        "reused": false,
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "node_modules/vitest@2.1.9 (dev), only copy; GHSA-5xrq-8626-4rwp <3.2.6, GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11. Not reused (cannot tell whether a production stage holds devDependencies; see @vitest/mocker). D1: a test runner declared in devDependencies of frontend, packages/api-client, packages/design-tokens and packages/shared; imported only by *.test.ts files and frontend/vitest.config.ts (excluded); scripts test/test:watch only; no production copy depends on or peers it (worst-case closure checked)."
+      }
+    ]
+  }
+]

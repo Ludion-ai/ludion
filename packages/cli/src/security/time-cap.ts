@@ -86,6 +86,15 @@ async function boundedJson(fetchFn: typeof fetch, url: string, maxBytes: number)
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 
+/**
+ * When an npm package first appeared: the earliest of `time.created` and every version's publish time. A package that
+ * was unpublished and created again gets a new `created`, while its old versions keep their times.
+ */
+export function firstPublish(time: Record<string, unknown>): string | null {
+  const times = Object.entries(time).filter(([key, at]) => key !== "modified" && key !== "unpublished" && typeof at === "string").map(([, at]) => Date.parse(at as string)).filter(Number.isFinite);
+  return times.length ? new Date(Math.min(...times)).toISOString() : null;
+}
+
 const NPM_NAME = /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i;
 /** npm: the registry's `time` (publish times and `created`) and each version's declared dependencies. */
 export async function npmReleases(name: string, fetchFn: typeof fetch = fetch): Promise<Releases> {
@@ -96,7 +105,7 @@ export async function npmReleases(name: string, fetchFn: typeof fetch = fetch): 
   const published = new Map<string, string>(), requires = new Map<string, string[]>();
   for (const [version, at] of Object.entries(doc.time)) if (version !== "created" && version !== "modified" && typeof at === "string") published.set(version, at);
   for (const [version, manifest] of Object.entries<any>(doc.versions)) requires.set(version, Object.keys({ ...manifest?.dependencies, ...manifest?.optionalDependencies }).sort());
-  return { created: typeof doc.time.created === "string" ? doc.time.created : null, published, requires };
+  return { created: firstPublish(doc.time), published, requires };
 }
 
 const COMPOSER_NAME = /^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/;

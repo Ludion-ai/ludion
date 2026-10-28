@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { provenanceFrom } from "../src/security/npm-facts.ts";
 import { pnpmChanges } from "../src/security/judge-cli.ts";
+import { firstPublish } from "../src/security/time-cap.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
 const url = (name: string, version: string) => `https://registry.npmjs.org/${name}/-/${name}-${version}.tgz`;
@@ -395,5 +396,12 @@ describe("pnpm-lock.yaml changes", () => {
     expect(result.time_cap.after_t).toEqual(["dep-a@1.1.0"]);
     expect(result.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: expect.stringContaining("dep-a@1.1.0 was published at or after the fix") }));
     expect(result.findings).toContainEqual(expect.objectContaining({ gate: 4, message: expect.stringContaining("not checked for pnpm") }));
+  });
+});
+
+describe("a package's first publish", () => {
+  it("is the earliest of created and every version, so a re-created package keeps its age", () => {
+    expect(firstPublish({ created: "2025-09-01T00:00:00Z", modified: "2026-01-01T00:00:00Z", "1.0.0": "2019-03-01T00:00:00Z", "2.0.0": "2025-09-01T00:00:00Z" })).toBe("2019-03-01T00:00:00.000Z");
+    expect(firstPublish({ modified: "2026-01-01T00:00:00Z" })).toBeNull();
   });
 });

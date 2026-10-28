@@ -20,7 +20,8 @@ const mutants = [
   [CLI, "an unparsable file read as empty object", "catch { return undefined; }", "catch { return {}; }"],
   // The review's two findings on the rule (#174, comment 6473296446).
   [RULE, "a * matches a dot folder", ` && have.every((s, i) => s !== "*" || !want[i]!.startsWith("."))`, ""],
-  [RULE, "inherited keys count as records", "Object.hasOwn(input.lock.before, dir) ? input.lock.before[dir] : undefined", "input.lock.before[dir]"],
+  [RULE, "inherited keys count as records (before)", "Object.hasOwn(input.lock.before, dir) ? input.lock.before[dir] : undefined", "input.lock.before[dir]"],
+  [RULE, "inherited keys count as records (after)", "Object.hasOwn(input.lock.after, dir) ? input.lock.after[dir] : undefined", "input.lock.after[dir]"],
 ];
 let survived = 0;
 for (const [file, name, from, to] of mutants) {

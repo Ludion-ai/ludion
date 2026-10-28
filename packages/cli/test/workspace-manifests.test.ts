@@ -84,6 +84,11 @@ describe("a workspace package.json that does not agree with the lockfile stops",
     // A folder named like an Object.prototype key is recorded only by the lockfile's own entry.
     const root = { ...ROOT, workspaces: ["*"] }, empty = { name: "x", version: "0.0.0" };
     expect(pr161({ file: "__proto__/package.json", before: empty, after: empty, root: { before: root, after: root }, lock: { before: unrecorded, after: unrecorded } })).toEqual(["The lockfile does not record the workspace __proto__ both before and after."]);
+    // JSON.parse makes "__proto__" an own key: recorded after the change only is still not recorded before.
+    const ownAfter = JSON.parse('{"__proto__": {}}') as Record<string, unknown>;
+    expect(Object.hasOwn(ownAfter, "__proto__")).toBe(true);
+    expect(pr161({ file: "__proto__/package.json", before: empty, after: empty, root: { before: root, after: root }, lock: { before: unrecorded, after: ownAfter } })).toEqual(["The lockfile does not record the workspace __proto__ both before and after."]);
+    expect(pr161({ file: "__proto__/package.json", before: empty, after: empty, root: { before: root, after: root }, lock: { before: ownAfter, after: unrecorded } })).toEqual(["The lockfile does not record the workspace __proto__ both before and after."]);
   });
   it("rule 3: a side that is missing or not an object, a field other than the dependency lists, a spec outside the registry, overrides", () => {
     expect(pr161({ before: undefined })).toEqual(["apps/worker/package.json is not a JSON object on both sides (before and after)."]);

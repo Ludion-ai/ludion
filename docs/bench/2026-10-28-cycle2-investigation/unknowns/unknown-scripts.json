@@ -1,0 +1,2346 @@
+{
+ "checked_at": "2026-10-28T08:09:57.537Z",
+ "note": "Estimate only; not a backtest run.",
+ "summary": {
+  "exploited": {
+   "unknown": 157,
+   "v_metadata": 122,
+   "scripts_added": 44,
+   "undetermined": 44
+  },
+  "high": {
+   "unknown": 157,
+   "v_metadata": 122,
+   "scripts_added": 44,
+   "undetermined": 44
+  },
+  "normal": {
+   "unknown": 95,
+   "v_metadata": 75,
+   "scripts_added": 8,
+   "undetermined": 28
+  },
+  "low": {
+   "unknown": 76,
+   "v_metadata": 61,
+   "scripts_added": 2,
+   "undetermined": 23
+  }
+ },
+ "rows": [
+  {
+   "key": "hyperterm-hipster@1.0.3",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@igh/server-updater-ssh@1.2.16",
+   "prev": "1.2.4",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@igh/server-updater-ssh-l1@1.2.17",
+   "prev": "1.2.8",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.77",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.78",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.79",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.80",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.81",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.82",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.83",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.84",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.85",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.86",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.87",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.88",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.89",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.90",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.91",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.92",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "@asyncapi/studio@0.20.1",
+   "prev": "0.20.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@asyncapi/studio@0.20.2",
+   "prev": "0.20.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.93",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.94",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.95",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.96",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.97",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.98",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.99",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.100",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.101",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "@mrpudidi/gravatar@1.0.3",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "@mrpudidi/gravatar@1.0.4",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "@optimystic99/dev-utils@1.0.15",
+   "prev": "1.0.7",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "@optimystic99/dev-utils@1.0.22",
+   "prev": "1.0.10",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [
+    "postinstall"
+   ],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "stringify-content@1.0.3",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "@rxap/ngx-bootstrap@19.0.3",
+   "prev": "19.0.3-dev.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@rxap/ngx-bootstrap@19.0.4",
+   "prev": "19.0.4-dev.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.102",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.103",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.104",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.105",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.106",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.3.5",
+   "prev": "1.1.9",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "ethersjs3-wallet@3.0.7",
+   "prev": "3.0.6",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "ethersjs3-wallet@3.0.8",
+   "prev": "3.0.6",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "ethersjs3-wallet@3.0.9",
+   "prev": "3.0.6",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "ethersjs3-wallet@3.0.10",
+   "prev": "3.0.6",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "ethersjs3-wallet@3.0.11",
+   "prev": "3.0.6",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "google-profanity-words@1.0.1",
+   "prev": "1.0.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "nx@21.6.0",
+   "prev": "21.5.0-canary.20250819-2307a8d",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": "some",
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "nx@21.7.0",
+   "prev": "21.5.0-canary.20250819-2307a8d",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": "some",
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "nx@21.8.0",
+   "prev": "21.5.0-canary.20250819-2307a8d",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": "some",
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "google-profanity-words@1.0.2",
+   "prev": "1.0.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "prebid-universal-creative@1.17.3",
+   "prev": "1.17.2",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@coveops/abi@2.0.1",
+   "prev": "2.0.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.3.6",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.3.8",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.3.9",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.5.0",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.5.2",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.5.3",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.5.5",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.5.6",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.5.8",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "airpilot@0.8.8",
+   "prev": "0.8.7",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "mcp-knowledge-graph@1.2.1",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "airchief@0.3.1",
+   "prev": "0.3.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": "some",
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "tvi-cli@0.1.5",
+   "prev": "0.1.4",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@tnf-dev/api@1.0.8",
+   "prev": "1.0.4",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@tnf-dev/js@1.0.8",
+   "prev": "1.0.4",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@tnf-dev/mui@1.0.8",
+   "prev": "1.0.4",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@tnf-dev/react@1.0.8",
+   "prev": "1.0.4",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@tnf-dev/core@1.0.8",
+   "prev": "1.0.4",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "rxnt-healthchecks-nestjs@1.0.3",
+   "prev": "1.0.1-alpha-1609",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": true
+  },
+  {
+   "key": "rxnt-kue@1.0.5",
+   "prev": "1.0.3",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "json-rules-engine-simplified@0.2.2",
+   "prev": "0.2.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "react-jsonschema-form-conditionals@0.3.19",
+   "prev": "0.3.17",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "react-jsonschema-rxnt-extras@0.4.7",
+   "prev": "0.4.2",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@hestjs/demo@0.1.2",
+   "prev": "0.1.1",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@nexe/eslint-config@0.1.1",
+   "prev": "0.1.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@hestjs/eslint-config@0.1.2",
+   "prev": "0.1.1",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@nexe/config-manager@0.1.1",
+   "prev": "0.1.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@nexe/logger@0.1.3",
+   "prev": "0.1.2",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@hestjs/logger@0.1.6",
+   "prev": "0.1.5",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@hestjs/validation@0.1.6",
+   "prev": "0.1.5",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@hestjs/core@0.2.1",
+   "prev": "0.2.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@hestjs/cqrs@0.1.6",
+   "prev": "0.1.5",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@hestjs/scalar@0.1.7",
+   "prev": "0.1.6",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "create-hest-app@0.1.9",
+   "prev": "0.1.8",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "rxnt-kue@1.0.6",
+   "prev": "1.0.3",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "rxnt-healthchecks-nestjs@1.0.4",
+   "prev": "1.0.1-alpha-1609",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": true
+  },
+  {
+   "key": "json-rules-engine-simplified@0.2.3",
+   "prev": "0.2.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "react-jsonschema-form-conditionals@0.3.20",
+   "prev": "0.3.17",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "react-jsonschema-rxnt-extras@0.4.8",
+   "prev": "0.4.2",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/config-eslint@2.0.4",
+   "prev": "2.0.3",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/slf@2.0.15",
+   "prev": "2.0.9",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/http-server@2.0.21",
+   "prev": "2.0.15",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@art-ws/di@2.0.28",
+   "prev": "2.0.22",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/di-node@2.0.13",
+   "prev": "2.0.7",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@art-ws/config-ts@2.0.7",
+   "prev": "2.0.6",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/openapi@0.1.9",
+   "prev": "0.1.3",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@art-ws/web-app@1.0.3",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/ssl-info@1.0.9",
+   "prev": "1.0.8",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/fastify-http-server@2.0.24",
+   "prev": "2.0.18",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "printjs-rpk@1.6.1",
+   "prev": "1.6.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "globalize-rpk@1.7.4",
+   "prev": "1.7.3",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@ui-ux-gang/devextreme-angular-rpk@24.1.7",
+   "prev": "24.1.6",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "devextreme-angular-rpk@21.2.8",
+   "prev": "21.2.7",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@ui-ux-gang/devextreme-rpk@24.1.7",
+   "prev": "24.1.6",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "devextreme-rpk@21.2.8",
+   "prev": "21.2.7",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "mstate-angular@0.4.4",
+   "prev": "0.4.3",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "mobioffice-cli@1.0.3",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "mstate-react@1.6.5",
+   "prev": "1.6.4",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "mstate-cli@0.4.7",
+   "prev": "0.4.6",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "mstate-dev-react@1.1.1",
+   "prev": "1.1.0",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@ahmedhfarag/ngx-perfect-scrollbar@20.0.20",
+   "prev": "20.0.19",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@ahmedhfarag/ngx-virtual-scroller@4.0.4",
+   "prev": "4.0.3",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/di-node@2.0.14",
+   "prev": "2.0.7",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@art-ws/di-node@2.0.15",
+   "prev": "2.0.7",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@art-ws/di-node@2.0.18",
+   "prev": "2.0.7",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@art-ws/http-server@2.0.24",
+   "prev": "2.0.15",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@art-ws/fastify-http-server@2.0.26",
+   "prev": "2.0.18",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": false
+  },
+  {
+   "key": "@art-ws/openapi@0.1.11",
+   "prev": "0.1.3",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@art-ws/http-server@2.0.25",
+   "prev": "2.0.15",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/fastify-http-server@2.0.27",
+   "prev": "2.0.18",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/openapi@0.1.12",
+   "prev": "0.1.3",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/slf@2.0.22",
+   "prev": "2.0.9",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@art-ws/ssl-info@1.0.10",
+   "prev": "1.0.8",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@art-ws/config-eslint@2.0.5",
+   "prev": "2.0.3",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/config-ts@2.0.8",
+   "prev": "2.0.6",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@art-ws/web-app@1.0.4",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@nativescript-community/ui-material-ripple@7.2.72",
+   "prev": "7.2.71",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@nativescript-community/ui-label@1.3.35",
+   "prev": "1.3.34",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@nativescript-community/ui-material-bottom-navigation@7.2.72",
+   "prev": "7.2.71",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "@basic-ui-components-stc/basic-ui-components@1.0.5",
+   "prev": "1.0.2",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@nativescript-community/ui-material-ripple@7.2.73",
+   "prev": "7.2.71",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@nativescript-community/ui-label@1.3.36",
+   "prev": "1.3.34",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@nativescript-community/ui-material-bottom-navigation@7.2.73",
+   "prev": "7.2.71",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@nativescript-community/ui-label@1.3.37",
+   "prev": "1.3.34",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@nativescript-community/ui-material-ripple@7.2.74",
+   "prev": "7.2.71",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@nativescript-community/ui-material-bottom-navigation@7.2.74",
+   "prev": "7.2.71",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "@nativescript-community/ui-document-picker@1.1.27",
+   "prev": "1.1.26",
+   "unknown_at": [
+    "exploited",
+    "high"
+   ],
+   "v_metadata": true,
+   "v_scripts": [
+    "postinstall"
+   ],
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": true
+  },
+  {
+   "key": "rxnt-healthchecks-nestjs@1.0.5",
+   "prev": "1.0.1-alpha-1609",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": null
+  },
+  {
+   "key": "rxnt-kue@1.0.7",
+   "prev": "1.0.3",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.5.9",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.107",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.6.0",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.6.3",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "n8n-nodes-phoai-ultimate-tools@1.6.5",
+   "prev": "1.2.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "loliloli@1.0.108",
+   "prev": "1.0.74",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": true,
+   "v_scripts": [],
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": false
+  },
+  {
+   "key": "@alexcolls/nuxt-ux@0.6.2",
+   "prev": "0.6.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  },
+  {
+   "key": "composite-reducer@1.0.5",
+   "prev": "1.0.1",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "vf-oss-template@1.0.4",
+   "prev": "1.0.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "bidirectional-adapter@1.2.5",
+   "prev": "1.2.1",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": null
+  },
+  {
+   "key": "normal-store@1.3.4",
+   "prev": "1.3.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": null,
+   "prev_source": null,
+   "scripts_added": null
+  },
+  {
+   "key": "dialogflow-es@1.1.4",
+   "prev": "1.1.0",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal",
+    "low"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "ecosyste.ms",
+   "scripts_added": null
+  },
+  {
+   "key": "@ifelsedeveloper/protocol-contracts-svm-idl@0.1.3",
+   "prev": "0.1.1",
+   "unknown_at": [
+    "exploited",
+    "high",
+    "normal"
+   ],
+   "v_metadata": false,
+   "v_scripts": null,
+   "prev_scripts": [],
+   "prev_source": "registry cache",
+   "scripts_added": null
+  }
+ ]
+}

@@ -1,0 +1,1104 @@
+{
+ "checked_at": "2026-10-28T08:02:05.984Z",
+ "removed": [
+  {
+   "key": "inquirer@1.3.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "is-extglob@1.1.3",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "progress-stream@1.2.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "radium-bootstrap-grid@0.1.9",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "rx-lite@4.1.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "rx-lite-aggregates@4.1.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "asn1.js@4.10.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "crypto-js@3.1.9",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "pinkie@2.0.5",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "coffee-script@1.12.8",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "async@0.1.23",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "less-middleware@2.3.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "dompurify@1.1.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "xml-name-validator@2.0.2",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "multihashing-async@0.4.9",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "markdown-toc@0.11.10",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "kind-of@1.1.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "babylon@7.0.0-beta.0-ranges",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "d3-array@1.3.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 200,
+    "deps": 0
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "mitt@1.1.4",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "opencollective@1.0.4",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "gaxios@1.9.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "z-schema@3.26.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "tabtab@1.4.3",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "update-notifier@2.6.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "minimist-options@3.1.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "knex@0.16.7",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "tarn@1.2.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "snyk-config@2.3.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "make-fetch-happen@5.1.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "ndarray@1.1.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "unicode-trie@1.0.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "mitt@1.2.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "react-router-dom@4.4.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 200,
+    "deps": 8
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "colors@1.4.2",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "rc@1.3.9",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "rc@1.2.9",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "@ensdomains/buffer@0.1.1",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 0,
+    "publisher": "makoto_inoue",
+    "install_scripts": [],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 200,
+    "deps": 0
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "coa@2.1.3",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "cbor-js@0.1.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "highlightjs-graphql@1.0.6",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "react-dropzone@4.3.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "postject@1.0.0-dev-a8bae4c",
+   "ecosystems": {
+    "status": 200,
+    "metadata": false,
+    "runtime_deps": 1,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "device-detector-js@3.11.4",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "debug@4.4.2",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 1,
+    "publisher": "qix",
+    "install_scripts": [],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "simple-swizzle@0.2.3",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 1,
+    "publisher": "qix",
+    "install_scripts": [],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "is-arrayish@0.3.3",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 0,
+    "publisher": "qix",
+    "install_scripts": [],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "color-name@2.0.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "error-ex@1.3.3",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "canvg@1.5.4",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 200,
+    "deps": 5
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "@asyncapi/specs@6.10.1",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 1,
+    "publisher": "asyncapi-bot",
+    "install_scripts": [
+     "preinstall"
+    ],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "monacopilot@1.3.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "posthog-node@4.18.1",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 200,
+    "deps": 1
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "mariadb@2.13.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "axios@1.14.1",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 4,
+    "publisher": "jasonsaayman",
+    "install_scripts": [],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "axios@0.30.4",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 4,
+    "publisher": "jasonsaayman",
+    "install_scripts": [],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "react-hook-form@7.73.0",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 200,
+    "deps": 1
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "@mistralai/mistralai@2.2.4",
+   "ecosystems": {
+    "status": 200,
+    "metadata": true,
+    "runtime_deps": 3,
+    "publisher": "bam4d",
+    "install_scripts": [
+     "preinstall"
+    ],
+    "attestations": false
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  },
+  {
+   "key": "@antv/g2plot@2.6.35",
+   "ecosystems": {
+    "status": 404,
+    "metadata": false,
+    "runtime_deps": null,
+    "publisher": null,
+    "install_scripts": null,
+    "attestations": null
+   },
+   "jsdelivr": {
+    "status": 404,
+    "deps": null
+   },
+   "depsdev": {
+    "status": 404
+   }
+  }
+ ],
+ "extra": {
+  "package": {
+   "eco": 404,
+   "jsd": 404
+  },
+  "@mistralai/mistralai@2.2.2": {
+   "status": 200,
+   "publisher": {
+    "name": "bam4d",
+    "email": "bam4d@mistral.ai"
+   },
+   "attestations": false,
+   "published": "2026-05-11T22:45:38.894Z"
+  },
+  "@mistralai/mistralai@2.2.3": {
+   "status": 200,
+   "publisher": {
+    "name": "bam4d",
+    "email": "bam4d@mistral.ai"
+   },
+   "attestations": false,
+   "published": "2026-05-11T22:49:23.971Z"
+  },
+  "@mistralai/mistralai@2.2.4": {
+   "status": 200,
+   "publisher": {
+    "name": "bam4d",
+    "email": "bam4d@mistral.ai"
+   },
+   "attestations": false,
+   "published": "2026-05-11T22:53:59.784Z"
+  }
+ }
+}

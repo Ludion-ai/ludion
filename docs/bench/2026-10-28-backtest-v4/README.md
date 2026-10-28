@@ -191,3 +191,17 @@ The exception's own facts (publisher, provenance) were read from the registry fo
   - Gate 2's provenance, scripts and publisher are unverified for 1,140 of the 1,148 removed versions.
   - A publisher whose account was hijacked, and who publishes a sibling with the fix's version number within 15 minutes and without provenance, would pass the exception. No such case occurs in this data; the wait and the re-query still apply to it.
 - The wait table is not changed.
+
+## Added 2026-10-28 (cycle 2): the malicious result as a stop-rate interval
+
+Out of 1,148, from the table above (primary result, conservative timing, with the exception):
+- lower bound: every unknown counted as missed;
+- upper bound: every unknown counted as stopped.
+
+The one missed version stays missed in both. Nothing above is changed. docs/bench/2026-10-28-cycle2-investigation has the optimistic timing and an investigation of the miss and the unknowns.
+
+| Wait | Lower bound | Upper bound |
+| --- | --- | --- |
+| 12h and 24h | 990 / 1,148 = 86.24% | 1,147 / 1,148 = 99.91% |
+| 72h | 1,052 / 1,148 = 91.64% | 1,147 / 1,148 = 99.91% |
+| 168h | 1,071 / 1,148 = 93.29% | 1,147 / 1,148 = 99.91% |

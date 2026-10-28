@@ -1,0 +1,58 @@
+[
+ {
+  "key": "rc@1.3.9",
+  "published": "2021-11-04T15:30:34.911Z",
+  "visits": 100,
+  "oldest_visit_listed": "2020-11-24T23:53:03.745000+00:00",
+  "visits_within_60_days": [],
+  "found_in": null
+ },
+ {
+  "key": "pinkie@2.0.5",
+  "published": "2018-01-06T18:50:54.900Z",
+  "visits": 100,
+  "oldest_visit_listed": "2020-11-24T06:03:23.061000+00:00",
+  "visits_within_60_days": [],
+  "found_in": null
+ },
+ {
+  "key": "device-detector-js@3.11.4",
+  "published": "2019-01-22T15:44:39.491Z",
+  "visits": 100,
+  "oldest_visit_listed": "2019-10-01T14:20:28.376000+00:00",
+  "visits_within_60_days": [],
+  "found_in": null
+ },
+ {
+  "key": "error-ex@1.3.3",
+  "published": "2025-09-08T13:16:05.782Z",
+  "visits": 100,
+  "oldest_visit_listed": "2020-11-26T05:37:30.725000+00:00",
+  "visits_within_60_days": [],
+  "found_in": null
+ },
+ {
+  "key": "colors@1.4.2",
+  "published": "2022-01-09T19:35:35.048Z",
+  "visits": 100,
+  "oldest_visit_listed": "2020-11-23T18:44:12.016000+00:00",
+  "visits_within_60_days": [],
+  "found_in": null
+ },
+ {
+  "key": "coa@2.1.3",
+  "published": "2021-11-04T13:02:53.478Z",
+  "visits": 100,
+  "oldest_visit_listed": "2020-10-02T03:43:06.559000+00:00",
+  "visits_within_60_days": [],
+  "found_in": null
+ },
+ {
+  "key": "is-extglob@1.1.3",
+  "published": "2015-03-06T20:58:24.527Z",
+  "visits": 100,
+  "oldest_visit_listed": "2020-11-28T06:21:58.610000+00:00",
+  "visits_within_60_days": [],
+  "found_in": null
+ }
+]

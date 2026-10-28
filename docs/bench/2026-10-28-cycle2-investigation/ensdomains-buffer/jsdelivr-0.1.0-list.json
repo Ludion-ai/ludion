@@ -1,0 +1,216 @@
+{
+	"type": "npm",
+	"name": "@ensdomains/buffer",
+	"version": "0.1.0",
+	"default": null,
+	"files": [
+		{
+			"type": "directory",
+			"name": "artifacts",
+			"files": [
+				{
+					"type": "directory",
+					"name": "test",
+					"files": [
+						{
+							"type": "directory",
+							"name": "TestBuffer.sol",
+							"files": [
+								{
+									"type": "file",
+									"name": "TestBuffer.dbg.json",
+									"hash": "TFepsw3qgmZNainn9iTo6Ja42F3NinfgzknD/igArVI=",
+									"size": 105
+								},
+								{
+									"type": "file",
+									"name": "TestBuffer.json",
+									"hash": "ijcL4LiFh5KaFpujsJTFhdJ1SkWc2tNWf56QRN7/mwQ=",
+									"size": 29481
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "directory",
+					"name": "contracts",
+					"files": [
+						{
+							"type": "directory",
+							"name": "Buffer.sol",
+							"files": [
+								{
+									"type": "file",
+									"name": "Buffer.dbg.json",
+									"hash": "TFepsw3qgmZNainn9iTo6Ja42F3NinfgzknD/igArVI=",
+									"size": 105
+								},
+								{
+									"type": "file",
+									"name": "Buffer.json",
+									"hash": "EzJ0THmGgE38t5QPZpvYjafvIjufA3kKmjqKUNwnoOA=",
+									"size": 726
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "directory",
+					"name": "build-info",
+					"files": [
+						{
+							"type": "file",
+							"name": "80a1728ba703a8c2a450daebf829f30f.json",
+							"hash": "ZhYXbaOxlegWgFhc8tqB5OCpvNp/kshQ/P0UM3ZgWdM=",
+							"size": 1182638
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "directory",
+			"name": "build",
+			"files": [
+				{
+					"type": "directory",
+					"name": "contracts",
+					"files": [
+						{
+							"type": "file",
+							"name": "Buffer.json",
+							"hash": "n0kRdS6Cfl4mu/C0oP0KqDJK5ilaIqoLBXuSIE1Wh/I=",
+							"size": 557013
+						},
+						{
+							"type": "file",
+							"name": "Migrations.json",
+							"hash": "7H4tVgpmz+cZzs3+tHV5/Rlee5KWSe5jBVj+4kc3GlQ=",
+							"size": 51982
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "directory",
+			"name": "cache",
+			"files": [
+				{
+					"type": "file",
+					"name": "solidity-files-cache.json",
+					"hash": "3yox9Ef7TWZj/xoGa1z67AKYiUhHA+ejpIqq5XMln7E=",
+					"size": 1759
+				}
+			]
+		},
+		{
+			"type": "directory",
+			"name": "contracts",
+			"files": [
+				{
+					"type": "file",
+					"name": "Buffer.sol",
+					"hash": "cI8jPtKhTL+lEDevtyQme+5A1NPR5xsJBk+c79K1kfc=",
+					"size": 8881
+				}
+			]
+		},
+		{
+			"type": "directory",
+			"name": "migrations",
+			"files": [
+				{
+					"type": "file",
+					"name": "1_initial_migration.js",
+					"hash": "QsIbQimzn9HK0WTtbUwkFoYg4vBKZlIbKy8pReI7hn0=",
+					"size": 129
+				},
+				{
+					"type": "file",
+					"name": "2_deploy_contracts.js",
+					"hash": "xAMlmqUiPhFXvv2uN0bPlWj8gbQ7ZFp9vFPdrC/TgzQ=",
+					"size": 43
+				}
+			]
+		},
+		{
+			"type": "directory",
+			"name": "test",
+			"files": [
+				{
+					"type": "file",
+					"name": "TestBuffer.js",
+					"hash": "QSvEDzylFgJpO+lcEWb/zR2uMtscyvR/CdausdU7SKI=",
+					"size": 676
+				},
+				{
+					"type": "file",
+					"name": "TestBuffer.sol",
+					"hash": "/iusMtS1Irhf6cptxYXkfCvF/jYry2Az5K5AZIaYOI4=",
+					"size": 4155
+				}
+			]
+		},
+		{
+			"type": "file",
+			"name": ".gitattributes",
+			"hash": "GvGqyxe6XiCeEfqVLb3xlgLTB0NQKbkgE6SvOZoj39c=",
+			"size": 33
+		},
+		{
+			"type": "file",
+			"name": ".soliumignore",
+			"hash": "FtMORGIYn7FN1hG9twjFEGMMV2ofNbk4PomkNS2jbJc=",
+			"size": 13
+		},
+		{
+			"type": "file",
+			"name": ".soliumrc.json",
+			"hash": "p+LOI79SR+v7fxxTj4iL8FYaaoEnHkaAFluvJBBO0Qo=",
+			"size": 168
+		},
+		{
+			"type": "file",
+			"name": ".travis.yml",
+			"hash": "N91EwnP9dq52PTwa2ukQbXcCgmGLOSwJD7QHl+o8qJs=",
+			"size": 218
+		},
+		{
+			"type": "file",
+			"name": "hardhat.config.js",
+			"hash": "btRANUaY2H8emk6yRkOoJABUyDGldnCwafhWM7wOCV0=",
+			"size": 195
+		},
+		{
+			"type": "file",
+			"name": "LICENSE",
+			"hash": "qGUms8emQ8WI+WyizIOpurwkBlS0FscMCtp9BVUcGyw=",
+			"size": 1326
+		},
+		{
+			"type": "file",
+			"name": "package.json",
+			"hash": "i4C/ppNO9KXPDgSife0lfrNohdTJ60lhi78CzF7yPJI=",
+			"size": 769
+		},
+		{
+			"type": "file",
+			"name": "README.md",
+			"hash": "ESQOZTaeOmm/+ZKoTrKC/iuei2l8lWAOCAcpRekduO8=",
+			"size": 1568
+		},
+		{
+			"type": "file",
+			"name": "truffle.js",
+			"hash": "87NPrRTFLp+VLo4UDJ+wdXNgAZ8MN/6hVej7Qy6M4ic=",
+			"size": 506
+		}
+	],
+	"links": {
+		"stats": "https://data.jsdelivr.com/v1/stats/packages/npm/@ensdomains/buffer@0.1.0",
+		"entrypoints": "https://data.jsdelivr.com/v1/packages/npm/@ensdomains/buffer@0.1.0/entrypoints"
+	}
+}

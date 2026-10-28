@@ -1,0 +1,14 @@
+0.0.15 2022-10-10T00:46:45.249Z deps: ^0.0.13 dev: - peer: - user: taytems
+0.0.16 2023-01-16T23:32:07.318Z deps: ^0.0.13 dev: - peer: - user: taytems
+0.0.17 2023-01-30T22:14:29.115Z deps: ^0.0.13 dev: - peer: - user: taytems
+0.0.18 2023-02-21T04:56:34.475Z deps: ^0.0.13 dev: - peer: - user: taytems
+0.0.19 2023-02-23T22:43:40.043Z deps: ^0.0.13 dev: - peer: - user: nickjohnson
+0.0.20 2023-03-01T08:35:38.274Z deps: ^0.1.1 dev: - peer: - user: makoto_inoue
+0.0.21 2023-05-23T00:15:28.239Z deps: ^0.1.1 dev: - peer: - user: taytems
+0.0.22 2023-07-10T00:06:21.278Z deps: ^0.1.1 dev: - peer: - user: taytems
+GHSA GHSA-rrxv-q8m4-wch3 published 2023-08-01T19:48:31Z modified 2026-09-10T03:49:57.769268305Z [["@ensdomains/ens-contracts",[{"type":"SEMVER","events":[{"introduced":"0"},{"fixed":"0.0.22"}]}]]]
+0.1.0 dist fileCount 22 unpackedSize 1842489
+0.1.0 tar entries 22 dirs 0
+jsDelivr 0.1.0 {"bytes":1842489,"files":22}
+jsDelivr 0.1.1 {"bytes":2096683,"files":21}
+jsDelivr 0.1.2 {"bytes":12259267,"files":23}

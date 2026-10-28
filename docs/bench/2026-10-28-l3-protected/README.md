@@ -84,6 +84,13 @@ The same head, copied with `git archive` into a Docker volume; `npm ci --ignore-
   | judge-comment.yml: the record's PR and head not compared | 3 failed, 24 passed |
   | after restoring | 27 passed |
 
+### After each merge of main (385cf73, 9f3fe4e)
+
+#166 took main twice before it was merged, and each merge head was checked again the same way: copied with `git archive` into a Docker volume, `npm ci --ignore-scripts --no-audit --no-fund` with network, then `--network none --read-only --tmpfs /tmp:exec`, user `node`, node:24-slim with jq, unzip and git added; the commands of `check-b1.sh` without its mutations. These two logs were committed with #166 but not named here until LP-rest.
+
+- `logs/tests-385cf73.log`: merge head 385cf738cb71143f861a20aded6768422f6a0c25 (d542094 and main 75622bd). `typecheck exit=0`; judge-workflow.test.ts `Tests  31 passed (31)`; packages `Test Files  8 passed (8)`, `Tests  241 passed (241)`; actionlint 1.7.12 on protected-paths.yml, judge.yml and judge-comment.yml `exit=0`.
+- `logs/tests-9f3fe4e.log`: merge head 9f3fe4e862f60b08908b66f44a940816c0c93958 (ac359a5 and main 51a8f0b). The same results: `typecheck exit=0`; `Tests  31 passed (31)`; `Test Files  8 passed (8)`, `Tests  241 passed (241)`; actionlint `exit=0`.
+
 ## Where the summaries were placed
 
 The first version of #166 put this record in the middle of decisions.md and progress.md. The cycle 3 instructions ask for only a few lines at the end of each, with the details under docs/bench/, so it moved here. The two Dependabot entries stay where #166 moved them (#157's finding 5).

@@ -1,0 +1,258 @@
+2026-10-28T08:56:01.137Z start at 2026-10-28T08:56:01.134Z, commit 2ee1afcd071f721e289ce1f0373728ba8f6bbcf8, npm 11.19.1, node v24.22.1, blobs {"tools/backtest/src/noise.ts":"a4a7bce0ce2aeb8d098fcaa58d60753dd0445990","packages/cli/src/security/judge.ts":"e32c2b8bb5bc5d8c9958735bd0a4d92fb1ad1fca","packages/cli/src/security/npm-facts.ts":"8289c4e208a4cda1dc215032df95ba56f1912262","packages/cli/src/security/time-cap.ts":"4fb4608234c42d0597a65eb10452f22d0d602575","node_modules/semver (version)":"7.8.5"}
+2026-10-28T08:56:01.218Z skip Duy-Huan/PhD-Research-Lab: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:06.471Z 1 Rafi-SBM/PySan: npm 18, judge 0
+2026-10-28T08:56:11.268Z skip DavidBraun777/davidbraun777.github.io: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T08:56:11.285Z skip apache/daffodil-vscode: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:11.296Z skip scriptex/webpack-mpa: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:42.447Z 2 Kmaina32/Varban-Markets: npm 81, judge 22
+2026-10-28T08:56:42.459Z skip misaon/nylzo: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:42.473Z skip raistlen-grim/grim-torrenter: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:42.483Z skip alberba/finance-tracker: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:42.495Z skip data-mermaid/mermaid-webapp: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:42.505Z skip davidecpr/customize-cra: fork: fork
+2026-10-28T08:56:42.517Z skip padhiyarshail15-cpu/Tech-Service: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:42.524Z skip pateldhruval872/liquorify-storefront: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:42.539Z skip turboBasic/zinit-doc: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:56:58.339Z 3 SteinOA/DSSA-Tale-Mac: npm 52, judge 11
+2026-10-28T08:56:58.341Z skip codeforamerica/sebt-self-service-portal: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:00.995Z skip MuhammadNoumanAfzal/bestilling-admin-panel: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T08:57:00.996Z skip YonderUrik/buddy-budget: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:00.998Z skip roedyrustam/agent-bridge-suite: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:01.000Z skip HydraDragonAntivirus/HydraDragonAntivirus: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:01.001Z skip NetNest-Design/netnest-fundamentals: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:02.862Z 4 bm-hien/is-this-code-safe: npm 1, judge 0
+2026-10-28T08:57:17.986Z 5 cofob/design-system: npm 34, judge 16
+2026-10-28T08:57:25.044Z 6 jasperyeo/jasper-oktavina-wedding: npm 19, judge 3
+2026-10-28T08:57:25.046Z skip mitre-attack/attack-website: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:25.048Z skip verbb/footnotes: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:25.049Z skip anuj7052/cloudledger: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:28.413Z 7 Sylonin/xposed-newx-patches: npm 2, judge 0
+2026-10-28T08:57:32.816Z 8 aniru-dh21/snap-validate: npm 5, judge 0
+2026-10-28T08:57:32.818Z skip jawon0407/account-book: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:32.820Z skip kasseika/idobata: fork: fork
+2026-10-28T08:57:36.658Z 9 MorpheApp/morphe-patcher: npm 6, judge 0
+2026-10-28T08:57:39.778Z 10 itsdarklikehell/my-resume: npm 6, judge 0
+2026-10-28T08:57:46.313Z 11 staticdesigner/modevue: npm 14, judge 10
+2026-10-28T08:57:46.315Z skip navaneeshnagarajan/FlintTrade: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:46.317Z skip venkyden/rental-platform: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:49.481Z 12 wefio/NodeMemoryGraph: npm 2, judge 0
+2026-10-28T08:57:52.903Z skip mhoward14/cyber-portfolio: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T08:57:52.904Z skip ChazSchmidt/defillama-server: fork: fork
+2026-10-28T08:57:52.906Z skip danyallya/barrier-free-city-router: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:52.907Z skip gtkx-org/gtkx: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:52.909Z skip anostoga/hvemhenter: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:57:52.911Z skip soupashh-ship-it/kestrel: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:02.210Z 13 yaeouk-rajab/pulsewatch-mobile: npm 16, judge 2
+2026-10-28T08:58:02.212Z skip Pocon824/GroceryGetter: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:02.214Z skip DaH3ckTh0r/csv-to-excel: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:12.390Z 14 mbadr5858/badr-pdf: npm 27, judge 8
+2026-10-28T08:58:15.405Z 15 padosoft/eval-harness-admin: npm 5, judge 0
+2026-10-28T08:58:20.309Z skip SC-Market/sc-market-backend: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T08:58:23.248Z skip sarthxkz/DepTrace: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T08:58:23.256Z skip zopenge/foundation-forge: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:23.258Z skip Neal006/ledgerops-platform: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:23.260Z skip Monsteryry/rails-vue-template: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:26.503Z skip rorymclark-prog/rorys-english: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T08:58:26.505Z skip superloglabs/responder-oss: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:39.926Z 16 developer3000S/OmniRouteRus: npm 38, judge 26
+2026-10-28T08:58:39.928Z skip nick-neely/tendnote: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:39.929Z skip rogerSuperBuilderAlpha/new-atp: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:58:47.116Z 17 mrBettazzi/nuxt-myweb: npm 14, judge 8
+2026-10-28T08:58:55.307Z 18 shiiizuku/document-management-tracking-system: npm 18, judge 9
+2026-10-28T08:58:57.959Z 19 wangyufengsky/qq-agents: npm 0, judge 1
+2026-10-28T08:59:02.765Z 20 microsoft/vscode-ts-file-path-support: npm 7, judge 0
+2026-10-28T08:59:02.767Z skip iamrajjoshi/cliplink: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:59:05.498Z 21 lalidiaz/node-store-api: npm 3, judge 0
+2026-10-28T08:59:18.411Z 22 airalab/robonomics.network: npm 52, judge 27
+2026-10-28T08:59:31.110Z 23 donkirkby/python-zendo: npm 42, judge 14
+2026-10-28T08:59:31.112Z skip scarbrob/RGBPuzz: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:59:31.114Z skip mjmconvento/tetris: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:59:39.849Z 24 akshaydhadwal745/lens-camera: npm 16, judge 5
+2026-10-28T08:59:43.066Z 25 Blackshield-Company/openshield-desktop: npm 12, judge 0
+2026-10-28T08:59:49.364Z 26 RoxyAPI/ai-spiritual-companion: npm 8, judge 0
+2026-10-28T08:59:49.366Z skip rafaelsanzio/ecoleta: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T08:59:58.115Z 27 shimi-lynx/mogledge: npm 18, judge 0
+2026-10-28T08:59:58.117Z skip ap0ught/OmniRoute: fork: fork
+2026-10-28T09:00:06.350Z 28 PM-Shawn/Abu-Cowork: npm 25, judge 7
+2026-10-28T09:00:06.352Z skip nicknmorty/recruiter-agent: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:00:10.908Z 29 datagrowth/sobre-abierto: npm 1, judge 1
+2026-10-28T09:00:10.919Z skip danyallya/clinic-waitlist: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:00:17.737Z 30 KisaesDevLab/Vibe-MyBooks: npm 6, judge 2
+2026-10-28T09:00:17.739Z skip Aurum-Soltec/genesis360empresarial: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:00:21.320Z 31 nmagera07/family-site: npm 23, judge 19
+2026-10-28T09:00:21.322Z skip EipRIDEO/komya-backend: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:00:21.324Z skip jameswlane/devex: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:00:25.365Z skip Earlo/AcademicCultureEnjoyers: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:00:25.367Z skip BUMETCS673/CS673A1F26P2: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:00:25.368Z skip justmadeid25/senecial: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:00:35.409Z 32 toddmedema/electrify: npm 23, judge 1
+2026-10-28T09:00:43.286Z 33 enonic/app-explorer: npm 11, judge 0
+2026-10-28T09:00:56.382Z 34 carlostighe/modalMap: npm 73, judge 35
+2026-10-28T09:01:00.094Z 35 louiseka/cove-ui: npm 1, judge 0
+2026-10-28T09:01:00.096Z skip Morin3/raven-reader: fork: fork
+2026-10-28T09:01:00.103Z skip developer3000S/browsh: owner: another repository of the same owner is already in the sample
+2026-10-28T09:01:00.112Z skip landsman/homelab: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:00.117Z skip playboardgamesonline/pbgo: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:00.119Z skip metaneutrons/eule-mcp: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:03.050Z skip nais-bond/naisbond-website: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:01:03.052Z skip gabrieldenti/cursos-angular: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:05.568Z 36 Desvelao/party-game: npm 6, judge 0
+2026-10-28T09:01:05.569Z skip nickspaargaren/koningsdaghuizen.nl: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:07.226Z skip sailxx/Tobi: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:01:09.493Z 37 Dhanush1376/Akula-s-Kitchen: npm 5, judge 0
+2026-10-28T09:01:09.495Z skip alsonick/lrc.notnick.io: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:15.607Z 38 mahaliahr/phd-live: npm 15, judge 7
+2026-10-28T09:01:20.886Z 39 newtonlorenz/benchledger: npm 15, judge 4
+2026-10-28T09:01:20.888Z skip saifymatteo/saifymatteo: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:26.368Z 40 NSWSESMembers/Lighthouse: npm 3, judge 1
+2026-10-28T09:01:26.374Z skip AndrewDongminYoo/react-native-adpopcorn-reward: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:26.376Z skip roboco-io/the-software-factory: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:26.381Z skip shadcn-ui/ui: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:31.237Z 41 eliflo1/certivue-marketing: npm 16, judge 15
+2026-10-28T09:01:31.247Z skip ujosting-hash/demo: fork: fork
+2026-10-28T09:01:31.261Z skip gdsc-osaka/iclub-reserve: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:31.280Z skip microsoft/rnx-kit: owner: another repository of the same owner is already in the sample
+2026-10-28T09:01:34.011Z 42 Palladin-io/palladin-agent: npm 8, judge 5
+2026-10-28T09:01:34.012Z skip gardner/button-nz: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:40.041Z 43 ruddyribera-ops/pria-app: npm 28, judge 10
+2026-10-28T09:01:47.478Z 44 ivanagas/writeconcise: npm 9, judge 2
+2026-10-28T09:01:47.479Z skip craftzdog/pouchdb-adapter-react-native-sqlite: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:53.626Z 45 bwhyte21/ProjectAniTracker: npm 16, judge 3
+2026-10-28T09:01:53.628Z skip mothership/react-native-maps: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:55.996Z 46 evanwon/tastemaker-site: npm 8, judge 0
+2026-10-28T09:01:55.998Z skip GERIMMO/GERIMMO_V4: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:56.000Z skip Tribunus-dev/Tribunus: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:01:59.269Z 47 Nickpavlenk0/chess-studio: npm 3, judge 0
+2026-10-28T09:02:05.223Z 48 karyna4k/100-days-css: npm 7, judge 3
+2026-10-28T09:02:08.087Z skip AbdulSamad94/Personal-Portfolio: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:02:18.543Z 49 jadwalit-jpg/Jadwal: npm 28, judge 2
+2026-10-28T09:02:18.545Z skip dargmuesli/nuxt-repro-shared-nitro-types: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:02:18.546Z skip Pedrolopesh/next-journey-to-do-list-gamified: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:02:20.769Z skip nassarwafik/ExamBank791381: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:02:20.771Z skip danyallya/accessibility-audit: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:02:20.776Z skip tryptz/Tryptify: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:02:39.792Z 50 kratus66/CodeAI-Academy: npm 40, judge 12
+2026-10-28T09:03:42.046Z 51 Armor-test/uptime-kuma: npm 73, judge 24
+2026-10-28T09:03:46.909Z 52 logicalgnosis/logicalgnosis.github.io: npm 4, judge 3
+2026-10-28T09:03:51.519Z 53 KHY90/JMAirAgentFront: npm 6, judge 0
+2026-10-28T09:03:51.530Z skip evanwon/threadsafe: owner: another repository of the same owner is already in the sample
+2026-10-28T09:03:55.514Z 54 TKExternalAffairs/website: npm 6, judge 5
+2026-10-28T09:03:59.603Z 55 ASIL-E-Hatake/vscode-games: npm 7, judge 0
+2026-10-28T09:04:05.246Z 56 clorth0/EQEmu: npm 11, judge 7
+2026-10-28T09:04:08.269Z skip navikt/veilarbdetaljerfs: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:04:11.619Z 57 AlbusKavaliro/AntiXss: npm 5, judge 0
+2026-10-28T09:04:11.621Z skip dimzyg110/ai: fork: fork
+2026-10-28T09:04:11.623Z skip KaoruNishikawa/ElementToHTML: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:15.830Z 58 JDonoghue-UL/my-astro-blog: npm 4, judge 4
+2026-10-28T09:04:20.240Z 59 TonyVoorhees/TonyVoorhees.github.io: npm 6, judge 5
+2026-10-28T09:04:20.241Z skip danyallya/skill-time-bank: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:25.652Z skip jacarium/jacarium: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:04:33.699Z 60 kkd927/kmux: npm 30, judge 5
+2026-10-28T09:04:33.701Z skip yplam/osrtos: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:33.706Z skip wangj6231/ai-trading-platform: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:35.957Z 61 KirishimaAmenatsu/web_site_guide: npm 2, judge 0
+2026-10-28T09:04:39.014Z 62 chadheise/blog: npm 1, judge 1
+2026-10-28T09:04:39.016Z skip notum-cz/strapi-next-monorepo-starter: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:39.018Z skip pant5uf1ard/budget-calendar: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:46.270Z 63 nikolanovoselec/codeflare: npm 8, judge 2
+2026-10-28T09:04:46.272Z skip Sellest-AI/Cuisko: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:46.273Z skip JamesFlare1212/brokenarrow-log-maggot: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:50.203Z skip temurtasyucel-ops/pinkrose-cafe: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:04:50.211Z skip madhu-sv/garuda: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:04:58.071Z 64 hitchhikers42/zanotam-proxy: npm 27, judge 11
+2026-10-28T09:05:07.183Z 65 ELDIABLO2020/bannersin48: npm 30, judge 8
+2026-10-28T09:05:07.192Z skip navikt/poao-frontend: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:05:09.783Z 66 bmesuere/licence-quest: npm 5, judge 2
+2026-10-28T09:05:09.785Z skip evanwon/goodreads-shelf-position-editor: owner: another repository of the same owner is already in the sample
+2026-10-28T09:05:12.495Z skip Juan-Carlos-Estevez-Vargas/Camila-Sanchez: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:05:12.497Z skip tranhatam-collab/omdala.com: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:05:12.499Z skip bizimind/loxel: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:05:12.502Z skip anthony-liddle/crowd: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:05:12.504Z skip kingofyadav/0dot: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:05:58.229Z skip JakeWharton/jakewharton.com: judge lockfile reader: after 3 attempts: judge lockfile reader: Unexpected package-lock path: node_modules/primitives/packages/ai-gateway.
+2026-10-28T09:05:58.241Z skip suttsc/terminal-react: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:05:58.251Z skip faddat/lambdavm: fork: fork
+2026-10-28T09:05:58.261Z skip danyallya/appliance-service-passport: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:06:04.021Z 67 PatricRc/haber: npm 6, judge 3
+2026-10-28T09:06:04.027Z skip totaldrop-app/totaldrop: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:06:17.375Z 68 derekantrican/derekantrican.github.io: npm 45, judge 19
+2026-10-28T09:06:19.198Z skip a-zen/simple-server: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:06:28.201Z 69 ShokooBid/PocketLedger: npm 19, judge 2
+2026-10-28T09:06:28.202Z skip Asherlc/dofek: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:06:28.204Z skip microsoft/gametheory: owner: another repository of the same owner is already in the sample
+2026-10-28T09:06:31.874Z 70 bdizzz/downtown-mars: npm 4, judge 0
+2026-10-28T09:06:31.875Z skip poad/pulumi-example: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:06:36.115Z 71 mapleclose/rocket-feast-website: npm 10, judge 5
+2026-10-28T09:06:49.601Z 72 guola/socratic-rush: npm 26, judge 6
+2026-10-28T09:06:55.650Z skip Ruthgyeul/RelayFiles: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:07:33.607Z 73 thomas40510/PS-Generator: npm 117, judge 49
+2026-10-28T09:07:37.326Z skip kerti/balances-landing: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:07:41.790Z 74 fastagent-sh/fastagent: npm 8, judge 3
+2026-10-28T09:07:41.792Z skip Merck/Data-Profiler: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:07:48.349Z 75 securityonionsolutions-com/securityonionsolutions-com.github.io: npm 16, judge 1
+2026-10-28T09:07:52.421Z skip devmiker/team-rodriguez: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:07:55.566Z 76 verygoodplugins/mcp-automem: npm 3, judge 0
+2026-10-28T09:07:55.573Z skip artkrsk/header-engine-for-elementor: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:07:59.666Z skip Earlo/fate: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:07:59.667Z skip bendrucker/claude: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:08:03.571Z 77 ayush-that/cobalt-landing-page: npm 4, judge 0
+2026-10-28T09:08:08.302Z 78 Renhuai123/ziwei-doushu: npm 2, judge 1
+2026-10-28T09:08:14.924Z 79 nschema-org/NSchema.Docs: npm 19, judge 12
+2026-10-28T09:08:14.926Z skip ankitects/anki: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:08:14.928Z skip danyallya/use-food-first: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:08:23.904Z 80 CDCgov/dibbs-query-connector: npm 7, judge 1
+2026-10-28T09:08:23.908Z skip tobiasvdorp/pull-request-image-upload-for-agents: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:08:40.208Z 81 halain/adminpro-angular: npm 38, judge 4
+2026-10-28T09:08:43.083Z 82 aydabd/cacad: npm 4, judge 1
+2026-10-28T09:08:43.085Z skip MishC/HTML_CSS_JavaScript: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:08:52.390Z 83 kyubey1228/ore-meshi: npm 22, judge 8
+2026-10-28T09:08:59.091Z 84 BilLogic/uno-blueprint: npm 12, judge 1
+2026-10-28T09:09:01.912Z 85 tranhatam-collab/tueban-platform: npm 6, judge 0
+2026-10-28T09:09:01.929Z skip ondatra-ai/true-bdd: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:09:06.313Z 86 Vithanco/vscode-vithanco: npm 11, judge 0
+2026-10-28T09:09:06.315Z skip pokelitee/rom-wiki: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:09:06.317Z skip microsoft/immersive-reader-sdk: owner: another repository of the same owner is already in the sample
+2026-10-28T09:09:06.318Z skip Raghavtripathii/email-job-scheduler: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:09:11.452Z 87 korbonits/korbonits.github.io: npm 15, judge 11
+2026-10-28T09:09:11.454Z skip yatabis/echo-chamber: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:09:11.456Z skip visitscotland/visitscotland-dot-com-frontend: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:09:11.457Z skip halain/angular-chat: owner: another repository of the same owner is already in the sample
+2026-10-28T09:09:11.459Z skip siyakhumalodev/copilot-metrics-viewer: fork: fork
+2026-10-28T09:09:43.278Z 88 Azure/api-management-developer-portal: npm 76, judge 22
+2026-10-28T09:09:47.625Z 89 chirag127/oz-chrome: npm 15, judge 0
+2026-10-28T09:10:00.181Z 90 sMorrison26/Portfolio: npm 51, judge 1
+2026-10-28T09:10:04.740Z 91 Galane-dev/shesha-config-diff: npm 1, judge 0
+2026-10-28T09:10:10.342Z 92 BROCKUGANDA/permitzero: npm 15, judge 2
+2026-10-28T09:10:21.233Z 93 Gray-Ghost-Data-Consultants-LLC/grayghostdata-website: npm 18, judge 12
+2026-10-28T09:11:03.580Z 94 paritytech/triangle-js-sdks: npm 31, judge 2
+2026-10-28T09:11:03.585Z skip danimaribeiro/HankoXml: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:11:03.600Z skip Aepzie/cutline: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:11:03.605Z skip Mayank01jh/sevasetu: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:11:03.621Z skip faddat/ethermint-2: fork: fork
+2026-10-28T09:11:03.631Z skip kirkyl93/Football-Query-Engine: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:11:06.251Z skip Unicon/grouper-mcp: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:11:06.253Z skip xSTORMYxSHM/Data-Horizon: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:11:08.313Z 95 clay-good/roughlogic.com: npm 3, judge 0
+2026-10-28T09:12:04.153Z 96 epam/statgpt-portal-frontend: npm 45, judge 2
+2026-10-28T09:12:04.167Z skip thewca/worldcubeassociation.org: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:07.087Z 97 frioux/woodworking-tools: npm 1, judge 0
+2026-10-28T09:12:07.089Z skip ripcity352/trip-planner: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:07.091Z skip apache/skywalking-ai-sessionizer: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:23.232Z 98 acekyd/acekyd: npm 61, judge 10
+2026-10-28T09:12:23.234Z skip Unique-AG/connectors: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:23.236Z skip polynomeer/monticker: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:23.237Z skip eriqjaffe/OOTP-Uniform-Maker: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:23.239Z skip rocketride-org/rocketride-server: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:48.587Z 99 GSA/ngx-uswds: npm 30, judge 1
+2026-10-28T09:12:48.589Z skip LiftbridgeLabs/credit-engine: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:48.590Z skip boffti/stardash: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:52.826Z skip xjilio123/orbe: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:12:52.828Z skip PuppetAJ/Chunkd: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:52.830Z skip openng-org/optimus-ui: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:56.590Z skip MaddyGuthridge/marked-mermaid: nothing named: neither npm audit nor OSV names an installed package
+2026-10-28T09:12:56.592Z skip jmoss333/psychiatry-clerkship: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:56.594Z skip tranhatam-collab/cios.iai.one: owner: another repository of the same owner is already in the sample
+2026-10-28T09:12:56.596Z skip juspay/hyperswitch-saleor-payment-app: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:12:56.597Z skip jenad-awwad/DAPOS: no root lockfile: no package.json and package-lock.json at the root
+2026-10-28T09:13:03.318Z 100 eitaar/eitaar.dev-v5: npm 15, judge 13
+2026-10-28T09:13:03.344Z done: 100 repositories, npm audit 1867, judge 560, considered 256 {"no root lockfile":114,"nothing named":23,"fork":10,"owner":8,"judge lockfile reader":1}

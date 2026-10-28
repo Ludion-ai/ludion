@@ -962,3 +962,14 @@ Design, "ロードマップと検証ゲート", gate 2 (ノイズ測定), and th
 - the exclusions by cause, lockfile v1 under "not measured", the frame of the rule-of-three bound, and what a pass means;
 - npm's version enforced, and the image pinned by digest;
 - the reviewer brief committed before the review.
+
+## 2026-10-28 — Noise measurement: one deviation during the search
+
+Recorded during the search, before the measurement ran. It changes no result.
+- **What failed.** GitHub's GraphQL answered HTTP 502 five times to the registered query (100 results an hour, each with two file lookups): hour 00 once, hour 01 once, hour 02 three times (`search/attempts.log`).
+- **What was done instead.** A 50-result page answered. So each hour was fetched as two pages of 50, which are the first 100 results in the same order with the same fields.
+  - The raw pages are kept as `hour-HH.p1.json` and `hour-HH.p2.json`.
+  - `join.mjs` joins them, with nothing fetched, into `hour-HH.json`, the file `noise.ts` reads.
+  - The query text differs from `SEARCH` in `noise.ts` only in `first: 50`, the `after` cursor and `pageInfo` (`scripts/search2.sh`).
+  - All 24 hours were fetched this way, including the two that had answered once at 100.
+- **When.** The search finished at 2026-10-28T08:55:14Z. It was committed and pushed as 2ee1afc (17:55:34 JST) before the measurement started at 08:56:01Z.

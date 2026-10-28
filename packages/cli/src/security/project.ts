@@ -1,6 +1,7 @@
 import { chmodSync, constants, closeSync, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { hash } from "./php.ts";
+import { isReadOnlyCliName, READONLY_CLI_NAMES, readOnlyRefusal } from "./readonly/index.ts";
 
 export const CONFIG = "ludion.security.json";
 export type Config = { schema: 1; ecosystem?: "php"; dockerfile: string; test: string[]; timeout_seconds: number };
@@ -35,6 +36,7 @@ export function readConfig(root: string): Config | DependencyConfig {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid security config.");
   const c = value as Record<string, unknown>;
   if (c.ecosystem !== undefined && c.ecosystem !== "php") {
+    if (isReadOnlyCliName(String(c.ecosystem)) || Object.values(READONLY_CLI_NAMES).some(r => r.ecosystem === c.ecosystem)) throw new Error(readOnlyRefusal(String(c.ecosystem)));
     if (!["npm", "composer", "maven"].includes(String(c.ecosystem)) || Object.keys(c).some(k => !["schema", "ecosystem", "image", "test", "timeout_seconds"].includes(k)) || c.schema !== 1 || !Array.isArray(c.test) || !c.test.length || c.test.length > 32 || !c.test.every(a => typeof a === "string" && a.length > 0 && a.length <= 2000 && !a.includes("\0")) || String(c.test[0]).startsWith("-") || !Number.isInteger(c.timeout_seconds) || Number(c.timeout_seconds) < 1 || Number(c.timeout_seconds) > 600 || (c.image !== undefined && (typeof c.image !== "string" || c.image.length > 240))) {
       throw new Error("Expected npm/composer/maven ecosystem, optional official tool image, test argv and timeout_seconds (1–600).");
     }

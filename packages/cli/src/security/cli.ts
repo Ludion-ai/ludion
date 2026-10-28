@@ -7,12 +7,28 @@ import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
 import { scanProject } from "./scan.ts";
 import { CONFIG, DEFAULT_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
+import type { ReadOnlyScan } from "./osv.ts";
+import { isReadOnlyCliName, readOnlyRefusal } from "./readonly/index.ts";
+
+/** The text lines for one read-only check, in the form of the other dependency checks. */
+export function readOnlyText(ecosystem: string, result: ReadOnlyScan): string[] {
+  // Limitations can quote project files: no control characters reach the terminal.
+  const plain = (text: string) => String(text).replace(/[\x00-\x1f\x7f]/g, " ");
+  return [
+    `${ecosystem}: ${result.inventory.packages.length} package versions · ${result.findings.length} advisory matches · ${result.status}`,
+    ...result.findings.map(f => `  ${f.package.name}@${f.package.version} · ${f.advisory.id} · ${f.advisory.summary} · ${f.fixed_versions.length ? `OSV lists fixed: ${f.fixed_versions.join(", ")}` : "OSV lists no fixed version"}`),
+    ...result.inventory.limitations.map(limit => `  Incomplete: ${plain(limit)}`),
+    `  Scope: ${plain(result.inventory.scope)} (${result.inventory.files.map(plain).join(", ")})`,
+    "  Read-only: Ludion reports known advisories for this ecosystem but does not plan or apply updates.",
+  ];
+}
 
 export async function securityCli(command: string, args: string[]): Promise<number> {
   const { values } = parseArgs({ args, options: { dir: { type: "string", default: "." }, ecosystem: { type: "string" }, json: { type: "boolean" }, apply: { type: "boolean" }, interval: { type: "string", default: "900" } } });
   if (values.apply && !["patch", "watch"].includes(command)) throw new Error("--apply is only valid with patch or watch.");
+  if (isReadOnlyCliName(values.ecosystem) && command !== "scan") throw new Error(readOnlyRefusal(values.ecosystem));
   if (values.ecosystem && !["init", "scan"].includes(command)) throw new Error("--ecosystem selects init/scan only; patch/watch use the saved project policy.");
-  if (values.ecosystem && !["auto", "php", "npm", "composer", "maven"].includes(values.ecosystem)) throw new Error("Supported ecosystems: php, npm, composer, maven, auto.");
+  if (values.ecosystem && !["auto", "php", "npm", "composer", "maven"].includes(values.ecosystem) && !isReadOnlyCliName(values.ecosystem)) throw new Error("Supported ecosystems: php, npm, composer, maven, python, go, rust (scan only), auto.");
   const root = rootPath(values.dir!);
   if (command === "init") {
     if (existsSync(join(root, CONFIG))) throw new Error(`${CONFIG} already exists. Edit it to choose your real validation command.`);
@@ -37,7 +53,8 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     else {
       for (const check of report.checks) {
         if ("error" in check) { console.error(`${check.ecosystem}: unavailable — ${check.error}`); continue; }
-        if ("findings" in check.result) {
+        if ("fixed_versions_note" in check.result) for (const line of readOnlyText(check.ecosystem, check.result)) console.log(line);
+        else if ("findings" in check.result) {
           console.log(`${check.ecosystem}: ${check.result.inventory.packages.length} package versions · ${check.result.findings.length} advisory matches · ${check.result.status}`);
           for (const finding of check.result.findings) console.log(`  ${finding.package.name}@${finding.package.version} · ${finding.advisory.id} · ${finding.advisory.summary}`);
           for (const limit of check.result.inventory.limitations) console.log(`  Incomplete: ${limit}`);

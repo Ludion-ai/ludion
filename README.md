@@ -9,7 +9,7 @@ Ludion detects known fixes, acquires dependencies, tests the original and update
 | PHP packages | Composer lockfile + OSV | Pinned public ZIP archives; standard vendor directory; no custom repositories or policy overrides |
 | Java / Maven | Resolved direct/transitive dependency graph + OSV | Standalone POM, public Central; no parents, profiles, modules, extensions or custom repositories |
 
-Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP, same-tag OS-image rebuilds, EOL certification and automatic production deployment remain unsupported. An empty result is not a security guarantee. Missing metadata and incomplete inventories remain visible.
+Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go and Rust are scanned read-only, with no updates (see [Read-only scans](#read-only-scans-python-go-and-rust)). Gradle, live server inventory, runtime upgrades beyond PHP, same-tag OS-image rebuilds, EOL certification and automatic production deployment remain unsupported. An empty result is not a security guarantee. Missing metadata and incomplete inventories remain visible.
 
 ## Getting started: judge your npm dependency PRs
 
@@ -109,6 +109,29 @@ node packages/cli/dist/cli.js watch --dir /path/to/app --apply --interval 900
 ```
 
 Ctrl+C cancels pending application. An in-flight Docker step may finish before exit. Watch installs no service or scheduler. Scan exits 1 for attention needed, 2 for an error, and 0 only when recorded supported inventories need no attention; it does not certify security. Patch exits 2 on failure.
+
+## Read-only scans: Python, Go and Rust
+
+`ludion scan` also reads these files at the project root and looks up their packages in OSV. Ludion reports known advisories for these ecosystems but does not plan or apply updates. There is no update policy for them: `init`, `patch` and `watch` refuse `--ecosystem python|go|rust`. `scan --ecosystem python` (or `go`, `rust`) scans only that ecosystem.
+
+| Ecosystem | Files read | OSV ecosystem |
+| --- | --- | --- |
+| Python | requirements.txt, pyproject.toml, poetry.lock, uv.lock, Pipfile.lock | PyPI |
+| Go | go.mod | Go |
+| Rust | Cargo.lock, Cargo.toml | crates.io |
+
+Checked:
+
+- The packages whose exact name and version the files state. Only each name and version is sent to OSV, and the match is OSV's. Withdrawn advisories are left out.
+- For each match: the advisory id, its summary and the fixed versions OSV lists for that package, copied as they are.
+
+Not checked:
+
+- Versions are not compared. Ludion does not say which listed fixed version applies to the installed one, or whether one is newer: PEP 440 and Go versions are not semver.
+- Anything that cannot be read as an exact name and version (an unpinned or ranged requirement, a Git, path or URL source, a Go replace directive, an unknown file format version) is listed as `Incomplete:` and the result is `incomplete`, never clean.
+- Files in subdirectories. Nothing is installed, resolved, built or run, and whether vulnerable code is reached is not checked.
+
+Exit codes are scan's own: 1 when an advisory matches, 2 when a result is incomplete or a check fails, 0 otherwise. `--json` also gives each match's `fixed_versions`.
 
 ## Validation and acquisition boundaries
 

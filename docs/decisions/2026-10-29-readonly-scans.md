@@ -1,0 +1,9 @@
+# 2026-10-29 — Read-only scans for Python, Go and Rust: the framework
+
+`ludion scan` reads PyPI, Go and crates.io inventories through registered readers (packages/cli/src/security/readonly/) and reports OSV's known advisories. Nothing is planned or applied for these ecosystems.
+
+- **No version comparison.** A finding is OSV's match on the exact name and version. Its `fixed_versions` are the fixed versions OSV lists for that package and ecosystem, copied as strings for display: PEP 440 and Go versions are not semver, so Ludion does not say which one applies. Only SEMVER and ECOSYSTEM ranges are read (a GIT range lists commits). PyPI names are matched in OSV records by PEP 503 normalization, Go and crates.io names exactly.
+- **Status.** The existing rule: `vulnerabilities_found` with any finding, otherwise `incomplete` when the inventory has any limitation, otherwise `no_known_vulnerabilities`. Withdrawn advisories are left out.
+- **Unsupported list.** Unchanged while no reader is registered (requirements.txt, pyproject.toml, go.mod, Cargo.lock, build.gradle, build.gradle.kts). A file leaves it only when a registered reader ran for it; that reader's check (a result or an error) then reports it. build.gradle(.kts) stay unsupported.
+- **Nothing dropped silently.** A reader that returns no inventory while one of its files is present, or an inventory of another ecosystem, gives an error check. A present file that the reader neither lists in `files` nor names in a limitation gets the limitation "<file> is present but was not read." Every present file is read before the reader runs and compared after the OSV lookup, so a change during the scan gives an error, as for the other inventories.
+- **No update policy.** `init`, `patch` and `watch` refuse `--ecosystem python|go|rust`, and a saved ludion.security.json naming python, go, rust, PyPI, Go or crates.io is refused with the same message.

@@ -1242,3 +1242,19 @@ One addition goes beyond section 2's text, in the safe direction: an install wit
 - **A second execution** at the fix commit, with the same script, sample, sources and image, is reported beside it, never instead of it. Its output goes to `docs/bench/2026-10-28-noise-v2/result-fixed/`.
 - Every fix only adds production, so its left-out list must be a subset of the result's. Its misses are counted from the review's verdicts for the packages it still leaves out. A left-out package that the review did not check counts as undecidable. No other review is run.
 - **Outcome.** The second execution (6c4f58e) gave the same numbers: the judge 938, the same 160 left out, 11 misses in 4 repositories. f0d489e later stopped the reader from backtracking exponentially on a crafted file, which an automated security review flagged. That changes no match.
+
+## 2026-10-28 (cycle 3, L1) — #168's delta review: three regressions fixed, the reader made linear, and a third execution beside the result
+
+#168's delta review (at 93d778b) found three places where 6c4f58e leaves out what c381a85 counted and section 2 calls production:
+- A: a stylesheet import clause that runs across lines;
+- B: a type-only brace list that swallows a real import;
+- C: here-strings (`<<<`) and shifts (`1<<2`) read as heredocs.
+
+So the premise in the entry above, that every fix only adds production, did not hold; `beside.mjs` checked the subset rather than assuming it, and the check held. The review also found quadratic paths on crafted files.
+
+- **The fixes.**
+  - Stylesheet clauses end at a line break (unless the line ends with a comma), at `;`, `{`, `}` or the next `@` outside quotes. c381a85's reading is kept beside them, so no stylesheet import it read is lost.
+  - A type-only brace list cannot hold quotes, semicolons or braces.
+  - A heredoc needs `<<` as its own word followed by a delimiter that starts with a letter or `_`, and a closing line; without one, the line is read as written.
+  - The import-call reader skips comments with cached positions; the YAML readers and the stage chain use loops.
+- **A third execution** at the commit with these fixes, with the same script, sample, sources and image, is reported beside the result, never instead of it, in `docs/bench/2026-10-28-noise-v2/result-final/`. Its misses are counted from the review's verdicts as in the entry above, with `beside.mjs`, and a package the review did not check counts as undecidable. The result (c381a85) stays the result.

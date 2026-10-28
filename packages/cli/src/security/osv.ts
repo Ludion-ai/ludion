@@ -11,7 +11,7 @@ export function comparableVersion(version: string, ecosystem: Ecosystem): string
   return semver.valid(version);
 }
 
-export type Advisory = { id: string; summary: string; aliases: string[]; affected: { package: { ecosystem: string; name: string }; ranges?: { type?: string; events?: { fixed?: string }[] }[] }[]; withdrawn?: string };
+export type Advisory = { id: string; summary: string; aliases: string[]; affected: { package: { ecosystem: string; name: string }; ranges?: { type?: string; events?: { fixed?: string }[] }[]; database_specific?: unknown }[]; withdrawn?: string };
 export type Finding = { package: Package; advisory: Advisory };
 export type DependencyScan = {
   schema: 1; checked_at: string; source: "https://osv.dev";
@@ -20,8 +20,11 @@ export type DependencyScan = {
   inventory: Inventory; findings: Finding[]; plan: Change[]; blocked: string[];
   note: string;
 };
-/** OSV matched this exact name and version. fixed_versions are OSV's own strings, for display only: never compared. */
-export type ReadOnlyFinding = { package: ReadOnlyPackage; advisory: Advisory; fixed_versions: string[] };
+/**
+ * OSV matched this exact name and version. fixed_versions are OSV's own strings, for display only: never compared.
+ * kind "informational" is a RustSec notice (unmaintained, unsound, notice): listed, but not counted as a vulnerability.
+ */
+export type ReadOnlyFinding = { package: ReadOnlyPackage; advisory: Advisory; fixed_versions: string[] } & ({ kind: "vulnerability" } | { kind: "informational"; informational: string });
 /** An ecosystem Ludion reads but does not patch: findings only, no plan and no apply. */
 export type ReadOnlyScan = {
   schema: 1; checked_at: string; source: "https://osv.dev"; status: "vulnerabilities_found" | "no_known_vulnerabilities" | "incomplete";
@@ -34,14 +37,45 @@ const READONLY_ECOSYSTEMS: readonly string[] = ["PyPI", "Go", "crates.io"];
 /** Printable ASCII without spaces: what is sent to OSV, and what a terminal shows, for read-only coordinates. */
 const PLAIN = /^[\x21-\x7e]+$/;
 
+/** golang.org/x/mod's CheckPath: a lower-case first element with a dot, then elements of [A-Za-z0-9._~-] not starting or ending with a dot. */
+function goModulePath(path: string): boolean {
+  const elements = path.split("/");
+  return /^[a-z0-9][a-z0-9.-]*$/.test(elements[0]!) && elements[0]!.includes(".") && elements.every(e => /^[A-Za-z0-9._~-]+$/.test(e) && !e.startsWith(".") && !e.endsWith("."));
+}
+/**
+ * The names each ecosystem can have, so a reader that passes on something else (an extra, a marker, a path) fails
+ * closed here instead of becoming a query that matches nothing.
+ */
+const VALID_NAME: Record<string, (name: string) => boolean> = {
+  // PEP 508 names: no extras, markers or version specifiers.
+  PyPI: name => name.length <= 240 && /^([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9])$/.test(name),
+  // A module path, or the names OSV gives the standard library and the go command.
+  Go: name => name.length <= 240 && (name === "stdlib" || name === "toolchain" || goModulePath(name)),
+  "crates.io": name => /^[A-Za-z0-9_-]{1,64}$/.test(name),
+};
 /** PEP 503: PyPI names compare case-insensitively, with runs of -, _ and . equal. */
-const sameName = (ecosystem: string, a: string, b: string) => ecosystem === "PyPI" ? a.toLowerCase().replace(/[-_.]+/g, "-") === b.toLowerCase().replace(/[-_.]+/g, "-") : a === b;
+const pep503 = (name: string) => name.toLowerCase().replace(/[-_.]+/g, "-");
+const sameName = (ecosystem: string, a: string, b: string) => ecosystem === "PyPI" ? pep503(a) === pep503(b) : a === b;
+const RUSTSEC_INFORMATIONAL = ["unmaintained", "unsound", "notice"];
+/**
+ * RustSec's informational kind for this package, or null when the advisory counts as a vulnerability. Every OSV entry
+ * for the package must carry a known kind, and a record that names a CVE counts as a vulnerability whatever it says.
+ */
+function informational(advisory: Advisory, ecosystem: string, name: string): string | null {
+  if (ecosystem !== "crates.io" || [advisory.id, ...advisory.aliases].some(id => /^CVE-/i.test(id))) return null;
+  const kinds = advisory.affected.filter(a => a.package.ecosystem === ecosystem && sameName(ecosystem, a.package.name, name)).map(a => {
+    const specific = a.database_specific;
+    const kind = specific && typeof specific === "object" && !Array.isArray(specific) ? (specific as Record<string, unknown>).informational : undefined;
+    return typeof kind === "string" && RUSTSEC_INFORMATIONAL.includes(kind) ? kind : null;
+  });
+  return kinds.length && kinds.every(k => k !== null) ? [...new Set(kinds)].join(", ") : null;
+}
 /**
  * The fixed versions OSV gives for one package, in OSV's order, as plain strings. Only SEMVER and ECOSYSTEM ranges hold
  * versions (a GIT range holds commits). Nothing here compares versions: PEP 440 and Go versions are not semver.
  */
 function fixedVersions(advisory: Advisory, ecosystem: string, name: string): string[] {
-  const fixed: string[] = [];
+  const fixed = new Set<string>();
   for (const affected of advisory.affected) {
     if (affected.package.ecosystem !== ecosystem || !sameName(ecosystem, affected.package.name, name)) continue;
     for (const range of affected.ranges ?? []) {
@@ -51,11 +85,11 @@ function fixedVersions(advisory: Advisory, ecosystem: string, name: string): str
         if (!event || typeof event !== "object") throw new Error(`Invalid range event in OSV advisory ${advisory.id}.`);
         if (event.fixed === undefined) continue;
         if (typeof event.fixed !== "string" || event.fixed.length > 100 || !PLAIN.test(event.fixed)) throw new Error(`Invalid fixed version in OSV advisory ${advisory.id}.`);
-        if (!fixed.includes(event.fixed)) fixed.push(event.fixed);
+        fixed.add(event.fixed);
       }
     }
   }
-  return fixed;
+  return [...fixed];
 }
 
 /** Fixed-origin requests only, with bounded bodies, deadlines and explicit pagination. No registry or database failure becomes a clean result. */
@@ -165,27 +199,31 @@ export class OsvClient {
     const ecosystem = inventory.ecosystem;
     if (!READONLY_ECOSYSTEMS.includes(ecosystem) || !Array.isArray(inventory.packages) || !Array.isArray(inventory.limitations) || !Array.isArray(inventory.files)) throw new Error("Invalid read-only inventory.");
     if (inventory.packages.length > 2000) throw new Error("Advisory scan exceeds 2,000 distinct installed package versions.");
+    // One query per package and version (PyPI names by PEP 503); listed twice, it is direct if either entry is.
     const unique = new Map<string, ReadOnlyPackage>();
     for (const pkg of inventory.packages) {
-      if (typeof pkg?.name !== "string" || pkg.name.length > 240 || !PLAIN.test(pkg.name) || typeof pkg.version !== "string" || pkg.version.length > 100 || !PLAIN.test(pkg.version) || typeof pkg.direct !== "boolean") throw new Error(`Invalid ${ecosystem} package coordinate; no clean result is available.`);
-      const key = queryKey({ ecosystem, name: pkg.name, version: pkg.version });
-      if (!unique.has(key)) unique.set(key, pkg);
+      if (typeof pkg?.name !== "string" || !VALID_NAME[ecosystem]!(pkg.name) || typeof pkg.version !== "string" || pkg.version.length > 100 || !PLAIN.test(pkg.version) || typeof pkg.direct !== "boolean") throw new Error(`Invalid ${ecosystem} package coordinate ${JSON.stringify(`${String(pkg?.name).slice(0, 100)}@${String(pkg?.version).slice(0, 100)}`)}; no clean result is available.`);
+      const key = queryKey({ ecosystem, name: ecosystem === "PyPI" ? pep503(pkg.name) : pkg.name, version: pkg.version });
+      const seen = unique.get(key);
+      unique.set(key, seen ? { ...seen, direct: seen.direct || pkg.direct } : { ...pkg });
     }
     const ids = await this.ids([...unique.values()].map(p => ({ ecosystem, name: p.name, version: p.version })));
     const records = [...new Set([...ids.values()].flat())];
     if (records.length > 1000) throw new Error("More than 1,000 advisory records; the read-only scan is incomplete.");
     for (let at = 0; at < records.length; at += 4) await Promise.all(records.slice(at, at + 4).map(id => this.advisory(id)));
     const findings: ReadOnlyFinding[] = [];
-    for (const [key, pkg] of unique) for (const id of ids.get(key) ?? []) {
+    for (const pkg of unique.values()) for (const id of ids.get(queryKey({ ecosystem, name: pkg.name, version: pkg.version })) ?? []) {
       const advisory = this.cache.get(id)!;
-      if (!advisory.withdrawn) findings.push({ package: pkg, advisory, fixed_versions: fixedVersions(advisory, ecosystem, pkg.name) });
+      if (advisory.withdrawn) continue;
+      const fixed_versions = fixedVersions(advisory, ecosystem, pkg.name), kind = informational(advisory, ecosystem, pkg.name);
+      findings.push(kind ? { package: pkg, advisory, fixed_versions, kind: "informational", informational: kind } : { package: pkg, advisory, fixed_versions, kind: "vulnerability" });
     }
     return {
       schema: 1, checked_at: new Date().toISOString(), source: "https://osv.dev",
-      status: findings.length ? "vulnerabilities_found" : inventory.limitations.length ? "incomplete" : "no_known_vulnerabilities",
+      status: findings.some(f => f.kind === "vulnerability") ? "vulnerabilities_found" : inventory.limitations.length ? "incomplete" : "no_known_vulnerabilities",
       inventory, findings,
       fixed_versions_note: `Each finding's fixed_versions are the fixed versions OSV gives for that ${ecosystem} package, copied as plain strings for display. Ludion does not compare them with the installed version, so it does not say which one applies or whether one is newer.`,
-      note: "Read-only: Ludion reports known advisories for this ecosystem but does not plan or apply updates. Only the exact package names and versions read from the files are looked up; no match is not a security guarantee. Package names and versions are sent to OSV; source is not.",
+      note: `Read-only: Ludion reports known advisories for this ecosystem but does not plan or apply updates. Only the exact package names and versions read from the files are looked up; no match is not a security guarantee. Package names and versions are sent to OSV; source is not.${ecosystem === "crates.io" ? " RustSec's informational advisories (unmaintained, unsound, notice) are listed with kind \"informational\" and do not count as vulnerabilities, unless they name a CVE." : ""}`,
     };
   }
 }

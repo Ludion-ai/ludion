@@ -3,9 +3,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Inventory } from "../src/security/inventory.ts";
-import { OsvClient } from "../src/security/osv.ts";
+import { OsvClient, type ReadOnlyScan } from "../src/security/osv.ts";
 import { readConfig } from "../src/security/project.ts";
-import { scanProject } from "../src/security/scan.ts";
+import { scanProject, vulnerable } from "../src/security/scan.ts";
 import { readOnlyText, securityCli } from "../src/security/cli.ts";
 import { GO_FILES, PYTHON_FILES, READONLY_READERS, RUST_FILES, type ReadOnlyReader } from "../src/security/readonly/index.ts";
 import type { ReadOnlyInventory } from "../src/security/readonly/types.ts";
@@ -126,6 +126,97 @@ describe("OSV for read-only inventories", () => {
     await expect(client.scanReadOnly({ ...pypi([django]), ecosystem: "npm" as never })).rejects.toThrow("Invalid read-only inventory");
     await expect(client.scanReadOnly(pypi(Array.from({ length: 2001 }, (_, i) => ({ name: `p${i}`, version: "1.0", direct: true }))))).rejects.toThrow("2,000");
     expect(seen).toEqual([]);
+  });
+  const names = {
+    PyPI: { valid: ["requests", "Flask_Cors", "zope.interface", "a", "A1"], invalid: ["requests[security]", "requests>=2", "requests;python_version<'3'", "-requests", "requests-", "requests.", "a b", "requests@2", "x".repeat(241)] },
+    Go: { valid: ["golang.org/x/net", "github.com/Foo/Bar", "gopkg.in/yaml.v3", "example.com/a~b/v2", "stdlib", "toolchain"], invalid: ["Golang.org/x/net", "golang/x", "-x.org/a", "golang.org//x", "golang.org/x/", "/golang.org/x", "golang.org/.x", "golang.org/x.", "golang.org/x/net@v1.0.0", "../x", "std", "golang.org/x net"] },
+    "crates.io": { valid: ["serde_json", "tokio-util", "a", "x".repeat(64)], invalid: ["serde json", "serde/json", "serde.json", "serde[derive]", "x".repeat(65)] },
+  } as const;
+  it.each(Object.entries(names))("accepts only real %s names, and fails closed before any request on anything else", async (ecosystem, { valid, invalid }) => {
+    const seen: { url: string }[] = [];
+    const client = osv({}, {}, seen);
+    const inventory = (name: string): ReadOnlyInventory => ({ ecosystem: ecosystem as ReadOnlyInventory["ecosystem"], files: ["x"], scope: "test", limitations: [], packages: [{ name, version: "1.0.0", direct: true }] });
+    for (const name of invalid) await expect(client.scanReadOnly(inventory(name)), name).rejects.toThrow(`Invalid ${ecosystem} package coordinate ${JSON.stringify(`${name.slice(0, 100)}@1.0.0`)}`);
+    expect(seen).toEqual([]);
+    for (const name of valid) expect((await client.scanReadOnly(inventory(name))).status, name).toBe("no_known_vulnerabilities");
+    expect(seen).toHaveLength(valid.length);
+  });
+  it("asks once for one PyPI package however its name is spelled, and keeps it direct if any entry is", async () => {
+    const seen: { url: string; body?: string }[] = [];
+    const result = await osv({ "django@3.2.0": ["GHSA-aaaa-bbbb-cccc"] }, { "GHSA-aaaa-bbbb-cccc": record("GHSA-aaaa-bbbb-cccc") }, seen).scanReadOnly(pypi([{ ...django, direct: false }, { name: "Django", version: "3.2.0", direct: true }, { name: "DJANGO", version: "3.2.0", direct: false }, { name: "django", version: "4.0.0", direct: false }]));
+    expect(JSON.parse(seen[0]!.body!).queries).toEqual([{ package: { ecosystem: "PyPI", name: "django" }, version: "3.2.0" }, { package: { ecosystem: "PyPI", name: "django" }, version: "4.0.0" }]);
+    expect(result.findings.map(f => f.package)).toEqual([{ name: "django", version: "3.2.0", direct: true }]);
+    // Go and crates.io names are not normalized: two spellings are two queries.
+    const goSeen: { url: string; body?: string }[] = [];
+    await osv({}, {}, goSeen).scanReadOnly({ ecosystem: "Go", files: ["go.mod"], scope: "test", limitations: [], packages: [{ name: "github.com/foo/bar", version: "1.0.0", direct: true }, { name: "github.com/Foo/Bar", version: "1.0.0", direct: true }] });
+    expect(JSON.parse(goSeen[0]!.body!).queries).toHaveLength(2);
+  });
+  it("is linear in the fixed events of one record", async () => {
+    const events = Array.from({ length: 100_000 }, (_, i) => ({ fixed: `1.${i}` }));
+    const huge = { ...record("GHSA-aaaa-bbbb-cccc"), affected: [{ package: { ecosystem: "PyPI", name: "django" }, ranges: [{ type: "ECOSYSTEM", events: [...events, ...events.slice(0, 1000)] }] }] };
+    const result = await osv({ "django@3.2.0": ["GHSA-aaaa-bbbb-cccc"] }, { "GHSA-aaaa-bbbb-cccc": huge }).scanReadOnly(pypi([django]));
+    expect(result.findings[0]!.fixed_versions).toHaveLength(100_000);
+  });
+});
+
+describe("RustSec informational advisories are listed apart from vulnerabilities", () => {
+  const atty = { name: "atty", version: "0.2.14", direct: true };
+  const crates = (limitations: string[] = []): ReadOnlyInventory => ({ ecosystem: "crates.io", files: ["Cargo.lock"], scope: "locked", packages: [atty], limitations });
+  // As OSV writes them (checked live: RUSTSEC-2024-0375, RUSTSEC-2021-0145, GHSA-g98v-hv3f-hcfr).
+  const rustsec = (id: string, informational: unknown, aliases: string[] = [], extra: Record<string, unknown>[] = []) => ({
+    id, summary: `${id} summary`, aliases,
+    affected: [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [{ type: "SEMVER", events: [{ introduced: "0.0.0-0" }] }], database_specific: { categories: [], cvss: null, informational } }, ...extra],
+  });
+  const records = {
+    "RUSTSEC-2024-0375": rustsec("RUSTSEC-2024-0375", "unmaintained"),
+    "RUSTSEC-2021-0145": rustsec("RUSTSEC-2021-0145", "unsound", ["GHSA-g98v-hv3f-hcfr"]),
+    "GHSA-g98v-hv3f-hcfr": { ...rustsec("GHSA-g98v-hv3f-hcfr", undefined, ["RUSTSEC-2021-0145"]), affected: [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [{ type: "SEMVER", events: [{ introduced: "0" }, { last_affected: "0.2.14" }] }], database_specific: { source: "https://github.com/github/advisory-database" } }] },
+    "RUSTSEC-2020-0036": rustsec("RUSTSEC-2020-0036", "unmaintained", ["CVE-2019-25010", "GHSA-jq66-xh47-j9f3"]),
+    "RUSTSEC-2099-0001": rustsec("RUSTSEC-2099-0001", "something-new"),
+    "RUSTSEC-2099-0002": rustsec("RUSTSEC-2099-0002", "unmaintained", [], [{ package: { ecosystem: "crates.io", name: "atty" }, ranges: [], database_specific: { informational: null } }]),
+    "RUSTSEC-2099-0003": rustsec("RUSTSEC-2099-0003", "notice", [], [{ package: { ecosystem: "crates.io", name: "other" }, ranges: [] }]),
+  };
+  const scan = (ids: string[], inventory = crates()) => osv({ "atty@0.2.14": ids }, records).scanReadOnly(inventory);
+
+  it("does not count unmaintained, unsound or notice records as vulnerabilities", async () => {
+    const result = await scan(["RUSTSEC-2024-0375", "RUSTSEC-2021-0145", "RUSTSEC-2099-0003"]);
+    expect(result.findings.map(f => [f.advisory.id, f.kind, f.kind === "informational" ? f.informational : null])).toEqual([["RUSTSEC-2024-0375", "informational", "unmaintained"], ["RUSTSEC-2021-0145", "informational", "unsound"], ["RUSTSEC-2099-0003", "informational", "notice"]]);
+    expect(result.status).toBe("no_known_vulnerabilities");
+    expect(result.note).toContain('kind "informational"');
+    expect((await scan(["RUSTSEC-2024-0375"], crates(["Cargo.toml: a git dependency is not checked."]))).status).toBe("incomplete");
+  });
+  it("still counts a vulnerability next to them, and lists both", async () => {
+    const result = await scan(["GHSA-g98v-hv3f-hcfr", "RUSTSEC-2021-0145"]);
+    expect(result.findings.map(f => [f.advisory.id, f.kind])).toEqual([["GHSA-g98v-hv3f-hcfr", "vulnerability"], ["RUSTSEC-2021-0145", "informational"]]);
+    expect(result.status).toBe("vulnerabilities_found");
+    expect(readOnlyText("crates.io", result).slice(0, 3)).toEqual([
+      "crates.io: 1 package versions · 1 advisory matches · 1 informational · vulnerabilities_found",
+      "  atty@0.2.14 · GHSA-g98v-hv3f-hcfr · GHSA-g98v-hv3f-hcfr summary · OSV lists no fixed version",
+      "  Informational (unsound, not counted as a vulnerability): atty@0.2.14 · RUSTSEC-2021-0145 · RUSTSEC-2021-0145 summary · OSV lists no fixed version",
+    ]);
+  });
+  it.each([
+    ["names a CVE", "RUSTSEC-2020-0036"],
+    ["has a kind Ludion does not know", "RUSTSEC-2099-0001"],
+    ["is informational for only one of the package's entries", "RUSTSEC-2099-0002"],
+  ])("counts a record that %s as a vulnerability", async (_name, id) => {
+    const result = await scan([id]);
+    expect(result.findings.map(f => f.kind)).toEqual(["vulnerability"]); expect(result.status).toBe("vulnerabilities_found");
+  });
+  it("reads the informational kind for crates.io only", async () => {
+    const pypiRecord = { ...record("PYSEC-2026-9"), aliases: [], affected: [{ package: { ecosystem: "PyPI", name: "django" }, ranges: [], database_specific: { informational: "unmaintained" } }] };
+    const result = await osv({ "django@3.2.0": ["PYSEC-2026-9"] }, { "PYSEC-2026-9": pypiRecord }).scanReadOnly(pypi([django]));
+    expect(result.findings[0]!.kind).toBe("vulnerability");
+  });
+  it("leaves an informational-only project clean in scan, and a vulnerability still needs attention", async () => {
+    const root = project({ "Cargo.lock": "version = 4\n" });
+    const reader = fakeReader(() => crates(), "crates.io", RUST_FILES);
+    const clean = await scanProject(root, undefined, { readers: [reader], client: osv({ "atty@0.2.14": ["RUSTSEC-2024-0375"] }, records) });
+    expect(clean.status).toBe("no_known_updates");
+    expect(clean.checks.every(c => "result" in c && !vulnerable(c.result as ReadOnlyScan))).toBe(true);
+    const found = await scanProject(root, undefined, { readers: [reader], client: osv({ "atty@0.2.14": ["RUSTSEC-2024-0375", "GHSA-g98v-hv3f-hcfr"] }, records) });
+    expect(found.status).toBe("attention_required");
+    expect(found.checks.every(c => "result" in c && vulnerable(c.result as ReadOnlyScan))).toBe(true);
   });
 });
 

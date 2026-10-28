@@ -124,6 +124,8 @@ Checked:
 
 - The packages whose exact name and version the files state. Only each name and version is sent to OSV, and the match is OSV's. Withdrawn advisories are left out.
 - For each match: the advisory id, its summary and the fixed versions OSV lists for that package, copied as they are.
+- Names must be valid for their ecosystem (PEP 508 names without extras, Go module paths or stdlib and toolchain, crates.io names); anything else stops the check with an error. A PyPI package listed under several spellings is looked up once (PEP 503).
+- RustSec advisories marked informational (unmaintained, unsound, notice) are listed as informational. They do not count as vulnerabilities for the status or the exit code, unless the record names a CVE.
 
 Not checked:
 

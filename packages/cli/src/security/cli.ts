@@ -5,18 +5,24 @@ import { setTimeout as delay } from "node:timers/promises";
 import { patchProject } from "./patch.ts";
 import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
-import { scanProject } from "./scan.ts";
+import { scanProject, vulnerable } from "./scan.ts";
 import { CONFIG, DEFAULT_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
-import type { ReadOnlyScan } from "./osv.ts";
-import { isReadOnlyCliName, readOnlyRefusal } from "./readonly/index.ts";
+import type { ReadOnlyFinding, ReadOnlyScan } from "./osv.ts";
+import { isReadOnlyCliName, READONLY_CLI_NAMES, readOnlyRefusal } from "./readonly/index.ts";
 
-/** The text lines for one read-only check, in the form of the other dependency checks. */
+/** Read-only checks can quote project files (limitations, reader errors): no C0 or C1 control character reaches the terminal. */
+const plain = (text: string) => String(text).replace(/[\x00-\x1f\x7f-\x9f]/g, " ");
+const READONLY_ECOSYSTEMS: readonly string[] = Object.values(READONLY_CLI_NAMES).map(r => r.ecosystem);
+
+/** The text lines for one read-only check, in the form of the other dependency checks. Informational findings come last. */
 export function readOnlyText(ecosystem: string, result: ReadOnlyScan): string[] {
-  // Limitations can quote project files: no control characters reach the terminal.
-  const plain = (text: string) => String(text).replace(/[\x00-\x1f\x7f]/g, " ");
+  const vulnerabilities = result.findings.filter(f => f.kind === "vulnerability");
+  const notices = result.findings.filter((f): f is Extract<ReadOnlyFinding, { kind: "informational" }> => f.kind === "informational");
+  const fixed = (f: ReadOnlyFinding) => f.fixed_versions.length ? `OSV lists fixed: ${f.fixed_versions.join(", ")}` : "OSV lists no fixed version";
   return [
-    `${ecosystem}: ${result.inventory.packages.length} package versions · ${result.findings.length} advisory matches · ${result.status}`,
-    ...result.findings.map(f => `  ${f.package.name}@${f.package.version} · ${f.advisory.id} · ${f.advisory.summary} · ${f.fixed_versions.length ? `OSV lists fixed: ${f.fixed_versions.join(", ")}` : "OSV lists no fixed version"}`),
+    `${ecosystem}: ${result.inventory.packages.length} package versions · ${vulnerabilities.length} advisory matches${notices.length ? ` · ${notices.length} informational` : ""} · ${result.status}`,
+    ...vulnerabilities.map(f => `  ${f.package.name}@${f.package.version} · ${f.advisory.id} · ${plain(f.advisory.summary)} · ${fixed(f)}`),
+    ...notices.map(f => `  Informational (${f.informational}, not counted as a vulnerability): ${f.package.name}@${f.package.version} · ${f.advisory.id} · ${plain(f.advisory.summary)} · ${fixed(f)}`),
     ...result.inventory.limitations.map(limit => `  Incomplete: ${plain(limit)}`),
     `  Scope: ${plain(result.inventory.scope)} (${result.inventory.files.map(plain).join(", ")})`,
     "  Read-only: Ludion reports known advisories for this ecosystem but does not plan or apply updates.",
@@ -52,7 +58,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     if (values.json) console.log(JSON.stringify(only && only.ecosystem === "php" && "result" in only && !report.unsupported.length ? only.result : report, null, 2));
     else {
       for (const check of report.checks) {
-        if ("error" in check) { console.error(`${check.ecosystem}: unavailable — ${check.error}`); continue; }
+        if ("error" in check) { console.error(`${check.ecosystem}: unavailable — ${READONLY_ECOSYSTEMS.includes(check.ecosystem) ? plain(check.error) : check.error}`); continue; }
         if ("fixed_versions_note" in check.result) for (const line of readOnlyText(check.ecosystem, check.result)) console.log(line);
         else if ("findings" in check.result) {
           console.log(`${check.ecosystem}: ${check.result.inventory.packages.length} package versions · ${check.result.findings.length} advisory matches · ${check.result.status}`);
@@ -64,8 +70,8 @@ export async function securityCli(command: string, args: string[]): Promise<numb
       if (report.unsupported.length) console.error(`Unsupported inventories: ${report.unsupported.join(", ")}. These have not been checked.`);
       console.log("Known data only; no match is not a security guarantee. Dependency coordinates are sent to OSV; source stays local to your Docker setup.");
     }
-    const vulnerable = report.checks.some(c => "result" in c && ("findings" in c.result ? c.result.findings.length > 0 : c.result.candidate !== null));
-    return vulnerable ? 1 : report.status === "attention_required" ? 2 : 0;
+    const found = report.checks.some(c => "result" in c && ("findings" in c.result ? vulnerable(c.result) : c.result.candidate !== null));
+    return found ? 1 : report.status === "attention_required" ? 2 : 0;
   }
   async function patch(signal?: AbortSignal): Promise<number> {
     const config = readConfig(root);

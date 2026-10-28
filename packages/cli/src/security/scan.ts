@@ -12,6 +12,8 @@ export type ProjectScan = { schema: 1; checked_at: string; status: "attention_re
 /** Inventories scan does not read. A file a registered read-only reader handled is left out. */
 const UNSUPPORTED = ["requirements.txt", "pyproject.toml", "go.mod", "Cargo.lock", "build.gradle", "build.gradle.kts"];
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
+/** A known vulnerability: any finding of a dependency scan; a read-only scan's informational findings do not count. */
+export const vulnerable = (result: DependencyScan | ReadOnlyScan): boolean => "fixed_versions_note" in result ? result.findings.some(f => f.kind === "vulnerability") : result.findings.length > 0;
 
 /** `readers` and `client` exist for tests; callers use the registered readers and OSV. */
 export async function scanProject(root: string, selected?: string, deps: { readers?: readonly ReadOnlyReader[]; client?: OsvClient } = {}): Promise<ProjectScan> {
@@ -73,6 +75,6 @@ export async function scanProject(root: string, selected?: string, deps: { reade
   }
   const unsupported = !auto ? [] : UNSUPPORTED.filter(f => existsSync(join(root, f)) && !handled.has(f));
   if (!checks.length && !unsupported.length) throw new Error(`No supported project inventory found. Expected PHP Dockerfile, npm lockfile, composer.lock or pom.xml${readers.length ? `, or for a read-only scan ${readers.flatMap(r => r.files).join(", ")}` : ""}.`);
-  const attention = unsupported.length > 0 || checks.some(c => "error" in c || ("findings" in c.result ? c.result.findings.length > 0 || c.result.status === "incomplete" : c.result.candidate !== null));
+  const attention = unsupported.length > 0 || checks.some(c => "error" in c || ("findings" in c.result ? vulnerable(c.result) || c.result.status === "incomplete" : c.result.candidate !== null));
   return { schema: 1, checked_at: new Date().toISOString(), status: attention ? "attention_required" : "no_known_updates", checks, unsupported };
 }

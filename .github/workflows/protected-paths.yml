@@ -1,6 +1,8 @@
 # Required check "protected-paths".
 # Fails a PR that touches a protected path until an independent review has approved the PR's CURRENT head:
-# the PR must carry the "review-approved" label AND have a comment with a line "reviewed-sha: <head sha>".
+# the PR must carry the "review-approved" label AND have an approving review comment with a line
+# "reviewed-sha: <head sha>". Every review ends with that line, whatever its verdict, so a review counts only when its
+# first line, the verdict, approves (APPROVING below).
 # A push changes the head SHA, so any earlier approval stops counting by itself; nothing has to be removed.
 #
 # Runs on pull_request_target so the workflow definition always comes from the base branch; a PR cannot
@@ -34,6 +36,10 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           LABEL: review-approved
+          # Applied to the PR's comments: the bodies of the reviews that approve. A review's first line states its
+          # verdict; it approves when that line has the word APPROVE and not REQUEST (docs/protected-paths.md).
+          APPROVING: |
+            .[] | .body | select(split("\n")[0] | test("\\bAPPROVE\\b") and (test("REQUEST") | not))
         run: |
           set -euo pipefail
           pattern='(^|/)(CLAUDE|AGENTS)\.md$|(^|/)\.cursorrules$|(^|/)CODEOWNERS$|^\.claude/|^\.cursor/|^\.github/|^tools/verify/|^packages/sandbox/|^lessons/|^packages/[^/]+/src/schema\.ts$|^packages/[^/]+/schema/|\.schema\.json$|^ludion\.config\.json$|^wrangler\.jsonc$|^docs/protected-paths\.md$'
@@ -63,9 +69,9 @@ jobs:
           fi
 
           approved=$(gh api --paginate "repos/${REPO}/issues/${PR}/comments" \
-            --jq '.[].body' | grep -Eo '^reviewed-sha: *[0-9a-f]{40}' | sed -E 's/^reviewed-sha: *//' | grep -Fx "$head" || true)
+            --jq "$APPROVING" | grep -Eo '^reviewed-sha: *[0-9a-f]{40}' | sed -E 's/^reviewed-sha: *//' | grep -Fx "$head" || true)
           if [ -z "$approved" ]; then
-            echo "::error::No comment says \"reviewed-sha: ${head}\". The review must cover the current head; review again after every push."
+            echo "::error::No approving review says \"reviewed-sha: ${head}\". The review must cover the current head and approve it; review again after every push."
             exit 1
           fi
 

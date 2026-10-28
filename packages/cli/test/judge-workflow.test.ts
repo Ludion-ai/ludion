@@ -476,3 +476,64 @@ describe.skipIf(!(hasJq && has("bash") && has("unzip", "-v")) && !process.env.CI
     expect([lost.status, lost.posted]).toEqual([1, null]);
   });
 });
+
+// protected-paths.yml's script against a stand-in for gh: every review ends with reviewed-sha, so only an approving
+// one may pass the check (#166's review, B1).
+describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml's script, against a stand-in for gh", () => {
+  const CHECK = read(".github/workflows/protected-paths.yml"), HEAD = "a".repeat(40), OLD = "b".repeat(40);
+  const GH = [
+    "#!/bin/sh",
+    "path= filter=",
+    "while [ $# -gt 0 ]; do",
+    '  case "$1" in',
+    "    api|--paginate) ;;",
+    "    --jq) filter=$2; shift ;;",
+    "    *) path=$1 ;;",
+    "  esac",
+    "  shift",
+    "done",
+    'case "$path" in',
+    '  repos/o/r/pulls/7) file=pull.json ;;',
+    '  repos/o/r/pulls/7/files) file=files.json ;;',
+    '  repos/o/r/issues/7/labels) file=labels.json ;;',
+    '  repos/o/r/issues/7/comments) file=comments.json ;;',
+    '  *) echo "stand-in gh: unexpected $path" >&2; exit 1 ;;',
+    "esac",
+    'jq -r "$filter" "$FAKE/$file"',
+    "",
+  ].join("\n");
+  let count = 0;
+  function check(comments: string[]) {
+    const fake = join(temp, `pp-${++count}`), bin = join(fake, "bin");
+    mkdirSync(bin, { recursive: true });
+    writeFileSync(join(bin, "gh"), GH, { mode: 0o755 });
+    writeFileSync(join(fake, "pull.json"), JSON.stringify({ head: { sha: HEAD } }));
+    writeFileSync(join(fake, "files.json"), JSON.stringify([{ filename: "CLAUDE.md" }]));
+    writeFileSync(join(fake, "labels.json"), JSON.stringify([{ name: "review-approved" }]));
+    writeFileSync(join(fake, "comments.json"), JSON.stringify(comments.map(body => ({ body }))));
+    const r = spawnSync("bash", ["-c", block(CHECK, "run")], {
+      encoding: "utf8",
+      env: { PATH: `${bin}:${process.env.PATH}`, FAKE: fake, GH_TOKEN: "x", REPO: "o/r", PR: "7", LABEL: "review-approved", APPROVING: block(CHECK, "APPROVING") },
+    });
+    return { status: r.status, out: r.stdout + r.stderr };
+  }
+  const review = (verdict: string, sha: string) => `${verdict}\n\nFindings.\n\nreviewed-sha: ${sha}`;
+  it("passes on an approving review of the current head, in each form the reviews have used", () => {
+    for (const verdict of ["Review of #7 (fresh context, full diff at x): APPROVE", "**Independent review, round 2** (fresh-context subagent, at x): **APPROVE**, with non-blocking findings:"]) {
+      const r = check([review(verdict, HEAD)]);
+      expect(r.status, r.out).toBe(0);
+      expect(r.out).toContain(`Approved for head ${HEAD}.`);
+    }
+  });
+  it("fails when the only review of the current head asks for changes, although the label stayed from an older approval", () => {
+    for (const verdict of ["Review of #7 (fresh context, full diff at x): REQUEST_CHANGES", "**Independent review** (fresh-context subagent, at x): **REQUEST CHANGES**", "Review of #7: REQUEST CHANGES (I would APPROVE once B1 is fixed)", "Not a review"]) {
+      const r = check([review("Review of #7: APPROVE", OLD), review(verdict, HEAD)]);
+      expect(r.status, r.out).toBe(1);
+      expect(r.out).toContain("No approving review says");
+    }
+  });
+  it("does not count an APPROVE that is not on the first line", () => {
+    const r = check([review("Review of #7 (fresh context, full diff at x)", HEAD).replace("Findings.", "APPROVE")]);
+    expect(r.status, r.out).toBe(1);
+  });
+});

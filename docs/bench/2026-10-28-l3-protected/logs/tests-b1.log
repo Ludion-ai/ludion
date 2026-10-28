@@ -1,0 +1,10 @@
+typecheck exit=0
+ Test Files  1 passed (1)
+      Tests  30 passed (30)
+ Test Files  8 passed (8)
+      Tests  240 passed (240)
+every comment counted (old filter) |       Tests  2 failed | 28 passed (30)
+REQUEST not excluded |       Tests  1 failed | 29 passed (30)
+APPROVE anywhere in the body |       Tests  1 failed | 29 passed (30)
+restored |       Tests  30 passed (30)
+actionlint 1.7.12 on protected-paths.yml, judge.yml, judge-comment.yml: exit=0

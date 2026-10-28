@@ -16,7 +16,7 @@ The rules, now in CLAUDE.md ("Every change goes through a PR") and docs/protecte
 - **N1, the build from the base.** An order check now fails when either part is missing (`at()` in the test), so none passes on -1. The test pins the two checkouts (the event's base and `git checkout --quiet --detach "$base"`), forbids a checkout that names `HEAD_SHA`, `MERGE_SHA`, `refs/ludion/merge`, `head.sha` or `github.sha`, and pins the base branch's refspec and `BASE_REF`. The review's mutations now fail tests. Until this, #156's PR body overstated the tests ("the build from it"); the body is left as reviewed and corrected here.
 - **N2, workflow commands in the log.** record.ts prints the record and the judge's text between `::stop-commands::<random token>` and `::<token>::`, as protected-paths.yml does for file names.
 - **N3, the failed step.** record.ts loads only node's own modules up front (the judgement type is a type-only import). The judge's renderer is imported after the build. A failed read or `npm ci` is now recorded with that step, not as "the judge did not finish".
-- **N4, Node from the base.** setup-node runs after the read step (also after a failed read, for the record script), so `.node-version` comes from the base the judge is built from. "The event's own base SHA is not used" in "The judge on this repository" is narrowed: it is used for the first checkout, which the read step replaces, and in the record until the read step finds the base.
+- **N4, Node from the base.** setup-node runs after the read step (also after a failed read, for the record script), so `.node-version` comes from the base the judge is built from. "The event's own base SHA is not used" in "The judge on this repository" is narrowed: it is used for the first checkout, which the read step replaces, and in the record until the read step finds the base. When the read step fails before its checkout, that first checkout stays: its `.node-version` and record.ts are then the event base's, which is also a commit of the base branch.
 - **N5, a late re-run.** A re-run reuses its event and so its test merge commit. Once the base branch is 50 or more commits past that commit's base, the re-run is undecidable, and the old merge commit may no longer be fetchable. To judge such a PR again, update it (for Dependabot, `@dependabot rebase`), which makes a new event. The code is not changed.
 - **N6, the refusal before the artifact.** judge-comment.yml finds the PR from GitHub: the open PRs from the run's head owner and branch into the default branch, of which exactly one must come from the run's head repository and branch and be at the run's head. It then reads what that head changes (`compare/<default branch>...<run head>`), and only when that head is not refused does it list, download and parse the artifact. The record must then name the same PR and head. So a refused head's artifact is never downloaded, and that head gets its fixed notice even when its run left no record. A PR that moved on posts nothing, without reading the artifact. A test runs the script with bash against a stand-in for `gh`.
 - **N7, #156's PR body.** "0.918 s now" was measured at 44c0fb6, not at the merged head; that head was checked live instead (0.577 s and 0.701 s). Corrected here.
@@ -35,6 +35,16 @@ The rules, now in CLAUDE.md ("Every change goes through a PR") and docs/protecte
 
 - **5.** The two Dependabot entries now follow the judge's entries in decisions.md and progress.md, unchanged.
 - **6.** `.github/dependabot.yml`'s comment names judge.yml, which exists since #156 was merged. Nothing to change.
+
+## #166's first review, and what changed after it
+
+The fresh-context review at 39500a4 (https://github.com/Ludion-ai/ludion/pull/166#issuecomment-6468106957) asked for changes:
+
+- **B1.** With "every review ends with `reviewed-sha:`, whatever its verdict" and "the label can stay", a review that asks for changes of the current head turned the required `protected-paths` check green, because protected-paths.yml counted the line in any comment. Fixed with the review's option (a): protected-paths.yml now counts the line only in a comment whose first line has the word `APPROVE` and not `REQUEST` (the jq program `APPROVING`). The first lines of earlier reviews (#151 to #160) have two forms, "Review of #N (…): APPROVE" and "**Independent review** (…): **APPROVE**, with …"; both count, and both forms of "REQUEST CHANGES" do not. docs/protected-paths.md says so in its list, in step 1 and under what the check guarantees. New tests run protected-paths.yml's script with bash against a stand-in for `gh`: both approving forms pass; a request for changes at the current head fails although an older head was approved and the label stayed; an `APPROVE` that is not on the first line does not count.
+- **N1.** The PR body named decisions.md for records that are in this README; the PR body is corrected. The decisions.md summary said it "fixes" #158's N8, which is left; it now says so.
+- **N2.** The narrowing for #156's N4 now covers a read step that fails before its checkout (above).
+- **N3, N5.** Behaviour changes the review called harmless (a refused head gets its notice even after a cancelled run; a PR that is gone ends with exit 0). Kept.
+- **N4.** CLAUDE.md and docs/protected-paths.md now also say that agents never enable auto-merge on a dependency-update PR (#157's review, finding 1).
 
 ## Checks
 
@@ -77,3 +87,19 @@ The same head, copied with `git archive` into a Docker volume; `npm ci --ignore-
 ## Where the summaries were placed
 
 The first version of #166 put this record in the middle of decisions.md and progress.md. The cycle 3 instructions ask for only a few lines at the end of each, with the details under docs/bench/, so it moved here. The two Dependabot entries stay where #166 moved them (#157's finding 5).
+
+### After the B1 fix
+
+The working tree with the B1 fix, copied into a new Docker volume, `npm ci --ignore-scripts` with network, then `--network none --read-only --tmpfs /tmp:exec`, user `node`, with `check-b1.sh`. Raw output: `logs/tests-b1.log`.
+
+- `npm run typecheck`: exit 0.
+- judge-workflow.test.ts: 30 passed (30), 3 of them new for protected-paths.yml; `npx vitest run --project node packages`: 8 files, 240 passed (240).
+- actionlint 1.7.12 on protected-paths.yml, judge.yml and judge-comment.yml: exit 0, no output.
+- Mutations of protected-paths.yml, one at a time, each caught:
+
+  | Mutation | judge-workflow.test.ts |
+  | --- | --- |
+  | every comment counted again (`--jq ".[].body"`) | 2 failed, 28 passed |
+  | `REQUEST` not excluded | 1 failed, 29 passed |
+  | `APPROVE` anywhere in the comment, not only on its first line | 1 failed, 29 passed |
+  | after restoring | 30 passed |

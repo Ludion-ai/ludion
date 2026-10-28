@@ -302,7 +302,7 @@ function packageFolder(source: string): string | null {
  */
 export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
   /** `named`: the stage holds package folders, its own or through `heldFrom` (kept as each is added, so it is O(1)). */
-  type Stage = { name: string | null; from: Stage | null; holds: boolean; held: string[]; heldFrom: Stage[]; named: boolean; production: boolean; workdir: string; runs: string[]; commands: string[]; copies: Stage[] };
+  type Stage = { name: string | null; from: Stage | null; holds: boolean; held: string[]; heldFrom: Stage[]; named: boolean; production: boolean; workdir: string; workdirAsWritten: string; runs: string[]; commands: string[]; copies: Stage[] };
   const stages: Stage[] = [];
   const install = /\b(npm\s+(ci|install|i)\b|yarn(\s+install)?\s*($|--|-)|pnpm\s+(install|i)\b|bun\s+(install|i)\b)/;
   const global = /(^|\s)(-g|--global)(\s|$)|\byarn\s+global\b/;
@@ -337,7 +337,7 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (op === "FROM") {
       const f = /^(?:--\S+\s+)*(\S+)(?:\s+AS\s+(\S+))?/i.exec(arg);
       const parent = named.get((f?.[1] ?? "").toLowerCase()) ?? null;
-      const stage: Stage = { name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, held: [], heldFrom: parent ? [parent] : [], named: parent?.named ?? false, production: parent?.production ?? false, workdir: parent?.workdir ?? "/", runs: [], commands: [], copies: [] };
+      const stage: Stage = { name: f?.[2] ?? null, from: parent, holds: parent?.holds ?? false, held: [], heldFrom: parent ? [parent] : [], named: parent?.named ?? false, production: parent?.production ?? false, workdir: parent?.workdir ?? "/", workdirAsWritten: parent?.workdirAsWritten ?? "/", runs: [], commands: [], copies: [] };
       stages.push(stage);
       if (stage.name !== null && !named.has(stage.name.toLowerCase())) named.set(stage.name.toLowerCase(), stage);
       continue;
@@ -346,8 +346,13 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
     if (!stage) continue;
     const command = arg.startsWith("[") ? (() => { try { return (JSON.parse(arg) as string[]).join(" "); } catch { return arg; } })() : arg;
     if ((op === "ENV" || op === "ARG") && /\bNODE_ENV\b/.test(arg)) stage.production = /\bNODE_ENV(\s*=\s*|\s+)["']?production\b/.test(arg);
-    // A relative WORKDIR is relative to the one before it.
-    if (op === "WORKDIR") { const w = arg.replace(/^["']|["']$/g, ""); stage.workdir = w.startsWith("/") ? w : `${stage.workdir.replace(/\/+$/, "")}/${w}`; }
+    // Two readings of the working folder, and a source matching either counts: as written (main's reading), and a
+    // relative WORKDIR resolved against the one before it, unless it holds a variable (which may be absolute).
+    if (op === "WORKDIR") {
+      const w = arg.replace(/^["']|["']$/g, "");
+      stage.workdir = w.startsWith("/") || w.includes("$") ? w : `${stage.workdir.replace(/\/+$/, "")}/${w}`;
+      stage.workdirAsWritten = w;
+    }
     if (op === "CMD" || op === "ENTRYPOINT") stage.commands.push(command);
     if (op === "RUN") {
       stage.commands.push(command); stage.runs.push(command);
@@ -372,16 +377,20 @@ export function dockerImage(text: string, ignoresNodeModules: boolean): Image {
       // Not for ADD, which can unpack an archive. The root, the working folder or a folder above it still holds them,
       // whatever its path.
       const folders = sources.map(s => op === "COPY" ? packageFolder(s) : null);
-      const holdsAll = (s: string, k: number, workdir: string | null) => {
+      const strip = (p: string) => p.replace(/\/+$/, "") || "/";
+      const holdsAll = (s: string, k: number, source: Stage | null) => {
         if (folders[k] === null && /node_modules/.test(s)) return true;
-        const n = folderOf(s), w = workdir === null ? null : folderOf(workdir);
-        return n === "" || (w !== null && (n === w || w.startsWith(`${n}/`)));
+        // The text as written against the working folder as written, as before.
+        if (source !== null && (/^(\.|\.\/|\/)$/.test(s) || strip(s) === strip(source.workdirAsWritten))) return true;
+        const n = folderOf(s);
+        if (n === "" || source === null) return n === "";
+        return [source.workdir, source.workdirAsWritten].some(workdir => { const w = folderOf(workdir); return n === w || w.startsWith(`${n}/`); });
       };
       if (from !== undefined) {
         const source = named.get(from.toLowerCase()) ?? (/^\d+$/.test(from) ? stages[Number(from)] : undefined);
         if (source) {
           stage.copies.push(source);
-          if (sources.some((s, k) => holdsAll(s, k, source.workdir))) { stage.holds ||= source.holds; stage.heldFrom.push(source); stage.named ||= source.named; }
+          if (sources.some((s, k) => holdsAll(s, k, source))) { stage.holds ||= source.holds; stage.heldFrom.push(source); stage.named ||= source.named; }
           // A folder from a stage that holds devDependencies or package folders: that folder, and whatever that stage
           // holds by name (it may have copied another package there). From any other stage it holds no devDependency.
           if ((source.holds || source.named) && folders.some(f => f !== null)) {

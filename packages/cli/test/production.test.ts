@@ -197,6 +197,11 @@ describe("production images and commands", () => {
       expect(dockerImage(`FROM node:22 AS b\nWORKDIR ${workdir}\nCOPY package*.json ./\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b ${source} /srv\n`, false).holds).toBe(true);
     }
     expect(dockerImage("FROM node:22\nCOPY x/.. /app\n", false).holds).toBe(true);
+    // A WORKDIR that holds a variable is kept as written, and a relative source still matches the working folder as
+    // written (#190 third delta review, 1, 2).
+    for (const [base, source] of [["WORKDIR /app\nFROM base AS builder\nARG APP_DIR=/usr/src/app\nWORKDIR $APP_DIR", "$APP_DIR"], ["WORKDIR /app\nFROM base AS builder\nWORKDIR ${APP_DIR}", "${APP_DIR}/"], ["WORKDIR /srv\nWORKDIR app\nFROM base AS builder", "app"]]) {
+      expect(dockerImage(`FROM node:22 AS base\n${base}\nCOPY package*.json ./\nRUN npm ci\nFROM node:22-slim\nCOPY --from=builder ${source} /x\n`, false).holds).toBe(true);
+    }
     expect(dockerImage("FROM node:22\nCOPY / /app\n", false).holds).toBe(true);
     expect(dockerImage("FROM node:22\nCOPY / /app\n", true).holds).toBe(false);
     // A package folder copied together with something that holds devDependencies.

@@ -73,7 +73,7 @@ const lines = (dir: string, kind: string) => readdirSync(join(dir, kind)).flatMa
 const setup = (maxBytes = 50_000_000) => {
   const dir = mkdtempSync(join(tmpdir(), "shadow-")), { w, fetchFn } = world();
   let t = Date.parse("2026-10-29T00:00:00Z");
-  const rec = new Recorder({ dir, maxBytes, fetchFn, watched: { "left-pad": ["0.9.0"] }, now: () => new Date(t) });
+  const rec = new Recorder({ dir, maxBytes, fetchFn, watched: { "left-pad": ["0.9.0"], "watched-quiet": [] }, now: () => new Date(t) });
   return { dir, w, rec, tick: (ms: number) => { t += ms; } };
 };
 
@@ -97,9 +97,10 @@ describe("newMalIds", () => {
 });
 
 describe("predecessor", () => {
-  it("is the latest-published version lower by semver, never a later backport", () => {
-    const time = { "1.0.0": "2026-01-01", "2.0.0": "2026-02-01", "1.9.5": "2026-03-01", "2.0.1": "2026-04-01" };
+  it("is the latest-published version lower by semver and published before it, never a later backport", () => {
+    const time = { "1.0.0": "2026-01-01", "2.0.0": "2026-02-01", "1.9.5": "2026-03-01", "2.0.1": "2026-04-01", "1.9.6": "2026-05-01" };
     expect(predecessor(Object.keys(time), time, "2.0.1")).toBe("1.9.5");
+    expect(predecessor(Object.keys(time), time, "2.0.0")).toBe("1.0.0");
     expect(predecessor(Object.keys(time), time, "1.9.5")).toBe("1.0.0");
     expect(predecessor(Object.keys(time), time, "1.0.0")).toBeUndefined();
   });
@@ -164,8 +165,9 @@ describe("Recorder", () => {
     const { dir, w, rec } = setup();
     await rec.poll(); w.feed.push({ seq: 101, id: "left-pad" }); await rec.poll();
     const p = w.packuments["left-pad"];
+    w.packuments["watched-quiet"] = { "dist-tags": {}, time: { created: "2025-01-01T00:00:00.000Z" }, versions: {} };
     w.packuments["tiny-dep"] = { "dist-tags": { latest: "1.0.0" }, time: { created: "2026-10-28T00:00:00.000Z", "1.0.0": "2026-10-28T00:00:00.000Z" }, versions: {} };
-    p.versions["1.0.1"] = manifest("1.0.1", { dependencies: { "tiny-dep": "^1.0.0", "left-pad": "*" } });
+    p.versions["1.0.1"] = manifest("1.0.1", { dependencies: { "tiny-dep": "^1.0.0", "left-pad": "*", "watched-quiet": "^1.0.0" } });
     p.time["1.0.1"] = "2026-10-29T01:00:00.000Z";
     w.feed.push({ seq: 103, id: "left-pad" });
     await rec.poll();
@@ -174,7 +176,7 @@ describe("Recorder", () => {
     w.tarballs.set("1.0.2", ball("1.0.2"));
     w.feed.push({ seq: 104, id: "left-pad" });
     await rec.poll();
-    expect(lines(dir, "captures").filter(r => r.type === "created")).toEqual([expect.objectContaining({ name: "tiny-dep", created: "2026-10-28T00:00:00.000Z" })]);
+    expect(lines(dir, "captures").filter(r => r.type === "created").map(r => [r.name, r.created])).toEqual([["tiny-dep", "2026-10-28T00:00:00.000Z"], ["watched-quiet", "2025-01-01T00:00:00.000Z"]]);
     expect(w.asked.filter(u => u === "https://registry.npmjs.org/tiny-dep")).toHaveLength(1);
   });
 

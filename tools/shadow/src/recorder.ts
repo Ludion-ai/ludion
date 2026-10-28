@@ -74,10 +74,12 @@ export function newMalIds(csv: string, since: string | null): { ids: { id: strin
   return { ids, newest };
 }
 
-/** The latest-published version lower than `version` by semver, among those listed with a publish time. */
+/** The latest-published version lower than `version` by semver and published before it (v5's prev_d rule). */
 export function predecessor(listed: string[], time: Record<string, string>, version: string): string | undefined {
   if (!semver.valid(version)) return undefined;
-  return listed.filter(x => semver.valid(x) && semver.lt(x, version) && time[x]).sort((a, b) => (time[a]! < time[b]! ? 1 : -1))[0];
+  const at = time[version];
+  if (!at) return undefined;
+  return listed.filter(x => semver.valid(x) && semver.lt(x, version) && time[x] && time[x]! < at).sort((a, b) => (time[a]! < time[b]! ? 1 : -1))[0];
 }
 
 export class Recorder {
@@ -233,11 +235,11 @@ export class Recorder {
       if (prior && !Object.hasOwn(versions, prior) && !wanted.has(prior)) wanted.set(prior, "predecessor");
     }
     for (const [v, reason] of wanted) records.push(await this.version(name, v, doc.versions[v], reason));
-    // Rule 2 needs when each new dependency's package first appeared: read it once for packages outside the watched set.
+    // Rule 2 needs when each new dependency's package first appeared: read it once for any package whose time is not stored.
     for (const v of fresh) {
       const m = doc.versions[v];
       for (const dep of Object.keys({ ...(m?.dependencies ?? {}), ...(m?.optionalDependencies ?? {}) })) {
-        if (this.watched.has(dep) || existsSync(this.createdPath(dep)) || !NAME.test(dep)) continue;
+        if (!NAME.test(dep) || existsSync(this.knownPath(dep)) || existsSync(this.createdPath(dep))) continue;
         const r = await this.created(dep);
         if (r) records.push(r);
       }

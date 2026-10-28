@@ -1,0 +1,102 @@
+2026-10-28T18:09:59.279Z start at 2026-10-28T18:09:59.276Z, sample original, commit 0d441eaedf84c1cdd5937e01c51c32e1e25c3cb0, npm 11.19.1, node v24.22.1, blobs {"docs/bench/2026-10-29-l1c/scripts/measure.ts":"38ae6fd311d8d4a41a28f12dd379c14a6451326b","packages/cli/src/security/production.ts":"153da2ff893ae10cdd2de19629135b2f41c532e3","packages/cli/src/security/judge.ts":"5a598fdc5412db75dda1411bef22b087b2fcb285","packages/cli/src/security/npm-facts.ts":"8289c4e208a4cda1dc215032df95ba56f1912262","packages/cli/src/security/time-cap.ts":"4fb4608234c42d0597a65eb10452f22d0d602575","docs/bench/2026-10-28-noise/noise.json":"30e16e491abd124236fae8d576a7f647689a2246","node_modules/semver (version)":"7.8.5"}
+2026-10-28T18:10:05.393Z 1 Rafi-SBM/PySan: npm 18, judge 10, split read, left out 7
+2026-10-28T18:10:35.026Z 2 Kmaina32/Varban-Markets: npm 81, judge 22, split read, left out 0
+2026-10-28T18:10:49.033Z 3 SteinOA/DSSA-Tale-Mac: npm 52, judge 20, split incomplete, left out 0
+2026-10-28T18:10:50.733Z 4 bm-hien/is-this-code-safe: npm 1, judge 1, split read, left out 0
+2026-10-28T18:11:04.934Z 5 cofob/design-system: npm 34, judge 19, split read, left out 7
+2026-10-28T18:11:11.381Z 6 jasperyeo/jasper-oktavina-wedding: npm 19, judge 16, split read, left out 0
+2026-10-28T18:11:14.540Z 7 Sylonin/xposed-newx-patches: npm 2, judge 0, split read, left out 2
+2026-10-28T18:11:18.541Z 8 aniru-dh21/snap-validate: npm 5, judge 0, split read, left out 1
+2026-10-28T18:11:22.569Z 9 MorpheApp/morphe-patcher: npm 6, judge 0, split read, left out 6
+2026-10-28T18:11:25.584Z 10 itsdarklikehell/my-resume: npm 6, judge 2, split read, left out 2
+2026-10-28T18:11:31.647Z 11 staticdesigner/modevue: npm 14, judge 10, split read image Dockerfile, left out 0
+2026-10-28T18:11:34.889Z 12 wefio/NodeMemoryGraph: npm 2, judge 1, split read, left out 0
+2026-10-28T18:11:43.924Z 13 yaeouk-rajab/pulsewatch-mobile: npm 16, judge 2, split read, left out 0
+2026-10-28T18:11:53.395Z 14 mbadr5858/badr-pdf: npm 27, judge 14, split read, left out 1
+2026-10-28T18:11:56.513Z 15 padosoft/eval-harness-admin: npm 5, judge 5, split read, left out 0
+2026-10-28T18:12:09.430Z 16 developer3000S/OmniRouteRus: npm 38, judge 29, split read, left out 6
+2026-10-28T18:12:17.207Z 17 mrBettazzi/nuxt-myweb: npm 14, judge 8, split read, left out 0
+2026-10-28T18:12:24.277Z 18 shiiizuku/document-management-tracking-system: npm 18, judge 12, split read, left out 0
+2026-10-28T18:12:26.768Z 19 wangyufengsky/qq-agents: npm 0, judge 1, split read, left out 0
+2026-10-28T18:12:31.235Z 20 microsoft/vscode-ts-file-path-support: npm 7, judge 4, split read, left out 1
+2026-10-28T18:12:33.790Z 21 lalidiaz/node-store-api: npm 3, judge 1, split read, left out 0
+2026-10-28T18:12:45.864Z 22 airalab/robonomics.network: npm 52, judge 32, split read, left out 0
+2026-10-28T18:12:57.421Z 23 donkirkby/python-zendo: npm 42, judge 14, split read, left out 0
+2026-10-28T18:13:06.114Z 24 akshaydhadwal745/lens-camera: npm 16, judge 5, split read, left out 0
+2026-10-28T18:13:09.581Z 25 Blackshield-Company/openshield-desktop: npm 12, judge 6, split read, left out 3
+2026-10-28T18:13:15.681Z 26 RoxyAPI/ai-spiritual-companion: npm 8, judge 4, split read, left out 1
+2026-10-28T18:13:24.229Z 27 shimi-lynx/mogledge: npm 18, judge 0, split read, left out 3
+2026-10-28T18:13:32.602Z 28 PM-Shawn/Abu-Cowork: npm 25, judge 17, split read, left out 5
+2026-10-28T18:13:36.963Z 29 datagrowth/sobre-abierto: npm 1, judge 1, split read image infra/Dockerfile, left out 0
+2026-10-28T18:13:43.539Z 30 KisaesDevLab/Vibe-MyBooks: npm 6, judge 6, split read image packages/api/Dockerfile, left out 0
+2026-10-28T18:13:47.326Z 31 nmagera07/family-site: npm 23, judge 19, split read, left out 0
+2026-10-28T18:13:57.505Z 32 toddmedema/electrify: npm 23, judge 5, split read, left out 0
+2026-10-28T18:14:05.013Z 33 enonic/app-explorer: npm 11, judge 2, split read, left out 1
+2026-10-28T18:14:17.968Z 34 carlostighe/modalMap: npm 73, judge 38, split read, left out 3
+2026-10-28T18:14:21.845Z 35 louiseka/cove-ui: npm 1, judge 0, split read, left out 1
+2026-10-28T18:14:24.050Z 36 Desvelao/party-game: npm 6, judge 2, split read, left out 3
+2026-10-28T18:14:25.938Z 37 Dhanush1376/Akula-s-Kitchen: npm 5, judge 0, split read, left out 4
+2026-10-28T18:14:31.952Z 38 mahaliahr/phd-live: npm 15, judge 10, split read, left out 1
+2026-10-28T18:14:37.670Z 39 newtonlorenz/benchledger: npm 15, judge 8, split read, left out 6
+2026-10-28T18:14:42.929Z 40 NSWSESMembers/Lighthouse: npm 3, judge 2, split read, left out 0
+2026-10-28T18:14:47.818Z 41 eliflo1/certivue-marketing: npm 16, judge 15, split read, left out 1
+2026-10-28T18:14:50.280Z 42 Palladin-io/palladin-agent: npm 8, judge 6, split read, left out 1
+2026-10-28T18:14:56.140Z 43 ruddyribera-ops/pria-app: npm 28, judge 21, split read image server/Dockerfile, left out 2
+2026-10-28T18:15:02.955Z 44 ivanagas/writeconcise: npm 9, judge 6, split read, left out 0
+2026-10-28T18:15:08.156Z 45 bwhyte21/ProjectAniTracker: npm 16, judge 12, split read, left out 2
+2026-10-28T18:15:10.399Z 46 evanwon/tastemaker-site: npm 8, judge 8, split read, left out 0
+2026-10-28T18:15:13.509Z 47 Nickpavlenk0/chess-studio: npm 3, judge 3, split read, left out 0
+2026-10-28T18:15:18.698Z 48 karyna4k/100-days-css: npm 7, judge 3, split read, left out 0
+2026-10-28T18:15:29.470Z 49 jadwalit-jpg/Jadwal: npm 28, judge 9, split read image apps/api/Dockerfile, left out 0
+2026-10-28T18:15:47.248Z 50 kratus66/CodeAI-Academy: npm 40, judge 20, split read, left out 3
+2026-10-28T18:16:44.551Z 51 Armor-test/uptime-kuma: npm 73, judge 32, split read, left out 6
+2026-10-28T18:16:49.209Z 52 logicalgnosis/logicalgnosis.github.io: npm 4, judge 4, split read image Dockerfile, left out 0
+2026-10-28T18:16:53.526Z 53 KHY90/JMAirAgentFront: npm 6, judge 3, split read, left out 2
+2026-10-28T18:17:00.965Z 54 TKExternalAffairs/website: npm 6, judge 5, split read, left out 0
+2026-10-28T18:17:05.212Z 55 ASIL-E-Hatake/vscode-games: npm 7, judge 2, split read, left out 2
+2026-10-28T18:17:10.430Z 56 clorth0/EQEmu: npm 11, judge 7, split read, left out 4
+2026-10-28T18:17:13.656Z 57 AlbusKavaliro/AntiXss: npm 5, judge 0, split read, left out 5
+2026-10-28T18:17:17.765Z 58 JDonoghue-UL/my-astro-blog: npm 4, judge 4, split read image Dockerfile, left out 0
+2026-10-28T18:17:21.785Z 59 TonyVoorhees/TonyVoorhees.github.io: npm 6, judge 5, split read, left out 1
+2026-10-28T18:17:30.371Z 60 kkd927/kmux: npm 30, judge 21, split read, left out 2
+2026-10-28T18:17:32.533Z 61 KirishimaAmenatsu/web_site_guide: npm 2, judge 2, split read, left out 0
+2026-10-28T18:17:35.522Z 62 chadheise/blog: npm 1, judge 1, split read, left out 0
+2026-10-28T18:17:42.310Z 63 nikolanovoselec/codeflare: npm 8, judge 5, split read, left out 0
+2026-10-28T18:17:50.960Z 64 hitchhikers42/zanotam-proxy: npm 27, judge 12, split read, left out 4
+2026-10-28T18:17:59.835Z 65 ELDIABLO2020/bannersin48: npm 30, judge 11, split read image backend/Dockerfile, left out 6
+2026-10-28T18:18:02.187Z 66 bmesuere/licence-quest: npm 5, judge 2, split read, left out 3
+2026-10-28T18:18:06.933Z 67 PatricRc/haber: npm 6, judge 3, split read, left out 3
+2026-10-28T18:18:18.567Z 68 derekantrican/derekantrican.github.io: npm 45, judge 19, split read, left out 0
+2026-10-28T18:18:27.040Z 69 ShokooBid/PocketLedger: npm 19, judge 5, split read, left out 0
+2026-10-28T18:18:30.433Z 70 bdizzz/downtown-mars: npm 4, judge 1, split read, left out 0
+2026-10-28T18:18:34.144Z 71 mapleclose/rocket-feast-website: npm 10, judge 6, split read, left out 2
+2026-10-28T18:18:45.284Z 72 guola/socratic-rush: npm 26, judge 15, split read, left out 3
+2026-10-28T18:19:18.475Z 73 thomas40510/PS-Generator: npm 117, judge 49, split read, left out 0
+2026-10-28T18:19:23.149Z 74 fastagent-sh/fastagent: npm 8, judge 3, split read, left out 4
+2026-10-28T18:19:30.100Z 75 securityonionsolutions-com/securityonionsolutions-com.github.io: npm 16, judge 12, split read, left out 0
+2026-10-28T18:19:33.221Z 76 verygoodplugins/mcp-automem: npm 3, judge 1, split read, left out 0
+2026-10-28T18:19:36.298Z 77 ayush-that/cobalt-landing-page: npm 4, judge 3, split read, left out 1
+2026-10-28T18:19:39.998Z 78 Renhuai123/ziwei-doushu: npm 2, judge 2, split read, left out 0
+2026-10-28T18:19:46.359Z 79 nschema-org/NSchema.Docs: npm 19, judge 12, split read, left out 2
+2026-10-28T18:19:53.474Z 80 CDCgov/dibbs-query-connector: npm 7, judge 1, split read, left out 1
+2026-10-28T18:20:06.825Z 81 halain/adminpro-angular: npm 38, judge 22, split read, left out 1
+2026-10-28T18:20:09.146Z 82 aydabd/cacad: npm 4, judge 1, split read, left out 1
+2026-10-28T18:20:16.999Z 83 kyubey1228/ore-meshi: npm 22, judge 17, split read, left out 0
+2026-10-28T18:20:22.767Z 84 BilLogic/uno-blueprint: npm 12, judge 4, split read, left out 6
+2026-10-28T18:20:24.468Z 85 tranhatam-collab/tueban-platform: npm 6, judge 1, split read, left out 3
+2026-10-28T18:20:29.482Z 86 Vithanco/vscode-vithanco: npm 11, judge 0, split read, left out 10
+2026-10-28T18:20:33.905Z 87 korbonits/korbonits.github.io: npm 15, judge 11, split read, left out 1
+2026-10-28T18:20:59.269Z 88 Azure/api-management-developer-portal: npm 76, judge 44, split read, left out 3
+2026-10-28T18:21:02.697Z 89 chirag127/oz-chrome: npm 15, judge 12, split read, left out 3
+2026-10-28T18:21:12.630Z 90 sMorrison26/Portfolio: npm 51, judge 1, split read, left out 0
+2026-10-28T18:21:16.569Z 91 Galane-dev/shesha-config-diff: npm 1, judge 1, split read, left out 0
+2026-10-28T18:21:21.768Z 92 BROCKUGANDA/permitzero: npm 15, judge 6, split read, left out 1
+2026-10-28T18:21:30.296Z 93 Gray-Ghost-Data-Consultants-LLC/grayghostdata-website: npm 18, judge 12, split read, left out 2
+2026-10-28T18:21:59.247Z 94 paritytech/triangle-js-sdks: npm 31, judge 15, split read, left out 2
+2026-10-28T18:22:01.081Z 95 clay-good/roughlogic.com: npm 3, judge 0, split read, left out 1
+2026-10-28T18:22:39.208Z 96 epam/statgpt-portal-frontend: npm 45, judge 14, split read, left out 1
+2026-10-28T18:22:41.457Z 97 frioux/woodworking-tools: npm 1, judge 0, split read, left out 1
+2026-10-28T18:22:57.912Z 98 acekyd/acekyd: npm 61, judge 47, split read, left out 3
+2026-10-28T18:23:19.177Z 99 GSA/ngx-uswds: npm 30, judge 15, split read, left out 0
+2026-10-28T18:23:24.964Z 100 eitaar/eitaar.dev-v5: npm 15, judge 13, split read, left out 0
+2026-10-28T18:23:24.984Z done: 100 repositories, npm audit 1867, judge 935, failed 0

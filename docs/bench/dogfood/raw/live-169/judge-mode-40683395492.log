@@ -1,0 +1,164 @@
+judge	Set up job	﻿2026-10-28T11:53:14.7231703Z Current runner version: '2.338.0'
+judge	Set up job	2026-10-28T11:53:14.7251912Z ##[group]Runner Image Provisioner
+judge	Set up job	2026-10-28T11:53:14.7252706Z Hosted Compute Agent
+judge	Set up job	2026-10-28T11:53:14.7253166Z Version: 20261021.618
+judge	Set up job	2026-10-28T11:53:14.7253554Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+judge	Set up job	2026-10-28T11:53:14.7254063Z Build Date: 2026-10-21T00:45:21Z
+judge	Set up job	2026-10-28T11:53:14.7254496Z Worker ID: {eff88124-3f6d-465f-86be-99b17a19bceb}
+judge	Set up job	2026-10-28T11:53:14.7254944Z Region: westus2
+judge	Set up job	2026-10-28T11:53:14.7255341Z Cloud: Azure
+judge	Set up job	2026-10-28T11:53:14.7255684Z ##[endgroup]
+judge	Set up job	2026-10-28T11:53:14.7256674Z ##[group]Operating System
+judge	Set up job	2026-10-28T11:53:14.7257071Z Ubuntu
+judge	Set up job	2026-10-28T11:53:14.7257437Z 24.04.5
+judge	Set up job	2026-10-28T11:53:14.7257801Z LTS
+judge	Set up job	2026-10-28T11:53:14.7258132Z ##[endgroup]
+judge	Set up job	2026-10-28T11:53:14.7258471Z ##[group]Runner Image
+judge	Set up job	2026-10-28T11:53:14.7258914Z Image: ubuntu-24.04
+judge	Set up job	2026-10-28T11:53:14.7259306Z Version: 20261025.353.1
+judge	Set up job	2026-10-28T11:53:14.7259978Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+judge	Set up job	2026-10-28T11:53:14.7261070Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+judge	Set up job	2026-10-28T11:53:14.7261663Z ##[endgroup]
+judge	Set up job	2026-10-28T11:53:14.7262350Z ##[group]GITHUB_TOKEN Permissions
+judge	Set up job	2026-10-28T11:53:14.7264139Z Contents: read
+judge	Set up job	2026-10-28T11:53:14.7264515Z Metadata: read
+judge	Set up job	2026-10-28T11:53:14.7264924Z ##[endgroup]
+judge	Set up job	2026-10-28T11:53:14.7266395Z Secret source: Actions
+judge	Set up job	2026-10-28T11:53:14.7267042Z Cache mode: write
+judge	Set up job	2026-10-28T11:53:14.7267487Z Prepare workflow directory
+judge	Set up job	2026-10-28T11:53:14.7483866Z Prepare all required actions
+judge	Set up job	2026-10-28T11:53:14.7516177Z Getting action download info
+judge	Set up job	2026-10-28T11:53:15.0928494Z Download action repository 'Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe' (SHA:8bc8c594f66289f7ccd2aa881c16b749447840fe)
+judge	Set up job	2026-10-28T11:53:15.9655575Z Getting action download info
+judge	Set up job	2026-10-28T11:53:16.1161931Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+judge	Set up job	2026-10-28T11:53:16.2716328Z Complete job name: judge
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	﻿2026-10-28T11:53:16.3285652Z ##[group]Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3286424Z with:
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3286783Z   mode: judge
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3287186Z   judge-workflow: .github/workflows/ludion-judge.yml
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3287685Z ##[endgroup]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3360655Z ##[start-action display=Check the mode, the event and the tools;id=__Ludion-ai_ludion.start]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3399893Z ##[group]Run bash "$GITHUB_ACTION_PATH/action/start.sh"
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3400466Z ^[[36;1mbash "$GITHUB_ACTION_PATH/action/start.sh"^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3420550Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3421117Z env:
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3421431Z   MODE: judge
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3421816Z   EVENT: pull_request
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3422223Z   RECORD: /home/runner/work/_temp/ludion/judgement.json
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3422859Z   PR: 169
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3423279Z   HEAD_SHA: 1c92aa083aad7ce2eb2a47bb8e7edb5de5ad4380
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3423740Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3424352Z   MERGE_SHA: c898f37f4b024aa5b05018e129faf8798dc6bf98
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:16.3424770Z ##[endgroup]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4927569Z ##[end-action id=__Ludion-ai_ludion.start;outcome=success;conclusion=success;duration_ms=2156]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4931784Z ##[start-action display=Check that this commit of the action carries the bundled judge;id=__Ludion-ai_ludion.bundle]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4988106Z ##[group]Run for file in packages/cli/dist/cli.js action/dist/record.js; do
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4988554Z ^[[36;1mfor file in packages/cli/dist/cli.js action/dist/record.js; do^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4988891Z ^[[36;1m  if [ ! -f "$GITHUB_ACTION_PATH/$file" ]; then^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4989283Z ^[[36;1m    echo "::error::This commit of the action has no bundled judge (${file}). Pin a release commit's SHA."^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4989645Z ^[[36;1m    exit 1^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4989984Z ^[[36;1m  fi^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.4990203Z ^[[36;1mdone^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5007119Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5007386Z ##[endgroup]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5103482Z ##[end-action id=__Ludion-ai_ludion.bundle;outcome=success;conclusion=success;duration_ms=17]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5108802Z ##[start-action display=Read the PR's package.json and package-lock.json as data;id=__Ludion-ai_ludion.read]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5130018Z ##[group]Run bash "$GITHUB_ACTION_PATH/action/read.sh"
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5130351Z ^[[36;1mbash "$GITHUB_ACTION_PATH/action/read.sh"^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5146271Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5146533Z env:
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5148703Z   GH_TOKEN: ***
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5148887Z   REPO: Ludion-ai/ludion
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5149101Z   INPUT: /home/runner/work/_temp/ludion/input
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5149363Z   HEAD_SHA: 1c92aa083aad7ce2eb2a47bb8e7edb5de5ad4380
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5149641Z   MERGE_SHA: c898f37f4b024aa5b05018e129faf8798dc6bf98
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5149881Z   BASE_REF: main
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:18.5150052Z ##[endgroup]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3122068Z ##[end-action id=__Ludion-ai_ludion.read;outcome=success;conclusion=success;duration_ms=4801]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3135937Z ##[start-action display=Judge;id=__Ludion-ai_ludion.__run]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3162369Z ##[group]Run node action/dist/record.js
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3162789Z ^[[36;1mnode action/dist/record.js^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3179316Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3179555Z env:
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3179805Z   RECORD: /home/runner/work/_temp/ludion/judgement.json
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3180027Z   INPUT: /home/runner/work/_temp/ludion/input
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3180227Z   STARTED_AT: 2026-10-28T11:53:18.481Z
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3180396Z   PR: 169
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3180566Z   HEAD_SHA: 1c92aa083aad7ce2eb2a47bb8e7edb5de5ad4380
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3180807Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3181024Z   MERGE_SHA: c898f37f4b024aa5b05018e129faf8798dc6bf98
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3181403Z   BUILD_OUTCOME: success
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3181564Z   READ_OUTCOME: success
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.3181753Z ##[endgroup]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9594503Z {
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9594959Z   "schema": 1,
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9595179Z   "pr": 169,
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9595391Z   "head_sha": "1c92aa083aad7ce2eb2a47bb8e7edb5de5ad4380",
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9595620Z   "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9595826Z   "merge_sha": "c898f37f4b024aa5b05018e129faf8798dc6bf98",
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9596007Z   "started_at": "2026-10-28T11:53:18.481Z",
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9596176Z   "verdict": "undecidable",
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9596310Z   "reason": null,
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9596438Z   "finished_at": "2026-10-28T11:53:23.953Z",
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9596597Z   "judge_seconds": 0.461,
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9596724Z   "job_seconds": 5.472,
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9596881Z   "judge_exit_code": 1
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9597005Z }
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9597431Z Ludion judgement: undecidable — not applied automatically
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9597730Z Urgency: low · wait 168h from the newest publish (unknown)
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9597969Z Published at or after T (unknown, the fix's publish time): unknown version(s)
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9598175Z Changed packages (0):
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9598331Z   [info] gate 1: The lockfile change adds no package version.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9598612Z   [info] gate 4: The given changed files do not include package-lock.json, although the lockfile changed.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9598859Z Not checked:
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9599057Z   - Gate 3 (build and tests of old and new versions) is not run by the judge v0.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9599359Z   - Obfuscated code and new network or process calls in the changed code are not inspected.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9599695Z   - Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9600572Z   - Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9601410Z   - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9603690Z   - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9604226Z   - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9604696Z Exposure: fix published n/a · seen 2026-10-28T11:53:23.576Z
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9659229Z ##[end-action id=__Ludion-ai_ludion.__run;outcome=success;conclusion=success;duration_ms=652]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9664756Z ##[start-action display=Summary;id=__Ludion-ai_ludion.__run_2]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9681174Z ##[group]Run {
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9681330Z ^[[36;1m{^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9681584Z ^[[36;1m  echo "**プレビュー：コメントのみ。マージは行わない。** Preview: comments only; nothing is merged."^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9681817Z ^[[36;1m  echo^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9682111Z ^[[36;1m  jq -r '"Verdict: `\(.verdict)` · head `\(.head_sha)` · judge \(.judge_seconds // "unknown") s, job \(.job_seconds // "unknown") s"' "$RECORD"^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9682414Z ^[[36;1m  echo^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9682908Z ^[[36;1m  echo "The full judgement is in this run's log and its ludion-judgement artifact; the comment job posts it on the PR."^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9683355Z ^[[36;1m} >> "$GITHUB_STEP_SUMMARY"^[[0m
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9699334Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9699530Z env:
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9699675Z   RECORD: /home/runner/work/_temp/ludion/judgement.json
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9699978Z ##[endgroup]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9765598Z ##[end-action id=__Ludion-ai_ludion.__run_2;outcome=success;conclusion=success;duration_ms=10]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9767112Z ##[start-action display=Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9;id=__Ludion-ai_ludion.__actions_upload-artifact]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9804674Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9804917Z with:
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9805043Z   name: ludion-judgement
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9805209Z   path: /home/runner/work/_temp/ludion/judgement.json
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9805388Z   if-no-files-found: error
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9805516Z   overwrite: true
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9805632Z   retention-days: 90
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9805754Z   compression-level: 6
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9805883Z   include-hidden-files: false
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9806027Z   archive: true
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:23.9806141Z ##[endgroup]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:24.2660171Z With the provided path, there will be 1 file uploaded
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:24.5795302Z Artifact name is valid!
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:24.5796084Z Root directory input is valid!
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:24.9784506Z Uploading artifact: ludion-judgement.zip
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:24.9809505Z Beginning upload of artifact content to blob storage
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:25.3169122Z Uploaded bytes 1496
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:25.3995490Z Finished uploading artifact content to blob storage!
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:25.3996056Z SHA256 digest of uploaded artifact is 7749b8a534f2432d9bb86466e03e419e6e8dc77704ebba5338fdda6481e0b5d6
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:25.3996587Z Finalizing artifact upload
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:26.0639725Z Artifact ludion-judgement successfully finalized. Artifact ID 12813756997
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:26.0640346Z Artifact ludion-judgement has been successfully uploaded! Final size is 1496 bytes. Artifact ID is 12813756997
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:26.0641628Z Artifact download URL: https://github.com/Ludion-ai/ludion/actions/runs/40683395492/artifacts/12813756997
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:26.0740478Z ##[end-action id=__Ludion-ai_ludion.__actions_upload-artifact;outcome=success;conclusion=success;duration_ms=2097]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:26.0746505Z ##[start-action display=Check the judgement and post it;id=__Ludion-ai_ludion.__run_3]
+judge	Run Ludion-ai/ludion@8bc8c594f66289f7ccd2aa881c16b749447840fe	2026-10-28T11:53:26.0749597Z ##[end-action id=__Ludion-ai_ludion.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+judge	Complete job	﻿2026-10-28T11:53:26.0809378Z Cleaning up orphan processes

@@ -1,0 +1,15 @@
+gh stub: no fixture for repos/Ludion-ai/ludion/contents/package-lock.json?ref=470a5542cc0b8b75787094be6dc3d6b4185a45c3
+{
+  "schema": 1,
+  "pr": 161,
+  "head_sha": "b5014ddae044f02288232f13b5d1863a3089bdb2",
+  "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
+  "merge_sha": "470a5542cc0b8b75787094be6dc3d6b4185a45c3",
+  "started_at": "2026-10-28T12:04:33.007Z",
+  "verdict": "undecidable",
+  "reason": "The PR's package.json and package-lock.json could not be read; see the run log.",
+  "finished_at": "2026-10-28T12:04:33.104Z",
+  "judge_seconds": null,
+  "job_seconds": 0.097,
+  "judge_exit_code": null
+}

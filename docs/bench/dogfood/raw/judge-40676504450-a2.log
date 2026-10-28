@@ -1,0 +1,345 @@
+judge	Set up job	﻿2026-10-28T11:01:13.2567345Z Current runner version: '2.338.0'
+judge	Set up job	2026-10-28T11:01:13.2589925Z ##[group]Runner Image Provisioner
+judge	Set up job	2026-10-28T11:01:13.2591007Z Hosted Compute Agent
+judge	Set up job	2026-10-28T11:01:13.2591595Z Version: 20261021.618
+judge	Set up job	2026-10-28T11:01:13.2592153Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+judge	Set up job	2026-10-28T11:01:13.2592804Z Build Date: 2026-10-21T00:45:21Z
+judge	Set up job	2026-10-28T11:01:13.2593479Z Worker ID: {1e42cccc-a303-4244-8391-d919de5846c0}
+judge	Set up job	2026-10-28T11:01:13.2594076Z Region: centralus
+judge	Set up job	2026-10-28T11:01:13.2594517Z Cloud: Azure
+judge	Set up job	2026-10-28T11:01:13.2595017Z ##[endgroup]
+judge	Set up job	2026-10-28T11:01:13.2596214Z ##[group]Operating System
+judge	Set up job	2026-10-28T11:01:13.2596761Z Ubuntu
+judge	Set up job	2026-10-28T11:01:13.2597289Z 24.04.5
+judge	Set up job	2026-10-28T11:01:13.2597652Z LTS
+judge	Set up job	2026-10-28T11:01:13.2598064Z ##[endgroup]
+judge	Set up job	2026-10-28T11:01:13.2598467Z ##[group]Runner Image
+judge	Set up job	2026-10-28T11:01:13.2598884Z Image: ubuntu-24.04
+judge	Set up job	2026-10-28T11:01:13.2599302Z Version: 20261025.353.1
+judge	Set up job	2026-10-28T11:01:13.2600023Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+judge	Set up job	2026-10-28T11:01:13.2601677Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+judge	Set up job	2026-10-28T11:01:13.2602347Z ##[endgroup]
+judge	Set up job	2026-10-28T11:01:13.2603152Z ##[group]GITHUB_TOKEN Permissions
+judge	Set up job	2026-10-28T11:01:13.2605110Z Contents: read
+judge	Set up job	2026-10-28T11:01:13.2605531Z Metadata: read
+judge	Set up job	2026-10-28T11:01:13.2605904Z ##[endgroup]
+judge	Set up job	2026-10-28T11:01:13.2607433Z Secret source: Dependabot
+judge	Set up job	2026-10-28T11:01:13.2608116Z Cache mode: write
+judge	Set up job	2026-10-28T11:01:13.2608786Z Prepare workflow directory
+judge	Set up job	2026-10-28T11:01:13.2951454Z Prepare all required actions
+judge	Set up job	2026-10-28T11:01:13.3002326Z Getting action download info
+judge	Set up job	2026-10-28T11:01:13.5607974Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+judge	Set up job	2026-10-28T11:01:13.6558933Z Download action repository 'actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1' (SHA:949feb2413d6458794dcd2491c4babbbce0c15c1)
+judge	Set up job	2026-10-28T11:01:13.8843784Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+judge	Set up job	2026-10-28T11:01:14.0732448Z Complete job name: judge
+judge	Record "undecidable" until the judge finishes	﻿2026-10-28T11:01:14.1268741Z ##[group]Run set -euo pipefail
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1269404Z ^[[36;1mset -euo pipefail^[[0m
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1269869Z ^[[36;1mat=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)^[[0m
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1270681Z ^[[36;1mecho "at=${at}" >> "$GITHUB_OUTPUT"^[[0m
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1271704Z ^[[36;1mjq -n --argjson pr "$PR" --arg head "$HEAD_SHA" --arg base "$BASE_SHA" --arg merge "$MERGE_SHA" --arg at "$at" "$INITIAL" > "$RECORD"^[[0m
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1287839Z shell: /usr/bin/bash -e {0}
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1288720Z env:
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1289179Z   PR: 161
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1289627Z   HEAD_SHA: b5014ddae044f02288232f13b5d1863a3089bdb2
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1290244Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1291055Z   MERGE_SHA: 470a5542cc0b8b75787094be6dc3d6b4185a45c3
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1291691Z   RECORD: /home/runner/work/_temp/judgement.json
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1293146Z   INITIAL: {schema: 1, pr: $pr, head_sha: $head, base_sha: $base, merge_sha: $merge, started_at: $at,
+judge	Record "undecidable" until the judge finishes	 verdict: "undecidable", reason: "The judge did not finish; see the run log.", finished_at: null,
+judge	Record "undecidable" until the judge finishes	 judge_seconds: null, job_seconds: null, judge_exit_code: null, judgement: null, text: null}
+judge	Record "undecidable" until the judge finishes	
+judge	Record "undecidable" until the judge finishes	2026-10-28T11:01:14.1294748Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-10-28T11:01:14.1582543Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1583193Z with:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1583689Z   ref: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1584205Z   persist-credentials: false
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1584642Z   repository: Ludion-ai/ludion
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1587325Z   token: ***
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1587686Z   ssh-strict: true
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1588063Z   ssh-user: git
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1588408Z   clean: true
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1588808Z   sparse-checkout-cone-mode: true
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1589419Z   fetch-depth: 1
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1589786Z   fetch-tags: false
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1590173Z   show-progress: true
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1590784Z   lfs: false
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1591157Z   submodules: false
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1591581Z   set-safe-directory: true
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1591996Z   allow-unsafe-pr-checkout: false
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1592423Z env:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1592925Z   PR: 161
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1593300Z   HEAD_SHA: b5014ddae044f02288232f13b5d1863a3089bdb2
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1593930Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1594429Z   MERGE_SHA: 470a5542cc0b8b75787094be6dc3d6b4185a45c3
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.1594921Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3844087Z Syncing repository: Ludion-ai/ludion
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3845517Z ##[group]Getting Git version info
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3846086Z Working directory is '/home/runner/work/ludion/ludion'
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3846848Z [command]/usr/bin/git version
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3901582Z git version 2.56.0
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3915471Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3935930Z Temporarily overriding HOME='/home/runner/work/_temp/6eace167-13d8-4795-a1bf-e8f5b76b4036' before making global git config changes
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3937700Z Adding repository directory to the temporary git global config as a safe directory
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.3943308Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludion/ludion
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4349810Z Deleting the contents of '/home/runner/work/ludion/ludion'
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4354454Z ##[group]Determining repository object format
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4355465Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4356309Z ##[group]Initializing the repository
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4358058Z [command]/usr/bin/git init /home/runner/work/ludion/ludion
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4451964Z hint: Using 'master' as the name for the initial branch. This default branch name
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4453751Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4454858Z hint: to use in all of your new repositories, which will suppress this warning,
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4455881Z hint: call:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4456416Z hint:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4457126Z hint: 	git config --global init.defaultBranch <name>
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4457849Z hint:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4458533Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4459587Z hint: 'development'. The just-created branch can be renamed via this command:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4460612Z hint:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4461340Z hint: 	git branch -m <name>
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4461945Z hint:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4462677Z hint: Disable this message with "git config set advice.defaultBranchName false"
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4463888Z Initialized empty Git repository in /home/runner/work/ludion/ludion/.git/
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4466961Z [command]/usr/bin/git remote add origin https://github.com/Ludion-ai/ludion
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4627181Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4628068Z ##[group]Disabling automatic garbage collection
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4629326Z [command]/usr/bin/git config --local gc.auto 0
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4656617Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4657248Z ##[group]Setting up auth
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4657693Z Removing SSH command configuration
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4659765Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4688168Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4943073Z Removing HTTP extra header
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4946774Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.4976089Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5123869Z Removing includeIf entries pointing to credentials config files
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5127419Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5149923Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5303931Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5332324Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ludion/ludion/.git.path /home/runner/work/_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5397256Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ludion/ludion/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5421937Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5446029Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5470890Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5471694Z ##[group]Fetching the repository
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:14.5475718Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.2969372Z From https://github.com/Ludion-ai/ludion
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.2971567Z  * branch            be8623912df7a6bddbd5c113db33b1eb18fd9acb -> FETCH_HEAD
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.2977567Z [command]/usr/bin/git rev-parse --verify --quiet be8623912df7a6bddbd5c113db33b1eb18fd9acb^{object}
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3000985Z be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3003685Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3005116Z ##[group]Determining the checkout info
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3006558Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3010026Z [command]/usr/bin/git sparse-checkout disable
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3053326Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3079120Z ##[group]Checking out the ref
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3081688Z [command]/usr/bin/git checkout --progress --force be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3495732Z Note: switching to 'be8623912df7a6bddbd5c113db33b1eb18fd9acb'.
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3496451Z 
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3496825Z You are in 'detached HEAD' state. You can look around, make experimental
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3497820Z changes and commit them, and you can discard any commits you make in this
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3498775Z state without impacting any branches by switching back to a branch.
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3499230Z 
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3499654Z If you want to create a new branch to retain commits you create, you may
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3500847Z do so (now or later) by using -c with the switch command. Example:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3501380Z 
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3501666Z   git switch -c <new-branch-name>
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3502182Z 
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3502463Z Or undo this operation with:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3502835Z 
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3503098Z   git switch -
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3503378Z 
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3503975Z Turn off this advice by setting config variable advice.detachedHead to false
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3504949Z 
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3505482Z HEAD is now at be86239 ci: judge this repository's dependency PRs, comments only (C-1) (#156)
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3507800Z ##[endgroup]
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3539829Z [command]/usr/bin/git log -1 --format=%H
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3560141Z be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3566890Z ##[group]Removing auth
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3570176Z Removing SSH command configuration
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3571553Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3594903Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3740731Z Removing HTTP extra header
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3742491Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3765200Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3903885Z Removing includeIf entries pointing to credentials config files
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3905362Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3924049Z includeif.gitdir:/home/runner/work/ludion/ludion/.git.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3925594Z includeif.gitdir:/home/runner/work/ludion/ludion/.git/worktrees/*.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3927077Z includeif.gitdir:/github/workspace/.git.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3928631Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3939836Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ludion/ludion/.git.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3956436Z /home/runner/work/_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.3968453Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ludion/ludion/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-6a0c8b82\-a2d6\-4445\-b621\-4050c73565ee\.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4019115Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ludion/ludion/.git/worktrees/*.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4036738Z /home/runner/work/_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4042907Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ludion/ludion/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-6a0c8b82\-a2d6\-4445\-b621\-4050c73565ee\.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4070744Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4089246Z /github/runner_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4094610Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-6a0c8b82\-a2d6\-4445\-b621\-4050c73565ee\.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4223546Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4241151Z /github/runner_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4246635Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-6a0c8b82\-a2d6\-4445\-b621\-4050c73565ee\.config
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4276074Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4422193Z Removing credentials config '/home/runner/work/_temp/git-credentials-6a0c8b82-a2d6-4445-b621-4050c73565ee.config'
+judge	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:15.4430967Z ##[endgroup]
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	﻿2026-10-28T11:01:15.4623826Z ##[group]Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4624561Z with:
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4625008Z   node-version-file: .node-version
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4625560Z   check-latest: false
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4628640Z   token: ***
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4629146Z   package-manager-cache: true
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4629652Z env:
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4630119Z   PR: 161
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4630849Z   HEAD_SHA: b5014ddae044f02288232f13b5d1863a3089bdb2
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4631515Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4632343Z   MERGE_SHA: 470a5542cc0b8b75787094be6dc3d6b4185a45c3
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.4632918Z ##[endgroup]
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.5554052Z Node version file is not TOML file
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.5555034Z Resolved .node-version as 24
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.5597212Z Found in cache @ /opt/hostedtoolcache/node/24.22.1/x64
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:15.6264600Z ##[group]Environment details
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:16.7495885Z node: v24.22.1
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:16.7496477Z npm: 11.19.1
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:16.7496996Z yarn: 1.22.22
+judge	Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	2026-10-28T11:01:16.7498139Z ##[endgroup]
+judge	Read the PR's package.json and package-lock.json as data	﻿2026-10-28T11:01:16.7602116Z ##[group]Run set -euo pipefail
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7602509Z ^[[36;1mset -euo pipefail^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7602863Z ^[[36;1mgit fetch --no-tags --depth=2 origin "+${MERGE_SHA}:refs/ludion/merge"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7603280Z ^[[36;1mread -r _ base second rest <<< "$(git rev-list --parents -n 1 "$MERGE_SHA")"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7603701Z ^[[36;1mif [ "$second" != "$HEAD_SHA" ] || [ -n "${rest:-}" ]; then^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7604192Z ^[[36;1m  echo "::error::The test merge commit ${MERGE_SHA} is not head ${HEAD_SHA} merged onto one base commit."^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7604588Z ^[[36;1m  exit 1^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7604817Z ^[[36;1mfi^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7605114Z ^[[36;1mgit fetch --no-tags --depth=50 origin "+refs/heads/${BASE_REF}:refs/ludion/base"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7605557Z ^[[36;1mif ! git merge-base --is-ancestor "$base" refs/ludion/base; then^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7605988Z ^[[36;1m  echo "::error::The test merge commit's base ${base} is not on ${BASE_REF} (last 50 commits)."^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7606474Z ^[[36;1m  exit 1^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7606701Z ^[[36;1mfi^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7606938Z ^[[36;1mmkdir -p "$INPUT/before" "$INPUT/after"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7607301Z ^[[36;1mfor file in package.json package-lock.json; do^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7607638Z ^[[36;1m  git show "${base}:${file}" > "$INPUT/before/${file}"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7607997Z ^[[36;1m  git show "${MERGE_SHA}:${file}" > "$INPUT/after/${file}"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7608314Z ^[[36;1mdone^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7608755Z ^[[36;1mgit diff --no-renames --name-only -z "$base" "$MERGE_SHA" > "$INPUT/files"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7609374Z ^[[36;1mgit checkout --quiet --detach "$base"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7609668Z ^[[36;1mecho "base=${base}" >> "$GITHUB_OUTPUT"^[[0m
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7629239Z shell: /usr/bin/bash -e {0}
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7629660Z env:
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7629901Z   PR: 161
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7630152Z   HEAD_SHA: b5014ddae044f02288232f13b5d1863a3089bdb2
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7630722Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7631101Z   MERGE_SHA: 470a5542cc0b8b75787094be6dc3d6b4185a45c3
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7631410Z   INPUT: /home/runner/work/_temp/judge-input
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7631692Z   BASE_REF: main
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:16.7631920Z ##[endgroup]
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:17.6381631Z From https://github.com/Ludion-ai/ludion
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:17.6382292Z  * [new ref]         470a5542cc0b8b75787094be6dc3d6b4185a45c3 -> refs/ludion/merge
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:19.0989674Z From https://github.com/Ludion-ai/ludion
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:19.0990314Z  * [new branch]      main       -> refs/ludion/base
+judge	Read the PR's package.json and package-lock.json as data	2026-10-28T11:01:19.0990906Z  * [new branch]      main       -> origin/main
+judge	Build the judge from the base commit	﻿2026-10-28T11:01:19.2022578Z ##[group]Run npm ci --ignore-scripts --no-audit --no-fund
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2022989Z ^[[36;1mnpm ci --ignore-scripts --no-audit --no-fund^[[0m
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2023331Z ^[[36;1mnpm run build --workspace ludion-ai^[[0m
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2034370Z shell: /usr/bin/bash -e {0}
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2034620Z env:
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2034862Z   PR: 161
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2035113Z   HEAD_SHA: b5014ddae044f02288232f13b5d1863a3089bdb2
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2035407Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2035725Z   MERGE_SHA: 470a5542cc0b8b75787094be6dc3d6b4185a45c3
+judge	Build the judge from the base commit	2026-10-28T11:01:19.2035988Z ##[endgroup]
+judge	Build the judge from the base commit	2026-10-28T11:01:25.8555554Z 
+judge	Build the judge from the base commit	2026-10-28T11:01:25.8556585Z added 263 packages in 7s
+judge	Build the judge from the base commit	2026-10-28T11:01:25.9960220Z 
+judge	Build the judge from the base commit	2026-10-28T11:01:25.9961642Z > ludion-ai@0.3.0-preview.1 build
+judge	Build the judge from the base commit	2026-10-28T11:01:25.9962453Z > node build.ts
+judge	Build the judge from the base commit	2026-10-28T11:01:25.9962660Z 
+judge	Build the judge from the base commit	2026-10-28T11:01:26.3512560Z Wrote dist/cli.js
+judge	Judge	﻿2026-10-28T11:01:26.3663615Z ##[group]Run node .github/judge/record.ts
+judge	Judge	2026-10-28T11:01:26.3664069Z ^[[36;1mnode .github/judge/record.ts^[[0m
+judge	Judge	2026-10-28T11:01:26.3674923Z shell: /usr/bin/bash -e {0}
+judge	Judge	2026-10-28T11:01:26.3675184Z env:
+judge	Judge	2026-10-28T11:01:26.3675390Z   PR: 161
+judge	Judge	2026-10-28T11:01:26.3675662Z   HEAD_SHA: b5014ddae044f02288232f13b5d1863a3089bdb2
+judge	Judge	2026-10-28T11:01:26.3675966Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Judge	2026-10-28T11:01:26.3676254Z   MERGE_SHA: 470a5542cc0b8b75787094be6dc3d6b4185a45c3
+judge	Judge	2026-10-28T11:01:26.3676612Z   RECORD: /home/runner/work/_temp/judgement.json
+judge	Judge	2026-10-28T11:01:26.3676905Z   INPUT: /home/runner/work/_temp/judge-input
+judge	Judge	2026-10-28T11:01:26.3677204Z   STARTED_AT: 2026-10-28T11:01:14.137Z
+judge	Judge	2026-10-28T11:01:26.3677455Z   BUILD_OUTCOME: success
+judge	Judge	2026-10-28T11:01:26.3677672Z   READ_OUTCOME: success
+judge	Judge	2026-10-28T11:01:26.3677939Z ##[endgroup]
+judge	Judge	2026-10-28T11:01:27.1794652Z {
+judge	Judge	2026-10-28T11:01:27.1795951Z   "schema": 1,
+judge	Judge	2026-10-28T11:01:27.1796603Z   "pr": 161,
+judge	Judge	2026-10-28T11:01:27.1797391Z   "head_sha": "b5014ddae044f02288232f13b5d1863a3089bdb2",
+judge	Judge	2026-10-28T11:01:27.1798348Z   "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
+judge	Judge	2026-10-28T11:01:27.1799126Z   "merge_sha": "470a5542cc0b8b75787094be6dc3d6b4185a45c3",
+judge	Judge	2026-10-28T11:01:27.1799770Z   "started_at": "2026-10-28T11:01:14.137Z",
+judge	Judge	2026-10-28T11:01:27.1801356Z   "verdict": "stop",
+judge	Judge	2026-10-28T11:01:27.1801902Z   "reason": null,
+judge	Judge	2026-10-28T11:01:27.1802283Z   "finished_at": "2026-10-28T11:01:27.177Z",
+judge	Judge	2026-10-28T11:01:27.1802853Z   "judge_seconds": 0.73,
+judge	Judge	2026-10-28T11:01:27.1803188Z   "job_seconds": 13.04,
+judge	Judge	2026-10-28T11:01:27.1803653Z   "judge_exit_code": 1
+judge	Judge	2026-10-28T11:01:27.1804035Z }
+judge	Judge	2026-10-28T11:01:27.1804856Z Ludion judgement: STOP — not applied automatically
+judge	Judge	2026-10-28T11:01:27.1805824Z Urgency: normal · wait 72h from the newest publish (2026-10-25T07:19:30.732Z)
+judge	Judge	2026-10-28T11:01:27.1806813Z Published at or after T (2026-10-25T07:19:30.732Z, the fix's publish time): 0 version(s)
+judge	Judge	2026-10-28T11:01:27.1807592Z Changed packages (1):
+judge	Judge	2026-10-28T11:01:27.1808221Z   hono 4.13.13 → 4.13.14
+judge	Judge	2026-10-28T11:01:27.1809062Z   [stop] gate 4: The change also touches apps/worker/package.json; a dependency update must change only package.json and package-lock.json.
+judge	Judge	2026-10-28T11:01:27.1810130Z Not checked:
+judge	Judge	2026-10-28T11:01:27.1811080Z   - Gate 3 (build and tests of old and new versions) is not run by the judge v0.
+judge	Judge	2026-10-28T11:01:27.1812189Z   - Obfuscated code and new network or process calls in the changed code are not inspected.
+judge	Judge	2026-10-28T11:01:27.1813229Z   - Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used.
+judge	Judge	2026-10-28T11:01:27.1815357Z   - Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.
+judge	Judge	2026-10-28T11:01:27.1817571Z   - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).
+judge	Judge	2026-10-28T11:01:27.1818970Z   - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.
+judge	Judge	2026-10-28T11:01:27.1820731Z   - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.
+judge	Judge	2026-10-28T11:01:27.1822163Z Exposure: fix published n/a · seen 2026-10-28T11:01:26.508Z
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	﻿2026-10-28T11:01:27.1922002Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1922421Z with:
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1922698Z   name: judgement
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1923118Z   path: /home/runner/work/_temp/judgement.json
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1923463Z   if-no-files-found: error
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1923738Z   overwrite: true
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1923998Z   retention-days: 90
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1924295Z   compression-level: 6
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1924606Z   include-hidden-files: false
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1924899Z   archive: true
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1925136Z env:
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1925385Z   PR: 161
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1925689Z   HEAD_SHA: b5014ddae044f02288232f13b5d1863a3089bdb2
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1926049Z   BASE_SHA: be8623912df7a6bddbd5c113db33b1eb18fd9acb
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1926411Z   MERGE_SHA: 470a5542cc0b8b75787094be6dc3d6b4185a45c3
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.1926737Z ##[endgroup]
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.3072359Z With the provided path, there will be 1 file uploaded
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.4923397Z Artifact name is valid!
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.4923961Z Root directory input is valid!
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.7915797Z Uploading artifact: judgement.zip
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.7945416Z Beginning upload of artifact content to blob storage
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:27.9863752Z Uploaded bytes 1678
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:28.0335880Z Finished uploading artifact content to blob storage!
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:28.0336577Z SHA256 digest of uploaded artifact is a229000f6c36d00b673f027326e04f2fddaf30fde89bb3b74495a0b5c4dc66fd
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:28.0337272Z Finalizing artifact upload
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:28.5708827Z Artifact judgement successfully finalized. Artifact ID 12810357439
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:28.5709811Z Artifact judgement has been successfully uploaded! Final size is 1678 bytes. Artifact ID is 12810357439
+judge	Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9	2026-10-28T11:01:28.5711480Z Artifact download URL: https://github.com/Ludion-ai/ludion/actions/runs/40676504450/artifacts/12810357439
+judge	Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1	﻿2026-10-28T11:01:28.5855431Z Post job cleanup.
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-10-28T11:01:28.6780311Z Post job cleanup.
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7444204Z [command]/usr/bin/git version
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7481772Z git version 2.56.0
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7512120Z Temporarily overriding HOME='/home/runner/work/_temp/e338d6aa-0945-403e-93d4-83de63a780b4' before making global git config changes
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7512785Z Adding repository directory to the temporary git global config as a safe directory
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7516597Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludion/ludion
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7542216Z Removing SSH command configuration
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7547163Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7587792Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7748658Z Removing HTTP extra header
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7752427Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7775559Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7929013Z Removing includeIf entries pointing to credentials config files
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7933417Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+judge	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-10-28T11:01:28.7955064Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+judge	Complete job	﻿2026-10-28T11:01:28.8228269Z Cleaning up orphan processes

@@ -1,0 +1,20 @@
+scale check at 2275d78 plus the uncommitted replay.ts of this fix (blob 7fd1adabadd244ef3136a30284a8ed4678d68c96), 2026-10-29
+store: scripts/scale.mjs /data 27100 2200 -> 463269960 bytes, 29 capture files
+replay: node tools/shadow/src/replay.ts /data /out/scale.json --as-of=2026-02-17T00:00:00.000Z, docker --memory 4g, NODE_OPTIONS=--max-old-space-size=3584, --network none
+exit=0 seconds=223
+Shadow replay as of 2026-02-17T00:00:00.000Z (store coverage 2026-02-16T00:00:30.000Z).
+Window: complete, 2026-01-05T00:00:00.000Z to 2026-02-02T00:00:00.000Z; runs: 2026-01-05T00:00:00.000Z.
+Final: no. the last OSV read (2026-02-16T00:00:30.000Z) is not 24h past the window's end + 336h; OSV was not asked for the records naming 2200 package(s) (without the network), so records the recorder did not store (modified before it started) are not counted.
+Recorder start commit(s): 8a78b55940def8463a2401e7bdd38d7e6c7b604d; watched list sha256: x.
+Versions in the window: 26980 (judged 26980, pending 0).
+Decided (b, one prev, stop or ready_except_build in all four rows): 18461 of 100 needed: not_yet.
+Misses (confirmed and record-omission candidates): 0: not_yet.
+MAL- records naming a watched version: 0; versions in the denominator: 0 (confirmed 0, record-omission 0, false-report 0, not checked 0); named outside it: 0.
+Capture lag: 26980 versions, median 0.000h, p90 0.000h.
+Capture gaps: 34076 row(s); undecidable verdicts: 0; recorder give-ups: 0; OSV give-ups: 0; duplicate records dropped: 0.
+Per scenario and row:
+  b:exploited: missed 18461, capture_gap 8519
+  b:high: missed 18461, capture_gap 8519
+  b:low: missed 18461, capture_gap 8519
+  b:normal: missed 18461, capture_gap 8519
+Literal verdicts (normal, production, no fix): capture_gap 8519, ready_except_build 18461.

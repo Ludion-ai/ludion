@@ -6,7 +6,8 @@
 # (node:24-slim pinned by digest, read-only root, user 1000, no host environment).
 # With NETWORK=1 it also runs the disputed check, which reads the registry, jsDelivr, ecosyste.ms, Software Heritage and
 # OSV (package names and versions only); without it, the container has no network and every MAL-named version counts
-# as malicious ("not checked").
+# as malicious ("not checked"). A final result needs NETWORK=1: OSV is also asked by package name. Each networked run
+# reads the network afresh, into <out>.cache beside its output.
 #   bash docs/bench/2026-10-29-shadow-replay/scripts/run.sh <node_modules volume> <recorder data dir> <snapshot dir> <out.json>
 set -eu
 export MSYS_NO_PATHCONV=1
@@ -34,6 +35,11 @@ WATCHED=$(grep -h '"type":"start"' "$SNAP"/status/*.jsonl | sed -E 's/.*"watched
 echo "watched list $WATCHED"
 W=$(cd "$TREE" && (pwd -W 2>/dev/null || pwd)); S=$(cd "$SNAP" && (pwd -W 2>/dev/null || pwd)); O=$(cd "$(dirname "$OUT")" && (pwd -W 2>/dev/null || pwd))
 NET="--network none"; CACHE=""
-if [ "${NETWORK:-0}" = 1 ]; then NET=""; CACHE="--cache=/out/cache"; fi
-docker run --rm $NET --read-only --tmpfs /tmp:exec --user 1000:1000 -e HOME=/tmp --memory 4g -v "$W:/w:ro" -v "$NM:/w/node_modules:ro" -v "$S:/data:ro" -v "$O:/out" -w /w "$IMAGE" \
+# A cache of its own per run, next to its output: a final run never reads answers fetched for an earlier one.
+CACHE_DIR="$(dirname "$OUT")/$(basename "$OUT" .json).cache"
+if [ "${NETWORK:-0}" = 1 ]; then
+  [ -e "$CACHE_DIR" ] && { echo "$CACHE_DIR exists; each networked run fetches afresh"; exit 1; }
+  NET=""; CACHE="--cache=/out/$(basename "$CACHE_DIR")"
+fi
+docker run --rm $NET --read-only --tmpfs /tmp:exec --user 1000:1000 -e HOME=/tmp -e NODE_OPTIONS=--max-old-space-size=3584 --memory 4g -v "$W:/w:ro" -v "$NM:/w/node_modules:ro" -v "$S:/data:ro" -v "$O:/out" -w /w "$IMAGE" \
   node tools/shadow/src/replay.ts /data "/out/$(basename "$OUT")" $CACHE

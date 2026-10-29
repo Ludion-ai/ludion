@@ -21,8 +21,11 @@ mkdir -p "$TREE/node_modules"
 git -c core.autocrlf=false archive HEAD | (cd "$TREE" && tar -x)
 for f in packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts packages/cli/src/security/time-cap.ts tools/backtest/src/archives-v5.ts; do git -c core.autocrlf=false show "$START:$f" > "$TREE/$f"; echo "  $f from $START: $(git hash-object --stdin < "$TREE/$f")"; done
 TW=$(cd "$TREE" && (pwd -W 2>/dev/null || pwd))
+# The typecheck covers the shadow's code and what it imports (the start commit's judge files): main's other files may
+# import what the start commit's judge does not export, and the count never loads them.
+echo '{"extends":"./tsconfig.json","include":["tools/shadow/src","tools/shadow/test"]}' > "$TREE/tsconfig.shadow.json"
 echo "== tests with the start commit's judge files"
-docker run --rm --network none --read-only --tmpfs /tmp:exec --user 1000:1000 -e HOME=/tmp -v "$TW:/w:ro" -v "$NM:/w/node_modules" -w /w "$IMAGE" sh -c "npx tsc -p tsconfig.json; echo tsc_exit=$?; npx vitest run tools/shadow 2>&1 | grep -E 'Tests |Test Files |×'"
+docker run --rm --network none --read-only --tmpfs /tmp:exec --user 1000:1000 -e HOME=/tmp -v "$TW:/w:ro" -v "$NM:/w/node_modules" -w /w "$IMAGE" sh -c "npx tsc -p tsconfig.shadow.json; echo tsc_exit=\$?; npx vitest run tools/shadow 2>&1 | grep -E 'Tests |Test Files |×'"
 rm -rf "$TREE"
 mutate() {
   local file="$1"; shift
@@ -58,6 +61,8 @@ mutate $R "seeds from V's own captures and P's packument only" '...(captureTimes
 mutate $R "OSV not asked by package name" 'else copies.push(...answer.filter(r => typeof r?.id === "string" && r.id.startsWith("MAL-")));' 'else void answer;'
 mutate $R "final although OSV was not asked" 'if (osvNotQueried.length) notFinal.push' 'if (false) notFinal.push'
 mutate $R "capture gaps of MAL-only cases not listed" 'capture_gaps: [...results, ...cases.filter(c => !results.some(r => r.name === c.name && r.version === c.version))]' 'capture_gaps: [...results]'
+mutate $R "no seed from a dependency's later first publish" '...[...deps].flatMap(d => (ctx.store.created.get(d) ?? []).map(c => c.fetched_at)),' '...[],'
+mutate $R "inputs past the coverage a gap, not pending" 'if (s > ctx.coverage) return' 'if (false) return'
 mutate $D "file list only from the last capture" '[...caps].reverse().find(c => c.files)?.files ?? null' 'cap?.files ?? null'
 mutate $D "recorder's file list not compared" 'if (captured?.files) {' 'if (false) {'
 mutate $D "O after another named version ignored" 'afterNamed || addsScript ?' 'addsScript ?'

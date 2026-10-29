@@ -54,17 +54,21 @@ export type Store = {
 
 const contentKey = (r: Rec) => createHash("sha256").update(JSON.stringify({ ...r, fetched_at: undefined })).digest("hex");
 const streamKey = (r: Rec) => `${r.type}\0${r.name ?? r.id}\0${r.version ?? ""}`;
-/** Every record under `dir`. A last line with no newline is still being appended (or was cut by a copy): it is skipped. */
-function lines(dir: string): Rec[] {
-  if (!existsSync(dir)) return [];
-  const out: Rec[] = [];
+/**
+ * Each record under `dir`, one file in memory at a time. A last line with no newline is still being appended (or was cut
+ * by a copy): it is skipped.
+ */
+function eachLine(dir: string, fn: (r: Rec) => void) {
+  if (!existsSync(dir)) return;
   for (const file of readdirSync(dir).filter(f => f.endsWith(".jsonl")).sort()) {
-    const parts = readFileSync(join(dir, file), "utf8").split("\n");
-    parts.pop();
-    for (const line of parts) if (line.trim()) out.push(JSON.parse(line));
+    const text = readFileSync(join(dir, file), "utf8");
+    for (let from = 0, nl = text.indexOf("\n"); nl >= 0; from = nl + 1, nl = text.indexOf("\n", from)) {
+      const line = text.slice(from, nl);
+      if (line.trim()) fn(JSON.parse(line));
+    }
   }
-  return out;
 }
+function lines(dir: string): Rec[] { const out: Rec[] = []; eachLine(dir, r => out.push(r)); return out; }
 
 /** The provenance the live judge would read from a stored attestations answer (npm-facts.ts, registryFacts). */
 function provenanceOf(name: string, version: string, manifest: Rec, attestations: Rec | null): VersionCapture["provenance"] {
@@ -84,16 +88,18 @@ export function readStore(dir: string, keepFiles: (name: string) => boolean = ()
   const store: Store = { timeline: new Map(), versions: new Map(), deprecations: new Map(), created: new Map(), gaveUp: [], osv: new Map(), osvGaveUp: [], status: lines(join(dir, "status")), duplicates: 0 };
   const previous = new Map<string, string>();
   const push = <T>(map: Map<string, T[]>, key: string, value: T) => { const list = map.get(key) ?? []; list.push(value); map.set(key, list); };
-  const captures = lines(join(dir, "captures")).map((r, i) => ({ r, i })).sort((a, b) => ms(a.r.fetched_at) - ms(b.r.fetched_at) || a.i - b.i).map(x => x.r);
-  for (const r of captures) {
-    const key = contentKey(r), stream = streamKey(r);
-    if (previous.get(stream) === key) { store.duplicates++; continue; }
-    previous.set(stream, key);
-    const at = ms(r.fetched_at);
-    if (r.type === "baseline" || r.type === "change" || r.type === "gone") push(store.timeline, r.name, { ...r, at });
+  // Each record is reduced as it is read (manifests and attestation bundles are not kept), so the store's size on disk
+  // is not held in memory at once. What is kept per record: its content hash, its stream and the reduced value.
+  type Item = { at: number; i: number; key: string; stream: string; apply: () => void };
+  const items: Item[] = [];
+  let i = 0;
+  eachLine(join(dir, "captures"), r => {
+    const at = ms(r.fetched_at), key = contentKey(r), stream = streamKey(r);
+    let apply: () => void = () => {};
+    if (r.type === "baseline" || r.type === "change" || r.type === "gone") { const t = { type: r.type, name: r.name, at, time: r.time ?? {}, removed: r.removed ?? [] }; apply = () => push(store.timeline, t.name, t); }
     else if (r.type === "version") {
       const m = r.manifest ?? {};
-      push(store.versions, `${r.name}@${r.version}`, {
+      const v: VersionCapture = {
         fetched_at: at, reason: r.reason,
         publisher: typeof m._npmUser?.name === "string" ? m._npmUser.name : null, shared_publisher: !!r.shared_publisher,
         install_scripts: installScripts(m.scripts), dependencies: Object.keys({ ...m.dependencies, ...m.optionalDependencies }).sort(),
@@ -102,10 +108,19 @@ export function readStore(dir: string, keepFiles: (name: string) => boolean = ()
         deprecated: typeof m.deprecated === "string" && m.deprecated ? m.deprecated : null,
         provenance: provenanceOf(r.name, r.version, m, r.attestations ?? null),
         files: r.files?.status === "hashed" && keepFiles(r.name) ? r.files.files : null, files_status: r.files?.status ?? null,
-      });
-    } else if (r.type === "deprecation") push(store.deprecations, `${r.name}@${r.version}`, { fetched_at: at, deprecated: r.deprecated ?? null });
-    else if (r.type === "created") push(store.created, r.name, { fetched_at: at, created: r.created ?? null, status: r.status ?? null });
-    else if (r.type === "gave_up") store.gaveUp.push(r);
+      };
+      const k = `${r.name}@${r.version}`;
+      apply = () => push(store.versions, k, v);
+    } else if (r.type === "deprecation") { const k = `${r.name}@${r.version}`, d = { fetched_at: at, deprecated: r.deprecated ?? null }; apply = () => push(store.deprecations, k, d); }
+    else if (r.type === "created") { const c = { fetched_at: at, created: r.created ?? null, status: r.status ?? null }; apply = () => push(store.created, r.name, c); }
+    else if (r.type === "gave_up") apply = () => store.gaveUp.push(r);
+    items.push({ at, i: i++, key, stream, apply });
+  });
+  items.sort((a, b) => a.at - b.at || a.i - b.i);
+  for (const item of items) {
+    if (previous.get(item.stream) === item.key) { store.duplicates++; continue; }
+    previous.set(item.stream, item.key);
+    item.apply();
   }
   const osvSeen = new Set<string>();
   for (const r of lines(join(dir, "osv")).sort((a, b) => ms(a.fetched_at) - ms(b.fetched_at))) {
@@ -302,7 +317,8 @@ function pollEndAfter(ctx: Ctx, t: number): number {
   if (!ends) { ends = ctx.store.status.filter(s => s.type === "poll" || s.type === "stopped" || (s.type === "error" && s.name === undefined && s.id === undefined)).map(s => ms(s.at)).sort((a, b) => a - b); pollEnds.set(ctx.store, ends); }
   let lo = 0, hi = ends.length;
   while (lo < hi) { const mid = (lo + hi) >> 1; if (ends[mid]! < t) lo = mid + 1; else hi = mid; }
-  return ends[lo] ?? ctx.coverage;
+  // No poll has ended after it yet (a snapshot taken mid-poll): Infinity, so the judgement is pending.
+  return ends[lo] ?? Infinity;
 }
 /** Per package name, when each of its version captures was taken (built once per store). */
 const captureTimes = new WeakMap<Store, Map<string, number[]>>();
@@ -344,6 +360,8 @@ export function judgeRow(ctx: Ctx, name: string, version: string, prev: string |
   if (!captures.length) return { ...base, gap: `${name}@${version} was never captured (removed before its first capture, or lost in a gap)` };
   let input: ReturnType<typeof inputAt> = { gap: "" }, seed = NaN;
   for (const s of seedsOf(ctx, name, version)) {
+    // Past the store's coverage, a later poll may still complete the inputs: pending, not a gap.
+    if (s > ctx.coverage) return { ...base, outcome: "pending", gap: "inputs not complete within the store's coverage" };
     seed = s;
     input = inputAt(ctx, name, version, prev, row, scenario, seed);
     if (!("gap" in input)) break;

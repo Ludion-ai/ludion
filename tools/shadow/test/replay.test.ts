@@ -548,3 +548,17 @@ describe("third review fixes (PR #194)", () => {
     expect(r).toMatchObject({ outcome: "missed", wait_hours: 144, iterations: 1 });
   });
 });
+
+describe("fourth review fixes (PR #194)", () => {
+  it("seeds from a later poll that stored a new dependency's first publish", () => {
+    const w = new World().publish("left-pad", "1.0.1", 1, { deps: { fresh: "^1.0.0" } });
+    w.captures.push({ type: "created", name: "fresh", fetched_at: at(5), url: "x", created: "2019-01-01T00:00:00.000Z" });
+    expect(row(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false), "b", "normal")).toMatchObject({ outcome: "missed", wait_hours: 144 });
+  });
+  it("is pending, not a gap, for a version captured after the last poll line", () => {
+    const w = new World(100);
+    w.publish("left-pad", "1.0.1", 100.5);
+    const r = judgeVersion(ctxOf(w, T0 + 96.5 * HOUR), "left-pad", "1.0.1", false);
+    expect(r.rows.map(x => x.outcome)).toEqual(["pending", "pending", "pending", "pending"]);
+  });
+});

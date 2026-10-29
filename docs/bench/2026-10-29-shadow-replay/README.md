@@ -41,7 +41,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
   - an OSV read is at least 24h past that time, since a record published by then may be imported into OSV later;
   - nothing is pending;
   - no OSV record was given up, and none is still being read again;
-  - the run had the network (`NETWORK=1`): OSV was asked for the records naming each watched package with a version in the window, and every range was enumerated over the registry's versions.
+  - the run had the network (`NETWORK=1`): OSV was asked for the records naming each watched package with a version in the window, that the feed showed changing in the window, or whose capture failed, and every range was enumerated over the registry's versions.
 - **Malicious versions** (sections 3 and 6). These are versions in the window named by a MAL- record published by the window's end + 336h. A record withdrawn later still counts here, because section 6 sets apart only false-report candidates. Each one goes through `tools/shadow/src/disputed.ts`:
   - **The disputed check.** It is v5's, in v5's order, read from the registry, jsDelivr, ecosyste.ms and Software Heritage. The recorder's captured manifest is one more copy of the registry's document. As the one addition, the recorder's own file list of V must equal jsDelivr's.
   - **Not disputed** is confirmed.
@@ -64,7 +64,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
 
 ## Readings taken where the decision is not literal
 
-None of these loosens a count. Each is the reading the code takes, and is tested. Five fresh-context reviews on PR #194 found readings that did loosen it.
+None of these loosens a count. Each is the reading the code takes, and is tested. Six fresh-context reviews on PR #194 found readings that did loosen it.
 - **The first, at 80b26f8.** Readings 5, 6 and 8 loosened the count, and MAL- records were read as they are today.
 - **The second, at 2250791.** It found:
   - a later copy of a record could drop a version from the denominator;
@@ -86,6 +86,11 @@ None of these loosens a count. Each is the reading the code takes, and is tested
   - finding the latest poll would overflow the call stack after months of polls;
   - OSV was asked only about names with a stored window version;
   - a record copy with no publish time dropped out.
+- **The sixth, at 34cdfa6.** It found:
+  - the recorder's `gave_up` records were ignored, so a version it gave up on could be judged from a partial capture and stopped;
+  - a permanent gap could be kept pending by the package's later activity;
+  - a range record with no publish time was not expanded;
+  - the re-query stopped a version on a range it could not place.
 
 All of these were changed as below.
 
@@ -95,7 +100,7 @@ All of these were changed as below.
    - a change to P's packument;
    - the first publish of one of V's dependencies.
 
-   A moment past the store's coverage (or a capture after the last poll line) makes the judgement pending, not a gap. The recorder retries a failed sub-read for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap.
+   Only captures up to V's publish time + 336h (the longest wait) count, since a later one comes after every wait_until. A moment within that but past the store's coverage (or a capture after the last poll line) makes the judgement pending, not a gap. A version with a `gave_up` record is a capture gap in every row, whatever its partial capture holds (section 9). The recorder retries a failed sub-read for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap.
 2. **"The end of the poll."** The facts "of V's first capture" are those stored by the end of the poll that took it: the next `poll` or `stopped` status line, or an `error` line that ended the whole poll. An `error` line naming a package or an OSV id is written mid-poll, so it does not end one. A capture's records are written over several seconds, so the predecessor's record comes after V's.
 3. **The registry's predecessor** is taken among the versions the recorder had captured by that moment, as listed versions. The recorder captures the predecessor with V, so a version whose `time` is stored but which was never captured was not listed: unpublished before the recorder saw the package.
 4. **Repeated records** are dropped only when equal, apart from `fetched_at`, to the record just before them with the same type, name and version. The recorder's README says "by type, name, version and content". Read over the whole stream, that would drop a deprecation that changes and changes back, or a 404 `created` record after a later success. In the third run's snapshot, 133 repeats were dropped: 79 `change` records with the same diff, and 54 `retry` version records (`logs/store-counts-3.log`).
@@ -116,7 +121,8 @@ All of these were changed as below.
 13. **OSV asked by package name.** The recorder stores only records modified after it started. So the denominator is also built from OSV's own answer for every watched package that has a version in the window, that the feed showed changing in the window (a package taken down too), or whose capture failed. Only package names are sent. Without the network, the result is not final. The judgements' re-query still reads stored copies only: the stricter side.
 14. **The run of identical code** uses the stored `time`, completed by the registry's `time` and V's own publish time, so a version placed only by the registry is in it.
 15. **The recorder's file hashes** (section 6's addition) are kept in full only for packages a stored record names. For every other hashed version, a digest of its sorted (path, sha256) pairs is kept, and compared with jsDelivr's list when the full list is not there. So the comparison is never skipped.
-16. **A record copy with no publish time** counts as published on time for the denominator; at a judgement, it does not stop the version. Both are the stricter side.
+16. **A record copy with no publish time** counts as published on time for the denominator, and its ranges are expanded. At a judgement, it does not stop the version. Both are the stricter side.
+17. **The re-query** stops a version only on a record that places it: listed in its `versions`, or within a range whose every event is a version. For the denominator, a range it cannot place still names the version (archives-v5's `names`). Both are the stricter side.
 
 ## Not done
 
@@ -126,11 +132,11 @@ All of these were changed as below.
 
 ## Tests
 
-`tools/shadow/test/replay.test.ts` has 54 tests. The recorder's 35 are unchanged, 89 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit 97a5a50:
+`tools/shadow/test/replay.test.ts` has 58 tests. The recorder's 35 are unchanged, 93 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit df73560:
 - typecheck exit 0;
-- 89 of 89 passed;
-- 89 of 89 passed again against the start commit's judge files, the ones the count runs (judge.ts 5a598fd; main's #193 version is at HEAD). The typecheck there covers `tools/shadow` and what it imports, and exits 0. The whole project does not typecheck against the old judge.ts, because main's workspace-manifests.ts imports `own`, which it lacks; the count never loads that file. (An earlier check.log at 658f5c5 printed `tsc_exit=0` for a whole-project typecheck that had failed: the host shell expanded `$?`. The fourth review found it.)
-- 36 deliberate mutations, each making tests fail:
+- 93 of 93 passed;
+- 93 of 93 passed again against the start commit's judge files, the ones the count runs (judge.ts 5a598fd; main's #193 version is at HEAD). The typecheck there covers `tools/shadow` and what it imports, and exits 0. The whole project does not typecheck against the old judge.ts, because main's workspace-manifests.ts imports `own`, which it lacks; the count never loads that file. (An earlier check.log at 658f5c5 printed `tsc_exit=0` for a whole-project typecheck that had failed: the host shell expanded `$?`. The fourth review found it.)
+- 40 deliberate mutations, each making tests fail:
   - the re-query cut-off off;
   - exploited's synthetic fix off;
   - no recomputation of `wait_until`;
@@ -165,24 +171,30 @@ All of these were changed as below.
   - the recorder's file list not compared by digest;
   - OSV asked only for names with a stored window version;
   - a copy with no publish time counted as late;
-  - the latest poll found by spreading every status line.
+  - the latest poll found by spreading every status line;
+  - a version the recorder gave up on judged from its partial capture;
+  - captures after V's publish + 336h seeding a judgement;
+  - a range record with no publish time not expanded;
+  - the re-query stopping on a range it cannot place.
 
-**Scale.** `scripts/scale.mjs` builds a synthetic store at the design's four-week size (`logs/scale.log`): 27,100 new versions over 2,200 watched names, recorder-sized manifests and attestation bundles, a poll a minute for 43 days, 463,269,960 bytes. The replay, with the replay.ts committed in 9d672be, judged 26,980 window versions in 223 s and exited 0, under run.sh's limits (`--memory 4g`, a 3,584 MB heap). Again at 8645b04, after the fifth review's fixes: 221 s, exit 0 (`logs/scale-2.log`). Peak memory was not measured. The synthetic data is not registry data, so its outcomes mean nothing.
+**Scale.** `scripts/scale.mjs` builds a synthetic store at the design's four-week size (`logs/scale.log`): 27,100 new versions over 2,200 watched names, recorder-sized manifests and attestation bundles, a poll a minute for 43 days, 463,269,960 bytes. The replay, with the replay.ts committed in 9d672be, judged 26,980 window versions in 223 s and exited 0, under run.sh's limits (`--memory 4g`, a 3,584 MB heap). Again at 8645b04, after the fifth review's fixes: 221 s, exit 0 (`logs/scale-2.log`). The sixth review's fixes were not rerun at scale: they add a check per row against the few give-up records, and filter seeds. Peak memory was not measured. The synthetic data is not registry data, so its outcomes mean nothing.
 
 ## The preliminary runs
 
-**The current one** is `out/replay-preliminary-6.json` (log `logs/run-preliminary-6.log`, store counts `logs/store-counts-6.log`), at 54c8705, after the fifth review's fixes, with `NETWORK=1`:
-- **The snapshot.** Taken at 2026-10-29T02:51:12Z, 50,808,124 bytes, a copy. The recorder was not stopped or touched.
+**The current one** is `out/replay-preliminary-7.json` (log `logs/run-preliminary-7.log`, store counts `logs/store-counts-7.log`), at 58c8a20, after the sixth review's fixes, with `NETWORK=1`:
+- **The snapshot.** Taken at 2026-10-29T03:06:55Z, 51,140,272 bytes, a copy. The recorder was not stopped or touched.
 - **The judge.** The judge's files are the start commit's, as the log prints. Watched list sha256 `02d3e6de…`.
-- **The network.** OSV was asked for the records naming each watched package with a version in the window (package names only). Its cache was its own, fresh, and was not committed.
+- **The network.** OSV was asked for the records naming each watched package with a version in the window, that the feed showed changing in the window, or whose capture failed (package names only). Its cache was its own, fresh, and was not committed.
 - **The window.** In progress, 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z, one run, no break.
-- **The versions.** 338 in the window, all pending. The coverage ends at the last OSV read, 2026-10-29T00:00:20.329Z. The first rows (exploited and high, 12h or 24h) become judgeable after the next daily OSV read.
+- **The versions.** 347 in the window, all pending. The coverage ends at the last OSV read, 2026-10-29T00:00:20.329Z. The first rows (exploited and high, 12h or 24h) become judgeable after the next daily OSV read.
 - **The gate.** Decided 0 of 100, `not_yet`. Misses 0, `not_yet`.
 - **MAL- records.**
   - 7 records (from OSV's answers) name a watched version. The 19 versions they name are all outside the window: published 2025-08-26 and 27 (nx and @nx/*) and 2025-11-24 (posthog-node and @posthog/core).
   - The recorder stored 15 records itself, and none names a watched package.
 - **Capture lag.** Median 0.012h, p90 0.017h.
-- **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 133 repeats dropped (79 `change`, 54 `retry`).
+- **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 153 repeats dropped (89 `change`, 64 `retry`).
+
+**The sixth one**, at 54c8705, with the network, before the sixth review: `logs/run-preliminary-6.log`, `logs/store-counts-6.log` and `out/replay-preliminary-6.json` (338 versions, all pending, 0 gaps; the same 7 records and 19 versions outside the window).
 
 **The fifth one**, at 32afeb8, with the network, before the fifth review: `logs/run-preliminary-5.log`, `logs/store-counts-5.log` and `out/replay-preliminary-5.json` (337 versions, all pending, 0 gaps; the same 7 records and 19 versions outside the window).
 

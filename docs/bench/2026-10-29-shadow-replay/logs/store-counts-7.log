@@ -1,0 +1,13 @@
+{
+ "osv_lines": 15,
+ "osv_records": 15,
+ "osv_ids": 15,
+ "mal_ids": 15,
+ "osv_gave_up": 0,
+ "ids_naming_a_watched_package": [],
+ "capture_records": 3628,
+ "repeats_dropped": {
+  "change": 89,
+  "version:retry": 64
+ }
+}

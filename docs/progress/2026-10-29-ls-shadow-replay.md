@@ -1,7 +1,7 @@
 # 2026-10-29 (LS) — The shadow's replay is built; there is no (b) result yet
 
 The replay that judges what the shadow's recorder captures: `tools/shadow/src/replay.ts` and `tools/shadow/src/disputed.ts`. It counts condition (b) as docs/decisions/2026-10-29-shadow-counting.md fixes it; that file is unchanged. Details, and the readings taken where the decision is not literal: docs/bench/2026-10-29-shadow-replay/README.md.
-- **The reviews.** Five fresh-context reviews on PR #194 (at 80b26f8, 2250791, b3ed314, 2275d78 and ec5cba4) asked for changes, and every finding was fixed:
+- **The reviews.** Six fresh-context reviews on PR #194 (at 80b26f8, 2250791, b3ed314, 2275d78, ec5cba4 and 34cdfa6) asked for changes, and every finding was fixed:
   - MAL- records read as they are today;
   - records whose later copy, or withdrawal, dropped a version from the count or the record-omission rule;
   - versions without a stored publish time, named only by a range, or placed only by the registry;
@@ -12,17 +12,18 @@ The replay that judges what the shadow's recorder captures: `tools/shadow/src/re
   - a network cache that never expired;
   - the whole store held in memory;
   - a misreported typecheck;
-  - section 6's file-hash comparison skipped for records known only from OSV's answer.
+  - section 6's file-hash comparison skipped for records known only from OSV's answer;
+  - versions the recorder gave up on, judged from a partial capture.
 - **Tests.**
-  - 54 new tests; 89 with the recorder's.
+  - 58 new tests; 93 with the recorder's.
   - All pass in Docker with no network, against HEAD's judge and against the start commit's.
   - The typecheck exits 0: the whole project at HEAD, and `tools/shadow` with its imports against the start commit's judge.
-  - 36 deliberate mutations each make tests fail (`logs/check.log`, at 97a5a50).
+  - 40 deliberate mutations each make tests fail (`logs/check.log`, at df73560).
   - A synthetic four-week store (463 MB, 27,100 versions) replays in 221 s under run.sh's 4 GB (`logs/scale-2.log`, at 8645b04).
-- **A preliminary run** with the network, on a copy of the recorder's store taken at 2026-10-29T02:51:12Z. The recorder was not touched.
+- **A preliminary run** with the network, on a copy of the recorder's store taken at 2026-10-29T03:06:55Z. The recorder was not touched.
   - **The judge.** The start commit's judge files (8a78b55), although main's #193 has since changed judge.ts.
   - **The window.** 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z, in progress, no break.
-  - **The versions.** 338 in the window, all pending. Every row's `wait_until` is past the store's coverage, the last daily OSV read at 2026-10-29T00:00:20.329Z.
+  - **The versions.** 347 in the window, all pending. Every row's `wait_until` is past the store's coverage, the last daily OSV read at 2026-10-29T00:00:20.329Z.
   - **The gate.** Decided 0 of 100. Misses 0.
   - **MAL- records.** 7 records from OSV's answers name 19 watched versions, all published in 2025 and outside the window. None of the 15 records the recorder stored names a watched package.
   - **Capture.** Lag median 0.012h, p90 0.017h. Capture gaps 0.

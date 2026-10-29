@@ -1,0 +1,111 @@
+measured_at 2026-10-29T01:13:00Z
+data_dir_bytes 58581507
+known_bytes 9245477 created_bytes 121934
+known_files 247 created_files 481
+gzip6 2026-10-28.jsonl 46161970 -> 15259830
+gzip6 2026-10-29.jsonl 3051294 -> 1009761
+gzip6 known/ 9245477 -> 2681500
+known_file_bytes n 247 median 15062 p90 99414 max 384202 mean 36937
+{
+ "captures/2026-10-28/baseline": {
+  "n": 230,
+  "bytes": 8507731
+ },
+ "captures/2026-10-28/version:new": {
+  "n": 313,
+  "bytes": 10462105
+ },
+ "captures/2026-10-28/version:lockfile": {
+  "n": 808,
+  "bytes": 9333264
+ },
+ "captures/2026-10-28/version:predecessor": {
+  "n": 1180,
+  "bytes": 15061679
+ },
+ "captures/2026-10-28/created": {
+  "n": 426,
+  "bytes": 108292
+ },
+ "captures/2026-10-28/deprecation": {
+  "n": 17,
+  "bytes": 3709
+ },
+ "captures/2026-10-28/change": {
+  "n": 187,
+  "bytes": 71098
+ },
+ "captures/2026-10-28/version:retry": {
+  "n": 91,
+  "bytes": 2614092
+ },
+ "captures/2026-10-29/baseline": {
+  "n": 17,
+  "bytes": 288607
+ },
+ "captures/2026-10-29/version:new": {
+  "n": 15,
+  "bytes": 1493828
+ },
+ "captures/2026-10-29/version:lockfile": {
+  "n": 60,
+  "bytes": 730262
+ },
+ "captures/2026-10-29/change": {
+  "n": 7,
+  "bytes": 1854
+ },
+ "captures/2026-10-29/version:retry": {
+  "n": 6,
+  "bytes": 108348
+ },
+ "captures/2026-10-29/version:predecessor": {
+  "n": 50,
+  "bytes": 414272
+ },
+ "captures/2026-10-29/created": {
+  "n": 55,
+  "bytes": 14123
+ },
+ "osv/2026-10-29/osv": {
+  "n": 15,
+  "bytes": 49440
+ },
+ "status/2026-10-28/start": {
+  "n": 1,
+  "bytes": 257
+ },
+ "status/2026-10-28/feed_start": {
+  "n": 1,
+  "bytes": 72
+ },
+ "status/2026-10-28/poll": {
+  "n": 488,
+  "bytes": 63050
+ },
+ "status/2026-10-28/osv": {
+  "n": 1,
+  "bytes": 99
+ },
+ "status/2026-10-29/poll": {
+  "n": 73,
+  "bytes": 9429
+ },
+ "status/2026-10-29/osv": {
+  "n": 1,
+  "bytes": 100
+ }
+}
+{"2026-10-28T16":6431287,"2026-10-28T17":2135413,"2026-10-28T18":4654060,"2026-10-28T19":5328637,"2026-10-28T20":5634640,"2026-10-28T21":7441699,"2026-10-28T22":2137066,"2026-10-28T23":12399168,"2026-10-29T00":728579,"2026-10-29T01":2322715}
+{
+  polls: 561,
+  first: '2026-10-28T15:51:48.401Z',
+  last: '2026-10-29T01:12:18.127Z',
+  ms_median: 301,
+  ms_p90: 3392,
+  ms_p99: 27835,
+  ms_max: 67362,
+  ms_sum: 938066,
+  entries_sum: 42829,
+  watched_sum: 441
+}

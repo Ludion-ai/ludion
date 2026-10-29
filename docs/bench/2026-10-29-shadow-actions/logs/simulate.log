@@ -1,0 +1,59 @@
+2026-10-29T01:16:36Z
+workflow blob 16cc675a0b688448a134d4659fc45b3562fab38f, driver blob 730ac8fdae0d0d113ce5efeb2ef811481f30de26, recorder 8a78b55940def8463a2401e7bdd38d7e6c7b604d, 120s per run
+== seed the data branch from the PC copy
+Pushed shadow-data: cbfb4f1948e201def932939a62f0ccca4aba90b3, 778 files, 61381245 bytes.
+-- a second seed is refused:
+shadow-data already exists on file:///sim/remote.git. Nothing pushed.
+exit 1
+== run 1 (run id 1001): record job
+Data branch at cbfb4f1948e201def932939a62f0ccca4aba90b3: 50415651 bytes outside state.json and known/.
+{"ended":"deadline","polls":2,"failed_polls":0}
+7 files, 143360 bytes.
+The recorder reached its deadline.
+== run 1: write job
+Committed runs/2026-10-29/011843Z-1001-1: 7 files.
+== run 2 (run id 1002): record job
+Data branch at 22a760cfd36e854fb77a78a7c6a0162454102f51: 50535156 bytes outside state.json and known/.
+{"ended":"deadline","polls":2,"failed_polls":0}
+5 files, 184320 bytes.
+The recorder reached its deadline.
+== run 2: write job
+Committed runs/2026-10-29/012020Z-1002-1: 5 files.
+== the data branch after two runs
+2882e84 shadow: run 2026-10-29/012020Z-1002-1
+22a760c shadow: run 2026-10-29/011843Z-1001-1
+cbfb4f1 shadow: the PC recorder's data at 8a78b55, seq 140476708, feed start 2026-10-28T15:51:48.394Z
+118882 runs/2026-10-29/011843Z-1001-1/captures/2026-10-29.jsonl
+623 runs/2026-10-29/011843Z-1001-1/status/2026-10-29.jsonl
+134894 runs/2026-10-29/012020Z-1002-1/captures/2026-10-29.jsonl
+623 runs/2026-10-29/012020Z-1002-1/status/2026-10-29.jsonl
+788 files, 60103366 bytes
+{"seq":"140477193","feed_started_at":"2026-10-28T15:51:48.394Z","osv_day":"2026-10-29","pending":0,"stopped":null}
+{"seq":"140476978","feed_started_at":"2026-10-28T15:51:48.394Z","osv_day":"2026-10-29","pending":0,"stopped":null}
+{"seq":"140476708","feed_started_at":"2026-10-28T15:51:48.394Z","osv_day":"2026-10-29","pending":0,"stopped":null}
+{"type":"start","at":"2026-10-29T01:17:42.272Z","commit":"8a78b55940def8463a2401e7bdd38d7e6c7b604d","watched_sha256":"02d3e6de2cc5e4d05af15d60bb6f9ca7ac17ebd261b652c77a9ce23281674f6a","watched_names":7660,"max_bytes":3800000000,"stored_bytes":50415651,"runner":"github-actions","run":"1001-1","bytes":59796093,"until":"2026-10-29T01:19:42.272Z"}
+      2 poll
+      1 start
+{"type":"start","at":"2026-10-29T01:19:15.292Z","commit":"8a78b55940def8463a2401e7bdd38d7e6c7b604d","watched_sha256":"02d3e6de2cc5e4d05af15d60bb6f9ca7ac17ebd261b652c77a9ce23281674f6a","watched_names":7660,"max_bytes":3800000000,"stored_bytes":50535156,"runner":"github-actions","run":"1002-1","bytes":59929567,"until":"2026-10-29T01:21:15.292Z"}
+      2 poll
+      1 start
+== refusals
+-- run 2's write again, after the branch moved:
+::error::The data branch moved from 22a760cfd36e854fb77a78a7c6a0162454102f51 to 2882e84bc2446c587b4e475f2e8c2e1d58b109e3 after the record job read it. Nothing committed.
+exit 1
+-- run 2's artifact under another run id:
+::error::Unexpected run directory: 2026-10-29/012020Z-1002-1
+exit 1
+-- an artifact holding a path the recorder never writes (.github/workflows/x.yml):
+::error::The artifact holds a path the recorder does not write:
+.github/workflows/x.yml
+exit 1
+-- an artifact holding a symbolic link at a known/ path:
+::error::The artifact holds something other than regular files. Nothing committed.
+exit 1
+-- the same run with only the recorder's paths is accepted:
+Committed runs/2026-10-29/000000Z-1003-1: 2 files.
+5a4340f shadow: run 2026-10-29/000000Z-1003-1
+.github entries on the branch: 0
+simulate exit 0
+2026-10-29T01:20:53Z

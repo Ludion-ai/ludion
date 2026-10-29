@@ -3,7 +3,7 @@
 // no network, read-only root, no capabilities, the nobody user, resource limits, no host mounts or forwarded environment.
 // This package is a protected path (docs/protected-paths.md): the sandbox flags change only with an independent review.
 import { spawn, type ChildProcess } from "node:child_process";
-import { accessSync, constants, mkdtempSync, statSync } from "node:fs";
+import { accessSync, constants, mkdtempSync, realpathSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { posix, resolve, win32 } from "node:path";
 
@@ -29,21 +29,40 @@ export function dockerCwd(): string {
   return (neutral ??= mkdtempSync(resolve(tmpdir(), "ludion-docker-")));
 }
 
+let project: string | null = null;
 /**
- * The docker program, by absolute path, from PATH's folders: only absolute ones, not the working directory itself and
- * not any folder with a node_modules segment (npx, npm exec and package scripts put a project's node_modules/.bin
- * first). So a project cannot choose which docker runs. Null when none is found. A PATH folder the user named inside a
- * project is the user's own choice and is not refused.
+ * The project being checked. PATH folders inside it are skipped by findDocker: a project's own scripts can put its bin
+ * folders (Composer's vendor/bin, a .venv/bin) first on PATH. The security CLI calls this with the project root.
  */
-export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), platform: NodeJS.Platform = process.platform): string | null {
+export function useProject(root: string | null): void {
+  project = root === null ? null : realpathSync(root);
+}
+
+/**
+ * The docker program, by absolute path, from PATH's folders. Skipped: an empty or relative entry; the working
+ * directory itself; anything inside the project (useProject); any folder with a node_modules segment (npx, npm exec
+ * and package scripts put the project's node_modules/.bin first); and Yarn 2+'s temporary shim folder
+ * (BERRY_BIN_FOLDER, put first on PATH for every dependency's bins). Null when none is found. This removes the ways
+ * known to us in which a project or its package manager puts a docker of its own on PATH; a PATH folder outside the
+ * project that the user named is the user's own choice.
+ */
+export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), platform: NodeJS.Platform = process.platform, root = project, berry = process.env.BERRY_BIN_FOLDER): string | null {
   const win = platform === "win32", P = win ? win32 : posix;
-  const same = (a: string, b: string) => win ? a.toLowerCase() === b.toLowerCase() : a === b;
-  const here = P.resolve(cwd);
+  const fold = (a: string) => win ? a.toLowerCase() : a;
+  const real = (p: string) => { try { return realpathSync(p); } catch { return p; } };
+  const inside = (dir: string, base: string | null | undefined) => {
+    if (!base || !P.isAbsolute(base)) return false;
+    const rel = P.relative(fold(P.resolve(base)), fold(dir));
+    return rel === "" || (!rel.startsWith("..") && !P.isAbsolute(rel));
+  };
+  const here = fold(P.resolve(cwd));
   for (const raw of path.split(win ? ";" : ":")) {
     const dir = raw.trim().replace(/^"(.*)"$/, "$1");
     if (!dir || !P.isAbsolute(dir)) continue;
-    const full = P.resolve(dir);
-    if (same(full, here) || full.split(/[\\/]/).some(part => same(part, "node_modules"))) continue;
+    const full = P.resolve(dir), resolved = win ? full : real(full);
+    if (fold(full) === here || fold(resolved) === here) continue;
+    if ([full, resolved].some(d => d.split(/[\\/]/).some(part => fold(part) === "node_modules"))) continue;
+    if ([full, resolved].some(d => inside(d, root) || inside(d, berry))) continue;
     for (const name of win ? ["docker.exe", "docker.com"] : ["docker"]) {
       const candidate = P.join(full, name);
       try {
@@ -55,7 +74,7 @@ export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), p
   }
   return null;
 }
-const NOT_FOUND = "docker was not found in PATH's absolute folders (the working directory and node_modules folders are skipped).";
+const NOT_FOUND = "docker was not found in PATH's absolute folders (the working directory, the project, node_modules folders and Yarn's shim folder are skipped).";
 
 /** Image retrieval/build/inspection only. Containers run only through runContainer. */
 export function runDockerImageCommand(args: string[], timeoutMs: number): Promise<string> {

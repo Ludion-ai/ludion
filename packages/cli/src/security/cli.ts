@@ -7,6 +7,7 @@ import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
 import { scanProject, vulnerable } from "./scan.ts";
 import { CONFIG, DEFAULT_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
+import { useProject } from "../../../sandbox/src/docker.ts";
 import type { ReadOnlyFinding, ReadOnlyScan } from "./osv.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, readOnlyRefusal } from "./readonly/index.ts";
 
@@ -36,6 +37,8 @@ export async function securityCli(command: string, args: string[]): Promise<numb
   if (values.ecosystem && !["init", "scan"].includes(command)) throw new Error("--ecosystem selects init/scan only; patch/watch use the saved project policy.");
   if (values.ecosystem && !["auto", "php", "npm", "composer", "maven"].includes(values.ecosystem) && !isReadOnlyCliName(values.ecosystem)) throw new Error("Supported ecosystems: php, npm, composer, maven, python, go, rust (scan only), auto.");
   const root = rootPath(values.dir!);
+  // docker is never taken from a PATH folder inside the project (packages/sandbox/src/docker.ts, findDocker).
+  useProject(root);
   if (command === "init") {
     if (existsSync(join(root, CONFIG))) throw new Error(`${CONFIG} already exists. Edit it to choose your real validation command.`);
     const choices: string[] = detectEcosystems(root);

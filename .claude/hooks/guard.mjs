@@ -1,10 +1,13 @@
 // PreToolUse hook for Bash and PowerShell: refuses commands that change production or secrets, or that run a
 // downloaded script. settings.json denies the plain forms; this sees the whole command line and judges each command
 // in it by what it runs, not by words that merely appear (a commit message or a grep pattern that mentions a deploy
-// is fine). `wrangler deploy --dry-run` passes: a deny rule can't make that exception. Exit 2 blocks the call.
+// is fine). `wrangler deploy --dry-run` passes: a deny rule can't make that exception. In Bash it also refuses a
+// backtick that would run as a command (runsBacktick). Exit 2 blocks the call.
 let input = "";
 for await (const chunk of process.stdin) input += chunk;
-const command = String(JSON.parse(input || "{}").tool_input?.command ?? "");
+const request = JSON.parse(input || "{}");
+const command = String(request.tool_input?.command ?? "");
+const tool = String(request.tool_name ?? "Bash");
 
 /** Words of one command, quotes respected: a quoted string is one word, without its quotes. */
 function words(segment) {
@@ -132,7 +135,61 @@ function check(line, depth = 0) {
   return undefined;
 }
 
-const why = check(command);
+/**
+ * Whether bash would run a backtick in this command line as a command: one outside single quotes and outside the body
+ * of a quoted heredoc (<<'EOF'). A markdown code span in double-quoted text (a PR body, a comment, a commit message)
+ * runs this way; on 2026-10-29 one ran `npx webpack serve` on a host. $( ) is not refused: "$(cat <<'EOF' ... EOF)"
+ * is how text is passed safely. A heredoc operator is recognised outside single quotes, wherever it stands.
+ */
+function runsBacktick(line) {
+  let quote = null;
+  const heredocs = [];
+  let body = null;
+  for (const text of line.split("\n")) {
+    if (body) {
+      if ((body.strip ? text.replace(/^\t+/, "") : text) === body.delim) body = heredocs.shift() ?? null;
+      else if (!body.literal && /(^|[^\\])`/.test(text)) return true;
+      continue;
+    }
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quote === "'") {
+        if (c === "'") quote = null;
+        continue;
+      }
+      if (c === "\\") {
+        i++;
+        continue;
+      }
+      if (c === "`") return true;
+      if (c === '"') {
+        quote = quote === '"' ? null : '"';
+        continue;
+      }
+      if (c === "'" && quote === null) {
+        quote = "'";
+        continue;
+      }
+      if (text.startsWith("<<<", i)) {
+        i += 2;
+        continue;
+      }
+      if (text.startsWith("<<", i)) {
+        const m = /^<<(-?)\s*(?:'([^']*)'|"([^"]*)"|\\(\w+)|(\w+))/.exec(text.slice(i));
+        if (m) {
+          heredocs.push({ delim: m[2] ?? m[3] ?? m[4] ?? m[5], literal: m[5] === undefined, strip: m[1] === "-" });
+          i += m[0].length - 1;
+        }
+      }
+    }
+    if (heredocs.length) body = heredocs.shift();
+  }
+  return false;
+}
+
+const BACKTICK = "A backtick outside single quotes runs as a command in bash, so a markdown code span inside double-quoted text runs on this machine. Write the text to a file and pass the file (--body-file, -F), or use a quoted heredoc (<<'EOF'); use $( ) for a command substitution you mean.";
+
+const why = check(command) ?? (tool === "Bash" && runsBacktick(command) ? BACKTICK : undefined);
 if (why) {
   process.stderr.write(`Blocked by .claude/hooks/guard.mjs: ${why}\n`);
   process.exit(2);

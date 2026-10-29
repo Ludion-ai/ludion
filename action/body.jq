@@ -1,4 +1,5 @@
-# The comment; judge-comment.yml's BODY with this action's preview line. The judge's text is shown as an indented code
+# The comment; judge-comment.yml's BODY with this action's preview line. A refused head has no record: it is rendered
+# with -n from $head and $run alone. The judge's text is shown as an indented code
 # block, so nothing in it is read as Markdown, a mention or a line of its own (such as reviewed-sha:). Dropped: control
 # characters (C0, C1), the soft hyphen, bidirectional marks, overrides and isolates, zero-width and invisible format
 # characters, line and paragraph separators, and tag characters. Tabs become spaces.
@@ -13,7 +14,7 @@ def named: {stop: "停止", wait: "待機", ready_except_build: "可（関門3�
   "Ludion 判定役 v0（npm）による参考表示で、必須チェックではない。判定するのは関門1・2・4の一部と待機だけで（実装した範囲と「Not checked」は判定役の出力にある）、関門3（旧版と新版のビルド・テスト）は未実装のため実行していない。",
   "",
   (if $refused then
-    "判定: **判定不能**（`undecidable`） · この PR の head は .github/ を変更している、または変更ファイルが 300 以上で確かめられない。判定ジョブはワークフロー定義を PR から読むため、その結果は信用しない。 · head `\($r.head_sha)` · [実行ログ](\($run))"
+    "判定: **判定不能**（`undecidable`） · この PR の head は .github/ を変更している、または変更ファイルが 300 以上で確かめられない。判定ジョブはワークフロー定義を PR から読むため、その結果は信用しない。 · head `\($head)` · [実行ログ](\($run))"
   else
     "判定: **\($r.verdict | named)**（`\($r.verdict)`） · 判定した head `\($r.head_sha)` · 判定にかかった時間: 判定役 \($r.judge_seconds // "不明") 秒、ジョブ開始から \($r.job_seconds // "不明") 秒 · [実行ログ](\($run))",
     "",

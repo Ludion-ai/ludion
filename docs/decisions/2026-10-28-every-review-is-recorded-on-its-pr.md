@@ -1,0 +1,4 @@
+## 2026-10-28 — Every review is recorded on its PR
+
+From 2026-10-28 (cycle 2), every PR's review is posted as a comment on that PR, protected path or not. The comment holds the verdict and its findings, and ends with `reviewed-sha: <the head SHA reviewed>`. A review with no such comment on GitHub is not reported as a review. A review made after a merge is posted on the merged PR. A push after a review needs a new review of the new head. For a PR that touches no protected path, a delta review is enough when it says what it covered. A protected PR follows docs/protected-paths.md unchanged: the full diff at the current head, every time. This entry does not relax that process. CLAUDE.md and docs/protected-paths.md are protected paths, so this rule is recorded here and not in them; adding it there is left to the owner.
+

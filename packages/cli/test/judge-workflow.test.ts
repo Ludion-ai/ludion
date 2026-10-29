@@ -70,9 +70,12 @@ describe("judge.yml (pull_request, read-only)", () => {
     // Node comes from the base commit's .node-version too, so it is set up after that checkout (#156's review, N4).
     expect(at(steps, "actions/setup-node@")).toBeGreaterThan(at(steps, checkoutBase));
     expect(steps).toMatch(/- uses: actions\/setup-node@\w+ # v[\d.]+\n        if: \$\{\{ !cancelled\(\) \}\}\n        with:\n          node-version-file: \.node-version\n/);
-    // The PR's tree is never checked out: two files are copied out of it with git show, and its file list is read.
-    expect(steps.match(/^.*\bgit\b.*$/gm)!.map(l => l.trim().split(" ").slice(0, 2).join(" "))).toEqual(["git fetch", "read -r", "git fetch", "if !", "git show", "git show", "git diff", "git checkout"]);
+    // The PR's tree is never checked out: two files and each changed */package.json are copied out of it with git show,
+    // and its file list is read.
+    expect(steps.match(/^.*\bgit\b.*$/gm)!.map(l => l.trim().split(" ").slice(0, 2).join(" "))).toEqual(["git fetch", "read -r", "git fetch", "if !", "git show", "git show", "git diff", "if git", "if git", "git checkout"]);
     expect(steps).toContain('for file in package.json package-lock.json; do');
+    expect(steps).toContain('case "$file" in */package.json) ;; *) continue ;; esac');
+    expect(steps).toContain('if git cat-file -e "${MERGE_SHA}:${file}" 2> /dev/null; then git show "${MERGE_SHA}:${file}" > "$INPUT/after/${file}"; fi');
     // The only program started after that is the record script, which runs the base commit's build of the judge.
     expect(steps.match(/^\s+run: node .*$/gm)!.map(l => l.trim())).toEqual(["run: node .github/judge/record.ts"]);
     expect(read(".github/judge/record.ts")).toContain('["packages/cli/dist/cli.js", "judge", "--before"');

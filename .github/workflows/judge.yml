@@ -2,8 +2,9 @@
 # Comments only: this job records a judgement as an artifact, judge-comment.yml posts it, nothing is merged.
 # Not a required check.
 #
-# The PR is data, never code: the judge is built from the base commit, and only the PR's package.json and
-# package-lock.json are read, with git show, from its test merge commit. Nothing from the PR is installed or run.
+# The PR is data, never code: the judge is built from the base commit, and only the PR's package.json,
+# package-lock.json and changed */package.json files are read, with git show, from its test merge commit and its base.
+# Nothing from the PR is installed or run.
 # The record says "undecidable" from the first step on; only a judge that finished replaces it.
 # A pull_request run takes this file from the PR itself, so a PR that edits .github/ could forge the artifact:
 # judge-comment.yml refuses the result of any PR that changes .github/.
@@ -56,7 +57,7 @@ jobs:
 
       # The base is the test merge commit's first parent: the event's base SHA is set when the PR opens and is not
       # updated when the base branch moves. That commit must be on the base branch; the judge is built from it.
-      - name: Read the PR's package.json and package-lock.json as data
+      - name: Read the PR's package.json files and package-lock.json as data
         id: read
         env:
           INPUT: ${{ runner.temp }}/judge-input
@@ -80,6 +81,17 @@ jobs:
             git show "${MERGE_SHA}:${file}" > "$INPUT/after/${file}"
           done
           git diff --no-renames --name-only -z "$base" "$MERGE_SHA" > "$INPUT/files"
+          # Each changed */package.json (a workspace's), on each side whose commit has it
+          # (docs/decisions/2026-10-29-lp-rest-followups.md). A path with an empty, "." or ".." segment stops the read.
+          while IFS= read -r -d '' file; do
+            case "$file" in */package.json) ;; *) continue ;; esac
+            case "/${file}/" in
+              *//*|*/./*|*/../*) echo "::error::The changed path ${file//[[:cntrl:]]/} cannot be copied as data."; exit 1 ;;
+            esac
+            mkdir -p "$INPUT/before/${file%/*}" "$INPUT/after/${file%/*}"
+            if git cat-file -e "${base}:${file}" 2> /dev/null; then git show "${base}:${file}" > "$INPUT/before/${file}"; fi
+            if git cat-file -e "${MERGE_SHA}:${file}" 2> /dev/null; then git show "${MERGE_SHA}:${file}" > "$INPUT/after/${file}"; fi
+          done < "$INPUT/files"
           git checkout --quiet --detach "$base"
           echo "base=${base}" >> "$GITHUB_OUTPUT"
 

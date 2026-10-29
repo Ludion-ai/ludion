@@ -2,12 +2,14 @@
 # Preview: comments only. Nothing is merged, and the judgement is not a required check.
 #
 # Two modes, for two jobs in two workflows, split like this repository's judge.yml and judge-comment.yml:
-#   mode: judge    on pull_request, with `contents: read` only. Reads the PR's package.json and package-lock.json as
-#                  data through the API, runs the judge bundled in this action, and uploads the record as an artifact.
+#   mode: judge    on pull_request, with `contents: read` only. Reads the PR's package.json and package-lock.json, and
+#                  each changed */package.json, as data through the API, runs the judge bundled in this action, and
+#                  uploads the record as an artifact.
 #                  Nothing from the PR is checked out, installed or run.
-#   mode: comment  on workflow_run after the judge workflow, with `pull-requests: write`. Checks the artifact as
-#                  untrusted data and posts it as one comment per PR, updated by each new judgement. It runs nothing
-#                  from the PR or the artifact.
+#   mode: comment  on workflow_run after the judge workflow, with `pull-requests: write`. Finds the PR from GitHub,
+#                  refuses a head that changes .github/ before reading the artifact, checks the artifact as untrusted
+#                  data and posts it as one comment per PR, updated by each new judgement. It runs nothing from the
+#                  PR or the artifact.
 #
 # Pin this action by a release commit's full SHA. Only a release commit carries the bundled judge
 # (packages/cli/dist/cli.js and action/dist/record.js, built by action/build.ts); any other commit stops with an error.
@@ -59,7 +61,7 @@ runs:
 
     # The base is the test merge commit's first parent: the event's base SHA is set when the PR opens and is not
     # updated when the base branch moves. That commit must be on the base branch.
-    - name: Read the PR's package.json and package-lock.json as data
+    - name: Read the PR's package.json files and package-lock.json as data
       id: read
       if: ${{ inputs.mode == 'judge' && steps.bundle.outcome == 'success' }}
       shell: bash
@@ -127,7 +129,9 @@ runs:
         RUN_ID: ${{ github.event.workflow_run.id }}
         RUN_HEAD: ${{ github.event.workflow_run.head_sha }}
         RUN_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+        RUN_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
         RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         RUN_URL: ${{ github.event.workflow_run.html_url }}
         CONCLUSION: ${{ github.event.workflow_run.conclusion }}
       run: bash "$GITHUB_ACTION_PATH/action/comment.sh"

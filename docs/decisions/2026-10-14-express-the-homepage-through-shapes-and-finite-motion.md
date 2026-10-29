@@ -1,0 +1,6 @@
+### 2026-10-14: Express the homepage through shapes and finite motion
+
+The owner clarified that more expression means graphics and movement, not more comparative text. Keep the approved opening and replace repeated prose below it with paper selection, configuration branching and context transport. Use one anonymous tile per actual active package lesson with states from sync's selection code; unknown measurements remain included. Evidence graphics show requirements rather than inventing a test run. Delivery distinguishes references from Cursor's inline copy; native wiring details retain the conditional contract.
+
+Use native disclosures for complete claims and wiring. Teacher and agent-draft attribution remain visible; coverage, privacy, exact records and URLs are retained. Motion finishes, settles when reduced, and stops when hidden/offscreen. Add neither a permanent idle loop nor a new dependency. Make the chapter nav static after the real expanded-state axe finding instead of weakening the check. Mobile geometry and flat labels were corrected after independent actual-screen review. Measurements and limits: `docs/bench/2026-10-14-home-motion/validation.json` and `docs/site/2026-10-14-home-motion.md`.
+

@@ -10,7 +10,7 @@ while [ $# -gt 0 ]; do
     -X) method=$2; shift 2 ;;
     --jq) filter=$2; shift 2 ;;
     --input) input=$2; shift 2 ;;
-    -H) shift 2 ;;
+    -H|-f) shift 2 ;;
     --paginate) shift ;;
     *) endpoint=$1; shift ;;
   esac

@@ -4,13 +4,16 @@ Nothing here has been published. This is what must be true, and who does it, bef
 
 ## npm: ludion-ai
 
-- [x] The tarball is exactly README.md, dist/cli.js and package.json, with no dependencies and no install scripts (npm-pack.md; publish.yml checks the same before staging).
+- [x] The tarball is exactly LICENSE, README.md, dist/cli.js and package.json (README.md, dist/cli.js and package.json before LP-rest), with no dependencies and no install scripts (npm-pack.md). publish.yml checks the same before staging, but still with the three-file list (below).
 - [x] `files` names the bundle only (`dist/cli.js`), so nothing else a build writes into dist/ is published.
 - [x] The README says, before anything else about the judge: **プレビュー：コメントのみ。マージは行わない。** It says the judge does not run gate 3, and that no release exists yet.
 - [ ] Publish only through publish.yml (trusted publishing, staged, approved by the owner on npmjs.com). No token, no hand publish. **Owner.**
 - [ ] Choose the dist-tag. `npm stage publish` with no `--tag` makes 0.3.0-preview.1 `latest`, replacing the lesson product's 0.1.4. Either is defensible; it is the owner's choice, and publish.yml would need `--tag` for anything but `latest` (a protected path). **Owner.**
 - [ ] `npm deprecate` the 0.1.x versions (design.md, 掃除計画 step 7). **Owner, on npm.**
-- [ ] LICENSE: package.json says Apache-2.0, but the tarball has no LICENSE file (none in packages/cli). Apache-2.0 asks that a copy of the license go with the work. Adding it changes publish.yml's expected file list, a protected path. **Decision for the owner; then a protected PR.**
+- [x] LICENSE: packages/cli/LICENSE (a copy of the repository's, which a test keeps equal) is in the tarball since LP-rest (npm-pack.md, "Again after LP-rest").
+- [ ] publish.yml's Pack step still expects README.md, dist/cli.js and package.json only, so it now fails before staging. Add `package/LICENSE` to its list (a protected path). **Owner.**
+- [x] The tarball's bytes do not depend on the checkout's file modes: the build sets the packed files to 0644, and a pack after marking them 0755 gave the same sha256 (npm-pack.md, "Again after LP-rest").
+- [x] Node floor raised to 22 (engines, both bundles' target, start.sh). Node 22.23.4: mode judge on #161's files gave `stop` and a record that matches valid.jq (action-check/node22.sh, out-2026-10-29/node22.txt).
 - [ ] The README's "Getting started" becomes true only once a release commit exists (below): replace "Not released yet" with the SHA then.
 
 ## The action: action.yml
@@ -18,7 +21,7 @@ Nothing here has been published. This is what must be true, and who does it, bef
 - [x] Mode judge runs with `contents: read` only, reads the PR's files as data through the API, and runs nothing from the PR. Mode comment runs in a separate workflow_run job with `pull-requests: write` and judge-comment.yml's checks (schema, head, `.github/` refusal, default branch, sanitised body). Local check: action-check/out/run-4.txt, 17 checks passed.
 - [x] The bundles build the same twice: four builds in this session gave the same sha256 for packages/cli/dist/cli.js and action/dist/record.js (npm-pack.md).
 - [x] The only action it uses (upload-artifact) is pinned by commit SHA, the one judge.yml uses.
-- [x] Node 20, the floor start.sh accepts: mode judge on #161's files gave `stop` and a record that matches valid.jq (action-check/node20.sh, out/node20.txt, node:20.19.2-bookworm). Runs in GitHub used Node 24 (from the runner).
+- [x] Node 20, the floor start.sh accepted before LP-rest: mode judge on #161's files gave `stop` and a record that matches valid.jq (action-check/node20.sh, out/node20.txt, node:20.19.2-bookworm). Runs in GitHub used Node 24 (from the runner).
 - [x] The README's workflows have the same concurrency as judge.yml (a newer push cancels) and judge-comment.yml (one comment run at a time per PR branch, so two runs cannot both post).
 - [x] Live run of mode judge on GitHub, pinned by a full SHA: see "Live check" below.
 - [ ] Live run of mode comment: not possible without a workflow on the default branch (workflow_run runs from there). It was checked locally only, with gh stubbed (run-4.txt). Before release, check it on a repository the owner approves, or by switching this repository's judge-comment.yml to the action (a protected PR).
@@ -26,7 +29,8 @@ Nothing here has been published. This is what must be true, and who does it, bef
 - [ ] Announce the SHA with its tag. Users should check the SHA is the tag's commit in Ludion-ai/ludion, since GitHub also resolves `owner/repo@sha` for commits that exist only in a fork.
 - [ ] Marketplace listing: not done, and needs the owner.
 - [ ] Updates to Ludion itself in users' repositories (a new action SHA, or a new ludion-ai version) must go through the same wait and provenance checks and never be auto-merged (CLAUDE.md). Today only the README asks for a review; nothing checks such an update. Decide before release how that is enforced or stated.
-- [ ] Node floor: start.sh accepts Node 20 (checked), but Node 20 reached end of life on 2026-04-30. Decide whether to raise it to 22.
+- [x] Node floor: start.sh accepted Node 20 (checked), but Node 20 reached end of life on 2026-04-30. Raised to 22 in LP-rest (above).
+- [x] Mode comment does what judge-comment.yml does, in its order (#166's N6): the PR from GitHub, the `.github/` refusal before the artifact is read. Local check after LP-rest: action-check/out-2026-10-29/run.txt, all checks passed; the same cases run in CI (packages/cli/test/action.test.ts).
 - [ ] Add action.yml and action/ to docs/protected-paths.md before the first release: users run this code with a `pull-requests: write` token. That is a protected PR.
 
 ## Live check

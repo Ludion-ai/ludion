@@ -1,0 +1,13 @@
+baseline     exit 0, Tests 45 passed (45)
+killed       comment.sh reads the artifact before the refusal: Tests 1 failed | 44 passed (45)
+killed       comment.sh skips the head check: Tests 2 failed | 43 passed (45)
+killed       comment.sh skips the record PR and head check: Tests 2 failed | 43 passed (45)
+killed       body.jq names the record head when refused: Tests 2 failed | 43 passed (45)
+killed       read.sh copies no workspace package.json: Tests 2 failed | 43 passed (45)
+killed       read.sh lets a .. path through: Tests 1 failed | 44 passed (45)
+killed       read.sh reads both sides of an added file: Tests 1 failed | 44 passed (45)
+killed       judge.yml lets a .. path through: Tests 1 failed | 44 passed (45)
+killed       judge.yml copies no workspace package.json: Tests 3 failed | 42 passed (45)
+killed       the package leaves out LICENSE: Tests 1 failed | 44 passed (45)
+killed       start.sh accepts Node 20: Tests 1 failed | 44 passed (45)
+survived: 0 of 11

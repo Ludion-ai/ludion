@@ -1,0 +1,142 @@
+commit 6accc4602eb7aa2ed94490f79e8cfca2ce3f64f8, started 2026-10-28T15:00:38Z
+debconf: delaying package configuration, since apt-utils is not installed
+
+== build: npm ci, the CLI bundle and the action's record bundle
+
+> ludion-ai@0.3.0-preview.1 build
+> node build.ts
+
+Wrote dist/cli.js
+Wrote action/dist/record.js
+v24.22.1
+bccbfd457d84af934defeacd9502fb4e9ceef40cad6c73368ff28abef8651d70  packages/cli/dist/cli.js
+dd9ae6d6089ba3f731a23f1280ddd6198c7c0f78d4ac01c1e4266308f40a18a8  action/dist/record.js
+
+== npm pack
+npm notice
+npm notice package: ludion-ai@0.3.0-preview.1
+npm notice Tarball Contents
+npm notice 11.4kB LICENSE
+npm notice 9.9kB README.md
+npm notice 472.1kB dist/cli.js
+npm notice 787B package.json
+npm notice Tarball Details
+npm notice name: ludion-ai
+npm notice version: 0.3.0-preview.1
+npm notice filename: ludion-ai-0.3.0-preview.1.tgz
+npm notice package size: 118.2 kB
+npm notice unpacked size: 494.2 kB
+npm notice shasum: 9d3c25dd163d2ee5ca28c7613e4b42fef62c845d
+npm notice integrity: sha512-MRftccSPHyERD[...]Mqq4Fwqinidsw==
+npm notice total files: 4
+npm notice
+package/LICENSE
+package/README.md
+package/dist/cli.js
+package/package.json
+ok   the package is LICENSE, README.md, dist/cli.js and package.json
+-rw-r--r-- package/LICENSE
+-rw-r--r-- package/README.md
+-rw-r--r-- package/dist/cli.js
+-rw-r--r-- package/package.json
+ok   every packed file is -rw-r--r--
+ok   the license is the repository's
+
+== npm pack, again after marking the packed files executable (as a copy from a Windows checkout has them)
+npm notice
+npm notice package: ludion-ai@0.3.0-preview.1
+npm notice Tarball Contents
+npm notice 11.4kB LICENSE
+npm notice 9.9kB README.md
+npm notice 472.1kB dist/cli.js
+npm notice 787B package.json
+npm notice Tarball Details
+npm notice name: ludion-ai
+npm notice version: 0.3.0-preview.1
+npm notice filename: ludion-ai-0.3.0-preview.1.tgz
+npm notice package size: 118.2 kB
+npm notice unpacked size: 494.2 kB
+npm notice shasum: 9d3c25dd163d2ee5ca28c7613e4b42fef62c845d
+npm notice integrity: sha512-MRftccSPHyERD[...]Mqq4Fwqinidsw==
+npm notice total files: 4
+npm notice
+9f3cfb02f204894b03cad89155675929988ba8ac7efa3a95c5690c2c8fa3c50d  /out/ludion-ai-0.3.0-preview.1.tgz
+9f3cfb02f204894b03cad89155675929988ba8ac7efa3a95c5690c2c8fa3c50d  /out/again/ludion-ai-0.3.0-preview.1.tgz
+ok   the same tarball, byte for byte
+ok   the same integrity
+
+== mode judge on PR #161
+::stop-commands::stop-8bc0513d-7780-4c69-91e1-5fb0d2ee15f2
+{
+  "schema": 1,
+  "pr": 161,
+  "head_sha": "b5014ddae044f02288232f13b5d1863a3089bdb2",
+  "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
+  "merge_sha": "470a5542cc0b8b75787094be6dc3d6b4185a45c3",
+  "started_at": "2026-10-28T15:00:59.404Z",
+  "verdict": "stop",
+  "reason": null,
+  "finished_at": "2026-10-28T15:01:00.618Z",
+  "judge_seconds": 0.968,
+  "job_seconds": 1.214,
+  "judge_exit_code": 1
+}
+Ludion judgement: STOP — not applied automatically
+Urgency: normal · wait 72h from the newest publish (2026-10-25T07:19:30.732Z)
+Published at or after T (2026-10-25T07:19:30.732Z, the fix's publish time): 0 version(s)
+Changed packages (1):
+  hono 4.13.13 → 4.13.14
+  [stop] gate 4: The change also touches apps/worker/package.json; a dependency update must change only package.json and package-lock.json.
+  [info] gate 1: Production/dev split without the source tree (no --source), so only test runners, linters, formatters and @types packages, and what only they reach, count as dev-only.
+Not checked:
+  - Gate 3 (build and tests of old and new versions) is not run by the judge v0.
+  - Obfuscated code and new network or process calls in the changed code are not inspected.
+  - Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used (docs/decisions.md, "Gate 1's production/dev split, rebuilt").
+  - Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.
+  - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).
+  - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.
+  - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.
+Exposure: fix published n/a · seen 2026-10-28T15:00:59.687Z
+::stop-8bc0513d-7780-4c69-91e1-5fb0d2ee15f2::
+ok   record.js exits 0 (a judgement)
+ok   the verdict is stop
+ok   the changed files are the two the merge changes
+ok   the changed workspace package.json is read on both sides
+ok   the record matches valid.jq
+
+== mode comment: first post
+Posted the judgement comment on PR #161 (b5014ddae044f02288232f13b5d1863a3089bdb2).
+ok   exit 0
+ok   one POST to issues/161/comments
+ok   the comment starts with the marker and the preview line
+ok   the comment names the verdict 停止 (stop)
+ok   the judge text is indented
+
+== mode comment: a re-judgement updates the same comment
+Updated the judgement comment on PR #161 (b5014ddae044f02288232f13b5d1863a3089bdb2).
+ok   exit 0
+ok   one PATCH of comment 42, no second POST
+
+== mode comment: a head that changes .github/ is refused
+Posted the judgement comment on PR #161 (b5014ddae044f02288232f13b5d1863a3089bdb2).
+ok   exit 0, posted as 判定不能 without the judge's text
+ok   the artifact was never listed or downloaded
+ok   the PR was found from GitHub, then the head's changes read, in that order
+
+== mode comment: a record that does not match the schema is not posted
+::error::The judgement does not match its schema. Nothing posted.
+ok   exit 1, nothing written
+
+== mode comment: another workflow's run is not posted
+::error::Run 1 is of .github/workflows/other.yml, not of .github/workflows/ludion-judge.yml (the judge-workflow input). Nothing posted.
+ok   exit 1, nothing written
+
+== mode judge: a file the API cannot give makes the record undecidable
+ok   record.js exits 1, verdict undecidable, reason names the read
+
+== mode judge: pull_request_target is refused
+ok   start.sh fails, no record
+
+== result
+all checks passed
+exit 0

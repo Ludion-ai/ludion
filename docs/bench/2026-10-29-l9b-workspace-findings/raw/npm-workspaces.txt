@@ -1,0 +1,58 @@
+# started 2026-10-29T01:00:06Z, node v24.22.1, npm 11.19.1, @npmcli/map-workspaces 5.0.3
+== lib/index.js lines 1-55
+const path = require('path')
+
+const getName = require('@npmcli/name-from-folder')
+const { minimatch } = require('minimatch')
+const pkgJson = require('@npmcli/package-json')
+const { glob } = require('glob')
+
+function appendNegatedPatterns (allPatterns) {
+  const patterns = []
+  const negatedPatterns = []
+  for (let pattern of allPatterns) {
+    const excl = pattern.match(/^!+/)
+    if (excl) {
+      pattern = pattern.slice(excl[0].length)
+    }
+
+    // strip off any / or ./ from the start of the pattern.  /foo => foo
+    pattern = pattern.replace(/^\.?\/+/, '')
+
+    // an odd number of ! means a negated pattern.  !!foo ==> foo
+    const negate = excl && excl[0].length % 2 === 1
+    if (negate) {
+      negatedPatterns.push(pattern)
+    } else {
+      // remove negated patterns that appeared before this pattern to avoid
+      // ignoring paths that were matched afterwards
+      // e.g: ['packages/**', '!packages/b/**', 'packages/b/a']
+      // in the above list, the last pattern overrides the negated pattern
+      // right before it. In effect, the above list would become:
+      // ['packages/**', 'packages/b/a']
+      // The order matters here which is why we must do it inside the loop
+      // as opposed to doing it all together at the end.
+      for (let i = 0; i < negatedPatterns.length; ++i) {
+        const negatedPattern = negatedPatterns[i]
+        if (minimatch(pattern, negatedPattern)) {
+          negatedPatterns.splice(i, 1)
+        }
+      }
+      patterns.push(pattern)
+    }
+  }
+
+  // use the negated patterns to eagerly remove all the patterns that
+  // can be removed to avoid unnecessary crawling
+  for (const negated of negatedPatterns) {
+    for (const pattern of minimatch.match(patterns, negated)) {
+      patterns.splice(patterns.indexOf(pattern), 1)
+    }
+  }
+  return { patterns, negatedPatterns }
+}
+
+function getPatterns (workspaces) {
+  const workspacesDeclaration =
+    Array.isArray(workspaces.packages)
+# finished 2026-10-29T01:00:06Z

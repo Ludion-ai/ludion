@@ -1,7 +1,7 @@
 // Gate 4 and a workspace's own package.json. Dependabot changes it when it updates that workspace's dependency; the
 // change is a dependency update only when it agrees with the lockfile
 // (docs/decisions/2026-10-29-l9-workspace-package-json.md).
-import { manifestChanges } from "./judge.ts";
+import { manifestChanges, own } from "./judge.ts";
 
 const GROUPS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];
 const SEGMENT = /^[A-Za-z0-9@._-]+$/;
@@ -27,6 +27,12 @@ function declaredWorkspace(root: unknown, dir: string): boolean {
     const have = pattern.replace(/^\.\//, "").replace(/\/$/, "").split("/");
     return have.length === want.length && have.every((s, i) => s === "*" || (plainSegment(s) && s === want[i])) && have.every((s, i) => s !== "*" || !want[i]!.startsWith("."));
   });
+}
+
+/** An entry with `!`: npm reads a leading `!` as an exclusion, which this check does not read, so it names no workspace. */
+function excludes(root: unknown): string | undefined {
+  const patterns = (root as { workspaces?: unknown } | null)?.workspaces;
+  return Array.isArray(patterns) ? patterns.find((p): p is string => typeof p === "string" && p.includes("!")) : undefined;
 }
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -55,6 +61,8 @@ export function workspaceManifestChanges(input: {
   const { file, before, after } = input;
   const dir = workspaceDir(file);
   if (dir === null) return [`${file} is not the package.json of a plain workspace folder.`];
+  const exclusion = excludes(input.root.before) ?? excludes(input.root.after);
+  if (exclusion !== undefined) return [`The root package.json's "workspaces" has "${exclusion}", an exclusion this check does not read, so ${dir} is not taken as a workspace.`];
   if (!declaredWorkspace(input.root.before, dir) || !declaredWorkspace(input.root.after, dir)) return [`${dir} is not a workspace that the root package.json's "workspaces" names (literal folders and a whole-segment * only), before and after.`];
   // The lockfile's own entries only: a folder named like an Object.prototype key (__proto__) is not a record.
   const recordBefore = Object.hasOwn(input.lock.before, dir) ? input.lock.before[dir] : undefined, recordAfter = Object.hasOwn(input.lock.after, dir) ? input.lock.after[dir] : undefined;
@@ -70,7 +78,7 @@ export function workspaceManifestChanges(input: {
     if (listOf(after, key) !== listOf(recordAfter, key)) out.push(`After the change, ${file} ${key} is not the lockfile's record of ${dir}.`);
   }
   for (const key of [...new Set([...Object.keys(recordBefore), ...Object.keys(recordAfter)])].sort()) {
-    if (!GROUPS.includes(key) && JSON.stringify(recordBefore[key]) !== JSON.stringify(recordAfter[key])) out.push(`The lockfile's record of ${dir} changes "${key}", which is not a dependency list.`);
+    if (!GROUPS.includes(key) && JSON.stringify(own(recordBefore, key)) !== JSON.stringify(own(recordAfter, key))) out.push(`The lockfile's record of ${dir} changes "${key}", which is not a dependency list.`);
   }
   return out;
 }

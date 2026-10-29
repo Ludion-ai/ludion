@@ -303,6 +303,8 @@ function registrySpec(spec: unknown): boolean {
   const alias = /^npm:((?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*)@(.+)$/i.exec(spec);
   return !!semver.validRange(alias ? alias[2]! : spec);
 }
+/** A key's own value: a key the object does not have is missing, not Object.prototype (JSON.parse makes "__proto__" an own key). */
+export const own = (owner: object, key: string): unknown => Object.hasOwn(owner, key) ? (owner as Record<string, unknown>)[key] : undefined;
 /**
  * Why a package.json change is more than a dependency update: any other field (scripts run on install, for one), or a
  * dependency or override that leaves the registry.
@@ -312,7 +314,7 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
   if (typeof after !== "object" || after === null || Array.isArray(after)) return ["package.json is not an object."];
   const out: string[] = [];
   for (const key of [...new Set([...Object.keys(b), ...Object.keys(a)])].sort()) {
-    if (JSON.stringify(b[key]) === JSON.stringify(a[key])) continue;
+    if (JSON.stringify(own(b, key)) === JSON.stringify(own(a, key))) continue;
     if (key === "overrides") {
       const specs: unknown[] = [];
       const walk = (value: unknown): void => { if (value && typeof value === "object") Object.values(value).forEach(walk); else specs.push(value); };
@@ -323,7 +325,7 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
     if (!DEPENDENCY_GROUPS.includes(key)) { out.push(`package.json changes "${key}", which is not a dependency list (scripts, for one, run on install).`); continue; }
     if (a[key] !== undefined && (typeof a[key] !== "object" || a[key] === null || Array.isArray(a[key]))) { out.push(`package.json ${key} is not an object of name: range.`); continue; }
     const group = (a[key] ?? {}) as Record<string, unknown>, old = (b[key] ?? {}) as Record<string, unknown>;
-    for (const [name, spec] of Object.entries(group)) if (spec !== old[name] && !registrySpec(spec)) out.push(`package.json ${key}.${name} is "${String(spec)}", not a registry range.`);
+    for (const [name, spec] of Object.entries(group)) if (spec !== own(old, name) && !registrySpec(spec)) out.push(`package.json ${key}.${name} is "${String(spec)}", not a registry range.`);
   }
   return out;
 }

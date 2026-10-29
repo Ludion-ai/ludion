@@ -1,0 +1,130 @@
+# started 2026-10-29T00:53:41Z, node v24.22.1, HEAD 1336380101874acbbad1195761f523f8c9885886
+== sha256
+85b80c1ead44b96a88e39eedb52fd26fde4da1205763c20fa9fa9561e936bb86  packages/cli/src/security/workspace-manifests.ts
+ba17df5b64915ab083de68c3eb14bedd57cf88cbdd98b29ed649f12cf0fda76c  packages/cli/src/security/judge.ts
+329fb33c6c14df2204ad76c3ac0f5eab95ccbcd814a5fb587e12a181dd1b8e02  packages/cli/src/security/judge-cli.ts
+c8f5b86a7fea549e70fc7c9e26f4971e8fce75fd4530a7dd734c07972bcbac68  packages/cli/test/workspace-manifests.test.ts
+== npm run typecheck
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+typecheck exit 0
+== npx vitest run --project node
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 34ms
+ ❯ |node| apps/site/test/knowledge.test.ts (0 test)
+ ❯ |node| packages/cli/test/action.test.ts (0 test)
+ ✓ |node| packages/cli/test/production.test.ts (47 tests) 875ms
+     ✓ collects what an image holds by name, and seeds held copies, in linear time  468ms
+ ✓ |node| .claude/hooks/guard.test.ts (39 tests) 709ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 475ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 492ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 337ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 270ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 216ms
+ ✓ |node| tools/shadow/test/recorder.test.ts (35 tests) 133ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 98ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 88ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (63 tests) 97ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (11 tests) 79ms
+ ✓ |node| packages/cli/test/judge.test.ts (63 tests) 48ms
+ ✓ |node| packages/cli/test/security.test.ts (33 tests) 37ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 32ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 21ms
+ ✓ |node| packages/sandbox/test/guard.test.ts (3 tests) 17ms
+ ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 8ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 4ms
+ ✓ |node| apps/site/test/discovery.test.ts (3 tests) 4ms
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| apps/site/test/knowledge.test.ts [ apps/site/test/knowledge.test.ts ]
+Error: spawnSync git ENOENT
+ ❯ apps/site/test/knowledge.test.ts:8:14
+      6| import { en } from "../src/strings/en.ts";
+      7|
+      8| const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { e…
+       |              ^
+      9|
+     10| describe("security preview claims", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |node| packages/cli/test/action.test.ts [ packages/cli/test/action.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'trim')
+ ❯ git packages/cli/test/action.test.ts:268:126
+    266|   const loop = lines.slice(from, to + 1).map(l => l.slice(lines[from]!…
+    267|   it("is in judge.yml's read step", () => expect([from > 0, to > from]…
+    268|   const repo = join(temp, "git"), git = (...args: string[]) => spawnSy…
+       |                                                                                                                              ^
+    269|   mkdirSync(join(repo, "apps", "site"), { recursive: true });
+    270|   mkdirSync(join(repo, "apps", "old"), { recursive: true });
+ ❯ packages/cli/test/action.test.ts:271:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 22 passed (24)
+      Tests  790 passed | 13 skipped (803)
+   Start at  00:53:42
+   Duration  7.01s (transform 427ms, setup 0ms, import 1.09s, tests 4.08s, environment 1ms)
+
+vitest exit 1
+== npm run build
+build exit 1
+npm error workspace @ludion/site@0.0.0
+npm error location /w/apps/site
+npm error command failed
+npm error command sh -c astro build
+
+== node mutate.mjs (module, 2026-10-28)
+killed   always agrees (failed tests: 15)
+killed   rule 1 off (any folder) (failed tests: 2)
+killed   rule 1 after only (failed tests: 1)
+killed   rule 1 glob loosened (failed tests: 1)
+killed   rule 1 non-plain dir (failed tests: 2)
+killed   rule 2 off (failed tests: 1)
+killed   rule 3 sides off (failed tests: 2)
+killed   rule 3 overrides off (failed tests: 1)
+killed   rule 3 manifestChanges off (failed tests: 6)
+killed   rule 4 before off (failed tests: 1)
+killed   rule 4 after off (failed tests: 2)
+NOT APPLIED: rule 5 off
+killed   missing list not empty (failed tests: 1)
+killed   key order counts (failed tests: 1)
+survived: 1 of 14
+== node mutate-wiring.mjs (2026-10-29)
+killed   agreeing files still stop (failed tests: 4)
+killed   any read file agrees (failed tests: 7)
+killed   an unread file agrees (failed tests: 1)
+killed   files not in the PR's list count (failed tests: 1)
+killed   reasons not stopped on (failed tests: 7)
+killed   an unread file not undecidable (failed tests: 1)
+killed   an unread file not stopped on (failed tests: 2)
+killed   no info line (failed tests: 3)
+killed   not passed to judge() (failed tests: 1)
+killed   an unreadable side agrees (failed tests: 2)
+killed   no plain-folder check before reading (failed tests: 1)
+killed   every listed file read (failed tests: 11)
+killed   the lockfile's before side used for after (failed tests: 7)
+killed   an unparsable file read as empty object (failed tests: 1)
+killed   a * matches a dot folder (failed tests: 1)
+killed   inherited keys count as records (before) (failed tests: 1)
+killed   inherited keys count as records (after) (failed tests: 1)
+survived: 0 of 17
+== node mutate-l9b.mjs
+killed   a '!' entry excludes nothing again (failed tests: 1)
+killed   only the root before the change is read (failed tests: 1)
+killed   only the root after the change is read (failed tests: 1)
+killed   only a leading '!' counts (failed tests: 1)
+killed   manifestChanges reads the before side through the prototype (failed tests: 2)
+killed   manifestChanges reads the after side through the prototype (failed tests: 1)
+killed   rule 5 reads the record before through the prototype (failed tests: 1)
+killed   rule 5 reads the record after through the prototype (failed tests: 1)
+killed   rule 5 off (failed tests: 1)
+survived: 0 of 9
+# finished 2026-10-29T00:54:28Z

@@ -3,8 +3,8 @@ import { en } from "../strings/en.ts";
 const states = en.home.guard.states;
 ---
 <ol class="states">
-  {states.map((state) => (
-    <li class:list={["state", { open: state.id === "update" }]} data-guard-state={state.id}>
+  {states.map((state, i) => (
+    <li class:list={["state", { open: i === 0 }]} data-guard-state={state.id}>
       <span class="gate" aria-hidden="true"></span>
       <code>{state.id}</code>
       <p>{state.detail}</p>

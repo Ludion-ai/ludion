@@ -1,5 +1,5 @@
 ---
-// Security-update content in the existing visual system. Illustrations are not run results.
+// The judge for npm dependency PRs, in the existing visual system. Illustrations are not run results.
 import Base from "../layouts/Base.astro";
 import RecordedMoment from "../components/RecordedMoment.astro";
 import ContextStage from "../components/ContextStage.astro";
@@ -156,7 +156,7 @@ const chapters = [
   @keyframes arrive { from{opacity:.3; transform:translateY(22px)}to{opacity:1;transform:none} }
   @media (max-width: 640px) {
     .home-stage { min-height:calc(100svh - 60px); padding-block:clamp(32px,6svh,52px) 20px; }
-    h1 { max-width: 22ch; margin-inline: auto; font-size:clamp(27px,7.8vw,33px); }
+    h1 { max-width: 22ch; margin-inline: auto; font-size:clamp(27px,7.8vw,33px); overflow-wrap:anywhere; }
     .introduction p { max-width: 24ch; margin-inline: auto; font-size: 14px; }
     .scene { margin-block:18px; }
     .actions { gap: 20px; }

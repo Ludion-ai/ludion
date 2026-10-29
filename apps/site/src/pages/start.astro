@@ -2,32 +2,67 @@
 import Base from "../layouts/Base.astro";
 import Pool from "../components/Pool.astro";
 import Coverage from "../components/Coverage.astro";
+// README.md, "Getting started" and "Run the judge locally". No release commit exists yet, so the SHA stays a placeholder.
 const commands = {
+ judge: `# .github/workflows/ludion-judge.yml
+name: ludion-judge
+on:
+  pull_request:
+    paths: [package-lock.json]
+permissions:
+  contents: read
+# A newer push cancels the judgement of an older head.
+concurrency:
+  group: ludion-judge-\${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: Ludion-ai/ludion@<release commit SHA>
+        with:
+          mode: judge`,
+ comment: `# .github/workflows/ludion-judge-comment.yml
+name: ludion-judge-comment
+on:
+  workflow_run:
+    workflows: [ludion-judge]
+    types: [completed]
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+# One comment run at a time per PR branch, so two runs cannot both post a comment.
+concurrency:
+  group: ludion-judge-comment-\${{ github.event.workflow_run.head_repository.full_name }}-\${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: Ludion-ai/ludion@<the same release commit SHA>
+        with:
+          mode: comment`,
  source: "git clone https://github.com/Ludion-ai/ludion.git\ncd ludion\nnpm ci\nnpm run build -w ludion-ai",
- scan: "node packages/cli/dist/cli.js scan --dir /path/to/app",
- init: "node packages/cli/dist/cli.js init --dir /path/to/app --ecosystem npm",
- patch: "node packages/cli/dist/cli.js patch --dir /path/to/app",
- apply: "node packages/cli/dist/cli.js patch --dir /path/to/app --apply",
- watch: "node packages/cli/dist/cli.js watch --dir /path/to/app --apply --interval 900",
+ local: "node packages/cli/dist/cli.js judge --before /path/to/app-main --after /path/to/app-pr --files package.json,package-lock.json",
 };
-const config=JSON.stringify({schema:1,ecosystem:"npm",image:"node:24-slim",test:["npm","test"],timeout_seconds:120},null,2);
 ---
-<Base title="Try the multi-stack preview | Ludion" description="Check PHP Docker, npm, Composer and Maven security updates. Choose an update policy and application test before applying source changes.">
+<Base title="Judge your npm dependency PRs | Ludion" description="Add the Ludion judge to a repository as two GitHub workflows, or run it locally against two checkouts. A preview that only comments; not released yet.">
  <article class="start-page wrap">
-  <header class="page-intro"><h1>One workflow. More of your stack.</h1><p class="intro">Scan the project, choose an ecosystem policy, then validate its security update against your application.</p></header>
+  <header class="page-intro"><h1>Judge your npm dependency PRs.</h1><p class="intro">Add two workflows to a repository, or run the judge locally against two checkouts. Preview: comments only; nothing is merged.</p></header>
   <Pool>
-   <section class="sync" aria-labelledby="scan">
-    <div class="install"><h2 id="scan">Check your project</h2><p class="where">Source preview · Node 24+ · Docker for acquisition and validation. The published npm 0.1.4 release does not include these commands.</p><p>After building this source revision, run:</p><div class="command primary-command"><pre><code id="scan-command">{commands.scan}</code></pre><button type="button" data-copy="scan-command" data-copied="Copied" data-selected="Selected" aria-label="Copy scan command" aria-live="polite" hidden>Copy</button></div><p class="wiring">Replace /path/to/app with your project directory. Scan detects supported lockfiles and the configured PHP Dockerfile. Maven resolves its graph in a manifest-only container. The original project is not modified.</p></div>
-    <aside class="path" aria-labelledby="update-path"><h3 id="update-path" class="visually-hidden">The update path</h3><ol class="flow"><li><span class="step-title">Detect</span><span class="step-detail">Installed versions and relevant advisories</span></li><li><span class="step-title">Validate</span><span class="step-detail">Your application test, old and new</span></li><li><span class="step-title">Apply</span><span class="step-detail">Recorded source updates</span></li></ol></aside>
+   <section class="sync" aria-labelledby="workflows">
+    <div class="install"><h2 id="workflows">Add two workflows</h2><p class="where">Not released yet · No release commit exists yet. The action needs one, because only a release commit carries the bundled judge; at any other commit it stops with an error. When one is published, pin its full 40-character SHA, not a tag or branch, in both workflows.</p><p>The first judges with read access only and runs nothing from the PR:</p><div class="command primary-command"><pre class="yaml" role="region" tabindex="0" aria-label="The judging workflow"><code id="judge-workflow">{commands.judge}</code></pre><button type="button" data-copy="judge-workflow" data-copied="Copied" data-selected="Selected" aria-label="Copy the judging workflow" aria-live="polite" hidden>Copy</button></div><p class="wiring">The second posts the result. It runs from your default branch after each judge run, checks the result as untrusted data, and keeps one comment per PR up to date:</p><div class="command primary-command"><pre class="yaml" role="region" tabindex="0" aria-label="The comment workflow"><code id="comment-workflow">{commands.comment}</code></pre><button type="button" data-copy="comment-workflow" data-copied="Copied" data-selected="Selected" aria-label="Copy the comment workflow" aria-live="polite" hidden>Copy</button></div><p class="wiring">A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it. The judge is not a required check unless you make it one.</p></div>
+    <aside class="path" aria-labelledby="judge-path"><h3 id="judge-path" class="visually-hidden">What the judge does</h3><ol class="flow"><li><span class="step-title">Read</span><span class="step-detail">The PR's package.json and package-lock.json, before and after</span></li><li><span class="step-title">Check</span><span class="step-detail">Provenance, publisher, install scripts, MAL- records, deprecation, new dependencies</span></li><li><span class="step-title">Comment</span><span class="step-detail">One verdict after the wait, with what was not checked</span></li></ol></aside>
    </section>
-   <p class="coverage">PHP Docker · npm · Composer · Maven. An unavailable database or unsupported inventory stays visible. Production is not automatically redeployed.</p>
-   <section class="reference" aria-labelledby="setup-details"><h2 id="setup-details">From discovery to a validated update</h2>
-    <details open><summary><span>1 · Build the source preview</span><span class="summary-note">Keep the existing npm install separate</span></summary><div class="detail-body"><p>Use the multi-stack source revision. These commands become available on the default branch when its pull request is merged.</p><div class="command"><pre><code id="source-command">{commands.source}</code></pre><button type="button" data-copy="source-command" data-copied="Copied" data-selected="Selected" aria-label="Copy source setup" aria-live="polite" hidden>Copy</button></div></div></details>
-    <details><summary><span>2 · Choose the ecosystem and test</span><span class="summary-note">Required before validation</span></summary><div class="detail-body"><p>Choose php, npm, composer or maven. A project may scan several ecosystems together; its saved patch policy selects one manager at a time.</p><div class="command"><pre><code id="init-command">{commands.init}</code></pre><button type="button" data-copy="init-command" data-copied="Copied" data-selected="Selected" aria-label="Copy init command" aria-live="polite" hidden>Copy</button></div><p>Edit ludion.security.json to select an official tool image matching your application and its real offline test command. npm acquisition uses npm 12.2.1; its Node tool image must support that version.</p><div class="command"><pre><code>{config}</code></pre></div><p>Tests must run with a read-only project and write only to supported scratch areas. Maven's online model excludes custom build/plugin configuration; those plugins must already be available for offline tests or validation will stop.</p></div></details>
-    <details><summary><span>3 · Validate, then apply</span><span class="summary-note">Source changes are opt-in</span></summary><div class="detail-body"><p>Acquire dependencies separately, run baseline/candidate tests offline and recheck the candidate inventory:</p><div class="command"><pre><code id="patch-command">{commands.patch}</code></pre><button type="button" data-copy="patch-command" data-copied="Copied" data-selected="Selected" aria-label="Copy validation command" aria-live="polite" hidden>Copy</button></div><p>To validate again and apply only on success:</p><div class="command"><pre><code id="apply-command">{commands.apply}</code></pre><button type="button" data-copy="apply-command" data-copied="Copied" data-selected="Selected" aria-label="Copy apply command" aria-live="polite" hidden>Copy</button></div><p>Review .ludion/security/ for the receipt and recovery journal. npm/Composer may adjust dependency constraints within the same major and regenerate the lockfile. Maven can add dependencyManagement constraints for vulnerable transitives. Major-version fixes and unresolved cases require review. Deploy through your normal process.</p></div></details>
-    <details><summary><span>4 · Keep checking automatically</span><span class="summary-note">While the process is running</span></summary><div class="detail-body"><p>Repeat the saved ecosystem policy every 900 seconds:</p><div class="command"><pre><code id="watch-command">{commands.watch}</code></pre><button type="button" data-copy="watch-command" data-copied="Copied" data-selected="Selected" aria-label="Copy watch command" aria-live="polite" hidden>Copy</button></div><p>Ctrl+C requests a stop. An in-flight Docker step may finish, but a pending update will not be applied after cancellation is received. A partially interrupted multi-file change blocks further updates until its journal is recovered.</p></div></details>
-    <details><summary><span>What leaves your machine</span><span class="summary-note">Requests and boundaries</span></summary><div class="detail-body privacy"><p>Package names and exact versions are sent to OSV. PHP uses php.net metadata. Tool images and dependencies come from the configured public sources; Composer ZIP redirects are checked before every request. npm URL/Git/file sources are disabled and Maven repositories are mirrored to public Central.</p><p>Application source is sent to your configured Docker daemon for offline tests; choose a local daemon to keep it on your machine. No source is uploaded to Ludion and security commands send no telemetry. Online acquisition contains manifests only. Source snapshots exclude .env files, Git history and common credential directories, but they are not general secret scanners. This website uses Google Analytics.</p></div></details>
-    <p class="privacy-summary">Known advisories and recorded application tests only. No match is not a security guarantee. Supported scope and unhandled cases stay explicit.</p>
+   <p class="coverage">npm only · Parts of gates 1, 2 and 4, and the wait. Gate 3, building and testing, is not run, so the judge never says an update can be applied.</p>
+   <section class="reference" aria-labelledby="setup-details"><h2 id="setup-details">Running it, and its limits</h2>
+    <details open><summary><span>Run the judge locally</span><span class="summary-note">Two checkouts, before and after</span></summary><div class="detail-body"><p>The published npm ludion-ai 0.1.4 release is the earlier lesson product, which ended on 2026-10-28; no release of the judge is on npm yet. Build this repository (Node 24):</p><div class="command"><pre><code id="source-command">{commands.source}</code></pre><button type="button" data-copy="source-command" data-copied="Copied" data-selected="Selected" aria-label="Copy build commands" aria-live="polite" hidden>Copy</button></div><p>Then give the judge two checkouts of your project, before and after the update, and the files the update changes:</p><div class="command"><pre><code id="judge-command">{commands.local}</code></pre><button type="button" data-copy="judge-command" data-copied="Copied" data-selected="Selected" aria-label="Copy judge command" aria-live="polite" hidden>Copy</button></div><p>Exit codes: 0 ready except build (gates 1, 2 and 4 found nothing and the wait is over); 3 wait; 1 stop or undecidable, also when a lookup fails or --files is missing; 2 the inputs could not be read. --json gives the whole judgement. A pnpm-lock.yaml is read as the set of versions it adds, which is always undecidable.</p></div></details>
+    <details><summary><span>Limits</span><span class="summary-note">What the action reads</span></summary><div class="detail-body"><p>GitHub-hosted Linux runners: the action needs gh, jq, unzip, GNU date and Node 22 or later. Only the root package.json and package-lock.json, and each changed */package.json, are read. A workspace package.json is left out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable.</p><p>A PR that changes .github/ or 300 or more files is shown as undecidable. The comment job posts only for PRs into the default branch. When a wait ends, nothing re-checks the PR by itself: the judge looks again only when it runs again.</p></div></details>
+    <details><summary><span>What leaves your machine</span><span class="summary-note">Requests and boundaries</span></summary><div class="detail-body privacy"><p>Package names and versions are sent to OSV and the npm registry. No source is sent, and no dependency code is run.</p><p>The judging job has read access only; the comment job runs from your default branch and treats the judge's result as untrusted data. This website uses Google Analytics.</p></div></details>
+    <p class="privacy-summary">No comment, or an undecidable one, means neither safe nor checked. Every comment lists what the judge did not check.</p>
    </section>
   </Pool>
  </article>
@@ -124,6 +159,15 @@ const config=JSON.stringify({schema:1,ecosystem:"npm",image:"node:24-slim",test:
   .primary-command pre code {
     font-size: 15px;
   }
+  /* A workflow keeps its lines: wrapped YAML reads as other YAML. The block scrolls; the page does not. */
+  pre.yaml {
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+  }
+  pre.yaml code {
+    font-size: 13px;
+  }
   button {
     flex: 0 0 auto;
     min-height: 40px;
@@ -162,6 +206,12 @@ const config=JSON.stringify({schema:1,ecosystem:"npm",image:"node:24-slim",test:
     font-size: var(--font-small, 13px);
     color: var(--muted);
     line-height: 1.75;
+  }
+  .wiring + .command {
+    margin-top: 12px;
+  }
+  .detail-body .command + p {
+    margin-top: 18px;
   }
   .path {
     padding-top: 4px;

@@ -15,13 +15,13 @@ export function sitemap({ site, builtAt }: { site: string; builtAt: string }): s
 export function llmsTxt(site: string): string {
  return `# Ludion
 
-> One workflow for security updates across PHP Docker, npm, Composer and Maven.
+> A judge for npm dependency-update PRs: it reads the PR's lockfile change and leaves one comment.
 
-Source preview: detect known advisories, acquire dependencies separately, test old/new application images offline, recheck the candidate and apply only under --apply policy.
+Preview, not released: comments only. It changes no file and merges nothing. It checks parts of gates 1, 2 and 4 and the wait: provenance, publisher, install scripts, OSV malicious-package (MAL-) records, deprecation, withdrawal, new dependencies, versions that move with the fix, and the lockfile's tarballs and hashes. Verdicts: stop, wait, ready_except_build, undecidable. It does not build or test anything (gate 3), so it never says an update can be applied. Every changed version counts as production.
 
-Coverage: exact single-stage official PHP Docker images; public npm package-lock v2/v3; Composer lockfiles with supported pinned public ZIP archives; standalone Maven resolved dependency graphs via public Central. Parents/profiles/modules/extensions, custom registries, major upgrades and unsupported offline builds require review. Yarn/pnpm discovery is partial. Python, Go, Rust, Gradle, live server inventory and automatic production deployment are unsupported. A missing update is not evidence that a project is secure. Package coordinates are sent to OSV; application source is not uploaded to Ludion.
+Scope: npm only; package-lock.json v2/v3, the root package.json and each changed */package.json. A pnpm-lock.yaml is always undecidable, as is a PR that changes .github/ or 300 or more files. Ludion does not find vulnerabilities or write updates: Dependabot, Renovate or a person opens the PR. A hijacked publisher account with no provenance change is caught only by the wait and by running the judge again when it ends. No comment means neither safe nor checked. Package names and versions are sent to OSV and the npm registry; no source is sent.
 
-- [Try the source preview](${site}/start/): init, scan, patch and watch.
+- [Try the preview](${site}/start/): two GitHub workflows, or the judge run locally.
 
 The lesson data and MCP endpoints of ludion-ai 0.1.x (/index.json, /index/*, /mcp) ended on 2026-10-28.
 `;

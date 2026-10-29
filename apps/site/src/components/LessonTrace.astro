@@ -3,10 +3,10 @@ import { en } from "../strings/en.ts";
 
 const v = en.home.verify;
 const steps = [
-  { id: "guard", label: v.steps.guard, body: v.guardBody },
-  { id: "program", label: v.steps.program, body: v.programBody },
-  { id: "verifier", label: v.steps.verifier, body: v.verifierBody },
-  { id: "receipt", label: v.steps.receipt, body: v.invalidates },
+  { id: "paths", label: v.steps.paths, body: v.pathsBody },
+  { id: "source", label: v.steps.source, body: v.sourceBody },
+  { id: "moves", label: v.steps.moves, body: v.movesBody },
+  { id: "lockfile", label: v.steps.lockfile, body: v.lockfileBody },
 ];
 ---
 <article class="lesson-trace" data-lesson-trace aria-label={v.title}>
@@ -14,7 +14,7 @@ const steps = [
   <div class="trace-workspace">
     <div class="trace-rail" data-trace-controls hidden role="group" aria-label={v.stepsLabel}>
       {steps.map((step) => (
-        <button type="button" data-trace-step={step.id} aria-pressed={step.id === "guard" ? "true" : "false"} aria-controls={`trace-${step.id}`}>
+        <button type="button" data-trace-step={step.id} aria-pressed={step.id === steps[0]!.id ? "true" : "false"} aria-controls={`trace-${step.id}`}>
           <span class="step-dot" aria-hidden="true"></span>
           <span>{step.label}</span>
         </button>
@@ -30,7 +30,7 @@ const steps = [
         ))}
       </div>
       <p class="panel-note">{v.notVerified}</p>
-      <p class="panel-note">{v.sameModel}</p>
+      <p class="panel-note">{v.hijack}</p>
       <p class="example">{en.home.example}</p>
     </div>
   </div>
@@ -48,7 +48,7 @@ const steps = [
     };
     trace.classList.add("trace-ready");
     trace.querySelector<HTMLElement>("[data-trace-controls]")!.hidden = false;
-    select("guard");
+    select(buttons[0]!.dataset.traceStep!);
     for (const button of buttons) button.addEventListener("click", () => select(button.dataset.traceStep!));
     for (const [index, button] of buttons.entries()) button.addEventListener("keydown", (event) => {
       let next: number;

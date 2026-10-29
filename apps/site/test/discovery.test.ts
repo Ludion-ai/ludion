@@ -24,10 +24,12 @@ describe("being found", () => {
     expect(xml).not.toContain("/@");
   });
 
-  it("describes the security source preview and says the old endpoints ended", () => {
+  it("describes the judge preview and says the old endpoints ended", () => {
     const txt = llmsTxt("https://ludion.ai");
-    expect(txt).toContain("One workflow for security updates across PHP Docker, npm, Composer and Maven.");
-    expect(txt).toContain("Python, Go, Rust, Gradle, live server inventory and automatic production deployment are unsupported.");
+    expect(txt).toContain("A judge for npm dependency-update PRs");
+    expect(txt).toContain("Preview, not released: comments only. It changes no file and merges nothing.");
+    expect(txt).toContain("never says an update can be applied");
+    expect(txt).not.toMatch(/--apply|\b(scan|patch|PHP|Composer|Maven|Docker)\b/);
     expect(txt).toContain("(/index.json, /index/*, /mcp) ended on 2026-10-28");
     expect(txt).not.toContain("https://ludion.ai/index.json");
     expect(txt).toContain("https://ludion.ai/start/");

@@ -7,26 +7,30 @@ import { en } from "../src/strings/en.ts";
 
 const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
 
-describe("security preview claims", () => {
-  it("distinguishes an update, no match, unavailable metadata and unsupported input", () => {
-    expect(en.home.guard.states.map(s => s.id)).toEqual(["update", "no-match", "unknown", "unsupported"]);
-    expect(en.home.guard.states.find(s => s.id === "no-match")?.detail).toContain("not a guarantee");
-    expect(en.home.guard.note).toContain("Dependency advisories come from OSV");
+describe("judge preview claims", () => {
+  it("names the judge's four verdicts, none of them apply", () => {
+    expect(en.home.guard.states.map(s => s.id)).toEqual(["stop", "wait", "ready_except_build", "undecidable"]);
+    expect(en.home.guard.states.find(s => s.id === "ready_except_build")?.detail).toContain("not a verdict that the update can be applied");
+    expect(en.home.guard.states.find(s => s.id === "undecidable")?.detail).toContain("never as clear");
+    expect(en.home.guard.note).toContain("Every changed version counts as production");
     expect(en.home.supported).toHaveLength(4);
-    expect(en.home.supportedNote).toContain("Yarn/pnpm discovery is partial");
+    expect(en.home.supportedNote).toContain("npm only");
   });
-  it("does not present illustrations or source updates as completed production remediation", () => {
-    expect(en.home.isolate.scope).toContain("not a completed update");
-    expect(en.home.receipt.scope).toContain("not a run result");
-    expect(en.home.receipt.notDeployed).toBe("Not changed");
-    expect(en.home.coverage).toContain("production deployment stays with your release process");
-    expect(en.home.supportedNote).toContain("automatic production deployment are not supported");
+  it("does not present illustrations as judgements, or the preview as released or merging", () => {
+    expect(en.home.isolate.scope).toContain("not a judgement");
+    expect(en.home.receipt.scope).toContain("not a judgement");
+    expect(en.home.receipt.notDeployed).toBe("Not run");
+    expect(en.home.coverage).toContain("Preview, not released");
+    expect(en.home.coverage).toContain("merges nothing");
   });
-  it("retains explicit application validation and user policy before source changes", () => {
-    expect(en.home.isolate.applyDetail).toContain("--apply");
-    expect(en.home.verify.notVerified).toContain("failed baseline");
-    expect(en.home.verify.notVerified).toContain("changed project");
-    expect(en.home.verify.sameModel).toContain("does not invent a passing test");
+  it("says what the judge does not check, including gate 3 and a hijacked publisher", () => {
+    expect(en.home.receipt.notChecked[0]).toContain("Gate 3");
+    expect(en.home.verify.notVerified).toContain("gate 3");
+    expect(en.home.verify.hijack).toContain("caught only by the wait");
+    expect(en.home.isolate.unavailable).toContain("only when it runs again");
+  });
+  it("describes none of the removed commands, ecosystems or Docker validation", () => {
+    expect(JSON.stringify(en)).not.toMatch(/--apply|\b(scan|patch|PHP|Composer|Maven|Docker|Dockerfile)\b/i);
   });
 });
 

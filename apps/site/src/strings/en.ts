@@ -1,8 +1,8 @@
-// Availability describes this source preview; detection is not a security guarantee.
+// The judge as README.md and docs/status.md describe it: a preview that comments on npm dependency PRs. Not a security guarantee.
 export const en = {
   "site": {
     "name": "Ludion",
-    "description": "One workflow for security updates across PHP Docker, npm, Composer and Maven. Find relevant fixes, validate the application, and update source with a recorded result."
+    "description": "A judge for npm dependency-update PRs. Ludion reads the lockfile change, checks provenance, publishers, install scripts and malicious-package records, waits, and leaves one comment. A preview, not released."
   },
   "nav": {
     "label": "Main",
@@ -11,129 +11,138 @@ export const en = {
     "start": "Try the preview"
   },
   "home": {
-    "title": "Ludion — One workflow for security updates",
+    "title": "Ludion — a judge for npm dependency updates",
     "headline": [
-      "Keep building.",
-      "Keep your stack moving."
+      "Every dependency PR,",
+      "judged before you merge."
     ],
-    "sub": "Find security fixes across PHP, JavaScript, TypeScript and Java. Validate the change, update the project, and see what still needs attention.",
+    "sub": "Ludion reads an npm dependency-update PR and leaves one comment: stop, wait, or what it could not decide. Comments only, nothing is merged.",
     "start": "Try the preview",
-    "seeItWork": "See the workflow",
-    "scroll": "Follow the update",
-    "coverage": "Source preview · PHP Docker, npm package-lock, Composer and standalone Maven. Source updates are validated locally; production deployment stays with your release process.",
-    "example": "Illustrated workflow. Run the preview to produce your own results.",
+    "seeItWork": "See the verdicts",
+    "scroll": "Follow a dependency PR",
+    "coverage": "Preview, not released · npm package-lock.json v2/v3; a pnpm-lock.yaml is always undecidable. The judge changes no file and merges nothing.",
+    "example": "Illustrated judgement. Not a run result.",
     "scene": {
-      "caption": "Your stack → relevant advisories → application checks → recorded updates."
+      "caption": "A dependency PR → its lockfile diff → checks and the wait → one comment."
     },
     "chapters": {
-      "label": "The update workflow",
-      "guard": "Detect",
-      "verify": "Check",
-      "isolate": "Update",
-      "receipt": "Record"
+      "label": "How the judge works",
+      "guard": "Verdicts",
+      "verify": "Checks",
+      "isolate": "Flow",
+      "receipt": "Comment"
     },
     "guard": {
-      "title": "One view of the updates your project needs.",
+      "title": "Four verdicts. None of them is “apply”.",
       "states": [
         {
-          "id": "update",
-          "detail": "A relevant PHP security release or known advisory matches an inventoried dependency. Plan an update within the supported version policy."
+          "id": "stop",
+          "detail": "A check found a reason not to take the update: provenance lost or from another repository or workflow, a new install script, an OSV MAL- record, deprecation or withdrawal, a downgrade or a new advisory, a version that moved with the fix and is too new, or a lockfile entry whose tarball or hash does not match."
         },
         {
-          "id": "no-match",
-          "detail": "No matching update was found in the recorded inventory. This is not a guarantee that the application is secure."
+          "id": "wait",
+          "detail": "Nothing stopped it, but the newest changed version is still inside its wait: 12 hours for an exploited fix (24 without comparable provenance), 24 for high, 72 for normal. A publisher change or new dependencies extend it. The comment says until when."
         },
         {
-          "id": "unknown",
-          "detail": "A source cannot be reached or read, or the project changed while checking. Report the gap instead of marking the project clear."
+          "id": "ready_except_build",
+          "detail": "Gates 1, 2 and 4 found nothing and the wait is over. Gate 3, building and testing old and new, is not run, so this is not a verdict that the update can be applied."
         },
         {
-          "id": "unsupported",
-          "detail": "An unsupported manifest, unresolved model or untrusted acquisition path needs review. It remains visible instead of being silently skipped."
+          "id": "undecidable",
+          "detail": "Something could not be read or looked up, the PR changes .github/ or 300 or more files, or the lockfile is pnpm-lock.yaml. It is shown as undecidable, never as clear."
         }
       ],
-      "note": "Read installed versions from npm and Composer lockfiles, or resolve a standalone Maven dependency graph. PHP runtime releases use the configured Dockerfile. Dependency advisories come from OSV."
+      "note": "Read from the PR's package.json and package-lock.json, before and after, with the npm registry and OSV. Every changed version counts as production: there is no dev-only split."
     },
     "verify": {
-      "title": "Check every update.",
-      "bar": "update.check",
-      "stepsLabel": "Validation steps",
+      "title": "Check every changed package.",
+      "bar": "judge.checks",
+      "stepsLabel": "What the judge checks",
       "steps": {
-        "guard": "Match",
-        "program": "Resolve",
-        "verifier": "Test",
-        "receipt": "Record"
+        "paths": "Paths",
+        "source": "Source",
+        "moves": "Moves",
+        "lockfile": "Lockfile"
       },
-      "guardBody": "Identify exact versions and match them against published advisories. Keep existing package majors; fixes that require a major upgrade stay visible for review.",
-      "programBody": "Resolve packages in a separate acquisition environment. Keep application files out of online resolution, constrain download sources, and pin the tool image by digest.",
-      "verifierBody": "Build baseline and candidate application images. Run your configured test offline on both and recheck the candidate dependency inventory for known advisories.",
-      "notVerified": "A failed baseline, failed candidate, remaining advisory, incomplete inventory or changed project blocks application. Passing tests establish only the recorded application behavior.",
-      "invalidates": "Keep advisory ids, version inventories, image ids, source hashes and test outcomes in a local receipt. Multi-file dependency updates have a recovery journal.",
-      "sameModel": "You choose the application test. Ludion does not invent a passing test, weaken it, or treat an unavailable database as a clean result."
+      "pathsBody": "Every install path whose package or version changes is checked for downgrades and for known advisories the old version did not have, and so is every package a dependent now loads instead: shadowing, moved dependents, removed copies, aliases.",
+      "sourceBody": "Provenance must stay, naming the same repository and workflow. A new install script, an OSV MAL- record, deprecation or withdrawal stops. A publisher change or new dependencies extend the wait.",
+      "movesBody": "Every version that moves with the fix must already be in the lockfile or published before the fix. A new dependency whose package first appeared less than the base wait before the fix stops.",
+      "lockfileBody": "The changed files, package.json, each changed entry's registry tarball and its sha512 integrity are checked. A workspace package.json that does not agree with the lockfile stops.",
+      "notVerified": "Not run: gate 3, building and testing old and new. Not inspected: obfuscated code, new network or process calls, and OS or configuration conditions.",
+      "hijack": "A hijacked publisher account with no provenance change is caught only by the wait and by running the judge again when it ends. Nothing schedules that second run."
     },
     "isolate": {
-      "title": "Resolve once. Check the app. Apply by policy.",
-      "bar": "patch.workflow",
-      "stagesLabel": "Update stages",
-      "install": "1 · Resolve",
-      "installDetail": "Acquire dependencies separately from application testing. npm blocks URL/Git/file dependencies; Composer archives are checked at each redirect; Maven uses public Central.",
-      "run": "2 · Validate",
-      "runDetail": "Run the original and updated application tests in Docker with no network, a read-only source/root, a non-root user and fixed scratch/resource limits. Check the resulting inventory again.",
-      "apply": "3 · Apply",
-      "applyDetail": "With --apply, change only the supported Dockerfile or dependency files after validation. Keep a receipt and journal. Production deployment remains a separate step.",
-      "limits": "Online acquisition contains dependency manifests, not application source or host credentials. Application tests run offline. Source remains local to your configured Docker setup.",
-      "unavailable": "Run watch --apply to repeat the saved ecosystem policy. A stop request cancels pending application; a Docker step already in flight may finish before exit.",
-      "scope": "Workflow illustration, not a completed update. Nothing is installed or executed by this page."
+      "title": "Read the diff. Check it. Wait. Comment.",
+      "bar": "judge.flow",
+      "stagesLabel": "Judge stages",
+      "read": "1 · Read",
+      "readDetail": "Read the PR's package.json and package-lock.json, before and after, and list every install path whose package or version changes. Nothing from the PR is run.",
+      "check": "2 · Check",
+      "checkDetail": "Look up each changed version in the npm registry and OSV: provenance, publisher, install scripts, MAL- records, deprecation, withdrawal and new dependencies.",
+      "comment": "3 · Wait, then comment",
+      "commentDetail": "Count the wait from the newest publish, then write one comment on the PR and keep it up to date. No file is changed and nothing is merged.",
+      "limits": "The judging job has read access only and runs no dependency code. A second job, from your default branch, checks its result as untrusted data and posts the comment.",
+      "unavailable": "When a wait ends, nothing re-checks the PR by itself: the judge looks again only when it runs again.",
+      "scope": "Flow illustration, not a judgement. Nothing is installed or run by this page."
     },
     "receipt": {
-      "title": "Know what changed, and what remains.",
-      "bar": "update.receipt · example",
+      "title": "One comment: what it found, and what it did not check.",
+      "bar": "PR comment · example",
       "fields": [
-        "Advisory source and matching ids",
-        "Before / after dependency inventories",
-        "Source tree and dependency file hashes",
-        "Tool image digest and application image ids",
-        "Application test command",
-        "Baseline / candidate test outcome",
-        "Candidate advisory recheck",
-        "Applied files and recovery journal"
+        "Verdict and the head it judged",
+        "Urgency and the wait, from the newest publish",
+        "Versions that move with the fix",
+        "Changed packages, from → to",
+        "Advisories the update fixes",
+        "Each finding: stop, extend or info, and its gate",
+        "Exposure: when the fix was published, when the judge saw it"
       ],
-      "results": "Production deployment",
-      "pending": "Recorded per run",
-      "notDeployed": "Not changed",
-      "scope": "Receipt structure, not a run result. Actual receipts stay in .ludion/security/. No security certification is implied."
+      "pending": "In every comment",
+      "notCheckedTitle": "Not checked",
+      "notChecked": [
+        "Gate 3: building and testing old and new versions.",
+        "Obfuscated code and new network or process calls in the changed code.",
+        "Gate 1's OS, SAPI and configuration conditions; every changed version counts as production.",
+        "Provenance's Sigstore signature and certificate: the registry's attestation record is read, not verified.",
+        "A hijacked publisher account with no provenance change, beyond the wait and a judge run after it.",
+        "The legacy dependencies section of a v2 lockfile.",
+        "A newly required dependency that lands on a copy already installed."
+      ],
+      "results": "Gate 3, build and tests",
+      "notDeployed": "Not run",
+      "scope": "Comment structure, not a judgement. The judge changes no file and merges nothing. No security certification is implied."
     },
     "closing": {
-      "title": "Bring more of your stack into one workflow.",
-      "action": "Try the multi-stack preview"
+      "title": "Put a judge behind your dependency PRs.",
+      "action": "See how to set it up"
     },
     "supported": [
       {
-        "name": "PHP runtime",
-        "detect": "Official security releases",
-        "apply": "Dockerfile update",
-        "scope": "Exact official PHP image; single stage; same major/minor branch."
+        "name": "package-lock.json",
+        "read": "v2/v3 packages, before and after",
+        "checked": "Gates 1, 2 and 4 in part, and the wait",
+        "scope": "The root lockfile; its legacy dependencies section is not compared."
       },
       {
-        "name": "JavaScript / TypeScript",
-        "detect": "npm lockfile + OSV",
-        "apply": "Manifest + lockfile",
-        "scope": "Public npm registry; package-lock v2/v3; no workspaces, URL/Git/file deps or major upgrades."
+        "name": "package.json",
+        "read": "The root one, and each changed */package.json",
+        "checked": "Gate 4's changed-files check",
+        "scope": "One that does not agree with the lockfile stops; one that cannot be read on both sides is undecidable."
       },
       {
-        "name": "PHP packages",
-        "detect": "Composer lockfile + OSV",
-        "apply": "Manifest + lockfile",
-        "scope": "Public pinned ZIP archives; standard vendor directory; no custom repositories or policy overrides."
+        "name": "pnpm-lock.yaml",
+        "read": "The versions it adds",
+        "checked": "Each added version, without its tarball, hash or what loads it",
+        "scope": "Always undecidable."
       },
       {
-        "name": "Java / Maven",
-        "detect": "Resolved graph + OSV",
-        "apply": "POM + dependency constraints",
-        "scope": "Standalone POM; public Maven Central. Parents, profiles, modules and extensions need review."
+        "name": "Pull request",
+        "read": "Its changed files",
+        "checked": "Nothing from the PR is run",
+        "scope": "A PR that changes .github/ or 300 or more files is undecidable. Comments go only to PRs into the default branch."
       }
     ],
-    "supportedNote": "Yarn/pnpm discovery is partial and does not enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP and automatic production deployment are not supported in this preview. Custom build tools may need an explicitly trusted offline cache."
+    "supportedNote": "npm only. Ludion does not find vulnerabilities or write updates: Dependabot, Renovate or a person opens the PR, and the judge stands behind it. Package names and versions are sent to OSV and the npm registry; no source is sent."
   },
   "footer": {
     "license": "Code is Apache-2.0.",

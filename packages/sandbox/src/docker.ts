@@ -53,7 +53,8 @@ export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), p
   const inside = (dir: string, base: string | null | undefined) => {
     if (!base || !P.isAbsolute(base)) return false;
     const rel = P.relative(fold(P.resolve(base)), fold(dir));
-    return rel === "" || (!rel.startsWith("..") && !P.isAbsolute(rel));
+    // Outside only when the path climbs out (".." or "../…"): a folder named "..bin" inside the project is inside.
+    return rel === "" || (rel !== ".." && !rel.startsWith(`..${P.sep}`) && !P.isAbsolute(rel));
   };
   const here = fold(P.resolve(cwd));
   for (const raw of path.split(win ? ";" : ":")) {

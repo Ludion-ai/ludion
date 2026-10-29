@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative } from "node:path";
 import { afterAll, beforeAll } from "vitest";
@@ -184,13 +184,17 @@ describe("findDocker", () => {
     expect([bins, plain].every(f => existsSync(f))).toBe(true);
   });
   it.skipIf(process.platform === "win32")("skips PATH folders inside the project (also through a link), Yarn's shim folder, a relative entry and a docker that is not a file", () => {
-    const project = folder("p2"), vendor = folder("p2/vendor/bin"), venv = folder("p2/.venv/bin"), berry = folder("xfs-1234"), dirDocker = folder("dirdocker"), outside = folder("outside");
-    docker(vendor); docker(venv); docker(berry); mkdirSync(join(dirDocker, "docker")); const found = docker(outside);
+    const project = folder("p2"), vendor = folder("p2/vendor/bin"), venv = folder("p2/.venv/bin"), dots = folder("p2/..bin"), berry = folder("xfs-1234"), berryDots = folder("xfs-1234/..x"), dirDocker = folder("dirdocker"), outside = folder("outside");
+    docker(vendor); docker(venv); docker(dots); docker(berry); docker(berryDots); mkdirSync(join(dirDocker, "docker")); const found = docker(outside);
     const link = join(root, "link-to-vendor"); symlinkSync(vendor, link);
     const rel = relative(process.cwd(), outside);
-    expect(findDocker([vendor, venv, link, berry, rel, dirDocker, outside].join(":"), root, "linux", project, berry)).toBe(found);
-    expect(findDocker([vendor, venv, link, berry, rel, dirDocker].join(":"), root, "linux", project, berry)).toBeNull();
+    expect(findDocker([vendor, venv, dots, link, berry, berryDots, rel, dirDocker, outside].join(":"), root, "linux", project, berry)).toBe(found);
+    expect(findDocker([vendor, venv, dots, link, berry, berryDots, rel, dirDocker].join(":"), root, "linux", project, berry)).toBeNull();
     expect(findDocker(vendor, root, "linux", null, undefined)).toBe(join(vendor, "docker"));
+  });
+  it("is told the project root by the security CLI right after it reads --dir", () => {
+    const cli = readFileSync(new URL("../../cli/src/security/cli.ts", import.meta.url), "utf8");
+    expect(cli).toMatch(/const root = rootPath\(values\.dir!\);\n(?:\s*\/\/.*\n)*\s*useProject\(root\);/);
   });
   it("on Windows, skips the working directory and node_modules folders whatever their case, and a quoted relative entry", () => {
     expect(findDocker('C:\\Project;C:\\Project\\NODE_MODULES\\.bin;"relative"', "c:\\project", "win32")).toBeNull();

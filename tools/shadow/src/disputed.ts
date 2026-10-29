@@ -11,7 +11,7 @@ import { join } from "node:path";
 import semver from "semver";
 import { registryTarball } from "../../../packages/cli/src/security/judge.ts";
 import { Archive, codeDifferences, ecosystems, jsdelivrFile, jsdelivrList, names, registryTarFiles, registryVersions, scriptsFromFiles, swhFiles, swhLocate, swhMetadata, type EcoRecord, type FileList, type RegistryDist, type TarListing } from "../../backtest/src/archives-v5.ts";
-import { allVersions, type Store } from "./replay.ts";
+import { allVersions, filesDigest, type Store } from "./replay.ts";
 
 type Rec = Record<string, any>;
 export type Category = "confirmed" | "record_omission" | "false_report" | "not_checked";
@@ -60,7 +60,7 @@ export function predecessorIn(time: Map<string, string>, version: string): strin
 }
 
 /** v5's disputed check (section 3), in its order, with the recorder's own file list as the one addition. */
-export async function dispute(input: { name: string; version: string; published: string; time: Map<string, string>; records: Rec[]; captured: { shasum: string | null; integrity: string | null; unpacked_size: number | null; files: [string, number, string][] | null } | null; sources: Sources }): Promise<Dispute & { reg?: RegistryDist; list?: FileList; pkg?: unknown }> {
+export async function dispute(input: { name: string; version: string; published: string; time: Map<string, string>; records: Rec[]; captured: { shasum: string | null; integrity: string | null; unpacked_size: number | null; files: [string, number, string][] | null; files_digest?: string | null } | null; sources: Sources }): Promise<Dispute & { reg?: RegistryDist; list?: FileList; pkg?: unknown }> {
   const { name, version, time, records, captured, sources: src } = input;
   const at = Date.parse(input.published);
   const earlier = [...time].filter(([v, t]) => semver.valid(v) && Date.parse(t) < at).sort((a, b) => Date.parse(b[1]) - Date.parse(a[1])).map(([v]) => v);
@@ -82,6 +82,8 @@ export async function dispute(input: { name: string; version: string; published:
   const differences = codeDifferences(list, pkg, prevFiles, parse(tar.packageJson));
   if (differences.length) return no("code differs from prev_d (jsDelivr's files)", { differences: differences.slice(0, 20), count: differences.length });
   // The addition (section 6): the recorder's own hashes of V's registry tarball must equal the archive's.
+  // Without the list (not kept in memory), its digest: the comparison is never skipped for a version the recorder hashed.
+  if (!captured?.files && captured?.files_digest && captured.files_digest !== filesDigest([...list].map(([p, f]) => [p, f.sha256]))) return no("the recorder's file list differs from jsDelivr's (by digest)");
   if (captured?.files) {
     const mine = new Map(captured.files.map(([p, size, sha]) => [p, { sha256: sha, size }]));
     const paths = [...new Set([...mine.keys(), ...list.keys()])].filter(p => mine.get(p)?.sha256 !== list.get(p)?.sha256);
@@ -136,8 +138,9 @@ export async function categorize(input: { name: string; version: string; publish
   const records = all.filter(r => !withdrawn.has(r.id));
   const caps = store.versions.get(`${name}@${version}`) ?? [], cap = caps.at(-1);
   // The file list from the latest capture that hashed the tarball: a later failed retry has none.
-  const files = [...caps].reverse().find(c => c.files)?.files ?? null;
-  const d = await dispute({ name, version, published: input.published, time, records, captured: cap ? { shasum: cap.shasum, integrity: cap.integrity, unpacked_size: cap.unpacked_size, files } : null, sources: src });
+  const hashed = [...caps].reverse().find(c => c.files || c.files_digest);
+  const files = hashed?.files ?? null, files_digest = hashed?.files_digest ?? null;
+  const d = await dispute({ name, version, published: input.published, time, records, captured: cap ? { shasum: cap.shasum, integrity: cap.integrity, unpacked_size: cap.unpacked_size, files, files_digest } : null, sources: src });
   const { reg, list, pkg, ...shown } = d;
   if (!d.disputed) return { category: "confirmed", evidence: shown };
   // The run of identical code, back to O.

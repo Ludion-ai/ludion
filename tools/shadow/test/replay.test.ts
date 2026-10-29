@@ -562,3 +562,38 @@ describe("fourth review fixes (PR #194)", () => {
     expect(r.rows.map(x => x.outcome)).toEqual(["pending", "pending", "pending", "pending"]);
   });
 });
+
+describe("fifth review fixes (PR #194)", () => {
+  const malFor = (name: string, versions: string[], published?: string) => ({ id: `MAL-${name}`, ...(published ? { published } : {}), modified: at(100), affected: [{ package: { ecosystem: "npm", name }, versions }] });
+  const pkg = (v: string) => `{"name":"left-pad","version":"${v}"}`;
+  const same = () => sources({ "1.0.0": { "package.json": pkg("1.0.0"), "a.js": "x" }, "1.0.1": { "package.json": pkg("1.0.1"), "a.js": "x" } });
+
+  it("compares the recorder's file hashes by digest when the list was not kept (a record known only from OSV's answer)", async () => {
+    const w = new World(400).publish("left-pad", "1.0.1", 1);
+    const v = w.captures.at(-1) as Record<string, unknown>;
+    v.files = { status: "hashed", tarball_bytes: 2, files: [["a.js", 1, "f".repeat(64)], ["package.json", 1, "0".repeat(64)]] };
+    const store = readStore(w.write(), () => false);
+    expect(store.versions.get("left-pad@1.0.1")![0]).toMatchObject({ files: null, files_digest: expect.any(String) });
+    const report = await replay({ store, watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...same(), osvRecords: async () => [malFor("left-pad", ["1.0.1"], at(100))] } });
+    expect(report.mal.cases.map(c => [c.version, c.category, (c.category_evidence as { step: string }).step])).toEqual([["1.0.1", "confirmed", "the recorder's file list differs from jsDelivr's (by digest)"]]);
+  });
+  it("reads the latest poll and OSV read without spreading months of status lines into one call", async () => {
+    const w = new World(400);
+    for (let k = 0; k < 130_000; k++) w.status.push({ type: "poll", at: at(-1 - (k + 1) / 120_000) });
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: null });
+    expect(report.coverage).toBe(at(384.5));
+  });
+  it("asks OSV about a watched package taken down in the window, with no stored version", async () => {
+    const w = new World(400);
+    w.watched["gone-pkg"] = ["1.0.0"];
+    w.captures.push({ type: "gone", name: "gone-pkg", fetched_at: at(5), url: "x", status: 404 });
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...sources({}), osvRecords: async (n: string) => n === "gone-pkg" ? [malFor("gone-pkg", ["2.0.0"], at(100))] : [], registryTime: async (n: string): Promise<Record<string, string>> => n === "gone-pkg" ? { "2.0.0": at(4) } : {} } });
+    expect(report.mal.cases.map(c => [c.name, c.version, c.missed_rows.length])).toEqual([["gone-pkg", "2.0.0", 4]]);
+  });
+  it("counts a record copy with no publish time as on time", async () => {
+    const w = new World(400).publish("left-pad", "1.0.1", 1);
+    w.osv.push({ type: "osv", id: "MAL-np", modified: at(100), fetched_at: at(101), sha256: "np", record: malFor("left-pad", ["1.0.1"]) });
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: null });
+    expect(report.mal.versions).toBe(1);
+  });
+});

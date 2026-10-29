@@ -37,6 +37,8 @@ export type VersionCapture = {
   /** Provenance from the stored attestations, or why it is missing (a gap) or unreadable (a judge error). */
   provenance: { ok: VersionFacts["provenance"] } | { gap: string } | { error: string };
   files: [string, number, string][] | null; files_status: string | null;
+  /** filesDigest of the hashed file list, kept for every version even when the list itself is not (keepFiles). */
+  files_digest: string | null;
 };
 export type Store = {
   /** Per name, in capture order: baseline, change and gone records. */
@@ -52,6 +54,8 @@ export type Store = {
   duplicates: number;
 };
 
+/** A file list's digest: sha256 of its sorted (path, sha256) pairs. The disputed check compares it when the list was not kept. */
+export const filesDigest = (pairs: [string, string][]) => createHash("sha256").update(JSON.stringify([...pairs].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)))).digest("hex");
 const contentKey = (r: Rec) => createHash("sha256").update(JSON.stringify({ ...r, fetched_at: undefined })).digest("hex");
 const streamKey = (r: Rec) => `${r.type}\0${r.name ?? r.id}\0${r.version ?? ""}`;
 /**
@@ -108,6 +112,7 @@ export function readStore(dir: string, keepFiles: (name: string) => boolean = ()
         deprecated: typeof m.deprecated === "string" && m.deprecated ? m.deprecated : null,
         provenance: provenanceOf(r.name, r.version, m, r.attestations ?? null),
         files: r.files?.status === "hashed" && keepFiles(r.name) ? r.files.files : null, files_status: r.files?.status ?? null,
+        files_digest: r.files?.status === "hashed" && Array.isArray(r.files.files) ? filesDigest(r.files.files.map((x: [string, number, string]) => [x[0], x[2]])) : null,
       };
       const k = `${r.name}@${r.version}`;
       apply = () => push(store.versions, k, v);
@@ -472,8 +477,9 @@ const quantile = (xs: number[], q: number) => { if (!xs.length) return null; con
  */
 export async function replay(input: { store: Store; watched: Record<string, string[]>; asOf: number; sources: Sources | null }): Promise<Report> {
   const { store, asOf } = input;
-  const lastPoll = Math.max(-Infinity, ...store.status.filter(s => s.type === "poll").map(s => ms(s.at)).filter(t => t <= asOf));
-  const lastOsv = Math.max(-Infinity, ...store.status.filter(s => s.type === "osv").map(s => ms(s.at)).filter(t => t <= asOf));
+  // A loop, not Math.max(...): months of one-a-minute polls are more arguments than a call may take.
+  const latest = (type: string) => store.status.reduce((m, s) => { const t = ms(s.at); return s.type === type && t <= asOf && t > m ? t : m; }, -Infinity);
+  const lastPoll = latest("poll"), lastOsv = latest("osv");
   const coverage = Math.min(lastPoll, lastOsv);
   // Every stored copy of every MAL- record: a version any copy named stays named, as a withdrawn record does.
   const copies = malCopies(store);
@@ -486,7 +492,10 @@ export async function replay(input: { store: Store; watched: Record<string, stri
   // (package names only). The judgements' re-query still reads stored copies only.
   const osvNotQueried: string[] = [];
   if (window.start) {
-    const withWindowVersions = [...store.timeline.keys()].filter(n => Object.hasOwn(input.watched, n) && [...allVersions(store, n, asOf).values()].some(inWindow));
+    // Every watched name the feed showed changing in the window (a publish changes the packument; so does a package
+    // taken down), every one whose capture failed, and every one with a stored window version.
+    const failedNames = new Set([...store.status.filter(x => x.type === "error" && typeof x.name === "string").map(x => x.name), ...store.gaveUp.map(g => g.name)]);
+    const withWindowVersions = [...new Set([...store.timeline.keys(), ...failedNames])].filter(n => Object.hasOwn(input.watched, n) && ((store.timeline.get(n) ?? []).some(r => r.at >= start && r.at <= asOf) || failedNames.has(n) || [...allVersions(store, n, asOf).values()].some(inWindow)));
     if (!input.sources) osvNotQueried.push(`${withWindowVersions.length} package(s) (without the network)`);
     else for (const n of withWindowVersions) {
       const answer = await input.sources.osvRecords(n);
@@ -517,7 +526,9 @@ export async function replay(input: { store: Store; watched: Record<string, stri
         if (!names(r, name, v)) continue;
         namingIds.add(r.id);
         const ids = named.get(`${name}@${v}`) ?? new Map<string, number>();
-        ids.set(r.id, Math.min(ids.get(r.id) ?? Infinity, ms(r.published)));
+        // A copy with no publish time cannot be shown to be late: it counts as on time (the stricter side).
+        const p = ms(r.published);
+        ids.set(r.id, Math.min(ids.get(r.id) ?? Infinity, Number.isFinite(p) ? p : -Infinity));
         named.set(`${name}@${v}`, ids);
       }
     }

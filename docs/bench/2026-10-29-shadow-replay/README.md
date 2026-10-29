@@ -2,7 +2,7 @@
 
 The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2.7. It counts condition (b) as docs/decisions/2026-10-29-shadow-counting.md fixes it. That decision is not changed here: where it could not be followed literally, the reading taken is listed below, and nothing in it was loosened.
 
-**What exists now.** The replay is built, and has run once on a snapshot of the recorder's store. **There is no (b) result.** The four weeks run until 2026-11-25T15:51:48.401Z, and the result is final only after 2026-12-09T15:51:48.401Z (the window's end + 336h). The run below is a preliminary check that the replay reads the real store, and it judges nothing yet.
+**What exists now.** The replay is built, and has run on snapshots of the recorder's store. **There is no (b) result.** The four weeks run until 2026-11-25T15:51:48.401Z, and the result is final only after 2026-12-09T15:51:48.401Z (the window's end + 336h). The runs below are preliminary checks that the replay reads the real store, and they judge nothing yet.
 
 ## What it does
 
@@ -14,7 +14,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
   - Only days before the replay's own day are checked: today is not over.
   - The window is the first run that lasts 28 days.
 - **The versions** (section 3). Every version of a watched name whose stored publish time (the packument's `time`, as captured) falls in the window.
-- **One judgement** (section 4). It is the judge's own `judge()`, imported unchanged. `scripts/run.sh` refuses to run unless judge.ts, npm-facts.ts, time-cap.ts and archives-v5.ts equal those at the recorder's start commit (8a78b55). It also refuses a watched list other than the start line's.
+- **One judgement** (section 4). It is the judge's own `judge()`, imported unchanged. `scripts/run.sh` refuses to run unless judge.ts, npm-facts.ts, time-cap.ts and archives-v5.ts equal those at the recorder's start commit (8a78b55). It compares the working tree, which is what the container runs. It also refuses a watched list other than the start line's.
   - **(b), per row.** A synthetic fix (`SHADOW-SYNTHETIC-FIX`) from prev to V sets the row. Exploited is `kev: true`; high is `severity: CRITICAL`; normal has neither; low is normal with the change marked dev.
     - `locked` is {P@prev}, and `files` is package.json and package-lock.json.
     - `resolved` is the registry tarball, and `integrity` is V's captured `dist.integrity`.
@@ -22,7 +22,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
   - **(a).** V is added as a direct dependency, `locked` is empty, and there is no fix. Normal and low are judged; exploited and high are `not_applicable`.
   - **prev.** Each watched-lockfile version of P below V. Without one, the registry's predecessor.
   - **When.** At the judge's own `wait_until`, with `now` 1 ms after it. It is computed first from the facts at the end of the poll that captured V, then again from the facts as of `wait_until`, until it stops moving (at most 20 times; otherwise a capture gap).
-  - **MAL- records.** A record counts at a judgement only if its `published` is at or before that moment, and it was not withdrawn by then.
+  - **MAL- records.** A record counts at a judgement as its latest stored copy modified by then says. It must be published by then, and not withdrawn by then.
 - **Outcomes** (section 5).
   - `stop`, or `undecidable` with every input captured, is stopped.
   - `ready_except_build` is missed.
@@ -30,11 +30,18 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
     - V never captured;
     - attestations the manifest lists that were not captured;
     - a predecessor not captured;
-    - a new dependency's `created` not captured.
+    - a new dependency's `created` not captured;
+    - no version of P below V at all (a missing predecessor).
   - A `wait` at `wait_until` is a capture gap.
   - Combined per row over every scenario and prev: missed if any missed, else a capture gap if any, else pending if any, else stopped.
 - **Pending.** A judgement whose `wait_until` is past the store's coverage is pending, and the result is not final. The coverage is the last successful poll or the last OSV read, whichever is earlier.
-- **Malicious versions** (sections 3 and 6). These are versions in the window named by a MAL- record published by the window's end + 336h and not withdrawn. Each one goes through `tools/shadow/src/disputed.ts`:
+- **Final.** All of these must hold:
+  - the window is complete;
+  - the window's end + 336h has passed;
+  - an OSV read is at least 24h past that time, since a record published by then may be imported into OSV later;
+  - nothing is pending;
+  - no OSV record was given up.
+- **Malicious versions** (sections 3 and 6). These are versions in the window named by a MAL- record published by the window's end + 336h. A record withdrawn later still counts here, because section 6 sets apart only false-report candidates. Each one goes through `tools/shadow/src/disputed.ts`:
   - **The disputed check.** It is v5's, in v5's order, read from the registry, jsDelivr, ecosyste.ms and Software Heritage. The recorder's captured manifest is one more copy of the registry's document. As the one addition, the recorder's own file list of V must equal jsDelivr's.
   - **Not disputed** is confirmed.
   - **Disputed.** The run of identical code is followed back to O.
@@ -45,7 +52,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
 - **The gate** (section 7).
   - **Misses.** Confirmed, record-omission and not-checked versions with any missed or capture-gap row.
   - **Decided.** Versions in the window whose four (b) rows, against the decided prev, are each `stop` or `ready_except_build`.
-  - **States.** Each half is `not_yet` until the result is final. With no case, the miss half is `met_with_no_case`.
+  - **States.** Each half is `not_yet` until the result is final. The miss half is `met_with_no_case` only when no MAL- record names a version in the window; with cases and no miss, it is `met`.
 - **Shown, not gated** (section 8):
   - MAL- records naming a watched version, by category;
   - capture lag, as a median and at p90;
@@ -56,20 +63,23 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
 
 ## Readings taken where the decision is not literal
 
-None of these loosens a count. Each is the reading the code takes, and is tested.
+None of these loosens a count. Each is the reading the code takes, and is tested. A fresh-context review of the first version (PR #194) found that readings 5, 6 and 8 did loosen it, and that MAL- records were read as they are today. Those were changed as below.
 
 1. **"V's first capture"** is the first capture of V with every input. The recorder retries a capture whose sub-reads failed, for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap. On the real store, four versions whose first capture got HTTP 404 for its attestations have a later capture with them. A dry run with the literal reading, at 01:01Z, made those four capture gaps.
 2. **"The end of the poll."** The facts "of V's first capture" are those stored by the end of the poll that took it: the next `poll`, `error` or `stopped` status line. A capture's records are written over several seconds, so the predecessor's record comes after V's.
 3. **The registry's predecessor** is taken among the versions the recorder had captured by that moment, as listed versions. The recorder captures the predecessor with V, so a version whose `time` is stored but which was never captured was not listed: unpublished before the recorder saw the package.
-4. **Repeated records** are dropped only when equal, apart from `fetched_at`, to the record just before them with the same type, name and version. The recorder's README says "by type, name, version and content". Read over the whole stream, that would drop a deprecation that changes and changes back, or a 404 `created` record after a later success. On the snapshot, 119 repeats were dropped: 71 `change` records with the same diff, and 48 `retry` version records.
-5. **A MAL-named version with no stored publish time.** Section 3 allows a publish time from the record or an archive. OSV records carry no version publish time, and the replay reads no archive for this. If the feed never showed the name changing and no capture of it failed, the version is outside the window, because a publish changes the packument. Otherwise it is a capture gap.
-6. **Withdrawn records.** One withdrawn by the replay's time is left out of the denominator, as v5 did. At a judgement, one withdrawn by that moment does not count.
+4. **Repeated records** are dropped only when equal, apart from `fetched_at`, to the record just before them with the same type, name and version. The recorder's README says "by type, name, version and content". Read over the whole stream, that would drop a deprecation that changes and changes back, or a 404 `created` record after a later success. In the first snapshot, 119 repeats were dropped: 71 `change` records with the same diff, and 48 `retry` version records.
+5. **A MAL-named version with no stored publish time.** Section 3 allows a publish time from the record or an archive. OSV records carry no version publish time. So with `NETWORK=1` the replay reads the registry's `time`, which keeps removed versions' times:
+   - outside the window: the version is outside;
+   - otherwise, or if the time cannot be read (always without network): every row is a capture gap.
+6. **Withdrawn records** stay in the denominator. At a judgement, one withdrawn by that moment does not stop the version, as the live re-query would not.
 7. **The disputed check's unreadable cases** are on the stricter side:
    - a source that cannot be read leaves V confirmed (v5);
    - a predecessor that cannot be read ends the run of identical code there, so O is later;
    - it also counts as O's added install script;
    - a first version (no predecessor) counts any install script it declares.
-8. **(b) with no version below V** anywhere is `not_applicable`. Such a version is never decided.
+8. **(b) with no version below V** anywhere is a capture gap in every row: section 5's missing predecessor. Such a version is never decided.
+9. **A MAL- record at a judgement** is read as its latest stored copy whose `modified` is at or before that moment. A record with no such copy is not known to have named V then, so it does not stop it: the stricter side.
 
 ## Not done
 
@@ -80,10 +90,10 @@ None of these loosens a count. Each is the reading the code takes, and is tested
 
 ## Tests
 
-`tools/shadow/test/replay.test.ts` has 32 tests. The recorder's 35 are unchanged, 67 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit 0027589:
+`tools/shadow/test/replay.test.ts` has 39 tests. The recorder's 35 are unchanged, 74 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit 4e145a7:
 - typecheck exit 0;
-- 67 of 67 passed;
-- 13 deliberate mutations, each making tests fail:
+- 74 of 74 passed;
+- 20 deliberate mutations, each making tests fail:
   - the re-query cut-off off;
   - exploited's synthetic fix off;
   - no recomputation of `wait_until`;
@@ -95,11 +105,27 @@ None of these loosens a count. Each is the reading the code takes, and is tested
   - nothing pending;
   - no seed from a later complete capture;
   - the recorder's file list not compared;
-  - each half of the record-omission rule off.
+  - each half of the record-omission rule off;
+  - MAL- records read as they are today;
+  - withdrawn records leaving the denominator;
+  - final without an OSV read past the deadline;
+  - no predecessor taken as not applicable;
+  - `met_with_no_case` when every case is a false-report candidate;
+  - a version with no stored publish time skipped;
+  - the file list taken only from the last capture.
 
-## The preliminary run
+## The preliminary runs
 
-`scripts/run.sh ludion-lsr-nm C:/dev/ludion-shadow-data/data <snapshot> out/replay-preliminary.json`, at 22ad747. The output is `logs/run-preliminary.log` and `out/replay-preliminary.json`.
+**The current one** is `out/replay-preliminary-2.json` (log `logs/run-preliminary-2.log`), at 0752459, after the review's fixes:
+- **The snapshot.** Taken at 2026-10-29T01:24:46Z, 50,635,994 bytes, a copy. No network, start commit 8a78b55, the judge's files unchanged in the working tree, watched list sha256 `02d3e6de…`.
+- **The window.** In progress, 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z, one run, no break.
+- **The versions.** 335 in the window, all pending. The coverage ends at the last OSV read, 2026-10-29T00:00:20.329Z.
+- **The gate.** Decided 0 of 100, `not_yet`. Misses 0, `not_yet`.
+- **MAL- records.** None of the 15 stored names a watched version.
+- **Capture lag.** Median 0.012h, p90 0.017h.
+- **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 133 repeats dropped.
+
+**The first one**, at 22ad747 and before the review, is kept as it ran: `logs/run-preliminary.log` and `out/replay-preliminary.json`.
 - **The snapshot.** Taken at 2026-10-29T01:06:35Z, 47,055,265 bytes, a copy. The recorder was not stopped or touched.
 - **The setup.** No network. Start commit 8a78b55, and the judge's files unchanged. Watched list sha256 `02d3e6de…`.
 - **The window.** In progress, 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z, one run, no break.

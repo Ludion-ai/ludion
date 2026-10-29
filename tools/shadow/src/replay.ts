@@ -141,9 +141,22 @@ const latestBefore = <T extends { fetched_at: number }>(list: T[] | undefined, c
 
 // --- OSV: the MAL- records the store holds. ---
 
-/** The latest stored copy of each MAL- record. */
-export function malRecords(store: Store): Rec[] {
-  return [...store.osv.values()].map(copies => copies.at(-1)!.record).filter(r => typeof r?.id === "string" && r.id.startsWith("MAL-"));
+/** Every stored copy of every MAL- record, in fetch order. */
+export function malCopies(store: Store): Rec[] {
+  return [...store.osv.values()].flatMap(copies => copies.map(c => c.record)).filter(r => typeof r?.id === "string" && r.id.startsWith("MAL-"));
+}
+/**
+ * OSV records whose read failed and is still being retried: an `error` status line naming the id, with no stored copy
+ * fetched after it and no give-up. What they name is not known yet.
+ */
+export function osvRetrying(store: Store): string[] {
+  const out = new Set<string>();
+  for (const s of store.status) {
+    if (s.type !== "error" || typeof s.id !== "string") continue;
+    const after = (store.osv.get(s.id) ?? []).some(c => ms(c.fetched_at) > ms(s.at)) || store.osvGaveUp.some(g => g.id === s.id && ms(g.fetched_at) > ms(s.at));
+    if (after) out.delete(s.id); else out.add(s.id);
+  }
+  return [...out].sort();
 }
 const withdrawnBy = (r: Rec, t: number) => Number.isFinite(ms(r.withdrawn)) && ms(r.withdrawn) <= t;
 /**
@@ -407,26 +420,41 @@ export async function replay(input: { store: Store; watched: Record<string, stri
   const lastPoll = Math.max(-Infinity, ...store.status.filter(s => s.type === "poll").map(s => ms(s.at)).filter(t => t <= asOf));
   const lastOsv = Math.max(-Infinity, ...store.status.filter(s => s.type === "osv").map(s => ms(s.at)).filter(t => t <= asOf));
   const coverage = Math.min(lastPoll, lastOsv);
-  const records = malRecords(store);
+  // Every stored copy of every MAL- record: a version any copy named stays named, as a withdrawn record does.
+  const copies = malCopies(store);
   const ctx: Ctx = { store, watched: new Map(Object.entries(input.watched)), coverage };
   const window = windowOf(store.status, asOf);
   const start = window.start ? ms(window.start) : NaN, end = window.end ? ms(window.end) : NaN;
   const inWindow = (published: string | null | undefined) => !!published && ms(published) >= start && ms(published) < end;
+  const registryTimes = new Map<string, Promise<Record<string, string> | "unreadable">>();
+  const registryTime = (name: string) => { if (!registryTimes.has(name)) registryTimes.set(name, input.sources!.registryTime(name)); return registryTimes.get(name)!; };
 
-  // MAL- records naming a watched version (section 3): explicit versions, and every stored version a range covers.
+  // MAL- records naming a watched version (section 3): explicit versions, and every version a range covers: those in
+  // the store, and with the network those in the registry's `time`. Per version, the earliest publish of a copy naming it.
   const watchedNames = new Set(Object.keys(input.watched));
-  const named = new Map<string, Set<string>>();
-  let recordsNamingWatched = 0;
-  for (const r of records) {
-    let any = false;
+  const named = new Map<string, Map<string, number>>();
+  const namingIds = new Set<string>();
+  const rangesNotRead = new Set<string>();
+  for (const r of copies) {
     for (const a of r.affected ?? []) {
       const name = a?.package?.ecosystem === "npm" ? a.package.name : null;
       if (typeof name !== "string" || !watchedNames.has(name)) continue;
       const candidates = new Set<string>([...(Array.isArray(a.versions) ? a.versions.filter((v: unknown) => typeof v === "string") : []), ...allVersions(store, name).keys()]);
-      for (const v of candidates) if (names(r, name, v)) { any = true; const set = named.get(`${name}@${v}`) ?? new Set(); set.add(r.id); named.set(`${name}@${v}`, set); }
+      if ((a.ranges ?? []).some((x: any) => x?.type === "SEMVER" || x?.type === "ECOSYSTEM") && ms(r.published) <= end + LATE_RECORD_MS) {
+        const time = input.sources ? await registryTime(name) : "unreadable";
+        if (time === "unreadable") rangesNotRead.add(`${r.id} (${name})`);
+        else for (const v of Object.keys(time)) if (semver.valid(v)) candidates.add(v);
+      }
+      for (const v of candidates) {
+        if (!names(r, name, v)) continue;
+        namingIds.add(r.id);
+        const ids = named.get(`${name}@${v}`) ?? new Map<string, number>();
+        ids.set(r.id, Math.min(ids.get(r.id) ?? Infinity, ms(r.published)));
+        named.set(`${name}@${v}`, ids);
+      }
     }
-    if (any) recordsNamingWatched++;
   }
+  const recordsNamingWatched = namingIds.size;
 
   const results: VersionResult[] = [];
   const outside: Report["mal"]["outside_window"] = [];
@@ -440,18 +468,20 @@ export async function replay(input: { store: Store; watched: Record<string, stri
     }
   }
   // MAL-named versions: in the denominator if in the window and named by a record published by the window's end + 336h.
-  for (const [id, recs] of named) {
+  for (const [id, ids] of named) {
     const name = id.slice(0, id.lastIndexOf("@")), version = id.slice(id.lastIndexOf("@") + 1);
-    // Withdrawn records stay in the denominator: section 6 sets apart only false-report candidates.
-    const due = records.filter(r => recs.has(r.id) && ms(r.published) <= end + LATE_RECORD_MS).map(r => r.id);
-    if (!window.start) { outside.push({ version: id, records: [...recs], why: "the four weeks have not started" }); continue; }
-    if (!due.length) { outside.push({ version: id, records: [...recs], why: "named only by records published after the window's end + 336h" }); continue; }
+    const recs = [...ids.keys()].sort();
+    // Withdrawn records, and records whose later copy no longer names V, stay: section 6 sets apart only false-report candidates.
+    const due = recs.filter(r => ids.get(r)! <= end + LATE_RECORD_MS);
+    if (!window.start) { outside.push({ version: id, records: recs, why: "the four weeks have not started" }); continue; }
+    if (!due.length) { outside.push({ version: id, records: recs, why: "named only by records published after the window's end + 336h" }); continue; }
     let published: string | null = allVersions(store, name, asOf).get(version) ?? null;
     let result = results.find(x => x.name === name && x.version === version);
     if (!published) {
       // No stored publish time (section 3): the registry's `time` keeps it, also for a removed version. Without it the
       // version can be neither placed nor replayed: a capture gap in every row.
-      const read = input.sources ? await input.sources.publishTime(name, version) : "unreadable";
+      const times = input.sources ? await registryTime(name) : "unreadable";
+      const read = times === "unreadable" ? "unreadable" : times[version] ?? null;
       const known = read !== null && read !== "unreadable" ? read : null;
       if (known && !inWindow(known)) { outside.push({ version: id, records: due, why: `published ${known} (the registry's time), outside the window` }); continue; }
       published = known;
@@ -459,7 +489,7 @@ export async function replay(input: { store: Store; watched: Record<string, stri
       result = { name, version, published, first_capture: null, capture_lag_hours: null, decided_prev: null, decided: false, rows: ROWS.map(row => ({ scenario: "b" as const, row, prev: null, outcome: "capture_gap" as const, gap })), literal: null, combined: Object.fromEntries(ROWS.map(r => [r, "capture_gap"])) as Record<Urgency, Outcome> };
     } else if (!inWindow(published)) { outside.push({ version: id, records: due, why: `published ${published}, outside the window` }); continue; }
     if (!result) throw new Error(`${id} is in the window but was not judged`);
-    const { category, evidence } = input.sources ? await categorize({ name, version, published, store, records, sources: input.sources }) : { category: "not_checked" as Category, evidence: "the disputed check was not run (no network sources given)" };
+    const { category, evidence } = input.sources ? await categorize({ name, version, published, store, records: copies, sources: input.sources }) : { category: "not_checked" as Category, evidence: "the disputed check was not run (no network sources given)" };
     const missedRows = ROWS.filter(row => result.combined![row] === "missed" || result.combined![row] === "capture_gap");
     cases.push({ ...result, records: due, category, category_evidence: evidence, counts_as_malicious: category !== "false_report", missed_rows: missedRows });
   }
@@ -471,6 +501,9 @@ export async function replay(input: { store: Store; watched: Record<string, stri
   const pendingVersions = results.filter(r => [...r.rows, ...(r.literal ? [r.literal] : [])].some(x => x.outcome === "pending"));
   if (pendingVersions.length) notFinal.push(`${pendingVersions.length} version(s) have a judgement whose wait_until is past the store's coverage (${iso(coverage)})`);
   if (store.osvGaveUp.length) notFinal.push(`${store.osvGaveUp.length} OSV record(s) were given up unread, so what they name is unknown`);
+  const retrying = osvRetrying(store);
+  if (retrying.length) notFinal.push(`${retrying.length} OSV record(s) are still being read again (${retrying.slice(0, 5).join(", ")}), so what they name is unknown`);
+  if (rangesNotRead.size) notFinal.push(`record(s) name watched packages by a range, and the registry's versions were not read (without the network, or unreadable): ${[...rangesNotRead].slice(0, 5).join(", ")}`);
   const final = notFinal.length === 0;
 
   const counted = cases.filter(c => c.counts_as_malicious);

@@ -238,7 +238,7 @@ function sources(files: Record<string, Record<string, string>>, opts: { listed?:
   const list = (v: string) => new Map(Object.entries(files[v]!).map(([p, c]) => [p, { sha256: sha(c), size: c.length }]));
   const listed = opts.listed ?? Object.keys(files);
   return {
-    publishTime: async () => null,
+    registryTime: async () => ({}),
     osvRecords: async () => opts.records ?? [],
     registry: async n => Object.fromEntries(listed.map(v => [v, { scripts: opts.scripts?.[v] ?? [], integrity: integrity(`${n}@${v}`), shasum: `sha1-${v}`, unpackedSize: null }])),
     registryTar: async (_n, v) => files[v] ? { ok: true, files: [...list(v)].map(([p, f]) => [p, f.sha256, f.size] as [string, string, number]), packageJson: files[v]!["package.json"] ?? null } : { ok: false, reason: "tarball HTTP 404" },
@@ -425,10 +425,10 @@ describe("review fixes (PR #194)", () => {
     const offline = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: null });
     expect(offline.versions_in_window).toBe(0);
     expect(offline.mal.cases.map(c => [c.version, c.missed_rows.length, c.rows[0]!.gap])).toEqual([["1.0.9", 4, "no stored publish time, and the registry's time was not read"]]);
-    const old = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...same(), publishTime: async () => "2019-01-01T00:00:00.000Z" } });
+    const old = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...same(), registryTime: async () => ({ "1.0.9": "2019-01-01T00:00:00.000Z" }) } });
     expect(old.mal.cases).toEqual([]);
     expect(old.mal.outside_window[0]!.why).toMatch(/registry's time/);
-    const inside = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...same(), publishTime: async () => at(5) } });
+    const inside = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...same(), registryTime: async () => ({ "1.0.9": at(5) }) } });
     expect(inside.mal.cases[0]!.rows[0]!.gap).toMatch(/never captured/);
   });
   it("compares the archives with the latest capture that hashed the tarball, not a later one without a list", async () => {
@@ -448,5 +448,51 @@ describe("the re-query's published rule", () => {
     const w = new World().publish("left-pad", "1.0.1", 1);
     w.osv.push({ type: "osv", id: "MAL-p", modified: at(10), fetched_at: at(11), sha256: "p", record: { id: "MAL-p", published: at(100), modified: at(10), affected: [{ package: { ecosystem: "npm", name: "left-pad" }, versions: ["1.0.1"] }] } });
     expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.map(x => x.outcome)).toEqual(["missed", "missed", "missed", "stopped"]);
+  });
+});
+
+describe("second review fixes (PR #194)", () => {
+  const rec = (id: string, name: string, affected: object, publishedH: number, modifiedH: number, extra: object = {}) => ({ type: "osv", id, modified: at(modifiedH), fetched_at: at(modifiedH + 1), sha256: `${id}-${modifiedH}`, record: { id, published: at(publishedH), modified: at(modifiedH), affected: [{ package: { ecosystem: "npm", name }, ...affected }], ...extra } });
+  const finalWorld = () => { const w = new World(28 * 24 + 336 + 200); w.publish("left-pad", "1.0.1", 1); return w; };
+  const asOfFinal = T0 + (28 * 24 + 336 + 200) * HOUR;
+
+  it("keeps a version in the denominator when a later copy of its record stops naming it", async () => {
+    const w = finalWorld();
+    w.osv.push(rec("MAL-d", "left-pad", { versions: ["1.0.1"] }, 100, 100), rec("MAL-d", "left-pad", { versions: ["1.0.0"] }, 100, 300));
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    expect(report.final).toBe(true);
+    expect(report.mal.versions).toBe(1);
+    expect(report.misses).toMatchObject({ count: 1, state: "not_met", versions: ["left-pad@1.0.1"] });
+  });
+  it("counts a withdrawn record's version as named in the record-omission rule", async () => {
+    const { store, records } = malStore([["1.0.0", 1], ["1.0.1", 2], ["1.0.2", 3], ["1.0.3", 4]], ["1.0.1", "1.0.3"]);
+    (records.find(r => (r as { id: string }).id === "MAL-1.0.1") as Record<string, unknown>).withdrawn = at(30);
+    const pkg = (v: string) => `{"name":"p","version":"${v}","scripts":{}}`;
+    const src = sources({ "1.0.0": { "package.json": pkg("1.0.0"), "a.js": "x" }, "1.0.1": { "package.json": pkg("1.0.1"), "a.js": "evil" }, "1.0.2": { "package.json": pkg("1.0.2"), "a.js": "y" }, "1.0.3": { "package.json": pkg("1.0.3"), "a.js": "y" } });
+    const c = await categorize({ name: "p", version: "1.0.3", published: at(4), store, records: records as any, sources: src });
+    expect(c.category).toBe("record_omission");
+    expect(c.evidence).toMatchObject({ prev_d: "1.0.2", earliest_other_named: "1.0.1" });
+  });
+  it("is not final while an OSV record's read is still being retried", async () => {
+    const w = finalWorld();
+    w.status.push({ type: "error", at: at(1100), id: "MAL-r", error: "osv: HTTP 503" });
+    const retrying = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    expect(retrying.final).toBe(false);
+    expect(retrying.not_final_because.join()).toMatch(/still being read again \(MAL-r\)/);
+    w.osv.push(rec("MAL-r", "unwatched", { versions: ["1.0.0"] }, 1090, 1100));
+    expect((await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null })).final).toBe(true);
+  });
+  it("enumerates a range over the registry's versions too; without the network the result is not final", async () => {
+    const w = new World(400);
+    w.publish("left-pad", "1.0.1", 1);
+    w.osv.push(rec("MAL-range", "left-pad", { ranges: [{ type: "SEMVER", events: [{ introduced: "1.0.1" }] }] }, 100, 100));
+    const offline = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: null });
+    expect(offline.not_final_because.join()).toMatch(/by a range/);
+    expect(offline.mal.cases.map(c => c.version)).toEqual(["1.0.1"]);
+    const pkg = (v: string) => `{"name":"left-pad","version":"${v}"}`;
+    const src = { ...sources({ "1.0.0": { "package.json": pkg("1.0.0"), "a.js": "x" }, "1.0.1": { "package.json": pkg("1.0.1"), "a.js": "y" } }), registryTime: async () => ({ "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": at(1), "1.0.5": at(50) }) };
+    const online = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: src });
+    expect(online.not_final_because.join()).not.toMatch(/by a range/);
+    expect(online.mal.cases.map(c => [c.version, c.rows[0]!.outcome])).toEqual([["1.0.1", "missed"], ["1.0.5", "capture_gap"]]);
   });
 });

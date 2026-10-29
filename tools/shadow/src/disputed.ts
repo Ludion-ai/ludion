@@ -17,8 +17,8 @@ type Rec = Record<string, any>;
 export type Category = "confirmed" | "record_omission" | "false_report" | "not_checked";
 /** What the check reads. The network implementation is networkSources; tests give fakes. */
 export type Sources = {
-  /** A version's publish time from the registry's `time` (kept for removed versions too); null when it has none. */
-  publishTime(name: string, version: string): Promise<string | null | "unreadable">;
+  /** The registry's `time` for a package (it keeps removed versions' times); {} when the registry does not have it. */
+  registryTime(name: string): Promise<Record<string, string> | "unreadable">;
   /** Every OSV record naming the package (MAL- and others), or "unreadable". */
   osvRecords(name: string): Promise<Rec[] | "unreadable">;
   /** The registry's listed versions today: install scripts and dist fields. */
@@ -125,10 +125,12 @@ export async function categorize(input: { name: string; version: string; publish
   if (!input.published) return { category: "confirmed", evidence: { step: "no stored publish time: the disputed check cannot place prev_d" } };
   const osv = await src.osvRecords(name);
   if (osv === "unreadable") return { category: "confirmed", evidence: { step: "OSV's records for the package unreadable" } };
-  // Every MAL- record naming the package: OSV's answer today, and the recorder's copies (latest per id). Not withdrawn.
-  const byId = new Map<string, Rec>();
-  for (const r of [...osv, ...input.records]) if (typeof r?.id === "string" && r.id.startsWith("MAL-") && (r.affected ?? []).some((a: any) => a?.package?.ecosystem === "npm" && a.package.name === name)) byId.set(r.id, r);
-  const records = [...byId.values()].filter(r => !r.withdrawn);
+  // Every MAL- record naming the package: OSV's answer today, and every copy the recorder stored. A version any of them
+  // names counts as named for the record-omission rule, withdrawn or not (section 6 does not set withdrawn records
+  // apart). prev_d alone leaves out withdrawn records, as v5 does: a record withdrawn in any copy.
+  const all = [...osv, ...input.records].filter(r => typeof r?.id === "string" && r.id.startsWith("MAL-") && (r.affected ?? []).some((a: any) => a?.package?.ecosystem === "npm" && a.package.name === name));
+  const withdrawn = new Set(all.filter(r => r.withdrawn).map(r => r.id));
+  const records = all.filter(r => !withdrawn.has(r.id));
   const caps = store.versions.get(`${name}@${version}`) ?? [], cap = caps.at(-1);
   // The file list from the latest capture that hashed the tarball: a later failed retry has none.
   const files = [...caps].reverse().find(c => c.files)?.files ?? null;
@@ -149,7 +151,7 @@ export async function categorize(input: { name: string; version: string; publish
     run.push(p);
   }
   const o = cur.version, oAt = Date.parse(time.get(o) ?? "");
-  const named = [...time.keys()].filter(v => v !== version && records.some(r => names(r, name, v))).sort((a, b) => Date.parse(time.get(a)!) - Date.parse(time.get(b)!));
+  const named = [...time.keys()].filter(v => v !== version && all.some(r => names(r, name, v))).sort((a, b) => Date.parse(time.get(a)!) - Date.parse(time.get(b)!));
   const afterNamed = named.length > 0 && oAt > Date.parse(time.get(named[0]!)!);
   // A predecessor that could not be read cannot show the script was there before: counted as added (the stricter side).
   const addsScript = ended.startsWith("unreadable") || cur.scripts.some(s => !(before?.scripts ?? []).includes(s));
@@ -185,19 +187,18 @@ export function networkSources(cacheDir: string): Sources {
       writeFileSync(`${file}.tmp`, JSON.stringify(out)); renameSync(`${file}.tmp`, file);
       return out;
     },
-    async publishTime(name, version) {
+    async registryTime(name) {
       const file = join(cacheDir, "registry-time", `${encodeURIComponent(name)}.json`);
-      let time: Record<string, unknown>;
-      if (existsSync(file)) time = JSON.parse(readFileSync(file, "utf8"));
-      else {
-        const path = name.startsWith("@") ? `@${encodeURIComponent(name.slice(1))}` : encodeURIComponent(name);
-        const res = await archive.bytes("registry", `https://registry.npmjs.org/${path}`);
-        if (!res || (res.status !== 200 && res.status !== 404) || (res.status === 200 && !res.body)) return "unreadable";
-        try { time = res.status === 404 ? {} : JSON.parse(res.body!.toString("utf8"))?.time ?? {}; } catch { return "unreadable"; }
-        mkdirSync(join(cacheDir, "registry-time"), { recursive: true });
-        writeFileSync(`${file}.tmp`, JSON.stringify(time)); renameSync(`${file}.tmp`, file);
-      }
-      return typeof time[version] === "string" ? time[version] as string : null;
+      if (existsSync(file)) return JSON.parse(readFileSync(file, "utf8"));
+      const path = name.startsWith("@") ? `@${encodeURIComponent(name.slice(1))}` : encodeURIComponent(name);
+      const res = await archive.bytes("registry", `https://registry.npmjs.org/${path}`);
+      if (!res || (res.status !== 200 && res.status !== 404) || (res.status === 200 && !res.body)) return "unreadable";
+      let raw: unknown;
+      try { raw = res.status === 404 ? {} : JSON.parse(res.body!.toString("utf8"))?.time ?? {}; } catch { return "unreadable"; }
+      const time: Record<string, string> = Object.fromEntries(Object.entries(raw as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === "string"));
+      mkdirSync(join(cacheDir, "registry-time"), { recursive: true });
+      writeFileSync(`${file}.tmp`, JSON.stringify(time)); renameSync(`${file}.tmp`, file);
+      return time;
     },
     registry: name => registryVersions(archive, cacheDir, name),
     registryTar: (name, version, integrity) => registryTarFiles(archive, cacheDir, name, version, integrity),

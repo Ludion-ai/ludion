@@ -1,0 +1,18 @@
+# Protected paths (docs/protected-paths.md). A change to any of them needs the owner's review: Ludion-ai is the owner's
+# account, and the agents work from their own account, which can write but cannot approve for the owner. The ruleset
+# on main makes this review required; until it exists, the protected-paths check and its label do.
+CLAUDE.md @Ludion-ai
+AGENTS.md @Ludion-ai
+.cursorrules @Ludion-ai
+CODEOWNERS @Ludion-ai
+/.claude/ @Ludion-ai
+/.cursor/ @Ludion-ai
+/.github/ @Ludion-ai
+/action.yml @Ludion-ai
+/action/ @Ludion-ai
+/packages/*/src/schema.ts @Ludion-ai
+/packages/*/schema/ @Ludion-ai
+*.schema.json @Ludion-ai
+/ludion.config.json @Ludion-ai
+/wrangler.jsonc @Ludion-ai
+/docs/protected-paths.md @Ludion-ai

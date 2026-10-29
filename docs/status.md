@@ -24,7 +24,7 @@ Ludion is a judge for npm dependency-update PRs (`ludion judge`, and the GitHub 
 - A scheduled re-query when the wait ends: it happens only if the judge is run again then.
 - A project's own stricter wait: `judge()` takes one, but no caller passes it.
 - Automatic merge.
-- Protected paths enforced by GitHub (the agents' own account, CODEOWNERS and a ruleset), a release condition of the preview.
+- Protected paths enforced by GitHub, a release condition of the preview: .github/CODEOWNERS names the owner, but the agents' own account and the ruleset on main are not set up yet.
 
 ## Evidence
 

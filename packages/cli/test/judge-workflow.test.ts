@@ -506,13 +506,13 @@ describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml
     "",
   ].join("\n");
   let count = 0;
-  function check(comments: string[]) {
+  function check(comments: string[], files = ["CLAUDE.md"], labels = ["review-approved"]) {
     const fake = join(temp, `pp-${++count}`), bin = join(fake, "bin");
     mkdirSync(bin, { recursive: true });
     writeFileSync(join(bin, "gh"), GH, { mode: 0o755 });
     writeFileSync(join(fake, "pull.json"), JSON.stringify({ head: { sha: HEAD } }));
-    writeFileSync(join(fake, "files.json"), JSON.stringify([{ filename: "CLAUDE.md" }]));
-    writeFileSync(join(fake, "labels.json"), JSON.stringify([{ name: "review-approved" }]));
+    writeFileSync(join(fake, "files.json"), JSON.stringify(files.map(filename => ({ filename }))));
+    writeFileSync(join(fake, "labels.json"), JSON.stringify(labels.map(name => ({ name }))));
     writeFileSync(join(fake, "comments.json"), JSON.stringify(comments.map(body => ({ body }))));
     const r = spawnSync("bash", ["-c", block(CHECK, "run")], {
       encoding: "utf8",
@@ -545,5 +545,17 @@ describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml
     expect(later.status, later.out).toBe(1);
     const again = check([request, approve]);
     expect(again.status, again.out).toBe(0);
+  });
+  it("protects the action users run with a write token, and passes a PR that touches no protected path", () => {
+    for (const file of ["action.yml", "action/start.sh", ".github/CODEOWNERS", "docs/protected-paths.md"]) {
+      const r = check([], [file], []);
+      expect(r.status, `${file}: ${r.out}`).toBe(1);
+      expect(r.out).toContain("This PR changes protected paths");
+    }
+    for (const file of ["docs/status.md", "packages/cli/src/security/judge.ts", "actions.md"]) {
+      const r = check([], [file], []);
+      expect(r.status, `${file}: ${r.out}`).toBe(0);
+      expect(r.out).toContain("No protected paths changed.");
+    }
   });
 });

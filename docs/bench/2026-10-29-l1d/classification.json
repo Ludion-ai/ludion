@@ -1,0 +1,892 @@
+{
+ "causes": {
+  "A": "The source came from GitHub's archive, which leaves out `export-ignore` files; the split read the partial tree as complete and used D2",
+  "B1": "A build or start command runs webpack's bin, which hands off to webpack-cli (named only in webpack's peerDependenciesMeta); webpack-cli's declared dependencies and peers reach the copy",
+  "B2": "`webpack serve` runs webpack's bin, which hands off to webpack-cli, which hands off to webpack-dev-server (named only in webpack-cli's or @webpack-cli/serve's peerDependenciesMeta); its dependencies reach the copy",
+  "B3": "The build and start commands load webpack.config.ts, which webpack-cli reads through a TypeScript register hook (ts-node, installed); ts-node's dependencies reach the copy",
+  "C1": "A require() whose argument is not a literal but holds one (`require(process.env.X || 'sharp')`)",
+  "C2": "A require.resolve() whose argument is a constant holding a literal (`const UPSTREAM = 'shadcn/tailwind.css'`)",
+  "C3": "A node_modules path built from literal segments (`path.join('node_modules', '@vscode', 'vsce', 'vsce')`)",
+  "D": "A build tool's configuration that P2's file list does not name (Umi's config/config.ts names @umijs/max-plugin-openapi)"
+ },
+ "by_cause": {
+  "B1": {
+   "cause": "A build or start command runs webpack's bin, which hands off to webpack-cli (named only in webpack's peerDependenciesMeta); webpack-cli's declared dependencies and peers reach the copy",
+   "misses": 8,
+   "packages": [
+    "STRML/strml.net body-parser",
+    "STRML/strml.net launch-editor",
+    "STRML/strml.net qs",
+    "STRML/strml.net shell-quote",
+    "ccnmtl/specialneedsvisit-pack body-parser",
+    "ccnmtl/specialneedsvisit-pack qs",
+    "carlostighe/modalMap cross-spawn",
+    "carlostighe/modalMap loader-utils"
+   ]
+  },
+  "D": {
+   "cause": "A build tool's configuration that P2's file list does not name (Umi's config/config.ts names @umijs/max-plugin-openapi)",
+   "misses": 1,
+   "packages": [
+    "stop-bullshit/luckyh-cloud-web mockjs"
+   ]
+  },
+  "B2": {
+   "cause": "`webpack serve` runs webpack's bin, which hands off to webpack-cli, which hands off to webpack-dev-server (named only in webpack-cli's or @webpack-cli/serve's peerDependenciesMeta); its dependencies reach the copy",
+   "misses": 6,
+   "packages": [
+    "timmson/agile-impact-map body-parser",
+    "timmson/agile-impact-map qs",
+    "opencast/studio body-parser",
+    "opencast/studio qs",
+    "opencast/studio uuid",
+    "opencast/studio webpack-dev-middleware"
+   ]
+  },
+  "A": {
+   "cause": "The source came from GitHub's archive, which leaves out `export-ignore` files; the split read the partial tree as complete and used D2",
+   "misses": 44,
+   "packages": [
+    "eighteen73/pulsar-extensions @babel/core",
+    "eighteen73/pulsar-extensions @babel/plugin-transform-modules-systemjs",
+    "eighteen73/pulsar-extensions @opentelemetry/core",
+    "eighteen73/pulsar-extensions @opentelemetry/instrumentation-knex",
+    "eighteen73/pulsar-extensions @opentelemetry/instrumentation-mongoose",
+    "eighteen73/pulsar-extensions @opentelemetry/instrumentation-mysql",
+    "eighteen73/pulsar-extensions @opentelemetry/instrumentation-mysql2",
+    "eighteen73/pulsar-extensions @opentelemetry/instrumentation-pg",
+    "eighteen73/pulsar-extensions @opentelemetry/instrumentation-tedious",
+    "eighteen73/pulsar-extensions @tootallnate/once",
+    "eighteen73/pulsar-extensions adm-zip",
+    "eighteen73/pulsar-extensions axios",
+    "eighteen73/pulsar-extensions basic-ftp",
+    "eighteen73/pulsar-extensions body-parser",
+    "eighteen73/pulsar-extensions colord",
+    "eighteen73/pulsar-extensions compression",
+    "eighteen73/pulsar-extensions deepmerge",
+    "eighteen73/pulsar-extensions extract-zip",
+    "eighteen73/pulsar-extensions follow-redirects",
+    "eighteen73/pulsar-extensions form-data",
+    "eighteen73/pulsar-extensions http-proxy-middleware",
+    "eighteen73/pulsar-extensions immutable",
+    "eighteen73/pulsar-extensions ip-address",
+    "eighteen73/pulsar-extensions joi",
+    "eighteen73/pulsar-extensions launch-editor",
+    "eighteen73/pulsar-extensions linkify-it",
+    "eighteen73/pulsar-extensions lodash",
+    "eighteen73/pulsar-extensions lodash-es",
+    "eighteen73/pulsar-extensions markdown-it",
+    "eighteen73/pulsar-extensions nanoid",
+    "eighteen73/pulsar-extensions node-forge",
+    "eighteen73/pulsar-extensions path-to-regexp",
+    "eighteen73/pulsar-extensions postcss",
+    "eighteen73/pulsar-extensions postcss-selector-parser",
+    "eighteen73/pulsar-extensions proxy-addr",
+    "eighteen73/pulsar-extensions qs",
+    "eighteen73/pulsar-extensions shell-quote",
+    "eighteen73/pulsar-extensions source-map-js",
+    "eighteen73/pulsar-extensions svgo",
+    "eighteen73/pulsar-extensions webpack-dev-middleware",
+    "eighteen73/pulsar-extensions webpack-dev-server",
+    "eighteen73/pulsar-extensions websocket-driver",
+    "eighteen73/pulsar-extensions ws",
+    "eighteen73/pulsar-extensions zod"
+   ]
+  },
+  "B3": {
+   "cause": "The build and start commands load webpack.config.ts, which webpack-cli reads through a TypeScript register hook (ts-node, installed); ts-node's dependencies reach the copy",
+   "misses": 1,
+   "packages": [
+    "opencast/studio diff"
+   ]
+  },
+  "C3": {
+   "cause": "A node_modules path built from literal segments (`path.join('node_modules', '@vscode', 'vsce', 'vsce')`)",
+   "misses": 2,
+   "packages": [
+    "ASIL-E-Hatake/vscode-games @azure/msal-node",
+    "ASIL-E-Hatake/vscode-games qs"
+   ]
+  },
+  "C2": {
+   "cause": "A require.resolve() whose argument is a constant holding a literal (`const UPSTREAM = 'shadcn/tailwind.css'`)",
+   "misses": 6,
+   "packages": [
+    "BilLogic/uno-blueprint body-parser",
+    "BilLogic/uno-blueprint deepmerge",
+    "BilLogic/uno-blueprint fast-uri",
+    "BilLogic/uno-blueprint hono",
+    "BilLogic/uno-blueprint ip-address",
+    "BilLogic/uno-blueprint qs"
+   ]
+  },
+  "C1": {
+   "cause": "A require() whose argument is not a literal but holds one (`require(process.env.X || 'sharp')`)",
+   "misses": 1,
+   "packages": [
+    "acekyd/acekyd sharp"
+   ]
+  }
+ },
+ "rows": [
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "STRML/strml.net",
+   "name": "body-parser",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "Only copy node_modules/body-parser 2.3.0 (dev), in range of GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0 (OSV confirms). Path: (.) > webpack-dev-server > express > body-parser; webpack-dev-server is reached from root devDependencies webpack-dev-server and webpack-cli (webpack-cli 7.2.3 declares peerDependencies webpack-dev-server ^5||^6). No Dockerfile, no start script, no source import. build = 'webpack': the bin 'webpack' belongs only to node_modules/webpack 5.111.1, which declares no dependency or peer on webpack-cli (peerDependenciesMeta only), so the literal P6 reading makes only webpack production; but webpack's bin runs webpack-cli, and if that counts as 'what the build runs' (section 2's (c)), following webpack-cli's declared peer webpack-dev-server makes this copy production. webpack.config.js names only 'babel-loader' (devServer is an unquoted key). Cannot decide between the two readings.",
+   "cause": "B1",
+   "basis": "build `webpack` runs webpack's bin, which runs webpack-cli 7.2.x (named only in webpack's peerDependenciesMeta); webpack-cli's peerDependencies name webpack-dev-server, which reaches the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "STRML/strml.net",
+   "name": "launch-editor",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "Only copy node_modules/launch-editor 2.14.1 (dev), in range of GHSA-698v-4r3x-3vcv <=2.14.1 (OSV: fixed 2.14.2). Path: (.) > webpack-dev-server > launch-editor. Same question as body-parser: build 'webpack' runs webpack-cli through webpack's bin; webpack-cli declares webpack-dev-server as a peer. Literal bin-name reading: not production; reading 'what the build runs' to include webpack-cli: production.",
+   "cause": "B1",
+   "basis": "build `webpack` runs webpack's bin, which runs webpack-cli 7.2.x (named only in webpack's peerDependenciesMeta); webpack-cli's peerDependencies name webpack-dev-server, which reaches the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "STRML/strml.net",
+   "name": "qs",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "Only copy node_modules/qs 6.16.0 (dev), in range of GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0 (OSV: fixed 6.16.1). Path: (.) > webpack-dev-server > express > qs. Same question as body-parser (webpack bin -> webpack-cli -> peer webpack-dev-server).",
+   "cause": "B1",
+   "basis": "build `webpack` runs webpack's bin, which runs webpack-cli 7.2.x (named only in webpack's peerDependenciesMeta); webpack-cli's peerDependencies name webpack-dev-server, which reaches the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "STRML/strml.net",
+   "name": "shell-quote",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "Only copy node_modules/shell-quote 1.10.0 (dev), in range of GHSA-pqg4-j6r4-53mv >=1.8.4 <1.11.0 (OSV confirms). Path: (.) > webpack-dev-server > launch-editor > shell-quote. Same question as body-parser.",
+   "cause": "B1",
+   "basis": "build `webpack` runs webpack's bin, which runs webpack-cli 7.2.x (named only in webpack's peerDependenciesMeta); webpack-cli's peerDependencies name webpack-dev-server, which reaches the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "stop-bullshit/luckyh-cloud-web",
+   "name": "mockjs",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "Only copy node_modules/mockjs 1.1.0 (dev), in range of GHSA-mh8j-9jvh-gjf6 <=1.1.0 (OSV: last_affected 1.1.0). Paths: (.) > mockjs and (.) > @umijs/max-plugin-openapi > @umijs/openapi > mockjs. Not imported by the source (only 'declare module' in src/typings.d.ts, a type declaration). But config/config.ts:194 is Umi's build configuration for 'max build' (the build script and the Dockerfile build stage) and names plugins: ['@umijs/max-plugin-openapi', ...]; config/config.ts is not in P2's file list, so the literal reading does not make the plugin production, while section 2's (c) ('what a build tool's configuration names ... is production') would, and following its dependencies reaches mockjs. Cannot decide.",
+   "cause": "D",
+   "basis": "config/config.ts:194 `plugins: ['@umijs/max-plugin-openapi', …]` (Umi's configuration for `max build`); the plugin declares @umijs/openapi → mockjs"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "timmson/agile-impact-map",
+   "name": "body-parser",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "Only copy node_modules/body-parser 2.3.0 (dev), in range of GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0. Path (.) > webpack-dev-server > express > body-parser (webpack-dev-server 6.0.0 is a root devDependency). package.json start = 'npx webpack serve --mode development': section 2's (d) says a start script counts whatever it runs, a development server included, and 'webpack serve' runs the webpack-dev-server dev server (through webpack-cli 4.9.2); but by bin name / first word the command names only webpack (bin 'webpack' -> node_modules/webpack 5.105.0), which does not declare webpack-dev-server. webpack.config.js names mini-css-extract-plugin, css-loader, sass-loader, babel-loader, @babel/preset-env only. No Dockerfile. Cannot decide which reading applies.",
+   "cause": "B2",
+   "basis": "start `npx webpack serve`: webpack 5.105.0's bin → webpack-cli 4.9.2 (peerDependenciesMeta of webpack) → webpack-dev-server 6.0.0 (peerDependenciesMeta of webpack-cli and @webpack-cli/serve) → the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "timmson/agile-impact-map",
+   "name": "qs",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "Only copy node_modules/qs 6.15.3 (dev), in range of GHSA-x5fp-wj9c-mxmx >=6.14.2 <=6.15.3 and GHSA-6pq8-jhm2-2vcw. Path (.) > webpack-dev-server > express > qs. Same question as body-parser: start 'npx webpack serve' runs the webpack-dev-server dev server, but by bin name only webpack is named.",
+   "cause": "B2",
+   "basis": "start `npx webpack serve`: webpack 5.105.0's bin → webpack-cli 4.9.2 (peerDependenciesMeta of webpack) → webpack-dev-server 6.0.0 (peerDependenciesMeta of webpack-cli and @webpack-cli/serve) → the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@babel/core",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 7.28.5: GHSA-4x5r-pxfx-6jf8 <=7.29.0 || 7.25.7: GHSA-4x5r-pxfx-6jf8 <=7.29.0. OSV querybatch also returns vulns for each installed version (@babel/core@7.28.5: 1 OSV record(s) incl. GHSA-4x5r-pxfx-6jf8; @babel/core@7.25.7: 1 OSV record(s) incl. GHSA-4x5r-pxfx-6jf8). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @babel/core@7.28.5 | @wordpress/scripts@31.1.0 > @wordpress/babel-preset-default@8.36.0 > @babel/core@7.25.7 | @wordpress/scripts@31.1.0 > @babel/core@7.25.7.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @babel/core@7.28.5 | @wordpress/scripts@31.1.0 > @wordpress/babel-preset-default@8.36.0 > @babel/core@7.25.7 | @wordpress/scripts@31.1.0 > @babel/core@7.25.7"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@babel/plugin-transform-modules-systemjs",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 7.28.5: GHSA-fv7c-fp4j-7gwp >=7.12.0 <=7.29.3. OSV querybatch also returns vulns for each installed version (@babel/plugin-transform-modules-systemjs@7.28.5: 1 OSV record(s) incl. GHSA-fv7c-fp4j-7gwp). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @babel/preset-env@7.25.7 > @babel/plugin-transform-modules-systemjs@7.28.5.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @babel/preset-env@7.25.7 > @babel/plugin-transform-modules-systemjs@7.28.5"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/core",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.30.1: GHSA-8988-4f7v-96qf <2.8.0. OSV querybatch also returns vulns for each installed version (@opentelemetry/core@1.30.1: 1 OSV record(s) incl. GHSA-8988-4f7v-96qf). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/core@1.30.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/core@1.30.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-knex",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.44.1: GHSA-qqmp-wf37-98f9 <0.65.0. OSV querybatch also returns vulns for each installed version (@opentelemetry/instrumentation-knex@0.44.1: 1 OSV record(s) incl. GHSA-qqmp-wf37-98f9). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-knex@0.44.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-knex@0.44.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-mongoose",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.46.1: GHSA-qqmp-wf37-98f9 <0.67.0. OSV querybatch also returns vulns for each installed version (@opentelemetry/instrumentation-mongoose@0.46.1: 1 OSV record(s) incl. GHSA-qqmp-wf37-98f9). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-mongoose@0.46.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-mongoose@0.46.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-mysql",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.45.1: GHSA-qqmp-wf37-98f9 <0.67.0. OSV querybatch also returns vulns for each installed version (@opentelemetry/instrumentation-mysql@0.45.1: 1 OSV record(s) incl. GHSA-qqmp-wf37-98f9). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-mysql@0.45.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-mysql@0.45.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-mysql2",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.45.2: GHSA-qqmp-wf37-98f9 <0.67.0. OSV querybatch also returns vulns for each installed version (@opentelemetry/instrumentation-mysql2@0.45.2: 1 OSV record(s) incl. GHSA-qqmp-wf37-98f9). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-mysql2@0.45.2.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-mysql2@0.45.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-pg",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.51.1: GHSA-qqmp-wf37-98f9 <0.73.0. OSV querybatch also returns vulns for each installed version (@opentelemetry/instrumentation-pg@0.51.1: 1 OSV record(s) incl. GHSA-qqmp-wf37-98f9). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-pg@0.51.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-pg@0.51.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-tedious",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.18.1: GHSA-qqmp-wf37-98f9 <0.40.0. OSV querybatch also returns vulns for each installed version (@opentelemetry/instrumentation-tedious@0.18.1: 1 OSV record(s) incl. GHSA-qqmp-wf37-98f9). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-tedious@0.18.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > @sentry/node@9.47.1 > @opentelemetry/instrumentation-tedious@0.18.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@tootallnate/once",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 2.0.0: GHSA-vpq2-c234-7xj6 <2.0.1. OSV querybatch also returns vulns for each installed version (@tootallnate/once@2.0.0: 1 OSV record(s) incl. GHSA-vpq2-c234-7xj6). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > jest-environment-jsdom@29.7.0 > jsdom@20.0.3 > http-proxy-agent@5.0.0 > @tootallnate/once@2.0.0. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > jest-environment-jsdom@29.7.0 > jsdom@20.0.3 > http-proxy-agent@5.0.0 > @tootallnate/once@2.0.0"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "adm-zip",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.5.16: GHSA-xcpc-8h2w-3j85 <0.6.0; GHSA-vwc7-r8mq-g2x9 >=0.5.9 <=0.6.0; GHSA-7q85-xj36-vmfc <0.6.1 (+5). OSV querybatch also returns vulns for each installed version (adm-zip@0.5.16: 8 OSV record(s) incl. GHSA-7q85-xj36-vmfc,GHSA-8238-w5pm-2374). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > adm-zip@0.5.16.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > adm-zip@0.5.16"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "axios",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.13.2: GHSA-3p68-rc4w-qgx5 >=1.0.0 <1.15.0; GHSA-w9j2-pvgh-6h63 >=1.0.0 <1.15.1; GHSA-pmwg-cvhr-8vh7 >=1.0.0 <1.15.1 (+32). OSV querybatch also returns vulns for each installed version (axios@1.13.2: 35 OSV record(s) incl. GHSA-35jp-ww65-95wh,GHSA-3g43-6gmg-66jw). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > axios@1.13.2. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > axios@1.13.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "basic-ftp",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 5.0.5: GHSA-5rq4-664w-9x2c <5.2.0; GHSA-6v7q-wjvx-w8wg <=5.2.1; GHSA-rp42-5vxx-qpwr <=5.2.2 (+2). OSV querybatch also returns vulns for each installed version (basic-ftp@5.0.5: 5 OSV record(s) incl. GHSA-5rq4-664w-9x2c,GHSA-6v7q-wjvx-w8wg). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > @puppeteer/browsers@2.6.1 > proxy-agent@6.5.0 > pac-proxy-agent@7.2.0 > get-uri@6.0.5 > basic-ftp@5.0.5.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > @puppeteer/browsers@2.6.1 > proxy-agent@6.5.0 > pac-proxy-agent@7.2.0 > get-uri@6.0.5 > basic-ftp@5.0.5"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "body-parser",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.20.4: GHSA-v422-hmwv-36x6 <1.20.6; GHSA-27r3-jxmh-p828 <1.20.9. OSV querybatch also returns vulns for each installed version (body-parser@1.20.4: 2 OSV record(s) incl. GHSA-27r3-jxmh-p828,GHSA-v422-hmwv-36x6). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > body-parser@1.20.4.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > body-parser@1.20.4"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "colord",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 2.9.3: GHSA-2wm5-q62r-hmrv <2.9.4. OSV querybatch also returns vulns for each installed version (colord@2.9.3: 1 OSV record(s) incl. GHSA-2wm5-q62r-hmrv). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > stylelint@16.26.1 > colord@2.9.3. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > stylelint@16.26.1 > colord@2.9.3"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "compression",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.8.1: GHSA-vc2v-76pw-4v95 <1.8.2. OSV querybatch also returns vulns for each installed version (compression@1.8.1: 1 OSV record(s) incl. GHSA-vc2v-76pw-4v95). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > compression@1.8.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > compression@1.8.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "deepmerge",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 4.3.1: GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1. OSV querybatch also returns vulns for each installed version (deepmerge@4.3.1: 1 OSV record(s) incl. GHSA-gcqx-w48m-w2h4). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @svgr/plugin-svgo@8.1.0 > deepmerge@4.3.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @svgr/plugin-svgo@8.1.0 > deepmerge@4.3.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "extract-zip",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 2.0.1: GHSA-jmr9-qjv8-65gv <=2.0.1; GHSA-7pqw-9j4j-h8q3 <=2.0.1. OSV querybatch also returns vulns for each installed version (extract-zip@2.0.1: 2 OSV record(s) incl. GHSA-7pqw-9j4j-h8q3,GHSA-jmr9-qjv8-65gv). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > @puppeteer/browsers@2.6.1 > extract-zip@2.0.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > @puppeteer/browsers@2.6.1 > extract-zip@2.0.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "follow-redirects",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.15.11: GHSA-r4q5-vmmm-2653 <=1.15.11. OSV querybatch also returns vulns for each installed version (follow-redirects@1.15.11: 1 OSV record(s) incl. GHSA-r4q5-vmmm-2653). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > axios@1.13.2 > follow-redirects@1.15.11. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > axios@1.13.2 > follow-redirects@1.15.11"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "form-data",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 4.0.5: GHSA-hmw2-7cc7-3qxx >=4.0.0 <4.0.6. OSV querybatch also returns vulns for each installed version (form-data@4.0.5: 1 OSV record(s) incl. GHSA-hmw2-7cc7-3qxx). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > jest-environment-jsdom@29.7.0 > jsdom@20.0.3 > form-data@4.0.5. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > jest-environment-jsdom@29.7.0 > jsdom@20.0.3 > form-data@4.0.5"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "http-proxy-middleware",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 2.0.9: GHSA-64mm-vxmg-q3vj >=0.16.0 <2.0.10. OSV querybatch also returns vulns for each installed version (http-proxy-middleware@2.0.9: 1 OSV record(s) incl. GHSA-64mm-vxmg-q3vj). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > http-proxy-middleware@2.0.9.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > http-proxy-middleware@2.0.9"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "immutable",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 5.1.4: GHSA-wf6x-7x77-mvgw >=5.0.0 <5.1.5; GHSA-xvcm-6775-5m9r >=5.0.0-beta.1 <5.1.8; GHSA-v56q-mh7h-f735 >=5.0.0-beta.1 <5.1.8. OSV querybatch also returns vulns for each installed version (immutable@5.1.4: 3 OSV record(s) incl. GHSA-v56q-mh7h-f735,GHSA-wf6x-7x77-mvgw). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > sass@1.96.0 > immutable@5.1.4.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > sass@1.96.0 > immutable@5.1.4"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "ip-address",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 10.1.0: GHSA-v2v4-37r5-5v8g <=10.1.0; GHSA-mwp4-54f8-5fhr <=10.3.0; GHSA-rpw4-54j3-4h4q <=10.5.0 (+3). OSV querybatch also returns vulns for each installed version (ip-address@10.1.0: 6 OSV record(s) incl. GHSA-h3mg-xc3c-68pw,GHSA-j6r3-76f7-8jcv). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > @puppeteer/browsers@2.6.1 > proxy-agent@6.5.0 > socks-proxy-agent@8.0.5 > socks@2.8.7 > ip-address@10.1.0.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > @puppeteer/browsers@2.6.1 > proxy-agent@6.5.0 > socks-proxy-agent@8.0.5 > socks@2.8.7 > ip-address@10.1.0"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "joi",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 18.0.2: GHSA-q7cg-457f-vx79 >=18.0.0 <18.2.1; GHSA-6w3j-5fw6-r9vr >=18.0.0 <18.2.5; GHSA-gg4h-3hg2-grpc >=18.0.0 <18.2.4 (+2). OSV querybatch also returns vulns for each installed version (joi@18.0.2: 5 OSV record(s) incl. GHSA-6h2x-m376-mqjq,GHSA-6w3j-5fw6-r9vr). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > joi@18.0.2. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > joi@18.0.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "launch-editor",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 2.12.0: GHSA-v6wh-96g9-6wx3 <=2.14.0; GHSA-698v-4r3x-3vcv <=2.14.1; GHSA-r825-w8mm-5pxw <=2.14.1 (+1). OSV querybatch also returns vulns for each installed version (launch-editor@2.12.0: 4 OSV record(s) incl. GHSA-587h-7wmj-h5pm,GHSA-698v-4r3x-3vcv). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > launch-editor@2.12.0.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > launch-editor@2.12.0"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "linkify-it",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 3.0.3: GHSA-22p9-wv53-3rq4 <=5.0.0; GHSA-v245-v573-v5vm <=5.0.1. OSV querybatch also returns vulns for each installed version (linkify-it@3.0.3: 2 OSV record(s) incl. GHSA-22p9-wv53-3rq4,GHSA-v245-v573-v5vm). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > markdownlint-cli@0.31.1 > markdownlint@0.25.1 > markdown-it@12.3.2 > linkify-it@3.0.3. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > markdownlint-cli@0.31.1 > markdownlint@0.25.1 > markdown-it@12.3.2 > linkify-it@3.0.3"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "lodash",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 4.17.21: GHSA-r5fr-rjxr-66jc >=4.0.0 <=4.17.23; GHSA-f23m-r3pf-42rh <=4.17.23; GHSA-xxjr-mmjv-4gpg >=4.0.0 <=4.17.22. OSV querybatch also returns vulns for each installed version (lodash@4.17.21: 3 OSV record(s) incl. GHSA-f23m-r3pf-42rh,GHSA-r5fr-rjxr-66jc). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > lodash@4.17.21. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > jest-dev-server@10.1.4 > wait-on@8.0.5 > lodash@4.17.21"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "lodash-es",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 4.17.21: GHSA-r5fr-rjxr-66jc >=4.0.0 <=4.17.23; GHSA-f23m-r3pf-42rh <=4.17.23; GHSA-xxjr-mmjv-4gpg >=4.0.0 <=4.17.22. OSV querybatch also returns vulns for each installed version (lodash-es@4.17.21: 3 OSV record(s) incl. GHSA-f23m-r3pf-42rh,GHSA-r5fr-rjxr-66jc). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > lodash-es@4.17.21.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > lodash-es@4.17.21"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "markdown-it",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 12.3.2: GHSA-6v5v-wf23-fmfq <=14.1.1; GHSA-r7fv-28h4-cvq7 <14.3.2; GHSA-vfgh-jcmw-g37q <14.3.3 (+1). OSV querybatch also returns vulns for each installed version (markdown-it@12.3.2: 4 OSV record(s) incl. GHSA-253c-mchw-3w2r,GHSA-6v5v-wf23-fmfq). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > markdownlint-cli@0.31.1 > markdownlint@0.25.1 > markdown-it@12.3.2. Section 2's following takes every declared dependency of a production copy, whatever it does at run time, so the D1 packages on this path do not stop it.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > markdownlint-cli@0.31.1 > markdownlint@0.25.1 > markdown-it@12.3.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "nanoid",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 3.3.11: GHSA-28wg-ghj8-5hjv <3.3.16; GHSA-2v37-7h3g-55p8 <3.3.18; GHSA-xwg4-73v4-xw9w <3.3.12. OSV querybatch also returns vulns for each installed version (nanoid@3.3.11: 3 OSV record(s) incl. GHSA-28wg-ghj8-5hjv,GHSA-2v37-7h3g-55p8). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > postcss@8.5.6 > nanoid@3.3.11.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > postcss@8.5.6 > nanoid@3.3.11"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "node-forge",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.3.3: GHSA-2328-f5f3-gj25 <=1.3.3; GHSA-q67f-28xg-22rw <1.4.0; GHSA-5m6q-g25r-mvwx <1.4.0 (+2). OSV querybatch also returns vulns for each installed version (node-forge@1.3.3: 5 OSV record(s) incl. GHSA-2328-f5f3-gj25,GHSA-5m6q-g25r-mvwx). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > selfsigned@2.4.1 > node-forge@1.3.3.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > selfsigned@2.4.1 > node-forge@1.3.3"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "path-to-regexp",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.1.12: GHSA-37ch-88jc-xwx2 <0.1.13. OSV querybatch also returns vulns for each installed version (path-to-regexp@0.1.12: 1 OSV record(s) incl. GHSA-37ch-88jc-xwx2). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > path-to-regexp@0.1.12.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > path-to-regexp@0.1.12"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "postcss",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 8.5.6: GHSA-qx2v-qp2m-jg93 <8.5.10; GHSA-6g55-p6wh-862q <=8.5.11; GHSA-fxqj-rqcc-2cmp <=8.5.22 (+1). OSV querybatch also returns vulns for each installed version (postcss@8.5.6: 4 OSV record(s) incl. GHSA-6g55-p6wh-862q,GHSA-fxqj-rqcc-2cmp). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > postcss@8.5.6.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > postcss@8.5.6"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "postcss-selector-parser",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 7.1.1: GHSA-w9m9-85wc-3x92 >=7.1.0 <7.1.3; GHSA-rj75-hqrm-r3gf >=7.0.0 <7.1.6 || 6.1.2: GHSA-w9m9-85wc-3x92 >=6.1.0 <6.1.3; GHSA-rj75-hqrm-r3gf <6.1.5. OSV querybatch also returns vulns for each installed version (postcss-selector-parser@7.1.1: 2 OSV record(s) incl. GHSA-rj75-hqrm-r3gf,GHSA-w9m9-85wc-3x92; postcss-selector-parser@6.1.2: 2 OSV record(s) incl. GHSA-rj75-hqrm-r3gf,GHSA-w9m9-85wc-3x92). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/stylelint-config@23.28.0 > stylelint-scss@6.13.0 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > stylelint@16.26.1 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > css-loader@6.11.0 > postcss-modules-local-by-default@4.2.0 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > css-loader@6.11.0 > postcss-modules-scope@3.2.1 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > @wordpress/stylelint-config@23.28.0 > @stylistic/stylelint-plugin@3.1.3 > postcss-selector-parser@6.1.2. The 13 other 7.1.1 copies (under @csstools/*, css-blank-pseudo, postcss-nesting, ...) come from root devDependency postcss-preset-env@10.5.0, which postcss.config.js:3 (raw at SHA) names as a key (P2): e.g. postcss-preset-env@10.5.0 > @csstools/postcss-cascade-layers@5.0.2 > postcss-selector-parser@7.1.1 | postcss-preset-env@10.5.0 > @csstools/postcss-is-pseudo-class@5.0.3 > postcss-selector-parser@7.1.1 | postcss-preset-env@10.5.0 > @csstools/postcss-scope-pseudo-class@4.0.1 > postcss-selector-parser@7.1.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/stylelint-config@23.28.0 > stylelint-scss@6.13.0 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > stylelint@16.26.1 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > css-loader@6.11.0 > postcss-modules-local-by-default@4.2.0 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > css-loader@6.11.0 > postcss-modules-scope@3.2.1 > postcss-selector-parser@7.1.1 | @wordpress/scripts@31.1.0 > @wordpress/stylelint-config@23.28.0 > @stylistic/stylelint-plugin@3.1.3 > postcss-selector-parser@6.1.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "proxy-addr",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 2.0.7: GHSA-jqcg-44mw-7w3h >=1.1.0 <2.0.8. OSV querybatch also returns vulns for each installed version (proxy-addr@2.0.7: 1 OSV record(s) incl. GHSA-jqcg-44mw-7w3h). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > proxy-addr@2.0.7.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > proxy-addr@2.0.7"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "qs",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 6.14.0: GHSA-w7fw-mjwx-w883 >=6.7.0 <=6.14.1; GHSA-6rw7-vpxm-498p <6.14.1; GHSA-q8mj-m7cp-5q26 >=6.11.1 <=6.15.1 (+2). OSV querybatch also returns vulns for each installed version (qs@6.14.0: 5 OSV record(s) incl. GHSA-4mjr-xmp4-gh2g,GHSA-6pq8-jhm2-2vcw). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > qs@6.14.0.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > express@4.22.1 > qs@6.14.0"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "shell-quote",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.8.3: GHSA-w7jw-789q-3m8p >=1.1.0 <=1.8.3; GHSA-395f-4hp3-45gv <=1.8.4. OSV querybatch also returns vulns for each installed version (shell-quote@1.9.0: 1 OSV record(s) incl. GHSA-pqg4-j6r4-53mv; shell-quote@1.8.3: 2 OSV record(s) incl. GHSA-395f-4hp3-45gv,GHSA-w7jw-789q-3m8p). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > launch-editor@2.12.0 > shell-quote@1.8.3.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > launch-editor@2.12.0 > shell-quote@1.8.3"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "source-map-js",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 1.2.1: GHSA-68fv-2mgg-jv7q >=1.0.0 <1.2.2. OSV querybatch also returns vulns for each installed version (source-map-js@1.2.1: 1 OSV record(s) incl. GHSA-68fv-2mgg-jv7q). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > postcss@8.5.6 > source-map-js@1.2.1.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > postcss@8.5.6 > source-map-js@1.2.1"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "svgo",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 3.3.2: GHSA-xpqw-6gx7-v673 >=3.0.0 <3.3.3; GHSA-2p49-hgcm-8545 >=3.0.0 <3.3.4; GHSA-4vpr-x523-8j87 >=3.0.0 <3.3.5 (+1). OSV querybatch also returns vulns for each installed version (svgo@3.3.2: 4 OSV record(s) incl. GHSA-2p49-hgcm-8545,GHSA-4vpr-x523-8j87). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @svgr/plugin-svgo@8.1.0 > svgo@3.3.2.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @svgr/webpack@8.1.0 > @svgr/plugin-svgo@8.1.0 > svgo@3.3.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "webpack-dev-middleware",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 5.3.4: GHSA-g84c-rxfj-3j2c <7.4.5. OSV querybatch also returns vulns for each installed version (webpack-dev-middleware@5.3.4: 1 OSV record(s) incl. GHSA-g84c-rxfj-3j2c). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > webpack-dev-middleware@5.3.4.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > webpack-dev-middleware@5.3.4"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "webpack-dev-server",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 4.15.2: GHSA-9jgg-88mc-972h <=5.2.0; GHSA-4v9v-hfq4-rm2v <=5.2.0; GHSA-79cf-xcqc-c78w <=5.2.3 (+3). OSV querybatch also returns vulns for each installed version (webpack-dev-server@4.15.2: 6 OSV record(s) incl. GHSA-4v9v-hfq4-rm2v,GHSA-79cf-xcqc-c78w). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "websocket-driver",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 0.7.4: GHSA-mp7j-qc5w-4988 <0.7.5; GHSA-xv26-6w52-cph6 <0.7.5. OSV querybatch also returns vulns for each installed version (websocket-driver@0.7.4: 2 OSV record(s) incl. GHSA-mp7j-qc5w-4988,GHSA-xv26-6w52-cph6). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > sockjs@0.3.24 > websocket-driver@0.7.4.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > webpack-dev-server@4.15.2 > sockjs@0.3.24 > websocket-driver@0.7.4"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "ws",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 8.18.3: GHSA-58qx-3vcg-4xpx >=8.0.0 <8.20.1; GHSA-96hv-2xvq-fx4p >=8.0.0 <8.21.0 || 7.5.10: GHSA-96hv-2xvq-fx4p >=7.0.0 <7.5.11. OSV querybatch also returns vulns for each installed version (ws@8.18.3: 2 OSV record(s) incl. GHSA-58qx-3vcg-4xpx,GHSA-96hv-2xvq-fx4p; ws@7.5.10: 1 OSV record(s) incl. GHSA-96hv-2xvq-fx4p). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > puppeteer-core@24.33.0 > ws@8.18.3 | @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > ws@7.5.10 | @wordpress/scripts@31.1.0 > webpack-bundle-analyzer@4.10.2 > ws@7.5.10 | @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > ws@8.18.3.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > puppeteer-core@24.33.0 > ws@8.18.3 | @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > ws@7.5.10 | @wordpress/scripts@31.1.0 > webpack-bundle-analyzer@4.10.2 > ws@7.5.10 | @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > ws@8.18.3"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "zod",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In range: npm audit GHSA ranges matched against installed versions: 3.25.76: GHSA-mrhx-c7xc-m3w5 <4.6.6 || 3.23.8: GHSA-mrhx-c7xc-m3w5 <4.6.6. OSV querybatch also returns vulns for each installed version (zod@4.4.3: 1 OSV record(s) incl. GHSA-mrhx-c7xc-m3w5; zod@3.25.76: 1 OSV record(s) incl. GHSA-mrhx-c7xc-m3w5; zod@3.23.8: 1 OSV record(s) incl. GHSA-mrhx-c7xc-m3w5). The archive in ludion-l1c-srcnew (27 files) is not the whole repository: .gitattributes at f2aad049 (read from raw.githubusercontent.com at that SHA) export-ignores /src, /package.json, /package-lock.json, /webpack.config.js, /postcss.config.js and /.*, so the judge's D2 rests on a partial tree and D2 cannot apply. package.json and package-lock.json were read from raw.githubusercontent.com at the SHA. package.json:10 `start`: \"wp-scripts start --webpack-copy-php --blocks-manifest\" (P5; also package.json:11 `build`: \"wp-scripts build ...\", P6) runs bin wp-scripts = node_modules/@wordpress/scripts@31.1.0 (lockfile line 7766, bin wp-scripts), so that copy is production and so is every copy its declared dependencies reach. Dependency path(s) from the production copy: @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > puppeteer-core@24.33.0 > chromium-bidi@11.0.0 > zod@3.25.76 | @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > chromium-bidi@0.11.0 > zod@3.23.8.",
+   "cause": "A",
+   "basis": "start/build `wp-scripts …` (P5/P6) → @wordpress/scripts@31.1.0 > @wordpress/e2e-test-utils-playwright@1.36.0 > lighthouse@12.8.2 > puppeteer-core@24.33.0 > chromium-bidi@11.0.0 > zod@3.25.76 | @wordpress/scripts@31.1.0 > puppeteer-core@23.11.1 > chromium-bidi@0.11.0 > zod@3.23.8"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "opencast/studio",
+   "name": "body-parser",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "1.20.5 in GHSA-v422-hmwv-36x6 <1.20.6 and GHSA-27r3-jxmh-p828 <1.20.9; only copy node_modules/body-parser (dev), path webpack-dev-server -> express -> body-parser. package.json start = 'webpack serve --open --mode=development': the start script runs webpack's dev server, webpack-dev-server (webpack.config.ts:33 devServer config; webpack-cli's @webpack-cli/serve loads it), and section 2 (d) counts whatever start runs, a development server included; following webpack-dev-server's declared dependencies reaches express and body-parser. Note: the bin-name reading alone names only 'webpack'; webpack-cli 6.0.1 and @webpack-cli/serve list webpack-dev-server only in peerDependenciesMeta, not peerDependencies.",
+   "cause": "B2",
+   "basis": "start `webpack serve`: webpack 5.108.3's bin → webpack-cli 6.0.1 (peerDependenciesMeta of webpack) → webpack-dev-server 5.2.6 (peerDependenciesMeta of webpack-cli and @webpack-cli/serve) → the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "opencast/studio",
+   "name": "diff",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "4.0.2 in GHSA-73rr-hh4g-fpgx >=4.0.0 <4.0.4; only copy node_modules/diff (dev), only parent ts-node (root devDependencies, not D1). ts-node is not imported (src/steps/review/preview.tsx:105 'diff' is a parameter name), not named in webpack.config.ts/.babelrc.js/tsconfig.json, and not run by bin name. But the configuration is webpack.config.ts, which webpack-cli loads through a TypeScript register (ts-node is the installed one) whenever start ('webpack serve') and build:release/build:dev ('webpack') run, so the start and build commands do run ts-node. Whether that counts as what they run under P5/P6 is not settled by the bin-name reading; cannot show dev-only.",
+   "cause": "B3",
+   "basis": "webpack.config.ts is read by webpack-cli through interpret/rechoir with ts-node 10.9.2 (root devDependency); ts-node declares diff 4.0.2"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "opencast/studio",
+   "name": "qs",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "In-range copy node_modules/qs 6.15.2 (GHSA-x5fp-wj9c-mxmx >=6.14.2 <=6.15.3, GHSA-4mjr-xmp4-gh2g <6.16.0, GHSA-6pq8-jhm2-2vcw <=6.16.0); node_modules/express/node_modules/qs 6.16.2 is out of range. Path webpack-dev-server -> express -> body-parser -> qs. start = 'webpack serve --open --mode=development' runs webpack-dev-server (dev server counted by section 2 (d)); following its dependencies reaches qs. Same caveat as body-parser: the bin name alone is 'webpack'.",
+   "cause": "B2",
+   "basis": "start `webpack serve`: webpack 5.108.3's bin → webpack-cli 6.0.1 (peerDependenciesMeta of webpack) → webpack-dev-server 5.2.6 (peerDependenciesMeta of webpack-cli and @webpack-cli/serve) → the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "opencast/studio",
+   "name": "uuid",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "8.3.2 in GHSA-w5hq-g745-h8pq <11.1.1; only copy node_modules/uuid (dev), path webpack-dev-server -> sockjs -> uuid. start = 'webpack serve' runs webpack-dev-server, counted by section 2 (d); following reaches sockjs and uuid. Same caveat as body-parser.",
+   "cause": "B2",
+   "basis": "start `webpack serve`: webpack 5.108.3's bin → webpack-cli 6.0.1 (peerDependenciesMeta of webpack) → webpack-dev-server 5.2.6 (peerDependenciesMeta of webpack-cli and @webpack-cli/serve) → the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "opencast/studio",
+   "name": "webpack-dev-middleware",
+   "verdict": "yes",
+   "criterion": "P5",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "OSV GHSA-g84c-rxfj-3j2c affected introduced 0, fixed 7.4.6 (and 8.0.0-8.3.0); installed 7.4.5 is in range by OSV (npm audit did not list it). Only copy node_modules/webpack-dev-middleware (dev), a declared dependency of webpack-dev-server. start = 'webpack serve --open --mode=development' runs webpack-dev-server, which serves through webpack-dev-middleware; section 2 (d) counts the dev server a start script runs. Same caveat as body-parser.",
+   "cause": "B2",
+   "basis": "start `webpack serve`: webpack 5.108.3's bin → webpack-cli 6.0.1 (peerDependenciesMeta of webpack) → webpack-dev-server 5.2.6 (peerDependenciesMeta of webpack-cli and @webpack-cli/serve) → the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "ccnmtl/specialneedsvisit-pack",
+   "name": "body-parser",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "2.3.0 in GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0; only copy node_modules/body-parser (dev); path webpack-dev-server -> express -> body-parser, and webpack-dev-server is reached from root devDependencies webpack-dev-server and from webpack-cli 7.2.1, which declares peerDependencies webpack-dev-server ^5 || ^6. The build script 'webpack && webpack --config test/test.webpack.config.js' (P6) runs webpack's bin, which hands off to webpack-cli (webpack lists webpack-cli in peerDependenciesMeta); if that makes webpack-cli production, following its peerDependencies makes webpack-dev-server and body-parser production. By the bin-name reading only 'webpack' is named. Not decidable from the rule's wording; the dev server itself is run only by the 'serve' script (not P5).",
+   "cause": "B1",
+   "basis": "build `webpack` runs webpack's bin, which runs webpack-cli 7.2.x (named only in webpack's peerDependenciesMeta); webpack-cli's peerDependencies name webpack-dev-server, which reaches the copy"
+  },
+  {
+   "sample": "second (L1c new 100)",
+   "repo": "ccnmtl/specialneedsvisit-pack",
+   "name": "qs",
+   "verdict": "undecidable",
+   "criterion": "none",
+   "source": "docs/bench/2026-10-29-l1c/review",
+   "evidence": "6.15.3 in GHSA-x5fp-wj9c-mxmx >=6.14.2 <=6.15.3 (and <6.16.0, <=6.16.0); only copy node_modules/qs (dev); parents body-parser and express under webpack-dev-server. Same open question as body-parser: the build's 'webpack' command hands off to webpack-cli 7.2.1, which declares peerDependencies webpack-dev-server; whether that makes it production is not settled by the bin-name reading.",
+   "cause": "B1",
+   "basis": "build `webpack` runs webpack's bin, which runs webpack-cli 7.2.x (named only in webpack's peerDependenciesMeta); webpack-cli's peerDependencies name webpack-dev-server, which reaches the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "carlostighe/modalMap",
+   "name": "cross-spawn",
+   "verdict": "yes",
+   "criterion": "P6",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: only node_modules/webpack-cli/node_modules/cross-spawn@6.0.5 (dev); OSV returns GHSA-3xgq-45jj-v275 for 6.0.5 (npm <6.0.6). node_modules/cross-spawn@7.0.6 and node_modules/execa/node_modules/cross-spawn@6.0.6 are out of range (OSV returns nothing). A condition section 2 adds applies (a build command running its parent), so the first-run 'no' is not reused. The build script 'NODE_ENV=production webpack --progress --colors -p' (package.json:7) runs webpack@5.104.1's bin, and webpack's bin/webpack.js (read as data from unpkg) runs the installed webpack-cli's bin: lines 108-113 define cli {package: 'webpack-cli', binName: 'webpack-cli'}, 79-94 runCli requires pkg.bin['webpack-cli'], 192 calls runCli(cli). The start script (package.json:8) runs it too: webpack-watch 'webpack --mode development --watch' (:10) and serve 'webpack-dev-server' (:9; webpack-dev-server@6.0.0 bin/webpack-dev-server.js:86-92,165 also runs webpack-cli). So node_modules/webpack-cli@3.3.11 (dev) is run by the build (P6) and start (P5), and following its declared dependency 'cross-spawn: 6.0.5' resolves to node_modules/webpack-cli/node_modules/cross-spawn, production whatever webpack-cli does with it at run time (the first run's 'never required by webpack-cli' is not a reason under section 2). Reading note: by a strict bin-name match the word 'webpack' names only the webpack package, and webpack declares webpack-cli only in peerDependenciesMeta (optional), not peerDependencies; under that reading the copy is still not shown dev-only (webpack-cli is not a D1 package, and D2 fails because a build command runs it), so it would be undecidable. A miss either way.",
+   "cause": "B1",
+   "basis": "build `webpack … -p` runs webpack 5.104.1's bin, which runs webpack-cli 3.3.11; webpack-cli declares the nested copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "carlostighe/modalMap",
+   "name": "loader-utils",
+   "verdict": "yes",
+   "criterion": "P6",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: only node_modules/webpack-cli/node_modules/loader-utils@1.2.3 (dev); OSV returns GHSA-3rfm-jhwj-7488, GHSA-76p3-8jx3-jpfq and GHSA-hhq3-ff78-jv3g for 1.2.3 (npm <1.4.1; >=1.0.0 <1.4.2; >=1.0.0 <1.4.2). node_modules/loader-utils@1.4.2 and node_modules/raw-loader/node_modules/loader-utils@2.0.4 are out of range (OSV returns nothing). As for cross-spawn: the build 'webpack ... -p' (package.json:7) and start (package.json:8-10) run webpack-cli@3.3.11 through webpack@5.104.1's bin/webpack.js (lines 79-94, 108-113, 192) and webpack-dev-server@6.0.0's bin (86-92, 165); webpack-cli declares 'loader-utils: 1.2.3', which resolves to node_modules/webpack-cli/node_modules/loader-utils, so following makes it production even though webpack-cli only requires it in its --plugin handling (first run's reason, not one under section 2). Same reading note as cross-spawn: under a strict bin-name reading it is undecidable rather than yes; a miss either way.",
+   "cause": "B1",
+   "basis": "build `webpack … -p` runs webpack 5.104.1's bin, which runs webpack-cli 3.3.11; webpack-cli declares the nested copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "ASIL-E-Hatake/vscode-games",
+   "name": "@azure/msal-node",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "node_modules/@azure/msal-node@6.0.1 (dev), only copy; GHSA-xcx6-jx8p-x3h5 >=5.0.0-beta.0 <7.1.0 (OSV: introduced 5.0.0-beta.0, fixed 7.1.0). P1 with following: scripts/test-package.ts:26 builds the path node_modules/@vscode/vsce/vsce (join('node_modules', '@vscode', 'vsce', 'vsce')) and :27 runs it (execFileSync('node', [vsceBin, 'ls', '--no-dependencies'])). scripts/test-package.ts is source under section 2 (scripts/ is not a test folder and the name matches no test pattern), and the first rule counted only the dist/ bundles; a node_modules/<package> path in a source file is an import, so node_modules/@vscode/vsce@4.0.0 is production, and following its dependencies: @vscode/vsce > @azure/identity@4.14.0 > @azure/msal-node@6.0.1. Section 2 condition that applies: an import from a non-test file the first rule did not count. Note for the tally: the path is assembled with path.join from literal segments, so a reader matching only the literal text 'node_modules/' misses it; read that way the package would be D2 'no' (no other import, no build tool config, build 'npm run clean && npm run build:content && node esbuild.mjs --production' runs tsx/esbuild only, vsce only in the 'package' script, no start, Dockerfile or Procfile). I count it under 'when in doubt, production'.",
+   "cause": "C3",
+   "basis": "scripts/test-package.ts:26 `join('node_modules', '@vscode', 'vsce', 'vsce')`, :27 runs it; @vscode/vsce 4.0.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "ASIL-E-Hatake/vscode-games",
+   "name": "qs",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "node_modules/qs@6.16.0 (dev), only copy; GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0 (OSV: introduced 6.7.0, fixed 6.16.1). P1 with following: scripts/test-package.ts:26-27 references and runs node_modules/@vscode/vsce/vsce (path.join of literal segments) from a non-test source file, making node_modules/@vscode/vsce@4.0.0 production; following its dependencies: @vscode/vsce > typed-rest-client@1.8.11 > qs@6.16.0. Same caveat as @azure/msal-node: if a path built with path.join is not counted as an import, the verdict would be D2 'no' (vsce otherwise only in the 'package' script; no start, Dockerfile, Procfile or other path to qs).",
+   "cause": "C3",
+   "basis": "scripts/test-package.ts:26 `join('node_modules', '@vscode', 'vsce', 'vsce')`, :27 runs it; @vscode/vsce 4.0.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "BilLogic/uno-blueprint",
+   "name": "body-parser",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: node_modules/body-parser@2.3.0 (dev) vs GHSA-27r3-jxmh-p828 >=2.0.0 <2.4.0 (OSV query confirms). Not reusable: a condition section 2 adds applies (an import from a non-test file the first rule did not count as shipped). scripts/check-vendored-css.mjs (under scripts/, not a test folder or test name, so source under section 2; run by scripts.check:vendored-css and imported by scripts/vendor-shadcn-css.mjs) sets `const UPSTREAM = 'shadcn/tailwind.css'` (:49), builds a require with createRequire (:121) and calls `require.resolve(UPSTREAM)` (:124): a require.resolve() of a bare specifier naming shadcn. Nearest copy from scripts/: node_modules/shadcn@4.18.0 (dev) -> P1, and following its declared dependencies reaches this copy: shadcn@4.18.0 > @modelcontextprotocol/sdk@1.32.1 > express@5.2.1 > body-parser@2.3.0 (also via express-rate-limit@8.6.2 > express). Note: the specifier reaches require.resolve through a module constant, not a literal; if the judge reads only literal arguments, D2 still cannot be shown (the source resolves the shadcn package), so the verdict would be at least undecidable, also a miss.",
+   "cause": "C2",
+   "basis": "scripts/check-vendored-css.mjs:49 `const UPSTREAM = 'shadcn/tailwind.css'`, :124 `require.resolve(UPSTREAM)`; shadcn 4.18.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "BilLogic/uno-blueprint",
+   "name": "deepmerge",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: node_modules/deepmerge@4.3.1 (dev) vs GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1 (OSV confirms). Not reusable: a condition section 2 adds applies (an import from a non-test file the first rule did not count as shipped). scripts/check-vendored-css.mjs (under scripts/, not a test folder or test name, so source under section 2; run by scripts.check:vendored-css and imported by scripts/vendor-shadcn-css.mjs) sets `const UPSTREAM = 'shadcn/tailwind.css'` (:49), builds a require with createRequire (:121) and calls `require.resolve(UPSTREAM)` (:124): a require.resolve() of a bare specifier naming shadcn. Nearest copy from scripts/: node_modules/shadcn@4.18.0 (dev) -> P1, and following its declared dependencies reaches this copy: shadcn@4.18.0 > deepmerge@4.3.1 (a declared dependency of shadcn). Note: the specifier reaches require.resolve through a module constant, not a literal; if the judge reads only literal arguments, D2 still cannot be shown (the source resolves the shadcn package), so the verdict would be at least undecidable, also a miss.",
+   "cause": "C2",
+   "basis": "scripts/check-vendored-css.mjs:49 `const UPSTREAM = 'shadcn/tailwind.css'`, :124 `require.resolve(UPSTREAM)`; shadcn 4.18.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "BilLogic/uno-blueprint",
+   "name": "fast-uri",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: node_modules/fast-uri@3.1.8 (dev) vs GHSA-333x-w4r6-6crp, GHSA-w74x-v6f9-j3xg, GHSA-xhq7-xmqj-769h >=3.0.0 <3.1.9 and GHSA-wjr9-j795-jxcr >=3.1.3 <3.1.9 (OSV confirms). Not reusable: a condition section 2 adds applies (an import from a non-test file the first rule did not count as shipped). scripts/check-vendored-css.mjs (under scripts/, not a test folder or test name, so source under section 2; run by scripts.check:vendored-css and imported by scripts/vendor-shadcn-css.mjs) sets `const UPSTREAM = 'shadcn/tailwind.css'` (:49), builds a require with createRequire (:121) and calls `require.resolve(UPSTREAM)` (:124): a require.resolve() of a bare specifier naming shadcn. Nearest copy from scripts/: node_modules/shadcn@4.18.0 (dev) -> P1, and following its declared dependencies reaches this copy: shadcn@4.18.0 > @modelcontextprotocol/sdk@1.32.1 > node_modules/@modelcontextprotocol/sdk/node_modules/ajv@8.20.0 > fast-uri@3.1.8 (also shadcn > @dotenvx/dotenvx@1.75.1 > conf@10.2.0 > ajv > fast-uri). Note: the specifier reaches require.resolve through a module constant, not a literal; if the judge reads only literal arguments, D2 still cannot be shown (the source resolves the shadcn package), so the verdict would be at least undecidable, also a miss.",
+   "cause": "C2",
+   "basis": "scripts/check-vendored-css.mjs:49 `const UPSTREAM = 'shadcn/tailwind.css'`, :124 `require.resolve(UPSTREAM)`; shadcn 4.18.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "BilLogic/uno-blueprint",
+   "name": "hono",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: node_modules/hono@4.13.7 (dev) vs GHSA-5r4p-p66f-jhc7 >=4.12.4 <4.13.11 (OSV confirms). Not reusable: a condition section 2 adds applies (an import from a non-test file the first rule did not count as shipped). scripts/check-vendored-css.mjs (under scripts/, not a test folder or test name, so source under section 2; run by scripts.check:vendored-css and imported by scripts/vendor-shadcn-css.mjs) sets `const UPSTREAM = 'shadcn/tailwind.css'` (:49), builds a require with createRequire (:121) and calls `require.resolve(UPSTREAM)` (:124): a require.resolve() of a bare specifier naming shadcn. Nearest copy from scripts/: node_modules/shadcn@4.18.0 (dev) -> P1, and following its declared dependencies reaches this copy: shadcn@4.18.0 > @modelcontextprotocol/sdk@1.32.1 > hono@4.13.7 (also > @hono/node-server@2.1.1 > hono). Note: the specifier reaches require.resolve through a module constant, not a literal; if the judge reads only literal arguments, D2 still cannot be shown (the source resolves the shadcn package), so the verdict would be at least undecidable, also a miss.",
+   "cause": "C2",
+   "basis": "scripts/check-vendored-css.mjs:49 `const UPSTREAM = 'shadcn/tailwind.css'`, :124 `require.resolve(UPSTREAM)`; shadcn 4.18.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "BilLogic/uno-blueprint",
+   "name": "ip-address",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: node_modules/ip-address@10.7.2 (dev) vs GHSA-rxp7-6hxx-x8q5 <=10.7.3 (OSV confirms). Not reusable: a condition section 2 adds applies (an import from a non-test file the first rule did not count as shipped). scripts/check-vendored-css.mjs (under scripts/, not a test folder or test name, so source under section 2; run by scripts.check:vendored-css and imported by scripts/vendor-shadcn-css.mjs) sets `const UPSTREAM = 'shadcn/tailwind.css'` (:49), builds a require with createRequire (:121) and calls `require.resolve(UPSTREAM)` (:124): a require.resolve() of a bare specifier naming shadcn. Nearest copy from scripts/: node_modules/shadcn@4.18.0 (dev) -> P1, and following its declared dependencies reaches this copy: shadcn@4.18.0 > socks@2.8.9 > ip-address@10.7.2 (also shadcn > @modelcontextprotocol/sdk > express-rate-limit@8.6.2 > ip-address). Note: the specifier reaches require.resolve through a module constant, not a literal; if the judge reads only literal arguments, D2 still cannot be shown (the source resolves the shadcn package), so the verdict would be at least undecidable, also a miss.",
+   "cause": "C2",
+   "basis": "scripts/check-vendored-css.mjs:49 `const UPSTREAM = 'shadcn/tailwind.css'`, :124 `require.resolve(UPSTREAM)`; shadcn 4.18.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "BilLogic/uno-blueprint",
+   "name": "qs",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "In range: node_modules/qs@6.16.0 (dev) vs GHSA-6pq8-jhm2-2vcw >=6.7.0 <=6.16.0 (OSV confirms). Not reusable: a condition section 2 adds applies (an import from a non-test file the first rule did not count as shipped). scripts/check-vendored-css.mjs (under scripts/, not a test folder or test name, so source under section 2; run by scripts.check:vendored-css and imported by scripts/vendor-shadcn-css.mjs) sets `const UPSTREAM = 'shadcn/tailwind.css'` (:49), builds a require with createRequire (:121) and calls `require.resolve(UPSTREAM)` (:124): a require.resolve() of a bare specifier naming shadcn. Nearest copy from scripts/: node_modules/shadcn@4.18.0 (dev) -> P1, and following its declared dependencies reaches this copy: shadcn@4.18.0 > @modelcontextprotocol/sdk@1.32.1 > express@5.2.1 > qs@6.16.0 (also > body-parser@2.3.0 > qs). Note: the specifier reaches require.resolve through a module constant, not a literal; if the judge reads only literal arguments, D2 still cannot be shown (the source resolves the shadcn package), so the verdict would be at least undecidable, also a miss.",
+   "cause": "C2",
+   "basis": "scripts/check-vendored-css.mjs:49 `const UPSTREAM = 'shadcn/tailwind.css'`, :124 `require.resolve(UPSTREAM)`; shadcn 4.18.0's dependencies reach the copy"
+  },
+  {
+   "sample": "original (noise rerun, kept by L1c)",
+   "repo": "acekyd/acekyd",
+   "name": "sharp",
+   "verdict": "yes",
+   "criterion": "P1",
+   "source": "docs/bench/2026-10-28-noise-v2/review",
+   "evidence": "Not reused: section 2 counts an import from a non-test file the first rule did not count as shipped code. In range: only copy node_modules/sharp 0.35.3 (dev, root devDependency package.json:23), OSV GHSA-rgj7-g3m4-5g8c [0,0.35.4) and GHSA-wq5f-xc86-pv6w [0,0.35.5) (re-fetched); npm <0.35.4, <0.35.5. P1: scripts/generate-og-cards.mjs (a section-2 source file: .mjs, not under a test folder, not a test or linter config) does const require = createRequire(import.meta.url) (line 11) and const sharp = require(process.env.SHARP_PATH || 'sharp') (line 12), a require() of the package sharp; the nearest node_modules from scripts/ is the root, so the imported copy is node_modules/sharp 0.35.3. The script is run by package.json:9 og:cards and writes the OG cards into public/og/ used by pages/posts/[...slug].vue:119. The first run itself cited this file as the user.",
+   "cause": "C1",
+   "basis": "scripts/generate-og-cards.mjs:12 `require(process.env.SHARP_PATH || 'sharp')`, run by og:cards"
+  }
+ ]
+}

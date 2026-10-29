@@ -67,7 +67,7 @@ mutate $D "the recorder's file list not compared by digest" 'if (!captured?.file
 mutate $R "OSV asked only for names with a stored window version" '(store.timeline.get(n) ?? []).some(r => r.at >= start && r.at <= asOf) || failedNames.has(n) || ' ''
 mutate $R "a copy with no publish time counts as late" 'Number.isFinite(p) ? p : -Infinity' 'p'
 mutate $R "the latest poll by spreading every status line" 'const lastPoll = latest("poll"), lastOsv = latest("osv");' 'const lastPoll = Math.max(-Infinity, ...store.status.filter(s => s.type === "poll").map(s => ms(s.at))), lastOsv = latest("osv");'
-mutate $D "file list only from the last capture" '[...caps].reverse().find(c => c.files)?.files ?? null' 'cap?.files ?? null'
+mutate $D "file list only from the last capture" 'const hashed = [...caps].reverse().find(c => c.files || c.files_digest);' 'const hashed = caps.at(-1);'
 mutate $D "recorder's file list not compared" 'if (captured?.files) {' 'if (false) {'
 mutate $D "O after another named version ignored" 'afterNamed || addsScript ?' 'addsScript ?'
 mutate $D "added install script ignored" 'afterNamed || addsScript ?' 'afterNamed ?'

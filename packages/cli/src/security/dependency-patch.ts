@@ -5,7 +5,7 @@ import { join, resolve, sep } from "node:path";
 import semver from "semver";
 import { runContainer, runDockerImageCommand, type Tool } from "../../../sandbox/src/docker.ts";
 import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenGraph, packageEntry, parsePom, textFile, type Change, type Ecosystem, type Inventory } from "./inventory.ts";
-import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
+import { comparableVersion, OsvClient, type DependencyScan, type Finding } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.ts";
 import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
@@ -270,6 +270,11 @@ export async function resolvedMavenInventory(root: string, image: string = DEFAU
 /** Top-level names that never reach the tests (the application image's .dockerignore below), so --apply does not compare them. */
 const NOT_TESTED = ["node_modules", "vendor", "target", ".npmrc", "auth.json", ".mvn"];
 
+/** A finding as name@version and advisory id. */
+const findingId = (f: Finding) => `${f.package.name}@${f.package.version} ${f.advisory.id}`;
+/** An OSV MAL- record (gate 2: a malicious package), by id or alias. */
+const malicious = (f: Finding) => [f.advisory.id, ...f.advisory.aliases].some(id => id.startsWith("MAL-"));
+
 /** One fix per package: every planned change of that package, in plan order. */
 export function fixesOf(plan: Change[]): Change[][] {
   const fixes = new Map<string, Change[]>();
@@ -311,6 +316,9 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     const source = join(temp, "source"); mkdirSync(source);
     if (snapshot(root, source) !== originalTree || hash(textFile(source, CONFIG)) !== receipt.config_hash) throw new Error("Source or update policy changed during advisory lookup.");
     if (initial.limitations.length) throw new Error(initial.limitations.join(" "));
+    // Gate 2: an OSV MAL- record stops the whole run, as before per-fix validation; nothing is installed or tested.
+    const marked = scan.findings.filter(malicious).map(findingId);
+    if (marked.length) throw new Error(`OSV has a MAL- record for an installed package (${marked.slice(0, 5).join(", ")}); nothing was validated or applied.`);
     if (!receipt.fixes.length) throw new Error(scan.blocked.join(" ") || "No fix was planned.");
     // Before any build or test (for Maven, after its dependency graph was resolved): every fix branch starts from the
     // commit whose files are the ones validated.
@@ -402,6 +410,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     }
     // Another fix's package may move within its advisory (Maven does not hold the graph fixed); that advisory is that fix's.
     const known = new Set(scan.findings.map(f => `${f.package.name} ${f.advisory.id}`));
+    const versioned = new Set(scan.findings.map(f => findingId(f)));
     const unversioned = (blocked: string) => blocked.replace(/^(.+?)@[^@:\s]+:/, "$1:"), knownBlocked = new Set(scan.blocked.map(unversioned));
     for (const [index, fix] of receipt.fixes.entries()) {
       if (!baseline || fix.outcome === "skipped" || fix.reason) continue;
@@ -425,12 +434,16 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         compatible(baseline.inventory, candidate.inventory);
         // This fix's package must have no finding left, and no package may have an advisory the baseline did not have on it.
         const after = fix.after = await client.scan(candidate.inventory); active();
-        const versioned = new Set(scan.findings.map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`));
-        const carried = after.findings.filter(f => f.package.name !== fix.package && !versioned.has(`${f.package.name}@${f.package.version} ${f.advisory.id}`)).map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`);
-        const left = after.findings.filter(f => f.package.name === fix.package || !known.has(`${f.package.name} ${f.advisory.id}`)).map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`);
-        const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !knownBlocked.has(unversioned(b)));
+        // A finding on a version the baseline did not have stops the fix. Only Maven, which does not hold the graph fixed,
+        // may carry another package to another version under an advisory the baseline already had on it (another fix's);
+        // a MAL- record is never carried.
+        const added = after.findings.filter(f => f.package.name !== fix.package && !versioned.has(findingId(f)));
+        const carried = ecosystem === "maven" ? added.filter(f => !malicious(f) && known.has(`${f.package.name} ${f.advisory.id}`)) : [];
+        const left = [...after.findings.filter(f => f.package.name === fix.package), ...added.filter(f => !carried.includes(f))].map(findingId);
+        // As with findings, only Maven compares a finding without a supported fix by package and advisory, not version.
+        const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !(ecosystem === "maven" ? knownBlocked.has(unversioned(b)) : scan.blocked.includes(b)));
         if (left.length || unfixable.length || after.inventory.limitations.length) throw new Error(`Candidate still contains known advisory findings or incomplete inventory${left.length ? ` (${left.slice(0, 5).join(", ")})` : ""}; no source change was made.`);
-        if (carried.length) fix.carried_findings = carried;
+        if (carried.length) fix.carried_findings = carried.map(findingId);
         const files = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(candidate.exported, path) })).filter(f => f.before !== f.after);
         if (!files.length) throw new Error("No dependency file changed.");
         fix.candidate_image = await test(label, candidate.exported, candidate.installedCache);

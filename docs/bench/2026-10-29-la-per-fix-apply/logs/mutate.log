@@ -1,4 +1,4 @@
-# started 2026-10-29T12:45:56Z, node v24.22.1, git version 2.39.5
+# started 2026-10-29T13:06:43Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       no hooks override — packages/cli/test/branch.test.ts
 caught       git started in the project's folder — packages/cli/test/branch.test.ts
@@ -13,7 +13,6 @@ caught       CRLF committed as checked out — packages/cli/test/branch.test.ts
 caught       a path HEAD lacks is added — packages/cli/test/branch.test.ts
 caught       a taken branch name reads skipped — packages/cli/test/dependencies.test.ts
 caught       a fix goes on beside its package's unfixable finding — packages/cli/test/dependencies.test.ts
-caught       blocked findings compared with their versions — packages/cli/test/dependencies.test.ts
 caught       unfixed findings ignored in the outcome — packages/cli/test/dependencies.test.ts
 caught       PHP: a taken branch name reads skipped — packages/cli/test/security.test.ts
 caught       no fsmonitor override — packages/cli/test/branch.test.ts
@@ -27,7 +26,10 @@ caught       apply writes the working tree — packages/cli/test/dependencies.te
 caught       no publish time — packages/cli/test/dependencies.test.ts
 caught       PHP: no publish time — packages/cli/test/security.test.ts
 caught       PHP: branch for an existing one — packages/cli/test/security.test.ts
-caught       the baseline's advisories keyed by version — packages/cli/test/dependencies.test.ts
+caught       npm carries another package within a known advisory — packages/cli/test/dependencies.test.ts
 caught       a new advisory accepted — packages/cli/test/dependencies.test.ts
-29 of 29 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
-# finished 2026-10-29T12:47:15Z
+caught       a baseline MAL- record accepted — packages/cli/test/dependencies.test.ts
+caught       a symbolic link in .git accepted — packages/cli/test/branch.test.ts
+caught       an existing reflog accepted — packages/cli/test/branch.test.ts
+31 of 31 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
+# finished 2026-10-29T13:08:04Z

@@ -154,6 +154,26 @@ describe("a fix on its own branch", () => {
     const made = fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{\"x\":1}\n" }], "ludion: x");
     expect(git(root, "--no-replace-objects", "ls-tree", "--name-only", "-r", made).split("\n")).toEqual(["package.json", "src/index.js"]);
   });
+  it.skipIf(process.platform === "win32")("refuses a symbolic link inside .git where Git would write, and a reflog the branch already has", () => {
+    const files = [{ path: "package.json", content: "{}\n" }];
+    // refs/heads/ludion pointing at refs/tags: the branch would become a tag.
+    const first = project(), firstBase = gitBase(first.root, first.copy);
+    symlinkSync("../tags", join(first.root, ".git", "refs", "heads", "ludion"));
+    expect(() => fixBranch(firstBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow("symbolic link where Git would write (refs/heads/ludion)");
+    expect(existsSync(join(first.root, ".git", "refs", "tags", "npm"))).toBe(false);
+    // The control: plain Git follows it.
+    git(first.root, "update-ref", "refs/heads/ludion/npm/control", "HEAD");
+    expect(existsSync(join(first.root, ".git", "refs", "tags", "npm", "control"))).toBe(true);
+    // An objects folder pointing outside the repository.
+    const second = project(), outside = mkdtempSync(join(tmpdir(), "ludion-branch-outside-"));
+    symlinkSync(outside, join(second.root, ".git", "objects", "zz"));
+    expect(() => fixBranch(gitBase(second.root, second.copy), "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow("objects/zz");
+    // A reflog file already there, which Git would append to.
+    const third = project();
+    mkdirSync(join(third.root, ".git", "logs", "refs", "heads", "ludion", "npm"), { recursive: true });
+    writeFileSync(join(third.root, ".git", "logs", "refs", "heads", "ludion", "npm", "x-1.0.1"), "");
+    expect(() => fixBranch(gitBase(third.root, third.copy), "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow("A reflog for the new branch");
+  });
   it("never follows a symbolic ref at the branch name to create its target", () => {
     const { root, copy } = project(), base = gitBase(root, copy);
     git(root, "symbolic-ref", "refs/heads/ludion/npm/x-1.0.1", "refs/tags/made-by-symref");

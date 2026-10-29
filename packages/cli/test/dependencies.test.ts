@@ -221,7 +221,7 @@ describe("dependency patch gates and recoverable application", () => {
     // The receipt on disk is the one returned.
     expect(JSON.parse(readFileSync(result.path!, "utf8")).fixes.map((f: any) => f.outcome)).toEqual(["failed", "applied"]);
   });
-  it("lets a fix's candidate hold another fix's package within the advisory the baseline had, and no other advisory", async () => {
+  it("stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had", async () => {
     const minimist: Advisory = { ...advisory, id: "GHSA-test-0002", affected: [{ package: { ecosystem: "npm", name: "minimist" }, ranges: [{ events: [{ fixed: "1.2.6" }] }] }] };
     const unseen: Advisory = { ...minimist, id: "GHSA-test-0003" };
     const osv = () => new OsvClient(async (url, init) => {
@@ -230,7 +230,8 @@ describe("dependency patch gates and recoverable application", () => {
       return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => ids[q.version] ? { vulns: [{ id: ids[q.version] }] } : {}) });
     });
     const npm = registry({ minimist: { created: "2013-06-25T08:12:47.000Z", versions: { "0.0.1": "2013-06-25T08:12:47.000Z", "1.2.4": "2019-11-12T00:00:00.000Z", "1.2.5": "2020-03-12T00:00:00.000Z", "1.2.6": "2022-03-21T00:00:00.000Z" } } });
-    for (const [nested, outcome] of [["1.2.4", "applied"], ["0.0.1", "failed"]] as const) {
+    // Only Maven, which does not hold the graph fixed, may carry another package within an advisory it had.
+    for (const [nested, outcome] of [["1.2.4", "failed"], ["0.0.1", "failed"]] as const) {
       const root = fixture();
       writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "4.17.20", minimist: "1.2.5" } }));
       writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor({ lodash: "4.17.20", minimist: "1.2.5" })));
@@ -247,8 +248,42 @@ describe("dependency patch gates and recoverable application", () => {
         return output;
       } });
       expect(result.receipt?.fixes.map(f => [f.package, f.outcome])).toEqual([["lodash", outcome], ["minimist", "applied"]]);
-      if (outcome === "failed") expect(result.receipt?.fixes[0]?.reason).toContain("minimist@0.0.1 GHSA-test-0003");
+      expect(result.receipt?.fixes[0]?.reason).toContain(nested === "1.2.4" ? "minimist@1.2.4 GHSA-test-0002" : "minimist@0.0.1 GHSA-test-0003");
     }
+  });
+  it("stops on an OSV MAL- record: in the baseline before any Docker work, in a candidate for that fix", async () => {
+    const evil: Advisory = { id: "MAL-2026-0001", summary: "Malicious code in evil", aliases: [], affected: [{ package: { ecosystem: "npm", name: "evil" }, ranges: [{ events: [{ introduced: "0" } as { fixed?: string }] }] }] };
+    const npm = registry({ evil: { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z", "1.0.1": "2016-01-01T00:00:00.000Z" } } });
+    const osvFor = (marked: string[]) => new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(String(url).endsWith(evil.id) ? evil : advisory);
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.version === "4.17.20" ? { vulns: [{ id: advisory.id }] } : marked.includes(`${q.package.name}@${q.version}`) ? { vulns: [{ id: evil.id }] } : {}) });
+    });
+    const project = () => {
+      const root = fixture(), deps = { lodash: "4.17.20", evil: "1.0.0" };
+      writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+      writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+      commit(root); return root;
+    };
+    // The cloud review's case: the baseline's evil@1.0.0 has the record, and the lodash candidate adds evil@1.0.1.
+    let docker = 0;
+    const counted = fakeCommand();
+    const stopped = await patchDependencies(project(), true, { fetchFn: npm, client: osvFor(["evil@1.0.0", "evil@1.0.1"]), command: async args => { docker++; return counted(args); }, testRun: async () => {} });
+    expect(stopped.receipt).toMatchObject({ outcome: "failed", reason: expect.stringContaining("MAL- record for an installed package (evil@1.0.0 MAL-2026-0001)") });
+    expect(stopped.receipt?.fixes[0]?.reason).toContain("Not validated:");
+    expect(docker).toBe(0);
+    // Only the candidate's added evil@1.0.1 has the record: that fix stops.
+    const command = fakeCommand();
+    const result = await patchDependencies(project(), true, { fetchFn: npm, client: osvFor(["evil@1.0.1"]), testRun: async () => {}, command: async args => {
+      const output = await command(args), out = args.find(a => a.startsWith("type=local,dest="))?.slice("type=local,dest=".length);
+      if (out?.endsWith("candidate-1-export")) {
+        const locked = JSON.parse(readFileSync(join(out, "package-lock.json"), "utf8"));
+        locked.packages["node_modules/lodash/node_modules/evil"] = { version: "1.0.1", resolved: "https://registry.npmjs.org/evil/-/evil-1.0.1.tgz" };
+        writeFileSync(join(out, "package-lock.json"), JSON.stringify(locked));
+      }
+      return output;
+    } });
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", branch: null });
+    expect(result.receipt?.fixes[0]?.reason).toContain("evil@1.0.1 MAL-2026-0001");
   });
   it("stops only the fix of a package with a finding that has no supported fix, and reports such findings", async () => {
     // OSV answers by name@version.
@@ -273,8 +308,8 @@ describe("dependency patch gates and recoverable application", () => {
     const second = await patchDependencies(project({ lodash: "4.17.20", other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "lodash@4.17.20": [advisory], "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });
     expect(second.receipt?.fixes.map(f => [f.package, f.outcome])).toEqual([["lodash", "applied"]]);
     expect(second.receipt).toMatchObject({ outcome: "partial", reason: expect.stringContaining("Findings without a supported fix: other@1.0.0: GHSA-test-0010") });
-    // The candidate holding another copy of that package: the same advisory passes and is listed; a new one stops the fix.
-    for (const [extra, outcome] of [["GHSA-test-0010", "applied"], ["GHSA-test-0011", "failed"]] as const) {
+    // The candidate holding another copy of that package stops the fix, under the same advisory or a new one.
+    for (const [extra, outcome] of [["GHSA-test-0010", "failed"], ["GHSA-test-0011", "failed"]] as const) {
       const command = fakeCommand();
       const result = await patchDependencies(project({ lodash: "4.17.20", other: "1.0.0" }), true, { fetchFn: npm, testRun: async () => {},
         client: osvOf({ "lodash@4.17.20": [advisory], "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")], "other@1.0.1": [on("other", extra, "2.0.0")] }),
@@ -288,7 +323,7 @@ describe("dependency patch gates and recoverable application", () => {
           return output;
         } });
       expect(result.receipt?.fixes[0]?.outcome).toBe(outcome);
-      if (outcome === "applied") expect(result.receipt?.fixes[0]?.carried_findings).toEqual(["other@1.0.1 GHSA-test-0010"]);
+      expect(result.receipt?.fixes[0]?.reason).toContain(`other@1.0.1 ${extra}`);
     }
     // Only findings without a supported fix: nothing to validate, and the run fails.
     const none = await patchDependencies(project({ other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });

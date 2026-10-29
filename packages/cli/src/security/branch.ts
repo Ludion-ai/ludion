@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { lstatSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, lstatSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { notSnapshotted } from "./project.ts";
@@ -135,6 +135,23 @@ export function skippedReason(base: GitBase, branch: string, parent: string | nu
 }
 
 /**
+ * Git writes the branch's ref, its reflog and loose objects inside the repository's .git folder. A symbolic link (or a
+ * Windows junction) on any of those paths would make it write outside the repository, so it is refused, and so is a
+ * reflog the new branch already has.
+ */
+function refuseLinks(base: GitBase, branch: string): void {
+  const common = realpathSync(resolve(base.top, git(base.top, ["rev-parse", "--git-common-dir"]).stdout.trim()));
+  const linked: string[] = [];
+  const check = (rel: string) => { try { if (lstatSync(join(common, rel)).isSymbolicLink()) linked.push(rel); } catch { /* absent: Git creates a real one */ } };
+  const parts = ["refs", "heads", ...branch.split("/")];
+  for (let i = 1; i <= parts.length; i++) { check(parts.slice(0, i).join("/")); check(["logs", ...parts.slice(0, i)].join("/")); }
+  check("logs"); check("objects");
+  try { for (const name of readdirSync(join(common, "objects"))) check(`objects/${name}`); } catch { /* no objects folder: Git creates it */ }
+  if (linked.length) throw new Error(`The repository's .git folder has a symbolic link where Git would write (${linked.slice(0, 3).map(plain).join(", ")}); applying needs review.`);
+  if (existsSync(join(common, "logs", ...parts))) throw new Error(`A reflog for the new branch ${plain(branch)} already exists; applying needs review.`);
+}
+
+/**
  * One commit on base.commit with `files` (project-relative paths HEAD has) replaced, on a new branch. A file the working
  * tree has only with CRLF line ends is committed with LF ends, as HEAD has it. An existing branch is never moved: the
  * ref is created only if it does not exist. Returns the commit.
@@ -144,6 +161,7 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
   if (git(base.top, ["check-ref-format", ref], { allowFail: true }).status !== 0) throw new Error(`Invalid branch name: ${plain(branch)}`);
   refuseConfiguration(base.top);
   if (git(base.top, ["symbolic-ref", "--quiet", ref], { allowFail: true }).status === 0) throw new Error(`${plain(ref)} is a symbolic ref; it was not changed, and applying needs review.`);
+  refuseLinks(base, branch);
   const unknown = files.filter(file => !base.modes.has(file.path));
   if (unknown.length) throw new Error(`The last commit has no ${unknown.map(f => plain(f.path)).join(", ")}; applying needs review.`);
   const temp = mkdtempSync(join(tmpdir(), "ludion-index-")), index = join(temp, "index");

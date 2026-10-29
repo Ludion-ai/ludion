@@ -1,4 +1,4 @@
-// `ludion judge` counts every changed version as production (docs/decisions/2026-10-29-no-split-and-release-when-complete.md): the lockfile's
+// `ludion judge` counts every changed version as production (docs/decisions/2026-10-29-every-change-counts-as-production.md): the lockfile's
 // own `dev` flag never lowers urgency to dev-only or the wait to 168 hours.
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

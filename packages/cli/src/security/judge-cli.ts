@@ -31,7 +31,7 @@ export async function judgeCli(args: string[]): Promise<number> {
   const manifest = beforeManifest === afterManifest ? undefined : { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) };
   const beforeEntries = lockEntries(beforeLock), afterEntries = lockEntries(afterLock);
   // Gate 1: every changed version counts as production. The lockfile's own `dev` flag is not used: a build can ship a
-  // devDependency (docs/decisions/2026-10-29-no-split-and-release-when-complete.md).
+  // devDependency (docs/decisions/2026-10-29-every-change-counts-as-production.md).
   const changes = allChanges(beforeLock, afterLock).map(c => ({ ...c, dev: false }));
   const entries = lockEntryChanges(beforeEntries, afterEntries);
   const hadLinks = new Set(lockLinks(beforeLock));

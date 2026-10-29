@@ -17,11 +17,12 @@ import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap
 
 /**
  * One run: one baseline, then each fix (every planned change of one package) validated on its own against it. `outcome`
- * is "partial" when some fixes failed, or some findings have no supported fix, and others did not.
+ * is "partial" when some fixes failed, or some findings have no supported fix, and others did not; "skipped" when every fix
+ * already had its branch, so nothing was validated.
  */
 export type DependencyReceipt = {
   schema: 2; id: string; ecosystem: Ecosystem; scope: "dependency_files_only_not_deployed";
-  started_at: string; finished_at: string; outcome: "failed" | "validated" | "applied" | "partial";
+  started_at: string; finished_at: string; outcome: "failed" | "validated" | "applied" | "partial" | "skipped";
   tree_hash: string; config_hash: string; before: DependencyScan;
   tool_image: string; baseline_image: string | null; baseline_passed: boolean; test: string[];
   /** With --apply: the commit every fix branch starts from, checked to hold the validated files. */
@@ -438,7 +439,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     }
     const done = receipt.fixes.filter(f => f.outcome !== "skipped"), failed = done.filter(f => f.outcome === "failed").length;
     const unplanned = scan.blocked.filter(b => !receipt.fixes.some(f => b.startsWith(`${f.package}@`)));
-    receipt.outcome = done.length && failed === done.length ? "failed" : failed || unplanned.length ? "partial" : apply ? "applied" : "validated";
+    receipt.outcome = done.length && failed === done.length ? "failed" : failed || unplanned.length ? "partial" : !done.length ? "skipped" : apply ? "applied" : "validated";
     const notes = [...(unplanned.length ? [`Findings without a supported fix: ${unplanned.join(" ")}`] : []), ...(done.length ? [] : ["Every fix already has its branch; nothing was validated again."])];
     if (notes.length) receipt.reason = notes.join(" ");
   } catch (error) {

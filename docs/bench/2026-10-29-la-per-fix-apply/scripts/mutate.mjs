@@ -4,6 +4,9 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 const mutations = [
   ["no hooks override", "packages/cli/src/security/branch.ts", "const config = [`core.hooksPath=${hooks}`, ", "const config = [", "packages/cli/test/branch.test.ts"],
+  ["git started in the project's folder", "packages/cli/src/security/branch.ts", "{ cwd: hooks, env,", "{ cwd: dir, env,", "packages/cli/test/branch.test.ts"],
+  ["no executable-bit check", "packages/cli/src/security/branch.ts", "(lstatSync(full).mode & 0o100 ? \"100755\" : \"100644\") === entry.mode", "true", "packages/cli/test/branch.test.ts"],
+  ["every fix skipped reads applied", "packages/cli/src/security/dependency-patch.ts", ": !done.length ? \"skipped\" : apply", ": apply", "packages/cli/test/dependencies.test.ts"],
   ["no fsmonitor override", "packages/cli/src/security/branch.ts", "\"core.fsmonitor=false\", ", "", "packages/cli/test/branch.test.ts"],
   ["no clean-tree check", "packages/cli/src/security/branch.ts", "  if (differs.length) throw", "  if (differs.length && false) throw", "packages/cli/test/branch.test.ts"],
   ["an existing branch is moved", "packages/cli/src/security/branch.ts", "ref, commit, \"0\".repeat(base.commit.length)]", "ref, commit]", "packages/cli/test/branch.test.ts"],

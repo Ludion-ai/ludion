@@ -15,15 +15,17 @@ export type GitBase = { top: string; prefix: string; commit: string; modes: Map<
 const IDENTITY = { GIT_AUTHOR_NAME: "Ludion", GIT_AUTHOR_EMAIL: "ludion@ludion.invalid", GIT_COMMITTER_NAME: "Ludion", GIT_COMMITTER_EMAIL: "ludion@ludion.invalid" };
 const plain = (text: string) => text.replace(/[\x00-\x1f\x7f-\x9f]/g, " ");
 
-function git(cwd: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
-  // An empty hooks folder for every call, so no hook of the repository (or of core.hooksPath) can run.
+function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
+  // An empty hooks folder for every call, so no hook of the repository (or of core.hooksPath) can run. It is also the
+  // working directory: Windows looks for git.exe in the child's working directory before PATH, so it is never the
+  // project's folder, and the repository is named with -C instead.
   const hooks = mkdtempSync(join(tmpdir(), "ludion-no-hooks-"));
   try {
     const env: NodeJS.ProcessEnv = {};
     for (const [key, value] of Object.entries(process.env)) if (!key.toUpperCase().startsWith("GIT_")) env[key] = value;
     Object.assign(env, IDENTITY, { GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0" }, options.index ? { GIT_INDEX_FILE: options.index } : {});
     const config = [`core.hooksPath=${hooks}`, "core.fsmonitor=false", "core.splitIndex=false", "commit.gpgSign=false", "gc.auto=0", "maintenance.auto=false"].flatMap(c => ["-c", c]);
-    const result = spawnSync("git", ["--no-pager", "--literal-pathspecs", ...config, ...args], { cwd, env, input: options.input, maxBuffer: 256 * 1024 * 1024, timeout: 60_000, windowsHide: true });
+    const result = spawnSync("git", ["-C", dir, "--no-pager", "--literal-pathspecs", ...config, ...args], { cwd: hooks, env, input: options.input, maxBuffer: 256 * 1024 * 1024, timeout: 60_000, windowsHide: true });
     if (result.error) throw new Error(`Git could not run: ${result.error.message}`);
     const status = result.status ?? -1;
     if (status !== 0 && !options.allowFail) throw new Error(`git ${args[0]} failed: ${plain(String(result.stderr)).trim().slice(-300)}`);
@@ -34,7 +36,8 @@ function git(cwd: string, args: string[], options: { input?: string; index?: str
 /**
  * The commit to branch from: HEAD, when the validated copy of the project (`copy`, from snapshot) has exactly HEAD's
  * files. Files the snapshot leaves out, and the top-level names in `leftOut` that never reach the tests, are not compared.
- * A file may differ from HEAD only by CRLF line ends (a checkout with core.autocrlf).
+ * A text file may differ from HEAD only by CRLF line ends (a checkout with core.autocrlf); the executable bit must match
+ * HEAD's mode, except on Windows.
  */
 export function gitBase(root: string, copy: string, leftOut: readonly string[] = []): GitBase {
   const inside = git(root, ["rev-parse", "--is-inside-work-tree"], { allowFail: true });
@@ -62,8 +65,11 @@ export function gitBase(root: string, copy: string, leftOut: readonly string[] =
       const full = join(dir, name), key = rel ? `${rel}/${name}` : name;
       if (lstatSync(full).isDirectory()) { walk(full, key); continue; }
       seen.add(key);
-      const data = readFileSync(full), oid = tracked.get(key)?.oid;
-      if (oid !== blob(data) && oid !== blob(Buffer.from(data.toString("latin1").replace(/\r\n/g, "\n"), "latin1"))) differs.push(key);
+      const data = readFileSync(full), entry = tracked.get(key);
+      // CRLF alone is allowed only in a text file (no NUL byte). The executable bit is compared where the file system has one.
+      const text = !data.includes(0), crlf = text && entry?.oid === blob(Buffer.from(data.toString("latin1").replace(/\r\n/g, "\n"), "latin1"));
+      const mode = process.platform === "win32" || !entry || (lstatSync(full).mode & 0o100 ? "100755" : "100644") === entry.mode;
+      if (!entry || (entry.oid !== blob(data) && !crlf) || !mode) differs.push(key);
     }
   };
   walk(copy, "");

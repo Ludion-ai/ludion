@@ -257,6 +257,7 @@ describe("dependency patch gates and recoverable application", () => {
     let tests = 0;
     const second = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
     expect(second.receipt?.fixes[0]).toMatchObject({ outcome: "skipped", branch: "ludion/npm/lodash-4.17.21", commit: null });
+    expect(second.receipt?.outcome).toBe("skipped");
     expect(second.receipt?.reason).toContain("already has its branch");
     expect(tests).toBe(0);
     expect(git(root, "rev-parse", "ludion/npm/lodash-4.17.21")).toBe(branch);

@@ -1,4 +1,5 @@
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -87,6 +88,46 @@ describe("a fix on its own branch", () => {
     // The control: plain Git does run the configured hook, so the check above can see one.
     git(root, "update-ref", "refs/heads/control", "HEAD");
     expect(existsSync(join(marks, "hooks-path.ran"))).toBe(true);
+  });
+  it.skipIf(process.platform === "win32")("never runs a git program from the project's folder", () => {
+    // Windows looks for git.exe in the child's working directory before PATH; "." on PATH does the same here.
+    const { root } = project(), marks = mkdtempSync(join(tmpdir(), "ludion-branch-marks-"));
+    writeFileSync(join(root, "git"), `#!/bin/sh\ntouch "${join(marks, "project-git.ran")}"\nexit 1\n`);
+    chmodSync(join(root, "git"), 0o755);
+    commit(root);
+    const copy = mkdtempSync(join(tmpdir(), "ludion-branch-copy-")); snapshot(root, copy);
+    const path = process.env.PATH;
+    process.env.PATH = `.:${path}`;
+    try {
+      fixBranch(gitBase(root, copy), "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{}\n" }], "ludion: x");
+      expect(existsSync(join(marks, "project-git.ran"))).toBe(false);
+      // The control: started in the project's folder, the project's git is the one that runs.
+      spawnSync("git", ["--version"], { cwd: root });
+      expect(existsSync(join(marks, "project-git.ran"))).toBe(true);
+    } finally { process.env.PATH = path; }
+  });
+  it("ignores GIT_DIR, GIT_INDEX_FILE and GIT_CONFIG_PARAMETERS inherited from the environment", () => {
+    const { root, copy } = project(), other = project(), saved = { ...process.env };
+    Object.assign(process.env, { GIT_DIR: join(other.root, ".git"), GIT_INDEX_FILE: join(tmpdir(), "ludion-no-such-index"), GIT_CONFIG_PARAMETERS: "'core.hookspath'='/nonexistent'" });
+    try {
+      const base = gitBase(root, copy);
+      expect(base.commit).toBe(git(root, "--git-dir", join(root, ".git"), "rev-parse", "HEAD"));
+      fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{}\n" }], "ludion: x");
+    } finally { for (const key of ["GIT_DIR", "GIT_INDEX_FILE", "GIT_CONFIG_PARAMETERS"]) if (saved[key] === undefined) delete process.env[key]; else process.env[key] = saved[key]; }
+    expect(git(root, "rev-parse", "--verify", "ludion/npm/x-1.0.1")).toMatch(/^[0-9a-f]{40}$/);
+    expect(git(other.root, "branch", "--list", "ludion/*")).toBe("");
+  });
+  it.skipIf(process.platform === "win32")("refuses a symbolic link in HEAD, and an executable bit or a binary file that differs", () => {
+    const first = project();
+    symlinkSync("package.json", join(first.root, "link")); commit(first.root);
+    expect(() => gitBase(first.root, first.copy)).toThrow("a symbolic link at link");
+    const second = project();
+    chmodSync(join(second.copy, "package.json"), 0o755);
+    expect(() => gitBase(second.root, second.copy)).toThrow("differ from it: package.json");
+    const third = project();
+    writeFileSync(join(third.root, "data.bin"), Buffer.from("a\0\nb")); commit(third.root);
+    writeFileSync(join(third.copy, "data.bin"), Buffer.from("a\0\r\nb"));
+    expect(() => gitBase(third.root, third.copy)).toThrow("differ from it: data.bin");
   });
   it("makes branch names Git accepts", () => {
     expect(branchName("ludion", "apps/web/", "npm", "@scope/pkg-1.2.3")).toBe("ludion/apps-web/npm/scope-pkg-1.2.3");

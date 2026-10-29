@@ -1,15 +1,15 @@
-# started 2026-10-29T11:11:14Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+# started 2026-10-29T11:23:48Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
 npm ci exit 0
 build exit 0
 == case npm
-committed 05ada67a4e4a0586349ec375cc04c2f09c352ab2
+committed 4709af8a3d12545136d62a9175389889b2d14984
 Result: applied
   lodash 4.17.20 → 4.18.0: applied (branch ludion/npm/lodash-4.18.0)
-Receipt: /e/npm/.ludion/security/b63accbf-a909-4259-b067-4a46e936ba09.json
+Receipt: /e/npm/.ludion/security/164797bb-dd2c-4384-ac60-cff054ff2f25.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
 -- branches:
-ludion/npm/lodash-4.18.0 ce2d1b69adf8fb875602d530e50fcf361a0924d5 parent=05ada67a4e4a0586349ec375cc04c2f09c352ab2
+ludion/npm/lodash-4.18.0 4cfe34ca588ff1b019feae7778feed21c07f0b87 parent=4709af8a3d12545136d62a9175389889b2d14984
 -- ludion/npm/lodash-4.18.0 changes:
  package-lock.json | 10 ++++++----
  package.json      |  8 ++++++--
@@ -19,14 +19,14 @@ ludion: lodash 4.17.20 -> 4.18.0 (npm)
 
 Fixes GHSA-29mw-wpgm-hmr9, GHSA-35jh-r3h4-6jhm, GHSA-f23m-r3pf-42rh, GHSA-r5fr-rjxr-66jc, GHSA-xxjr-mmjv-4gpg.
 
-Ludion receipt b63accbf-a909-4259-b067-4a46e936ba09: the project's test passed on 05ada67a4e4a and on this change alone, offline in Docker.
+Ludion receipt 164797bb-dd2c-4384-ac60-cff054ff2f25: the project's test passed on 4709af8a3d12 and on this change alone, offline in Docker.
 Source dependency files only; production was not changed.
 
 -- working tree status (empty means unchanged):
--- receipt b63accbf-a909-4259-b067-4a46e936ba09.json:
+-- receipt 164797bb-dd2c-4384-ac60-cff054ff2f25.json:
 {
   "outcome": "applied",
-  "base_commit": "05ada67a4e4a0586349ec375cc04c2f09c352ab2",
+  "base_commit": "4709af8a3d12545136d62a9175389889b2d14984",
   "baseline_passed": true,
   "tool_image": "node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c",
   "fixes": [
@@ -37,32 +37,32 @@ Source dependency files only; production was not changed.
       ],
       "outcome": "applied",
       "branch": "ludion/npm/lodash-4.18.0",
-      "commit": "ce2d1b69adf8fb875602d530e50fcf361a0924d5",
+      "commit": "4cfe34ca588ff1b019feae7778feed21c07f0b87",
       "fix_published_at": "2026-03-31T18:18:42.717Z",
       "fix_published_note": "registry.npmjs.org's publish time of the fixed version.",
-      "found_at": "2026-10-29T11:11:25.168Z",
-      "applied_at": "2026-10-29T11:11:33.888Z",
+      "found_at": "2026-10-29T11:23:57.327Z",
+      "applied_at": "2026-10-29T11:24:04.846Z",
       "candidate_passed": true
     }
   ]
 }
 -- second run (the branches exist):
-Result: applied — Every fix already has its branch; nothing was validated again.
+Result: skipped — Every fix already has its branch; nothing was validated again.
   lodash 4.17.20 → 4.18.0: skipped (branch ludion/npm/lodash-4.18.0) — The branch ludion/npm/lodash-4.18.0 already exists; this fix was not validated again and the branch was not changed.
-Receipt: /e/npm/.ludion/security/608cde5c-1873-4589-8653-40c970893642.json
+Receipt: /e/npm/.ludion/security/48c10a31-f048-4655-927e-9f80902bbe08.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
 == case npm-two
 lockfile exit 0
-committed d4c0603e4d9210c3fd9b09e73c274825887d28b6
+committed 0a417daeb4f09d347d14ffebec7fa6a6210630df
 Result: partial
   lodash 4.17.20 → 4.18.0: failed — Application validation failed (1): 
   minimist 1.2.5 → 1.2.6: applied (branch ludion/npm/minimist-1.2.6)
-Receipt: /e/npm-two/.ludion/security/ff81cef9-d284-488c-ba01-0b5c73ea3f60.json
+Receipt: /e/npm-two/.ludion/security/718ef512-8364-4a91-9740-01f513ecc352.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 2
 -- branches:
-ludion/npm/minimist-1.2.6 13533bf0cf247bed7c93e98ea45dc2a3c360e1f5 parent=d4c0603e4d9210c3fd9b09e73c274825887d28b6
+ludion/npm/minimist-1.2.6 7ddad2066d8710540d281fc65f5a0672db7c122c parent=0a417daeb4f09d347d14ffebec7fa6a6210630df
 -- ludion/npm/minimist-1.2.6 changes:
  package-lock.json | 8 ++++----
  package.json      | 2 +-
@@ -72,14 +72,14 @@ ludion: minimist 1.2.5 -> 1.2.6 (npm)
 
 Fixes GHSA-xvch-5gv4-984h.
 
-Ludion receipt ff81cef9-d284-488c-ba01-0b5c73ea3f60: the project's test passed on d4c0603e4d92 and on this change alone, offline in Docker.
+Ludion receipt 718ef512-8364-4a91-9740-01f513ecc352: the project's test passed on 0a417daeb4f0 and on this change alone, offline in Docker.
 Source dependency files only; production was not changed.
 
 -- working tree status (empty means unchanged):
--- receipt ff81cef9-d284-488c-ba01-0b5c73ea3f60.json:
+-- receipt 718ef512-8364-4a91-9740-01f513ecc352.json:
 {
   "outcome": "partial",
-  "base_commit": "d4c0603e4d9210c3fd9b09e73c274825887d28b6",
+  "base_commit": "0a417daeb4f09d347d14ffebec7fa6a6210630df",
   "baseline_passed": true,
   "tool_image": "node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c",
   "fixes": [
@@ -93,7 +93,7 @@ Source dependency files only; production was not changed.
       "commit": null,
       "fix_published_at": "2026-03-31T18:18:42.717Z",
       "fix_published_note": "registry.npmjs.org's publish time of the fixed version.",
-      "found_at": "2026-10-29T11:11:37.545Z",
+      "found_at": "2026-10-29T11:24:08.080Z",
       "applied_at": null,
       "candidate_passed": false,
       "reason": "Application validation failed (1): "
@@ -105,11 +105,11 @@ Source dependency files only; production was not changed.
       ],
       "outcome": "applied",
       "branch": "ludion/npm/minimist-1.2.6",
-      "commit": "13533bf0cf247bed7c93e98ea45dc2a3c360e1f5",
+      "commit": "7ddad2066d8710540d281fc65f5a0672db7c122c",
       "fix_published_at": "2022-03-22T02:50:30.352Z",
       "fix_published_note": "registry.npmjs.org's publish time of the fixed version.",
-      "found_at": "2026-10-29T11:11:37.545Z",
-      "applied_at": "2026-10-29T11:11:46.765Z",
+      "found_at": "2026-10-29T11:24:08.080Z",
+      "applied_at": "2026-10-29T11:24:16.707Z",
       "candidate_passed": true
     }
   ]
@@ -118,18 +118,18 @@ Source dependency files only; production was not changed.
 Result: failed
   lodash 4.17.20 → 4.18.0: failed — Application validation failed (1): 
   minimist 1.2.5 → 1.2.6: skipped (branch ludion/npm/minimist-1.2.6) — The branch ludion/npm/minimist-1.2.6 already exists; this fix was not validated again and the branch was not changed.
-Receipt: /e/npm-two/.ludion/security/f6016119-ce6d-4f5a-bc24-606389375438.json
+Receipt: /e/npm-two/.ludion/security/cfb8331d-b96a-4219-a6f6-44124cf49fc1.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 2
 == case php
-committed b1167cedc182f2699056c9eb5eedb1ebf3f71b5e
+committed 3381911b1d806496855ec174f2877240882de1ff
 Result: applied
   Branch: ludion/php/8.4.27
-Receipt: /e/php/.ludion/security/73c84f04-464c-49f7-95d5-665785ea2124.json
+Receipt: /e/php/.ludion/security/f74c5b16-f110-45ee-8737-29f8a828a1ee.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
 -- branches:
-ludion/php/8.4.27 eebd40d8613d37a3652ad3adb382b304fcc39932 parent=b1167cedc182f2699056c9eb5eedb1ebf3f71b5e
+ludion/php/8.4.27 4803275c8910a0a3a62a4d263470b44946a4bfea parent=3381911b1d806496855ec174f2877240882de1ff
 -- ludion/php/8.4.27 changes:
  Dockerfile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -138,42 +138,42 @@ ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile
 
 Official PHP security releases: 8.4.27.
 
-Ludion receipt 73c84f04-464c-49f7-95d5-665785ea2124: the project's test passed on b1167cedc182 and on this change, offline in Docker.
+Ludion receipt f74c5b16-f110-45ee-8737-29f8a828a1ee: the project's test passed on 3381911b1d80 and on this change, offline in Docker.
 Source Dockerfile only; production was not changed.
 
 -- working tree status (empty means unchanged):
--- receipt 73c84f04-464c-49f7-95d5-665785ea2124.json:
+-- receipt f74c5b16-f110-45ee-8737-29f8a828a1ee.json:
 {
   "outcome": "applied",
-  "base_commit": "b1167cedc182f2699056c9eb5eedb1ebf3f71b5e",
+  "base_commit": "3381911b1d806496855ec174f2877240882de1ff",
   "baseline_passed": true,
   "candidate": {
     "version": "8.4.27",
     "reference": "php:8.4.27-cli-alpine"
   },
   "branch": "ludion/php/8.4.27",
-  "commit": "eebd40d8613d37a3652ad3adb382b304fcc39932",
+  "commit": "4803275c8910a0a3a62a4d263470b44946a4bfea",
   "fix_published_at": "2026-10-21T00:00:00.000Z",
   "fix_published_note": "php.net's release date of PHP 8.4.27, the first security release newer than the Dockerfile's version. php.net gives a day only; recorded as 00:00 UTC that day.",
-  "found_at": "2026-10-29T11:11:55.766Z",
-  "applied_at": "2026-10-29T11:12:02.788Z",
+  "found_at": "2026-10-29T11:24:24.426Z",
+  "applied_at": "2026-10-29T11:24:29.674Z",
   "candidate_passed": true
 }
 -- second run (the branches exist):
 Result: skipped — The branch ludion/php/8.4.27 already exists; this update was not validated again and the branch was not changed.
   Branch: ludion/php/8.4.27
-Receipt: /e/php/.ludion/security/a37c36b8-a29c-47b2-87d9-01eac68998e3.json
+Receipt: /e/php/.ludion/security/b9991ce8-0618-4609-a3bf-83fd121fab8f.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
 == case composer
-committed e4f7db4dd399ff2bb70f8896bd2b9e3711315b10
+committed 466c71afe2861bac5b362f05b48702bbf33b34a2
 Result: applied
   symfony/http-foundation 5.4.0 → 5.4.54: applied (branch ludion/composer/symfony-http-foundation-5.4.54)
-Receipt: /e/composer/.ludion/security/a3c3eab7-ae65-494e-b2d8-f1e87e9ed185.json
+Receipt: /e/composer/.ludion/security/7974899d-1d83-4e5b-9639-f93c1dcd55f4.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
 -- branches:
-ludion/composer/symfony-http-foundation-5.4.54 8a62e9a4cd7fb88af5a7eabc67f075efed997a2e parent=e4f7db4dd399ff2bb70f8896bd2b9e3711315b10
+ludion/composer/symfony-http-foundation-5.4.54 01b3f315d26c20eedbe8a0df0229c1ec43670e20 parent=466c71afe2861bac5b362f05b48702bbf33b34a2
 -- ludion/composer/symfony-http-foundation-5.4.54 changes:
  composer.json |  8 ++++++--
  composer.lock | 25 ++++++++++++++++---------
@@ -183,14 +183,14 @@ ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)
 
 Fixes GHSA-3rg7-wf37-54rm, GHSA-mrqx-rp3w-jpjp, GHSA-r925-mgvr-h9cc, PKSA-365x-2zjk-pt47, PKSA-b35n-565h-rs4q.
 
-Ludion receipt a3c3eab7-ae65-494e-b2d8-f1e87e9ed185: the project's test passed on e4f7db4dd399 and on this change alone, offline in Docker.
+Ludion receipt 7974899d-1d83-4e5b-9639-f93c1dcd55f4: the project's test passed on 466c71afe286 and on this change alone, offline in Docker.
 Source dependency files only; production was not changed.
 
 -- working tree status (empty means unchanged):
--- receipt a3c3eab7-ae65-494e-b2d8-f1e87e9ed185.json:
+-- receipt 7974899d-1d83-4e5b-9639-f93c1dcd55f4.json:
 {
   "outcome": "applied",
-  "base_commit": "e4f7db4dd399ff2bb70f8896bd2b9e3711315b10",
+  "base_commit": "466c71afe2861bac5b362f05b48702bbf33b34a2",
   "baseline_passed": true,
   "tool_image": "composer:2@sha256:2cf275428757e5435a667bfc0d038b14520ca02be2b1b70d44a05c8c19e2de48",
   "fixes": [
@@ -201,32 +201,32 @@ Source dependency files only; production was not changed.
       ],
       "outcome": "applied",
       "branch": "ludion/composer/symfony-http-foundation-5.4.54",
-      "commit": "8a62e9a4cd7fb88af5a7eabc67f075efed997a2e",
+      "commit": "01b3f315d26c20eedbe8a0df0229c1ec43670e20",
       "fix_published_at": "2026-09-30T11:07:08.000Z",
       "fix_published_note": "Packagist's release date of the fixed version, which its author sets.",
-      "found_at": "2026-10-29T11:12:05.075Z",
-      "applied_at": "2026-10-29T11:12:22.144Z",
+      "found_at": "2026-10-29T11:24:31.497Z",
+      "applied_at": "2026-10-29T11:24:43.216Z",
       "candidate_passed": true
     }
   ]
 }
 -- second run (the branches exist):
-Result: applied — Every fix already has its branch; nothing was validated again.
+Result: skipped — Every fix already has its branch; nothing was validated again.
   symfony/http-foundation 5.4.0 → 5.4.54: skipped (branch ludion/composer/symfony-http-foundation-5.4.54) — The branch ludion/composer/symfony-http-foundation-5.4.54 already exists; this fix was not validated again and the branch was not changed.
-Receipt: /e/composer/.ludion/security/6fa82734-4759-49d3-abb6-c3e7dfeb99e0.json
+Receipt: /e/composer/.ludion/security/bd557e34-4bbb-445a-8710-50b11957f04b.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
 == case maven
-committed 4ff27a93ef929346369848bfdc35cb065419fde5
+committed 0dc53d1e7c04680dce6bbf40d5214871294626f9
 Result: applied
   org.apache.commons:commons-text 1.9 → 1.10.0: applied (branch ludion/maven/org.apache.commons-commons-text-1.10.0)
   org.apache.commons:commons-lang3 3.11 → 3.18.0: applied (branch ludion/maven/org.apache.commons-commons-lang3-3.18.0)
-Receipt: /e/maven/.ludion/security/2b2743b9-e07f-42cd-b071-f5b093436d86.json
+Receipt: /e/maven/.ludion/security/730a06c8-fb3c-4b02-85c1-5ee6920cc333.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
 -- branches:
-ludion/maven/org.apache.commons-commons-lang3-3.18.0 1b8d7928ea85b0503fb81d6ee6f5123857fc6b95 parent=4ff27a93ef929346369848bfdc35cb065419fde5
-ludion/maven/org.apache.commons-commons-text-1.10.0 801ac2af77a80a9c6c4ff01329b660261bc740ed parent=4ff27a93ef929346369848bfdc35cb065419fde5
+ludion/maven/org.apache.commons-commons-lang3-3.18.0 e5b26aa862a24a1bc4fc325ccb84e51af0815b52 parent=0dc53d1e7c04680dce6bbf40d5214871294626f9
+ludion/maven/org.apache.commons-commons-text-1.10.0 3319234e4c853713c24312c4a9e5ebeabae8064a parent=0dc53d1e7c04680dce6bbf40d5214871294626f9
 -- ludion/maven/org.apache.commons-commons-lang3-3.18.0 changes:
  pom.xml | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -235,7 +235,7 @@ ludion: org.apache.commons:commons-lang3 3.11 -> 3.18.0 (maven)
 
 Fixes GHSA-j288-q9x7-2f5v.
 
-Ludion receipt 2b2743b9-e07f-42cd-b071-f5b093436d86: the project's test passed on 4ff27a93ef92 and on this change alone, offline in Docker.
+Ludion receipt 730a06c8-fb3c-4b02-85c1-5ee6920cc333: the project's test passed on 0dc53d1e7c04 and on this change alone, offline in Docker.
 Source dependency files only; production was not changed.
 
 -- ludion/maven/org.apache.commons-commons-text-1.10.0 changes:
@@ -246,14 +246,14 @@ ludion: org.apache.commons:commons-text 1.9 -> 1.10.0 (maven)
 
 Fixes GHSA-599f-7c49-w659.
 
-Ludion receipt 2b2743b9-e07f-42cd-b071-f5b093436d86: the project's test passed on 4ff27a93ef92 and on this change alone, offline in Docker.
+Ludion receipt 730a06c8-fb3c-4b02-85c1-5ee6920cc333: the project's test passed on 0dc53d1e7c04 and on this change alone, offline in Docker.
 Source dependency files only; production was not changed.
 
 -- working tree status (empty means unchanged):
--- receipt 2b2743b9-e07f-42cd-b071-f5b093436d86.json:
+-- receipt 730a06c8-fb3c-4b02-85c1-5ee6920cc333.json:
 {
   "outcome": "applied",
-  "base_commit": "4ff27a93ef929346369848bfdc35cb065419fde5",
+  "base_commit": "0dc53d1e7c04680dce6bbf40d5214871294626f9",
   "baseline_passed": true,
   "tool_image": "maven:3.9-eclipse-temurin-21@sha256:99e61abcff91a9b1333463bd8451fb18495d6eba9250ac66a338b518f8278320",
   "fixes": [
@@ -264,11 +264,11 @@ Source dependency files only; production was not changed.
       ],
       "outcome": "applied",
       "branch": "ludion/maven/org.apache.commons-commons-text-1.10.0",
-      "commit": "801ac2af77a80a9c6c4ff01329b660261bc740ed",
+      "commit": "3319234e4c853713c24312c4a9e5ebeabae8064a",
       "fix_published_at": null,
       "fix_published_note": "Not read: Ludion does not read Maven Central's publish times yet.",
-      "found_at": "2026-10-29T11:12:29.366Z",
-      "applied_at": "2026-10-29T11:12:40.109Z",
+      "found_at": "2026-10-29T11:24:49.127Z",
+      "applied_at": "2026-10-29T11:24:58.213Z",
       "candidate_passed": true
     },
     {
@@ -278,20 +278,20 @@ Source dependency files only; production was not changed.
       ],
       "outcome": "applied",
       "branch": "ludion/maven/org.apache.commons-commons-lang3-3.18.0",
-      "commit": "1b8d7928ea85b0503fb81d6ee6f5123857fc6b95",
+      "commit": "e5b26aa862a24a1bc4fc325ccb84e51af0815b52",
       "fix_published_at": null,
       "fix_published_note": "Not read: Ludion does not read Maven Central's publish times yet.",
-      "found_at": "2026-10-29T11:12:29.366Z",
-      "applied_at": "2026-10-29T11:12:43.885Z",
+      "found_at": "2026-10-29T11:24:49.127Z",
+      "applied_at": "2026-10-29T11:25:02.298Z",
       "candidate_passed": true
     }
   ]
 }
 -- second run (the branches exist):
-Result: applied — Every fix already has its branch; nothing was validated again.
+Result: skipped — Every fix already has its branch; nothing was validated again.
   org.apache.commons:commons-text 1.9 → 1.10.0: skipped (branch ludion/maven/org.apache.commons-commons-text-1.10.0) — The branch ludion/maven/org.apache.commons-commons-text-1.10.0 already exists; this fix was not validated again and the branch was not changed.
   org.apache.commons:commons-lang3 3.11 → 3.18.0: skipped (branch ludion/maven/org.apache.commons-commons-lang3-3.18.0) — The branch ludion/maven/org.apache.commons-commons-lang3-3.18.0 already exists; this fix was not validated again and the branch was not changed.
-Receipt: /e/maven/.ludion/security/9562d187-0d82-405e-af74-fa9a632c8019.json
+Receipt: /e/maven/.ludion/security/245ab4c2-4520-4f28-be89-5fd5ac5bd54a.json
 Source update only, on branches; the working tree was not changed. Production deployment was not changed.
 patch exit 0
-# finished 2026-10-29T11:12:49Z
+# finished 2026-10-29T11:25:06Z

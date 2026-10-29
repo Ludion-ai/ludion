@@ -1,11 +1,11 @@
-commit: df7356085134676edb247c35ed2e2d836b4d98d7  replay.ts blob: 12d7fb1e11ebbb235457710a4c4d4a4b86898f2d  disputed.ts blob: afd2f5bc3bf7f4eae80842f74d777f6dd9b12604  test blob: 86d6db1679efc86c3232a9bae742567688bd4a5a
+commit: 05e33cf07fc8a4fb5b233cedf3028099ebb6bc0e  replay.ts blob: 091f2cd345c5ed01da039edabb32830efc026987  disputed.ts blob: f9d57bc2fc5254cb96cbb58cbf85618125f71bd7  test blob: 35f6c08dab76b89ccf7bd992531c64e4962521b2
 == typecheck
 tsc_exit=0
 == tests
- [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/recorder.test.ts [2m([22m[2m35 tests[22m[2m)[22m[32m 129[2mms[22m[39m
- [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/replay.test.ts [2m([22m[2m58 tests[22m[2m)[22m[33m 548[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/recorder.test.ts [2m([22m[2m35 tests[22m[2m)[22m[32m 128[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/replay.test.ts [2m([22m[2m61 tests[22m[2m)[22m[33m 580[2mms[22m[39m
 [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[32m93 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[32m96 passed[39m[22m[90m (96)[39m
   packages/cli/src/security/judge.ts from 8a78b55940def8463a2401e7bdd38d7e6c7b604d: 5a598fdc5412db75dda1411bef22b087b2fcb285
   packages/cli/src/security/npm-facts.ts from 8a78b55940def8463a2401e7bdd38d7e6c7b604d: 8289c4e208a4cda1dc215032df95ba56f1912262
   packages/cli/src/security/time-cap.ts from 8a78b55940def8463a2401e7bdd38d7e6c7b604d: 4fb4608234c42d0597a65eb10452f22d0d602575
@@ -13,165 +13,177 @@ tsc_exit=0
 == tests with the start commit's judge files
 tsc_exit=0
 [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[32m93 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[32m96 passed[39m[22m[90m (96)[39m
 == mutation: MAL- re-query sees every record, whenever published
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: synthetic fix never exploited
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m87 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m90 passed[39m[22m[90m (96)[39m
 == mutation: no recomputation of wait_until
 [31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 23 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m23 failed[39m[22m[2m | [22m[1m[32m70 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m23 failed[39m[22m[2m | [22m[1m[32m73 passed[39m[22m[90m (96)[39m
 == mutation: missing attestations not a gap
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m89 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (96)[39m
 == mutation: a day without a poll does not break the run
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: false-report candidates counted as misses
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m91 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m94 passed[39m[22m[90m (96)[39m
 == mutation: repeated records kept
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m91 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m94 passed[39m[22m[90m (96)[39m
 == mutation: records after the window's end + 336h join the denominator
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: nothing pending past the store's coverage
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: no seed from a later complete capture
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m90 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m93 passed[39m[22m[90m (96)[39m
 == mutation: MAL- records read as they are today
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: withdrawn records leave the denominator
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: final without an OSV read past the deadline
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: no predecessor is not applicable
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: met with no case when every case is a false-report candidate
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: a version with no stored publish time is skipped offline
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: the denominator from each record's latest copy only
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: OSV records still being retried ignored
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: ranges enumerated over stored versions only
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m91 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m94 passed[39m[22m[90m (96)[39m
 == mutation: final although a range was not enumerated
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: withdrawn records left out of the record-omission rule
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: V left out of the run of identical code's times
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m88 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m91 passed[39m[22m[90m (96)[39m
 == mutation: seeds from V's own captures and P's packument only
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: OSV not asked by package name
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m90 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m93 passed[39m[22m[90m (96)[39m
 == mutation: final although OSV was not asked
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: capture gaps of MAL-only cases not listed
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: no seed from a dependency's later first publish
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: inputs past the coverage a gap, not pending
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: the recorder's file list not compared by digest
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: OSV asked only for names with a stored window version
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: a copy with no publish time counts as late
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m91 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m94 passed[39m[22m[90m (96)[39m
 == mutation: the latest poll by spreading every status line
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: a version the recorder gave up on judged from its partial capture
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: captures after V's publish + 336h seed a judgement
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: a range record with no publish time not expanded
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: the re-query stops on a range it cannot place
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
+== mutation: prev_d leaves out a record withdrawn in any copy
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
+== mutation: an OSV give-up never lifted
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
+== mutation: take-downs compared within their own type only
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: file list only from the last capture
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 == mutation: recorder's file list not compared
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m91 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m94 passed[39m[22m[90m (96)[39m
 == mutation: O after another named version ignored
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m90 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m93 passed[39m[22m[90m (96)[39m
 == mutation: added install script ignored
 [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
-[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m92 passed[39m[22m[90m (93)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
 replay.ts and disputed.ts restored

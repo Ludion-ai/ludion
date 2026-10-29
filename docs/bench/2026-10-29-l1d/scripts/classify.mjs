@@ -59,6 +59,6 @@ const byCause = {};
 for (const r of rows) (byCause[r.cause] ??= { cause: CAUSES[r.cause], misses: 0, packages: [] }).misses++, byCause[r.cause].packages.push(`${r.repo} ${r.name}`);
 writeFileSync(join(out, "classification.json"), JSON.stringify({ causes: CAUSES, by_cause: byCause, rows }, null, 1));
 const md = ["| # | Sample | Repository | Package | Verdict | Cause | Basis |", "| --- | --- | --- | --- | --- | --- | --- |",
-  ...rows.map((r, i) => `| ${i + 1} | ${r.sample.split(" ")[0]} | ${r.repo} | ${r.name} | ${r.verdict}${r.criterion && r.criterion !== "none" ? ` (${r.criterion})` : ""} | ${r.cause} | ${r.basis.replace(/\|/g, "\\|")} |`)];
+  ...rows.map((r, i) => `| ${i + 1} | ${r.sample.split(" ")[0]} | ${r.repo} | ${r.name} | ${r.verdict}${r.criterion && r.criterion !== "none" ? ` (${r.criterion})` : ""} | ${r.cause} | ${r.basis.replace(/\\/g, "\\\\").replace(/\|/g, "\\|")} |`)];
 writeFileSync(join(out, "classification-table.md"), md.join("\n") + "\n");
 console.log(JSON.stringify(Object.fromEntries(Object.entries(byCause).map(([k, v]) => [k, v.misses]))));

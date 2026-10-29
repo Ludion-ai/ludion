@@ -26,7 +26,7 @@ docs/bench/2026-10-29-l1d; PR #196.
 - **1:** a pino logger transport named by a string at start;
 - **1:** a `node_modules/wrangler` path in `wrangler.jsonc`, which the reviewer could not decide.
 
-  Reference samples: 0 misses each.
+  6 is the count as the reviewers gave it. It would be up to 16 under two readings from the reviewers' notes: an obfuscated build payload in one repository (7 packages), and a `$schema` node_modules path read as P2 in another (3). Reference samples: 0 misses each.
 
 **Overlap:** 0 repositories and 0 owners shared with the earlier samples. No repository failed. The code-review fix after the runs started (45079c2) changes 0 pairs in all three samples.
 

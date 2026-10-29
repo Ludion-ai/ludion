@@ -19,7 +19,11 @@ The verdict comes from the third sample. Section 2 of the split's definition, "w
 | Misses (yes + undecidable) | 0 | 0 | **6 (5 yes, 1 undecidable) in 4 repositories: not met** |
 | L1c's numbers for the same sample | 1,867 / 935, 11 misses | 2,136 / 998, 58 misses | (new) |
 
-**Neither gate is met on the third sample, the sample the verdict comes from.** The 69 earlier misses are all counted now: 0 remain in either reference sample (`review/review-tally.json`, and `recount/recount-*-45079c2.json`: 11 of 11 and 58 of 58 counted). The third sample has 6 misses of causes the fix did not cover (below). Fixing misses raised the count, which was already 47–52% of npm audit's where the gate needs 33%.
+**Neither gate is met on the third sample, the sample the verdict comes from.** The 69 earlier misses are all counted now: 0 remain in either reference sample (`review/review-tally.json`, and `recount/recount-*-45079c2.json`: 11 of 11 and 58 of 58 counted). The third sample has 6 misses of causes the fix did not cover (below).
+
+6 is the count as the reviewers gave it, not a ceiling. Under two readings that the reviewers' notes raise, it would be up to 16: Joshuasco/coffeeShop's 7 packages, whose build runs an obfuscated payload, and 2fa-cfworkers' 3 packages under Parallax's `$schema` reading.
+
+Fixing misses raised the count. As a share of npm audit's, the judge's count was 50.1% (original) and 46.7% (second) before the fix (L1c). After it, the shares are 50.8%, 49.6% and 51.8% (third). The gate needs 33%.
 
 ## The steps, in commit order
 

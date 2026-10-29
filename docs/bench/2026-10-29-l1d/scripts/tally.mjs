@@ -21,7 +21,9 @@ for (const sample of ["third", "original", "second"]) {
   const rows = [];
   for (const g of a.groups) for (const r of g.repositories) if (r.sample === sample) for (const name of r.packages) {
     const v = verdicts.get(`${r.repo}\0${name}`);
-    rows.push({ repo: r.repo, name, verdict: v ? v.production_relevant : "no verdict", criterion: v?.criterion ?? null, unfinished: unfinished.has(r.repo) });
+    // In an unfinished repository, only a "yes" or a "no" counts as checked; anything else is a miss (the brief).
+    const given = v && (!unfinished.has(r.repo) || v.production_relevant === "yes" || v.production_relevant === "no");
+    rows.push({ repo: r.repo, name, verdict: given ? v.production_relevant : "no verdict", criterion: v?.criterion ?? null, unfinished: unfinished.has(r.repo) });
   }
   for (const k of a.kept.filter(k => k.sample === sample)) rows.push({ repo: k.repo, name: k.name, verdict: k.production_relevant, criterion: k.criterion, kept_from_earlier: true });
   const miss = rows.filter(x => x.verdict === "yes" || x.verdict === "undecidable" || x.verdict === "no verdict");

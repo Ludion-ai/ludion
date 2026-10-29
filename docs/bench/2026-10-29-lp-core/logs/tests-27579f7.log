@@ -1,0 +1,72 @@
+# Head 27579f7 (e0c28b6 + origin/main 41202db + the footer rule), copied with git archive into a Docker volume; npm ci --ignore-scripts with network, then --network none --read-only --tmpfs /tmp:exec, user node.
+== v24.22.1 jq-1.6
+typecheck exit=0
+ ✓  node  packages/cli/test/judge-workflow.test.ts (27 tests) 1678ms
+     ✓ reject a record that is not exactly the schema  352ms
+     ✓ fails, posting nothing, when the record does not match the schema or names another PR or head  353ms
+ ✓  node  packages/cli/test/protected-paths-workflow.test.ts (13 tests) 5038ms
+     ✓ passes on an approving review of the current head with the label, whatever the case or decoration  456ms
+     ✓ does not approve on a first line that says not to, asks for changes, or does not begin with APPROVE  877ms
+     ✓ reads reviewed-sha only on the last line, after trailing blanks and \r  449ms
+     ✓ removes the footer when it ends the comment, then reads reviewed-sha on the line before it  387ms
+     ✓ removes nothing when another line follows the footer or the footer is not exactly those two lines  661ms
+     ✓ reads only comments by the owner, a member or a collaborator  660ms
+     ✓ treats an empty or missing body as no review, without breaking the check  458ms
+ Test Files  2 passed (2)
+      Tests  40 passed (40)
+== node project, packages and tools
+ Test Files  21 passed (21)
+      Tests  779 passed (779)
+== mutations
+every comment read, whoever wrote it | Tests 1 failed | 12 passed (13)
+CONTRIBUTOR also read | Tests 1 failed | 12 passed (13)
+association compared without case | Tests 1 failed | 12 passed (13)
+reviewed-sha on any line | Tests 2 failed | 11 passed (13)
+text allowed after the SHA | Tests 1 failed | 12 passed (13)
+reviewed-sha anywhere in the last line | Tests 1 failed | 12 passed (13)
+trailing blanks not trimmed | Tests 2 failed | 11 passed (13)
+footer never removed | Tests 1 failed | 12 passed (13)
+blank lines before the footer kept | Tests 1 failed | 12 passed (13)
+footer's --- line not required | Tests 1 failed | 12 passed (13)
+footer's Generated line not required | Tests 1 failed | 12 passed (13)
+footer's Generated line matched by prefix | Tests 1 failed | 12 passed (13)
+footer's --- line not trimmed | Tests 1 failed | 12 passed (13)
+footer's --- line also left-trimmed | Tests 1 failed | 12 passed (13)
+missing body not defaulted | Tests 1 failed | 12 passed (13)
+APPROVE anywhere on the first line | Tests 1 failed | 12 passed (13)
+APPROVED counted as APPROVE | Tests 1 failed | 12 passed (13)
+APPROVE matched in upper case only | Tests 1 failed | 12 passed (13)
+NOT and REQUEST matched in upper case only | Tests 2 failed | 11 passed (13)
+NOT not excluded | Tests 2 failed | 11 passed (13)
+REQUEST not excluded | Tests 1 failed | 12 passed (13)
+decoration * _ ` not read as spaces | Tests 1 failed | 12 passed (13)
+strikethrough read as decoration | Tests 1 failed | 12 passed (13)
+leading # and > not removed | Tests 1 failed | 12 passed (13)
+APPROVE on any line | Tests 1 failed | 12 passed (13)
+every review counted as approving | Tests 5 failed | 8 passed (13)
+the first review of the head decides | Tests 2 failed | 11 passed (13)
+any approval of the head counts | Tests 2 failed | 11 passed (13)
+label check passes on an empty answer | Tests 1 failed | 12 passed (13)
+action/ not protected | Tests 1 failed | 12 passed (13)
+action.yml not protected | Tests 1 failed | 12 passed (13)
+pipefail off | Tests 1 failed | 12 passed (13)
+caught 32 of 32
+restored | Tests 13 passed (13)
+== actionlint, --network none, read-only
+1.7.12
+installed by building from source
+built with go1.26.1 compiler for linux/amd64
+actionlint exit=0
+== REVIEWS on 12 footer probe bodies under jq 1.6, jq 1.7.1, gojq 0.12.17 (first 12 characters of each output line)
+footer | jq1.6=[approve aaaa] jq1.7.1=[approve aaaa] gojq=[approve aaaa]
+footer, blanks around | jq1.6=[approve aaaa] jq1.7.1=[approve aaaa] gojq=[approve aaaa]
+footer, CRLF | jq1.6=[approve aaaa] jq1.7.1=[approve aaaa] gojq=[approve aaaa]
+footer, trailing spaces | jq1.6=[approve aaaa] jq1.7.1=[approve aaaa] gojq=[approve aaaa]
+footer, request changes | jq1.6=[other aaaaaa] jq1.7.1=[other aaaaaa] gojq=[other aaaaaa]
+line after footer | jq1.6=[] jq1.7.1=[] gojq=[]
+footer twice | jq1.6=[] jq1.7.1=[] gojq=[]
+blank inside footer | jq1.6=[] jq1.7.1=[] gojq=[]
+indented --- | jq1.6=[] jq1.7.1=[] gojq=[]
+other link | jq1.6=[] jq1.7.1=[] gojq=[]
+footer only | jq1.6=[] jq1.7.1=[] gojq=[]
+no footer | jq1.6=[approve aaaa] jq1.7.1=[approve aaaa] gojq=[approve aaaa]

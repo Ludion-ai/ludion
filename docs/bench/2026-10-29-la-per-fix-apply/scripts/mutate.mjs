@@ -7,7 +7,6 @@ const mutations = [
   ["git started in the project's folder", "packages/cli/src/security/branch.ts", "{ cwd: hooks, env,", "{ cwd: dir, env,", "packages/cli/test/branch.test.ts"],
   ["no executable-bit check", "packages/cli/src/security/branch.ts", "(lstatSync(full).mode & 0o100 ? \"100755\" : \"100644\") === entry.mode", "true", "packages/cli/test/branch.test.ts"],
   ["every fix skipped reads applied", "packages/cli/src/security/dependency-patch.ts", ": !done.length ? \"skipped\" : apply", ": apply", "packages/cli/test/dependencies.test.ts"],
-  // Either of the two transport defences stops the fetch alone on Git 2.39.5 (GIT_NO_LAZY_FETCH came with 2.39.4), so both go.
   ["no configuration check before a branch", "packages/cli/src/security/branch.ts", "  refuseConfiguration(base.top);\n", "", "packages/cli/test/branch.test.ts"],
   ["two fixes on one branch name", "packages/cli/src/security/dependency-patch.ts", "else if (branch && branches.indexOf(branch) !== index)", "else if (false)", "packages/cli/test/dependencies.test.ts"],
   ["partial clone accepted", "packages/cli/src/security/branch.ts", "  if (promisor.length) throw", "  if (promisor.length && false) throw", "packages/cli/test/branch.test.ts"],

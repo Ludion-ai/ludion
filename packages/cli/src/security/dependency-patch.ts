@@ -427,10 +427,10 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const after = fix.after = await client.scan(candidate.inventory); active();
         const versioned = new Set(scan.findings.map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`));
         const carried = after.findings.filter(f => f.package.name !== fix.package && !versioned.has(`${f.package.name}@${f.package.version} ${f.advisory.id}`)).map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`);
-        if (carried.length) fix.carried_findings = carried;
         const left = after.findings.filter(f => f.package.name === fix.package || !known.has(`${f.package.name} ${f.advisory.id}`)).map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`);
         const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !knownBlocked.has(unversioned(b)));
         if (left.length || unfixable.length || after.inventory.limitations.length) throw new Error(`Candidate still contains known advisory findings or incomplete inventory${left.length ? ` (${left.slice(0, 5).join(", ")})` : ""}; no source change was made.`);
+        if (carried.length) fix.carried_findings = carried;
         const files = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(candidate.exported, path) })).filter(f => f.before !== f.after);
         if (!files.length) throw new Error("No dependency file changed.");
         fix.candidate_image = await test(label, candidate.exported, candidate.installedCache);

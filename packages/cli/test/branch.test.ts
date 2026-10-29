@@ -3,7 +3,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { branchName, branchSubject, fixBranch, gitBase } from "../src/security/branch.ts";
+import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "../src/security/branch.ts";
 import { dependencyFixPublished } from "../src/security/exposure.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
@@ -31,8 +31,10 @@ describe("a fix on its own branch", () => {
     expect(git(root, "log", "-1", "--format=%an <%ae>%n%s", made)).toBe("Ludion <ludion@ludion.invalid>\nludion: x 1.0.0 -> 1.0.1 (npm)");
     expect(readFileSync(join(root, "package.json"), "utf8")).toBe("{}\n");
     expect(git(root, "status", "--porcelain")).toBe("");
-    expect(branchSubject(base, "ludion/npm/x-1.0.1")).toBe("ludion: x 1.0.0 -> 1.0.1 (npm)");
-    expect(branchSubject(base, "ludion/npm/none")).toBeNull();
+    expect(branchTip(base, "ludion/npm/x-1.0.1")).toEqual({ subject: "ludion: x 1.0.0 -> 1.0.1 (npm)", parent: head });
+    expect(branchTip(base, "ludion/npm/none")).toBeNull();
+    expect(skippedReason(base, "ludion/npm/x-1.0.1", head, "fix")).not.toContain("not from HEAD");
+    expect(skippedReason(base, "ludion/npm/x-1.0.1", "a".repeat(40), "fix")).toContain(`It starts from aaaaaaaaaaaa, not from HEAD ${head.slice(0, 12)}`);
     // An existing branch is never moved.
     expect(() => fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{\"x\":2}\n" }], "again")).toThrow();
     expect(git(root, "rev-parse", "ludion/npm/x-1.0.1")).toBe(made);
@@ -136,6 +138,13 @@ describe("a fix on its own branch", () => {
     git(root, "config", "hook.audit.command", "true");
     expect(() => gitBase(root, copy)).toThrow("names hooks (hook.audit.event, hook.audit.command)");
   });
+  it("never follows a symbolic ref at the branch name to create its target", () => {
+    const { root, copy } = project(), base = gitBase(root, copy);
+    git(root, "symbolic-ref", "refs/heads/ludion/npm/x-1.0.1", "refs/tags/made-by-symref");
+    expect(() => fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{}\n" }], "ludion: x")).toThrow("is a symbolic ref");
+    expect(git(root, "symbolic-ref", "refs/heads/ludion/npm/x-1.0.1")).toBe("refs/tags/made-by-symref");
+    expect(spawnSync("git", ["rev-parse", "--verify", "--quiet", "refs/tags/made-by-symref"], { cwd: root }).status).not.toBe(0);
+  });
   it("checks the configuration again before each branch", () => {
     const { root, copy } = project(), base = gitBase(root, copy);
     git(root, "config", "hook.late.command", "true");
@@ -173,7 +182,7 @@ describe("a fix on its own branch", () => {
     expect(() => gitBase(first.root, first.copy)).toThrow("a submodule at sub");
     const second = project();
     git(second.root, "config", "core.worktree", mkdtempSync(join(tmpdir(), "ludion-branch-elsewhere-")));
-    expect(() => gitBase(second.root, second.copy)).toThrow();
+    expect(() => gitBase(second.root, second.copy)).toThrow(/not in a Git work tree|not where Git places it/);
   });
   it("makes branch names Git accepts", () => {
     const long = `io.opentelemetry.instrumentation:${"x".repeat(200)}-2.10.0`;

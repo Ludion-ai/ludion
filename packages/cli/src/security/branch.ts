@@ -113,12 +113,18 @@ export function branchName(...parts: string[]): string {
   }).join("/");
 }
 
-/** The first line of the message of the branch's tip commit, or null when there is no such branch. */
-export function branchSubject(base: GitBase, branch: string): string | null {
+/** The branch's tip commit: the first line of its message and its first parent; null when there is no such branch. */
+export function branchTip(base: GitBase, branch: string): { subject: string; parent: string | null } | null {
   const tip = git(base.top, ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}^{commit}`], { allowFail: true });
   if (tip.status !== 0) return null;
-  const body = git(base.top, ["cat-file", "commit", tip.stdout.trim()]).stdout;
-  return body.slice(body.indexOf("\n\n") + 2).split("\n")[0] ?? "";
+  const body = git(base.top, ["cat-file", "commit", tip.stdout.trim()]).stdout, headers = body.slice(0, body.indexOf("\n\n"));
+  return { subject: body.slice(body.indexOf("\n\n") + 2).split("\n")[0] ?? "", parent: /^parent ([0-9a-f]+)$/m.exec(headers)?.[1] ?? null };
+}
+
+/** The reason a fix is skipped because its branch exists, saying when the branch starts from another commit than HEAD. */
+export function skippedReason(base: GitBase, branch: string, parent: string | null, what: "fix" | "update"): string {
+  const older = parent !== base.commit ? ` It starts from ${parent ? parent.slice(0, 12) : "no commit"}, not from HEAD ${base.commit.slice(0, 12)}: merge or delete it for this ${what} to be validated again.` : "";
+  return `The branch ${branch} already exists; this ${what} was not validated again and the branch was not changed.${older}`;
 }
 
 /**
@@ -130,6 +136,7 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
   const ref = `refs/heads/${branch}`;
   if (git(base.top, ["check-ref-format", ref], { allowFail: true }).status !== 0) throw new Error(`Invalid branch name: ${plain(branch)}`);
   refuseConfiguration(base.top);
+  if (git(base.top, ["symbolic-ref", "--quiet", ref], { allowFail: true }).status === 0) throw new Error(`${plain(ref)} is a symbolic ref; it was not changed, and applying needs review.`);
   const unknown = files.filter(file => !base.modes.has(file.path));
   if (unknown.length) throw new Error(`The last commit has no ${unknown.map(f => plain(f.path)).join(", ")}; applying needs review.`);
   const temp = mkdtempSync(join(tmpdir(), "ludion-index-")), index = join(temp, "index");
@@ -142,7 +149,8 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
     }
     const tree = git(base.top, ["write-tree"], { index }).stdout.trim();
     const commit = git(base.top, ["commit-tree", tree, "-p", base.commit, "--no-gpg-sign", "-F", "-"], { input: message.replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, " ") }).stdout.trim();
-    git(base.top, ["update-ref", "-m", "ludion: one fix", ref, commit, "0".repeat(base.commit.length)]);
+    // --no-deref: a symbolic ref at this name is itself "existing", never followed to create its target.
+    git(base.top, ["update-ref", "--no-deref", "-m", "ludion: one fix", ref, commit, "0".repeat(base.commit.length)]);
     return commit;
   } finally { rmSync(temp, { recursive: true, force: true }); }
 }

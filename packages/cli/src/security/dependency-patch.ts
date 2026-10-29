@@ -8,7 +8,7 @@ import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenG
 import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.ts";
-import { branchName, branchSubject, fixBranch, gitBase } from "./branch.ts";
+import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
 import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
 import { releaseIdentity, WAIT_HOURS } from "./judge.ts";
@@ -319,11 +319,11 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     const branches = receipt.fixes.map(fix => base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), ecosystem, `${fix.package}-${[...new Set(fix.changes.map(c => c.to))].join("-")}`));
     const subject = (fix: FixReceipt) => `ludion: ${fix.package} ${fix.changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${ecosystem})`;
     for (const [index, fix] of receipt.fixes.entries()) {
-      const branch = branches[index], tip = base && branch ? branchSubject(base, branch) : null;
+      const branch = branches[index], tip = base && branch ? branchTip(base, branch) : null;
       // A branch of the same name is this fix only when its tip says so; otherwise the name is taken and the fix stops.
-      if (tip === subject(fix)) { fix.outcome = "skipped"; fix.branch = branch!; fix.reason = `The branch ${branch} already exists; this fix was not validated again and the branch was not changed.`; }
+      if (base && branch && tip?.subject === subject(fix)) { fix.outcome = "skipped"; fix.branch = branch; fix.reason = skippedReason(base, branch, tip.parent, "fix"); }
       else if (branch && branches.indexOf(branch) !== index) fix.reason = `Another fix of this run has the branch name ${branch}; this fix was not validated.`;
-      else if (tip !== null) fix.reason = `The branch ${branch} already exists and holds another change ("${tip.slice(0, 200)}"); it was not changed, and this fix was not validated.`;
+      else if (tip !== null) fix.reason = `The branch ${branch} already exists and holds another change ("${tip.subject.slice(0, 200)}"); it was not changed, and this fix was not validated.`;
     }
     const pending = receipt.fixes.filter(fix => fix.outcome !== "skipped" && !fix.reason);
     acquisitionPolicy(source, ecosystem);

@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
-import { branchName, branchSubject, fixBranch, gitBase } from "./branch.ts";
+import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
 import { phpFixPublished } from "./exposure.ts";
 
 export type Command = (args: string[], timeoutMs: number) => Promise<string>;
@@ -73,12 +73,12 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     receipt.base_commit = base?.commit ?? null;
     const branch = base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), "php", scan.candidate.version);
     const subject = `ludion: PHP ${scan.current.version} -> ${scan.candidate.version} in ${config.dockerfile}`;
-    const tip = base && branch ? branchSubject(base, branch) : null;
+    const tip = base && branch ? branchTip(base, branch) : null;
     // A branch of the same name is this update only when its tip says so; otherwise the name is taken and the update stops.
-    if (tip !== null && tip !== subject) throw new Error(`The branch ${branch} already exists and holds another change ("${tip.slice(0, 200)}"); it was not changed, and this update was not validated.`);
-    if (tip === subject) {
+    if (tip !== null && tip.subject !== subject) throw new Error(`The branch ${branch} already exists and holds another change ("${tip.subject.slice(0, 200)}"); it was not changed, and this update was not validated.`);
+    if (base && branch && tip?.subject === subject) {
       receipt.outcome = "skipped"; receipt.branch = branch;
-      receipt.reason = `The branch ${branch} already exists; this update was not validated again and the branch was not changed.`;
+      receipt.reason = skippedReason(base, branch, tip.parent, "update");
       return { receipt, path: receiptPath, scan };
     }
     for (const [label, ref, expected] of [

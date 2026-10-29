@@ -4,20 +4,20 @@ docs/status.md, "Missing before complete", item 2, in part. `ludion patch --appl
 
 - **Tests** (Docker, image ludion-l9-node24-git):
   - `tsc -p tsconfig.json` exits 0.
-  - The CLI tests: 16 files, 684 passed, 19 skipped (`logs/test.log`).
-  - CI's checks except Playwright, against a stand-in repository: typecheck 0, build 0, and `npm test` with 28 files, 919 passed, 19 skipped (`logs/full.log`).
-  - 26 of 26 mutations caught (`logs/mutate.log`).
-- **The built CLI on the examples.** `patch --apply` ran twice on copies of examples/*-security, each committed in a repository of its own, with the real sandbox through the host's Docker (`logs/e2e.log`, started 2026-10-29T11:59:02Z). In every case the working tree was unchanged afterwards, and each branch is one commit whose parent is the copy's commit.
+  - The CLI tests: 16 files, 685 passed, 19 skipped (`logs/test.log`).
+  - CI's checks except Playwright, against a stand-in repository: typecheck 0, build 0, and `npm test` with 28 files, 920 passed, 19 skipped (`logs/full.log`).
+  - 27 of 27 mutations caught (`logs/mutate.log`).
+- **The built CLI on the examples.** `patch --apply` ran twice on copies of examples/*-security, each committed in a repository of its own, with the real sandbox through the host's Docker (`logs/e2e.log`, started 2026-10-29T12:29:25Z). In every case the working tree was unchanged afterwards, and each branch is one commit whose parent is the copy's commit.
 
 | Case | Fix | First run | Branch | fix_published_at | found_at | applied_at |
 |---|---|---|---|---|---|---|
-| npm | lodash 4.17.20 → 4.18.0 | applied | ludion/npm/lodash-4.18.0 | 2026-03-31T18:18:42.717Z | 2026-10-29T11:59:11.527Z | 2026-10-29T11:59:19.400Z |
-| npm, two fixes (the app's test requires lodash 4.17.20) | lodash 4.17.20 → 4.18.0 | failed: "Application validation failed (1)" | none | 2026-03-31T18:18:42.717Z | 2026-10-29T11:59:22.618Z | null |
-| | minimist 1.2.5 → 1.2.6 | applied | ludion/npm/minimist-1.2.6 | 2022-03-22T02:50:30.352Z | 2026-10-29T11:59:22.618Z | 2026-10-29T11:59:31.171Z |
-| PHP | php:8.4.26-cli-alpine → 8.4.27 | applied | ludion/php/8.4.27 | 2026-10-21T00:00:00.000Z (php.net gives the day only) | 2026-10-29T11:59:38.566Z | 2026-10-29T11:59:43.998Z |
-| Composer | symfony/http-foundation 5.4.0 → 5.4.54 | applied | ludion/composer/symfony-http-foundation-5.4.54 | 2026-09-30T11:07:08.000Z (Packagist, set by the author) | 2026-10-29T11:59:45.763Z | 2026-10-29T11:59:57.472Z |
-| Maven | commons-text 1.9 → 1.10.0 | applied | ludion/maven/org.apache.commons-commons-text-1.10.0 | null (not read for Maven) | 2026-10-29T12:00:03.035Z | 2026-10-29T12:00:12.646Z |
-| | commons-lang3 3.11 → 3.18.0 | applied | ludion/maven/org.apache.commons-commons-lang3-3.18.0 | null (not read for Maven) | 2026-10-29T12:00:03.035Z | 2026-10-29T12:00:16.653Z |
+| npm | lodash 4.17.20 → 4.18.0 | applied | ludion/npm/lodash-4.18.0 | 2026-03-31T18:18:42.717Z | 2026-10-29T12:29:34.621Z | 2026-10-29T12:29:43.088Z |
+| npm, two fixes (the app's test requires lodash 4.17.20) | lodash 4.17.20 → 4.18.0 | failed: "Application validation failed (1)" | none | 2026-03-31T18:18:42.717Z | 2026-10-29T12:29:46.119Z | null |
+| | minimist 1.2.5 → 1.2.6 | applied | ludion/npm/minimist-1.2.6 | 2022-03-22T02:50:30.352Z | 2026-10-29T12:29:46.119Z | 2026-10-29T12:29:54.995Z |
+| PHP | php:8.4.26-cli-alpine → 8.4.27 | applied | ludion/php/8.4.27 | 2026-10-21T00:00:00.000Z (php.net gives the day only) | 2026-10-29T12:30:02.829Z | 2026-10-29T12:30:08.288Z |
+| Composer | symfony/http-foundation 5.4.0 → 5.4.54 | applied | ludion/composer/symfony-http-foundation-5.4.54 | 2026-09-30T11:07:08.000Z (Packagist, set by the author) | 2026-10-29T12:30:10.262Z | 2026-10-29T12:30:22.008Z |
+| Maven | commons-text 1.9 → 1.10.0 | applied | ludion/maven/org.apache.commons-commons-text-1.10.0 | null (not read for Maven) | 2026-10-29T12:30:27.475Z | 2026-10-29T12:30:36.805Z |
+| | commons-lang3 3.11 → 3.18.0 | applied | ludion/maven/org.apache.commons-commons-lang3-3.18.0 | null (not read for Maven) | 2026-10-29T12:30:27.475Z | 2026-10-29T12:30:40.698Z |
 
 - **Outcomes.** The run outcomes were applied, partial (exit 2), applied, applied and applied.
 - **The second run.** Every fix with a branch was skipped, and no Docker work ran for it; four of the five runs ended `skipped` (exit 0). In the two-fix npm case, lodash was validated again and failed again (`failed`, exit 2).

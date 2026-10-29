@@ -1,4 +1,4 @@
-# started 2026-10-29T12:14:46Z, node v24.22.1, git version 2.39.5
+# started 2026-10-29T12:29:25Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       no hooks override — packages/cli/test/branch.test.ts
 caught       git started in the project's folder — packages/cli/test/branch.test.ts
@@ -6,6 +6,7 @@ caught       no executable-bit check — packages/cli/test/branch.test.ts
 caught       every fix skipped reads applied — packages/cli/test/dependencies.test.ts
 caught       no configuration check before a branch — packages/cli/test/branch.test.ts
 caught       two fixes on one branch name — packages/cli/test/dependencies.test.ts
+caught       a symbolic ref at the name accepted — packages/cli/test/branch.test.ts
 caught       partial clone accepted — packages/cli/test/branch.test.ts
 caught       hooks named in configuration accepted — packages/cli/test/branch.test.ts
 caught       CRLF committed as checked out — packages/cli/test/branch.test.ts
@@ -26,5 +27,5 @@ caught       PHP: no publish time — packages/cli/test/security.test.ts
 caught       PHP: branch for an existing one — packages/cli/test/security.test.ts
 caught       the baseline's advisories keyed by version — packages/cli/test/dependencies.test.ts
 caught       a new advisory accepted — packages/cli/test/dependencies.test.ts
-26 of 26 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
-# finished 2026-10-29T12:15:53Z
+27 of 27 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
+# finished 2026-10-29T12:30:42Z

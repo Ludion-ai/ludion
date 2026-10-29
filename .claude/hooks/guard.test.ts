@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const hook = fileURLToPath(new URL("./guard.mjs", import.meta.url));
-const exitFor = (command: string) =>
-  spawnSync(process.execPath, [hook], { input: JSON.stringify({ tool_name: "Bash", tool_input: { command } }) }).status;
+const exitFor = (command: string, tool = "Bash") =>
+  spawnSync(process.execPath, [hook], { input: JSON.stringify({ tool_name: tool, tool_input: { command } }) }).status;
 
 describe("guard hook", () => {
   it.each([
@@ -55,5 +55,34 @@ describe("guard hook", () => {
     "echo npx wrangler deploy",
   ])("allows %s", (command) => {
     expect(exitFor(command)).toBe(0);
+  });
+
+  // A backtick outside single quotes runs as a command in bash: a markdown code span in a double-quoted PR body ran
+  // `npx webpack serve` on a host on 2026-10-29.
+  it.each([
+    'gh pr comment 1 --body "Run `npx webpack serve` first"',
+    'git commit -m "Fix `judge`"',
+    "cat <<EOF\nrun `id`\nEOF",
+    "gh pr comment 1 --body \"first line\nthen `node api.js && tsc -b`\"",
+    "echo `date`",
+  ])("blocks a backtick that would run: %s", (command) => {
+    expect(exitFor(command)).toBe(2);
+  });
+
+  it.each([
+    "gh pr create --body \"$(cat <<'EOF'\nUse `ludion judge` here.\nEOF\n)\"",
+    "git commit -F - <<'EOF'\nmsg with `code`\nEOF",
+    "cat <<\"EOF\"\n`literal`\nEOF",
+    "git commit -m 'uses `backticks` literally'",
+    'echo "escaped \\` backtick"',
+    "gh pr comment 1 --body-file notes.md",
+    'echo "$(date)"',
+    "grep -c x <<< \"$line\"",
+  ])("allows text that only shows a backtick: %s", (command) => {
+    expect(exitFor(command)).toBe(0);
+  });
+
+  it("leaves PowerShell's backtick, its escape character, alone", () => {
+    expect(exitFor('Write-Host "one`ntwo"', "PowerShell")).toBe(0);
   });
 });

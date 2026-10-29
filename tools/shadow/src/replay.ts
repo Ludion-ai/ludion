@@ -57,7 +57,9 @@ export type Store = {
 /** A file list's digest: sha256 of its sorted (path, sha256) pairs. The disputed check compares it when the list was not kept. */
 export const filesDigest = (pairs: [string, string][]) => createHash("sha256").update(JSON.stringify([...pairs].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)))).digest("hex");
 const contentKey = (r: Rec) => createHash("sha256").update(JSON.stringify({ ...r, fetched_at: undefined })).digest("hex");
-const streamKey = (r: Rec) => `${r.type}\0${r.name ?? r.id}\0${r.version ?? ""}`;
+// Baseline, change and gone records share one stream per name, so that a take-down, a return and a second take-down
+// keep both take-downs.
+const streamKey = (r: Rec) => r.type === "baseline" || r.type === "change" || r.type === "gone" ? `timeline\0${r.name}` : `${r.type}\0${r.name ?? r.id}\0${r.version ?? ""}`;
 /**
  * Each record under `dir`, one file in memory at a time. A last line with no newline is still being appended (or was cut
  * by a copy): it is skipped.
@@ -598,7 +600,9 @@ export async function replay(input: { store: Store; watched: Record<string, stri
   if (window.end && !(lastOsv >= end + LATE_RECORD_MS + OSV_MARGIN_MS)) notFinal.push(`the last OSV read (${Number.isFinite(lastOsv) ? iso(lastOsv) : "none"}) is not 24h past the window's end + 336h`);
   const pendingVersions = results.filter(r => [...r.rows, ...(r.literal ? [r.literal] : [])].some(x => x.outcome === "pending"));
   if (pendingVersions.length) notFinal.push(`${pendingVersions.length} version(s) have a judgement whose wait_until is past the store's coverage (${iso(coverage)})`);
-  if (store.osvGaveUp.length) notFinal.push(`${store.osvGaveUp.length} OSV record(s) were given up unread, so what they name is unknown`);
+  // A give-up is lifted by a copy of the same record stored after it.
+  const givenUp = store.osvGaveUp.filter(g => !(store.osv.get(g.id) ?? []).some(c => ms(c.fetched_at) > ms(g.fetched_at)));
+  if (givenUp.length) notFinal.push(`${givenUp.length} OSV record(s) were given up unread, so what they name is unknown`);
   const retrying = osvRetrying(store);
   if (retrying.length) notFinal.push(`${retrying.length} OSV record(s) are still being read again (${retrying.slice(0, 5).join(", ")}), so what they name is unknown`);
   if (osvNotQueried.length) notFinal.push(`OSV was not asked for the records naming ${osvNotQueried.slice(0, 5).join(", ")}, so records the recorder did not store (modified before it started) are not counted`);

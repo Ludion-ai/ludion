@@ -16,10 +16,13 @@ IMAGE=node:24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee995
 [ -e "$SNAP" ] && { echo "$SNAP exists"; exit 1; }
 [ -e "$OUT" ] && { echo "$OUT exists; a replay never overwrites an earlier output"; exit 1; }
 mkdir -p "$SNAP"
-cp -r "$DATA/captures" "$DATA/osv" "$DATA/status" "$SNAP/"
+# status/ first: a status line copied before the records it reports on is never ahead of them.
+cp -r "$DATA/status" "$SNAP/"
+cp -r "$DATA/captures" "$DATA/osv" "$SNAP/"
 echo "snapshot taken at $(date -u +%FT%TZ): $(du -sb "$SNAP" | cut -f1) bytes"
-START=$(grep -h '"type":"start"' "$SNAP"/status/*.jsonl | sed -E 's/.*"commit":"([0-9a-f]{40})".*/\1/' | sort -u)
-[ "$(echo "$START" | wc -l)" = 1 ] || { echo "more than one start commit: $START"; exit 1; }
+# The judge is the one at the recorder's first start (section 4); a later restart or move at another commit does not change it.
+START=$(cat $(ls "$SNAP"/status/*.jsonl | sort) | grep '"type":"start"' | head -1 | sed -E 's/.*"commit":"([0-9a-f]{40})".*/\1/')
+[ ${#START} = 40 ] || { echo "no start commit in the status lines"; exit 1; }
 FILES="packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts packages/cli/src/security/time-cap.ts tools/backtest/src/archives-v5.ts"
 # The container runs a tree of its own: HEAD's committed files (not the working tree), with the judge's files taken
 # from the start commit, so that a later change to the judge does not change the count (section 4).

@@ -132,9 +132,12 @@ export async function categorize(input: { name: string; version: string; publish
   if (osv === "unreadable") return { category: "confirmed", evidence: { step: "OSV's records for the package unreadable" } };
   // Every MAL- record naming the package: OSV's answer today, and every copy the recorder stored. A version any of them
   // names counts as named for the record-omission rule, withdrawn or not (section 6 does not set withdrawn records
-  // apart). prev_d alone leaves out withdrawn records, as v5 does: a record withdrawn in any copy.
+  // apart). prev_d alone leaves out withdrawn records, as v5 does: a record whose latest state (the copy with the latest
+  // `modified`; OSV's answer is today's) is withdrawn. One withdrawn and later reinstated is not left out.
   const all = [...osv, ...input.records].filter(r => typeof r?.id === "string" && r.id.startsWith("MAL-") && (r.affected ?? []).some((a: any) => a?.package?.ecosystem === "npm" && a.package.name === name));
-  const withdrawn = new Set(all.filter(r => r.withdrawn).map(r => r.id));
+  const latest = new Map<string, Rec>();
+  for (const r of all) { const l = latest.get(r.id); if (!l || Date.parse(r.modified ?? "") >= Date.parse(l.modified ?? "") || !Number.isFinite(Date.parse(l.modified ?? ""))) latest.set(r.id, r); }
+  const withdrawn = new Set([...latest.values()].filter(r => r.withdrawn).map(r => r.id));
   const records = all.filter(r => !withdrawn.has(r.id));
   const caps = store.versions.get(`${name}@${version}`) ?? [], cap = caps.at(-1);
   // The file list from the latest capture that hashed the tarball: a later failed retry has none.

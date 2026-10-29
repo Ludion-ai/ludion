@@ -624,3 +624,31 @@ describe("sixth review fixes (PR #194)", () => {
     expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.map(x => x.outcome)).toEqual(["missed", "missed", "missed", "missed"]);
   });
 });
+
+describe("seventh review fixes (PR #194)", () => {
+  it("leaves out of the prev_d search only a record whose latest state is withdrawn", async () => {
+    const { store } = malStore([["1.0.0", 1], ["1.0.1", 2], ["1.0.2", 3]], []);
+    const rec = (id: string, v: string, modifiedH: number, extra: object = {}) => ({ id, published: at(20), modified: at(modifiedH), affected: [{ package: { ecosystem: "npm", name: "p" }, versions: [v] }], ...extra });
+    const records = [rec("MAL-A", "1.0.1", 30, { withdrawn: at(30) }), rec("MAL-A", "1.0.1", 40), rec("MAL-B", "1.0.2", 20)];
+    const pkg = (v: string) => `{"name":"p","version":"${v}","scripts":{}}`;
+    const src = sources({ "1.0.0": { "package.json": pkg("1.0.0"), "a.js": "clean" }, "1.0.1": { "package.json": pkg("1.0.1"), "a.js": "evil" }, "1.0.2": { "package.json": pkg("1.0.2"), "a.js": "evil" } });
+    const c = await categorize({ name: "p", version: "1.0.2", published: at(3), store, records: records as any, sources: src });
+    expect(c).toMatchObject({ category: "confirmed", evidence: { prev_d: "1.0.0", step: "code differs from prev_d (jsDelivr's files)" } });
+  });
+  it("lifts an OSV give-up when a copy of the same record was stored after it", async () => {
+    const w = new World(28 * 24 + 336 + 200);
+    w.publish("left-pad", "1.0.1", 1);
+    w.osv.push({ type: "gave_up", id: "MAL-z", modified: at(990), fetched_at: at(1000), tries: 60 });
+    const asOf = T0 + (28 * 24 + 336 + 200) * HOUR;
+    const stuck = await replay({ store: w.store(), watched: w.watched, asOf, sources: sources({}) });
+    expect(stuck.not_final_because.join()).toMatch(/given up unread/);
+    w.osv.push({ type: "osv", id: "MAL-z", modified: at(990), fetched_at: at(1100), sha256: "z", record: { id: "MAL-z", published: at(980), modified: at(990), affected: [{ package: { ecosystem: "npm", name: "unwatched" }, versions: ["1.0.0"] }] } });
+    expect((await replay({ store: w.store(), watched: w.watched, asOf, sources: sources({}) })).final).toBe(true);
+  });
+  it("keeps both take-downs of a package that was taken down, came back and was taken down again", () => {
+    const w = new World();
+    const gone = (h: number) => ({ type: "gone", name: "left-pad", fetched_at: at(h), url: "https://registry.npmjs.org/left-pad", status: 404 });
+    w.captures.push(gone(10), { type: "change", name: "left-pad", fetched_at: at(20), url: "x", dist_tags: null, time: {}, removed: [] }, gone(30));
+    expect(w.store().timeline.get("left-pad")!.filter(r => r.type === "gone").length).toBe(2);
+  });
+});

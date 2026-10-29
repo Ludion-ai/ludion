@@ -14,7 +14,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
   - Only days before the replay's own day are checked: today is not over.
   - The window is the first run that lasts 28 days.
 - **The versions** (section 3). Every version of a watched name whose stored publish time (the packument's `time`, as captured) falls in the window.
-- **One judgement** (section 4). It is the judge's own `judge()`, imported unchanged. `scripts/run.sh` runs a tree of its own: HEAD's committed files, with judge.ts, npm-facts.ts, time-cap.ts and archives-v5.ts taken from the recorder's start commit (8a78b55). So a later change to the judge does not change the count (main's #193 changed judge.ts after the start). It prints each file's blob next to the start commit's, and the output records the blobs it ran. It refuses a watched list other than the start line's.
+- **One judgement** (section 4). It is the judge's own `judge()`, imported unchanged. `scripts/run.sh` runs a tree of its own (the recorder's first start line gives the commit; a later restart or move does not change it): HEAD's committed files, with judge.ts, npm-facts.ts, time-cap.ts and archives-v5.ts taken from the recorder's start commit (8a78b55). So a later change to the judge does not change the count (main's #193 changed judge.ts after the start). It prints each file's blob next to the start commit's, and the output records the blobs it ran. It refuses a watched list other than the start line's.
   - **(b), per row.** A synthetic fix (`SHADOW-SYNTHETIC-FIX`) from prev to V sets the row. Exploited is `kev: true`; high is `severity: CRITICAL`; normal has neither; low is normal with the change marked dev.
     - `locked` is {P@prev}, and `files` is package.json and package-lock.json.
     - `resolved` is the registry tarball, and `integrity` is V's captured `dist.integrity`.
@@ -31,7 +31,8 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
     - attestations the manifest lists that were not captured;
     - a predecessor not captured;
     - a new dependency's `created` not captured;
-    - no version of P below V at all (a missing predecessor).
+    - no version of P below V at all (a missing predecessor);
+    - a version the recorder gave up on (`gave_up`), whatever its partial capture holds.
   - A `wait` at `wait_until` is a capture gap.
   - Combined per row over every scenario and prev: missed if any missed, else a capture gap if any, else pending if any, else stopped.
 - **Pending.** A judgement whose `wait_until` is past the store's coverage is pending, and the result is not final. The coverage is the last successful poll or the last OSV read, whichever is earlier.
@@ -40,7 +41,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
   - the window's end + 336h has passed;
   - an OSV read is at least 24h past that time, since a record published by then may be imported into OSV later;
   - nothing is pending;
-  - no OSV record was given up, and none is still being read again;
+  - no OSV record was given up (unless a copy of it was stored after the give-up), and none is still being read again;
   - the run had the network (`NETWORK=1`): OSV was asked for the records naming each watched package with a version in the window, that the feed showed changing in the window, or whose capture failed, and every range was enumerated over the registry's versions.
 - **Malicious versions** (sections 3 and 6). These are versions in the window named by a MAL- record published by the window's end + 336h. A record withdrawn later still counts here, because section 6 sets apart only false-report candidates. Each one goes through `tools/shadow/src/disputed.ts`:
   - **The disputed check.** It is v5's, in v5's order, read from the registry, jsDelivr, ecosyste.ms and Software Heritage. The recorder's captured manifest is one more copy of the registry's document. As the one addition, the recorder's own file list of V must equal jsDelivr's.
@@ -64,7 +65,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
 
 ## Readings taken where the decision is not literal
 
-None of these loosens a count. Each is the reading the code takes, and is tested. Six fresh-context reviews on PR #194 found readings that did loosen it.
+None of these loosens a count. Each is the reading the code takes, and is tested. Seven fresh-context reviews on PR #194 found readings that did loosen it.
 - **The first, at 80b26f8.** Readings 5, 6 and 8 loosened the count, and MAL- records were read as they are today.
 - **The second, at 2250791.** It found:
   - a later copy of a record could drop a version from the denominator;
@@ -91,6 +92,12 @@ None of these loosens a count. Each is the reading the code takes, and is tested
   - a permanent gap could be kept pending by the package's later activity;
   - a range record with no publish time was not expanded;
   - the re-query stopped a version on a range it could not place.
+- **The seventh, at abe596c.** It found:
+  - prev_d left out a record that was withdrawn and later reinstated;
+  - an OSV give-up blocked finality even after a later copy;
+  - run.sh refused a second start commit;
+  - a second take-down could be dropped as a repeat;
+  - run.sh copied `status/` last.
 
 All of these were changed as below.
 
@@ -103,11 +110,11 @@ All of these were changed as below.
    Only captures up to V's publish time + 336h (the longest wait) count, since a later one comes after every wait_until. A moment within that but past the store's coverage (or a capture after the last poll line) makes the judgement pending, not a gap. A version with a `gave_up` record is a capture gap in every row, whatever its partial capture holds (section 9). The recorder retries a failed sub-read for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap.
 2. **"The end of the poll."** The facts "of V's first capture" are those stored by the end of the poll that took it: the next `poll` or `stopped` status line, or an `error` line that ended the whole poll. An `error` line naming a package or an OSV id is written mid-poll, so it does not end one. A capture's records are written over several seconds, so the predecessor's record comes after V's.
 3. **The registry's predecessor** is taken among the versions the recorder had captured by that moment, as listed versions. The recorder captures the predecessor with V, so a version whose `time` is stored but which was never captured was not listed: unpublished before the recorder saw the package.
-4. **Repeated records** are dropped only when equal, apart from `fetched_at`, to the record just before them with the same type, name and version. The recorder's README says "by type, name, version and content". Read over the whole stream, that would drop a deprecation that changes and changes back, or a 404 `created` record after a later success. In the third run's snapshot, 133 repeats were dropped: 79 `change` records with the same diff, and 54 `retry` version records (`logs/store-counts-3.log`).
+4. **Repeated records** are dropped only when equal, apart from `fetched_at`, to the record just before them with the same type, name and version (baseline, change and gone records of a name form one stream, so a take-down, a return and a second take-down keep both take-downs). The recorder's README says "by type, name, version and content". Read over the whole stream, that would drop a deprecation that changes and changes back, or a 404 `created` record after a later success. In the third run's snapshot, 133 repeats were dropped: 79 `change` records with the same diff, and 54 `retry` version records (`logs/store-counts-3.log`).
 5. **A MAL-named version with no stored publish time.** Section 3 allows a publish time from the record or an archive. OSV records carry no version publish time. So with `NETWORK=1` the replay reads the registry's `time`, which keeps removed versions' times:
    - outside the window: the version is outside;
    - otherwise, or if the time cannot be read (always without network): every row is a capture gap.
-6. **Withdrawn records** stay in the denominator, and a version they name counts as named in the record-omission rule. At a judgement, one withdrawn by that moment does not stop the version, as the live re-query would not. Only prev_d leaves withdrawn records out, as v5 does.
+6. **Withdrawn records** stay in the denominator, and a version they name counts as named in the record-omission rule. At a judgement, one withdrawn by that moment does not stop the version, as the live re-query would not. Only prev_d leaves withdrawn records out, as v5 does: a record whose latest state is withdrawn. One withdrawn and later reinstated is not left out.
 7. **The disputed check's unreadable cases** are on the stricter side:
    - a source that cannot be read leaves V confirmed (v5);
    - a predecessor that cannot be read ends the run of identical code there, so O is later;

@@ -6,14 +6,14 @@ The owner decided on 2026-10-29 (09:30 JST, D) that these two findings get fixed
 
 - **A `!` entry in the root's `workspaces`** (`packages/cli/src/security/workspace-manifests.ts`, `excludes`).
   - Before: such an entry matched nothing, and it also excluded nothing, so with `["apps/*", "!apps/worker"]` the folder `apps/worker` was read as a workspace.
-  - npm reads a leading `!` as an exclusion. This was checked in node:24-slim: npm 11.19.1, `@npmcli/map-workspaces` 5.0.3, `lib/index.js` lines 10–50 (an odd number of `!` excludes, and a later entry can undo it).
+  - npm reads a leading `!` as an exclusion. This was checked in node:24-slim: npm 11.19.1, `@npmcli/map-workspaces` 5.0.3, `lib/index.js` (an odd number of `!` excludes, and a later entry can undo it). The source as read is in `raw/npm-workspaces.txt` (`scripts/npm-workspaces.sh`, offline, read only). It was added after the review of #193 (finding 4).
   - Now: when the root's `workspaces`, before or after, has any string entry containing `!`, no folder is read as a workspace. The reason names that entry, and the file stays in gate 4's changed-files stop. This check does not reproduce npm's exclusions, so it refuses to read them.
 - **A top-level `"__proto__"`** (`packages/cli/src/security/judge.ts`, `own` and `manifestChanges`; rule 5 in `workspace-manifests.ts`).
   - Before: `JSON.parse` makes `"__proto__"` an own key, but `manifestChanges` read `b[key]`. On a side without that own key, this gave `Object.prototype`, which `JSON.stringify` writes as `{}`. So adding `"__proto__": {}` was not a change.
   - Now: both sides are read through their own keys only, and a key one side lacks is `undefined`. Adding, removing or changing it is a change to a field that is not a dependency list, which stops. This applies to the root `package.json` too, since it uses the same function. Rule 5 compares the lockfile's record of the workspace the same way. `old[name]` in the registry-spec check also reads own keys now, which is equivalent there (any value other than the spec is checked), so no mutant covers it.
 - **Tests** (`packages/cli/test/workspace-manifests.test.ts`): 19 → 22.
   - Rule 1 with `!`:
-    - seven `workspaces` shapes: an exclusion of the folder, of another folder, `!!`, `./!`, `!` inside a segment, and `!` alone;
+    - seven `workspaces` shapes: an exclusion of the folder, an exclusion undone by a later entry (`["!apps/worker", "apps/worker"]`), an exclusion of another folder, `!!`, `./!`, `!` inside a segment, and `!` alone;
     - `!` on the before side only, and on the after side only;
     - through `workspaceManifests` (the judge's reader).
   - Rule 3 with `__proto__`:
@@ -21,7 +21,7 @@ The owner decided on 2026-10-29 (09:30 JST, D) that these two findings get fixed
     - the same own key on both sides changes nothing;
     - the root through `manifestChanges`, both directions;
     - no prototype is changed.
-  - Rule 5 with `__proto__`: the record has it on the after side only, and on the before side only.
+  - Rule 5 with `__proto__`: the record has it on the after side only, and on the before side only (stops); the same on both sides (no reason). The last case was added after the review of #193 (comment 6484899627, finding 3).
   - Through `judge()` on disk: a `__proto__` added to the file stops, and the file stays in the changed-files stop.
   - `["!apps/site"]` moved from rule 1's "matches nothing" list to the new `!` test, because its reason is now the exclusion.
 

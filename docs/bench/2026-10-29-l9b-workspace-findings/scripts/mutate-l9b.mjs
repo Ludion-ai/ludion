@@ -14,6 +14,7 @@ const mutants = [
   [JUDGE, "manifestChanges reads the after side through the prototype", "=== JSON.stringify(own(a, key))", "=== JSON.stringify(a[key])"],
   [RULE, "rule 5 reads the record before through the prototype", "JSON.stringify(own(recordBefore, key))", "JSON.stringify(recordBefore[key])"],
   [RULE, "rule 5 reads the record after through the prototype", "JSON.stringify(own(recordAfter, key))", "JSON.stringify(recordAfter[key])"],
+  [RULE, "rule 5 stops on any __proto__ key (added after the review of #193, finding 3)", "if (!GROUPS.includes(key) && JSON.stringify(own(recordBefore, key)) !== JSON.stringify(own(recordAfter, key))) out.push", "if (!GROUPS.includes(key) && (key === \"__proto__\" || JSON.stringify(own(recordBefore, key)) !== JSON.stringify(own(recordAfter, key)))) out.push"],
   // L9's 2026-10-28 "rule 5 off" mutant, on the line as it now reads (its old text no longer applies there).
   [RULE, "rule 5 off", "if (!GROUPS.includes(key) && JSON.stringify(own(recordBefore, key)) !== JSON.stringify(own(recordAfter, key))) out.push", "if (false) out.push"],
 ];

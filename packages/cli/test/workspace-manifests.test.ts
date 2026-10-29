@@ -149,6 +149,8 @@ describe("a workspace package.json that does not agree with the lockfile stops",
     const lockBefore = workerLock("^4.13.13", "4.13.13");
     const protoBefore = JSON.parse(JSON.stringify(lockBefore["apps/worker"]).replace(/^\{/, '{"__proto__":{},')) as Record<string, unknown>;
     expect(pr161({ lock: { before: { ...lockBefore, "apps/worker": protoBefore }, after: lockAfter } })).toEqual(['The lockfile\'s record of apps/worker changes "__proto__", which is not a dependency list.']);
+    // The same own key on both sides of the record changes nothing.
+    expect(pr161({ lock: { before: { ...lockBefore, "apps/worker": protoBefore }, after: { ...lockAfter, "apps/worker": proto } } })).toEqual([]);
   });
 });
 

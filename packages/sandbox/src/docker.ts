@@ -47,6 +47,12 @@ export function useProject(root: string | null): void {
  * project that the user named is the user's own choice.
  */
 export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), platform: NodeJS.Platform = process.platform, root = project, berry = process.env.BERRY_BIN_FOLDER): string | null {
+  return findProgram("docker", path, cwd, platform, root, berry);
+}
+
+/** Any host program (`docker`, `git`) by the same rules as findDocker. */
+export function findProgram(program: string, path = process.env.PATH ?? "", cwd = process.cwd(), platform: NodeJS.Platform = process.platform, root = project, berry = process.env.BERRY_BIN_FOLDER): string | null {
+  if (!/^[a-z][a-z0-9-]*$/.test(program)) throw new Error("Expected a plain program name.");
   const win = platform === "win32", P = win ? win32 : posix;
   const fold = (a: string) => win ? a.toLowerCase() : a;
   const real = (p: string) => { try { return realpathSync(p); } catch { return p; } };
@@ -64,7 +70,7 @@ export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), p
     if (fold(full) === here || fold(resolved) === here) continue;
     if ([full, resolved].some(d => d.split(/[\\/]/).some(part => fold(part) === "node_modules"))) continue;
     if ([full, resolved].some(d => inside(d, root) || inside(d, berry))) continue;
-    for (const name of win ? ["docker.exe", "docker.com"] : ["docker"]) {
+    for (const name of win ? [`${program}.exe`, `${program}.com`] : [program]) {
       const candidate = P.join(full, name);
       try {
         if (!statSync(candidate).isFile()) continue;

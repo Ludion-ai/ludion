@@ -4,7 +4,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSyn
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative } from "node:path";
 import { afterAll, beforeAll } from "vitest";
-import { dockerCwd, findDocker, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
+import { dockerCwd, findDocker, findProgram, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
 
 // The module takes no spawn parameter (a caller could otherwise rewrite the argv), so tests replace node's spawn.
 const current = vi.hoisted(() => ({ spawn: undefined as unknown as (cmd: string, args: readonly string[], options: unknown) => unknown }));
@@ -191,6 +191,13 @@ describe("findDocker", () => {
     expect(findDocker([vendor, venv, dots, link, berry, berryDots, rel, dirDocker, outside].join(":"), root, "linux", project, berry)).toBe(found);
     expect(findDocker([vendor, venv, dots, link, berry, berryDots, rel, dirDocker].join(":"), root, "linux", project, berry)).toBeNull();
     expect(findDocker(vendor, root, "linux", null, undefined)).toBe(join(vendor, "docker"));
+  });
+  it.skipIf(process.platform === "win32")("finds any plain program name by the same rules, and refuses a name that is a path", () => {
+    const project = folder("p3"), inner = folder("p3/node_modules/.bin"), good = folder("good-git");
+    for (const dir of [inner, good]) { const file = join(dir, "git"); writeFileSync(file, ""); chmodSync(file, 0o755); }
+    expect(findProgram("git", [inner, good].join(":"), root, "linux", project, undefined)).toBe(join(good, "git"));
+    expect(() => findProgram("../git")).toThrow("plain program name");
+    expect(() => findProgram("git.exe")).toThrow("plain program name");
   });
   it("is told the project root by the security CLI right after it reads --dir", () => {
     const cli = readFileSync(new URL("../../cli/src/security/cli.ts", import.meta.url), "utf8");

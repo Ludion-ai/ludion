@@ -8,9 +8,10 @@
 - **A top-level `"__proto__"`.**
   - Before: `manifestChanges` read an absent key through `Object.prototype`, so adding `"__proto__": {}` did not count as a change.
   - Now: it reads own keys only, and so does rule 5's comparison of the lockfile record. Adding, removing or changing a top-level `"__proto__"` stops, in a workspace `package.json` and in the root one.
-- **Results** (Docker, offline, HEAD 1336380):
+- **Results** (Docker, offline, HEAD 1066088, the third run; the README lists all three):
   - typecheck exit 0;
   - node tests: 790 passed and 13 skipped. The two files that need git failed without git, then passed with it (13 passed, 6 skipped), and the build exited 0;
   - workspace-manifests.test.ts: 22 tests, up from 19;
-  - mutants: this lane's 9, 0 survived. L9's wiring mutants, 0 of 17 survived. L9's module mutants, 1 of 14 counted as surviving: "rule 5 off" no longer applies to the changed line, and the same mutant on the new text is among this lane's 9 and is killed.
+  - mutants: this lane's 10, 0 survived. L9's wiring mutants, 0 of 17 survived. L9's module mutants, 1 of 14 counted as surviving: "rule 5 off" no longer applies to the changed line, and the same mutant on the new text is among this lane's 10 and is killed.
+- **Review.** #193 comment 6484899627 (APPROVE at a5fad1e, four non-blocking findings). Its findings on the records and the missing pass-direction test of rule 5 were acted on in 1066088 and after.
 - **Not changed.** The rule's other parts, the wait table, gate criteria, `.github/workflows/` and `action/`. #161 and #162 were not judged again.

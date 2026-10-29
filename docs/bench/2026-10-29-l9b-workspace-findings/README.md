@@ -33,24 +33,30 @@ All runs were in Docker, from scripts in `scripts/`. Outputs are in `raw/`. The 
 - Dependencies came from `npm ci --ignore-scripts` (`install.sh`), the only step with network.
 - Everything else ran with `--network none`, `--read-only`, user `node`, 4 GB and 2 CPUs.
 
-**Tests** (`raw/tests.txt`, `run.sh`, node:24-slim, HEAD 1336380):
+**Runs.** Three runs were made, and the numbers below are the last one, at 1066088 (`raw/tests-1066088.txt`, `raw/git-1066088.txt`). The earlier two:
+- The first run, at d0c6ab5, had this lane's mutants 0 of 8, and its other numbers equal the ones below. Its output was overwritten by the second run and is kept only in the branch history (`raw/tests.txt` at 1336380).
+- The second run, at 1336380 (`raw/tests.txt`, `raw/git.txt`), added "rule 5 off" on the new text.
+
+After the review of #193 (comment 6484899627, at a5fad1e), one assertion and one mutant were added, and the third run was made.
+
+**Tests** (`raw/tests-1066088.txt`, `run.sh`, node:24-slim, HEAD 1066088):
 - `npm run typecheck`: exit 0.
 - `vitest run --project node`: Test Files 2 failed | 22 passed (24); Tests 790 passed | 13 skipped (803).
   - The two failed files are `apps/site/test/knowledge.test.ts` (`spawnSync git ENOENT`) and `packages/cli/test/action.test.ts` (`Cannot read properties of undefined (reading 'trim')` from its `git` helper). The image has no git.
   - `npm run build` failed for the same reason (astro).
 - `workspace-manifests.test.ts`: 22 passed. `judge.test.ts`: 63 passed.
 
-**The checks that need git** (`raw/git.txt`, `git.sh`, image `ludion-l9-node24-git`: L9's node:24-slim with git 2.39.5, and a throwaway repository of the same files, HEAD 1336380):
+**The checks that need git** (`raw/git.txt`, `git.sh`, image `ludion-l9-node24-git`: L9's node:24-slim with git 2.39.5, and a throwaway repository of the same files, HEAD 1066088; `raw/git-1066088.txt`):
 - `knowledge.test.ts` and `action.test.ts`: Test Files 2 passed (2); Tests 13 passed | 6 skipped (19).
 - `npm run build`: exit 0.
 
-**Mutants** (`raw/tests.txt`). Each one must make a test in workspace-manifests.test.ts fail.
+**Mutants** (`raw/tests-1066088.txt`). Each one must make a test in workspace-manifests.test.ts fail.
 
 | Script | Survived | Notes |
 | --- | --- | --- |
 | L9's module mutants, 2026-10-28 `mutate.mjs` | 1 of 14 | The one counted as surviving is "rule 5 off", which was not applied: its text, `recordBefore[key]`, no longer exists, because this change reads own keys there. The script is a historical record and was not edited. The same mutant on the new text is in `mutate-l9b.mjs` and is killed. |
 | L9's wiring mutants, 2026-10-29 `mutate-wiring.mjs` | 0 of 17 | |
-| This lane's `mutate-l9b.mjs` | 0 of 9 | Four for `!` (ignored; only before; only after; only a leading `!`), four for own keys (`manifestChanges` before and after, rule 5 before and after), and "rule 5 off" on the new text. |
+| This lane's `mutate-l9b.mjs` | 0 of 10 | Four for `!` (ignored; only before; only after; only a leading `!`), four for own keys (`manifestChanges` before and after, rule 5 before and after), rule 5 stopping on any `__proto__` key (added after the review), and "rule 5 off" on the new text. |
 
 ## Not done
 

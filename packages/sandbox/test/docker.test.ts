@@ -1,6 +1,9 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
-import { runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
+import { existsSync, readdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { isAbsolute, relative } from "node:path";
+import { dockerCwd, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
 
 // The module takes no spawn parameter (a caller could otherwise rewrite the argv), so tests replace node's spawn.
 const current = vi.hoisted(() => ({ spawn: undefined as unknown as (cmd: string, args: readonly string[], options: unknown) => unknown }));
@@ -75,7 +78,7 @@ describe("Docker image commands", () => {
   it("return trimmed output, and reject on a non-zero exit, a timeout or a missing Docker", async () => {
     const ok = fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "sha256:abc\n"); child.emit("close", 0); }));
     await expect(runDockerImageCommand(["image", "inspect", "x"], 1_000)).resolves.toBe("sha256:abc");
-    expect(ok.calls[0]!.options).toEqual({ windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    expect(ok.calls[0]!.options).toEqual({ cwd: dockerCwd(), windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     fakeSpawn((_args, child) => queueMicrotask(() => { child.stderr.emit("data", "manifest unknown"); child.emit("close", 1); }));
     await expect(runDockerImageCommand(["pull", "x"], 1_000)).rejects.toThrow("Docker image command failed (1): manifest unknown");
     fakeSpawn();
@@ -94,7 +97,7 @@ describe("security test container runner", () => {
     }));
     await expect(runContainer("x", IMAGE, ["php", "t.php"], 1_000)).resolves.toEqual({ kind: "exited", exitCode: 3, stdout: "ok", stderr: "warn", timedOut: false });
     expect(calls.map(c => c.args)).toEqual([runArgs("x", IMAGE, ["php", "t.php"])]);
-    expect(calls[0]!.options).toEqual({ stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+    expect(calls[0]!.options).toEqual({ cwd: dockerCwd(), stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
   });
   it("passes the tool to runArgs and nothing else", async () => {
     const { calls } = fakeSpawn((_args, child) => queueMicrotask(() => child.emit("close", 0)));
@@ -131,5 +134,20 @@ describe("security test container runner", () => {
     }));
     const result = await runContainer("x", IMAGE, ["php"], 1_000);
     expect(result.kind === "exited" && result.stdout.length).toBe(1_000_000);
+  });
+  it("starts every docker process, the timeout kill included, from one empty private folder, not the working directory", async () => {
+    const { calls } = fakeSpawn((args, child) => { if (args[0] !== "run") queueMicrotask(() => child.emit("close", 0)); });
+    await runDockerImageCommand(["image", "inspect", "x"], 1_000);
+    const pending = runContainer("slow", IMAGE, ["php"], 20);
+    await vi.waitFor(() => expect(calls.filter(c => c.args[0] === "kill")).toHaveLength(1));
+    calls[1]!.child.emit("close", 137);
+    await pending;
+    expect(calls.map(c => c.args[0])).toEqual(["image", "run", "kill"]);
+    const dirs = calls.map(c => (c.options as { cwd?: string }).cwd);
+    expect(new Set(dirs)).toEqual(new Set([dockerCwd()]));
+    const dir = dockerCwd();
+    expect(isAbsolute(dir) && !relative(tmpdir(), dir).startsWith("..")).toBe(true);
+    expect(dir).not.toBe(process.cwd());
+    expect(existsSync(dir) && readdirSync(dir)).toEqual([]);
   });
 });

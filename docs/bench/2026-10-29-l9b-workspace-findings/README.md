@@ -34,7 +34,7 @@ All runs were in Docker, from scripts in `scripts/`. Outputs are in `raw/`. The 
 - Everything else ran with `--network none`, `--read-only`, user `node`, 4 GB and 2 CPUs.
 
 **Runs.** Three runs were made, and the numbers below are the last one, at 1066088 (`raw/tests-1066088.txt`, `raw/git-1066088.txt`). The earlier two:
-- The first run, at d0c6ab5, had this lane's mutants 0 of 8, and its other numbers equal the ones below. Its output was overwritten by the second run and is kept only in the branch history (`raw/tests.txt` at 1336380).
+- The first run, at d0c6ab5, was `run.sh` only, with no git checks. It had this lane's mutants 0 of 8, and its other `run.sh` numbers equal the ones below. Its output was overwritten by the second run and is kept only in the branch history (`raw/tests.txt` at 1336380).
 - The second run, at 1336380 (`raw/tests.txt`, `raw/git.txt`), added "rule 5 off" on the new text.
 
 After the review of #193 (comment 6484899627, at a5fad1e), one assertion and one mutant were added, and the third run was made.
@@ -46,7 +46,7 @@ After the review of #193 (comment 6484899627, at a5fad1e), one assertion and one
   - `npm run build` failed for the same reason (astro).
 - `workspace-manifests.test.ts`: 22 passed. `judge.test.ts`: 63 passed.
 
-**The checks that need git** (`raw/git.txt`, `git.sh`, image `ludion-l9-node24-git`: L9's node:24-slim with git 2.39.5, and a throwaway repository of the same files, HEAD 1066088; `raw/git-1066088.txt`):
+**The checks that need git** (`raw/git-1066088.txt`, `git.sh`, image `ludion-l9-node24-git`: L9's node:24-slim with git 2.39.5, and a throwaway repository of the same files, HEAD 1066088):
 - `knowledge.test.ts` and `action.test.ts`: Test Files 2 passed (2); Tests 13 passed | 6 skipped (19).
 - `npm run build`: exit 0.
 

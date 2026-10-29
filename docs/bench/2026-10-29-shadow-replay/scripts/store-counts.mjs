@@ -16,7 +16,7 @@ const namingWatched = [...new Set(records.filter(r => (r.record?.affected ?? [])
 const captures = read("captures").map((r, i) => ({ r, i })).sort((a, b) => Date.parse(a.r.fetched_at) - Date.parse(b.r.fetched_at) || a.i - b.i).map(x => x.r);
 const previous = new Map(), repeats = {};
 for (const r of captures) {
-  const key = createHash("sha256").update(JSON.stringify({ ...r, fetched_at: undefined })).digest("hex"), stream = `${r.type}\0${r.name ?? r.id}\0${r.version ?? ""}`;
+  const key = createHash("sha256").update(JSON.stringify({ ...r, fetched_at: undefined })).digest("hex"), stream = ["baseline", "change", "gone"].includes(r.type) ? `timeline\0${r.name}` : `${r.type}\0${r.name ?? r.id}\0${r.version ?? ""}`;
   if (previous.get(stream) === key) { const t = r.type === "version" ? `version:${r.reason}` : r.type; repeats[t] = (repeats[t] ?? 0) + 1; }
   previous.set(stream, key);
 }

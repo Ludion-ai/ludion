@@ -139,11 +139,11 @@ All of these were changed as below.
 
 ## Tests
 
-`tools/shadow/test/replay.test.ts` has 58 tests. The recorder's 35 are unchanged, 93 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit df73560:
+`tools/shadow/test/replay.test.ts` has 61 tests. The recorder's 35 are unchanged, 96 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit 05e33cf:
 - typecheck exit 0;
-- 93 of 93 passed;
-- 93 of 93 passed again against the start commit's judge files, the ones the count runs (judge.ts 5a598fd; main's #193 version is at HEAD). The typecheck there covers `tools/shadow` and what it imports, and exits 0. The whole project does not typecheck against the old judge.ts, because main's workspace-manifests.ts imports `own`, which it lacks; the count never loads that file. (An earlier check.log at 658f5c5 printed `tsc_exit=0` for a whole-project typecheck that had failed: the host shell expanded `$?`. The fourth review found it.)
-- 40 deliberate mutations, each making tests fail:
+- 96 of 96 passed;
+- 96 of 96 passed again against the start commit's judge files, the ones the count runs (judge.ts 5a598fd; main's #193 version is at HEAD). The typecheck there covers `tools/shadow` and what it imports, and exits 0. The whole project does not typecheck against the old judge.ts, because main's workspace-manifests.ts imports `own`, which it lacks; the count never loads that file. (An earlier check.log at 658f5c5 printed `tsc_exit=0` for a whole-project typecheck that had failed: the host shell expanded `$?`. The fourth review found it.)
+- 43 deliberate mutations, each making tests fail:
   - the re-query cut-off off;
   - exploited's synthetic fix off;
   - no recomputation of `wait_until`;
@@ -182,14 +182,17 @@ All of these were changed as below.
   - a version the recorder gave up on judged from its partial capture;
   - captures after V's publish + 336h seeding a judgement;
   - a range record with no publish time not expanded;
-  - the re-query stopping on a range it cannot place.
+  - the re-query stopping on a range it cannot place;
+  - prev_d leaving out a record withdrawn in any copy;
+  - an OSV give-up never lifted;
+  - take-downs compared within their own type only.
 
 **Scale.** `scripts/scale.mjs` builds a synthetic store at the design's four-week size (`logs/scale.log`): 27,100 new versions over 2,200 watched names, recorder-sized manifests and attestation bundles, a poll a minute for 43 days, 463,269,960 bytes. The replay, with the replay.ts committed in 9d672be, judged 26,980 window versions in 223 s and exited 0, under run.sh's limits (`--memory 4g`, a 3,584 MB heap). Again at 8645b04, after the fifth review's fixes: 221 s, exit 0 (`logs/scale-2.log`). The sixth review's fixes were not rerun at scale: they add a check per row against the few give-up records, and filter seeds. Peak memory was not measured. The synthetic data is not registry data, so its outcomes mean nothing.
 
 ## The preliminary runs
 
-**The current one** is `out/replay-preliminary-7.json` (log `logs/run-preliminary-7.log`, store counts `logs/store-counts-7.log`), at 58c8a20, after the sixth review's fixes, with `NETWORK=1`:
-- **The snapshot.** Taken at 2026-10-29T03:06:55Z, 51,140,272 bytes, a copy. The recorder was not stopped or touched.
+**The current one** is `out/replay-preliminary-8.json` (log `logs/run-preliminary-8.log`, store counts `logs/store-counts-8.log`), at f9bf96c, after the seventh review's fixes, with `NETWORK=1`:
+- **The snapshot.** Taken at 2026-10-29T03:26:08Z, 51,503,952 bytes, a copy. The recorder was not stopped or touched.
 - **The judge.** The judge's files are the start commit's, as the log prints. Watched list sha256 `02d3e6de…`.
 - **The network.** OSV was asked for the records naming each watched package with a version in the window, that the feed showed changing in the window, or whose capture failed (package names only). Its cache was its own, fresh, and was not committed.
 - **The window.** In progress, 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z, one run, no break.
@@ -199,7 +202,9 @@ All of these were changed as below.
   - 7 records (from OSV's answers) name a watched version. The 19 versions they name are all outside the window: published 2025-08-26 and 27 (nx and @nx/*) and 2025-11-24 (posthog-node and @posthog/core).
   - The recorder stored 15 records itself, and none names a watched package.
 - **Capture lag.** Median 0.012h, p90 0.017h.
-- **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 153 repeats dropped (89 `change`, 64 `retry`).
+- **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 191 repeats dropped (108 `change`, 83 `retry`).
+
+**The seventh one**, at 58c8a20, with the network, before the seventh review: `logs/run-preliminary-7.log`, `logs/store-counts-7.log` and `out/replay-preliminary-7.json` (347 versions, all pending, 0 gaps; 153 repeats; the same 7 records and 19 versions outside the window).
 
 **The sixth one**, at 54c8705, with the network, before the sixth review: `logs/run-preliminary-6.log`, `logs/store-counts-6.log` and `out/replay-preliminary-6.json` (338 versions, all pending, 0 gaps; the same 7 records and 19 versions outside the window).
 

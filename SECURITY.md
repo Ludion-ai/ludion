@@ -24,7 +24,7 @@ Ludion is maintained by a small team. We aim to acknowledge a report within 7 da
 | Version | Supported |
 | --- | --- |
 | 0.3.x previews | Yes |
-| 0.1.x | No (deprecated) |
+| 0.1.x | No |
 
 ## Scope
 

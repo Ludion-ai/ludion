@@ -1,0 +1,37 @@
+# started 2026-10-29T15:13:48Z, node v24.20.0, git version 2.43.0
+npm ci exit 0
+stand-in repository: 860 files
+== npm run typecheck
+typecheck exit 0
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+== npm run build
+build exit 0
+15:14:00 [build] ✓ Completed in 375ms.
+15:14:00 [build] 3 page(s) built in 519ms
+15:14:00 [build] Complete!
+== npm test
+npm test exit 0
+ Test Files  28 passed (28)
+      Tests  885 passed | 19 skipped (904)
+== npm run test:e2e (CI=1)
+e2e exit 0
+  1 skipped
+  30 passed (53.0s)
+::notice title=🎭 Playwright Run Summary::  1 skipped%0A  30 passed (53.0s)
+== widths (320, 1280)
+widths exit 0
+/ 320px scrollWidth=320 clientWidth=320
+/ 1280px scrollWidth=1280 clientWidth=1280
+/start/ 320px scrollWidth=320 clientWidth=320
+.apply-branches 320px x=18 width=284
+.apply-needs 320px x=18 width=284
+/start/ 1280px scrollWidth=1280 clientWidth=1280
+.apply-branches 1280px x=120 width=704
+.apply-needs 1280px x=120 width=704
+  2 passed (3.0s)
+== screenshots
+screenshots exit 0
+36
+# finished 2026-10-29T15:15:16Z

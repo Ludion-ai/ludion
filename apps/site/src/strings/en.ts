@@ -2,7 +2,7 @@
 export const en = {
   "site": {
     "name": "Ludion",
-    "description": "One workflow for security updates across PHP Docker, npm, Composer and Maven. Find relevant fixes, validate the application, and update source with a recorded result."
+    "description": "One workflow for security updates across PHP Docker, npm, Composer and Maven. Find relevant fixes, validate the application, and commit each fix to its own Git branch with a recorded result."
   },
   "nav": {
     "label": "Main",
@@ -68,7 +68,7 @@ export const en = {
       "programBody": "Resolve packages in a separate acquisition environment. Keep application files out of online resolution, constrain download sources, and pin the tool image by digest.",
       "verifierBody": "Build baseline and candidate application images. Run your configured test offline on both and recheck the candidate dependency inventory for known advisories.",
       "notVerified": "A failed baseline, failed candidate, remaining advisory, incomplete inventory or changed project blocks application. Passing tests establish only the recorded application behavior.",
-      "invalidates": "Keep advisory ids, version inventories, image ids, source hashes and test outcomes in a local receipt. Multi-file dependency updates have a recovery journal.",
+      "invalidates": "Keep advisory ids, version inventories, image ids, source hashes and test outcomes in a local receipt, with each applied fix's branch and commit.",
       "sameModel": "You choose the application test. Ludion does not invent a passing test, weaken it, or treat an unavailable database as a clean result."
     },
     "isolate": {
@@ -80,7 +80,7 @@ export const en = {
       "run": "2 · Validate",
       "runDetail": "Run the original and updated application tests in Docker with no network, a read-only source/root, a non-root user and fixed scratch/resource limits. Check the resulting inventory again.",
       "apply": "3 · Apply",
-      "applyDetail": "With --apply, change only the supported Dockerfile or dependency files after validation. Keep a receipt and journal. Production deployment remains a separate step.",
+      "applyDetail": "With --apply, commit each fix that passes on its own to a new Git branch. Your files and current branch stay unchanged. Production deployment remains a separate step.",
       "limits": "Online acquisition contains dependency manifests, not application source or host credentials. Application tests run offline. Source remains local to your configured Docker setup.",
       "unavailable": "Run watch --apply to repeat the saved ecosystem policy. A stop request cancels pending application; a Docker step already in flight may finish before exit.",
       "scope": "Workflow illustration, not a completed update. Nothing is installed or executed by this page."
@@ -96,7 +96,7 @@ export const en = {
         "Application test command",
         "Baseline / candidate test outcome",
         "Candidate advisory recheck",
-        "Applied files and recovery journal"
+        "Each applied fix's branch and commit"
       ],
       "results": "Production deployment",
       "pending": "Recorded per run",

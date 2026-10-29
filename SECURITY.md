@@ -39,7 +39,6 @@ Two kinds of finding count as vulnerabilities in Ludion: a judgement that passes
 
 Out of scope:
 
-- vulnerabilities in third-party packages Ludion reports on (report them to that project or to the GitHub Advisory Database);
-- the intentionally vulnerable test fixtures in `examples/*-security`.
+- vulnerabilities in third-party packages Ludion reports on (report them to that project or to the GitHub Advisory Database).
 
-What Ludion checks and does not check is listed in the README; a limitation stated there is not a vulnerability.
+What Ludion checks and does not check is listed in docs/status.md; a limitation stated there is not a vulnerability.

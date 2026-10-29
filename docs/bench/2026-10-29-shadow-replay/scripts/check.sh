@@ -22,7 +22,7 @@ mutate() {
   run "npx vitest run tools/shadow 2>&1 | grep -E 'Tests '"
   mv "$file.orig" "$file"
 }
-mutate $R "MAL- re-query sees every record, whenever published" 'records.filter(r => ms(r.published) <= t &&' 'records.filter(r => true &&'
+mutate $R "MAL- re-query sees every record, whenever published" 'if (r && ms(r.published) <= t && !withdrawnBy' 'if (r && !withdrawnBy'
 mutate $R "synthetic fix never exploited" 'kev: row === "exploited"' 'kev: false'
 mutate $R "no recomputation of wait_until" 'while (j.wait_until && Date.parse(j.wait_until) !== at && iterations < 20)' 'while (false)'
 mutate $R "missing attestations not a gap" 'if ("gap" in cap.provenance) return' 'if (false) return'

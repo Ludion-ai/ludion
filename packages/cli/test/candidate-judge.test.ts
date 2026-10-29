@@ -1,9 +1,11 @@
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { candidateRefusal, judgeNpmCandidate, NO_SPLIT } from "../src/security/candidate-judge.ts";
 import { EXPLOITED_UNCOMPARABLE_HOURS, EXTENDED_MIN_HOURS, registryTarball, WAIT_HOURS } from "../src/security/judge.ts";
+import { EPSS_LIST } from "../src/security/npm-facts.ts";
 
 // A project moves lodash 4.17.20 -> 4.17.21 (the fix, published at T). The candidate also moves helper 1.0.0 -> 1.1.0,
 // published before T: a package in the lockfile diff that is not the fix, so every check must reach it too.
@@ -12,7 +14,7 @@ const hours = (h: number) => new Date(Date.parse(T) + h * 3_600_000);
 const LATER = hours(24 * 90);
 
 type Version = { published: string; npmUser?: object; deprecated?: string; scripts?: Record<string, string>; dependencies?: Record<string, string>; provenance?: { repository: string; workflow: string }; absent?: boolean };
-type World = { packages: Record<string, { created?: string; versions: Record<string, Version> }>; osv?: Record<string, string[]>; severity?: string; kev?: boolean; failing?: string };
+type World = { packages: Record<string, { created?: string; versions: Record<string, Version> }>; osv?: Record<string, string[]>; severity?: string; kev?: boolean; epss?: number; failing?: string; seen?: string[] };
 const integrityOf = (name: string, version: string) => `sha512-${Buffer.from(`${name}@${version}`.padEnd(64, "#")).toString("base64")}`;
 const json = (value: unknown) => new Response(JSON.stringify(value));
 
@@ -27,15 +29,21 @@ function base(): World {
   };
 }
 
-/** registry.npmjs.org (packuments and attestations), OSV, KEV and EPSS as the world says. */
+/** FIRST's daily EPSS list, as epss.empiricalsecurity.com serves it: the fixed URL redirects to the day's file. */
+const EPSS_DAY = "https://epss.empiricalsecurity.com/epss_scores-2026-10-01.csv.gz";
+const epssList = (score: number) => gzipSync(`#model_version:v2026.06.15,score_date:2026-10-01T00:00:00Z\ncve,epss,percentile\nCVE-1999-0001,0.5,0.9\nCVE-2026-0001,${score},0.5\n`);
+
+/** registry.npmjs.org (packuments and attestations), OSV, KEV and EPSS as the world says; `seen` collects every URL and body. */
 function fetchOf(world: World): typeof fetch {
   return async (url, init) => {
     const u = decodeURIComponent(String(url));
+    world.seen?.push(u, init?.body === undefined ? "" : String(init.body));
     if (world.failing && u.startsWith(world.failing)) return new Response("", { status: 500 });
     if (u === "https://api.osv.dev/v1/querybatch") return json({ results: JSON.parse(String(init?.body)).queries.map((q: any) => ({ vulns: (world.osv?.[`${q.package.name}@${q.version}`] ?? []).map(id => ({ id })) })) });
     if (u.startsWith("https://api.osv.dev/v1/vulns/")) return json({ id: u.split("/").at(-1), aliases: ["CVE-2026-0001"], ...(world.severity ? { database_specific: { severity: world.severity } } : {}) });
     if (u.startsWith("https://www.cisa.gov/")) return json({ vulnerabilities: world.kev ? [{ cveID: "CVE-2026-0001" }] : [] });
-    if (u.startsWith("https://api.first.org/")) return json({ data: [] });
+    if (u === EPSS_LIST) return new Response(null, { status: 302, headers: { location: EPSS_DAY } });
+    if (u === EPSS_DAY) return new Response(epssList(world.epss ?? 0.01));
     const att = /^https:\/\/registry\.npmjs\.org\/-\/npm\/v1\/attestations\/(.+)@([^@]+)$/.exec(u);
     if (att) {
       const [, name, version] = att as unknown as [string, string, string];
@@ -124,6 +132,14 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     for (const j of [scripts, link, repointed]) expect(j.verdict).toBe("stop");
   });
 
+  it("downloads the EPSS list whole and sends no CVE ID", async () => {
+    const world: World = { ...base(), seen: [] };
+    const j = await run(world);
+    expect(j.fixes.map(f => [f.id, f.epss])).toEqual([["GHSA-test-0001", 0.01]]);
+    expect(world.seen).toEqual(expect.arrayContaining([EPSS_LIST, EPSS_DAY]));
+    expect(world.seen!.filter(s => s.includes("CVE-"))).toEqual([]);
+  });
+
   it("keeps the judge's own list of what it did not check", async () => {
     const j = await run(base());
     expect(j.not_checked).toContain("Gate 1's OS, SAPI and configuration conditions are not matched, and production and dev-only dependencies are not told apart: every changed version counts as production.");
@@ -133,6 +149,15 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     const j = await run(base(), LATER, changed("package-lock.json", doc => { doc.packages["node_modules/helper/packages/x"] = { version: "1.0.0", extraneous: true }; }));
     expect(j.verdict).toBe("stop");
     expect(stops(j)).toEqual([expect.stringContaining("An extraneous lockfile folder outside the install paths is added, removed or changed: node_modules/helper/packages/x ")]);
+  });
+
+  it("stops an extraneous lockfile folder the candidate removes", async () => {
+    const from = before(), lockFile = join(from, "package-lock.json"), doc = JSON.parse(readFileSync(lockFile, "utf8"));
+    doc.packages["node_modules/helper/packages/x"] = { version: "1.0.0", extraneous: true };
+    writeFileSync(lockFile, JSON.stringify(doc));
+    const j = await judgeNpmCandidate(from, after(), fetchOf(base()), LATER);
+    expect(j.verdict).toBe("stop");
+    expect(stops(j)).toEqual([expect.stringContaining("An extraneous lockfile folder outside the install paths is added, removed or changed: (removed) node_modules/helper/packages/x ")]);
   });
 
   it("does not let an undecidable judgement with no stop finding through (an unchanged lockfile)", async () => {
@@ -150,6 +175,7 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
   it.each<[string, World, [string, string][]]>([
     ["a publisher change", helperTo({ npmUser: { name: "someone-else" } }), [["helper", "1.1.0"]]],
     ["a new dependency", helperTo({ dependencies: { "old-dep": "^1.0.0" } }), [["helper", "1.1.0"], ["old-dep", "1.0.0"]]],
+    ["a replaced version the registry no longer lists", helperTo({}, { absent: true }), [["helper", "1.1.0"]]],
   ])("extends the wait for %s and does not apply before it ends", async (_label, world, others) => {
     const to = after(others);
     const extended = Math.max(WAIT_HOURS.normal * 2, EXTENDED_MIN_HOURS);
@@ -165,6 +191,7 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
   it.each<[string, Partial<World>, number]>([
     ["normal", {}, WAIT_HOURS.normal],
     ["high", { severity: "CRITICAL" }, WAIT_HOURS.high],
+    ["high", { epss: 0.1 }, WAIT_HOURS.high],
     // No provenance to compare, so an exploited fix waits 24h instead of 12h.
     ["exploited", { kev: true }, EXPLOITED_UNCOMPARABLE_HOURS],
   ])("waits by the wait table: %s", async (urgency, extra, wait) => {
@@ -182,7 +209,7 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
   });
 
   it("cannot decide when a lookup fails, and says so", async () => {
-    for (const failing of ["https://registry.npmjs.org/helper", "https://api.osv.dev/", "https://www.cisa.gov/"]) {
+    for (const failing of ["https://registry.npmjs.org/helper", "https://api.osv.dev/", "https://www.cisa.gov/", "https://epss.empiricalsecurity.com/"]) {
       const j = await run({ ...base(), failing });
       expect(j.verdict).toBe("undecidable");
       expect(candidateRefusal(j)).toMatch(/^The judge cannot decide on the candidate: gate 2: A lookup failed: .* answered HTTP 500/);

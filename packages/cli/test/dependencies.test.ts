@@ -1,11 +1,13 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { gzipSync } from "node:zlib";
 import { describe, expect, it, vi } from "vitest";
 import semver from "semver";
 import { acquisitionPolicy, applyFiles, candidateTimeCap, changedPackages, compatible, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals } from "../src/security/dependency-patch.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl } from "../src/security/acquisition.ts";
 import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, type Inventory } from "../src/security/inventory.ts";
+import { EPSS_LIST } from "../src/security/npm-facts.ts";
 import { OsvClient, type Advisory } from "../src/security/osv.ts";
 import { privateState, snapshot } from "../src/security/project.ts";
 import { scanProject } from "../src/security/scan.ts";
@@ -34,16 +36,19 @@ function client(candidateVulnerable = false): OsvClient {
 /**
  * registry.npmjs.org for the time cap and the judge: lodash 4.17.21 (the fix) and any extra versions given, each with
  * its fixture integrity and `manifest`'s fields. For the judge also OSV (lodash@4.17.20 has the advisory), an empty KEV
- * catalog and no EPSS scores.
+ * catalog and FIRST's whole EPSS list, which does not have the advisory's CVE. `seen` collects every URL and body.
  */
-function registry(extra: Record<string, { created: string; versions: Record<string, string> }> = {}, manifest: (name: string, version: string) => object = () => ({})): typeof fetch {
+const EPSS_DAY = "https://epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz";
+function registry(extra: Record<string, { created: string; versions: Record<string, string> }> = {}, manifest: (name: string, version: string) => object = () => ({}), seen: string[] = []): typeof fetch {
   const docs: Record<string, { created: string; versions: Record<string, string> }> = { lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z" } }, ...extra };
   return async (url, init) => {
     const u = String(url);
+    seen.push(u, init?.body === undefined ? "" : String(init.body));
     if (u === "https://api.osv.dev/v1/querybatch") return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.package.name === "lodash" && q.version === "4.17.20" ? { vulns: [{ id: advisory.id }] } : {}) });
     if (u.startsWith("https://api.osv.dev/v1/vulns/")) return response(advisory);
     if (u.startsWith("https://www.cisa.gov/")) return response({ vulnerabilities: [] });
-    if (u.startsWith("https://api.first.org/")) return response({ data: [] });
+    if (u === EPSS_LIST) return new Response(null, { status: 302, headers: { location: EPSS_DAY } });
+    if (u === EPSS_DAY) return new Response(gzipSync("cve,epss,percentile\nCVE-1999-0001,0.5,0.9\n"));
     const name = decodeURIComponent(u.replace("https://registry.npmjs.org/", ""));
     const doc = docs[name];
     if (!doc) return new Response("", { status: 404 });
@@ -441,7 +446,7 @@ describe("Composer plans also read Packagist's advisories", () => {
   });
 });
 
-describe("the judge on npm candidates", () => {
+describe.each([true, false])("the judge on npm candidates, apply %s", apply => {
   const lodash = (fix: object, published = "2021-02-20T15:42:16.891Z") => registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": published } } }, (_name, version) => version === "4.17.21" ? fix : {});
   it.each<[string, typeof fetch, string, string]>([
     ["a deprecated fix", lodash({ deprecated: "use 4.17.22" }), "stop", "The judge stops the candidate: gate 2: lodash@4.17.21 is deprecated: use 4.17.22"],
@@ -452,13 +457,22 @@ describe("the judge on npm candidates", () => {
     ["a candidate whose OSV lookup fails", async (url, init) => String(url).startsWith("https://api.osv.dev/") ? new Response("", { status: 503 }) : registry()(url, init), "undecidable", "The judge cannot decide on the candidate: gate 2: A lookup failed: api.osv.dev answered HTTP 503."],
   ])("does not apply %s, and does not run the candidate's tests", async (_label, fetchFn, verdict, reason) => {
     const root = fixture(), before = snapshot(root); let tests = 0;
-    const result = await patchDependencies(root, true, { fetchFn, client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
+    const result = await patchDependencies(root, apply, { fetchFn, client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
     expect(result.receipt?.outcome).toBe("failed");
     expect(result.receipt?.judgement?.verdict).toBe(verdict);
     expect(result.receipt?.reason).toContain(reason);
     expect(result.receipt?.candidate_passed).toBe(false);
     expect(tests).toBe(1);
     expect(snapshot(root)).toBe(before);
+  });
+  it("goes on to the candidate's tests when the judge finds nothing, downloading the EPSS list whole and sending no CVE ID", async () => {
+    const root = fixture(), seen: string[] = []; let tests = 0;
+    const result = await patchDependencies(root, apply, { fetchFn: registry({}, () => ({}), seen), client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
+    expect(result.receipt?.judgement?.verdict).toBe("ready_except_build");
+    expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
+    expect(tests).toBe(2);
+    expect(seen).toEqual(expect.arrayContaining([EPSS_LIST, EPSS_DAY]));
+    expect(seen.filter(s => s.includes("CVE-"))).toEqual([]);
   });
 });
 

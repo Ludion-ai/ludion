@@ -25,12 +25,12 @@ FILES="packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts
 git diff --quiet HEAD -- tools/shadow || { echo "tools/shadow has uncommitted changes; commit them first"; exit 1; }
 TREE="$SNAP.tree"
 mkdir -p "$TREE/node_modules"
-git archive HEAD | tar -x -C "$TREE"
-for f in $FILES; do git show "$START:$f" > "$TREE/$f"; done
+git -c core.autocrlf=false archive HEAD | (cd "$TREE" && tar -x)
+for f in $FILES; do git -c core.autocrlf=false show "$START:$f" > "$TREE/$f"; done
 echo "start commit $START; replay at HEAD $(git rev-parse HEAD); judge files from the start commit:"
 for f in $FILES; do echo "  $f $(git hash-object "$TREE/$f") (start: $(git rev-parse "$START:$f"))"; done
 WATCHED=$(grep -h '"type":"start"' "$SNAP"/status/*.jsonl | sed -E 's/.*"watched_sha256":"([0-9a-f]{64})".*/\1/' | sort -u)
-[ "$WATCHED" = "$(sha256sum "$TREE/tools/shadow/watched.json" | cut -d' ' -f1)" ] || { echo "tools/shadow/watched.json is not the list the recorder started with ($WATCHED)"; exit 1; }
+[ "$WATCHED" = "$(sha256sum < "$TREE/tools/shadow/watched.json" | cut -d' ' -f1)" ] || { echo "tools/shadow/watched.json is not the list the recorder started with ($WATCHED)"; exit 1; }
 echo "watched list $WATCHED"
 W=$(cd "$TREE" && (pwd -W 2>/dev/null || pwd)); S=$(cd "$SNAP" && (pwd -W 2>/dev/null || pwd)); O=$(cd "$(dirname "$OUT")" && (pwd -W 2>/dev/null || pwd))
 NET="--network none"; CACHE=""

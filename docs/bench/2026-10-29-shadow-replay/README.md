@@ -14,7 +14,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
   - Only days before the replay's own day are checked: today is not over.
   - The window is the first run that lasts 28 days.
 - **The versions** (section 3). Every version of a watched name whose stored publish time (the packument's `time`, as captured) falls in the window.
-- **One judgement** (section 4). It is the judge's own `judge()`, imported unchanged. `scripts/run.sh` refuses to run unless judge.ts, npm-facts.ts, time-cap.ts and archives-v5.ts equal those at the recorder's start commit (8a78b55). It compares the working tree, which is what the container runs. It also refuses a watched list other than the start line's.
+- **One judgement** (section 4). It is the judge's own `judge()`, imported unchanged. `scripts/run.sh` runs a tree of its own: HEAD's committed files, with judge.ts, npm-facts.ts, time-cap.ts and archives-v5.ts taken from the recorder's start commit (8a78b55). So a later change to the judge does not change the count (main's #193 changed judge.ts after the start). It prints each file's blob next to the start commit's, and the output records the blobs it ran. It refuses a watched list other than the start line's.
   - **(b), per row.** A synthetic fix (`SHADOW-SYNTHETIC-FIX`) from prev to V sets the row. Exploited is `kev: true`; high is `severity: CRITICAL`; normal has neither; low is normal with the change marked dev.
     - `locked` is {P@prev}, and `files` is package.json and package-lock.json.
     - `resolved` is the registry tarball, and `integrity` is V's captured `dist.integrity`.
@@ -124,6 +124,8 @@ None of these loosens a count. Each is the reading the code takes, and is tested
 - **MAL- records.** None of the 15 stored names a watched version.
 - **Capture lag.** Median 0.012h, p90 0.017h.
 - **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 133 repeats dropped.
+
+**A check of the final run.sh** (not committed: an output in a temporary folder). At c8bf211, after main's #193 changed judge.ts, a run printed judge.ts blob 5a598fd, which is the start commit's, and recorded it in its output.
 
 **The first one**, at 22ad747 and before the review, is kept as it ran: `logs/run-preliminary.log` and `out/replay-preliminary.json`.
 - **The snapshot.** Taken at 2026-10-29T01:06:35Z, 47,055,265 bytes, a copy. The recorder was not stopped or touched.

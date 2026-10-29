@@ -1,0 +1,176 @@
+{
+ "third": {
+  "repositories": 100,
+  "failed": 0,
+  "totals": {
+   "npm_audit": 1972,
+   "judge_production": 1021,
+   "npm_audit_omit_dev": 755,
+   "npm_audit_direct": 1200,
+   "left_out": 182
+  },
+  "count_gate": {
+   "rule": "judge_production <= npm_audit / 3",
+   "met": false
+  },
+  "needed_at_most": 657,
+  "also_shown": {
+   "judge_over_npm_direct": 0.8508333333333333,
+   "judge_over_npm_omit_dev": 1.352317880794702,
+   "per_repository_ratio_median": 0.5033333333333334,
+   "repositories_without_a_ratio": 0,
+   "repositories_npm_zero_judge_above_zero": 0,
+   "repositories_at_or_below_a_third": 26,
+   "splits": {
+    "source_read": 87,
+    "image_holds_dev": 9,
+    "incomplete": 4,
+    "not_given": 0
+   }
+  },
+  "candidates": 1477,
+  "considered": 231,
+  "exclusions_by_cause": {
+   "fork": 18,
+   "nothing named": 22,
+   "no root lockfile": 82,
+   "in an earlier sample": 4,
+   "archived": 2,
+   "owner": 3
+  },
+  "sources": {
+   "fetched": 100,
+   "not_fetched": [],
+   "retried": [],
+   "export_ignore": [
+    "mustafaakalin/laravel-avukatlik-burosu",
+    "vilu85/toastr-ts",
+    "vistik/houston"
+   ]
+  },
+  "incomplete": [
+   "OkayOkay101/BattleFightLegacy: docs/licenses/texts/electron-runtime/LICENSES.chromium.html could not be read",
+   "mustafaakalin/laravel-avukatlik-burosu: GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): /.github export-ignore; CHANGELOG.md export-ignore; .styleci.yml export-ignore | .gitattributes: /.github export-ignore; CHANGELOG.md export-ignore; .styleci.yml export-ignore)",
+   "vilu85/toastr-ts: GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): /tests export-ignore; /docs export-ignore; *.test.js export-ignore; *.test.php export-ignore; *.spec.js export-ignore | .gitattributes: /tests export-ignore; /docs export-ignore; *.test.js export-ignore; *.test.php export-ignore; *.spec.js export-ignore)",
+   "vistik/houston: GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): CHANGELOG.md export-ignore; README.md export-ignore | .gitattributes: CHANGELOG.md export-ignore; README.md export-ignore)"
+  ],
+  "image_holds_dev": [
+   "M-Waweru/new-mathnuscripts-garden",
+   "lass-machen/meetropolis",
+   "Tabitha022/study-notes",
+   "devwork5600/lokko-hub",
+   "gorjoe/knowledge",
+   "zbzq8ztx22-star/OmniRoute",
+   "owodunni/curarehab",
+   "vaynel/llmwiki-public",
+   "bpawlowski21/recipes"
+  ],
+  "gitmodules": []
+ },
+ "original": {
+  "repositories": 100,
+  "failed": 0,
+  "totals": {
+   "npm_audit": 1871,
+   "judge_production": 950,
+   "npm_audit_omit_dev": 923,
+   "npm_audit_direct": 1090,
+   "left_out": 151
+  },
+  "count_gate": {
+   "rule": "judge_production <= npm_audit / 3",
+   "met": false
+  },
+  "needed_at_most": 623,
+  "also_shown": {
+   "judge_over_npm_direct": 0.8715596330275229,
+   "judge_over_npm_omit_dev": 1.029252437703142,
+   "per_repository_ratio_median": 0.5714285714285714,
+   "repositories_without_a_ratio": 1,
+   "repositories_npm_zero_judge_above_zero": 1,
+   "repositories_at_or_below_a_third": 27,
+   "splits": {
+    "source_read": 91,
+    "image_holds_dev": 8,
+    "incomplete": 1,
+    "not_given": 0
+   }
+  },
+  "sources": {
+   "fetched": 100,
+   "not_fetched": [],
+   "retried": [],
+   "export_ignore": []
+  },
+  "incomplete": [
+   "SteinOA/DSSA-Tale-Mac: resources/legal/LICENSES.chromium.html could not be read"
+  ],
+  "image_holds_dev": [
+   "staticdesigner/modevue",
+   "datagrowth/sobre-abierto",
+   "KisaesDevLab/Vibe-MyBooks",
+   "ruddyribera-ops/pria-app",
+   "jadwalit-jpg/Jadwal",
+   "logicalgnosis/logicalgnosis.github.io",
+   "JDonoghue-UL/my-astro-blog",
+   "ELDIABLO2020/bannersin48"
+  ],
+  "gitmodules": []
+ },
+ "second": {
+  "repositories": 100,
+  "failed": 0,
+  "totals": {
+   "npm_audit": 2142,
+   "judge_production": 1062,
+   "npm_audit_omit_dev": 751,
+   "npm_audit_direct": 1272,
+   "left_out": 218
+  },
+  "count_gate": {
+   "rule": "judge_production <= npm_audit / 3",
+   "met": false
+  },
+  "needed_at_most": 714,
+  "also_shown": {
+   "judge_over_npm_direct": 0.8349056603773585,
+   "judge_over_npm_omit_dev": 1.4141145139813582,
+   "per_repository_ratio_median": 0.5199938949938949,
+   "repositories_without_a_ratio": 0,
+   "repositories_npm_zero_judge_above_zero": 1,
+   "repositories_at_or_below_a_third": 32,
+   "splits": {
+    "source_read": 91,
+    "image_holds_dev": 6,
+    "incomplete": 3,
+    "not_given": 0
+   }
+  },
+  "sources": {
+   "fetched": 100,
+   "not_fetched": [],
+   "retried": [],
+   "export_ignore": [
+    "eighteen73/pulsar-extensions",
+    "3liz/lizmap-web-client",
+    "kulykovoleksii/board"
+   ]
+  },
+  "incomplete": [
+   "eighteen73/pulsar-extensions: GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): /.git export-ignore; /.github export-ignore; /.husky export-ignore; /.vscode export-ignore; /node_modules export-ignore; /src export-ignore; /tests export-ignore; /.* export-ignore; /CHANGELOG.md export-ignore; /CODE_OF_CONDUCT.md export-ignore; /CONTRIBUTING.md export-ignore; /CREDITS.md export-ignore; /lefthook.yml export-ignore; /package-lock.json export-ignore; /package.json export-ignore; /phpcs.xml export-ignore; /postcss.config.js export-ignore;)",
+   "3liz/lizmap-web-client: GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): .gitattributes export-ignore; .gitignore export-ignore; .github export-ignore; .jelixlocales.ini export-ignore; .gitlab-ci.yml export-ignore; .php-cs.dist export-ignore; phpstan.neon export-ignore; ./tests   export-ignore)",
+   "kulykovoleksii/board: GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): CHANGELOG.md export-ignore | .gitattributes: CHANGELOG.md export-ignore)"
+  ],
+  "image_holds_dev": [
+   "joelmale/nexusVTT",
+   "W8SOJIB/W8OmniRouteTermux-Modedd",
+   "Brutusjam/projekt-status",
+   "monoscope-tech/monoscope",
+   "HillsboroLLC/jaspen",
+   "jonorl/fugazzeta"
+  ],
+  "gitmodules": [
+   "jbpratt/pi-experiments"
+  ]
+ }
+}

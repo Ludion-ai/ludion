@@ -1,0 +1,117 @@
+[
+  { "repo": "httpcats/http.cat", "sha": "d8bbe60946d37e4f347229be6f9443c84190efab", "finished": true,
+    "packages": [
+      { "name": "tmp", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/tmp@0.0.33 (lockfile dev) [GHSA-52f5-9888-hmc6 <=0.2.3; GHSA-ph9p-34f9-6g65 <0.2.6]. Only copy. Lockfile reverse closure (deps/optional/peer): root devDependencies all-contributors-cli > inquirer > external-editor > tmp; no other parent. all-contributors-cli is not a D1 package, so D2. Source tree complete (409 files, no .ludion-incomplete, no .gitmodules); repo-wide grep (excluding package-lock.json) for all-contributors|inquirer|external-editor|'tmp' finds only package.json:37 (devDependencies). No import from source; P2 files next.config.ts, postcss.config.mjs, tailwind.config.ts name none of them; scripts: start 'next start', build 'next build && node ./scripts/post-build.js' (post-build.js imports none of them); bin 'all-contributors' is in no script; not P3/P4; no Dockerfile, Procfile, compose, vercel.json or netlify.toml, so no production stage holds devDependencies; not reached from any production copy (the reverse closure contains no production package)." }
+    ] },
+  { "repo": "canada-ca/template-gabarit", "sha": "6ad23fd8068e1a114d641249c3198219ed405c7e", "finished": true,
+    "packages": [
+      { "name": "katex", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/katex@0.16.47 (dev) [GHSA-238p-pmpm-9mq7 >=0.11.0 <0.18.2]. D1: only lockfile path is root devDependencies markdownlint-cli (a D1 linter) > markdownlint > micromark-extension-math > katex; every path passes through markdownlint-cli. No P-rule: no deps (only devDependencies chalk, glob, markdown-link-check, markdownlint-cli); scripts are link-check/lint/test only (no start/build); no P2 file; single source file link-check.js imports none; no Dockerfile." },
+      { "name": "re2js", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/re2js@2.8.6 (dev) [GHSA-gg6h-894w-4m9c >=2.2.0 <2.8.7]. D1: only path root devDependencies markdownlint-cli (D1 linter) > markdownlint > re2js. No start/build script, no P2 file, no Dockerfile, link-check.js does not import it." }
+    ] },
+  { "repo": "lean-17/task-dashboard", "sha": "dbebb03394d9997819ac2f52b4aa02dac39e513f", "finished": true,
+    "packages": [
+      { "name": "@vitest/mocker", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/@vitest/mocker@3.2.4 (dev) [GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11; GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12]. D1: it is @vitest/* (test runner list) and its only parent is node_modules/vitest (root devDependencies vitest, D1). No P-rule: vitest is imported only by excluded files (src/setupTests.js, *.test.jsx, vitest.config.js); vite.config.mjs names only vite, @vitejs/plugin-react, @tailwindcss/vite (its 'test' block names no package); start 'vite --port 3000', build 'vite build' do not run vitest; no Dockerfile." },
+      { "name": "tinypool", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/tinypool@1.1.1 (dev) [GHSA-5gmw-xhrv-c9v3 <=2.1.0; GHSA-85c8-ppgw-ccpr <2.1.2]. D1: only path root devDependencies vitest (D1 test runner) > tinypool. Not imported by source, not named in vite.config.mjs/postcss.config.js, not run by start/build, no Dockerfile." },
+      { "name": "vitest", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/vitest@3.2.4 (dev) [GHSA-5xrq-8626-4rwp <3.2.6; GHSA-82fw-gwwq-j7x9 >=2.1.0 <4.1.11]. D1: vitest is a test runner declared in root devDependencies (package.json:60). Imports only from excluded test files and vitest.config.js; P2 vite.config.mjs does not name 'vitest'; run only by the 'test' script; no Dockerfile." }
+    ] },
+  { "repo": "TurboWarp/packager", "sha": "c115bdf525c5f49f0fb689a21b335ccb70fc22d2", "finished": true,
+    "packages": [
+      { "name": "@tootallnate/once", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/@tootallnate/once@1.1.2 (dev) [GHSA-vpq2-c234-7xj6 <2.0.1]. D1: reverse closure is http-proxy-agent < jsdom < jest-environment-jsdom < jest-config/jest-runner < @jest/core/jest-cli < jest (root devDependencies, D1 test runner); every path from root passes through jest. No P-rule reaches it: babel.config.js and webpack.config.js name none of these; start 'webpack serve' and build 'npm run clean && webpack' do not run jest; only 'test' (and prepublishOnly, not P5/P6) run jest; no source import; no Dockerfile." },
+      { "name": "deepmerge", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/deepmerge@4.3.1 (dev) [GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1; OSV last_affected 4.3.1]. D1: only parent jest-config; paths root > jest > (@jest/core|jest-cli) > jest-config > deepmerge; all through jest (D1). Not imported, not named by babel/webpack config, not run by start/build, no Dockerfile." },
+      { "name": "form-data", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/form-data@3.0.3 (dev) [GHSA-fjxv-7rqg-78g4 >=3.0.0 <3.0.4; GHSA-hmw2-7cc7-3qxx >=3.0.0 <3.0.5]. D1: only parent jsdom; paths root > jest > ... > jest-environment-jsdom > jsdom > form-data; all through jest (D1). Not imported by source, not named by P2 files, not run by start/build, no Dockerfile." },
+      { "name": "js-yaml", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/js-yaml@3.14.1 (dev) [GHSA-mh29-5h37-fv8m <3.14.2 and four others with >=3.0.0 <3.15.x]. D1: only parent @istanbuljs/load-nyc-config < babel-plugin-istanbul < @jest/transform < babel-jest / jest family; paths root > babel-jest (D1, root devDependencies) > ... and root > jest (D1) > ...; every path passes through jest or babel-jest. babel.config.js does not name istanbul; not imported; not run by start/build; no Dockerfile." }
+    ] },
+  { "repo": "comShadowHarvy/snake42", "sha": "a4e5bf4a971ea7d20144ec94d89598550a8124c4", "finished": true,
+    "packages": [
+      { "name": "shell-quote", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/shell-quote@1.8.3 (dev) [GHSA-w7jw-789q-3m8p >=1.1.0 <=1.8.3; GHSA-395f-4hp3-45gv <=1.8.4]. Only path root devDependencies concurrently > shell-quote (concurrently not D1), so D2. Source complete (24 files, no marker); repo grep for concurrently|shell-quote finds only package.json:9 ('dev' script, not P5/P6) and :42. start 'electron .', build 'electron-builder' / build-all; electron (P4) and electron-builder (P6) closures do not contain concurrently (reverse closure of shell-quote is only concurrently, root). No source import, no P2 file, not P3/P4, no Dockerfile." }
+    ] },
+  { "repo": "filestack/filestack-angular", "sha": "9441941a653f0a1b92702bbf7a86038bf562f98c", "finished": true,
+    "packages": [
+      { "name": "handlebars", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/handlebars@4.7.9 (dev) [GHSA-xw65-4hp5-5hc7, GHSA-8r5x-fm3f-whwj >=4.0.0 <=4.7.9; GHSA-p8wg-vrv2-v86f >=3.0.0 <=4.7.9]. Only path root devDependencies standard-version > conventional-changelog > conventional-changelog-core > conventional-changelog-writer > handlebars (standard-version not D1), so D2. Repo grep for handlebars|standard-version|conventional-changelog|.hbs finds only package.json:20 ('release' script, not P5/P6), :75 and CHANGELOG.md. start 'ng serve', build 'ng build ... && npm run build:schematics', build:umd 'rollup -c' do not run it; P2 files (.storybook/*, angular.json, rollup.config.js, webpack.config.js, app.config.ts) do not name it; not P3/P4; no Dockerfile; no production copy's closure reaches it." }
+    ] },
+  { "repo": "ztimson/formula-manager-2", "sha": "55ac1d1e808ff8ea44265ed4128f77906e8878bd", "finished": true,
+    "packages": [
+      { "name": "@xmldom/xmldom", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/@xmldom/xmldom@0.8.10 (dev) [e.g. GHSA-wh4c-j3r5-mjhp <0.8.12; GHSA-6gmq-8vp8-gcm6 >=0.7.0 <=0.8.14]. Only paths root devDependencies @electron/packager > (plist | @electron/osx-sign > plist | @electron/universal > plist) > @xmldom/xmldom; @electron/packager is not D1, so D2. @electron/packager (bin electron-packager) runs only in package:win/mac/linux scripts, which are not P5 (prestart/start/poststart) or P6 (build/generate/export and build:*); start 'ng serve', build 'ng build', build:electron 'ng build --base-href ./' do not run it; electron (P4) closure does not reach plist (reverse closure has no electron). Repo grep for xmldom|plist|electron-packager|@electron/ finds only package.json. P2 file angular.json does not name it; not P3/P4; no Dockerfile. Note: the packaging scripts use --prune=true, so the packaged app also excludes devDependencies." }
+    ] },
+  { "repo": "krisnayogantaraa/lumina-borealis-ui", "sha": "6259b99d4257c08d9e38a4b0952be10030cd3835", "finished": true,
+    "packages": [
+      { "name": "@storybook/core", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/@storybook/core@8.6.18 (dev) [GHSA-f2ph-cmg5-wxc8, GHSA-px85-f4q5-jh77 >=8.0.0 <8.6.19]. Only parent node_modules/storybook (v8); reverse closure: packages/vue devDependencies @storybook/blocks@8 > storybook > @storybook/core, @storybook/test@8 > (storybook | @storybook/instrumenter > storybook) > @storybook/core, plus @storybook/theming (peer). None is D1 (@storybook/test is not @storybook/test-runner), so D2. packages/vue's own storybook ^10.4.1 resolves to packages/vue/node_modules/storybook, not this copy. No import of @storybook/blocks, @storybook/test, @storybook/instrumenter, @storybook/theming or storybook in source: stories use only 'import type' from @storybook/vue3; .storybook/preview.ts imports @storybook/vue3; .storybook/main.ts names @storybook/addon-links, @storybook/addon-docs, @storybook/vue3-vite (P2), whose copies do not reach node_modules/storybook (not in the reverse closure). Scripts: root build runs workspace builds ('npx vite build && npx vue-tsc' / tsc); 'storybook' and 'build-storybook' are not P5/P6 names and run the v10 bin anyway; no start script; vite.config.ts files do not name storybook; not P3/P4; no Dockerfile." }
+    ] },
+  { "repo": "Marcentella/Plainchord", "sha": "b90dc573c43261cdd70f1bb3725441a0dffa3df1", "finished": true,
+    "packages": [
+      { "name": "zod", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/zod@4.6.2 (dev) [GHSA-mrhx-c7xc-m3w5 <4.6.6; OSV fixed 4.6.6]. D1: paths root devDependencies eslint-config-next (D1 eslint-*) > eslint-plugin-react-hooks > zod and > eslint-plugin-react-hooks > zod-validation-error > zod; every path passes through eslint-config-next/eslint-plugin-react-hooks. No source import of zod; next.config.ts and postcss.config.mjs do not name it; start 'next start', build 'next build' (next's closure does not reach zod); no Dockerfile." }
+    ] },
+  { "repo": "gaspareu/recipe-hug", "sha": "f894c1a290a607a77883be02d4abb8e595fb932f", "finished": true,
+    "packages": [
+      { "name": "smol-toml", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/smol-toml@1.8.0 (dev) [GHSA-r4xh-jqrq-34v2 <=1.8.0; OSV fixed 1.9.0]. Only path root devDependencies knip > smol-toml; knip is not in D1's lists, so D2. Repo grep for knip|smol-toml finds only package.json ('lint:dead-code' script, not P5/P6; reached via 'check'/'check:all', which are not P5/P6). Build 'vite build' (vite P3/P6, its closure does not reach smol-toml); no start script; vite.config.ts does not name it; vercel.json has only rewrites (no buildCommand); no netlify.toml, no Dockerfile; no source import; not P3/P4." }
+    ] },
+  { "repo": "yuma-shin/SafeGo", "sha": "c9c7db218cc8eb0d9d5d238fd04be9f5ce356e8b", "finished": true,
+    "packages": [
+      { "name": "deepmerge", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/deepmerge@4.3.1 (dev) [GHSA-gcqx-w48m-w2h4 >=4.2.0 <=4.3.1]. D1: only parent jest-config; paths root > jest (D1) > ... > jest-config > deepmerge and root > ts-jest (D1) > jest > ...; all pass through jest/ts-jest. Not imported by source, not named by next.config.ts/postcss.config.mjs/tailwind.config.ts, start 'next start' and build 'next build' do not run jest; no Dockerfile." }
+    ] },
+  { "repo": "Lisow7/FridgePlus", "sha": "5f62f259054813ac075c19fab2615d8f8d955e5e", "finished": true,
+    "packages": [
+      { "name": "@vitest/mocker", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/@vitest/mocker@5.0.0 (dev) [GHSA-qxg6-89mg-rqv8 >=5.0.0-beta.1 <5.0.3; GHSA-xp26-3454-mjgp >=5.0.0-rc.2 <5.0.3]. D1: it is @vitest/*, and its only parent is vitest (D1); paths root > vitest, root > @testing-library/jest-dom > vitest, root > @vitest/coverage-v8 > vitest, root > @vitest/ui > vitest; all pass through vitest. No vitest reference outside tests/config: vite.config.js does not name it; build 'vite build && vite build --ssr ... && node scripts/prerender.mjs' does not run it; no start script; no Dockerfile." },
+      { "name": "@vitest/ui", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/@vitest/ui@5.0.0 (dev) [GHSA-p458-7748-mcp3 >=5.0.0-beta.6 <5.0.5]. D1: @vitest/* test runner package declared in root devDependencies (package.json:75); other paths go through vitest. Run only by 'test:ui' (vitest --ui); not imported or named by vite.config.js; no Dockerfile." },
+      { "name": "smol-toml", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/smol-toml@1.8.0 (dev) [GHSA-r4xh-jqrq-34v2 <=1.8.0]. Only path root devDependencies knip > smol-toml; knip not D1, so D2. knip appears only in package.json ('knip' script, not P5/P6) and knip.json; build runs vite and scripts/prerender.mjs (no import of knip/smol-toml); no start script; vercel.json has no buildCommand; vite.config.js does not name it; not P3/P4; no Dockerfile; no source import." }
+    ] },
+  { "repo": "elkimek/venice-e2ee", "sha": "6988165aea661ba383763ab9df18c2ead07e9977", "finished": true,
+    "packages": [
+      { "name": "@vitest/mocker", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/@vitest/mocker@4.1.11 (dev) [GHSA-qxg6-89mg-rqv8 >=2.1.0-beta.7 <4.1.12; GHSA-xp26-3454-mjgp >=4.1.11 <4.1.12]. D1: @vitest/*, only path root devDependencies vitest (D1) > @vitest/mocker. Build 'tsc' / build:browser 'esbuild ...' do not run vitest; no P2 file; no source import; no Dockerfile." }
+    ] },
+  { "repo": "andressalame/profesormvt-web", "sha": "190e4b76c0b2b6dc907448f19729d37d886d49a3", "finished": true,
+    "packages": [
+      { "name": "undici", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/undici@7.29.0 (dev) [e.g. GHSA-r53p-7pc4-xj5r >=7.0.0 <7.29.1; GHSA-4qv8-2p9j-2685 >=7.0.0 <7.30.1]. Only path root devDependencies wrangler > miniflare > undici (wrangler not D1), so D2. Repo grep finds no 'undici' or 'miniflare' anywhere outside the lockfile. wrangler is not imported (batuta-app/bin/fixtures.mjs:57 and batuta-app/vigia-retencion-mvt.mjs:197 call execFileSync(\"wrangler\", ...), which is not an import under section 2; shell scripts use npx wrangler, not source). Scripts: start 'astro dev', build 'astro build && node bin/postbuild.mjs' (postbuild.mjs imports only node:fs/node:path); astro.config.mjs names astro/config and @astrojs/sitemap; wrangler.toml is not a P2 file and has no build command; no Dockerfile, Procfile, compose, vercel.json or netlify.toml; not P3/P4. Note for the tally: production deploy is .github/workflows/deploy.yml 'npx wrangler deploy', which section 2 does not list as a P5/P6 command; if a deploy step were counted, following wrangler > miniflare would make undici production, though miniflare/undici do not enter the worker bundle." }
+    ] },
+  { "repo": "kandotrun/send", "sha": "9d5fd1e4dde61b2d86abdcb3dfb8b9619b9c057c", "finished": true,
+    "packages": [
+      { "name": "@vitest/mocker", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/@vitest/mocker@5.0.2 (dev) [GHSA-qxg6-89mg-rqv8 >=5.0.0-beta.1 <5.0.3; GHSA-xp26-3454-mjgp >=5.0.0-rc.2 <5.0.3]. D1: @vitest/*, only path root devDependencies vitest (D1) > @vitest/mocker. vite.config.ts does not name vitest; build 'cf build' and build:web 'vite build --mode assets' do not run it (cf's and vite's closures do not reach it); no start script; no Dockerfile; no source import." }
+    ] },
+  { "repo": "Brummolix/AutoarchiveReloaded", "sha": "75d720978f3bb16e78a37c56ebc35012d4b355de", "finished": true,
+    "packages": [
+      { "name": "zod", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/zod@4.4.3 (dev) [GHSA-mrhx-c7xc-m3w5 <4.6.6]. D1: paths root devDependencies eslint-plugin-react-hooks (D1 eslint-*) > zod and > zod-validation-error > zod; every path through eslint-plugin-react-hooks. The build runs build:lint (eslint) and build:test (vitest), which P6 does not make production; webpack.config.js does not name eslint-plugin-react-hooks or zod; no source import; no start script; no Dockerfile." }
+    ] },
+  { "repo": "gabrieltanchen/finance-api", "sha": "08519dcfc6ab04896f56e24727ff9ceaa3d3b950", "finished": true,
+    "packages": [
+      { "name": "ajv", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/ajv@6.12.6 (dev) [GHSA-2g4f-4pwh-qvx6 <6.14.0]. Parents: @eslint/eslintrc, eslint and har-validator; path root devDependencies coveralls > request > har-validator > ajv avoids every D1 package, so D1 does not hold; D2. Source complete (554 files, no marker, no Dockerfile/Procfile/compose). start 'node index' (no package); no build script; 'coveralls' runs only in the 'coveralls' script (not P5/P6); repo-wide grep (excluding tests/ and package-lock.json) for coveralls|request|har-validator|ajv finds only package.json, eslint.config.mjs (excluded linter config), README, .github, .vscode; no P2 file; not P3/P4; no production (non-dev) copy depends on it." },
+      { "name": "diff", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/diff@7.0.0 (dev) [GHSA-73rr-hh4g-fpgx >=6.0.0 <8.0.3]. Parents mocha (D1) and sinon (not D1): path root devDependencies sinon > diff, so D2. sinon and mocha are used only under tests/ (excluded) and in the test/test:ci scripts; no source import, no P2 file, no build script, start 'node index'; not P3/P4; no Dockerfile." },
+      { "name": "form-data", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/form-data@2.3.3 (dev) [GHSA-fjxv-7rqg-78g4 <2.5.4; GHSA-hmw2-7cc7-3qxx <2.5.6] via root devDependencies coveralls > request > form-data; node_modules/superagent/node_modules/form-data@4.0.0 (dev) [>=4.0.0 <4.0.4; >=4.0.0 <4.0.6] via root devDependencies chai-http > superagent > form-data. coveralls and chai-http are not D1, so D2 for both copies. chai-http/superagent are required only under tests/; coveralls runs only in the 'coveralls' script; no source import, no P2 file, no build script, start 'node index'; not P3/P4; no Dockerfile." },
+      { "name": "formidable", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/formidable@2.1.2 (dev) [GHSA-75v8-2h7p-7m2m >=2.1.0 <2.1.3]. Only path root devDependencies chai-http > superagent > formidable (chai-http not D1), so D2. chai-http used only under tests/; no source import of chai-http/superagent/formidable; no P2 file; no build script; start 'node index'; no Dockerfile." },
+      { "name": "qs", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "Copies: node_modules/qs@6.16.1 (not dev, P0) is NOT in range [OSV/npm GHSA-6rw7-vpxm-498p fixed 6.14.1; GHSA-4mjr-xmp4-gh2g >=2.2.5 fixed 6.16.0]. In range only node_modules/request/node_modules/qs@6.5.3 (dev), via root devDependencies coveralls > request > qs (no D1 package), so D2. request/coveralls are not imported anywhere outside the lockfile/package.json; coveralls only in the 'coveralls' script; no build script; start 'node index'; express/body-parser (production) resolve the root qs@6.16.1, not the nested copy; no Dockerfile." },
+      { "name": "request", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/request@2.88.2 (dev) [GHSA-p8p7-x288-28g6 <=2.88.2]. Only path root devDependencies coveralls > request (coveralls not D1), so D2. No source import of request; coveralls bin runs only in the 'coveralls' script (not P5/P6); no build script; start 'node index'; no P2 file; not P3/P4; no Dockerfile." },
+      { "name": "serialize-javascript", "in_range": "yes", "production_relevant": "no", "criterion": "D1",
+        "evidence": "In range: node_modules/serialize-javascript@6.0.2 (dev) [GHSA-5c6j-r48x-rmvq <=7.0.2; GHSA-qj8w-gfj5-8c6v >=5.0.0 <7.0.5; GHSA-m5mm-p8h7-m29v <7.1.3]. D1: only path root devDependencies mocha (D1 test runner) > serialize-javascript. Not imported by source, no build script, start 'node index', no Dockerfile." },
+      { "name": "tough-cookie", "in_range": "yes", "production_relevant": "no", "criterion": "D2",
+        "evidence": "In range: node_modules/tough-cookie@2.5.0 (dev) [GHSA-72xf-g2v4-qvf3 <4.1.3]. Only path root devDependencies coveralls > request > tough-cookie (no D1 package), so D2. Not imported by source; coveralls only in the 'coveralls' script; no build script; start 'node index'; no P2 file; not P3/P4; no Dockerfile." }
+    ] }
+]

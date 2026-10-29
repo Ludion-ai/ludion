@@ -1,0 +1,324 @@
+[
+  {
+    "repo": "RobertvandeCamp/bratra-action-order-bc-sync",
+    "sha": "aa9bafa391b7cf3701658a3a967cba56ab798c74",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 4.1.11, lockfile dev; in range of GHSA-qxg6-89mg-rqv8 (>=2.1.0-beta.7 <4.1.12) and GHSA-xp26-3454-mjgp (>=4.1.11 <4.1.12). Name matches D1's @vitest/*; its only lockfile path is @vitest/mocker <- vitest <- root devDependencies (vitest is D1). No P-rule reaches it: source (21 files) imports @azure/msal-node, @supabase/supabase-js, aws-embedded-metrics, dotenv, esbuild, pino, zod only; the only P2 file esbuild.config.mjs names esbuild; build = node esbuild.config.mjs; no start script; P3 copies (typescript, esbuild, vite, rolldown) do not depend on it; docker/Dockerfile (FROM public.ecr.aws/lambda/nodejs:22-arm64, COPY dist/, CMD index.handler) installs nothing and copies no node_modules. Forward closure from all P0-P4 seeds does not reach it."
+      }
+    ]
+  },
+  {
+    "repo": "Rhys-Lindmark/digicene",
+    "sha": "a66906e3ea8fc3f23833fa5e598965d12cb99487",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 4.1.11, dev; in range of GHSA-qxg6-89mg-rqv8 (<4.1.12) and GHSA-xp26-3454-mjgp (>=4.1.11 <4.1.12). Name matches @vitest/*; only path @vitest/mocker <- vitest <- root devDependencies. Not imported by the source (22 files: astro.config.mjs, src/**), not named by astro.config.mjs (names astro, @astrojs/react, @astrojs/node), not run by build (astro build) and there is no start script; not reached from any P0/P1/P2/P3 copy."
+      },
+      {
+        "name": "fast-uri",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/fast-uri 3.1.7, dev; in range of GHSA-hrr3-gc8f-f4qj (>=3.0.0 <3.1.8, confirmed at api.github.com) and the other four GHSAs (<3.1.9). D1 does not apply: path fast-uri <- ajv <- yaml-language-server <- volar-service-yaml <- @astrojs/language-server <- @astrojs/check <- root devDependencies (@astrojs/check is not a D1 package). D2: complete source tree (no .ludion-incomplete, no .gitmodules); no Dockerfile, Procfile, compose or other deploy file in the repository. No source import of fast-uri, ajv, yaml-language-server or @astrojs/check (imports: @astrojs/node, @astrojs/react, astro, react, zod). P2: astro.config.mjs names astro, @astrojs/react, @astrojs/node; tsconfig jsxImportSource react. P5/P6: no start script; build = astro build (astro is P0; @astrojs/check is run only by the 'check' script, which is neither build nor start); astro's lockfile entry has no dependency/peer edge to @astrojs/check (forward closure from all P0 copies, P3 typescript and the P1/P2 names does not reach fast-uri). Not a P3/P4 package."
+      }
+    ]
+  },
+  {
+    "repo": "armsone/Hanstree.com",
+    "sha": "6bb4609d5d7e84392a2b43302babb2182d13b2f5",
+    "finished": true,
+    "packages": [
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Copies node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion 5.0.9 (dev; in >=4.0.0 <5.0.10/5.0.11/5.0.12) and node_modules/brace-expansion 1.1.18 (dev; in <1.1.19/<1.1.20/<1.1.21). Every path from the declared dependencies passes through a D1 package: 5.0.9 <- minimatch <- @typescript-eslint/typescript-estree <- typescript-eslint/@typescript-eslint/* ; 1.1.18 <- minimatch <- eslint / eslint-plugin-jsx-a11y / eslint-plugin-react / @eslint/config-array / @eslint/eslintrc (checked by a walk from all declared deps that does not enter D1 packages: neither copy reached). No P-rule: source imports (87 files) are @cloudflare/vite-plugin, drizzle-kit, drizzle-orm, esbuild, qrcode, react, react-dom, react-markdown, remark-gfm, sharp, tailwindcss, vinext, vite; P2 (vite.config.ts, postcss.config.mjs, next.config.ts) names vinext, vite, @cloudflare/vite-plugin, @tailwindcss/postcss; start/build run vinext and node build/*.mjs; no Dockerfile. Forward closure from all P0-P4 seeds reaches neither copy."
+      },
+      {
+        "name": "js-yaml",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/js-yaml 4.3.1, dev; in range of GHSA-2883-xcg3-v3hh (>=4.0.0 <4.3.2). Every path passes through D1 packages: js-yaml <- @eslint/eslintrc <- eslint <- root devDependencies (and via eslint-plugin-*, typescript-eslint). Not imported by the source, not named by vite.config.ts/postcss.config.mjs/next.config.ts, not run by prebuild/build/start (node build/optimize-images.mjs, vinext build, node build/prune-duplicate-hero-media.mjs, vinext start); no Dockerfile; not reached from any P0-P4 copy."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/zod 4.4.3, dev; in range of GHSA-mrhx-c7xc-m3w5 (<4.6.6, confirmed at api.github.com). Every path passes through a D1 package: zod <- eslint-plugin-react-hooks <- root devDependencies, and zod <- zod-validation-error <- eslint-plugin-react-hooks. The only textual 'zod' in the source is inside base64 image data in public/guides/webdav-macos-folders/community-guide.html (lines 572, 584), not an import. Not named by any P2 file, not run by build/start, no Dockerfile; not reached from any P0-P4 copy."
+      }
+    ]
+  },
+  {
+    "repo": "shaqmughal/seekstone",
+    "sha": "3575c7a6e0e37b734be3f9bfb91ef2fa75aab167",
+    "finished": true,
+    "packages": [
+      {
+        "name": "node-forge",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "P6",
+        "evidence": "Only copy node_modules/node-forge 1.4.0, dev; in range of GHSA-86w9-cpqp-85rv (<=1.4.0, no fix; confirmed at api.github.com). Path: node-forge <- @anthropic-ai/mcpb (root devDependency, not a D1 package), so D1 does not apply. The root package.json script 'build:mcpb' (a build:* script, P6) is 'node scripts/build-mcpb.mjs', and that build script runs 'npx @anthropic-ai/mcpb pack' (scripts/build-mcpb.mjs:143, execSync); .github/workflows/release.yml:130 runs npm run build:mcpb for the release bundles. So the build runs @anthropic-ai/mcpb (by name after the npx runner), and following its declared dependencies reaches node-forge. If P6 is read to cover only the literal script string, D2 still cannot be shown, because a build command runs @anthropic-ai/mcpb through the script it hands off to; the verdict would then be undecidable, which also counts as a miss. osv-scanner.toml:5-13 says this copy is dev-only and unused; that is repository text, treated as data and not relied on."
+      },
+      {
+        "name": "zod",
+        "in_range": "yes",
+        "production_relevant": "yes",
+        "criterion": "P6",
+        "evidence": "Copies: node_modules/zod 4.6.7 (not dev, production by P0, but not in range: GHSA-mrhx-c7xc-m3w5 is <4.6.6) and node_modules/@anthropic-ai/mcpb/node_modules/zod 3.25.76 (dev; in range <4.6.6). The in-range copy is a dependency of @anthropic-ai/mcpb, resolved from mcpb's own nested node_modules (path zod <- @anthropic-ai/mcpb <- root devDependencies; not D1). The build:mcpb script (P6) runs node scripts/build-mcpb.mjs, which runs 'npx @anthropic-ai/mcpb pack' (scripts/build-mcpb.mjs:143); following mcpb's declared dependencies reaches this zod copy. Under the narrower reading of P6 the copy is undecidable (D2's 'no build command running it, directly or through a package it hands off to' fails); either way a miss. osv-scanner.toml:22-24's claim that this copy is dev-only is repository text, treated as data."
+      }
+    ]
+  },
+  {
+    "repo": "devlargs/pokedocs",
+    "sha": "4dc128f76eb4f876a20472c4631d78ca9df26fdd",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 5.0.0, dev; in range of GHSA-qxg6-89mg-rqv8 (>=5.0.0-beta.1 <5.0.3) and GHSA-xp26-3454-mjgp (>=5.0.0-rc.2 <5.0.3). Name matches @vitest/*; only path @vitest/mocker <- vitest <- root devDependencies. Source (28 files) imports next, react, tailwindcss, three only; P2 next.config.mjs/postcss.config.mjs name next and @tailwindcss/postcss; build/start are next build / next start -p 3331; no Dockerfile; not reached from any P0-P4 copy (vite, rollup, esbuild, typescript as P3 do not depend on it)."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Copies node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion 5.0.9 (dev; in >=4.0.0 <5.0.10) and node_modules/brace-expansion 1.1.18 (dev; in <1.1.19). Every path passes through D1 packages: 5.0.9 <- minimatch <- @typescript-eslint/typescript-estree <- @typescript-eslint/parser|eslint-plugin|utils <- eslint-config-next; 1.1.18 <- minimatch <- eslint / @eslint/eslintrc / @eslint/config-array (eslint-config-next, eslint-config-prettier). A walk from all declared deps that does not enter D1 packages reaches neither copy. Not imported, not named by next.config.mjs/postcss.config.mjs, not run by build/start (a linter run by next build would not be made production by P6 anyway), no Dockerfile; not reached from any P0-P4 copy."
+      }
+    ]
+  },
+  {
+    "repo": "m-saito14/daily-wisdom",
+    "sha": "5750e115cfdd89d1e042af3f0fd19998b71c24c3",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@humanfs/node",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@humanfs/node 0.16.7, dev; in range of GHSA-p498-v437-472g (<0.16.8). Every path passes through D1: @humanfs/node <- eslint <- root devDependencies (and eslint <- eslint-config-next / eslint-plugin-*). Not imported (source imports: @ai-sdk/*, @libsql/client, @mastra/core, @vercel/otel, ai, langfuse, langfuse-vercel, next, react, tailwindcss, zod), not named by next.config.ts/postcss.config.mjs; build/start are next build/next start; Dockerfile builder stage runs npm ci and npm run build (P6: next build; linters run by a build are not made production), and the final stage 'runner' copies only /app/.next/standalone, /app/.next/static and /app/public from builder (not node_modules nor the whole working folder) and runs node server.js. Not reached from any P0-P4 copy."
+      },
+      {
+        "name": "ajv",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/ajv 6.12.6, dev; in range of GHSA-2g4f-4pwh-qvx6 (<6.14.0). Every path passes through D1: ajv <- eslint and ajv <- @eslint/eslintrc <- eslint (eslint-config-next and eslint-plugin-* above). Not imported, not named by a P2 file, not run by build/start or by the Dockerfile (builder: npm ci, npm run build; runner: copies .next/standalone, .next/static, public; CMD node server.js). Not reached from any P0-P4 copy."
+      },
+      {
+        "name": "flatted",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/flatted 3.3.3, dev; in range of GHSA-25h7-pfq9-p65f (<3.4.0) and GHSA-rf6f-7fwh-wjgh (<=3.4.1). Every path passes through D1: flatted <- flat-cache <- file-entry-cache <- eslint <- root devDependencies / eslint-config-next. Not imported, not named, not run by build/start/Dockerfile; final Docker stage does not hold devDependencies (copies only .next/standalone, .next/static, public). Not reached from any P0-P4 copy."
+      },
+      {
+        "name": "minimatch",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In-range copy node_modules/minimatch 3.1.2 (dev; GHSA-3ppc-4f35-3m26 and GHSA-7r86-cg39-jmmj <3.1.3, GHSA-23c5-xmqv-rm74 <3.1.4). The other copy node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch 10.2.6 is outside every listed range (and is also D1, via typescript-eslint <- eslint-config-next). Every path to 3.1.2 passes through D1: minimatch <- eslint / @eslint/config-array / @eslint/eslintrc / eslint-plugin-import / eslint-plugin-jsx-a11y (eslint-config-next). Not imported, not named, not run by build/start/Dockerfile; not reached from any P0-P4 copy."
+      },
+      {
+        "name": "picomatch",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "In-range copy node_modules/tinyglobby/node_modules/picomatch 4.0.3 (dev; GHSA-3v7f-55p6-f55p and GHSA-c2c7-rcm5-vvqj >=4.0.0 <4.0.4). node_modules/picomatch 2.3.2 is outside the ranges (and D1 via fast-glob <- @next/eslint-plugin-next <- eslint-config-next). Every path to 4.0.3 passes through D1: picomatch <- tinyglobby (or fdir <- tinyglobby) <- eslint-import-resolver-typescript <- eslint-config-next, and <- @typescript-eslint/typescript-estree <- typescript-eslint <- eslint-config-next. Not imported, not named, not run by build/start/Dockerfile; not reached from any P0-P4 copy (next, P3 typescript/esbuild/@babel/helpers, P1/P2 tailwindcss/@tailwindcss/postcss)."
+      }
+    ]
+  },
+  {
+    "repo": "codebam/x402-crypto-worker",
+    "sha": "0eead3d272db68cd226583a674f9fb3cfa4bdfae",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 3.2.4, dev; in range of GHSA-82fw-gwwq-j7x9 (>=2.1.0 <4.1.11) and GHSA-qxg6-89mg-rqv8 (<4.1.12). Name matches @vitest/*; paths @vitest/mocker <- vitest <- root devDependencies and <- vitest <- @cloudflare/vitest-pool-workers (all through vitest). Source is src/index.ts, src/html.ts, public/index.html (imports @solana/web3.js, @x402/*, ethers, hash.js, hono, qrcode); vitest.config.mts and test/ are excluded; no P2 file; start = wrangler dev (P5) and wrangler's closure does not reach it; no build script, no Dockerfile. Not reached from any P0-P5 copy (P3 esbuild, vite, rollup)."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/tinypool 1.1.1, dev; in range of GHSA-5gmw-xhrv-c9v3 (<=2.1.0) and GHSA-85c8-ppgw-ccpr (<2.1.2). Every path passes through D1 vitest: tinypool <- vitest <- root devDependencies, tinypool <- vitest <- @cloudflare/vitest-pool-workers. Not imported, no P2 file, start (wrangler dev) closure does not reach it, no Dockerfile; not reached from any P0-P5 copy."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest 3.2.4, dev; in range of GHSA-5xrq-8626-4rwp (<3.2.6) and GHSA-82fw-gwwq-j7x9 (>=2.1.0 <4.1.11). A test runner declared in root devDependencies. Run only by the 'test' script; imported only from vitest.config.mts and test/ (excluded from the source); start = wrangler dev does not reach it; no build script, no Dockerfile; not reached from any P0-P5 copy."
+      }
+    ]
+  },
+  {
+    "repo": "NateJ45/ncs-astro-sanity-starter",
+    "sha": "38d91befe4a0f9673be6fdd2ac3e25e73d201831",
+    "finished": true,
+    "packages": [
+      {
+        "name": "basic-ftp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/basic-ftp 5.3.1, dev; in range of GHSA-c475-qrg2-pj4r (<=6.2.0, confirmed at api.github.com). Not D1: path basic-ftp <- get-uri <- pac-proxy-agent <- proxy-agent <- @lhci/cli (and via @puppeteer/browsers <- puppeteer-core <- lighthouse <- @lhci/cli) <- root devDependencies. D2: complete tree (no .ludion-incomplete, no .gitmodules), no Dockerfile/Containerfile/Procfile/compose in the repository. No source import of basic-ftp, get-uri, proxy-agent, puppeteer-core, lighthouse or @lhci/cli (714 source files scanned). astro.config.mjs (P2) names astro, vite, @astrojs/*, @tailwindcss/vite, @sanity/astro, sanity, react and similar, not these. No start script; build = node scripts/with-workerd.mjs astro build && node scripts/purge-page-css.mjs && build-brand-icons/build-og-cards/build-csp/build-search-index scripts; build:full = typegen (sanity) + build; lhci is run only by .github/workflows/lighthouse.yml:108,116 (npx lhci autorun, CI); no script under scripts/ spawns lhci. Not a P3/P4 package; the forward closure from every P0 copy and the P1/P2/P3 copies (including playwright, @playwright/test, pagefind, opentype.js) does not reach it."
+      },
+      {
+        "name": "extract-zip",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/extract-zip 2.0.1, dev; in range of GHSA-jmr9-qjv8-65gv and GHSA-7pqw-9j4j-h8q3 (<=2.0.1). Not D1: path extract-zip <- @puppeteer/browsers <- puppeteer-core <- lighthouse <- @lhci/cli (or @lhci/utils <- @lhci/cli) <- root devDependencies. D2 as for basic-ftp: complete tree, no Dockerfile or deploy file; no source import of extract-zip, @puppeteer/browsers, puppeteer-core, lighthouse, @lhci/*; not named by astro.config.mjs; not run by build/build:full (no start script); lhci only in CI (.github/workflows/lighthouse.yml); not P3/P4; not reached from any production copy."
+      },
+      {
+        "name": "follow-redirects",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/follow-redirects 1.16.0, dev; in range of GHSA-q3jh-wrc6-jgq8 and GHSA-8r9p-f939-6h3c (>=1.16.0 <1.16.1). Not D1: path follow-redirects <- http-proxy <- http-server <- root devDependencies. D2: http-server is run only by playwright.visual.config.ts:94 (webServer command of a Playwright test configuration, not a build or production command) and mentioned in a comment in scripts/free-dist.mjs:7,42,65 (a process-match string, not an import or a run); no source import of follow-redirects, http-proxy or http-server; not named by astro.config.mjs; not run by build/build:full; no start script; no Dockerfile or deploy file; not P3/P4; not reached from any production copy."
+      },
+      {
+        "name": "tmp",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Copies node_modules/tmp 0.1.0 and node_modules/external-editor/node_modules/tmp 0.0.33, both dev; both in range of GHSA-52f5-9888-hmc6 (<=0.2.3) and GHSA-ph9p-34f9-6g65 (<0.2.6). Not D1: paths tmp <- @lhci/cli and tmp <- external-editor <- inquirer <- @lhci/cli <- root devDependencies. D2: the string 'tmp' appears in several scripts (scripts/apply-asset-patches.mjs, scripts/generate-favicons.mjs, ...) only as path text; no import/require of 'tmp', external-editor, inquirer or @lhci/cli in the source; not named by astro.config.mjs; not run by build/build:full; no start script; lhci only in CI; no Dockerfile or deploy file; not P3/P4; neither copy reached from any production copy."
+      }
+    ]
+  },
+  {
+    "repo": "kimbelas/flightdeck",
+    "sha": "2a083e0a537fed99c3129a6826cbf6e448b2de34",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 5.0.1, dev; in range of GHSA-qxg6-89mg-rqv8 (>=5.0.0-beta.1 <5.0.3) and GHSA-xp26-3454-mjgp (>=5.0.0-rc.2 <5.0.3). Name matches @vitest/*; paths @vitest/mocker <- vitest <- root devDependencies and <- vitest <- @vitest/coverage-v8 (both D1). Source (436 files) imports @xterm/*, next, node-pty, playwright, react, toasted-notifier, ws, yaml; next.config.ts names next; build/start = next build / next start; no Dockerfile; not reached from any P0-P4 copy (incl. P1 playwright, ws, yaml; P3 typescript, vite, rolldown)."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/brace-expansion 5.0.9, dev; in range (>=4.0.0 <5.0.10/<5.0.11/<5.0.12). Every path passes through D1: brace-expansion <- minimatch <- eslint / @eslint/config-array / @typescript-eslint/typescript-estree (typescript-eslint, @eslint/js). A walk from all declared deps that does not enter D1 packages does not reach it. Not imported, not named by next.config.ts, not run by build/start, no Dockerfile; not reached from any P0-P4 copy."
+      }
+    ]
+  },
+  {
+    "repo": "rekstrom-bot/task-dashboard",
+    "sha": "eeedd8ff255ac5eb1992780e708341b1b61e8e94",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/@vitest/mocker 3.2.4, dev; in range of GHSA-82fw-gwwq-j7x9 (>=2.1.0 <4.1.11) and GHSA-qxg6-89mg-rqv8 (<4.1.12). Name matches @vitest/*; only path @vitest/mocker <- vitest <- root devDependencies. vite.config.mjs imports vite, @vitejs/plugin-react, @tailwindcss/vite and has a test block naming 'jsdom' (no 'vitest' string, no import of vitest/config); start = vite --port 3000 (P5 vite), build = vite build; vite, @vitejs/plugin-react, jsdom and the other P0-P5 copies do not reach it; no Dockerfile."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/tinypool 1.1.1, dev; in range of GHSA-5gmw-xhrv-c9v3 (<=2.1.0) and GHSA-85c8-ppgw-ccpr (<2.1.2). Only path tinypool <- vitest <- root devDependencies (D1). Not imported, not named by vite.config.mjs/postcss.config.js, not run by start (vite) or build (vite build; build:css tailwindcss), no Dockerfile; not reached from any P0-P5 copy."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest 3.2.4, dev; in range of GHSA-5xrq-8626-4rwp (<3.2.6) and GHSA-82fw-gwwq-j7x9 (>=2.1.0 <4.1.11). Test runner declared in root devDependencies; run only by the 'test' script; vite.config.mjs does not import or name vitest (its test block names only 'jsdom'); start/build run vite only; no Dockerfile; not reached from any P0-P5 copy."
+      }
+    ]
+  },
+  {
+    "repo": "Don-Stevenson/scheduler",
+    "sha": "424f7a44ad8b695e9e1dc324cd943b63e79f7249",
+    "finished": true,
+    "packages": [
+      {
+        "name": "telejson",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "In-range copy node_modules/telejson 3.3.0 (dev; GHSA-ccgf-5rwj-j3hv <6.0.0, confirmed at api.github.com). The other copy node_modules/@storybook/preview-api/node_modules/telejson 7.1.0 is production (reached from @storybook/react, imported by .storybook/config.js and stories/index.js) but outside the range. Not D1: path telejson 3.3.0 <- @storybook/api <- @storybook/addons <- root devDependencies (also <- @storybook/addons <- @storybook/addon-links). D2: complete tree, no Dockerfile or deploy file. No source import of telejson, @storybook/api, @storybook/addons or @storybook/addon-links (Storybook imports: .storybook/config.js @storybook/react; .storybook/addons.js @storybook/addon-actions/register, @storybook/addon-backgrounds/register; stories/index.js @storybook/react, @storybook/addon-actions). The .storybook/ P2 files name only those three packages (.storybook/webpack.config.js names none). start = react-scripts start, build = react-scripts build (react-scripts is P0); 'storybook' and 'build-storybook' are neither start, build nor build:* scripts. Not P3/P4; the forward closure from every P0 copy and the P1/P2/P3 copies (core-js, esbuild, the three Storybook packages) does not reach telejson 3.3.0."
+      }
+    ]
+  },
+  {
+    "repo": "KhazP/GetirFiltre",
+    "sha": "9d08118c27c9e02e3102865d01ec8cf6bf64fed8",
+    "finished": true,
+    "packages": [
+      {
+        "name": "@vitest/mocker",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest/node_modules/@vitest/mocker 2.1.9, dev; in range of GHSA-82fw-gwwq-j7x9 (>=2.1.0 <4.1.11) and GHSA-qxg6-89mg-rqv8 (>=2.1.0-beta.7 <4.1.12). Name matches @vitest/*; only path <- vitest <- root devDependencies. Source (41 files) imports @crxjs/vite-plugin, @vitejs/plugin-react, lucide-react, react, react-dom, tailwindcss, vite; vite.config.ts names vite, @vitejs/plugin-react, @crxjs/vite-plugin; vitest.config.ts is excluded; build = tsc && vite build; no start script; no Dockerfile; not reached from any P0-P4 copy."
+      },
+      {
+        "name": "brace-expansion",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Copies node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion 5.0.5 (dev; in e.g. GHSA-jxxr-4gwj-5jf2 >=5.0.0 <5.0.6) and node_modules/brace-expansion 1.1.14 (dev; in e.g. GHSA-3jxr-9vmj-r5cp <1.1.16). Every path passes through D1: 5.0.5 <- minimatch <- @typescript-eslint/typescript-estree <- typescript-eslint / @typescript-eslint/*; 1.1.14 <- minimatch <- eslint / @eslint/config-array / @eslint/eslintrc (eslint-plugin-react-hooks, eslint-plugin-react-refresh, typescript-eslint). Not imported, not named, not run by build, no Dockerfile; not reached from any P0-P4 copy."
+      },
+      {
+        "name": "js-yaml",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/js-yaml 4.1.1, dev; in range of GHSA-h67p-54hq-rp68 (>=4.0.0 <=4.1.1) and three later GHSAs. Every path passes through D1: js-yaml <- @eslint/eslintrc <- eslint (eslint-plugin-react-hooks, eslint-plugin-react-refresh, typescript-eslint). Not imported, not named, not run by build, no Dockerfile; not reached from any P0-P4 copy."
+      },
+      {
+        "name": "tinypool",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/tinypool 1.1.1, dev; in range of GHSA-5gmw-xhrv-c9v3 (<=2.1.0) and GHSA-85c8-ppgw-ccpr (<2.1.2). Only path tinypool <- vitest <- root devDependencies (D1). Not imported, not named, not run by build (tsc && vite build), no Dockerfile; not reached from any P0-P4 copy."
+      },
+      {
+        "name": "vitest",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D1",
+        "evidence": "Only copy node_modules/vitest 2.1.9, dev; in range of GHSA-5xrq-8626-4rwp (<3.2.6) and GHSA-82fw-gwwq-j7x9 (>=2.1.0 <4.1.11). Test runner declared in root devDependencies; used by the 'test' scripts, vitest.config.ts and src/content/card-manipulator.test.ts (all excluded from the source); vite.config.ts does not import or name it; build = tsc && vite build; no start script; no Dockerfile; not reached from any P0-P4 copy."
+      },
+      {
+        "name": "ws",
+        "in_range": "yes",
+        "production_relevant": "no",
+        "criterion": "D2",
+        "evidence": "Only copy node_modules/ws 8.20.0, dev; in range of GHSA-58qx-3vcg-4xpx (>=8.0.0 <8.20.1, confirmed at api.github.com) and GHSA-96hv-2xvq-fx4p (<8.21.0). Not D1: path ws <- jsdom <- root devDependencies (jsdom is not a D1 package; also ws <- jsdom <- vitest). D2: complete tree, no Dockerfile or deploy file. jsdom is mentioned only in vitest.config.ts and src/content/card-manipulator.test.ts (both excluded) and package.json; vite.config.ts (P2) names vite, @vitejs/plugin-react, @crxjs/vite-plugin only; postcss.config.js names tailwindcss and autoprefixer (object keys; both added as production seeds, closure still does not reach ws) and tailwind.config.js names tailwindcss, not jsdom or ws. No source import of ws (source mentions of 'ws' are substrings such as in identifiers/CSS, not specifiers). build = tsc && vite build; no start script; not P3/P4; the forward closure from every P0 copy and the P1/P2/P3 copies (vite, rollup, esbuild, typescript, tslib, @babel/helpers, @crxjs/vite-plugin, @vitejs/plugin-react, tailwindcss) does not reach node_modules/ws."
+      }
+    ]
+  }
+]

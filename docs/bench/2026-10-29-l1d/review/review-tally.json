@@ -1,0 +1,80 @@
+{
+ "third": {
+  "decides_the_gate": true,
+  "checked": 182,
+  "by_verdict": {
+   "no": 176,
+   "yes": 5,
+   "undecidable": 1
+  },
+  "misses": 6,
+  "repositories_with_a_miss": 4,
+  "miss_gate_met": false,
+  "missed": [
+   {
+    "repo": "haksanlulz/mcp-fairrent",
+    "name": "node-forge",
+    "verdict": "yes",
+    "criterion": "P6",
+    "unfinished": false
+   },
+   {
+    "repo": "haksanlulz/mcp-fairrent",
+    "name": "tmp",
+    "verdict": "yes",
+    "criterion": "P6",
+    "unfinished": false
+   },
+   {
+    "repo": "hirthickramanath/Parallax",
+    "name": "undici",
+    "verdict": "undecidable",
+    "criterion": "none",
+    "unfinished": false
+   },
+   {
+    "repo": "ember-hearted/z-wiki",
+    "name": "fast-copy",
+    "verdict": "yes",
+    "criterion": "P5",
+    "unfinished": false
+   },
+   {
+    "repo": "shaqmughal/seekstone",
+    "name": "node-forge",
+    "verdict": "yes",
+    "criterion": "P6",
+    "unfinished": false
+   },
+   {
+    "repo": "shaqmughal/seekstone",
+    "name": "zod",
+    "verdict": "yes",
+    "criterion": "P6",
+    "unfinished": false
+   }
+  ]
+ },
+ "original": {
+  "decides_the_gate": false,
+  "checked": 151,
+  "by_verdict": {
+   "no": 151
+  },
+  "misses": 0,
+  "repositories_with_a_miss": 0,
+  "miss_gate_met": true,
+  "missed": []
+ },
+ "second": {
+  "decides_the_gate": false,
+  "checked": 218,
+  "by_verdict": {
+   "no": 218
+  },
+  "misses": 0,
+  "repositories_with_a_miss": 0,
+  "miss_gate_met": true,
+  "missed": []
+ }
+}

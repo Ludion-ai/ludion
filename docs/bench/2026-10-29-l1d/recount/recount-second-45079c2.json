@@ -1,0 +1,2047 @@
+{
+ "note": "Beside the result, never instead of it.",
+ "noise": "/w/docs/bench/2026-10-29-l1d/result-second/noise.json",
+ "production_ts_blob": "dd5911bac26e69086d2799a64fa32f2ed5660dbb",
+ "measured_total": 1062,
+ "recomputed_total": 1062,
+ "misses": {
+  "listed": 58,
+  "counted": 58,
+  "not_counted": []
+ },
+ "changed": [],
+ "miss_status": [
+  {
+   "repo": "STRML/strml.net",
+   "name": "body-parser",
+   "cause": "B1",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/body-parser",
+     "version": "2.3.0",
+     "production": true,
+     "why": "a dependency of express@5.2.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "STRML/strml.net",
+   "name": "launch-editor",
+   "cause": "B1",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/launch-editor",
+     "version": "2.14.1",
+     "production": true,
+     "why": "a dependency of webpack-dev-server@6.0.0 at node_modules/webpack-dev-server, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "STRML/strml.net",
+   "name": "qs",
+   "cause": "B1",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/qs",
+     "version": "6.16.0",
+     "production": true,
+     "why": "a dependency of express@5.2.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "STRML/strml.net",
+   "name": "shell-quote",
+   "cause": "B1",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/shell-quote",
+     "version": "1.10.0",
+     "production": true,
+     "why": "a dependency of launch-editor@2.14.1 at node_modules/launch-editor, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "stop-bullshit/luckyh-cloud-web",
+   "name": "mockjs",
+   "cause": "D",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/mockjs",
+     "version": "1.1.0",
+     "production": true,
+     "why": "a dependency of @umijs/openapi@1.14.1 at node_modules/@umijs/openapi, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "timmson/agile-impact-map",
+   "name": "body-parser",
+   "cause": "B2",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/body-parser",
+     "version": "2.3.0",
+     "production": true,
+     "why": "a dependency of express@5.2.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "timmson/agile-impact-map",
+   "name": "qs",
+   "cause": "B2",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/qs",
+     "version": "6.15.3",
+     "production": true,
+     "why": "a dependency of express@5.2.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@babel/core",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@babel/core",
+     "version": "7.28.5",
+     "production": true,
+     "why": "a dependency of @svgr/webpack@8.1.0 at node_modules/@svgr/webpack, which is production"
+    },
+    {
+     "path": "node_modules/@wordpress/babel-preset-default/node_modules/@babel/core",
+     "version": "7.25.7",
+     "production": true,
+     "why": "a dependency of @wordpress/babel-preset-default@8.36.0 at node_modules/@wordpress/babel-preset-default, which is production"
+    },
+    {
+     "path": "node_modules/@wordpress/scripts/node_modules/@babel/core",
+     "version": "7.25.7",
+     "production": true,
+     "why": "a dependency of @wordpress/scripts@31.1.0 at node_modules/@wordpress/scripts, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@babel/plugin-transform-modules-systemjs",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@babel/plugin-transform-modules-systemjs",
+     "version": "7.28.5",
+     "production": true,
+     "why": "a dependency of @babel/preset-env@7.25.7 at node_modules/@babel/preset-env, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/core",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@opentelemetry/core",
+     "version": "1.30.1",
+     "production": true,
+     "why": "a dependency of @sentry/node@9.47.1 at node_modules/@sentry/node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-knex",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@opentelemetry/instrumentation-knex",
+     "version": "0.44.1",
+     "production": true,
+     "why": "a dependency of @sentry/node@9.47.1 at node_modules/@sentry/node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-mongoose",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@opentelemetry/instrumentation-mongoose",
+     "version": "0.46.1",
+     "production": true,
+     "why": "a dependency of @sentry/node@9.47.1 at node_modules/@sentry/node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-mysql",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@opentelemetry/instrumentation-mysql",
+     "version": "0.45.1",
+     "production": true,
+     "why": "a dependency of @sentry/node@9.47.1 at node_modules/@sentry/node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-mysql2",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@opentelemetry/instrumentation-mysql2",
+     "version": "0.45.2",
+     "production": true,
+     "why": "a dependency of @sentry/node@9.47.1 at node_modules/@sentry/node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-pg",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@opentelemetry/instrumentation-pg",
+     "version": "0.51.1",
+     "production": true,
+     "why": "a dependency of @sentry/node@9.47.1 at node_modules/@sentry/node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@opentelemetry/instrumentation-tedious",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@opentelemetry/instrumentation-tedious",
+     "version": "0.18.1",
+     "production": true,
+     "why": "a dependency of @sentry/node@9.47.1 at node_modules/@sentry/node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "@tootallnate/once",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@tootallnate/once",
+     "version": "2.0.0",
+     "production": true,
+     "why": "a dependency of http-proxy-agent@5.0.0 at node_modules/http-proxy-agent, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "adm-zip",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/adm-zip",
+     "version": "0.5.16",
+     "production": true,
+     "why": "a dependency of @wordpress/scripts@31.1.0 at node_modules/@wordpress/scripts, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "axios",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/axios",
+     "version": "1.13.2",
+     "production": true,
+     "why": "a dependency of wait-on@8.0.5 at node_modules/wait-on, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "basic-ftp",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/basic-ftp",
+     "version": "5.0.5",
+     "production": true,
+     "why": "a dependency of get-uri@6.0.5 at node_modules/get-uri, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "body-parser",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/body-parser",
+     "version": "1.20.4",
+     "production": true,
+     "why": "a dependency of express@4.22.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "colord",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/colord",
+     "version": "2.9.3",
+     "production": true,
+     "why": "a dependency of stylelint@16.26.1 at node_modules/@wordpress/scripts/node_modules/stylelint, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "compression",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/compression",
+     "version": "1.8.1",
+     "production": true,
+     "why": "a dependency of webpack-dev-server@4.15.2 at node_modules/webpack-dev-server, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "deepmerge",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/deepmerge",
+     "version": "4.3.1",
+     "production": true,
+     "why": "a dependency of @svgr/plugin-svgo@8.1.0 at node_modules/@svgr/plugin-svgo, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "extract-zip",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/extract-zip",
+     "version": "2.0.1",
+     "production": true,
+     "why": "a dependency of @puppeteer/browsers@2.6.1 at node_modules/@puppeteer/browsers, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "follow-redirects",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/follow-redirects",
+     "version": "1.15.11",
+     "production": true,
+     "why": "a dependency of axios@1.13.2 at node_modules/axios, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "form-data",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/form-data",
+     "version": "4.0.5",
+     "production": true,
+     "why": "a dependency of jsdom@20.0.3 at node_modules/jsdom, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "http-proxy-middleware",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/http-proxy-middleware",
+     "version": "2.0.9",
+     "production": true,
+     "why": "a dependency of webpack-dev-server@4.15.2 at node_modules/webpack-dev-server, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "immutable",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/immutable",
+     "version": "5.1.4",
+     "production": true,
+     "why": "a dependency of sass@1.96.0 at node_modules/sass, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "ip-address",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/ip-address",
+     "version": "10.1.0",
+     "production": true,
+     "why": "a dependency of socks@2.8.7 at node_modules/socks, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "joi",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/joi",
+     "version": "18.0.2",
+     "production": true,
+     "why": "a dependency of wait-on@8.0.5 at node_modules/wait-on, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "launch-editor",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/launch-editor",
+     "version": "2.12.0",
+     "production": true,
+     "why": "a dependency of webpack-dev-server@4.15.2 at node_modules/webpack-dev-server, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "linkify-it",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/linkify-it",
+     "version": "3.0.3",
+     "production": true,
+     "why": "a dependency of markdown-it@12.3.2 at node_modules/markdown-it, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "lodash",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/lodash",
+     "version": "4.17.21",
+     "production": true,
+     "why": "a dependency of wait-on@8.0.5 at node_modules/wait-on, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "lodash-es",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/lodash-es",
+     "version": "4.17.21",
+     "production": true,
+     "why": "a dependency of lighthouse@12.8.2 at node_modules/lighthouse, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "markdown-it",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/markdown-it",
+     "version": "12.3.2",
+     "production": true,
+     "why": "a dependency of markdownlint@0.25.1 at node_modules/markdownlint, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "nanoid",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/nanoid",
+     "version": "3.3.11",
+     "production": true,
+     "why": "a dependency of postcss@8.5.6 at node_modules/postcss, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "node-forge",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/node-forge",
+     "version": "1.3.3",
+     "production": true,
+     "why": "a dependency of selfsigned@2.4.1 at node_modules/selfsigned, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "path-to-regexp",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/path-to-regexp",
+     "version": "0.1.12",
+     "production": true,
+     "why": "a dependency of express@4.22.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "postcss",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/postcss",
+     "version": "8.5.6",
+     "production": true,
+     "why": "a dependency of @wordpress/scripts@31.1.0 at node_modules/@wordpress/scripts, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "postcss-selector-parser",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/@csstools/postcss-cascade-layers/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of @csstools/postcss-cascade-layers@5.0.2 at node_modules/@csstools/postcss-cascade-layers, which is production"
+    },
+    {
+     "path": "node_modules/@csstools/postcss-is-pseudo-class/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of @csstools/postcss-is-pseudo-class@5.0.3 at node_modules/@csstools/postcss-is-pseudo-class, which is production"
+    },
+    {
+     "path": "node_modules/@csstools/postcss-scope-pseudo-class/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of @csstools/postcss-scope-pseudo-class@4.0.1 at node_modules/@csstools/postcss-scope-pseudo-class, which is production"
+    },
+    {
+     "path": "node_modules/@wordpress/scripts/node_modules/stylelint-scss/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of stylelint-scss@6.13.0 at node_modules/@wordpress/scripts/node_modules/stylelint-scss, which is production"
+    },
+    {
+     "path": "node_modules/@wordpress/scripts/node_modules/stylelint/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of stylelint@16.26.1 at node_modules/@wordpress/scripts/node_modules/stylelint, which is production"
+    },
+    {
+     "path": "node_modules/css-blank-pseudo/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of css-blank-pseudo@7.0.1 at node_modules/css-blank-pseudo, which is production"
+    },
+    {
+     "path": "node_modules/css-has-pseudo/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of css-has-pseudo@7.0.3 at node_modules/css-has-pseudo, which is production"
+    },
+    {
+     "path": "node_modules/postcss-attribute-case-insensitive/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-attribute-case-insensitive@7.0.1 at node_modules/postcss-attribute-case-insensitive, which is production"
+    },
+    {
+     "path": "node_modules/postcss-custom-selectors/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-custom-selectors@8.0.5 at node_modules/postcss-custom-selectors, which is production"
+    },
+    {
+     "path": "node_modules/postcss-dir-pseudo-class/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-dir-pseudo-class@9.0.1 at node_modules/postcss-dir-pseudo-class, which is production"
+    },
+    {
+     "path": "node_modules/postcss-focus-visible/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-focus-visible@10.0.1 at node_modules/postcss-focus-visible, which is production"
+    },
+    {
+     "path": "node_modules/postcss-focus-within/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-focus-within@9.0.1 at node_modules/postcss-focus-within, which is production"
+    },
+    {
+     "path": "node_modules/postcss-modules-local-by-default/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-modules-local-by-default@4.2.0 at node_modules/postcss-modules-local-by-default, which is production"
+    },
+    {
+     "path": "node_modules/postcss-modules-scope/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-modules-scope@3.2.1 at node_modules/postcss-modules-scope, which is production"
+    },
+    {
+     "path": "node_modules/postcss-nesting/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-nesting@13.0.2 at node_modules/postcss-nesting, which is production"
+    },
+    {
+     "path": "node_modules/postcss-pseudo-class-any-link/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-pseudo-class-any-link@10.0.1 at node_modules/postcss-pseudo-class-any-link, which is production"
+    },
+    {
+     "path": "node_modules/postcss-selector-not/node_modules/postcss-selector-parser",
+     "version": "7.1.1",
+     "production": true,
+     "why": "a dependency of postcss-selector-not@8.0.1 at node_modules/postcss-selector-not, which is production"
+    },
+    {
+     "path": "node_modules/postcss-selector-parser",
+     "version": "6.1.2",
+     "production": true,
+     "why": "a dependency of stylelint@14.16.1 at node_modules/stylelint, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "proxy-addr",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/proxy-addr",
+     "version": "2.0.7",
+     "production": true,
+     "why": "a dependency of express@4.22.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "qs",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/qs",
+     "version": "6.14.0",
+     "production": true,
+     "why": "a dependency of express@4.22.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "shell-quote",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/shell-quote",
+     "version": "1.8.3",
+     "production": true,
+     "why": "a dependency of launch-editor@2.12.0 at node_modules/launch-editor, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "source-map-js",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/source-map-js",
+     "version": "1.2.1",
+     "production": true,
+     "why": "a dependency of postcss@8.5.6 at node_modules/postcss, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "svgo",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/svgo",
+     "version": "3.3.2",
+     "production": true,
+     "why": "a dependency of @svgr/plugin-svgo@8.1.0 at node_modules/@svgr/plugin-svgo, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "webpack-dev-middleware",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/webpack-dev-middleware",
+     "version": "5.3.4",
+     "production": true,
+     "why": "a dependency of webpack-dev-server@4.15.2 at node_modules/webpack-dev-server, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "webpack-dev-server",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/webpack-dev-server",
+     "version": "4.15.2",
+     "production": true,
+     "why": "a dependency of @wordpress/scripts@31.1.0 at node_modules/@wordpress/scripts, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "websocket-driver",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/websocket-driver",
+     "version": "0.7.4",
+     "production": true,
+     "why": "a dependency of sockjs@0.3.24 at node_modules/sockjs, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "ws",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/lighthouse/node_modules/puppeteer-core/node_modules/ws",
+     "version": "8.18.3",
+     "production": true,
+     "why": "a dependency of puppeteer-core@24.33.0 at node_modules/lighthouse/node_modules/puppeteer-core, which is production"
+    },
+    {
+     "path": "node_modules/lighthouse/node_modules/ws",
+     "version": "7.5.10",
+     "production": true,
+     "why": "a dependency of lighthouse@12.8.2 at node_modules/lighthouse, which is production"
+    },
+    {
+     "path": "node_modules/webpack-bundle-analyzer/node_modules/ws",
+     "version": "7.5.10",
+     "production": true,
+     "why": "a dependency of webpack-bundle-analyzer@4.10.2 at node_modules/webpack-bundle-analyzer, which is production"
+    },
+    {
+     "path": "node_modules/ws",
+     "version": "8.18.3",
+     "production": true,
+     "why": "a dependency of puppeteer-core@23.11.1 at node_modules/puppeteer-core, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "name": "zod",
+   "cause": "A",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/lighthouse/node_modules/zod",
+     "version": "3.25.76",
+     "production": true,
+     "why": "a dependency of chromium-bidi@11.0.0 at node_modules/lighthouse/node_modules/puppeteer-core/node_modules/chromium-bidi, which is production"
+    },
+    {
+     "path": "node_modules/zod",
+     "version": "3.23.8",
+     "production": true,
+     "why": "a dependency of chromium-bidi@0.11.0 at node_modules/chromium-bidi, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "opencast/studio",
+   "name": "body-parser",
+   "cause": "B2",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/body-parser",
+     "version": "1.20.5",
+     "production": true,
+     "why": "a dependency of express@4.22.3 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "opencast/studio",
+   "name": "diff",
+   "cause": "B3",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/diff",
+     "version": "4.0.2",
+     "production": true,
+     "why": "a dependency of ts-node@10.9.2 at node_modules/ts-node, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "opencast/studio",
+   "name": "qs",
+   "cause": "B2",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/express/node_modules/qs",
+     "version": "6.16.2",
+     "production": true,
+     "why": "a dependency of express@4.22.3 at node_modules/express, which is production"
+    },
+    {
+     "path": "node_modules/qs",
+     "version": "6.15.2",
+     "production": true,
+     "why": "a dependency of body-parser@1.20.5 at node_modules/body-parser, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "opencast/studio",
+   "name": "uuid",
+   "cause": "B2",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/uuid",
+     "version": "8.3.2",
+     "production": true,
+     "why": "a dependency of sockjs@0.3.24 at node_modules/sockjs, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "opencast/studio",
+   "name": "webpack-dev-middleware",
+   "cause": "B2",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/webpack-dev-middleware",
+     "version": "7.4.5",
+     "production": true,
+     "why": "a dependency of webpack-dev-server@5.2.6 at node_modules/webpack-dev-server, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "ccnmtl/specialneedsvisit-pack",
+   "name": "body-parser",
+   "cause": "B1",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/body-parser",
+     "version": "2.3.0",
+     "production": true,
+     "why": "a dependency of express@5.2.1 at node_modules/express, which is production"
+    }
+   ]
+  },
+  {
+   "repo": "ccnmtl/specialneedsvisit-pack",
+   "name": "qs",
+   "cause": "B1",
+   "counted": true,
+   "osv_named": true,
+   "copies": [
+    {
+     "path": "node_modules/qs",
+     "version": "6.15.3",
+     "production": true,
+     "why": "a dependency of express@5.2.1 at node_modules/express, which is production"
+    }
+   ]
+  }
+ ],
+ "repos": [
+  {
+   "repo": "joelmale/nexusVTT",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "apps/codex/services/doc-api/Dockerfile",
+     "apps/codex/services/doc-processor/Dockerfile",
+     "apps/codex/services/doc-websocket/Dockerfile",
+     "apps/vtt/docker/backend.Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "multi-protocol-flow/multi-protocol-flow-executor",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "DLsnows/Sonic_Bridge",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "nextcloud/notes",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "nwtgck/naidan",
+   "measured": 22,
+   "recomputed": 22,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "federicoscimone/HomeTab",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "egallmann/ste-runtime",
+   "measured": 15,
+   "recomputed": 15,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "sexcme5/llm-chat-app-template",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "W8SOJIB/W8OmniRouteTermux-Modedd",
+   "measured": 41,
+   "recomputed": 41,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile",
+     "docker/devin-bridge/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "bilalix/arabic-reshaper-app",
+   "measured": 8,
+   "recomputed": 8,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "trstnk/aws-cli-agent",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "bota-dev/app-sdk",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "lerna/lerna",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "budieprof/lascodia-trading-engine-admin-ui",
+   "measured": 14,
+   "recomputed": 14,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "kyoresuas/import-ladder",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jacwohlen/administra",
+   "measured": 8,
+   "recomputed": 8,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ShujaatAzim/Tippi-legacy",
+   "measured": 31,
+   "recomputed": 31,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Brutusjam/projekt-status",
+   "measured": 27,
+   "recomputed": 27,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "shute1102/task-dashboard",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "plutus21tech/compass",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "SonyaMoisset/TOH_ANGULAR7",
+   "measured": 38,
+   "recomputed": 38,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "monoscope-tech/monoscope",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile.deps"
+    ]
+   }
+  },
+  {
+   "repo": "davidtech2026-ops/mobile-money",
+   "measured": 37,
+   "recomputed": 37,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "hyeoniverse/web-portfolio-hyeoniverse",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "fegome90-cmd/skill_fabrik",
+   "measured": 10,
+   "recomputed": 10,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "camsanchez33/green-reserve",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "sirloinbh/dev-career-portfolio",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "stefanseeger/ts-page-object",
+   "measured": 52,
+   "recomputed": 52,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Dynamsoft/mobile-web-capture",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "HillsboroLLC/jaspen",
+   "measured": 15,
+   "recomputed": 15,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "backend/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "guim31/gladys-habitica",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "STRML/strml.net",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Prithvi-ra-j/NutriLift",
+   "measured": 21,
+   "recomputed": 21,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "iansduncan-oss/web-push-lite",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "stop-bullshit/luckyh-cloud-web",
+   "measured": 28,
+   "recomputed": 28,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "paul-mueser/bingo-homepage",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "olufemid/task-dashboard",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "DarkStarStrix/Allanatrix",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "pendulumdev/arc-wordpress",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Aiyeesha/Aicha-Imene-DAHOUMANE-Portfolio.dev",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "curvefi/docs",
+   "measured": 16,
+   "recomputed": 16,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Aturm4/bumbars",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "timmson/agile-impact-map",
+   "measured": 10,
+   "recomputed": 10,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "SaraAboElenien/gahezlak-v2",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "xln-0/Arbora",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Accsimplify/obsidian-copy-contents",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jonbon0987/CampaignManager",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "eighteen73/pulsar-extensions",
+   "measured": 58,
+   "recomputed": 58,
+   "split": {
+    "source": "incomplete",
+    "incomplete": "GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): /.git export-ignore; /.github export-ignore; /.husky export-ignore; /.vscode export-ignore; /node_modules export-ignore; /src export-ignore; /tests export-ignore; /.* export-ignore; /CHANGELOG.md export-ignore; /CODE_OF_CONDUCT.md export-ignore; /CONTRIBUTING.md export-ignore; /CREDITS.md export-ignore; /lefthook.yml export-ignore; /package-lock.json export-ignore; /package.json export-ignore; /phpcs.xml export-ignore; /postcss.config.js export-ignore;)",
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "StackOverflowIsBetterThanAnyAI/clash-of-clans-api",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "nrelab/nrelab.github.io",
+   "measured": 37,
+   "recomputed": 37,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jeni0101/OpenClaw-WeChat-Codex",
+   "measured": 17,
+   "recomputed": 17,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "3liz/lizmap-web-client",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "incomplete",
+    "incomplete": "GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): .gitattributes export-ignore; .gitignore export-ignore; .github export-ignore; .jelixlocales.ini export-ignore; .gitlab-ci.yml export-ignore; .php-cs.dist export-ignore; phpstan.neon export-ignore; ./tests   export-ignore)",
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "DoveLi-Gu/dsh-showcase",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "futugyou/angular-project",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "opencast/studio",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ccnmtl/specialneedsvisit-pack",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "bobthebob58/HVL-INTERAKTIV",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "PeWu/topola",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "asirihewage/npm-nullcode",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "roberjo/aws-testing",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "corndogit/maimai-score-tracker",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "leivadev/tender-management-system",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "hakatashi/solid-start-firebase-template",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "pradeepsalamon/NexaGen",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mattruby/supabase-worker-previews",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "yuanyu90221/webpack-demo-dir",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "pietro1704/youtube-webos-pietro",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "google-wallet/save-to-google-pay-button",
+   "measured": 43,
+   "recomputed": 43,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Vegadarkk/joutiya",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "dgrammatiko/on-a-diet",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "oscarlea/aluraflix",
+   "measured": 41,
+   "recomputed": 41,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Egoushka/oura-mcp-app",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "noa10/mataresit",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Reeti05Agarwal/NeoPwnsPolitely",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "thealirazadev/shopify-bulk-editor",
+   "measured": 25,
+   "recomputed": 25,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "AlfWuxy/focus-log-planner",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Zafiro-0/bjtu-self-service-web",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "TangoMan75/calculatrice-salaire-net",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "VantageInc/image-sorter",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "andrewwsou/valorant-tracker",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "adulbrich/eecs-capstone",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "stringologytimes/StringologyTimes",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Luckystrike561/terrarium",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "hikaru90/owlery",
+   "measured": 23,
+   "recomputed": 23,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jonorl/fugazzeta",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "server/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "baditaflorin/meshtrack-studio",
+   "measured": 10,
+   "recomputed": 10,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "AeonusOvO/claude-dock-control-panel",
+   "measured": 20,
+   "recomputed": 20,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "palindsay/label_maker",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Focalyst-Chintan/focalyst",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mirabhakta/ai-repo-inspector-mira-bhakta",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Heuller/gelo-e-fogo-rpg",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "fdamianenriquez/AgentIntake",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "kulykovoleksii/board",
+   "measured": 19,
+   "recomputed": 19,
+   "split": {
+    "source": "incomplete",
+    "incomplete": "GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): CHANGELOG.md export-ignore | .gitattributes: CHANGELOG.md export-ignore)",
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "wesleysoares1983/Princelegal",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "abhx31/amrutham-backend",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mikesimone/tab-automator",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mazyu36/langfuse-with-aws-cdk",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "jbpratt/pi-experiments",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Wealcoder/animation-addons-for-elementor",
+   "measured": 59,
+   "recomputed": 59,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Yil00/databastion",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  }
+ ]
+}

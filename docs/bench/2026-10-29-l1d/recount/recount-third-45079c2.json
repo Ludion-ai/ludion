@@ -1,0 +1,1037 @@
+{
+ "note": "Beside the result, never instead of it.",
+ "noise": "/w/docs/bench/2026-10-29-l1d/result-third/noise.json",
+ "production_ts_blob": "dd5911bac26e69086d2799a64fa32f2ed5660dbb",
+ "measured_total": 1021,
+ "recomputed_total": 1021,
+ "misses": {
+  "listed": 0,
+  "counted": 0,
+  "not_counted": []
+ },
+ "changed": [],
+ "miss_status": [],
+ "repos": [
+  {
+   "repo": "RoBorg/stringy",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "tntayyab/writerifygateway",
+   "measured": 19,
+   "recomputed": 19,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ansh3108/cyber-anshk-dev",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "pcmarts/x402git",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "salesforce/zana",
+   "measured": 26,
+   "recomputed": 26,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "OkayOkay101/BattleFightLegacy",
+   "measured": 37,
+   "recomputed": 37,
+   "split": {
+    "source": "incomplete",
+    "incomplete": "docs/licenses/texts/electron-runtime/LICENSES.chromium.html could not be read",
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "zasclan/AutoScanAI",
+   "measured": 15,
+   "recomputed": 15,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "M-Waweru/new-mathnuscripts-garden",
+   "measured": 14,
+   "recomputed": 14,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "tailstory/tailstory.dev",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "2747025402/2fa-cfworkers",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "redxking/event-atlas-nfl-demo",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mustafaakalin/laravel-avukatlik-burosu",
+   "measured": 17,
+   "recomputed": 17,
+   "split": {
+    "source": "incomplete",
+    "incomplete": "GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): /.github export-ignore; CHANGELOG.md export-ignore; .styleci.yml export-ignore | .gitattributes: /.github export-ignore; CHANGELOG.md export-ignore; .styleci.yml export-ignore)",
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Joshuasco/coffeeShop",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "haksanlulz/mcp-fairrent",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Hubertoink/stato_okja",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "rbcodelabs/geode-wikiskill",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "vilu85/toastr-ts",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "incomplete",
+    "incomplete": "GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): /tests export-ignore; /docs export-ignore; *.test.js export-ignore; *.test.php export-ignore; *.spec.js export-ignore | .gitattributes: /tests export-ignore; /docs export-ignore; *.test.js export-ignore; *.test.php export-ignore; *.spec.js export-ignore)",
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "hirthickramanath/Parallax",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ember-hearted/z-wiki",
+   "measured": 18,
+   "recomputed": 18,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "vistik/houston",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "incomplete",
+    "incomplete": "GitHub's archive leaves out export-ignore paths (.gitattributes (raw.githubusercontent.com): CHANGELOG.md export-ignore; README.md export-ignore | .gitattributes: CHANGELOG.md export-ignore; README.md export-ignore)",
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "kyleb4rnes/rave-route",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "mrcgrtz/elements",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "promptfoo/promptfoo",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "openapistack/openapi-backend",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "alt3/rank-my-wallet",
+   "measured": 14,
+   "recomputed": 14,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Ai-assistant-KIRA/whoax",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "KalingaAbhisek/portfolio",
+   "measured": 57,
+   "recomputed": 57,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ayleen/triss-coworker",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "domdomegg/airtable-ts-codegen",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "davidcolome9-byte/DavidOS",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "lalitaalaalitah/01_AddCommentedLines",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "shuttle-hq/www",
+   "measured": 28,
+   "recomputed": 28,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Trancendos/ManagementCenter",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "PodZonePlatformEngineering/academy-api",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "borisonekenobi/am-i-there-yet",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Solvelyllc/Tidebroker",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "httpcats/http.cat",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "canada-ca/template-gabarit",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "lean-17/task-dashboard",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "TurboWarp/packager",
+   "measured": 39,
+   "recomputed": 39,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "comShadowHarvy/snake42",
+   "measured": 18,
+   "recomputed": 18,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "lass-machen/meetropolis",
+   "measured": 18,
+   "recomputed": 18,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "apps/loadtest/Dockerfile",
+     "apps/server/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "filestack/filestack-angular",
+   "measured": 40,
+   "recomputed": 40,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ztimson/formula-manager-2",
+   "measured": 67,
+   "recomputed": 67,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "krisnayogantaraa/lumina-borealis-ui",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Marcentella/Plainchord",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "sprint-labs/sandalwood-and-sage",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "gaspareu/recipe-hug",
+   "measured": 10,
+   "recomputed": 10,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "bariskisir/ClaudeCodeProfileSwitcher",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "yuma-shin/SafeGo",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "adimoldovan/slowgram",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Lisow7/FridgePlus",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "elkimek/venice-e2ee",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Heber-Modelo/heber-modelo",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Tabitha022/study-notes",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "ernolf/twofactor_oath",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "andressalame/profesormvt-web",
+   "measured": 5,
+   "recomputed": 5,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "devwork5600/lokko-hub",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "apps/socket/Dockerfile",
+     "apps/worker/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "kandotrun/send",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "gorjoe/knowledge",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "Brummolix/AutoarchiveReloaded",
+   "measured": 0,
+   "recomputed": 0,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "gabrieltanchen/finance-api",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Firestitch/npx-syntax-highlighter",
+   "measured": 38,
+   "recomputed": 38,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "intechstudio/grid-editor",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "RobertvandeCamp/bratra-action-order-bc-sync",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Rhys-Lindmark/digicene",
+   "measured": 8,
+   "recomputed": 8,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "zbzq8ztx22-star/OmniRoute",
+   "measured": 39,
+   "recomputed": 39,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile",
+     "docker/devin-bridge/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "armsone/Hanstree.com",
+   "measured": 6,
+   "recomputed": 6,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "ccmueller355/shadowlist",
+   "measured": 9,
+   "recomputed": 9,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "dx-corp/kestrel",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "cncf/endusers",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "shaqmughal/seekstone",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "fratercem-design/cultcodex-v2",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "devlargs/pokedocs",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "contentstack/kickstart-angular",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "m-saito14/daily-wisdom",
+   "measured": 26,
+   "recomputed": 26,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "codebam/x402-crypto-worker",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "NateJ45/ncs-astro-sanity-starter",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "kimbelas/flightdeck",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "rekstrom-bot/task-dashboard",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Don-Stevenson/scheduler",
+   "measured": 38,
+   "recomputed": 38,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "KhazP/GetirFiltre",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "dev-build-deploy/release-me",
+   "measured": 11,
+   "recomputed": 11,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Web3Auth/web3auth-examples",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "rg-engineering/ioBroker.heatingcontrol",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "owodunni/curarehab",
+   "measured": 57,
+   "recomputed": 57,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "packages/directus/Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "alexandru-tiron/next-ecommerce",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "MisakaZentai/suixin-writing",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "vaynel/llmwiki-public",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "dekimuhq/dekimu-mcp",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "bpawlowski21/recipes",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": [
+     "Dockerfile"
+    ]
+   }
+  },
+  {
+   "repo": "lawandorga/lawandorga-main-frontend",
+   "measured": 1,
+   "recomputed": 1,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "alterj07/walkpath",
+   "measured": 8,
+   "recomputed": 8,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "DommyLlamanati/bwain",
+   "measured": 12,
+   "recomputed": 12,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "The-Allsparks/ftc-dev-tools",
+   "measured": 13,
+   "recomputed": 13,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "kimd10041004-gif/bandut-partner-platform-audit",
+   "measured": 7,
+   "recomputed": 7,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "p00rmanS/cadence",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "abdalrahmanattya/customer-support-chatbot-aws-bedrock",
+   "measured": 4,
+   "recomputed": 4,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Zeeraa/protogen-configurator",
+   "measured": 2,
+   "recomputed": 2,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  },
+  {
+   "repo": "Toilet-Paper-Games/cover-story",
+   "measured": 3,
+   "recomputed": 3,
+   "split": {
+    "source": "read",
+    "incomplete": null,
+    "images_with_dev": []
+   }
+  }
+ ]
+}

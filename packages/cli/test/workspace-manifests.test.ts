@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, renameSync, rmSync, symlinkSync, writeFileSync 
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, describe, expect, it, vi } from "vitest";
-import { allChanges, judge, lockEntries, lockEntryChanges, type Change, type Judgement, type VersionFacts } from "../src/security/judge.ts";
+import { allChanges, judge, lockEntries, lockEntryChanges, manifestChanges, type Change, type Judgement, type VersionFacts } from "../src/security/judge.ts";
 import { judgeCli, workspaceManifests } from "../src/security/judge-cli.ts";
 import { workspaceDir, workspaceManifestChanges } from "../src/security/workspace-manifests.ts";
 
@@ -66,7 +66,7 @@ describe("a workspace package.json that does not agree with the lockfile stops",
       expect(pr161({ file }), file).toEqual([expect.stringContaining("is not the package.json of a plain workspace folder")]);
     }
     expect(pr161({ file: "examples/npm-security/package.json" })).toEqual([expect.stringContaining("is not a workspace that the root package.json")]);
-    for (const workspaces of [["apps/**"], ["apps/w*"], ["apps/?orker"], ["apps/{worker,site}"], ["!apps/site"], "apps/*", { packages: ["apps/*"] }]) {
+    for (const workspaces of [["apps/**"], ["apps/w*"], ["apps/?orker"], ["apps/{worker,site}"], "apps/*", { packages: ["apps/*"] }]) {
       const root = { ...ROOT, workspaces };
       expect(pr161({ root: { before: root, after: root } }), JSON.stringify(workspaces)).toEqual([expect.stringContaining("is not a workspace that the root package.json")]);
     }
@@ -76,6 +76,21 @@ describe("a workspace package.json that does not agree with the lockfile stops",
     const dotted = (root: unknown) => pr161({ file: "apps/.hidden/package.json", root: { before: root, after: root }, lock: { before: hidden(workerLock("^4.13.13", "4.13.13")), after: hidden(workerLock("^4.13.14", "4.13.14")) } });
     expect(dotted(ROOT)).toEqual([expect.stringContaining("is not a workspace that the root package.json")]);
     expect(dotted({ ...ROOT, workspaces: ["apps/.hidden"] })).toEqual([]);
+  });
+  it("rule 1: a '!' entry anywhere in the root's workspaces, before or after, names no workspace (npm reads it as an exclusion)", () => {
+    const excluded = (entry: string) => [`The root package.json's "workspaces" has "${entry}", an exclusion this check does not read, so apps/worker is not taken as a workspace.`];
+    // npm does not make apps/worker a workspace in the first; the others are refused too, as this check does not read exclusions.
+    for (const workspaces of [["apps/*", "!apps/worker"], ["!apps/worker", "apps/worker"], ["apps/*", "!apps/site"], ["apps/*", "!!apps/worker"], ["apps/*", "./!apps/worker"], ["apps/*", "apps/!x"], ["!apps/site"]]) {
+      const root = { ...ROOT, workspaces }, entry = workspaces.find(w => w.includes("!"))!;
+      expect(pr161({ root: { before: root, after: root } }), JSON.stringify(workspaces)).toEqual(excluded(entry));
+    }
+    const root = { ...ROOT, workspaces: [...ROOT.workspaces, "!apps/worker"] };
+    expect(pr161({ root: { before: ROOT, after: root } })).toEqual(excluded("!apps/worker"));
+    expect(pr161({ root: { before: root, after: ROOT } })).toEqual(excluded("!apps/worker"));
+    // Through the judge's reader too: the file is not taken as agreeing.
+    const dirs = checkouts("apps/worker/package.json", SHAPE_161);
+    const lock = { before: lockText(SHAPE_161.before.lock), after: lockText(SHAPE_161.after.lock) };
+    expect(workspaceManifests(dirs.before, dirs.after, ["package-lock.json", "apps/worker/package.json"], { before: root, after: root }, lock)).toEqual([{ file: "apps/worker/package.json", reasons: excluded("!apps/worker") }]);
   });
   it("rule 2: a workspace the lockfile does not record before and after", () => {
     const { "apps/worker": _, ...unrecorded } = workerLock("^4.13.13", "4.13.13");
@@ -99,6 +114,24 @@ describe("a workspace package.json that does not agree with the lockfile stops",
     }
     expect(pr161({ after: { ...worker("^4.13.14"), overrides: { hono: "4.13.14" } } })).toEqual(['apps/worker/package.json changes "overrides", which npm reads only in the root package.json; the lockfile cannot show it.']);
   });
+  it('rule 3: a top-level "__proto__" added, removed or changed (JSON.parse makes it an own key), in a workspace file and in the root', () => {
+    const withProto = (manifest: unknown, value: string) => JSON.parse(JSON.stringify(manifest).replace(/^\{/, `{"__proto__":${value},`)) as Record<string, unknown>;
+    const added = withProto(worker("^4.13.14"), "{}");
+    expect(Object.hasOwn(added, "__proto__")).toBe(true);
+    expect(Object.getPrototypeOf(added)).toBe(Object.prototype);
+    const stop = ['apps/worker/package.json changes "__proto__", which is not a dependency list (scripts, for one, run on install).'];
+    expect(pr161({ after: added })).toEqual(stop);
+    expect(pr161({ before: withProto(worker("^4.13.13"), "{}") })).toEqual(stop);
+    expect(pr161({ before: withProto(worker("^4.13.13"), "{}"), after: withProto(worker("^4.13.14"), '{"scripts":{}}') })).toEqual(stop);
+    // The same own key on both sides changes nothing.
+    expect(pr161({ before: withProto(worker("^4.13.13"), "{}"), after: added })).toEqual([]);
+    // The root package.json goes through the same comparison.
+    const rootStop = ['package.json changes "__proto__", which is not a dependency list (scripts, for one, run on install).'];
+    expect(manifestChanges(ROOT, withProto(ROOT, "{}"))).toEqual(rootStop);
+    expect(manifestChanges(withProto(ROOT, "{}"), ROOT)).toEqual(rootStop);
+    // Nothing was assigned onto a prototype.
+    expect(({} as Record<string, unknown>).scripts).toBeUndefined();
+  });
   it("rule 4: a dependency list that is not the lockfile's record, after or before", () => {
     // Dependabot raised the range in package.json but the lockfile still records the old one.
     expect(pr161({ lock: { before: workerLock("^4.13.13", "4.13.13"), after: workerLock("^4.13.13", "4.13.14") } })).toEqual(["After the change, apps/worker/package.json dependencies is not the lockfile's record of apps/worker."]);
@@ -110,6 +143,12 @@ describe("a workspace package.json that does not agree with the lockfile stops",
     const lockAfter = workerLock("^4.13.14", "4.13.14");
     const record = { ...lockAfter["apps/worker"], bin: { worker: "x.js" } };
     expect(pr161({ lock: { before: workerLock("^4.13.13", "4.13.13"), after: { ...lockAfter, "apps/worker": record } } })).toEqual(['The lockfile\'s record of apps/worker changes "bin", which is not a dependency list.']);
+    // A top-level "__proto__" in the record, on one side only, is a change too.
+    const proto = JSON.parse(JSON.stringify(lockAfter["apps/worker"]).replace(/^\{/, '{"__proto__":{},')) as Record<string, unknown>;
+    expect(pr161({ lock: { before: workerLock("^4.13.13", "4.13.13"), after: { ...lockAfter, "apps/worker": proto } } })).toEqual(['The lockfile\'s record of apps/worker changes "__proto__", which is not a dependency list.']);
+    const lockBefore = workerLock("^4.13.13", "4.13.13");
+    const protoBefore = JSON.parse(JSON.stringify(lockBefore["apps/worker"]).replace(/^\{/, '{"__proto__":{},')) as Record<string, unknown>;
+    expect(pr161({ lock: { before: { ...lockBefore, "apps/worker": protoBefore }, after: lockAfter } })).toEqual(['The lockfile\'s record of apps/worker changes "__proto__", which is not a dependency list.']);
   });
 });
 
@@ -174,6 +213,7 @@ describe("the judge with workspace package.json files", () => {
     ["a range the lockfile does not record", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, lock: workerLock("^4.13.13", "4.13.14") } }, "is not the lockfile's record of apps/worker"],
     ["a new install script", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, manifest: { ...worker("^4.13.14"), scripts: { postinstall: "node x.js" } } } }, 'changes "scripts"'],
     ["a spec outside the registry", "apps/worker/package.json", { ...SHAPE_161, after: { manifest: worker("github:evil/hono"), lock: workerLock("github:evil/hono", "4.13.14") } }, "not a registry range"],
+    ["a top-level __proto__ added", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, manifest: JSON.stringify(worker("^4.13.14")).replace(/^\{/, '{"__proto__":{},') } }, 'changes "__proto__"'],
     ["a file that is not JSON", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, manifest: "{ not json" } }, "is not a JSON object on both sides"],
     ["a folder the root's workspaces do not name", "other/worker/package.json", { before: { manifest: worker("^4.13.13"), lock: otherWorker("^4.13.13", "4.13.13") }, after: { manifest: worker("^4.13.14"), lock: otherWorker("^4.13.14", "4.13.14") } }, "is not a workspace that the root package.json"],
   ] as const)("stops %s, with the file still in the changed-files stop", (_name, file, shape, reason) => {

@@ -1,7 +1,7 @@
 {
   "scan": {
     "schema": 1,
-    "checked_at": "2026-10-29T13:51:39.816Z",
+    "checked_at": "2026-10-29T14:55:59.918Z",
     "source": "https://osv.dev",
     "sources": [
       "https://osv.dev"
@@ -426,8 +426,8 @@
                 }
               ],
               "database_specific": {
-                "last_known_affected_version_range": "<= 4.17.23",
-                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json"
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json",
+                "last_known_affected_version_range": "<= 4.17.23"
               }
             },
             {
@@ -562,8 +562,8 @@
                 }
               ],
               "database_specific": {
-                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json",
-                "last_known_affected_version_range": "<= 4.17.23"
+                "last_known_affected_version_range": "<= 4.17.23",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json"
               }
             },
             {
@@ -724,17 +724,17 @@
   },
   "receipt": {
     "schema": 1,
-    "id": "0a7331a2-20bc-49af-8665-1f12546c2c80",
+    "id": "3e9b8ad3-d7ed-483f-b0bc-24f5039761b6",
     "ecosystem": "npm",
     "scope": "dependency_files_only_not_deployed",
-    "started_at": "2026-10-29T13:51:39.818Z",
-    "finished_at": "2026-10-29T13:51:49.361Z",
+    "started_at": "2026-10-29T14:55:59.921Z",
+    "finished_at": "2026-10-29T14:56:10.777Z",
     "outcome": "failed",
     "tree_hash": "8a2dfdf5dc22e028e82eda9fdcc53a2478d52c21359814eb1067edc2f2655643",
     "config_hash": "e55273c15c74bb619a5e25ad12cd33b9fcb9fc7d18bc9586885a06d58d0be2ca",
     "before": {
       "schema": 1,
-      "checked_at": "2026-10-29T13:51:39.816Z",
+      "checked_at": "2026-10-29T14:55:59.918Z",
       "source": "https://osv.dev",
       "sources": [
         "https://osv.dev"
@@ -1159,8 +1159,8 @@
                   }
                 ],
                 "database_specific": {
-                  "last_known_affected_version_range": "<= 4.17.23",
-                  "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json"
+                  "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json",
+                  "last_known_affected_version_range": "<= 4.17.23"
                 }
               },
               {
@@ -1295,8 +1295,8 @@
                   }
                 ],
                 "database_specific": {
-                  "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json",
-                  "last_known_affected_version_range": "<= 4.17.23"
+                  "last_known_affected_version_range": "<= 4.17.23",
+                  "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json"
                 }
               },
               {
@@ -1457,7 +1457,7 @@
     },
     "after": null,
     "tool_image": "node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c",
-    "baseline_image": "sha256:b69664fb2624387f00ee42c7b94f4ae13196a63aba23fb96af0ae2797ac77033",
+    "baseline_image": "sha256:8271c218d27c7c2f15e93f2a2ed313d79c1ee8402f5c4ee37ec85e61a35caa24",
     "candidate_image": null,
     "baseline_passed": true,
     "candidate_passed": false,
@@ -1491,7 +1491,7 @@
     },
     "judgement": {
       "schema": 1,
-      "judged_at": "2026-10-29T13:51:46.660Z",
+      "judged_at": "2026-10-29T14:56:06.304Z",
       "verdict": "stop",
       "urgency": "high",
       "wait_hours": 72,
@@ -1592,7 +1592,7 @@
       ],
       "exposure": {
         "fix_published_at": "2026-03-31T18:18:42.717Z",
-        "detected_at": "2026-10-29T13:51:46.660Z"
+        "detected_at": "2026-10-29T14:56:06.304Z"
       },
       "time_cap": {
         "t": "2026-03-31T18:18:42.717Z",
@@ -1617,5 +1617,5 @@
     },
     "reason": "The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead."
   },
-  "path": "/tmp/ex/.ludion/security/0a7331a2-20bc-49af-8665-1f12546c2c80.json"
+  "path": "/tmp/ex/.ludion/security/3e9b8ad3-d7ed-483f-b0bc-24f5039761b6.json"
 }

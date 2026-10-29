@@ -136,7 +136,7 @@ describe("the split with the source tree (D2)", () => {
       "node_modules/x": { dev: true },
       "node_modules/b/node_modules/x": { dev: true },
     });
-    expect(devOnly(lock, tree({ "src/a.js": `import "a";` }))).toEqual(["b@1.0.0"]);
+    expect(devOnly(lock, tree({ "package.json": "{}", "src/a.js": `import "a";` }))).toEqual(["b@1.0.0"]);
   });
   it("falls back to D1 when a source file cannot be read or the tree is incomplete", () => {
     expect(productionSplit(app, appSource({ "src/huge.js": null })).summary).toEqual({ source: "incomplete", incomplete: "src/huge.js could not be read", images_with_dev: [] });
@@ -223,12 +223,12 @@ describe("production images and commands", () => {
     expect(unknown.copies.get("node_modules/lodash")?.why).toContain("copies a node_modules folder that matches no installed copy");
     // A scoped folder, and one in a workspace's node_modules.
     const ws = lockOf({ devDependencies: { "@s/a": "^1" } }, { "node_modules/@s/a": { dev: true }, "node_modules/c": { dev: true }, "packages/api/node_modules/foo": { dev: true } }, { "packages/api": { name: "api" } });
-    const both = productionSplit(ws, tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/node_modules/@s/a ./node_modules/@s/a\nCOPY --from=b /app/packages/api/node_modules/foo ./foo\n" }));
+    const both = productionSplit(ws, tree({ "package.json": "{}", "packages/api/package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/node_modules/@s/a ./node_modules/@s/a\nCOPY --from=b /app/packages/api/node_modules/foo ./foo\n" }));
     expect(both.summary.images_with_dev).toEqual([]);
     expect([...both.devOnly]).toEqual(["c@1.0.0"]);
     // A project folder whose name ends in node_modules: its copy is found at that path (#190 second delta review, 1).
     const xnm = lockOf({ devDependencies: { a: "^1", c: "^1" } }, { "node_modules/a": { dev: true }, "node_modules/c": { dev: true }, "xnode_modules/node_modules/a": { dev: true, version: "2.0.0" } }, { xnode_modules: { name: "x" } });
-    const odd = productionSplit(xnm, tree({ "package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nCOPY . .\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/xnode_modules/node_modules/a ./x\n" }));
+    const odd = productionSplit(xnm, tree({ "package.json": "{}", "xnode_modules/package.json": "{}", Dockerfile: "FROM node:22 AS b\nWORKDIR /app\nCOPY . .\nRUN npm ci\nFROM node:22-slim\nCOPY --from=b /app/xnode_modules/node_modules/a ./x\n" }));
     expect(odd.copies.get("xnode_modules/node_modules/a")?.production).toBe(true);
     expect(odd.devOnly.has("a@2.0.0")).toBe(false);
   });
@@ -504,5 +504,115 @@ describe("after #168's delta review: what c381a85 counted is not lost", () => {
     const fact: VersionFacts = { published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: null, install_scripts: [], dependencies: [], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z" };
     const j = judge({ changes: [], facts: new Map([["a@1.0.0", fact]]), fixes: [], files: ["pnpm-lock.yaml"], now: new Date("2026-10-28T00:00:00Z"), lockfile: "pnpm-lock", split: { source: "pnpm", incomplete: null, images_with_dev: [] } });
     expect(renderJudgement(j)).toContain("No production/dev split for pnpm-lock.yaml");
+  });
+});
+
+describe("L1d: the misses of the noise rerun and of L1c are counted", () => {
+  const quick = (f: () => unknown) => { const t0 = performance.now(); f(); return performance.now() - t0; };
+  /** Raw lockfile entries, for fields lockOf does not write (peerDependenciesMeta). */
+  const entry = (name: string, fields: Record<string, unknown> = {}) => ({ version: "1.0.0", resolved: `https://registry.npmjs.org/${name}/-/${name.split("/").at(-1)}-1.0.0.tgz`, integrity: INTEGRITY, dev: true, ...fields });
+  const webpackApp = (scripts: Record<string, string>, cliPeers: Record<string, unknown>) => ({
+    lock: lockOf({ devDependencies: { webpack: "^5", "webpack-cli": "^6", "webpack-dev-server": "^5" } }, {}, {
+      "node_modules/webpack": entry("webpack", { bin: { webpack: "bin/webpack.js" }, peerDependenciesMeta: { "webpack-cli": { optional: true } } }),
+      "node_modules/webpack-cli": entry("webpack-cli", { bin: { "webpack-cli": "bin/cli.js" }, dependencies: { "cross-spawn": "^6" }, ...cliPeers }),
+      "node_modules/webpack-cli/node_modules/cross-spawn": entry("cross-spawn"),
+      "node_modules/webpack-dev-server": entry("webpack-dev-server", { bin: { "webpack-dev-server": "bin/wds.js" }, dependencies: { express: "^4" }, peerDependenciesMeta: { webpack: { optional: true }, "webpack-cli": { optional: true } } }),
+      "node_modules/express": entry("express"),
+    }),
+    source: tree({ "package.json": JSON.stringify({ scripts }), "webpack.config.js": "module.exports = { devServer: { port: 3000 } };", "src/index.js": "" }),
+  });
+
+  it("reads a tree without a project folder's package.json as incomplete, so only D1 applies (cause A)", () => {
+    const partial = tree({ "README.md": "", "src/index.php": "" });
+    expect(productionSplit(app, partial).summary).toEqual({ source: "incomplete", incomplete: "package.json, a project folder's manifest, is not in it", images_with_dev: [] });
+    expect(devOnly(app, partial)).toEqual(devOnly(app, null));
+    // A workspace folder's manifest counts too; a folder outside the tree (`../lib`) does not.
+    const ws = lockOf({ devDependencies: { a: "^1" } }, { "node_modules/a": { dev: true } }, { "packages/api": { name: "api" }, "../lib": { name: "lib" } });
+    expect(productionSplit(ws, tree({ "package.json": "{}" })).summary.incomplete).toBe("packages/api/package.json, a project folder's manifest, is not in it");
+    expect(productionSplit(ws, tree({ "package.json": "{}", "packages/api/package.json": "{}" })).summary.source).toBe("read");
+  });
+
+  it("follows a command into what the package it runs hands off to: webpack → webpack-cli → webpack-dev-server (causes B1, B2)", () => {
+    // webpack-cli 7 names webpack-dev-server in peerDependencies: `webpack` in a build reaches it through webpack-cli.
+    const b1 = webpackApp({ build: "webpack --mode production" }, { peerDependencies: { webpack: "^5", "webpack-dev-server": "^5" }, peerDependenciesMeta: { "webpack-dev-server": { optional: true } } });
+    const s1 = productionSplit(b1.lock, b1.source);
+    expect(s1.copies.get("node_modules/webpack-cli")!.why).toContain("handed off to by webpack@1.0.0");
+    for (const p of ["node_modules/webpack-cli/node_modules/cross-spawn", "node_modules/webpack-dev-server", "node_modules/express"]) expect(s1.copies.get(p)!.production).toBe(true);
+    // webpack-cli 4 and 6 name it only in peerDependenciesMeta: `webpack serve` in start reaches it by hand-off.
+    const b2 = webpackApp({ start: "webpack serve --open" }, { peerDependencies: { webpack: "^5" }, peerDependenciesMeta: { "webpack-dev-server": { optional: true } } });
+    const s2 = productionSplit(b2.lock, b2.source);
+    expect(s2.copies.get("node_modules/express")!.production).toBe(true);
+    expect(s2.copies.get("node_modules/webpack-dev-server")!.why).toContain("handed off to by webpack-cli@1.0.0");
+    // Without a command that runs webpack, P3 still makes webpack production, but nothing runs it, so nothing is handed off to.
+    const quiet = webpackApp({ test: "jest" }, { peerDependencies: { webpack: "^5" }, peerDependenciesMeta: { "webpack-dev-server": { optional: true } } });
+    expect(productionSplit(quiet.lock, quiet.source).copies.get("node_modules/webpack")!.production).toBe(true);
+    expect(devOnly(quiet.lock, quiet.source)).toEqual(["cross-spawn@1.0.0", "express@1.0.0", "webpack-cli@1.0.0", "webpack-dev-server@1.0.0"]);
+    // A test runner that a build runs is not production (P6), and what it hands off to is not either.
+    const runner = lockOf({ devDependencies: { vitest: "^1" } }, {}, { "node_modules/vitest": entry("vitest", { bin: { vitest: "vitest.mjs" }, peerDependenciesMeta: { "happy-dom": { optional: true } } }), "node_modules/happy-dom": entry("happy-dom") });
+    expect(devOnly(runner, tree({ "package.json": JSON.stringify({ scripts: { build: "vitest run && echo ok" } }) }))).toEqual(["happy-dom@1.0.0", "vitest@1.0.0"]);
+  });
+
+  it("hands off once per copy, so a ring of optional peers and many commands cost linear time", () => {
+    const n = 3000, ring: Record<string, unknown> = {};
+    for (let k = 0; k < n; k++) ring[`node_modules/p${k}`] = entry(`p${k}`, { bin: { [`p${k}`]: "x.js" }, peerDependenciesMeta: { [`p${(k + 1) % n}`]: { optional: true }, [`p${(k + 7) % n}`]: { optional: true } } });
+    const lock = lockOf({ devDependencies: { p0: "^1" } }, {}, ring);
+    const scripts = Object.fromEntries(Array.from({ length: n }, (_, k) => [`build:${k}`, `p${k}`]));
+    let split: ReturnType<typeof productionSplit> | undefined;
+    expect(quick(() => { split = productionSplit(lock, tree({ "package.json": JSON.stringify({ scripts }) })); })).toBeLessThan(3000);
+    expect(split!.devOnly.size).toBe(0);
+  });
+
+  it("makes the TypeScript register hooks production for a TypeScript build configuration that interpret can load (cause B3)", () => {
+    const lock = (withInterpret: boolean) => lockOf({ devDependencies: { "ts-node": "^10", "webpack-cli": "^6" } }, {
+      "node_modules/ts-node": { dev: true, dependencies: { diff: "^4" } },
+      "node_modules/diff": { dev: true },
+      "node_modules/webpack-cli": { dev: true, dependencies: withInterpret ? { interpret: "^3" } : {} },
+      ...(withInterpret ? { "node_modules/interpret": { dev: true } } : {}),
+    });
+    const files = (config: string) => tree({ "package.json": "{}", [config]: "export default { entry: './src/index.ts' };", "src/index.ts": "" });
+    expect(productionSplit(lock(true), files("webpack.config.ts")).copies.get("node_modules/diff")!.production).toBe(true);
+    expect(productionSplit(lock(true), files("webpack.config.ts")).copies.get("node_modules/ts-node")!.why).toContain("TypeScript register hook");
+    expect(devOnly(lock(true), files("webpack.config.js"))).toContain("ts-node@1.0.0");
+    expect(devOnly(lock(false), files("webpack.config.ts"))).toContain("ts-node@1.0.0");
+  });
+
+  it("reads the literals a call's argument holds, and an identifier's literal from the same file (causes C1, C2)", () => {
+    expect(codeSpecifiers("const sharp = require(process.env.SHARP_PATH || 'sharp');")).toEqual(["sharp"]);
+    expect(codeSpecifiers("const UPSTREAM = 'shadcn/tailwind.css';\nconst require = createRequire(import.meta.url);\nrequire.resolve(UPSTREAM);")).toEqual(["shadcn/tailwind.css"]);
+    expect(codeSpecifiers("const m = await import(flag ? 'a-pkg' : \"b-pkg\");")).toEqual(["a-pkg", "b-pkg"]);
+    expect(codeSpecifiers("let name = 'x-pkg';\nrequire(name, { paths });")).toEqual(["x-pkg"]);
+    // An identifier with no literal in the file, and a template with a substitution, name nothing.
+    expect(codeSpecifiers("require(somewhere);\nimport(`./locale/${lang}.json`);")).toEqual([]);
+    // The literal form is unchanged.
+    expect(codeSpecifiers("require('a'); import('b'); require.resolve('c/d')")).toEqual(["a", "b", "c/d"]);
+    const lock = lockOf({ devDependencies: { sharp: "^0.35", shadcn: "^4", other: "^1" } }, { "node_modules/sharp": { dev: true }, "node_modules/shadcn": { dev: true, dependencies: { hono: "^4" } }, "node_modules/hono": { dev: true }, "node_modules/other": { dev: true } });
+    const source = tree({ "package.json": "{}", "scripts/og.mjs": "const sharp = require(process.env.SHARP_PATH || 'sharp');", "scripts/css.mjs": "const UPSTREAM = 'shadcn/tailwind.css';\nrequire.resolve(UPSTREAM);" });
+    expect(devOnly(lock, source)).toEqual(["other@1.0.0"]);
+  });
+
+  it("reads a node_modules path built from literal segments (cause C3)", () => {
+    const lock = lockOf({ devDependencies: { "@vscode/vsce": "^4", other: "^1" } }, { "node_modules/@vscode/vsce": { dev: true, dependencies: { qs: "^6" } }, "node_modules/qs": { dev: true }, "node_modules/other": { dev: true } });
+    const source = tree({ "package.json": "{}", "scripts/test-package.ts": "const vsceBin = join('node_modules', '@vscode', 'vsce', 'vsce');\nexecFileSync('node', [vsceBin, 'ls']);" });
+    expect(devOnly(lock, source)).toEqual(["other@1.0.0"]);
+    expect(productionSplit(lock, source).copies.get("node_modules/@vscode/vsce")!.why).toBe("named by a node_modules path in scripts/test-package.ts");
+    expect(devOnly(lock, tree({ "package.json": "{}", "scripts/a.ts": "join(__dirname, \"node_modules\", \"other\")" }))).toEqual(["@vscode/vsce@1.0.0", "qs@1.0.0"]);
+  });
+
+  it("reads Umi's configuration as a build tool's (cause D)", () => {
+    const lock = lockOf({ devDependencies: { "@umijs/max-plugin-openapi": "^2", other: "^1" } }, { "node_modules/@umijs/max-plugin-openapi": { dev: true, dependencies: { mockjs: "^1" } }, "node_modules/mockjs": { dev: true }, "node_modules/other": { dev: true } });
+    for (const config of ["config/config.ts", ".umirc.ts", "config/config.prod.ts"]) {
+      expect(devOnly(lock, tree({ "package.json": "{}", [config]: "export default defineConfig({ plugins: ['@umijs/max-plugin-openapi'] });" }))).toEqual(["other@1.0.0"]);
+    }
+    expect(devOnly(lock, tree({ "package.json": "{}", "config/settings.ts": "export default { plugins: ['@umijs/max-plugin-openapi'] };" }))).toContain("mockjs@1.0.0");
+  });
+
+  it("reads crafted arguments and joined paths in linear time", () => {
+    const n = 40_000;
+    expect(quick(() => codeSpecifiers(`${"const a = 'x';".repeat(n)}${"require(a);".repeat(n)}`))).toBeLessThan(1500);
+    expect(codeSpecifiers(`${"const a = 'x';".repeat(3)}${"require(a);".repeat(3)}`)).toEqual(["x", "x", "x"]);
+    expect(quick(() => codeSpecifiers(`require(${"(".repeat(n)}`))).toBeLessThan(1500);
+    expect(quick(() => codeSpecifiers(`${"require(x ".repeat(n)}`))).toBeLessThan(1500);
+    const lock = lockOf({ devDependencies: { x: "^1" } }, { "node_modules/x": { dev: true } });
+    expect(quick(() => productionSplit(lock, tree({ "package.json": "{}", "src/a.js": `${"'node_modules', 'a".repeat(n)}`, "src/b.js": `'node_modules'${", 'a'".repeat(n)}` })))).toBeLessThan(1500);
   });
 });

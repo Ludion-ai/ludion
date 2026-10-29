@@ -78,7 +78,11 @@ const BUILD_CONFIG = new RegExp([
   `(${BUILD_TOOLS})\\.(config|conf)(\\.[^/]*)?`, "webpack\\.[^/]+\\.[cm]?[jt]s",
   "(gatsby-config|gatsby-node|gatsby-browser|gatsby-ssr|ember-cli-build|gulpfile|gruntfile)\\.[^/]+",
   "(angular|project|nx|turbo)\\.json", "electron-builder\\.(json|ya?ml)", "\\.babelrc[^/]*", "\\.postcssrc[^/]*", "\\.swcrc", "\\.parcelrc",
+  // Umi's configuration, which `umi build` and `max build` read (L1d, cause D).
+  "\\.umirc[^/]*", "config\\/config(\\.[^/]+)?\\.[cm]?[jt]s",
 ].map(p => `(^|\\/)${p}$`).join("|") + "|(^|\\/)\\.storybook\\/", "i");
+/** The TypeScript register hooks that `interpret` lists for `.ts`, `.cts` and `.mts` (webpack-cli and gulp load a TypeScript configuration through it). */
+const TS_LOADERS = ["ts-node", "sucrase", "@babel/register", "esbuild-register", "@swc/register"];
 const TSCONFIG = /(^|\/)(tsconfig|jsconfig)[^/]*\.json$/i;
 const DOCKERFILE = /(^|\/)(dockerfile|containerfile)[^/]*$|\.(dockerfile|containerfile)$/i;
 /** P5: files that hold production commands. */
@@ -115,14 +119,46 @@ function finder(text: string): (token: string, from: number) => number {
   };
 }
 
+/** How far a call's argument that is not a literal is read for the literals it holds (L1d, cause C). */
+const ARGUMENT_SPAN = 400;
 /**
  * The literal specifier of each `import(…)`, `require(…)` and `require.resolve(…)` call, after any whitespace and any
- * number of comments. Linear on any file: where a comment ends is a lookup, where skipping from a position ends is
- * remembered for every position passed, and each specifier position is read once, however many calls reach it.
+ * number of comments. An argument that is not a literal names every literal it holds (`require(process.env.X || "sharp")`)
+ * and, when it is one identifier, the literals a `const`, `let` or `var` of that name is given in the same file
+ * (`const UPSTREAM = "shadcn/tailwind.css"`). Linear on any file: where a comment ends is a lookup, where skipping from a
+ * position ends is remembered for every position passed, each specifier position is read once, however many calls
+ * reach it, and an argument is read for at most ARGUMENT_SPAN characters.
  */
 function callSpecifiers(text: string): string[] {
   const out: string[] = [], quoted = /(["'\x60])([^"'\x60\n$]+)\1/y, next = finder(text);
-  const settled = new Map<number, number>(), specifierAt = new Map<number, string | null>();
+  const settled = new Map<number, number>(), specifierAt = new Map<number, string[]>();
+  let assigned: Map<string, string[]> | null = null;
+  const expanded = new Set<string>();
+  const literalsOf = (name: string) => {
+    if (!assigned) {
+      assigned = new Map();
+      for (const m of text.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(["'\x60])([^"'\x60\n$]+)\2/g)) {
+        const at = assigned.get(m[1]!);
+        if (at) at.push(m[3]!); else assigned.set(m[1]!, [m[3]!]);
+      }
+    }
+    return assigned.get(name) ?? [];
+  };
+  /** The argument from `p` to its closing parenthesis (or ARGUMENT_SPAN characters): its literals, or an identifier's. */
+  const argumentAt = (p: number) => {
+    let depth = 0, end = p;
+    for (; end < text.length && end < p + ARGUMENT_SPAN; end++) {
+      const c = text[end];
+      if (c === "(") depth++;
+      else if (c === ")") { if (depth === 0) break; depth--; }
+    }
+    const arg = text.slice(p, end), literals = [...arg.matchAll(/(["'\x60])([^"'\x60\n$]+)\1/g)].map(m => m[2]!);
+    // An identifier's literals are given once per file, however many calls pass it: linear time.
+    const id = /^\s*([A-Za-z_$][\w$]*)\s*(,|$)/.exec(arg)?.[1];
+    if (id === undefined || expanded.has(id)) return literals;
+    expanded.add(id);
+    return [...literals, ...literalsOf(id)];
+  };
   const skip = (start: number) => {
     const path: number[] = [];
     let p = start, end = settled.get(p);
@@ -141,9 +177,12 @@ function callSpecifiers(text: string): string[] {
   };
   for (const m of text.matchAll(/\b(?:import|require(?:\.resolve)?)\s*\(/g)) {
     const p = skip(m.index! + m[0].length);
-    if (!specifierAt.has(p)) { quoted.lastIndex = p; specifierAt.set(p, quoted.exec(text)?.[2] ?? null); }
-    const specifier = specifierAt.get(p);
-    if (specifier) out.push(specifier);
+    if (!specifierAt.has(p)) {
+      quoted.lastIndex = p;
+      const literal = quoted.exec(text)?.[2];
+      specifierAt.set(p, literal ? [literal] : argumentAt(p));
+    }
+    out.push(...specifierAt.get(p)!);
   }
   return out;
 }
@@ -221,8 +260,15 @@ export function styleSpecifiers(text: string): string[] {
   for (const m of text.matchAll(/url\(\s*["']?~([^"')\s]+)/g)) out.push(m[1]!);
   return [...new Set(out)];
 }
-/** Packages a file names by a node_modules path (a <script src>, a copied asset). */
-const nodeModulesPaths = (text: string) => [...text.matchAll(/node_modules\/((?:@[\w.-]+\/)?[\w.-]+)/g)].map(m => m[1]!);
+/**
+ * Packages a file names by a node_modules path (a <script src>, a copied asset), written out or built from literal
+ * segments after a literal `node_modules` (`join("node_modules", "@vscode", "vsce", "vsce")`; L1d, cause C).
+ */
+const nodeModulesPaths = (text: string) => {
+  const joined = [...text.matchAll(/(["'\x60])node_modules\1((?:\s*,\s*(["'\x60])[^"'\x60\n]{1,214}\3){1,8})/g)]
+    .map(m => `node_modules/${[...m[2]!.matchAll(/(["'\x60])([^"'\x60\n]+)\1/g)].map(s => s[2]!.replace(/^\/+|\/+$/g, "")).join("/")}`);
+  return [text, ...joined].flatMap(t => [...t.matchAll(/node_modules\/((?:@[\w.-]+\/)?[\w.-]+)/g)].map(m => m[1]!));
+};
 
 /**
  * Package names a build tool's configuration names: quoted strings (and, for a JSON value, every string and key), every
@@ -544,6 +590,10 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
   const production: { from: string; text: string }[] = [], build: { from: string; text: string }[] = [];
   if (source) {
     const has = new Set(source.files);
+    // A tree without the package.json of a project folder inside it is not the project's tree (an archive that left out
+    // export-ignore files; L1d, cause A). A folder outside the tree (`../lib`) was never in it.
+    for (const { dir } of folders) if (!dir.split("/").includes("..") && !dir.startsWith("/") && !has.has(`${dir}package.json`)) incomplete ??= `${dir}package.json, a project folder's manifest, is not in it`;
+    const loaders = byName.has("interpret") || byName.has("rechoir");
     const text = (file: string) => { const t = source.read(file); if (t === null) incomplete ??= `${file} could not be read`; return t; };
     const ignores = (path: string) => { const t = has.has(path) ? source.read(path) : null; return t !== null && /^[ \t]*(\*\*\/|\/|\.\/)?node_modules(\/\*{0,2})?\/?[ \t]*\r?$/m.test(t); };
     for (const file of source.files) {
@@ -588,6 +638,8 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
       if (BUILD_CONFIG.test(file)) {
         const t = text(file);
         if (t !== null) for (const n of configNames(t, /babel/i.test(base) ? "babel" : /postcss/i.test(base) ? "postcss" : "other")) seedFrom(file, n, `named by ${file}, a build tool's configuration`);
+        // A TypeScript configuration is read through a register hook that interpret picks from the installed ones (L1d, cause B3).
+        if (loaders && /\.[cm]?ts$/i.test(base)) for (const n of TS_LOADERS) if (byName.has(n)) seedFrom(file, n, `a TypeScript register hook that interpret or rechoir can load ${file}, a build tool's configuration, through`);
       }
       if (TSCONFIG.test(file)) for (const m of (text(file) ?? "").matchAll(/"jsxImportSource"\s*:\s*"([^"]+)"/g)) seedFrom(file, packageOf(m[1]!), `jsxImportSource in ${file}`);
       if (TEST_DIR.test(file) || TEST_FILE.test(file) || TOOL_CONFIG.test(file) || TYPES_FILE.test(file)) continue;
@@ -631,12 +683,28 @@ export function productionSplit(lockText: string, source: SourceTree | null, man
     return out;
   };
   const run = (commands: { from: string; text: string }[], kind: "production" | "build") => {
-    const followed = new Set<string>(), expanded = new Set<string>();
+    const followed = new Set<string>(), expanded = new Set<string>(), ran = new Set<string>();
     for (let i = 0; i < commands.length; i++) {
       const { from, text } = commands[i]!;
       const why = kind === "production" ? `${from} runs it` : `the build runs it (${from})`;
-      // P6 does not make test runners, linters and formatters production.
-      const use = (e: LockEntry) => { if (kind === "production" || !devTool(e.name)) seed(e, why); };
+      // P6 does not make test runners, linters and formatters production. A package that runs also runs what it hands off
+      // to: the copies it resolves for the names in its peerDependenciesMeta (webpack's bin runs webpack-cli, and
+      // `webpack serve` runs webpack-dev-server; L1d, cause B). Each copy is handed off from once per kind: linear time.
+      const use = (start: LockEntry) => {
+        const queue: [LockEntry, string][] = [[start, why]];
+        while (queue.length) {
+          const [e, because] = queue.pop()!;
+          if (kind === "build" && devTool(e.name)) continue;
+          seed(e, because);
+          if (ran.has(e.path)) continue;
+          ran.add(e.path);
+          const meta = lock[e.path]?.peerDependenciesMeta;
+          for (const name of Object.keys(meta && typeof meta === "object" ? meta : {})) {
+            const dep = resolveFrom(byPath, `${e.path}/`, name);
+            if (dep) queue.push([dep, `handed off to by ${e.name}@${e.version} at ${e.path} (peerDependenciesMeta), which runs because: ${because}`]);
+          }
+        }
+      };
       for (const n of nodeModulesPaths(text)) for (const e of byName.get(n) ?? []) use(e);
       for (const segment of segmentsOf(text)) {
         const words = commandWords(segment), runner = words.some(w => RUNNER.test(w));

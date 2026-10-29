@@ -164,7 +164,8 @@ function refuseLinks(base: GitBase, branch: string): void {
   try { names = readdirSync(join(common, "objects")); } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw new Error("The repository's objects folder could not be read; applying needs review."); }
   for (const name of names) {
     check(`objects/${name}`);
-    if (!/^[0-9a-f]{2}$/.test(name)) continue;
+    // Any letter case: on a case-insensitive file system Git writes objects/c0/ into a folder named C0.
+    if (!/^[0-9a-f]{2}$/i.test(name)) continue;
     const stat = lstatSync(join(common, "objects", name));
     if (stat.isSymbolicLink()) continue;
     if (!stat.isDirectory()) { linked.push(`objects/${name} (not a folder)`); continue; }

@@ -19,7 +19,7 @@ START=${2:-8a78b55940def8463a2401e7bdd38d7e6c7b604d}
 TREE=$(mktemp -d)
 mkdir -p "$TREE/node_modules"
 git -c core.autocrlf=false archive HEAD | (cd "$TREE" && tar -x)
-for f in packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts packages/cli/src/security/time-cap.ts tools/backtest/src/archives-v5.ts; do git -c core.autocrlf=false show "$START:$f" > "$TREE/$f"; echo "  $f from $START: $(git hash-object "$TREE/$f")"; done
+for f in packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts packages/cli/src/security/time-cap.ts tools/backtest/src/archives-v5.ts; do git -c core.autocrlf=false show "$START:$f" > "$TREE/$f"; echo "  $f from $START: $(git hash-object --stdin < "$TREE/$f")"; done
 TW=$(cd "$TREE" && (pwd -W 2>/dev/null || pwd))
 echo "== tests with the start commit's judge files"
 docker run --rm --network none --read-only --tmpfs /tmp:exec --user 1000:1000 -e HOME=/tmp -v "$TW:/w:ro" -v "$NM:/w/node_modules" -w /w "$IMAGE" sh -c "npx tsc -p tsconfig.json; echo tsc_exit=$?; npx vitest run tools/shadow 2>&1 | grep -E 'Tests |Test Files |×'"
@@ -29,7 +29,7 @@ mutate() {
   echo "== mutation: $1"
   cp "$file" "$file.orig"
   node -e "const fs=require('fs');const s=fs.readFileSync('$file','utf8');const t=s.replace(process.argv[1],process.argv[2]);if(t===s)process.exit(3);fs.writeFileSync('$file',t)" "$2" "$3" || { echo "mutation not applied"; rm "$file.orig"; return; }
-  run "npx vitest run tools/shadow 2>&1 | grep -E 'Tests '"
+  run "npx vitest run tools/shadow 2>&1 | grep -E 'Tests |Test Files '"
   mv "$file.orig" "$file"
 }
 mutate $R "MAL- re-query sees every record, whenever published" 'if (r && ms(r.published) <= t && !withdrawnBy' 'if (r && !withdrawnBy'
@@ -55,7 +55,7 @@ mutate $R "final although a range was not enumerated" 'if (rangesNotRead.size) n
 mutate $D "withdrawn records left out of the record-omission rule" 'all.some(r => names(r, name, v))' 'records.some(r => names(r, name, v))'
 mutate $D "V left out of the run of identical code's times" 'time.set(version, input.published);' 'time.delete(version);'
 mutate $R "seeds from V's own captures and P's packument only" '...(captureTimesByName(ctx.store).get(name) ?? []),' '...[],'
-mutate $R "OSV not asked by package name" 'else copies.push(...answer.filter(' 'else void answer.filter('
+mutate $R "OSV not asked by package name" 'else copies.push(...answer.filter(r => typeof r?.id === "string" && r.id.startsWith("MAL-")));' 'else void answer;'
 mutate $R "final although OSV was not asked" 'if (osvNotQueried.length) notFinal.push' 'if (false) notFinal.push'
 mutate $R "capture gaps of MAL-only cases not listed" 'capture_gaps: [...results, ...cases.filter(c => !results.some(r => r.name === c.name && r.version === c.version))]' 'capture_gaps: [...results]'
 mutate $D "file list only from the last capture" '[...caps].reverse().find(c => c.files)?.files ?? null' 'cap?.files ?? null'

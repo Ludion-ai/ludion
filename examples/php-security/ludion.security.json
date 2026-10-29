@@ -1,6 +1,0 @@
-{
-  "schema": 1,
-  "dockerfile": "Dockerfile",
-  "test": ["php", "tests/smoke.php"],
-  "timeout_seconds": 30
-}

@@ -1,5 +1,0 @@
-{
-  "name": "ludion/security-example",
-  "require": { "symfony/http-foundation": "5.4.0" },
-  "config": { "allow-plugins": false }
-}

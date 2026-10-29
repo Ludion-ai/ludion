@@ -1,7 +1,7 @@
 {
   "name": "ludion-ai",
   "version": "0.3.0-preview.1",
-  "description": "One security-update workflow for PHP Docker, npm, Composer and Maven. Source preview with offline application validation.",
+  "description": "A judge for npm dependency-update PRs: whether an update may be taken, when, and why not. Preview, comments only.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "@types/semver": "^7.7.1",
-    "@xmldom/xmldom": "^0.9.12",
     "esbuild": "^0.28.2",
     "semver": "^7.8.5"
   }

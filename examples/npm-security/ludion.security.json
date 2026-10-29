@@ -1,7 +1,0 @@
-{
-  "schema": 1,
-  "ecosystem": "npm",
-  "image": "node:24-slim",
-  "test": ["node", "--test", "tests/smoke.test.cjs"],
-  "timeout_seconds": 60
-}

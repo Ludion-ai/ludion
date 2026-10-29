@@ -4,34 +4,8 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    # The root lockfile, the one judge.yml judges; the workspaces are locked in it. examples/ are fixtures.
+    # The root lockfile, the one judge.yml judges; the workspaces are locked in it.
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
-
-  # examples/*-security are owned fixtures pinned to vulnerable versions on purpose: Ludion's own scan and patch find
-  # and fix them (CLAUDE.md, "Check the change"). Dependabot opens no PR for them, version or security update
-  # (docs/decisions/2026-10-29-lp-rest-followups.md). `ignore` also applies to security updates;
-  # `open-pull-requests-limit: 0` stops version updates.
-  - package-ecosystem: npm
-    directory: /examples/npm-security
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 0
-    ignore:
-      - dependency-name: "*"
-  - package-ecosystem: composer
-    directory: /examples/composer-security
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 0
-    ignore:
-      - dependency-name: "*"
-  - package-ecosystem: maven
-    directory: /examples/maven-security
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 0
-    ignore:
-      - dependency-name: "*"

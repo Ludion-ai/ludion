@@ -1,7 +1,0 @@
-{
-  "schema": 1,
-  "ecosystem": "composer",
-  "image": "composer:2",
-  "test": ["php", "tests/smoke.php"],
-  "timeout_seconds": 60
-}

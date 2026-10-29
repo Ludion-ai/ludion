@@ -37,7 +37,7 @@ In scope:
 - this repository's workflows;
 - the site at ludion.ai.
 
-Anything in scope that weakens its security counts, in particular a check that passes or applies an update it should have stopped, a way to use Ludion, or an update to it, to attack the projects it updates, and Ludion sending more about a project than docs/status.md says it sends.
+Anything in scope that weakens Ludion's own security counts, in particular a check that passes or applies an update it should have stopped, a way to use Ludion, or an update to it, to attack the projects it updates, and Ludion sending more about a project than docs/status.md and the README say it sends.
 
 Out of scope:
 

@@ -219,13 +219,13 @@ describe("prevs", () => {
     w.version("left-pad", "1.0.0", 1.02, "predecessor");
     expect(registryPredecessor(w.store(), "left-pad", "1.0.1")).toBe("1.0.0");
   });
-  it("(b) is not applicable without any version below V", () => {
+  it("(b) without any version below V is a capture gap: a missing predecessor", () => {
     const w = new World();
     w.watched = {};
     w.captures.push({ type: "baseline", name: "fresh", fetched_at: at(1.01), time: { created: at(1), "1.0.0": at(1) }, dist_tags: {} });
     w.version("fresh", "1.0.0", 1.01);
     const r = judgeVersion(ctxOf(w), "fresh", "1.0.0", true);
-    expect(r.rows.filter(x => x.scenario === "b").every(x => x.outcome === "not_applicable")).toBe(true);
+    expect(r.rows.filter(x => x.scenario === "b").every(x => x.outcome === "capture_gap" && /missing predecessor/.test(x.gap!))).toBe(true);
     expect(r.decided).toBe(false);
     // (a): a package first published at T is younger than any base wait (rule 2).
     expect(row(r, "a", "normal")).toMatchObject({ outcome: "stopped" });
@@ -238,6 +238,7 @@ function sources(files: Record<string, Record<string, string>>, opts: { listed?:
   const list = (v: string) => new Map(Object.entries(files[v]!).map(([p, c]) => [p, { sha256: sha(c), size: c.length }]));
   const listed = opts.listed ?? Object.keys(files);
   return {
+    publishTime: async () => null,
     osvRecords: async () => opts.records ?? [],
     registry: async n => Object.fromEntries(listed.map(v => [v, { scripts: opts.scripts?.[v] ?? [], integrity: integrity(`${n}@${v}`), shasum: `sha1-${v}`, unpackedSize: null }])),
     registryTar: async (_n, v) => files[v] ? { ok: true, files: [...list(v)].map(([p, f]) => [p, f.sha256, f.size] as [string, string, number]), packageJson: files[v]!["package.json"] ?? null } : { ok: false, reason: "tarball HTTP 404" },
@@ -339,7 +340,7 @@ describe("the report", () => {
     expect(report.versions_in_window).toBe(101);
     expect(report.decided).toEqual({ count: 101, needed: 100, state: "met" });
     expect(report.misses).toMatchObject({ count: 0, state: "met_with_no_case" });
-    expect(report.mal.outside_window).toEqual([{ version: "left-pad@1.1.0", records: ["MAL-late"], why: "named only by records published after the window's end + 336h, or withdrawn" }]);
+    expect(report.mal.outside_window).toEqual([{ version: "left-pad@1.1.0", records: ["MAL-late"], why: "named only by records published after the window's end + 336h" }]);
   });
   it("a version published before the window is not counted", async () => {
     const w = new World(100);
@@ -377,5 +378,67 @@ describe("retries and repeats", () => {
     expect(store.duplicates).toBe(1);
     // Deprecated again at hour 20, before every row's wait_until: every row stops.
     expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.every(x => x.outcome === "stopped")).toBe(true);
+  });
+});
+
+describe("review fixes (PR #194)", () => {
+  const copy = (id: string, versions: string[], publishedH: number, modifiedH: number, extra: object = {}) => ({ type: "osv", id, modified: at(modifiedH), fetched_at: at(modifiedH + 1), sha256: `${id}-${modifiedH}`, record: { id, published: at(publishedH), modified: at(modifiedH), affected: [{ package: { ecosystem: "npm", name: "left-pad" }, versions }], ...extra } });
+  const pkg = (v: string) => `{"name":"left-pad","version":"${v}"}`;
+  const same = () => sources({ "1.0.0": { "package.json": pkg("1.0.0"), "a.js": "x" }, "1.0.1": { "package.json": pkg("1.0.1"), "a.js": "x" } });
+  const finalWorld = () => { const w = new World(28 * 24 + 336 + 200); w.publish("left-pad", "1.0.1", 1); return w; };
+  const asOfFinal = T0 + (28 * 24 + 336 + 200) * HOUR;
+
+  it("reads a MAL- record as its copy modified by the judgement says, not as it is today", () => {
+    // Published before V naming only 1.0.0; extended to 1.0.1 at hour 200, after every row's wait_until.
+    const w = new World().publish("left-pad", "1.0.1", 1);
+    w.osv.push(copy("MAL-x", ["1.0.0"], -10, -10), copy("MAL-x", ["1.0.0", "1.0.1"], -10, 200));
+    expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.map(x => x.outcome)).toEqual(["missed", "missed", "missed", "missed"]);
+    // Extended at hour 30 instead: normal (73) and low (169) see it.
+    const w2 = new World().publish("left-pad", "1.0.1", 1);
+    w2.osv.push(copy("MAL-x", ["1.0.0"], -10, -10), copy("MAL-x", ["1.0.0", "1.0.1"], -10, 30));
+    expect(judgeVersion(ctxOf(w2), "left-pad", "1.0.1", false).rows.map(x => x.outcome)).toEqual(["missed", "missed", "stopped", "stopped"]);
+  });
+  it("keeps a withdrawn record's version in the denominator", async () => {
+    const w = finalWorld();
+    w.osv.push(copy("MAL-w", ["1.0.1"], 100, 100), copy("MAL-w", ["1.0.1"], 100, 300, { withdrawn: at(300) }));
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    expect(report.mal.versions).toBe(1);
+    expect(report.misses).toMatchObject({ count: 1, state: "not_met" });
+  });
+  it("is not final until an OSV read 24h past the window's end + 336h", async () => {
+    const w = finalWorld();
+    w.status = w.status.filter(s => (s as { type: string }).type !== "osv" || Date.parse((s as { at: string }).at) <= T0 + (671 + 336 + 22) * HOUR);
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    expect(report.final).toBe(false);
+    expect(report.not_final_because.join()).toMatch(/last OSV read/);
+    expect(report.misses.state).toBe("not_yet");
+  });
+  it("says met, not met with no case, when every case is a false-report candidate", async () => {
+    const w = finalWorld().mal("MAL-9", "left-pad", ["1.0.1"], 100);
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: same() });
+    expect(report.final).toBe(true);
+    expect(report.mal.by_category.false_report).toBe(1);
+    expect(report.misses).toMatchObject({ count: 0, state: "met" });
+  });
+  it("a MAL-named version with no stored publish time: a capture gap, unless the registry's time places it outside", async () => {
+    const w = new World(400).mal("MAL-g", "left-pad", ["1.0.9"], 100);
+    const offline = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: null });
+    expect(offline.versions_in_window).toBe(0);
+    expect(offline.mal.cases.map(c => [c.version, c.missed_rows.length, c.rows[0]!.gap])).toEqual([["1.0.9", 4, "no stored publish time, and the registry's time was not read"]]);
+    const old = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...same(), publishTime: async () => "2019-01-01T00:00:00.000Z" } });
+    expect(old.mal.cases).toEqual([]);
+    expect(old.mal.outside_window[0]!.why).toMatch(/registry's time/);
+    const inside = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...same(), publishTime: async () => at(5) } });
+    expect(inside.mal.cases[0]!.rows[0]!.gap).toMatch(/never captured/);
+  });
+  it("compares the archives with the latest capture that hashed the tarball, not a later one without a list", async () => {
+    const { store, records } = malStore([["1.0.0", 1], ["1.0.1", 2]], ["1.0.1"]);
+    const caps = store.versions.get("p@1.0.1")!;
+    caps[0]!.files = [["a.js", 1, "f".repeat(64)]];
+    caps.push({ ...caps[0]!, fetched_at: caps[0]!.fetched_at + HOUR, files: null, files_status: "error" });
+    const pkgP = (v: string) => `{"name":"p","version":"${v}","scripts":{}}`;
+    const src = sources({ "1.0.0": { "package.json": pkgP("1.0.0"), "a.js": "x" }, "1.0.1": { "package.json": pkgP("1.0.1"), "a.js": "x" } });
+    const c = await categorize({ name: "p", version: "1.0.1", published: at(2), store, records: records as any, sources: src });
+    expect(c).toMatchObject({ category: "confirmed", evidence: { step: "the recorder's file list differs from jsDelivr's" } });
   });
 });

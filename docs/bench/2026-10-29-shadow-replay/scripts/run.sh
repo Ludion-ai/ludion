@@ -19,8 +19,9 @@ echo "snapshot taken at $(date -u +%FT%TZ): $(du -sb "$SNAP" | cut -f1) bytes"
 START=$(grep -h '"type":"start"' "$SNAP"/status/*.jsonl | sed -E 's/.*"commit":"([0-9a-f]{40})".*/\1/' | sort -u)
 [ "$(echo "$START" | wc -l)" = 1 ] || { echo "more than one start commit: $START"; exit 1; }
 FILES="packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts packages/cli/src/security/time-cap.ts tools/backtest/src/archives-v5.ts"
-git diff --quiet "$START" HEAD -- $FILES || { echo "the judge's files differ from the start commit $START"; exit 1; }
-echo "start commit $START; judge files unchanged at $(git rev-parse HEAD)"
+# Against the working tree, which is what the container runs.
+git diff --quiet "$START" -- $FILES || { echo "the judge's files in the working tree differ from the start commit $START"; exit 1; }
+echo "start commit $START; judge files in the working tree unchanged (HEAD $(git rev-parse HEAD))"
 WATCHED=$(grep -h '"type":"start"' "$SNAP"/status/*.jsonl | sed -E 's/.*"watched_sha256":"([0-9a-f]{64})".*/\1/' | sort -u)
 [ "$WATCHED" = "$(sha256sum tools/shadow/watched.json | cut -d' ' -f1)" ] || { echo "tools/shadow/watched.json is not the list the recorder started with ($WATCHED)"; exit 1; }
 echo "watched list $WATCHED"

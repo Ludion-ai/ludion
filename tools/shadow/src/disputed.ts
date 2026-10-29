@@ -17,6 +17,8 @@ type Rec = Record<string, any>;
 export type Category = "confirmed" | "record_omission" | "false_report" | "not_checked";
 /** What the check reads. The network implementation is networkSources; tests give fakes. */
 export type Sources = {
+  /** A version's publish time from the registry's `time` (kept for removed versions too); null when it has none. */
+  publishTime(name: string, version: string): Promise<string | null | "unreadable">;
   /** Every OSV record naming the package (MAL- and others), or "unreadable". */
   osvRecords(name: string): Promise<Rec[] | "unreadable">;
   /** The registry's listed versions today: install scripts and dist fields. */
@@ -127,8 +129,10 @@ export async function categorize(input: { name: string; version: string; publish
   const byId = new Map<string, Rec>();
   for (const r of [...osv, ...input.records]) if (typeof r?.id === "string" && r.id.startsWith("MAL-") && (r.affected ?? []).some((a: any) => a?.package?.ecosystem === "npm" && a.package.name === name)) byId.set(r.id, r);
   const records = [...byId.values()].filter(r => !r.withdrawn);
-  const cap = store.versions.get(`${name}@${version}`)?.at(-1);
-  const d = await dispute({ name, version, published: input.published, time, records, captured: cap ? { shasum: cap.shasum, integrity: cap.integrity, unpacked_size: cap.unpacked_size, files: cap.files } : null, sources: src });
+  const caps = store.versions.get(`${name}@${version}`) ?? [], cap = caps.at(-1);
+  // The file list from the latest capture that hashed the tarball: a later failed retry has none.
+  const files = [...caps].reverse().find(c => c.files)?.files ?? null;
+  const d = await dispute({ name, version, published: input.published, time, records, captured: cap ? { shasum: cap.shasum, integrity: cap.integrity, unpacked_size: cap.unpacked_size, files } : null, sources: src });
   const { reg, list, pkg, ...shown } = d;
   if (!d.disputed) return { category: "confirmed", evidence: shown };
   // The run of identical code, back to O.
@@ -180,6 +184,20 @@ export function networkSources(cacheDir: string): Sources {
       mkdirSync(join(cacheDir, "osv-query"), { recursive: true });
       writeFileSync(`${file}.tmp`, JSON.stringify(out)); renameSync(`${file}.tmp`, file);
       return out;
+    },
+    async publishTime(name, version) {
+      const file = join(cacheDir, "registry-time", `${encodeURIComponent(name)}.json`);
+      let time: Record<string, unknown>;
+      if (existsSync(file)) time = JSON.parse(readFileSync(file, "utf8"));
+      else {
+        const path = name.startsWith("@") ? `@${encodeURIComponent(name.slice(1))}` : encodeURIComponent(name);
+        const res = await archive.bytes("registry", `https://registry.npmjs.org/${path}`);
+        if (!res || (res.status !== 200 && res.status !== 404) || (res.status === 200 && !res.body)) return "unreadable";
+        try { time = res.status === 404 ? {} : JSON.parse(res.body!.toString("utf8"))?.time ?? {}; } catch { return "unreadable"; }
+        mkdirSync(join(cacheDir, "registry-time"), { recursive: true });
+        writeFileSync(`${file}.tmp`, JSON.stringify(time)); renameSync(`${file}.tmp`, file);
+      }
+      return typeof time[version] === "string" ? time[version] as string : null;
     },
     registry: name => registryVersions(archive, cacheDir, name),
     registryTar: (name, version, integrity) => registryTarFiles(archive, cacheDir, name, version, integrity),

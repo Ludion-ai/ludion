@@ -60,6 +60,10 @@ function refuseConfiguration(dir: string): void {
   // A partial clone fetches missing objects through its remote; it is refused, not only kept off the network.
   const promisor = configNames(dir, "^(extensions\\.partialclone|remote\\..*\\.promisor)$");
   if (promisor.length) throw new Error(`The repository is a partial clone (${promisor.slice(0, 3).map(plain).join(", ")}), which can fetch a missing object through its remote's command; applying needs review. Nothing was validated or changed.`);
+  // Only the files ref storage, whose paths refuseLinks checks; reftable keeps refs in a folder of its own.
+  const storage = git(dir, ["config", "--get", "extensions.refstorage"], { allowFail: true });
+  if (storage.status !== 0 && storage.status !== 1) throw new Error("The repository's Git configuration could not be read; applying needs review. Nothing was validated or changed.");
+  if (storage.status === 0 && storage.stdout.trim().toLowerCase() !== "files") throw new Error(`The repository keeps its refs in ${plain(storage.stdout.trim())} storage, not files; applying needs review. Nothing was validated or changed.`);
 }
 
 /**
@@ -139,13 +143,15 @@ export function skippedReason(base: GitBase, branch: string, parent: string | nu
  * Windows junction) on any of those paths would make it write outside the repository, so it is refused, and so is a
  * reflog the new branch already has.
  */
-function refuseLinks(base: GitBase, branch: string): void {
+function refuseLinks(base: GitBase, branch: string, objects: string[]): void {
   const common = realpathSync(resolve(base.top, git(base.top, ["rev-parse", "--git-common-dir"]).stdout.trim()));
   const linked: string[] = [];
   const check = (rel: string) => { try { if (lstatSync(join(common, rel)).isSymbolicLink()) linked.push(rel); } catch { /* absent: Git creates a real one */ } };
   const parts = ["refs", "heads", ...branch.split("/")];
   for (let i = 1; i <= parts.length; i++) { check(parts.slice(0, i).join("/")); check(["logs", ...parts.slice(0, i)].join("/")); }
-  check("logs"); check("objects");
+  check("logs"); check("objects"); check("reftable");
+  // Each loose object Git would write: a link there would make Git take the object as present and touch the target.
+  for (const oid of objects) check(`objects/${oid.slice(0, 2)}/${oid.slice(2)}`);
   try { for (const name of readdirSync(join(common, "objects"))) check(`objects/${name}`); } catch { /* no objects folder: Git creates it */ }
   if (linked.length) throw new Error(`The repository's .git folder has a symbolic link where Git would write (${linked.slice(0, 3).map(plain).join(", ")}); applying needs review.`);
   if (existsSync(join(common, "logs", ...parts))) throw new Error(`A reflog for the new branch ${plain(branch)} already exists; applying needs review.`);
@@ -161,15 +167,15 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
   if (git(base.top, ["check-ref-format", ref], { allowFail: true }).status !== 0) throw new Error(`Invalid branch name: ${plain(branch)}`);
   refuseConfiguration(base.top);
   if (git(base.top, ["symbolic-ref", "--quiet", ref], { allowFail: true }).status === 0) throw new Error(`${plain(ref)} is a symbolic ref; it was not changed, and applying needs review.`);
-  refuseLinks(base, branch);
+  const contents = files.map(file => base.crlf.has(file.path) ? file.content.replace(/\r\n/g, "\n") : file.content);
+  refuseLinks(base, branch, contents.map(content => createHash(base.commit.length === 64 ? "sha256" : "sha1").update(`blob ${Buffer.byteLength(content)}\0`).update(content).digest("hex")));
   const unknown = files.filter(file => !base.modes.has(file.path));
   if (unknown.length) throw new Error(`The last commit has no ${unknown.map(f => plain(f.path)).join(", ")}; applying needs review.`);
   const temp = mkdtempSync(join(tmpdir(), "ludion-index-")), index = join(temp, "index");
   try {
     git(base.top, ["read-tree", base.commit], { index });
-    for (const file of files) {
-      const content = base.crlf.has(file.path) ? file.content.replace(/\r\n/g, "\n") : file.content;
-      const oid = git(base.top, ["hash-object", "-w", "--no-filters", "--stdin"], { input: content }).stdout.trim();
+    for (const [i, file] of files.entries()) {
+      const oid = git(base.top, ["hash-object", "-w", "--no-filters", "--stdin"], { input: contents[i] }).stdout.trim();
       git(base.top, ["update-index", "--add", "--cacheinfo", base.modes.get(file.path)!, oid, `${base.prefix}${file.path}`], { index });
     }
     const tree = git(base.top, ["write-tree"], { index }).stdout.trim();

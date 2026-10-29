@@ -168,6 +168,13 @@ describe("a fix on its own branch", () => {
     const second = project(), outside = mkdtempSync(join(tmpdir(), "ludion-branch-outside-"));
     symlinkSync(outside, join(second.root, ".git", "objects", "zz"));
     expect(() => fixBranch(gitBase(second.root, second.copy), "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow("objects/zz");
+    // A link at the very object file Git would write: Git would take the object as present and touch the target.
+    const fourth = project(), fourthBase = gitBase(fourth.root, fourth.copy);
+    const fresh = [{ path: "package.json", content: "{\"z\":3}\n" }];
+    const oid = spawnSync("git", ["hash-object", "--stdin"], { cwd: fourth.root, input: fresh[0]!.content, encoding: "utf8" }).stdout.trim();
+    mkdirSync(join(fourth.root, ".git", "objects", oid.slice(0, 2)), { recursive: true });
+    symlinkSync(join(outside, "target"), join(fourth.root, ".git", "objects", oid.slice(0, 2), oid.slice(2)));
+    expect(() => fixBranch(fourthBase, "ludion/npm/x-1.0.1", fresh, "ludion: x")).toThrow(`objects/${oid.slice(0, 2)}/${oid.slice(2)}`);
     // A reflog file already there, which Git would append to.
     const third = project();
     mkdirSync(join(third.root, ".git", "logs", "refs", "heads", "ludion", "npm"), { recursive: true });
@@ -180,6 +187,12 @@ describe("a fix on its own branch", () => {
     expect(() => fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{}\n" }], "ludion: x")).toThrow("is a symbolic ref");
     expect(git(root, "symbolic-ref", "refs/heads/ludion/npm/x-1.0.1")).toBe("refs/tags/made-by-symref");
     expect(spawnSync("git", ["rev-parse", "--verify", "--quiet", "refs/tags/made-by-symref"], { cwd: root }).status).not.toBe(0);
+  });
+  it("refuses a repository whose refs are not in the files storage", () => {
+    const { root, copy } = project();
+    // Git versions without reftable ignore the setting in a version-0 repository; the refusal reads it all the same.
+    git(root, "config", "extensions.refStorage", "reftable");
+    expect(() => gitBase(root, copy)).toThrow("keeps its refs in reftable storage");
   });
   it("checks the configuration again before each branch", () => {
     const { root, copy } = project(), base = gitBase(root, copy);

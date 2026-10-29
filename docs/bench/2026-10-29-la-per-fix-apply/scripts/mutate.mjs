@@ -10,6 +10,8 @@ const mutations = [
   ["no configuration check before a branch", "packages/cli/src/security/branch.ts", "  refuseConfiguration(base.top);\n", "", "packages/cli/test/branch.test.ts"],
   ["two fixes on one branch name", "packages/cli/src/security/dependency-patch.ts", "else if (branch && branches.indexOf(branch) !== index)", "else if (false)", "packages/cli/test/dependencies.test.ts"],
   ["a symbolic ref at the name accepted", "packages/cli/src/security/branch.ts", "ref], { allowFail: true }).status === 0) throw", "ref], { allowFail: true }).status === 0 && false) throw", "packages/cli/test/branch.test.ts"],
+  ["reftable accepted","packages/cli/src/security/branch.ts","if (storage.status === 0 && storage.stdout.trim().toLowerCase() !== \"files\") throw","if (false) throw","packages/cli/test/branch.test.ts"],
+  ["a link at an object file accepted","packages/cli/src/security/branch.ts","  for (const oid of objects) check(","  for (const oid of []) check(","packages/cli/test/branch.test.ts"],
   ["partial clone accepted", "packages/cli/src/security/branch.ts", "  if (promisor.length) throw", "  if (promisor.length && false) throw", "packages/cli/test/branch.test.ts"],
   ["hooks named in configuration accepted", "packages/cli/src/security/branch.ts", "  if (hooks.length) throw", "  if (hooks.length && false) throw", "packages/cli/test/branch.test.ts"],
   ["CRLF committed as checked out", "packages/cli/src/security/branch.ts", "base.crlf.has(file.path) ? file.content.replace(/\\r\\n/g, \"\\n\") : file.content", "file.content", "packages/cli/test/branch.test.ts"],

@@ -59,9 +59,10 @@ export function registryTarball(name: string, version: string): string {
 
 /**
  * A known advisory the change fixes, with what is known about its urgency: `from` had the advisory and `to`, the
- * version it changed to, does not.
+ * version it changed to, does not. `epss_date` is the score_date of the EPSS list its CVE ids were looked up in (null
+ * when the list gives none); it is absent when no list was read for it.
  */
-export type FixedAdvisory = { id: string; package: string; from: string; to: string; aliases: string[]; severity: string | null; kev: boolean; epss: number | null };
+export type FixedAdvisory = { id: string; package: string; from: string; to: string; aliases: string[]; severity: string | null; kev: boolean; epss: number | null; epss_date?: string | null };
 
 /**
  * The fixes that count as the change's own: per advisory, package and vulnerable version, the smallest version it
@@ -532,6 +533,8 @@ export function renderJudgement(j: Judgement): string {
   lines.push(`Changed packages (${j.changes.length}):`);
   for (const c of j.changes) lines.push(`  ${c.name} ${c.from ?? "(new)"} → ${c.to}${c.dev ? " (dev)" : ""}${c.replaced ? ` (replaces ${c.replaced} at ${c.path})` : ""}`);
   if (j.fixes.length) lines.push(`Fixes: ${[...new Set(j.fixes.map(f => f.id))].join(", ")}`);
+  const epssDates = [...new Set(j.fixes.filter(f => f.epss_date !== undefined).map(f => f.epss_date ?? "not given"))];
+  if (epssDates.length) lines.push(`EPSS list (FIRST) score date: ${epssDates.join(", ")}`);
   const order = { stop: 0, extend: 1, info: 2 } as const;
   for (const f of [...j.findings].sort((a, b) => order[a.effect] - order[b.effect])) lines.push(`  [${f.effect}] gate ${f.gate}: ${f.message}`);
   if (!j.findings.length) lines.push("  No gate finding.");

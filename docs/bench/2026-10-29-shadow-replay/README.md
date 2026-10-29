@@ -40,7 +40,8 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
   - the window's end + 336h has passed;
   - an OSV read is at least 24h past that time, since a record published by then may be imported into OSV later;
   - nothing is pending;
-  - no OSV record was given up.
+  - no OSV record was given up, and none is still being read again;
+  - the run had the network (`NETWORK=1`): OSV was asked for the records naming each watched package with a version in the window, and every range was enumerated over the registry's versions.
 - **Malicious versions** (sections 3 and 6). These are versions in the window named by a MAL- record published by the window's end + 336h. A record withdrawn later still counts here, because section 6 sets apart only false-report candidates. Each one goes through `tools/shadow/src/disputed.ts`:
   - **The disputed check.** It is v5's, in v5's order, read from the registry, jsDelivr, ecosyste.ms and Software Heritage. The recorder's captured manifest is one more copy of the registry's document. As the one addition, the recorder's own file list of V must equal jsDelivr's.
   - **Not disputed** is confirmed.
@@ -48,7 +49,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
     - It is a record-omission candidate if O was published after the earliest-published other version a MAL- record names, or if O declares an install script its predecessor does not.
     - Otherwise it is a false-report candidate.
   - **MAL- records for the package.** OSV's query API by package name, plus the recorder's stored copies.
-  - **Without network** (`run.sh` without `NETWORK=1`), this check is not run. Every MAL-named version is then `not_checked`, and counts as malicious.
+  - **Without network** (`run.sh` without `NETWORK=1`), this check is not run. Every MAL-named version is then `not_checked`, and counts as malicious, and the result is not final.
 - **The gate** (section 7).
   - **Misses.** Confirmed, record-omission and not-checked versions with any missed or capture-gap row.
   - **Decided.** Versions in the window whose four (b) rows, against the decided prev, are each `stop` or `ready_except_build`.
@@ -63,7 +64,7 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
 
 ## Readings taken where the decision is not literal
 
-None of these loosens a count. Each is the reading the code takes, and is tested. Three fresh-context reviews on PR #194 found readings that did loosen it.
+None of these loosens a count. Each is the reading the code takes, and is tested. Four fresh-context reviews on PR #194 found readings that did loosen it.
 - **The first, at 80b26f8.** Readings 5, 6 and 8 loosened the count, and MAL- records were read as they are today.
 - **The second, at 2250791.** It found:
   - a later copy of a record could drop a version from the denominator;
@@ -75,6 +76,11 @@ None of these loosens a count. Each is the reading the code takes, and is tested
   - judgements were seeded only from V's own captures;
   - mid-poll error lines were taken as a poll's end;
   - the store cannot hold MAL- records modified before the recorder started.
+- **The fourth, at 2275d78.** It found:
+  - networked runs reused a cache that never expired;
+  - check.sh misreported the start-commit typecheck;
+  - the whole store was held in memory;
+  - a capture after the last poll was reported as a gap rather than pending.
 
 All of these were changed as below.
 
@@ -84,7 +90,7 @@ All of these were changed as below.
    - a change to P's packument;
    - the first publish of one of V's dependencies.
 
-   The recorder retries a failed sub-read for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap.
+   A moment past the store's coverage (or a capture after the last poll line) makes the judgement pending, not a gap. The recorder retries a failed sub-read for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap.
 2. **"The end of the poll."** The facts "of V's first capture" are those stored by the end of the poll that took it: the next `poll` or `stopped` status line, or an `error` line that ended the whole poll. An `error` line naming a package or an OSV id is written mid-poll, so it does not end one. A capture's records are written over several seconds, so the predecessor's record comes after V's.
 3. **The registry's predecessor** is taken among the versions the recorder had captured by that moment, as listed versions. The recorder captures the predecessor with V, so a version whose `time` is stored but which was never captured was not listed: unpublished before the recorder saw the package.
 4. **Repeated records** are dropped only when equal, apart from `fetched_at`, to the record just before them with the same type, name and version. The recorder's README says "by type, name, version and content". Read over the whole stream, that would drop a deprecation that changes and changes back, or a 404 `created` record after a later success. In the third run's snapshot, 133 repeats were dropped: 79 `change` records with the same diff, and 54 `retry` version records (`logs/store-counts-3.log`).
@@ -113,11 +119,11 @@ All of these were changed as below.
 
 ## Tests
 
-`tools/shadow/test/replay.test.ts` has 48 tests. The recorder's 35 are unchanged, 83 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit 658f5c5:
+`tools/shadow/test/replay.test.ts` has 50 tests. The recorder's 35 are unchanged, 85 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit 23f4f59:
 - typecheck exit 0;
-- 83 of 83 passed;
-- 83 of 83 passed again, with typecheck exit 0, against the start commit's judge files, the ones the count runs (judge.ts 5a598fd; main's #193 version is at HEAD);
-- 30 deliberate mutations, each making tests fail:
+- 85 of 85 passed;
+- 85 of 85 passed again against the start commit's judge files, the ones the count runs (judge.ts 5a598fd; main's #193 version is at HEAD). The typecheck there covers `tools/shadow` and what it imports, and exits 0. The whole project does not typecheck against the old judge.ts, because main's workspace-manifests.ts imports `own`, which it lacks; the count never loads that file. (An earlier check.log at 658f5c5 printed `tsc_exit=0` for a whole-project typecheck that had failed: the host shell expanded `$?`. The fourth review found it.)
+- 32 deliberate mutations, each making tests fail:
   - the re-query cut-off off;
   - exploited's synthetic fix off;
   - no recomputation of `wait_until`;
@@ -146,14 +152,18 @@ All of these were changed as below.
   - seeds only from V's own captures and P's packument;
   - OSV not asked by package name;
   - final although OSV was not asked;
-  - capture gaps of MAL-only cases not listed.
+  - capture gaps of MAL-only cases not listed;
+  - no seed from a dependency's later first publish;
+  - inputs past the coverage a gap, not pending.
+
+**Scale.** `scripts/scale.mjs` builds a synthetic store at the design's four-week size (`logs/scale.log`): 27,100 new versions over 2,200 watched names, recorder-sized manifests and attestation bundles, a poll a minute for 43 days, 463,269,960 bytes. The replay, with the replay.ts committed in 9d672be, judged 26,980 window versions in 223 s and exited 0, under run.sh's limits (`--memory 4g`, a 3,584 MB heap). Peak memory was not measured. The synthetic data is not registry data, so its outcomes mean nothing.
 
 ## The preliminary runs
 
-**The current one** is `out/replay-preliminary-4.json` (log `logs/run-preliminary-4.log`, store counts `logs/store-counts-4.log`), at 32b97f0, after the third review's fixes, with `NETWORK=1`:
-- **The snapshot.** Taken at 2026-10-29T01:59:14Z, 50,753,705 bytes, a copy. The recorder was not stopped or touched.
+**The current one** is `out/replay-preliminary-5.json` (log `logs/run-preliminary-5.log`, store counts `logs/store-counts-5.log`), at 32afeb8, after the fourth review's fixes, with `NETWORK=1`:
+- **The snapshot.** Taken at 2026-10-29T02:29:54Z, 50,757,708 bytes, a copy. The recorder was not stopped or touched.
 - **The judge.** The judge's files are the start commit's, as the log prints. Watched list sha256 `02d3e6de…`.
-- **The network.** OSV was asked for the records naming each watched package with a version in the window (package names only). Its query cache was not committed.
+- **The network.** OSV was asked for the records naming each watched package with a version in the window (package names only). Its cache was its own, fresh, and was not committed.
 - **The window.** In progress, 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z, one run, no break.
 - **The versions.** 337 in the window, all pending. The coverage ends at the last OSV read, 2026-10-29T00:00:20.329Z. The first rows (exploited and high, 12h or 24h) become judgeable after the next daily OSV read.
 - **The gate.** Decided 0 of 100, `not_yet`. Misses 0, `not_yet`.
@@ -162,6 +172,8 @@ All of these were changed as below.
   - The recorder stored 15 records itself, and none names a watched package.
 - **Capture lag.** Median 0.012h, p90 0.017h.
 - **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 133 repeats dropped (79 `change`, 54 `retry`).
+
+**The fourth one**, at 32b97f0, with the network, before the fourth review: `logs/run-preliminary-4.log`, `logs/store-counts-4.log` and `out/replay-preliminary-4.json` (the same counts as the fifth; snapshot 01:59:14Z, 50,753,705 bytes).
 
 **The third one**, at 9ed5466, without the network: `logs/run-preliminary-3.log`, `logs/store-counts-3.log` and `out/replay-preliminary-3.json` (336 versions, all pending, 0 gaps).
 
@@ -182,4 +194,4 @@ All of these were changed as below.
 bash docs/bench/2026-10-29-shadow-replay/scripts/run.sh <node_modules volume> C:/dev/ludion-shadow-data/data <new snapshot dir> <new out.json>
 ```
 
-Add `NETWORK=1` when the report lists MAL- cases, so that the disputed check runs. Its cache is kept beside the output. The replay never overwrites an earlier output.
+A result can be final only with `NETWORK=1`. That asks OSV by package name, enumerates ranges, and runs the disputed check. Each networked run reads the network afresh, into `<out>.cache` beside its output, and refuses an existing one. The replay never overwrites an earlier output.

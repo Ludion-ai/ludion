@@ -33,7 +33,7 @@ Start: main 2cce104. Branch `lane/la-per-fix-apply`.
 
 All of them ran in Docker; nothing ran on the host. `scripts/test.sh` and `scripts/e2e.sh` use the volume ludion-la-w, and `scripts/mutate.sh` and `scripts/full.sh` use ludion-la-m, so a mutation never reaches an e2e build. The scripts are in `scripts/` and the output is in `logs/`. The logs were made from the working tree of the commit that last changed them (/w has no .git, so they cannot name it); the reviews re-ran `scripts/test.sh` at their heads.
 
-- `scripts/test.sh` (image ludion-l9-node24-git): `tsc -p tsconfig.json` exits 0, and `vitest run --project node packages/cli/test` gives 16 files, 692 passed and 19 skipped.
-- `scripts/full.sh` runs CI's checks except Playwright, against a stand-in repository: `npm run typecheck` 0, `npm run build` 0, and `npm test` with 28 files, 927 passed and 19 skipped (`logs/full.log`).
+- `scripts/test.sh` (image ludion-l9-node24-git): `tsc -p tsconfig.json` exits 0, and `vitest run --project node packages/cli/test` gives 16 files, 650 passed and 19 skipped.
+- `scripts/full.sh` runs CI's checks except Playwright, against a stand-in repository: `npm run typecheck` 0, `npm run build` 0, and `npm test` with 28 files, 885 passed and 19 skipped (`logs/full.log`).
 - `scripts/mutate.mjs`: 34 of 34 mutations are caught, and the three test files pass without them (`logs/mutate.log`).
 - `scripts/e2e.sh` (image ludion-la-runner, `scripts/runner.Dockerfile`): the built CLI runs `patch --apply` twice on copies of examples/*-security, each committed in a repository of its own. The CLI reaches Docker through the mounted socket, and the sandbox runs the tests. Results are in `logs/e2e.log` and in docs/progress/2026-10-29-la-per-fix-apply.md.

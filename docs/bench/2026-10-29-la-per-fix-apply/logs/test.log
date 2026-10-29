@@ -1,4 +1,4 @@
-# started 2026-10-29T14:02:01Z, node v24.22.1, git version 2.39.5
+# started 2026-10-29T14:02:57Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 == npx tsc -p tsconfig.json
 tsc exit 0
@@ -6,35 +6,32 @@ tsc exit 0
 
  RUN  v4.1.12 /w
 
- ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 72ms
- ✓ |node| packages/cli/test/judge.test.ts (63 tests) 109ms
- ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 102ms
- ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 211ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (1 test) 19ms
+ ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 69ms
+ ✓ |node| packages/cli/test/judge.test.ts (66 tests) 99ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 43ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 136ms
  ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 7ms
- ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 301ms
- ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 231ms
- ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 407ms
- ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 623ms
-     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  543ms
- ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 837ms
-     ✓ parseRequirements: a run of backslash continuations  352ms
- ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 967ms
- ✓ |node| packages/cli/test/production.test.ts (47 tests) 1447ms
-     ✓ collects what an image holds by name, and seeds held copies, in linear time  817ms
- ✓ |node| packages/cli/test/security.test.ts (39 tests) 1688ms
- ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2342ms
-     ✓ duplicate members count once toward the 1,000  643ms
-     ✓ more than 1,000 literal members are read no further, and say so  1146ms
- ✓ |node| packages/cli/test/branch.test.ts (21 tests) 2428ms
-     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  412ms
- ✓ |node| packages/cli/test/dependencies.test.ts (72 tests) 2559ms
-     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  306ms
-     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  425ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 211ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 176ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 352ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 488ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  422ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 687ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 819ms
+ ✓ |node| packages/cli/test/security.test.ts (39 tests) 1439ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 1981ms
+     ✓ duplicate members count once toward the 1,000  554ms
+     ✓ more than 1,000 literal members are read no further, and say so  978ms
+ ✓ |node| packages/cli/test/branch.test.ts (21 tests) 2060ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  379ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (72 tests) 2149ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  345ms
 
  Test Files  16 passed (16)
-      Tests  693 passed | 19 skipped (712)
-   Start at  14:02:09
-   Duration  3.19s (transform 2.81s, setup 0ms, import 5.01s, tests 14.33s, environment 2ms)
+      Tests  650 passed | 19 skipped (669)
+   Start at  14:03:05
+   Duration  2.74s (transform 3.08s, setup 0ms, import 4.94s, tests 10.74s, environment 1ms)
 
 vitest exit 0
-# finished 2026-10-29T14:02:13Z
+# finished 2026-10-29T14:03:07Z

@@ -1,0 +1,19 @@
+# started 2026-10-29T00:54:29Z, node v24.22.1, git version 2.39.5, HEAD 1336380101874acbbad1195761f523f8c9885886
+stand-in repository: 799 files
+== npx vitest run --project node apps/site/test/knowledge.test.ts packages/cli/test/action.test.ts
+vitest exit 0
+ ✓ |node| apps/site/test/knowledge.test.ts (5 tests) 5ms
+ ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 32ms
+
+ Test Files  2 passed (2)
+      Tests  13 passed | 6 skipped (19)
+   Start at  00:54:30
+   Duration  314ms (transform 60ms, setup 0ms, import 121ms, tests 37ms, environment 0ms)
+
+== npm run build
+build exit 0
+
+00:54:31 [build] ✓ Completed in 359ms.
+00:54:31 [build] 3 page(s) built in 403ms
+00:54:31 [build] Complete!
+# finished 2026-10-29T00:54:31Z

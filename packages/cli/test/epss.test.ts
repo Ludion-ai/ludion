@@ -24,7 +24,7 @@ function first(day: () => Response | Promise<Response> = () => new Response(gzip
 describe("EPSS, from FIRST's whole daily list", () => {
   it("looks the CVE ids up in the list it downloaded, and sends none of them", async () => {
     const { fetchFn, seen } = first();
-    const scores = await epssScores(["CVE-2026-12345", "CVE-2026-1"], fetchFn);
+    const scores = await epssScores(["CVE-2026-12345", "CVE-2026-10001"], fetchFn);
     expect([...scores]).toEqual([["CVE-2026-12345", 0.27183]]);
     expect(seen.map(s => s.url)).toEqual([EPSS_LIST, DAY]);
     expect(seen.every(s => s.redirect === "manual" && s.body === "")).toBe(true);
@@ -65,6 +65,7 @@ describe("EPSS, from FIRST's whole daily list", () => {
 
   const stops: [string, () => ReturnType<typeof first>, RegExp][] = [
     ["FIRST answers an error", () => first(() => new Response("busy", { status: 503 })), /HTTP 503/],
+    ["FIRST answers with part of the list", () => first(() => new Response(gzipSync(LIST), { status: 206 })), /HTTP 206/],
     ["the fixed URL answers an error", () => ({ fetchFn: (async () => new Response("gone", { status: 404 })) as unknown as typeof fetch, seen: [] }), /HTTP 404/],
     ["the redirect goes to another host", () => first(undefined, "https://example.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
     ["the redirect goes to plain http", () => first(undefined, "http://epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
@@ -72,7 +73,7 @@ describe("EPSS, from FIRST's whole daily list", () => {
     ["the redirect carries a query", () => first(undefined, "epss_scores-2026-10-29.csv.gz?x=1"), /redirected/],
     ["the redirect carries a fragment", () => first(undefined, "epss_scores-2026-10-29.csv.gz#x"), /redirected/],
     ["the redirect carries a user name", () => first(undefined, "https://u@epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
-    ["the redirect carries a password", () => first(undefined, "https://u:p@epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
+    ["the redirect carries a password", () => first(undefined, "https://:p@epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
     ["the redirect goes to another port", () => first(undefined, "https://epss.empiricalsecurity.com:8443/epss_scores-2026-10-29.csv.gz"), /redirected/],
     ["the redirect has no location", () => ({ fetchFn: (async () => new Response(null, { status: 302 })) as unknown as typeof fetch, seen: [] }), /redirected/],
     ["the day's file redirects again", () => first(() => new Response(null, { status: 302, headers: { location: "epss_scores-2026-10-28.csv.gz" } })), /HTTP 302/],
@@ -80,13 +81,15 @@ describe("EPSS, from FIRST's whole daily list", () => {
     ["the gzip is cut short", () => first(() => new Response(gzipSync(LIST).subarray(0, 40))), /could not be expanded/],
     ["the header is missing", () => first(() => new Response(gzipSync("CVE-1999-0001,0.04753,0.9186\n"))), /header/],
     ["the list is only a header", () => first(() => new Response(gzipSync("cve,epss,percentile\n"))), /no scores/],
-    ["a score is not a number", () => first(() => new Response(gzipSync(LIST + "CVE-2026-1,high,0.5\n"))), /line 6/],
-    ["a score is above 1", () => first(() => new Response(gzipSync(LIST + "CVE-2026-1,1.5,0.5\n"))), /line 6/],
-    ["a line has a fourth field", () => first(() => new Response(gzipSync(LIST + "CVE-2026-1,0.1,0.5,x\n"))), /line 6/],
-    ["a line has no percentile", () => first(() => new Response(gzipSync(LIST + "CVE-2026-1,0.1\n"))), /line 6/],
+    ["a score is not a number", () => first(() => new Response(gzipSync(LIST + "CVE-2026-10001,high,0.5\n"))), /line 6/],
+    ["a score is empty", () => first(() => new Response(gzipSync(LIST + "CVE-2026-10001,,0.5\n"))), /line 6/],
+    ["a score is negative", () => first(() => new Response(gzipSync(LIST + "CVE-2026-10001,-0.5,0.5\n"))), /line 6/],
+    ["a score is above 1", () => first(() => new Response(gzipSync(LIST + "CVE-2026-10001,1.5,0.5\n"))), /line 6/],
+    ["a line has a fourth field", () => first(() => new Response(gzipSync(LIST + "CVE-2026-10001,0.1,0.5,x\n"))), /line 6/],
+    ["a line has no percentile", () => first(() => new Response(gzipSync(LIST + "CVE-2026-10001,0.1\n"))), /line 6/],
     ["a line is not a CVE", () => first(() => new Response(gzipSync(LIST + "GHSA-aaaa-bbbb-cccc,0.1,0.5\n"))), /line 6/],
     ["a CVE is listed twice", () => first(() => new Response(gzipSync(LIST + "CVE-2026-12345,0.01,0.5\n"))), /line 6/],
-    ["a blank line is inside the list", () => first(() => new Response(gzipSync(LIST + "\nCVE-2026-1,0.1,0.5\n"))), /line 6/],
+    ["a blank line is inside the list", () => first(() => new Response(gzipSync(LIST + "\nCVE-2026-10001,0.1,0.5\n"))), /line 6/],
   ];
   for (const [what, make, message] of stops) it(`throws, so the judgement is undecidable, when ${what}`, async () => {
     await expect(epssScores(["CVE-2026-12345"], make().fetchFn)).rejects.toThrow(message);

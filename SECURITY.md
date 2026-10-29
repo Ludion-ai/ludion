@@ -1,6 +1,6 @@
 # Security policy
 
-Ludion decides whether a dependency update is safe to take, so a flaw in Ludion itself can let an unsafe update through. Please report one privately.
+Ludion is a security agent: it finds security fixes and puts them into projects automatically. A flaw in Ludion itself could put an unsafe update into a project, or let someone attack the projects it updates. Please report one privately.
 
 ## Reporting a vulnerability
 
@@ -10,32 +10,34 @@ Please do not open a public issue, pull request or discussion for a suspected vu
 
 A useful report says:
 
-- what is affected (the command, the GitHub Action, the site, or the published package and its version);
+- what is affected (the command, the GitHub Action, the site, and the commit you used);
 - how to reproduce it, with the smallest input you can find;
 - what happens and what you expected;
 - whether you believe it is being exploited.
 
 ## What happens next
 
-Ludion is maintained by a small team. We aim to acknowledge a report within 7 days and to agree on a disclosure date with you. When a fix is released, we publish a GitHub security advisory and credit you unless you ask us not to.
+Ludion is maintained by a small team. We aim to acknowledge a report within 7 days and to agree on a disclosure date with you. When it is fixed, we publish a GitHub security advisory and credit you unless you ask us not to.
 
 ## Supported versions
 
-| Version | Supported |
+Nothing of the security agent is released yet: it is not released until it is complete (CLAUDE.md, Goal).
+
+| What | Supported |
 | --- | --- |
-| 0.3.x previews | Yes |
-| 0.1.x | No |
+| The source on `main` (not released) | Yes |
+| `ludion-ai` 0.1.x on npm (the lesson tool, which ended on 2026-10-28) | No |
 
 ## Scope
 
 In scope:
 
-- the `ludion-ai` npm package and the CLI in `packages/cli`;
+- the CLI in `packages/cli` (`scan`, `patch`, `watch` and `judge`) and its sandbox in `packages/sandbox`;
 - the GitHub Action (`action.yml` and `action/`);
 - this repository's workflows;
 - the site at ludion.ai.
 
-Two kinds of finding count as vulnerabilities in Ludion: a judgement that passes an update it should have stopped, and an update to Ludion that could be used to attack its users.
+Two kinds of finding count as vulnerabilities in Ludion: a check that passes or applies an update it should have stopped, and a way to use Ludion, or an update to it, to attack the projects it updates.
 
 Out of scope:
 

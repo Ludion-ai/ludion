@@ -10,7 +10,7 @@ const states = strings[lang].home.guard.states;
   {states.map((state, i) => (
     <li class:list={["state", { open: i === 0 }]} data-guard-state={state.id}>
       <span class="gate" aria-hidden="true"></span>
-      <code>{state.id}</code>
+      <code lang="en">{state.id}</code>
       <p>{state.detail}</p>
     </li>
   ))}

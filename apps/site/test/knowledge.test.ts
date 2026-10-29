@@ -63,6 +63,10 @@ describe("the Japanese pages' claims", () => {
     expect(ja.start.notReleased).toContain("まだリリースしていません");
     expect(ja.start.coverage).toContain("関門3（ビルドとテスト）は実行しない");
     expect(ja.start.intro).toContain("何もマージしません");
+    // "Cannot be read on both sides": one side unreadable is enough, as for an added or removed workspace.
+    expect(ja.start.limits.body[0]).toContain("前と後のどちらかで読めないもの（ワークスペースを追加、削除、改名した場合など）は undecidable");
+    expect(ja.home.supported[1]!.scope).toContain("前と後のどちらかで読めないもの");
+    expect(JSON.stringify(ja)).not.toContain("両方で読めない");
   });
   it("says what the judge does not check, including gate 3 and a hijacked publisher", () => {
     expect(ja.home.receipt.notChecked).toHaveLength(7);

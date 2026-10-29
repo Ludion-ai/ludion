@@ -597,3 +597,30 @@ describe("fifth review fixes (PR #194)", () => {
     expect(report.mal.versions).toBe(1);
   });
 });
+
+describe("sixth review fixes (PR #194)", () => {
+  it("makes a version the recorder gave up on a capture gap, whatever its partial capture holds", () => {
+    const w = new World().publish("left-pad", "1.0.1", 1);
+    expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.every(x => x.outcome === "missed")).toBe(true);
+    w.captures.push({ type: "gave_up", name: "left-pad", version: "1.0.1", fetched_at: at(3), tries: 1, reason: "removed before its capture was complete" });
+    const r = judgeVersion(ctxOf(w), "left-pad", "1.0.1", false);
+    expect(r.rows.every(x => x.outcome === "capture_gap" && /gave up/.test(x.gap!))).toBe(true);
+  });
+  it("does not let a capture after V's publish + 336h keep a permanent gap pending", () => {
+    const w = new World(900).publish("left-pad", "1.0.1", 1, { attested: true }, "fail");
+    w.publish("left-pad", "1.0.2", 500);
+    const r = judgeVersion(ctxOf(w, T0 + 400 * HOUR), "left-pad", "1.0.1", false);
+    expect(r.rows.map(x => x.outcome)).toEqual(["capture_gap", "capture_gap", "capture_gap", "capture_gap"]);
+  });
+  it("expands a range record with no publish time over the registry's versions", async () => {
+    const w = new World(400).publish("left-pad", "1.0.1", 1);
+    w.osv.push({ type: "osv", id: "MAL-rng", modified: at(100), fetched_at: at(101), sha256: "rng", record: { id: "MAL-rng", modified: at(100), affected: [{ package: { ecosystem: "npm", name: "left-pad" }, ranges: [{ type: "SEMVER", events: [{ introduced: "1.0.1" }] }] }] } });
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...sources({}), registryTime: async () => ({ "1.0.1": at(1), "1.0.5": at(50) }) } });
+    expect(report.mal.cases.map(c => c.version).sort()).toEqual(["1.0.1", "1.0.5"]);
+  });
+  it("does not stop a version at the re-query on a range it cannot place", () => {
+    const w = new World().publish("left-pad", "1.0.1", 1);
+    w.osv.push({ type: "osv", id: "MAL-odd", modified: at(10), fetched_at: at(11), sha256: "odd", record: { id: "MAL-odd", published: at(10), modified: at(10), affected: [{ package: { ecosystem: "npm", name: "left-pad" }, ranges: [{ type: "ECOSYSTEM", events: [{ introduced: "not-a-version" }] }] }] } });
+    expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.map(x => x.outcome)).toEqual(["missed", "missed", "missed", "missed"]);
+  });
+});

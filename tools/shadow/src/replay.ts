@@ -180,6 +180,18 @@ export function osvRetrying(store: Store): string[] {
 }
 const withdrawnBy = (r: Rec, t: number) => Number.isFinite(ms(r.withdrawn)) && ms(r.withdrawn) <= t;
 /**
+ * Does a record name the version in a way it can place: in its `versions`, or within a range whose every event is a
+ * version? archives-v5's `names` also counts a range it cannot place, which is the stricter side for the denominator;
+ * at a judgement that would stop the version, the laxer side, so the re-query uses this.
+ */
+export function namesPlaced(r: Rec, name: string, version: string): boolean {
+  if (!names(r, name, version)) return false;
+  const mine = (r.affected ?? []).filter((a: any) => a?.package?.ecosystem === "npm" && a.package.name === name);
+  if (mine.some((a: any) => Array.isArray(a.versions) && a.versions.includes(version))) return true;
+  const at = (e: any) => e?.introduced ?? e?.fixed ?? e?.last_affected ?? e?.limit;
+  return !!semver.valid(version) && mine.flatMap((a: any) => a.ranges ?? []).every((x: any) => (Array.isArray(x?.events) ? x.events : []).every((e: any) => at(e) === "0" || semver.valid(at(e))));
+}
+/**
  * Ids of MAL- records naming name@version at `t` (the re-query at the wait's end): each record as its latest stored copy
  * modified by `t` says, published by `t` and not withdrawn by then. A record with no stored copy modified by `t` is not
  * known to have named it then, so it does not stop it (the stricter side: a miss).
@@ -190,7 +202,7 @@ export function malNaming(store: Store, name: string, version: string, t: number
     if (!id.startsWith("MAL-")) continue;
     let r: Rec | undefined, at = -Infinity;
     for (const c of copies) { const m = ms(c.record?.modified ?? c.modified); if (m <= t && m >= at) { r = c.record; at = m; } }
-    if (r && ms(r.published) <= t && !withdrawnBy(r, t) && names(r, name, version)) out.push(id);
+    if (r && ms(r.published) <= t && !withdrawnBy(r, t) && namesPlaced(r, name, version)) out.push(id);
   }
   return out.sort();
 }
@@ -345,12 +357,15 @@ function* seedsOf(ctx: Ctx, name: string, version: string): Generator<number> {
   const own = ctx.store.versions.get(`${name}@${version}`) ?? [];
   const first = own[0]!.fetched_at;
   const deps = new Set(own.flatMap(c => c.dependencies));
+  // A capture later than V's publish + 336h (the longest wait) is after every wait_until: it cannot complete a judgement.
+  const published = ms(allVersions(ctx.store, name).get(version));
+  const last336 = Number.isFinite(published) ? published + LATE_RECORD_MS : Infinity;
   const times = [
     ...own.map(c => c.fetched_at),
     ...(ctx.store.timeline.get(name) ?? []).map(r => r.at as number),
     ...(captureTimesByName(ctx.store).get(name) ?? []),
     ...[...deps].flatMap(d => (ctx.store.created.get(d) ?? []).map(c => c.fetched_at)),
-  ].filter(t => t >= first).sort((a, b) => a - b);
+  ].filter(t => t >= first && t <= last336).sort((a, b) => a - b);
   let last = -Infinity;
   for (const t of times) { const end = pollEndAfter(ctx, t); if (end > last) { last = end; yield end; } }
 }
@@ -361,9 +376,13 @@ function* seedsOf(ctx: Ctx, name: string, version: string): Generator<number> {
  */
 export function judgeRow(ctx: Ctx, name: string, version: string, prev: string | null, row: Urgency | null, scenario: Scenario): RowResult {
   const base: RowResult = { scenario, row, prev, outcome: "capture_gap" };
+  // Section 9: a version the recorder gave up on (a read kept failing, or it was removed before its capture was
+  // complete) is a capture gap, whatever its partial capture holds.
+  const gaveUp = ctx.store.gaveUp.find(g => g.name === name && g.version === version);
+  if (gaveUp) return { ...base, gap: `the recorder gave up on ${name}@${version}: ${String(gaveUp.reason ?? "")}` };
   const captures = ctx.store.versions.get(`${name}@${version}`) ?? [];
   if (!captures.length) return { ...base, gap: `${name}@${version} was never captured (removed before its first capture, or lost in a gap)` };
-  let input: ReturnType<typeof inputAt> = { gap: "" }, seed = NaN;
+  let input: ReturnType<typeof inputAt> = { gap: "no capture of its inputs within its publish time + 336h" }, seed = NaN;
   for (const s of seedsOf(ctx, name, version)) {
     // Past the store's coverage, a later poll may still complete the inputs: pending, not a gap.
     if (s > ctx.coverage) return { ...base, outcome: "pending", gap: "inputs not complete within the store's coverage" };
@@ -517,7 +536,7 @@ export async function replay(input: { store: Store; watched: Record<string, stri
       const name = a?.package?.ecosystem === "npm" ? a.package.name : null;
       if (typeof name !== "string" || !watchedNames.has(name)) continue;
       const candidates = new Set<string>([...(Array.isArray(a.versions) ? a.versions.filter((v: unknown) => typeof v === "string") : []), ...allVersions(store, name).keys()]);
-      if ((a.ranges ?? []).some((x: any) => x?.type === "SEMVER" || x?.type === "ECOSYSTEM") && ms(r.published) <= end + LATE_RECORD_MS) {
+      if ((a.ranges ?? []).some((x: any) => x?.type === "SEMVER" || x?.type === "ECOSYSTEM") && !(ms(r.published) > end + LATE_RECORD_MS)) {
         const time = input.sources ? await registryTime(name) : "unreadable";
         if (time === "unreadable") rangesNotRead.add(`${r.id} (${name})`);
         else for (const v of Object.keys(time)) if (semver.valid(v)) candidates.add(v);

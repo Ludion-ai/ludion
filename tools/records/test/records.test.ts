@@ -76,7 +76,7 @@ describe("the rule on deleted files", () => {
   const pattern = /^\s+REMOVED: '([^']+)'$/m.exec(workflow)?.[1] ?? "";
 
   it("names the same places in protected-paths.yml, CLAUDE.md and docs/protected-paths.md", () => {
-    const sentence = /A PR that deletes (.+?) is a protected PR/.exec(read("CLAUDE.md"))?.[1] ?? "";
+    const sentence = /A PR that deletes(.+?) is a protected PR/.exec(read("CLAUDE.md"))?.[1] ?? "";
     const named = (sentence.match(/[a-z][a-z0-9._*-]*(?:\/[a-z0-9._*-]+)*\/|action\.yml/g) ?? []).sort();
     expect(places(pattern)).toEqual(["action.yml", "action/", "apps/site/src/pages/", "docs/decisions/", "docs/mistakes/", "packages/*/src/"]);
     expect(named).toEqual(places(pattern));

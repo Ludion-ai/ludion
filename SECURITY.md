@@ -21,12 +21,12 @@ Ludion is maintained by a small team. We aim to acknowledge a report within 7 da
 
 ## Supported versions
 
-Nothing of the security agent is released yet: it is not released until it is complete (CLAUDE.md, Goal).
+Nothing of the security agent is released yet: it is not released until it is complete (README.md, and CLAUDE.md's Goal).
 
 | What | Supported |
 | --- | --- |
 | The source on `main` (not released) | Yes |
-| `ludion-ai` 0.0.1 and 0.1.x on npm (the lesson tool, which ended on 2026-10-28) | No |
+| `ludion-ai` 0.0.1 and 0.1.x on npm (earlier products; 0.1.x is the lesson tool, which ended on 2026-10-28) | No |
 
 ## Scope
 

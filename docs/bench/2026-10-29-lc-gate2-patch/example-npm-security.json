@@ -1,7 +1,7 @@
 {
   "scan": {
     "schema": 1,
-    "checked_at": "2026-10-29T10:54:45.954Z",
+    "checked_at": "2026-10-29T13:51:39.816Z",
     "source": "https://osv.dev",
     "sources": [
       "https://osv.dev"
@@ -562,8 +562,8 @@
                 }
               ],
               "database_specific": {
-                "last_known_affected_version_range": "<= 4.17.23",
-                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json"
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json",
+                "last_known_affected_version_range": "<= 4.17.23"
               }
             },
             {
@@ -724,17 +724,17 @@
   },
   "receipt": {
     "schema": 1,
-    "id": "e6ba68fb-0385-4db4-ad5c-86b9f95f2c4e",
+    "id": "0a7331a2-20bc-49af-8665-1f12546c2c80",
     "ecosystem": "npm",
     "scope": "dependency_files_only_not_deployed",
-    "started_at": "2026-10-29T10:54:45.957Z",
-    "finished_at": "2026-10-29T10:54:54.181Z",
+    "started_at": "2026-10-29T13:51:39.818Z",
+    "finished_at": "2026-10-29T13:51:49.361Z",
     "outcome": "failed",
     "tree_hash": "8a2dfdf5dc22e028e82eda9fdcc53a2478d52c21359814eb1067edc2f2655643",
     "config_hash": "e55273c15c74bb619a5e25ad12cd33b9fcb9fc7d18bc9586885a06d58d0be2ca",
     "before": {
       "schema": 1,
-      "checked_at": "2026-10-29T10:54:45.954Z",
+      "checked_at": "2026-10-29T13:51:39.816Z",
       "source": "https://osv.dev",
       "sources": [
         "https://osv.dev"
@@ -1295,8 +1295,8 @@
                   }
                 ],
                 "database_specific": {
-                  "last_known_affected_version_range": "<= 4.17.23",
-                  "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json"
+                  "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json",
+                  "last_known_affected_version_range": "<= 4.17.23"
                 }
               },
               {
@@ -1457,7 +1457,7 @@
     },
     "after": null,
     "tool_image": "node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c",
-    "baseline_image": "sha256:2e4c6ba8c50c8ad17c655f86cee38c54d9918f7485da66cc945698cf0491f534",
+    "baseline_image": "sha256:b69664fb2624387f00ee42c7b94f4ae13196a63aba23fb96af0ae2797ac77033",
     "candidate_image": null,
     "baseline_passed": true,
     "candidate_passed": false,
@@ -1491,7 +1491,7 @@
     },
     "judgement": {
       "schema": 1,
-      "judged_at": "2026-10-29T10:54:50.804Z",
+      "judged_at": "2026-10-29T13:51:46.660Z",
       "verdict": "stop",
       "urgency": "high",
       "wait_hours": 72,
@@ -1575,7 +1575,7 @@
         {
           "gate": 1,
           "effect": "info",
-          "message": "No production/dev split in `ludion patch`: every changed version counts as production."
+          "message": "Every changed version counts as production, as in `ludion judge` (docs/decisions/2026-10-29-every-change-counts-as-production.md)."
         },
         {
           "gate": 2,
@@ -1592,7 +1592,7 @@
       ],
       "exposure": {
         "fix_published_at": "2026-03-31T18:18:42.717Z",
-        "detected_at": "2026-10-29T10:54:50.804Z"
+        "detected_at": "2026-10-29T13:51:46.660Z"
       },
       "time_cap": {
         "t": "2026-03-31T18:18:42.717Z",
@@ -1608,7 +1608,7 @@
       "not_checked": [
         "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
         "Obfuscated code and new network or process calls in the changed code are not inspected.",
-        "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used (docs/decisions.md, \"Gate 1's production/dev split, rebuilt\").",
+        "Gate 1's OS, SAPI and configuration conditions are not matched, and production and dev-only dependencies are not told apart: every changed version counts as production.",
         "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
         "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
         "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
@@ -1617,5 +1617,5 @@
     },
     "reason": "The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead."
   },
-  "path": "/tmp/ex/.ludion/security/e6ba68fb-0385-4db4-ad5c-86b9f95f2c4e.json"
+  "path": "/tmp/ex/.ludion/security/0a7331a2-20bc-49af-8665-1f12546c2c80.json"
 }

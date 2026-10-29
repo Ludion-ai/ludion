@@ -330,17 +330,6 @@ export function manifestChanges(before: unknown, after: unknown): string[] {
   return out;
 }
 
-/** Which production/dev split was used (production.ts): with or without the whole source tree, and images holding devDependencies. */
-export type SplitSummary = { source: "read" | "not_given" | "incomplete" | "pnpm"; incomplete: string | null; images_with_dev: string[] };
-const D1_ONLY = "so only test runners, linters, formatters and @types packages, and what only they reach, count as dev-only";
-function splitMessage(s: SplitSummary): string {
-  if (s.source === "pnpm") return "No production/dev split for pnpm-lock.yaml: --source is not read, and every changed version counts as production.";
-  if (s.source === "not_given") return `Production/dev split without the source tree (no --source), ${D1_ONLY}.`;
-  if (s.source === "incomplete") return `Production/dev split: the source tree could not be read completely (${s.incomplete ?? "unknown"}), ${D1_ONLY}.`;
-  if (s.images_with_dev.length) return `Production/dev split: the final stage of ${s.images_with_dev.join(", ")} holds devDependencies, ${D1_ONLY}.`;
-  return "Production/dev split from the lockfile and the source tree: a dev copy counts as dev-only only when the source does not import it, no build tool names or runs it, and no production command uses it.";
-}
-
 /** Urgency of the change: from the advisories it fixes, and whether any fixed package is used in production. */
 export function urgencyOf(fixes: FixedAdvisory[], changes: Change[], epssHigh = 0.1): Urgency {
   // Every fix counts here, not only the change's own (ownFixes): a dependent that moves off the vulnerable version in
@@ -386,8 +375,6 @@ export function judge(input: {
   created?: Map<string, string | null>;
   /** pnpm-lock.yaml changes are read as name@version sets: gate 4's per-entry checks are not implemented for them. */
   lockfile?: "package-lock" | "pnpm-lock";
-  /** How the changes' `dev` was decided (production.ts), shown in the comment. */
-  split?: SplitSummary;
   /** Skipped extraneous lockfile folders (lockExtraneous) that are added, removed or changed. */
   extraneous?: string[];
   /**
@@ -400,7 +387,6 @@ export function judge(input: {
   const findings: Finding[] = [];
   const add = (finding: Finding) => findings.push(finding);
   const urgency = urgencyOf(fixes, changes);
-  if (input.split) add({ gate: 1, effect: "info", message: splitMessage(input.split) });
   let undecidable = false;
   for (const error of input.errors ?? []) { add({ gate: 2, effect: "stop", message: `A lookup failed: ${error.slice(0, 300)}` }); undecidable = true; }
   if (!changes.length && !(input.links ?? []).length) {
@@ -530,7 +516,7 @@ export function judge(input: {
     not_checked: [
       "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
       "Obfuscated code and new network or process calls in the changed code are not inspected.",
-      "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used (docs/decisions.md, \"Gate 1's production/dev split, rebuilt\").",
+      "Gate 1's OS, SAPI and configuration conditions are not matched, and production and dev-only dependencies are not told apart: every changed version counts as production.",
       "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
       "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
       "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",

@@ -1,6 +1,6 @@
 # Security policy
 
-Ludion is a security agent: it finds security fixes and puts them into projects automatically. A flaw in Ludion itself could put an unsafe update into a project, or let someone attack the projects it updates. Please report one privately.
+Ludion is being built as a security agent that finds security fixes and puts them into projects automatically; today it is an unreleased source preview (docs/status.md says what is built). A flaw in Ludion itself could put an unsafe update into a project, or let someone attack the projects it updates. Please report one privately.
 
 ## Reporting a vulnerability
 
@@ -17,7 +17,7 @@ A useful report says:
 
 ## What happens next
 
-Ludion is maintained by a small team. We aim to acknowledge a report within 7 days and to agree on a disclosure date with you. When it is fixed, we publish a GitHub security advisory and credit you unless you ask us not to.
+Ludion is maintained by a small team. We aim to acknowledge a report within 7 days and to agree on a disclosure date with you. When it is fixed, we normally publish a GitHub security advisory and credit you unless you ask us not to.
 
 ## Supported versions
 
@@ -26,18 +26,18 @@ Nothing of the security agent is released yet: it is not released until it is co
 | What | Supported |
 | --- | --- |
 | The source on `main` (not released) | Yes |
-| `ludion-ai` 0.1.x on npm (the lesson tool, which ended on 2026-10-28) | No |
+| `ludion-ai` 0.0.1 and 0.1.x on npm (the lesson tool, which ended on 2026-10-28) | No |
 
 ## Scope
 
 In scope:
 
-- the CLI in `packages/cli` (`scan`, `patch`, `watch` and `judge`) and its sandbox in `packages/sandbox`;
+- the CLI in `packages/cli` (`init`, `scan`, `patch`, `watch` and `judge`) and its sandbox in `packages/sandbox`;
 - the GitHub Action (`action.yml` and `action/`);
 - this repository's workflows;
 - the site at ludion.ai.
 
-Two kinds of finding count as vulnerabilities in Ludion: a check that passes or applies an update it should have stopped, and a way to use Ludion, or an update to it, to attack the projects it updates.
+Anything in scope that weakens its security counts, in particular a check that passes or applies an update it should have stopped, a way to use Ludion, or an update to it, to attack the projects it updates, and Ludion sending more about a project than docs/status.md says it sends.
 
 Out of scope:
 

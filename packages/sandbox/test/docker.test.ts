@@ -1,9 +1,10 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
-import { existsSync, readdirSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { isAbsolute, relative } from "node:path";
-import { dockerCwd, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
+import { isAbsolute, join, relative } from "node:path";
+import { afterAll, beforeAll } from "vitest";
+import { dockerCwd, findDocker, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
 
 // The module takes no spawn parameter (a caller could otherwise rewrite the argv), so tests replace node's spawn.
 const current = vi.hoisted(() => ({ spawn: undefined as unknown as (cmd: string, args: readonly string[], options: unknown) => unknown }));
@@ -24,15 +25,22 @@ function fakeChild(): FakeChild {
   return child;
 }
 function fakeSpawn(onSpawn: (args: readonly string[], child: FakeChild) => void = () => {}) {
-  const calls: { args: readonly string[]; options: unknown; child: FakeChild }[] = [];
-  current.spawn = (_cmd, args, options) => {
+  const calls: { cmd: string; args: readonly string[]; options: unknown; child: FakeChild }[] = [];
+  current.spawn = (cmd, args, options) => {
     const child = fakeChild();
-    calls.push({ args, options, child });
+    calls.push({ cmd, args, options, child });
     onSpawn(args, child);
     return child;
   };
   return { calls };
 }
+
+// A docker for findDocker to find, in an absolute PATH folder outside the working directory; spawn itself is faked.
+const bin = mkdtempSync(join(tmpdir(), "ludion-bin-"));
+const DOCKER = join(bin, process.platform === "win32" ? "docker.exe" : "docker");
+const savedPath = process.env.PATH;
+beforeAll(() => { writeFileSync(DOCKER, ""); chmodSync(DOCKER, 0o755); process.env.PATH = bin; });
+afterAll(() => { process.env.PATH = savedPath; rmSync(bin, { recursive: true, force: true }); });
 
 describe("security test container arguments", () => {
   it("are the fixed hardened argv, with the test argv only after the image", () => {
@@ -143,11 +151,39 @@ describe("security test container runner", () => {
     calls[1]!.child.emit("close", 137);
     await pending;
     expect(calls.map(c => c.args[0])).toEqual(["image", "run", "kill"]);
+    expect(new Set(calls.map(c => c.cmd))).toEqual(new Set([DOCKER]));
     const dirs = calls.map(c => (c.options as { cwd?: string }).cwd);
     expect(new Set(dirs)).toEqual(new Set([dockerCwd()]));
     const dir = dockerCwd();
     expect(isAbsolute(dir) && !relative(tmpdir(), dir).startsWith("..")).toBe(true);
     expect(dir).not.toBe(process.cwd());
     expect(existsSync(dir) && readdirSync(dir)).toEqual([]);
+  });
+  it("start nothing when no docker is found outside the working directory and node_modules", async () => {
+    const { calls } = fakeSpawn();
+    process.env.PATH = join(bin, "node_modules", ".bin");
+    try {
+      await expect(runDockerImageCommand(["image", "inspect", "x"], 1_000)).rejects.toThrow("Docker unavailable: docker was not found");
+      await expect(runContainer("x", IMAGE, ["php"], 1_000)).resolves.toEqual({ kind: "spawn_error", message: expect.stringContaining("docker was not found") });
+      expect(calls).toHaveLength(0);
+    } finally { process.env.PATH = bin; }
+  });
+});
+
+describe("findDocker", () => {
+  const root = mkdtempSync(join(tmpdir(), "ludion-find-"));
+  const folder = (name: string) => { const dir = join(root, name); mkdirSync(dir, { recursive: true }); return dir; };
+  const docker = (dir: string, mode = 0o755) => { const file = join(dir, "docker"); writeFileSync(file, ""); chmodSync(file, mode); return file; };
+  afterAll(() => rmSync(root, { recursive: true, force: true }));
+  it.skipIf(process.platform === "win32")("takes the first absolute PATH folder with an executable docker, skipping empty and relative entries, the working directory, node_modules folders and files that cannot run", () => {
+    const project = folder("project"), bins = docker(folder("project/node_modules/.bin")), plain = docker(folder("plain"), 0o644), good = folder("good"), later = folder("later");
+    docker(project); docker(later);
+    const found = docker(good);
+    expect(findDocker(["", "relative/bin", project, join(project, "node_modules", ".bin"), join(root, "plain"), good, later].join(":"), project)).toBe(found);
+    expect(findDocker(["", "relative/bin", project, join(project, "node_modules", ".bin"), join(root, "plain")].join(":"), project)).toBeNull();
+    expect([bins, plain].every(f => existsSync(f))).toBe(true);
+  });
+  it("on Windows, skips the working directory and node_modules folders whatever their case, and a quoted relative entry", () => {
+    expect(findDocker('C:\\Project;C:\\Project\\NODE_MODULES\\.bin;"relative"', "c:\\project", "win32")).toBeNull();
   });
 });

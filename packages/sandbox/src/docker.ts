@@ -3,9 +3,9 @@
 // no network, read-only root, no capabilities, the nobody user, resource limits, no host mounts or forwarded environment.
 // This package is a protected path (docs/protected-paths.md): the sandbox flags change only with an independent review.
 import { spawn, type ChildProcess } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { accessSync, constants, mkdtempSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { posix, resolve, win32 } from "node:path";
 
 export type ContainerOutcome =
   | { kind: "exited"; exitCode: number | null; stdout: string; stderr: string; timedOut: boolean }
@@ -26,16 +26,46 @@ let neutral: string | undefined;
  * Callers pass absolute paths (build contexts are temporary folders), so nothing depends on the working directory.
  */
 export function dockerCwd(): string {
-  return (neutral ??= mkdtempSync(join(tmpdir(), "ludion-docker-")));
+  return (neutral ??= mkdtempSync(resolve(tmpdir(), "ludion-docker-")));
 }
+
+/**
+ * The docker program, by absolute path, from PATH's folders: only absolute ones, not the working directory itself and
+ * not any folder with a node_modules segment (npx, npm exec and package scripts put a project's node_modules/.bin
+ * first). So a project cannot choose which docker runs. Null when none is found. A PATH folder the user named inside a
+ * project is the user's own choice and is not refused.
+ */
+export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), platform: NodeJS.Platform = process.platform): string | null {
+  const win = platform === "win32", P = win ? win32 : posix;
+  const same = (a: string, b: string) => win ? a.toLowerCase() === b.toLowerCase() : a === b;
+  const here = P.resolve(cwd);
+  for (const raw of path.split(win ? ";" : ":")) {
+    const dir = raw.trim().replace(/^"(.*)"$/, "$1");
+    if (!dir || !P.isAbsolute(dir)) continue;
+    const full = P.resolve(dir);
+    if (same(full, here) || full.split(/[\\/]/).some(part => same(part, "node_modules"))) continue;
+    for (const name of win ? ["docker.exe", "docker.com"] : ["docker"]) {
+      const candidate = P.join(full, name);
+      try {
+        if (!statSync(candidate).isFile()) continue;
+        if (!win) accessSync(candidate, constants.X_OK);
+        return candidate;
+      } catch { /* not here */ }
+    }
+  }
+  return null;
+}
+const NOT_FOUND = "docker was not found in PATH's absolute folders (the working directory and node_modules folders are skipped).";
 
 /** Image retrieval/build/inspection only. Containers run only through runContainer. */
 export function runDockerImageCommand(args: string[], timeoutMs: number): Promise<string> {
   if (!["pull", "build", "image"].includes(args[0] ?? "") || (args[0] === "image" && !["inspect", "rm"].includes(args[1] ?? ""))) {
     return Promise.reject(new Error("Only Docker image retrieval, build, inspect and cleanup are allowed here."));
   }
+  const program = findDocker();
+  if (!program) return Promise.reject(new Error(`Docker unavailable: ${NOT_FOUND}`));
   return new Promise((resolve, reject) => {
-    const child = spawn("docker", args, { cwd: dockerCwd(), windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(program, args, { cwd: dockerCwd(), windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     let output = "", error = "", timeout = false;
     const timer = setTimeout(() => { timeout = true; child.kill(); }, timeoutMs);
     child.stdout.on("data", chunk => { output = (output + String(chunk)).slice(-16_384); });
@@ -72,10 +102,12 @@ export function runArgs(name: string, image: string, command: readonly string[],
  */
 export function runContainer(name: string, image: string, command: readonly string[], timeoutMs: number, tool?: Tool): Promise<ContainerOutcome> {
   const args = runArgs(name, image, command, tool);
+  const program = findDocker();
+  if (!program) return Promise.resolve({ kind: "spawn_error", message: NOT_FOUND });
   return new Promise(resolve => {
     let child: ChildProcess;
     try {
-      child = spawn("docker", args, { cwd: dockerCwd(), stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+      child = spawn(program, args, { cwd: dockerCwd(), stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
     } catch (err) {
       resolve({ kind: "spawn_error", message: err instanceof Error && err.message ? err.message : String(err) });
       return;
@@ -84,7 +116,7 @@ export function runContainer(name: string, image: string, command: readonly stri
     let grace: ReturnType<typeof setTimeout> | undefined;
     const timer = setTimeout(() => {
       timedOut = true;
-      try { spawn("docker", ["kill", name], { cwd: dockerCwd(), stdio: "ignore", windowsHide: true }).on("error", () => {}); } catch { /* the grace kill below still runs */ }
+      try { spawn(program, ["kill", name], { cwd: dockerCwd(), stdio: "ignore", windowsHide: true }).on("error", () => {}); } catch { /* the grace kill below still runs */ }
       grace = setTimeout(() => { try { child.kill(); } catch { /* already gone */ } }, GRACE_MS);
     }, timeoutMs);
     const finish = (result: ContainerOutcome) => {

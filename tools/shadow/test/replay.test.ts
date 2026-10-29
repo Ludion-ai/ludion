@@ -442,3 +442,11 @@ describe("review fixes (PR #194)", () => {
     expect(c).toMatchObject({ category: "confirmed", evidence: { step: "the recorder's file list differs from jsDelivr's" } });
   });
 });
+
+describe("the re-query's published rule", () => {
+  it("does not count a record published after the judgement, even if a copy says it was modified before", () => {
+    const w = new World().publish("left-pad", "1.0.1", 1);
+    w.osv.push({ type: "osv", id: "MAL-p", modified: at(10), fetched_at: at(11), sha256: "p", record: { id: "MAL-p", published: at(100), modified: at(10), affected: [{ package: { ecosystem: "npm", name: "left-pad" }, versions: ["1.0.1"] }] } });
+    expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.map(x => x.outcome)).toEqual(["missed", "missed", "missed", "stopped"]);
+  });
+});

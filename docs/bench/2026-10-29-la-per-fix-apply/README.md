@@ -1,0 +1,38 @@
+# LA — each fix validated and applied on its own (2026-10-29)
+
+docs/status.md, "Missing before complete", item 2. `ludion patch --apply` no longer writes every planned fix into the working tree at once. Each fix is validated alone against one baseline and, with `--apply`, committed on its own branch. Receipts carry `fix_published_at`, `found_at` and `applied_at`. Nothing opens a PR yet; that is the next stage (the scheduled Action).
+
+Start: main 2cce104. Branch `lane/la-per-fix-apply`.
+
+## What changed
+
+- **A fix.** Every planned change of one package (`fixesOf`), or PHP's one image update. Its candidate is the baseline with only that package moved: the manifests, `changedManifest`, `unplannedRemovals`, the time cap (`candidateTimeCap`, called with the fix's changes and otherwise untouched) and the compatibility check all see that fix's changes only.
+- **One baseline.** The baseline is built and tested once per run. Each candidate is acquired, checked, built and tested on its own.
+- **A failing fix stops no other.** Its receipt entry is `failed` with the reason, and the loop goes on. A run-level failure (the baseline's test, the tool image, the acquisition policy, an incomplete inventory, cancellation) fails every fix not yet decided, each with `Not validated: <reason>`.
+- **After the candidate.** The OSV re-scan must show no finding left on the fix's own package, and no package may have an advisory the baseline did not have on it. The comparison is by package and advisory, not version. Findings on other packages are other fixes. A package with a finding that has no supported fix (`scan.blocked`) does not get a fix branch.
+  - Why not by version: the first Maven run, with version-keyed findings, failed commons-text's fix. Alone, commons-text 1.10.0 brings commons-lang3 3.12.0, which has GHSA-j288-q9x7-2f5v, the same advisory the baseline's commons-lang3 3.11 had and the one commons-lang3's own fix removes. That run's reason was "Candidate still contains known advisory findings or incomplete inventory (org.apache.commons:commons-lang3@3.12.0 GHSA-j288-q9x7-2f5v); no source change was made." Its log was deleted before the final run and is not kept; the run with the final code is in `logs/e2e.log`.
+- **The branch** (`packages/cli/src/security/branch.ts`). Branch names are `ludion/<ecosystem>/<package>-<version>` and `ludion/php/<version>`; a project in a subfolder of its repository gets the folder in the name.
+  - Before any Docker work, `gitBase` checks that the validated copy of the project has exactly HEAD's files (differences in CRLF line ends alone are allowed). Files the snapshot leaves out, and the top-level names the application image's .dockerignore leaves out, are not compared.
+  - `fixBranch` makes one commit on that HEAD, with only the changed files replaced, using a temporary index. It creates the ref only if it does not exist. The working tree, the index and HEAD are not touched, and nothing is pushed.
+  - A fix whose branch exists is `skipped`: it is not validated again, and the branch is not changed. When every fix is skipped, no Docker work runs.
+- **Git runs only plumbing.** The commands are `rev-parse`, `ls-tree`, `read-tree`, `hash-object --no-filters`, `update-index --cacheinfo`, `write-tree`, `commit-tree --no-gpg-sign`, `update-ref` and `check-ref-format`. Every call sets `core.hooksPath` to an empty temporary folder, `core.fsmonitor=false`, `commit.gpgSign=false`, `core.splitIndex=false`, `gc.auto=0` and `maintenance.auto=false`. It drops every `GIT_*` variable from the environment and sets the author and committer to `Ludion <ludion@ludion.invalid>`. A project's Git configuration is data: none of its hooks, fsmonitor, signing program or filter drivers runs (branch.test.ts, with a control showing that plain Git does run the hook).
+- **Timestamps** (`packages/cli/src/security/exposure.ts`). Reading them never stops a fix.
+  - `fix_published_at` is the fix's official publication. For PHP, it is php.net's release day of the first security release newer than the Dockerfile's version, at 00:00 UTC, because php.net gives a day only. For npm, it is the registry's publish time of the fixed version. For Composer, it is Packagist's release date, which the author sets. When a fix has several changes, it is the latest of their times. It is null, with `fix_published_note` saying why, for Maven (not read yet) and whenever the time cannot be read.
+  - `found_at` is this run's advisory or release lookup (`scan.checked_at`). A fix found in an earlier run is found again, so detection time is not measured yet.
+  - `applied_at` is when the branch was made. It is null when no branch was made.
+- **The receipt.** Dependency receipts are `schema: 2`: the run's baseline, plus `fixes[]`, one entry per fix, with its own outcome, branch, commit, timestamps, candidate image, after-scan, files, changed packages, time cap and reason. The run's `outcome` is `partial` when some fixes failed, or some findings have no supported fix, while others did not. PHP receipts stay `schema: 1`, with the timestamps, `base_commit`, `branch` and `commit` added and a `skipped` outcome.
+- **The CLI.** It prints one line per fix and exits 2 on `failed` or `partial`.
+- **Removed.** `applyFiles`, the in-place multi-file write with its journal, and its test. `privateState` still refuses to run while an earlier version's unfinished journal is there.
+
+## What a project without Git can no longer do
+
+`--apply` on a project that is not in a Git repository used to edit the files in place. Now it refuses before any Docker work, and only validation (without `--apply`) runs. This is the one sentence for the owner's OK (CLAUDE.md, How we work, Scope): "Ludion will no longer apply fixes to a project that is not a Git repository; there it only validates."
+
+## Checks
+
+All of them ran in Docker; nothing ran on the host. The scripts are in `scripts/` and the output is in `logs/`.
+
+- `scripts/test.sh` (image ludion-l9-node24-git): `tsc -p tsconfig.json` exits 0, and `vitest run --project node packages/cli/test` gives 16 files, 671 passed and 19 skipped.
+- `scripts/full.sh` runs CI's checks except Playwright, against a stand-in repository: `npm run typecheck` 0, `npm run build` 0, and `npm test` with 28 files, 906 passed and 19 skipped (`logs/full.log`).
+- `scripts/mutate.mjs`: 12 of 12 mutations are caught, and the three test files pass without them (`logs/mutate.log`).
+- `scripts/e2e.sh` (image ludion-la-runner, `scripts/runner.Dockerfile`): the built CLI runs `patch --apply` twice on copies of examples/*-security, each committed in a repository of its own. The CLI reaches Docker through the mounted socket, and the sandbox runs the tests. Results are in `logs/e2e.log` and in docs/progress/2026-10-29-la-per-fix-apply.md.

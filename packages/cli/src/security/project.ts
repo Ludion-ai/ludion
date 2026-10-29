@@ -49,6 +49,9 @@ export function readConfig(root: string): Config | DependencyConfig {
   return c as Config;
 }
 
+/** Names the snapshot leaves out at any depth: credentials, Git history, installed dependencies and our own receipts. */
+export const notSnapshotted = (name: string): boolean => [".git", ".ludion", "node_modules", ".ssh", ".aws"].includes(name) || name === ".env" || name.startsWith(".env.");
+
 /** A bounded private snapshot. Do not follow links or copy credentials, Git history, or our own receipts. */
 export function snapshot(root: string, destination?: string): string {
   let bytes = 0, count = 0;
@@ -56,7 +59,7 @@ export function snapshot(root: string, destination?: string): string {
   function walk(dir: string, rel: string, depth: number) {
     if (depth > 40) throw new Error("Project snapshot exceeds 40 directory levels.");
     for (const name of readdirSync(dir).sort()) {
-      if ([".git", ".ludion", "node_modules", ".ssh", ".aws"].includes(name) || name === ".env" || name.startsWith(".env.")) continue;
+      if (notSnapshotted(name)) continue;
       if (++count > 10_000) throw new Error("Project snapshot exceeds 10,000 entries.");
       const src = join(dir, name), key = rel ? `${rel}/${name}` : name;
       const stat = lstatSync(src);

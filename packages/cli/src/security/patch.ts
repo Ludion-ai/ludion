@@ -1,18 +1,25 @@
 import { randomUUID } from "node:crypto";
-import { closeSync, existsSync, lstatSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { closeSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
+import { branchExists, branchName, fixBranch, gitBase } from "./branch.ts";
+import { phpFixPublished } from "./exposure.ts";
 
 export type Command = (args: string[], timeoutMs: number) => Promise<string>;
 export type Receipt = {
   schema: 1; id: string; started_at: string; finished_at: string;
-  outcome: "validated" | "applied" | "failed"; scope: "dockerfile_only_not_deployed";
+  /** "skipped": with --apply, the branch for this update already exists; it was not validated again or changed. */
+  outcome: "validated" | "applied" | "failed" | "skipped"; scope: "dockerfile_only_not_deployed";
   scan: Scan; tree_hash: string; dockerfile_before: string; dockerfile_after: string | null;
   old_digest: string | null; new_digest: string | null;
   test: string[]; baseline_passed: boolean; candidate_passed: boolean; reason?: string;
+  /** Exposure-time timestamps (UTC): the fix's official publication, the release lookup of this run, the branch. */
+  fix_published_at: string | null; fix_published_note: string; found_at: string; applied_at: string | null;
+  /** --apply: the update is one commit on base_commit, on its own branch. The working tree is not changed. */
+  base_commit: string | null; branch: string | null; commit: string | null;
 };
 
 export const dockerCommand: Command = runDockerImageCommand;
@@ -41,11 +48,13 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
   try { lockFd = openSync(lock, "wx", 0o600); } catch { throw new Error("Another patch may be running, or patch.lock remains after an interruption. Inspect it before retrying."); }
   const id = randomUUID(), images: string[] = [];
   let temporary = "";
-  const receiptPath = join(state, `${id}.json`);
+  const receiptPath = join(state, `${id}.json`), published = phpFixPublished(scan);
   const receipt: Receipt = {
     schema: 1, id, started_at: new Date().toISOString(), finished_at: "", outcome: "failed", scope: "dockerfile_only_not_deployed",
     scan, tree_hash: "", dockerfile_before: hash(original), dockerfile_after: null, old_digest: null, new_digest: null,
     test: [...config.test], baseline_passed: false, candidate_passed: false,
+    fix_published_at: published.at, fix_published_note: published.note, found_at: scan.checked_at, applied_at: null,
+    base_commit: null, branch: null, commit: null,
   };
   const command = deps.command ?? dockerCommand;
   const run = deps.testRun ?? (async (name, image, command, timeoutMs) => {
@@ -53,13 +62,21 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     if (result.kind === "spawn_error") throw new Error(`Docker unavailable: ${result.message}`);
     if (result.timedOut || result.exitCode !== 0) throw new Error(result.timedOut ? "Validation timed out." : `Validation exited ${result.exitCode}: ${result.stderr.slice(-1000)}`);
   });
-  let staged: string | undefined;
   try {
     temporary = mkdtempSync(join(tmpdir(), "ludion-security-"));
     writeFileSync(lockFd, JSON.stringify({ id, pid: process.pid, started_at: receipt.started_at }));
     receipt.tree_hash = snapshot(root, temporary);
     if (JSON.stringify(readConfig(temporary)) !== JSON.stringify(config)) throw new Error("Validation policy changed during scan; retry.");
     if (readFileSync(join(temporary, config.dockerfile), "utf8") !== original) throw new Error("Dockerfile changed during scan; retry.");
+    // Before any Docker work: the branch starts from the commit whose files are the ones validated.
+    const base = apply ? gitBase(root, temporary) : null;
+    receipt.base_commit = base?.commit ?? null;
+    const branch = base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), "php", scan.candidate.version);
+    if (base && branch && branchExists(base, branch)) {
+      receipt.outcome = "skipped"; receipt.branch = branch;
+      receipt.reason = `The branch ${branch} already exists; this update was not validated again and the branch was not changed.`;
+      return { receipt, path: receiptPath, scan };
+    }
     for (const [label, ref, expected] of [
       ["baseline", scan.current.reference, scan.current.version],
       ["candidate", scan.candidate.reference, scan.candidate.version],
@@ -96,13 +113,11 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     receipt.finished_at = new Date().toISOString();
     // Persist the validation evidence before touching source. It is not a deployment or exploit-test receipt.
     writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx", mode: 0o600 });
-    if (apply) {
+    if (base && branch) {
       active();
-      staged = `${dockerfile}.ludion-${id}.tmp`;
-      writeFileSync(staged, updated, { flag: "wx", mode: lstatSync(dockerfile).mode & 0o777 });
-      renameSync(staged, dockerfile);
-      staged = undefined;
-      receipt.outcome = "applied";
+      const message = `ludion: PHP ${scan.current.version} -> ${scan.candidate.version} in ${config.dockerfile}\n\nOfficial PHP security releases: ${scan.security_releases.map(r => r.version).join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+      receipt.commit = fixBranch(base, branch, [{ path: config.dockerfile, content: updated }], message);
+      receipt.branch = branch; receipt.applied_at = new Date().toISOString(); receipt.outcome = "applied";
     }
   } catch (err) {
     receipt.outcome = "failed";
@@ -114,7 +129,6 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
       writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { mode: 0o600 });
     } finally {
       for (const image of images) await command(["image", "rm", image], 15_000).catch(() => {});
-      if (staged && existsSync(staged)) rmSync(staged);
       // temporary is an absolute private mkdtemp directory, never a computed project path.
       if (temporary && (resolve(temporary).startsWith(resolve(tmpdir()) + "/") || resolve(temporary).startsWith(resolve(tmpdir()) + "\\"))) rmSync(temporary, { recursive: true, force: true });
       closeSync(lockFd);

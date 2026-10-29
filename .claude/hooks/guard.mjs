@@ -140,6 +140,8 @@ function check(line, depth = 0) {
  * of a quoted heredoc (<<'EOF'). A markdown code span in double-quoted text (a PR body, a comment, a commit message)
  * runs this way; on 2026-10-29 one ran `npx webpack serve` on a host. $( ) is not refused: "$(cat <<'EOF' ... EOF)"
  * is how text is passed safely. A heredoc operator is recognised outside single quotes, wherever it stands.
+ * A backstop, not a parser: it misses a backtick after a heredoc operator merely mentioned inside double quotes, after
+ * an apostrophe in a # comment, inside $'...', and before a heredoc terminator ending in CRLF.
  */
 function runsBacktick(line) {
   let quote = null;

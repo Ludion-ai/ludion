@@ -33,7 +33,8 @@
 5. **Decision records only for a change to a gate, a rule, the scope, or something that cannot be undone.** Other details go in the PR description.
 6. **At most one open PR changes a protected path at a time.** Main is not merged into a branch only to bring it up to date.
 7. **The shadow moves to its own public repository,** Ludion-ai/ludion-shadow, with its workflow and its data together, so this repository's clones, its Actions standing and its protected-path process stay out of it. PR #197 is ported there; the PC recorder runs until the move.
-8. **Text reaches commands through a file or a quoted heredoc, never inside double quotes.** The Bash guard hook (.claude/hooks/guard.mjs) refuses a backtick that bash would run. Third-party repositories are read only inside a container with no credentials.
+8. **Work only on what a release condition, a gate or a reported failure needs;** propose anything else to the owner before building it. This rule came with the PR that carries this record; the owner approves it by merging that PR.
+9. **Text reaches commands through a file or a quoted heredoc, never inside double quotes.** The Bash guard hook (.claude/hooks/guard.mjs) refuses a backtick that bash would run. Third-party repositories are read only inside a container with no credentials.
 
 ## Release conditions after this decision
 

@@ -24,9 +24,10 @@ Ludion is a judge for npm dependency-update PRs (`ludion judge`, and the GitHub 
 - A scheduled re-query when the wait ends: it happens only if the judge is run again then.
 - A project's own stricter wait: `judge()` takes one, but no caller passes it.
 - Automatic merge.
+- Protected paths enforced by GitHub (the agents' own account, CODEOWNERS and a ruleset), a release condition of the preview.
 
 ## Evidence
 
 - **Backtests,** up to v5 (docs/bench/2026-10-28-backtest-v5), do not meet the backtest gate: one malicious version is still missed (v5 also counts it as disputed) and unknowns remain.
-- **Noise measurements** (docs/bench/2026-10-28-noise-v2, docs/bench/2026-10-29-l1c, and the third sample in PR #196) measured the production/dev split, which was removed; none met its count gate or its miss gate.
+- **Noise measurements** (docs/bench/2026-10-28-noise-v2, docs/bench/2026-10-29-l1c, and the third sample in PR #196, closed without merging, where its measurements stay) measured the production/dev split, which was removed; none met its count gate or its miss gate.
 - **Shadow operation:** the recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md), and the replay that judges what it captures is built (tools/shadow, PR #194). The first four-week window ends on 2026-11-26 JST, so automatic merge's condition (b) has no result before 2026-12-10.

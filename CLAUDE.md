@@ -15,7 +15,7 @@ Ludion judges npm dependency-update PRs (from Dependabot, Renovate or a person):
   - The preview (comments only) is released when all three hold:
     - the judge has no production/dev split;
     - the workspace false stop is fixed (L9);
-    - protected paths are enforced by GitHub: the agents use their own account without admin, CODEOWNERS names the owner, and a ruleset on main requires the code owner's review.
+    - protected paths are enforced by GitHub: the agents use their own account with write but not admin access, CODEOWNERS names the owner, and a ruleset on main requires the code owner's review and dismisses stale approvals.
   - Automatic merge is enabled only when both hold:
     - (a) zero misses of confirmed malicious versions in the backtests, where a disputed version that meets v5's evidence standard stays in the denominator, is shown apart and is not counted as a miss;
     - (b) four consecutive weeks of shadow operation with zero misses on versions that received a MAL- record, and at least 100 decided judgements, counted as fixed in docs/decisions/2026-10-29-shadow-counting.md.

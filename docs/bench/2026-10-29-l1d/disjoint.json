@@ -1,0 +1,14 @@
+{
+ "third": 100,
+ "original": 101,
+ "second": 100,
+ "with_original": {
+  "repositories": [],
+  "owners": []
+ },
+ "with_second": {
+  "repositories": [],
+  "owners": []
+ },
+ "disjoint": true
+}

@@ -1,0 +1,1400 @@
+{
+ "fetched_at": "2026-10-29T01:14:43.879Z",
+ "repositories": [
+  {
+   "repo": "RoBorg/stringy",
+   "sha": "603448b8d042a210fa7f3c116d618306447dacb5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "515ccb748b6fe3032fcdd44a207eb0e4720d0b3f65dd25b7e163abccd38c8665",
+   "archive_bytes": 94814,
+   "files": 79,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "tntayyab/writerifygateway",
+   "sha": "889e4cfe87e23d0dadf6a102bb8af7509656b2ef",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "ef7927145a7fb6c488f300fadc46ba89ffe0eff6d9b57bcc1496d6726beaf416",
+   "archive_bytes": 11592057,
+   "files": 4378,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "EmpoweredVote/CompassV2",
+   "sha": "82bc65139c1ce9aa29a0539dc59a274e0b08fce2",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4cb2ccb687bebe333de784566080343098e9fd0e3e06e5af053d518008b82320",
+   "archive_bytes": 43694971,
+   "files": 158,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "arhancanli/canlicapital",
+   "sha": "ecd09be307417f7d626a29f4af824dad48c24a43",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "523f08a429f3a3017f3ed87ebc614925fea575a4fc4705c8d74bc01efa68ca57",
+   "archive_bytes": 230700457,
+   "files": 8391,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "ansh3108/cyber-anshk-dev",
+   "sha": "5f7456e17d0acba0d5909d4b43c5ae0ddd8e3533",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "16c664eaceb4df77c485faf66c70dc56aafa2f21c5797c0a26fa0c02ef84ce49",
+   "archive_bytes": 1066072,
+   "files": 63,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "pcmarts/x402git",
+   "sha": "d87ea409a05698f6240d3811841009278ba3367f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "f338b229c7ae789d97cba7136e08afea4b22d1c3d4c2c626f13aa79deadd4f64",
+   "archive_bytes": 1737132,
+   "files": 521,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "salesforce/zana",
+   "sha": "bfc0785c9981bb3e4cc7ad158eaf2a5fc0158f0a",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "73d8c1b9d8c51bed8992b8e0fd00a8bfcf1231196be683d7666d2a7170100fee",
+   "archive_bytes": 168581164,
+   "files": 8786,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "OkayOkay101/BattleFightLegacy",
+   "sha": "42def762655ca0fcaf433d0ee5d3736c921d2ebf",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "3a56d00728edef262b29f52dd7dab95a8ba9b872ed9617ecb05d488178f9e46f",
+   "archive_bytes": 18809890,
+   "files": 3669,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "zasclan/AutoScanAI",
+   "sha": "d9fca5e0bea7be7b99fc80b2c784d6e668382691",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "91b754702a528dab43848921b79f52adcc78e54b3257640e4b37a4fec2dd3f8b",
+   "archive_bytes": 728037,
+   "files": 60,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "M-Waweru/new-mathnuscripts-garden",
+   "sha": "eac941eec3ccee0cd919ab4eeb662277e8275a4c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "463ba0890ee4ab432802046dce59fe76c44f983dd28d7db732d652020e23e27c",
+   "archive_bytes": 33114005,
+   "files": 559,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "tailstory/tailstory.dev",
+   "sha": "caee5778a436c40ce0b8e36ee0a7b932511d8d1d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e08e5ba0bbe15cb903e8181776a2f8adcc32dff3e19388e1fcca9c54be5d25cc",
+   "archive_bytes": 43240,
+   "files": 18,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "2747025402/2fa-cfworkers",
+   "sha": "3d23d70c459f6be8c8191ed960d7c649cc7899f7",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e0c00a66d49e25c0af2f555a0814af906879618e8f722df24a318a09803891c2",
+   "archive_bytes": 545153,
+   "files": 24,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "redxking/event-atlas-nfl-demo",
+   "sha": "344e502abcdf23dbc66b4496cc516d4f64477f24",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4fde3f01390991b24b327c0e16208df18d23a2da49c10e8e234a4c7cc663b021",
+   "archive_bytes": 4454749,
+   "files": 602,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "mustafaakalin/laravel-avukatlik-burosu",
+   "sha": "dee595b4d0af318b9e3885920a4911eae43f7a2d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "fa1891635f394caada616aee3f45ec6c074b1dcdb241677bc7b355da2c19fb06",
+   "archive_bytes": 723239,
+   "files": 138,
+   "root_gitattributes": true,
+   "export_ignore": [
+    {
+     "file": ".gitattributes (raw.githubusercontent.com)",
+     "lines": [
+      "/.github export-ignore",
+      "CHANGELOG.md export-ignore",
+      ".styleci.yml export-ignore"
+     ]
+    },
+    {
+     "file": ".gitattributes",
+     "lines": [
+      "/.github export-ignore",
+      "CHANGELOG.md export-ignore",
+      ".styleci.yml export-ignore"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "Joshuasco/coffeeShop",
+   "sha": "1b5975b2adb49441b327141e1e571e6bd1b3f6e6",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "5e3b4f647752bc4985fe47f7aa01c77ce3c7cf88750405e3475e950a6df79409",
+   "archive_bytes": 1421739,
+   "files": 36,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "haksanlulz/mcp-fairrent",
+   "sha": "284916a4318eacf27aba47131d982f0bfcfa94f0",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "ad62391dd137c0de63f848088a0c99503aa318e2d9def8c21b16cac9671d235f",
+   "archive_bytes": 98024,
+   "files": 20,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Tyllage/Tyllage-Comcrop",
+   "sha": "c3fb0e3c93254c15654e08b2f058306f67b11e8f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "0d6fec7de73134d6be5007ab3816778019721e6efdbcbbca2b57bce37ec3c7bf",
+   "archive_bytes": 1034622,
+   "files": 199,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Geuthur/aa-taxsystem",
+   "sha": "e97d6abe47872bf1af6d923973c13257a0563c6e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "1940071c232f84f8e4819581f74fed2f55e61b9e767316a9eeb0a4c1849c2e97",
+   "archive_bytes": 2537006,
+   "files": 424,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Hubertoink/stato_okja",
+   "sha": "d7db9f07037742df459ac02ce74b7f123f56d2e6",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e5d6efda3c8821150cf04d3bafc9e52b20a97f4f0ac97e3dc46236f46eaf0ae7",
+   "archive_bytes": 8085266,
+   "files": 978,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "rbcodelabs/geode-wikiskill",
+   "sha": "25bf85bcdcedf44b2e4b57174d3654a4fc851845",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7b14ad83142d323931079ddefdb0ea05199c853e5c00bc96f7895be5eb6c9049",
+   "archive_bytes": 261678,
+   "files": 47,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "vilu85/toastr-ts",
+   "sha": "bdc1e34c3a4d86ee8a44c1b25f6859629324a912",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d3ed83f11d1500a8ac817ba75d9e96af2972d7d6967bc5fa32a0714613f68f4e",
+   "archive_bytes": 174859,
+   "files": 39,
+   "root_gitattributes": true,
+   "export_ignore": [
+    {
+     "file": ".gitattributes (raw.githubusercontent.com)",
+     "lines": [
+      "/tests export-ignore",
+      "/docs export-ignore",
+      "*.test.js export-ignore",
+      "*.test.php export-ignore",
+      "*.spec.js export-ignore"
+     ]
+    },
+    {
+     "file": ".gitattributes",
+     "lines": [
+      "/tests export-ignore",
+      "/docs export-ignore",
+      "*.test.js export-ignore",
+      "*.test.php export-ignore",
+      "*.spec.js export-ignore"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "hirthickramanath/Parallax",
+   "sha": "971a16da2f5ae577b6361b9a8ae30658f11a00fa",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "5cba334995ee249230acbc9d873611d51a12606e5710b36d5ba3ace43fe4ac75",
+   "archive_bytes": 1465818,
+   "files": 680,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "ember-hearted/z-wiki",
+   "sha": "1c8d047e8b07a7410fe45e690fea7dc6ec4256b5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "3c8edb48fdab004d64a0bdae4269f33c182dd5549b1d7adc9a80af70a41079f0",
+   "archive_bytes": 903671,
+   "files": 266,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "vistik/houston",
+   "sha": "d16285d8e430fa42349941ffdacfba141050a9be",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "fcda9113d1ce27c51665d233017f6f78f09658fd18081c12ba729ad99bdc23c8",
+   "archive_bytes": 2995147,
+   "files": 467,
+   "root_gitattributes": true,
+   "export_ignore": [
+    {
+     "file": ".gitattributes (raw.githubusercontent.com)",
+     "lines": [
+      "CHANGELOG.md export-ignore",
+      "README.md export-ignore"
+     ]
+    },
+    {
+     "file": ".gitattributes",
+     "lines": [
+      "CHANGELOG.md export-ignore",
+      "README.md export-ignore"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "kyleb4rnes/rave-route",
+   "sha": "689be054d800845146a093e539e5ba9b98d85f83",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7c2e2138c71d19f60716285216c77e672dbb62af84c345f861ccd2886d16fc5d",
+   "archive_bytes": 12040298,
+   "files": 259,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "mrcgrtz/elements",
+   "sha": "0520251a9713b113dae801f177c1b942428d250b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b8173c0724c5f067034e3badd10016416fbf79bc1005675cd80a1f87677cb934",
+   "archive_bytes": 118233,
+   "files": 53,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "promptfoo/promptfoo",
+   "sha": "204cf8f2fa5cd92661b041a32a39276e7a83a7d3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b7babf49c41562e9585396ba5aadb02ff9e05ec99092dd7315668fb2eeab83a5",
+   "archive_bytes": 183699755,
+   "files": 5962,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "openapistack/openapi-backend",
+   "sha": "89c3866203da13691487fd61f7d38ae1bd2cbc4c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d4f283a4ee91ee6f8b4dc3848daef8dc2894f94c044d58ab4391453c9e85bf84",
+   "archive_bytes": 262064,
+   "files": 51,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "alt3/rank-my-wallet",
+   "sha": "cc2421061ffe15740a6b9b695544f3bc5a3e14e8",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "2a2e07b9de3cbc1b5ec152297f45e90f4d8bacc91548fc422fea6307fc69c6cc",
+   "archive_bytes": 543853,
+   "files": 184,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Ai-assistant-KIRA/whoax",
+   "sha": "81fe1facd8652326c88d97bc84a72d592aeef423",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7678ed32e63748df8b5f03560342d31de9796a33a185b5e7a7cd77e773f63826",
+   "archive_bytes": 104742892,
+   "files": 235,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "KalingaAbhisek/portfolio",
+   "sha": "45e78aff6b35b39badd6c4f185ee1ec410ef114c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b268e37a03882716fedb2f334f1714f83145c1920eda357a7efb8cd77103f5d1",
+   "archive_bytes": 2757342,
+   "files": 80,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "ayleen/triss-coworker",
+   "sha": "8baae4dad67dd34f2124062e8caaf64fd92a87f9",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "43b36d1b5510de80f6cf074de289c002710db3035908f64545314c593faae81a",
+   "archive_bytes": 7797910,
+   "files": 610,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "domdomegg/airtable-ts-codegen",
+   "sha": "9850adef0b0f6910ba39c313f037d9fb553b2d38",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "dd8a4a5a6f865eb9d34c93c4d7e6c7effa3d15cef094a406573a469072df04a1",
+   "archive_bytes": 58570,
+   "files": 24,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "davidcolome9-byte/DavidOS",
+   "sha": "db3688f16fcd4ca35e56c2a8bea874d31e5c8315",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "332fd9d3433d0567a26cb650d966eba7abd2dad6aab42f9d0b9cdbc70ee964e9",
+   "archive_bytes": 2184351,
+   "files": 271,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "lalitaalaalitah/01_AddCommentedLines",
+   "sha": "bdba90dcb58be1e617636f7e6a34b30da1a1619b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "053550f4b0ca31d2b5d378a931afe332c8357fbc124b07c7d6c8ed7f80fadc11",
+   "archive_bytes": 60158,
+   "files": 16,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "shuttle-hq/www",
+   "sha": "8ee32e00983865b3d6766b5624004de21b5d8308",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4f01b1db1e6bb6974e0a2084d681cf72897422547ecc8aa8a9b186be83a88ef1",
+   "archive_bytes": 325753398,
+   "files": 1167,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "GitSquared/wikiweaver",
+   "sha": "35f9096880ee8b60d5cd2f884e8a137619e755ec",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "10ffecc679960347bcea80472d60643fd5277bc1e7503497a438e9a4faf114e6",
+   "archive_bytes": 324857,
+   "files": 78,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Trancendos/ManagementCenter",
+   "sha": "3660a7ad9a74cc6196888597f40e63e55912e5fc",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "6dd9cbb7eabaf44a942364eb1f82711a8d96ce9f28655d28a3a87fcc2a064ad8",
+   "archive_bytes": 3371948,
+   "files": 316,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "PodZonePlatformEngineering/academy-api",
+   "sha": "266247019ea90c4589cf8f8f3a853c89bd505909",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "f74dc045b5d024bb2bd848fbf3589238f51a29351ca53bf294b72a45776dacb7",
+   "archive_bytes": 67505,
+   "files": 36,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "borisonekenobi/am-i-there-yet",
+   "sha": "5767ca832f38d3e965e0c610df91ab6242955d11",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "fbb67400ab8e675670a0552ff9291b137e7a8a4e1f15bb85322c60a049441097",
+   "archive_bytes": 67684,
+   "files": 24,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Solvelyllc/Tidebroker",
+   "sha": "516b25271aa4189094d58a1d53e47c1de0b7a551",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "85e82b27cc352a43701000c7562264641401694c44323686ad48bf377096d8ff",
+   "archive_bytes": 172842,
+   "files": 153,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "httpcats/http.cat",
+   "sha": "d8bbe60946d37e4f347229be6f9443c84190efab",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d196cd014362ddf0b7370dd86148e967e3c2fa0c88a4c902b719baa99ae39a02",
+   "archive_bytes": 9055555,
+   "files": 408,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "canada-ca/template-gabarit",
+   "sha": "6ad23fd8068e1a114d641249c3198219ed405c7e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "880de60e8066b91698a9e32173771b3c67fee980d71ea56e0b7961c051a7fd7c",
+   "archive_bytes": 44417,
+   "files": 19,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "Colemichael16/ColePortfolio",
+   "sha": "fb2305acc4924f0cf1be73b6e28eff4680cda9f5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8a63eeeaecf23f824c9a44594a04ea95889f2d7a7378f20e365551b6b63db4c6",
+   "archive_bytes": 35563897,
+   "files": 121,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "lean-17/task-dashboard",
+   "sha": "dbebb03394d9997819ac2f52b4aa02dac39e513f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d2568e3dd98f52d9efafcb5bf9ec62b5fede2119a1bffb55bd24af3fcd4bf649",
+   "archive_bytes": 129123,
+   "files": 51,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "minoreality/chromalum",
+   "sha": "bd47c91aab238b2564b61e40edc1d3558def50fd",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "22ff25bde6d61556652d13accd23f339fafa310092ac0881410aa29ac317123f",
+   "archive_bytes": 2221018,
+   "files": 537,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "viztfxyz/handcart",
+   "sha": "a381c15c24dd5326a82b4aec99b32f1d56095478",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e237b0239575a3b7ed41bab1c311f21fc46b1e9d3bdfdd050d5b29f0dd88ab6b",
+   "archive_bytes": 191781,
+   "files": 84,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "jmbost20/threadglyph",
+   "sha": "de3cc0efba726f348eff624e3780b21097f47892",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "862773010a955850ad9133890796b821a1bd4dc223f711ac60019d6a89632c6f",
+   "archive_bytes": 2084798,
+   "files": 130,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "TurboWarp/packager",
+   "sha": "c115bdf525c5f49f0fb689a21b335ccb70fc22d2",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a00efb9b91f8f98a8afb7fe957686da46cd04574e2110fa5ef77102a9ea39e7d",
+   "archive_bytes": 494241,
+   "files": 225,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "comShadowHarvy/snake42",
+   "sha": "a4e5bf4a971ea7d20144ec94d89598550a8124c4",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "c70bcd7f5558d62459db6e1c0d9c648073d2cc0ebae29567beb2d6ecdb101904",
+   "archive_bytes": 72380,
+   "files": 23,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "lass-machen/meetropolis",
+   "sha": "1402ee52db98d16348c5ebdc96b6d33f1fd60e70",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a025cdd729ef1426fe836be4dc7ae286b128acbd886f1d8ac889c7b042111286",
+   "archive_bytes": 4793215,
+   "files": 1291,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "filestack/filestack-angular",
+   "sha": "9441941a653f0a1b92702bbf7a86038bf562f98c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7d8dd95e7008caf3b60f4693000c83ed746f2d7ce5aae2ea9f727c1d1abeec24",
+   "archive_bytes": 246098,
+   "files": 92,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "ztimson/formula-manager-2",
+   "sha": "55ac1d1e808ff8ea44265ed4128f77906e8878bd",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d419f4ab49180b05fb898b95a1371613381f2288234816b25c1aead42cd6b550",
+   "archive_bytes": 1107163,
+   "files": 48,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "krisnayogantaraa/lumina-borealis-ui",
+   "sha": "6259b99d4257c08d9e38a4b0952be10030cd3835",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "0fa0af672836a2e51404e869f82625e36d95548d686741c4098bfc2eb2953e3b",
+   "archive_bytes": 116608,
+   "files": 270,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Marcentella/Plainchord",
+   "sha": "b90dc573c43261cdd70f1bb3725441a0dffa3df1",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "05298191b2f903ca6ace504766b2fb5208682798601fcee963839fd78f82bae9",
+   "archive_bytes": 9289383,
+   "files": 125,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "sprint-labs/sandalwood-and-sage",
+   "sha": "60515ad60d5307eb5e86e9abdb6f5afe75c77c6b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "31a00afd809f64c02f9ec9019a9208c067fc2592ac501ffc48b6b275a0d63aaa",
+   "archive_bytes": 2824072,
+   "files": 184,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "gaspareu/recipe-hug",
+   "sha": "f894c1a290a607a77883be02d4abb8e595fb932f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "13c514b16d9efc22120d51049966ada766470814fc3788b67312db8a02c4ae53",
+   "archive_bytes": 5745505,
+   "files": 503,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "XCQ0607/lxserver",
+   "sha": "1f731b9041d6653f443bcabde2a5c40e1408cf35",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "243b1784224fc5fd57175fc6a83c5e3e90a108451f4c330ec16ad77eb538274d",
+   "archive_bytes": 65466067,
+   "files": 588,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "larkiner/ecomers",
+   "sha": "c2bd5f14783728f6b6413c0d2cd9c8e829e34285",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8077ff96163cd7a2bee0dd373a3cf069b9ed1b4706cef5278222c50979eaa7b5",
+   "archive_bytes": 130634,
+   "files": 92,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "bariskisir/ClaudeCodeProfileSwitcher",
+   "sha": "a2818cb75bb88795f1d14c8caf0411de94be43e7",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "3354d4ded4be6e45ab9104f9e35ace60f4db6a552812c8c7bce71f2181414e14",
+   "archive_bytes": 69886,
+   "files": 17,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "miclip/patchscore",
+   "sha": "00bfb927268265c7b1b6cdc63d0c85781aa57ec4",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "332d5212f787890588a0d621acb803ff9b8c187ab0e3b53ef3002f8401f55637",
+   "archive_bytes": 4478594,
+   "files": 598,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "yuma-shin/SafeGo",
+   "sha": "c9c7db218cc8eb0d9d5d238fd04be9f5ce356e8b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "400858016ec4e9e089b47b444aac9b3bfc3348a6678cccf262534abde1370490",
+   "archive_bytes": 189274,
+   "files": 49,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "dr0v3rr/tabletop-conduit",
+   "sha": "2fd85c2ba21cfe3290d6e62bc3c97e028b9f8581",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "297e8bfcca8b2f264c97155f6ed3a491edad427adf8ca1b5b6194f34e379c596",
+   "archive_bytes": 3501663,
+   "files": 183,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "adimoldovan/slowgram",
+   "sha": "58d2005a6fca96fd624af4e19fda0637d58bff62",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "3a31039399a2d219812233e086a248ec693bd38ea62bbbf0d1646220b02f9f2d",
+   "archive_bytes": 760113,
+   "files": 55,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Lisow7/FridgePlus",
+   "sha": "5f62f259054813ac075c19fab2615d8f8d955e5e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "bfd9765fc7e532b314e993fcdaa0b16f6f7587d88a6557c9ea2702995d52964d",
+   "archive_bytes": 3115028,
+   "files": 1271,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Geuthur/aa-ledger",
+   "sha": "fbeb560b3d71b0aab90d0a15051ef288e94d7938",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b945481b9d52472ffed3a91882b8ad063981fe5db28624aa409bf2809f6f916b",
+   "archive_bytes": 3506449,
+   "files": 428,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "elkimek/venice-e2ee",
+   "sha": "6988165aea661ba383763ab9df18c2ead07e9977",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e738e17770cfbc68433b8a723dd3dce2d76d8a285c171ad330856a8800a72afb",
+   "archive_bytes": 237205,
+   "files": 95,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Marks-VB/HabbAI",
+   "sha": "38ab14cfabe1d582b6fcc32844c2539881e6eb83",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "bd8fe3351e84f72948e9148cb300968f1027ea15cbbb73d6a4bc11653fae6036",
+   "archive_bytes": 11556364,
+   "files": 630,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "Heber-Modelo/heber-modelo",
+   "sha": "ec00227cddbac318753e3231635ac6e86e95a598",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "66c5c2d3905382719c3fc859c0faeb632d52daa9f761e5b5c0e8a4cae4e7546a",
+   "archive_bytes": 406468,
+   "files": 454,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "Tabitha022/study-notes",
+   "sha": "d54b33cd97c4af4953b578badc09d9199dfd5419",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9fbe361d97201cdcabebf14c9a9e6191d363340946a1180abb94b2b12109a69a",
+   "archive_bytes": 13366789,
+   "files": 377,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "ernolf/twofactor_oath",
+   "sha": "f0af580e0ac31fe938d7ba91ce6227a247d90c1b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "35a34c959bd34bf67a462385b0e341f17af30a7fb6ed010f988c55cecf51fe69",
+   "archive_bytes": 3134752,
+   "files": 333,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "andressalame/profesormvt-web",
+   "sha": "190e4b76c0b2b6dc907448f19729d37d886d49a3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "601bf99d3f29544a1ed0b92bc587475fc6a0be6ac1da528017cf94220d870017",
+   "archive_bytes": 3378263,
+   "files": 392,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "devwork5600/lokko-hub",
+   "sha": "cf1f7e6450839a25db485e19af6ba9c205ab13c7",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "f77bc82abc303028fb9e499978c7de7473965ef4fc61115453d929625730969d",
+   "archive_bytes": 297740,
+   "files": 218,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "kandotrun/send",
+   "sha": "9d5fd1e4dde61b2d86abdcb3dfb8b9619b9c057c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "0954885378e3d53fb8717b9435629f1318123cb65ae8c7464295edbf456cbef6",
+   "archive_bytes": 138351,
+   "files": 65,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "gorjoe/knowledge",
+   "sha": "42c14042a8c9130fa51207b02d6174ee26780956",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "cbf561c1203946e45492437de8fcbca25c7b7595382bdc90f7d86c07d04b5a84",
+   "archive_bytes": 13147354,
+   "files": 300,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "Brummolix/AutoarchiveReloaded",
+   "sha": "75d720978f3bb16e78a37c56ebc35012d4b355de",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b1022b1802f2b8782e602b8993f4b03eb358e28eb5212ee5f9bd9242829d7325",
+   "archive_bytes": 185704,
+   "files": 50,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "gabrieltanchen/finance-api",
+   "sha": "08519dcfc6ab04896f56e24727ff9ceaa3d3b950",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "ac4a75aef3bb22b8a03c1d5a85de8c3ba410a01431af7cd8dc3c7d42a54bacfb",
+   "archive_bytes": 395558,
+   "files": 553,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Firestitch/npx-syntax-highlighter",
+   "sha": "bdcfc31e455b6044c4ddcb36babf958999efd9d2",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9988c8ac631257d85a4c7d5897f1b51d59828b7096e5af350d59adcad5763fff",
+   "archive_bytes": 172353,
+   "files": 50,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "intechstudio/grid-editor",
+   "sha": "eff625188e4fcd5627be2dd4ee9ce5b8855573c5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "144db87bdaa08d6ed6072f8a5b947080ff108c692c5c6a6e237ff9667faf1799",
+   "archive_bytes": 2743361,
+   "files": 568,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Esl1h/StandardNotes-kanban",
+   "sha": "c38ddc644ec2bc5db3d747eed5bbfcb3aef8138d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "29fc1e3d80b798c0d2535db20f1710a3e658f711609d9b283943900ed3a7e7be",
+   "archive_bytes": 511593,
+   "files": 132,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "RobertvandeCamp/bratra-action-order-bc-sync",
+   "sha": "aa9bafa391b7cf3701658a3a967cba56ab798c74",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "93c208c8b97a7c2a6a938b60b2523837aa1f7ee27415121239301e30384087f7",
+   "archive_bytes": 620825,
+   "files": 66,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Rhys-Lindmark/digicene",
+   "sha": "a66906e3ea8fc3f23833fa5e598965d12cb99487",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "0b4fb371f6708d884389a3ad986632b2c945452b6f3f371db192b2160551261a",
+   "archive_bytes": 3964948,
+   "files": 58,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "zbzq8ztx22-star/OmniRoute",
+   "sha": "7b7c44b2417e8b2637d65a28291edef7f0663ba2",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "29606cf08df9c3e292ee4354e9ba42691f0545c00d43f83b35c34240fdf6220b",
+   "archive_bytes": 65645782,
+   "files": 13432,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "armsone/Hanstree.com",
+   "sha": "6bb4609d5d7e84392a2b43302babb2182d13b2f5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "74e372be3af185266b05638a6a5cfb779813f1c5d4c74dbd054449b7f7dce88f",
+   "archive_bytes": 335784249,
+   "files": 1115,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "griffio1/theChair",
+   "sha": "f0df67d8830f950782af4414de1765a60419ded4",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "09715dec9958a2b1df7782a4f8b364913a86fed97ed018e5da7de869246d447a",
+   "archive_bytes": 859595,
+   "files": 248,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "ccmueller355/shadowlist",
+   "sha": "636beb71cf173cf73c87a79f25a674a7eb56b258",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8e1592215e66c5f7321b7363c5fc93bc79c92e7d458536c273a6e391321da21d",
+   "archive_bytes": 4348448,
+   "files": 184,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "dx-corp/kestrel",
+   "sha": "20f0f25bc80b98dba8839dfe697a90a7527f7185",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "727d684de5e10c5077a8ad7565de91ec6c98337d2413f5e39726d3d8b87eacd2",
+   "archive_bytes": 645115,
+   "files": 183,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "cncf/endusers",
+   "sha": "e7ac6e80e978cdcdb700f91c7d449cdcaf2ffd25",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "af24781595c1be1de344fa14fa92bf6e5dea960e4318fe73a8d9ed78c59dc88b",
+   "archive_bytes": 10185611,
+   "files": 805,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "bamr87/zer0-mistakes",
+   "sha": "34a224f903218257f3b7cec81691fa6304f6b967",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "9b593c2fca08a6c4f75b641c8ee13f2821e98a8bf641f8aeafb79041b183ad4c",
+   "archive_bytes": 128382044,
+   "files": 2503,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "shaqmughal/seekstone",
+   "sha": "3575c7a6e0e37b734be3f9bfb91ef2fa75aab167",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "bc9b4fc34548c6d475ec6a2b411bd6a2ecc14e4e13bd8b314987909f34259c07",
+   "archive_bytes": 47003045,
+   "files": 16945,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "fratercem-design/cultcodex-v2",
+   "sha": "fa578f9931f41b71affaf45adc75ede35f5e0e1f",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "5b9ad77681f178dca60fa57c37401d8ac24f2c6592bf1d40b8ea06142d22a5e8",
+   "archive_bytes": 137130387,
+   "files": 2592,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "devlargs/pokedocs",
+   "sha": "4dc128f76eb4f876a20472c4631d78ca9df26fdd",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "14ac445e2704a7ffcb44010b6cbe1220518af1e7d27181bc15e353e8e93a4edc",
+   "archive_bytes": 557662,
+   "files": 51,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "contentstack/kickstart-angular",
+   "sha": "4c197813cef34096f75bfc964ba65b07f383660a",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "e85b04123105391414a93052324b2cc393173f4f79b65ff5fcadce2d41ce5f09",
+   "archive_bytes": 127441,
+   "files": 29,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "m-saito14/daily-wisdom",
+   "sha": "5750e115cfdd89d1e042af3f0fd19998b71c24c3",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b1292c5cc8d3b4591d1e95a83b700a3c61624df85e41255c1310ea233c5254ea",
+   "archive_bytes": 152210,
+   "files": 56,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "codebam/x402-crypto-worker",
+   "sha": "0eead3d272db68cd226583a674f9fb3cfa4bdfae",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d8e93035046af43d5f5f0b781bf64f8eb7dce279dc6d29ed7009f519f78bdc7e",
+   "archive_bytes": 154406,
+   "files": 21,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "NateJ45/ncs-astro-sanity-starter",
+   "sha": "38d91befe4a0f9673be6fdd2ac3e25e73d201831",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "dd67c47db0053e756db0f44abc18f5c41493669baff04decce51473e0819ebe0",
+   "archive_bytes": 5097026,
+   "files": 1137,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "kimbelas/flightdeck",
+   "sha": "2a083e0a537fed99c3129a6826cbf6e448b2de34",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a176e1494585f877464265af2c442b370964b28ea91addaecb8edca1e6739a6f",
+   "archive_bytes": 1738561,
+   "files": 858,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "rekstrom-bot/task-dashboard",
+   "sha": "eeedd8ff255ac5eb1992780e708341b1b61e8e94",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "666754a41b2f5913ec4496c75524f487d2a7ab714993c3c5110c0e26600d9cfe",
+   "archive_bytes": 129120,
+   "files": 51,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Don-Stevenson/scheduler",
+   "sha": "424f7a44ad8b695e9e1dc324cd943b63e79f7249",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8d88585a109cda241050c093f96eb4c12da56913dd9eff7183bf73659fc270cb",
+   "archive_bytes": 841554,
+   "files": 76,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "KhazP/GetirFiltre",
+   "sha": "9d08118c27c9e02e3102865d01ec8cf6bf64fed8",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "43db0c3b2f99e944cf88a63f8f68dd242d9e13704be91a12d3faa9cbe049183e",
+   "archive_bytes": 137199,
+   "files": 75,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "dev-build-deploy/release-me",
+   "sha": "5ddb280f81db8dcd35226f1633331022bd609ff6",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "b10d9e50ae1ffa2139effe3b175ab9fe36f9fe40379447481891a3293d036066",
+   "archive_bytes": 2820540,
+   "files": 54,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "Web3Auth/web3auth-examples",
+   "sha": "61d1cb887a4beb44f74d85ff4f44c05597d51402",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "ccf27bf7afbae6e9a9f374e9f280b4cb0443d79c21435a7d6734e233e740ffa3",
+   "archive_bytes": 5474851,
+   "files": 1031,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "rg-engineering/ioBroker.heatingcontrol",
+   "sha": "dc0403d0848aa3542e84d55d9ce6c9d970e278c4",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d689d2726d3cf355b90849d45ea8f17461bf4564e03520b57afd4f06f99c418e",
+   "archive_bytes": 1363697,
+   "files": 99,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "owodunni/curarehab",
+   "sha": "0e410321bbd99d7751f3a69ce3bb48647aebe3ae",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "69a75d245caea191941f29ed21aa7278f948d4b4b5892a41b672a936db1fc530",
+   "archive_bytes": 850505,
+   "files": 237,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "alexandru-tiron/next-ecommerce",
+   "sha": "819c24a1d8c2d3f6c22b8277049861ac1c0b203b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "0feb82411303859709cfbfae894c7ebcb82b151660c22fa50f2e83cc8a0bda3c",
+   "archive_bytes": 686735,
+   "files": 340,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "kpk1310032003cy10-hue/orbit-lan",
+   "sha": "09ed2836160e60bb19471444e55d4315f3472af5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "500ca5fdd8fe63867d90671211b664e1e924b5c5cbf8affe5376d0350c2f0cb7",
+   "archive_bytes": 698048,
+   "files": 111,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "MisakaZentai/suixin-writing",
+   "sha": "38b1f2612f2144d913cb36790ad0e598bc0c8182",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "7c6e684a836e0da885d6a9d6fb54ed5822f576c97d7e797b1226406b91bac134",
+   "archive_bytes": 1156059,
+   "files": 179,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "vaynel/llmwiki-public",
+   "sha": "7df24ffb4cdfe35a5494918424a0ef36176692c5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "65116dee66245c6cb659215669fe0f6a9f14871769d525c1e2f0abbf6668d1e4",
+   "archive_bytes": 27838115,
+   "files": 669,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "Resner/Biosphere",
+   "sha": "44e4d737e86b9e9e3a1c3c638c710a866e512576",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "f3c83f11044465e264c2edf2452167d382a7bcf028ce4f32b6a3264fcab92b25",
+   "archive_bytes": 4313124,
+   "files": 521,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "dekimuhq/dekimu-mcp",
+   "sha": "15b998b93cf03289c5bc52e4b6ce2ec49fabf19b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d63f88d2aa2053f8e4deafae11d0bd4084f34903d8e9f1c5de690a9375787695",
+   "archive_bytes": 70316,
+   "files": 50,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "bpawlowski21/recipes",
+   "sha": "df75e56f5d6f15c6c49eb23d58cb14ecdbf5e5d0",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d8af7f170b2c7c1238ca386236ab5416647ed7a9a39f3f3518de2c866c2f0173",
+   "archive_bytes": 78395356,
+   "files": 1466,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "lawandorga/lawandorga-main-frontend",
+   "sha": "c618971f8f267e5db4865d7d5db7ef37b9a58f41",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "baea2c7868c1593aa3839a4bd4919a69e1f567d994c9338dcabc7ab3e4676b01",
+   "archive_bytes": 755309,
+   "files": 539,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "alterj07/walkpath",
+   "sha": "b5a840a06386fe44351193f5fd9012a0de859055",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8e557a08d9b3d1ab9ae5c0c6121728de0e33295c9e89bd63675b53e6e159b509",
+   "archive_bytes": 1015868,
+   "files": 251,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "DaniGuardiola/extend.computer",
+   "sha": "7e6fd4aa82d8fe1badc6977dbe74d725d72608f9",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "dfd6b473451996e973c17a12e1cb89ac152b305a6230446d5a80eb9259cfe338",
+   "archive_bytes": 25078327,
+   "files": 1143,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "DommyLlamanati/bwain",
+   "sha": "335d555e4e53034486d909e66d606db679353df9",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "8d8f1668ef28b3f78cb46b0c52903b86ef7fe420c2dc8a2b0b68c5738bdb08b7",
+   "archive_bytes": 729959,
+   "files": 229,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "The-Allsparks/ftc-dev-tools",
+   "sha": "a5b805326f80590fa81e412d59f1cfbef33b3e6b",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "3080c27a691cf44ab5117c19d89ba294bd331474ec60cc3a7f6a8ddb6a39c0cc",
+   "archive_bytes": 1322165,
+   "files": 617,
+   "root_gitattributes": true,
+   "export_ignore": []
+  },
+  {
+   "repo": "kimd10041004-gif/bandut-partner-platform-audit",
+   "sha": "ba214ed4c784867f652c4620a2d03da398c61dfb",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4f3d5dfa2e8224cf1493dd31858075552c8b94651b45f6a85b252bd61e3aba3c",
+   "archive_bytes": 9708335,
+   "files": 753,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "p00rmanS/cadence",
+   "sha": "3f21d57cfcd864917065ea7247764f0e323a6a9c",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "a9ae1e65fa31f5151ef3473ba78e63fe1fbf0abdbf73c973d0b4e31718adfbf2",
+   "archive_bytes": 513931,
+   "files": 181,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "abdalrahmanattya/customer-support-chatbot-aws-bedrock",
+   "sha": "9029b2845fda0f29a407110a24df77daeccd639a",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "d1523ce99db9781b3bf3ec07587fcfd415ab7c3fdb4365b79217da04ecbb79d0",
+   "archive_bytes": 489370,
+   "files": 94,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Zeeraa/protogen-configurator",
+   "sha": "e3192261866b54dfbeef182ab00a54cc2b83650e",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "1724f2afd400907e4434946185f4b215c54dfe9160208db31d4d8215e2a911a0",
+   "archive_bytes": 105895,
+   "files": 66,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Mihanikuz/classic-mail-mcp-exchange",
+   "sha": "d7a56c5f39d71d7bf8589a4d429fa3acd507e28d",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "4488e1f64dd253d856396cea7bc13ee0590e1b04e2f60ac1e5313a491ca07ed6",
+   "archive_bytes": 157753,
+   "files": 60,
+   "root_gitattributes": false,
+   "export_ignore": []
+  },
+  {
+   "repo": "Toilet-Paper-Games/cover-story",
+   "sha": "85b9a81eb651f9812edf116545ffbbaadb8655b5",
+   "ok": true,
+   "attempt": 1,
+   "archive_sha256": "10a25728aab8bbf651b0a16d185d8eb29a9a55ecf416453694942a11f9bb4366",
+   "archive_bytes": 21105633,
+   "files": 74,
+   "root_gitattributes": false,
+   "export_ignore": []
+  }
+ ]
+}

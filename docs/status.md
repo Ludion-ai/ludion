@@ -23,7 +23,7 @@ Not in the text above:
 
 - Every changed version counts as production in `ludion judge`: no dependency is told apart as dev-only, and there is no 7-day wait.
 - `ludion scan` also reads Python, Go and Rust projects, read-only: it reports known advisories and plans or applies nothing (README, "Read-only scans").
-- What `ludion judge` sends: package names and versions to OSV and the npm registry, the IDs of the advisories OSV returns back to OSV, and their CVE IDs to FIRST's EPSS service. It downloads CISA's catalog of exploited vulnerabilities whole. No source is sent. The owner decided that EPSS scores are downloaded whole too, so that no CVE ID is sent (docs/decisions/2026-10-29-epss-downloaded-whole.md); until that is built, CVE IDs still go to FIRST.
+- What `ludion judge` sends: package names and versions to OSV and the npm registry, and the IDs of the advisories OSV returns back to OSV. No CVE ID is sent and no source is sent. It downloads CISA's catalog of exploited vulnerabilities whole, and, when a fix has a CVE ID, FIRST's daily list of EPSS scores whole, and looks the CVE IDs up in them (docs/decisions/2026-10-29-epss-downloaded-whole.md). The EPSS list comes from the one URL first.org/epss/data gives (epss.empiricalsecurity.com), following only its redirect to that day's file on the same host, at most 16 MiB compressed and 64 MiB expanded, within 120 seconds; a list that cannot be downloaded or has any line that is not a score makes the judgement undecidable. The urgency rule is unchanged (an EPSS of 0.1 or more is high).
 
 ## Missing before complete (working list)
 
@@ -34,7 +34,6 @@ A proposal from the owner's Claude chat, to be fixed with the owner (CLAUDE.md, 
 3. **All four gates on Ludion's own updates.** `patch` and `watch` do not call the judge's checks. Outside `ludion judge`: gate 2's provenance, publisher, install-script, deprecation and withdrawal checks, and the waits. Everywhere: gate 1's OS/SAPI/configuration matching, gate 2's inspection for obfuscated code and new network or process calls, gate 3's check that a changed package loads, and the re-query when a wait ends.
 4. **Runtimes and images beyond PHP.** Node.js and other runtime releases, and base images. PHP in Docker is the only runtime today (README: "runtime upgrades beyond PHP ... remain unsupported").
 5. **The measurement gates the owner picks.** The design's gates are a backtest, a noise measurement and five users for two weeks (docs/design.md, ロードマップと検証ゲート). Which of them "complete" requires is the owner's call.
-6. **No CVE ID sent.** EPSS scores downloaded whole, as decided (docs/decisions/2026-10-29-epss-downloaded-whole.md); `ludion judge` still sends CVE IDs to FIRST's EPSS service.
 
 ## Waiting for the owner
 

@@ -41,7 +41,7 @@ mutate $R "no recomputation of wait_until" 'while (j.wait_until && Date.parse(j.
 mutate $R "missing attestations not a gap" 'if ("gap" in cap.provenance) return' 'if (false) return'
 mutate $R "a day without a poll does not break the run" 'if (days.has(dayOf(d))) continue;' 'continue;'
 mutate $R "false-report candidates counted as misses" 'counts_as_malicious: category !== "false_report"' 'counts_as_malicious: true'
-mutate $R "repeated records kept" 'if (previous.get(stream) === key)' 'if (false)'
+mutate $R "repeated records kept" 'if (previous.get(item.stream) === item.key)' 'if (false)'
 mutate $R "records after the window's end + 336h join the denominator" 'const due = recs.filter(r => ids.get(r)! <= end + LATE_RECORD_MS);' 'const due = recs;'
 mutate $R "nothing pending past the store's coverage" 'if (at > ctx.coverage) return' 'if (false) return'
 mutate $R "no seed from a later complete capture" 'if (!("gap" in input)) break;' 'break;'

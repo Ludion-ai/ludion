@@ -1,4 +1,4 @@
-# started 2026-10-29T13:23:11Z, node v24.22.1, git version 2.39.5
+# started 2026-10-29T13:45:23Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       no hooks override — packages/cli/test/branch.test.ts
 caught       git started in the project's folder — packages/cli/test/branch.test.ts
@@ -8,7 +8,7 @@ caught       no configuration check before a branch — packages/cli/test/branch
 caught       two fixes on one branch name — packages/cli/test/dependencies.test.ts
 caught       a symbolic ref at the name accepted — packages/cli/test/branch.test.ts
 caught       reftable accepted — packages/cli/test/branch.test.ts
-caught       a link at an object file accepted — packages/cli/test/branch.test.ts
+caught       a link at another loose object accepted — packages/cli/test/branch.test.ts
 caught       partial clone accepted — packages/cli/test/branch.test.ts
 caught       hooks named in configuration accepted — packages/cli/test/branch.test.ts
 caught       CRLF committed as checked out — packages/cli/test/branch.test.ts
@@ -28,10 +28,11 @@ caught       apply writes the working tree — packages/cli/test/dependencies.te
 caught       no publish time — packages/cli/test/dependencies.test.ts
 caught       PHP: no publish time — packages/cli/test/security.test.ts
 caught       PHP: branch for an existing one — packages/cli/test/security.test.ts
-caught       npm carries another package within a known advisory — packages/cli/test/dependencies.test.ts
-caught       a new advisory accepted — packages/cli/test/dependencies.test.ts
+caught       a planted object accepted — packages/cli/test/branch.test.ts
+caught       alternates accepted — packages/cli/test/branch.test.ts
+caught       a finding on a new version accepted — packages/cli/test/dependencies.test.ts
 caught       a baseline MAL- record accepted — packages/cli/test/dependencies.test.ts
 caught       a symbolic link in .git accepted — packages/cli/test/branch.test.ts
 caught       an existing reflog accepted — packages/cli/test/branch.test.ts
-33 of 33 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
-# finished 2026-10-29T13:24:45Z
+34 of 34 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
+# finished 2026-10-29T13:47:06Z

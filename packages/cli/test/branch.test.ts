@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { deflateSync } from "node:zlib";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { branchName, branchTip, fixBranch, GIT_SETTINGS, gitBase, skippedReason } from "../src/security/branch.ts";
@@ -102,7 +103,7 @@ describe("a fix on its own branch", () => {
     const path = process.env.PATH;
     process.env.PATH = `.:${path}`;
     try {
-      fixBranch(gitBase(root, copy), "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{}\n" }], "ludion: x");
+      fixBranch(gitBase(root, copy), "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{\"x\":1}\n" }], "ludion: x");
       expect(existsSync(join(marks, "project-git.ran"))).toBe(false);
       // The control: started in the project's folder, the project's git is the one that runs.
       spawnSync("git", ["--version"], { cwd: root });
@@ -115,7 +116,7 @@ describe("a fix on its own branch", () => {
     try {
       const base = gitBase(root, copy);
       expect(base.commit).toBe(git(root, "--git-dir", join(root, ".git"), "rev-parse", "HEAD"));
-      fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{}\n" }], "ludion: x");
+      fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{\"x\":1}\n" }], "ludion: x");
     } finally { for (const key of ["GIT_DIR", "GIT_INDEX_FILE", "GIT_CONFIG_PARAMETERS"]) if (saved[key] === undefined) delete process.env[key]; else process.env[key] = saved[key]; }
     expect(git(root, "rev-parse", "--verify", "ludion/npm/x-1.0.1")).toMatch(/^[0-9a-f]{40}$/);
     expect(git(other.root, "branch", "--list", "ludion/*")).toBe("");
@@ -175,6 +176,11 @@ describe("a fix on its own branch", () => {
     mkdirSync(join(fourth.root, ".git", "objects", oid.slice(0, 2)), { recursive: true });
     symlinkSync(join(outside, "target"), join(fourth.root, ".git", "objects", oid.slice(0, 2), oid.slice(2)));
     expect(() => fixBranch(fourthBase, "ludion/npm/x-1.0.1", fresh, "ludion: x")).toThrow(`objects/${oid.slice(0, 2)}/${oid.slice(2)}`);
+    // A link at any loose object file, such as the tree Git would write next.
+    const fifth = project(), fifthBase = gitBase(fifth.root, fifth.copy);
+    mkdirSync(join(fifth.root, ".git", "objects", "ab"), { recursive: true });
+    symlinkSync(join(outside, "tree"), join(fifth.root, ".git", "objects", "ab", "c".repeat(38)));
+    expect(() => fixBranch(fifthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow(`objects/ab/${"c".repeat(38)}`);
     // A reflog file already there, which Git would append to.
     const third = project();
     mkdirSync(join(third.root, ".git", "logs", "refs", "heads", "ludion", "npm"), { recursive: true });
@@ -188,11 +194,27 @@ describe("a fix on its own branch", () => {
     expect(git(root, "symbolic-ref", "refs/heads/ludion/npm/x-1.0.1")).toBe("refs/tags/made-by-symref");
     expect(spawnSync("git", ["rev-parse", "--verify", "--quiet", "refs/tags/made-by-symref"], { cwd: root }).status).not.toBe(0);
   });
+  it("reads back what it wrote: an object planted at the new content's id stops the branch", () => {
+    const { root, copy } = project(), base = gitBase(root, copy), content = "{\"p\":1}\n";
+    const oid = spawnSync("git", ["hash-object", "--stdin"], { cwd: root, input: content, encoding: "utf8" }).stdout.trim();
+    // A loose object at that id holding other bytes: Git takes it as present and never writes ours.
+    const other = Buffer.from("{\"evil\":1}\n");
+    mkdirSync(join(root, ".git", "objects", oid.slice(0, 2)), { recursive: true });
+    writeFileSync(join(root, ".git", "objects", oid.slice(0, 2), oid.slice(2)), deflateSync(Buffer.concat([Buffer.from(`blob ${other.length}\0`), other])));
+    expect(() => fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content }], "ludion: x")).toThrow("already holds another object for the new package.json");
+    expect(git(root, "branch", "--list", "ludion/*")).toBe("");
+  });
+  it("refuses a repository that borrows objects from other folders", () => {
+    const { root, copy } = project();
+    writeFileSync(join(root, ".git", "objects", "info", "alternates"), `${mkdtempSync(join(tmpdir(), "ludion-branch-alternate-"))}\n`);
+    expect(() => gitBase(root, copy)).toThrow("borrows objects from other folders");
+  });
   it("refuses a repository whose refs are not in the files storage", () => {
     const { root, copy } = project();
-    // Git versions without reftable ignore the setting in a version-0 repository; the refusal reads it all the same.
+    // Git without reftable ignores the setting in a version-0 repository, and Ludion refuses it all the same; Git with
+    // reftable cannot read this files repository so set, and Ludion refuses it one step earlier.
     git(root, "config", "extensions.refStorage", "reftable");
-    expect(() => gitBase(root, copy)).toThrow("keeps its refs in reftable storage");
+    expect(() => gitBase(root, copy)).toThrow(/keeps its refs in reftable storage|not in a Git work tree/);
   });
   it("checks the configuration again before each branch", () => {
     const { root, copy } = project(), base = gitBase(root, copy);

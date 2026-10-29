@@ -47,11 +47,6 @@ export type FixReceipt = {
   changed_packages?: PackageChange[];
   /** Rules 1 and 2 of the time cap on the candidate (npm and Composer). */
   time_cap?: TimeCap;
-  /**
-   * Findings of the candidate on another package at a version the baseline did not have, under an advisory the baseline
-   * already had on that package (for example Maven moving it). Allowed, and listed here.
-   */
-  carried_findings?: string[];
   reason?: string;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
@@ -408,10 +403,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       receipt.baseline_image = await test("baseline", baseline.exported, baseline.installedCache);
       receipt.baseline_passed = true;
     }
-    // Another fix's package may move within its advisory (Maven does not hold the graph fixed); that advisory is that fix's.
-    const known = new Set(scan.findings.map(f => `${f.package.name} ${f.advisory.id}`));
     const versioned = new Set(scan.findings.map(f => findingId(f)));
-    const unversioned = (blocked: string) => blocked.replace(/^(.+?)@[^@:\s]+:/, "$1:"), knownBlocked = new Set(scan.blocked.map(unversioned));
     for (const [index, fix] of receipt.fixes.entries()) {
       if (!baseline || fix.outcome === "skipped" || fix.reason) continue;
       try {
@@ -434,16 +426,11 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         compatible(baseline.inventory, candidate.inventory);
         // This fix's package must have no finding left, and no package may have an advisory the baseline did not have on it.
         const after = fix.after = await client.scan(candidate.inventory); active();
-        // A finding on a version the baseline did not have stops the fix. Only Maven, which does not hold the graph fixed,
-        // may carry another package to another version under an advisory the baseline already had on it (another fix's);
-        // a MAL- record is never carried.
-        const added = after.findings.filter(f => f.package.name !== fix.package && !versioned.has(findingId(f)));
-        const carried = ecosystem === "maven" ? added.filter(f => !malicious(f) && known.has(`${f.package.name} ${f.advisory.id}`)) : [];
-        const left = [...after.findings.filter(f => f.package.name === fix.package), ...added.filter(f => !carried.includes(f))].map(findingId);
-        // As with findings, only Maven compares a finding without a supported fix by package and advisory, not version.
-        const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !(ecosystem === "maven" ? knownBlocked.has(unversioned(b)) : scan.blocked.includes(b)));
+        // Nothing may be left on the fix's own package, and no finding on any package version the baseline did not have:
+        // as before per-fix validation, a fix that passes only with another (Maven's commons-text with commons-lang3) stops.
+        const left = after.findings.filter(f => f.package.name === fix.package || !versioned.has(findingId(f))).map(findingId);
+        const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !scan.blocked.includes(b));
         if (left.length || unfixable.length || after.inventory.limitations.length) throw new Error(`Candidate still contains known advisory findings or incomplete inventory${left.length ? ` (${left.slice(0, 5).join(", ")})` : ""}; no source change was made.`);
-        if (carried.length) fix.carried_findings = carried.map(findingId);
         const files = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(candidate.exported, path) })).filter(f => f.before !== f.after);
         if (!files.length) throw new Error("No dependency file changed.");
         fix.candidate_image = await test(label, candidate.exported, candidate.installedCache);

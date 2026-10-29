@@ -60,10 +60,17 @@ function refuseConfiguration(dir: string): void {
   // A partial clone fetches missing objects through its remote; it is refused, not only kept off the network.
   const promisor = configNames(dir, "^(extensions\\.partialclone|remote\\..*\\.promisor)$");
   if (promisor.length) throw new Error(`The repository is a partial clone (${promisor.slice(0, 3).map(plain).join(", ")}), which can fetch a missing object through its remote's command; applying needs review. Nothing was validated or changed.`);
-  // Only the files ref storage, whose paths refuseLinks checks; reftable keeps refs in a folder of its own.
-  const storage = git(dir, ["config", "--get", "extensions.refstorage"], { allowFail: true });
+  // Only the files ref storage, whose paths refuseLinks checks; reftable keeps refs in a folder of its own. Git reads the
+  // repository format from the repository's own config file without includes, so that is what is read here, and newer
+  // Git is also asked directly.
+  const common = realpathSync(resolve(dir, git(dir, ["rev-parse", "--git-common-dir"]).stdout.trim()));
+  const storage = git(dir, ["config", "--file", join(common, "config"), "--no-includes", "--get", "extensions.refstorage"], { allowFail: true });
   if (storage.status !== 0 && storage.status !== 1) throw new Error("The repository's Git configuration could not be read; applying needs review. Nothing was validated or changed.");
-  if (storage.status === 0 && storage.stdout.trim().toLowerCase() !== "files") throw new Error(`The repository keeps its refs in ${plain(storage.stdout.trim())} storage, not files; applying needs review. Nothing was validated or changed.`);
+  const format = git(dir, ["rev-parse", "--show-ref-format"], { allowFail: true }).stdout.trim();
+  const named = storage.status === 0 ? storage.stdout.trim().toLowerCase() : format === "reftable" ? "reftable" : "files";
+  if (named !== "files") throw new Error(`The repository keeps its refs in ${plain(named)} storage, not files; applying needs review. Nothing was validated or changed.`);
+  // Alternates: Git reads and touches objects in other folders the repository names.
+  if (existsSync(join(common, "objects", "info", "alternates"))) throw new Error("The repository borrows objects from other folders (objects/info/alternates); applying needs review. Nothing was validated or changed.");
 }
 
 /**
@@ -143,16 +150,21 @@ export function skippedReason(base: GitBase, branch: string, parent: string | nu
  * Windows junction) on any of those paths would make it write outside the repository, so it is refused, and so is a
  * reflog the new branch already has.
  */
-function refuseLinks(base: GitBase, branch: string, objects: string[]): void {
+function refuseLinks(base: GitBase, branch: string): void {
   const common = realpathSync(resolve(base.top, git(base.top, ["rev-parse", "--git-common-dir"]).stdout.trim()));
   const linked: string[] = [];
   const check = (rel: string) => { try { if (lstatSync(join(common, rel)).isSymbolicLink()) linked.push(rel); } catch { /* absent: Git creates a real one */ } };
   const parts = ["refs", "heads", ...branch.split("/")];
   for (let i = 1; i <= parts.length; i++) { check(parts.slice(0, i).join("/")); check(["logs", ...parts.slice(0, i)].join("/")); }
   check("logs"); check("objects"); check("reftable");
-  // Each loose object Git would write: a link there would make Git take the object as present and touch the target.
-  for (const oid of objects) check(`objects/${oid.slice(0, 2)}/${oid.slice(2)}`);
-  try { for (const name of readdirSync(join(common, "objects"))) check(`objects/${name}`); } catch { /* no objects folder: Git creates it */ }
+  // Every loose object file: a link where Git writes a blob, tree or commit would make Git take the object as present
+  // and touch the target.
+  try {
+    for (const name of readdirSync(join(common, "objects"))) {
+      check(`objects/${name}`);
+      if (/^[0-9a-f]{2}$/.test(name) && !lstatSync(join(common, "objects", name)).isSymbolicLink()) for (const file of readdirSync(join(common, "objects", name))) check(`objects/${name}/${file}`);
+    }
+  } catch { /* no objects folder: Git creates it */ }
   if (linked.length) throw new Error(`The repository's .git folder has a symbolic link where Git would write (${linked.slice(0, 3).map(plain).join(", ")}); applying needs review.`);
   if (existsSync(join(common, "logs", ...parts))) throw new Error(`A reflog for the new branch ${plain(branch)} already exists; applying needs review.`);
 }
@@ -168,7 +180,7 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
   refuseConfiguration(base.top);
   if (git(base.top, ["symbolic-ref", "--quiet", ref], { allowFail: true }).status === 0) throw new Error(`${plain(ref)} is a symbolic ref; it was not changed, and applying needs review.`);
   const contents = files.map(file => base.crlf.has(file.path) ? file.content.replace(/\r\n/g, "\n") : file.content);
-  refuseLinks(base, branch, contents.map(content => createHash(base.commit.length === 64 ? "sha256" : "sha1").update(`blob ${Buffer.byteLength(content)}\0`).update(content).digest("hex")));
+  refuseLinks(base, branch);
   const unknown = files.filter(file => !base.modes.has(file.path));
   if (unknown.length) throw new Error(`The last commit has no ${unknown.map(f => plain(f.path)).join(", ")}; applying needs review.`);
   const temp = mkdtempSync(join(tmpdir(), "ludion-index-")), index = join(temp, "index");
@@ -180,6 +192,16 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
     }
     const tree = git(base.top, ["write-tree"], { index }).stdout.trim();
     const commit = git(base.top, ["commit-tree", tree, "-p", base.commit, "--no-gpg-sign", "-F", "-"], { input: message.replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, " ") }).stdout.trim();
+    // Git takes an object already present at an id as that object, so a planted one would stand in for ours. Read back
+    // what the branch would hold: the commit's tree and only parent, the files it changes, and each file's bytes.
+    const headers = git(base.top, ["cat-file", "commit", commit]).stdout.split("\n\n")[0]!.split("\n");
+    if (headers.find(h => h.startsWith("tree ")) !== `tree ${tree}` || headers.filter(h => h.startsWith("parent ")).join("\n") !== `parent ${base.commit}`) throw new Error("The commit Git wrote is not the one made; applying needs review.");
+    const changed = git(base.top, ["diff-tree", "-r", "-z", "--no-renames", base.commit, commit]).stdout.split("\0").filter(Boolean);
+    const paths = changed.filter((_, i) => i % 2 === 1), expected = files.map(file => `${base.prefix}${file.path}`);
+    if (paths.sort().join("\0") !== [...expected].sort().join("\0")) throw new Error(`The branch would change ${paths.map(plain).join(", ") || "nothing"}, not only ${expected.map(plain).join(", ")}; applying needs review.`);
+    for (const [i, file] of files.entries()) {
+      if (git(base.top, ["cat-file", "blob", `${commit}:${base.prefix}${file.path}`]).stdout !== contents[i]) throw new Error(`The repository already holds another object for the new ${plain(file.path)}; applying needs review.`);
+    }
     // A symbolic ref at this name was refused above; --no-deref keeps update-ref from following one in any case.
     git(base.top, ["update-ref", "--no-deref", "-m", "ludion: one fix", ref, commit, "0".repeat(base.commit.length)]);
     return commit;

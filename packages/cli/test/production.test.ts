@@ -611,6 +611,9 @@ describe("L1d: the misses of the noise rerun and of L1c are counted", () => {
     expect(quick(() => codeSpecifiers(`${"const a = 'x';".repeat(n)}${"require(a);".repeat(n)}`))).toBeLessThan(1500);
     expect(codeSpecifiers(`${"const a = 'x';".repeat(3)}${"require(a);".repeat(3)}`)).toEqual(["x", "x", "x"]);
     expect(quick(() => codeSpecifiers(`require(${"(".repeat(n)}`))).toBeLessThan(1500);
+    // Long specifier lists do not overflow push()'s argument limit (#196 review, finding 1).
+    expect(codeSpecifiers(`${"const a = 'x';".repeat(300_000)}require(a);`)).toHaveLength(300_000);
+    expect(codeSpecifiers("require('x');".repeat(300_000))).toHaveLength(300_000);
     expect(quick(() => codeSpecifiers(`${"require(x ".repeat(n)}`))).toBeLessThan(1500);
     const lock = lockOf({ devDependencies: { x: "^1" } }, { "node_modules/x": { dev: true } });
     expect(quick(() => productionSplit(lock, tree({ "package.json": "{}", "src/a.js": `${"'node_modules', 'a".repeat(n)}`, "src/b.js": `'node_modules'${", 'a'".repeat(n)}` })))).toBeLessThan(1500);

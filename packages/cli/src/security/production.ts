@@ -182,7 +182,8 @@ function callSpecifiers(text: string): string[] {
       const literal = quoted.exec(text)?.[2];
       specifierAt.set(p, literal ? [literal] : argumentAt(p));
     }
-    out.push(...specifierAt.get(p)!);
+    // One push per specifier: spreading a long list into push() exceeds the engine's argument limit.
+    for (const s of specifierAt.get(p)!) out.push(s);
   }
   return out;
 }
@@ -196,7 +197,7 @@ export function codeSpecifiers(text: string): string[] {
   for (const m of text.matchAll(/\b(?:import|export)\s+type\s+(?:\{[^{}"'\x60;]{0,2000}\}|\*\s*as\s+[\w$]+|[\w$]+)\s*(from\s*(["'])[^"'\n]+\2)/g)) typeOnly.add(m.index! + m[0].length - m[1]!.length);
   for (const m of text.matchAll(/\bfrom\s*(["'])([^"'\n]+)\1/g)) if (!typeOnly.has(m.index!)) out.push(m[2]!);
   for (const m of text.matchAll(/\bimport\s*(["'])([^"'\n]+)\1/g)) out.push(m[2]!);
-  out.push(...callSpecifiers(text));
+  for (const s of callSpecifiers(text)) out.push(s);
   for (const m of text.matchAll(/@jsxImportSource\s+([^\s*]+)/g)) out.push(m[1]!);
   return out;
 }

@@ -124,10 +124,22 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     for (const j of [scripts, link, repointed]) expect(j.verdict).toBe("stop");
   });
 
-  it("says in what it did not check that there is no production/dev split", async () => {
+  it("keeps the judge's own list of what it did not check", async () => {
     const j = await run(base());
-    expect(j.not_checked).toContain(`Gate 1's OS, SAPI and configuration conditions are not matched. ${NO_SPLIT}`);
-    expect(j.not_checked.join(" ")).not.toContain("only production versus dev-only is used");
+    expect(j.not_checked).toContain("Gate 1's OS, SAPI and configuration conditions are not matched, and production and dev-only dependencies are not told apart: every changed version counts as production.");
+  });
+
+  it("stops an extraneous lockfile folder the candidate adds", async () => {
+    const j = await run(base(), LATER, changed("package-lock.json", doc => { doc.packages["node_modules/helper/packages/x"] = { version: "1.0.0", extraneous: true }; }));
+    expect(j.verdict).toBe("stop");
+    expect(stops(j)).toEqual([expect.stringContaining("An extraneous lockfile folder outside the install paths is added, removed or changed: node_modules/helper/packages/x ")]);
+  });
+
+  it("does not let an undecidable judgement with no stop finding through (an unchanged lockfile)", async () => {
+    const j = await run(base(), LATER, before());
+    expect(j.verdict).toBe("undecidable");
+    expect(stops(j)).toEqual([]);
+    expect(candidateRefusal(j)).toContain("The judge cannot decide on the candidate: gate 1: The lockfile change adds no package version. gate 4: ");
   });
 
   it("stops the same checks on the fix itself", async () => {

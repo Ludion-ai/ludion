@@ -17,3 +17,6 @@ try "manifest dropped" packages/cli/src/security/candidate-judge.ts 'judge({ ...
 try "links dropped" packages/cli/src/security/candidate-judge.ts 'judge({ ...lock, changes,' 'judge({ ...lock, links: [], changes,'
 try "entries dropped" packages/cli/src/security/candidate-judge.ts 'judge({ ...lock, changes,' 'judge({ ...lock, entries: undefined, changes,'
 try "extend reasons dropped" packages/cli/src/security/candidate-judge.ts '${extended.length ?' '${false ?'
+try "judge exception swallowed" packages/cli/src/security/dependency-patch.ts 'const refusal = candidateRefusal(receipt.judgement = await judgeNpmCandidate(source, exported, deps.fetchFn)); active();' 'let refusal: string | null = null; try { refusal = candidateRefusal(receipt.judgement = await judgeNpmCandidate(source, exported, deps.fetchFn)); } catch {} active();'
+try "extraneous dropped" packages/cli/src/security/candidate-judge.ts 'judge({ ...lock, changes,' 'judge({ ...lock, extraneous: [], changes,'
+try "undecidable without stop passes" packages/cli/src/security/candidate-judge.ts 'if (j.verdict === "ready_except_build") return null;' 'if (j.verdict === "ready_except_build" || (j.verdict === "undecidable" && !j.findings.some(f => f.effect === "stop"))) return null;'

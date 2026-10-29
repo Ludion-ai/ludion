@@ -7,8 +7,8 @@ import { judge, type FixedAdvisory, type Judgement, type VersionFacts } from "./
 import { packageLockInputs } from "./judge-cli.ts";
 import { gatherFacts } from "./npm-facts.ts";
 
-/** `ludion patch` has no production/dev split (docs/status.md, "Waiting for the owner", 2). */
-export const NO_SPLIT = "No production/dev split in `ludion patch`: every changed version counts as production.";
+/** As in `ludion judge`, no dependency is told apart as dev-only (the owner's decision). */
+export const NO_SPLIT = "Every changed version counts as production, as in `ludion judge` (docs/decisions/2026-10-29-every-change-counts-as-production.md).";
 
 /** Judge the change from `before` (the project) to `after` (the candidate), each a folder with package.json and package-lock.json. */
 export async function judgeNpmCandidate(before: string, after: string, fetchFn: typeof fetch = fetch, now = new Date()): Promise<Judgement> {
@@ -20,9 +20,7 @@ export async function judgeNpmCandidate(before: string, after: string, fetchFn: 
   try { ({ facts, fixes, created } = await gatherFacts(changes, fetchFn, lock.entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const files = [a.manifest === b.manifest ? null : "package.json", a.lock === b.lock ? null : "package-lock.json"].filter((f): f is string => f !== null);
   const judgement = judge({ ...lock, changes, facts, fixes, created, errors, files, now });
-  // The judge's own note on gate 1 says it uses a production/dev split; this path has none.
-  const notChecked = judgement.not_checked.map(n => n.startsWith("Gate 1's OS, SAPI") ? `Gate 1's OS, SAPI and configuration conditions are not matched. ${NO_SPLIT}` : n);
-  return { ...judgement, findings: [{ gate: 1, effect: "info", message: NO_SPLIT }, ...judgement.findings], not_checked: notChecked };
+  return { ...judgement, findings: [{ gate: 1, effect: "info", message: NO_SPLIT }, ...judgement.findings] };
 }
 
 /** Why the patch must not go on with the candidate, or null when the judge found nothing and the wait is over. */

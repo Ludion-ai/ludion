@@ -462,6 +462,32 @@ describe("the judge on npm candidates", () => {
   });
 });
 
+describe("the judge on npm candidates, when it throws", () => {
+  it("fails the receipt and applies nothing", async () => {
+    // Two lockfile paths that differ only in case: the inventory reads them, the judge's lockfile reader refuses them.
+    const root = fixture(), withCase = lock() as any;
+    withCase.packages["node_modules/other"] = { version: "1.0.0", resolved: "https://registry.npmjs.org/other/-/other-1.0.0.tgz", integrity: integrityOf("other", "1.0.0") };
+    withCase.packages["node_modules/Other"] = { ...withCase.packages["node_modules/other"] };
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(withCase));
+    const before = snapshot(root), command = fakeCommand(); let tests = 0;
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), testRun: async () => { tests++; }, command: async args => {
+      const output = await command(args);
+      const out = args.find(a => a.startsWith("type=local,dest="));
+      if (out?.endsWith("candidate-export")) {
+        const file = join(out.slice("type=local,dest=".length), "package-lock.json"), candidate = JSON.parse(readFileSync(file, "utf8"));
+        Object.assign(candidate.packages, { "node_modules/other": withCase.packages["node_modules/other"], "node_modules/Other": withCase.packages["node_modules/Other"] });
+        writeFileSync(file, JSON.stringify(candidate));
+      }
+      return output;
+    } });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toBe("Two package-lock paths differ only in case: node_modules/Other.");
+    expect(result.receipt?.judgement).toBeUndefined();
+    expect(tests).toBe(1);
+    expect(snapshot(root)).toBe(before);
+  });
+});
+
 describe("the time cap on candidates", () => {
   const inv = (ecosystem: "npm" | "composer", packages: [string, string][]): Inventory => ({ ecosystem, files: [], scope: "locked_dependencies", limitations: [], packages: packages.map(([name, version]) => ({ ecosystem, name, version, direct: false })) });
   const plan = [{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: ["GHSA-test-0001"] }];

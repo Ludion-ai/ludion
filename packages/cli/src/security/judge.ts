@@ -476,7 +476,7 @@ export function judge(input: {
   const locked = input.locked ?? new Set(changes.flatMap(c => c.from ? [`${c.name}@${c.from}`] : []));
   const lockedNames = new Set([...locked].map(id => id.slice(0, id.lastIndexOf("@"))));
   // The targets are the change's own fixing versions (ownFixes): another copy of a fixed package, added or newly loaded
-  // in the same change, neither sets T nor anchors a sibling (as in `ludion patch`).
+  // in the same change, neither sets T nor anchors a sibling.
   let targets = changes.filter(fixedBy(fixes));
   if (!targets.length) targets = changes.filter(c => (input.direct ?? []).includes(c.name));
   const newDependencies = changes.flatMap(c => {

@@ -2,7 +2,7 @@
 // the fix (the latest, when one change fixes several packages). Every other version a change installs must already be
 // in the lockfile or have been published strictly before T (rule 1), and a new dependency whose package first appeared
 // less than the base wait before T stops the change (rule 2). The rules are one pure function, used by `ludion judge`
-// (npm, pnpm) and on `ludion patch` candidates (npm, Composer), with the release facts fetched below.
+// (npm, pnpm) and the backtests, with npm's release facts fetched below.
 // A version published at or after T may still move when it is the same release as a target (the same-release
 // exception, docs/decisions.md, "Rule 1's same-release exception").
 
@@ -146,33 +146,4 @@ export async function npmReleases(name: string, fetchFn: typeof fetch = fetch): 
   for (const [version, at] of Object.entries(doc.time)) if (version !== "created" && version !== "modified" && typeof at === "string") published.set(version, at);
   for (const [version, manifest] of Object.entries<any>(doc.versions)) requires.set(version, Object.keys({ ...manifest?.dependencies, ...manifest?.optionalDependencies }).sort());
   return { created: firstPublish(doc.time), published, requires };
-}
-
-const COMPOSER_NAME = /^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/;
-/** Without a leading "v", so "v1.2.3" in a lockfile and "1.2.3" on Packagist are one version. */
-export const composerVersion = (version: string) => version.replace(/^v(?=\d)/, "");
-/**
- * Composer: Packagist's metadata for tagged releases (`time`, `require`). The minified format lists only what changed
- * from the previous entry; "__unset" removes a key. Packagist's `time` is the release's commit or tag date, which its
- * author sets: a backdated release is not caught by the cap (docs/decisions.md).
- */
-export async function packagistReleases(name: string, fetchFn: typeof fetch = fetch): Promise<Releases> {
-  if (!COMPOSER_NAME.test(name)) throw new Error(`Invalid Composer package name: ${name}`);
-  const doc = await boundedJson(fetchFn, `https://repo.packagist.org/p2/${name}.json`, 32 * 1024 * 1024);
-  const list = doc?.packages?.[name];
-  if (!Array.isArray(list)) throw new Error(`Invalid Packagist metadata for ${name}.`);
-  const published = new Map<string, string>(), requires = new Map<string, string[]>();
-  let current: Record<string, unknown> = {};
-  for (const entry of list) {
-    if (!entry || typeof entry !== "object") throw new Error(`Invalid Packagist metadata for ${name}.`);
-    current = doc.minified === "composer/2.0" ? { ...current } : {};
-    for (const [key, value] of Object.entries(entry)) { if (value === "__unset") delete current[key]; else current[key] = value; }
-    if (typeof current.version !== "string") throw new Error(`Invalid Packagist metadata for ${name}.`);
-    const version = composerVersion(current.version);
-    if (typeof current.time === "string") published.set(version, current.time);
-    const require = current.require && typeof current.require === "object" ? Object.keys(current.require).filter(r => r.includes("/")) : [];
-    requires.set(version, require.sort());
-  }
-  const times = [...published.values()].map(Date.parse).filter(Number.isFinite);
-  return { created: times.length ? new Date(Math.min(...times)).toISOString() : null, published, requires };
 }

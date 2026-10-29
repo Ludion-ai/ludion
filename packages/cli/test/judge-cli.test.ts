@@ -1,9 +1,9 @@
 // `ludion judge` counts every changed version as production (docs/decisions/2026-10-29-judge-only.md): the lockfile's
 // own `dev` flag never lowers urgency to dev-only or the wait to 168 hours.
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { judgeCli } from "../src/security/judge-cli.ts";
 import type { Judgement } from "../src/security/judge.ts";
 
@@ -24,8 +24,12 @@ const lock = (a: string, b: string) => JSON.stringify({
 });
 const manifest = JSON.stringify({ name: "app", devDependencies: { a: "^1.0.0" } });
 
+const made: string[] = [];
+afterAll(() => { for (const dir of made) rmSync(dir, { recursive: true, force: true }); });
+
 function checkout(lockText: string): string {
   const dir = mkdtempSync(join(tmpdir(), "judge-cli-"));
+  made.push(dir);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "package.json"), manifest);
   writeFileSync(join(dir, "package-lock.json"), lockText);

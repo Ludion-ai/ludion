@@ -51,7 +51,7 @@ test("a phone does not scroll sideways and keeps reachable controls", async ({ p
     await touchTargets(page.locator("[data-delivery-target]"), viewport.width);
     await expect(page.locator("[data-delivery-target=read]")).toContainText("Read");
     await expect(page.locator("[data-delivery-target=check]")).toContainText("Check");
-    await expect(page.locator("[data-delivery-target=comment]")).toContainText("Wait, then comment");
+    await expect(page.locator("[data-delivery-target=comment]")).toContainText("Count the wait, comment");
     await reflow(page);
   }
 });
@@ -64,8 +64,8 @@ test("200 percent text keeps the design on the phone", async ({ page }) => {
     await page.evaluate(() => document.fonts.ready);
     await resizeText(page);
     await reflow(page);
-    await expect(page.locator("h1")).toContainText("Every dependency PR,");
-    await expect(page.locator("h1")).toContainText("judged before you merge.");
+    await expect(page.locator("h1")).toContainText("Every npm dependency PR,");
+    await expect(page.locator("h1")).toContainText("judged in one comment.");
     await expect(page.locator("[data-guard-state]")).toHaveCount(4);
     await expect(page.locator("#receipt")).toContainText("Gate 3, build and tests");
     await expect(page.locator("#isolate")).toContainText("Flow illustration");

@@ -32,6 +32,7 @@ test("setup shows the two workflows pinned to a release commit, says nothing is 
 
   const workflow = page.getByRole("button", { name: "Copy the judging workflow", exact: true });
   await workflow.click();
+  await expect(workflow).toHaveText("Copied");
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("name: ludion-judge\non:\n  pull_request:\n    paths: [package-lock.json]\n");
 
   const hrefs = await page.locator("a[href]").evaluateAll((els) => els.map((el) => el.getAttribute("href") ?? ""));

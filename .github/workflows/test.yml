@@ -12,6 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # PRs target main, and a lane starts from main, never from an open PR (CLAUDE.md, How we work).
+      - name: The PR targets main
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          if [ "$BASE" != "main" ]; then
+            echo "::error::This PR does not target main. Retarget it to main; stacked PRs are not used (CLAUDE.md, How we work)."
+            exit 1
+          fi
+
       - uses: actions/checkout@v7
         with:
           persist-credentials: false

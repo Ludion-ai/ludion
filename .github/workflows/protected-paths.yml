@@ -36,6 +36,9 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           LABEL: review-approved
+          # A file deleted here, or renamed out of here, makes the PR protected: removing what Ludion does is a scope
+          # change, and decision and mistake records are never deleted (CLAUDE.md, How we work).
+          REMOVED: '^packages/[^/]+/src/|^apps/site/src/pages/|^action/|^action\.yml$|^docs/decisions/|^docs/mistakes/'
           # Applied to each page of the PR's comments, oldest first: "<approve|other> <sha>" for every reviewed-sha
           # line. A review's first line states its verdict; it approves when that line has the word APPROVE and not
           # REQUEST (docs/protected-paths.md).
@@ -52,7 +55,10 @@ jobs:
 
           files=$(gh api --paginate "repos/${REPO}/pulls/${PR}/files" \
             --jq '.[] | .filename, (.previous_filename // empty)')
-          hits=$(printf '%s\n' "$files" | grep -E "$pattern" | sort -u || true)
+          deleted=$(gh api --paginate "repos/${REPO}/pulls/${PR}/files" \
+            --jq '.[] | select(.status == "removed" or (.status == "renamed" and (.filename | test(env.REMOVED) | not)))
+              | (.previous_filename // .filename) | select(test(env.REMOVED))')
+          hits=$( { printf '%s\n' "$files" | grep -E "$pattern" || true; printf '%s\n' "$deleted" | sed '/^$/d; s/$/ (deleted)/'; } | sort -u)
 
           if [ -z "$hits" ]; then
             echo "No protected paths changed."

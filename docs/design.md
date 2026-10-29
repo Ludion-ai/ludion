@@ -1,5 +1,7 @@
 # Ludion 設計書：安全な修正の自動適用
 
+> **2026-10-29：** 方向は CLAUDE.md の Goal が決める。この設計書と違うところ（ロードマップの順番「判定役が先」と、推奨「入口は判定役から」）は、Goal が優先する。設計はオーナーとやり直す（docs/decisions/2026-10-29-security-agent-no-release-until-complete.md）。今の状態は docs/status.md にある。
+
 2026-10-27 時点
 
 Ludionは、プロジェクトに入れるだけで、依存ライブラリ・ランタイム・ベースイメージのセキュリティ修正を自動で当てる。当てるのは「最小の修正版」を「信頼できると判定できた時点」で、「壊れないと確認できたもの」だけ。配布はnpm（npx ludion-ai）とGitHub Actionから始め、npm → PHP → Javaの順に広げる。

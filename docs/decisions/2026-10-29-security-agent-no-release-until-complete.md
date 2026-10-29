@@ -9,7 +9,7 @@
 3. **The cut of 2026-10-29 11:29 is withdrawn.** Nothing it proposed to remove is removed. PRs #198 and #199 (the cut and its follow-ups), #200 (the site rewritten for the judge) and #201 (Japanese pages on top of #200) are closed unmerged, and their branches are kept.
 4. **Carried over from the 11:29 review as rules,** because they are about how the work is recorded and done, not about what Ludion is: what is built moves out of CLAUDE.md into docs/status.md; a decision record only for a change to the goal, the scope, a gate, a wait or a rule, or one that cannot be undone; at most one open protected PR; main merged into a branch only for a conflict; text passed to a command through a file or a quoted heredoc, with the Bash guard refusing a backtick bash would run; third-party repositories read only inside a container with no credentials. The owner approves these by merging the PR that carries this record.
 5. **Held for the owner, not done:** the judge's dev-only split (docs/status.md, Waiting for the owner). The proposals to give the agents their own GitHub account, CODEOWNERS and a ruleset also wait for the owner, who has to create the account.
-6. **docs/design.md** stays the plan for building Ludion, but its roadmap order (the judge first) and its recommendation 「入口は判定役から」 no longer set the direction. The owner redoes the design; a note at the top of design.md says so.
+6. **docs/design.md** stays the plan for building Ludion, but its roadmap order (the judge first) and its recommendation on where to start (「推奨は判定役から」) no longer set the direction. The owner redoes the design; a note at the top of design.md says so.
 
 ## Undo
 

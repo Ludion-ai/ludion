@@ -9,7 +9,7 @@
   5. Lanes started from an open PR: #200 and #201 were built on #198's text before it was merged.
 - **Check:** `.github/workflows/protected-paths.yml` — a PR that deletes a file under packages/*/src/, apps/site/src/pages/, action/, docs/decisions/ or docs/mistakes/ is protected: fresh-context review and the owner's merge.
 - **Check:** `tools/records/test/records.test.ts` — CLAUDE.md opens with the goal and stays under 12,000 bytes, and the deletion rule names the same places in CLAUDE.md and in the workflow.
-- **Check:** `.github/workflows/test.yml` — a PR whose base is not main fails, so no lane is built on an unmerged PR.
+- **Check:** `.github/workflows/test.yml` — a PR whose base is not main fails, so no PR can be stacked on another PR's branch, as #199 and #201 were. It would not have stopped #200, which targeted main with #198's text; the last rule below covers that.
 - **Rule:** "Until Ludion does what this section says, for everything it claims to support, through all four gates, nothing is released: no npm release, no GitHub Action release and no announcement, a comments-only preview included."
 - **Rule:** "Removing or narrowing what Ludion does (an ecosystem, a command, a gate, a page of the site) is a scope change."
 - **Rule:** "Before it, write one sentence saying what Ludion will no longer do, and get the owner's OK on that sentence; an OK to a list does not approve a scope change inside it."

@@ -1,6 +1,6 @@
 # Ludion 設計書：安全な修正の自動適用
 
-> **2026-10-29：** 方向は CLAUDE.md の Goal が決める。この設計書と違うところ（ロードマップの順番「判定役が先」と、推奨「入口は判定役から」）は、Goal が優先する。設計はオーナーとやり直す（docs/decisions/2026-10-29-security-agent-no-release-until-complete.md）。今の状態は docs/status.md にある。
+> **2026-10-29：** 方向は CLAUDE.md の Goal が決める。この設計書と違うところ（ロードマップの順番「判定役が先」と、「入口をどちらにするか」への推奨「判定役から」）は、Goal が優先する。設計はオーナーとやり直す（docs/decisions/2026-10-29-security-agent-no-release-until-complete.md）。今の状態は docs/status.md にある。
 
 2026-10-27 時点
 

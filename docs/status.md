@@ -6,14 +6,14 @@ What Ludion does today, what is missing before it is complete, and what waits fo
 
 Not released. Nothing is released until Ludion is complete (CLAUDE.md, Goal; docs/decisions/2026-10-29-security-agent-no-release-until-complete.md). Automatic merge also needs (a) and (b) (CLAUDE.md, Product):
 
-- (a) is not met: backtest v5 (docs/bench/2026-10-28-backtest-v5) still misses one malicious version, which v5 also counts as disputed, and unknowns remain.
+- (a) is not shown met: unknowns remain in backtest v5 (docs/bench/2026-10-28-backtest-v5), and the one malicious version it still misses is one v5 counts as disputed, shown apart.
 - (b) has no result yet. The shadow's recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md) and the replay that judges what it captures is built (tools/shadow, #194). It needs four consecutive weeks.
 
 The preview's conditions of 2026-10-28 (L1, L9 and LP, in docs/decisions/2026-10-28-release-gates-by-stage.md) no longer release anything.
 
 ## What is built
 
-Moved word for word from CLAUDE.md on 2026-10-29, where it opened the file. "Below" in it means CLAUDE.md's Product section.
+Moved word for word from CLAUDE.md on 2026-10-29, where it opened the file.
 
 What exists today is a source preview: it scans PHP Docker, npm, Composer and Maven, validates candidates offline in Docker and updates source dependency files only with --apply. It does not deploy production or inventory live servers.
 
@@ -37,8 +37,8 @@ A proposal from the owner's Claude chat, to be fixed with the owner (CLAUDE.md, 
 ## Waiting for the owner
 
 1. **What "complete" means.** The working list above is a proposal.
-2. **Gate 1's dev-only split in `ludion judge`.** Held from the 2026-10-29 11:29 review: count every changed version as production, because the noise measurement's miss gate was not met (docs/bench/2026-10-28-noise-v2) and the count gate was not met on a new sample either (docs/bench/2026-10-29-l1c). The trade: with the split, a shipped dependency wrongly shown dev-only waits 7 days at lower priority; without it, a real dev-only update waits 24 to 72 hours instead of 7 days. This changes gate 1, so it waits for the owner. The change is ready on the branch claude/split-and-rules, not opened as a PR.
+2. **Gate 1's dev-only split in `ludion judge`.** Held from the 2026-10-29 11:29 review: count every changed version as production, because the noise measurement's miss gate was not met (docs/bench/2026-10-28-noise-v2) and the count gate was not met on a new sample either (docs/bench/2026-10-29-l1c). The trade: with the split, a shipped dependency wrongly shown dev-only waits 7 days at lower priority; without it, a real dev-only update waits 12 to 72 hours instead of 7 days. This changes gate 1, so it waits for the owner. The change is ready on the branch claude/split-and-rules, not opened as a PR.
 3. **Shorter waits for official runtime releases.** The owner's point (2026-10-29): once a fix is public the race is short. Whether a fix from a runtime's own official channel (php.net, the official Docker image) waits less than the table says changes the wait table, so it is the owner's.
 4. **The judge's lookups by ID.** Keep fetching OSV advisories by ID and sending their CVE IDs to FIRST's EPSS service, and write that into CLAUDE.md's rule, or stop.
 5. **Gates and learned models.** The owner, 2026-10-29 18:24 JST: 「ニューラルネットワーク式にやったらいいじゃない？関門は全てアルゴで まぁ設計はまた後で深掘りする」. Taken for now as: improve the way of working like training, each mistake fed back into a rule or a check, and every checkpoint as code (docs/decisions/2026-10-29-way-of-working.md). Whether any of Ludion's gates should use a learned model is for the design deep-dive. A note for it from the Claude chat: a learned score could add a reason to wait or to notify, but should not lift a stop, because a release can be tuned against a model and a receipt has to say why.
-6. **The design.** docs/design.md's roadmap puts the judge first and recommends 「入口は判定役から」; the Goal now wins over both, and the owner redoes the design.
+6. **The design.** docs/design.md's roadmap puts the judge first, and its open decision on where to start says 「推奨は判定役から」; the Goal now wins over both, and the owner redoes the design.

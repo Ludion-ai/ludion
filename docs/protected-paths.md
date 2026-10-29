@@ -11,7 +11,7 @@ PRs that change any of these paths are not auto-merged (CLAUDE.md, "Every change
 - `lessons/`
 - `ludion.config.json`, `wrangler.jsonc`
 - this file, `docs/protected-paths.md`
-- a file **deleted**, or renamed out of its folder, under `packages/*/src/`, `apps/site/src/pages/`, `action/` (and `action.yml`), `docs/decisions/` or `docs/mistakes/`: removing what Ludion does is a scope change, and decision and mistake records are never deleted (CLAUDE.md, How we work)
+- a file **deleted**, or renamed to a path outside all of these places, under `packages/*/src/`, `apps/site/src/pages/`, `action/` (and `action.yml`), `docs/decisions/` or `docs/mistakes/`: removing what Ludion does is a scope change, and decision and mistake records are never deleted (CLAUDE.md, How we work). A rename from one of these places to another is not caught.
 
 Dependency files (`package.json`, lockfiles) outside the paths above are not protected paths, so this check does not block dependency updates. Instead, every new dependency is checked by security before it is added. Agents still never merge, or enable auto-merge on, a dependency-update PR (Dependabot, Renovate and the like), whatever its checks say, nor any PR an agent did not open (CLAUDE.md, "Every change goes through a PR").
 

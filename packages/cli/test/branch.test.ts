@@ -181,6 +181,10 @@ describe("a fix on its own branch", () => {
     mkdirSync(join(fifth.root, ".git", "objects", "ab"), { recursive: true });
     symlinkSync(join(outside, "tree"), join(fifth.root, ".git", "objects", "ab", "c".repeat(38)));
     expect(() => fixBranch(fifthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow(`objects/ab/${"c".repeat(38)}`);
+    // A fan-out entry that is not a folder does not end the check: the link after it is still found.
+    const sixth = project(), sixthBase = gitBase(sixth.root, sixth.copy);
+    writeFileSync(join(sixth.root, ".git", "objects", "00"), "");
+    expect(() => fixBranch(sixthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow("objects/00 (not a folder)");
     // A reflog file already there, which Git would append to.
     const third = project();
     mkdirSync(join(third.root, ".git", "logs", "refs", "heads", "ludion", "npm"), { recursive: true });

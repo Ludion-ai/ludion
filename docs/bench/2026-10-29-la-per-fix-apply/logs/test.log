@@ -1,4 +1,4 @@
-# started 2026-10-29T13:41:29Z, node v24.22.1, git version 2.39.5
+# started 2026-10-29T14:02:01Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 == npx tsc -p tsconfig.json
 tsc exit 0
@@ -6,34 +6,35 @@ tsc exit 0
 
  RUN  v4.1.12 /w
 
- ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 58ms
- ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 38ms
- ✓ |node| packages/cli/test/judge.test.ts (63 tests) 97ms
- ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 6ms
- ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 189ms
- ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 242ms
- ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 376ms
- ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 216ms
- ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 532ms
-     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  464ms
- ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 736ms
-     ✓ parseRequirements: a run of backslash continuations  323ms
- ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 876ms
- ✓ |node| packages/cli/test/production.test.ts (47 tests) 1224ms
-     ✓ collects what an image holds by name, and seeds held copies, in linear time  737ms
- ✓ |node| packages/cli/test/security.test.ts (38 tests) 1371ms
- ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 1969ms
-     ✓ duplicate members count once toward the 1,000  556ms
-     ✓ more than 1,000 literal members are read no further, and say so  966ms
- ✓ |node| packages/cli/test/branch.test.ts (21 tests) 2031ms
-     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  306ms
- ✓ |node| packages/cli/test/dependencies.test.ts (72 tests) 2148ms
-     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  356ms
+ ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 72ms
+ ✓ |node| packages/cli/test/judge.test.ts (63 tests) 109ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 102ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 211ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 7ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 301ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 231ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 407ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 623ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  543ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 837ms
+     ✓ parseRequirements: a run of backslash continuations  352ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 967ms
+ ✓ |node| packages/cli/test/production.test.ts (47 tests) 1447ms
+     ✓ collects what an image holds by name, and seeds held copies, in linear time  817ms
+ ✓ |node| packages/cli/test/security.test.ts (39 tests) 1688ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2342ms
+     ✓ duplicate members count once toward the 1,000  643ms
+     ✓ more than 1,000 literal members are read no further, and say so  1146ms
+ ✓ |node| packages/cli/test/branch.test.ts (21 tests) 2428ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  412ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (72 tests) 2559ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  306ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  425ms
 
  Test Files  16 passed (16)
-      Tests  692 passed | 19 skipped (711)
-   Start at  13:41:36
-   Duration  2.72s (transform 3.08s, setup 0ms, import 4.73s, tests 12.11s, environment 1ms)
+      Tests  693 passed | 19 skipped (712)
+   Start at  14:02:09
+   Duration  3.19s (transform 2.81s, setup 0ms, import 5.01s, tests 14.33s, environment 2ms)
 
 vitest exit 0
-# finished 2026-10-29T13:41:39Z
+# finished 2026-10-29T14:02:13Z

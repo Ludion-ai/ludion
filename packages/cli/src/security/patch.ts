@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { closeSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join, posix, resolve } from "node:path";
 import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
@@ -120,7 +120,8 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     if (base && branch) {
       active();
       const message = `${subject}\n\nOfficial PHP security releases: ${scan.security_releases.map(r => r.version).join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
-      receipt.commit = fixBranch(base, branch, [{ path: config.dockerfile, content: updated }], message);
+      // The path as Git names it: "./Dockerfile" in the config is "Dockerfile" in the commit.
+      receipt.commit = fixBranch(base, branch, [{ path: posix.normalize(config.dockerfile), content: updated }], message);
       receipt.branch = branch; receipt.applied_at = new Date().toISOString(); receipt.outcome = "applied";
     }
   } catch (err) {

@@ -102,6 +102,13 @@ describe("bounded patch application and evidence", () => {
     expect(docker).toBe(0);
     expect(git(root, "rev-parse", "ludion/php/8.4.28")).toBe(head);
   });
+  it("applies when the config names the Dockerfile as ./Dockerfile", async () => {
+    const root = fixture();
+    writeFileSync(join(root, "ludion.security.json"), JSON.stringify({ ...DEFAULT_CONFIG, dockerfile: "./Dockerfile" }));
+    commit(root);
+    const result = await patchProject(root, true, { fetchFn, command, testRun });
+    expect(result.receipt).toMatchObject({ outcome: "applied", branch: "ludion/php/8.4.28" });
+  });
   it("commits a Dockerfile checked out with CRLF ends with LF ends, as the last commit has it", async () => {
     const root = fixture();
     writeFileSync(join(root, "Dockerfile"), SOURCE.replace(/\n/g, "\r\n"));

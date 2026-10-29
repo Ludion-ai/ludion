@@ -159,12 +159,17 @@ function refuseLinks(base: GitBase, branch: string): void {
   check("logs"); check("objects"); check("reftable");
   // Every loose object file: a link where Git writes a blob, tree or commit would make Git take the object as present
   // and touch the target.
-  try {
-    for (const name of readdirSync(join(common, "objects"))) {
-      check(`objects/${name}`);
-      if (/^[0-9a-f]{2}$/.test(name) && !lstatSync(join(common, "objects", name)).isSymbolicLink()) for (const file of readdirSync(join(common, "objects", name))) check(`objects/${name}/${file}`);
-    }
-  } catch { /* no objects folder: Git creates it */ }
+  // Fails closed: only a missing objects folder reads as empty, and a fan-out entry that is not a real folder refuses.
+  let names: string[] = [];
+  try { names = readdirSync(join(common, "objects")); } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw new Error("The repository's objects folder could not be read; applying needs review."); }
+  for (const name of names) {
+    check(`objects/${name}`);
+    if (!/^[0-9a-f]{2}$/.test(name)) continue;
+    const stat = lstatSync(join(common, "objects", name));
+    if (stat.isSymbolicLink()) continue;
+    if (!stat.isDirectory()) { linked.push(`objects/${name} (not a folder)`); continue; }
+    for (const file of readdirSync(join(common, "objects", name))) check(`objects/${name}/${file}`);
+  }
   if (linked.length) throw new Error(`The repository's .git folder has a symbolic link where Git would write (${linked.slice(0, 3).map(plain).join(", ")}); applying needs review.`);
   if (existsSync(join(common, "logs", ...parts))) throw new Error(`A reflog for the new branch ${plain(branch)} already exists; applying needs review.`);
 }
@@ -198,6 +203,9 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
     if (headers.find(h => h.startsWith("tree ")) !== `tree ${tree}` || headers.filter(h => h.startsWith("parent ")).join("\n") !== `parent ${base.commit}`) throw new Error("The commit Git wrote is not the one made; applying needs review.");
     const changed = git(base.top, ["diff-tree", "-r", "-z", "--no-renames", base.commit, commit]).stdout.split("\0").filter(Boolean);
     const paths = changed.filter((_, i) => i % 2 === 1), expected = files.map(file => `${base.prefix}${file.path}`);
+    // Each changed file keeps HEAD's mode: a planted tree could otherwise make it executable, a link or a submodule.
+    const modes = changed.filter((_, i) => i % 2 === 0).map(meta => meta.split(" ")[1]);
+    if (modes.some((mode, i) => mode !== base.modes.get(paths[i]!.slice(base.prefix.length)))) throw new Error("The tree Git wrote changes a file's mode; applying needs review.");
     if (paths.sort().join("\0") !== [...expected].sort().join("\0")) throw new Error(`The branch would change ${paths.map(plain).join(", ") || "nothing"}, not only ${expected.map(plain).join(", ")}; applying needs review.`);
     for (const [i, file] of files.entries()) {
       if (git(base.top, ["cat-file", "blob", `${commit}:${base.prefix}${file.path}`]).stdout !== contents[i]) throw new Error(`The repository already holds another object for the new ${plain(file.path)}; applying needs review.`);

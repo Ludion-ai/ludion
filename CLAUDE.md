@@ -26,11 +26,11 @@ Every mistake is traced to its cause and fed back into a rule or a check, so the
 
 - One goal: minimise the time from a published fix to it being in the project's configuration (exposure time), and the human work for it, without adding supply-chain risk. Measure those two (median exposure time, human minutes per fix), plus broken automatic applies (target zero; one stops automatic apply and is published) and missed cases. Scan counts are not remediation.
 - "Safe" means passing all four gates; anything that cannot be judged stops (design, "「安全」の定義"):
-  1. Applies: inside the vulnerable range, loaded in production, matching conditions (OS, SAPI, configuration). Dev/test-only dependencies get lower priority, not silence.
+  1. Applies: inside the vulnerable range, matching conditions (OS, SAPI, configuration). Every changed version counts as production: dev-only dependencies are not told apart, so none gets a lower priority or a longer wait (docs/decisions/2026-10-29-every-change-counts-as-production.md).
   2. Genuine: official source, hash-pinned. Stop on lost provenance or a changed repository/workflow, new install scripts, an OSV MAL- record, deprecation or withdrawal. Publisher change, new dependencies or obfuscated/new network or process code extend the wait and notify. Check every package in the lockfile diff, not only the target. Re-query MAL-/deprecation/withdrawal when the wait ends.
   3. Doesn't break: old and new built and tested the same way in isolation; every test passing on old passes on new. Nothing passing on old, or a changed package that cannot be shown to load, is undecidable.
   4. Revertible: one fix per commit or PR, hash-pinned lockfile.
-- Wait before applying: exploited 12h (24h without comparable provenance), high 24h, normal 72h, dev-only 7 days weekly. A stricter project setting wins. The default stops at a PR.
+- Wait before applying: exploited 12h (24h without comparable provenance), high 24h, normal 72h. A stricter project setting wins. The default stops at a PR.
 - Release: none until complete (Goal; docs/decisions/2026-10-29-security-agent-no-release-until-complete.md). Automatic merge is enabled only when both hold: (a) zero misses of confirmed malicious versions in the backtests, where a disputed version that meets v5's evidence standard stays in the denominator, is shown apart and is not counted as a miss; (b) four consecutive weeks of shadow operation with zero misses on versions that received a MAL- record, and at least 100 decided judgements, counted as fixed in docs/decisions/2026-10-29-shadow-counting.md. These conditions do not change the wait table or any gate's numeric criteria.
 - Make supported scope and failures explicit. No result means neither safe nor patched. No fabricated metrics, security certification, or claims that source edits reached production. Say plainly that an update from a hijacked legitimate publisher with no provenance change is caught only by the wait and the re-query. Until each part docs/status.md lists as not built exists, do not describe the preview, its receipts or its updates as gated, waited or "passed the four gates".
 - Preserve the existing Astro UI, brand, responsive layout and motion. Reuse before adding; no unnecessary abstractions.
@@ -43,7 +43,7 @@ Every mistake is traced to its cause and fed back into a rule or a check, so the
 - Updates to ludion-ai itself in users' projects go through the same wait and provenance checks and are never auto-merged.
 - A job that runs candidate code has no write permission and no secrets; a job that writes runs no dependency code.
 - No Ludion-operated relay servers or mirrors: point at official registries and images, pinned by hash.
-- Send OSV package names and versions only, never source or usage.
+- Send only package names and versions (to OSV and the official registries) and, back to OSV, the IDs of the advisories it returned. Download whole lists, such as CISA's exploited vulnerabilities and FIRST's EPSS scores, instead of sending CVE IDs (docs/decisions/2026-10-29-epss-downloaded-whole.md). Never send source or usage.
 
 ## Engineering and security
 

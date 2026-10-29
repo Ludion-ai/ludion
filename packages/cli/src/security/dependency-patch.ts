@@ -11,7 +11,7 @@ import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.
 import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
 import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
-import { releaseIdentity, WAIT_HOURS } from "./judge.ts";
+import { releaseIdentity } from "./judge.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
@@ -81,10 +81,15 @@ export function unplannedRemovals(before: Inventory, after: Inventory, plan: Cha
  * The time cap on a candidate (docs/decisions.md, "Moving dependencies are capped at the fix's publish time"). T is the
  * latest publish time of the planned packages' new versions. Every other version the candidate adds must have been
  * published before T, and a package new to the lockfile, or newly required by a planned package, must have first
- * appeared at least the wait before T. `ludion patch` computes no urgency, so the longest wait (168h) applies.
+ * appeared at least NEW_PACKAGE_AGE_HOURS before T. `ludion patch` computes no urgency, so it uses 168h, the longest
+ * wait the table had when this rule was decided. The dev-only row (168h) has since left the wait table
+ * (docs/decisions/2026-10-29-every-change-counts-as-production.md); this age threshold stays.
  * npm: a version published at or after T may move when it is the same release as a planned version (publisher and
  * provenance read from the registry). Composer: Packagist has neither, so nothing published at or after T may move.
  */
+/** Rule 2's minimum age for a package new to the lockfile, in `ludion patch` (see candidateTimeCap). */
+export const NEW_PACKAGE_AGE_HOURS = 168;
+
 export async function candidateTimeCap(ecosystem: "npm" | "composer", before: Inventory, after: Inventory, plan: Change[], fetchFn: typeof fetch = fetch): Promise<TimeCap> {
   const locked = new Set(before.packages.map(p => `${p.name}@${p.version}`)), lockedNames = new Set(before.packages.map(p => p.name));
   const added = after.packages.filter(p => !locked.has(`${p.name}@${p.version}`));
@@ -108,7 +113,7 @@ export async function candidateTimeCap(ecosystem: "npm" | "composer", before: In
     targets: added.filter(p => plannedTo.has(`${p.name}@${composerVersion(p.version)}`)), others: added, locked, newDependencies,
     published: (name: string, version: string) => releases.get(name)?.published.get(composerVersion(version)),
     created: (name: string) => releases.get(name)?.created,
-    waitHours: WAIT_HOURS.low,
+    waitHours: NEW_PACKAGE_AGE_HOURS,
   };
   const cap = timeCap(input);
   if (ecosystem !== "npm" || !cap.after_t.length) return cap;

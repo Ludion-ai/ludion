@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
+import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { gatherFacts, provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
 import { pnpmChanges } from "../src/security/judge-cli.ts";
 import { firstPublish, renderTimeCap, timeCap } from "../src/security/time-cap.ts";
@@ -588,5 +588,36 @@ describe("a package's first publish", () => {
   it("is the earliest of created and every version, so a re-created package keeps its age", () => {
     expect(firstPublish({ created: "2025-09-01T00:00:00Z", modified: "2026-01-01T00:00:00Z", "1.0.0": "2019-03-01T00:00:00Z", "2.0.0": "2025-09-01T00:00:00Z" })).toBe("2019-03-01T00:00:00.000Z");
     expect(firstPublish({ modified: "2026-01-01T00:00:00Z" })).toBeNull();
+  });
+});
+
+// Moved from production.test.ts when the split was removed (docs/decisions/2026-10-29-every-change-counts-as-production.md):
+// these test the lockfile reader and gate 4 in judge.ts, which stay.
+describe("the lockfile reader's extraneous folders", () => {
+  const folder = { name: "@netlify/ai-gateway", version: "1.0.0", extraneous: true, dependencies: { "@netlify/api": "^14" } };
+  const lockWith = (extra: Record<string, unknown>) => JSON.stringify({ lockfileVersion: 3, packages: { "": { name: "app", dependencies: { a: "^1" } }, "node_modules/a": { version: "1.0.0", resolved: url("a", "1.0.0"), integrity: INTEGRITY }, ...extra } });
+  it("skips an installed package's own workspace folder that npm records as extraneous", () => {
+    const lock = lockWith({ "node_modules/primitives/packages/ai-gateway": folder });
+    expect(lockEntries(lock).map(e => e.path)).toEqual(["node_modules/a"]);
+    expect(lockExtraneous(lock)).toEqual([`node_modules/primitives/packages/ai-gateway ${JSON.stringify(folder)}`]);
+  });
+  it("still refuses such a path when it is not extraneous, or carries a tarball, a hash, a link or a dot segment", () => {
+    for (const [path, item] of [
+      ["node_modules/primitives/packages/ai-gateway", { ...folder, extraneous: false }],
+      ["node_modules/primitives/packages/ai-gateway", { ...folder, resolved: "https://evil.example/x.tgz" }],
+      ["node_modules/primitives/packages/ai-gateway", { ...folder, integrity: INTEGRITY }],
+      ["node_modules/primitives/packages/ai-gateway", { ...folder, link: true }],
+      ["node_modules/primitives/../ai-gateway", folder],
+    ] as const) expect(() => lockEntries(lockWith({ [path]: item }))).toThrow("Unexpected package-lock path");
+  });
+  it("stops the judge when such a folder is added, removed or changed", () => {
+    const j = judge({
+      changes: [{ path: "node_modules/a", name: "a", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("a", "1.0.1"), integrity: INTEGRITY, replaced: null }],
+      facts: new Map([["a@1.0.0", fact()], ["a@1.0.1", fact()]]), fixes: [], files: ["package-lock.json"], now: new Date("2026-10-28T00:00:00Z"), direct: ["a"],
+      extraneous: [`node_modules/primitives/packages/ai-gateway ${JSON.stringify(folder)}`],
+    });
+    expect(j.verdict).toBe("stop");
+    expect(j.findings.some(f => f.gate === 4 && f.effect === "stop" && f.message.includes("extraneous"))).toBe(true);
+    expect(renderJudgement(j)).toContain("extraneous");
   });
 });

@@ -1,6 +1,6 @@
 # 2026-10-29 — EPSS scores are downloaded whole; no CVE ID is sent
 
-**Owner decision, 2026-10-29 about 20:55 JST**, to the owner's Claude chat, choosing 「一覧を丸ごと取る」 for "Waiting for the owner" 4 in docs/status.md.
+**Owner decision, 2026-10-29 about 20:55 JST**, to the owner's Claude chat, choosing 「一覧を丸ごと取る」 for "Waiting for the owner" 4 in docs/status.md (as numbered at main 6e38f1f).
 
 ## Why
 

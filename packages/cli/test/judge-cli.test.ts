@@ -13,16 +13,17 @@ const entry = (name: string, version: string) => ({
   integrity: `sha512-${name}-${version}`,
   dev: true,
 });
+// eslint, a linter: the removed split showed a linter dev-only, so this fails if that split comes back.
 const lock = (a: string, b: string) => JSON.stringify({
   name: "app", lockfileVersion: 3, requires: true,
   packages: {
-    "": { name: "app", devDependencies: { a: "^1.0.0" } },
-    "node_modules/a": { ...entry("a", a), dependencies: { b: "^2.0.0" } },
+    "": { name: "app", devDependencies: { eslint: "^1.0.0" } },
+    "node_modules/eslint": { ...entry("eslint", a), dependencies: { b: "^2.0.0" } },
     // A nested copy, dev like its parent.
-    "node_modules/a/node_modules/b": entry("b", b),
+    "node_modules/eslint/node_modules/b": entry("b", b),
   },
 });
-const manifest = JSON.stringify({ name: "app", devDependencies: { a: "^1.0.0" } });
+const manifest = JSON.stringify({ name: "app", devDependencies: { eslint: "^1.0.0" } });
 
 const made: string[] = [];
 afterAll(() => { for (const dir of made) rmSync(dir, { recursive: true, force: true }); });
@@ -45,7 +46,7 @@ describe("ludion judge on dev-flagged lockfile entries", () => {
     try { await judgeCli(["--before", before, "--after", after, "--files", "package-lock.json", "--now", "2027-01-01T00:00:00Z", "--json"]); }
     finally { log.mockRestore(); vi.unstubAllGlobals(); }
     const result = JSON.parse(lines.join("\n")) as Judgement;
-    expect(result.changes.map(c => `${c.name}@${c.to}`)).toEqual(["a@1.0.1", "b@2.0.1"]);
+    expect(result.changes.map(c => `${c.name}@${c.to}`).sort()).toEqual(["b@2.0.1", "eslint@1.0.1"]);
     expect(result.changes.every(c => c.dev === false)).toBe(true);
     expect(result.urgency).not.toBe("low");
     expect(result.wait_hours).not.toBe(168);

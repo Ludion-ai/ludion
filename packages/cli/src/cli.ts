@@ -17,7 +17,8 @@ const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (
       --apply updates only source dependency files after validation. Production is not deployed.
   ludion watch [--dir <path>] [--apply] [--interval <seconds>] [--json]
       Repeat patch checks in the foreground (default 900 seconds). Ctrl+C cancels pending apply;
-      a Docker step already in progress may finish before exit.
+      a Docker step already in progress, or the judge's lookups for an npm candidate (each request up to
+      30 seconds), may finish before exit.
   ludion judge --before <dir> --after <dir> --files <changed,files> [--json]
       Judge an npm dependency update between two checkouts (preview, comments only): provenance,
       publisher, install scripts, malicious-package records, deprecation, new dependencies and the

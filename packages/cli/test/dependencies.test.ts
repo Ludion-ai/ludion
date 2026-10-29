@@ -180,7 +180,7 @@ describe("dependency patch gates and recoverable application", () => {
     expect(tools).toEqual(["npm", "npm"]);
     expect(result.receipt?.after?.findings).toEqual([]);
     expect(result.receipt?.files).toHaveLength(2);
-    // The judge's gates 1, 2 and 4 and its wait found nothing to stop or wait for.
+    // The judge's parts of gates 1, 2 and 4 and its wait found nothing to stop or wait for.
     expect(result.receipt?.judgement).toMatchObject({ verdict: "ready_except_build", urgency: "normal", fixes: [expect.objectContaining({ id: advisory.id, package: "lodash", from: "4.17.20", to: "4.17.21" })] });
     if (apply) expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).dependencies.lodash).toBe("4.17.21");
     else expect(snapshot(root)).toBe(before);

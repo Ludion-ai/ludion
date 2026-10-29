@@ -62,8 +62,9 @@ export const exitCode = (o: Outcome) => (o.ended === "stopped" ? 3 : o.polls ===
 /** record.ts <recorder.ts> <data dir> <max bytes> <bytes stored elsewhere> <seconds> <commit> <run> */
 export async function main(args: string[]): Promise<Outcome> {
   const [recorderPath, dir, max, stored, seconds, commit, run] = args;
-  const numbers = [max, stored, seconds].map(Number);
-  if (!recorderPath || !dir || !commit || !run || numbers.some(n => !Number.isSafeInteger(n) || n < 0)) {
+  // Digits only: Number("") is 0, and a missing size must not count as nothing stored.
+  const numbers = [max, stored, seconds].map(s => (s !== undefined && /^\d+$/.test(s) ? Number(s) : NaN));
+  if (!recorderPath || !dir || !commit || !run || numbers.some(n => !Number.isSafeInteger(n))) {
     throw new Error("usage: record.ts <recorder.ts> <data dir> <max bytes> <bytes stored elsewhere> <seconds> <commit> <run>");
   }
   const [maxBytes, storedBytes, secs] = numbers as [number, number, number];

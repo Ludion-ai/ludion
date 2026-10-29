@@ -1,0 +1,18 @@
+2026-10-29T01:38:19Z
+workflow blob eb0900462573120e46ce7bca7367ff42bfb74d02, driver blob 60b491a6ed7ac95d5022544ec48cc80581ce894a, recorder 8a78b55940def8463a2401e7bdd38d7e6c7b604d, 120s per run
+== seed the data branch from the PC copy
+Pushed shadow-data: 8320d50c293cbdd5ab677915731d8aa3e0dbcea1, 783 files, 61760808 bytes.
+-- a second seed is refused:
+shadow-data already exists on file:///sim/remote.git. Nothing pushed.
+exit 1
+== run 1 (run id 1001): record job
+Data branch at 8320d50c293cbdd5ab677915731d8aa3e0dbcea1: 50722390 bytes under runs/.
+{"ended":"deadline","polls":2,"failed_polls":0}
+2 files, 10240 bytes.
+The recorder reached its deadline.
+== run 1: write job
+Committed runs/2026-10-29/013956Z-1001-1: 2 files.
+== run 2 (run id 1002): record job
+Data branch at 88a2638179755aa18ac35651b292adb1eac579a8: 50723012 bytes under runs/.
+Error response from daemon: No such container: ludion-shadow
+-- [note added afterwards] Claude Code ended this background command during run 2's recording because the system ran low on memory. The line above is from the recorder container being removed by hand afterwards (it belonged to this dry run). Not restarted.

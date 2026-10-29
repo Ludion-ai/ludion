@@ -74,7 +74,7 @@ jobs:
           filter: blob:none
           sparse-checkout: known
 
-      - name: Read the size of the files stored on the data branch
+      - name: Check the data branch and read the size of its runs
         id: stored
         env:
           GH_TOKEN: ${{ github.token }}
@@ -82,18 +82,31 @@ jobs:
         run: |
           set -euo pipefail
           data_sha=$(git -C data rev-parse HEAD)
-          # The recorder counts its data directory, so the repository stays out of it.
-          mv data/.git data.git
-          gh api "repos/${REPO}/git/trees/${data_sha}?recursive=1" > tree.json
-          if [ "$(jq -r '.truncated' tree.json)" != "false" ]; then
-            echo "::error::The data branch's tree listing is truncated; its size cannot be counted."
+          # The branch must hold the PC's state and nothing else at its root: a branch without a feed position would
+          # start a second shadow, with a new feed start.
+          root=$(git -C data ls-tree --name-only HEAD | tr '\n' ' ')
+          if [ "$root" != "known runs state.json " ]; then
+            echo "::error::The data branch's root holds '${root}', not 'known runs state.json'."
             exit 1
           fi
-          # Everything but state.json and known/, which are on disk and counted by the recorder.
-          stored=$(jq -r '[.tree[] | select(.type == "blob" and .path != "state.json" and (.path | startswith("known/") | not)) | .size] | add // 0' tree.json)
+          if ! jq -e 'type == "object" and (.seq | type == "string") and (.feed_started_at | type == "string")' data/state.json > /dev/null; then
+            echo "::error::The data branch's state.json has no feed position and feed start."
+            exit 1
+          fi
+          # state.json and known/ are on disk and counted by the recorder; everything else is under runs/. Only that
+          # subtree is listed, which stays far under the listing's limits (100,000 entries, 7 MB).
+          runs=$(git -C data rev-parse "HEAD:runs")
+          # The recorder counts its data directory, so the repository stays out of it.
+          mv data/.git data.git
+          gh api "repos/${REPO}/git/trees/${runs}?recursive=1" > tree.json
+          if [ "$(jq -r '.truncated' tree.json)" != "false" ]; then
+            echo "::error::The listing of runs/ is truncated; its size cannot be counted."
+            exit 1
+          fi
+          stored=$(jq -r '[.tree[] | select(.type == "blob") | .size] | add // 0' tree.json)
           echo "data_sha=${data_sha}" >> "$GITHUB_OUTPUT"
           echo "bytes=${stored}" >> "$GITHUB_OUTPUT"
-          echo "Data branch at ${data_sha}: ${stored} bytes outside state.json and known/."
+          echo "Data branch at ${data_sha}: ${stored} bytes under runs/."
 
       - name: Add semver from the pinned commit's lockfile, checked against its integrity
         run: |
@@ -155,7 +168,9 @@ jobs:
           for kind in captures osv status; do
             if [ -d "data/${kind}" ]; then mv "data/${kind}" "data/runs/${stamp}/"; fi
           done
-          git --git-dir=data.git --work-tree=data ls-files -z -m -o --exclude-standard | grep -zv '\.tmp$' > files.list
+          # state.json always, so that an hour in which it did not change still commits its lines.
+          git --git-dir=data.git --work-tree=data ls-files -z -m -o --exclude-standard > changed.list
+          { printf 'state.json\0'; grep -zv -e '\.tmp$' -e '^state\.json$' changed.list || true; } > files.list
           tar --null --no-recursion -C data -T files.list -cf shadow.tar
           echo "$(tr -cd '\0' < files.list | wc -c) files, $(stat -c %s shadow.tar) bytes."
           echo "stamp=${stamp}" >> "$GITHUB_OUTPUT"
@@ -262,6 +277,10 @@ jobs:
 
           cd data
           git --literal-pathspecs add --sparse --pathspec-from-file=../files.txt
+          if git diff --cached --quiet; then
+            echo "Run ${STAMP} changed nothing on the data branch. Nothing committed."
+            exit 0
+          fi
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit --quiet -m "shadow: run ${STAMP}"
           git push --quiet origin "HEAD:refs/heads/${DATA_BRANCH}"

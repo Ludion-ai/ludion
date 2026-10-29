@@ -70,7 +70,7 @@ one_run() {
   git archive "$COMMIT" package.json package-lock.json tools/shadow tools/backtest/src packages/cli/src/security | tar -x -C "$SIM/$r/app"
   tools "$r" "git clone -q --depth 1 --filter=blob:none --sparse --branch shadow-data file:///sim/remote.git data && git -C data sparse-checkout set known && chmod -R a+rwX data"
   touch "$SIM/$r/out.record"
-  tools "$r" "$(block 'Read the size of the files stored on the data branch')" GH_TOKEN=x REPO=Ludion-ai/ludion GITHUB_OUTPUT="/sim/$r/out.record"
+  tools "$r" "$(block 'Check the data branch and read the size of its runs')" GH_TOKEN=x REPO=Ludion-ai/ludion GITHUB_OUTPUT="/sim/$r/out.record"
   tools "$r" "$(block "Add semver from the pinned commit's lockfile, checked against its integrity")"
   docker rm -f ludion-shadow > /dev/null 2>&1 || true
   (cd "$SIM/$r" && GITHUB_WORKSPACE=$(win .) GITHUB_OUTPUT=out.record STORED=$(out "$r" bytes) RUN="$id-1" IMAGE=$IMAGE \

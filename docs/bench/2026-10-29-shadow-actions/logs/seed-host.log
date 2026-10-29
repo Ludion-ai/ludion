@@ -1,0 +1,27 @@
+seed test on the host: 2026-10-29T01:33:49Z, GNU bash, version 5.3.15(2)-release (x86_64-pc-cygwin), git version 2.55.0.windows.5, core.autocrlf=true, jq: none, MSYS_NO_PATHCONV=unset
+script blob 65439e01cf6111fb29bd0b6f88fb4b9db590f996
+-- from a checkout whose origin is a local bare repository, remote given as 'origin':
+Pushed shadow-data: 0461d70e1558ce96f811c5022dff1d8ee24da211, 783 files, 60162723 bytes.
+exit 0
+-- again (refused):
+shadow-data already exists on C:/Users/haya0/.claude/jobs/7d355a59/tmp/seedtest/remote.git. Nothing pushed.
+exit 1
+-- the pushed branch:
+0461d70 shadow: the PC recorder's data at 8a78b55, seq 140479321, feed start 2026-10-28T15:51:48.394Z
+known runs state.json 
+runs/pc-8a78b55/captures/2026-10-28.jsonl
+runs/pc-8a78b55/captures/2026-10-29.jsonl
+runs/pc-8a78b55/osv/2026-10-29.jsonl
+runs/pc-8a78b55/status/2026-10-28.jsonl
+runs/pc-8a78b55/status/2026-10-29.jsonl
+-- every file's blob equals the PC copy's bytes:
+783 files compared, 0 differ
+-- split test: a synthetic 60 MB day file and a .tmp leftover
+source bytes 61188890
+/tmp/tmp.8AxgahZzoN/known/aa/y.json.tmp
+Pushed shadow-data: 913a089aadb4f45c5f98872196f2811ac4818fc8, 4 files, 61188963 bytes.
+3 known/aa/x.json
+49999490 runs/pc-8a78b55/captures/2026-10-30.part00.jsonl
+11189400 runs/pc-8a78b55/captures/2026-10-30.part01.jsonl
+70 state.json
+parts joined in name order equal the source

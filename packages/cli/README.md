@@ -9,7 +9,7 @@ Ludion detects known fixes, acquires dependencies, tests the original and update
 | PHP packages | Composer lockfile + OSV | Pinned public ZIP archives; standard vendor directory; no custom repositories or policy overrides |
 | Java / Maven | Resolved direct/transitive dependency graph + OSV | Standalone POM, public Central; no parents, profiles, modules, extensions or custom repositories |
 
-Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP, same-tag OS-image rebuilds, EOL certification and automatic production deployment remain unsupported. An empty result is not a security guarantee. Missing metadata and incomplete inventories remain visible.
+Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go and Rust are scanned read-only, with no updates (see [Read-only scans](#read-only-scans-python-go-and-rust)). Gradle, live server inventory, runtime upgrades beyond PHP, same-tag OS-image rebuilds, EOL certification and automatic production deployment remain unsupported. An empty result is not a security guarantee. Missing metadata and incomplete inventories remain visible.
 
 ## Getting started: judge your npm dependency PRs
 
@@ -108,7 +108,52 @@ node packages/cli/dist/cli.js patch --dir /path/to/app --apply
 node packages/cli/dist/cli.js watch --dir /path/to/app --apply --interval 900
 ```
 
-Ctrl+C cancels pending application. An in-flight Docker step may finish before exit. Watch installs no service or scheduler. Scan exits 1 for attention needed, 2 for an error, and 0 only when recorded supported inventories need no attention; it does not certify security. Patch exits 2 on failure.
+Ctrl+C cancels pending application. An in-flight Docker step may finish before exit. Watch installs no service or scheduler. Scan exits 1 when it finds a known vulnerability or a PHP security release, 2 when it finds none but something still needs attention (a failed check, an incomplete result or an unsupported inventory), and 0 only when recorded supported inventories need no attention; it does not certify security. Patch exits 2 on failure.
+
+## Read-only scans: Python, Go and Rust
+
+`ludion scan` also reads these files at the project root and looks up their packages in OSV. Ludion reports known advisories for these ecosystems but does not plan or apply updates. There is no update policy for them: `init`, `patch` and `watch` refuse `--ecosystem python|go|rust`. `scan --ecosystem python` (or `go`, `rust`) scans only that ecosystem.
+
+| Ecosystem | A scan runs when the root has | Inventory | OSV ecosystem |
+| --- | --- | --- | --- |
+| Python | requirements.txt, pyproject.toml, poetry.lock, uv.lock, Pipfile.lock, Pipfile, setup.py or setup.cfg | Registry packages locked in uv.lock (format 1), poetry.lock (1.x and 2.x) and Pipfile.lock (spec 6), and exact `==` pins in requirements.txt. | PyPI |
+| Go | go.mod | go.mod's require list (the build list since Go 1.17), plus `stdlib` and `toolchain` at the version on the toolchain line. That line is only a minimum, so a Go result always has a limitation and exits 2 when nothing matches. | Go |
+| Rust | Cargo.lock or Cargo.toml | crates.io packages in Cargo.lock (formats 1 to 4), for every target and feature. | crates.io |
+
+What gives a limitation (`Incomplete:`, never a clean result), besides anything a file cannot state exactly:
+
+- **Python, without a lock Ludion reads** (uv.lock, poetry.lock or Pipfile.lock): pyproject.toml always gives a limitation, whatever it holds. Pipfile without Pipfile.lock gives one when it declares packages. Versions are never guessed.
+- **Python, with a lock:**
+  - a uv.lock without the project's package;
+  - a lock missing a requirement its manifest declares (for uv.lock, `[tool.uv] dev-dependencies` too);
+  - a literal `[tool.uv.workspace]` member that is not one of uv.lock's project packages, or members given by pattern or exclude;
+  - a manifest that cannot be read;
+  - any `[tool.*]` setting whose key names dependencies, requires, deps or members, outside uv's beside uv.lock and Poetry's beside poetry.lock. This over-reports by design: ruff's `required-version` counts too.
+- **Python, setuptools:** setup.py is never read and always gives a limitation. setup.cfg is read for its section headers only: any section naming `options` gives a limitation.
+- **Rust:** Cargo.toml is read beside Cargo.lock. These give a limitation:
+  - a lock without Cargo.toml's package among its workspace members;
+  - a crate that `[dependencies]`, `[dev-dependencies]`, `[build-dependencies]` or `[target.*]` declare but the lock does not list;
+  - a literal `[workspace]` member (named in its own Cargo.toml) that is not one of the lock's members, or members given by pattern or exclude;
+  - a Cargo.toml that names another workspace root (`package.workspace`), or one that cannot be read;
+  - Cargo.toml without Cargo.lock.
+
+Checked:
+
+- The packages whose exact name and version the files state. Only each name and version is sent to OSV, and the match is OSV's. Withdrawn advisories are left out.
+- For each match: the advisory id, its summary and the fixed versions OSV lists for that package, copied as they are.
+- Names must be valid for their ecosystem (PEP 508 names without extras, Go module paths or stdlib and toolchain, crates.io names); anything else stops the check with an error. A PyPI package listed under several spellings is looked up once (PEP 503).
+- RustSec advisories marked unmaintained or notice are listed as informational, and do not count as vulnerabilities for the status or the exit code. One with a CVE or GHSA alias, or whose OSV entries for the crate are not all marked, counts as a vulnerability. Unsound ones always count.
+
+Not checked:
+
+- Versions are not compared. Ludion does not say which listed fixed version applies to the installed one, or whether one is newer: PEP 440 and Go versions are not semver.
+- Anything that cannot be read as an exact name and version (an unpinned or ranged requirement, a Git, path or URL source, a Go replace directive, an unknown file format version) is listed as `Incomplete:` and the result is `incomplete`, never clean.
+- Whether a lock is up to date beyond those checks: the lock is the inventory, and a manifest's version ranges are not compared with it.
+- Files in subdirectories and go.sum are not read, and give no limitation. The exception is a literal workspace member's Cargo.toml or pyproject.toml, read for its package name only. go.work is not read, and gives a limitation.
+- pyproject.toml's `[build-system] requires` (build-time requirements) and `[tool.poetry.requires-plugins]` (Poetry's own plugins, which poetry.lock does not lock) are not read. Neither are tool configuration files outside pyproject.toml (tox.ini, hatch.toml, noxfile.py, pixi.toml); they give no limitation. Requirements files other than requirements.txt give a limitation, but a project whose only Python file is one of them is not scanned.
+- Nothing is installed, resolved, built or run, and whether vulnerable code is reached is not checked.
+
+Exit codes are scan's own: 1 when a vulnerability matches, 2 when a result is incomplete or a check fails, 0 otherwise. An informational-only match exits 0. `--json` also gives each match's `kind` and `fixed_versions`.
 
 ## Validation and acquisition boundaries
 

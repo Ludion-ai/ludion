@@ -63,18 +63,29 @@ The replay from docs/bench/2026-10-28-shadow-design/README.md, sections 2.5 to 2
 
 ## Readings taken where the decision is not literal
 
-None of these loosens a count. Each is the reading the code takes, and is tested. Two fresh-context reviews on PR #194 found readings that did loosen it.
+None of these loosens a count. Each is the reading the code takes, and is tested. Three fresh-context reviews on PR #194 found readings that did loosen it.
 - **The first, at 80b26f8.** Readings 5, 6 and 8 loosened the count, and MAL- records were read as they are today.
 - **The second, at 2250791.** It found:
   - a later copy of a record could drop a version from the denominator;
   - withdrawn records were left out of the record-omission rule;
   - "final" did not wait for OSV reads still being retried;
   - versions named only by a range were missed.
+- **The third, at b3ed314.** It found:
+  - a version placed only by the registry's time was missing from the run of identical code, which could make it a false-report candidate;
+  - judgements were seeded only from V's own captures;
+  - mid-poll error lines were taken as a poll's end;
+  - the store cannot hold MAL- records modified before the recorder started.
 
 All of these were changed as below.
 
-1. **"V's first capture"** is the first capture of V with every input. The recorder retries a capture whose sub-reads failed, for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap.
-2. **"The end of the poll."** The facts "of V's first capture" are those stored by the end of the poll that took it: the next `poll`, `error` or `stopped` status line. A capture's records are written over several seconds, so the predecessor's record comes after V's.
+1. **"V's first capture"** is the first moment, from V's first capture on, at which every input of the judgement is stored. The candidates are the ends of the polls that stored something the judgement reads:
+   - a capture of V;
+   - a capture of another version of P (a predecessor's retry, say);
+   - a change to P's packument;
+   - the first publish of one of V's dependencies.
+
+   The recorder retries a failed sub-read for up to 60 attempts, then gives up, and a give-up stays a capture gap. Taking the literal first capture would make every transient failure a gap.
+2. **"The end of the poll."** The facts "of V's first capture" are those stored by the end of the poll that took it: the next `poll` or `stopped` status line, or an `error` line that ended the whole poll. An `error` line naming a package or an OSV id is written mid-poll, so it does not end one. A capture's records are written over several seconds, so the predecessor's record comes after V's.
 3. **The registry's predecessor** is taken among the versions the recorder had captured by that moment, as listed versions. The recorder captures the predecessor with V, so a version whose `time` is stored but which was never captured was not listed: unpublished before the recorder saw the package.
 4. **Repeated records** are dropped only when equal, apart from `fetched_at`, to the record just before them with the same type, name and version. The recorder's README says "by type, name, version and content". Read over the whole stream, that would drop a deprecation that changes and changes back, or a 404 `created` record after a later success. In the third run's snapshot, 133 repeats were dropped: 79 `change` records with the same diff, and 54 `retry` version records (`logs/store-counts-3.log`).
 5. **A MAL-named version with no stored publish time.** Section 3 allows a publish time from the record or an archive. OSV records carry no version publish time. So with `NETWORK=1` the replay reads the registry's `time`, which keeps removed versions' times:
@@ -91,20 +102,22 @@ All of these were changed as below.
 10. **The denominator** is built from every stored copy of every MAL- record. A version any copy named stays named, even if a later copy no longer names it. Its publish date is the earliest of the copies naming it.
 11. **Ranges.** A record that names a watched package by a range is applied to every version in the store and, with `NETWORK=1`, every version in the registry's `time`. Without the network, or if the registry cannot be read, the result is not final.
 12. **OSV reads still retried.** An OSV `error` status line naming an id, with no copy of that id fetched later and no give-up, keeps the result from being final.
+13. **OSV asked by package name.** The recorder stores only records modified after it started, so the denominator is also built from OSV's own answer for every watched package with a version in the window. Only package names are sent. Without the network, the result is not final. The judgements' re-query still reads stored copies only: the stricter side.
+14. **The run of identical code** uses the stored `time`, completed by the registry's `time` and V's own publish time, so a version placed only by the registry is in it.
 
 ## Not done
 
-- **OSV records modified before the recorder started.** The recorder stores only records modified since its start, so one modified before then that names a window version is not in the store. The disputed check's per-package OSV query sees all of them, but only for versions already named by a stored record.
 - **The judge's dependencies.** The semver package's version is not part of the start-commit check (judge.ts imports it).
 - **No schedule.** Moving the shadow to GitHub Actions is the SA lane's. `.github/workflows/` is not changed.
 - **Older records.** docs/bench/2026-10-28-shadow-design/README.md and docs/bench/2026-10-29-shadow-recorder/README.md still say the replay is not built. So does CLAUDE.md, a protected path. They are left for their owners.
 
 ## Tests
 
-`tools/shadow/test/replay.test.ts` has 43 tests. The recorder's 35 are unchanged, 78 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit bebebbe:
+`tools/shadow/test/replay.test.ts` has 48 tests. The recorder's 35 are unchanged, 83 in all. They run in Docker with no network, using node:24-slim pinned by digest. The run is `scripts/check.sh`, and its output is `logs/check.log`, at commit 658f5c5:
 - typecheck exit 0;
-- 78 of 78 passed;
-- 25 deliberate mutations, each making tests fail:
+- 83 of 83 passed;
+- 83 of 83 passed again, with typecheck exit 0, against the start commit's judge files, the ones the count runs (judge.ts 5a598fd; main's #193 version is at HEAD);
+- 30 deliberate mutations, each making tests fail:
   - the re-query cut-off off;
   - exploited's synthetic fix off;
   - no recomputation of `wait_until`;
@@ -128,20 +141,29 @@ All of these were changed as below.
   - OSV records still being retried ignored;
   - ranges enumerated over stored versions only;
   - final although a range was not enumerated;
-  - withdrawn records left out of the record-omission rule.
+  - withdrawn records left out of the record-omission rule;
+  - V left out of the run of identical code's times;
+  - seeds only from V's own captures and P's packument;
+  - OSV not asked by package name;
+  - final although OSV was not asked;
+  - capture gaps of MAL-only cases not listed.
 
 ## The preliminary runs
 
-**The current one** is `out/replay-preliminary-3.json` (log `logs/run-preliminary-3.log`, store counts `logs/store-counts-3.log`), at 9ed5466, after both reviews' fixes:
-- **The snapshot.** Taken at 2026-10-29T01:40:34Z, 50,722,648 bytes, a copy. The recorder was not stopped or touched.
-- **The setup.** No network. Watched list sha256 `02d3e6de…`.
-- **The judge.** HEAD carries main's #193 version of judge.ts, so this run tests that run.sh puts back the start commit's judge files. The log prints them: judge.ts 5a598fd, npm-facts.ts 8289c4e, time-cap.ts 4fb4608 and archives-v5.ts 835452a, each equal to 8a78b55's.
+**The current one** is `out/replay-preliminary-4.json` (log `logs/run-preliminary-4.log`, store counts `logs/store-counts-4.log`), at 32b97f0, after the third review's fixes, with `NETWORK=1`:
+- **The snapshot.** Taken at 2026-10-29T01:59:14Z, 50,753,705 bytes, a copy. The recorder was not stopped or touched.
+- **The judge.** The judge's files are the start commit's, as the log prints. Watched list sha256 `02d3e6de…`.
+- **The network.** OSV was asked for the records naming each watched package with a version in the window (package names only). Its query cache was not committed.
 - **The window.** In progress, 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z, one run, no break.
-- **The versions.** 336 in the window, all pending. The coverage ends at the last OSV read, 2026-10-29T00:00:20.329Z. The first rows (exploited and high, 12h or 24h) become judgeable after the next daily OSV read.
+- **The versions.** 337 in the window, all pending. The coverage ends at the last OSV read, 2026-10-29T00:00:20.329Z. The first rows (exploited and high, 12h or 24h) become judgeable after the next daily OSV read.
 - **The gate.** Decided 0 of 100, `not_yet`. Misses 0, `not_yet`.
-- **MAL- records.** 15 OSV records stored, all MAL-, and none names a watched package.
+- **MAL- records.**
+  - 7 records (from OSV's answers) name a watched version. The 19 versions they name are all outside the window: published 2025-08-26 and 27 (nx and @nx/*) and 2025-11-24 (posthog-node and @posthog/core).
+  - The recorder stored 15 records itself, and none names a watched package.
 - **Capture lag.** Median 0.012h, p90 0.017h.
-- **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 133 repeats dropped.
+- **Gaps and repeats.** Capture gaps 0, undecidable 0, give-ups 0. 133 repeats dropped (79 `change`, 54 `retry`).
+
+**The third one**, at 9ed5466, without the network: `logs/run-preliminary-3.log`, `logs/store-counts-3.log` and `out/replay-preliminary-3.json` (336 versions, all pending, 0 gaps).
 
 **The second one**, at 0752459, between the two reviews: `logs/run-preliminary-2.log` and `out/replay-preliminary-2.json` (335 versions, all pending, 0 gaps).
 

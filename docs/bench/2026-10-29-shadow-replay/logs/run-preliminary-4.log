@@ -1,0 +1,23 @@
+snapshot taken at 2026-10-29T01:59:14Z: 50753705 bytes
+start commit 8a78b55940def8463a2401e7bdd38d7e6c7b604d; replay at HEAD 32b97f07390ee1b3fc647c7d94a84c138e2314c8; judge files from the start commit:
+  packages/cli/src/security/judge.ts 5a598fdc5412db75dda1411bef22b087b2fcb285 (start: 5a598fdc5412db75dda1411bef22b087b2fcb285)
+  packages/cli/src/security/npm-facts.ts 8289c4e208a4cda1dc215032df95ba56f1912262 (start: 8289c4e208a4cda1dc215032df95ba56f1912262)
+  packages/cli/src/security/time-cap.ts 4fb4608234c42d0597a65eb10452f22d0d602575 (start: 4fb4608234c42d0597a65eb10452f22d0d602575)
+  tools/backtest/src/archives-v5.ts 835452a38182d97e0f856c92f8f2706a657575fa (start: 835452a38182d97e0f856c92f8f2706a657575fa)
+watched list 02d3e6de2cc5e4d05af15d60bb6f9ca7ac17ebd261b652c77a9ce23281674f6a
+Shadow replay as of 2026-10-29T01:59:16.857Z (store coverage 2026-10-29T00:00:20.329Z).
+Window: in_progress, 2026-10-28T15:51:48.401Z to 2026-11-25T15:51:48.401Z; runs: 2026-10-28T15:51:48.401Z.
+Final: no. the four weeks run until 2026-11-25T15:51:48.401Z; MAL- records can still join the denominator until 2026-12-09T15:51:48.401Z (the window's end + 336h); the last OSV read (2026-10-29T00:00:20.329Z) is not 24h past the window's end + 336h; 337 version(s) have a judgement whose wait_until is past the store's coverage (2026-10-29T00:00:20.329Z).
+Recorder start commit(s): 8a78b55940def8463a2401e7bdd38d7e6c7b604d; watched list sha256: 02d3e6de2cc5e4d05af15d60bb6f9ca7ac17ebd261b652c77a9ce23281674f6a.
+Versions in the window: 337 (judged 0, pending 337).
+Decided (b, one prev, stop or ready_except_build in all four rows): 0 of 100 needed: not_yet.
+Misses (confirmed and record-omission candidates): 0: not_yet.
+MAL- records naming a watched version: 7; versions in the denominator: 0 (confirmed 0, record-omission 0, false-report 0, not checked 0); named outside it: 19.
+Capture lag: 337 versions, median 0.012h, p90 0.017h.
+Capture gaps: 0 row(s); undecidable verdicts: 0; recorder give-ups: 0; OSV give-ups: 0; duplicate records dropped: 133.
+Per scenario and row:
+  b:exploited: pending 337
+  b:high: pending 337
+  b:low: pending 337
+  b:normal: pending 337
+Literal verdicts (normal, production, no fix): pending 337.

@@ -4,7 +4,7 @@
 // the file list (path, size, sha256) of its registry tarball. The tarball itself is never stored, extracted to disk
 // or run. Once a day it stores new and changed MAL- records from OSV's npm export.
 // What leaves the machine: package names and versions (registry URLs), the feed position, and OSV record ids. It
-// stops recording when the data directory reaches its limit. It judges nothing: the replay is not built.
+// stops recording when the data directory reaches its limit. It judges nothing: replay.ts reads what it stores.
 import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";

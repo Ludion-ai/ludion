@@ -1,0 +1,249 @@
+{
+ "schema": 1,
+ "as_of": "2026-10-29T01:59:16.857Z",
+ "coverage": "2026-10-29T00:00:20.329Z",
+ "window": {
+  "runs": [
+   {
+    "start": "2026-10-28T15:51:48.401Z",
+    "broken_by": null
+   }
+  ],
+  "start": "2026-10-28T15:51:48.401Z",
+  "end": "2026-11-25T15:51:48.401Z",
+  "state": "in_progress"
+ },
+ "final": false,
+ "not_final_because": [
+  "the four weeks run until 2026-11-25T15:51:48.401Z",
+  "MAL- records can still join the denominator until 2026-12-09T15:51:48.401Z (the window's end + 336h)",
+  "the last OSV read (2026-10-29T00:00:20.329Z) is not 24h past the window's end + 336h",
+  "337 version(s) have a judgement whose wait_until is past the store's coverage (2026-10-29T00:00:20.329Z)"
+ ],
+ "start_commits": [
+  "8a78b55940def8463a2401e7bdd38d7e6c7b604d"
+ ],
+ "watched_sha256": [
+  "02d3e6de2cc5e4d05af15d60bb6f9ca7ac17ebd261b652c77a9ce23281674f6a"
+ ],
+ "versions_in_window": 337,
+ "judged": 0,
+ "pending": 337,
+ "decided": {
+  "count": 0,
+  "needed": 100,
+  "state": "not_yet"
+ },
+ "misses": {
+  "count": 0,
+  "versions": [],
+  "state": "not_yet"
+ },
+ "mal": {
+  "records_naming_watched": 7,
+  "versions": 0,
+  "by_category": {
+   "confirmed": 0,
+   "record_omission": 0,
+   "false_report": 0,
+   "not_checked": 0
+  },
+  "records_by_category": {
+   "confirmed": 0,
+   "record_omission": 0,
+   "false_report": 0,
+   "not_checked": 0
+  },
+  "cases": [],
+  "outside_window": [
+   {
+    "version": "posthog-node@5.11.3",
+    "records": [
+     "MAL-2025-190925"
+    ],
+    "why": "published 2025-11-24T04:04:24.809Z, outside the window"
+   },
+   {
+    "version": "posthog-node@5.13.3",
+    "records": [
+     "MAL-2025-190925"
+    ],
+    "why": "published 2025-11-24T04:09:08.061Z, outside the window"
+   },
+   {
+    "version": "posthog-node@4.18.1",
+    "records": [
+     "MAL-2025-190925"
+    ],
+    "why": "published 2025-11-24T04:13:22.416Z, outside the window"
+   },
+   {
+    "version": "@posthog/core@1.5.6",
+    "records": [
+     "MAL-2025-190645"
+    ],
+    "why": "published 2025-11-24T04:09:13.670Z, outside the window"
+   },
+   {
+    "version": "@nx/devkit@20.9.0",
+    "records": [
+     "MAL-2025-41436"
+    ],
+    "why": "published 2025-08-26T22:42:43.194Z, outside the window"
+   },
+   {
+    "version": "@nx/devkit@21.5.0",
+    "records": [
+     "MAL-2025-41436"
+    ],
+    "why": "published 2025-08-26T22:31:44.202Z, outside the window"
+   },
+   {
+    "version": "@nx/js@20.9.0",
+    "records": [
+     "MAL-2025-41439"
+    ],
+    "why": "published 2025-08-26T22:46:18.482Z, outside the window"
+   },
+   {
+    "version": "@nx/js@21.5.0",
+    "records": [
+     "MAL-2025-41439"
+    ],
+    "why": "published 2025-08-26T22:32:00.114Z, outside the window"
+   },
+   {
+    "version": "@nx/eslint@21.5.0",
+    "records": [
+     "MAL-2025-41438"
+    ],
+    "why": "published 2025-08-26T22:31:54.388Z, outside the window"
+   },
+   {
+    "version": "@nx/workspace@20.9.0",
+    "records": [
+     "MAL-2025-41442"
+    ],
+    "why": "published 2025-08-26T22:46:33.465Z, outside the window"
+   },
+   {
+    "version": "@nx/workspace@21.5.0",
+    "records": [
+     "MAL-2025-41442"
+    ],
+    "why": "published 2025-08-26T22:32:31.098Z, outside the window"
+   },
+   {
+    "version": "nx@20.9.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-26T22:39:32.482Z, outside the window"
+   },
+   {
+    "version": "nx@20.10.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-26T23:54:13.820Z, outside the window"
+   },
+   {
+    "version": "nx@20.11.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-27T00:16:47.286Z, outside the window"
+   },
+   {
+    "version": "nx@20.12.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-27T00:37:44.372Z, outside the window"
+   },
+   {
+    "version": "nx@21.5.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-26T22:32:25.482Z, outside the window"
+   },
+   {
+    "version": "nx@21.6.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-26T23:54:32.051Z, outside the window"
+   },
+   {
+    "version": "nx@21.7.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-27T00:17:13.250Z, outside the window"
+   },
+   {
+    "version": "nx@21.8.0",
+    "records": [
+     "MAL-2025-41443"
+    ],
+    "why": "published 2025-08-27T00:37:19.279Z, outside the window"
+   }
+  ]
+ },
+ "capture_lag_hours": {
+  "count": 337,
+  "median": 0.011910555555555556,
+  "p90": 0.01711644444444445
+ },
+ "per_row": {
+  "b:exploited": {
+   "stopped": 0,
+   "missed": 0,
+   "capture_gap": 0,
+   "pending": 337,
+   "not_applicable": 0
+  },
+  "b:high": {
+   "stopped": 0,
+   "missed": 0,
+   "capture_gap": 0,
+   "pending": 337,
+   "not_applicable": 0
+  },
+  "b:normal": {
+   "stopped": 0,
+   "missed": 0,
+   "capture_gap": 0,
+   "pending": 337,
+   "not_applicable": 0
+  },
+  "b:low": {
+   "stopped": 0,
+   "missed": 0,
+   "capture_gap": 0,
+   "pending": 337,
+   "not_applicable": 0
+  }
+ },
+ "capture_gaps": [],
+ "undecidable": [],
+ "literal": {
+  "pending": 337
+ },
+ "gave_up": [],
+ "osv_gave_up": [],
+ "duplicates": 133,
+ "run": {
+  "blobs": {
+   "tools/shadow/src/replay.ts": "a57f31f7e84052b13469bc928877ef122dd5e211",
+   "tools/shadow/src/disputed.ts": "1ce8036cf4f5cb875a13af9c1f41eca3bbcd142d",
+   "tools/backtest/src/archives-v5.ts": "835452a38182d97e0f856c92f8f2706a657575fa",
+   "packages/cli/src/security/judge.ts": "5a598fdc5412db75dda1411bef22b087b2fcb285",
+   "packages/cli/src/security/npm-facts.ts": "8289c4e208a4cda1dc215032df95ba56f1912262",
+   "packages/cli/src/security/time-cap.ts": "4fb4608234c42d0597a65eb10452f22d0d602575"
+  },
+  "watched_sha256": "02d3e6de2cc5e4d05af15d60bb6f9ca7ac17ebd261b652c77a9ce23281674f6a",
+  "node": "v24.22.1"
+ }
+}

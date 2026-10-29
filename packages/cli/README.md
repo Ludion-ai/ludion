@@ -65,7 +65,7 @@ jobs:
 
 A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
 
-Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 22 or later); only the root package.json and package-lock.json, and each changed */package.json, are read (the judge leaves a workspace package.json out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable); a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. Package names and versions are sent to OSV and the npm registry. No source is sent.
+Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 22 or later); only the root package.json and package-lock.json, and each changed */package.json, are read (the judge leaves a workspace package.json out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable); a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. It sends package names and versions to OSV and the npm registry, the IDs of the advisories OSV returns back to OSV, and their CVE IDs to FIRST's EPSS service; it downloads CISA's catalog of exploited vulnerabilities whole. No source is sent.
 
 ## Run the judge locally
 
@@ -77,7 +77,7 @@ npm run build -w ludion-ai
 node packages/cli/dist/cli.js judge --before /path/to/app-main --after /path/to/app-pr --files package.json,package-lock.json
 ```
 
-Exit codes: 0 ready except build (gates 1, 2 and 4 found nothing and the wait is over); 3 wait; 1 stop or undecidable, also when a lookup fails or `--files` is missing; 2 the inputs could not be read. `--json` gives the whole judgement. A pnpm-lock.yaml is read as the set of versions it adds, which is always undecidable. Package names and versions are sent to OSV and the npm registry; no source is sent, and no dependency code is run.
+Exit codes: 0 ready except build (gates 1, 2 and 4 found nothing and the wait is over); 3 wait; 1 stop or undecidable, also when a lookup fails or `--files` is missing; 2 the inputs could not be read. `--json` gives the whole judgement. A pnpm-lock.yaml is read as the set of versions it adds, which is always undecidable. It sends package names and versions to OSV and the npm registry, the IDs of the advisories OSV returns back to OSV, and their CVE IDs to FIRST's EPSS service; it downloads CISA's catalog of exploited vulnerabilities whole. No source is sent, and no dependency code is run.
 
 ## What was removed on 2026-10-29
 

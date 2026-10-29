@@ -12,6 +12,7 @@ Ludion is a judge for npm dependency-update PRs (`ludion judge`, and the GitHub 
 - **Gate 4's checks on every changed entry:** the changed files, package.json, each entry's registry tarball and its sha512 integrity. A changed `*/package.json` is left out of the changed-files stop when it agrees with the lockfile (docs/decisions/2026-10-29-l9-workspace-package-json.md); one that does not agree stops, one that cannot be read is undecidable, and a `!` workspaces entry or a top-level `"__proto__"` change stops.
 - **The waits of the design's wait table**, not its weekly batching.
 - **Exposure evidence:** each judgement records when the fix was published and when the judge saw it.
+- **What it asks, and of whom:** package documents and attestations from the npm registry; advisories from OSV, sent package names and versions, then the advisory IDs OSV returned; CISA's catalog of exploited vulnerabilities, downloaded whole; EPSS scores from FIRST, sent the CVE IDs of the advisories the update fixes. No source is sent.
 - **Where it runs:** on this repository's own dependency PRs (judge.yml and judge-comment.yml), and as a GitHub Action (a preview, not released).
 - **pnpm-lock.yaml** is read as the set of versions it adds; each entry's tarball, hash and what each dependent loads are not checked, so a pnpm judgement is always undecidable.
 

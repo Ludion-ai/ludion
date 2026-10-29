@@ -6,7 +6,7 @@ const SECTIONS = ["guard", "verify", "isolate", "receipt"] as const;
 test("the home page describes the judge and says it never applies or merges", async ({ page }) => {
   await page.goto("/");
   const heading = page.locator("h1");
-  await expect(heading).toContainText("Every npm dependency PR,");
+  await expect(heading).toContainText("An npm dependency PR,");
   await expect(heading).toContainText("judged in one comment.");
   await expect(page.locator(".introduction")).toContainText("Comments only, nothing is merged.");
   await expect(page.getByRole("link", { name: "Try the preview" }).first()).toHaveAttribute("href", "/start/");
@@ -27,7 +27,7 @@ test("the verdicts, checks and comment stay in the page without JavaScript", asy
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText("Every npm dependency PR,");
+  await expect(page.locator("h1")).toContainText("An npm dependency PR,");
   await expect(page.locator(".introduction")).toContainText("Comments only, nothing is merged.");
   await expect(page.getByRole("link", { name: "See the verdicts", exact: true })).toHaveAttribute("href", "#guard");
   for (const id of SECTIONS) await expect(page.locator(`#${id}`)).toContainText(EXAMPLES[id]!);

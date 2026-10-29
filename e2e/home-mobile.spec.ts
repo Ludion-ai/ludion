@@ -64,7 +64,7 @@ test("200 percent text keeps the design on the phone", async ({ page }) => {
     await page.evaluate(() => document.fonts.ready);
     await resizeText(page);
     await reflow(page);
-    await expect(page.locator("h1")).toContainText("Every npm dependency PR,");
+    await expect(page.locator("h1")).toContainText("An npm dependency PR,");
     await expect(page.locator("h1")).toContainText("judged in one comment.");
     await expect(page.locator("[data-guard-state]")).toHaveCount(4);
     await expect(page.locator("#receipt")).toContainText("Gate 3, build and tests");

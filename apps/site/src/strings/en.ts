@@ -13,7 +13,7 @@ export const en = {
   "home": {
     "title": "Ludion — a judge for npm dependency updates",
     "headline": [
-      "Every npm dependency PR,",
+      "An npm dependency PR,",
       "judged in one comment."
     ],
     "sub": "Ludion reads an npm dependency-update PR and leaves one comment: stop, wait, ready except build, or undecidable. Comments only, nothing is merged.",
@@ -23,7 +23,7 @@ export const en = {
     "coverage": "Preview, not released · npm package-lock.json v2/v3; a pnpm-lock.yaml, read only by the local command, is always undecidable. The judge changes no file and merges nothing.",
     "example": "Illustrated judgement. Not a run result.",
     "scene": {
-      "caption": "A dependency PR → its lockfile diff → checks and the wait's end → one comment."
+      "caption": "A dependency PR → its lockfile diff → checks → one comment, with when the wait ends."
     },
     "chapters": {
       "label": "How the judge works",
@@ -37,7 +37,7 @@ export const en = {
       "states": [
         {
           "id": "stop",
-          "detail": "A check found a reason not to take the update. Among them: provenance lost or from another repository or workflow, a new install script, an OSV MAL- record, deprecation or withdrawal, a downgrade or a new advisory, a version that moved with the fix and is too new, a lockfile entry whose tarball or hash does not match, or a change to other files or to package.json beyond its dependency lists and overrides."
+          "detail": "A check found a reason not to take the update. Among them: provenance lost or from another repository or workflow, a new install script, an OSV MAL- record, deprecation or withdrawal, a downgrade or a new advisory, a version that moved with the fix and is too new, a lockfile entry whose tarball or hash does not match, or a change to other files, to package.json beyond its dependency lists and overrides, or to a range or override outside the registry."
         },
         {
           "id": "wait",

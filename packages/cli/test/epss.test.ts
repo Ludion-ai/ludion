@@ -7,13 +7,13 @@ const DAY = "https://epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz";
 const LIST = "#model_version:v2026.06.15,score_date:2026-10-29T12:03:14Z\ncve,epss,percentile\nCVE-1999-0001,0.04753,0.9186\nCVE-2026-12345,0.27183,0.98048\nCVE-2026-9999,0.00249,0.16284\n";
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
 
-type Seen = { url: string; body: string; redirect: RequestRedirect | undefined };
+type Seen = { url: string; body: string; headers: string; redirect: RequestRedirect | undefined };
 /** A FIRST that redirects the fixed URL to the day's file, as it did on 2026-10-29; `day` answers the second request. */
 function first(day: () => Response | Promise<Response> = () => new Response(gzipSync(LIST)), location = "epss_scores-2026-10-29.csv.gz") {
   const seen: Seen[] = [];
   const fetchFn = (async (input: string | URL | Request, init?: RequestInit) => {
     const url = String(input);
-    seen.push({ url, body: init?.body === undefined ? "" : String(init.body), redirect: init?.redirect });
+    seen.push({ url, body: init?.body === undefined ? "" : String(init.body), headers: JSON.stringify([...new Headers(init?.headers)]), redirect: init?.redirect });
     if (url === EPSS_LIST) return new Response(null, { status: 302, headers: { location } });
     if (url === DAY) return day();
     return new Response("not found", { status: 404 });
@@ -28,7 +28,7 @@ describe("EPSS, from FIRST's whole daily list", () => {
     expect([...scores]).toEqual([["CVE-2026-12345", 0.27183]]);
     expect(seen.map(s => s.url)).toEqual([EPSS_LIST, DAY]);
     expect(seen.every(s => s.redirect === "manual" && s.body === "")).toBe(true);
-    for (const s of seen) expect(s.url + s.body).not.toMatch(/CVE/i);
+    for (const s of seen) expect(s.url + s.body + s.headers).not.toMatch(/CVE/i);
   });
   it("reads a list with Windows line ends and no comment line, and a list served without a redirect", async () => {
     const crlf = LIST.split("\n").slice(1).join("\r\n");
@@ -42,7 +42,7 @@ describe("EPSS, from FIRST's whole daily list", () => {
     const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
     const fetchFn = (async (input: string | URL | Request, init?: RequestInit) => {
       const url = String(input);
-      seen.push({ url, body: init?.body === undefined ? "" : String(init.body), redirect: init?.redirect });
+      seen.push({ url, body: init?.body === undefined ? "" : String(init.body), headers: JSON.stringify([...new Headers(init?.headers)]), redirect: init?.redirect });
       if (url === "https://api.osv.dev/v1/querybatch") {
         const queries = JSON.parse(String(init?.body)).queries as { version: string }[];
         return json({ results: queries.map(q => ({ vulns: q.version === "1.0.0" ? [{ id: "GHSA-aaaa-bbbb-cccc" }] : [] })) });
@@ -60,7 +60,7 @@ describe("EPSS, from FIRST's whole daily list", () => {
     // The rule is unchanged: an EPSS of 0.1 or more makes a moderate fix high.
     expect(urgencyOf(fixes, [change])).toBe("high");
     expect(seen.some(s => s.url === DAY)).toBe(true);
-    for (const s of seen) expect(s.url + s.body).not.toMatch(/CVE/i);
+    for (const s of seen) expect(s.url + s.body + s.headers).not.toMatch(/CVE/i);
   });
 
   const stops: [string, () => ReturnType<typeof first>, RegExp][] = [
@@ -70,6 +70,10 @@ describe("EPSS, from FIRST's whole daily list", () => {
     ["the redirect goes to plain http", () => first(undefined, "http://epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
     ["the redirect goes to another path on the host", () => first(undefined, "/other.csv.gz"), /redirected/],
     ["the redirect carries a query", () => first(undefined, "epss_scores-2026-10-29.csv.gz?x=1"), /redirected/],
+    ["the redirect carries a fragment", () => first(undefined, "epss_scores-2026-10-29.csv.gz#x"), /redirected/],
+    ["the redirect carries a user name", () => first(undefined, "https://u@epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
+    ["the redirect carries a password", () => first(undefined, "https://u:p@epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz"), /redirected/],
+    ["the redirect goes to another port", () => first(undefined, "https://epss.empiricalsecurity.com:8443/epss_scores-2026-10-29.csv.gz"), /redirected/],
     ["the redirect has no location", () => ({ fetchFn: (async () => new Response(null, { status: 302 })) as unknown as typeof fetch, seen: [] }), /redirected/],
     ["the day's file redirects again", () => first(() => new Response(null, { status: 302, headers: { location: "epss_scores-2026-10-28.csv.gz" } })), /HTTP 302/],
     ["the body is not gzip", () => first(() => new Response(LIST)), /could not be expanded/],

@@ -1,7 +1,11 @@
 ---
 import BrandMark from "./BrandMark.astro";
-import { en } from "../strings/en.ts";
-const r = en.home.receipt;
+import { strings, type Lang } from "../strings/index.ts";
+interface Props {
+  lang?: Lang;
+}
+const { lang = "en" } = Astro.props;
+const r = strings[lang].home.receipt;
 ---
 <figure class="moment">
   <figcaption class="topline"><span class="brand"><BrandMark size={14} />{r.bar}</span></figcaption>

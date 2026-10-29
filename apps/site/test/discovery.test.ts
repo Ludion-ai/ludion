@@ -14,10 +14,10 @@ const SECTION_A = [
 ];
 
 describe("being found", () => {
-  it("lists only the home page and setup in the sitemap", () => {
+  it("lists only the home page and setup, in English and Japanese, in the sitemap", () => {
     const xml = sitemap({ site: "https://ludion.ai", builtAt: "2026-10-12T00:00:00Z" });
     const locs = [...xml.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1]);
-    expect(locs).toEqual(["https://ludion.ai/", "https://ludion.ai/start/"]);
+    expect(locs).toEqual(["https://ludion.ai/", "https://ludion.ai/start/", "https://ludion.ai/ja/", "https://ludion.ai/ja/start/"]);
     expect(xml).toContain("<lastmod>2026-10-12</lastmod>");
     expect(xml).not.toContain("/lessons/");
     expect(xml).not.toContain("/bench");
@@ -34,6 +34,7 @@ describe("being found", () => {
     expect(txt).not.toContain("https://ludion.ai/index.json");
     expect(txt).toContain("https://ludion.ai/start/");
     expect(txt).not.toContain("Ludion v3 (in design)");
+    expect(txt).not.toContain("/ja/");
   });
 
   it("redirects removed pages and never the home page or setup", () => {

@@ -1,0 +1,433 @@
+---
+// The setup page, in either language. The workflows and commands stay as README.md has them.
+import Base from "../layouts/Base.astro";
+import Pool from "./Pool.astro";
+import Coverage from "./Coverage.astro";
+import { strings, type Lang } from "../strings/index.ts";
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = strings[lang].start;
+const c = t.copy;
+// README.md, "Getting started" and "Run the judge locally". No release commit exists yet, so the SHA stays a placeholder.
+const commands = {
+ judge: `# .github/workflows/ludion-judge.yml
+name: ludion-judge
+on:
+  pull_request:
+    paths: [package-lock.json]
+permissions:
+  contents: read
+# A newer push cancels the judgement of an older head.
+concurrency:
+  group: ludion-judge-\${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: Ludion-ai/ludion@<release commit SHA>
+        with:
+          mode: judge`,
+ comment: `# .github/workflows/ludion-judge-comment.yml
+name: ludion-judge-comment
+on:
+  workflow_run:
+    workflows: [ludion-judge]
+    types: [completed]
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+# One comment run at a time per PR branch, so two runs cannot both post a comment.
+concurrency:
+  group: ludion-judge-comment-\${{ github.event.workflow_run.head_repository.full_name }}-\${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: Ludion-ai/ludion@<the same release commit SHA>
+        with:
+          mode: comment`,
+ source: "git clone https://github.com/Ludion-ai/ludion.git\ncd ludion\nnpm ci\nnpm run build -w ludion-ai",
+ local: "node packages/cli/dist/cli.js judge --before /path/to/app-main --after /path/to/app-pr --files package.json,package-lock.json",
+};
+---
+<Base title={t.title} description={t.description} lang={lang} page="/start/">
+ <article class="start-page wrap">
+  <header class="page-intro"><h1>{t.heading}</h1><p class="intro">{t.intro}</p></header>
+  <Pool>
+   <section class="sync" aria-labelledby="workflows">
+    <div class="install"><h2 id="workflows">{t.workflows}</h2><p class="where">{t.notReleased}</p><p>{t.judgeIntro}</p><div class="command primary-command"><pre class="yaml" role="region" tabindex="0" aria-label={t.judgeLabel}><code id="judge-workflow">{commands.judge}</code></pre><button type="button" data-copy="judge-workflow" data-copied={c.copied} data-selected={c.selected} aria-label={c.judgeWorkflow} aria-live="polite" hidden>{c.copy}</button></div><p class="wiring">{t.commentIntro}</p><div class="command primary-command"><pre class="yaml" role="region" tabindex="0" aria-label={t.commentLabel}><code id="comment-workflow">{commands.comment}</code></pre><button type="button" data-copy="comment-workflow" data-copied={c.copied} data-selected={c.selected} aria-label={c.commentWorkflow} aria-live="polite" hidden>{c.copy}</button></div><p class="wiring">{t.pinNote}</p></div>
+    <aside class="path" aria-labelledby="judge-path"><h3 id="judge-path" class="visually-hidden">{t.pathLabel}</h3><ol class="flow">{t.flow.map((step) => <li><span class="step-title">{step.title}</span><span class="step-detail">{step.detail}</span></li>)}</ol></aside>
+   </section>
+   <p class="coverage">{t.coverage}</p>
+   <section class="reference" aria-labelledby="setup-details"><h2 id="setup-details">{t.reference}</h2>
+    <details open><summary><span>{t.local.summary}</span><span class="summary-note">{t.local.note}</span></summary><div class="detail-body"><p>{t.local.build}</p><div class="command"><pre><code id="source-command">{commands.source}</code></pre><button type="button" data-copy="source-command" data-copied={c.copied} data-selected={c.selected} aria-label={c.build} aria-live="polite" hidden>{c.copy}</button></div><p>{t.local.run}</p><div class="command"><pre><code id="judge-command">{commands.local}</code></pre><button type="button" data-copy="judge-command" data-copied={c.copied} data-selected={c.selected} aria-label={c.judge} aria-live="polite" hidden>{c.copy}</button></div><p>{t.local.exits}</p></div></details>
+    <details><summary><span>{t.limits.summary}</span><span class="summary-note">{t.limits.note}</span></summary><div class="detail-body">{t.limits.body.map((p) => <p>{p}</p>)}</div></details>
+    <details><summary><span>{t.privacy.summary}</span><span class="summary-note">{t.privacy.note}</span></summary><div class="detail-body privacy">{t.privacy.body.map((p) => <p>{p}</p>)}</div></details>
+    <p class="privacy-summary">{t.summary}</p>
+   </section>
+  </Pool>
+ </article>
+ <Coverage lang={lang} />
+</Base>
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
+    const code = document.getElementById(button.dataset.copy!);
+    if (!code) return;
+    button.hidden = false;
+    const label = button.textContent;
+    let reset: ReturnType<typeof setTimeout>;
+
+    button.addEventListener("click", async () => {
+      clearTimeout(reset);
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? "");
+        button.textContent = button.dataset.copied ?? label;
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(code);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        button.textContent = button.dataset.selected ?? label;
+      }
+      reset = setTimeout(() => { button.textContent = label; }, 2000);
+    });
+  });
+</script>
+
+<style>
+  .start-page {
+    max-width: calc(1040px + var(--gutter) * 2);
+  }
+  .page-intro {
+    padding-block: 16px 64px;
+    max-width: 40rem;
+  }
+  h1 {
+    font-size: var(--font-title, clamp(32px, 4vw, 48px));
+    font-weight: 560;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .intro {
+    margin: 20px 0 0;
+    max-width: 35em;
+    font-size: var(--font-body, 16px);
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  .sync {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: 48px 80px;
+    padding-top: 48px;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 560;
+    letter-spacing: -0.02em;
+  }
+  .where {
+    margin: 12px 0 24px;
+    font-size: var(--font-small, 13px);
+    color: var(--muted);
+  }
+  .command {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    background: var(--paper);
+    padding: 16px;
+  }
+  .primary-command {
+    padding: 22px;
+  }
+  pre {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.7;
+  }
+  pre code {
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .primary-command pre code {
+    font-size: 15px;
+  }
+  /* A workflow keeps its lines: wrapped YAML reads as other YAML. The block scrolls; the page does not. */
+  pre.yaml {
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+  }
+  pre.yaml code {
+    font-size: 13px;
+  }
+  button {
+    flex: 0 0 auto;
+    min-height: 40px;
+    min-width: 48px;
+    border: 0;
+    border-radius: 3px;
+    padding: 4px 6px;
+    margin: -2px -4px 0 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  button:hover {
+    background: var(--paper-2);
+    color: var(--ink);
+  }
+  button[hidden] {
+    display: none;
+  }
+  .result {
+    margin: 18px 0 0;
+    font-size: var(--font-small, 13px);
+    line-height: 1.8;
+    color: var(--muted);
+  }
+  .result code {
+    color: var(--text);
+    font-size: 12px;
+  }
+  .wiring {
+    margin: 24px 0 0;
+    max-width: 42em;
+    font-size: var(--font-small, 13px);
+    color: var(--muted);
+    line-height: 1.75;
+  }
+  .wiring + .command {
+    margin-top: 12px;
+  }
+  .detail-body .command + p {
+    margin-top: 18px;
+  }
+  .path {
+    padding-top: 4px;
+  }
+  .flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .flow li {
+    position: relative;
+    padding: 0 0 36px 24px;
+    border-left: 1px solid var(--rule);
+  }
+  .flow li:last-child {
+    padding-bottom: 0;
+    border-left-color: transparent;
+  }
+  .flow li::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: -4px;
+    width: 7px;
+    height: 7px;
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 50%;
+  }
+  .step-title,
+  .step-detail {
+    display: block;
+  }
+  .step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .step-detail {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .step-detail.file {
+    font-family: var(--font-code);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .coverage {
+    margin: 36px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: var(--font-small, 13px);
+    line-height: 1.75;
+  }
+  .coverage a {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--ink);
+  }
+  .reference {
+    margin-top: 72px;
+  }
+  .reference > h2 {
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: var(--font-small, 13px);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  details {
+    border-top: 1px solid var(--rule);
+  }
+  details:last-of-type {
+    border-bottom: 1px solid var(--rule);
+  }
+  summary {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 22px 28px 22px 0;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 500;
+    list-style: none;
+    cursor: pointer;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: "+";
+    position: absolute;
+    right: 1px;
+    top: 20px;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  details[open] > summary::after {
+    content: "−";
+  }
+  summary:hover > :first-child {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .summary-note {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .detail-body {
+    max-width: 44rem;
+    padding-bottom: 28px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .detail-body > p {
+    margin: 0 0 18px;
+  }
+  .detail-body .command + .command-label {
+    margin-top: 24px;
+  }
+  .detail-body .command-label {
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .detail-body .consent {
+    margin: 20px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .privacy-summary {
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  @media (max-width: 800px) {
+    .sync {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .flow li {
+      padding: 18px 0 0;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .flow li::before {
+      top: -4px;
+      left: 0;
+    }
+  }
+  @media (max-width: 540px) {
+    .page-intro {
+      padding-block: 8px 40px;
+    }
+    .sync {
+      padding-top: 32px;
+    }
+    .primary-command {
+      padding: 16px;
+      gap: 8px;
+    }
+    .primary-command pre code {
+      font-size: 13px;
+    }
+    .flow {
+      grid-template-columns:minmax(0,1fr);
+      gap:0;
+    }
+    .flow li {
+      padding:0 0 24px 20px;
+      border-top:0;
+      border-left:1px solid var(--rule);
+    }
+    .flow li:last-child {padding-bottom:0;}
+    .flow li::before {top:5px;left:-4px;}
+    .step-title {
+      font-size: 13px;
+    }
+    .step-detail {
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .step-detail.file {
+      font-size: 12px;
+    }
+    .reference {
+      margin-top: 48px;
+    }
+    .summary-note {
+      display: none;
+    }
+    .command {
+      gap: 8px;
+      padding: 14px;
+    }
+    .command pre code {
+      font-size: 12px;
+    }
+  }
+</style>

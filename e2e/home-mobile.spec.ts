@@ -8,6 +8,12 @@ const phones = [
   { width: 844, height: 390 },
 ];
 
+// The home page in each language, and the words each check looks for.
+const homes = [
+  { path: "/", headline: ["An npm dependency PR,", "judged in one comment."], stages: ["Read", "Check", "Count the wait, comment"], receipt: "Gate 3, build and tests", isolate: "Flow illustration" },
+  { path: "/ja/", headline: ["npm の依存更新 PR を、", "1つのコメントで判定します。"], stages: ["読む", "確かめる", "待機を数えてコメント"], receipt: "関門3、ビルドとテスト", isolate: "流れのイメージ図" },
+];
+
 async function reflow(page: Page) {
   const width = page.viewportSize()!.width;
   const sizes = await page.evaluate(() => ({ layout: document.documentElement.clientWidth, content: document.documentElement.scrollWidth, viewport: innerWidth }));
@@ -37,11 +43,11 @@ async function resizeText(page: Page) {
   });
 }
 
-test("a phone does not scroll sideways and keeps reachable controls", async ({ page }) => {
+for (const home of homes) test(`a phone does not scroll sideways and keeps reachable controls (${home.path})`, async ({ page }) => {
   for (const viewport of phones) {
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
+    await page.goto(home.path);
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator("[data-delivery-target=read]")).toBeVisible();
     await expect(page.locator("[data-trace-step=paths]")).toBeVisible();
@@ -49,26 +55,26 @@ test("a phone does not scroll sideways and keeps reachable controls", async ({ p
     await touchTargets(page.locator(".site-header nav a"), viewport.width);
     await touchTargets(page.locator("[data-trace-step]"), viewport.width);
     await touchTargets(page.locator("[data-delivery-target]"), viewport.width);
-    await expect(page.locator("[data-delivery-target=read]")).toContainText("Read");
-    await expect(page.locator("[data-delivery-target=check]")).toContainText("Check");
-    await expect(page.locator("[data-delivery-target=comment]")).toContainText("Count the wait, comment");
+    await expect(page.locator("[data-delivery-target=read]")).toContainText(home.stages[0]!);
+    await expect(page.locator("[data-delivery-target=check]")).toContainText(home.stages[1]!);
+    await expect(page.locator("[data-delivery-target=comment]")).toContainText(home.stages[2]!);
     await reflow(page);
   }
 });
 
-test("200 percent text keeps the design on the phone", async ({ page }) => {
+for (const home of homes) test(`200 percent text keeps the design on the phone (${home.path})`, async ({ page }) => {
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
+    await page.goto(home.path);
     await page.evaluate(() => document.fonts.ready);
     await resizeText(page);
     await reflow(page);
-    await expect(page.locator("h1")).toContainText("An npm dependency PR,");
-    await expect(page.locator("h1")).toContainText("judged in one comment.");
+    await expect(page.locator("h1")).toContainText(home.headline[0]!);
+    await expect(page.locator("h1")).toContainText(home.headline[1]!);
     await expect(page.locator("[data-guard-state]")).toHaveCount(4);
-    await expect(page.locator("#receipt")).toContainText("Gate 3, build and tests");
-    await expect(page.locator("#isolate")).toContainText("Flow illustration");
+    await expect(page.locator("#receipt")).toContainText(home.receipt);
+    await expect(page.locator("#isolate")).toContainText(home.isolate);
     await expect(page.locator("[data-delivery-target=check]")).toBeVisible();
     await reflow(page);
   }

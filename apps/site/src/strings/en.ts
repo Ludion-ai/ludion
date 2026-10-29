@@ -8,7 +8,9 @@ export const en = {
     "label": "Main",
     "skip": "Skip to content",
     "design": "How it works",
-    "start": "Try the preview"
+    "start": "Try the preview",
+    "switch": "日本語",
+    "switchLang": "ja"
   },
   "home": {
     "title": "Ludion — a judge for npm dependency updates",
@@ -23,7 +25,9 @@ export const en = {
     "coverage": "Preview, not released · npm package-lock.json v2/v3; a pnpm-lock.yaml, read only by the local command, is always undecidable. The judge changes no file and merges nothing.",
     "example": "Illustrated judgement. Not a run result.",
     "scene": {
-      "caption": "A dependency PR → its lockfile diff → checks → one comment, with when the wait ends."
+      "caption": "A dependency PR → its lockfile diff → checks → one comment, with when the wait ends.",
+      "pr": "dependency PR",
+      "comment": "one comment"
     },
     "chapters": {
       "label": "How the judge works",
@@ -83,7 +87,19 @@ export const en = {
       "commentDetail": "Count the wait from the newest publish and write one comment on the PR at once. If nothing stopped it and the wait has not ended, the verdict is wait, with the time it ends. Later runs update the same comment. No file is changed and nothing is merged.",
       "limits": "The judging job has read access only and runs no dependency code. A second job, from your default branch, checks its result as untrusted data and posts the comment.",
       "unavailable": "When a wait ends, nothing re-checks the PR by itself: the judge looks again only when it runs again.",
-      "scope": "Flow illustration, not a judgement. Nothing is installed or run by this page."
+      "scope": "Flow illustration, not a judgement. Nothing is installed or run by this page.",
+      "visual": {
+        "context": "dependency PR",
+        "reference": "read by the judge",
+        "inline": "one comment",
+        "noChange": "no change",
+        "replay": "Replay",
+        "files": {
+          "read": "package-lock.json",
+          "check": "registry + OSV",
+          "comment": "PR comment"
+        }
+      }
     },
     "receipt": {
       "title": "One comment: what it found, and what it did not check.",
@@ -116,6 +132,14 @@ export const en = {
       "title": "Put a judge behind your dependency PRs.",
       "action": "See how to set it up"
     },
+    "coverageTable": {
+      "title": "Know what the judge reads.",
+      "label": "What the judge reads",
+      "input": "Input",
+      "read": "Read",
+      "checked": "Checked",
+      "boundary": "Current boundary"
+    },
     "supported": [
       {
         "name": "package-lock.json",
@@ -143,6 +167,70 @@ export const en = {
       }
     ],
     "supportedNote": "npm only. Ludion does not find vulnerabilities or write updates: Dependabot, Renovate or a person opens the PR, and the judge stands behind it. Package names and versions are sent to OSV and the npm registry; no source is sent."
+  },
+  "start": {
+    "title": "Judge your npm dependency PRs | Ludion",
+    "description": "Add the Ludion judge to a repository as two GitHub workflows, or run it locally against two checkouts. A preview that only comments; not released yet.",
+    "heading": "Judge your npm dependency PRs.",
+    "intro": "Add two workflows to a repository, or run the judge locally against two checkouts. Preview: comments only; nothing is merged.",
+    "workflows": "Add two workflows",
+    "notReleased": "Not released yet · No release commit exists yet. The action needs one, because only a release commit carries the bundled judge; at any other commit it stops with an error. When one is published, pin its full 40-character SHA, not a tag or branch, in both workflows.",
+    "judgeIntro": "The first judges with read access only and runs nothing from the PR:",
+    "judgeLabel": "The judging workflow",
+    "commentIntro": "The second posts the result. It runs from your default branch after each judge run, checks the result as untrusted data, and keeps one comment per PR up to date:",
+    "commentLabel": "The comment workflow",
+    "pinNote": "A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it. The judge is not a required check unless you make it one.",
+    "pathLabel": "What the judge does",
+    "flow": [
+      {
+        "title": "Read",
+        "detail": "The PR's package.json and package-lock.json, before and after"
+      },
+      {
+        "title": "Check",
+        "detail": "Provenance, publisher, install scripts, MAL- records, deprecation, new dependencies"
+      },
+      {
+        "title": "Comment",
+        "detail": "One verdict, with when the wait ends and what was not checked"
+      }
+    ],
+    "coverage": "npm only · Parts of gates 1, 2 and 4, and the wait. Gate 3, building and testing, is not run, so the judge never says an update can be applied.",
+    "reference": "Running it, and its limits",
+    "local": {
+      "summary": "Run the judge locally",
+      "note": "Two checkouts, before and after",
+      "build": "The published npm ludion-ai 0.1.4 release is the earlier lesson product, which ended on 2026-10-28; no release of the judge is on npm yet. Build this repository (Node 24):",
+      "run": "Then give the judge two checkouts of your project, before and after the update, and the files the update changes:",
+      "exits": "Exit codes: 0 ready except build (gates 1, 2 and 4 found nothing and the wait is over); 3 wait; 1 stop or undecidable, also when a lookup fails or --files is missing; 2 the inputs could not be read. --json gives the whole judgement. A pnpm-lock.yaml is read as the set of versions it adds, which is always undecidable."
+    },
+    "limits": {
+      "summary": "Limits",
+      "note": "What the action reads",
+      "body": [
+        "GitHub-hosted Linux runners: the action needs gh, jq, unzip, GNU date and Node 22 or later. Only the root package.json and package-lock.json, and each changed */package.json, are read. A workspace package.json is left out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable.",
+        "A PR that changes .github/ or 300 or more files is shown as undecidable. The comment job posts only for PRs into the default branch. When a wait ends, nothing re-checks the PR by itself: the judge looks again only when it runs again.",
+        "A hijacked publisher account with no provenance change is caught only by the wait and by running the judge again when it ends."
+      ]
+    },
+    "privacy": {
+      "summary": "What leaves your machine",
+      "note": "Requests and boundaries",
+      "body": [
+        "Package names and versions are sent to OSV and the npm registry. No source is sent, and no dependency code is run.",
+        "The judging job has read access only; the comment job runs from your default branch and treats the judge's result as untrusted data. This website uses Google Analytics."
+      ]
+    },
+    "summary": "No comment, or an undecidable one, means neither safe nor cleared. Each judgement lists what the judge did not check.",
+    "copy": {
+      "copy": "Copy",
+      "copied": "Copied",
+      "selected": "Selected",
+      "judgeWorkflow": "Copy the judging workflow",
+      "commentWorkflow": "Copy the comment workflow",
+      "build": "Copy build commands",
+      "judge": "Copy judge command"
+    }
   },
   "footer": {
     "license": "Code is Apache-2.0.",

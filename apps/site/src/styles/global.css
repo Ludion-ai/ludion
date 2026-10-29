@@ -34,6 +34,17 @@ h3 {
   line-height: 1.15;
 }
 
+/* Japanese pages. The brand face has no Japanese glyphs, so kana and kanji come from the device's Japanese font (no
+   web font is added). Lines break between phrases, by the strict rules, and headings keep the font's own spacing. */
+html:lang(ja) {
+  --font-ui: "Schibsted Grotesk Variable", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP", system-ui, sans-serif;
+  word-break: auto-phrase;
+  line-break: strict;
+}
+html:lang(ja) :is(h1, h2, h3) {
+  letter-spacing: 0;
+}
+
 .claim {
   font-family: var(--font-ui);
   font-weight: 560;

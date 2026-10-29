@@ -1,15 +1,21 @@
 ---
-import { en } from "../strings/en.ts";
+import { strings, type Lang } from "../strings/index.ts";
+interface Props {
+  lang?: Lang;
+}
+const { lang = "en" } = Astro.props;
+const h = strings[lang].home;
+const c = h.coverageTable;
 ---
 <section class="coverage-section wrap" id="coverage" aria-labelledby="coverage-heading">
-  <h2 id="coverage-heading">Know what the judge reads.</h2>
-  <div class="coverage-table" role="region" aria-label="What the judge reads" tabindex="0">
+  <h2 id="coverage-heading">{c.title}</h2>
+  <div class="coverage-table" role="region" aria-label={c.label} tabindex="0">
     <table>
-      <thead><tr><th scope="col">Input</th><th scope="col">Read</th><th scope="col">Checked</th><th scope="col">Current boundary</th></tr></thead>
-      <tbody>{en.home.supported.map(row => <tr><th scope="row">{row.name}</th><td>{row.read}</td><td>{row.checked}</td><td>{row.scope}</td></tr>)}</tbody>
+      <thead><tr><th scope="col">{c.input}</th><th scope="col">{c.read}</th><th scope="col">{c.checked}</th><th scope="col">{c.boundary}</th></tr></thead>
+      <tbody>{h.supported.map(row => <tr><th scope="row">{row.name}</th><td>{row.read}</td><td>{row.checked}</td><td>{row.scope}</td></tr>)}</tbody>
     </table>
   </div>
-  <p>{en.home.supportedNote}</p>
+  <p>{h.supportedNote}</p>
 </section>
 <style>
   .coverage-section { padding-block:64px; border-top:1px solid var(--rule); max-width:1120px; }

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { en } from "../src/strings/en.ts";
+import { ja } from "../src/strings/ja.ts";
 
 const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
 
@@ -31,6 +32,51 @@ describe("judge preview claims", () => {
   });
   it("describes none of the removed commands, ecosystems or Docker validation", () => {
     expect(JSON.stringify(en)).not.toMatch(/--apply|\b(scan|patch|PHP|Composer|Maven|Docker|Dockerfile)\b/i);
+  });
+});
+
+describe("the Japanese pages' claims", () => {
+  // Keys, list lengths and value types, at every depth.
+  const shape = (value: unknown): unknown =>
+    Array.isArray(value) ? value.map(shape)
+    : value && typeof value === "object" ? Object.fromEntries(Object.entries(value).map(([key, item]) => [key, shape(item)]))
+    : typeof value;
+
+  it("has en.ts's keys and lists, and the same verdicts and code names", () => {
+    expect(shape(ja)).toEqual(shape(en));
+    expect(ja.home.guard.states.map(s => s.id)).toEqual(en.home.guard.states.map(s => s.id));
+    expect(ja.home.verify.bar).toBe(en.home.verify.bar);
+    expect(ja.home.isolate.bar).toBe(en.home.isolate.bar);
+    expect(ja.home.supported.slice(0, 3).map(s => s.name)).toEqual(en.home.supported.slice(0, 3).map(s => s.name));
+  });
+  it("says what the English says: a preview, not released, comments only, never apply, npm only", () => {
+    expect(ja.home.sub).toContain("コメントするだけで、マージはしません。");
+    expect(ja.home.coverage).toContain("プレビュー版で、まだリリースしていません");
+    expect(ja.home.coverage).toContain("何もマージしません");
+    expect(ja.home.guard.states.find(s => s.id === "ready_except_build")?.detail).toContain("更新を適用してよいという判定ではありません");
+    expect(ja.home.guard.states.find(s => s.id === "undecidable")?.detail).toContain("問題なしとは表示しません");
+    expect(ja.home.guard.note).toContain("変わったバージョンはすべて本番用として扱います");
+    expect(ja.home.supportedNote).toContain("npm だけです");
+    expect(ja.home.isolate.scope).toContain("判定ではありません");
+    expect(ja.home.receipt.scope).toContain("判定ではありません");
+    expect(ja.home.receipt.notDeployed).toBe("実行しない");
+    expect(ja.start.notReleased).toContain("まだリリースしていません");
+    expect(ja.start.coverage).toContain("関門3（ビルドとテスト）は実行しない");
+    expect(ja.start.intro).toContain("何もマージしません");
+  });
+  it("says what the judge does not check, including gate 3 and a hijacked publisher", () => {
+    expect(ja.home.receipt.notChecked).toHaveLength(7);
+    expect(ja.home.receipt.notChecked[0]).toContain("関門3");
+    expect(ja.home.verify.notVerified).toContain("関門3");
+    expect(ja.home.verify.hijack).toContain("見つけられるのは待機時間と");
+    expect(ja.home.isolate.unavailable).toContain("もう一度実行したときだけ");
+  });
+  it("uses the terms Japanese developers use", () => {
+    const text = JSON.stringify(ja);
+    for (const term of ["Dependabot", "PR", "ロックファイル", "来歴証明（provenance）", "インストールスクリプト", "OSV の悪性パッケージ記録（MAL-）"]) expect(text, term).toContain(term);
+  });
+  it("describes none of the removed commands, ecosystems or Docker validation", () => {
+    expect(JSON.stringify(ja)).not.toMatch(/--apply|\b(scan|patch|PHP|Composer|Maven|Docker|Dockerfile)\b|スキャン|パッチ/i);
   });
 });
 

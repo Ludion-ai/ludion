@@ -1,25 +1,31 @@
 ---
 import BrandMark from "./BrandMark.astro";
-import { en } from "../strings/en.ts";
-const iso = en.home.isolate;
+import { localPath, strings, type Lang } from "../strings/index.ts";
+interface Props {
+  lang?: Lang;
+}
+const { lang = "en" } = Astro.props;
+const t = strings[lang];
+const iso = t.home.isolate;
+const visual = iso.visual;
 // Stage labels for the existing delivery animation: a dependency PR reaching its comment. This page runs nothing.
 const s = {
   label: iso.bar,
   choose: iso.stagesLabel,
-  context: "dependency PR",
-  reference: "read by the judge",
-  inline: "one comment",
+  context: visual.context,
+  reference: visual.reference,
+  inline: visual.inline,
   illustration: iso.scope,
-  replay: "Replay",
+  replay: visual.replay,
   scope: iso.scope,
   limits: iso.limits,
   unavailable: iso.unavailable,
-  setup: en.nav.start,
+  setup: t.nav.start,
 };
 const routes = [
-  { id: "read", name: iso.read, file: "package-lock.json", note: iso.readDetail },
-  { id: "check", name: iso.check, file: "registry + OSV", note: iso.checkDetail },
-  { id: "comment", name: iso.comment, file: "PR comment", note: iso.commentDetail },
+  { id: "read", name: iso.read, file: visual.files.read, note: iso.readDetail },
+  { id: "check", name: iso.check, file: visual.files.check, note: iso.checkDetail },
+  { id: "comment", name: iso.comment, file: visual.files.comment, note: iso.commentDetail },
 ];
 ---
 <div class="delivery" data-delivery data-reference={s.reference} data-inline={s.inline}>
@@ -32,7 +38,7 @@ const routes = [
       <div class="mobile-space" data-mobile-delivery>
         <div class="mobile-file"><span>{s.context}</span><code>judge</code></div>
         <div class="mobile-route"><i></i><div class="mobile-packet" data-mobile-packet><i class="paper-shape"></i></div></div>
-        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>{routes[0]!.name}</span><code data-static-destination>package-lock.json</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">no change</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
+        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>{routes[0]!.name}</span><code data-static-destination>package-lock.json</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">{visual.noChange}</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
       </div>
     </div>
     <figcaption id="delivery-caption" class="visually-hidden">{s.illustration}</figcaption>
@@ -46,10 +52,10 @@ const routes = [
   </div>
   <p class="limits">{s.limits}</p>
   <p class="unavailable">{s.unavailable}</p>
-  <p class="command"><a href="/start/">{s.setup}<span aria-hidden="true"> ↗</span></a></p>
+  <p class="command"><a href={localPath(lang, "/start/")}>{s.setup}<span aria-hidden="true"> ↗</span></a></p>
   <p class="delivery-scope">{s.scope}</p><span class="visually-hidden" role="status" data-delivery-status></span>
   <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>judge</code></div><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></template>
-  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>package-lock.json</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>no change</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
+  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>package-lock.json</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>{visual.noChange}</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
   <template data-delivery-object="packet"><div class="packet"><div class="packet-papers"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div><span>{s.context}</span></div></template>
   <template data-delivery-object="floor"><div class="world-floor"></div></template>
 </div>

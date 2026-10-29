@@ -37,10 +37,10 @@ test("the verdicts, checks and comment stay in the page without JavaScript", asy
   await context.close();
 });
 
-test("changing reduced motion stops and resumes the wave without reloading", async ({ page }) => {
+for (const path of ["/", "/ja/"]) test(`changing reduced motion stops and resumes the wave without reloading (${path})`, async ({ page }) => {
   await page.clock.install();
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
+  await page.goto(path);
   test.skip(!(await page.locator("html").getAttribute("class"))?.includes("has-water"), "WebGL unavailable");
   await page.evaluate(() => document.fonts.ready);
   await page.clock.runFor(1200);
@@ -58,11 +58,11 @@ test("changing reduced motion stops and resumes the wave without reloading", asy
   expect((await page.screenshot({ clip })).equals(first)).toBe(false);
 });
 
-test("home opens on the visual scene and scrolls to the guard", async ({ page }) => {
+for (const path of ["/", "/ja/"]) test(`home opens on the visual scene and scrolls to the guard (${path})`, async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+    await page.goto(path);
     await page.evaluate(() => document.fonts.ready);
     const stage = page.locator("[data-context-stage]");
     await expect(stage).toHaveClass(/active/);
@@ -70,7 +70,8 @@ test("home opens on the visual scene and scrolls to the guard", async ({ page })
     const initial = await scene.evaluate((el) => getComputedStyle(el).getPropertyValue("--scroll"));
     const guard = page.locator("#guard");
     expect((await guard.boundingBox())!.y).toBeGreaterThanOrEqual(700);
-    await page.getByRole("link", { name: "See the verdicts", exact: true }).click();
+    // The "See the verdicts" link, in either language.
+    await page.locator("a#replay").click();
     await expect(page).toHaveURL(/#guard$/);
     await expect.poll(async () => (await guard.boundingBox())!.y).toBeCloseTo(40, 0);
     await expect(stage).not.toHaveClass(/active/);

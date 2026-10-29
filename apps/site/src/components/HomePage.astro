@@ -1,0 +1,200 @@
+---
+// The home page, in either language: the judge for npm dependency PRs, in the existing visual system. Illustrations are not run results.
+import Base from "../layouts/Base.astro";
+import RecordedMoment from "./RecordedMoment.astro";
+import ContextStage from "./ContextStage.astro";
+import GuardStates from "./GuardStates.astro";
+import LessonTrace from "./LessonTrace.astro";
+import DeliveryScene from "./DeliveryScene.astro";
+import BrandMark from "./BrandMark.astro";
+import Coverage from "./Coverage.astro";
+import { localPath, strings, type Lang } from "../strings/index.ts";
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = strings[lang];
+const chapters = [
+  { id: "guard", label: t.home.chapters.guard },
+  { id: "verify", label: t.home.chapters.verify },
+  { id: "isolate", label: t.home.chapters.isolate },
+  { id: "receipt", label: t.home.chapters.receipt },
+];
+---
+
+<Base title={t.home.title} description={t.site.description} lang={lang} page="/">
+  <section class="home-stage" aria-labelledby="home-heading" data-water data-water-showcase>
+    <div class="introduction wrap">
+      <h1 id="home-heading">{t.home.headline.map((line) => <span>{line}</span>)}</h1>
+      <p>{t.home.sub}</p>
+    </div>
+    <div class="invitation wrap">
+      <div class="actions">
+        <a class="start" href={localPath(lang, "/start/")}>{t.home.start}<span aria-hidden="true"> ↗</span></a>
+        <a class="proof" id="replay" href="#guard">{t.home.seeItWork}<span aria-hidden="true"> ↓</span></a>
+      </div>
+    </div>
+    <div class="scene"><span class="horizon" data-water-surface aria-hidden="true"></span><ContextStage lang={lang} /></div>
+    <a class="scroll-cue" href="#guard">{t.home.scroll}<span aria-hidden="true"> ↓</span></a>
+  </section>
+  <div class="home-story">
+    <nav class="story-nav" aria-label={t.home.chapters.label}><span class="story-brand" aria-hidden="true"><BrandMark size={15}/></span>{chapters.map(({ id, label }) => <a href={`#${id}`} data-story-link={id}>{label}</a>)}</nav>
+    <section class="story-scene" id="guard" aria-labelledby="guard-heading">
+      <div class="section-intro wrap"><h2 id="guard-heading">{t.home.guard.title}</h2></div>
+      <GuardStates lang={lang} />
+      <p class="guard-note">{t.home.guard.note}</p>
+      <p class="example">{t.home.example}</p>
+    </section>
+    <section class="story-scene story-scene--split" id="verify" aria-labelledby="verify-heading">
+      <div class="proof-layout">
+      <div class="section-intro wrap"><h2 id="verify-heading">{t.home.verify.title}</h2></div>
+      <LessonTrace lang={lang} />
+      </div>
+    </section>
+    <section class="story-scene" id="isolate" aria-labelledby="isolate-heading">
+      <div class="section-intro wrap"><h2 id="isolate-heading">{t.home.isolate.title}</h2></div>
+      <DeliveryScene lang={lang} />
+    </section>
+  <section class="recorded-scene" id="receipt" aria-labelledby="receipt-heading">
+    <div class="section-intro wrap"><h2 id="receipt-heading">{t.home.receipt.title}</h2></div>
+    <RecordedMoment lang={lang} />
+    <p class="coverage">{t.home.coverage}</p>
+  </section>
+  </div>
+  <Coverage lang={lang} />
+  <section class="closing-scene wrap" aria-labelledby="closing-heading">
+    <h2 id="closing-heading">{t.home.closing.title}</h2>
+    <a class="start" href={localPath(lang, "/start/")}>{t.home.closing.action}<span aria-hidden="true"> ↗</span></a>
+  </section>
+</Base>
+
+<script>
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      if (!motion.matches) entry.target.classList.add("arriving");
+      observer.unobserve(entry.target);
+    }
+  }, {threshold:.15});
+  const scenes = document.querySelectorAll(".story-scene, .recorded-scene, .closing-scene");
+  for (const scene of scenes) observer.observe(scene);
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-story-link]")];
+  const chapters = new IntersectionObserver(entries=>{
+    for(const entry of entries) if(entry.isIntersecting) for(const link of links) {
+      if(link.dataset.storyLink === entry.target.id) link.setAttribute("aria-current","location"); else link.removeAttribute("aria-current");
+    }
+  },{rootMargin:"-10% 0px -60% 0px"});
+  for(const scene of document.querySelectorAll(".story-scene, .recorded-scene")) chapters.observe(scene);
+</script>
+
+<style>
+  .home-stage {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: calc(100svh - 64px);
+    padding-block: clamp(80px,12vh,132px) 36px;
+    text-align: center;
+  }
+  .introduction { position: relative; z-index: 2; }
+  h1 {
+    font-size: clamp(34px, 4.8vw, 58px);
+    font-weight: 480;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  h1 span { display:block; }
+  .introduction p { margin: 22px 0 0; color: var(--muted); font-size: 15px; }
+  .invitation { margin-top:26px; position:relative; z-index:2; }
+  .scene {
+    position: relative;
+    width: min(100%, 1400px);
+    min-width: 0;
+    align-self: center;
+    justify-self: center;
+    margin-block: 12px 28px;
+  }
+  .horizon { position: absolute; top: 56%; left: 0; width: 100%; height: 0; }
+  .actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 18px 28px; }
+  .start {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    min-height: 44px;
+    padding: 10px 21px;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 180ms, opacity 180ms;
+  }
+  .start:hover { opacity: 0.84; transform: translateY(-2px); }
+  .proof { padding: 10px 0; font-size: 14px; text-decoration: none; }
+  .proof:hover { text-decoration: underline; }
+  .scroll-cue { justify-self:center; color:var(--muted); font-size:11px; text-decoration:none; padding:8px; }
+  .home-story { padding-top:22px; border-top:1px solid var(--rule); background:var(--paper); }
+  .story-nav { display:flex; align-items:center; justify-content:center; gap:4px; width:max-content; max-width:calc(100% - 36px); margin:0 auto; padding:4px 6px; border:1px solid var(--rule); border-radius:999px; background:var(--paper); }
+  .story-brand { padding-inline:10px; color:var(--ink); line-height:1; }
+  .story-nav a { padding:10px 16px; min-height:40px; font-size:12px; color:var(--muted); text-decoration:none; border-radius:999px; }
+  .story-nav a[aria-current] { background:var(--paper-2); color:var(--ink); }
+  .story-scene { padding-block:100px 110px; text-align:center; scroll-margin-top:40px; }
+  .story-scene + .story-scene { border-top:1px solid var(--rule); }
+  @media (min-width:1100px) {
+    .proof-layout { display:grid; grid-template-columns:250px minmax(0,1fr); align-items:start; gap:48px; width:min(100% - 72px,1120px); margin:auto; }
+    .story-scene--split .section-intro { width:auto; margin:50px 0 0; text-align:left; }
+    .story-scene--split .section-intro p { margin-inline:0; }
+    .proof-layout :global(.lesson-trace) { width:100%; }
+  }
+  .recorded-scene { padding-block:140px 120px; text-align:center; border-top:1px solid var(--rule); background:var(--paper); scroll-margin-top:40px; }
+  .section-intro { margin-bottom:48px; }
+  h2 { font-size:clamp(28px,3.2vw,40px); font-weight:460; letter-spacing:-.035em; text-wrap:balance; }
+  .guard-note, .example { width:min(100% - 36px, 720px); margin:28px auto 0; color:var(--muted); font-size:14px; line-height:1.7; text-wrap:pretty; }
+  .example { margin-top:14px; font-size:12px; }
+  .coverage { margin:30px 0 0; font-size:12px; color:var(--muted); }
+  .closing-scene { padding-block:110px 130px; text-align:center; border-top:1px solid var(--rule); }
+  .closing-scene .start { margin-top:32px; }
+  .arriving .section-intro,.closing-scene.arriving h2 { animation:arrive 650ms cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes arrive { from{opacity:.3; transform:translateY(22px)}to{opacity:1;transform:none} }
+  @media (max-width: 640px) {
+    .home-stage { min-height:calc(100svh - 60px); padding-block:clamp(32px,6svh,52px) 20px; }
+    h1 { max-width: 22ch; margin-inline: auto; font-size:clamp(27px,7.8vw,33px); overflow-wrap:anywhere; }
+    .introduction p { max-width: 24ch; margin-inline: auto; font-size: 14px; }
+    .scene { margin-block:18px; }
+    .actions { gap: 20px; }
+    .recorded-scene { padding-block:48px 52px; }
+    .section-intro { margin-bottom:24px; }
+    h2 { font-size:26px; line-height:1.2; }
+    .closing-scene { padding-block:56px; }
+    .story-scene { padding-block:44px 48px; }
+    .story-scene--split { padding-top:32px; }
+    .story-scene--split .section-intro { margin-bottom:20px; }
+    .story-brand { display:none; }
+    .story-nav { flex-wrap:wrap; }
+    .story-nav a { padding-inline:12px; min-height:44px; font-size:12px; }
+    .scroll-cue { min-height:44px; display:flex; align-items:center; font-size:12px; }
+    .guard-note, .example { font-size:14px; }
+  }
+  @media(max-width:1000px) and (max-height:500px) {
+    .home-stage { min-height:calc(100svh - 60px); grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-rows:auto auto auto; gap:12px 20px; padding:20px var(--gutter) 12px; text-align:left; }
+    .introduction { grid-area:1 / 1; align-self:end; padding:0; }
+    .introduction p { font-size:13px; margin-top:14px; max-width:28ch; }
+    h1 { font-size:clamp(24px,3.8vw,32px); }
+    .invitation { grid-area:2 / 1; align-self:start; padding:0; margin-top:0; }
+    .scene { grid-area:1 / 2 / span 2; margin:0; }
+    .actions { justify-content:flex-start; gap:10px; }
+    .start,.proof { font-size:12px; }
+    .scroll-cue { grid-area:3 / 1 / auto / span 2; min-height:44px; display:flex; align-items:center; }
+    .story-scene,.recorded-scene { padding-block:32px 40px; }
+    .section-intro { margin-bottom:20px; }
+    h2 { font-size:26px; }
+  }
+  @media(min-width:641px) and (max-width:1000px) and (max-height:500px) {
+    .proof-layout { display:grid; grid-template-columns:150px minmax(0,1fr); align-items:start; gap:18px; width:calc(100% - 36px); margin:auto; }
+    .story-scene--split .section-intro { width:auto; padding:0; margin:0; text-align:left; }
+    .proof-layout :global(.lesson-trace) { width:100%; }
+  }
+</style>

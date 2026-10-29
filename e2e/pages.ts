@@ -1,8 +1,8 @@
 import type { APIRequestContext } from "@playwright/test";
 
-/** The public pages. The optional request keeps older callers type-safe. */
+/** The public pages, in English and Japanese. The optional request keeps older callers type-safe. */
 export function allPages(_request?: APIRequestContext): string[] {
-  return ["/", "/start/", "/no-such-page/"];
+  return ["/", "/start/", "/ja/", "/ja/start/", "/no-such-page/"];
 }
 
 /** Removed URLs and where they go. Location for "/" is the site root, not every path that ends in a slash. */

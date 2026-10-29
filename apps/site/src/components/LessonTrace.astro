@@ -1,7 +1,11 @@
 ---
-import { en } from "../strings/en.ts";
-
-const v = en.home.verify;
+import { strings, type Lang } from "../strings/index.ts";
+interface Props {
+  lang?: Lang;
+}
+const { lang = "en" } = Astro.props;
+const t = strings[lang];
+const v = t.home.verify;
 const steps = [
   { id: "paths", label: v.steps.paths, body: v.pathsBody },
   { id: "source", label: v.steps.source, body: v.sourceBody },
@@ -31,7 +35,7 @@ const steps = [
       </div>
       <p class="panel-note">{v.notVerified}</p>
       <p class="panel-note">{v.hijack}</p>
-      <p class="example">{en.home.example}</p>
+      <p class="example">{t.home.example}</p>
     </div>
   </div>
 </article>

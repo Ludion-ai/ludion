@@ -2,7 +2,7 @@
 # Typecheck, the shadow's tests (recorder and replay), and deliberate mutations of the replay, each run in Docker with
 # no network (node:24-slim pinned by digest, read-only root, user 1000). Each mutation must make a test fail; the file
 # is restored after each. Run from the repository root with a Linux node_modules volume:
-#   bash docs/bench/2026-10-29-shadow-replay/scripts/check.sh ludion-lsr-nm > docs/bench/2026-10-29-shadow-replay/logs/check.log 2>&1
+#   bash docs/bench/2026-10-29-shadow-replay/scripts/check.sh ludion-lsr-nm [start commit] > docs/bench/2026-10-29-shadow-replay/logs/check.log 2>&1
 set -u
 export MSYS_NO_PATHCONV=1
 NM="$1"
@@ -14,6 +14,16 @@ run() { docker run --rm --network none --read-only --tmpfs /tmp:exec --user 1000
 echo "commit: $(git rev-parse HEAD)  replay.ts blob: $(git hash-object $R)  disputed.ts blob: $(git hash-object $D)  test blob: $(git hash-object tools/shadow/test/replay.test.ts)"
 echo "== typecheck"; run "npx tsc -p tsconfig.json; echo tsc_exit=\$?"
 echo "== tests"; run "npx vitest run tools/shadow 2>&1 | grep -E 'Tests |Test Files |✓|×'"
+# The count runs the judge's files from the recorder's start commit (run.sh): the tests run against them too.
+START=${2:-8a78b55940def8463a2401e7bdd38d7e6c7b604d}
+TREE=$(mktemp -d)
+mkdir -p "$TREE/node_modules"
+git -c core.autocrlf=false archive HEAD | (cd "$TREE" && tar -x)
+for f in packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts packages/cli/src/security/time-cap.ts tools/backtest/src/archives-v5.ts; do git -c core.autocrlf=false show "$START:$f" > "$TREE/$f"; echo "  $f from $START: $(git hash-object "$TREE/$f")"; done
+TW=$(cd "$TREE" && (pwd -W 2>/dev/null || pwd))
+echo "== tests with the start commit's judge files"
+docker run --rm --network none --read-only --tmpfs /tmp:exec --user 1000:1000 -e HOME=/tmp -v "$TW:/w:ro" -v "$NM:/w/node_modules" -w /w "$IMAGE" sh -c "npx tsc -p tsconfig.json; echo tsc_exit=$?; npx vitest run tools/shadow 2>&1 | grep -E 'Tests |Test Files |×'"
+rm -rf "$TREE"
 mutate() {
   local file="$1"; shift
   echo "== mutation: $1"
@@ -43,6 +53,11 @@ mutate $R "OSV records still being retried ignored" 'if (retrying.length) notFin
 mutate $R "ranges enumerated over stored versions only" 'else for (const v of Object.keys(time)) if (semver.valid(v)) candidates.add(v);' 'else void time;'
 mutate $R "final although a range was not enumerated" 'if (rangesNotRead.size) notFinal.push' 'if (false) notFinal.push'
 mutate $D "withdrawn records left out of the record-omission rule" 'all.some(r => names(r, name, v))' 'records.some(r => names(r, name, v))'
+mutate $D "V left out of the run of identical code's times" 'time.set(version, input.published);' 'time.delete(version);'
+mutate $R "seeds from V's own captures and P's packument only" '...(captureTimesByName(ctx.store).get(name) ?? []),' '...[],'
+mutate $R "OSV not asked by package name" 'else copies.push(...answer.filter(' 'else void answer.filter('
+mutate $R "final although OSV was not asked" 'if (osvNotQueried.length) notFinal.push' 'if (false) notFinal.push'
+mutate $R "capture gaps of MAL-only cases not listed" 'capture_gaps: [...results, ...cases.filter(c => !results.some(r => r.name === c.name && r.version === c.version))]' 'capture_gaps: [...results]'
 mutate $D "file list only from the last capture" '[...caps].reverse().find(c => c.files)?.files ?? null' 'cap?.files ?? null'
 mutate $D "recorder's file list not compared" 'if (captured?.files) {' 'if (false) {'
 mutate $D "O after another named version ignored" 'afterNamed || addsScript ?' 'addsScript ?'

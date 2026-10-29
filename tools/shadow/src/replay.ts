@@ -292,9 +292,46 @@ function inputAt(ctx: Ctx, name: string, version: string, prev: string | null, r
   };
 }
 
-/** The end of the poll that took a capture: its status line (a poll, or the error that ended it). All its records come before it. */
+/**
+ * The end of the poll that took a capture: its status line (a poll, the error that ended the whole poll, or a stop).
+ * All its records come before it. An error line naming a package or an OSV id is written mid-poll, so it is not one.
+ */
+const pollEnds = new WeakMap<Store, number[]>();
 function pollEndAfter(ctx: Ctx, t: number): number {
-  return ctx.store.status.filter(s => (s.type === "poll" || s.type === "error" || s.type === "stopped") && ms(s.at) >= t).map(s => ms(s.at)).sort((a, b) => a - b)[0] ?? ctx.coverage;
+  let ends = pollEnds.get(ctx.store);
+  if (!ends) { ends = ctx.store.status.filter(s => s.type === "poll" || s.type === "stopped" || (s.type === "error" && s.name === undefined && s.id === undefined)).map(s => ms(s.at)).sort((a, b) => a - b); pollEnds.set(ctx.store, ends); }
+  let lo = 0, hi = ends.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (ends[mid]! < t) lo = mid + 1; else hi = mid; }
+  return ends[lo] ?? ctx.coverage;
+}
+/** Per package name, when each of its version captures was taken (built once per store). */
+const captureTimes = new WeakMap<Store, Map<string, number[]>>();
+function captureTimesByName(store: Store): Map<string, number[]> {
+  let byName = captureTimes.get(store);
+  if (!byName) {
+    byName = new Map();
+    for (const [key, list] of store.versions) { const n = key.slice(0, key.lastIndexOf("@")); byName.set(n, [...(byName.get(n) ?? []), ...list.map(c => c.fetched_at)]); }
+    captureTimes.set(store, byName);
+  }
+  return byName;
+}
+/**
+ * The moments at which V's inputs can first be complete: the end of each poll, from V's first capture on, that stored
+ * anything the judgement reads. That is a capture of V, of another version of P (its predecessor's retry, say), a
+ * change to P's packument, or the first publish of one of V's dependencies.
+ */
+function* seedsOf(ctx: Ctx, name: string, version: string): Generator<number> {
+  const own = ctx.store.versions.get(`${name}@${version}`) ?? [];
+  const first = own[0]!.fetched_at;
+  const deps = new Set(own.flatMap(c => c.dependencies));
+  const times = [
+    ...own.map(c => c.fetched_at),
+    ...(ctx.store.timeline.get(name) ?? []).map(r => r.at as number),
+    ...(captureTimesByName(ctx.store).get(name) ?? []),
+    ...[...deps].flatMap(d => (ctx.store.created.get(d) ?? []).map(c => c.fetched_at)),
+  ].filter(t => t >= first).sort((a, b) => a - b);
+  let last = -Infinity;
+  for (const t of times) { const end = pollEndAfter(ctx, t); if (end > last) { last = end; yield end; } }
 }
 /**
  * One row of one scenario, judged at the judge's own wait_until: computed first from the end of the poll that first
@@ -306,8 +343,8 @@ export function judgeRow(ctx: Ctx, name: string, version: string, prev: string |
   const captures = ctx.store.versions.get(`${name}@${version}`) ?? [];
   if (!captures.length) return { ...base, gap: `${name}@${version} was never captured (removed before its first capture, or lost in a gap)` };
   let input: ReturnType<typeof inputAt> = { gap: "" }, seed = NaN;
-  for (const c of captures) {
-    seed = pollEndAfter(ctx, c.fetched_at);
+  for (const s of seedsOf(ctx, name, version)) {
+    seed = s;
     input = inputAt(ctx, name, version, prev, row, scenario, seed);
     if (!("gap" in input)) break;
   }
@@ -426,6 +463,19 @@ export async function replay(input: { store: Store; watched: Record<string, stri
   const window = windowOf(store.status, asOf);
   const start = window.start ? ms(window.start) : NaN, end = window.end ? ms(window.end) : NaN;
   const inWindow = (published: string | null | undefined) => !!published && ms(published) >= start && ms(published) < end;
+  // The recorder stores only records modified after its start, and only those OSV's export lists after its cursor. For
+  // the denominator, OSV is also asked for every record naming each watched package with a version in the window
+  // (package names only). The judgements' re-query still reads stored copies only.
+  const osvNotQueried: string[] = [];
+  if (window.start) {
+    const withWindowVersions = [...store.timeline.keys()].filter(n => Object.hasOwn(input.watched, n) && [...allVersions(store, n, asOf).values()].some(inWindow));
+    if (!input.sources) osvNotQueried.push(`${withWindowVersions.length} package(s) (without the network)`);
+    else for (const n of withWindowVersions) {
+      const answer = await input.sources.osvRecords(n);
+      if (answer === "unreadable") osvNotQueried.push(n);
+      else copies.push(...answer.filter(r => typeof r?.id === "string" && r.id.startsWith("MAL-")));
+    }
+  }
   const registryTimes = new Map<string, Promise<Record<string, string> | "unreadable">>();
   const registryTime = (name: string) => { if (!registryTimes.has(name)) registryTimes.set(name, input.sources!.registryTime(name)); return registryTimes.get(name)!; };
 
@@ -503,6 +553,7 @@ export async function replay(input: { store: Store; watched: Record<string, stri
   if (store.osvGaveUp.length) notFinal.push(`${store.osvGaveUp.length} OSV record(s) were given up unread, so what they name is unknown`);
   const retrying = osvRetrying(store);
   if (retrying.length) notFinal.push(`${retrying.length} OSV record(s) are still being read again (${retrying.slice(0, 5).join(", ")}), so what they name is unknown`);
+  if (osvNotQueried.length) notFinal.push(`OSV was not asked for the records naming ${osvNotQueried.slice(0, 5).join(", ")}, so records the recorder did not store (modified before it started) are not counted`);
   if (rangesNotRead.size) notFinal.push(`record(s) name watched packages by a range, and the registry's versions were not read (without the network, or unreadable): ${[...rangesNotRead].slice(0, 5).join(", ")}`);
   const final = notFinal.length === 0;
 
@@ -530,7 +581,7 @@ export async function replay(input: { store: Store; watched: Record<string, stri
     mal: { records_naming_watched: recordsNamingWatched, versions: cases.length, by_category: byCategory, records_by_category: recordsByCategory, cases, outside_window: outside },
     capture_lag_hours: { count: lags.length, median: quantile(lags, 0.5), p90: quantile(lags, 0.9) },
     per_row: perRow,
-    capture_gaps: results.flatMap(r => r.rows.filter(x => x.outcome === "capture_gap").map(x => ({ version: id(r), scenario: x.scenario, row: x.row, prev: x.prev, gap: x.gap ?? "" }))),
+    capture_gaps: [...results, ...cases.filter(c => !results.some(r => r.name === c.name && r.version === c.version))].flatMap(r => r.rows.filter(x => x.outcome === "capture_gap").map(x => ({ version: id(r), scenario: x.scenario, row: x.row, prev: x.prev, gap: x.gap ?? "" }))),
     undecidable: results.flatMap(r => [...r.rows, ...(r.literal ? [r.literal] : [])].filter(x => x.verdict === "undecidable").map(x => ({ version: id(r), scenario: x.scenario, row: x.row, prev: x.prev, stops: x.stops ?? [] }))),
     literal, gave_up: store.gaveUp, osv_gave_up: store.osvGaveUp, duplicates: store.duplicates,
   };

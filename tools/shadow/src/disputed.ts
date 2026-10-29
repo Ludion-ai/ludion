@@ -121,8 +121,11 @@ export async function dispute(input: { name: string; version: string; published:
  */
 export async function categorize(input: { name: string; version: string; published: string | null; store: Store; records: Rec[]; sources: Sources }): Promise<{ category: Category; evidence: unknown }> {
   const { name, version, store, sources: src } = input;
-  const time = allVersions(store, name);
-  if (!input.published) return { category: "confirmed", evidence: { step: "no stored publish time: the disputed check cannot place prev_d" } };
+  if (!input.published) return { category: "confirmed", evidence: { step: "no publish time: the disputed check cannot place prev_d" } };
+  // The stored `time`, completed by the registry's (a version never captured, or one placed only by the registry) and V's own.
+  const registry = await src.registryTime(name);
+  const time = new Map([...Object.entries(registry === "unreadable" ? {} : registry).filter(([v]) => semver.valid(v)), ...allVersions(store, name)]);
+  time.set(version, input.published);
   const osv = await src.osvRecords(name);
   if (osv === "unreadable") return { category: "confirmed", evidence: { step: "OSV's records for the package unreadable" } };
   // Every MAL- record naming the package: OSV's answer today, and every copy the recorder stored. A version any of them

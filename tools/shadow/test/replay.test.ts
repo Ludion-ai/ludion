@@ -335,7 +335,7 @@ describe("the report", () => {
     for (let i = 1; i <= 100; i++) w.publish("left-pad", `1.0.${i}`, i);
     // A record published long after the window's end + 336h does not join the denominator.
     w.publish("left-pad", "1.1.0", 300, { scripts: { postinstall: "x" } }).mal("MAL-late", "left-pad", ["1.1.0"], 28 * 24 + 337 + 50, 28 * 24 + 337 + 51);
-    const report = await replay({ store: w.store(), watched: w.watched, asOf: T0 + (28 * 24 + 336 + 200) * HOUR, sources: null });
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: T0 + (28 * 24 + 336 + 200) * HOUR, sources: sources({}) });
     expect(report.final).toBe(true);
     expect(report.versions_in_window).toBe(101);
     expect(report.decided).toEqual({ count: 101, needed: 100, state: "met" });
@@ -408,7 +408,7 @@ describe("review fixes (PR #194)", () => {
   it("is not final until an OSV read 24h past the window's end + 336h", async () => {
     const w = finalWorld();
     w.status = w.status.filter(s => (s as { type: string }).type !== "osv" || Date.parse((s as { at: string }).at) <= T0 + (671 + 336 + 22) * HOUR);
-    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: sources({}) });
     expect(report.final).toBe(false);
     expect(report.not_final_because.join()).toMatch(/last OSV read/);
     expect(report.misses.state).toBe("not_yet");
@@ -459,7 +459,7 @@ describe("second review fixes (PR #194)", () => {
   it("keeps a version in the denominator when a later copy of its record stops naming it", async () => {
     const w = finalWorld();
     w.osv.push(rec("MAL-d", "left-pad", { versions: ["1.0.1"] }, 100, 100), rec("MAL-d", "left-pad", { versions: ["1.0.0"] }, 100, 300));
-    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: sources({}) });
     expect(report.final).toBe(true);
     expect(report.mal.versions).toBe(1);
     expect(report.misses).toMatchObject({ count: 1, state: "not_met", versions: ["left-pad@1.0.1"] });
@@ -476,11 +476,11 @@ describe("second review fixes (PR #194)", () => {
   it("is not final while an OSV record's read is still being retried", async () => {
     const w = finalWorld();
     w.status.push({ type: "error", at: at(1100), id: "MAL-r", error: "osv: HTTP 503" });
-    const retrying = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    const retrying = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: sources({}) });
     expect(retrying.final).toBe(false);
     expect(retrying.not_final_because.join()).toMatch(/still being read again \(MAL-r\)/);
     w.osv.push(rec("MAL-r", "unwatched", { versions: ["1.0.0"] }, 1090, 1100));
-    expect((await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null })).final).toBe(true);
+    expect((await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: sources({}) })).final).toBe(true);
   });
   it("enumerates a range over the registry's versions too; without the network the result is not final", async () => {
     const w = new World(400);
@@ -494,5 +494,57 @@ describe("second review fixes (PR #194)", () => {
     const online = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: src });
     expect(online.not_final_because.join()).not.toMatch(/by a range/);
     expect(online.mal.cases.map(c => [c.version, c.rows[0]!.outcome])).toEqual([["1.0.1", "missed"], ["1.0.5", "capture_gap"]]);
+  });
+});
+
+describe("third review fixes (PR #194)", () => {
+  const finalWorld = () => { const w = new World(28 * 24 + 336 + 200); w.publish("left-pad", "1.0.1", 1); return w; };
+  const asOfFinal = T0 + (28 * 24 + 336 + 200) * HOUR;
+
+  it("places a version known only from the registry's time in the run of identical code", async () => {
+    // 1.0.2 is not in the store; it has 1.0.0's code, and 1.0.1 (evil, named) comes between them.
+    const { store, records } = malStore([["1.0.0", 1], ["1.0.1", 2]], ["1.0.1"]);
+    const w2 = new World().mal("MAL-1.0.2", "p", ["1.0.2"], 20);
+    const extra = w2.store().osv.get("MAL-1.0.2")!.map(c => c.record);
+    const pkg = (v: string) => `{"name":"p","version":"${v}","scripts":{}}`;
+    const src = { ...sources({ "1.0.0": { "package.json": pkg("1.0.0"), "a.js": "x" }, "1.0.1": { "package.json": pkg("1.0.1"), "a.js": "evil" }, "1.0.2": { "package.json": pkg("1.0.2"), "a.js": "x" } }), registryTime: async () => ({ "1.0.0": at(1), "1.0.1": at(2), "1.0.2": at(3) }) };
+    const c = await categorize({ name: "p", version: "1.0.2", published: at(3), store, records: [...records, ...extra] as any, sources: src });
+    expect(c.category).toBe("record_omission");
+    expect(c.evidence).toMatchObject({ prev_d: "1.0.0", o: "1.0.2", o_predecessor: "1.0.1", earliest_other_named: "1.0.1", o_after_earliest_named: true });
+  });
+  it("seeds from a later capture of the predecessor that completes its inputs", () => {
+    const w = new World();
+    w.captures.pop();
+    w.version("left-pad", "1.0.0", -0.5, "lockfile", { attested: true }, "fail");
+    w.publish("left-pad", "1.0.1", 1);
+    expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.every(x => x.outcome === "capture_gap")).toBe(true);
+    w.version("left-pad", "1.0.0", 3.01, "retry", { attested: true }, attestations("left-pad", "1.0.0"));
+    // 1.0.0 had provenance and 1.0.1 has none: every row stops, judged from the seed after the retry.
+    expect(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false).rows.map(x => x.outcome)).toEqual(["stopped", "stopped", "stopped", "stopped"]);
+  });
+  it("asks OSV by package name for records the recorder never stored; without the network the result is not final", async () => {
+    const w = finalWorld();
+    const offline = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: null });
+    expect(offline.final).toBe(false);
+    expect(offline.not_final_because.join()).toMatch(/OSV was not asked/);
+    const old = { id: "MAL-old", published: at(-100), modified: at(-50), affected: [{ package: { ecosystem: "npm", name: "left-pad" }, ranges: [{ type: "SEMVER", events: [{ introduced: "1.0.1" }] }] }] };
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: asOfFinal, sources: { ...sources({}), osvRecords: async () => [old] } });
+    expect(report.final).toBe(true);
+    expect(report.mal.cases.map(c => [c.version, c.records])).toEqual([["1.0.1", ["MAL-old"]]]);
+    expect(report.misses).toMatchObject({ count: 1, state: "not_met" });
+  });
+  it("lists the capture gaps of MAL-named versions placed only by the registry", async () => {
+    const w = new World(400).mal("MAL-g", "left-pad", ["1.0.9"], 100);
+    const report = await replay({ store: w.store(), watched: w.watched, asOf: T0 + 400 * HOUR, sources: { ...sources({}), registryTime: async () => ({ "1.0.9": at(5) }) } });
+    expect(report.capture_gaps.filter(g => g.version === "left-pad@1.0.9")).toHaveLength(4);
+  });
+  it("does not take an error line naming a package for the end of a poll", () => {
+    const w = new World();
+    w.status.push({ type: "error", at: at(1.012), name: "other", error: "HTTP 500" });
+    w.publish("left-pad", "1.0.1", 1, { deps: { fresh: "^1.0.0" } });
+    w.captures.push({ type: "created", name: "fresh", fetched_at: at(1.015), url: "x", created: "2019-01-01T00:00:00.000Z" });
+    // The created record (1.015) comes after the mid-poll error line (1.012) and before the poll's end (2).
+    const r = row(judgeVersion(ctxOf(w), "left-pad", "1.0.1", false), "b", "normal");
+    expect(r).toMatchObject({ outcome: "missed", wait_hours: 144, iterations: 1 });
   });
 });

@@ -14,9 +14,11 @@ const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (
       Exit 1: attention needed; 2: error. An empty result is not a security guarantee.
   ludion patch [--dir <path>] [--apply] [--json]
       Download official images, build and test old/new versions offline, and save a receipt.
-      An npm candidate also goes through the judge's checks (as in ludion judge) after the baseline's
-      tests; one that must wait, stops or cannot be judged is not tested or applied.
-      --apply updates only source dependency files after validation. Production is not deployed.
+      Each fix is validated on its own. An npm fix's candidate also goes through the judge's checks (as in
+      ludion judge) after the baseline's tests; a fix that must wait, stops or cannot be judged is not
+      tested or applied, and the other fixes go on.
+      --apply commits each fix that passes to its own new Git branch; the files and HEAD are not changed.
+      Production is not deployed.
   ludion watch [--dir <path>] [--apply] [--interval <seconds>] [--json]
       Repeat patch checks in the foreground (default 900 seconds). Ctrl+C cancels pending apply;
       a Docker step already in progress, or the judge's lookups for an npm candidate (each request up to

@@ -38,6 +38,12 @@ const mutations = [
   ["a baseline MAL- record accepted","packages/cli/src/security/dependency-patch.ts","    if (marked.length) throw","    if (marked.length && false) throw","packages/cli/test/dependencies.test.ts"],
   ["a symbolic link in .git accepted","packages/cli/src/security/branch.ts","  if (linked.length) throw","  if (linked.length && false) throw","packages/cli/test/branch.test.ts"],
   ["an existing reflog accepted","packages/cli/src/security/branch.ts","  if (existsSync(join(common, \"logs\", ...parts))) throw","  if (false) throw","packages/cli/test/branch.test.ts"],
+  // LA5 (2026-10-30): #203's judge, called once per fix (the review of f976ec2, comment 6501442567, "#204 がやること" 4).
+  ["the judge not called", "packages/cli/src/security/dependency-patch.ts", "const refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); active();", "const refusal = null as string | null;", "packages/cli/test/dependencies.test.ts"],
+  ["the judge's exception swallowed", "packages/cli/src/security/dependency-patch.ts", "const refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); active();", "let refusal: string | null = null; try { refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); } catch {} active();", "packages/cli/test/dependencies.test.ts"],
+  ["the refusal honoured only with --apply", "packages/cli/src/security/dependency-patch.ts", "            if (refusal) throw new Error(refusal);", "            if (refusal && apply) throw new Error(refusal);", "packages/cli/test/dependencies.test.ts"],
+  ["a wait let through", "packages/cli/src/security/candidate-judge.ts", "if (j.verdict === \"ready_except_build\") return null;", "if (j.verdict === \"ready_except_build\" || j.verdict === \"wait\") return null;", "packages/cli/test/dependencies.test.ts"],
+  ["every fix judged on the first fix's candidate", "packages/cli/src/security/dependency-patch.ts", "judgeNpmCandidate(source, candidate.exported, deps.fetchFn)", "judgeNpmCandidate(source, join(temp, \"candidate-1-export\"), deps.fetchFn)", "packages/cli/test/dependencies.test.ts"],
 ];
 const vitest = file => { try { execFileSync("npx", ["vitest", "run", "--project", "node", file], { stdio: "pipe", env: { ...process.env, NO_COLOR: "1" } }); return "pass"; } catch { return "fail"; } };
 let caught = 0;

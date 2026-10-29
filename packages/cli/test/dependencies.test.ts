@@ -196,6 +196,10 @@ describe("dependency patch gates and recoverable application", () => {
     expect(fix.files).toHaveLength(2);
     // The judge's parts of gates 1, 2 and 4 and its wait found nothing to stop or wait for.
     expect(fix.judgement).toMatchObject({ verdict: "ready_except_build", urgency: "normal", fixes: [expect.objectContaining({ id: advisory.id, package: "lodash", from: "4.17.20", to: "4.17.21" })] });
+    // The judge's exposure times: here the fix's own publish time, seen after this run's lookup and before the branch.
+    expect(fix.judgement?.exposure.fix_published_at).toBe(fix.fix_published_at);
+    expect(Date.parse(fix.judgement!.exposure.detected_at)).toBeGreaterThanOrEqual(Date.parse(fix.found_at));
+    if (apply) expect(Date.parse(fix.applied_at!)).toBeGreaterThanOrEqual(Date.parse(fix.judgement!.exposure.detected_at));
     // The working tree is never changed; with --apply the fix is one commit on HEAD, on its own branch.
     expect(snapshot(root)).toBe(before);
     expect(git(root, "rev-parse", "HEAD")).toBe(head);
@@ -687,7 +691,7 @@ describe("Composer plans also read Packagist's advisories", () => {
 });
 
 describe.each([true, false])("the judge on each npm fix, apply %s", apply => {
-  const lodash = (fix: object, published = "2021-02-20T15:42:16.891Z", extra: Parameters<typeof registry>[0] = {}) => registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": published } }, ...extra }, (name, version) => name === "lodash" && version === "4.17.21" ? fix : {});
+  const lodash = (fix: object, published = "2021-02-20T15:42:16.891Z") => registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": published } } }, (_name, version) => version === "4.17.21" ? fix : {});
   /** With --apply the working tree never changes, so a refused fix shows as no branch and no commit. */
   const nothingCommitted = (root: string, fix: FixReceipt) => {
     expect(fix).toMatchObject({ branch: null, commit: null, applied_at: null });
@@ -731,9 +735,10 @@ describe.each([true, false])("the judge on each npm fix, apply %s", apply => {
       if (String(url).includes("/vulns/")) return response(String(url).endsWith(minimistAdvisory.id) ? minimistAdvisory : advisory);
       return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => VULNERABLE[`${q.package.name}@${q.version}`] ? { vulns: [{ id: VULNERABLE[`${q.package.name}@${q.version}`]!.id }] } : {}) });
     });
-    const tested: string[] = [];
+    const tested: string[] = [], seen: string[] = [];
+    const fetchFn = registry({ minimist: MINIMIST_RELEASES }, (name, version) => name === "lodash" && version === "4.17.21" ? { deprecated: "use 4.17.22" } : {}, seen);
     const result = await patchDependencies(root, apply, {
-      fetchFn: lodash({ deprecated: "use 4.17.22" }, undefined, { minimist: MINIMIST_RELEASES }), client: osv, command: fakeCommand(),
+      fetchFn, client: osv, command: fakeCommand(),
       testRun: async name => { tested.push(name.replace(/^ludion-check-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, "")); },
     });
     expect(result.receipt?.outcome).toBe("partial");
@@ -751,6 +756,10 @@ describe.each([true, false])("the judge on each npm fix, apply %s", apply => {
     expect(refused?.judgement?.fixes.map(f => [f.id, f.package])).toEqual([[advisory.id, "lodash"]]);
     expect(passed?.judgement?.changes.map(c => [c.name, c.from, c.to])).toEqual([["minimist", "1.2.5", "1.2.6"]]);
     expect(passed?.judgement?.fixes.map(f => [f.id, f.package])).toEqual([[minimistAdvisory.id, "minimist"]]);
+    // KEV and the EPSS list are downloaded whole once per judged fix, and no CVE ID is sent.
+    expect(seen.filter(s => s.startsWith("https://www.cisa.gov/"))).toHaveLength(2);
+    expect(seen.filter(s => s === EPSS_LIST)).toHaveLength(2);
+    expect(seen.filter(s => s.includes("CVE-"))).toEqual([]);
     if (apply) {
       expect(git(root, "branch", "--list", "ludion/*")).toBe("ludion/npm/minimist-1.2.6");
       expect(JSON.parse(git(root, "show", "ludion/npm/minimist-1.2.6:package.json")).dependencies).toEqual({ lodash: "4.17.20", minimist: "1.2.6" });

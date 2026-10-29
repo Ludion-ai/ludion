@@ -18,4 +18,5 @@ Taken as: before more code, change how the work is done and bring the records up
 - The deletion rule sees a deleted or renamed-out file, not a file emptied in place or a command taken out of a file that stays. The review and CLAUDE.md's Scope rule cover those.
 - The base check stops a PR stacked on another PR's branch (as #199 and #201 were), not a lane that copies an open PR's text into a PR against main (as #200 did); the rule that direction comes from main covers that.
 - records.test.ts checks that a mistake's check or rule still exists, not that it still catches the mistake.
+- CLAUDE.md's rule against calling unbuilt work gated or waited reads its list of what is not built from docs/status.md, which is not a protected path. A PR that shortens that list needs the reviewer to check each item it removes.
 - Every agent writes from the same GitHub account, so, like the rest of protected-paths.yml, these are process gates, not technical ones (docs/protected-paths.md).

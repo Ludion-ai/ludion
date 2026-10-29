@@ -8,14 +8,14 @@ What `judge()` checks, unchanged, on every package in the candidate's lockfile d
 
 - **Gate 2.** Lost provenance, a changed repository or workflow, new install scripts, MAL- records, deprecation, withdrawal, a publisher change and new dependencies. The last two extend the wait. Also the time cap's rules 1 and 2, with T from the fixes OSV reports.
 - **Gate 1.** Downgrades and advisories the new version adds.
-- **Gate 4.** Each changed entry's registry tarball and sha512, and that only package.json and package-lock.json change.
-- **The wait.** The design's wait table from the urgency (KEV, severity, EPSS), with the extensions.
+- **Gate 4.** Each changed entry's registry tarball and sha512. The judge's check that only package.json and package-lock.json change holds by construction here: the module reads only those two files, and the patch writes only them. So it checks nothing on this path.
+- **The wait.** The design's wait table from the urgency (KEV, severity, EPSS), with the extensions. Not the dev-only 7-day wait, and not its weekly batching: with no split, nothing is dev-only, so the urgency is never `low`. A candidate that moves only dev-only packages waits 12h to 72h instead.
 
 There is no production/dev split: every changed version counts as production (docs/status.md, "Waiting for the owner", 2). The judgement says so in its first finding.
 
 `patch` goes on to the baseline and candidate tests only on `ready_except_build`. The other verdicts fail the receipt with nothing applied:
 
-- `wait`: the reason gives the time the wait ends.
+- `wait`: the reason gives the time the wait ends, and the findings that extended it.
 - `stop`: the reason gives the first five stop findings.
 - `undecidable`: the reason gives what could not be decided.
 
@@ -25,12 +25,12 @@ To avoid writing the judge's input assembly twice, `judge-cli.ts` now exports `p
 
 ## Checks run (all in Docker; scripts/ has the scripts)
 
-- **Typecheck, build and the full vitest suite.** In `ludion-l9-node24-git` (Node 24, with a stand-in git repository, because the site build reads git): typecheck exit 0, build exit 0, 28 test files, 914 passed and 19 skipped (`scripts/full.sh`).
-- **New tests.** 17 in packages/cli/test/candidate-judge.test.ts and 5 in dependencies.test.ts ("the judge on npm candidates"). Existing patch tests now give their fixture lockfiles a sha512 integrity, and their fixture registry also answers OSV, KEV and EPSS.
+- **Typecheck, build and the full vitest suite.** In `ludion-l9-node24-git` (Node 24, with a stand-in git repository, because the site build reads git): typecheck exit 0, build exit 0, 28 test files, 915 passed and 19 skipped (`scripts/full.sh`).
+- **New tests.** 18 in packages/cli/test/candidate-judge.test.ts and 5 in dependencies.test.ts ("the judge on npm candidates"). Existing patch tests now give their fixture lockfiles a sha512 integrity, and their fixture registry also answers OSV, KEV and EPSS.
 - **Mutations** (`scripts/mutate.sh`). Each of these makes tests fail:
   - the call removed from dependency-patch.ts (7 failed);
   - a `wait` let through (7);
-  - only the fix judged (11);
+  - only the fix judged (12);
   - the lockfile's `dev` kept (1);
   - lookup errors dropped (2);
   - `undecidable` let through (2).

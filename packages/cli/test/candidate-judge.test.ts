@@ -54,16 +54,16 @@ function fetchOf(world: World): typeof fetch {
   };
 }
 
-/** A project folder with package.json and package-lock.json: lodash (direct) and the other packages given. */
-function project(lodash: string, others: [string, string][], dev: string[] = []): string {
+/** A project folder with package.json and package-lock.json: lodash (direct) and the other packages given (at node_modules/<name> unless a path is given). */
+function project(lodash: string, others: [string, string, string?][], dev: string[] = []): string {
   const dir = mkdtempSync(join(tmpdir(), "ludion-candidate-judge-"));
-  const entry = (name: string, version: string) => [`node_modules/${name}`, { version, resolved: registryTarball(name, version), integrity: integrityOf(name, version), ...(dev.includes(name) ? { dev: true } : {}) }];
+  const entry = (name: string, version: string, path = `node_modules/${name}`) => [path, { version, resolved: registryTarball(name, version), integrity: integrityOf(name, version), ...(dev.includes(name) ? { dev: true } : {}) }];
   writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "app", dependencies: { lodash } }));
-  writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": { name: "app", dependencies: { lodash } }, ...Object.fromEntries([entry("lodash", lodash), ...others.map(([n, v]) => entry(n, v))]) } }));
+  writeFileSync(join(dir, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": { name: "app", dependencies: { lodash } }, ...Object.fromEntries([entry("lodash", lodash), ...others.map(([n, v, p]) => entry(n, v, p))]) } }));
   return dir;
 }
 const before = () => project("4.17.20", [["helper", "1.0.0"]]);
-const after = (others: [string, string][] = [["helper", "1.1.0"]], dev: string[] = []) => project("4.17.21", others, dev);
+const after = (others: [string, string, string?][] = [["helper", "1.1.0"]], dev: string[] = []) => project("4.17.21", others, dev);
 const run = (world: World, now = LATER, to = after()) => judgeNpmCandidate(before(), to, fetchOf(world), now);
 const stops = (j: Awaited<ReturnType<typeof run>>) => j.findings.filter(f => f.effect === "stop").map(f => f.message);
 
@@ -100,6 +100,13 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     expect(candidateRefusal(j)).toContain(message.slice(0, 40));
   });
 
+  it("reaches a nested copy the candidate adds", async () => {
+    const j = await run(helperTo({ deprecated: "do not use" }), LATER, after([["helper", "1.0.0"], ["helper", "1.1.0", "node_modules/lodash/node_modules/helper"]]));
+    expect(j.changes.map(c => `${c.path} ${c.from} -> ${c.to}`)).toContain("node_modules/lodash/node_modules/helper 1.0.0 -> 1.1.0");
+    expect(j.verdict).toBe("stop");
+    expect(stops(j)).toEqual(["helper@1.1.0 is deprecated: do not use"]);
+  });
+
   it("stops the same checks on the fix itself", async () => {
     const world = base(); world.packages.lodash!.versions["4.17.21"]!.scripts = { preinstall: "curl x" };
     expect(stops(await run(world))).toEqual(["lodash@4.17.21 adds install scripts: preinstall."]);
@@ -114,7 +121,9 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     const early = await run(world, hours(WAIT_HOURS.normal + 1), to);
     expect(early).toMatchObject({ verdict: "wait", urgency: "normal", wait_hours: extended, newest_publish: T, wait_until: hours(extended).toISOString() });
     expect(early.findings.some(f => f.effect === "extend")).toBe(true);
-    expect(candidateRefusal(early)).toBe(`The judge's wait is not over: not applied before ${hours(extended).toISOString()} (urgency normal, ${extended}h from the newest publish, ${T}). Run the patch again after it.`);
+    const why = early.findings.filter(f => f.effect === "extend").map(f => f.message);
+    expect(why.length).toBeGreaterThan(0);
+    expect(candidateRefusal(early)).toBe(`The judge's wait is not over: not applied before ${hours(extended).toISOString()} (urgency normal, ${extended}h from the newest publish, ${T}). The wait is extended: ${why.join(" ")} Run the patch again after it.`);
     expect((await run(world, hours(extended), to)).verdict).toBe("ready_except_build");
   });
 

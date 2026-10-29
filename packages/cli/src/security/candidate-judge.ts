@@ -26,7 +26,10 @@ export async function judgeNpmCandidate(before: string, after: string, fetchFn: 
 /** Why the patch must not go on with the candidate, or null when the judge found nothing and the wait is over. */
 export function candidateRefusal(j: Judgement): string | null {
   if (j.verdict === "ready_except_build") return null;
-  if (j.verdict === "wait") return `The judge's wait is not over: not applied before ${j.wait_until} (urgency ${j.urgency}, ${j.wait_hours}h from the newest publish, ${j.newest_publish}). Run the patch again after it.`;
+  if (j.verdict === "wait") {
+    const extended = j.findings.filter(f => f.effect === "extend").map(f => f.message);
+    return `The judge's wait is not over: not applied before ${j.wait_until} (urgency ${j.urgency}, ${j.wait_hours}h from the newest publish, ${j.newest_publish}).${extended.length ? ` The wait is extended: ${extended.slice(0, 5).join(" ")}` : ""} Run the patch again after it.`;
+  }
   const stops = j.findings.filter(f => f.effect === "stop");
   const reasons = stops.length ? stops : j.findings.filter(f => f.message !== NO_SPLIT);
   return `The judge ${j.verdict === "stop" ? "stops" : "cannot decide on"} the candidate: ${reasons.slice(0, 5).map(f => `gate ${f.gate}: ${f.message}`).join(" ")}${reasons.length > 5 ? ` (${reasons.length - 5} more in the receipt)` : ""}`;

@@ -156,7 +156,15 @@ const EPSS_DAY = /^\/epss_scores-\d{4}-\d{2}-\d{2}\.csv\.gz$/;
 /** On 2026-10-29 the list was 2,789,117 bytes compressed and 12,088,559 bytes expanded. */
 export const EPSS_LIMITS = { compressed: 16 * 1024 * 1024, expanded: 64 * 1024 * 1024, ms: 120_000 };
 const SCORE = /^\d+(?:\.\d+)?(?:[eE][-+]?\d+)?$/;
-const SCORE_DATE = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2}))?$/;
+const SCORE_DATE = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|[+-](\d{2}):?(\d{2})))?$/;
+/** A score_date in the form FIRST writes it, naming a day on the calendar and a time of day (V8's Date.parse takes 2026-02-30). */
+const scoreDate = (text: string) => {
+  const m = SCORE_DATE.exec(text);
+  if (!m) return false;
+  const [y, mo, d, h = 0, mi = 0, s = 0, oh = 0, om = 0] = m.slice(1).map(v => v === undefined ? undefined : Number(v));
+  const day = new Date(Date.UTC(y!, mo! - 1, d!));
+  return day.getUTCFullYear() === y && day.getUTCMonth() === mo! - 1 && day.getUTCDate() === d && h <= 23 && mi <= 59 && s <= 59 && oh <= 23 && om <= 59;
+};
 
 /**
  * EPSS scores for CVE ids, looked up in FIRST's whole daily list, so no CVE id is sent; a CVE the list does not have
@@ -190,7 +198,7 @@ export async function epssScores(cves: string[], fetchFn: Fetch = fetch, limits 
     const field = lines[0].slice(1).replace(/\r$/, "").split(",").find(f => f.startsWith("score_date:"));
     if (field !== undefined) {
       date = field.slice("score_date:".length);
-      if (!SCORE_DATE.test(date) || !Number.isFinite(Date.parse(date))) throw new Error("The EPSS list's score_date is not a date.");
+      if (!scoreDate(date)) throw new Error("The EPSS list's score_date is not a date.");
     }
     at = 1;
   }

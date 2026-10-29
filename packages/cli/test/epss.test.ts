@@ -100,6 +100,12 @@ describe("EPSS, from FIRST's whole daily list", () => {
     ["the score_date is not an ISO date", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "29 Oct 2026 12:03:14 GMT")))), /score_date is not a date/],
     ["the score_date has a comment after it", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "2026-10-29 (x)")))), /score_date is not a date/],
     ["the score_date is no day of the calendar", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "2026-13-45T12:03:14Z")))), /score_date is not a date/],
+    // Date.parse takes each of these; none is a real day or time of day.
+    ["the score_date is February 30th", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "2026-02-30")))), /score_date is not a date/],
+    ["the score_date is February 29th of a common year", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "2026-02-29T12:00:00Z")))), /score_date is not a date/],
+    ["the score_date is April 31st", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "2026-04-31T12:00:00Z")))), /score_date is not a date/],
+    ["the score_date's hour is 24", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "2026-10-29T24:00:00Z")))), /score_date is not a date/],
+    ["the score_date's offset is 24 hours", () => first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", "2026-10-29T12:00:00+2400")))), /score_date is not a date/],
   ];
   for (const [what, make, message] of stops) it(`throws, so the judgement is undecidable, when ${what}`, async () => {
     await expect(epssScores(["CVE-2026-12345"], make().fetchFn)).rejects.toThrow(message);
@@ -166,10 +172,13 @@ function world(aliases: string[], list = LIST) {
 const judged = (fixes: FixedAdvisory[]) => judge({ changes: [lib], facts: new Map(), fixes, files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
 
 describe("the EPSS list's date", () => {
-  it("is read from the score_date on the list's first line, in either form FIRST has written it", async () => {
-    for (const date of ["2026-10-29T12:03:14Z", "2023-03-02T00:00:00+0000", "2026-10-29"]) {
+  it("is read from the score_date on the list's first line, in each form FIRST has written it", async () => {
+    for (const date of ["2026-10-29T12:03:14Z", "2023-03-02T00:00:00+0000", "2026-10-29", "2024-02-29T23:59:59.5-05:30"]) {
       expect((await epssScores(["CVE-2026-12345"], first(() => new Response(gzipSync(LIST.replace("2026-10-29T12:03:14Z", date)))).fetchFn)).date).toBe(date);
     }
+    // With Windows line ends, the first line's \r is not part of the date.
+    const crlf = await epssScores(["CVE-2026-12345"], first(() => new Response(gzipSync(LIST.split("\n").join("\r\n")))).fetchFn);
+    expect(crlf).toEqual({ date: "2026-10-29T12:03:14Z", scores: new Map([["CVE-2026-12345", 0.27183]]) });
     // A first line that names no score_date gives no date, and the list is still read.
     const noDate = await epssScores(["CVE-2026-12345"], first(() => new Response(gzipSync(LIST.replace(",score_date:2026-10-29T12:03:14Z", "")))).fetchFn);
     expect(noDate).toEqual({ date: null, scores: new Map([["CVE-2026-12345", 0.27183]]) });

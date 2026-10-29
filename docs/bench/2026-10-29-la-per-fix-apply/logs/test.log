@@ -1,4 +1,4 @@
-# started 2026-10-29T12:28:55Z, node v24.22.1, git version 2.39.5
+# started 2026-10-29T12:45:28Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 == npx tsc -p tsconfig.json
 tsc exit 0
@@ -6,34 +6,33 @@ tsc exit 0
 
  RUN  v4.1.12 /w
 
- ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 64ms
- ✓ |node| packages/cli/test/judge.test.ts (63 tests) 116ms
- ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 63ms
- ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 178ms
- ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 227ms
+ ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 75ms
+ ✓ |node| packages/cli/test/judge.test.ts (63 tests) 92ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 54ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 146ms
  ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 7ms
- ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 433ms
-     ✓ names the step that failed even when the judge's modules are missing  330ms
- ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 237ms
- ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 592ms
-     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  520ms
- ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 776ms
-     ✓ parseRequirements: a run of backslash continuations  320ms
- ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 912ms
- ✓ |node| packages/cli/test/security.test.ts (38 tests) 1252ms
- ✓ |node| packages/cli/test/production.test.ts (47 tests) 1362ms
-     ✓ collects what an image holds by name, and seeds held copies, in linear time  873ms
- ✓ |node| packages/cli/test/branch.test.ts (15 tests) 1315ms
- ✓ |node| packages/cli/test/dependencies.test.ts (71 tests) 1862ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 241ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 380ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 208ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 561ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  492ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 747ms
+     ✓ parseRequirements: a run of backslash continuations  304ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 896ms
+ ✓ |node| packages/cli/test/production.test.ts (47 tests) 1246ms
+     ✓ collects what an image holds by name, and seeds held copies, in linear time  782ms
+ ✓ |node| packages/cli/test/security.test.ts (38 tests) 1209ms
+ ✓ |node| packages/cli/test/branch.test.ts (17 tests) 1322ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (71 tests) 1842ms
      ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  349ms
- ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 1980ms
-     ✓ duplicate members count once toward the 1,000  572ms
-     ✓ more than 1,000 literal members are read no further, and say so  979ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 1959ms
+     ✓ duplicate members count once toward the 1,000  567ms
+     ✓ more than 1,000 literal members are read no further, and say so  936ms
 
  Test Files  16 passed (16)
-      Tests  685 passed | 19 skipped (704)
-   Start at  12:29:03
-   Duration  2.54s (transform 2.97s, setup 0ms, import 4.83s, tests 11.38s, environment 1ms)
+      Tests  687 passed | 19 skipped (706)
+   Start at  12:45:36
+   Duration  2.50s (transform 3.01s, setup 0ms, import 4.96s, tests 10.99s, environment 2ms)
 
 vitest exit 0
-# finished 2026-10-29T12:29:05Z
+# finished 2026-10-29T12:45:39Z

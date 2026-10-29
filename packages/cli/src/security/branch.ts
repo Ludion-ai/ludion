@@ -8,7 +8,7 @@ import { notSnapshotted } from "./project.ts";
 /**
  * `--apply` puts each validated fix on its own branch: one commit on the commit it was validated against (gate 4, one
  * fix per commit). The working tree is not changed. Only Git plumbing runs, with the repository's hooks, fsmonitor,
- * signing and transports out of reach and no filters, and a repository that names hooks in its configuration (which newer
+ * signing, transports and replace refs out of reach and no filters, and a repository that names hooks in its configuration (which newer
  * Git runs whatever core.hooksPath says) is refused: a project's Git configuration is data, never a command
  * run on the host.
  */
@@ -16,6 +16,14 @@ export type GitBase = { top: string; prefix: string; commit: string; modes: Map<
 
 const IDENTITY = { GIT_AUTHOR_NAME: "Ludion", GIT_AUTHOR_EMAIL: "ludion@ludion.invalid", GIT_COMMITTER_NAME: "Ludion", GIT_COMMITTER_EMAIL: "ludion@ludion.invalid" };
 const plain = (text: string) => text.replace(/[\x00-\x1f\x7f-\x9f]/g, " ");
+
+/**
+ * The -c settings of every call besides core.hooksPath. core.fsmonitor is empty, not "false": before Git 2.36 the setting
+ * is a hook path, and "false" runs a program named false from PATH (docs/mistakes/2026-10-29-fsmonitor-false-is-a-program.md).
+ * A repository's protocol.<name>.allow wins over protocol.allow, so each one is set here, where -c wins over it.
+ */
+export const GIT_SETTINGS: readonly string[] = ["core.fsmonitor=", "core.splitIndex=false", "commit.gpgSign=false", "gc.auto=0", "maintenance.auto=false", "protocol.allow=never",
+  ...["file", "ext", "ssh", "git", "http", "https"].map(name => `protocol.${name}.allow=never`)];
 
 function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
   // An empty hooks folder for every call, so no hook of the repository (or of core.hooksPath) can run. It is also the
@@ -25,12 +33,11 @@ function git(dir: string, args: string[], options: { input?: string; index?: str
   try {
     const env: NodeJS.ProcessEnv = {};
     for (const [key, value] of Object.entries(process.env)) if (!key.toUpperCase().startsWith("GIT_")) env[key] = value;
-    // No transport: a partial clone would otherwise fetch a missing object with the repository's remote command.
-    Object.assign(env, IDENTITY, { GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_NO_LAZY_FETCH: "1", GIT_ALLOW_PROTOCOL: "none" }, options.index ? { GIT_INDEX_FILE: options.index } : {});
-    const config = [`core.hooksPath=${hooks}`, "core.fsmonitor=false", "core.splitIndex=false", "commit.gpgSign=false", "gc.auto=0", "maintenance.auto=false", "protocol.allow=never",
-      // A repository's protocol.<name>.allow wins over protocol.allow, so each one is set here, where -c wins over it.
-      ...["file", "ext", "ssh", "git", "http", "https"].map(name => `protocol.${name}.allow=never`)].flatMap(c => ["-c", c]);
-    const result = spawnSync("git", ["-C", dir, "--no-pager", "--literal-pathspecs", ...config, ...args], { cwd: hooks, env, input: options.input, maxBuffer: 256 * 1024 * 1024, timeout: 60_000, windowsHide: true });
+    // No transport: a partial clone would otherwise fetch a missing object with the repository's remote command. No
+    // replace refs: the commit and tree read are HEAD's own, not a replacement the repository names.
+    Object.assign(env, IDENTITY, { GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_NO_LAZY_FETCH: "1", GIT_ALLOW_PROTOCOL: "none", GIT_NO_REPLACE_OBJECTS: "1" }, options.index ? { GIT_INDEX_FILE: options.index } : {});
+    const config = [`core.hooksPath=${hooks}`, ...GIT_SETTINGS].flatMap(c => ["-c", c]);
+    const result = spawnSync("git", ["-C", dir, "--no-pager", "--no-replace-objects", "--literal-pathspecs", ...config, ...args], { cwd: hooks, env, input: options.input, maxBuffer: 256 * 1024 * 1024, timeout: 60_000, windowsHide: true });
     if (result.error) throw new Error(`Git could not run: ${result.error.message}`);
     const status = result.status ?? -1;
     if (status !== 0 && !options.allowFail) throw new Error(`git ${args[0]} failed: ${plain(String(result.stderr)).trim().slice(-300)}`);
@@ -98,7 +105,7 @@ export function gitBase(root: string, copy: string, leftOut: readonly string[] =
   };
   walk(copy, "");
   for (const key of tracked.keys()) if (!seen.has(key)) differs.push(key);
-  if (differs.length) throw new Error(`--apply branches from the last commit, and these project files differ from it: ${differs.sort().slice(0, 5).map(plain).join(", ")}${differs.length > 5 ? `, and ${differs.length - 5} more` : ""}. Commit or remove them first. Nothing was validated or changed.`);
+  if (differs.length) throw new Error(`--apply branches from the last commit, and these project files differ from it: ${differs.sort().slice(0, 5).map(plain).join(", ")}${differs.length > 5 ? `, and ${differs.length - 5} more` : ""}. Commit or remove them first; files Git stores through a filter (Git LFS, git-crypt) and a sparse checkout cannot be applied to. Nothing was validated or changed.`);
   return { top, prefix, commit, modes: new Map([...tracked].map(([path, entry]) => [path, entry.mode])), crlf: crlfOnly };
 }
 
@@ -149,7 +156,7 @@ export function fixBranch(base: GitBase, branch: string, files: { path: string; 
     }
     const tree = git(base.top, ["write-tree"], { index }).stdout.trim();
     const commit = git(base.top, ["commit-tree", tree, "-p", base.commit, "--no-gpg-sign", "-F", "-"], { input: message.replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, " ") }).stdout.trim();
-    // --no-deref: a symbolic ref at this name is itself "existing", never followed to create its target.
+    // A symbolic ref at this name was refused above; --no-deref keeps update-ref from following one in any case.
     git(base.top, ["update-ref", "--no-deref", "-m", "ludion: one fix", ref, commit, "0".repeat(base.commit.length)]);
     return commit;
   } finally { rmSync(temp, { recursive: true, force: true }); }

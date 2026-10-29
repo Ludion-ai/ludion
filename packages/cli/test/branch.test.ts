@@ -3,7 +3,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "../src/security/branch.ts";
+import { branchName, branchTip, fixBranch, GIT_SETTINGS, gitBase, skippedReason } from "../src/security/branch.ts";
 import { dependencyFixPublished } from "../src/security/exposure.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
@@ -137,6 +137,22 @@ describe("a fix on its own branch", () => {
     git(root, "config", "hook.audit.event", "reference-transaction");
     git(root, "config", "hook.audit.command", "true");
     expect(() => gitBase(root, copy)).toThrow("names hooks (hook.audit.event, hook.audit.command)");
+  });
+  it("turns fsmonitor off with an empty value, which every Git version reads as off", () => {
+    // Before Git 2.36, core.fsmonitor=false names a program "false" (docs/bench/2026-10-29-la-per-fix-apply/logs/fsmonitor-probe.log).
+    expect(GIT_SETTINGS).toContain("core.fsmonitor=");
+    expect(GIT_SETTINGS.filter(setting => setting.startsWith("core.fsmonitor="))).toEqual(["core.fsmonitor="]);
+  });
+  it("reads HEAD's own commit and tree, not a replacement the repository names", () => {
+    const { root, copy } = project(), head = git(root, "rev-parse", "HEAD");
+    // A replacement commit whose tree has other files.
+    writeFileSync(join(root, "extra.txt"), "x"); git(root, "add", "extra.txt"); git(root, "commit", "-qm", "replacement");
+    const replacement = git(root, "rev-parse", "HEAD"); git(root, "reset", "-q", "--hard", head);
+    git(root, "replace", head, replacement);
+    const base = gitBase(root, copy);
+    expect(base.commit).toBe(head);
+    const made = fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{\"x\":1}\n" }], "ludion: x");
+    expect(git(root, "--no-replace-objects", "ls-tree", "--name-only", "-r", made).split("\n")).toEqual(["package.json", "src/index.js"]);
   });
   it("never follows a symbolic ref at the branch name to create its target", () => {
     const { root, copy } = project(), base = gitBase(root, copy);

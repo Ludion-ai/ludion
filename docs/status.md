@@ -29,4 +29,4 @@ Ludion is a judge for npm dependency-update PRs (`ludion judge`, and the GitHub 
 
 - **Backtests,** up to v5 (docs/bench/2026-10-28-backtest-v5), do not meet the backtest gate: one malicious version is still missed (v5 also counts it as disputed) and unknowns remain.
 - **Noise measurements** (docs/bench/2026-10-28-noise-v2, docs/bench/2026-10-29-l1c, and the third sample in PR #196) measured the production/dev split, which was removed; none met its count gate or its miss gate.
-- **Shadow operation:** the recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md); the replay that judges what it captures is not built, so there is no result for automatic merge's condition (b).
+- **Shadow operation:** the recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md), and the replay that judges what it captures is built (tools/shadow, PR #194). The first four-week window ends on 2026-11-26 JST, so automatic merge's condition (b) has no result before 2026-12-10.

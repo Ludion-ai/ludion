@@ -1,7 +1,8 @@
 // Live facts for the judge: npm registry metadata and attestations, OSV (malicious records and advisories),
 // CISA KEV and FIRST EPSS. Fixed origins, bounded bodies and deadlines. A failed lookup throws; `ludion judge` then
-// reports the judgement as undecidable, never as a pass. Only package names, versions and
-// advisory ids leave the machine.
+// reports the judgement as undecidable, never as a pass. Only package names, versions and the ids of the advisories
+// OSV returned leave the machine; CISA's and FIRST's lists are downloaded whole and looked up here.
+import { gunzipSync } from "node:zlib";
 import { installScripts, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
 import { firstPublish, npmReleases } from "./time-cap.ts";
 
@@ -10,19 +11,27 @@ type Fetch = typeof fetch;
 async function boundedJson(fetchFn: Fetch, url: string, init: RequestInit = {}, maxBytes = 64 * 1024 * 1024): Promise<any> {
   const res = await fetchFn(url, { redirect: "error", signal: AbortSignal.timeout(30_000), ...init, headers: { accept: "application/json", "user-agent": "Ludion-Judge", ...(init.headers ?? {}) } });
   if (!res.ok) { await res.body?.cancel().catch(() => {}); throw Object.assign(new Error(`${new URL(url).hostname} answered HTTP ${res.status}.`), { status: res.status }); }
+  return JSON.parse((await boundedBody(res, new URL(url).hostname, maxBytes)).toString("utf8"));
+}
+
+/** A response body of at most maxBytes. An aborted signal also ends a read that has stalled, and throws. */
+async function boundedBody(res: Response, host: string, maxBytes: number, signal?: AbortSignal): Promise<Buffer> {
   const reader = res.body?.getReader();
-  if (!reader) throw new Error(`Empty response from ${new URL(url).hostname}.`);
+  if (!reader) throw new Error(`Empty response from ${host}.`);
+  const stop = () => { reader.cancel().catch(() => {}); };
+  signal?.addEventListener("abort", stop);
   const chunks: Uint8Array[] = []; let size = 0;
   try {
     while (true) {
       const { done, value } = await reader.read();
+      signal?.throwIfAborted();
       if (done) break;
       size += value.length;
-      if (size > maxBytes) throw new Error(`Response from ${new URL(url).hostname} exceeds ${maxBytes} bytes.`);
+      if (size > maxBytes) throw new Error(`Response from ${host} exceeds ${maxBytes} bytes.`);
       chunks.push(value);
     }
-  } finally { await reader.cancel().catch(() => {}); }
-  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } finally { signal?.removeEventListener("abort", stop); await reader.cancel().catch(() => {}); }
+  return Buffer.concat(chunks);
 }
 
 const NAME = /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i;
@@ -137,16 +146,73 @@ export async function kevCves(fetchFn: Fetch = fetch): Promise<Set<string>> {
   return new Set(body.vulnerabilities.map((v: any) => v?.cveID).filter((id: unknown): id is string => typeof id === "string"));
 }
 
-/** EPSS scores for CVE ids; a CVE FIRST does not list is left out. */
-export async function epssScores(cves: string[], fetchFn: Fetch = fetch): Promise<Map<string, number>> {
-  const scores = new Map<string, number>();
-  for (let at = 0; at < cves.length; at += 50) {
-    const slice = cves.slice(at, at + 50).filter(c => /^CVE-\d{4}-\d{4,}$/.test(c));
-    if (!slice.length) continue;
-    const body = await boundedJson(fetchFn, `https://api.first.org/data/v1/epss?cve=${slice.join(",")}`, {}, 4 * 1024 * 1024);
-    for (const row of body?.data ?? []) if (typeof row?.cve === "string" && Number.isFinite(Number(row.epss))) scores.set(row.cve, Number(row.epss));
+/**
+ * FIRST's daily list of every EPSS score, as first.org/epss/data gives it: one fixed URL that redirects to that day's
+ * file on the same host. One redirect is followed, to a file on that host named for any day (the list's own
+ * score_date, not the name, says how old it is). No other redirect is followed.
+ */
+export const EPSS_LIST = "https://epss.empiricalsecurity.com/epss_scores-current.csv.gz";
+const EPSS_DAY = /^\/epss_scores-\d{4}-\d{2}-\d{2}\.csv\.gz$/;
+/** On 2026-10-29 the list was 2,789,117 bytes compressed and 12,088,559 bytes expanded. */
+export const EPSS_LIMITS = { compressed: 16 * 1024 * 1024, expanded: 64 * 1024 * 1024, ms: 120_000 };
+const SCORE = /^\d+(?:\.\d+)?(?:[eE][-+]?\d+)?$/;
+const SCORE_DATE = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|[+-](\d{2}):?(\d{2})))?$/;
+/** A score_date in the form FIRST writes it, naming a day on the calendar and a time of day (V8's Date.parse takes 2026-02-30). */
+const scoreDate = (text: string) => {
+  const m = SCORE_DATE.exec(text);
+  if (!m) return false;
+  const [y, mo, d, h = 0, mi = 0, s = 0, oh = 0, om = 0] = m.slice(1).map(v => v === undefined ? undefined : Number(v));
+  const day = new Date(Date.UTC(y!, mo! - 1, d!));
+  return day.getUTCFullYear() === y && day.getUTCMonth() === mo! - 1 && day.getUTCDate() === d && h <= 23 && mi <= 59 && s <= 59 && oh <= 23 && om <= 59;
+};
+
+/**
+ * EPSS scores for CVE ids, looked up in FIRST's whole daily list, so no CVE id is sent; a CVE the list does not have
+ * is left out. `date` is the list's own score_date, as written on its first line (null when the list gives none). An
+ * old list is not refused: the date is only shown. A list that cannot be fetched, is too large or too slow, has a
+ * score_date that is not a date, or has any line that is not a score throws.
+ */
+export async function epssScores(cves: string[], fetchFn: Fetch = fetch, limits = EPSS_LIMITS): Promise<{ date: string | null; scores: Map<string, number> }> {
+  const signal = AbortSignal.timeout(limits.ms);
+  const init: RequestInit = { redirect: "manual", signal, headers: { "user-agent": "Ludion-Judge" } };
+  const list = new URL(EPSS_LIST);
+  let res = await fetchFn(EPSS_LIST, init);
+  if (res.status >= 300 && res.status < 400) {
+    const location = res.headers.get("location");
+    await res.body?.cancel().catch(() => {});
+    let day: URL | null = null;
+    try { day = location ? new URL(location, EPSS_LIST) : null; } catch {}
+    if (!day || day.origin !== list.origin || !EPSS_DAY.test(day.pathname) || day.search || day.hash || day.username || day.password) throw new Error(`The EPSS list redirected somewhere other than a day's file on ${list.hostname}.`);
+    // Fetched with redirect "manual" too: a second redirect is not a 200 and throws below.
+    res = await fetchFn(day.href, init);
   }
-  return scores;
+  if (res.status !== 200) { await res.body?.cancel().catch(() => {}); throw new Error(`${list.hostname} answered HTTP ${res.status} for the EPSS list.`); }
+  const compressed = await boundedBody(res, list.hostname, limits.compressed, signal);
+  let text: string;
+  try { text = gunzipSync(compressed, { maxOutputLength: limits.expanded }).toString("utf8"); } catch (error) { throw new Error(`The EPSS list could not be expanded within ${limits.expanded} bytes: ${error instanceof Error ? error.message : String(error)}`); }
+  const lines = text.split("\n");
+  if (lines.at(-1) === "") lines.pop();
+  // A first line starting with # names the model version and the score date ("#model_version:…,score_date:…").
+  let at = 0, date: string | null = null;
+  if (lines[0]?.startsWith("#")) {
+    const field = lines[0].slice(1).replace(/\r$/, "").split(",").find(f => f.startsWith("score_date:"));
+    if (field !== undefined) {
+      date = field.slice("score_date:".length);
+      if (!scoreDate(date)) throw new Error("The EPSS list's score_date is not a date.");
+    }
+    at = 1;
+  }
+  if (lines[at]?.replace(/\r$/, "") !== "cve,epss,percentile") throw new Error("The EPSS list has no cve,epss,percentile header.");
+  const wanted = new Set(cves), seen = new Set<string>(), scores = new Map<string, number>();
+  for (at++; at < lines.length; at++) {
+    const [cve, epss, percentile, extra] = lines[at]!.replace(/\r$/, "").split(",");
+    const valid = extra === undefined && cve !== undefined && /^CVE-\d{4}-\d{4,}$/.test(cve) && !seen.has(cve) && [epss, percentile].every(v => v !== undefined && SCORE.test(v) && Number(v) <= 1);
+    if (!valid) throw new Error(`The EPSS list's line ${at + 1} is not a score.`);
+    seen.add(cve!);
+    if (wanted.has(cve!)) scores.set(cve!, Number(epss));
+  }
+  if (!seen.size) throw new Error("The EPSS list has no scores.");
+  return { date, scores };
 }
 
 /** Everything the judge needs for one lockfile change, fetched live. */
@@ -190,11 +256,13 @@ export async function gatherFacts(changes: Change[], fetchFn: Fetch = fetch, als
   }
   const cves = [...new Set([...records.values()].flatMap(r => r.aliases).filter(a => a.startsWith("CVE-")))];
   const kev = fixed.length ? await kevCves(fetchFn) : new Set<string>();
-  const epss = cves.length ? await epssScores(cves, fetchFn) : new Map<string, number>();
+  const epss = cves.length ? await epssScores(cves, fetchFn) : { date: null, scores: new Map<string, number>() };
   const fixes = fixed.map(f => {
     const r = records.get(f.id)!;
-    const cveScores = r.aliases.map(a => epss.get(a)).filter((s): s is number => s !== undefined);
-    return { id: f.id, package: f.package, from: f.from, to: f.to, aliases: r.aliases, severity: r.severity, kev: r.aliases.some(a => kev.has(a)), epss: cveScores.length ? Math.max(...cveScores) : null };
+    // Of several CVE aliases, the highest score counts.
+    const cveScores = r.aliases.map(a => epss.scores.get(a)).filter((s): s is number => s !== undefined);
+    const looked = r.aliases.some(a => a.startsWith("CVE-"));
+    return { id: f.id, package: f.package, from: f.from, to: f.to, aliases: r.aliases, severity: r.severity, kev: r.aliases.some(a => kev.has(a)), epss: cveScores.length ? Math.max(...cveScores) : null, ...(looked ? { epss_date: epss.date } : {}) };
   });
   return { facts, fixes, created };
 }

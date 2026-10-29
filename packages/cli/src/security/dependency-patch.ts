@@ -11,7 +11,8 @@ import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.
 import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
 import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
-import { releaseIdentity } from "./judge.ts";
+import { releaseIdentity, type Judgement } from "./judge.ts";
+import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
@@ -47,6 +48,8 @@ export type FixReceipt = {
   changed_packages?: PackageChange[];
   /** Rules 1 and 2 of the time cap on the candidate (npm and Composer). */
   time_cap?: TimeCap;
+  /** npm: the judge's gates 1, 2 and 4 and its wait over this fix's lockfile diff (candidate-judge.ts). */
+  judgement?: Judgement;
   reason?: string;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
@@ -427,6 +430,12 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
           const cap = fix.time_cap = await candidateTimeCap(ecosystem, baseline.inventory, candidate.inventory, fix.changes, deps.fetchFn); active();
           if (cap.undecidable.length) throw new Error(`The time cap could not be checked: ${cap.undecidable.slice(0, 5).join(" ")}`);
           if (cap.after_t.length || cap.young.length) throw new Error(`The candidate breaks the time cap. ${renderTimeCap(cap).join(" ")}${cap.young.length ? ` New dependencies first published less than ${cap.wait_hours}h before T: ${cap.young.join(", ")}.` : ""}`);
+          // The judge on this fix alone: the change from the project's lockfile to this fix's candidate, whose folder the
+          // branch commit's files are read from. A refusal stops only this fix.
+          if (ecosystem === "npm") {
+            const refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); active();
+            if (refusal) throw new Error(refusal);
+          }
         }
         compatible(baseline.inventory, candidate.inventory);
         // This fix's package must have no finding left, and no package may have an advisory the baseline did not have on it.

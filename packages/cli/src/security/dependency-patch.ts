@@ -9,7 +9,8 @@ import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, regularFile, rootPath, snapshot, type DependencyConfig } from "./project.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
-import { releaseIdentity } from "./judge.ts";
+import { releaseIdentity, type Judgement } from "./judge.ts";
+import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
@@ -26,6 +27,8 @@ export type DependencyReceipt = {
   changed_packages?: PackageChange[];
   /** Rules 1 and 2 of the time cap on the candidate (npm and Composer). */
   time_cap?: TimeCap;
+  /** npm: the judge's gates 1, 2 and 4 and its wait over the candidate's lockfile diff (candidate-judge.ts). */
+  judgement?: Judgement;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
 /** The final manifest beside the pinned one in the npm candidate context (see resolverDockerfile). */
@@ -371,6 +374,10 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
           const cap = receipt.time_cap = await candidateTimeCap(ecosystem, baselineInventory, resolvedInventory, scan.plan, deps.fetchFn); active();
           if (cap.undecidable.length) throw new Error(`The time cap could not be checked: ${cap.undecidable.slice(0, 5).join(" ")}`);
           if (cap.after_t.length || cap.young.length) throw new Error(`The candidate breaks the time cap. ${renderTimeCap(cap).join(" ")}${cap.young.length ? ` New dependencies first published less than ${cap.wait_hours}h before T: ${cap.young.join(", ")}.` : ""}`);
+          if (ecosystem === "npm") {
+            const refusal = candidateRefusal(receipt.judgement = await judgeNpmCandidate(source, exported, deps.fetchFn)); active();
+            if (refusal) throw new Error(refusal);
+          }
         }
         compatible(baselineInventory, resolvedInventory);
         receipt.after = await client.scan(resolvedInventory); active();

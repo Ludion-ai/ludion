@@ -8,8 +8,9 @@ const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (
 
   ludion init [--dir <path>] [--ecosystem php|npm|composer|maven]
       Create ludion.security.json. Set your application's real test command.
-  ludion scan [--dir <path>] [--ecosystem php|npm|composer|maven] [--json]
+  ludion scan [--dir <path>] [--ecosystem php|npm|composer|maven|python|go|rust] [--json]
       Detect supported inventories and look up PHP releases / OSV advisories.
+      python, go and rust are read-only: known advisories are reported; nothing is planned or applied.
       Exit 1: attention needed; 2: error. An empty result is not a security guarantee.
   ludion patch [--dir <path>] [--apply] [--json]
       Download official images, build and test old/new versions offline, and save a receipt.

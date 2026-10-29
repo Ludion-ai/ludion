@@ -1,0 +1,4 @@
+-rw-r--r-- package/LICENSE
+-rw-r--r-- package/README.md
+-rw-r--r-- package/dist/cli.js
+-rw-r--r-- package/package.json

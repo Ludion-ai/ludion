@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "pr": 161,
+  "head_sha": "b5014ddae044f02288232f13b5d1863a3089bdb2",
+  "base_sha": "be8623912df7a6bddbd5c113db33b1eb18fd9acb",
+  "merge_sha": "470a5542cc0b8b75787094be6dc3d6b4185a45c3",
+  "started_at": "2026-10-28T15:00:59.404Z",
+  "verdict": "stop",
+  "reason": null,
+  "finished_at": "2026-10-28T15:01:00.618Z",
+  "judge_seconds": 0.968,
+  "job_seconds": 1.214,
+  "judge_exit_code": 1,
+  "judgement": {
+    "schema": 1,
+    "judged_at": "2026-10-28T15:00:59.687Z",
+    "verdict": "stop",
+    "urgency": "normal",
+    "wait_hours": 72,
+    "newest_publish": "2026-10-25T07:19:30.732Z",
+    "wait_until": "2026-10-28T07:19:30.732Z",
+    "changes": [
+      {
+        "path": "node_modules/hono",
+        "name": "hono",
+        "from": "4.13.13",
+        "to": "4.13.14",
+        "dev": false,
+        "resolved": "https://registry.npmjs.org/hono/-/hono-4.13.14.tgz",
+        "integrity": "sha512-yhRLQ21U6qa9Hsu2N7Qcbh8tE+WKEcoErjIo56LeSGiGXGp9sA7UpE86Ui9uexb61KakiGwuHMn2QdV7w6i6kQ==",
+        "replaced": null
+      }
+    ],
+    "fixes": [],
+    "findings": [
+      {
+        "gate": 1,
+        "effect": "info",
+        "message": "Production/dev split without the source tree (no --source), so only test runners, linters, formatters and @types packages, and what only they reach, count as dev-only."
+      },
+      {
+        "gate": 4,
+        "effect": "stop",
+        "message": "The change also touches apps/worker/package.json; a dependency update must change only package.json and package-lock.json."
+      }
+    ],
+    "exposure": {
+      "fix_published_at": null,
+      "detected_at": "2026-10-28T15:00:59.687Z"
+    },
+    "time_cap": {
+      "t": "2026-10-25T07:19:30.732Z",
+      "targets": [
+        "hono@4.13.14"
+      ],
+      "after_t": [],
+      "same_release": [],
+      "young": [],
+      "undecidable": [],
+      "wait_hours": 72
+    },
+    "not_checked": [
+      "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
+      "Obfuscated code and new network or process calls in the changed code are not inspected.",
+      "Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used (docs/decisions.md, \"Gate 1's production/dev split, rebuilt\").",
+      "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
+      "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
+      "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
+      "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it."
+    ]
+  },
+  "text": "Ludion judgement: STOP — not applied automatically\nUrgency: normal · wait 72h from the newest publish (2026-10-25T07:19:30.732Z)\nPublished at or after T (2026-10-25T07:19:30.732Z, the fix's publish time): 0 version(s)\nChanged packages (1):\n  hono 4.13.13 → 4.13.14\n  [stop] gate 4: The change also touches apps/worker/package.json; a dependency update must change only package.json and package-lock.json.\n  [info] gate 1: Production/dev split without the source tree (no --source), so only test runners, linters, formatters and @types packages, and what only they reach, count as dev-only.\nNot checked:\n  - Gate 3 (build and tests of old and new versions) is not run by the judge v0.\n  - Obfuscated code and new network or process calls in the changed code are not inspected.\n  - Gate 1's OS, SAPI and configuration conditions are not matched; only production versus dev-only is used (docs/decisions.md, \"Gate 1's production/dev split, rebuilt\").\n  - Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.\n  - A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).\n  - The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.\n  - A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.\nExposure: fix published n/a · seen 2026-10-28T15:00:59.687Z"
+}

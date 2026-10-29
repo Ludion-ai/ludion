@@ -23,7 +23,18 @@ mkdir -p /out/bundle && cp packages/cli/dist/cli.js action/dist/record.js /out/b
 step "npm pack"
 (cd packages/cli && npm pack --dry-run --json > /out/npm-pack-dry-run.json 2> /out/npm-pack-dry-run.stderr && npm pack --pack-destination /out > /dev/null) || exit 1
 tar -tzf /out/ludion-ai-*.tgz | LC_ALL=C sort | tee /out/npm-pack-files.txt
-check "the package is README.md, dist/cli.js and package.json" '[ "$(cat /out/npm-pack-files.txt)" = "$(printf "package/README.md\npackage/dist/cli.js\npackage/package.json")" ]'
+check "the package is LICENSE, README.md, dist/cli.js and package.json" '[ "$(cat /out/npm-pack-files.txt)" = "$(printf "package/LICENSE\npackage/README.md\npackage/dist/cli.js\npackage/package.json")" ]'
+tar -tvzf /out/ludion-ai-*.tgz | awk '{print $1, $6}' | LC_ALL=C sort -k2 | tee /out/npm-pack-modes.txt
+check "every packed file is -rw-r--r--" '[ "$(cut -d" " -f1 /out/npm-pack-modes.txt | sort -u)" = "-rw-r--r--" ]'
+check "the license is the repository's" 'cmp -s LICENSE packages/cli/LICENSE'
+
+step "npm pack, again after marking the packed files executable (as a copy from a Windows checkout has them)"
+chmod 0755 packages/cli/LICENSE packages/cli/README.md packages/cli/package.json packages/cli/dist/cli.js
+npm run build -w ludion-ai > /dev/null || exit 1
+mkdir -p /out/again && (cd packages/cli && npm pack --dry-run --json > /out/npm-pack-again-dry-run.json 2> /dev/null && npm pack --pack-destination /out/again > /dev/null) || exit 1
+sha256sum /out/ludion-ai-*.tgz /out/again/ludion-ai-*.tgz | tee /out/npm-pack-tarballs-sha256.txt
+check "the same tarball, byte for byte" 'cmp -s /out/ludion-ai-*.tgz /out/again/ludion-ai-*.tgz'
+check "the same integrity" '[ "$(jq -r ".[0].integrity" /out/npm-pack-dry-run.json)" = "$(jq -r ".[0].integrity" /out/npm-pack-again-dry-run.json)" ]'
 
 mkdir -p /stub && cp docs/bench/dogfood/action-check/gh-stub.sh /stub/gh && chmod +x /stub/gh
 export PATH="/stub:$PATH" GH_TOKEN=stub GITHUB_ACTION_PATH=/work REPO=Ludion-ai/ludion
@@ -50,6 +61,7 @@ cp /runner/ludion/judgement.json /out/judge-mode-judgement.json
 check "record.js exits 0 (a judgement)" '[ $code = 0 ]'
 check "the verdict is stop" '[ "$(jq -r .verdict /out/judge-mode-judgement.json)" = stop ]'
 check "the changed files are the two the merge changes" '[ "$(tr "\0" " " < /runner/ludion/input/files)" = "apps/worker/package.json package-lock.json " ]'
+check "the changed workspace package.json is read on both sides" 'cmp -s /runner/ludion/input/before/apps/worker/package.json "/fx/$(printf "%s" "repos/${REPO}/contents/apps/worker/package.json?ref=${BASE_SHA}" | tr -c "A-Za-z0-9._-" "_")" && cmp -s /runner/ludion/input/after/apps/worker/package.json "/fx/$(printf "%s" "repos/${REPO}/contents/apps/worker/package.json?ref=${MERGE_SHA}" | tr -c "A-Za-z0-9._-" "_")"'
 check "the record matches valid.jq" 'jq -e -s -f action/valid.jq /out/judge-mode-judgement.json > /dev/null'
 
 step "mode comment: first post"
@@ -58,13 +70,13 @@ key() { printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '_'; }
 comment_fixtures() { # $1: the compare answer's files
   printf '{"artifacts":[{"id":7,"size_in_bytes":%s,"expired":false,"created_at":"2026-10-28T00:00:00Z"}]}\n' "$(stat -c %s /tmp/artifact.zip)" > "/fx/$(key "repos/${REPO}/actions/runs/1/artifacts?name=ludion-judgement")"
   cp /tmp/artifact.zip "/fx/$(key "repos/${REPO}/actions/artifacts/7/zip")"
-  printf '{"state":"open","head":{"sha":"%s","ref":"dependabot/npm_and_yarn/hono-4.13.14","repo":{"full_name":"%s"}},"base":{"ref":"main","repo":{"default_branch":"main"}}}\n' "$HEAD_SHA" "$REPO" > "/fx/$(key "repos/${REPO}/pulls/161")"
+  printf '[{"number":161,"state":"open","head":{"sha":"%s","ref":"dependabot/npm_and_yarn/hono-4.13.14","repo":{"full_name":"%s"}},"base":{"ref":"main"}}]\n' "$HEAD_SHA" "$REPO" > "/fx/$(key "repos/${REPO}/pulls")"
   printf '{"files":%s}\n' "$1" > "/fx/$(key "repos/${REPO}/compare/main...${HEAD_SHA}")"
   echo '[]' > "/fx/$(key "repos/${REPO}/issues/161/comments")"
 }
 comment_mode() {
   JUDGE_WORKFLOW=.github/workflows/ludion-judge.yml RUN_EVENT=pull_request RUN_PATH=${RUN_PATH:-.github/workflows/ludion-judge.yml} RUN_ID=1 RUN_HEAD=$HEAD_SHA \
-    RUN_REPO=$REPO RUN_BRANCH=dependabot/npm_and_yarn/hono-4.13.14 RUN_URL=https://github.com/Ludion-ai/ludion/actions/runs/1 CONCLUSION=success \
+    RUN_REPO=$REPO RUN_OWNER=Ludion-ai DEFAULT_BRANCH=main RUN_BRANCH=dependabot/npm_and_yarn/hono-4.13.14 RUN_URL=https://github.com/Ludion-ai/ludion/actions/runs/1 CONCLUSION=success \
     bash action/comment.sh
 }
 SAFE='[{"filename":"apps/worker/package.json"},{"filename":"package-lock.json"}]'
@@ -88,6 +100,8 @@ rm -rf /fx && cp -r /fixtures /fx && comment_fixtures '[{"filename":"package-loc
 comment_mode; code=$?
 jq -r .body /fx/written-1-POST.json > /out/comment-refused.md
 check "exit 0, posted as 判定不能 without the judge's text" '[ $code = 0 ] && grep -q "判定: \*\*判定不能\*\*" /out/comment-refused.md && ! grep -q "Ludion judgement" /out/comment-refused.md'
+check "the artifact was never listed or downloaded" '! grep -q "artifacts" /fx/calls.log'
+check "the PR was found from GitHub, then the head's changes read, in that order" '[ "$(grep -n -m1 "^GET repos/${REPO}/pulls$" /fx/calls.log | cut -d: -f1)" = 1 ] && [ "$(grep -n -m1 "/compare/main\.\.\." /fx/calls.log | cut -d: -f1)" = 2 ]'
 
 step "mode comment: a record that does not match the schema is not posted"
 rm -rf /fx && cp -r /fixtures /fx && mkdir -p /tmp/bad && jq '.verdict = "ready_except_build"' /runner/ludion/judgement.json > /tmp/bad/judgement.json

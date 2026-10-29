@@ -1,0 +1,41 @@
+commit c27ee6c51cc62a36490946d4d407f55863aca903, started 2026-10-28T21:00:00Z
+image ludion-c3-test sha256:3db9aaf122a7fb05a071bb17b0ab4b94af8a071e5c59ef0b080e94db7c3cc75c
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+v24.22.1
+jq-1.6
+git version 2.39.5
+typecheck exit 0
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+build exit 0
+vitest exit 0
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w[39m
+
+ [32m✓[39m [30m[43m node [49m[39m packages/sandbox/test/guard.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/lockfile.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/sandbox/test/docker.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/security.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/workspace-manifests.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/sandbox/test/safe-fetch.test.ts [2m([22m[2m32 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/judge.test.ts [2m([22m[2m63 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/dependencies.test.ts [2m([22m[2m63 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/production.test.ts [2m([22m[2m47 tests[22m[2m)[22m[33m 884[2mms[22m[39m
+     [33m[2m✓[22m[39m collects what an image holds by name, and seeds held copies, in linear time [33m 461[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/action.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1962[2mms[22m[39m
+     [33m[2m✓[22m[39m fails, posting nothing, when the record does not match the schema or names another PR or head, or the run is another workflow's [33m 426[2mms[22m[39m
+     [33m[2m✓[22m[39m stops on a path that cannot be copied as data, a file the API does not give, or 300 changed files [33m 676[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/judge-workflow.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 2161[2mms[22m[39m
+     [33m[2m✓[22m[39m reject a record that is not exactly the schema [33m 355[2mms[22m[39m
+     [33m[2m✓[22m[39m fails, posting nothing, when the record does not match the schema or names another PR or head [33m 337[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+[2m      Tests [22m [1m[32m321 passed[39m[22m[90m (321)[39m
+[2m   Start at [22m 21:00:12
+[2m   Duration [22m 2.47s[2m (transform 1.34s, setup 0ms, import 2.01s, tests 5.41s, environment 1ms)[22m
+
+finished 2026-10-28T21:00:14Z

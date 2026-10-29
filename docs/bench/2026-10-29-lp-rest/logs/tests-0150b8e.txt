@@ -1,0 +1,40 @@
+commit 0150b8e375c9f76199f9801363653bf161638e48, started 2026-10-28T15:03:15Z
+image ludion-c3-test sha256:3db9aaf122a7fb05a071bb17b0ab4b94af8a071e5c59ef0b080e94db7c3cc75c
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+v24.22.1
+jq-1.6
+git version 2.39.5
+typecheck exit 0
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+build exit 0
+vitest exit 0
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w[39m
+
+ [32m✓[39m [30m[43m node [49m[39m packages/sandbox/test/guard.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/lockfile.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/sandbox/test/docker.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 88[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/sandbox/test/safe-fetch.test.ts [2m([22m[2m32 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/security.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/judge.test.ts [2m([22m[2m63 tests[22m[2m)[22m[32m 81[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/dependencies.test.ts [2m([22m[2m63 tests[22m[2m)[22m[32m 112[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/production.test.ts [2m([22m[2m42 tests[22m[2m)[22m[33m 608[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/action.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1823[2mms[22m[39m
+     [33m[2m✓[22m[39m posts the judgement on the PR at the run's head, and updates its own comment the next time [33m 308[2mms[22m[39m
+     [33m[2m✓[22m[39m fails, posting nothing, when the record does not match the schema or names another PR or head, or the run is another workflow's [33m 429[2mms[22m[39m
+     [33m[2m✓[22m[39m stops on a path that cannot be copied as data, a file the API does not give, or 300 changed files [33m 558[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m packages/cli/test/judge-workflow.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 2216[2mms[22m[39m
+     [33m[2m✓[22m[39m reject a record that is not exactly the schema [33m 381[2mms[22m[39m
+     [33m[2m✓[22m[39m fails, posting nothing, when the record does not match the schema or names another PR or head [33m 338[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m      Tests [22m [1m[32m297 passed[39m[22m[90m (297)[39m
+[2m   Start at [22m 15:03:26
+[2m   Duration [22m 2.55s[2m (transform 1.37s, setup 0ms, import 2.16s, tests 5.06s, environment 1ms)[22m
+
+finished 2026-10-28T15:03:29Z

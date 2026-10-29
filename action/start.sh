@@ -13,7 +13,7 @@ case "$MODE" in
       exit 1
     fi
     need gh jq node
-    node -e 'if (Number(process.versions.node.split(".")[0]) < 20) { console.error(`::error::The judge needs Node 20 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
+    node -e 'if (Number(process.versions.node.split(".")[0]) < 22) { console.error(`::error::The judge needs Node 22 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
     at=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)
     echo "at=${at}" >> "$GITHUB_OUTPUT"
     mkdir -p "$(dirname "$RECORD")"

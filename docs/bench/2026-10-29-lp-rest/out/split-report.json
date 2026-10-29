@@ -1,0 +1,718 @@
+[
+  {
+    "kind": "decisions",
+    "commit": "e72301d64b8b33cf298ba6eacab4dad137f70a24",
+    "old_lines": 1269,
+    "old_bytes": 228737,
+    "files": 65,
+    "moved_lines": 1263,
+    "kept_lines": 6,
+    "lines_add_up": true,
+    "byte_identical": true,
+    "list": [
+      {
+        "file": "2026-10-15-compose-home-for-the-phone-instead-of-shrinking-desktop.md",
+        "start": 3,
+        "end": 12,
+        "lines": 10
+      },
+      {
+        "file": "2026-10-14-express-the-homepage-through-shapes-and-finite-motion.md",
+        "start": 13,
+        "end": 18,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-14-show-home-benefits-as-an-explorable-application.md",
+        "start": 19,
+        "end": 24,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-14-home-as-a-sequence-of-visual-and-interactive-scenes.md",
+        "start": 25,
+        "end": 39,
+        "lines": 15
+      },
+      {
+        "file": "2026-10-14-a-quieter-site-with-a-recorded-result-as-its-visual.md",
+        "start": 44,
+        "end": 54,
+        "lines": 11
+      },
+      {
+        "file": "2026-10-13-counting-index-requests-analytics-engine.md",
+        "start": 55,
+        "end": 65,
+        "lines": 11
+      },
+      {
+        "file": "2026-10-13-license-of-lessons-cc-by-4-0-and-the-teacher-s-sentence.md",
+        "start": 66,
+        "end": 75,
+        "lines": 10
+      },
+      {
+        "file": "2026-10-12-the-seed-pipeline-tools-seed.md",
+        "start": 76,
+        "end": 90,
+        "lines": 15
+      },
+      {
+        "file": "2026-10-12-revising-seed-drafts-machine-check-fixes-first-then-opus-for.md",
+        "start": 91,
+        "end": 102,
+        "lines": 12
+      },
+      {
+        "file": "2026-10-13-a-fix-made-after-a-review-is-reviewed-again-wrangler-4-113-0.md",
+        "start": 103,
+        "end": 108,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-12-who-works-on-what.md",
+        "start": 109,
+        "end": 112,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-12-choosing-new-subjects.md",
+        "start": 113,
+        "end": 147,
+        "lines": 35
+      },
+      {
+        "file": "2026-10-12-nightly-seed-watch-seed-watch-yml.md",
+        "start": 148,
+        "end": 156,
+        "lines": 9
+      },
+      {
+        "file": "2026-10-12-spending-the-usage-limit.md",
+        "start": 157,
+        "end": 168,
+        "lines": 12
+      },
+      {
+        "file": "2026-10-12-experiment-3-no-skill-delivery-for-now.md",
+        "start": 169,
+        "end": 174,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-12-unverified-lessons-in-the-personal-ledger.md",
+        "start": 175,
+        "end": 182,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-12-being-found-sitemap-llms-txt-robots-txt.md",
+        "start": 183,
+        "end": 191,
+        "lines": 9
+      },
+      {
+        "file": "2026-10-12-partial-coverage-said-everywhere.md",
+        "start": 192,
+        "end": 203,
+        "lines": 12
+      },
+      {
+        "file": "2026-10-12-what-ludion-is-restated-a-changelog-machines-write-machines.md",
+        "start": 204,
+        "end": 211,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-12-analytics.md",
+        "start": 212,
+        "end": 219,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-12-publishing.md",
+        "start": 220,
+        "end": 230,
+        "lines": 11
+      },
+      {
+        "file": "2026-10-11-nightly-reverify.md",
+        "start": 231,
+        "end": 250,
+        "lines": 20
+      },
+      {
+        "file": "2026-10-11-measuring-done-3.md",
+        "start": 251,
+        "end": 263,
+        "lines": 13
+      },
+      {
+        "file": "2026-10-11-seed-lessons.md",
+        "start": 264,
+        "end": 284,
+        "lines": 21
+      },
+      {
+        "file": "2026-10-14-the-launch-film-video.md",
+        "start": 285,
+        "end": 294,
+        "lines": 10
+      },
+      {
+        "file": "2026-10-13-the-bench-page-bench.md",
+        "start": 295,
+        "end": 307,
+        "lines": 13
+      },
+      {
+        "file": "2026-10-13-water-on-every-page.md",
+        "start": 308,
+        "end": 315,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-13-the-lesson-pages-set-like-the-bench.md",
+        "start": 316,
+        "end": 323,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-13-the-bench-page-laid-out-like-the-home-page.md",
+        "start": 324,
+        "end": 332,
+        "lines": 9
+      },
+      {
+        "file": "2026-10-13-the-bench-page-s-look-doesn-t-know-as-empty-squares.md",
+        "start": 333,
+        "end": 342,
+        "lines": 10
+      },
+      {
+        "file": "2026-10-13-every-page-down-to-320-px.md",
+        "start": 343,
+        "end": 349,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-11-site-pages-for-v2.md",
+        "start": 350,
+        "end": 357,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-11-the-claude-code-plugin.md",
+        "start": 358,
+        "end": 366,
+        "lines": 9
+      },
+      {
+        "file": "2026-10-11-the-ludion-cli-index-shards-and-the-v2-mcp-tools.md",
+        "start": 367,
+        "end": 405,
+        "lines": 39
+      },
+      {
+        "file": "2026-10-11-lesson-format-1.md",
+        "start": 406,
+        "end": 445,
+        "lines": 40
+      },
+      {
+        "file": "2026-10-11-deploy-safety-from-20.md",
+        "start": 446,
+        "end": 459,
+        "lines": 14
+      },
+      {
+        "file": "2026-10-11-switching-to-spec-v2.md",
+        "start": 460,
+        "end": 476,
+        "lines": 17
+      },
+      {
+        "file": "2026-10-12-carried-over-from-v0.md",
+        "start": 477,
+        "end": 603,
+        "lines": 127
+      },
+      {
+        "file": "2026-10-27-security-update-pivot.md",
+        "start": 604,
+        "end": 612,
+        "lines": 9
+      },
+      {
+        "file": "2026-10-27-shared-security-workflow-across-package-ecosystems.md",
+        "start": 613,
+        "end": 620,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-27-security-commands-own-their-docker-boundary.md",
+        "start": 621,
+        "end": 628,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-28-the-sandbox-is-its-own-package-packages-sandbox.md",
+        "start": 629,
+        "end": 640,
+        "lines": 12
+      },
+      {
+        "file": "2026-10-28-the-lesson-product-is-deleted-from-main.md",
+        "start": 641,
+        "end": 659,
+        "lines": 19
+      },
+      {
+        "file": "2026-10-28-claude-md-follows-the-design-cleanup-pr-d.md",
+        "start": 660,
+        "end": 663,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-28-claude-md-s-built-and-not-built-list-catches-up.md",
+        "start": 664,
+        "end": 714,
+        "lines": 51
+      },
+      {
+        "file": "2026-10-28-the-smallest-fix-for-npm-and-composer.md",
+        "start": 715,
+        "end": 730,
+        "lines": 16
+      },
+      {
+        "file": "2026-10-28-the-judge-v0-npm.md",
+        "start": 731,
+        "end": 747,
+        "lines": 17
+      },
+      {
+        "file": "2026-10-28-the-judge-on-this-repository.md",
+        "start": 748,
+        "end": 818,
+        "lines": 71
+      },
+      {
+        "file": "2026-10-28-dependabot-feeds-the-judge.md",
+        "start": 819,
+        "end": 829,
+        "lines": 11
+      },
+      {
+        "file": "2026-10-28-composer-plans-also-read-packagist-s-advisories.md",
+        "start": 830,
+        "end": 835,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-28-backtest-rerun-definitions-fixed-before-running-it.md",
+        "start": 836,
+        "end": 867,
+        "lines": 32
+      },
+      {
+        "file": "2026-10-28-moving-dependencies-are-capped-at-the-fix-s-publish-time.md",
+        "start": 868,
+        "end": 883,
+        "lines": 16
+      },
+      {
+        "file": "2026-10-28-backtest-v3-definitions-fixed-before-running-it.md",
+        "start": 884,
+        "end": 924,
+        "lines": 41
+      },
+      {
+        "file": "2026-10-28-rule-1-s-same-release-exception-and-backtest-v4-s.md",
+        "start": 925,
+        "end": 981,
+        "lines": 57
+      },
+      {
+        "file": "2026-10-28-after-151-s-post-merge-review.md",
+        "start": 982,
+        "end": 997,
+        "lines": 16
+      },
+      {
+        "file": "2026-10-28-every-review-is-recorded-on-its-pr.md",
+        "start": 998,
+        "end": 1001,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-28-noise-measurement-definitions-fixed-before-running-it.md",
+        "start": 1002,
+        "end": 1098,
+        "lines": 97
+      },
+      {
+        "file": "2026-10-28-noise-measurement-one-deviation-during-the-search.md",
+        "start": 1099,
+        "end": 1114,
+        "lines": 16
+      },
+      {
+        "file": "2026-10-28-the-judge-as-an-action-preview-and-the-dogfood-record.md",
+        "start": 1115,
+        "end": 1120,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-28-two-rules-into-claude-md-the-follow-ups-to-156-157-and-158-s.md",
+        "start": 1121,
+        "end": 1124,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-28-backtest-v5-archives-as-signal-sources-and-the-disputed.md",
+        "start": 1125,
+        "end": 1131,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-28-gate-1-s-production-dev-split-rebuilt-the-noise-rerun-s.md",
+        "start": 1132,
+        "end": 1222,
+        "lines": 91
+      },
+      {
+        "file": "2026-10-28-the-noise-rerun-s-result-what-is-left-open.md",
+        "start": 1223,
+        "end": 1228,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-28-168-s-review-the-split-s-reader-is-fixed-to-section-2-and-a.md",
+        "start": 1229,
+        "end": 1249,
+        "lines": 21
+      },
+      {
+        "file": "2026-10-28-168-s-delta-review-three-regressions-fixed-the-reader-made.md",
+        "start": 1250,
+        "end": 1269,
+        "lines": 20
+      }
+    ]
+  },
+  {
+    "kind": "progress",
+    "commit": "e72301d64b8b33cf298ba6eacab4dad137f70a24",
+    "old_lines": 562,
+    "old_bytes": 88004,
+    "files": 50,
+    "moved_lines": 558,
+    "kept_lines": 4,
+    "lines_add_up": true,
+    "byte_identical": true,
+    "list": [
+      {
+        "file": "2026-10-25-moved-v3-p1-capability-types-hashing-guard-and-receipt-no.md",
+        "start": 3,
+        "end": 9,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-15-moved-home-composed-for-phones.md",
+        "start": 10,
+        "end": 16,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-14-moved-less-home-copy-more-graphic-motion.md",
+        "start": 17,
+        "end": 23,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-14-moved-whole-home-product-interaction-and-authorized-release.md",
+        "start": 24,
+        "end": 29,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-14-moved-visual-opening-and-recorded-interaction-on-scroll.md",
+        "start": 30,
+        "end": 38,
+        "lines": 9
+      },
+      {
+        "file": "2026-10-14-moved-site-refinement-and-a-recorded-homepage-comparison.md",
+        "start": 39,
+        "end": 46,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-12-moved-done-when-claude-md.md",
+        "start": 47,
+        "end": 54,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-12-moved-current-work-batch-mode-from-2026-10-12.md",
+        "start": 55,
+        "end": 118,
+        "lines": 64
+      },
+      {
+        "file": "2026-10-13-moved-lessons-are-cc-by-4-0-analytics-engine-counting-opened-93.md",
+        "start": 121,
+        "end": 127,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-14-moved-the-launch-film.md",
+        "start": 128,
+        "end": 133,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-13-moved-ui-bugs-fixed-every-page-down-to-320-px.md",
+        "start": 134,
+        "end": 138,
+        "lines": 5
+      },
+      {
+        "file": "2026-10-13-moved-0-1-4-is-on-npm-done-2-passed.md",
+        "start": 139,
+        "end": 145,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-13-moved-0-1-4-staged-a-lesson-retracted-done-2-prepared.md",
+        "start": 146,
+        "end": 152,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-13-moved-bench-freshbench-results-for-sharing.md",
+        "start": 153,
+        "end": 157,
+        "lines": 5
+      },
+      {
+        "file": "2026-10-13-moved-water-on-every-page.md",
+        "start": 158,
+        "end": 162,
+        "lines": 5
+      },
+      {
+        "file": "2026-10-13-moved-lessons-and-the-lesson-pages-redrawn.md",
+        "start": 163,
+        "end": 167,
+        "lines": 5
+      },
+      {
+        "file": "2026-10-13-moved-bench-laid-out-like-the-home-page.md",
+        "start": 168,
+        "end": 172,
+        "lines": 5
+      },
+      {
+        "file": "2026-10-13-moved-bench-redrawn-knowledge-strips-bars-dates.md",
+        "start": 173,
+        "end": 178,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-12-moved-published-as-ludion-ai-the-v2-stack-is-on-main.md",
+        "start": 179,
+        "end": 183,
+        "lines": 5
+      },
+      {
+        "file": "2026-10-11-moved-done-3-on-the-b-questions-harm-check.md",
+        "start": 184,
+        "end": 190,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-11-moved-seeds-the-plugin-site-pages-reverify-prs-open-how-done-3-is.md",
+        "start": 191,
+        "end": 207,
+        "lines": 17
+      },
+      {
+        "file": "2026-10-11-moved-the-cli-index-shards-mcp-v2-pr-open-single-player-first.md",
+        "start": 208,
+        "end": 214,
+        "lines": 7
+      },
+      {
+        "file": "2026-10-11-moved-lesson-format-1-pr-open.md",
+        "start": 215,
+        "end": 219,
+        "lines": 5
+      },
+      {
+        "file": "2026-10-11-moved-switched-to-spec-v2.md",
+        "start": 220,
+        "end": 225,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-12-moved-stopped-at-the-usage-limit-resume-from-here.md",
+        "start": 226,
+        "end": 234,
+        "lines": 9
+      },
+      {
+        "file": "2026-10-12-moved-stopped-at-the-usage-limit-again-resume-here.md",
+        "start": 235,
+        "end": 242,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-27-moved-security-update-source-preview.md",
+        "start": 243,
+        "end": 254,
+        "lines": 12
+      },
+      {
+        "file": "2026-10-27-moved-npm-composer-and-maven-security-updates.md",
+        "start": 255,
+        "end": 262,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-27-moved-design-adopted-legacy-frozen.md",
+        "start": 263,
+        "end": 268,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-27-moved-security-docker-runner-extracted.md",
+        "start": 269,
+        "end": 284,
+        "lines": 16
+      },
+      {
+        "file": "2026-10-28-moved-packages-sandbox-cleanup-pr-b.md",
+        "start": 285,
+        "end": 290,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-28-moved-legacy-deleted-cleanup-pr-c.md",
+        "start": 291,
+        "end": 294,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-28-moved-claude-md-rewritten-cleanup-pr-d.md",
+        "start": 295,
+        "end": 300,
+        "lines": 6
+      },
+      {
+        "file": "2026-10-28-moved-claude-md-s-built-list-updated.md",
+        "start": 301,
+        "end": 317,
+        "lines": 17
+      },
+      {
+        "file": "2026-10-28-moved-the-smallest-fix-for-npm-and-composer.md",
+        "start": 318,
+        "end": 331,
+        "lines": 14
+      },
+      {
+        "file": "2026-10-28-moved-judge-v0-npm-and-its-backtest.md",
+        "start": 332,
+        "end": 360,
+        "lines": 29
+      },
+      {
+        "file": "2026-10-28-moved-the-judge-on-this-repository-s-prs.md",
+        "start": 361,
+        "end": 409,
+        "lines": 49
+      },
+      {
+        "file": "2026-10-28-moved-dependabot-for-npm.md",
+        "start": 410,
+        "end": 413,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-28-moved-packagist-advisories-in-composer-plans.md",
+        "start": 414,
+        "end": 417,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-28-moved-backtest-rerun-with-the-registered-definitions.md",
+        "start": 418,
+        "end": 425,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-28-moved-the-time-cap-and-backtest-v3.md",
+        "start": 426,
+        "end": 453,
+        "lines": 28
+      },
+      {
+        "file": "2026-10-28-moved-rule-1-s-same-release-exception.md",
+        "start": 454,
+        "end": 461,
+        "lines": 8
+      },
+      {
+        "file": "2026-10-28-moved-backtest-v4-rule-1-with-the-same-release-exception.md",
+        "start": 462,
+        "end": 479,
+        "lines": 18
+      },
+      {
+        "file": "2026-10-28-moved-151-s-post-merge-review-and-its-fixes.md",
+        "start": 480,
+        "end": 494,
+        "lines": 15
+      },
+      {
+        "file": "2026-10-28-moved-the-miss-the-unknowns-and-the-stop-rate-interval.md",
+        "start": 495,
+        "end": 509,
+        "lines": 15
+      },
+      {
+        "file": "2026-10-28-moved-noise-measurement-count-met-misses-not-met.md",
+        "start": 510,
+        "end": 525,
+        "lines": 16
+      },
+      {
+        "file": "2026-10-28-l4-dogfood-record-and-the-action-prepared-not-released.md",
+        "start": 526,
+        "end": 535,
+        "lines": 10
+      },
+      {
+        "file": "2026-10-28-moved-two-rules-into-claude-md-the-follow-ups-to-156-157-and-158-s.md",
+        "start": 536,
+        "end": 539,
+        "lines": 4
+      },
+      {
+        "file": "2026-10-28-moved-backtest-v5-archives-as-install-script-sources-and-the.md",
+        "start": 540,
+        "end": 553,
+        "lines": 14
+      },
+      {
+        "file": "2026-10-28-l1-gate-1-s-split-rebuilt-the-noise-rerun-count-not-met-misses.md",
+        "start": 554,
+        "end": 562,
+        "lines": 9
+      }
+    ]
+  }
+]

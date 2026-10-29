@@ -1,0 +1,7 @@
+### 2026-10-15: Home composed for phones
+
+- Built: phone-specific proportions for the visual opening, package selection, content-sized lesson inspector, native animated file delivery and recorded comparison controls. Short landscape shows the configuration comparison beside its metadata. The shared phone header wraps and exposes larger touch controls. Retained the independently merged desktop angle correction in #114.
+- Preserved: exact package/model selection, unknown measurement handling, generated claims, teacher and agent-draft attribution, recorded answers, conditional wiring, scopes, partial coverage, privacy, URLs and motion termination. No dependency or protected path changed.
+- Review: corrected actual enlarged-text overflow in chapter navigation and selection counts, enlarged small lesson targets/annotations, retained full selected values when native controls cannot wrap, and removed stretched landscape metadata rows that pushed attribution below the comparison. Fresh PR review additionally caught inherited version-label overlap and a clipped Context filename at enlarged text; corrected both and added glyph-bound/non-overlap assertions with a failing preceding-build receipt.
+- Measured checks and source/capture receipts: `docs/site/2026-10-15-home-mobile.md` and `docs/bench/2026-10-15-home-mobile/validation.json`. Publication proceeds through its own unprotected PR, current-head green CI and deploy.yml; local checks alone do not establish publication.
+

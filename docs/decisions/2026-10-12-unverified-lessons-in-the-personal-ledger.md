@@ -1,0 +1,8 @@
+### 2026-10-12: Unverified lessons in the personal ledger
+
+- **`ludion teach` accepts a draft with no evidence** (no `evidence`, or an empty list) and saves it to the ledger as **unverified** (`"unverified": true` in the entry). People correct their assistants every day, mostly without a test or a quote at hand; refusing those corrections loses them.
+- **"No evidence" means no `evidence` key or an empty list** (`hasNoEvidence`). Evidence in any other shape is checked as evidence and gets the schema's error, never quietly dropped.
+- **Checked anyway** (`unverifiedProblems` in `packages/core`): every field but the evidence, against the format 1 schema (`validateUnverified`, which drops only the evidence errors); the subject, reserved names, and range; and **the detail stays grounded**, in the fields alone (package, versions, symbol, replacement), as for any lesson whose evidence grounds nothing. CLAUDE.md's grounding rule holds for every lesson, including a ledger one: an assistant can run `ludion teach` without `--public` (no confirmation), so ungrounded free text would be a way to put arbitrary sentences into every later session. Nothing is fetched and nothing runs.
+- **Shown only to its teacher**: sync writes it in their own projects as "Taught by you (in your ledger, not public); unverified, yours only." (with ", drafted by an agent" for `--drafted-by-agent`). It never enters the index: the schema needs at least one piece of evidence, so `verify` refuses it.
+- **`--public` still needs evidence**: with no evidence, `teach --public` stops before calling `gh` and says to add a test or a source. `ludion_teach` accepts such a draft too, returns the command with `"evidence": []`, and says it stays unverified in the user's ledger.
+

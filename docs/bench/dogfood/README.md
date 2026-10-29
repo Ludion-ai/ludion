@@ -22,4 +22,4 @@ There is no gate in this measurement: it records what the judge did, with no pas
 - `results.md`: the table, from `raw/`.
 - `npm-pack.md`: what `npm pack` puts in ludion-ai.
 - `prepublish-checklist.md`: what must be true before the npm package or the action is released, and the live check of the action (#169).
-- `action-check/`: the local check of action.yml in Docker, with gh stubbed (`run.sh`, `prepare.sh`, `gh-stub.sh`, outputs in `out/`).
+- `action-check/`: the local check of action.yml in Docker, with gh stubbed (`run.sh`, `prepare.sh`, `gh-stub.sh`). `out/` is from those scripts at 75622bd (#170), `node20.sh` included. `out-2026-10-29/` is from them at 6accc46 (LP-rest: the comment job in judge-comment.yml's order, the changed workspace package.json read, LICENSE, Node 22 with `node22.sh`, the packed files' modes), with record.ts as #166 left it; its first line names the commit and the start time.

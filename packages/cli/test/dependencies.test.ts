@@ -446,7 +446,8 @@ describe("the judge on npm candidates", () => {
   it.each<[string, typeof fetch, string, string]>([
     ["a deprecated fix", lodash({ deprecated: "use 4.17.22" }), "stop", "The judge stops the candidate: gate 2: lodash@4.17.21 is deprecated: use 4.17.22"],
     ["a fix that adds an install script", lodash({ scripts: { postinstall: "node x.js" } }), "stop", "The judge stops the candidate: gate 2: lodash@4.17.21 adds install scripts: postinstall."],
-    ["a fix from another publisher", lodash({ _npmUser: { name: "someone-else" } }, new Date(Date.now() - 3_600_000).toISOString()), "wait", "The judge's wait is not over: not applied before "],
+    // 80h ago: past the normal 72h, inside the 144h a publisher change extends it to.
+    ["a fix from another publisher", lodash({ _npmUser: { name: "someone-else" } }, new Date(Date.now() - 80 * 3_600_000).toISOString()), "wait", "The wait is extended: lodash@4.17.21 was published by someone-else, 4.17.20 by unknown."],
     ["a fix published an hour ago", lodash({}, new Date(Date.now() - 3_600_000).toISOString()), "wait", "The judge's wait is not over: not applied before "],
     ["a candidate whose OSV lookup fails", async (url, init) => String(url).startsWith("https://api.osv.dev/") ? new Response("", { status: 503 }) : registry()(url, init), "undecidable", "The judge cannot decide on the candidate: gate 2: A lookup failed: api.osv.dev answered HTTP 503."],
   ])("does not apply %s, and does not run the candidate's tests", async (_label, fetchFn, verdict, reason) => {

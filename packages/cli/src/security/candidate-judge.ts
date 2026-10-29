@@ -20,7 +20,9 @@ export async function judgeNpmCandidate(before: string, after: string, fetchFn: 
   try { ({ facts, fixes, created } = await gatherFacts(changes, fetchFn, lock.entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const files = [a.manifest === b.manifest ? null : "package.json", a.lock === b.lock ? null : "package-lock.json"].filter((f): f is string => f !== null);
   const judgement = judge({ ...lock, changes, facts, fixes, created, errors, files, now });
-  return { ...judgement, findings: [{ gate: 1, effect: "info", message: NO_SPLIT }, ...judgement.findings] };
+  // The judge's own note on gate 1 says it uses a production/dev split; this path has none.
+  const notChecked = judgement.not_checked.map(n => n.startsWith("Gate 1's OS, SAPI") ? `Gate 1's OS, SAPI and configuration conditions are not matched. ${NO_SPLIT}` : n);
+  return { ...judgement, findings: [{ gate: 1, effect: "info", message: NO_SPLIT }, ...judgement.findings], not_checked: notChecked };
 }
 
 /** Why the patch must not go on with the candidate, or null when the judge found nothing and the wait is over. */

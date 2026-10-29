@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -105,6 +105,29 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     expect(j.changes.map(c => `${c.path} ${c.from} -> ${c.to}`)).toContain("node_modules/lodash/node_modules/helper 1.0.0 -> 1.1.0");
     expect(j.verdict).toBe("stop");
     expect(stops(j)).toEqual(["helper@1.1.0 is deprecated: do not use"]);
+  });
+
+  /** The candidate folder with its package.json or package-lock.json changed by `change`. */
+  const changed = (file: "package.json" | "package-lock.json", change: (doc: any) => void, others: [string, string, string?][] = [["helper", "1.1.0"]]) => {
+    const dir = after(others), doc = JSON.parse(readFileSync(join(dir, file), "utf8"));
+    change(doc); writeFileSync(join(dir, file), JSON.stringify(doc));
+    return dir;
+  };
+  it("passes the judge the package.json change, new links and every changed entry", async () => {
+    const scripts = await run(base(), LATER, changed("package.json", doc => { doc.scripts = { postinstall: "node x.js" }; }));
+    expect(stops(scripts)).toEqual([expect.stringContaining('package.json changes "scripts"')]);
+    const link = await run(base(), LATER, changed("package-lock.json", doc => { doc.packages["node_modules/local"] = { resolved: "../local", link: true }; }));
+    expect(stops(link)).toEqual(["node_modules/local -> ../local: a link to a local directory that is new or points elsewhere, instead of a registry package."]);
+    // helper stays 1.0.0 with the same hash, re-pointed to another tarball: not a version change, but a changed entry.
+    const repointed = await run(base(), LATER, changed("package-lock.json", doc => { doc.packages["node_modules/helper"].resolved = "https://example.invalid/helper-1.0.0.tgz"; }, [["helper", "1.0.0"]]));
+    expect(stops(repointed)).toEqual([`helper@1.0.0 at node_modules/helper resolves to https://example.invalid/helper-1.0.0.tgz, not the registry's tarball ${registryTarball("helper", "1.0.0")}.`]);
+    for (const j of [scripts, link, repointed]) expect(j.verdict).toBe("stop");
+  });
+
+  it("says in what it did not check that there is no production/dev split", async () => {
+    const j = await run(base());
+    expect(j.not_checked).toContain(`Gate 1's OS, SAPI and configuration conditions are not matched. ${NO_SPLIT}`);
+    expect(j.not_checked.join(" ")).not.toContain("only production versus dev-only is used");
   });
 
   it("stops the same checks on the fix itself", async () => {

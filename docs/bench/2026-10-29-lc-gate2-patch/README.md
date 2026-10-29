@@ -13,7 +13,7 @@ What `judge()` checks, unchanged, on every package in the candidate's lockfile d
 
 There is no production/dev split: every changed version counts as production (docs/status.md, "Waiting for the owner", 2). The judgement says so in its first finding.
 
-`patch` goes on to the baseline and candidate tests only on `ready_except_build`. The other verdicts fail the receipt with nothing applied:
+The baseline is built and tested first, as before. The judge runs in the candidate's pass, and `patch` goes on to the candidate's build and tests only on `ready_except_build`. The other verdicts fail the receipt with nothing applied:
 
 - `wait`: the reason gives the time the wait ends, and the findings that extended it.
 - `stop`: the reason gives the first five stop findings.
@@ -25,15 +25,17 @@ To avoid writing the judge's input assembly twice, `judge-cli.ts` now exports `p
 
 ## Checks run (all in Docker; scripts/ has the scripts)
 
-- **Typecheck, build and the full vitest suite.** In `ludion-l9-node24-git` (Node 24, with a stand-in git repository, because the site build reads git): typecheck exit 0, build exit 0, 28 test files, 915 passed and 19 skipped (`scripts/full.sh`).
-- **New tests.** 18 in packages/cli/test/candidate-judge.test.ts and 5 in dependencies.test.ts ("the judge on npm candidates"). Existing patch tests now give their fixture lockfiles a sha512 integrity, and their fixture registry also answers OSV, KEV and EPSS.
-- **Mutations** (`scripts/mutate.sh`). Each of these makes tests fail:
+- **Typecheck, build and the full vitest suite.** In `ludion-l9-node24-git` (Node 24, with a stand-in git repository, because the site build reads git): typecheck exit 0, build exit 0, 28 test files, 917 passed and 19 skipped (`scripts/full.sh`).
+- **New tests.** 20 in packages/cli/test/candidate-judge.test.ts and 5 in dependencies.test.ts ("the judge on npm candidates"). Existing patch tests now give their fixture lockfiles a sha512 integrity, and their fixture registry also answers OSV, KEV and EPSS.
+- **Mutations** (`scripts/mutate.sh`). Each of these 10 makes tests fail:
   - the call removed from dependency-patch.ts (7 failed);
   - a `wait` let through (7);
   - only the fix judged (12);
   - the lockfile's `dev` kept (1);
   - lookup errors dropped (2);
-  - `undecidable` let through (2).
+  - `undecidable` let through (2);
+  - the package.json change, new links or changed entries not passed to the judge (1 each);
+  - a wait's extend reasons dropped (3).
 - **Real run** on a copy of examples/npm-security, validation only (no `--apply`). `scripts/example.sh` ran in `scripts/runner.Dockerfile` (node:24-slim with the Docker CLI) against the local Docker daemon, using the CLI built from this branch. Output: `example-npm-security.json`.
   - The plan picked lodash 4.17.20 → 4.18.0, which fixes 5 advisories.
   - The baseline tests passed.

@@ -13,3 +13,7 @@ try "only the fix judged" packages/cli/src/security/candidate-judge.ts 'const ch
 try "lockfile dev kept" packages/cli/src/security/candidate-judge.ts 'const changes = lock.changes.map(c => ({ ...c, dev: false }));' 'const changes = lock.changes;'
 try "lookup errors dropped" packages/cli/src/security/candidate-judge.ts 'errors = [error instanceof Error ? error.message : String(error)]; facts = new Map();' 'facts = new Map();'
 try "undecidable passes" packages/cli/src/security/candidate-judge.ts 'if (j.verdict === "ready_except_build") return null;' 'if (j.verdict !== "stop" && j.verdict !== "wait") return null;'
+try "manifest dropped" packages/cli/src/security/candidate-judge.ts 'judge({ ...lock, changes,' 'judge({ ...lock, manifest: undefined, changes,'
+try "links dropped" packages/cli/src/security/candidate-judge.ts 'judge({ ...lock, changes,' 'judge({ ...lock, links: [], changes,'
+try "entries dropped" packages/cli/src/security/candidate-judge.ts 'judge({ ...lock, changes,' 'judge({ ...lock, entries: undefined, changes,'
+try "extend reasons dropped" packages/cli/src/security/candidate-judge.ts '${extended.length ?' '${false ?'

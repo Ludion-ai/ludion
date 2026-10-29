@@ -29,25 +29,39 @@ export async function judgeCli(args: string[]): Promise<number> {
   if (!existsSync(join(after, "package-lock.json")) && existsSync(join(after, "pnpm-lock.yaml"))) return pnpm(readText(before, "pnpm-lock.yaml"), readText(after, "pnpm-lock.yaml"), JSON.parse(readText(after, "package.json")), files, now, !!values.json);
   const beforeLock = readText(before, "package-lock.json"), afterLock = readText(after, "package-lock.json");
   const beforeManifest = readText(before, "package.json"), afterManifest = readText(after, "package.json");
-  const manifest = beforeManifest === afterManifest ? undefined : { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) };
-  const beforeEntries = lockEntries(beforeLock), afterEntries = lockEntries(afterLock);
+  const lock = packageLockInputs({ before: beforeLock, after: afterLock }, { before: beforeManifest, after: afterManifest });
   // Gate 1's split (production.ts): a changed version is dev-only only when every installed copy of it is shown
   // dev-only. The source tree, read as text and never run, is the project at the judged commit; without it only test
   // runners, linters, formatters and @types packages can be dev-only.
   const split = productionSplit(afterLock, values.source ? readSourceTree(rootPath(values.source)) : null, JSON.parse(afterManifest));
-  const changes = allChanges(beforeLock, afterLock).map(c => ({ ...c, dev: split.devOnly.has(`${c.name}@${c.to}`) }));
-  const entries = lockEntryChanges(beforeEntries, afterEntries);
-  const hadLinks = new Set(lockLinks(beforeLock));
-  const links = lockLinks(afterLock).filter(link => !hadLinks.has(link));
-  const extraneousBefore = lockExtraneous(beforeLock), extraneousAfter = lockExtraneous(afterLock);
-  const extraneous = [...extraneousAfter.filter(e => !extraneousBefore.includes(e)), ...extraneousBefore.filter(e => !extraneousAfter.includes(e)).map(e => `(removed) ${e}`)];
+  const changes = lock.changes.map(c => ({ ...c, dev: split.devOnly.has(`${c.name}@${c.to}`) }));
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], created = new Map<string, string | null>(), errors: string[] = [];
-  try { ({ facts, fixes, created } = await gatherFacts(changes, fetch, entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
-  const locked = new Set(beforeEntries.map(e => `${e.name}@${e.version}`));
+  try { ({ facts, fixes, created } = await gatherFacts(changes, fetch, lock.entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const workspaces = workspaceManifests(before, after, files, { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) }, { before: beforeLock, after: afterLock });
-  const result = judge({ changes, entries, facts, fixes, files, links, extraneous, now, errors, manifest, locked, created, direct: declaredByProject(afterLock), split: split.summary, workspaces });
+  const result = judge({ ...lock, changes, facts, fixes, files, now, errors, created, split: split.summary, workspaces });
   console.log(values.json ? JSON.stringify(result, null, 2) : renderJudgement(result));
   return exitCode(result.verdict);
+}
+
+/**
+ * What the judge reads from a package-lock change besides the registry's facts: every changed version (`dev` as the
+ * lockfile records it), every entry that changed at its path, new links and extraneous folders, the package.json
+ * change, what was locked before and what the project declares. `ludion judge` and `ludion patch` (candidate-judge.ts)
+ * both judge from it.
+ */
+export function packageLockInputs(lock: { before: string; after: string }, manifest: { before: string; after: string }) {
+  const beforeEntries = lockEntries(lock.before), afterEntries = lockEntries(lock.after);
+  const hadLinks = new Set(lockLinks(lock.before));
+  const extraneousBefore = lockExtraneous(lock.before), extraneousAfter = lockExtraneous(lock.after);
+  return {
+    changes: allChanges(lock.before, lock.after),
+    entries: lockEntryChanges(beforeEntries, afterEntries),
+    links: lockLinks(lock.after).filter(link => !hadLinks.has(link)),
+    extraneous: [...extraneousAfter.filter(e => !extraneousBefore.includes(e)), ...extraneousBefore.filter(e => !extraneousAfter.includes(e)).map(e => `(removed) ${e}`)],
+    manifest: manifest.before === manifest.after ? undefined : { before: JSON.parse(manifest.before) as unknown, after: JSON.parse(manifest.after) as unknown },
+    locked: new Set(beforeEntries.map(e => `${e.name}@${e.version}`)),
+    direct: declaredByProject(lock.after),
+  };
 }
 
 /**

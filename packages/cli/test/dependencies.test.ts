@@ -12,7 +12,9 @@ import { scanProject } from "../src/security/scan.ts";
 import { packagistReleases, renderTimeCap } from "../src/security/time-cap.ts";
 
 const DIGEST = `sha256:${"a".repeat(64)}`;
-const lock = (version = "4.17.20") => ({ lockfileVersion: 3, packages: { "": { dependencies: { lodash: version } }, "node_modules/lodash": { version, resolved: `https://registry.npmjs.org/lodash/-/lodash-${version}.tgz` } } });
+/** The fixture registry's sha512 for a version's tarball (fixtures only, not a real hash). */
+const integrityOf = (name: string, version: string) => `sha512-${Buffer.from(`${name}@${version}`.padEnd(64, "#")).toString("base64")}`;
+const lock = (version = "4.17.20") => ({ lockfileVersion: 3, packages: { "": { dependencies: { lodash: version } }, "node_modules/lodash": { version, resolved: `https://registry.npmjs.org/lodash/-/lodash-${version}.tgz`, integrity: integrityOf("lodash", version) } } });
 const advisory: Advisory = { id: "GHSA-test-0001", summary: "Example advisory", aliases: ["CVE-2026-0001"], affected: [{ package: { ecosystem: "npm", name: "lodash" }, ranges: [{ events: [{ fixed: "4.17.21" }] }] }] };
 function fixture(): string {
   const root = mkdtempSync(join(tmpdir(), "ludion-dependency-test-"));
@@ -29,14 +31,23 @@ function client(candidateVulnerable = false): OsvClient {
     return response({ results: queries.map((q: any) => q.version === "4.17.20" || candidateVulnerable ? { vulns: [{ id: advisory.id }] } : {}) });
   });
 }
-/** registry.npmjs.org for the time cap: lodash 4.17.21 (the fix) and any extra versions given. */
-function registry(extra: Record<string, { created: string; versions: Record<string, string> }> = {}): typeof fetch {
+/**
+ * registry.npmjs.org for the time cap and the judge: lodash 4.17.21 (the fix) and any extra versions given, each with
+ * its fixture integrity and `manifest`'s fields. For the judge also OSV (lodash@4.17.20 has the advisory), an empty KEV
+ * catalog and no EPSS scores.
+ */
+function registry(extra: Record<string, { created: string; versions: Record<string, string> }> = {}, manifest: (name: string, version: string) => object = () => ({})): typeof fetch {
   const docs: Record<string, { created: string; versions: Record<string, string> }> = { lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z" } }, ...extra };
-  return async url => {
-    const name = decodeURIComponent(String(url).replace("https://registry.npmjs.org/", ""));
+  return async (url, init) => {
+    const u = String(url);
+    if (u === "https://api.osv.dev/v1/querybatch") return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.package.name === "lodash" && q.version === "4.17.20" ? { vulns: [{ id: advisory.id }] } : {}) });
+    if (u.startsWith("https://api.osv.dev/v1/vulns/")) return response(advisory);
+    if (u.startsWith("https://www.cisa.gov/")) return response({ vulnerabilities: [] });
+    if (u.startsWith("https://api.first.org/")) return response({ data: [] });
+    const name = decodeURIComponent(u.replace("https://registry.npmjs.org/", ""));
     const doc = docs[name];
     if (!doc) return new Response("", { status: 404 });
-    return response({ time: { created: doc.created, ...doc.versions }, versions: Object.fromEntries(Object.keys(doc.versions).map(v => [v, { dependencies: {} }])) });
+    return response({ time: { created: doc.created, ...doc.versions }, versions: Object.fromEntries(Object.keys(doc.versions).map(v => [v, { dependencies: {}, dist: { integrity: integrityOf(name, v) }, ...manifest(name, v) }])) });
   };
 }
 const pom = '<project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>example</groupId><artifactId>app</artifactId><version>1.0</version><properties><text.version>1.9</text.version></properties><dependencies><dependency><groupId>org.apache.commons</groupId><artifactId>commons-text</artifactId><version>${text.version}</version></dependency></dependencies></project>';
@@ -169,6 +180,8 @@ describe("dependency patch gates and recoverable application", () => {
     expect(tools).toEqual(["npm", "npm"]);
     expect(result.receipt?.after?.findings).toEqual([]);
     expect(result.receipt?.files).toHaveLength(2);
+    // The judge's gates 1, 2 and 4 and its wait found nothing to stop or wait for.
+    expect(result.receipt?.judgement).toMatchObject({ verdict: "ready_except_build", urgency: "normal", fixes: [expect.objectContaining({ id: advisory.id, package: "lodash", from: "4.17.20", to: "4.17.21" })] });
     if (apply) expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).dependencies.lodash).toBe("4.17.21");
     else expect(snapshot(root)).toBe(before);
     expect(existsSync(join(root, ".ludion/security/patch.lock"))).toBe(false);
@@ -425,6 +438,26 @@ describe("Composer plans also read Packagist's advisories", () => {
     const seen: string[] = [];
     await withSources(null, { advisories: [] }, seen).scan(inventory(fixture(), "npm"));
     expect(seen.some(u => u.includes("packagist"))).toBe(false);
+  });
+});
+
+describe("the judge on npm candidates", () => {
+  const lodash = (fix: object, published = "2021-02-20T15:42:16.891Z") => registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": published } } }, (_name, version) => version === "4.17.21" ? fix : {});
+  it.each<[string, typeof fetch, string, string]>([
+    ["a deprecated fix", lodash({ deprecated: "use 4.17.22" }), "stop", "The judge stops the candidate: gate 2: lodash@4.17.21 is deprecated: use 4.17.22"],
+    ["a fix that adds an install script", lodash({ scripts: { postinstall: "node x.js" } }), "stop", "The judge stops the candidate: gate 2: lodash@4.17.21 adds install scripts: postinstall."],
+    ["a fix from another publisher", lodash({ _npmUser: { name: "someone-else" } }, new Date(Date.now() - 3_600_000).toISOString()), "wait", "The judge's wait is not over: not applied before "],
+    ["a fix published an hour ago", lodash({}, new Date(Date.now() - 3_600_000).toISOString()), "wait", "The judge's wait is not over: not applied before "],
+    ["a candidate whose OSV lookup fails", async (url, init) => String(url).startsWith("https://api.osv.dev/") ? new Response("", { status: 503 }) : registry()(url, init), "undecidable", "The judge cannot decide on the candidate: gate 2: A lookup failed: api.osv.dev answered HTTP 503."],
+  ])("does not apply %s, and does not run the candidate's tests", async (_label, fetchFn, verdict, reason) => {
+    const root = fixture(), before = snapshot(root); let tests = 0;
+    const result = await patchDependencies(root, true, { fetchFn, client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.judgement?.verdict).toBe(verdict);
+    expect(result.receipt?.reason).toContain(reason);
+    expect(result.receipt?.candidate_passed).toBe(false);
+    expect(tests).toBe(1);
+    expect(snapshot(root)).toBe(before);
   });
 });
 

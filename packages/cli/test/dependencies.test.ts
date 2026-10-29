@@ -250,6 +250,62 @@ describe("dependency patch gates and recoverable application", () => {
       if (outcome === "failed") expect(result.receipt?.fixes[0]?.reason).toContain("minimist@0.0.1 GHSA-test-0003");
     }
   });
+  it("stops only the fix of a package with a finding that has no supported fix, and reports such findings", async () => {
+    // OSV answers by name@version.
+    const osvOf = (found: Record<string, Advisory[]>) => new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(Object.values(found).flat().find(a => String(url).endsWith(`/${a.id}`)));
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => found[`${q.package.name}@${q.version}`] ? { vulns: found[`${q.package.name}@${q.version}`]!.map(a => ({ id: a.id })) } : {}) });
+    });
+    const on = (name: string, id: string, fixed: string): Advisory => ({ ...advisory, id, affected: [{ package: { ecosystem: "npm", name }, ranges: [{ events: [{ fixed }] }] }] });
+    const npm = registry({ minimist: { created: "2013-06-25T08:12:47.000Z", versions: { "1.2.5": "2020-03-12T00:00:00.000Z", "1.2.6": "2022-03-21T00:00:00.000Z" } }, other: { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z", "1.0.1": "2016-01-01T00:00:00.000Z" } } });
+    const project = (deps: Record<string, string>) => {
+      const root = fixture();
+      writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+      writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+      commit(root); return root;
+    };
+    // lodash also has an advisory fixed only in the next major: its fix stops; minimist's goes on.
+    const first = await patchDependencies(project({ lodash: "4.17.20", minimist: "1.2.5" }), true, { fetchFn: npm, client: osvOf({ "lodash@4.17.20": [advisory, on("lodash", "GHSA-test-0009", "5.0.0")], "minimist@1.2.5": [on("minimist", "GHSA-test-0002", "1.2.6")] }), command: fakeCommand(), testRun: async () => {} });
+    expect(first.receipt?.fixes.map(f => [f.package, f.outcome])).toEqual([["lodash", "failed"], ["minimist", "applied"]]);
+    expect(first.receipt?.fixes[0]?.reason).toContain("finding without a supported fix: lodash@4.17.20: GHSA-test-0009");
+    expect(first.receipt?.outcome).toBe("partial");
+    // A package with only such a finding has no fix: the run is partial and says so.
+    const second = await patchDependencies(project({ lodash: "4.17.20", other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "lodash@4.17.20": [advisory], "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });
+    expect(second.receipt?.fixes.map(f => [f.package, f.outcome])).toEqual([["lodash", "applied"]]);
+    expect(second.receipt).toMatchObject({ outcome: "partial", reason: expect.stringContaining("Findings without a supported fix: other@1.0.0: GHSA-test-0010") });
+    // The candidate holding another copy of that package: the same advisory passes and is listed; a new one stops the fix.
+    for (const [extra, outcome] of [["GHSA-test-0010", "applied"], ["GHSA-test-0011", "failed"]] as const) {
+      const command = fakeCommand();
+      const result = await patchDependencies(project({ lodash: "4.17.20", other: "1.0.0" }), true, { fetchFn: npm, testRun: async () => {},
+        client: osvOf({ "lodash@4.17.20": [advisory], "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")], "other@1.0.1": [on("other", extra, "2.0.0")] }),
+        command: async args => {
+          const output = await command(args), out = args.find(a => a.startsWith("type=local,dest="))?.slice("type=local,dest=".length);
+          if (out?.endsWith("candidate-1-export")) {
+            const locked = JSON.parse(readFileSync(join(out, "package-lock.json"), "utf8"));
+            locked.packages["node_modules/lodash/node_modules/other"] = { version: "1.0.1", resolved: "https://registry.npmjs.org/other/-/other-1.0.1.tgz" };
+            writeFileSync(join(out, "package-lock.json"), JSON.stringify(locked));
+          }
+          return output;
+        } });
+      expect(result.receipt?.fixes[0]?.outcome).toBe(outcome);
+      if (outcome === "applied") expect(result.receipt?.fixes[0]?.carried_findings).toEqual(["other@1.0.1 GHSA-test-0010"]);
+    }
+    // Only findings without a supported fix: nothing to validate, and the run fails.
+    const none = await patchDependencies(project({ other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });
+    expect(none.receipt).toMatchObject({ outcome: "failed", fixes: [], reason: expect.stringContaining("other@1.0.0: GHSA-test-0010") });
+  });
+  it("fails a fix whose branch name already holds another change, and leaves that branch alone", async () => {
+    const root = fixture(), head = commit(root);
+    git(root, "branch", "ludion/npm/lodash-4.17.21", head);
+    let docker = 0;
+    const counted = fakeCommand();
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: async args => { docker++; return counted(args); }, testRun: async () => {} });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", branch: null });
+    expect(result.receipt?.fixes[0]?.reason).toContain("holds another change (\"fixture\")");
+    expect(docker).toBe(0);
+    expect(git(root, "rev-parse", "ludion/npm/lodash-4.17.21")).toBe(head);
+  });
   it("leaves a fix whose branch exists unchanged and does not validate it again", async () => {
     const root = fixture(); commit(root);
     const first = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });

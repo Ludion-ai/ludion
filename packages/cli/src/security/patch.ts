@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
-import { branchExists, branchName, fixBranch, gitBase } from "./branch.ts";
+import { branchName, branchSubject, fixBranch, gitBase } from "./branch.ts";
 import { phpFixPublished } from "./exposure.ts";
 
 export type Command = (args: string[], timeoutMs: number) => Promise<string>;
@@ -72,7 +72,11 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     const base = apply ? gitBase(root, temporary) : null;
     receipt.base_commit = base?.commit ?? null;
     const branch = base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), "php", scan.candidate.version);
-    if (base && branch && branchExists(base, branch)) {
+    const subject = `ludion: PHP ${scan.current.version} -> ${scan.candidate.version} in ${config.dockerfile}`;
+    const tip = base && branch ? branchSubject(base, branch) : null;
+    // A branch of the same name is this update only when its tip says so; otherwise the name is taken and the update stops.
+    if (tip !== null && tip !== subject) throw new Error(`The branch ${branch} already exists and holds another change ("${tip.slice(0, 200)}"); it was not changed, and this update was not validated.`);
+    if (tip === subject) {
       receipt.outcome = "skipped"; receipt.branch = branch;
       receipt.reason = `The branch ${branch} already exists; this update was not validated again and the branch was not changed.`;
       return { receipt, path: receiptPath, scan };
@@ -115,7 +119,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx", mode: 0o600 });
     if (base && branch) {
       active();
-      const message = `ludion: PHP ${scan.current.version} -> ${scan.candidate.version} in ${config.dockerfile}\n\nOfficial PHP security releases: ${scan.security_releases.map(r => r.version).join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+      const message = `${subject}\n\nOfficial PHP security releases: ${scan.security_releases.map(r => r.version).join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
       receipt.commit = fixBranch(base, branch, [{ path: config.dockerfile, content: updated }], message);
       receipt.branch = branch; receipt.applied_at = new Date().toISOString(); receipt.outcome = "applied";
     }

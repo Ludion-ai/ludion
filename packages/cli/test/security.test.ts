@@ -92,6 +92,23 @@ describe("bounded patch application and evidence", () => {
     expect(docker).toBe(0);
     expect(git(root, "rev-parse", "ludion/php/8.4.28")).toBe(first.receipt?.commit);
   });
+  it("stops when the branch name already holds another change, and leaves that branch alone", async () => {
+    const root = fixture(), head = git(root, "rev-parse", "HEAD");
+    git(root, "branch", "ludion/php/8.4.28", head);
+    let docker = 0;
+    const result = await patchProject(root, true, { fetchFn, command: async (args, timeout) => { docker++; return command(args, timeout); }, testRun });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("holds another change (\"fixture\")");
+    expect(docker).toBe(0);
+    expect(git(root, "rev-parse", "ludion/php/8.4.28")).toBe(head);
+  });
+  it("commits a Dockerfile checked out with CRLF ends with LF ends, as the last commit has it", async () => {
+    const root = fixture();
+    writeFileSync(join(root, "Dockerfile"), SOURCE.replace(/\n/g, "\r\n"));
+    const result = await patchProject(root, true, { fetchFn, command, testRun });
+    expect(result.receipt?.outcome).toBe("applied");
+    expect(git(root, "cat-file", "blob", "ludion/php/8.4.28:Dockerfile") + "\n").toBe(SOURCE.replace("php:8.4.25-cli-alpine", `php:8.4.28-cli-alpine@${DIGEST}`));
+  });
   it("refuses --apply outside Git or with files that differ from the last commit, before Docker", async () => {
     const plain = mkdtempSync(join(tmpdir(), "ludion-security-plain-"));
     writeFileSync(join(plain, "Dockerfile"), SOURCE);

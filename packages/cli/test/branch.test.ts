@@ -3,7 +3,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { branchExists, branchName, fixBranch, gitBase } from "../src/security/branch.ts";
+import { branchName, branchSubject, fixBranch, gitBase } from "../src/security/branch.ts";
 import { dependencyFixPublished } from "../src/security/exposure.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
@@ -31,7 +31,8 @@ describe("a fix on its own branch", () => {
     expect(git(root, "log", "-1", "--format=%an <%ae>%n%s", made)).toBe("Ludion <ludion@ludion.invalid>\nludion: x 1.0.0 -> 1.0.1 (npm)");
     expect(readFileSync(join(root, "package.json"), "utf8")).toBe("{}\n");
     expect(git(root, "status", "--porcelain")).toBe("");
-    expect(branchExists(base, "ludion/npm/x-1.0.1")).toBe(true);
+    expect(branchSubject(base, "ludion/npm/x-1.0.1")).toBe("ludion: x 1.0.0 -> 1.0.1 (npm)");
+    expect(branchSubject(base, "ludion/npm/none")).toBeNull();
     // An existing branch is never moved.
     expect(() => fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{\"x\":2}\n" }], "again")).toThrow();
     expect(git(root, "rev-parse", "ludion/npm/x-1.0.1")).toBe(made);
@@ -129,7 +130,47 @@ describe("a fix on its own branch", () => {
     writeFileSync(join(third.copy, "data.bin"), Buffer.from("a\0\r\nb"));
     expect(() => gitBase(third.root, third.copy)).toThrow("differ from it: data.bin");
   });
+  it("refuses a repository whose configuration names hooks, which newer Git runs whatever core.hooksPath says", () => {
+    const { root, copy } = project();
+    git(root, "config", "hook.audit.event", "reference-transaction");
+    git(root, "config", "hook.audit.command", "true");
+    expect(() => gitBase(root, copy)).toThrow("names hooks (hook.audit.event, hook.audit.command)");
+  });
+  it.skipIf(process.platform === "win32")("never fetches a missing object with the repository's own transport command", () => {
+    // A partial clone whose HEAD commit is missing locally: Git would fetch it, running remote.origin.uploadpack.
+    const origin = project(), marks = mkdtempSync(join(tmpdir(), "ludion-branch-marks-"));
+    const root = mkdtempSync(join(tmpdir(), "ludion-branch-partial-"));
+    git(root, "init", "-q");
+    writeFileSync(join(root, ".git", "refs", "heads", "main"), `${git(origin.root, "rev-parse", "HEAD")}\n`);
+    for (const [key, value] of [["core.repositoryformatversion", "1"], ["extensions.partialClone", "origin"], ["remote.origin.url", origin.root], ["remote.origin.promisor", "true"], ["remote.origin.uploadpack", `touch "${join(marks, "uploadpack.ran")}"; git-upload-pack`]]) git(root, "config", key!, value!);
+    expect(() => gitBase(root, mkdtempSync(join(tmpdir(), "ludion-branch-empty-")))).toThrow("no commit");
+    expect(existsSync(join(marks, "uploadpack.ran"))).toBe(false);
+    // The control: plain Git fetches it, and runs the command.
+    spawnSync("git", ["rev-parse", "--verify", "--quiet", "HEAD^{commit}"], { cwd: root });
+    expect(existsSync(join(marks, "uploadpack.ran"))).toBe(true);
+  });
+  it("commits a file the working tree has only with CRLF ends with LF ends, as HEAD has it, and only paths HEAD has", () => {
+    const { root, copy } = project(), head = git(root, "rev-parse", "HEAD");
+    writeFileSync(join(copy, "package.json"), "{}\r\n");
+    const base = gitBase(root, copy);
+    expect([...base.crlf]).toEqual(["package.json"]);
+    const made = fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{\r\n  \"x\": 1\r\n}\r\n" }], "ludion: x");
+    expect(git(root, "cat-file", "blob", `${made}:package.json`)).toBe("{\n  \"x\": 1\n}");
+    expect(git(root, "diff", "--name-only", head, made)).toBe("package.json");
+    expect(() => fixBranch(base, "ludion/npm/x-1.0.2", [{ path: "Package.json", content: "{}\n" }], "ludion: x")).toThrow("The last commit has no Package.json");
+  });
+  it("refuses a submodule in HEAD and a work tree Git places elsewhere", () => {
+    const first = project(), commitId = git(first.root, "rev-parse", "HEAD");
+    git(first.root, "update-index", "--add", "--cacheinfo", "160000", commitId, "sub"); git(first.root, "commit", "-qm", "submodule");
+    expect(() => gitBase(first.root, first.copy)).toThrow("a submodule at sub");
+    const second = project();
+    git(second.root, "config", "core.worktree", mkdtempSync(join(tmpdir(), "ludion-branch-elsewhere-")));
+    expect(() => gitBase(second.root, second.copy)).toThrow();
+  });
   it("makes branch names Git accepts", () => {
+    const long = `io.opentelemetry.instrumentation:${"x".repeat(200)}-2.10.0`;
+    expect(branchName("ludion", "maven", long)).not.toBe(branchName("ludion", "maven", long.replace("2.10.0", "2.10.1")));
+    expect(branchName("ludion", "maven", long).split("/")[2]!.length).toBeLessThanOrEqual(200);
     expect(branchName("ludion", "apps/web/", "npm", "@scope/pkg-1.2.3")).toBe("ludion/apps-web/npm/scope-pkg-1.2.3");
     expect(branchName("ludion", "composer", "vendor/x..y.lock")).toBe("ludion/composer/vendor-x.y-lock");
     expect(branchName("ludion", "..", "php", "8.4.28")).toBe("ludion/x/php/8.4.28");

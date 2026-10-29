@@ -8,7 +8,7 @@ import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenG
 import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.ts";
-import { branchExists, branchName, fixBranch, gitBase } from "./branch.ts";
+import { branchName, branchSubject, fixBranch, gitBase } from "./branch.ts";
 import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
 import { releaseIdentity, WAIT_HOURS } from "./judge.ts";
@@ -47,6 +47,11 @@ export type FixReceipt = {
   changed_packages?: PackageChange[];
   /** Rules 1 and 2 of the time cap on the candidate (npm and Composer). */
   time_cap?: TimeCap;
+  /**
+   * Findings of the candidate on another package at a version the baseline did not have, under an advisory the baseline
+   * already had on that package (for example Maven moving it). Allowed, and listed here.
+   */
+  carried_findings?: string[];
   reason?: string;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
@@ -307,15 +312,19 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     if (snapshot(root, source) !== originalTree || hash(textFile(source, CONFIG)) !== receipt.config_hash) throw new Error("Source or update policy changed during advisory lookup.");
     if (initial.limitations.length) throw new Error(initial.limitations.join(" "));
     if (!receipt.fixes.length) throw new Error(scan.blocked.join(" ") || "No fix was planned.");
-    // Before any Docker work: every fix branch starts from the commit whose files are the ones validated.
+    // Before any build or test (for Maven, after its dependency graph was resolved): every fix branch starts from the
+    // commit whose files are the ones validated.
     const base = apply ? gitBase(root, source, NOT_TESTED) : null;
     receipt.base_commit = base?.commit ?? null;
     const branches = receipt.fixes.map(fix => base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), ecosystem, `${fix.package}-${[...new Set(fix.changes.map(c => c.to))].join("-")}`));
+    const subject = (fix: FixReceipt) => `ludion: ${fix.package} ${fix.changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${ecosystem})`;
     for (const [index, fix] of receipt.fixes.entries()) {
-      const branch = branches[index];
-      if (base && branch && branchExists(base, branch)) { fix.outcome = "skipped"; fix.branch = branch; fix.reason = `The branch ${branch} already exists; this fix was not validated again and the branch was not changed.`; }
+      const branch = branches[index], tip = base && branch ? branchSubject(base, branch) : null;
+      // A branch of the same name is this fix only when its tip says so; otherwise the name is taken and the fix stops.
+      if (tip === subject(fix)) { fix.outcome = "skipped"; fix.branch = branch!; fix.reason = `The branch ${branch} already exists; this fix was not validated again and the branch was not changed.`; }
+      else if (tip !== null) fix.reason = `The branch ${branch} already exists and holds another change ("${tip.slice(0, 200)}"); it was not changed, and this fix was not validated.`;
     }
-    const pending = receipt.fixes.filter(fix => fix.outcome !== "skipped");
+    const pending = receipt.fixes.filter(fix => fix.outcome !== "skipped" && !fix.reason);
     acquisitionPolicy(source, ecosystem);
     // No Docker work when every fix already has its branch.
     if (pending.length) {
@@ -394,7 +403,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     const known = new Set(scan.findings.map(f => `${f.package.name} ${f.advisory.id}`));
     const unversioned = (blocked: string) => blocked.replace(/^(.+?)@[^@:\s]+:/, "$1:"), knownBlocked = new Set(scan.blocked.map(unversioned));
     for (const [index, fix] of receipt.fixes.entries()) {
-      if (!baseline || fix.outcome === "skipped") continue;
+      if (!baseline || fix.outcome === "skipped" || fix.reason) continue;
       try {
         active();
         const blocked = scan.blocked.filter(b => b.startsWith(`${fix.package}@`));
@@ -415,6 +424,9 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         compatible(baseline.inventory, candidate.inventory);
         // This fix's package must have no finding left, and no package may have an advisory the baseline did not have on it.
         const after = fix.after = await client.scan(candidate.inventory); active();
+        const versioned = new Set(scan.findings.map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`));
+        const carried = after.findings.filter(f => f.package.name !== fix.package && !versioned.has(`${f.package.name}@${f.package.version} ${f.advisory.id}`)).map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`);
+        if (carried.length) fix.carried_findings = carried;
         const left = after.findings.filter(f => f.package.name === fix.package || !known.has(`${f.package.name} ${f.advisory.id}`)).map(f => `${f.package.name}@${f.package.version} ${f.advisory.id}`);
         const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !knownBlocked.has(unversioned(b)));
         if (left.length || unfixable.length || after.inventory.limitations.length) throw new Error(`Candidate still contains known advisory findings or incomplete inventory${left.length ? ` (${left.slice(0, 5).join(", ")})` : ""}; no source change was made.`);
@@ -430,7 +442,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         if (base && branch) {
           active();
           const advisories = [...new Set(fix.changes.flatMap(c => c.advisories))];
-          const message = `ludion: ${fix.package} ${fix.changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${ecosystem})\n\nFixes ${advisories.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`;
+          const message = `${subject(fix)}\n\nFixes ${advisories.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`;
           fix.commit = fixBranch(base, branch, files.map(f => ({ path: f.path, content: f.after })), message);
           fix.branch = branch; fix.applied_at = new Date().toISOString(); fix.outcome = "applied";
         }

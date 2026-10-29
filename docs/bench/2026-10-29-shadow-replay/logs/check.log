@@ -1,0 +1,49 @@
+commit: 00275894b39a07fc6af3cfe4b1414e8595ceeb59  replay.ts blob: a3be8ebe64893b4a3dcb5b0e5893faf17bc72b3b  disputed.ts blob: f29f500cbbeba8d2dfc0955d61f099e27f175c2f  test blob: 2a62b8369e37a3069143a44c6bfa28419a993d83
+== typecheck
+tsc_exit=0
+== tests
+ [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/recorder.test.ts [2m([22m[2m35 tests[22m[2m)[22m[32m 174[2mms[22m[39m
+ [32m✓[39m [30m[43m node [49m[39m tools/shadow/test/replay.test.ts [2m([22m[2m32 tests[22m[2m)[22m[33m 559[2mms[22m[39m
+     [33m[2m✓[22m[39m is final after the window plus 336h: 100 decided versions and no MAL case is met, with no case [33m 433[2mms[22m[39m
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m67 passed[39m[22m[90m (67)[39m
+== mutation: MAL- re-query sees every record, whenever published
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m64 passed[39m[22m[90m (67)[39m
+== mutation: synthetic fix never exploited
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m62 passed[39m[22m[90m (67)[39m
+== mutation: no recomputation of wait_until
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 15 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m15 failed[39m[22m[2m | [22m[1m[32m52 passed[39m[22m[90m (67)[39m
+== mutation: missing attestations not a gap
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m65 passed[39m[22m[90m (67)[39m
+== mutation: a day without a poll does not break the run
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+== mutation: false-report candidates counted as misses
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+== mutation: repeated records kept
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m65 passed[39m[22m[90m (67)[39m
+== mutation: records after the window's end + 336h join the denominator
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+== mutation: nothing pending past the store's coverage
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+== mutation: no seed from a later complete capture
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+== mutation: recorder's file list not compared
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+== mutation: O after another named version ignored
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+== mutation: added install script ignored
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m66 passed[39m[22m[90m (67)[39m
+replay.ts and disputed.ts restored

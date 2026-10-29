@@ -2,7 +2,7 @@
 # One replay over a snapshot of the recorder's store. The recorder keeps running: its data folder is only read, by
 # copying captures/, osv/ and status/ into a new folder first. The judge's files at this commit must equal those at
 # the commit the recorder's start line records (docs/decisions/2026-10-29-shadow-counting.md, section 4); otherwise
-# nothing runs. Runs in Docker (node:24-slim pinned by digest, read-only root, user 1000, no host environment).
+# nothing runs. So does a watched list other than the one whose sha256 the start line records. Runs in Docker (node:24-slim pinned by digest, read-only root, user 1000, no host environment).
 # With NETWORK=1 it also runs the disputed check, which reads the registry, jsDelivr, ecosyste.ms, Software Heritage and
 # OSV (package names and versions only); without it, the container has no network and every MAL-named version counts
 # as malicious ("not checked").
@@ -21,6 +21,9 @@ START=$(grep -h '"type":"start"' "$SNAP"/status/*.jsonl | sed -E 's/.*"commit":"
 FILES="packages/cli/src/security/judge.ts packages/cli/src/security/npm-facts.ts packages/cli/src/security/time-cap.ts tools/backtest/src/archives-v5.ts"
 git diff --quiet "$START" HEAD -- $FILES || { echo "the judge's files differ from the start commit $START"; exit 1; }
 echo "start commit $START; judge files unchanged at $(git rev-parse HEAD)"
+WATCHED=$(grep -h '"type":"start"' "$SNAP"/status/*.jsonl | sed -E 's/.*"watched_sha256":"([0-9a-f]{64})".*/\1/' | sort -u)
+[ "$WATCHED" = "$(sha256sum tools/shadow/watched.json | cut -d' ' -f1)" ] || { echo "tools/shadow/watched.json is not the list the recorder started with ($WATCHED)"; exit 1; }
+echo "watched list $WATCHED"
 W=$(pwd -W 2>/dev/null || pwd); S=$(cd "$SNAP" && (pwd -W 2>/dev/null || pwd)); O=$(cd "$(dirname "$OUT")" && (pwd -W 2>/dev/null || pwd))
 NET="--network none"; CACHE=""
 if [ "${NETWORK:-0}" = 1 ]; then NET=""; CACHE="--cache=/out/cache"; fi

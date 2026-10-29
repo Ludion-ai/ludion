@@ -322,6 +322,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       const branch = branches[index], tip = base && branch ? branchSubject(base, branch) : null;
       // A branch of the same name is this fix only when its tip says so; otherwise the name is taken and the fix stops.
       if (tip === subject(fix)) { fix.outcome = "skipped"; fix.branch = branch!; fix.reason = `The branch ${branch} already exists; this fix was not validated again and the branch was not changed.`; }
+      else if (branch && branches.indexOf(branch) !== index) fix.reason = `Another fix of this run has the branch name ${branch}; this fix was not validated.`;
       else if (tip !== null) fix.reason = `The branch ${branch} already exists and holds another change ("${tip.slice(0, 200)}"); it was not changed, and this fix was not validated.`;
     }
     const pending = receipt.fixes.filter(fix => fix.outcome !== "skipped" && !fix.reason);

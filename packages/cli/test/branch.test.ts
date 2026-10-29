@@ -136,14 +136,22 @@ describe("a fix on its own branch", () => {
     git(root, "config", "hook.audit.command", "true");
     expect(() => gitBase(root, copy)).toThrow("names hooks (hook.audit.event, hook.audit.command)");
   });
+  it("checks the configuration again before each branch", () => {
+    const { root, copy } = project(), base = gitBase(root, copy);
+    git(root, "config", "hook.late.command", "true");
+    expect(() => fixBranch(base, "ludion/npm/x-1.0.1", [{ path: "package.json", content: "{}\n" }], "ludion: x")).toThrow("names hooks (hook.late.command)");
+    expect(git(root, "branch", "--list", "ludion/*")).toBe("");
+  });
   it.skipIf(process.platform === "win32")("never fetches a missing object with the repository's own transport command", () => {
     // A partial clone whose HEAD commit is missing locally: Git would fetch it, running remote.origin.uploadpack.
     const origin = project(), marks = mkdtempSync(join(tmpdir(), "ludion-branch-marks-"));
     const root = mkdtempSync(join(tmpdir(), "ludion-branch-partial-"));
     git(root, "init", "-q");
     writeFileSync(join(root, ".git", "refs", "heads", "main"), `${git(origin.root, "rev-parse", "HEAD")}\n`);
-    for (const [key, value] of [["core.repositoryformatversion", "1"], ["extensions.partialClone", "origin"], ["remote.origin.url", origin.root], ["remote.origin.promisor", "true"], ["remote.origin.uploadpack", `touch "${join(marks, "uploadpack.ran")}"; git-upload-pack`]]) git(root, "config", key!, value!);
-    expect(() => gitBase(root, mkdtempSync(join(tmpdir(), "ludion-branch-empty-")))).toThrow("no commit");
+    for (const [key, value] of [["core.repositoryformatversion", "1"], ["extensions.partialClone", "origin"], ["remote.origin.url", origin.root], ["remote.origin.promisor", "true"], ["remote.origin.uploadpack", `touch "${join(marks, "uploadpack.ran")}"; git-upload-pack`], ["protocol.file.allow", "always"]]) git(root, "config", key!, value!);
+    // A partial clone is refused. The transport settings behind the refusal stop the fetch even with the repository's
+    // protocol.file.allow=always, which wins over protocol.allow (docs/bench/2026-10-29-la-per-fix-apply/logs/transport-probe.log).
+    expect(() => gitBase(root, mkdtempSync(join(tmpdir(), "ludion-branch-empty-")))).toThrow("partial clone (extensions.partialclone, remote.origin.promisor)");
     expect(existsSync(join(marks, "uploadpack.ran"))).toBe(false);
     // The control: plain Git fetches it, and runs the command.
     spawnSync("git", ["rev-parse", "--verify", "--quiet", "HEAD^{commit}"], { cwd: root });

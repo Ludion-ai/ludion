@@ -26,14 +26,33 @@ function git(dir: string, args: string[], options: { input?: string; index?: str
     const env: NodeJS.ProcessEnv = {};
     for (const [key, value] of Object.entries(process.env)) if (!key.toUpperCase().startsWith("GIT_")) env[key] = value;
     // No transport: a partial clone would otherwise fetch a missing object with the repository's remote command.
-    Object.assign(env, IDENTITY, { GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_NO_LAZY_FETCH: "1" }, options.index ? { GIT_INDEX_FILE: options.index } : {});
-    const config = [`core.hooksPath=${hooks}`, "core.fsmonitor=false", "core.splitIndex=false", "commit.gpgSign=false", "gc.auto=0", "maintenance.auto=false", "protocol.allow=never"].flatMap(c => ["-c", c]);
+    Object.assign(env, IDENTITY, { GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_NO_LAZY_FETCH: "1", GIT_ALLOW_PROTOCOL: "none" }, options.index ? { GIT_INDEX_FILE: options.index } : {});
+    const config = [`core.hooksPath=${hooks}`, "core.fsmonitor=false", "core.splitIndex=false", "commit.gpgSign=false", "gc.auto=0", "maintenance.auto=false", "protocol.allow=never",
+      // A repository's protocol.<name>.allow wins over protocol.allow, so each one is set here, where -c wins over it.
+      ...["file", "ext", "ssh", "git", "http", "https"].map(name => `protocol.${name}.allow=never`)].flatMap(c => ["-c", c]);
     const result = spawnSync("git", ["-C", dir, "--no-pager", "--literal-pathspecs", ...config, ...args], { cwd: hooks, env, input: options.input, maxBuffer: 256 * 1024 * 1024, timeout: 60_000, windowsHide: true });
     if (result.error) throw new Error(`Git could not run: ${result.error.message}`);
     const status = result.status ?? -1;
     if (status !== 0 && !options.allowFail) throw new Error(`git ${args[0]} failed: ${plain(String(result.stderr)).trim().slice(-300)}`);
     return { status, stdout: String(result.stdout) };
   } finally { rmSync(hooks, { recursive: true, force: true }); }
+}
+
+/** Exit status 1 of `git config --get-regexp` means no match; any other failure is not read as "none". */
+function configNames(dir: string, pattern: string): string[] {
+  const found = git(dir, ["config", "--name-only", "--get-regexp", pattern], { allowFail: true });
+  if (found.status !== 0 && found.status !== 1) throw new Error("The repository's Git configuration could not be read; applying needs review. Nothing was validated or changed.");
+  return found.stdout.split("\n").filter(Boolean);
+}
+
+/** Configuration Git would act on whatever the -c settings say: refused, not overridden. Checked again before each branch. */
+function refuseConfiguration(dir: string): void {
+  // Hooks named in configuration (hook.<name>.command) run whatever core.hooksPath says.
+  const hooks = configNames(dir, "^hook\\.");
+  if (hooks.length) throw new Error(`The Git configuration names hooks (${hooks.slice(0, 3).map(plain).join(", ")}), which Git runs whatever core.hooksPath says; applying needs review. Nothing was validated or changed.`);
+  // A partial clone fetches missing objects through its remote; it is refused, not only kept off the network.
+  const promisor = configNames(dir, "^(extensions\\.partialclone|remote\\..*\\.promisor)$");
+  if (promisor.length) throw new Error(`The repository is a partial clone (${promisor.slice(0, 3).map(plain).join(", ")}), which can fetch a missing object through its remote's command; applying needs review. Nothing was validated or changed.`);
 }
 
 /**
@@ -45,9 +64,7 @@ function git(dir: string, args: string[], options: { input?: string; index?: str
 export function gitBase(root: string, copy: string, leftOut: readonly string[] = []): GitBase {
   const inside = git(root, ["rev-parse", "--is-inside-work-tree"], { allowFail: true });
   if (inside.status !== 0 || inside.stdout.trim() !== "true") throw new Error("--apply puts each fix on its own Git branch, and this project is not in a Git work tree. Nothing was validated or changed.");
-  // Hooks named in configuration (hook.<name>.command) run whatever core.hooksPath says, so they are refused, not overridden.
-  const hooks = git(root, ["config", "--name-only", "--get-regexp", "^hook\\."], { allowFail: true }).stdout.split("\n").filter(Boolean);
-  if (hooks.length) throw new Error(`The Git configuration names hooks (${hooks.slice(0, 3).map(plain).join(", ")}), which Git runs whatever core.hooksPath says; applying needs review. Nothing was validated or changed.`);
+  refuseConfiguration(root);
   const top = realpathSync(git(root, ["rev-parse", "--show-toplevel"]).stdout.trim());
   const prefix = git(root, ["rev-parse", "--show-prefix"]).stdout.trim();
   if (realpathSync(resolve(top, prefix || ".")) !== root) throw new Error("The project's folder is not where Git places it in the work tree; applying needs review.");
@@ -112,6 +129,7 @@ export function branchSubject(base: GitBase, branch: string): string | null {
 export function fixBranch(base: GitBase, branch: string, files: { path: string; content: string }[], message: string): string {
   const ref = `refs/heads/${branch}`;
   if (git(base.top, ["check-ref-format", ref], { allowFail: true }).status !== 0) throw new Error(`Invalid branch name: ${plain(branch)}`);
+  refuseConfiguration(base.top);
   const unknown = files.filter(file => !base.modes.has(file.path));
   if (unknown.length) throw new Error(`The last commit has no ${unknown.map(f => plain(f.path)).join(", ")}; applying needs review.`);
   const temp = mkdtempSync(join(tmpdir(), "ludion-index-")), index = join(temp, "index");

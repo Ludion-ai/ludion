@@ -8,7 +8,9 @@ const mutations = [
   ["no executable-bit check", "packages/cli/src/security/branch.ts", "(lstatSync(full).mode & 0o100 ? \"100755\" : \"100644\") === entry.mode", "true", "packages/cli/test/branch.test.ts"],
   ["every fix skipped reads applied", "packages/cli/src/security/dependency-patch.ts", ": !done.length ? \"skipped\" : apply", ": apply", "packages/cli/test/dependencies.test.ts"],
   // Either of the two transport defences stops the fetch alone on Git 2.39.5 (GIT_NO_LAZY_FETCH came with 2.39.4), so both go.
-  ["transports allowed", "packages/cli/src/security/branch.ts", [[", \"protocol.allow=never\"]", "]"], [", GIT_NO_LAZY_FETCH: \"1\" }", " }"]], null, "packages/cli/test/branch.test.ts"],
+  ["no configuration check before a branch", "packages/cli/src/security/branch.ts", "  refuseConfiguration(base.top);\n", "", "packages/cli/test/branch.test.ts"],
+  ["two fixes on one branch name", "packages/cli/src/security/dependency-patch.ts", "else if (branch && branches.indexOf(branch) !== index)", "else if (false)", "packages/cli/test/dependencies.test.ts"],
+  ["partial clone accepted", "packages/cli/src/security/branch.ts", "  if (promisor.length) throw", "  if (promisor.length && false) throw", "packages/cli/test/branch.test.ts"],
   ["hooks named in configuration accepted", "packages/cli/src/security/branch.ts", "  if (hooks.length) throw", "  if (hooks.length && false) throw", "packages/cli/test/branch.test.ts"],
   ["CRLF committed as checked out", "packages/cli/src/security/branch.ts", "base.crlf.has(file.path) ? file.content.replace(/\\r\\n/g, \"\\n\") : file.content", "file.content", "packages/cli/test/branch.test.ts"],
   ["a path HEAD lacks is added", "packages/cli/src/security/branch.ts", "  if (unknown.length) throw", "  if (unknown.length && false) throw", "packages/cli/test/branch.test.ts"],

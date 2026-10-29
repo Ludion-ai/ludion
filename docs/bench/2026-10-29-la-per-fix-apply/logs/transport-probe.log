@@ -1,0 +1,6 @@
+git version 2.39.5
+plain git: RAN
+-c protocol.allow=never only: RAN
+-c protocol.allow=never and each protocol.<name>.allow=never: not run
+GIT_NO_LAZY_FETCH=1 only: not run
+GIT_ALLOW_PROTOCOL=none only: not run

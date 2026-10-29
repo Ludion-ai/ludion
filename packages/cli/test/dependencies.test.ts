@@ -294,6 +294,26 @@ describe("dependency patch gates and recoverable application", () => {
     const none = await patchDependencies(project({ other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });
     expect(none.receipt).toMatchObject({ outcome: "failed", fixes: [], reason: expect.stringContaining("other@1.0.0: GHSA-test-0010") });
   });
+  it("validates only the first of two fixes whose branch names are the same", async () => {
+    // "@a/b" and "a-b" both clean to "a-b".
+    const deps = { "@a/b": "1.0.0", "a-b": "1.0.0" };
+    const root = fixture();
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+    commit(root);
+    const on = (name: string, id: string): Advisory => ({ ...advisory, id, affected: [{ package: { ecosystem: "npm", name }, ranges: [{ events: [{ fixed: "1.0.1" }] }] }] });
+    const found: Record<string, Advisory> = { "@a/b": on("@a/b", "GHSA-test-0021"), "a-b": on("a-b", "GHSA-test-0022") };
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(Object.values(found).find(a => String(url).endsWith(`/${a.id}`)));
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.version === "1.0.0" ? { vulns: [{ id: found[q.package.name]!.id }] } : {}) });
+    });
+    const npm = registry({ "@a/b": { created: "2020-01-01T00:00:00.000Z", versions: { "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": "2021-01-01T00:00:00.000Z" } }, "a-b": { created: "2020-01-01T00:00:00.000Z", versions: { "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": "2021-01-01T00:00:00.000Z" } } });
+    let tests = 0;
+    const result = await patchDependencies(root, true, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    expect(result.receipt?.fixes.map(f => [f.package, f.outcome, f.branch])).toEqual([["@a/b", "applied", "ludion/npm/a-b-1.0.1"], ["a-b", "failed", null]]);
+    expect(result.receipt?.fixes[1]?.reason).toContain("Another fix of this run has the branch name ludion/npm/a-b-1.0.1");
+    expect(tests).toBe(2);
+  });
   it("fails a fix whose branch name already holds another change, and leaves that branch alone", async () => {
     const root = fixture(), head = commit(root);
     git(root, "branch", "ludion/npm/lodash-4.17.21", head);

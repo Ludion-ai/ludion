@@ -41,6 +41,13 @@ describe("the template users copy", () => {
     expect(pr).toEqual(expect.arrayContaining(["needs: patch", "if: ${{ !cancelled() && needs.patch.outputs.packed == 'true' }}", "mode: pull-request"]));
     expect(TEMPLATE).not.toMatch(/secrets\./);
   });
+  it("turns setup-node's npm cache off in both jobs", () => {
+    // A cache restored in the job that writes and saved by the job that runs candidate code would cross the split.
+    for (const job of ["patch", "pull-request"]) {
+      const lines = section(TEMPLATE, new RegExp(`^  ${job}:$`)), at = lines.findIndex(l => l.includes("actions/setup-node@"));
+      expect(lines.slice(at, at + 4), job).toEqual(expect.arrayContaining(["package-manager-cache: false"]));
+    }
+  });
   it("pins every action by a full commit SHA", () => {
     const uses = TEMPLATE.split("\n").filter(l => /^\s+(- )?uses:/.test(l));
     expect(uses.length).toBe(4);

@@ -1,0 +1,9 @@
+# 2026-10-31 (LAF) — the scheduled workflow's GitHub runs in README and status, and setup-node's npm cache off
+
+Started from main 897997f. The gates' numbers and the wait table are unchanged; no judgement and no receipt changes.
+
+- **README.md and docs/status.md** said the scheduled workflow had not run on GitHub. After LB2b (docs/progress/2026-10-30-lb2b-trial-first-run.md, docs/bench/2026-10-30-lb2b-trial) that is no longer true. They now say what the record says and no more: two runs on GitHub, both by hand (workflow_dispatch) on 2026-10-30 in a private trial repository, one for an old PHP image and one for a vulnerable npm version; each succeeded and opened one PR for its one fix. Not recorded yet: a run on the schedule, a second run (which should open no second PR), CI on Ludion's PRs, and a fix that waits or fails. The not-built list's "opening PRs on GitHub" is now "a released way to open PRs on GitHub", because the workflow is an unreleased preview.
+- **action/patch-workflow.yml**: `package-manager-cache: false` on setup-node in both jobs. LB2b's job logs show `Cache mode: write` with the cache on (docs/bench/2026-10-30-lb2b-trial, item 4). This removes one way a candidate that escaped the sandbox in the patch job could write the default branch's Actions caches; the runner's own cache token remains, as README says.
+- **Test** (packages/cli/test/action-patch.test.ts, "turns setup-node's npm cache off in both jobs"): on the unchanged template it failed (`patch: expected [ …(4) ] to deeply equal ArrayContaining{…}`; 1 failed, 6 passed). With the template changed, 7 passed. Mutations: the line removed from the pull-request job only, failed (`pull-request: …`); `false` changed to `true`, failed.
+- **Checks** (Docker, node:24, `--network none` after `npm ci --ignore-scripts`): typecheck 0, build 0, `vitest run` 36 files, 1206 passed, 19 skipped.
+- **Not done.** Nothing was released or merged.

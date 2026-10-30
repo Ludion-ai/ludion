@@ -2,15 +2,16 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { findProgram } from "../../../sandbox/src/docker.ts";
 import { notSnapshotted } from "./project.ts";
 
 /**
  * `--apply` puts each validated fix on its own branch: one commit on the commit it was validated against (gate 4, one
  * fix per commit). The working tree is not changed. Only Git plumbing runs, with the repository's hooks, fsmonitor,
- * signing, transports and replace refs out of reach and no filters, and a repository that names hooks in its configuration (which newer
- * Git runs whatever core.hooksPath says) is refused: a project's Git configuration is data, never a command
- * run on the host.
+ * signing, transports and replace refs out of reach and no filters, and git itself found by absolute path outside the
+ * repository. A repository that names hooks in its configuration (which newer Git runs whatever core.hooksPath says) is
+ * refused: a project's Git configuration is data, never a command run on the host.
  */
 export type GitBase = { top: string; prefix: string; commit: string; modes: Map<string, string>; crlf: Set<string> };
 
@@ -25,10 +26,28 @@ const plain = (text: string) => text.replace(/[\x00-\x1f\x7f-\x9f]/g, " ");
 export const GIT_SETTINGS: readonly string[] = ["core.fsmonitor=", "core.splitIndex=false", "commit.gpgSign=false", "gc.auto=0", "maintenance.auto=false", "protocol.allow=never",
   ...["file", "ext", "ssh", "git", "http", "https"].map(name => `protocol.${name}.allow=never`)];
 
+/**
+ * The host's git, by absolute path, from PATH's absolute folders by findProgram's rules (packages/sandbox/src/docker.ts):
+ * not the working directory, a node_modules folder (npx, npm exec and package scripts put the project's
+ * node_modules/.bin first) or Yarn's shim folder, and nothing inside the repository (a Composer vendor/bin or a
+ * .venv/bin the project's scripts put on PATH). The repository is the nearest folder at or above `dir` with a .git
+ * entry, where Git itself looks, so for a project in a subfolder it is the whole repository.
+ */
+function gitProgram(dir: string): string {
+  let top = realpathSync(dir);
+  for (let at = top; ; at = dirname(at)) {
+    if (existsSync(join(at, ".git"))) { top = at; break; }
+    if (dirname(at) === at) break;
+  }
+  const program = findProgram("git", process.env.PATH ?? "", process.cwd(), process.platform, top);
+  if (!program) throw new Error("--apply needs git, and none was found in PATH's absolute folders (the working directory, the repository, node_modules folders and Yarn's shim folder are skipped). Run without --apply to validate only. Nothing was validated or changed.");
+  return program;
+}
+
 function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
+  const program = gitProgram(dir);
   // An empty hooks folder for every call, so no hook of the repository (or of core.hooksPath) can run. It is also the
-  // working directory: Windows looks for git.exe in the child's working directory before PATH, so it is never the
-  // project's folder, and the repository is named with -C instead.
+  // working directory, never the project's folder, and the repository is named with -C instead.
   const hooks = mkdtempSync(join(tmpdir(), "ludion-no-hooks-"));
   try {
     const env: NodeJS.ProcessEnv = {};
@@ -37,7 +56,7 @@ function git(dir: string, args: string[], options: { input?: string; index?: str
     // replace refs: the commit and tree read are HEAD's own, not a replacement the repository names.
     Object.assign(env, IDENTITY, { GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_NO_LAZY_FETCH: "1", GIT_ALLOW_PROTOCOL: "none", GIT_NO_REPLACE_OBJECTS: "1" }, options.index ? { GIT_INDEX_FILE: options.index } : {});
     const config = [`core.hooksPath=${hooks}`, ...GIT_SETTINGS].flatMap(c => ["-c", c]);
-    const result = spawnSync("git", ["-C", dir, "--no-pager", "--no-replace-objects", "--literal-pathspecs", ...config, ...args], { cwd: hooks, env, input: options.input, maxBuffer: 256 * 1024 * 1024, timeout: 60_000, windowsHide: true });
+    const result = spawnSync(program, ["-C", dir, "--no-pager", "--no-replace-objects", "--literal-pathspecs", ...config, ...args], { cwd: hooks, env, input: options.input, maxBuffer: 256 * 1024 * 1024, timeout: 60_000, windowsHide: true });
     if (result.error) throw new Error(`Git could not run: ${result.error.message}`);
     const status = result.status ?? -1;
     if (status !== 0 && !options.allowFail) throw new Error(`git ${args[0]} failed: ${plain(String(result.stderr)).trim().slice(-300)}`);

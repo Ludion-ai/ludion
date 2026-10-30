@@ -1,4 +1,4 @@
-# started 2026-10-29T16:24:34Z, node v24.22.1, git version 2.39.5
+# started 2026-10-30T00:19:15Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       no hooks override — packages/cli/test/branch.test.ts
 caught       git started in the project's folder — packages/cli/test/branch.test.ts
@@ -39,5 +39,11 @@ caught       the judge's exception swallowed — packages/cli/test/dependencies.
 caught       the refusal honoured only with --apply — packages/cli/test/dependencies.test.ts
 caught       a wait let through — packages/cli/test/dependencies.test.ts
 caught       every fix judged on the first fix's candidate — packages/cli/test/dependencies.test.ts
-39 of 39 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
-# finished 2026-10-29T16:26:28Z
+caught       git started by name through PATH — packages/cli/test/branch.test.ts
+caught       PATH folders inside the repository searched — packages/cli/test/branch.test.ts
+caught       only the project's folder skipped, not the repository's — packages/cli/test/branch.test.ts
+caught       no git found falls back to the name — packages/cli/test/branch.test.ts
+caught       no git found falls back to the name (patch) — packages/cli/test/dependencies.test.ts
+caught       a candidate's new entry without a supported fix ignored — packages/cli/test/dependencies.test.ts
+45 of 45 caught; without mutations: packages/cli/test/branch.test.ts pass, packages/cli/test/dependencies.test.ts pass, packages/cli/test/security.test.ts pass
+# finished 2026-10-30T00:22:14Z

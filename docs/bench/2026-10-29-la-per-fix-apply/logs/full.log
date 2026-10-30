@@ -1,6 +1,6 @@
-# started 2026-10-29T16:24:45Z, node v24.22.1, git version 2.39.5
+# started 2026-10-30T00:14:55Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
-stand-in repository: 876 files
+stand-in repository: 879 files
 == npm run typecheck
 typecheck exit 0
 > typecheck
@@ -8,11 +8,11 @@ typecheck exit 0
 
 == npm run build
 build exit 0
-16:25:00 [build] ✓ Completed in 421ms.
-16:25:00 [build] 3 page(s) built in 778ms
-16:25:00 [build] Complete!
+00:15:14 [build] ✓ Completed in 535ms.
+00:15:14 [build] 3 page(s) built in 711ms
+00:15:14 [build] Complete!
 == npm test
 npm test exit 0
- Test Files  30 passed (30)
-      Tests  978 passed | 19 skipped (997)
-# finished 2026-10-29T16:25:05Z
+ Test Files  31 passed (31)
+      Tests  991 passed | 19 skipped (1010)
+# finished 2026-10-30T00:15:20Z

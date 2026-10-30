@@ -110,6 +110,35 @@ describe("a fix on its own branch", () => {
       expect(existsSync(join(marks, "project-git.ran"))).toBe(true);
     } finally { process.env.PATH = path; }
   });
+  it.skipIf(process.platform === "win32")("never runs a git from a PATH folder inside the repository or a node_modules folder, and needs one outside", () => {
+    // npx, npm exec and package scripts put the project's node_modules/.bin first on PATH; a Composer script can add
+    // vendor/bin, and an activated venv its bin folder, here at the top of the repository the project is a subfolder of.
+    const repo = mkdtempSync(join(tmpdir(), "ludion-branch-path-")), root = join(repo, "apps", "web"), marks = mkdtempSync(join(tmpdir(), "ludion-branch-marks-"));
+    mkdirSync(root, { recursive: true });
+    writeFileSync(join(root, "package.json"), "{}\n");
+    const planted = ([["node-modules", join(root, "node_modules", ".bin")], ["vendor", join(root, "vendor", "bin")], ["venv", join(repo, ".venv", "bin")]] as const).map(([name, folder]) => {
+      mkdirSync(folder, { recursive: true });
+      writeFileSync(join(folder, "git"), `#!/bin/sh\ntouch "${join(marks, `${name}.ran`)}"\nexit 1\n`);
+      chmodSync(join(folder, "git"), 0o755);
+      return { name, folder };
+    });
+    commit(repo);
+    const copy = mkdtempSync(join(tmpdir(), "ludion-branch-copy-")); snapshot(root, copy);
+    const path = process.env.PATH!, ran = () => planted.filter(p => existsSync(join(marks, `${p.name}.ran`))).map(p => p.name);
+    process.env.PATH = [...planted.map(p => p.folder), path].join(":");
+    try {
+      fixBranch(gitBase(root, copy), "ludion/apps-web/npm/x-1.0.1", [{ path: "package.json", content: "{\"x\":1}\n" }], "ludion: x");
+      expect(ran()).toEqual([]);
+      // Only the planted ones and an empty folder: no git is found, so --apply refuses before Git runs.
+      process.env.PATH = [...planted.map(p => p.folder), mkdtempSync(join(tmpdir(), "ludion-branch-empty-"))].join(":");
+      expect(() => gitBase(root, copy)).toThrow("--apply needs git, and none was found in PATH's absolute folders");
+      expect(ran()).toEqual([]);
+    } finally { process.env.PATH = path; }
+    expect(git(repo, "rev-parse", "--verify", "ludion/apps-web/npm/x-1.0.1")).toMatch(/^[0-9a-f]{40}$/);
+    // The control: started by name, each planted git is the one that runs.
+    for (const p of planted) spawnSync("git", ["--version"], { cwd: marks, env: { ...process.env, PATH: `${p.folder}:${path}` } });
+    expect(ran()).toEqual(["node-modules", "vendor", "venv"]);
+  });
   it("ignores GIT_DIR, GIT_INDEX_FILE and GIT_CONFIG_PARAMETERS inherited from the environment", () => {
     const { root, copy } = project(), other = project(), saved = { ...process.env };
     Object.assign(process.env, { GIT_DIR: join(other.root, ".git"), GIT_INDEX_FILE: join(tmpdir(), "ludion-no-such-index"), GIT_CONFIG_PARAMETERS: "'core.hookspath'='/nonexistent'" });

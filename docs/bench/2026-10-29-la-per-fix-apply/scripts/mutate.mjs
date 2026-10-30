@@ -4,7 +4,9 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 const mutations = [
   ["no hooks override", "packages/cli/src/security/branch.ts", "const config = [`core.hooksPath=${hooks}`, ", "const config = [", "packages/cli/test/branch.test.ts"],
-  ["git started in the project's folder", "packages/cli/src/security/branch.ts", "{ cwd: hooks, env,", "{ cwd: dir, env,", "packages/cli/test/branch.test.ts"],
+  // Since LA6 git is started by absolute path, so the working directory no longer chooses the program: the mutation
+  // undoes both, as the code was when the review of b572f81 found it.
+  ["git started in the project's folder", "packages/cli/src/security/branch.ts", [["{ cwd: hooks, env,", "{ cwd: dir, env,"], ["spawnSync(program, [", "spawnSync(\"git\", ["]], null, "packages/cli/test/branch.test.ts"],
   ["no executable-bit check", "packages/cli/src/security/branch.ts", "(lstatSync(full).mode & 0o100 ? \"100755\" : \"100644\") === entry.mode", "true", "packages/cli/test/branch.test.ts"],
   ["every fix skipped reads applied", "packages/cli/src/security/dependency-patch.ts", ": !done.length ? \"skipped\" : apply", ": apply", "packages/cli/test/dependencies.test.ts"],
   ["no configuration check before a branch", "packages/cli/src/security/branch.ts", "  refuseConfiguration(base.top);\n", "", "packages/cli/test/branch.test.ts"],
@@ -44,6 +46,13 @@ const mutations = [
   ["the refusal honoured only with --apply", "packages/cli/src/security/dependency-patch.ts", "            if (refusal) throw new Error(refusal);", "            if (refusal && apply) throw new Error(refusal);", "packages/cli/test/dependencies.test.ts"],
   ["a wait let through", "packages/cli/src/security/candidate-judge.ts", "if (j.verdict === \"ready_except_build\") return null;", "if (j.verdict === \"ready_except_build\" || j.verdict === \"wait\") return null;", "packages/cli/test/dependencies.test.ts"],
   ["every fix judged on the first fix's candidate", "packages/cli/src/security/dependency-patch.ts", "judgeNpmCandidate(source, candidate.exported, deps.fetchFn)", "judgeNpmCandidate(source, join(temp, \"candidate-1-export\"), deps.fetchFn)", "packages/cli/test/dependencies.test.ts"],
+  // LA6 (2026-10-30): git by absolute path, outside the repository (the review of 89fd0c8, comment 6503011718).
+  ["git started by name through PATH", "packages/cli/src/security/branch.ts", "spawnSync(program, [", "spawnSync(\"git\", [", "packages/cli/test/branch.test.ts"],
+  ["PATH folders inside the repository searched", "packages/cli/src/security/branch.ts", "process.platform, top);", "process.platform, null);", "packages/cli/test/branch.test.ts"],
+  ["only the project's folder skipped, not the repository's", "packages/cli/src/security/branch.ts", "top = at; break;", "break;", "packages/cli/test/branch.test.ts"],
+  ["no git found falls back to the name", "packages/cli/src/security/branch.ts", [["  if (!program) throw", "  if (false) throw"], ["  return program;\n}", "  return program ?? \"git\";\n}"]], null, "packages/cli/test/branch.test.ts"],
+  ["no git found falls back to the name (patch)", "packages/cli/src/security/branch.ts", [["  if (!program) throw", "  if (false) throw"], ["  return program;\n}", "  return program ?? \"git\";\n}"]], null, "packages/cli/test/dependencies.test.ts"],
+  ["a candidate's new entry without a supported fix ignored", "packages/cli/src/security/dependency-patch.ts", " || !scan.blocked.includes(b))", ")", "packages/cli/test/dependencies.test.ts"],
 ];
 const vitest = file => { try { execFileSync("npx", ["vitest", "run", "--project", "node", file], { stdio: "pipe", env: { ...process.env, NO_COLOR: "1" } }); return "pass"; } catch { return "fail"; } };
 let caught = 0;

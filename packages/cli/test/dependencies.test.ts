@@ -360,6 +360,25 @@ describe("dependency patch gates and recoverable application", () => {
     const none = await patchDependencies(project({ other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });
     expect(none.receipt).toMatchObject({ outcome: "failed", fixes: [], reason: expect.stringContaining("other@1.0.0: GHSA-test-0010") });
   });
+  it("stops a fix whose candidate has an entry without a supported fix the baseline did not have, on any package", async () => {
+    // A Composer candidate that adds a dependency whose Packagist advisories cannot be read gives such an entry with no
+    // finding, so only the comparison of the two scans' entries catches it. The same entry in the baseline does not stop.
+    const entry = "other@1.0.0: Packagist's advisories for other cannot be read.";
+    const osv = (inBaseline: boolean): OsvClient => {
+      const real = client();
+      let calls = 0;
+      return { scan: async (inv: Inventory) => {
+        const result = await real.scan(inv), candidate = ++calls > 1;
+        return candidate || inBaseline ? { ...result, blocked: [...result.blocked, entry] } : result;
+      } } as unknown as OsvClient;
+    };
+    const added = await patchDependencies((() => { const root = fixture(); commit(root); return root; })(), true, { fetchFn: registry(), client: osv(false), command: fakeCommand(), testRun: async () => {} });
+    expect(added.receipt?.fixes[0]).toMatchObject({ package: "lodash", outcome: "failed", branch: null, candidate_passed: false });
+    expect(added.receipt?.fixes[0]?.reason).toContain("Candidate still contains known advisory findings");
+    const kept = await patchDependencies((() => { const root = fixture(); commit(root); return root; })(), true, { fetchFn: registry(), client: osv(true), command: fakeCommand(), testRun: async () => {} });
+    expect(kept.receipt?.fixes[0]).toMatchObject({ package: "lodash", outcome: "applied", branch: "ludion/npm/lodash-4.17.21" });
+    expect(kept.receipt).toMatchObject({ outcome: "partial", reason: expect.stringContaining(`Findings without a supported fix: ${entry}`) });
+  });
   it("validates only the first of two fixes whose branch names are the same", async () => {
     // "@a/b" and "a-b" both clean to "a-b".
     const deps = { "@a/b": "1.0.0", "a-b": "1.0.0" };
@@ -419,6 +438,14 @@ describe("dependency patch gates and recoverable application", () => {
       const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command, testRun: async () => {} });
       expect(result.receipt?.reason).toContain("differ from it");
     }
+    // No git outside the project on PATH: refused the same way.
+    const path = process.env.PATH, root = fixture(); commit(root);
+    process.env.PATH = mkdtempSync(join(tmpdir(), "ludion-no-git-"));
+    try {
+      const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command, testRun: async () => {} });
+      expect(result.receipt).toMatchObject({ outcome: "failed", reason: expect.stringContaining("--apply needs git, and none was found") });
+      expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", branch: null, reason: expect.stringContaining("Not validated:") });
+    } finally { process.env.PATH = path; }
     expect(docker).toBe(0);
     // Without --apply, Git is not needed.
     expect((await patchDependencies(fixture(), false, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} })).receipt?.outcome).toBe("validated");

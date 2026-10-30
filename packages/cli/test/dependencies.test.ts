@@ -196,7 +196,7 @@ function twoCopies(manifest: (name: string, version: string) => object = () => (
     if (String(url).includes("/vulns/")) return response(both);
     return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.package.name === "lodash" && ["4.17.20", "3.10.0"].includes(q.version) ? { vulns: [{ id: both.id }] } : {}) });
   });
-  const lodash = { created: "2012-04-23T16:37:11.912Z", versions: { "3.10.0": "2015-06-30T00:00:00.000Z", "3.10.2": "2015-07-10T00:00:00.000Z", "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z", "4.17.22": "2021-03-01T00:00:00.000Z" } };
+  const lodash = { created: "2012-04-23T16:37:11.912Z", versions: { "3.10.0": "2015-06-30T00:00:00.000Z", "3.10.2": "2015-07-10T00:00:00.000Z", "3.10.3": "2015-07-20T00:00:00.000Z", "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z", "4.17.22": "2021-03-01T00:00:00.000Z" } };
   const one = { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z" } };
   const npm = registry({ lodash, first: one, other: one }, manifest, [], { "lodash@4.17.20": both, "lodash@3.10.0": both, ...found });
   return { root, osv, npm };
@@ -1230,6 +1230,27 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
     const fix = result.receipt!.fixes[0]!;
     expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: "4.17.22" }), expect.objectContaining({ smallest: "3.10.2", chosen: null, malicious: ["MAL-2026-0009"] })]);
+    expect(fix.reason).toBe(`Gate 2 stops this fix: ${fix.version_choice?.[1]?.note}`);
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null });
+    expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
+    expect(tests).toBe(0);
+  });
+  it("ends a fix's lookups at a publisher stop on its first change, too", async () => {
+    // 4.17.22 is another account's; 3.10.2 is deprecated, so without the end of the lookups it would be looked at too.
+    const { root, osv, npm } = twoCopies(one((_name, version) => ["4.17.21", "3.10.2"].includes(version) ? { deprecated: "Bad release" } : version === "4.17.22" ? { _npmUser: { name: "mallory" } } : {}));
+    const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => {} });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: null, publisher_check: expect.objectContaining({ result: "stop" }) })]);
+    expect(fix.reason).toBe(`Gate 2 stops this fix: ${fix.version_choice?.[0]?.note}`);
+    expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
+  });
+  it("keeps every smallest in a fix stopped by the publisher check, though an earlier change's next version qualified", async () => {
+    // 4.17.22 (the same account's) qualifies for 4.17.21; then 3.10.3, in place of the deprecated 3.10.2, is another account's.
+    const { root, osv, npm } = twoCopies(one((_name, version) => ["4.17.21", "3.10.2"].includes(version) ? { deprecated: "Bad release" } : version === "3.10.3" ? { _npmUser: { name: "mallory" } } : {}));
+    let tests = 0;
+    const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: "4.17.22" }), expect.objectContaining({ smallest: "3.10.2", chosen: null, publisher_check: expect.objectContaining({ version: "3.10.3", result: "stop" }) })]);
     expect(fix.reason).toBe(`Gate 2 stops this fix: ${fix.version_choice?.[1]?.note}`);
     expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null });
     expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);

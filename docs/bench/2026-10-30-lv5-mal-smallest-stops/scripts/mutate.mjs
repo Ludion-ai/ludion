@@ -15,6 +15,8 @@ const mutations = [
   ["the stop's reason leaves out the deprecation or absence", NEXT, `, ...(registry ? [registry] : [])].join("; ");`, `].join("; ");`],
   ["a stop does not end the fix's lookups (round 1 finding 2)", PATCH, ` stopped = true; break; }`, ` stopped = true; }`],
   ["a stopped fix's changes take an earlier change's next version (round 1 finding 2)", PATCH, `if (taken.size && !stopped) fix.changes`, `if (taken.size) fix.changes`],
+  ["only a MAL- stop ends the fix's lookups (round 2 finding 1)", PATCH, ` stopped = true; break; }`, ` stopped = true; if (choice.malicious?.length) break; }`],
+  ["only a MAL- stop keeps every smallest in changes (round 2 finding 1)", PATCH, `if (taken.size && !stopped) fix.changes`, `if (taken.size && !fix.version_choice?.some(c => c.malicious?.length)) fix.changes`],
   ["the receipt does not name the MAL- records", NEXT, `skipped: [{ version: from, reason }], malicious, note:`, `skipped: [{ version: from, reason }], note:`],
 ];
 const test = () => { try { execFileSync("npx", ["vitest", "run", "--project", "node", "packages/cli/test/dependencies.test.ts"], { stdio: "pipe" }); return true; } catch { return false; } };

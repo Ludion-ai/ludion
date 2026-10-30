@@ -555,10 +555,12 @@ describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml
     const request = check([review("Review of #7: APPROVE", HEAD), review("Review of #7: REQUEST CHANGES", HEAD) + footer]);
     expect(request.status, request.out).toBe(1);
   });
-  it("does not count a reviewed-sha line in backticks, in a list item, in a quote or in uppercase", () => {
+  it("does not count a reviewed-sha line in inline backticks, a list item, a quote or uppercase, and counts one in a code block", () => {
     for (const line of [`\`reviewed-sha: ${HEAD}\``, `- reviewed-sha: ${HEAD}`, `> reviewed-sha: ${HEAD}`, `reviewed-sha: ${HEAD.toUpperCase()}`]) {
       const r = check([review("Review of #7: APPROVE", HEAD).replace(`reviewed-sha: ${HEAD}`, line)]);
       expect([line, r.status]).toEqual([line, 1]);
     }
+    const fenced = check([review("Review of #7: APPROVE", HEAD).replace(`reviewed-sha: ${HEAD}`, `\`\`\`\nreviewed-sha: ${HEAD}\n\`\`\``)]);
+    expect(fenced.status, fenced.out).toBe(0);
   });
 });

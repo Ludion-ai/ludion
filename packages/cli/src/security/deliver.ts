@@ -216,6 +216,12 @@ function archiveRepository(value: unknown): string | null {
     return `${url.hostname === "codeload.github.com" || url.hostname === "api.github.com" ? "github.com" : url.hostname}/${owner}/${name}`.toLowerCase();
   } catch { return null; }
 }
+/** What Composer installs, or runs, from a lock entry: compared with Packagist's release for every entry a fix adds or moves. */
+const COMPOSER_INSTALL = ["type", "require", "conflict", "replace", "provide", "autoload", "autoload-dev", "bin", "include-path", "target-dir", "extra", "transport-options", "dist", "source"];
+/** Every key a lock entry the fix adds or moves may have; any other refuses. */
+const COMPOSER_KEYS = new Set([...COMPOSER_INSTALL, ...COMPOSER_METADATA, "name", "version", "require-dev", "suggest", "notification-url", "abandoned", "default-branch"]);
+/** The notification-url Composer writes for a package from Packagist. */
+const PACKAGIST_NOTIFY = "https://packagist.org/downloads/";
 const withoutMetadata = (entry: Record<string, unknown>) => Object.fromEntries(Object.entries(entry).filter(([key]) => !COMPOSER_METADATA.has(key)));
 
 /** composer.lock: why it says more than the fix, or null. See contentProblem. */
@@ -231,6 +237,10 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
   const tos = new Set(fix.changes.map(c => c.to.replace(/^v/, "")));
   const added: Record<string, unknown>[] = [];
   let planned: Record<string, unknown> | null = null;
+  // One entry per name across both lists: a second copy (say in packages-dev, with another archive) is refused.
+  const names = [...(Array.isArray(b.packages) ? b.packages : []), ...(Array.isArray(b["packages-dev"]) ? b["packages-dev"] : [])].map(e => isObject(e) ? String(e.name).toLowerCase() : "");
+  const twice = names.filter((n, i) => names.indexOf(n) !== i);
+  if (twice.length) return `composer.lock lists ${plain(twice[0]!).slice(0, 200)} more than once.`;
   for (const section of ["packages", "packages-dev"]) {
     const was = a[section] ?? [], is = b[section] ?? [];
     if (!Array.isArray(was) || !Array.isArray(is)) return `composer.lock's ${section} is not a list.`;
@@ -240,6 +250,8 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
       if (!isObject(entry) || typeof entry.name !== "string") return `composer.lock has an entry without a name in ${section}.`;
       seen.add(entry.name);
       const earlier = prior.get(entry.name), name = plain(entry.name).slice(0, 200);
+      const unknown = Object.keys(entry).filter(key => !COMPOSER_KEYS.has(key));
+      if ((entry.name === fix.package || !earlier) && unknown.length) return `composer.lock gives ${name} keys Ludion does not check (${unknown.slice(0, 3).map(k => plain(k).slice(0, 40)).join(", ")}).`;
       if (entry.name === fix.package) {
         if (!earlier) return `composer.lock moves ${name} between its package lists, or adds it.`;
         if (!tos.has(String(entry.version ?? "").replace(/^v/, ""))) return `composer.lock moves ${name} to ${plain(String(entry.version)).slice(0, 60)}, not to the fix's version.`;
@@ -260,7 +272,7 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
       // A new package: from a pinned public archive, neither a Composer plugin nor an installer, no notification-url.
       if (!archiveRepository(isObject(entry.dist) ? entry.dist.url : "")) return `composer.lock takes ${name} from outside the pinned public archives.`;
       if (typeof entry.type === "string" && /^composer-(plugin|installer)$/.test(entry.type)) return `composer.lock brings ${name}, a ${entry.type}.`;
-      if (entry["notification-url"] !== undefined) return `composer.lock gives the new ${name} a notification-url.`;
+      if (entry["notification-url"] !== undefined && entry["notification-url"] !== PACKAGIST_NOTIFY) return `composer.lock gives the new ${name} a notification-url other than Packagist's.`;
       added.push(entry);
     }
     for (const name of prior.keys()) if (!seen.has(name) && name !== fix.package) return `composer.lock removes ${plain(String(name)).slice(0, 200)}.`;
@@ -415,6 +427,8 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     `| Branch made | ${code(fix.applied_at)} |`,
     `| Receipt | ${code(artifact.id!)} (in this run's ludion-fixes artifact) |`,
     "",
+    "The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.",
+    "",
     "**What was checked**",
     "",
     `- The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
@@ -506,8 +520,8 @@ async function registryJson(fetchFn: typeof fetch, url: string, init: RequestIni
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 
-/** Packagist's dist and source for one tagged release (repo.packagist.org's p2 metadata, minified entries expanded). */
-export type PackagistRelease = { dist: { url?: unknown; reference?: unknown }; source: { url?: unknown; reference?: unknown } };
+/** One tagged release as Packagist lists it (repo.packagist.org's p2 metadata, minified entries expanded). */
+export type PackagistRelease = Record<string, unknown>;
 export async function packagistRelease(name: string, version: string, fetchFn: typeof fetch = fetch): Promise<PackagistRelease | null> {
   if (!/^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/.test(name)) throw new Error(`Invalid Composer package name: ${plain(name).slice(0, 100)}`);
   const doc = await registryJson(fetchFn, `https://repo.packagist.org/p2/${name}.json`);
@@ -518,30 +532,33 @@ export async function packagistRelease(name: string, version: string, fetchFn: t
     if (!isObject(entry)) throw new Error(`Invalid Packagist metadata for ${name}.`);
     current = doc.minified === "composer/2.0" ? { ...current } : {};
     for (const [key, value] of Object.entries(entry)) { if (value === "__unset") delete current[key]; else current[key] = value; }
-    if (String(current.version).replace(/^v(?=\d)/, "") === version.replace(/^v(?=\d)/, "")) {
-      return { dist: isObject(current.dist) ? current.dist : {}, source: isObject(current.source) ? current.source : {} };
-    }
+    if (String(current.version).replace(/^v(?=\d)/, "") === version.replace(/^v(?=\d)/, "")) return current;
   }
   return null;
 }
 
 /**
- * Composer: every composer.lock entry the fix adds or moves (the planned package and the new ones) must name the archive
- * and the commit Packagist lists for that name and version: dist URL and reference, and source URL and reference. A
- * pinned archive from another repository, or a fork's commit served through the upstream's URL, is refused.
+ * Composer: every composer.lock entry the fix adds or moves (the planned package and the new ones) must say what
+ * Packagist lists for that name and version in every key Composer installs or runs from (COMPOSER_INSTALL): the archive
+ * and commit, the requirements, autoload rules, binaries and type. A pinned archive from another repository, a fork's
+ * commit served through the upstream's URL, or an added autoload file is refused. The new packages' requirements are
+ * then Packagist's, so contentProblem's "required by the fixed version" rests on Packagist's data.
  */
 async function composerAgain(top: string, prefix: string, base: string, fix: CheckedFix, release: (name: string, version: string) => Promise<PackagistRelease | null>): Promise<string | null> {
   const read = (rev: string) => JSON.parse(git(top, ["cat-file", "blob", `${rev}:${prefix}composer.lock`]).stdout) as Record<string, unknown>;
   const entries = (lock: Record<string, unknown>) => [...(Array.isArray(lock.packages) ? lock.packages : []), ...(Array.isArray(lock["packages-dev"]) ? lock["packages-dev"] : [])].filter(isObject);
   try {
-    const before = new Set(entries(read(base)).map(e => `${e.name}@${e.version}`));
-    for (const entry of entries(read(fix.commit)).filter(e => !before.has(`${e.name}@${e.version}`))) {
+    // Every entry that is not, apart from descriptive metadata, one the base already had: the planned package, new ones,
+    // and anything else that differs (which contentProblem has refused already, unless it is one of those).
+    const before = entries(read(base)).map(withoutMetadata);
+    for (const entry of entries(read(fix.commit)).filter(e => !before.some(b => isDeepStrictEqual(b, withoutMetadata(e))))) {
       const name = String(entry.name), version = String(entry.version), at = `${plain(name).slice(0, 100)}@${plain(version).slice(0, 60)}`;
       const listed = await release(name, version);
       if (!listed) return `Packagist lists no ${at}.`;
-      const field = (o: unknown, key: string) => isObject(o) ? o[key] : undefined;
-      for (const [part, key] of [["dist", "url"], ["dist", "reference"], ["source", "url"], ["source", "reference"]] as const) {
-        if (field(entry[part], key) !== field(listed[part], key)) return `composer.lock's ${part} ${key} for ${at} is not the one Packagist lists.`;
+      // Everything Composer installs or runs from the entry, as Packagist lists it: the archive and commit, and also the
+      // requirements, autoload rules, binaries and type, so a forged entry cannot keep Packagist's archive and add code paths.
+      for (const key of COMPOSER_INSTALL) {
+        if (!isDeepStrictEqual(entry[key], listed[key])) return `composer.lock's ${key} for ${at} is not what Packagist lists.`;
       }
     }
     return null;

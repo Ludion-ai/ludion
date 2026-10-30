@@ -432,7 +432,7 @@ describe("the PR job checks what a fix pins against the official registry", () =
   });
   it("Composer: each added or moved lock entry must carry the archive and commit Packagist lists", async () => {
     const a = "a".repeat(40), b = "b".repeat(40), c = "c".repeat(40), lock = (packages: unknown[]) => `${JSON.stringify({ "content-hash": "1", packages, "packages-dev": [] }, null, 4)}\n`;
-    for (const [listed, outcome] of [[c, "opened"], ["d".repeat(40), "failed"]] as const) {
+    for (const [listed, outcome] of [[{}, "opened"], [{ dist: { type: "zip", url: `https://api.github.com/repos/symfony/http-foundation/zipball/${"d".repeat(40)}`, reference: "d".repeat(40), shasum: "" } }, "failed"], [{ autoload: { files: ["evil.php"] } }, "failed"]] as const) {
       const r = repository({
         "ludion.security.json": `${JSON.stringify({ schema: 1, ecosystem: "composer", image: "composer:2", test: ["php", "t.php"], timeout_seconds: 60 })}\n`,
         "composer.json": `${JSON.stringify({ name: "app/app", require: { "symfony/http-foundation": "5.4.0" } }, null, 2)}\n`,
@@ -449,10 +449,10 @@ describe("the PR job checks what a fix pins against the official registry", () =
         fixes: [{ package: change.name, changes: [change], outcome: "applied", branch, commit: made, candidate_passed: true, files: [{ path: "composer.json", before_hash: "", after_hash: sha256(json) }, { path: "composer.lock", before_hash: "", after_hash: sha256(fixedLock) }], fix_published_at: null, found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z" }],
       };
       const asked: string[] = [], gh = github(r.origin);
-      const packagist = async (name: string, version: string) => { asked.push(`${name}@${version}`); return { dist: { url: `https://api.github.com/repos/${name}/zipball/${listed}`, reference: listed }, source: {} }; };
+      const packagist = async (name: string, version: string) => { asked.push(`${name}@${version}`); return { ...composerEntry(name, version, c), "version_normalized": "5.4.54.0", ...listed }; };
       const result = await open(checkout(r.origin), artifact(r.work, receipt, [`refs/heads/${branch}`], r.base), r.base, r.origin, gh, "refs/heads/main", { packagist });
       expect(asked).toEqual(["symfony/http-foundation@v5.4.54"]);
-      expect(result.deliveries[0]).toMatchObject({ outcome, ...(outcome === "failed" ? { reason: expect.stringContaining("is not the one Packagist lists") } : {}) });
+      expect(result.deliveries[0]).toMatchObject({ outcome, ...(outcome === "failed" ? { reason: expect.stringContaining("is not what Packagist lists") } : {}) });
       expect(branchAt(r.origin, branch)).toBe(outcome === "opened" ? made : "");
     }
   });
@@ -533,15 +533,17 @@ describe("the policy at the base decides what a fix may change, and what it may 
     // The fix itself, with descriptive metadata changed on another package, a new dependency, and the newer Composer of
     // the tool image (examples/composer-security: plugin-api-version 2.9.0 -> 2.11.0).
     const fixed = entry("symfony/http-foundation", "v5.4.54", c, { require: { "symfony/polyfill-php83": "^1.27" } });
-    expect(contentProblem("composer", fix, files(before), after([entry("symfony/deprecation-contracts", "v2.5.0", a, { "published-time": "2026-06-27T21:46:34+00:00" }), fixed, entry("symfony/polyfill-php83", "v1.31.0", c, { require: { "symfony/polyfill-mbstring": "^1" } }), entry("symfony/polyfill-mbstring", "v1.31.0", c)], { "plugin-api-version": "2.11.0" }))).toBeNull();
+    expect(contentProblem("composer", fix, files(before), after([entry("symfony/deprecation-contracts", "v2.5.0", a, { "published-time": "2026-06-27T21:46:34+00:00" }), fixed, entry("symfony/polyfill-php83", "v1.31.0", c, { require: { "symfony/polyfill-mbstring": "^1" }, "notification-url": "https://packagist.org/downloads/" }), entry("symfony/polyfill-mbstring", "v1.31.0", c)], { "plugin-api-version": "2.11.0" }))).toBeNull();
     // The same package from another repository, a new package nothing requires, a notification-url (Composer calls it).
     for (const [packages, why] of [
       [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...fixed, dist: { type: "zip", url: `https://api.github.com/repos/evil/http-foundation/zipball/${c}` } }], "from another archive repository than the base did"],
       [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...fixed, source: { type: "git", url: "https://github.com/evil/http-foundation.git", reference: c } }], "changes where symfony/http-foundation comes from"],
       [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, entry("symfony/polyfill-php83", "v1.31.0", c), entry("evil/unrequired", "1.0.0", c)], "adds evil/unrequired, which the fixed version does not require"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, entry("symfony/polyfill-php83", "v1.31.0", c), entry("symfony/deprecation-contracts", "v2.5.0", "e".repeat(40))], "lists symfony/deprecation-contracts more than once"],
       [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, { ...entry("symfony/polyfill-php83", "v1.31.0", c), dist: { type: "zip", url: "https://evil.invalid/polyfill.zip" } }], "takes symfony/polyfill-php83 from outside the pinned public archives"],
       [[entry("symfony/deprecation-contracts", "v2.5.0", a, { "notification-url": "https://evil.invalid/ping" }), fixed, entry("symfony/polyfill-php83", "v1.31.0", c)], "changes symfony/deprecation-contracts"],
-      [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, entry("symfony/polyfill-php83", "v1.31.0", c, { "notification-url": "https://evil.invalid/ping" })], "gives the new symfony/polyfill-php83 a notification-url"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, entry("symfony/polyfill-php83", "v1.31.0", c, { "notification-url": "https://evil.invalid/ping" })], "gives the new symfony/polyfill-php83 a notification-url other than Packagist's"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...fixed, scripts: { "post-install-cmd": "evil" } }, entry("symfony/polyfill-php83", "v1.31.0", c)], "gives symfony/http-foundation keys Ludion does not check (scripts)"],
       [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...fixed, "notification-url": "https://evil.invalid/ping" }, entry("symfony/polyfill-php83", "v1.31.0", c)], "changes symfony/http-foundation's notification-url"],
     ] as const) expect(contentProblem("composer", fix, files(before), after([...packages]))).toContain(why);
     for (const [packages, why] of [

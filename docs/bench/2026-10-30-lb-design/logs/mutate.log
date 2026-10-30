@@ -1,4 +1,4 @@
-# started 2026-10-30T02:31:13Z, node v24.22.1, git version 2.39.5
+# started 2026-10-30T02:46:41Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       a parent other than the base accepted — packages/cli/test/deliver.test.ts
 caught       files outside the receipt's list accepted — packages/cli/test/deliver.test.ts
@@ -24,7 +24,8 @@ caught       composer.lock: a new package from any archive accepted — packages
 caught       composer.lock: the planned package from another repository accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: a new package nothing requires accepted — packages/cli/test/deliver.test.ts
 caught       composer: Packagist not asked — packages/cli/test/deliver.test.ts
-caught       composer: another dist or source than Packagist's accepted — packages/cli/test/deliver.test.ts
+caught       composer: an entry other than Packagist's release accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: keys Ludion does not check accepted — packages/cli/test/deliver.test.ts
 caught       PHP: Docker Hub not asked — packages/cli/test/deliver.test.ts
 caught       PHP: another digest under the tag accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: a new notification-url accepted — packages/cli/test/deliver.test.ts
@@ -48,5 +49,5 @@ caught       patch mode: an OIDC token allowed — packages/cli/test/action-patc
 caught       template: the validation job may write — packages/cli/test/action-patch.test.ts
 caught       action: the checkout keeps the credential — packages/cli/test/action-patch.test.ts
 caught       action: the validation step gets the token — packages/cli/test/action-patch.test.ts
-48 of 48 caught; without mutations: packages/cli/test/deliver.test.ts pass, packages/cli/test/action-patch.test.ts pass
-# finished 2026-10-30T02:40:18Z
+49 of 49 caught; without mutations: packages/cli/test/deliver.test.ts pass, packages/cli/test/action-patch.test.ts pass
+# finished 2026-10-30T02:56:04Z

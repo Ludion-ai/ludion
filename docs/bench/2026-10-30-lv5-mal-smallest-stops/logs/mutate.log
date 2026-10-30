@@ -1,4 +1,4 @@
-# started 2026-10-30T09:10:46Z, node v24.22.1
+# started 2026-10-30T09:25:36Z, node v24.22.1
 npm ci exit 0
 baseline passes: true
 caught: the MAL- check on the smallest removed (the next version is looked for)
@@ -10,7 +10,9 @@ caught: later versions are asked about before the stop
 caught: the stop takes the next listed version anyway
 caught: the stop's reason leaves out the other records
 caught: the stop's reason leaves out the deprecation or absence
+caught: a stop does not end the fix's lookups (round 1 finding 2)
+caught: a stopped fix's changes take an earlier change's next version (round 1 finding 2)
 caught: the receipt does not name the MAL- records
-10 of 10 caught
+12 of 12 caught
 after restoring, passes: true
-# finished 2026-10-30T09:13:39Z
+# finished 2026-10-30T09:27:44Z

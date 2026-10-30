@@ -1,0 +1,61 @@
+# Ludion's scheduled workflow, for a user's repository: copy it to .github/workflows/ludion.yml (preview, not released;
+# docs/bench/2026-10-30-lb-design). It needs ludion.security.json in the project's folder (`ludion init`) and the
+# repository setting "Allow GitHub Actions to create and approve pull requests".
+#
+# Two jobs (CLAUDE.md, "Ludion must not become the attack path"):
+#   patch          runs candidate code, only in Docker, so it holds no write permission and no secret.
+#   pull-request   writes (branches and PRs), so it runs no dependency code; it checks patch's artifact as untrusted data.
+#
+# The schedule can come hours late or not at all (on 2026-10-29 GitHub's hourly schedule did not fire for five hours in
+# Ludion-ai/ludion-shadow), so it runs every 6 hours, off the hour; run it by hand with workflow_dispatch.
+# Nothing is merged. PRs opened with the workflow's token start no CI; start it before merging.
+#
+# Pin Ludion by a release commit's full SHA. No release exists yet: the SHA below is a placeholder.
+name: ludion
+
+on:
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ludion-patch
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    outputs:
+      packed: ${{ steps.ludion.outputs.packed }}
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - id: ludion
+        uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet
+        with:
+          mode: patch
+          dir: .
+
+  pull-request:
+    needs: patch
+    # Also after a failed fix: the fixes that passed are in the artifact.
+    if: ${{ !cancelled() && needs.patch.outputs.packed == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet
+        with:
+          mode: pull-request
+          dir: .

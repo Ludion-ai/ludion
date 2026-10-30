@@ -3,6 +3,7 @@
 // package retrieval; tests run only in Docker.
 import { securityCli } from "./security/cli.ts";
 import { judgeCli } from "./security/judge-cli.ts";
+import { deliverCli } from "./security/deliver.ts";
 
 const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (source preview).
 
@@ -29,12 +30,20 @@ const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (
       wait. Every changed version counts as production. Build and tests are not run.
       Exit 0: ready except build; 3: wait; 1: stop or undecidable
       (also when a lookup fails or --files is missing); 2: the inputs could not be read.
+  ludion deliver pack --dir <path> --result <patch --json output> --out <folder>
+  ludion deliver open --dir <path> --artifact <folder> --base <sha> --repo <owner/name> --ref <ref>
+                      --api <url> --remote <url> [--json]
+      The scheduled workflow's two steps (action.yml, modes patch and pull-request; preview, not
+      released). pack writes the receipt and a Git bundle of the applied fixes' branches. open checks
+      that artifact as untrusted data, then pushes each fix to its own branch and opens one PR per
+      fix, unless a PR from that branch exists (GH_TOKEN). Nothing is merged.
 `;
 
 async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
   if (command && ["init", "scan", "patch", "watch"].includes(command)) return securityCli(command, rest);
   if (command === "judge") return judgeCli(rest);
+  if (command === "deliver") return deliverCli(rest);
   if (command === "sync" || command === "teach") {
     console.error(`ludion ${command} ended on 2026-10-28 with the lesson data it used. Ludion is now a security-update tool; run ludion help.`);
     return 2;

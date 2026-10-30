@@ -27,8 +27,8 @@ The workflow file a user adds is `action/patch-workflow.yml` (a template; the ac
 
 ### Validation job (`mode: patch`)
 
-- **Permissions:** `contents: read` only. No secret is passed, and the action gives this mode no token: none of its steps names `github.token`.
-- **Checkout:** the action checks out the run's commit (`github.sha`) itself, with `persist-credentials: false`, so no credential is left in `.git/config`.
+- **Permissions:** `contents: read` only. No secret is passed, and none of this mode's steps names `github.token`. The job refuses to start when it can request an OIDC token (`id-token: write`).
+- **Checkout:** the action checks out the run's commit (`github.sha`) itself. actions/checkout fetches with the job's read-only token and, with `persist-credentials: false`, leaves no credential in `.git/config`, before any candidate is built.
 - **Run:** `ludion patch --apply --json` in the project folder (input `dir`). Candidate code runs only inside packages/sandbox's Docker (no network, read-only root, non-root user). On the runner itself only Ludion's bundled CLI and Git run. Each fix that passes becomes one commit on the checked-out commit, on its own branch (`ludion/<ecosystem>/<package>-<version>`, `ludion/php/<version>`), as `--apply` does today.
 - **Result:** `ludion deliver pack` writes the artifact `ludion-fixes`:
   - `receipt.json`, the run's receipt;

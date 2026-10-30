@@ -33,7 +33,7 @@ export const GIT_SETTINGS: readonly string[] = ["core.fsmonitor=", "core.splitIn
  * .venv/bin the project's scripts put on PATH). The repository is the nearest folder at or above `dir` with a .git
  * entry, where Git itself looks, so for a project in a subfolder it is the whole repository.
  */
-function gitProgram(dir: string): string {
+export function gitProgram(dir: string): string {
   let top = realpathSync(dir);
   for (let at = top; ; at = dirname(at)) {
     if (existsSync(join(at, ".git"))) { top = at; break; }
@@ -44,7 +44,7 @@ function gitProgram(dir: string): string {
   return program;
 }
 
-function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
+export function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
   const program = gitProgram(dir);
   // An empty hooks folder for every call, so no hook of the repository (or of core.hooksPath) can run. It is also the
   // working directory, never the project's folder, and the repository is named with -C instead.

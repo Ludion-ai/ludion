@@ -29,8 +29,31 @@ case "$MODE" in
     fi
     need gh jq unzip
     ;;
+  patch|pull-request)
+    # The scheduled workflow's two jobs (action/patch-workflow.yml): on a schedule or by hand, on the default branch.
+    # A scheduled run is always on the default branch; a dispatched one names its branch.
+    if [ "$EVENT" != "schedule" ] && [ "$EVENT" != "workflow_dispatch" ]; then
+      echo "::error::mode ${MODE} runs on schedule or workflow_dispatch, not ${EVENT}."
+      exit 1
+    fi
+    if [ "$EVENT" = "workflow_dispatch" ] && [ "$REF" != "refs/heads/${DEFAULT_BRANCH}" ]; then
+      echo "::error::mode ${MODE} runs on the default branch (${DEFAULT_BRANCH}), not ${REF}."
+      exit 1
+    fi
+    if [ "$MODE" = "patch" ]; then
+      # The job that runs candidate code holds no secret: an OIDC token request means id-token: write was granted.
+      if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+        echo "::error::mode patch runs candidate code and must hold no secret, but this job may request an OIDC token (id-token: write). Give it contents: read only."
+        exit 1
+      fi
+      need node git docker jq
+    else
+      need node git
+    fi
+    node -e 'if (Number(process.versions.node.split(".")[0]) < 22) { console.error(`::error::Ludion needs Node 22 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
+    ;;
   *)
-    echo "::error::mode must be judge or comment."
+    echo "::error::mode must be judge, comment, patch or pull-request."
     exit 1
     ;;
 esac

@@ -4,7 +4,7 @@ import { detectEcosystems, inventory, textFile, type Ecosystem } from "./invento
 import { resolvedMavenInventory } from "./dependency-patch.ts";
 import { OsvClient, type DependencyScan, type ReadOnlyScan } from "./osv.ts";
 import { scanPhp, type Scan } from "./php.ts";
-import { NODE_FROM, scanNode } from "./node.ts";
+import { namesNodeImage, scanNode } from "./node.ts";
 import { CONFIG, readConfig } from "./project.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, READONLY_READERS, type ReadOnlyReader } from "./readonly/index.ts";
 import type { ReadOnlyEcosystem } from "./readonly/types.ts";
@@ -75,7 +75,7 @@ export async function scanProject(root: string, selected?: string, deps: { reade
     } catch (error) { checks.push({ ecosystem: "php", error: message(error) }); }
   }
   // The official Node.js image (node.ts): when the policy or --ecosystem says node, or, unselected, a FROM line names it.
-  if (selected === "node" || (auto && saved && "dockerfile" in saved && saved.ecosystem === "node") || (auto && existsSync(join(root, imageFile)) && NODE_FROM.test(textFile(root, imageFile)))) {
+  if (selected === "node" || (auto && saved && "dockerfile" in saved && saved.ecosystem === "node") || (auto && existsSync(join(root, imageFile)) && namesNodeImage(textFile(root, imageFile)))) {
     try {
       checks.push({ ecosystem: "node", result: await scanNode(textFile(root, imageFile)) });
     } catch (error) { checks.push({ ecosystem: "node", error: message(error) }); }

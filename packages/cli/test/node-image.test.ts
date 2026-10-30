@@ -1,5 +1,6 @@
 // The official Node.js image, moved to a security release of its own line (packages/cli/src/security/node.ts;
 // docs/decisions/2026-10-31-lnode-node-image.md). nodejs.org's index and Docker are stand-ins here; nothing is fetched or run.
+import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -61,6 +62,9 @@ describe("official Node.js security update decisions", () => {
     "FROM evil/node:22.11.0\n", "FROM ghcr.io/library/node:22.11.0\n", "ARG V=22.11.0\nFROM node:${V}\n", "FROM node:22.11.0 AS build\n",
     "FROM node:22.11.0\nFROM scratch\n", "# syntax=evil/build\nFROM node:22.11.0\n", "FROM node:22.11.0\nADD https://example.com/app /app\n",
     "FROM node:22.11.0\nCOPY --from=evil / /app\n", "FROM node:22.11.0\nRUN --network=host true\n", `FROM node:22.11.0-${"a".repeat(65)}\n`,
+    // A pin that is not a sha256 digest of 64 lower-case hex digits (R231d's R2).
+    `FROM node:22.11.0@sha256:${"a".repeat(63)}\n`, `FROM node:22.11.0@sha256:${"a".repeat(65)}\n`, `FROM node:22.11.0@sha256:${"A".repeat(64)}\n`,
+    `FROM node:22.11.0@md5:${"a".repeat(32)}\n`, `FROM node:22.11.0-alpine@sha512:${"a".repeat(128)}\n`, `FROM node:22.11.0@${"a".repeat(64)}\n`,
   ])("refuses an image or build input it cannot read exactly: %s", text => {
     expect(() => nodeImage(text)).toThrow();
   });
@@ -141,7 +145,7 @@ describe("the Node.js image policy", () => {
   // R231c's review (PR #231, comment 6534443349): these FROM lines name a node image in a form Ludion does not read, and
   // were left out of an unconfigured scan, which then exited 0 beside an npm lockfile.
   it.each([
-    "FROM node:22-alpine\n", "FROM --platform=linux/amd64 node:22.11.0-alpine\n", "FROM --platform=$BUILDPLATFORM --pull node:22-alpine\n",
+    "FROM node:22-alpine\n", "\u{FEFF}FROM node:22-alpine\n", "FROM --platform=linux/amd64 node:22.11.0-alpine\n", "FROM --platform=$BUILDPLATFORM --pull node:22-alpine\n",
     "FROM docker.io/node:22.11.0-alpine\n", "FROM index.docker.io/library/node:22.11.0-alpine\n", "FROM ghcr.io/acme/node:22.11.0\n",
     `FROM node@sha256:${"c".repeat(64)}\n`, "FROM node\n", "FROM node AS build\n", "from Node:22-alpine\n",
   ])("scan reports a FROM naming node in a form it cannot read as a failed check, and exits 2: %s", async from => {
@@ -174,6 +178,53 @@ describe("the Node.js image policy", () => {
       if (/\bphp:/.test(text)) expect(scan.checks.map(c => `${c.ecosystem}:${"error" in c ? "error" : "ok"}`)).toEqual(["npm:ok", "php:error"]);
     } finally { vi.unstubAllGlobals(); }
   });
+  // R231d's review (PR #231, comment 6535222762): Docker builds a Dockerfile that starts with a UTF-8 byte-order mark, and
+  // reads it without the mark. So does Ludion, for detection and for reading, PHP's included.
+  it.each([
+    ["FROM node:22.23.4\nWORKDIR /app\n", "node", { status: "no_newer_security_release", candidate: null }, 0],
+    ["FROM node:22.11.0-alpine\nWORKDIR /app\n", "node", { status: "update_available", candidate: { version: "22.23.4", reference: "node:22.23.4-alpine" } }, 1],
+    ["FROM php:8.4.27-fpm\nWORKDIR /app\n", "php", { status: "update_available", candidate: { version: "8.4.29", reference: "php:8.4.29-fpm" } }, 1],
+  ] as const)("reads a Dockerfile with a byte-order mark as Docker does, as without one: %s", async (text, ecosystem, expected, exit) => {
+    const php = { "8.4.29": { date: "30 Oct 2026", tags: [] }, "8.4.28": { date: "29 Oct 2026", tags: ["security"] }, "8.4.27": { date: "21 Oct 2026", tags: ["security"] } };
+    vi.stubGlobal("fetch", async (url: string | URL | Request) => new Response(JSON.stringify(String(url).startsWith("https://www.php.net/") ? php : INDEX)));
+    const error = vi.spyOn(console, "error").mockImplementation(() => {}), log = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      const results = [];
+      for (const mark of ["", "\u{FEFF}"]) {
+        const root = mkdtempSync(join(tmpdir(), "ludion-node-bom-"));
+        writeFileSync(join(root, "Dockerfile"), `${mark}${text}`);
+        npmProject(root);
+        const scan = await scanProject(root);
+        expect(scan.checks.map(c => `${c.ecosystem}:${"error" in c ? "error" : "ok"}`)).toEqual(["npm:ok", `${ecosystem}:ok`]);
+        const result = (scan.checks[1] as unknown as { result: { status: string; candidate: unknown; current: { start: number; end: number; reference: string; version: string; flavor: string } } }).result;
+        expect(result).toMatchObject(expected);
+        // The image's place in the file counts the mark; what is read does not.
+        expect(text.slice(result.current.start - mark.length, result.current.end - mark.length)).toBe(result.current.reference);
+        results.push({ ...result.current, start: result.current.start - mark.length, end: result.current.end - mark.length });
+        expect(await securityCli("scan", ["--dir", root])).toBe(exit);
+        // init sees the image too: beside the npm lockfile it asks which policy, and it writes the one asked for.
+        await expect(securityCli("init", ["--dir", root])).rejects.toThrow("Choose the update policy with --ecosystem");
+        expect(await securityCli("init", ["--dir", root, "--ecosystem", ecosystem])).toBe(0);
+        expect(readConfig(root)).toMatchObject({ dockerfile: "Dockerfile", ...(ecosystem === "node" ? { ecosystem: "node" } : {}) });
+      }
+      expect(results[1]).toEqual(results[0]);
+    } finally { vi.unstubAllGlobals(); error.mockRestore(); log.mockRestore(); }
+  });
+  it("scan checks the image of a saved node policy even when its FROM line names none (R231d's R5)", async () => {
+    vi.stubGlobal("fetch", async () => { throw new Error("no request expected"); });
+    try {
+      const root = mkdtempSync(join(tmpdir(), "ludion-node-policy-"));
+      writeFileSync(join(root, "Dockerfile"), "ARG IMG=node:22.11.0-alpine\nFROM ${IMG}\n");
+      writeFileSync(join(root, "ludion.security.json"), JSON.stringify(DEFAULT_NODE_CONFIG));
+      npmProject(root);
+      const scan = await scanProject(root);
+      expect(scan.checks).toMatchObject([{ ecosystem: "npm" }, { ecosystem: "node", error: expect.stringContaining("exact version") }]);
+      expect(scan.status).toBe("attention_required");
+      // Without the policy the line is not detected: it names no image.
+      writeFileSync(join(root, "ludion.security.json"), JSON.stringify({ schema: 1, ecosystem: "npm", test: ["npm", "test"], timeout_seconds: 30 }));
+      expect((await scanProject(root)).checks.map(c => c.ecosystem)).toEqual(["npm"]);
+    } finally { vi.unstubAllGlobals(); }
+  });
 });
 
 describe("Node.js image patch, validated and applied as PHP's", () => {
@@ -200,6 +251,15 @@ describe("Node.js image patch, validated and applied as PHP's", () => {
         expect(git(root, "log", "-1", "--format=%B", "ludion/node/22.23.4")).toContain("ludion: Node.js 22.11.0 -> 22.23.4 in Dockerfile\n\nOfficial Node.js security releases: 22.23.4, 22.23.2.");
       }
     }
+  });
+  it("updates a Dockerfile that starts with a byte-order mark, changing only FROM and keeping the mark", async () => {
+    const root = fixture(`\u{FEFF}${SOURCE}`);
+    const result = await patchProject(root, true, { fetchFn, command, testRun: async () => {} });
+    expect(result.receipt).toMatchObject({ outcome: "applied", branch: "ludion/node/22.23.4" });
+    // Read as bytes: the test's git helper trims its output, and trimming removes U+FEFF.
+    const blob = spawnSync("git", ["cat-file", "blob", "ludion/node/22.23.4:Dockerfile"], { cwd: root }).stdout as Buffer;
+    expect(blob.toString("utf8")).toBe(`\u{FEFF}${SOURCE.replace("node:22.11.0-alpine", `node:22.23.4-alpine@${DIGEST}`)}`);
+    expect([...blob.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
   });
   it("fails when the pulled image has no official node digest, and when a probe or test fails, and applies nothing", async () => {
     const root = fixture(), head = git(root, "rev-parse", "HEAD");

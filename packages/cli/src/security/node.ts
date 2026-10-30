@@ -1,4 +1,4 @@
-import { compare, officialImage, releaseJson, type Release, type RuntimeImage, type Scan } from "./php.ts";
+import { compare, officialImage, releaseJson, withoutBom, type Release, type RuntimeImage, type Scan } from "./php.ts";
 
 /**
  * The official Node.js image, moved to a security release of its own line (docs/decisions/2026-10-31-lnode-node-image.md).
@@ -12,6 +12,8 @@ export const NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
  * here becomes a check that could not be made, never a skipped one.
  */
 export const NODE_FROM = /^[ \t]*FROM[ \t]+(?:--\S+[ \t]+)*(?:\S*\/)?node(?=[:@ \t\r]|$)/im;
+/** Whether a Dockerfile names a node image (NODE_FROM), read as Docker reads it: without a leading byte-order mark. */
+export const namesNodeImage = (dockerfile: string): boolean => NODE_FROM.test(withoutBom(dockerfile));
 
 export function nodeImage(dockerfile: string): RuntimeImage {
   return officialImage(dockerfile, /^(?:(?:docker\.io\/)?library\/)?node:(\d+\.\d+\.\d+)((?:-[a-z][a-z0-9.-]{0,63})?)(?:@sha256:[a-f0-9]{64})?$/,

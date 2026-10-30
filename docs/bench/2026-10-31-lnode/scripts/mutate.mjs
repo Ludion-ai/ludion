@@ -46,6 +46,14 @@ const M = [
   ["N5: any name starting with node", `${S}node.ts`, String.raw`node(?=[:@ \t\r]|$)/im`, String.raw`node/im`],
   ["N6: not anchored on FROM", `${S}node.ts`, String.raw`/^[ \t]*FROM[ \t]+(?:--\S+`, String.raw`/(?:--\S+`],
   ["N7: case-sensitive", `${S}node.ts`, String.raw`|$)/im;`, String.raw`|$)/m;`],
+  // LNODE4, after R231d's review 6535222762: a leading byte-order mark, and R231d's surviving R2, R4 and R5.
+  ["B1: detection reads the byte-order mark", `${S}node.ts`, "NODE_FROM.test(withoutBom(dockerfile))", "NODE_FROM.test(dockerfile)"],
+  ["B2: withoutBom removes nothing", `${S}php.ts`, String.raw`text.startsWith("\u{FEFF}") ? text.slice(1) : text`, "text"],
+  ["B3: the image's offsets leave out the mark", `${S}php.ts`, "const start = mark + stage.index!", "const start = stage.index!"],
+  ["B4 (equivalent: \\s matches U+FEFF): reading keeps the mark", `${S}php.ts`, "const dockerfile = withoutBom(file), mark = file.length - dockerfile.length;", "const dockerfile = file, mark = 0;"],
+  ["R2: any pin after @", `${S}node.ts`, "(?:@sha256:[a-f0-9]{64})?$/,", "(?:@[^ ]+)?$/,"],
+  ["R4: a PHP policy takes a receipt that says node", `${S}deliver.ts`, "if (scanned !== (runtime === \"node\" ? \"node\" : undefined)) refuse", "if (runtime === \"node\" && scanned !== \"node\") refuse"],
+  ["R5: a saved node policy does not force the node check", `${S}scan.ts`, "(auto && saved && \"dockerfile\" in saved && saved.ecosystem === \"node\") || ", ""],
 ];
 
 const results = [];

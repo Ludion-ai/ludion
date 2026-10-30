@@ -7,7 +7,7 @@ import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
 import { scanProject, vulnerable } from "./scan.ts";
 import { CONFIG, DEFAULT_CONFIG, DEFAULT_NODE_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
-import { NODE_FROM } from "./node.ts";
+import { namesNodeImage } from "./node.ts";
 import { useProject } from "../../../sandbox/src/docker.ts";
 import type { ReadOnlyFinding, ReadOnlyScan } from "./osv.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, readOnlyRefusal } from "./readonly/index.ts";
@@ -44,7 +44,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     if (existsSync(join(root, CONFIG))) throw new Error(`${CONFIG} already exists. Edit it to choose your real validation command.`);
     const choices: string[] = detectEcosystems(root);
     if (existsSync(join(root, "Dockerfile")) && /\bphp:/.test(textFile(root, "Dockerfile"))) choices.push("php");
-    if (existsSync(join(root, "Dockerfile")) && NODE_FROM.test(textFile(root, "Dockerfile"))) choices.push("node");
+    if (existsSync(join(root, "Dockerfile")) && namesNodeImage(textFile(root, "Dockerfile"))) choices.push("node");
     const selected = values.ecosystem && values.ecosystem !== "auto" ? values.ecosystem : choices.length === 1 ? choices[0]! : undefined;
     if (!selected) throw new Error("Choose the update policy with --ecosystem php|node|npm|composer|maven. A multi-ecosystem project can be scanned together; each patch policy chooses its dependency manager.");
     let config: unknown = selected === "node" ? DEFAULT_NODE_CONFIG : DEFAULT_CONFIG;

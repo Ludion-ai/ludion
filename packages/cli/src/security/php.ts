@@ -30,12 +30,17 @@ export function compare(a: string, b: string): number {
   return 0;
 }
 
+/** A Dockerfile as Docker (BuildKit) reads it: one UTF-8 byte-order mark at the start of the file is removed. */
+export const withoutBom = (text: string): string => text.startsWith("\u{FEFF}") ? text.slice(1) : text;
+
 /**
  * Deliberately narrow: one stage, an exact version, an official image. Never guess ARGs or floating tags. `ref` matches the
- * whole FROM image and captures its version and flavor; `usage` is the refusal when it does not match.
+ * whole FROM image and captures its version and flavor; `usage` is the refusal when it does not match. The file is read
+ * without its byte-order mark (withoutBom); `start` and `end` stay offsets in the file as given, mark included.
  */
-export function officialImage(dockerfile: string, ref: RegExp, usage: string, line: (version: string) => string): RuntimeImage {
-  if (dockerfile.length > 64 * 1024) throw new Error("Dockerfile exceeds 64 KiB.");
+export function officialImage(file: string, ref: RegExp, usage: string, line: (version: string) => string): RuntimeImage {
+  if (file.length > 64 * 1024) throw new Error("Dockerfile exceeds 64 KiB.");
+  const dockerfile = withoutBom(file), mark = file.length - dockerfile.length;
   if (/^\s*#\s*(?:syntax|escape)\s*=/im.test(dockerfile) || /\\\r?\n/.test(dockerfile)) {
     throw new Error("Dockerfile frontend directives and continuations are not supported in this preview.");
   }
@@ -49,7 +54,7 @@ export function officialImage(dockerfile: string, ref: RegExp, usage: string, li
   if (/^\s*ADD\s/im.test(dockerfile) || /^\s*COPY\s+.*--from[=\s]/im.test(dockerfile) || /^\s*RUN\s+.*--(?:network|mount)[=\s]/im.test(dockerfile)) {
     throw new Error("ADD, external COPY and RUN network/mount overrides are not supported by the offline validator.");
   }
-  const start = stage.index! + stage[0].indexOf(stage[1]!);
+  const start = mark + stage.index! + stage[0].indexOf(stage[1]!);
   return { reference: from, version: match[1]!, branch: line(match[1]!), flavor: match[2]!, start, end: start + stage[1]!.length };
 }
 

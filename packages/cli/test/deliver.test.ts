@@ -549,6 +549,10 @@ describe("the policy at the base decides what a fix may change, and what it may 
     const checked = checkArtifact(work, out, base);
     expect(checked.fixes).toMatchObject([{ package: "php", branch: "ludion/php/8.4.27", commit: made, files: [{ path: "Dockerfile" }] }]);
     expect(pullRequestBody(checked, checked.fixes[0]!)).toContain("PHP image updates do not go through Ludion's judge");
+    // A PHP policy's receipt has no runtime: one whose scan says node is refused, even with PHP's versions (R231d's R4).
+    for (const runtime of ["node", "php"]) {
+      expect(() => checkArtifact(work, artifact(work, { ...receipt, scan: { ...receipt.scan, runtime } }, ["refs/heads/ludion/php/8.4.27"], base), base)).toThrow("the receipt's scan is not of the PHP image");
+    }
     // The same commit under a Composer policy: the Dockerfile is not a file a Composer fix may change.
     writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify({ schema: 1, ecosystem: "composer", image: "composer:2", test: ["php", "x"], timeout_seconds: 60 })}\n`);
     git(work, "commit", "-qam", "composer policy");

@@ -1,4 +1,0 @@
-npm error code ELSPROBLEMS
-npm error missing: react@^18.2.0, required by react-dom@18.2.0
-npm error missing: js-tokens@^3.0.0 || ^4.0.0, required by loose-envify@1.4.0
-npm error A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-30T22_29_37_098Z-debug-0.log

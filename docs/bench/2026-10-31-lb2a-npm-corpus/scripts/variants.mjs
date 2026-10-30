@@ -67,7 +67,7 @@ for (const npm of readdirSync(out).filter(n => /^\d/.test(n)).sort()) for (const
   for (const [name, change] of Object.entries(result)) {
     const target = join(dir, "variants", name);
     mkdirSync(target, { recursive: true });
-    for (const entry of readdirSync(dir)) if (!["variants", "package-lock.json", "npm.log", "npm.exit"].includes(entry)) cpSync(join(dir, entry), join(target, entry), { recursive: true });
+    for (const entry of readdirSync(dir)) if (!["variants", "package-lock.json", "npm.log", "npm.exit"].includes(entry) && !/^ls[-.]/.test(entry)) cpSync(join(dir, entry), join(target, entry), { recursive: true });
     const lock = JSON.parse(text);
     change(lock, treeIndex(lock));
     writeFileSync(join(target, "package-lock.json"), `${JSON.stringify(lock, null, 2)}\n`);

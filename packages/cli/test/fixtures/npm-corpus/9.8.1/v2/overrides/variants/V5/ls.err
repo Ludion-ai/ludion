@@ -1,4 +1,0 @@
-npm ERR! code ELSPROBLEMS
-npm ERR! invalid: minimist@1.2.6 /out/9.8.1/v2/overrides/variants/V5/node_modules/minimist
-
-npm ERR! A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-30T22_29_10_241Z-debug-0.log

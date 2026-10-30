@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "name": "s2",
+  "problems": [
+    "invalid: minimist@99.0.0 /out/7.10.0/v2/overrides/variants/V2/node_modules/minimist"
+  ],
+  "dependencies": {
+    "mkdirp": {
+      "version": "0.5.6",
+      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.6.tgz",
+      "overridden": false,
+      "dependencies": {
+        "minimist": {
+          "version": "99.0.0",
+          "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.8.tgz",
+          "overridden": false,
+          "invalid": "\"1.2.5\" from node_modules/mkdirp",
+          "problems": [
+            "invalid: minimist@99.0.0 /out/7.10.0/v2/overrides/variants/V2/node_modules/minimist"
+          ]
+        }
+      }
+    }
+  },
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "invalid: minimist@99.0.0 /out/7.10.0/v2/overrides/variants/V2/node_modules/minimist",
+    "detail": ""
+  }
+}

@@ -97,7 +97,7 @@ node packages/cli/dist/cli.js scan --dir /path/to/app
 node packages/cli/dist/cli.js init --dir /path/to/app --ecosystem npm
 ```
 
-Scan discovers all supported manifests in a project. A saved update policy selects one ecosystem at a time; pass --ecosystem when initializing a mixed project. Set the real application test before applying:
+Scan discovers all supported manifests in a project. A saved update policy selects one ecosystem at a time; pass --ecosystem when initializing a mixed project (an npm lockfile beside a Dockerfile whose FROM names node is one). A FROM node: line without an exact version (node:22-alpine, node:lts) is reported by scan as a check it could not make, and scan exits 2. Set the real application test before applying:
 
 ```json
 {

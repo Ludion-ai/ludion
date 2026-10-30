@@ -601,6 +601,7 @@ describe("the policy at the base decides what a fix may change, and what it may 
     ]) expect(check(now)).toMatch(/changes more than its FROM image/);
     expect(check(old.replace("8.4.26", "8.4.25"), "8.4.25")).toMatch(/is not a newer release/);
     expect(check(old.replace("8.4.26", "8.5.0"), "8.5.0")).toMatch(/is not a newer release/);
+    expect(check(old.replace("php:8.4.26-cli-alpine", `php:8.4.26-cli-alpine@sha256:${digest}`), "8.4.26")).toMatch(/PHP 8.4.26 is not a newer release/);
   });
   it("Node.js: only the FROM image may change, to the official node image of a newer release of the same major, pinned by digest", () => {
     const old = "FROM node:22.11.0-alpine\nWORKDIR /app\nCOPY --chown=node:node . /app\n", fix = fixOf("node", "22.11.0", "22.23.4", ["Dockerfile"]), digest = "2".repeat(64);
@@ -619,6 +620,8 @@ describe("the policy at the base decides what a fix may change, and what it may 
       old.replace("WORKDIR /app", "WORKDIR /").replace("node:22.11.0-alpine", `node:22.23.4-alpine@sha256:${digest}`),
     ]) expect(check(now)).toMatch(/changes more than its FROM image to the official node:22\.23\.4-alpine/);
     expect(check(old.replace("22.11.0", "22.10.0"), "22.10.0")).toMatch(/Node.js 22.10.0 is not a newer release of Node.js 22/);
+    // The same version, only pinned, is no update.
+    expect(check(old.replace("node:22.11.0-alpine", `node:22.11.0-alpine@sha256:${digest}`), "22.11.0")).toMatch(/Node.js 22.11.0 is not a newer release/);
     expect(check(old.replace("22.11.0", "24.22.1"), "24.22.1")).toMatch(/is not a newer release/);
     // A PHP Dockerfile is not one the Node.js policy updates.
     expect(contentProblem("node", fix, files({ Dockerfile: "FROM php:8.4.26-cli-alpine\n" }), files({ Dockerfile: `FROM node:22.23.4@sha256:${digest}\n` }))).toMatch(/is not one Ludion updates/);

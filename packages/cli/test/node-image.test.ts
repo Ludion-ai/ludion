@@ -64,6 +64,14 @@ describe("official Node.js security update decisions", () => {
   ])("refuses an image or build input it cannot read exactly: %s", text => {
     expect(() => nodeImage(text)).toThrow();
   });
+  it("asks for the index with no redirect and a 30-second deadline", async () => {
+    const seen: (RequestInit | undefined)[] = [], timeout = vi.spyOn(AbortSignal, "timeout");
+    try {
+      await scanNode(SOURCE, async (_url, init) => { seen.push(init); return new Response(JSON.stringify(INDEX)); });
+      expect(seen).toMatchObject([{ redirect: "error" }]);
+      expect(timeout).toHaveBeenCalledWith(30_000);
+    } finally { timeout.mockRestore(); }
+  });
   it("fails closed on an unavailable, oversized or incomplete index", async () => {
     await expect(scanNode(SOURCE, async () => new Response("", { status: 503 }))).rejects.toThrow("HTTP 503");
     await expect(scanNode(SOURCE, async () => new Response(" ".repeat(4 * 1024 * 1024 + 1)))).rejects.toThrow("4 MiB");

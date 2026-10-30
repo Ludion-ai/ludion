@@ -33,6 +33,11 @@ const M = [
   ["PR job: Docker Hub asked for library/php", `${S}deliver.ts`, "scope=repository:library/${repository}:pull", "scope=repository:library/php:pull"],
   ["PR job: Docker Hub manifest of library/php", `${S}deliver.ts`, "v2/library/${repository}/manifests/", "v2/library/php/manifests/"],
   ["PR body: no Node.js advisory note", `${S}deliver.ts`, "ecosystem === \"node\" ? \"nodejs.org's security release (no advisory ID read)\" : ", ""],
+  // The four the R lane's review 6532823264 found surviving (M1, M9, D2, H1), added after it.
+  ["M1: the index request follows redirects", `${S}php.ts`, "fetchFn(url, { redirect: \"error\",", "fetchFn(url, { redirect: \"follow\","],
+  ["M9: the index deadline 300 s", `${S}node.ts`, "\"Node.js release\", 4, 30_000", "\"Node.js release\", 4, 300_000"],
+  ["D2: the PR job takes the same version", `${S}deliver.ts`, "compare(to, current.version) <= 0", "compare(to, current.version) < 0"],
+  ["H1: PHP's hyphen check removed", `${S}php.ts`, "if (!image.flavor.startsWith(\"-\")) throw", "if (false) throw"],
 ];
 
 const results = [];

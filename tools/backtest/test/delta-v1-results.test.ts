@@ -17,6 +17,8 @@ describe("delta v1 results", () => {
     for (const r of malicious) {
       for (const side of ["prev", "next"]) for (const why of Object.values(r.tried[side] ?? {})) expect([`${r.name}@${r.version}`, why]).toEqual([`${r.name}@${r.version}`, expect.stringMatching(reason)]);
       if (r.shown) expect(typeof r.shown.scriptFiles).toBe("number");
+      // Free text (an analyzer error's message) must not reach the committed results unreviewed.
+      if ("undecidable" in r) expect(r.undecidable).toMatch(/^(?:(?:previous|new): (?:no root package\.json|package\.json is not an object|package\.json is not JSON)|held, but a second fetch failed)$/);
       for (const c of r.capabilities ?? []) expect(c).toMatch(/^(?:module|api|code|obf):|^(?:install-script|new-dependency|binary)$/);
     }
   });

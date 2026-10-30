@@ -14,7 +14,7 @@ The definitions are in `docs/decisions/2026-10-30-ld-delta-v1-definitions.md`. T
 | Fix: long runs scanned by hand, an analyzer error is undecidable (`docs/mistakes/2026-10-30-delta-regex-stack.md`) | 9443192 | committed 00:51:43Z |
 | **The execution** (the result), at 9443192 | — | 00:51:53Z–07:26:30Z, exit 0 (`run-times.txt`) |
 
-- **The first execution stopped** after about 1,200 of the 1,348 pairs. `/[A-Za-z0-9+/]{200,}/` overflowed V8's regex stack on a multi-megabyte run in one fetched file. The fix counts the same maximal runs by hand, so the definitions are unchanged. The fix also records an analyzer error on one pair as undecidable; none occurred in the result. The first execution wrote no result, so nothing from it is reported beyond its log.
+- **The first execution stopped** after about 1,200 of the 1,348 pairs. `/[A-Za-z0-9+/]{200,}/` overflowed V8's regex stack on one fetched file. That the file held a very long run is inferred from the error; the file and its size were not recorded. The fix counts the same maximal runs by hand, so the definitions are unchanged. The fix also records an analyzer error on one pair as undecidable; none occurred in the result. The first execution wrote no result, so nothing from it is reported beyond its log.
 - **Setup.** Both executions ran in Docker (node:24-slim, Node v24.22.2) as user 1000, with a read-only root, a tmpfs /tmp, no credentials, no forwarded environment, and the repository mounted read-only.
 - **No package file reached the host.** Tarballs and files were held in memory. A named volume cached the fetchers' answers: v5's ecosyste.ms, jsDelivr list and Software Heritage answers were copied in, and new ones were added.
 - **One exception in the cache** (found in review). v5's Software Heritage answers include the raw `package.json` text of the versions Software Heritage held for v5 (`swhManifest`). So the copied cache did hold that one file of those versions, as inert text, inside the volume. This execution's own fetches cached no package file. See `docs/mistakes/2026-10-30-delta-v1-records.md`.
@@ -183,7 +183,7 @@ Median / maximum over the judged pairs:
 
 ## What this shows, and what it does not
 
-- **v1's rules on the 11 obtained malicious versions.** 9 are caught, 8 of them not disputed (freo-design-system 1.0.4 is disputed, and is flagged for changes first published in 1.0.3). One real miss (@react-native-aria/switch 0.2.5) shows nothing to any v1 rule. The counts measured afterwards suggest why: one long line under the thresholds, behind whitespace, through computed names (inferred; decision entry above). The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
+- **v1's rules on the 11 obtained malicious versions.** 9 are caught, 8 of them not disputed (freo-design-system 1.0.4 is disputed: it is flagged against 1.0.0 for changes made across 1.0.1–1.0.3, and its code equals 1.0.3's, which no MAL record names). One real miss (@react-native-aria/switch 0.2.5) shows nothing to any v1 rule. The counts measured afterwards suggest why: one long line under the thresholds, behind whitespace, through computed names (inferred; decision entry above). The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
 - **On the genuine fixes, v1 raises a false alarm on 26.56%.** Most of them are bundled builds whose hashed file names make all their code look new.
 - **The data is the larger limit.** Only 11 of the 1,148 malicious versions could be fetched: the registry, and almost always jsDelivr, no longer serve removed versions, and Software Heritage rarely holds them and answers 120 requests an hour. Any rule tuned on these results would be tuned on 11 versions, 8 of them the registry's own leftovers. So whether diff checking can replace the wait is not decided here.
 - **What a v2 would look at.** Each item is an idea for a new definitions entry and a new run, never a change to this one:
@@ -199,7 +199,7 @@ The runner and the analyzer are kept as they ran, so their blob hashes match the
 - **No malicious outcome is affected.** This is shown below by after-the-result checks for the two items that could have changed one: dotted paths and backtick module names.
 - **Two items can move a number:**
   - the deadline item, one not-obtained reason;
-  - the `.` path-segment item, one genuine false alarm (51 could be 50).
+  - the `.` path-segment item, at least one genuine false alarm (js-toml 1.0.2, so 51 could be 50). The other genuine fixes were not checked for dotted paths.
 - **Effect on the genuine fixes not known:** the backtick item.
 - Every other item changes nothing in this run.
 
@@ -233,13 +233,20 @@ The runner and the analyzer are kept as they ran, so their blob hashes match the
     - Every tarball matched the registry's sha512 integrity.
     - The script prints names, versions, that flag and counts, never a path.
   - **js-toml 1.0.2** has 1 dotted path, and the tarball also holds the same path without the dot: a duplicate entry. With the dot removed, the two would collide, and which copy counts is not decided here. So this false alarm could go, and 51 could be 50. js-toml 1.0.1 has no dotted path.
+  - **The other genuine fixes were not checked.**
+    - A dotted path in a previous version could make a changed file count as having no previous file, and its flags would show under the plain path.
+    - 29 flagged genuine pairs have files removed and a changed code file with no previous file at the same path, so more than one false alarm could be affected.
+    - Most likely none is, since npm pack writes no `./` entries. That is not measured.
   - **No malicious outcome can change.**
     - **The registry's versions.** Every registry-held version of the 11 malicious pairs has 0 dotted paths:
       - the 8 still-listed pairs, both versions each;
       - the previous versions of @ensdomains/buffer, voiceflow and kinvey.
     - **The other three.** Those three pairs' V's came from Software Heritage directories, whose paths have no `.` segment.
 - **The first results commit's subject** (6d9960a, "9 of 11 obtained malicious flagged") counts both disputed versions without showing them apart. The tables above show them apart.
-- **A re-fetch may use another source.** When a pending pair is judged, a side is fetched again: from Software Heritage if that is where it was found, otherwise registry then jsDelivr. In principle the second source could differ from the one in `sources`. Here it does not: the 3 pending pairs judged are registry / Software Heritage, and none of their registry sides failed.
+- **A re-fetch may use another source.** When a pending pair is judged, a side is fetched again: from Software Heritage if that is where it was found, otherwise registry then jsDelivr. In principle the second source could differ from the one in `sources`. Here it does not: the 3 pending pairs judged are registry / Software Heritage, and none of their registry sides failed. Their Software Heritage sides were fetched again after the 6-hour deadline (07:20:10Z–07:26:30Z). These were versions already held, not new lookups, so no count changes.
+- **`from "m"` anywhere.** Rule 1 names `import … from "m"` and `export … from "m"`. The analyzer counts any `from "m"` naming a listed module, wherever it appears, just as it counts comments and strings.
+  - Among the malicious rows, only freo-design-system 1.0.1 is flagged by modules alone (child_process, dns).
+  - The effect on any row is not known.
 - **"Registry, hash unknown"** (definitions section 2): 0 versions. Every registry tarball used had a known hash.
 - **Module names in backticks.** Rule 1 writes `require("m")` and `import("m")` with quotes. The analyzer also counts the same calls with the name in backticks (a template literal without substitutions), which load the same module.
   - **Checked afterwards** (`scripts/check-backtick-modules.ts`, 2026-10-30 08:31Z, output in `after-checks.txt`): every registry-held version of the 11 malicious pairs has 0 such calls in any code file.

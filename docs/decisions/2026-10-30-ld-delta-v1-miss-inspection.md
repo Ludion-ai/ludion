@@ -48,7 +48,7 @@ Section 6 of `2026-10-30-ld-delta-v1-definitions.md` says each missed malicious 
 - Any idea the numbers suggest for a v2 (lower thresholds, a whitespace-padding marker, computed access to `global`) needs a new definitions entry and a new run.
 
 **Paths.**
-- No file of the final tree names a file path of a malicious version. The README does not, the results JSON never held one (`tools/backtest/test/delta-v1-results.test.ts`), and the script takes the path as an argument.
+- No file this lane adds names a file path of a malicious version. (main's v5 results, which this lane reads, do hold such paths in their disputed evidence.) The README does not, the results JSON never held one (`tools/backtest/test/delta-v1-results.test.ts`), and the script takes the path as an argument.
 - The script's output, which did list both versions' files, was not committed.
 - The branch's earlier commits named paths of this version:
   - 6d9960a and 20810f5 named four paths in the README;

@@ -9,7 +9,7 @@
 - **What changed.**
   - The README states the cache exception.
   - The miss has its decision entry.
-  - No file in the final tree names a path of a malicious version.
+  - No file this lane adds names a path of a malicious version.
   - A test now fails if a malicious row in the committed results gains any field beyond those that carry no path, or a changed-code entry beyond capability names and counts.
 - **Check:** `tools/backtest/test/delta-v1-results.test.ts` — every malicious row in delta-v1.json has only the fields that carry no path.
 - **Rule:** "Make supported scope and failures explicit."

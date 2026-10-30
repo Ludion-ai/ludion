@@ -8,7 +8,7 @@ import { publicArchiveUrl } from "./acquisition.ts";
 import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
-import type { Judgement } from "./judge.ts";
+import { DECLARED, lockEntries, lockKey, readLock, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
 import { comparableVersion } from "./osv.ts";
 import { compare, phpImage } from "./php.ts";
@@ -243,42 +243,85 @@ const COMPOSER_KEYS = new Set([...COMPOSER_INSTALL, ...COMPOSER_METADATA, "name"
 const PACKAGIST_NOTIFY = "https://packagist.org/downloads/";
 const withoutMetadata = (entry: Record<string, unknown>) => Object.fromEntries(Object.entries(entry).filter(([key]) => !COMPOSER_METADATA.has(key)));
 
+/** The requirement groups of the project's own entry (""), which mirror package.json's. */
+const ROOT_GROUPS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];
+
 /**
- * package-lock.json says the receipt's change and no other fix (gate 4: one fix per PR):
- * - each change's package is at its `from` in the base's lock, and at its `to`, and no longer at its `from`, in the
- *   fix's, as for Composer, so a lock that moves another package cannot carry a receipt that names this one;
- * - no package but the fix's loses an installed version, as `patch`'s candidate check (unplannedRemovals) requires;
- *   new versions may appear (the fixed version's new dependencies).
- * Packages are named by their install path. The judge, run again in openFixes, checks the changed entries against the
- * registry.
+ * package-lock.json says the receipt's change and no other fix (gate 4: one fix per PR), by install path (review
+ * 6518582507, N-a), as Composer's walk of what the fixed version requires does by name:
+ * - every key is the root or an install path, read by the judge's own lockKey; a key in any other form (a folder, or
+ *   "aaaaaaaaaaaaminimist", which npm installs nothing at) refuses the artifact, never is skipped (B1). `patch` does not
+ *   fix workspaces, so a project folder has no place in a fix's lock; an extraneous folder may only stay as it was;
+ * - the planned paths: each install path where the base has the fix's package (the path's name, not the entry's own
+ *   `name`, which an alias sets) at a change's `from`. Each change has one, and in the fix each is at the same path at
+ *   that change's `to`, under no other name; no install path has the package at a `from` any more;
+ * - every added path is installed, and is what a planned path or another added path resolves for one of its own
+ *   requirements (DECLARED, by Node's lookup), so none comes from nowhere;
+ * - every other key is exactly as at the base; the root's only change is the fix's package's requirement.
+ * The judge, run again in openFixes, checks the changed and added entries against the registry.
  */
 function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix): string | null {
   if (old === null || now === null) return "package-lock.json is missing.";
-  let a: unknown, b: unknown;
-  try { a = JSON.parse(old); b = JSON.parse(now); } catch { return "package-lock.json is not JSON."; }
-  const versions = (lock: unknown) => {
-    const map = new Map<string, Set<string>>();
-    const packages = isObject(lock) && isObject(lock.packages) ? lock.packages : {};
-    for (const [path, entry] of Object.entries(packages)) {
-      if (!path || !isObject(entry) || typeof entry.version !== "string") continue;
-      // The name the install path gives, never the entry's own `name` (an alias's, and the artifact's to choose), so a
-      // moved package cannot be filed under the fix's name.
-      const name = path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
-      map.set(name, (map.get(name) ?? new Set()).add(entry.version));
-    }
-    return map;
-  };
-  const was = versions(a), is = versions(b), pkg = plain(fix.package).slice(0, 200), tos = new Set(fix.changes.map(c => c.to));
+  const show = (path: string) => plain(path).slice(0, 200), pkg = show(fix.package);
+  let was: Record<string, unknown>, is: Record<string, unknown>, kinds: Map<string, ReturnType<typeof lockKey>>;
+  try {
+    was = readLock(old); is = readLock(now);
+    // The judge's reading of both, which also refuses two paths that differ only in case and an invalid version.
+    lockEntries(old); lockEntries(now);
+    kinds = new Map([...Object.entries(was), ...Object.entries(is)].map(([path, item]) => [path, lockKey(path, item)]));
+  } catch (error) { return `package-lock.json is not one Ludion reads (${plain(error instanceof Error ? error.message : String(error)).slice(0, 200)}).`; }
+  for (const [path, kind] of kinds) {
+    if (kind === "folder") return `package-lock.json has ${show(path)}, which is not an install path (Ludion's fixes cover no workspace or local folder).`;
+    if ([was, is].some(lock => Object.hasOwn(lock, path) && !isObject(lock[path]))) return `package-lock.json's ${show(path)} is not an object.`;
+  }
+  const entry = (lock: Record<string, unknown>, path: string) => Object.hasOwn(lock, path) ? lock[path] as Record<string, unknown> : null;
+  const to = new Map<string, string>();
   for (const change of fix.changes) {
-    if (!was.get(fix.package)?.has(change.from)) return `the receipt moves ${pkg} from ${plain(change.from).slice(0, 60)}, and the base's package-lock.json does not have ${pkg} at that version.`;
-    if (!is.get(fix.package)?.has(change.to)) return `package-lock.json does not have ${pkg} at ${plain(change.to).slice(0, 60)}, the fix's version.`;
-    if (!tos.has(change.from) && is.get(fix.package)?.has(change.from)) return `package-lock.json still has ${pkg} at ${plain(change.from).slice(0, 60)}, which the fix moves.`;
+    if (to.has(change.from) && to.get(change.from) !== change.to) return `the receipt moves ${pkg} from ${plain(change.from).slice(0, 60)} twice.`;
+    to.set(change.from, change.to);
   }
-  for (const [name, set] of was) {
-    if (name === fix.package) continue;
-    const gone = [...set].filter(v => !is.get(name)?.has(v));
-    if (gone.length) return `package-lock.json moves ${plain(name).slice(0, 200)} from ${plain(gone[0]!).slice(0, 60)}, which this fix does not plan.`;
+  const ours = (path: string, item: Record<string, unknown> | null) => kinds.get(path) === "install" && requireName(path) === fix.package && !!item && (item.name === undefined || item.name === fix.package) && !item.link;
+  const planned = Object.keys(was).filter(path => ours(path, entry(was, path)) && to.has(String(entry(was, path)!.version)));
+  for (const change of fix.changes) {
+    if (!planned.some(path => entry(was, path)!.version === change.from)) return `the receipt moves ${pkg} from ${plain(change.from).slice(0, 60)}, and the base's package-lock.json does not have ${pkg} at that version.`;
   }
+  for (const path of planned) {
+    const from = String(entry(was, path)!.version), wanted = to.get(from)!;
+    if (!ours(path, entry(is, path)) || entry(is, path)!.version !== wanted) return `package-lock.json does not have ${pkg} at ${plain(wanted).slice(0, 60)}, the fix's version, at ${show(path)}, where the base has ${plain(from).slice(0, 60)}.`;
+  }
+  const tos = new Set(to.values());
+  for (const path of Object.keys(is)) {
+    const version = String(entry(is, path)!.version);
+    if (kinds.get(path) === "install" && requireName(path) === fix.package && to.has(version) && !tos.has(version)) return `package-lock.json still has ${pkg} at ${plain(version).slice(0, 60)}, which the fix moves (${show(path)}).`;
+  }
+  // Each requirement group of the root with the fix's package's range blanked: nothing else of the root may change.
+  const root = (item: Record<string, unknown> | null) => item && Object.fromEntries(Object.entries(item).map(([key, value]) => [key,
+    ROOT_GROUPS.includes(key) && isObject(value) ? Object.fromEntries(Object.entries(value).map(([name, range]) => [name, name === fix.package ? "" : range])) : value]));
+  const added: string[] = [];
+  for (const path of kinds.keys()) {
+    if (planned.includes(path)) continue;
+    const before = entry(was, path), after = entry(is, path), version = (item: Record<string, unknown> | null) => plain(String(item?.version)).slice(0, 60);
+    if (path === "") { if (!isDeepStrictEqual(root(before), root(after))) return "package-lock.json changes the project's own entry beyond the fix's requirement."; continue; }
+    if (!after) return `package-lock.json removes ${show(path)} (${version(before)}), which this fix does not plan.`;
+    if (!before) {
+      if (kinds.get(path) !== "install" || after.link) return `package-lock.json adds ${show(path)}, which is not an installed package.`;
+      added.push(path);
+      continue;
+    }
+    if (!isDeepStrictEqual(before, after)) return `package-lock.json changes ${show(path)} (${version(before)} -> ${version(after)}), which this fix does not plan.`;
+  }
+  // From the planned paths, every added path some reached path resolves for one of its own requirements.
+  const installed = new Map([...kinds].filter(([, kind]) => kind === "install").filter(([path]) => Object.hasOwn(is, path)).map(([path]) => [path, { path } as LockEntry]));
+  const reached = new Set<string>(), queue = [...planned];
+  while (queue.length) {
+    const path = queue.shift()!, item = entry(is, path)!;
+    for (const group of DECLARED) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
+      const target = resolveFrom(installed, `${path}/`, name)?.path;
+      if (target && added.includes(target) && !reached.has(target)) { reached.add(target); queue.push(target); }
+    }
+  }
+  const stray = added.filter(path => !reached.has(path));
+  if (stray.length) return `package-lock.json adds ${stray.slice(0, 3).map(show).join(", ")}, which no package the fix moves or adds requires.`;
   return null;
 }
 
@@ -430,19 +473,25 @@ export function checkArtifact(dir: string, artifact: string, base: string): Chec
   if (listed.join("\n") !== expected.join("\n")) refuse(`the bundle's branches are not exactly the receipt's applied fixes (bundle: ${listed.length}, receipt: ${expected.length}${listed.some(l => !expected.includes(l)) ? `; not in the receipt: ${plain(listed.filter(l => !expected.includes(l)).slice(0, 3).join(", ")).slice(0, 300)}` : ""}).`);
   if (git(top, ["bundle", "verify", "--quiet", bundleFile], { allowFail: true }).status !== 0) refuse("the bundle needs commits other than the base, or is damaged.");
   git(top, ["bundle", "unbundle", bundleFile]);
+  const where = (fix: CheckedFix) => `${fix.branch} (${fix.commit.slice(0, 12)})`;
+  const commits = new Map(checked.fixes.map(fix => {
+    const c = commitOf(top, fix.commit);
+    if (c.parents.length !== 1 || c.parents[0] !== base) refuse(`${where(fix)} does not have the base ${base.slice(0, 12)} as its only parent.`);
+    if (!c.inOrder) refuse(`${where(fix)}'s headers are not exactly tree, parent, author and committer, in that order.`);
+    return [fix.commit, c];
+  }));
+  // Git's own check, so nothing the checks read past is malformed. It runs once: fsck reads every object in the
+  // repository whatever heads it is given (review 6518582507, N-c). So an error in the base checkout itself refuses
+  // every artifact of that repository, which fails closed.
+  try { git(top, ["fsck", "--no-dangling", "--no-reflogs", "--no-progress", ...checked.fixes.map(f => f.commit)]); }
+  catch (error) { refuse(`the base checkout with the bundle's objects does not pass git fsck (${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}).`); }
   const modes = new Map<string, string>();
   for (const line of git(top, ["ls-tree", "-r", "-z", "--full-tree", base]).stdout.split("\0").filter(Boolean)) {
     const tab = line.indexOf("\t"), [mode, type] = line.slice(0, tab).split(" ");
     if (type === "blob") modes.set(line.slice(tab + 1), mode!);
   }
   for (const fix of checked.fixes) {
-    const at = `${fix.branch} (${fix.commit.slice(0, 12)})`;
-    const c = commitOf(top, fix.commit);
-    if (c.parents.length !== 1 || c.parents[0] !== base) refuse(`${at} does not have the base ${base.slice(0, 12)} as its only parent.`);
-    if (!c.inOrder) refuse(`${at}'s headers are not exactly tree, parent, author and committer, in that order.`);
-    // Git's own check of every object from the fix's commit down, so nothing the checks above read past is malformed.
-    try { git(top, ["fsck", "--no-dangling", "--no-reflogs", "--no-progress", fix.commit]); }
-    catch (error) { refuse(`${at} does not pass git fsck (${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}).`); }
+    const at = where(fix), c = commits.get(fix.commit)!;
     if (!IDENTITY.test(c.author) || !IDENTITY.test(c.committer)) refuse(`${at} is not authored and committed by Ludion.`);
     if (c.message.split("\n")[0] !== fix.subject) refuse(`${at}'s subject is not the receipt's change.`);
     // The whole message, so nothing (a "Closes #1", a trailer) rides along with the fix.
@@ -507,7 +556,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json moves this package from the version the base locks to the fix's version, and that no other package loses a version there" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json moves this package, at each install path where the base locks the fixed version, to the fix's version, adds only packages that those paths (or packages so added) require, and changes no other entry" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,

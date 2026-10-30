@@ -788,6 +788,9 @@ describe("Composer plans also read Packagist's advisories", () => {
     ["a name that was not asked for", { advisories: { "evil/other": [] } }],
     ["a record for another package", { advisories: { "symfony/http-foundation": [{ ...pksa("PKSA-aaaa-bbbb-cccc", "<5.4.54"), packageName: "evil/other" }] } }],
     ["an invalid advisory id", { advisories: { "symfony/http-foundation": [pksa("../../x", "<5.4.54")] } }],
+    // The PR job's ADVISORY (deliver.ts) refuses these, so they are never read here (review 6518582507, N-d).
+    ["an advisory id ending with -", { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-", "<5.4.54")] } }],
+    ["an advisory id starting with -", { advisories: { "symfony/http-foundation": [pksa("PKSA--aaaa", "<5.4.54")] } }],
   ])("never treats %s as a clean Packagist answer", async (_label, body) => {
     await expect(withSources(null, body).scan(installed())).rejects.toThrow(/Packagist/);
   });

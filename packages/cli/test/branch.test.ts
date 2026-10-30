@@ -307,6 +307,8 @@ describe("a fix on its own branch", () => {
       [fixBranchName("", "npm", "@foo/bar", ["1.0.0"]), fixBranchName("", "npm", "foo-bar", ["1.0.0"])],
       [fixBranchName("", "npm", "a", ["1.0.0", "2.0.0"]), fixBranchName("", "npm", "a-1.0.0", ["2.0.0"])],
       [fixBranchName("", "npm", "a", ["1.0.0-2.0.0"]), fixBranchName("", "npm", "a", ["1.0.0", "2.0.0"])],
+      // Both would read "a-1.0.0-2.0.0" without the "no - in the version" rule (review 6518582507, N-b R16).
+      [fixBranchName("", "npm", "a", ["1.0.0-2.0.0"]), fixBranchName("", "npm", "a-1.0.0", ["2.0.0"])],
       [fixBranchName("", "composer", "a/b-c", ["1.0.0"]), fixBranchName("", "composer", "a-b/c", ["1.0.0"])],
       [fixBranchName("", "maven", "a.b:c-d", ["1.0"]), fixBranchName("", "maven", "a.b-c:d", ["1.0"])],
       [fixBranchName("apps/web/", "php", null, ["8.4.28"]), fixBranchName("apps-web/", "php", null, ["8.4.28"])],

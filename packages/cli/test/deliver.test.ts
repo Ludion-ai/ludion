@@ -11,6 +11,7 @@ import { fixBranch, fixBranchName, gitBase } from "../src/security/branch.ts";
 import { ADVISORY, BUNDLE_LIMIT, checkArtifact, closedWarnings, contentProblem, deliverCli, FILE_LIMIT, fileLimit, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
 import { changedManifest } from "../src/security/inventory.ts";
 import type { Judgement } from "../src/security/judge.ts";
+import { PKSA_ID } from "../src/security/packagist.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
 
@@ -100,11 +101,11 @@ function forge(work: string, branch: string, parent: string, files: Record<strin
 
 /**
  * A commit written byte for byte (git hash-object --literally), to forge what commit-tree would not write: its tree is
- * that of a correct fix commit on `parent`, and its header lines are `headers` (with T for the tree).
+ * that of a correct fix commit on `parent`, and its header lines are `headers` (with T for the tree, U for it in upper case).
  */
 function raw(work: string, branch: string, parent: string, headers: string[]): string {
   const tree = git(work, "rev-parse", `${forge(work, "ludion/scratch", parent, { "package-lock.json": FIXED })}^{tree}`);
-  const text = `${headers.map(h => h.replace(/^tree T$/, `tree ${tree}`)).join("\n")}\n\n${message(parent)}`;
+  const text = `${headers.map(h => h.replace(/^tree T$/, `tree ${tree}`).replace(/^tree U$/, `tree ${tree.toUpperCase()}`)).join("\n")}\n\n${message(parent)}`;
   const r = spawnSync("git", ["hash-object", "-t", "commit", "-w", "--literally", "--stdin"], { cwd: work, input: text, encoding: "utf8" });
   if (r.status !== 0) throw new Error(r.stderr);
   git(work, "update-ref", `refs/heads/${branch}`, r.stdout.trim());
@@ -339,6 +340,9 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       (base: string) => ["tree T", `parent ${base}`, `author ${WHO}`, `parent ${base}`, `committer ${WHO}`],
       (base: string) => ["tree T", `parent ${base}`, `author ${WHO}`, `committer ${WHO}`, "encoding UTF-8"],
       (base: string) => ["tree T", `parent ${base}`, `committer ${WHO}`, `author ${WHO}`],
+      // The tree in upper-case hex, which Git reads as the same tree: the tree compared is Git's reading, not the raw
+      // text (review 6518582507, N-b R4).
+      (base: string) => ["tree U", `parent ${base}`, `author ${WHO}`, `committer ${WHO}`],
     ]) {
       await refused(p => {
         const made = raw(p.work, BRANCH, p.base, headers(p.base));
@@ -362,6 +366,42 @@ describe("the PR job refuses an artifact the validation job would not write", { 
     const made = forge(p.work, BRANCH, p.base, { "package-lock.json": lock });
     return { receipt: receiptFor(p.base, made, lock), refs: [`refs/heads/${BRANCH}`] };
   }, "package-lock.json does not have lodash at 4.17.21, the fix's version"));
+  /**
+   * A transitive npm fix, minimist 1.2.5 -> 1.2.6, as review 6518582507 forged them: a base where mkdirp requires
+   * minimist, and a fix commit whose package-lock.json has `packages` (package.json does not change).
+   */
+  const MKDIRP = { "": { name: "app", dependencies: { lodash: "4.17.20", mkdirp: "0.5.5" } }, "node_modules/lodash": { version: "4.17.20" }, "node_modules/minimist": { version: "1.2.5" }, "node_modules/mkdirp": { version: "0.5.5", dependencies: { minimist: "^1.2.5" } } };
+  function minimistFix(p: ReturnType<typeof project>, packages: Record<string, unknown>) {
+    const text = (packages: Record<string, unknown>) => `${JSON.stringify({ name: "app", lockfileVersion: 3, packages }, null, 2)}\n`;
+    const pkg = `${JSON.stringify({ name: "app", dependencies: { lodash: "4.17.20", mkdirp: "0.5.5" } })}\n`, before = text(MKDIRP), lock = text(packages);
+    writeFileSync(join(p.work, "package.json"), pkg); writeFileSync(join(p.work, "package-lock.json"), before);
+    git(p.work, "add", "-A"); git(p.work, "commit", "-qm", "mkdirp"); git(p.work, "push", "-q", p.origin, "HEAD:refs/heads/main");
+    const base = git(p.work, "rev-parse", "HEAD"), branch = fixBranchName("", "npm", "minimist", ["1.2.6"]);
+    const made = forge(p.work, branch, base, { "package.json": pkg, "package-lock.json": lock }, { subject: "ludion: minimist 1.2.5 -> 1.2.6 (npm)" });
+    const receipt = receiptFor(base, made) as { fixes: Record<string, unknown>[] };
+    Object.assign(receipt.fixes[0]!, { package: "minimist", branch, changes: [{ name: "minimist", from: "1.2.5", to: "1.2.6", advisories: ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337"] }], files: [{ path: "package-lock.json", before_hash: sha256(before), after_hash: sha256(lock) }] });
+    receipt.fixes.pop();
+    return { receipt, refs: [`refs/heads/${branch}`], base, branch };
+  }
+  it("a transitive npm fix as patch makes it is opened", async () => {
+    const p = project(), s = minimistFix(p, { ...MKDIRP, "node_modules/minimist": { version: "1.2.6" } }), gh = github(p.origin);
+    const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh);
+    expect(result.deliveries).toMatchObject([{ package: "minimist", branch: s.branch, outcome: "opened" }]);
+  });
+  it("forged transitive npm fixes (review 6518582507, B1 and N-a)", async () => {
+    const { "node_modules/minimist": _gone, ...withoutMinimist } = MKDIRP;
+    const stray = { "node_modules/mkdirp/node_modules/is-number": { version: "7.0.0" } };
+    for (const [packages, why] of [
+      // B1: the top-level minimist removed, a key npm installs nothing at, and an unrequired lodash for the judge to fix.
+      [{ ...withoutMinimist, "aaaaaaaaaaaaminimist": { version: "1.2.6" }, "node_modules/mkdirp/node_modules/lodash": { version: "4.17.21" }, ...stray }, "has aaaaaaaaaaaaminimist, which is not an install path"],
+      // N-a (a): the real move, and a package nothing requires.
+      [{ ...MKDIRP, "node_modules/minimist": { version: "1.2.6" }, ...stray }, "adds node_modules/mkdirp/node_modules/is-number, which no package the fix moves or adds requires"],
+      // N-a (b): the top-level minimist removed, 1.2.6 only under mkdirp, and the same package.
+      [{ ...withoutMinimist, "node_modules/mkdirp/node_modules/minimist": { version: "1.2.6" }, ...stray }, "does not have minimist at 1.2.6, the fix's version, at node_modules/minimist"],
+      // N-a (c): an alias of another package at 1.2.6 in minimist's place.
+      [{ ...MKDIRP, "node_modules/minimist": { name: "is-number", version: "1.2.6" } }, "does not have minimist at 1.2.6, the fix's version, at node_modules/minimist"],
+    ] as const) await refused(p => minimistFix(p, packages), why);
+  });
   it("a file outside the plan, beside the planned ones", () => refused(p => {
     const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED, "README.md": "changed\n" });
     return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
@@ -619,34 +659,59 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(contentProblem("composer", fixOf("symfony/http-foundation", "5.4.0", "5.4.54", ["composer.json", "composer.lock"]), base, files({ "composer.json": json("5.4.54"), "composer.lock": lock([entry("v5.4.54")]) }))).toBeNull();
     const pom = readFileSync(new URL("../../../examples/maven-security/pom.xml", import.meta.url), "utf8");
     expect(contentProblem("maven", fixOf("org.apache.commons:commons-lang3", "3.11", "3.10", ["pom.xml"]), files({ "pom.xml": pom }), files({ "pom.xml": pom }))).toContain("is not an update to a higher version");
-    // npm: the lockfile moves only the fix's package; another package losing a version is refused, a new one is not.
-    const npmLock = (packages: Record<string, unknown>) => JSON.stringify({ name: "app", lockfileVersion: 3, packages: { "": { name: "app", dependencies: { lodash: "4.17.21" } }, ...packages } });
+    // npm: the lockfile moves only the fix's package, by install path; another entry changing is refused, a new one that
+    // the fixed version requires is not.
+    const npmLock = (packages: Record<string, unknown>, root: Record<string, unknown> = { name: "app", dependencies: { lodash: "4.17.21" } }) => JSON.stringify({ name: "app", lockfileVersion: 3, packages: { "": root, ...packages } });
     const pkg = JSON.stringify({ name: "app", dependencies: { lodash: "4.17.20" } }), fixedPkg = JSON.stringify({ name: "app", dependencies: { lodash: "4.17.21" } });
     const npmBase = files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, "node_modules/minimist": { version: "1.2.6" } }) });
     const fix = fixOf("lodash", "4.17.20", "4.17.21", ["package.json", "package-lock.json"]);
-    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.6" }, "node_modules/new-dep": { version: "1.0.0" } }) }))).toBeNull();
-    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.8" } }) }))).toContain("moves minimist from 1.2.6, which this fix does not plan");
+    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21", dependencies: { "new-dep": "^1.0.0" } }, "node_modules/minimist": { version: "1.2.6" }, "node_modules/new-dep": { version: "1.0.0" } }) }))).toBeNull();
+    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.8" } }) }))).toContain("changes node_modules/minimist (1.2.6 -> 1.2.8), which this fix does not plan");
     // The entry's own name is not trusted: minimist filed under "lodash" still counts as minimist.
-    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { name: "lodash", version: "1.2.8" } }) }))).toContain("moves minimist from 1.2.6");
+    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { name: "lodash", version: "1.2.8" } }) }))).toContain("changes node_modules/minimist (1.2.6 -> 1.2.8)");
     // An alias in the base named for the fix's package: its move is still another package's (review 6516135819, N7).
     const aliased = files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, "node_modules/m-alias": { name: "lodash", version: "1.0.0" } }) });
-    expect(contentProblem("npm", fix, aliased, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/m-alias": { name: "lodash", version: "2.0.0" } }) }))).toContain("moves m-alias from 1.0.0, which this fix does not plan");
-    // The lock is tied to the receipt's change, by install path (review 6516135819, N2): the base has the package at
-    // `from`, and the fix has it at `to` and nowhere at `from`; an entry's own name does not count.
-    // A transitive fix (package.json does not change), as the review forged it: minimist 1.2.5 -> 1.2.6.
+    expect(contentProblem("npm", fix, aliased, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/m-alias": { name: "lodash", version: "2.0.0" } }) }))).toContain("changes node_modules/m-alias (1.0.0 -> 2.0.0), which this fix does not plan");
+    // The lock is tied to the receipt's change, by install path (reviews 6516135819, N2, and 6518582507, N-a): the base
+    // has the package at `from` at a path, the fix has it at `to` at that path and nowhere at `from`; an entry's own name
+    // does not count. A transitive fix (package.json does not change), as the reviews forged it: minimist 1.2.5 -> 1.2.6.
     const transitive = fixOf("minimist", "1.2.5", "1.2.6", ["package.json", "package-lock.json"]);
-    const lockOf = (packages: Record<string, unknown>) => files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, ...packages }) });
+    const lockOf = (packages: Record<string, unknown>, root?: Record<string, unknown>) => files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, ...packages }, root) });
     const vulnerable = lockOf({ "node_modules/minimist": { version: "1.2.5" } });
-    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/new-dep": { version: "1.0.0" } }))).toBeNull();
+    // The fixed version's new dependencies, hoisted or nested, and theirs: each is what a moved or added path requires.
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "new-dep": "^1.0.0", nested: "2" } }, "node_modules/new-dep": { version: "1.0.0", optionalDependencies: { deeper: "*" } }, "node_modules/deeper": { version: "3.0.0" }, "node_modules/minimist/node_modules/nested": { version: "2.0.0" } }))).toBeNull();
     expect(contentProblem("npm", transitive, npmBase, lockOf({ "node_modules/minimist": { version: "1.2.6" } }))).toContain("the base's package-lock.json does not have minimist at that version");
     expect(contentProblem("npm", transitive, lockOf({}), lockOf({ "node_modules/lodash/node_modules/evil-copy": { version: "9.9.9" } }))).toContain("the base's package-lock.json does not have minimist");
+    // An alias that calls itself minimist, moved: the path's name counts, not the entry's.
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.5" } }), lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.6" } }))).toContain("the base's package-lock.json does not have minimist at that version");
+    // The base has 1.2.5 only under another name (review 6518582507, N-b R5).
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/other": { version: "1.2.5" }, "node_modules/minimist": { version: "1.2.0" } }), lockOf({ "node_modules/other": { version: "1.2.6" }, "node_modules/minimist": { version: "1.2.0" } }))).toContain("the base's package-lock.json does not have minimist at that version");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.5" }, "node_modules/lodash/node_modules/evil-copy": { version: "9.9.9" } }))).toContain("does not have minimist at 1.2.6, the fix's version");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.5" }, "node_modules/x": { name: "minimist", version: "1.2.6" } }))).toContain("does not have minimist at 1.2.6");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/lodash/node_modules/minimist": { version: "1.2.5" } }))).toContain("still has minimist at 1.2.5, which the fix moves");
+    // The forged locks of review 6518582507: a key npm installs nothing at, filed as minimist (B1); a package nothing
+    // requires beside the real move (N-a a); the top-level copy removed and 1.2.6 only nested (N-a b); an alias of
+    // another package at the planned path (N-a c).
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "aaaaaaaaaaaaminimist": { version: "1.2.6" } }))).toContain("has aaaaaaaaaaaaminimist, which is not an install path");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/is-number": { version: "7.0.0" } }))).toContain("adds node_modules/is-number, which no package the fix moves or adds requires");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/lodash/node_modules/minimist": { version: "1.2.6" } }))).toContain("does not have minimist at 1.2.6, the fix's version, at node_modules/minimist");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { name: "evil", version: "1.2.6" } }))).toContain("does not have minimist at 1.2.6, the fix's version, at node_modules/minimist");
+    // A required name resolves to the nearest copy: a top-level copy that a nested one hides from the requirer is stray.
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { dep: "1" } }, "node_modules/minimist/node_modules/dep": { version: "1.0.0" }, "node_modules/dep": { version: "1.0.0" } }))).toContain("adds node_modules/dep, which no package");
+    // Removing or adding anything else, a link, a project folder (even unchanged), and the root's other requirements.
+    expect(contentProblem("npm", transitive, vulnerable, files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/minimist": { version: "1.2.6" } }) }))).toContain("removes node_modules/lodash (4.17.20), which this fix does not plan");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { x: "*" } }, "node_modules/x": { resolved: "evil", link: true } }))).toContain("adds node_modules/x, which is not an installed package");
+    const folder = { "packages/a": { name: "a", version: "1.0.0" } };
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { version: "1.2.5" }, ...folder }), lockOf({ "node_modules/minimist": { version: "1.2.6" }, ...folder }))).toContain("has packages/a, which is not an install path");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" } }, { name: "app", dependencies: { lodash: "4.17.21", evil: "1" } }))).toContain("changes the project's own entry beyond the fix's requirement");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" } }, { name: "app", dependencies: { lodash: "4.17.21", minimist: "1.2.6" } }))).toContain("changes the project's own entry beyond the fix's requirement");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/../x": { version: "1.0.0" } }))).toContain("package-lock.json is not one Ludion reads (Unexpected package-lock path: node_modules/../x.)");
   });
   it("advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own)", () => {
     for (const id of ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337", "CVE-2024-1234567", "MAL-2024-12345", "PKSA-n8pg-4n3p-wcn3"]) expect(ADVISORY.test(id), id).toBe(true);
     for (const id of ["GH-1", "GHSA-35jh-r3h4-6jh1", "GHSA-35jh-r3h4", "CVE-21-1", "MAL-x", "PYSEC-2021-1", "OSV-2020-1", "PKSA-", "PKSA-a-", "ghsa-35jh-r3h4-6jhm", "GHSA-35jh-r3h4-6jhm\n"]) expect(ADVISORY.test(id), id).toBe(false);
+    // What packagist.ts reads as a PKSA ID is exactly what ADVISORY lets through (review 6518582507, N-d).
+    for (const id of ["PKSA-n8pg-4n3p-wcn3", "PKSA-a", "PKSA-ab", "PKSA-", "PKSA-a-", "PKSA--a", "PKSA-A", `PKSA-${"a".repeat(60)}`, `PKSA-${"a".repeat(61)}`]) expect(PKSA_ID.test(id), id).toBe(ADVISORY.test(id));
   });
   it("a changed file's size limit: twice the base's file and 1 MiB, at most 50 MiB", () => {
     expect(fileLimit(0)).toBe(1024 * 1024);

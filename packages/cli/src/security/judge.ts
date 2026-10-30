@@ -126,6 +126,22 @@ export const requireName = (path: string) => path.slice(path.lastIndexOf("node_m
 const extraneousFolder = (path: string, item: any) => path.includes("node_modules/") && !LOCK_PATH.test(path) && item?.extraneous === true
   && item.resolved === undefined && item.integrity === undefined && item.link === undefined && !path.split("/").some(segment => segment === "." || segment === "..");
 
+/**
+ * What a package-lock `packages` key is: the project's root (""), an install path (LOCK_PATH), a folder of the project
+ * (no node_modules segment: a workspace, or a local package), or an installed package's extraneous folder, which is
+ * skipped (extraneousFolder). Any other key throws: a key in no known form is refused, never skipped. The judge
+ * (lockEntries) and the PR job (deliver.ts) read keys through this one function (review 6518582507, B1).
+ */
+export function lockKey(path: string, item: unknown): "root" | "install" | "folder" | "extraneous" {
+  if (path === "") return "root";
+  if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
+  if (!path.includes("node_modules/")) return "folder";
+  if (extraneousFolder(path, item)) return "extraneous";
+  // A key that is not a plain install path (.., backslashes, empty segments) could make two keys mean one place.
+  if (!LOCK_PATH.test(path) || path.split("/").some(segment => segment === "." || segment === "..")) throw new Error(`Unexpected package-lock path: ${path}.`);
+  return "install";
+}
+
 /** The skipped extraneous folders (see extraneousFolder), each with its entry, so a change to them can be stopped. */
 export function lockExtraneous(lockText: string): string[] {
   return Object.entries(readLock(lockText)).filter(([path, item]) => !path.includes("\\") && extraneousFolder(path, item)).map(([path, item]) => `${path} ${JSON.stringify(item)}`).sort();
@@ -139,11 +155,7 @@ export function lockEntries(lockText: string): LockEntry[] {
     // On Windows and macOS, node_modules/Lodash and node_modules/lodash are one folder.
     if (folded.has(path.toLowerCase())) throw new Error(`Two package-lock paths differ only in case: ${path}.`);
     folded.add(path.toLowerCase());
-    if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
-    if (!path.includes("node_modules/") || extraneousFolder(path, item)) continue;
-    // A key that is not a plain install path (.., backslashes, empty segments) could make two keys mean one place.
-    if (!LOCK_PATH.test(path) || path.split("/").some(segment => segment === "." || segment === "..")) throw new Error(`Unexpected package-lock path: ${path}.`);
-    if (item?.link) continue;
+    if (lockKey(path, item) !== "install" || item?.link) continue;
     // An alias (node_modules/my-name with "name": "real") installs the real package.
     const name = typeof item.name === "string" ? item.name : requireName(path);
     if (typeof item.version !== "string" || !semver.valid(item.version)) throw new Error(`Invalid locked version at ${path}.`);
@@ -225,7 +237,8 @@ export function declaredByProject(lockText: string): string[] {
 
 /** Something that requires packages: the project root, a workspace folder, or an installed package. */
 type Consumer = { path: string; name: string; dir: string; requires: string[] };
-const DECLARED = ["dependencies", "optionalDependencies", "peerDependencies"];
+/** The requirements an installed package's lock entry declares (devDependencies are not installed for it). */
+export const DECLARED = ["dependencies", "optionalDependencies", "peerDependencies"];
 
 function consumers(lockText: string): Consumer[] {
   const out: Consumer[] = [];

@@ -1,0 +1,18 @@
+# started 2026-10-30T04:24:23Z, node v24.22.1, git version 2.39.5
+npm ci exit 0
+stand-in repository: 902 files
+== npm run typecheck
+typecheck exit 0
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+== npm run build
+build exit 0
+04:24:36 [build] ✓ Completed in 376ms.
+04:24:36 [build] 3 page(s) built in 525ms
+04:24:36 [build] Complete!
+== npm test
+npm test exit 0
+ Test Files  31 passed (31)
+      Tests  1053 passed | 19 skipped (1072)
+# finished 2026-10-30T04:24:44Z

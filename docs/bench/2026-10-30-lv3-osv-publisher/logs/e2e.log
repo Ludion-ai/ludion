@@ -1,0 +1,120 @@
+# started 2026-10-30T04:25:07Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+npm ci exit 0
+build exit 0
+committed 28feebeed1ce6d3b3aa2e7e1e4f971aec9be948f
+Result: applied
+  lodash 4.17.20 → 4.18.1: applied (branch ludion/npm/lodash-4.18.1)
+    The smallest fixed version lodash@4.18.0 cannot be used (deprecated: Bad release. Please use lodash@4.17.21 instead.). 4.18.1 is the next smallest 4.x version the registry lists that is not deprecated and that no OSV record names, so it is taken instead. The same publisher account: 4.18.0 has no provenance and was published by the npm account jdalton; 4.18.1 has no provenance and was published by the npm account jdalton.
+Receipt: /e/npm/.ludion/security/bed797fa-2a0d-4cae-be46-817a58572201.json
+Source update only, on branches; the working tree was not changed. Production deployment was not changed.
+patch exit 0
+-- branches:
+ludion/npm/lodash-4.18.1 42e2d0e0c25c2a89702dfafd4ed5c26cfc2a3dae parent=28feebeed1ce6d3b3aa2e7e1e4f971aec9be948f
+-- ludion/npm/lodash-4.18.1 changes:
+ package-lock.json | 9 +++++----
+ package.json      | 8 ++++++--
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+diff --git a/package.json b/package.json
+index f1eb4d3..397c488 100755
+--- a/package.json
++++ b/package.json
+@@ -2,6 +2,10 @@
+   "name": "ludion-npm-security-example",
+   "version": "1.0.0",
+   "private": true,
+-  "scripts": { "test": "node --test tests/smoke.test.cjs" },
+-  "dependencies": { "lodash": "4.17.20" }
++  "scripts": {
++    "test": "node --test tests/smoke.test.cjs"
++  },
++  "dependencies": {
++    "lodash": "4.18.1"
++  }
+ }
+Ludion <ludion@ludion.invalid>
+ludion: lodash 4.17.20 -> 4.18.1 (npm)
+
+Fixes GHSA-29mw-wpgm-hmr9, GHSA-35jh-r3h4-6jhm, GHSA-f23m-r3pf-42rh, GHSA-r5fr-rjxr-66jc, GHSA-xxjr-mmjv-4gpg.
+
+Ludion receipt bed797fa-2a0d-4cae-be46-817a58572201: the project's test passed on 28feebeed1ce and on this change alone, offline in Docker.
+Source dependency files only; production was not changed.
+
+-- working tree status (empty means unchanged):
+-- receipt bed797fa-2a0d-4cae-be46-817a58572201.json:
+{
+  "outcome": "applied",
+  "base_commit": "28feebeed1ce6d3b3aa2e7e1e4f971aec9be948f",
+  "baseline_passed": true,
+  "tool_image": "node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c",
+  "fixes": [
+    {
+      "package": "lodash",
+      "changes": [
+        "4.17.20 -> 4.18.1"
+      ],
+      "outcome": "applied",
+      "branch": "ludion/npm/lodash-4.18.1",
+      "commit": "42e2d0e0c25c2a89702dfafd4ed5c26cfc2a3dae",
+      "fix_published_at": "2026-04-01T21:01:20.458Z",
+      "fix_published_note": "registry.npmjs.org's publish time of the fixed version. The smallest fixed version was passed over (version_choice); this is the publish time of the version taken.",
+      "found_at": "2026-10-30T04:25:19.337Z",
+      "applied_at": "2026-10-30T04:25:33.949Z",
+      "candidate_passed": true,
+      "version_choice": [
+        {
+          "package": "lodash",
+          "smallest": "4.18.0",
+          "chosen": "4.18.1",
+          "skipped": [
+            {
+              "version": "4.18.0",
+              "reason": "deprecated: Bad release. Please use lodash@4.17.21 instead."
+            }
+          ],
+          "publisher_check": {
+            "version": "4.18.1",
+            "smallest": {
+              "publisher": "jdalton",
+              "provenance": null
+            },
+            "candidate": {
+              "publisher": "jdalton",
+              "provenance": null
+            },
+            "result": "publisher",
+            "detail": "The same publisher account: 4.18.0 has no provenance and was published by the npm account jdalton; 4.18.1 has no provenance and was published by the npm account jdalton."
+          },
+          "note": "The smallest fixed version lodash@4.18.0 cannot be used (deprecated: Bad release. Please use lodash@4.17.21 instead.). 4.18.1 is the next smallest 4.x version the registry lists that is not deprecated and that no OSV record names, so it is taken instead. The same publisher account: 4.18.0 has no provenance and was published by the npm account jdalton; 4.18.1 has no provenance and was published by the npm account jdalton."
+        }
+      ],
+      "judgement": {
+        "verdict": "ready_except_build",
+        "urgency": "high",
+        "wait_hours": 72,
+        "wait_until": "2026-04-04T21:01:20.458Z",
+        "changes": [
+          "lodash 4.17.20 -> 4.18.1"
+        ],
+        "fixes": [
+          "GHSA-29mw-wpgm-hmr9",
+          "GHSA-35jh-r3h4-6jhm",
+          "GHSA-f23m-r3pf-42rh",
+          "GHSA-r5fr-rjxr-66jc",
+          "GHSA-xxjr-mmjv-4gpg"
+        ],
+        "exposure": {
+          "fix_published_at": "2026-04-01T21:01:20.458Z",
+          "detected_at": "2026-10-30T04:25:27.985Z"
+        }
+      }
+    }
+  ]
+}
+-- second run (the branch exists):
+Result: skipped — Every fix already has its branch; nothing was validated again.
+  lodash 4.17.20 → 4.18.1: skipped (branch ludion/npm/lodash-4.18.1) — The branch ludion/npm/lodash-4.18.1 already exists; this fix was not validated again and the branch was not changed.
+    The smallest fixed version lodash@4.18.0 cannot be used (deprecated: Bad release. Please use lodash@4.17.21 instead.). 4.18.1 is the next smallest 4.x version the registry lists that is not deprecated and that no OSV record names, so it is taken instead. The same publisher account: 4.18.0 has no provenance and was published by the npm account jdalton; 4.18.1 has no provenance and was published by the npm account jdalton.
+Receipt: /e/npm/.ludion/security/40525cb2-49b2-4217-9f22-5b138a95e90e.json
+Source update only, on branches; the working tree was not changed. Production deployment was not changed.
+patch exit 0
+# finished 2026-10-30T04:25:36Z

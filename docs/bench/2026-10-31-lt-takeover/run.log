@@ -1,0 +1,16 @@
+lt refs commit 9d8d42b0df00982ae6bdb71f46ab6fc4a1ee9d0c selftest 2026-10-30T16:25:40Z
+selftest passed
+lt refs start 2026-10-30T16:25:40Z
+lt refs end 2026-10-30T16:28:14Z exit 0
+lt archive commit 9d8d42b0df00982ae6bdb71f46ab6fc4a1ee9d0c selftest 2026-10-30T16:38:13Z
+selftest passed
+lt archive start 2026-10-30T16:38:13Z
+lt source commit 9d8d42b0df00982ae6bdb71f46ab6fc4a1ee9d0c selftest 2026-10-30T16:39:52Z
+selftest passed
+lt source start 2026-10-30T16:39:52Z
+lt source end 2026-10-30T16:41:23Z exit 0
+lt archive end 2026-10-30T17:07:15Z exit 0
+lt summary commit 9d8d42b0df00982ae6bdb71f46ab6fc4a1ee9d0c selftest 2026-10-30T17:07:37Z
+selftest passed
+lt summary start 2026-10-30T17:07:37Z
+lt summary end 2026-10-30T17:07:37Z exit 0

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Both jobs of the scheduled workflow on copies of examples/*-security, in Docker (image ludion-la-runner: node 24,
 # git, the Docker CLI on the host's socket). GitHub's Git is a local bare repository and its API a stand-in
-# (github.mjs). Each case runs the workflow twice: validation job (a fresh clone, patch --apply, deliver pack), then
+# (github.mjs). Clones are depth 1 with HEAD detached, as actions/checkout makes them. Each case runs the workflow twice: validation job (a fresh clone, patch --apply, deliver pack), then
 # PR job (another fresh clone, deliver open). The second run must open no PR.
 # Usage: e2e.sh <case>...  Cases: npm, npm-two, php, composer, maven.
 set -u
@@ -33,14 +33,14 @@ for case in "$@"; do
   sleep 1
   for run in 1 2; do
     echo "-- run $run, validation job (contents: read): fresh clone, patch --apply, deliver pack"
-    v=$d/v$run; G clone -q "$d/origin.git" "$v"
+    v=$d/v$run; G clone -q --depth 1 "file://$d/origin.git" "$v" && git -C "$v" checkout -q --detach
     node "$CLI" patch --dir "$v" --apply --json > "$d/result$run.json"; echo "patch exit $?"
     node /scripts/summary.mjs "$d/result$run.json"
     node "$CLI" deliver pack --dir "$v" --result "$d/result$run.json" --out "$d/artifact$run"; echo "pack exit $?"
     ls -l "$d/artifact$run" | sed 1d | awk '{print "  " $5 " bytes " $9}'
     [ -f "$d/artifact$run/fixes.bundle" ] && git -C "$v" bundle list-heads "$d/artifact$run/fixes.bundle" | sed 's/^/  head /'
     echo "-- run $run, PR job (contents and pull-requests: write): fresh clone, deliver open"
-    p=$d/p$run; G clone -q "$d/origin.git" "$p"
+    p=$d/p$run; G clone -q --depth 1 "file://$d/origin.git" "$p" && git -C "$p" checkout -q --detach
     GH_TOKEN=e2e-token node "$CLI" deliver open --dir "$p" --artifact "$d/artifact$run" --base "$base" --repo o/r --ref refs/heads/main --api "http://127.0.0.1:$port" --remote "$d/origin.git"; echo "open exit $?"
     echo "-- origin's branches:"; git --git-dir "$d/origin.git" for-each-ref --format='  %(refname:short) %(objectname)' refs/heads
     for b in $(git --git-dir "$d/origin.git" for-each-ref --format='%(refname:short)' 'refs/heads/ludion/*'); do

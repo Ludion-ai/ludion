@@ -29,7 +29,7 @@ describe("the template users copy", () => {
   it("runs on a schedule or by hand only, with no permission at the top", () => {
     expect(section(TEMPLATE, /^on:$/)).toEqual(["schedule:", '- cron: "23 */6 * * *"', "workflow_dispatch:"]);
     expect(TEMPLATE).toMatch(/^permissions: \{\}$/m);
-    expect(section(TEMPLATE, /^concurrency:$/)).toEqual(["group: ludion-patch", "cancel-in-progress: false"]);
+    expect(section(TEMPLATE, /^concurrency:$/)).toEqual(["group: ludion-${{ github.workflow }}", "cancel-in-progress: false"]);
   });
   it("gives the validation job contents: read only and the PR job contents and pull-requests: write only", () => {
     expect(section(TEMPLATE.slice(TEMPLATE.indexOf("\n  patch:")), /^    permissions:$/)).toEqual(["contents: read"]);

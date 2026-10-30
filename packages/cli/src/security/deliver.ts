@@ -3,9 +3,13 @@ import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
-import { parseArgs } from "node:util";
+import { isDeepStrictEqual, parseArgs } from "node:util";
+import { publicArchiveUrl } from "./acquisition.ts";
 import { branchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
-import { MANIFESTS } from "./inventory.ts";
+import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
+import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
+import type { Judgement } from "./judge.ts";
+import { compare, phpImage } from "./php.ts";
 import { CONFIG, rootPath } from "./project.ts";
 
 /**
@@ -41,8 +45,9 @@ const VERDICTS = ["stop", "wait", "ready_except_build", "undecidable"] as const;
 type Ecosystem = "npm" | "composer" | "maven" | "php";
 /** One applied fix, as the PR job takes it from the receipt after checking every field it uses. */
 export type CheckedFix = {
-  package: string; changes: { from: string; to: string; advisories: string[] }[];
-  branch: string; commit: string; subject: string; files: { path: string; after_hash: string }[];
+  package: string; changes: Change[];
+  /** The commit message `patch --apply` writes for this fix, rebuilt from checked fields; the commit must carry exactly it. */
+  branch: string; commit: string; subject: string; message: string; tree: string; files: { path: string; after_hash: string }[];
   fix_published_at: string | null; found_at: string; applied_at: string; verdict: (typeof VERDICTS)[number] | null;
 };
 export type CheckedArtifact = { id: string | null; ecosystem: Ecosystem | null; base: string; fixes: CheckedFix[]; notApplied: Record<string, number> };
@@ -135,10 +140,13 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
     if (text(r.base_commit, SHA, "base_commit") !== base) refuse("the receipt's base_commit is not the commit this run checked out.");
     const scan = object(r.scan, "The receipt's scan"), current = object(scan.current, "scan.current"), candidate = object(scan.candidate, "scan.candidate");
     const from = text(current.version, VERSION, "The current PHP version"), to = text(candidate.version, VERSION, "The candidate PHP version");
+    const releases = list(scan.security_releases, 1, 100, "The PHP security releases").map(release => text(object(release, "A PHP release").version, VERSION, "A PHP release's version"));
+    const subject = `ludion: PHP ${from} -> ${to} in ${policy.dockerfile}`;
     const fix: CheckedFix = {
-      package: "php", changes: [{ from, to, advisories: [] }],
-      branch: text(r.branch, /^ludion\/[A-Za-z0-9._/-]+$/, "The branch"), commit: text(r.commit, SHA, "The commit"),
-      subject: `ludion: PHP ${from} -> ${to} in ${policy.dockerfile}`,
+      package: "php", changes: [{ name: "php", from, to, advisories: [] }],
+      branch: text(r.branch, /^ludion\/[A-Za-z0-9._/-]+$/, "The branch"), commit: text(r.commit, SHA, "The commit"), subject, tree: "",
+      // patch.ts's message.
+      message: `${subject}\n\nOfficial PHP security releases: ${releases.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
       files: [{ path: policy.allowed[0]!, after_hash: text(r.dockerfile_after, HEX64, "dockerfile_after") }],
       fix_published_at: timeOrNull(r.fix_published_at, "fix_published_at"), found_at: time(r.found_at, "found_at"), applied_at: time(r.applied_at, "applied_at"), verdict: null,
     };
@@ -156,7 +164,7 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
     const changes = list(f.changes, 1, 50, "A fix's changes").map(c => {
       const change = object(c, "A change");
       if (change.name !== pkg) refuse(`a change of ${pkg} names another package.`);
-      return { from: text(change.from, VERSION, "A change's from"), to: text(change.to, VERSION, "A change's to"), advisories: list(change.advisories, 0, 100, "A change's advisories").map(a => text(a, ADVISORY, "An advisory")) };
+      return { name: pkg, from: text(change.from, VERSION, "A change's from"), to: text(change.to, VERSION, "A change's to"), advisories: list(change.advisories, 0, 100, "A change's advisories").map(a => text(a, ADVISORY, "An advisory")) };
     });
     const files = list(f.files, 1, MANIFESTS[policy.ecosystem as "npm" | "composer" | "maven"].length, "A fix's files").map(entry => {
       const file = object(entry, "A file");
@@ -168,10 +176,12 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
     const judgement = f.judgement === undefined ? null : object(f.judgement, "A fix's judgement");
     const verdict = judgement === null ? null : VERDICTS.find(v => v === judgement.verdict) ?? refuse("a fix's judgement has no known verdict.");
     if (policy.ecosystem === "npm" && verdict !== "ready_except_build") refuse(`the npm fix of ${pkg} is applied without the judge's ready_except_build.`);
+    const subject = `ludion: ${pkg} ${changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${policy.ecosystem})`;
     const fix: CheckedFix = {
-      package: pkg, changes, files, verdict,
+      package: pkg, changes, files, verdict, subject, tree: "",
       branch: text(f.branch, /^ludion\/[A-Za-z0-9._/-]+$/, "A fix's branch"), commit: text(f.commit, SHA, "A fix's commit"),
-      subject: `ludion: ${pkg} ${changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${policy.ecosystem})`,
+      // dependency-patch.ts's message.
+      message: `${subject}\n\nFixes ${[...new Set(changes.flatMap(c => c.advisories))].join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`,
       fix_published_at: timeOrNull(f.fix_published_at, "fix_published_at"), found_at: time(f.found_at, "found_at"), applied_at: time(f.applied_at, "applied_at"),
     };
     if (fix.branch !== fixBranchName(prefix, policy.ecosystem, pkg, changes.map(c => c.to))) refuse(`the branch ${fix.branch} is not the one Ludion names for ${pkg}.`);
@@ -190,6 +200,85 @@ function commitOf(top: string, commit: string): { tree: string; parents: string[
     tree: value("tree")[0] ?? "", parents: value("parent"), author: value("author").join("\n"), committer: value("committer").join("\n"),
     message: split < 0 ? "" : body.slice(split + 2), other: headers.filter(h => !/^(tree|parent|author|committer) /.test(h)),
   };
+}
+
+const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
+/** composer.lock keys that describe a package without changing what is installed. */
+const COMPOSER_METADATA = new Set(["time", "published-time", "support", "funding", "description", "homepage", "keywords", "authors", "notification-url", "license"]);
+const withoutMetadata = (entry: Record<string, unknown>) => Object.fromEntries(Object.entries(entry).filter(([key]) => !COMPOSER_METADATA.has(key)));
+
+/** composer.lock: why it says more than the fix, or null. See contentProblem. */
+function composerLockProblem(old: string | null, now: string | null, fix: CheckedFix): string | null {
+  if (old === null || now === null) return "composer.lock is missing.";
+  let a: unknown, b: unknown;
+  try { a = JSON.parse(old); b = JSON.parse(now); } catch { return "composer.lock is not JSON."; }
+  if (!isObject(a) || !isObject(b)) return "composer.lock is not an object.";
+  for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    // plugin-api-version names the Composer that wrote the file (the tool image's), not what is installed.
+    if (!["content-hash", "packages", "packages-dev", "plugin-api-version"].includes(key) && !isDeepStrictEqual(a[key], b[key])) return `composer.lock changes its ${plain(key).slice(0, 60)}.`;
+  }
+  const tos = new Set(fix.changes.map(c => c.to.replace(/^v/, "")));
+  for (const section of ["packages", "packages-dev"]) {
+    const was = a[section] ?? [], is = b[section] ?? [];
+    if (!Array.isArray(was) || !Array.isArray(is)) return `composer.lock's ${section} is not a list.`;
+    const prior = new Map(was.filter(isObject).map(entry => [entry.name, entry]));
+    const seen = new Set<unknown>();
+    for (const entry of is) {
+      if (!isObject(entry) || typeof entry.name !== "string") return `composer.lock has an entry without a name in ${section}.`;
+      seen.add(entry.name);
+      const earlier = prior.get(entry.name), name = plain(entry.name).slice(0, 200);
+      if (entry.name === fix.package) {
+        if (!tos.has(String(entry.version ?? "").replace(/^v/, ""))) return `composer.lock moves ${name} to ${plain(String(entry.version)).slice(0, 60)}, not to the fix's version.`;
+      } else if (earlier) {
+        if (!isDeepStrictEqual(withoutMetadata(earlier), withoutMetadata(entry))) return `composer.lock changes ${name}, which this fix does not plan.`;
+        continue;
+      }
+      // The planned package and each new one: from a pinned public archive, and neither a Composer plugin nor an installer.
+      try { publicArchiveUrl(String(isObject(entry.dist) ? entry.dist.url : "")); } catch { return `composer.lock takes ${name} from outside the pinned public archives.`; }
+      if (typeof entry.type === "string" && /^composer-(plugin|installer)$/.test(entry.type)) return `composer.lock brings ${name}, a ${entry.type}.`;
+    }
+    for (const name of prior.keys()) if (!seen.has(name) && name !== fix.package) return `composer.lock removes ${plain(String(name)).slice(0, 200)}.`;
+  }
+  return null;
+}
+
+/**
+ * Null when each file of the fix says only what `patch --apply` writes for the receipt's change, else why not. Both
+ * sides are read by Git from the base commit and the fix's commit; nothing is installed or run.
+ * - Dockerfile: only the FROM image changes, to the official PHP image of a newer release of the same branch and flavor,
+ *   pinned by digest.
+ * - package.json, composer.json, pom.xml: exactly what `changedManifest` (inventory.ts, as `patch` calls it) makes from
+ *   the base's files for the receipt's changes.
+ * - composer.lock: no other top-level key changes; the planned package is at the fix's version; every other package is as
+ *   at the base apart from descriptive metadata, or new; the planned and new ones come from a pinned public archive and
+ *   are no Composer plugin or installer.
+ * - package-lock.json: the judge, run again by the PR job (openFixes), since it needs the registry.
+ */
+export function contentProblem(ecosystem: Ecosystem, fix: CheckedFix, before: (path: string) => string | null, after: (path: string) => string | null): string | null {
+  if (ecosystem === "php") {
+    const path = fix.files[0]!.path, old = before(path), now = after(path), to = fix.changes[0]!.to;
+    if (old === null || now === null) return `${path} is missing.`;
+    let current: ReturnType<typeof phpImage>;
+    try { current = phpImage(old); } catch { return `the base's ${path} is not one Ludion updates.`; }
+    if (!/^\d+\.\d+\.\d+$/.test(to) || !to.startsWith(`${current.branch}.`) || compare(to, current.version) <= 0) return `PHP ${to} is not a newer release of PHP ${current.branch}.`;
+    const head = old.slice(0, current.start), tail = old.slice(current.end), image = now.slice(head.length, now.length - tail.length);
+    const escape = (part: string) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const official = new RegExp(`^(?:(?:docker\\.io/)?library/)?php:${escape(to)}${escape(current.flavor)}@sha256:[a-f0-9]{64}$`);
+    if (!now.startsWith(head) || !now.endsWith(tail) || now.length < head.length + tail.length || !official.test(image)) return `${path} changes more than its FROM image to the official php:${to}${current.flavor}, pinned by digest.`;
+    return null;
+  }
+  const manifest = MANIFESTS[ecosystem][0], dir = mkdtempSync(join(tmpdir(), "ludion-manifest-"));
+  try {
+    for (const name of MANIFESTS[ecosystem]) { const content = before(name); if (content !== null) writeFileSync(join(dir, name), content); }
+    let expected: string;
+    try { expected = changedManifest(dir, ecosystem, fix.changes); } catch (error) { return `${manifest} at the base cannot take this fix (${plain(error instanceof Error ? error.message : String(error)).slice(0, 200)}).`; }
+    const now = after(manifest) ?? "", lf = (s: string) => s.replace(/\r\n/g, "\n");
+    let same = false;
+    if (ecosystem === "maven") same = lf(now) === lf(expected);
+    else try { same = isDeepStrictEqual(JSON.parse(now), JSON.parse(expected)); } catch { same = false; }
+    if (!same) return `${manifest} is not what Ludion writes for ${fix.package} ${fix.changes.map(c => c.to).join(", ")}.`;
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  return ecosystem === "composer" ? composerLockProblem(before("composer.lock"), after("composer.lock"), fix) : null;
 }
 
 /**
@@ -235,7 +324,9 @@ export function checkArtifact(dir: string, artifact: string, base: string): Chec
     if (c.other.length) refuse(`${at} carries headers other than tree, parent, author and committer.`);
     if (!IDENTITY.test(c.author) || !IDENTITY.test(c.committer)) refuse(`${at} is not authored and committed by Ludion.`);
     if (c.message.split("\n")[0] !== fix.subject) refuse(`${at}'s subject is not the receipt's change.`);
-    if (!c.message.includes(`Ludion receipt ${checked.id}:`)) refuse(`${at}'s message does not name the receipt ${checked.id}.`);
+    // The whole message, so nothing (a "Closes #1", a trailer) rides along with the fix.
+    if (c.message !== fix.message) refuse(`${at}'s message is not the one Ludion writes for the receipt ${checked.id}.`);
+    fix.tree = c.tree;
     const changed = git(top, ["diff-tree", "-r", "-z", "--no-renames", base, fix.commit]).stdout.split("\0").filter(Boolean);
     const metas = changed.filter((_, i) => i % 2 === 0), paths = changed.filter((_, i) => i % 2 === 1);
     const wanted = fix.files.map(f => `${prefix}${f.path}`).sort();
@@ -248,6 +339,13 @@ export function checkArtifact(dir: string, artifact: string, base: string): Chec
     for (const file of fix.files) {
       if (sha256(git(top, ["cat-file", "blob", `${fix.commit}:${prefix}${file.path}`]).stdout) !== file.after_hash) refuse(`${at}'s ${file.path} is not the receipt's file (after_hash).`);
     }
+    // What the files say, not only which files change: the receipt's hashes come from the same untrusted artifact.
+    const blob = (rev: string, path: string) => {
+      const found = git(top, ["cat-file", "blob", `${rev}:${prefix}${path}`], { allowFail: true });
+      return found.status === 0 ? found.stdout : null;
+    };
+    const problem = contentProblem(policy.ecosystem, fix, path => blob(base, path), path => blob(fix.commit, path));
+    if (problem) refuse(`${at}: ${problem}`);
   }
   return { ...checked, base };
 }
@@ -282,9 +380,9 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit (checked again by the job that opened this PR).`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by digest" : ecosystem === "npm" ? "package.json is what Ludion writes for this change" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, and that composer.lock moves only this package and adds no plugin or installer" : "pom.xml is what Ludion writes for this change"}.`,
     ecosystem === "npm"
-      ? `- Ludion's judge on the lockfile change: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
+      ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
     "",
     "**Not checked**",
@@ -313,27 +411,52 @@ const segments = (branch: string) => branch.split("/").map(encodeURIComponent).j
  * `git push` of one commit to a new branch, never forced, to the repository's own URL. The token reaches Git through
  * its environment (GIT_CONFIG_*), not .git/config. Only that URL's protocol is allowed; hooks and helpers are off.
  */
-export function pushBranch(top: string, remote: string, commit: string, branch: string, token: string | null): void {
+export function pushInvocation(top: string, remote: string, commit: string, branch: string, token: string | null, hooks: string, environment: NodeJS.ProcessEnv = process.env): { args: string[]; env: NodeJS.ProcessEnv } {
   const https = /^https:\/\/[A-Za-z0-9.-]+(?::\d+)?\/[A-Za-z0-9._/-]+\.git$/.test(remote);
   if (!https && !(posix.isAbsolute(remote) || /^[A-Za-z]:[\\/]/.test(remote))) throw new Error("The remote must be an https URL or an absolute path.");
+  if (!SHA.test(commit) || !/^ludion\/[A-Za-z0-9._/-]+$/.test(branch)) throw new Error("Only a fix commit goes to a ludion/ branch.");
+  const env: NodeJS.ProcessEnv = {};
+  for (const [key, value] of Object.entries(environment)) if (!key.toUpperCase().startsWith("GIT_")) env[key] = value;
+  Object.assign(env, { GIT_TERMINAL_PROMPT: "0", GIT_NO_REPLACE_OBJECTS: "1", GIT_ALLOW_PROTOCOL: https ? "https" : "file" });
+  if (https && token) Object.assign(env, { GIT_CONFIG_COUNT: "1", GIT_CONFIG_KEY_0: `http.${remote}.extraheader`, GIT_CONFIG_VALUE_0: `AUTHORIZATION: basic ${Buffer.from(`x-access-token:${token}`).toString("base64")}` });
+  const config = [`core.hooksPath=${hooks}`, ...GIT_SETTINGS, `protocol.${https ? "https" : "file"}.allow=always`, "credential.helper=", "http.followRedirects=false", "push.recurseSubmodules=no"].flatMap(c => ["-c", c]);
+  // A plain refspec: no "+", and no --force of any kind, so Git refuses to move a branch that is not a fast-forward.
+  return { args: ["-C", top, "--no-pager", "--no-replace-objects", ...config, "push", "--no-verify", "--porcelain", remote, `${commit}:refs/heads/${branch}`], env };
+}
+
+export function pushBranch(top: string, remote: string, commit: string, branch: string, token: string | null): void {
   const program = gitProgram(top), hooks = mkdtempSync(join(tmpdir(), "ludion-no-hooks-"));
   try {
-    const env: NodeJS.ProcessEnv = {};
-    for (const [key, value] of Object.entries(process.env)) if (!key.toUpperCase().startsWith("GIT_")) env[key] = value;
-    Object.assign(env, { GIT_TERMINAL_PROMPT: "0", GIT_NO_REPLACE_OBJECTS: "1", GIT_ALLOW_PROTOCOL: https ? "https" : "file" });
-    if (https && token) Object.assign(env, { GIT_CONFIG_COUNT: "1", GIT_CONFIG_KEY_0: `http.${remote}.extraheader`, GIT_CONFIG_VALUE_0: `AUTHORIZATION: basic ${Buffer.from(`x-access-token:${token}`).toString("base64")}` });
-    const config = [`core.hooksPath=${hooks}`, ...GIT_SETTINGS, `protocol.${https ? "https" : "file"}.allow=always`, "credential.helper=", "http.followRedirects=false", "push.recurseSubmodules=no"].flatMap(c => ["-c", c]);
-    const result = spawnSync(program, ["-C", top, "--no-pager", "--no-replace-objects", ...config, "push", "--no-verify", "--porcelain", remote, `${commit}:refs/heads/${branch}`], { cwd: hooks, env, encoding: "utf8", timeout: 120_000, windowsHide: true });
+    const { args, env } = pushInvocation(top, remote, commit, branch, token, hooks);
+    const result = spawnSync(program, args, { cwd: hooks, env, encoding: "utf8", timeout: 120_000, windowsHide: true });
     if (result.error) throw new Error(`Git could not run: ${result.error.message}`);
     if (result.status !== 0) throw new Error(`git push failed: ${plain(`${result.stdout}\n${result.stderr}`).replaceAll(token ?? "\0", "***").trim().slice(-300)}`);
   } finally { rmSync(hooks, { recursive: true, force: true }); }
 }
 
 /**
+ * npm: the judge (candidate-judge.ts, as `patch` runs it) on package.json and package-lock.json at the base and at the
+ * fix's commit, read by Git into two private folders. Null when it says ready_except_build, else why not. It reads the
+ * registry, OSV, CISA's catalog and FIRST's EPSS list, as `patch` does; nothing is installed or run.
+ */
+async function judgeAgain(top: string, prefix: string, base: string, fix: CheckedFix, judge: (before: string, after: string) => Promise<Judgement>): Promise<string | null> {
+  const dirs = [mkdtempSync(join(tmpdir(), "ludion-judge-base-")), mkdtempSync(join(tmpdir(), "ludion-judge-fix-"))];
+  try {
+    for (const [i, rev] of [base, fix.commit].entries()) for (const name of MANIFESTS.npm) {
+      writeFileSync(join(dirs[i]!, name), git(top, ["cat-file", "blob", `${rev}:${prefix}${name}`]).stdout);
+    }
+    const refusal = candidateRefusal(await judge(dirs[0]!, dirs[1]!));
+    return refusal ? refusal.slice(0, 400) : null;
+  } catch (error) {
+    return `could not judge: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
+  } finally { for (const dir of dirs) rmSync(dir, { recursive: true, force: true }); }
+}
+
+/**
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -343,7 +466,7 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
   if (repository.status !== 200 || typeof defaultBranch !== "string") throw new Error(`GitHub did not give the repository's default branch (HTTP ${repository.status}).`);
   if (options.ref !== `refs/heads/${defaultBranch}`) throw new Error(`This run is on ${plain(options.ref)}, not on the default branch ${plain(defaultBranch)}; no PR is opened.`);
   const checked = checkArtifact(options.dir, options.artifact, options.base);
-  const { top } = workTree(rootPath(options.dir)), owner = options.repo.split("/")[0]!, push = options.push ?? pushBranch;
+  const { top, prefix } = workTree(rootPath(options.dir)), owner = options.repo.split("/")[0]!, push = options.push ?? pushBranch;
   const deliveries: Delivery[] = [];
   for (const fix of checked.fixes) {
     const done = (d: Omit<Delivery, "package" | "branch">) => deliveries.push({ package: fix.package, branch: fix.branch, ...d });
@@ -360,11 +483,28 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
       const remoteSha = ref.status === 200 ? (ref.json as { ref?: unknown; object?: { sha?: unknown } } | null) : null;
       if (ref.status === 200 && remoteSha?.ref !== `refs/heads/${fix.branch}`) throw new Error(`GitHub's answer for the branch ${fix.branch} is not that branch.`);
       if (ref.status !== 200 && ref.status !== 404) throw new Error(`GitHub did not say whether ${fix.branch} exists (HTTP ${ref.status}).`);
-      if (remoteSha && remoteSha.object?.sha !== fix.commit) { done({ outcome: "branch_differs", reason: `The branch exists on GitHub at another commit; it was not changed (Ludion never force-pushes).` }); continue; }
+      const remoteCommit = remoteSha?.object?.sha;
+      if (remoteSha && (typeof remoteCommit !== "string" || !SHA.test(remoteCommit))) throw new Error(`GitHub's answer for the branch ${fix.branch} names no commit.`);
+      if (remoteSha && remoteCommit !== fix.commit) {
+        // A branch an earlier run pushed before its PR could not be opened (for example, while the repository did not let
+        // Actions open PRs) holds this same fix when its commit has this commit's tree and the same only parent: the PR is
+        // opened from it. Any other commit is left alone, and the fix fails, saying what to do.
+        const earlier = await call(api, "GET", `/repos/${options.repo}/git/commits/${remoteCommit}`);
+        const e = earlier.json as { tree?: { sha?: unknown }; parents?: { sha?: unknown }[] } | null;
+        if (!(earlier.status === 200 && e?.tree?.sha === fix.tree && Array.isArray(e.parents) && e.parents.length === 1 && e.parents[0]?.sha === checked.base)) {
+          done({ outcome: "branch_differs", reason: "The branch exists on GitHub at another commit with another change or base, and no PR is from it. Ludion never moves a branch (no force push): delete it, and the next run pushes this fix and opens its PR." });
+          continue;
+        }
+      }
+      // The lockfile's content, which only the registry can confirm: the judge again, here, on the base and this commit.
+      if (checked.ecosystem === "npm") {
+        const refusal = await judgeAgain(top, prefix, checked.base, fix, options.judgeNpm ?? ((before, after) => judgeNpmCandidate(before, after)));
+        if (refusal) throw new Error(`Not pushed: the judge was run again on this commit's lockfile. ${refusal}`);
+      }
       if (!remoteSha) push(top, options.remote, fix.commit, fix.branch, options.token);
       const created = await call(api, "POST", `/repos/${options.repo}/pulls`, { title: fix.subject, head: fix.branch, base: defaultBranch, body: pullRequestBody(checked, fix), maintainer_can_modify: false });
       const pr = created.json as { number?: unknown; html_url?: unknown } | null;
-      if (created.status !== 201 || typeof pr?.number !== "number") throw new Error(`GitHub did not open the PR (HTTP ${created.status}${typeof (created.json as { message?: unknown } | null)?.message === "string" ? `: ${plain((created.json as { message: string }).message).slice(0, 200)}` : ""}).`);
+      if (created.status !== 201 || typeof pr?.number !== "number") throw new Error(`GitHub did not open the PR (HTTP ${created.status}${typeof (created.json as { message?: unknown } | null)?.message === "string" ? `: ${plain((created.json as { message: string }).message).slice(0, 200)}` : ""}). The branch ${fix.branch} is on GitHub; the next run opens the PR from it while the default branch has not moved.`);
       done({ outcome: "opened", pr: pr.number, url: typeof pr.html_url === "string" ? pr.html_url : undefined });
     } catch (error) {
       done({ outcome: "failed", reason: plain(error instanceof Error ? error.message : String(error)).slice(0, 500) });
@@ -392,6 +532,7 @@ export async function deliverCli(args: string[], env: NodeJS.ProcessEnv = proces
     console.log(`Receipt ${checked.id ?? "none"} on ${checked.base.slice(0, 12)}: ${checked.fixes.length} applied fix${checked.fixes.length === 1 ? "" : "es"}${Object.keys(checked.notApplied).length ? `; not applied: ${Object.entries(checked.notApplied).map(([k, n]) => `${n} ${k}`).join(", ")}` : ""}.`);
     for (const d of deliveries) console.log(`  ${d.package} (${d.branch}): ${d.outcome}${d.pr ? ` #${d.pr}` : ""}${d.reason ? ` — ${d.reason}` : ""}`);
   }
-  return deliveries.some(d => d.outcome === "failed") ? 2 : 0;
+  // A branch that holds another commit needs someone to act, so it fails the job as a failed fix does.
+  return deliveries.some(d => d.outcome === "failed" || d.outcome === "branch_differs") ? 2 : 0;
 }
 

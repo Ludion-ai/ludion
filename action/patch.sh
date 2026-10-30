@@ -14,6 +14,9 @@ if ! node "$CLI" deliver pack --dir "$PROJECT" --result "$result" --out "$OUT"; 
   echo "::error::ludion patch exited ${status} without a receipt to pack. Nothing is uploaded, and no PR is opened."
   exit 1
 fi
+# The receipt is uploaded on every run that wrote one, so the reasons of fixes that failed or wait stay with the run;
+# packed (at least one applied fix) is what starts the PR job.
+echo "receipt=true" >> "$GITHUB_OUTPUT"
 if [ -f "$OUT/fixes.bundle" ]; then echo "packed=true" >> "$GITHUB_OUTPUT"; else echo "packed=false" >> "$GITHUB_OUTPUT"; fi
 {
   echo "**プレビュー：マージは行わない。** Preview: Ludion opens PRs and merges nothing."

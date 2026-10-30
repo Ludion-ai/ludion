@@ -22,16 +22,22 @@ Added 2026-10-31 03:54 JST by the chat (ludion-ops#1 comment 6531046171, 2, answ
 
 Added 2026-10-31 06:00 JST by the chat (ludion-ops#1 comment 6533365853, 6), which took in findings N1 to N4 of the review of this PR (comment 6532712835 on PR #230) and the audit's own correction of the "median > t" condition, as corrections to the definition before measuring:
 
-9. **The window** is fixed before counting. A pair already open when the window starts is either entered into Kaplan–Meier with delayed entry (left truncation) or always shown as a separate row of the same table; which of the two is fixed with the window. Choosing the window's start later cannot then drop the longest exposures. With delayed entry, those pairs are in the Kaplan–Meier denominator too, so it is wider than item 6's; with the separate row, item 6's denominator stays as it is and the row is shown beside it.
+9. **The window** is fixed before counting. A pair already open when the window starts is either entered into Kaplan–Meier with delayed entry (left truncation) or always shown as a separate row of the same table; which of the two is fixed with the window. Choosing the window's start later cannot then drop the longest exposures.
 10. **Censoring time:** an open pair is censored at the last detection, within the window, that still found the advisory in the project's configuration.
-11. **When a version is judged usable** (items 2 and 8): as of the pair's end, or its censoring time while it is open. A version deprecated, withdrawn or given a MAL- record after that does not move the start of a pair that has ended, so a later deprecation does not shorten an ended pair's exposure. While a pair is open its censoring time moves on, so its start can still move later. The npm registry keeps no time for a deprecation (`deprecated` is only a string), so the state "as of" a time cannot be decided afterwards unless it was read and recorded then; OSV's MAL- and withdrawn records have times. One of the following is fixed before counting:
-    - usability is read and recorded at the detection that sets the pair's end or censoring time, and a version with no such record is shown separately as 不明; or
-    - usability changes with time: from any time t at which a usable fixed version exists, the pair is exposed. A MAL- version is unusable from the start; a deprecated or withdrawn version is unusable from that time.
-12. **Which pairs exist** is decided by matching the advisory's affected range against the versions in the lockfile or the image (OSV), not by Ludion's own judgement. Pairs that Ludion's gate 1 finds not to apply are counted separately, and stay in the denominator. A pair is decided by OSV's answer at the first detection that found it; a later change in OSV does not remove it, and pairs that OSV later changed are shown separately.
+11. **When a version is judged usable** (items 2 and 8): as of the pair's end, or its censoring time while it is open.
+12. **Which pairs exist** is decided by matching the advisory's affected range against the versions in the lockfile or the image (OSV), not by Ludion's own judgement. Pairs that Ludion's gate 1 finds not to apply are counted separately, and stay in the denominator.
 
 Added 2026-10-31 06:59 JST by the chat (ludion-ops#1 comment 6534448385, 2, after the audit in comment 6533867423, 1):
 
 13. **The scheduled slots that did not fire are part of the result:** with exposure time, each repository's q (the share of slots that fired) for the window is reported.
+
+Added 2026-10-31 08:19 JST by the chat (ludion-ops#1 comment 6535572537), which took in findings N1 to N4 of review 6534361203 (R230c) on PR #230: the wording of item 7 ("does not reach 0.5", which stays in item 7), the last sentence of item 9, the second half of item 11 and the last sentence of item 12. The last three are here:
+
+- **Item 9, last sentence.** With delayed entry, those pairs are in the Kaplan–Meier denominator too, so it is wider than item 6's; with the separate row, item 6's denominator stays as it is and the row is shown beside it.
+- **Item 11, second half.** A version deprecated, withdrawn or given a MAL- record after that does not move the start of a pair that has ended, so a later deprecation does not shorten an ended pair's exposure. While a pair is open its censoring time moves on, so its start can still move later. The npm registry keeps no time for a deprecation (`deprecated` is only a string), so the state "as of" a time cannot be decided afterwards unless it was read and recorded then; OSV's MAL- and withdrawn records have times. One of the following is fixed before counting:
+    - usability is read and recorded at the detection that sets the pair's end or censoring time, and a version with no such record is shown separately as 不明; or
+    - usability changes with time: from any time t at which a usable fixed version exists, the pair is exposed. A MAL- version is unusable from the start; a deprecated or withdrawn version is unusable from that time.
+- **Item 12, last sentence.** A pair is decided by OSV's answer at the first detection that found it; a later change in OSV does not remove it, and pairs that OSV later changed are shown separately.
 
 ## When it takes effect
 

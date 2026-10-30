@@ -480,9 +480,9 @@ describe.skipIf(!(hasJq && has("bash") && has("unzip", "-v")) && !process.env.CI
   });
 });
 
-// protected-paths.yml's script against a stand-in for gh: every review has a reviewed-sha line, not always as its last
-// (docs/decisions/2026-10-30-reviewed-sha-has-the-line.md), so the check passes only when the latest review of the
-// head approves (#166's review, B1).
+// protected-paths.yml's script against a stand-in for gh: every review has exactly one reviewed-sha line, not always as
+// its last (docs/decisions/2026-10-30-reviewed-sha-has-the-line.md), so the check passes only when the latest review of
+// the head approves (#166's review, B1).
 describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml's script, against a stand-in for gh", () => {
   const CHECK = read(".github/workflows/protected-paths.yml"), HEAD = "a".repeat(40), OLD = "b".repeat(40);
   const GH = [
@@ -555,12 +555,25 @@ describe.skipIf(!(hasJq && has("bash")) && !process.env.CI)("protected-paths.yml
     const request = check([review("Review of #7: APPROVE", HEAD), review("Review of #7: REQUEST CHANGES", HEAD) + footer]);
     expect(request.status, request.out).toBe(1);
   });
-  it("does not count a reviewed-sha line in inline backticks, a list item, a quote or uppercase, and counts one in a code block", () => {
-    for (const line of [`\`reviewed-sha: ${HEAD}\``, `- reviewed-sha: ${HEAD}`, `> reviewed-sha: ${HEAD}`, `reviewed-sha: ${HEAD.toUpperCase()}`]) {
+  it("counts only a line that is, in full, reviewed-sha:, one space and the 40-character SHA in lowercase", () => {
+    expect(check(["Review of #7: APPROVE\n\nFindings."]).status).toBe(1);
+    const lines = [`\`reviewed-sha: ${HEAD}\``, `- reviewed-sha: ${HEAD}`, `> reviewed-sha: ${HEAD}`, `    reviewed-sha: ${HEAD}`, ` reviewed-sha: ${HEAD}`,
+      `reviewed-sha: ${HEAD} `, `reviewed-sha: ${HEAD}a`, `reviewed-sha: ${HEAD.slice(1)}`, `reviewed-sha:${HEAD}`, `reviewed-sha:  ${HEAD}`,
+      `reviewed-sha:\t${HEAD}`, `reviewed-sha: ${HEAD.toUpperCase()}`, `Reviewed-sha: ${HEAD}`];
+    for (const line of lines) {
       const r = check([review("Review of #7: APPROVE", HEAD).replace(`reviewed-sha: ${HEAD}`, line)]);
       expect([line, r.status]).toEqual([line, 1]);
     }
-    const fenced = check([review("Review of #7: APPROVE", HEAD).replace(`reviewed-sha: ${HEAD}`, `\`\`\`\nreviewed-sha: ${HEAD}\n\`\`\``)]);
-    expect(fenced.status, fenced.out).toBe(0);
+  });
+  it("does not count a comment with two reviewed-sha lines as a review: it approves nothing and undoes an earlier approval", () => {
+    const approve = review("Review of #7: APPROVE", HEAD), quoted = `\n\nThe earlier review said:\n\n\`\`\`\nreviewed-sha: ${OLD}\n\`\`\``;
+    for (const body of [`${approve}\nreviewed-sha: ${HEAD}`, approve + quoted, approve.replace("Findings.", `\`\`\`\nreviewed-sha: ${HEAD}\n\`\`\``)]) {
+      const r = check([body]);
+      expect([body, r.status]).toEqual([body, 1]);
+    }
+    const undone = check([approve, review("Review of #7: REQUEST CHANGES", HEAD) + quoted]);
+    expect(undone.status, undone.out).toBe(1);
+    const again = check([approve, review("Review of #7: REQUEST CHANGES", HEAD) + quoted, approve]);
+    expect(again.status, again.out).toBe(0);
   });
 });

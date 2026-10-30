@@ -1,9 +1,9 @@
 # Required check "protected-paths".
 # Fails a PR that touches a protected path until an independent review has approved the PR's CURRENT head:
 # the PR must carry the "review-approved" label AND the latest comment with a line "reviewed-sha: <head sha>" must
-# approve. Every review has that line, whatever its verdict, but not always as its last line (a footer may follow it),
-# so every line of a comment is read. The comment's first line, the verdict, decides (REVIEWS below), and a later
-# review of the same head that does not approve undoes an earlier approval.
+# approve. Every review has exactly one such line, whatever its verdict, but not always as its last line (a footer may
+# follow it), so every line of a comment is read. The comment's first line, the verdict, decides (REVIEWS below), and
+# a later review of the same head that does not approve undoes an earlier approval.
 # A push changes the head SHA, so any earlier approval stops counting by itself; nothing has to be removed.
 #
 # Runs on pull_request_target so the workflow definition always comes from the base branch; a PR cannot
@@ -40,13 +40,16 @@ jobs:
           # A file deleted here, or renamed to a path outside all of these places, makes the PR protected: removing what
           # Ludion does is a scope change, and decision and mistake records are never deleted (CLAUDE.md, How we work).
           REMOVED: '^packages/[^/]+/src/|^apps/site/src/pages/|^action/|^action\.yml$|^docs/decisions/|^docs/mistakes/'
-          # Applied to each page of the PR's comments, oldest first: "<approve|other> <sha>" for every reviewed-sha
-          # line. A review's first line states its verdict; it approves when that line has the word APPROVE and not
-          # REQUEST (docs/protected-paths.md).
+          # Applied to each page of the PR's comments, oldest first: "<approve|other> <sha>" for every line that is, in
+          # full, "reviewed-sha: <40 lowercase hex>". A review's first line states its verdict; it approves when that
+          # line has the word APPROVE and not REQUEST, and the comment has exactly one such line. A comment with two or
+          # more (one quoting another review, say) approves nothing and undoes an earlier approval of each head it
+          # names (docs/protected-paths.md).
           REVIEWS: |
             .[] | (.body | split("\n")) as $lines
-            | (if $lines[0] | test("\\bAPPROVE\\b") and (test("REQUEST") | not) then "approve" else "other" end) as $verdict
-            | $lines[] | select(test("^reviewed-sha: *[0-9a-f]{40}")) | "\($verdict) \(sub("^reviewed-sha: *"; "") | .[0:40])"
+            | [$lines[] | capture("^reviewed-sha: (?<sha>[0-9a-f]{40})$").sha] as $shas
+            | (if ($shas | length) == 1 and ($lines[0] | test("\\bAPPROVE\\b") and (test("REQUEST") | not)) then "approve" else "other" end) as $verdict
+            | $shas[] | "\($verdict) \(.)"
         run: |
           set -euo pipefail
           pattern='(^|/)(CLAUDE|AGENTS)\.md$|(^|/)\.cursorrules$|(^|/)CODEOWNERS$|^\.claude/|^\.cursor/|^\.github/|^tools/verify/|^packages/sandbox/|^lessons/|^packages/[^/]+/src/schema\.ts$|^packages/[^/]+/schema/|\.schema\.json$|^ludion\.config\.json$|^wrangler\.jsonc$|^docs/protected-paths\.md$'

@@ -102,8 +102,9 @@ describe("the rule on recording a review", () => {
   // so a review has the line rather than ends with it (docs/decisions/2026-10-30-reviewed-sha-has-the-line.md).
   const RULE = "Every review, protected path or not, is posted on its PR as a comment that has the line `reviewed-sha: <the head SHA reviewed>`; a review with no such record on GitHub is never reported as a review.";
   const STEP_1 = "1. A reviewer other than the author, with fresh context, reads the full diff at the current head and posts the review as a PR comment. Its first line states the verdict (`APPROVE` or `REQUEST CHANGES`), and it has the line `reviewed-sha: <head SHA it reviewed>`, which need not be its last line.";
-  const EVERY = "Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and has the line `reviewed-sha: <the head SHA it reviewed>`. That line starts with `reviewed-sha:` and gives the full SHA in lowercase; in inline backticks, a list item or a quote it is not counted, but inside a code block it is. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review.";
-  const SAYS = { "CLAUDE.md": [RULE], "docs/protected-paths.md": [STEP_1, EVERY] };
+  const EVERY = "Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and has the line `reviewed-sha: <the head SHA it reviewed>`. That line is, in full, `reviewed-sha:`, one space and the 40-character SHA in lowercase, with nothing before or after it; a line in any other form is not counted. A comment with exactly one such line is a review of the head it names. A comment with two or more, as when it quotes another review's line, is not counted as a review: it approves nothing, and it undoes an earlier approval of each head it names. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review.";
+  const CHECK = "A comment approves when its first line has the word `APPROVE` and not `REQUEST`, and it has exactly one `reviewed-sha:` line (below).";
+  const SAYS = { "CLAUDE.md": [RULE], "docs/protected-paths.md": [CHECK, STEP_1, EVERY] };
   type Path = keyof typeof SAYS;
   const missing = (path: Path, text: string) => SAYS[path].filter(sentence => !flat(text).includes(flat(sentence)));
   const swap = (text: string, from: string, to: string) => { expect(text).toContain(from); return text.split(from).join(to); };
@@ -123,6 +124,8 @@ describe("the rule on recording a review", () => {
       ["docs/protected-paths.md", "on that PR and has the line", "on that PR and ends with the line", EVERY],
       ["docs/protected-paths.md", "`reviewed-sha: <the head SHA it reviewed>`. That line", "`reviewed-sha: <the head SHA it reviewed>` as its last line. That line", EVERY],
       ["docs/protected-paths.md", "on that PR and has the line", "on that PR and usually has the line", EVERY],
+      ["docs/protected-paths.md", "and it has exactly one `reviewed-sha:` line", "and it has a `reviewed-sha:` line", CHECK],
+      ["docs/protected-paths.md", "A comment with exactly one such line", "A comment with at least one such line", EVERY],
     ];
     for (const [path, from, to, lost] of changes) expect([to, missing(path, swap(path === "CLAUDE.md" ? claude : doc, from, to))]).toEqual([to, [lost]]);
   });

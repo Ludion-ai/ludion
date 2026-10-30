@@ -138,7 +138,7 @@ export async function registryVersions(name: string, fetchFn: Fetch = fetch): Pr
 /**
  * OSV advisory ids per `name@version` (malicious records included), via the batch API. Each item is checked as
  * OsvClient.ids checks it: one that is not an object (null, a number), has a key other than vulns and next_page_token,
- * or has vulns that is not a list ({vulns: null}) throws, rather than reading as no record.
+ * or has vulns that is not a list ({vulns: null}) throws, rather than reading as no record. A repeated id is kept once, as there.
  */
 export async function osvIds(packages: { name: string; version: string }[], fetchFn: Fetch = fetch): Promise<Map<string, string[]>> {
   const result = new Map<string, string[]>();
@@ -152,7 +152,7 @@ export async function osvIds(packages: { name: string; version: string }[], fetc
       if (item.next_page_token) throw new Error("OSV paginated a judge query; refusing a partial answer.");
       const ids = (item?.vulns ?? []).map((v: any) => v?.id);
       if (!ids.every((id: unknown) => typeof id === "string" && /^[A-Za-z0-9][A-Za-z0-9._-]{0,150}$/.test(id))) throw new Error("Invalid OSV advisory id.");
-      result.set(`${slice[i]!.name}@${slice[i]!.version}`, ids);
+      result.set(`${slice[i]!.name}@${slice[i]!.version}`, [...new Set<string>(ids)]);
     });
   }
   return result;

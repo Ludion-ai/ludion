@@ -5,6 +5,7 @@ import { spawn } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 const D = "packages/cli/src/security/deliver.ts", T = "packages/cli/test/deliver.test.ts", A = "packages/cli/test/action-patch.test.ts";
 const B = "packages/cli/src/security/branch.ts", BT = "packages/cli/test/branch.test.ts";
+const J = "packages/cli/src/security/judge.ts", JT = "packages/cli/test/judge.test.ts";
 const LIMIT = 300_000;
 /** `text` starts with "if (": its whole condition, up to the matching ")", becomes false. */
 const off = (name, text) => {
@@ -88,6 +89,17 @@ const mutations = [
   off("npm: another package loading another copy accepted (B1 B)", "if (then !== now) return"),
   off("npm: an added alias, or a version outside its requirer's range, accepted (security pass at 8b4856d)", "if ((found.name !== undefined && found.name !== name) || typeof range !== \"string\" || !semver.validRange(range) || !semver.satisfies(version, range)) {"),
   ["npm: the lock not read as the judge reads it (N3)", D, "    lockEntries(old); lockEntries(now);\n", "", T],
+  // Review of aa5d75b (lane): B1, the lock as every npm reads it (judge.ts's readLock, which the PR job also uses).
+  ["lock views: a disagreeing npm 6 tree accepted", J, "    if (a !== b) throw new Error(", "    if (false) throw new Error(", JT],
+  ["lock views: the npm 6 tree not walked", J, "  walk(tree, \"\");\n", "", JT],
+  ["lock views: a link's children read under the link, not its folder", J, "linked?.link && typeof linked.resolved === \"string\" ? `${linked.resolved}/` : `${path}/`", "`${path}/`", JT],
+  ["lock views: an alias read without its real name", J, ": alias ? `npm:${item.name}@${text(item.version)}` :", ": alias ? text(item.version) :", JT],
+  ["lock: another lockfileVersion read", J, "(top.lockfileVersion !== 2 && top.lockfileVersion !== 3)", "false", JT],
+  ["lock: a top-level key npm does not write read", J, "if (unknown.length) throw", "if (false) throw", JT],
+  ["lock views: the review's tree attack through the PR job", J, "    if (a !== b) throw new Error(", "    if (false) throw new Error(", T],
+  off("npm: the top-level lockfileVersion changed", "if (key !== \"packages\" && key !== \"dependencies\" && !isDeepStrictEqual(baseTop![key], fixTop![key])) return"),
+  off("npm: a base with npm-shrinkwrap.json accepted", "if (ecosystem === \"npm\" && before(\"npm-shrinkwrap.json\") !== null) return"),
+  ["judge: package-lock.json judged beside npm-shrinkwrap.json", "packages/cli/src/security/judge-cli.ts", "for (const dir of [before, after]) if (existsSync(join(dir, \"npm-shrinkwrap.json\")))", "for (const dir of [before, after]) if (false)", "packages/cli/test/judge-cli.test.ts"],
   ["the tree read from the raw headers, not from Git (R4)", D, "const tree = git(top, [\"rev-parse\", \"--verify\", `${commit}^{tree}`]).stdout.trim();", "const tree = (headers[0] ?? \"\").slice(\"tree \".length);", T],
   ["branch names: a version with \"-\" kept readable (R16)", B, "!tos[0]!.includes(\"-\") && ", "", BT],
   ["packagist: a PKSA ID with a \"-\" at an end read (N-d)", "packages/cli/src/security/packagist.ts", "export const PKSA_ID = /^PKSA-[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?$/;", "export const PKSA_ID = /^PKSA-[a-z0-9-]{1,60}$/;", "packages/cli/test/dependencies.test.ts"],

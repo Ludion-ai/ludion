@@ -26,6 +26,9 @@ export async function judgeCli(args: string[]): Promise<number> {
   if (!Number.isFinite(now.getTime())) throw new Error("--now must be an ISO date.");
   // pnpm: read as the set of versions pnpm-lock.yaml adds (pnpmChanges).
   if (!existsSync(join(after, "package-lock.json")) && existsSync(join(after, "pnpm-lock.yaml"))) return pnpm(readText(before, "pnpm-lock.yaml"), readText(after, "pnpm-lock.yaml"), JSON.parse(readText(after, "package.json")), files, now, !!values.json);
+  // npm installs from npm-shrinkwrap.json, not package-lock.json, when both are there: judging package-lock.json would
+  // judge a tree npm does not install.
+  for (const dir of [before, after]) if (existsSync(join(dir, "npm-shrinkwrap.json"))) throw new Error("npm-shrinkwrap.json is there, and npm installs from it instead of package-lock.json; the judge does not read it.");
   const beforeLock = readText(before, "package-lock.json"), afterLock = readText(after, "package-lock.json");
   const beforeManifest = readText(before, "package.json"), afterManifest = readText(after, "package.json");
   const lock = packageLockInputs({ before: beforeLock, after: afterLock }, { before: beforeManifest, after: afterManifest });

@@ -405,6 +405,27 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       [{ ...MKDIRP, "node_modules/minimist": { name: "is-number", version: "1.2.6" } }, "does not have minimist at 1.2.6, the fix's version, at node_modules/minimist"],
     ] as const) await refused(p => minimistFix(p, packages), why);
   });
+  it("a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)", async () => {
+    const LEFT_PAD = { resolved: "https://registry.npmjs.org/left-pad/-/left-pad-1.3.0.tgz", integrity: "sha512-XI5MPzVNApjAyhQzphX8BkmKsKUxD4LdyK24iZeQGinBN9yTQT3bFlCBy/aVx2HrNcqQGsdot8ghrjyrvMCoEA==" };
+    const v2 = (tree: Record<string, unknown>) => `${JSON.stringify({ name: "app", lockfileVersion: 2, packages: { "node_modules/lodash": { version: "4.17.21" } }, dependencies: tree }, null, 2)}\n`;
+    for (const [lock, why] of [
+      // The review's attack: packages moves lodash as planned; the tree npm 6 installs from gives another tarball.
+      [v2({ lodash: { version: "4.17.21", ...LEFT_PAD } }), "package-lock.json is not one Ludion reads (package-lock.json's packages and its npm 6 dependencies tree disagree at node_modules/lodash"],
+      // Both views agree, but the base was v3: npm 6 would now read a tree the base never had.
+      [v2({ lodash: { version: "4.17.21" } }), "package-lock.json changes its top-level lockfileVersion"],
+    ] as const) {
+      await refused(p => {
+        const made = forge(p.work, BRANCH, p.base, { "package-lock.json": lock });
+        return { receipt: receiptFor(p.base, made, lock), refs: [`refs/heads/${BRANCH}`] };
+      }, why);
+    }
+    await refused(p => {
+      writeFileSync(join(p.work, "npm-shrinkwrap.json"), LOCK);
+      git(p.work, "add", "npm-shrinkwrap.json"); git(p.work, "commit", "-qm", "shrinkwrap"); git(p.work, "push", "-q", p.origin, "HEAD:refs/heads/main");
+      const base = git(p.work, "rev-parse", "HEAD"), made = forge(p.work, BRANCH, base, { "package-lock.json": FIXED });
+      return { receipt: receiptFor(base, made), refs: [`refs/heads/${BRANCH}`], base };
+    }, "the base has npm-shrinkwrap.json, which npm reads instead of package-lock.json");
+  });
   it("reads one version's manifest from the registry, by the package's name only", async () => {
     const urls: string[] = [];
     const answer = (body: unknown) => (async (url: string | URL | Request) => { urls.push(String(url)); return new Response(JSON.stringify(body), { status: 200 }); }) as typeof fetch;

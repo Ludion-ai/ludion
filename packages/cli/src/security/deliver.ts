@@ -271,6 +271,11 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
     lockEntries(old); lockEntries(now);
     kinds = new Map([...Object.entries(was), ...Object.entries(is)].map(([path, item]) => [path, lockKey(path, item)]));
   } catch (error) { return `package-lock.json is not one Ludion reads (${plain(error instanceof Error ? error.message : String(error)).slice(0, 200)}).`; }
+  // The rest of the file as at the base: lockfileVersion decides whether npm 6 reads the dependencies tree at all.
+  const [baseTop, fixTop] = [JSON.parse(old), JSON.parse(now)] as Record<string, unknown>[];
+  for (const key of new Set([...Object.keys(baseTop!), ...Object.keys(fixTop!)])) {
+    if (key !== "packages" && key !== "dependencies" && !isDeepStrictEqual(baseTop![key], fixTop![key])) return `package-lock.json changes its top-level ${show(key)}.`;
+  }
   for (const [path, kind] of kinds) {
     if (kind === "folder") return `package-lock.json has ${show(path)}, which is not an install path (Ludion's fixes cover no workspace or local folder).`;
     if ([was, is].some(lock => Object.hasOwn(lock, path) && !isObject(lock[path]))) return `package-lock.json's ${show(path)} is not an object.`;
@@ -491,6 +496,9 @@ export function contentProblem(ecosystem: Ecosystem, fix: CheckedFix, before: (p
     else try { same = isDeepStrictEqual(JSON.parse(now), JSON.parse(expected)); } catch { same = false; }
     if (!same) return `${manifest} is not what Ludion writes for ${fix.package} ${fix.changes.map(c => c.to).join(", ")}.`;
   } finally { rmSync(dir, { recursive: true, force: true }); }
+  // npm reads npm-shrinkwrap.json instead of package-lock.json when both are there, so a fix to package-lock.json would
+  // install nothing of what the receipt says.
+  if (ecosystem === "npm" && before("npm-shrinkwrap.json") !== null) return "the base has npm-shrinkwrap.json, which npm reads instead of package-lock.json.";
   if (ecosystem === "npm") return npmLockProblem(before("package-lock.json"), after("package-lock.json"), fix);
   return ecosystem === "composer" ? composerLockProblem(before("composer.lock"), after("composer.lock"), fix) : null;
 }
@@ -609,7 +617,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json moves this package, at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry and nothing another package loads, and that each moved or added entry declares the requirements, os and cpu the registry lists" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json says the same to every npm (a v2 lock's npm 6 tree agrees with its packages section), that it moves this package, at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry and nothing another package loads, and that each moved or added entry declares the requirements, os and cpu the registry lists" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,

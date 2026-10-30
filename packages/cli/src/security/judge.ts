@@ -107,11 +107,64 @@ export function installScripts(scripts: unknown): string[] {
   return LIFECYCLE.filter(name => typeof (scripts as Record<string, unknown>)[name] === "string");
 }
 
-type Lockfile = { lockfileVersion?: unknown; packages?: Record<string, any> };
+/** The top-level keys npm writes in a package-lock v2/v3; any other is refused. */
+const LOCK_KEYS = new Set(["name", "version", "lockfileVersion", "requires", "packages", "dependencies"]);
+
+/**
+ * The `packages` section of a package-lock v2/v3, after checking that every npm reads the same tree from the file. A v2
+ * lock holds the tree twice: `packages` (npm 7 and later) and the nested `dependencies` tree (npm 6, and npm 7 and later
+ * ignore it). The two views must agree (lockViews): the same install paths, each with the same version, resolved and
+ * integrity. A lock with another lockfileVersion, a top-level key npm does not write, or two views that disagree throws.
+ * The judge and the PR job (deliver.ts) read package-lock.json only through this (review of aa5d75b, B1).
+ */
 export function readLock(lockText: string): Record<string, any> {
-  const lock = JSON.parse(lockText) as Lockfile;
-  if (!lock.packages || typeof lock.packages !== "object" || ![2, 3].includes(Number(lock.lockfileVersion))) throw new Error("The judge reads package-lock v2/v3 only.");
-  return lock.packages;
+  const lock: unknown = JSON.parse(lockText);
+  if (!lock || typeof lock !== "object" || Array.isArray(lock)) throw new Error("package-lock.json is not an object.");
+  const top = lock as Record<string, any>;
+  if (!top.packages || typeof top.packages !== "object" || Array.isArray(top.packages) || (top.lockfileVersion !== 2 && top.lockfileVersion !== 3)) throw new Error("The judge reads package-lock v2/v3 only.");
+  const unknown = Object.keys(top).filter(key => !LOCK_KEYS.has(key));
+  if (unknown.length) throw new Error(`package-lock.json has a top-level key npm does not write: ${unknown.slice(0, 3).join(", ")}.`);
+  // npm 6 reads the tree of a v2 lock (none at all means it installs nothing from the lock), and of any lock that has one.
+  if (top.lockfileVersion === 3 && top.dependencies === undefined) return top.packages;
+  const [packagesView, treeView] = lockViews(top.packages, top.dependencies);
+  for (const path of new Set([...packagesView.keys(), ...treeView.keys()])) {
+    const a = packagesView.get(path), b = treeView.get(path);
+    if (a !== b) throw new Error(`package-lock.json's packages and its npm 6 dependencies tree disagree at ${path}: ${a === undefined ? "only the dependencies tree has it" : b === undefined ? "only packages has it" : `${a.replaceAll("\0", " ")} against ${b.replaceAll("\0", " ")}`}.`);
+  }
+  return top.packages;
+}
+
+/**
+ * What a lock installs at each install path, as `packages` says it and as the nested `dependencies` tree says it:
+ * "version\0resolved\0integrity". The tree's entry `b` inside `a` is node_modules/a/node_modules/b; inside a link (a
+ * workspace or a local folder, version "file:<folder>"), its children are in <folder>/node_modules. An alias is
+ * "npm:<name>@<version>" in the tree. A v3 lock has no tree; a v2 lock without one installs nothing under npm 6, so it
+ * agrees only when `packages` installs nothing either.
+ */
+function lockViews(packages: Record<string, any>, tree: unknown): [Map<string, string>, Map<string, string>] {
+  const fromPackages = new Map<string, string>(), fromTree = new Map<string, string>();
+  const text = (value: unknown) => typeof value === "string" ? value : value === undefined ? "" : `<${JSON.stringify(value)}>`;
+  for (const [path, item] of Object.entries(packages)) {
+    if (lockKey(path, item) !== "install") continue;
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`Unexpected package-lock entry at ${path}.`);
+    const alias = typeof item.name === "string" && item.name !== requireName(path);
+    const version = item.link ? `file:${text(item.resolved)}` : alias ? `npm:${item.name}@${text(item.version)}` : text(item.version);
+    fromPackages.set(path, [version, item.link ? "" : text(item.resolved), item.link ? "" : text(item.integrity)].join("\0"));
+  }
+  if (tree === undefined) return [fromPackages, fromTree];
+  const walk = (level: unknown, prefix: string) => {
+    if (!level || typeof level !== "object" || Array.isArray(level)) throw new Error(`package-lock.json's dependencies tree is not an object under ${prefix || "the root"}.`);
+    for (const [name, entry] of Object.entries(level as Record<string, any>)) {
+      const path = `${prefix}node_modules/${name}`;
+      if (!entry || typeof entry !== "object" || Array.isArray(entry)) throw new Error(`Unexpected package-lock dependencies entry at ${path}.`);
+      if (fromTree.has(path)) throw new Error(`package-lock.json's dependencies tree has ${path} twice.`);
+      fromTree.set(path, [text(entry.version), text(entry.resolved), text(entry.integrity)].join("\0"));
+      const linked = Object.hasOwn(packages, path) ? packages[path] : undefined;
+      if (entry.dependencies !== undefined) walk(entry.dependencies, linked?.link && typeof linked.resolved === "string" ? `${linked.resolved}/` : `${path}/`);
+    }
+  };
+  walk(tree, "");
+  return [fromPackages, fromTree];
 }
 
 /** A package-lock `packages` key: an optional workspace prefix, then one or more node_modules/<name> segments. */

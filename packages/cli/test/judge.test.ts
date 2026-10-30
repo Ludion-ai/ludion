@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { gatherFacts, osvIds, provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
@@ -727,5 +728,55 @@ describe("the lockfile reader's extraneous folders", () => {
     expect(j.verdict).toBe("stop");
     expect(j.findings.some(f => f.gate === 4 && f.effect === "stop" && f.message.includes("extraneous"))).toBe(true);
     expect(renderJudgement(j)).toContain("extraneous");
+  });
+});
+
+describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () => {
+  // Written by npm 11.19.1 (`npm install --package-lock-only --lockfile-version 2`, in Docker): nested copies, an alias,
+  // a dev and an optional dependency; and a workspace with its own nested copy and a local folder.
+  const fixture = (name: string) => readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
+  const nested = fixture("lock-v2-npm11-nested.json"), workspace = fixture("lock-v2-npm11-workspace.json");
+  const edit = (text: string, change: (lock: any) => void) => { const lock = JSON.parse(text); change(lock); return JSON.stringify(lock); };
+  const LEFT_PAD = { resolved: "https://registry.npmjs.org/left-pad/-/left-pad-1.3.0.tgz", integrity: "sha512-XI5MPzVNApjAyhQzphX8BkmKsKUxD4LdyK24iZeQGinBN9yTQT3bFlCBy/aVx2HrNcqQGsdot8ghrjyrvMCoEA==" };
+
+  it("reads what npm writes: both views of a v2 lock agree", () => {
+    expect(lockEntries(nested).map(e => e.path)).toContain("node_modules/mkdirp/node_modules/minimist");
+    expect(lockEntries(nested).find(e => e.path === "node_modules/lodash-alias")).toMatchObject({ name: "lodash", version: "4.17.21" });
+    expect(lockEntries(workspace).map(e => e.path)).toContain("packages/a/node_modules/is-number");
+    expect(lockLinks(workspace)).toEqual(["node_modules/a -> packages/a", "node_modules/local -> local"]);
+  });
+
+  it("refuses a v2 lock whose npm 6 tree installs something else", () => {
+    for (const [lock, at] of [
+      // Another tarball under a fixed version's name (the review's attack: npm 6 installs left-pad as minimist).
+      [edit(nested, l => Object.assign(l.dependencies.minimist, LEFT_PAD)), "disagree at node_modules/minimist"],
+      // A package only the tree has, at the top and nested.
+      [edit(nested, l => { l.dependencies.evil = { version: "9.9.9", ...LEFT_PAD }; }), "disagree at node_modules/evil: only the dependencies tree has it"],
+      [edit(nested, l => { l.dependencies.mkdirp.dependencies.evil = { version: "1.3.0", ...LEFT_PAD }; }), "disagree at node_modules/mkdirp/node_modules/evil"],
+      // A copy the tree leaves out, and one it moves to another place.
+      [edit(nested, l => { delete l.dependencies.mkdirp.dependencies; }), "disagree at node_modules/mkdirp/node_modules/minimist: only packages has it"],
+      [edit(nested, l => { l.dependencies.minimist2 = l.dependencies.mkdirp.dependencies.minimist; delete l.dependencies.mkdirp.dependencies; }), "disagree at node_modules/m"],
+      // An alias pointing at another package, a version, and an integrity.
+      [edit(nested, l => { l.dependencies["lodash-alias"].version = "npm:left-pad@4.17.21"; }), "disagree at node_modules/lodash-alias"],
+      [edit(nested, l => { l.dependencies.nan.version = "2.29.0"; }), "disagree at node_modules/nan"],
+      [edit(nested, l => { l.dependencies.nan.integrity = LEFT_PAD.integrity; }), "disagree at node_modules/nan"],
+      // A workspace's nested copy, and a link's target.
+      [edit(workspace, l => Object.assign(l.dependencies.a.dependencies["is-number"], LEFT_PAD)), "disagree at packages/a/node_modules/is-number"],
+      [edit(workspace, l => { l.dependencies.local.version = "file:elsewhere"; }), "disagree at node_modules/local"],
+      // A v2 lock with no tree, which npm 6 does not install from.
+      [edit(nested, l => { delete l.dependencies; }), "only packages has it"],
+      // A key that is not a name.
+      [edit(nested, l => { l.dependencies[".."] = { version: "1.0.0" }; }), "disagree at node_modules/.."],
+    ] as const) expect(() => lockEntries(lock), at).toThrow(at);
+  });
+
+  it("refuses another lockfileVersion and a top-level key npm does not write", () => {
+    for (const version of [1, 4, "2", null]) expect(() => lockEntries(edit(nested, l => { l.lockfileVersion = version; }))).toThrow("package-lock v2/v3 only");
+    expect(() => lockEntries(edit(nested, l => { l.overrides = {}; }))).toThrow("a top-level key npm does not write: overrides");
+    expect(() => lockEntries("[]")).toThrow("not an object");
+    // A v3 lock carries no tree; one that does is held to it as well.
+    const v3 = edit(nested, l => { l.lockfileVersion = 3; delete l.dependencies; });
+    expect(lockEntries(v3)).toHaveLength(lockEntries(nested).length);
+    expect(() => lockEntries(edit(nested, l => { l.lockfileVersion = 3; l.dependencies.nan.version = "2.29.0"; }))).toThrow("disagree at node_modules/nan");
   });
 });

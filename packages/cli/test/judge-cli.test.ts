@@ -52,3 +52,13 @@ describe("ludion judge on dev-flagged lockfile entries", () => {
     expect(result.wait_hours).not.toBe(168);
   });
 });
+
+describe("ludion judge and npm-shrinkwrap.json (review of aa5d75b)", () => {
+  it("does not judge package-lock.json when npm would install from npm-shrinkwrap.json instead", async () => {
+    for (const side of ["before", "after"] as const) {
+      const dirs = { before: checkout(lock("1.0.0", "2.0.0")), after: checkout(lock("1.0.1", "2.0.0")) };
+      writeFileSync(join(dirs[side], "npm-shrinkwrap.json"), lock("1.0.0", "2.0.0"));
+      await expect(judgeCli(["--before", dirs.before, "--after", dirs.after, "--files", "package-lock.json"])).rejects.toThrow("npm-shrinkwrap.json is there, and npm installs from it instead of package-lock.json");
+    }
+  });
+});

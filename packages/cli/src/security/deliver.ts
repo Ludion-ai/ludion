@@ -276,6 +276,9 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
   for (const key of new Set([...Object.keys(baseTop!), ...Object.keys(fixTop!)])) {
     if (key !== "packages" && key !== "dependencies" && !isDeepStrictEqual(baseTop![key], fixTop![key])) return `package-lock.json changes its top-level ${show(key)}.`;
   }
+  // A tree npm 6 reads only where the base had one (review of 1e6f705, B1): a v3 base given one would hand npm 6 a tree to
+  // install from. Where both have one, readLock has tied each to its packages section, which the checks below compare.
+  if (Object.hasOwn(baseTop!, "dependencies") !== Object.hasOwn(fixTop!, "dependencies")) return `package-lock.json ${Object.hasOwn(fixTop!, "dependencies") ? "adds" : "removes"} the npm 6 dependencies tree.`;
   for (const [path, kind] of kinds) {
     if (kind === "folder") return `package-lock.json has ${show(path)}, which is not an install path (Ludion's fixes cover no workspace or local folder).`;
     if ([was, is].some(lock => Object.hasOwn(lock, path) && !isObject(lock[path]))) return `package-lock.json's ${show(path)} is not an object.`;

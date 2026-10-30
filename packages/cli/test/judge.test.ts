@@ -744,6 +744,34 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
     expect(lockEntries(nested).find(e => e.path === "node_modules/lodash-alias")).toMatchObject({ name: "lodash", version: "4.17.21" });
     expect(lockEntries(workspace).map(e => e.path)).toContain("packages/a/node_modules/is-number");
     expect(lockLinks(workspace)).toEqual(["node_modules/a -> packages/a", "node_modules/local -> local"]);
+    // Also written by npm 11.19.1: many dev and optional entries with their requires (react, react-dom, chokidar 2), and
+    // a workspace and a local folder with devDependencies and optionalDependencies, which a link's requires includes.
+    expect(lockEntries(fixture("lock-v2-npm11-flags.json")).length).toBeGreaterThan(100);
+    expect(lockEntries(fixture("lock-v2-npm11-workspace-dev.json")).map(e => e.path)).toContain("node_modules/is-odd/node_modules/is-number");
+  });
+
+  it("refuses a v2 lock whose npm 6 tree requires, or flags, something else (review of 1e6f705, B1)", () => {
+    const wsdev = fixture("lock-v2-npm11-workspace-dev.json"), URL_SPEC = "https://registry.npmjs.org/left-pad/-/left-pad-1.3.0.tgz";
+    for (const [lock, why] of [
+      // The review's attack: npm 6 installs what requires names when the tree lacks it, from any spec.
+      [edit(nested, l => { l.dependencies.minimist.requires = { "left-pad": URL_SPEC }; }), "disagree at node_modules/minimist"],
+      [edit(nested, l => { l.dependencies.minimist.requires = { "left-pad": "1.3.0" }; }), "disagree at node_modules/minimist"],
+      [edit(nested, l => { l.dependencies.mkdirp.requires.minimist = URL_SPEC; }), "disagree at node_modules/mkdirp"],
+      [edit(nested, l => { delete l.dependencies.mkdirp.requires; }), "disagree at node_modules/mkdirp"],
+      // A link's requires (the folder's own requirements, devDependencies included).
+      [edit(wsdev, l => { l.dependencies.a.requires["left-pad"] = "1.3.0"; }), "disagree at node_modules/a"],
+      [edit(wsdev, l => { delete l.dependencies.local.requires["left-pad"]; }), "disagree at node_modules/local"],
+      // The flags, which decide what npm 6 --production leaves out.
+      [edit(nested, l => { l.dependencies.minimist.dev = true; }), "disagree at node_modules/minimist"],
+      [edit(nested, l => { delete l.dependencies["left-pad"].dev; }), "disagree at node_modules/left-pad"],
+      [edit(nested, l => { l.dependencies.nan.bundled = true; }), "disagree at node_modules/nan"],
+      // Keys and values npm does not write.
+      [edit(nested, l => { l.dependencies.minimist.from = "evil"; }), "gives node_modules/minimist a key npm does not write: from"],
+      [edit(nested, l => { l.dependencies["left-pad"].dev = "yes"; }), "gives node_modules/left-pad a flag that is not true: dev"],
+      [edit(nested, l => { l.dependencies.mkdirp.requires = { minimist: 1 }; }), "gives node_modules/mkdirp requires that are not a list of specs"],
+    ] as const) expect(() => lockEntries(lock), why).toThrow(why);
+    // The packages side says the same: a requirement only packages has disagrees too.
+    expect(() => lockEntries(edit(nested, l => { l.packages["node_modules/minimist"].dependencies = { "left-pad": "1.3.0" }; }))).toThrow("disagree at node_modules/minimist");
   });
 
   it("refuses a v2 lock whose npm 6 tree installs something else", () => {

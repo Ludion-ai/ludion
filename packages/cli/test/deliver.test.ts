@@ -413,6 +413,10 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       [v2({ lodash: { version: "4.17.21", ...LEFT_PAD } }), "package-lock.json is not one Ludion reads (package-lock.json's packages and its npm 6 dependencies tree disagree at node_modules/lodash"],
       // Both views agree, but the base was v3: npm 6 would now read a tree the base never had.
       [v2({ lodash: { version: "4.17.21" } }), "package-lock.json changes its top-level lockfileVersion"],
+      // The review of 1e6f705: the tree's lodash requires left-pad from a URL, which npm 6 `install` adds.
+      [v2({ lodash: { version: "4.17.21", requires: { "left-pad": LEFT_PAD.resolved } } }), "disagree at node_modules/lodash"],
+      // And a tree added to a v3 base that agrees with packages: npm 6 would install from a tree the base never had.
+      [`${JSON.stringify({ name: "app", lockfileVersion: 3, packages: { "node_modules/lodash": { version: "4.17.21" } }, dependencies: { lodash: { version: "4.17.21" } } }, null, 2)}\n`, "package-lock.json adds the npm 6 dependencies tree"],
     ] as const) {
       await refused(p => {
         const made = forge(p.work, BRANCH, p.base, { "package-lock.json": lock });
@@ -458,6 +462,15 @@ describe("the PR job refuses an artifact the validation job would not write", { 
     expect(asked).toContain("minimist@1.2.6");
     expect(asked).toContain("is-number@7.0.0");
     expect(asked).not.toContain("mkdirp@0.5.5");
+  });
+  it("npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)", async () => {
+    // Each makes the walk reach a stray is-number as the forged "dependencies" did; the registry's 1.2.6 lists neither.
+    for (const [group, why] of [["optionalDependencies", "package-lock.json's dependencies for minimist@1.2.6"], ["peerDependencies", "package-lock.json's peerDependencies for minimist@1.2.6"]] as const) {
+      const p = project(), s = minimistFix(p, { ...MKDIRP, "node_modules/minimist": { version: "1.2.6", [group]: { "is-number": "^7.0.0" } }, "node_modules/is-number": { version: "7.0.0" } }), gh = github(p.origin);
+      const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh);
+      expect(result.deliveries[0], group).toMatchObject({ outcome: "failed", reason: expect.stringContaining(why) });
+      expect(gh.opened, group).toHaveLength(0);
+    }
   });
   it("a file outside the plan, beside the planned ones", () => refused(p => {
     const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED, "README.md": "changed\n" });

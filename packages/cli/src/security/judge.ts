@@ -134,31 +134,55 @@ export function readLock(lockText: string): Record<string, any> {
   return top.packages;
 }
 
+/** The keys npm writes in an entry of the npm 6 `dependencies` tree; any other is refused. */
+const TREE_KEYS = new Set(["version", "resolved", "integrity", "dev", "optional", "devOptional", "peer", "extraneous", "bundled", "requires", "dependencies"]);
+/** The flags both views carry, as the tree names them (`packages` calls `bundled` `inBundle`). */
+const TREE_FLAGS = ["dev", "optional", "devOptional", "peer", "extraneous", "bundled"];
+
 /**
  * What a lock installs at each install path, as `packages` says it and as the nested `dependencies` tree says it:
- * "version\0resolved\0integrity". The tree's entry `b` inside `a` is node_modules/a/node_modules/b; inside a link (a
- * workspace or a local folder, version "file:<folder>"), its children are in <folder>/node_modules. An alias is
- * "npm:<name>@<version>" in the tree. A v3 lock has no tree; a v2 lock without one installs nothing under npm 6, so it
- * agrees only when `packages` installs nothing either.
+ * "version\0resolved\0integrity\0flags\0requires". The tree's entry `b` inside `a` is node_modules/a/node_modules/b;
+ * inside a link (a workspace or a local folder, version "file:<folder>"), its children are in <folder>/node_modules. An
+ * alias is "npm:<name>@<version>" in the tree. npm 6 installs what a tree entry's `requires` names when the tree does not
+ * have it, from any spec (review of 1e6f705, B1), so `requires` must be what `packages` says the package requires:
+ * its `dependencies` and `optionalDependencies`, and for a link its folder's, `devDependencies` included, as npm writes
+ * it. The flags (dev, optional and the like, which decide what `--production` leaves out) must be the same too; npm
+ * writes none on a link. A tree entry with a key npm does not write, or a flag that is not `true`, is refused. A v3 lock
+ * has no tree; a v2 lock without one installs nothing under npm 6, so it agrees only when `packages` installs nothing.
  */
 function lockViews(packages: Record<string, any>, tree: unknown): [Map<string, string>, Map<string, string>] {
   const fromPackages = new Map<string, string>(), fromTree = new Map<string, string>();
   const text = (value: unknown) => typeof value === "string" ? value : value === undefined ? "" : `<${JSON.stringify(value)}>`;
+  const isObject = (value: unknown): value is Record<string, unknown> => !!value && typeof value === "object" && !Array.isArray(value);
+  // A requirement list in one form, whatever its key order: [[name, spec], ...] sorted by name, or "" when empty.
+  const requirements = (...groups: unknown[]) => {
+    // A Map, not an object: a "__proto__" key stays a key.
+    const all = [...new Map(groups.flatMap(g => isObject(g) ? Object.entries(g) : [])).entries()].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+    return all.length ? JSON.stringify(all) : "";
+  };
   for (const [path, item] of Object.entries(packages)) {
     if (lockKey(path, item) !== "install") continue;
-    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`Unexpected package-lock entry at ${path}.`);
+    if (!isObject(item)) throw new Error(`Unexpected package-lock entry at ${path}.`);
     const alias = typeof item.name === "string" && item.name !== requireName(path);
     const version = item.link ? `file:${text(item.resolved)}` : alias ? `npm:${item.name}@${text(item.version)}` : text(item.version);
-    fromPackages.set(path, [version, item.link ? "" : text(item.resolved), item.link ? "" : text(item.integrity)].join("\0"));
+    const target = item.link && typeof item.resolved === "string" && Object.hasOwn(packages, item.resolved) ? packages[item.resolved] : undefined;
+    const flags = item.link ? "" : TREE_FLAGS.filter(flag => (flag === "bundled" ? item.inBundle : item[flag]) === true).join(",");
+    const requires = item.link ? requirements(target?.dependencies, target?.optionalDependencies, target?.devDependencies) : requirements(item.dependencies, item.optionalDependencies);
+    fromPackages.set(path, [version, item.link ? "" : text(item.resolved), item.link ? "" : text(item.integrity), flags, requires].join("\0"));
   }
   if (tree === undefined) return [fromPackages, fromTree];
   const walk = (level: unknown, prefix: string) => {
-    if (!level || typeof level !== "object" || Array.isArray(level)) throw new Error(`package-lock.json's dependencies tree is not an object under ${prefix || "the root"}.`);
-    for (const [name, entry] of Object.entries(level as Record<string, any>)) {
+    if (!isObject(level)) throw new Error(`package-lock.json's dependencies tree is not an object under ${prefix || "the root"}.`);
+    for (const [name, entry] of Object.entries(level)) {
       const path = `${prefix}node_modules/${name}`;
-      if (!entry || typeof entry !== "object" || Array.isArray(entry)) throw new Error(`Unexpected package-lock dependencies entry at ${path}.`);
+      if (!isObject(entry)) throw new Error(`Unexpected package-lock dependencies entry at ${path}.`);
       if (fromTree.has(path)) throw new Error(`package-lock.json's dependencies tree has ${path} twice.`);
-      fromTree.set(path, [text(entry.version), text(entry.resolved), text(entry.integrity)].join("\0"));
+      const unknown = Object.keys(entry).filter(key => !TREE_KEYS.has(key));
+      if (unknown.length) throw new Error(`package-lock.json's dependencies tree gives ${path} a key npm does not write: ${unknown.slice(0, 3).join(", ")}.`);
+      const odd = TREE_FLAGS.filter(flag => entry[flag] !== undefined && entry[flag] !== true);
+      if (odd.length) throw new Error(`package-lock.json's dependencies tree gives ${path} a flag that is not true: ${odd.join(", ")}.`);
+      if (entry.requires !== undefined && (!isObject(entry.requires) || Object.values(entry.requires).some(spec => typeof spec !== "string"))) throw new Error(`package-lock.json's dependencies tree gives ${path} requires that are not a list of specs.`);
+      fromTree.set(path, [text(entry.version), text(entry.resolved), text(entry.integrity), TREE_FLAGS.filter(flag => entry[flag] === true).join(","), requirements(entry.requires)].join("\0"));
       const linked = Object.hasOwn(packages, path) ? packages[path] : undefined;
       if (entry.dependencies !== undefined) walk(entry.dependencies, linked?.link && typeof linked.resolved === "string" ? `${linked.resolved}/` : `${path}/`);
     }

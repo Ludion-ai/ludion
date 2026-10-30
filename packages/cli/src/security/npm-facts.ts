@@ -122,6 +122,13 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
   return facts;
 }
 
+/** Every version the registry still lists for a package (an unpublished one is not), with its deprecation message or null. */
+export async function registryVersions(name: string, fetchFn: Fetch = fetch): Promise<Map<string, string | null>> {
+  const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);
+  if (!doc || typeof doc !== "object" || !doc.versions || typeof doc.versions !== "object" || Array.isArray(doc.versions)) throw new Error(`Invalid registry document for ${name}.`);
+  return new Map(Object.entries<any>(doc.versions).map(([version, manifest]) => [version, typeof manifest?.deprecated === "string" && manifest.deprecated ? manifest.deprecated : null]));
+}
+
 /** OSV advisory ids per `name@version` (malicious records included), via the batch API. */
 export async function osvIds(packages: { name: string; version: string }[], fetchFn: Fetch = fetch): Promise<Map<string, string[]>> {
   const result = new Map<string, string[]>();

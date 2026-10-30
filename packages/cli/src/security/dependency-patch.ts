@@ -14,6 +14,7 @@ import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, ty
 import { releaseIdentity, type Judgement } from "./judge.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryFacts } from "./npm-facts.ts";
+import { nextFix, type VersionChoice } from "./next-fix.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
 /**
@@ -50,6 +51,11 @@ export type FixReceipt = {
   time_cap?: TimeCap;
   /** npm: the judge's gates 1, 2 and 4 and its wait over this fix's lockfile diff (candidate-judge.ts). */
   judgement?: Judgement;
+  /**
+   * npm: each smallest fixed version that was deprecated, no longer listed or named by OSV, with the versions passed over
+   * and the one taken instead (next-fix.ts); `changes` hold the versions taken, `before.plan` the smallest.
+   */
+  version_choice?: VersionChoice[];
   reason?: string;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
@@ -323,6 +329,22 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     const marked = scan.findings.filter(malicious).map(findingId);
     if (marked.length) throw new Error(`OSV has a MAL- record for an installed package (${marked.slice(0, 5).join(", ")}); nothing was validated or applied.`);
     if (!receipt.fixes.length) throw new Error(scan.blocked.join(" ") || "No fix was planned.");
+    // npm, before the branch names: a smallest fixed version that is deprecated, no longer listed or named by OSV gives
+    // way to the next smallest that is none of these. A failed lookup keeps the smallest, which the judge checks again.
+    if (ecosystem === "npm") for (const fix of receipt.fixes) {
+      const taken = new Map<string, string>();
+      for (const to of new Set(fix.changes.map(c => c.to))) {
+        let choice: VersionChoice | null;
+        try { choice = await nextFix(fix.package, to, deps.fetchFn); }
+        catch (error) { choice = { package: fix.package, smallest: to, chosen: null, skipped: [], note: `Whether the smallest fixed version ${fix.package}@${to} can be used could not be read (${(error instanceof Error ? error.message : String(error)).slice(0, 300)}); it stays, and the judge checks it again.` }; }
+        active();
+        if (!choice) continue;
+        (fix.version_choice ??= []).push(choice);
+        if (choice.chosen) taken.set(to, choice.chosen);
+      }
+      // New objects: the plan's own changes stay in `before.plan` as the smallest.
+      if (taken.size) fix.changes = fix.changes.map(c => taken.has(c.to) ? { ...c, to: taken.get(c.to)! } : c);
+    }
     // Before any build or test (for Maven, after its dependency graph was resolved): every fix branch starts from the
     // commit whose files are the ones validated.
     const base = apply ? gitBase(root, source, NOT_TESTED) : null;
@@ -421,6 +443,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const branch = branches[index];
         const published = await dependencyFixPublished(ecosystem, fix.changes, deps.fetchFn); active();
         fix.fix_published_at = published.at; fix.fix_published_note = published.note;
+        if (fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the publish time of the version taken.";
         const label = `candidate-${index + 1}`, candidate = await acquire(label, fix.changes);
         if (candidate.archives.length) fix.archives = candidate.archives;
         fix.changed_packages = changedPackages(baseline.inventory, candidate.inventory);

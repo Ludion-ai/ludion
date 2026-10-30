@@ -16,7 +16,9 @@ import { githubOf, packageDir, releaseTag, repositoryOf, tagsFromRefs } from "..
 import { contentDelta, explain, readSourceTar, timeStats, type ContentDelta } from "./lold2.ts";
 
 const [deltaFile, loFile, v5File, cacheDir, gitDir, outFile, smokeFlag] = process.argv.slice(2);
-const smoke = smokeFlag?.startsWith("--smoke=") ? Number(smokeFlag.slice(8)) : null;
+// --only=<name@version>,... (smoke runs only) handles just those genuine rows.
+const smoke = smokeFlag?.startsWith("--smoke=") ? Number(smokeFlag.slice(8)) : smokeFlag?.startsWith("--only=") ? -1 : null;
+const only = smokeFlag?.startsWith("--only=") ? new Set(smokeFlag.slice(7).split(",")) : null;
 if (!deltaFile || !loFile || !v5File || !cacheDir || !gitDir || !outFile) throw new Error("Usage: node run-lold2.ts <delta-v1.json> <lo.json> <malicious-v5.json> <cache-dir> <git-dir> <out.json>");
 const startedAt = new Date().toISOString();
 const log = (s: string) => console.log(`${new Date().toISOString()} ${s}`);
@@ -123,7 +125,7 @@ async function sourcePackage(owner: string, repo: string, commit: string, name: 
 // --- The rows ---
 const capWhere = (w: Record<string, string[]>) => Object.fromEntries(Object.entries(w).map(([c, l]) => [c, l.slice(0, 20)]));
 const genuineOut: any[] = [], maliciousOut: any[] = [];
-const genuineToDo = smoke === null ? genuineRows : genuineRows.slice(0, smoke);
+const genuineToDo = smoke === null ? genuineRows : only ? genuineRows.filter(r => only.has(`${r.name}@${r.version}`)) : genuineRows.slice(0, smoke);
 for (const [i, r] of genuineToDo.entries()) {
   const l = loRow(r);
   const out: any = { id: r.id, name: r.name, prev: r.prev, version: r.version };

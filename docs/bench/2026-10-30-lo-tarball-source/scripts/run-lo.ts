@@ -2,7 +2,8 @@
 // (registry tarball or Software Heritage, as LD's row got them), its release in the GitHub repository (tag, else
 // provenance commit), the source archive's file hashes, and the comparison. Runs only inside a credential-free
 // container (run.sh). Nothing fetched is extracted to a disk or run.
-// Usage: node run-lo.ts <delta-v1.json> <malicious-v5.json> <cache-dir> <out.json>
+// Usage: node run-lo.ts <delta-v1.json> <malicious-v5.json> <cache-dir> <out.json> [--smoke=N]
+// --smoke=N compares only the first N genuine rows, to try the runner; its output is never the result.
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -14,7 +15,8 @@ import { registryTarball } from "../../../../packages/cli/src/security/judge.ts"
 import { provenanceFrom } from "../../../../packages/cli/src/security/npm-facts.ts";
 import { built, compare, githubOf, packageDir, readTar, releaseTag, repositoryOf, TarReader, tagsFromRefs, type Files, type Source } from "./lo.ts";
 
-const [deltaFile, v5File, cacheDir, outFile] = process.argv.slice(2);
+const [deltaFile, v5File, cacheDir, outFile, smokeFlag] = process.argv.slice(2);
+const smoke = smokeFlag?.startsWith("--smoke=") ? Number(smokeFlag.slice(8)) : null;
 if (!deltaFile || !v5File || !cacheDir || !outFile) throw new Error("Usage: node run-lo.ts <delta-v1.json> <malicious-v5.json> <cache-dir> <out.json>");
 const startedAt = new Date().toISOString();
 const log = (s: string) => console.log(`${new Date().toISOString()} ${s}`);
@@ -111,7 +113,7 @@ async function sourceArchive(owner: string, repo: string, commit: string): Promi
 
 type Row = Record<string, unknown> & { set: LdRow["set"]; outcome: string };
 const results: Row[] = [];
-for (const [i, row] of rows.entries()) {
+for (const [i, row] of (smoke === null ? rows : rows.filter(r => r.set === "genuine").slice(0, smoke)).entries()) {
   const base: Row = { set: row.set, id: row.id, name: row.name, version: row.version, files_from: row.sources.next, outcome: "not comparable" };
   if (row.set === "malicious") base.disputed = disputed(row.name, row.version);
   const docAnswer = await archive.get("registry", `https://registry.npmjs.org/${regPath(row.name)}/${encodeURIComponent(row.version)}`);
@@ -176,9 +178,9 @@ for (const [i, row] of rows.entries()) {
   try { const t = src.source.kept.get(where.dir ? `${where.dir}/package.json` : "package.json"); const p = t === undefined ? null : JSON.parse(t); if (!p || typeof p !== "object" || Array.isArray(p)) throw new Error("not an object"); sourcePkg = p; }
   catch { finish({ ...base, reason: "source package.json unreadable", built: "unknown" }); continue; }
   const c = compare({ files: v.files, pkg }, src.source, where.dir, sourcePkg);
-  const { differentPaths, absentPaths, ...counts } = c;
+  const { outcome, differentPaths, absentPaths, ...counts } = c;
   // Paths are committed for genuine versions only (definitions §7).
-  finish({ ...base, outcome: c.outcome, built: built(sourcePkg) ? "built" : "not built", ...counts, ...(row.set === "genuine" ? { different_paths: differentPaths.slice(0, 20), absent_paths: absentPaths.slice(0, 20) } : {}) });
+  finish({ ...base, outcome, built: built(sourcePkg) ? "built" : "not built", ...counts, ...(row.set === "genuine" ? { different_paths: differentPaths.slice(0, 20), absent_paths: absentPaths.slice(0, 20) } : {}) });
 }
 
 // --- Summary ---
@@ -206,6 +208,7 @@ function summary(set: Row["set"]) {
     release_kind: tally(comparable, r => { const k = r.release as any; return k?.kind === "tag" ? `tag form ${k.form}` : "provenance"; }),
     shown: {
       absent_under_missing_top: comparable.reduce((a, r) => a + Number(r.absentUnderMissingTop ?? 0), 0),
+      rows_with_absent_under_missing_top_by_outcome: tally(comparable.filter(r => Number(r.absentUnderMissingTop) > 0), r => r.outcome),
       absent_total: comparable.reduce((a, r) => a + Number(r.absent ?? 0), 0),
       different_total: comparable.reduce((a, r) => a + Number(r.different ?? 0), 0),
       different_but_eol_identical: comparable.reduce((a, r) => a + Number(r.differentButEolIdentical ?? 0), 0),
@@ -225,7 +228,7 @@ const blobs = Object.fromEntries([
   ["packages/cli/src/security/judge.ts", join(here, "../../../../packages/cli/src/security/judge.ts")],
 ].map(([k, p]) => [k, blob(p!)]));
 const out = {
-  run: { started_at: startedAt, ended_at: new Date().toISOString(), node: process.version, blobs, requests: { ...archive.counters, ...counters } },
+  run: { smoke, started_at: startedAt, ended_at: new Date().toISOString(), node: process.version, blobs, requests: { ...archive.counters, ...counters } },
   definitions: "docs/decisions/2026-10-30-lo-tarball-source-definitions.md",
   data: { file: "docs/bench/2026-10-30-delta-v1/delta-v1.json at 79f8816 (lane LD)", sha256: createHash("sha256").update(readFileSync(deltaFile)).digest("hex") },
   genuine: summary("genuine"),

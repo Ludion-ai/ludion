@@ -1,0 +1,94 @@
+# at commit d901755cbfbd8d40d84f09e54800ced3a72b06a3, 0 files differing from it
+# started 2026-10-30T12:26:34Z, node v24.22.1, git version 2.39.5
+npm ci exit 0
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+typecheck exit 0
+build exit 0
+12:26:45 [build] ✓ Completed in 373ms.
+12:26:45 [build] 3 page(s) built in 523ms
+12:26:45 [build] Complete!
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/action.test.ts (15 tests | 6 skipped) 62ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 198ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 208ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 136ms
+ ✓ |node| packages/cli/test/judge.test.ts (126 tests) 124ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 388ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 214ms
+ ✓ |node| packages/sandbox/test/guard.test.ts (3 tests) 49ms
+ ✓ |node| tools/records/test/records.test.ts (10 tests) 30ms
+ ✓ |node| tools/shadow/test/recorder.test.ts (35 tests) 597ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (18 tests) 165ms
+ ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 21ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 663ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  569ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (31 tests) 291ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (7 tests) 96ms
+ ✓ |node| packages/cli/test/patch-cli.test.ts (5 tests) 16ms
+ ✓ |node| packages/sandbox/test/docker-lookup.test.ts (4 tests) 34ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 44ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 105ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (2 tests) 46ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 7ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 1171ms
+     ✓ fails deep or very long input with an ordinary error, never a stack overflow  387ms
+ ✓ |node| apps/site/test/knowledge.test.ts (5 tests) 7ms
+ ✓ |node| apps/site/test/discovery.test.ts (3 tests) 7ms
+ ✓ |node| tools/backtest/test/delta-v1-results.test.ts (3 tests) 86ms
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 4ms
+ ✓ |node| tools/shadow/test/replay.test.ts (61 tests) 1567ms
+     ✓ is final after the window plus 336h: 100 decided versions and no MAL case is met, with no case  602ms
+     ✓ reads the latest poll and OSV read without spreading months of status lines into one call  403ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 752ms
+     ✓ parseRequirements: a run of backslash continuations  312ms
+ ✓ |node| tools/backtest/test/delta.test.ts (21 tests) 1171ms
+     ✓ counts runs of several megabytes without overflowing the stack (docs/mistakes/2026-10-30-delta-regex-stack.md)  883ms
+ ✓ |node| .claude/hooks/guard.test.ts (53 tests) 1466ms
+ ✓ |node| packages/cli/test/security.test.ts (39 tests) 1995ms
+     ✓ validates without changing source by default; commits only FROM on its own branch when explicitly enabled  343ms
+     ✓ leaves an existing branch unchanged and runs no Docker work for it  342ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2365ms
+     ✓ duplicate members count once toward the 1,000  718ms
+     ✓ more than 1,000 literal members are read no further, and say so  1106ms
+ ✓ |node| packages/cli/test/branch.test.ts (23 tests) 2955ms
+     ✓ commits only the given files on HEAD, on a new branch, and leaves the working tree and HEAD alone  301ms
+     ✓ compares the validated copy with HEAD, file by file  533ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  442ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (165 tests) 6562ms
+     ✓ commits both dependency files on the fix's own branch only under explicit policy (apply=true)  315ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  581ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  420ms
+     ✓ gives two fixes whose names clean alike two branches, and stops one whose name an older-named branch holds  344ms
+ ✓ |node| packages/cli/test/deliver.test.ts (48 tests) 15614ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base  316ms
+     ✓ packs no bundle when nothing was applied, and refuses a branch the receipt does not match  384ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  712ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  639ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  461ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  552ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  398ms
+     ✓ keeps a file's executable mode from the base (a checkout from a file system without modes)  320ms
+     ✓ headers out of Git's order or beyond it, even with the base as Git's parent  597ms
+     ✓ forged transitive npm fixes (review 6518582507, B1 and N-a)  823ms
+     ✓ a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)  568ms
+     ✓ npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))  1266ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  370ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  485ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  541ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  566ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  845ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  457ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1274ms
+
+ Test Files  35 passed (35)
+      Tests  1215 passed | 19 skipped (1234)
+   Start at  12:26:45
+   Duration  16.34s (transform 4.31s, setup 0ms, import 7.87s, tests 39.22s, environment 3ms)
+
+vitest exit 0
+# finished 2026-10-30T12:27:02Z

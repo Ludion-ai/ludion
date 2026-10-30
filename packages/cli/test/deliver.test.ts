@@ -742,6 +742,11 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" } }, { name: "app", dependencies: { lodash: "4.17.21", evil: "1" } }))).toContain("changes the project's own entry beyond the fix's requirement");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" } }, { name: "app", dependencies: { lodash: "4.17.21", minimist: "1.2.6" } }))).toContain("changes the project's own entry beyond the fix's requirement");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/../x": { version: "1.0.0" } }))).toContain("package-lock.json is not one Ludion reads (Unexpected package-lock path: node_modules/../x.)");
+    // An added copy must be the package its requirer asks for, at a version its range takes: an alias of another package,
+    // a version outside the range, and a range that is not semver (here an npm: alias spec) are refused.
+    for (const [foo, range] of [[{ name: "evil", version: "1.0.0" }, "^1.0.0"], [{ version: "2.0.0" }, "^1.0.0"], [{ name: "evil", version: "1.0.0" }, "npm:evil@1.0.0"]] as const) {
+      expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { foo: range } }, "node_modules/foo": foo }))).toContain(`which is not what node_modules/minimist requires (foo ${range})`);
+    }
     // Read as the judge reads it (review of 7d25696, N3): two paths that differ only in case, and a version that is not semver.
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/Minimist": { version: "1.2.6" } }))).toContain("not one Ludion reads (Two package-lock paths differ only in case");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { x: "*" } }, "node_modules/x": { version: "latest" } }))).toContain("not one Ludion reads (Invalid locked version at node_modules/x.)");

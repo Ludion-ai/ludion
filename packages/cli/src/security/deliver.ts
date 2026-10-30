@@ -316,9 +316,16 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
   const reached = new Set<string>(), queue = [...planned];
   while (queue.length) {
     const path = queue.shift()!, item = entry(is, path)!;
-    for (const group of DECLARED) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
+    for (const group of DECLARED) for (const [name, range] of isObject(item[group]) ? Object.entries(item[group]) : []) {
       const target = resolveFrom(installed, `${path}/`, name)?.path;
-      if (target && added.includes(target) && !reached.has(target)) { reached.add(target); queue.push(target); }
+      if (!target || !added.includes(target)) continue;
+      // The added copy is the package asked for, at a version its range takes: no alias of another package, and no range
+      // npm would not read as semver (a URL, a tag, "npm:…").
+      const found = entry(is, target)!, version = String(found.version);
+      if ((found.name !== undefined && found.name !== name) || typeof range !== "string" || !semver.validRange(range) || !semver.satisfies(version, range)) {
+        return `package-lock.json adds ${show(target)} (${plain(String(found.name ?? name)).slice(0, 100)}@${plain(version).slice(0, 60)}), which is not what ${show(path)} requires (${show(name)} ${plain(String(range)).slice(0, 60)}).`;
+      }
+      if (!reached.has(target)) { reached.add(target); queue.push(target); }
     }
   }
   const stray = added.filter(path => !reached.has(path));

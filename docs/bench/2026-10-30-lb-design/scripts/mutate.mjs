@@ -86,6 +86,7 @@ const mutations = [
   off("npm: an entry's requirements other than the registry's accepted (B1 A)", "if (!isDeepStrictEqual(lock[key], registry[key])) return"),
   off("npm: an entry the registry does not list accepted (B1 A)", "if (!listed) return"),
   off("npm: another package loading another copy accepted (B1 B)", "if (then !== now) return"),
+  off("npm: an added alias, or a version outside its requirer's range, accepted (security pass at 8b4856d)", "if ((found.name !== undefined && found.name !== name) || typeof range !== \"string\" || !semver.validRange(range) || !semver.satisfies(version, range)) {"),
   ["npm: the lock not read as the judge reads it (N3)", D, "    lockEntries(old); lockEntries(now);\n", "", T],
   ["the tree read from the raw headers, not from Git (R4)", D, "const tree = git(top, [\"rev-parse\", \"--verify\", `${commit}^{tree}`]).stdout.trim();", "const tree = (headers[0] ?? \"\").slice(\"tree \".length);", T],
   ["branch names: a version with \"-\" kept readable (R16)", B, "!tos[0]!.includes(\"-\") && ", "", BT],

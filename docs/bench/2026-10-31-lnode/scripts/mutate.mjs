@@ -21,8 +21,9 @@ const M = [
   ["branch named php for node", `${S}patch.ts`, "...(base.prefix ? [base.prefix] : []), repository, scan.candidate.version", "...(base.prefix ? [base.prefix] : []), \"php\", scan.candidate.version"],
   ["node policy run as PHP", `${S}patch.ts`, "config.ecosystem === \"node\" ? \"node\" : \"php\"", "\"php\" as \"php\" | \"node\""],
   ["fix published: the newest security release", `${S}exposure.ts`, "const first = [...scan.security_releases].sort((a, b) => compare(a.version, b.version))[0];\n  if (!first) return { at: null, note: \"Not found: nodejs.org", "const first = [...scan.security_releases].sort((a, b) => compare(b.version, a.version))[0];\n  if (!first) return { at: null, note: \"Not found: nodejs.org"],
-  ["scan: FROM node not detected", `${S}scan.ts`, "NODE_FROM.test(textFile(root, imageFile))", "false"],
-  ["init: node not offered", `${S}cli.ts`, "NODE_FROM.test(textFile(root, \"Dockerfile\"))) choices.push(\"node\")", "false) choices.push(\"node\")"],
+  // Since LNODE4 detection goes through namesNodeImage.
+  ["scan: FROM node not detected", `${S}scan.ts`, "namesNodeImage(textFile(root, imageFile))", "false"],
+  ["init: node not offered", `${S}cli.ts`, "namesNodeImage(textFile(root, \"Dockerfile\"))) choices.push(\"node\")", "false) choices.push(\"node\")"],
   ["PR job: receipt runtime not checked", `${S}deliver.ts`, "if (scanned !== (runtime === \"node\" ? \"node\" : undefined)) refuse", "if (false) refuse"],
   ["PR job: node policy read as PHP", `${S}deliver.ts`, "ecosystem: config.ecosystem === \"node\" ? \"node\" : \"php\", dockerfile", "ecosystem: \"php\" as Ecosystem, dockerfile"],
   ["PR job: Dockerfile + other ecosystem accepted", `${S}deliver.ts`, "&& config.ecosystem !== \"node\") refuse(", "&& config.ecosystem !== \"node\" && false) refuse("],

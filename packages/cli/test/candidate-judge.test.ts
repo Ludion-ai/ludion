@@ -217,7 +217,7 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     }
   });
 
-  it.each([[null], [7], [{ vulnerabilities: [] }], [{ vulns: null }]])("cannot decide when OSV's batch item is not an answer (%j), rather than reading it as no record", async osvItem => {
+  it.each([[null], [7], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }]])("cannot decide when OSV's batch item is not an answer (%j), rather than reading it as no record", async osvItem => {
     const j = await run({ ...base(), osvItem });
     expect(j.verdict).toBe("undecidable");
     expect(candidateRefusal(j)).toMatch(/^The judge cannot decide on the candidate: gate 2: A lookup failed: Invalid OSV batch item; no clean result is available\./);

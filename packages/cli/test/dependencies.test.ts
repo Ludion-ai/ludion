@@ -1026,7 +1026,7 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(fix).toMatchObject({ outcome: apply ? "applied" : "validated", candidate_passed: true, changes: [{ name: "lodash", from: "4.17.20", to: version }] });
     expect(fix.judgement).toMatchObject({ verdict: "ready_except_build", changes: [expect.objectContaining({ name: "lodash", from: "4.17.20", to: version })] });
     expect(fix.fix_published_at).toBe(LODASH.versions[version as keyof typeof LODASH.versions]);
-    expect(fix.fix_published_note).toContain("The smallest fixed version was passed over (version_choice)");
+    expect(fix.fix_published_note).toContain("The smallest fixed version was passed over (version_choice); this is the latest publish time among the fix's planned versions, the version taken included.");
     if (apply) {
       expect(fix.branch).toBe(`ludion/npm/lodash-${version}`);
       expect(JSON.parse(git(root, "show", `${fix.branch}:package.json`)).dependencies.lodash).toBe(version);
@@ -1140,6 +1140,17 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.22"], ["3.10.0", "3.10.2"]]);
     expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: "4.17.22" })]);
     expect(result.receipt?.before.plan.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
+  });
+  it("stops the whole fix when one of its two changes would take a version from another account", async () => {
+    const { root, osv, npm } = twoCopies(one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : version === "4.17.22" ? { _npmUser: { name: "mallory" } } : {}));
+    let tests = 0;
+    const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null });
+    expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
+    expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: null, publisher_check: expect.objectContaining({ result: "stop" }) })]);
+    expect(fix.reason).toMatch(/^Gate 2 stops this fix: .*The publishers differ/);
+    expect(tests).toBe(0);
   });
   it("adds the passed-over sentence to fix_published_note only when a publish time was read", async () => {
     const npm = registry({ lodash: LODASH }, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}));
@@ -1287,6 +1298,8 @@ describe("the next smallest fix's publisher check (docs/decisions/2026-10-30-nex
     // With provenance on both, the publisher account is not what is compared: trusted publishing's shared user is fine.
     const oidc = { _npmUser: { name: "GitHub Actions", email: "npm-oidc-no-reply@github.com", trustedPublisher: { id: "github" } } };
     expect((await check({ provenance: release, ...oidc }, { provenance: release, ...oidc })).choice.chosen).toBe("1.0.1");
+    // Nor do two named accounts need to be the same one.
+    expect((await check({ provenance: release }, { provenance: release, _npmUser: { name: "bob" } })).check).toMatchObject({ result: "provenance", smallest: { publisher: "alice" }, candidate: { publisher: "bob" } });
   });
   it("takes the version when neither has provenance and the same account published both", async () => {
     const { choice, check: c, seen } = await check({}, {});

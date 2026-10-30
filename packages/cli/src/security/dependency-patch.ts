@@ -448,7 +448,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const branch = branches[index];
         const published = await dependencyFixPublished(ecosystem, fix.changes, deps.fetchFn); active();
         fix.fix_published_at = published.at; fix.fix_published_note = published.note;
-        if (fix.fix_published_at && fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the publish time of the version taken.";
+        if (fix.fix_published_at && fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the latest publish time among the fix's planned versions, the version taken included.";
         const label = `candidate-${index + 1}`, candidate = await acquire(label, fix.changes);
         if (candidate.archives.length) fix.archives = candidate.archives;
         fix.changed_packages = changedPackages(baseline.inventory, candidate.inventory);

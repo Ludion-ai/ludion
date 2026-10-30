@@ -572,7 +572,7 @@ describe("provenance records", () => {
 describe("OSV's batch answers for the judge", () => {
   const answering = (item: unknown): typeof fetch => async () => new Response(JSON.stringify({ results: [item] }));
   const one = [{ name: "lib", version: "1.0.0" }];
-  it.each([[null], [7], ["GHSA-x"], [{ vulnerabilities: [] }], [{ vulns: null }], [{ vulns: {} }], [[]]])("throws on an item that is not an answer (%j), as OsvClient.ids does, rather than reading it as no record", async item => {
+  it.each([[null], [7], ["GHSA-x"], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }], [{ vulns: {} }], [[]]])("throws on an item that is not an answer (%j), as OsvClient.ids does, rather than reading it as no record", async item => {
     await expect(osvIds(one, answering(item))).rejects.toThrow("Invalid OSV batch item; no clean result is available.");
   });
   it("reads an empty item as no record, and refuses a pagination token", async () => {

@@ -12,10 +12,12 @@ const lockOf = (packages: Record<string, { version: string; dev?: boolean }>) =>
   packages: { "": { name: "app" }, ...Object.fromEntries(Object.entries(packages).map(([path, p]) => [path, { version: p.version, resolved: url(path.split("node_modules/").at(-1)!, p.version), integrity: INTEGRITY, ...(p.dev ? { dev: true } : {}) }])) },
 });
 const COMMIT = "535e26d3c69de49df8bd17618a424cbe65ec897b";
-const PROV = { repository: "https://github.com/acme/lib", workflow: ".github/workflows/release.yml", commit: COMMIT };
-const fact = (over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z", ...over });
+/** A record as npm writes it today, with GitHub's repository id and event; OLD has neither, as older or other formats. */
+const PROV = { repository: "https://github.com/acme/lib", workflow: ".github/workflows/release.yml", commit: COMMIT, repository_id: "123456789", event: "push" };
+const OLD = { repository: PROV.repository, workflow: PROV.workflow, commit: COMMIT };
+const fact =(over: Partial<VersionFacts> = {}): VersionFacts => ({ published_at: "2026-10-01T00:00:00Z", present: true, deprecated: null, publisher: "alice", shared_publisher: false, provenance: PROV, install_scripts: [], dependencies: ["dep-a"], integrity: INTEGRITY, malicious: [], advisories: [], package_created: "2020-01-01T00:00:00Z", ...over });
 /** A package from another repository and release than lib, so it is never lib's sibling. */
-const depFact = (over: Partial<VersionFacts> = {}) => fact({ provenance: { repository: "https://github.com/acme/dep-a", workflow: ".github/workflows/release.yml", commit: "1".repeat(40) }, ...over });
+const depFact = (over: Partial<VersionFacts> = {}) => fact({ provenance: { repository: "https://github.com/acme/dep-a", workflow: ".github/workflows/release.yml", commit: "1".repeat(40), repository_id: "987654321", event: "push" }, ...over });
 const change = (over: Partial<Change> = {}): Change => ({ path: "node_modules/lib", name: "lib", from: "1.0.0", to: "1.0.1", dev: false, resolved: url("lib", "1.0.1"), integrity: INTEGRITY, replaced: null, ...over });
 const fixHigh: FixedAdvisory = { id: "GHSA-aaaa-bbbb-cccc", package: "lib", from: "1.0.0", to: "1.0.1", aliases: ["CVE-2026-1"], severity: "CRITICAL", kev: false, epss: null };
 const run = (next: Partial<VersionFacts>, prev: Partial<VersionFacts> = {}, opts: { fixes?: FixedAdvisory[]; now?: string; changes?: Change[]; files?: string[] | null } = {}) => judge({
@@ -67,6 +69,16 @@ describe("gate 2 and the wait", () => {
     ["lost provenance", { provenance: null }, {}, "had build provenance"],
     ["a different repository", { provenance: { ...PROV, repository: "https://github.com/evil/lib" } }, {}, "was built from"],
     ["a different workflow", { provenance: { ...PROV, workflow: ".github/workflows/other.yml" } }, {}, "was built from"],
+    // docs/decisions/2026-10-30-provenance-immutable-id.md. SlugFest: the name and path are the same, the id is another.
+    ["another repository id under the same name and workflow", { provenance: { ...PROV, repository_id: "999" } }, {}, "was built from GitHub repository id 999, not 123456789 like 1.0.0."],
+    ["a repository id on the new version only", {}, { provenance: OLD }, "Only one of lib@1.0.0 and 1.0.1 records a GitHub repository id in its provenance, so they cannot be compared."],
+    ["a repository id on the old version only", { provenance: OLD }, {}, "Only one of lib@1.0.0 and 1.0.1 records a GitHub repository id"],
+    ["a name that differs with the same id (a rename or transfer is not let through)", { provenance: { ...PROV, repository: "https://github.com/acme/lib-renamed" } }, {}, "was built from"],
+    ["publishing from pull_request_target", { provenance: { ...PROV, event: "pull_request_target" } }, {}, "lib@1.0.1's provenance was published from a GitHub pull_request_target event, not push, release or workflow_dispatch."],
+    ["publishing from issue_comment", { provenance: { ...PROV, event: "issue_comment" } }, {}, "issue_comment event"],
+    ["publishing from workflow_run", { provenance: { ...PROV, event: "workflow_run" } }, {}, "workflow_run event"],
+    ["publishing from schedule", { provenance: { ...PROV, event: "schedule" } }, {}, "schedule event"],
+    ["a repository id without an event", { provenance: { ...PROV, event: null } }, {}, "lib@1.0.1's provenance records a GitHub repository id but no triggering event."],
     ["a new install script", { install_scripts: ["preinstall"] }, {}, "adds install scripts: preinstall"],
     ["a malicious-package record", { malicious: ["MAL-2025-1"] }, {}, "malicious-package records"],
     ["deprecation", { deprecated: "Bad release" }, {}, "deprecated"],
@@ -75,6 +87,28 @@ describe("gate 2 and the wait", () => {
     const result = run(next, prev, { now: "2027-01-01T00:00:00Z" });
     expect(result.verdict).toBe("stop");
     expect(result.findings.some(f => f.effect === "stop" && f.message.includes(message))).toBe(true);
+  });
+  it("compares two records without a repository id by name and workflow, as before, and says it did not compare by ID", () => {
+    const result = run({ provenance: OLD }, { provenance: OLD }, { now: "2027-01-01T00:00:00Z" });
+    expect(result.verdict).toBe("ready_except_build");
+    expect(result.findings).toEqual([{ gate: 2, package: "lib", effect: "info", message: "Neither lib@1.0.0 nor 1.0.1 records a GitHub repository id in its provenance: compared by repository name and workflow, not by ID." }]);
+    expect(run({ provenance: { ...OLD, repository: "https://github.com/evil/lib" } }, { provenance: OLD }, { now: "2027-01-01T00:00:00Z" }).verdict).toBe("stop");
+    // A record with neither an id nor an event is not checked for its event.
+    expect(run({ provenance: { ...OLD, event: null, repository_id: null } }, { provenance: OLD }, { now: "2027-01-01T00:00:00Z" }).verdict).toBe("ready_except_build");
+  });
+  it("lets push, release and workflow_dispatch publish, and judges the event of the version installed, not the one replaced", () => {
+    for (const event of ["push", "release", "workflow_dispatch"]) expect(run({ provenance: { ...PROV, event } }, {}, { now: "2027-01-01T00:00:00Z" }).findings).toEqual([]);
+    expect(run({}, { provenance: { ...PROV, event: "pull_request_target" } }, { now: "2027-01-01T00:00:00Z" }).verdict).toBe("ready_except_build");
+    // An event recorded with no id on either side is still checked.
+    const eventOnly = run({ provenance: { ...OLD, event: "issue_comment" } }, { provenance: OLD }, { now: "2027-01-01T00:00:00Z" });
+    expect(eventOnly.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: expect.stringContaining("issue_comment event") }));
+  });
+  it("says the id and the event are the build's own claims, which only the wait and the re-query back", () => {
+    expect(run({}).not_checked).toContain("The GitHub repository id and event in a provenance statement are written by npm from the build's environment variables, which the publishing workflow can set; Ludion has not established that the registry matches them against the signing certificate. A re-registered repository name whose publisher writes the old id and an allowed event passes these checks and is caught only by the wait and the re-query.");
+  });
+  it("stops a package new to the project when its provenance was published from another event", () => {
+    const result = judge({ changes: [change({ from: null })], facts: new Map([["lib@1.0.1", fact({ provenance: { ...PROV, event: "pull_request_target" } })]]), fixes: [], direct: ["lib"], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), created: new Map([["lib", "2020-01-01T00:00:00Z"]]) });
+    expect(result.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: "lib@1.0.1's provenance was published from a GitHub pull_request_target event, not push, release or workflow_dispatch." }));
   });
   it("stops a downgrade, and a version with advisories the old one did not have", () => {
     const down = run({}, {}, { changes: [change({ from: "1.0.1", to: "1.0.0", resolved: url("lib", "1.0.0") })], now: "2027-01-01T00:00:00Z" });
@@ -191,9 +225,17 @@ describe("rule 1's same-release exception", () => {
   it("allows a sibling whose provenance names the same repository, workflow and commit, at any time and any version", () => {
     const result = sibling({ published_at: "2026-10-03T00:00:00Z" }, {}, "2.0.0");
     expect(result.time_cap.after_t).toEqual([]);
-    expect(result.time_cap.same_release).toEqual([{ version: "lib-env@2.0.0", target: "lib@1.0.1", basis: "provenance" }]);
+    expect(result.time_cap.same_release).toEqual([{ version: "lib-env@2.0.0", target: "lib@1.0.1", basis: "provenance", by_id: true }]);
     expect(result.findings.filter(f => f.effect === "stop")).toEqual([]);
-    expect(renderJudgement(result)).toContain("Published at or after T (2026-10-01T00:00:00.000Z, the fix's publish time): 1 version(s)\n  lib-env@2.0.0: allowed, the same release as lib@1.0.1 (provenance names the same repository, workflow and commit)");
+    expect(renderJudgement(result)).toContain("Published at or after T (2026-10-01T00:00:00.000Z, the fix's publish time): 1 version(s)\n  lib-env@2.0.0: allowed, the same release as lib@1.0.1 (provenance names the same repository, workflow, commit and repository id)");
+  });
+  it("allows a sibling when neither record has a repository id, as before, and says it was not compared by ID", () => {
+    const cap = sibling({ published_at: "2026-10-01T00:00:05Z", provenance: OLD }, { provenance: OLD }).time_cap;
+    expect(cap.same_release).toEqual([{ version: "lib-env@1.0.1", target: "lib@1.0.1", basis: "provenance", by_id: false }]);
+    expect(renderTimeCap(cap)[1]).toBe("  lib-env@1.0.1: allowed, the same release as lib@1.0.1 (provenance names the same repository, workflow and commit; neither records a repository id, so not compared by ID)");
+    // An entry that does not say it was compared by ID is shown as not compared by ID.
+    const { by_id: _unsaid, ...unsaid } = cap.same_release[0]!;
+    expect(renderTimeCap({ ...cap, same_release: [unsaid] })[1]).toContain("so not compared by ID");
   });
   it("counts the wait from the newest sibling", () => {
     const result = sibling({ published_at: "2026-10-01T00:10:00Z" });
@@ -209,6 +251,12 @@ describe("rule 1's same-release exception", () => {
     ["a record without a workflow", { provenance: { ...PROV, workflow: null } }, { provenance: { ...PROV, workflow: null } }],
     ["provenance on the sibling only", {}, { provenance: null }],
     ["provenance on the fix only", { provenance: null }, {}],
+    ["another repository id under the same name, workflow and commit", { provenance: { ...PROV, repository_id: "999" } }, {}],
+    ["a repository id on the fix only", { provenance: OLD }, {}],
+    ["a repository id on the sibling only", {}, { provenance: OLD }],
+    ["a sibling published from pull_request_target", { provenance: { ...PROV, event: "pull_request_target" } }, {}],
+    ["a fix published from issue_comment", {}, { provenance: { ...PROV, event: "issue_comment" } }],
+    ["a sibling with a repository id and no event", { provenance: { ...PROV, event: null } }, {}],
   ])("stops a sibling with %s", (_name, next, fix) => {
     const result = sibling({ published_at: "2026-10-01T00:00:05Z", ...next }, fix);
     expect(result.time_cap.same_release).toEqual([]);
@@ -522,17 +570,47 @@ describe("gate 4 and urgency", () => {
 
 describe("provenance records", () => {
   const encode = (statement: unknown) => Buffer.from(JSON.stringify(statement)).toString("base64");
-  const v1 = (resolvedDependencies: unknown) => ({ attestations: [{ predicateType: "https://github.com/npm/attestation/tree/main/specs/publish/v0.1" }, { predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: encode({ predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/acme/lib", path: ".github/workflows/release.yml" } }, resolvedDependencies } } }) } } }] });
-  const v02 = (digest: unknown) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v0.2", bundle: { dsseEnvelope: { payload: encode({ predicate: { invocation: { configSource: { uri: "git+https://github.com/acme/lib@refs/heads/main", digest, entryPoint: ".github/workflows/release.yml" } } } }) } } }] });
+  /** With `github`, v1's internalParameters.github; with `environment`, v0.2's invocation.environment. */
+  const v1 = (resolvedDependencies: unknown, github?: unknown) => ({ attestations: [{ predicateType: "https://github.com/npm/attestation/tree/main/specs/publish/v0.1" }, { predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: encode({ predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/acme/lib", path: ".github/workflows/release.yml" } }, ...(github === undefined ? {} : { internalParameters: { github } }), resolvedDependencies } } }) } } }] });
+  const v02 = (digest: unknown, environment?: unknown) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v0.2", bundle: { dsseEnvelope: { payload: encode({ predicate: { invocation: { configSource: { uri: "git+https://github.com/acme/lib@refs/heads/main", digest, entryPoint: ".github/workflows/release.yml" }, ...(environment === undefined ? {} : { environment }) } } }) } } }] });
+  const resolved = [{ uri: "git+https://github.com/acme/lib@refs/heads/main", digest: { gitCommit: COMMIT } }];
   it("reads the repository, workflow and source commit from SLSA v1 and v0.2 statements", () => {
-    expect(provenanceFrom(v1([{ uri: "git+https://github.com/acme/lib@refs/heads/main", digest: { gitCommit: COMMIT } }]))).toEqual(PROV);
-    expect(provenanceFrom(v02({ sha1: COMMIT }))).toEqual(PROV);
+    expect(provenanceFrom(v1(resolved))).toEqual({ ...OLD, repository_id: null, event: null });
+    expect(provenanceFrom(v02({ sha1: COMMIT }))).toEqual({ ...OLD, repository_id: null, event: null });
+  });
+  it("reads GitHub's repository id and event from v1's internalParameters and v0.2's environment", () => {
+    expect(provenanceFrom(v1(resolved, { event_name: "push", repository_id: "123456789", repository_owner_id: "42" }))).toEqual(PROV);
+    expect(provenanceFrom(v02({ sha1: COMMIT }, { GITHUB_EVENT_NAME: "push", GITHUB_REPOSITORY_ID: "123456789", GITHUB_REPOSITORY: "acme/lib" }))).toEqual(PROV);
+    expect(provenanceFrom(v1(resolved, { event_name: "pull_request_target" }))).toEqual({ ...OLD, repository_id: null, event: "pull_request_target" });
+    expect(provenanceFrom(v1(resolved, {}))).toEqual({ ...OLD, repository_id: null, event: null });
+  });
+  it.each([
+    ["an id that is a number, not text", { repository_id: 123456789, event_name: "push" }, "repository id is not in the expected form"],
+    ["an id that is not only digits", { repository_id: "12a", event_name: "push" }, "repository id is not in the expected form"],
+    ["an empty id", { repository_id: "", event_name: "push" }, "repository id is not in the expected form"],
+    ["an event that is not a plain lower-case name", { repository_id: "1", event_name: "Push" }, "event name is not in the expected form"],
+    ["an event with other characters", { repository_id: "1", event_name: "push\n" }, "event name is not in the expected form"],
+    ["GitHub parameters that are not an object", "push", "not an object"],
+    ["GitHub parameters that are a list", ["push"], "not an object"],
+  ])("refuses a statement with %s", (_name, github, message) => {
+    expect(() => provenanceFrom(v1(resolved, github))).toThrow(message);
+  });
+  it("reads both values from the one block of the statement's own form, never one from each", () => {
+    const both = (predicate: unknown) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: encode({ predicate }) } } }] });
+    const github = { repository_id: "123456789" }, environment = { GITHUB_EVENT_NAME: "push", GITHUB_REPOSITORY_ID: "555" };
+    // A v1 statement takes nothing from a v0.2 environment beside it, and a v0.2 statement nothing from v1's internalParameters.
+    expect(provenanceFrom(both({ buildDefinition: { externalParameters: { workflow: { repository: PROV.repository, path: PROV.workflow } }, internalParameters: { github }, resolvedDependencies: resolved }, invocation: { environment } }))).toEqual({ ...PROV, event: null });
+    expect(provenanceFrom(both({ buildDefinition: { internalParameters: { github: { repository_id: "1", event_name: "issue_comment" } } }, invocation: { configSource: { uri: "git+https://github.com/acme/lib@refs/heads/main", digest: { sha1: COMMIT }, entryPoint: PROV.workflow }, environment } }))).toEqual({ ...OLD, repository_id: "555", event: "push" });
+  });
+  it("refuses a v0.2 environment that is malformed", () => {
+    expect(() => provenanceFrom(v02({ sha1: COMMIT }, { GITHUB_REPOSITORY_ID: 5 }))).toThrow("repository id is not in the expected form");
+    expect(() => provenanceFrom(v02({ sha1: COMMIT }, "x"))).toThrow("not an object");
   });
   it("refuses a statement that does not name the version and its tarball, when asked to check", () => {
     const hex = Buffer.from(INTEGRITY.slice(7), "base64").toString("hex");
     const signed = (subject: unknown) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: encode({ subject, predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/acme/lib", path: ".github/workflows/release.yml" } }, resolvedDependencies: [{ digest: { gitCommit: COMMIT } }] } } }) } } }] });
     const want = { name: "@acme/lib", version: "1.0.1", integrity: INTEGRITY };
-    expect(provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.1", digest: { sha512: hex } }]), want)).toEqual(PROV);
+    expect(provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.1", digest: { sha512: hex } }]), want)).toEqual({ ...OLD, repository_id: null, event: null });
     expect(() => provenanceFrom(signed([{ name: "pkg:npm/%40acme/other@1.0.1", digest: { sha512: hex } }]), want)).toThrow("does not name @acme/lib@1.0.1");
     expect(() => provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.0", digest: { sha512: hex } }]), want)).toThrow("does not name");
     expect(() => provenanceFrom(signed([{ name: "pkg:npm/%40acme/lib@1.0.1", digest: { sha512: "f".repeat(128) } }]), want)).toThrow("does not name");
@@ -583,9 +661,16 @@ describe("OSV's batch answers for the judge", () => {
     await expect(osvIds(one, answering({ vulns: [], next_page_token: 7 }))).rejects.toThrow("Invalid OSV pagination token.");
     await expect(osvIds(one, answering({ vulns: [null] }))).rejects.toThrow("Invalid OSV advisory id.");
   });
+  it("keeps a repeated id once, in OSV's order", async () => {
+    expect(await osvIds(one, answering({ vulns: [{ id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }, { id: "MAL-2026-0001" }] }))).toEqual(new Map([["lib@1.0.0", ["MAL-2026-0001", "GHSA-aaaa-bbbb-cccc"]]]));
+    // Only the whole id is one id: two ids with the same prefix stay two, or a newly named advisory reads as the old one
+    // and gate 1's "introduced" stop is lost (docs/mistakes/2026-10-30-lv4-fixes-not-held-by-tests.md).
+    expect(await osvIds(one, answering({ vulns: [{ id: "GHSA-aaaa-bbbb-cccc" }, { id: "GHSA-dddd-eeee-ffff" }, { id: "GHSA-aaaa-bbbb-cccc" }] }))).toEqual(new Map([["lib@1.0.0", ["GHSA-aaaa-bbbb-cccc", "GHSA-dddd-eeee-ffff"]]]));
+    expect(await osvIds(one, answering({ vulns: [{ id: "MAL-2026-0001" }, { id: "MAL-2026-0002" }] }))).toEqual(new Map([["lib@1.0.0", ["MAL-2026-0001", "MAL-2026-0002"]]]));
+  });
   // The judge's reader and the scan's reader (OsvClient.ids) are two parsers of one answer; they must refuse the same
   // items and read the same ids (docs/mistakes/2026-10-30-osv-batch-item-read-as-no-record.md).
-  it.each([[null], [7], ["GHSA-x"], [[]], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }], [{ vulns: {} }], [{ vulns: [null] }], [{ vulns: [{ id: "../x" }] }], [{ vulns: [], next_page_token: 7 }], [{}], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }]])("agrees with OsvClient.ids on %j", async item => {
+  it.each([[null], [7], ["GHSA-x"], [[]], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }], [{ vulns: {} }], [{ vulns: [null] }], [{ vulns: [{ id: "../x" }] }], [{ vulns: [], next_page_token: 7 }], [{}], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "MAL-2026-0001" }] }], [{ vulns: [{ id: "GHSA-aaaa-bbbb-cccc" }, { id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }], [{ vulns: [{ id: "GHSA-aaaa-bbbb-cccc" }, { id: "GHSA-dddd-eeee-ffff" }, { id: "GHSA-aaaa-bbbb-cccc" }] }], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "MAL-2026-0002" }] }]])("agrees with OsvClient.ids on %j", async item => {
     const scan = await new OsvClient(answering(item)).ids([{ ecosystem: "npm", name: "lib", version: "1.0.0" }]).then(m => [...m.values()], () => "throws");
     const judge = await osvIds(one, answering(item)).then(m => [...m.values()], () => "throws");
     expect(judge).toEqual(scan);

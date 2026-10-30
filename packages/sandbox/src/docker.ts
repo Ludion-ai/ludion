@@ -35,7 +35,7 @@ let project: string | null = null;
  * folders (Composer's vendor/bin, a .venv/bin) first on PATH. The security CLI calls this with the project root.
  */
 export function useProject(root: string | null): void {
-  project = root === null ? null : realpathSync(root);
+  project = root === null ? null : process.platform === "win32" ? realpathSync.native(root) : realpathSync(root);
 }
 
 /**
@@ -55,7 +55,8 @@ export function findProgram(program: string, path = process.env.PATH ?? "", cwd 
   if (!/^[a-z][a-z0-9-]*$/.test(program)) throw new Error("Expected a plain program name.");
   const win = platform === "win32", P = win ? win32 : posix;
   const fold = (a: string) => win ? a.toLowerCase() : a;
-  const real = (p: string) => { try { return realpathSync(p); } catch { return p; } };
+  // On Windows the OS call follows junctions and subst drives, which the JavaScript walk does not.
+  const real = (p: string) => { try { return win ? realpathSync.native(p) : realpathSync(p); } catch { return p; } };
   const inside = (dir: string, base: string | null | undefined) => {
     if (!base || !P.isAbsolute(base)) return false;
     const rel = P.relative(fold(P.resolve(base)), fold(dir));
@@ -66,7 +67,7 @@ export function findProgram(program: string, path = process.env.PATH ?? "", cwd 
   for (const raw of path.split(win ? ";" : ":")) {
     const dir = raw.trim().replace(/^"(.*)"$/, "$1");
     if (!dir || !P.isAbsolute(dir)) continue;
-    const full = P.resolve(dir), resolved = win ? full : real(full);
+    const full = P.resolve(dir), resolved = real(full);
     if (fold(full) === here || fold(resolved) === here) continue;
     if ([full, resolved].some(d => d.split(/[\\/]/).some(part => fold(part) === "node_modules"))) continue;
     if ([full, resolved].some(d => inside(d, root) || inside(d, berry))) continue;

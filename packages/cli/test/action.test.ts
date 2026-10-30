@@ -315,6 +315,10 @@ describe("the npm package", () => {
     for (const build of ["packages/cli/build.ts", "action/build.ts"]) expect(read(build)).toContain('target: "node22",');
     expect(read("action/start.sh")).toContain('split(".")[0]) < 22)');
   });
+  it("is checked by the publish workflow against exactly the files package.json ships, plus package.json", () => {
+    const listed = /printf '([^']+)' \| LC_ALL=C sort \| diff - files\.txt/.exec(read(".github/workflows/publish.yml"))?.[1];
+    expect(listed?.split("\\n").filter(Boolean).sort()).toEqual([...pkg.files, "package.json"].map((f: string) => `package/${f}`).sort());
+  });
   it("sets every packed file to 0644 when it builds, so any checkout packs the same bytes", () => {
     expect(read("packages/cli/build.ts")).toContain('for (const file of ["dist/cli.js", "LICENSE", "README.md", "package.json"]) chmodSync(file, 0o644);');
     if (process.platform !== "win32" && existsSync(path("packages/cli/dist/cli.js"))) {

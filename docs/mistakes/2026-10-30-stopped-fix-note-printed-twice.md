@@ -1,0 +1,5 @@
+# 2026-10-30 — `ludion patch` printed a stopped fix's note twice
+
+- **What happened.** When the next-fix publisher check (#213) stops a fix, dependency-patch.ts sets the fix's reason to "Gate 2 stops this fix: " followed by the version choice's note. `ludion patch` (packages/cli/src/security/cli.ts) printed the reason on the fix's line and then the same note again on the version choice's line, so the terminal said it twice. The receipt was right; only the text was repeated. The cloud review of #213 found it (https://github.com/Ludion-ai/ludion/pull/213#issuecomment-6515878521, finding 2). LV4 fixed it: a note the reason already carries is not printed again, and the versions passed over are still listed.
+- **Why.** The reason and the version choice line were written in different PRs (#213 and #209), and no test read `ludion patch`'s text for a stopped fix; the tests read the receipt only.
+- **Check:** `packages/cli/test/patch-cli.test.ts` — the note appears once for a stopped fix, with and without versions passed over, and once for a fix that took the next version.

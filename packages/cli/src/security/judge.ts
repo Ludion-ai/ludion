@@ -2,7 +2,7 @@
 // Pure: every fact comes in as data (registry, OSV, KEV), so the same rules run live and in the backtest.
 // v0 judges gates 1, 2 and 4 and the wait. Gate 3 (build and test) is not run here, so v0 never says "apply".
 import semver from "semver";
-import { renderTimeCap, timeCap, type ReleaseIdentity, type TimeCap } from "./time-cap.ts";
+import { eventProblem, renderTimeCap, repositoryIds, timeCap, type Provenance, type ReleaseIdentity, type TimeCap } from "./time-cap.ts";
 
 export type Urgency = "exploited" | "high" | "normal" | "low";
 /** Hours to wait after the newest publish in the diff (design, "待機時間"). */
@@ -35,7 +35,7 @@ export type VersionFacts = {
   /** The publisher counts as no account (npm-facts.ts, sharedPublisher): trusted publishing's shared user, say. */
   shared_publisher: boolean;
   /** Build provenance from the registry's attestations: null when the version has none. */
-  provenance: { repository: string | null; workflow: string | null; commit: string | null } | null;
+  provenance: Provenance | null;
   /** Which of preinstall, install, postinstall the version declares. */
   install_scripts: string[];
   dependencies: string[];
@@ -460,6 +460,8 @@ export function judge(input: {
     if (!next.present) add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to} is no longer listed by the registry (unpublished or withdrawn).` });
     if (next.deprecated) add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to} is deprecated: ${next.deprecated.slice(0, 200)}` });
     if (c.replaced) add({ gate: 2, package: c.name, effect: "stop", message: `${c.path} now installs ${c.name}@${c.to} instead of ${c.replaced}: another package under the same name.` });
+    const event = next.provenance && eventProblem(next.provenance);
+    if (event) add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to}'s provenance ${event}.` });
     if (c.from && semver.lt(c.to, c.from)) add({ gate: 1, package: c.name, effect: "stop", message: `${c.name} goes down from ${c.from} to ${c.to} at ${c.path}.` });
     const introduced = next.advisories.filter(id => !prev?.advisories.includes(id));
     if (introduced.length) add({ gate: 1, package: c.name, effect: "stop", message: `${c.name}@${c.to} has known advisories ${c.from ? `that ${c.from} did not have` : "and is new to the project"}: ${introduced.join(", ")}.` });
@@ -475,6 +477,13 @@ export function judge(input: {
     if (prev.provenance && !next.provenance) add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.from} had build provenance and ${c.to} has none.` });
     else if (prev.provenance && next.provenance && (prev.provenance.repository !== next.provenance.repository || prev.provenance.workflow !== next.provenance.workflow)) {
       add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to} was built from ${next.provenance.repository ?? "?"} ${next.provenance.workflow ?? "?"}, not ${prev.provenance.repository ?? "?"} ${prev.provenance.workflow ?? "?"} like ${c.from}.` });
+    }
+    // The repository's immutable id as well (docs/decisions/2026-10-30-provenance-immutable-id.md): a name can be registered again.
+    if (prev.provenance && next.provenance) {
+      const ids = repositoryIds(prev.provenance, next.provenance);
+      if (ids === "differ") add({ gate: 2, package: c.name, effect: "stop", message: `${c.name}@${c.to} was built from GitHub repository id ${next.provenance.repository_id}, not ${prev.provenance.repository_id} like ${c.from}.` });
+      else if (ids === "one") add({ gate: 2, package: c.name, effect: "stop", message: `Only one of ${c.name}@${c.from} and ${c.to} records a GitHub repository id in its provenance, so they cannot be compared.` });
+      else if (ids === "none") add({ gate: 2, package: c.name, effect: "info", message: `Neither ${c.name}@${c.from} nor ${c.to} records a GitHub repository id in its provenance: compared by repository name and workflow, not by ID.` });
     }
     // Comparable only when both sides name a repository and a workflow.
     if (!prev.provenance?.repository || !prev.provenance.workflow || !next.provenance?.repository || !next.provenance.workflow) comparable = false;
@@ -531,7 +540,8 @@ export function judge(input: {
       "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
       "Obfuscated code and new network or process calls in the changed code are not inspected.",
       "Gate 1's OS, SAPI and configuration conditions are not matched, and production and dev-only dependencies are not told apart: every changed version counts as production.",
-      "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (and the same-release exception that relies on it) rests on the registry's checks at publish time.",
+      "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (its repository, workflow and commit, and the same-release exception that relies on it) rests on the registry's checks at publish time.",
+      "The GitHub repository id and event in a provenance statement are written by npm from the build's environment variables, which the publishing workflow can set; Ludion has not established that the registry matches them against the signing certificate. A re-registered repository name whose publisher writes the old id and an allowed event passes these checks and is caught only by the wait and the re-query.",
       "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
       "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
       "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.",

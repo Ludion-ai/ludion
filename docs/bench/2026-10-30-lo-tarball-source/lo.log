@@ -1,0 +1,204 @@
+2026-10-30T10:55:31.834Z 1/203 malicious @igh/server-updater-ssh@1.2.16: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:55:32.752Z 2/203 malicious @igh/server-updater-ssh-l1@1.2.17: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:55:34.089Z 3/203 malicious @asyncapi/studio@0.20.1: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:55:35.167Z 4/203 malicious @asyncapi/studio@0.20.2: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:55:35.394Z 5/203 malicious freo-design-system@1.0.1: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:55:35.667Z 6/203 malicious freo-design-system@1.0.4: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:55:36.238Z 7/203 malicious @dm3-org/dm3-lib-shared@1.7.2: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:55:37.061Z 8/203 malicious @react-native-aria/switch@0.2.5: not comparable (no release tag and no provenance: repository not reachable (HTTP 401); no attestations)
+2026-10-30T10:55:39.149Z 9/203 genuine react-server-dom-turbopack@19.2.2: differs
+2026-10-30T10:55:39.850Z 10/203 genuine axios@1.8.2: match
+2026-10-30T10:55:40.829Z 11/203 genuine @react-native-community/cli-server-api@19.1.2: absent files only
+2026-10-30T10:55:41.537Z 12/203 genuine mcp-remote@0.1.16: absent files only
+2026-10-30T10:55:51.021Z 13/203 genuine next@15.5.7: differs
+2026-10-30T10:55:52.654Z 14/203 genuine react-server-dom-webpack@19.1.2: differs
+2026-10-30T10:55:57.972Z 15/203 genuine @angular/platform-server@20.3.0: differs
+2026-10-30T10:55:59.948Z 16/203 genuine @sentry/nextjs@8.49.0: absent files only
+2026-10-30T10:56:01.711Z 17/203 genuine react-server-dom-turbopack@19.0.2: differs
+2026-10-30T10:56:02.127Z 18/203 genuine flowise@3.0.6: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:56:04.105Z 19/203 genuine undici@6.21.1: match
+2026-10-30T10:56:07.133Z 20/203 genuine @portkey-ai/gateway@1.14.0: absent files only
+2026-10-30T10:56:12.538Z 21/203 genuine @strapi/core@5.10.3: absent files only
+2026-10-30T10:56:16.603Z 22/203 genuine n8n@1.114.0: absent files only
+2026-10-30T10:56:19.860Z 23/203 genuine @plone/volto@17.22.1: absent files only
+2026-10-30T10:56:20.576Z 24/203 genuine xml-crypto@6.0.1: differs
+2026-10-30T10:56:22.283Z 25/203 genuine @fedify/fedify@1.3.20: not comparable (package directory not found)
+2026-10-30T10:56:23.025Z 26/203 genuine tarteaucitronjs@1.22.0: match
+2026-10-30T10:56:24.135Z 27/203 genuine @auth0/nextjs-auth0@4.5.1: absent files only
+2026-10-30T10:56:24.953Z 28/203 genuine dom-expressions@0.39.5: match
+2026-10-30T10:56:25.237Z 29/203 genuine tryton-sao@7.4.21: not comparable (no release tag and no provenance: not GitHub; no attestations)
+2026-10-30T10:56:32.236Z 30/203 genuine next@15.2.4: differs
+2026-10-30T10:56:34.118Z 31/203 genuine @intlify/core@9.14.5: absent files only
+2026-10-30T10:56:34.765Z 32/203 genuine brace-expansion@1.1.12: match
+2026-10-30T10:56:36.856Z 33/203 genuine vite@5.4.17: absent files only
+2026-10-30T10:56:42.440Z 34/203 genuine ghost@6.0.9: absent files only
+2026-10-30T10:56:43.238Z 35/203 genuine snowflake-sdk@2.0.2: match
+2026-10-30T10:56:44.085Z 36/203 genuine psitransfer@2.3.1: match
+2026-10-30T10:56:44.645Z 37/203 genuine @sentry/nestjs@8.49.0: absent files only
+2026-10-30T10:56:47.597Z 38/203 genuine @plone/volto@16.34.0: absent files only
+2026-10-30T10:56:48.682Z 39/203 genuine koa@2.16.3: absent files only
+2026-10-30T10:56:50.756Z 40/203 genuine parse-server@8.0.2: absent files only
+2026-10-30T10:56:55.000Z 41/203 genuine mermaid@11.10.0: absent files only
+2026-10-30T10:56:56.445Z 42/203 genuine @fedify/fedify@1.3.4: not comparable (package directory not found)
+2026-10-30T10:56:57.896Z 43/203 genuine @fedify/fedify@1.6.8: absent files only
+2026-10-30T10:56:58.758Z 44/203 genuine get-jwks@11.0.2: match
+2026-10-30T10:57:00.042Z 45/203 genuine vite@6.2.4: absent files only
+2026-10-30T10:57:01.234Z 46/203 genuine @fastify/reply-from@12.5.0: absent files only
+2026-10-30T10:57:09.012Z 47/203 genuine directus@11.5.0: match
+2026-10-30T10:57:10.051Z 48/203 genuine on-headers@1.1.0: match
+2026-10-30T10:57:11.701Z 49/203 genuine react-server-dom-turbopack@19.2.3: differs
+2026-10-30T10:57:12.552Z 50/203 genuine multer@2.0.1: match
+2026-10-30T10:57:13.123Z 51/203 genuine @sentry/nuxt@8.49.0: absent files only
+2026-10-30T10:57:13.971Z 52/203 genuine vite-plugin-static-copy@2.3.2: absent files only
+2026-10-30T10:57:14.937Z 53/203 genuine @vitejs/plugin-rsc@0.5.7: absent files only
+2026-10-30T10:57:15.812Z 54/203 genuine node-forge@1.3.2: absent files only
+2026-10-30T10:57:22.752Z 55/203 genuine next@15.0.7: differs
+2026-10-30T10:57:24.831Z 56/203 genuine @finos/git-proxy@1.19.2: differs
+2026-10-30T10:57:28.506Z 57/203 genuine @plone/volto@18.24.0: absent files only
+2026-10-30T10:57:30.553Z 58/203 genuine @angular/ssr@20.3.0: absent files only
+2026-10-30T10:57:33.483Z 59/203 genuine cloudinary@2.7.0: match
+2026-10-30T10:57:34.647Z 60/203 genuine @node-saml/node-saml@5.1.0: absent files only
+2026-10-30T10:57:35.420Z 61/203 genuine @octokit/endpoint@9.0.6: absent files only
+2026-10-30T10:57:36.120Z 62/203 genuine mcp-server-kubernetes@2.5.0: absent files only
+2026-10-30T10:57:36.675Z 63/203 genuine mcp-server-kubernetes@2.9.8: absent files only
+2026-10-30T10:57:37.330Z 64/203 genuine @webrecorder/wabac@2.23.11: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:57:38.177Z 65/203 genuine js-toml@1.0.2: absent files only
+2026-10-30T10:57:39.806Z 66/203 genuine better-auth@1.2.10: absent files only
+2026-10-30T10:57:41.279Z 67/203 genuine @nestjs/common@10.4.16: absent files only
+2026-10-30T10:57:44.011Z 68/203 genuine @anthropic-ai/claude-code@1.0.93: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:57:52.148Z 69/203 genuine next@16.0.9: differs
+2026-10-30T10:57:54.162Z 70/203 genuine @directus/api@24.0.1: absent files only
+2026-10-30T10:57:55.417Z 71/203 genuine react-router@7.5.2: absent files only
+2026-10-30T10:57:56.093Z 72/203 genuine screenshot-desktop@1.15.2: match
+2026-10-30T10:57:57.293Z 73/203 genuine vite@4.5.11: absent files only
+2026-10-30T10:58:01.231Z 74/203 genuine astro@5.15.8: absent files only
+2026-10-30T10:58:06.468Z 75/203 genuine azle@0.30.0: differs
+2026-10-30T10:58:08.324Z 76/203 genuine react-server-dom-webpack@19.0.1: differs
+2026-10-30T10:58:09.341Z 77/203 genuine @octokit/request-error@6.1.7: absent files only
+2026-10-30T10:58:12.667Z 78/203 genuine @astrojs/node@9.4.1: absent files only
+2026-10-30T10:58:13.854Z 79/203 genuine @backstage/plugin-scaffolder-backend@2.1.1: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T10:58:18.174Z 80/203 genuine @angular/compiler@19.2.17: differs
+2026-10-30T10:58:19.994Z 81/203 genuine @umbraco-cms/backoffice@14.3.2: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T10:58:20.572Z 82/203 genuine pbkdf2@3.1.3: not comparable (source archive not read: source archive not read: HTTP 404)
+2026-10-30T10:58:27.189Z 83/203 genuine next@14.2.26: differs
+2026-10-30T10:58:28.735Z 84/203 genuine openpgp@5.11.3: absent files only
+2026-10-30T10:58:29.641Z 85/203 genuine glob@11.1.0: absent files only
+2026-10-30T10:58:30.583Z 86/203 genuine @auth0/nextjs-auth0@4.11.2: absent files only
+2026-10-30T10:58:33.050Z 87/203 genuine mongosh@2.3.9: differs
+2026-10-30T10:58:35.635Z 88/203 genuine vite@6.3.6: absent files only
+2026-10-30T10:58:36.956Z 89/203 genuine vite@6.0.14: absent files only
+2026-10-30T10:58:39.141Z 90/203 genuine @directus/api@28.0.2: absent files only
+2026-10-30T10:58:42.564Z 91/203 genuine n8n@1.121.1: absent files only
+2026-10-30T10:58:44.034Z 92/203 genuine react-server-dom-turbopack@19.1.3: differs
+2026-10-30T10:58:45.375Z 93/203 genuine vite@7.0.7: absent files only
+2026-10-30T10:58:47.795Z 94/203 genuine better-auth@1.4.2: absent files only
+2026-10-30T10:58:48.244Z 95/203 genuine @sentry/astro@8.49.0: absent files only
+2026-10-30T10:59:03.520Z 96/203 genuine snyk@1.1297.3: differs
+2026-10-30T10:59:04.202Z 97/203 genuine @lodestar/reqresp@1.25.0: not comparable (no release tag and no provenance: repository not understood; no attestations)
+2026-10-30T10:59:04.755Z 98/203 genuine @octokit/request-error@5.1.1: absent files only
+2026-10-30T10:59:12.231Z 99/203 genuine next@16.0.10: differs
+2026-10-30T10:59:13.461Z 100/203 genuine mermaid@10.9.4: absent files only
+2026-10-30T10:59:15.487Z 101/203 genuine @apollo/composition@2.12.1: absent files only
+2026-10-30T10:59:16.098Z 102/203 genuine @cloudflare/workers-oauth-provider@0.0.5: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:59:16.622Z 103/203 genuine mailgen@2.0.30: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T10:59:18.845Z 104/203 genuine better-auth@1.1.16: absent files only
+2026-10-30T10:59:19.869Z 105/203 genuine next-auth@4.24.12: absent files only
+2026-10-30T10:59:20.377Z 106/203 genuine @intlify/vue-i18n-core@9.14.5: absent files only
+2026-10-30T10:59:21.091Z 107/203 genuine flowise-components@2.2.4: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T10:59:27.759Z 108/203 genuine next@15.2.2: differs
+2026-10-30T10:59:28.874Z 109/203 genuine @fastify/multipart@8.3.1: match
+2026-10-30T10:59:29.299Z 110/203 genuine git-commiters@0.1.2: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T10:59:30.585Z 111/203 genuine vite@7.1.11: absent files only
+2026-10-30T10:59:31.196Z 112/203 genuine @sentry/google-cloud-serverless@8.49.0: absent files only
+2026-10-30T10:59:38.796Z 113/203 genuine next@15.5.8: differs
+2026-10-30T10:59:40.128Z 114/203 genuine @escape.tech/graphql-armor-max-depth@2.4.2: absent files only
+2026-10-30T10:59:41.556Z 115/203 genuine vite@7.1.5: absent files only
+2026-10-30T10:59:43.078Z 116/203 genuine typeorm@0.3.26: differs
+2026-10-30T10:59:43.958Z 117/203 genuine tar-fs@1.16.5: match
+2026-10-30T10:59:44.826Z 118/203 genuine formio@3.5.7: match
+2026-10-30T10:59:51.572Z 119/203 genuine next@15.1.9: differs
+2026-10-30T10:59:52.449Z 120/203 genuine form-data@2.5.4: differs
+2026-10-30T10:59:52.884Z 121/203 genuine tar-fs@3.1.1: match
+2026-10-30T10:59:55.095Z 122/203 genuine @vitest/browser@3.0.4: absent files only
+2026-10-30T10:59:57.365Z 123/203 genuine x402@0.5.2: absent files only
+2026-10-30T10:59:58.198Z 124/203 genuine formidable@3.5.3: absent files only
+2026-10-30T11:00:04.856Z 125/203 genuine @openai/codex@0.39.0: differs
+2026-10-30T11:00:05.603Z 126/203 genuine estree-util-value-to-estree@3.3.3: absent files only
+2026-10-30T11:00:06.445Z 127/203 genuine parse-server@8.2.2: absent files only
+2026-10-30T11:00:07.400Z 128/203 genuine parse-server@7.5.4: absent files only
+2026-10-30T11:00:08.750Z 129/203 genuine vite@6.0.15: absent files only
+2026-10-30T11:00:17.172Z 130/203 genuine next@15.3.3: differs
+2026-10-30T11:00:18.541Z 131/203 genuine redoc@2.4.0: absent files only
+2026-10-30T11:00:19.280Z 132/203 genuine langchain@0.3.37: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T11:00:20.858Z 133/203 genuine @openzeppelin/contracts-upgradeable@5.4.0: absent files only
+2026-10-30T11:00:21.487Z 134/203 genuine @apollo/sandbox@2.7.2: not comparable (no release tag and no provenance: repository not understood; no attestations)
+2026-10-30T11:00:23.814Z 135/203 genuine directus@11.13.0: match
+2026-10-30T11:00:27.278Z 136/203 genuine @anthropic-ai/claude-code@2.0.31: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T11:00:27.777Z 137/203 genuine vue-i18n@9.14.5: absent files only
+2026-10-30T11:00:34.509Z 138/203 genuine next@15.1.10: differs
+2026-10-30T11:00:35.114Z 139/203 genuine xml-crypto@3.2.1: differs
+2026-10-30T11:00:38.894Z 140/203 genuine @haxtheweb/haxcms-nodejs@11.0.8: absent files only
+2026-10-30T11:00:39.750Z 141/203 genuine @anthropic-ai/sandbox-runtime@0.0.16: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T11:00:47.537Z 142/203 genuine next@15.4.10: differs
+2026-10-30T11:00:49.124Z 143/203 genuine react-server-dom-turbopack@19.0.3: differs
+2026-10-30T11:00:52.406Z 144/203 genuine astro@5.12.8: absent files only
+2026-10-30T11:00:59.233Z 145/203 genuine next@15.2.3: differs
+2026-10-30T11:01:00.487Z 146/203 genuine @workos-inc/authkit-react-router@0.7.0: absent files only
+2026-10-30T11:01:01.073Z 147/203 genuine @sentry/remix@8.49.0: absent files only
+2026-10-30T11:01:08.496Z 148/203 genuine next@15.2.6: differs
+2026-10-30T11:01:10.087Z 149/203 genuine vite@6.2.3: absent files only
+2026-10-30T11:01:10.817Z 150/203 genuine parse-server@7.5.3: absent files only
+2026-10-30T11:01:12.254Z 151/203 genuine vite@6.2.6: absent files only
+2026-10-30T11:01:12.790Z 152/203 genuine @sentry/aws-serverless@8.49.0: absent files only
+2026-10-30T11:01:15.718Z 153/203 genuine jspdf@3.0.1: match
+2026-10-30T11:01:15.934Z 154/203 genuine node-code-sandbox-mcp@1.3.0: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T11:01:16.417Z 155/203 genuine lightning-flow-scanner@6.10.6: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T11:01:17.828Z 156/203 genuine qs@6.14.1: differs
+2026-10-30T11:01:19.166Z 157/203 genuine vite@5.4.21: absent files only
+2026-10-30T11:01:19.809Z 158/203 genuine @sentry/solidstart@8.49.0: absent files only
+2026-10-30T11:01:20.892Z 159/203 genuine image-size@2.0.2: absent files only
+2026-10-30T11:01:23.639Z 160/203 genuine @anthropic-ai/claude-code@1.0.105: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T11:01:24.581Z 161/203 genuine happy-dom@20.0.2: absent files only
+2026-10-30T11:01:31.376Z 162/203 genuine next@14.2.30: differs
+2026-10-30T11:01:32.459Z 163/203 genuine @supabase/auth-js@2.70.0: differs
+2026-10-30T11:01:34.103Z 164/203 genuine @sentry/nestjs@10.27.0: absent files only
+2026-10-30T11:01:34.929Z 165/203 genuine systeminformation@5.27.14: match
+2026-10-30T11:01:36.195Z 166/203 genuine vite@4.5.13: absent files only
+2026-10-30T11:01:37.318Z 167/203 genuine @elysiajs/cors@1.3.1: absent files only
+2026-10-30T11:01:37.599Z 168/203 genuine react-server-dom-parcel@19.2.2: differs
+2026-10-30T11:01:39.420Z 169/203 genuine @tinacms/graphql@2.0.3: not comparable (directory not in source)
+2026-10-30T11:01:45.832Z 170/203 genuine next@15.0.6: differs
+2026-10-30T11:01:46.807Z 171/203 genuine parse-server@8.6.1: absent files only
+2026-10-30T11:01:47.608Z 172/203 genuine sveltekit-superforms@2.27.4: differs
+2026-10-30T11:01:48.324Z 173/203 genuine mdast-util-to-hast@13.2.1: absent files only
+2026-10-30T11:01:49.086Z 174/203 genuine zx@8.8.5: match
+2026-10-30T11:01:49.364Z 175/203 genuine tryton-sao@6.0.67: not comparable (no release tag and no provenance: not GitHub; no attestations)
+2026-10-30T11:01:53.108Z 176/203 genuine elysia@1.4.17: absent files only
+2026-10-30T11:01:53.817Z 177/203 genuine tar@7.5.2: absent files only
+2026-10-30T11:01:56.340Z 178/203 genuine n8n@1.107.0: absent files only
+2026-10-30T11:01:57.178Z 179/203 genuine ipx@3.1.1: absent files only
+2026-10-30T11:01:59.956Z 180/203 genuine n8n@1.119.2: absent files only
+2026-10-30T11:02:01.667Z 181/203 genuine @cyanheads/git-mcp-server@2.1.5: absent files only
+2026-10-30T11:02:05.588Z 182/203 genuine @lobehub/chat@1.129.4: differs
+2026-10-30T11:02:10.768Z 183/203 genuine next@13.5.10: differs
+2026-10-30T11:02:11.245Z 184/203 genuine tar-fs@2.1.4: match
+2026-10-30T11:02:12.224Z 185/203 genuine trix@2.1.16: absent files only
+2026-10-30T11:02:12.792Z 186/203 genuine @sentry/astro@10.27.0: absent files only
+2026-10-30T11:02:19.475Z 187/203 genuine next@15.2.7: differs
+2026-10-30T11:02:20.879Z 188/203 genuine vite@6.1.3: absent files only
+2026-10-30T11:02:22.030Z 189/203 genuine vite@4.5.10: absent files only
+2026-10-30T11:02:25.137Z 190/203 genuine astro@5.14.3: absent files only
+2026-10-30T11:02:26.321Z 191/203 genuine @jitbit/htmlsanitizer@2.0.3: differs
+2026-10-30T11:02:27.251Z 192/203 genuine hono@4.9.7: absent files only
+2026-10-30T11:02:28.641Z 193/203 genuine @akoskm/create-mcp-server-stdio@0.0.13: match
+2026-10-30T11:02:28.944Z 194/203 genuine flowise@3.0.8: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T11:02:30.089Z 195/203 genuine @alizeait/unflatto@1.0.3: absent files only
+2026-10-30T11:02:30.930Z 196/203 genuine js-yaml@3.14.2: match
+2026-10-30T11:02:31.510Z 197/203 genuine tarteaucitronjs@1.20.1: match
+2026-10-30T11:03:36.133Z 198/203 genuine aws-cdk-lib@2.189.0: differs
+2026-10-30T11:03:39.141Z 199/203 genuine vega@6.2.0: absent files only
+2026-10-30T11:03:45.395Z 200/203 genuine next@15.0.5: differs
+2026-10-30T11:04:02.394Z 201/203 malicious @ensdomains/buffer@0.1.1: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T11:04:18.019Z 202/203 malicious @voiceflow/natural-language-commander@0.5.3: not comparable (no release tag and no provenance: no tag of the 8 forms; no attestations)
+2026-10-30T11:04:28.089Z 203/203 malicious eslint-config-kinvey-flex-service@0.1.1: not comparable (no release tag and no provenance: no repository; no attestations)
+2026-10-30T11:04:28.106Z done: 203 rows

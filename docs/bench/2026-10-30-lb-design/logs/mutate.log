@@ -1,5 +1,5 @@
-# at commit 579665c0b31495f4d29baaa68f88778941c0cc9e, 2 files differing from it
-# started 2026-10-30T03:27:20Z, node v24.22.1, git version 2.39.5
+# at commit 13656a9cfb882c2481635e12327ed6f24aa1f0e2, 2 files differing from it
+# started 2026-10-30T03:37:55Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       a parent other than the base accepted — packages/cli/test/deliver.test.ts
 caught       files outside the receipt's list accepted — packages/cli/test/deliver.test.ts
@@ -24,3 +24,4 @@ caught       composer.lock: a plugin accepted — packages/cli/test/deliver.test
 caught       composer.lock: a new package from any archive accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: the planned package from another repository accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: a new package nothing requires accepted — packages/cli/test/deliver.test.ts
+# stopped by Claude Code: the system was low on memory (2026-10-30); the container was then stopped. The remaining mutations did not run.

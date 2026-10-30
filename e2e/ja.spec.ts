@@ -2,6 +2,8 @@
 // and the same content and controls as the English pages. axe, reflow, canonical and the water check cover them
 // through allPages() and water.spec.ts.
 import { expect, test, type Page } from "@playwright/test";
+import { en as enStrings } from "../apps/site/src/strings/en.ts";
+import { ja as jaStrings } from "../apps/site/src/strings/ja.ts";
 
 const PAIRS = [
   { en: "/", ja: "/ja/" },
@@ -9,12 +11,21 @@ const PAIRS = [
 ];
 const SECTIONS = ["guard", "verify", "isolate", "receipt"] as const;
 
-/** No English label or sentence is left on the page (code, ids and product names aside), visible or not yet replaced by a script. */
+// Every English string that the Japanese file translates (names, ids and code-like labels are the same in both).
+const leaves = (value: unknown): string[] =>
+  typeof value === "string" ? [value] : Object.values(value as object).flatMap(leaves);
+const jaLeaves = new Set(leaves(jaStrings));
+const ENGLISH = [...new Set(leaves(enStrings).filter((text) => !jaLeaves.has(text) && /[A-Za-z]/.test(text)))];
+
+/**
+ * No English label or sentence is left on the page (code, ids and product names aside), visible or not yet replaced by
+ * a script. Each English string of en.ts that ja.ts translates is looked for, so a string hard-coded in a component
+ * shows up here.
+ */
 async function noEnglishLeft(page: Page) {
   const text = await page.locator("body").evaluate((body) => body.textContent ?? "");
-  for (const english of ["Illustrated workflow", "Know the supported scope", "Try the preview", "Production deployment", "Replay", "security update", "dependency files", "application test", "fix branch", "tested update", "your project"]) {
-    expect(text, english).not.toContain(english);
-  }
+  expect(ENGLISH.length).toBeGreaterThan(100);
+  expect(ENGLISH.filter((english) => text.includes(english))).toEqual([]);
 }
 
 async function alternates(page: Page) {
@@ -132,6 +143,7 @@ test("the Japanese setup page keeps the commands, copies them, and opens each st
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/ja/start/");
   await expect(page.locator("h1")).toHaveText("ひとつの流れで、スタックのより広い範囲を。");
+  await noEnglishLeft(page);
   await expect(page.locator("#scan-command")).toHaveText("node packages/cli/dist/cli.js scan --dir /path/to/app");
   await expect(page.locator("#source-command")).toContainText("npm run build -w ludion-ai");
   await expect(page.locator(".where")).toContainText("npm 0.1.4 には、これらのコマンドは入っていません");
@@ -165,8 +177,9 @@ test("Japanese text breaks by phrase and by the strict rules, in the device's fo
     await page.goto(path);
     const style = await page.evaluate(() => {
       const s = getComputedStyle(document.body);
-      return { wordBreak: s.wordBreak, lineBreak: s.lineBreak, font: s.fontFamily };
+      return { wordBreak: s.wordBreak, lineBreak: s.lineBreak, font: s.fontFamily, code: getComputedStyle(document.querySelector("code")!).fontFamily };
     });
+    expect(style.code, path).toMatch(/^"?JetBrains Mono Variable"?,.*Hiragino Sans.*Yu Gothic.*Noto Sans JP/);
     expect(style.wordBreak, path).toBe("auto-phrase");
     expect(style.lineBreak, path).toBe("strict");
     expect(style.font, path).toContain("Hiragino Sans");

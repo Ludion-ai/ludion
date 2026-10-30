@@ -4,7 +4,7 @@ import type { en } from "./en.ts";
 export const ja: typeof en = {
   "site": {
     "name": "Ludion",
-    "description": "PHP の Docker、npm、Composer、Maven のセキュリティ更新を、ひとつの流れで扱います。関係する修正を見つけ、アプリケーションで確かめ、修正ごとに Git のブランチへコミットして、結果を記録します。"
+    "description": "PHP Docker、npm、Composer、Maven のセキュリティ更新を、ひとつの流れで扱います。関係する修正を見つけ、アプリケーションで確かめ、修正ごとに Git のブランチへコミットして、結果を記録します。"
   },
   "nav": {
     "label": "メイン",
@@ -51,14 +51,14 @@ export const ja: typeof en = {
         },
         {
           "id": "unknown",
-          "detail": "情報源に接続できないか読めない、または確認の間にプロジェクトが変わりました。問題なしとはせず、確かめられなかった部分として報告します。"
+          "detail": "情報源に接続できないか読めない場合や、確認の途中でプロジェクトが変わった場合です。問題なしとはせず、確かめられなかった部分として報告します。"
         },
         {
           "id": "unsupported",
           "detail": "対応していないマニフェスト、解決できなかったモデル、信頼できない取得経路は、人の確認が要ります。黙って飛ばさず、見える形で残します。"
         }
       ],
-      "note": "インストール済みのバージョンは、npm と Composer のロックファイルから読みます。Maven は、単体の依存関係グラフを解決します。PHP ランタイムのリリースは、設定した Dockerfile を使います。依存関係の脆弱性情報は OSV から取ります。"
+      "note": "インストール済みのバージョンは、npm と Composer のロックファイルから読みます。Maven は、単体の POM から依存関係グラフを解決します。PHP ランタイムのリリースは、設定した Dockerfile を使います。依存関係の脆弱性情報は OSV から取ります。"
     },
     "verify": {
       "title": "どの更新も確かめます。",
@@ -93,7 +93,7 @@ export const ja: typeof en = {
       "context": "セキュリティ更新",
       "reference": "セキュリティパッチ",
       "inline": "テスト済みの更新",
-      "replay": "もう一度",
+      "replay": "もう一度再生",
       "installFile": "依存関係のファイル",
       "runFile": "アプリケーションのテスト",
       "applyFile": "修正のブランチ"
@@ -158,7 +158,7 @@ export const ja: typeof en = {
   },
   "start": {
     "title": "複数スタック対応のプレビューを試す | Ludion",
-    "description": "PHP の Docker、npm、Composer、Maven のセキュリティ更新を確かめます。修正を Git のブランチにコミットする前に、更新の方針とアプリケーションのテストを選びます。",
+    "description": "PHP Docker、npm、Composer、Maven のセキュリティ更新を確かめます。修正を Git のブランチにコミットする前に、更新の方針とアプリケーションのテストを選びます。",
     "heading": "ひとつの流れで、スタックのより広い範囲を。",
     "intro": "プロジェクトをスキャンし、エコシステムの方針を選んでから、そのセキュリティ更新をアプリケーションで検証します。",
     "copy": "コピー",

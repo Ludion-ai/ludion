@@ -183,7 +183,7 @@ const entry = (name: string, version: string) => ({ version, resolved: `https://
  * and 3.10.0 under `other` (fixed in 3.10.2), so its one fix has two changes (each a scoped override; npm refuses two
  * changes of a direct dependency). `manifest` gives registry fields per version.
  */
-function twoCopies(manifest: (name: string, version: string) => object = () => ({})) {
+function twoCopies(manifest: (name: string, version: string) => object = () => ({}), found: Record<string, Advisory> = {}) {
   const root = fixture(), deps = { first: "1.0.0", other: "1.0.0" };
   writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
   const locked = lockFor(deps);
@@ -198,7 +198,7 @@ function twoCopies(manifest: (name: string, version: string) => object = () => (
   });
   const lodash = { created: "2012-04-23T16:37:11.912Z", versions: { "3.10.0": "2015-06-30T00:00:00.000Z", "3.10.2": "2015-07-10T00:00:00.000Z", "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z", "4.17.22": "2021-03-01T00:00:00.000Z" } };
   const one = { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z" } };
-  const npm = registry({ lodash, first: one, other: one }, manifest, [], { "lodash@4.17.20": both, "lodash@3.10.0": both });
+  const npm = registry({ lodash, first: one, other: one }, manifest, [], { "lodash@4.17.20": both, "lodash@3.10.0": both, ...found });
   return { root, osv, npm };
 }
 
@@ -1209,6 +1209,30 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
     expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: null, publisher_check: expect.objectContaining({ result: "stop" }) })]);
     expect(fix.reason).toMatch(/^Gate 2 stops this fix: .*The publishers differ/);
+    expect(tests).toBe(0);
+  });
+  it("ends a fix's lookups at a MAL- stop on its first change, when one fix has two changes of the package", async () => {
+    // 4.17.21 has a MAL- record; 3.10.2 is deprecated, so without the end of the lookups it would be looked at too.
+    const { root, osv, npm } = twoCopies(one((_name, version) => version === "3.10.2" ? { deprecated: "Bad release" } : {}), { "lodash@4.17.21": mal });
+    let tests = 0;
+    const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: null, malicious: ["MAL-2026-0009"] })]);
+    expect(fix.reason).toBe(`Gate 2 stops this fix: ${fix.version_choice?.[0]?.note}`);
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null });
+    expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
+    expect(tests).toBe(0);
+  });
+  it("keeps every smallest in a stopped fix's changes, though an earlier change's next version qualified", async () => {
+    // 4.17.21 is deprecated and 4.17.22 (the same account's) qualifies; then 3.10.2 has a MAL- record.
+    const { root, osv, npm } = twoCopies(one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}), { "lodash@3.10.2": mal });
+    let tests = 0;
+    const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: "4.17.22" }), expect.objectContaining({ smallest: "3.10.2", chosen: null, malicious: ["MAL-2026-0009"] })]);
+    expect(fix.reason).toBe(`Gate 2 stops this fix: ${fix.version_choice?.[1]?.note}`);
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null });
+    expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
     expect(tests).toBe(0);
   });
   it("adds the passed-over sentence to fix_published_note only when a publish time was read", async () => {

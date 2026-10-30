@@ -337,6 +337,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     // does a smallest with a MAL- record (docs/decisions/2026-10-30-mal-smallest-stops-the-fix.md).
     if (ecosystem === "npm") for (const fix of receipt.fixes) {
       const taken = new Map<string, string>();
+      let stopped = false;
       for (const to of new Set(fix.changes.map(c => c.to))) {
         let choice: VersionChoice | null;
         try { choice = await nextFix(fix.package, to, deps.fetchFn); }
@@ -344,13 +345,13 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         active();
         if (!choice) continue;
         (fix.version_choice ??= []).push(choice);
-        if (choice.chosen) taken.set(to, choice.chosen);
         // Gate 2: the smallest has a MAL- record, or the version that qualified is not the smallest's publisher's, or
-        // cannot be compared; the fix stops.
-        if (choice.malicious?.length || choice.publisher_check?.result === "stop") fix.reason ??= `Gate 2 stops this fix: ${choice.note}`;
+        // cannot be compared; the fix stops, keeps the smallest, and nothing more is looked up for it.
+        if (choice.malicious?.length || choice.publisher_check?.result === "stop") { fix.reason ??= `Gate 2 stops this fix: ${choice.note}`; stopped = true; break; }
+        if (choice.chosen) taken.set(to, choice.chosen);
       }
       // New objects: the plan's own changes stay in `before.plan` as the smallest.
-      if (taken.size) fix.changes = fix.changes.map(c => taken.has(c.to) ? { ...c, to: taken.get(c.to)! } : c);
+      if (taken.size && !stopped) fix.changes = fix.changes.map(c => taken.has(c.to) ? { ...c, to: taken.get(c.to)! } : c);
     }
     // Before any build or test (for Maven, after its dependency graph was resolved): every fix branch starts from the
     // commit whose files are the ones validated.

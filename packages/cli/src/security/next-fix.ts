@@ -1,6 +1,7 @@
 // The next smallest fix (LV): when an npm package's smallest fixed version is deprecated, no longer listed by the
 // registry, or named by an OSV record that is not a MAL- record, `ludion patch` takes the next smallest version in
-// the same major (and the same minor below 1.0.0) that is none of these. Without one, the smallest stays and its fix
+// the same major (and the same minor below 1.0.0) that is listed, not deprecated, and named by no OSV record, MAL- or
+// other. Without one, the smallest stays and its fix
 // stops, as before. Only package names and versions leave the machine, and, back to OSV, the ids of the records it
 // returned. Composer and Maven have no per-version
 // deprecation to read (Packagist marks a whole package abandoned; Maven Central lists versions only), so this is npm only.
@@ -94,8 +95,8 @@ export async function nextFix(name: string, smallest: string, fetchFn: typeof fe
   const scope = semver.major(from) === 0 ? `0.${semver.minor(from)}` : `${semver.major(from)}.x`;
   const later = [...listed.keys()].filter(v => semver.valid(v) === v && !semver.prerelease(v) && semver.gt(v, from) && semver.major(v) === semver.major(from) && (semver.major(from) !== 0 || semver.minor(v) === semver.minor(from))).sort(semver.compare);
   const looked = later.slice(0, NEXT_FIX_LIMIT);
-  // OSV is asked only about listed versions that are not deprecated: the others are passed over already. Each record it
-  // names is read once, for its withdrawal.
+  // OSV is asked about the smallest, and about the later versions that are listed and not deprecated (the others are
+  // passed over already). Each record it names is read once, for its withdrawal.
   const ids = new Map<string, string[]>(), records = new OsvClient(fetchFn);
   const ask = async (versions: string[], all = false) => {
     const found = await osvIds(versions.filter(v => all || (listed.has(v) && !listed.get(v))).map(version => ({ name, version })), fetchFn);

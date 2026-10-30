@@ -47,7 +47,7 @@ What made a build "not with no network" (the first pattern of LR2 section 3.2 fo
 
 ### Decision 4: kept patched by Ludion with no person
 
-**0 of 100 (0.0%; 95% Wilson interval 0.0% to 3.7%).** As LR2 section 4 says, H6 (the fix reaches the repository with no person) is not met by any repository today, because automatic merge, opening PRs on GitHub and a release are not built and PHP image updates do not go through the judge. That was known before counting.
+**0 of 100 (0.0%; 95% Wilson interval 0.0% to 3.7%).** As LR2 section 4 says, H6 (the fix reaches the repository with no person) is not met by any repository today, because automatic merge and a release are not built (opening PRs on GitHub is an unreleased preview) and PHP image updates do not go through the judge. That was known before counting. The line numbers LR2 section 4 cites in docs/status.md are as of b884cbb; main has changed that file since (the scheduled workflow, run twice by hand on GitHub on 2026-10-30, opened one PR per fix in a private trial repository), which leaves H6 as it is.
 
 What the files show, which is **not what Ludion can do** (it would still need everything H6 names): H1 to H5 are met by **0 of 100** (95% Wilson 0.0% to 3.7%), so even with H6 built this sample would have none.
 
@@ -65,7 +65,7 @@ What the files show, which is **not what Ludion can do** (it would still need ev
 ### What this says (and does not)
 
 - Half of these Dockerfiles (54 of 100) are behind a security release of their own series on 2026-10-30; the median is 9 days and the p90 is about 5 years. Where Dependabot's docker updates or Renovate are configured (20), the median is 0 and the p90 9 days; where neither is (80), the p90 is 2075 days. This is an association in a best-match sample, not a cause.
-- On this sample, the narrow PHP Docker path that is built today would reach almost nothing: the line-continuation rule alone stops 45 of 50 php Dockerfiles, and 92 of 100 Dockerfiles run a command that usually fetches from the network, which a `--network=none` build cannot do. These are the two largest gaps the counts show between the PHP Docker path and these repositories. Changing either is a design question for the owner, not a result of this lane.
+- On this sample, the narrow PHP Docker path that is built today would reach almost nothing: the check for frontend directives or line continuations stops 45 of 50 php Dockerfiles (which of the two was not recorded), and 92 of 100 Dockerfiles run a command that usually fetches from the network, which a `--network=none` build cannot do. These are the two largest gaps the counts show between the PHP Docker path and these repositories. Changing either is a design question for the owner, not a result of this lane.
 - 51 of 100 show some test sign and 21 deploy on merge, both read from text only.
 
 ## How it ran
@@ -73,11 +73,11 @@ What the files show, which is **not what Ludion can do** (it would still need ev
 1. `releases.sh` (2026-10-30T11:49:11Z): php.net's release lists for PHP 5, 7 and 8 and its states, Node's `index.json` and release schedule, in `raw/releases/`.
 2. `search.sh` (2026-10-30T11:49:06Z to 12:29:16Z): GitHub code search, 28 queries × 10 pages, 280 pages, no error lines (`raw/search-pages.tsv`), 28,000 hits (`raw/search-hits.tsv`). Its shell was stopped from outside on low memory while it ran, and a note said the search had stopped at 225 pages; the process in fact went on and finished every page. That note (`STOPPED.md`) is kept, marked superseded.
 3. `select.sh` (2026-10-30T17:00:18Z to 19:14:03Z, second start): the walk of LR section 6 with LR2's one-repository-per-owner rule, then the files of LR section 5 and LR2 section 2 for each chosen repository. One row per repository checked in `raw/checked.tsv`, the FROM lines of every Dockerfile examined in `raw/froms.tsv`, LR2's items in `raw/lr2.tsv`, progress and API errors in `raw/select.log`.
-4. `analyze.mjs`, in Docker with no network: `results.json` and `results.md`.
+4. `analyze.mjs`, in Docker with no network: `results.json` and `results.md`. From this folder in Git Bash: `MSYS_NO_PATHCONV=1 docker run --rm --network none --read-only --user 1000:1000 --memory 512m --cap-drop ALL --security-opt no-new-privileges -v "$(pwd -W):/d" node@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c node /d/scripts/analyze.mjs /d > results.md`.
 
 **Change of method (not of what is counted), LR2 section 2:** LR's `select.sh` as first committed (c0d1b6c) read Dockerfiles with `grep` on the host. It never ran on real data. The version that ran passes the contents API's base64 text, still encoded, to `classify.mjs` in a container (`node:24-slim` pinned by digest, `--network none`, read-only root, user 1000, `--cap-drop ALL`, no-new-privileges, 256 MB, 64 processes, no host environment), which applies the same patterns and prints only flags and matched lines. The FROM pattern, the Dependabot pattern and the `"renovate"` key pattern are LR's, written as JavaScript regular expressions. H2 runs `phpImage` from `packages/cli/src/security/php.ts`, mounted read-only, on the measured Dockerfile.
 
-**A first start that was stopped (a mistake in the walk).** The walk was first started at 3a48513 and stopped about two minutes later, while it was still ordering the php pool: no repository had been read and no row written. An automated security review of the pushed commit found that the test-sign step put the measured Dockerfile's directory, which comes from a third-party path, into a `sed` program on the host, where a path holding `|` could have become sed commands (14 hit paths hold a shell or sed character such as `&` or `'`; none was reached). e0a4319 passes it to `awk` through the environment instead, and the path in `froms.tsv` too. The walk was then started again from the beginning; the run below is that one. No mistake record is added in this lane (its files are this folder and two records); it is reported to the coordinator.
+**A first start that was stopped (a mistake in the walk).** The walk was first started at 3a48513 and stopped about two minutes later, while it was still ordering the php pool: no repository had been read and no row written. An automated security review of the pushed commit found that the test-sign step put the measured Dockerfile's directory, which comes from a third-party path, into a `sed` program on the host, where a path holding `|` could have become sed commands (14 hit paths hold a shell or sed character such as `&` or `'`; none was reached). e0a4319 passes it to `awk` through the environment instead, and the path in `froms.tsv` too. The walk was then started again from the beginning; the run below is that one. Mistake record: `docs/mistakes/2026-10-31-third-party-path-in-host-sed.md`.
 
 **Small readings made while writing the scripts (before counting):**
 
@@ -85,9 +85,15 @@ What the files show, which is **not what Ludion can do** (it would still need ev
 - A Dockerfile line counts as continued when it ends in `\` followed only by spaces or tabs; comment lines are dropped before lines are joined, as Docker does.
 - A root `package.json` whose `"renovate"` line is found counts for Renovate even when the file does not parse as JSON (LR's rule is by line).
 
+**Gaps in the script that ran, found in review (left as they ran, so the run stays reproducible):**
+
+- `select.sh` orders a repository's hit files with `sort -u` in the host's locale, not `LC_ALL=C`. Checked afterwards: the 5 chosen repositories with more than one accepted hit file have the same order both ways, so no chosen file would change.
+- `has()` matches a listed name with `grep -qx` without `-F`, so the `.` in a name such as `package.json` matches any character. A file named, for example, `packageXjson` would count; not seen.
+- If the classifier's `docker run` failed for a hit Dockerfile, its empty output counted as "no qualifying FROM" rather than unread. The reviewer checked the 13 repositories rejected that way with no row in `raw/froms.tsv`; each is explained by its hit files' names, so there is no sign that it happened.
+
 ## Limits
 
 - The sample is GitHub's best-match code search, active repositories only (pushed within 365 days of 2026-10-30), one per owner: not a random sample of GitHub.
-- Files were read between 17:19Z and 19:14Z on 2026-10-30, the same UTC date as the measurement date, which every day count uses.
+- Files were read between 17:00Z and 19:14Z on 2026-10-30 (the hit Dockerfiles from 17:00Z, LR2's files of the chosen repositories from 17:19Z), the same UTC date as the measurement date, which every day count uses.
 - LR2's items are read from text: a test that exists is not run; "builds with no network" is a list of commands that usually fetch; a deploy is a push-triggered workflow that says `deploy`, or a platform file; none of these was checked by running anything.
 - Decision 4's H6 is not met by any repository today, by what is built (LR2 section 4); the share is known to be 0 before counting. H1–H5 is what the files show, not what Ludion can do.

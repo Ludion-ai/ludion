@@ -1,0 +1,1374 @@
+stratum	full_name	path	line_no	line
+php	issagomesdev/saire	docker/php/Dockerfile	11	FROM php:8.3-fpm-alpine AS base
+php	issagomesdev/saire	docker/php/Dockerfile	59	FROM base AS development
+php	issagomesdev/saire	docker/php/Dockerfile	90	FROM node:20-alpine AS frontend-builder
+php	issagomesdev/saire	docker/php/Dockerfile	106	FROM base AS production
+php	lumenpink/indieinabox	docker/Dockerfile.ci	14	FROM php:8.5-cli
+php	jvancoillie/advent-of-code	Dockerfile	4	FROM php:8.2-fpm-alpine AS php_upstream
+php	jvancoillie/advent-of-code	Dockerfile	5	FROM mlocati/php-extension-installer:2 AS php_extension_installer_upstream
+php	jvancoillie/advent-of-code	Dockerfile	6	FROM composer/composer:2-bin AS composer_upstream
+php	jvancoillie/advent-of-code	Dockerfile	8	FROM php_upstream AS php_aoc
+php	viet2457/Os_command	os_command_injection/command_injection/cmdi_level3/Dockerfile	1	FROM php:7.2-apache
+php	absmartly/cross-sdk-tests	php-wrapper/Dockerfile	1	FROM php:8.4-cli AS sdk-builder
+php	absmartly/cross-sdk-tests	php-wrapper/Dockerfile	14	FROM sdk-builder AS tester
+php	absmartly/cross-sdk-tests	php-wrapper/Dockerfile	19	FROM sdk-builder AS server
+php	SzmrLevee/VueFrontend	gyakorlas/backend/Dockerfile	1	FROM php:8.4.8-fpm-alpine3.22
+php	recybertech/docker-templates	php-mysql/8.4/Dockerfile	1	FROM php:8.4-fpm
+php	supurazako/php-realtime	apps/php-webrtc-relay/Dockerfile	1	FROM php:8.4-cli-trixie
+php	aKira041795/Ikabud-Kernel-OS	docker/workbench/Dockerfile	3	FROM php:8.3-cli-alpine
+php	alysenko4317/ntu-web	Labs/LR4_library_php_auth/Dockerfile	1	FROM php:8.2-apache
+php	DiaztMF/Sistem-Manajemen-Rapat-Dokumen	Dockerfile	6	FROM php:8.4-fpm-alpine
+php	abhishekchotaliya-developer/wedding-management	Dockerfile	1	FROM php:8.4-cli
+php	Make-Magazine/makehub	wp-content/plugins/ultimate-elementor/modules/login-form/includes/vendor/guzzlehttp/guzzle/Dockerfile	1	FROM composer:latest as setup
+php	Make-Magazine/makehub	wp-content/plugins/ultimate-elementor/modules/login-form/includes/vendor/guzzlehttp/guzzle/Dockerfile	12	FROM php:7.3
+php	epss01/CaseTrack	Dockerfile	2	FROM php:8.4-cli
+php	vknikolov/Employee-Pair-Project	Dockerfile	2	FROM php:8.2-apache
+php	a-rakitin/learning-php	section-2/07-autoloading-psr-composer/docker/Dockerfile	1	FROM php:8.0.2-fpm
+php	leroy-merlin-br/exacttarget-client	docker/Dockerfile	1	FROM php:8.0-fpm
+php	YAAMSOrg/yaams-server	Docker/Dockerfile	1	FROM php:8.5-cli
+php	YAAMSOrg/yaams-server	Docker/Dockerfile.prod	16	FROM composer:2 AS vendor
+php	YAAMSOrg/yaams-server	Docker/Dockerfile.prod	42	FROM php:8.5-fpm-alpine
+php	sun-asterisk-research/docker-php	8.0/buster/fpm/Dockerfile	3	FROM php:8.0.30-fpm-buster
+php	albinurrosif/inventaris-smkn-1-sumenep	Dockerfile.cron	1	FROM php:8.2-cli
+php	Marc-Alban/php-professional-blog	Dockerfile	1	FROM php:8.1-apache
+php	graze/docker-php-alpine	8.5/Dockerfile	1	FROM php:8.5-cli-alpine3.23
+php	graze/docker-php-alpine	8.5/debug.Dockerfile	1	FROM graze/php-alpine:8.5
+php	Gadsotek/artifactflow	Dockerfile	3	FROM php:8.5.12-cli-trixie@sha256:ce5d49625b9c50020dc1ce3c9cf4cdfa31cba31b6651e72daa3e6f5a010d234a AS php-base
+php	Gadsotek/artifactflow	Dockerfile	44	FROM php-base AS production-vendor
+php	Gadsotek/artifactflow	Dockerfile	72	FROM node:26-alpine@sha256:aadf416b2cdce311a8811ba3f0608a61b77dbf997500e2eafe781b51f6a0b019 AS frontend-build
+php	Gadsotek/artifactflow	Dockerfile	86	FROM php-base AS runtime-base
+php	Gadsotek/artifactflow	Dockerfile	98	FROM runtime-base AS dev
+php	Gadsotek/artifactflow	Dockerfile	129	FROM php:8.5.12-cli-alpine3.24@sha256:eef5baa8671b37f2909d4b2f1849ea663df6ff4fe8936f102208ce54f1e32e01 AS image-parser
+php	Gadsotek/artifactflow	Dockerfile	179	FROM golang:1.27.3-alpine3.24@sha256:f2c872bcee949b7be9c490efd02b48a8a2fbf947cdf533f1c58525ec9d8170fd AS go-toolchain
+php	Gadsotek/artifactflow	Dockerfile	183	FROM dunglas/frankenphp:builder-php8.5-alpine@sha256:3b672209c1201d4c980d4aa76b962171fdb063b47e0108c50d61331488d23d5f AS frankenphp-security-builder
+php	Gadsotek/artifactflow	Dockerfile	214	FROM dunglas/frankenphp:1-php8.5-alpine@sha256:f4947926b4c5070176be7c72b03939e045f7ae9d249a3219cf9708bd5e6d0ff2 AS production
+php	polyipseity/capture-the-flag	competitions/2024/0xL4ugh CTF 2024/Ghazy Corp/Corp_-_ToGive/Dockerfile	1	FROM php:8.0-apache
+php	adhimiw/MANGALAM-HEALTHY-FOODS	backend/Dockerfile	1	FROM php:8.3-cli-alpine
+php	keboola/db-extractor-common	Dockerfile	1	FROM php:8.2-cli-trixie
+php	GRVictor/ynentario	Dockerfile	1	FROM php:8.3-fpm-alpine
+php	jonasmessias/agenda-clinica	infra/php/Dockerfile	1	FROM php:8.5-fpm
+php	managnora/pointage	docker/Dockerfile	1	FROM php:8.3-fpm
+php	mendoza000/e-commerce	docker/backend.Dockerfile	3	FROM php:8.4-cli
+php	wxwmoe/wxwClub	Dockerfile	1	FROM php:8.4-cli-alpine
+php	Ammar-1993/wavss	Dockerfile	1	FROM php:8.2-apache
+php	robiningelbrecht/phpunit-pretty-print	docker/php-cli/Dockerfile	1	FROM php:8.4-cli
+php	bulfaitelo/DevCore-PHP	docker/app/Dockerfile.php.8.3	2	FROM php:8.3-apache
+php	Ahmadkhan12345566/zl3	Dockerfile	1	FROM php:7.3-alpine
+php	LeThiBaoUyen/KienTrucKyThuatPhanMem	Tuan04/Phan2/PHP/Dockerfile	1	FROM php:8.2-apache
+php	tig-mmp/git-name	backend/Dockerfile	1	FROM php:8.3-cli
+php	hadziqmtqn/school-reference	Dockerfile	1	FROM php:8.3-fpm-alpine
+php	muchcco/centromac	Dockerfile	2	FROM php:7.4-apache
+php	sawala-tech/todolist-app	Dockerfile	1	FROM php:8.1-apache
+php	Guntis-Lielbardis/BudgetPlanningApp	Dockerfile	1	FROM php:8.4-cli
+php	FrancisCalla/RenTara	Dockerfile	1	FROM php:8.4-apache
+php	rkweber-max/wallet-php	Dockerfile	1	FROM composer:2.8 AS vendor_builder
+php	rkweber-max/wallet-php	Dockerfile	13	FROM php:8.5-fpm-alpine AS runtime
+php	tackleza/docker-php-apache-ext	8.1/Dockerfile	1	FROM php:8.1-apache
+php	DasGreff/php	Dockerfile	1	FROM php:8.5-apache-trixie
+php	muhammadroyyan11/failover-jez	Dockerfile	1	FROM php:8.3-fpm-alpine
+php	nguyenhuuluan1702/PCS_MLops	WebApp/dockerfile	1	FROM php:8.2-fpm
+php	mqqff/menu.co	docker/octane/Dockerfile	1	FROM php:8.5-cli AS builder
+php	mqqff/menu.co	docker/octane/Dockerfile	38	FROM php:8.5-cli
+php	hujia7812556/docker	floryday/php/Dockerfile	1	FROM php:7.1-fpm
+php	ValkyrjaProject/Valkyrja.web	Dockerfile	1	FROM php:7.1-cli
+php	muzammalali2011/aws-ecs-web-app-deployment	Dockerfile	1	FROM php:8.2-apache
+php	KlausAbut/ecoridesymfony	Dockerfile	1	FROM php:8.4-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset-2/cve-2024-11744/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset-2/cve-2024-12968/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset-2/cve-2024-2820/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset/cve-2020-11060/Dockerfile	1	FROM php:7.4-apache-bullseye
+php	livecvebench/CVE-Factory	cve_tasks/trainset/cve-2022-0705/Dockerfile	1	FROM php:8.0-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset/cve-2022-23626/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset/cve-2022-4559/Dockerfile	1	FROM php:8.0-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset/cve-2023-3095/Dockerfile	1	FROM php:8.1-apache-bullseye
+php	livecvebench/CVE-Factory	cve_tasks/trainset/cve-2023-3190/Dockerfile	1	FROM php:8.1-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset/cve-2023-48709/Dockerfile	1	FROM php:7.4-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2017-16244/Dockerfile	1	FROM php:7.4-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2017-16880/Dockerfile	1	FROM php:7.4-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2020-15245/Dockerfile	2	FROM php:7.4-fpm
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2020-15247/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2020-5255/Dockerfile	1	FROM php:7.4-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2021-3603/Dockerfile	1	FROM php:7.4-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2021-3768/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2021-3932/Dockerfile	1	FROM php:7.4-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part1/cve-2021-4119/Dockerfile	1	FROM php:8.0-cli
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part2/cve-2022-0179/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part2/cve-2022-35946/Dockerfile	1	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part2/cve-2022-35947/Dockerfile	2	FROM php:7.4-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part2/cve-2022-4665/Dockerfile	2	FROM php:8.0-apache
+php	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part2/cve-2023-6850/Dockerfile	1	FROM php:7.4-cli
+php	erik-cuevas/mi-proyecto-antenas	web/Dockerfile	1	FROM php:8.2-apache
+php	kimjohn02/EMS_PROJECT	Dockerfile	1	FROM php:8.4-apache
+php	willfeerr/librium-backend	Dockerfile	1	FROM php:8.3-fpm-alpine
+php	RickyCaesar/MARKASAssistant	Dockerfile.railway	2	FROM php:8.4-cli
+php	SUASecLab/workadventure-admin	containers/php/Dockerfile	1	FROM php:8.5-fpm
+php	flaviosalgado2/PHPSvelteCRUD	Dockerfile	2	FROM php:8.5.6-fpm
+php	ralph-sison/laravel-ai-workflow-engine	Dockerfile.dev	1	FROM php:8.3-fpm-alpine
+php	j6s/shape-up-downloader	Dockerfile	1	FROM php:8.4-cli AS base
+php	j6s/shape-up-downloader	Dockerfile	4	FROM base AS builder
+php	j6s/shape-up-downloader	Dockerfile	18	FROM base
+php	gabriel-fn/Exercicios-NextGenPHP	Aulas-NextGenPHP1/Aula11/ambiente_puro/docker/dev.Dockerfile	1	FROM php:8.4-fpm-alpine
+php	labmgf-polimi/belvedere-viewers	Dockerfile	1	FROM php:8.2-apache
+php	vamischenko/bookhub_back	Dockerfile	1	FROM php:8.5-cli-bookworm
+php	e-repo/trade	docker/development/cli/Dockerfile	1	FROM php:8.4.19-cli-alpine
+php	polascin/nefro	tools/integration/Dockerfile	1	FROM node:22-bookworm-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392 AS node
+php	polascin/nefro	tools/integration/Dockerfile	2	FROM php:8.5.8-cli-bookworm@sha256:fb740987f3e7aefd7f52d1f961fa91602874f2b6a5b0bf0105725f8987b54bee
+php	techcto/docker	php/alpine/php-fpm-8.0/Dockerfile	1	FROM php:8.0-fpm-alpine
+php	phpstan/phpstan	docker/Dockerfile.php.8.0	4	FROM php:8.0-cli-alpine AS pgo-builder
+php	phpstan/phpstan	docker/Dockerfile.php.8.0	20	FROM php:8.0-cli-alpine
+php	phpstan/phpstan	docker/Dockerfile.php.8.5	4	FROM php:8.5-cli-alpine AS pgo-builder
+php	phpstan/phpstan	docker/Dockerfile.php.8.5	20	FROM php:8.5-cli-alpine
+php	datle0910/KienTrucPhamMem_22001605_DHKTPM18C	Tuan04/Phan2/PHP/Dockerfile	1	FROM php:8.2-apache
+php	phel-lang/phel-lang	docker/repl/Dockerfile	1	FROM php:8.5-cli-alpine
+php	adhocore/docker-phpfpm	8.0.Dockerfile	1	FROM php:8.0.30-fpm-alpine3.16
+php	maximuml/tracker-lp-bits	.docker/php/Dockerfile	3	FROM php:8.5-fpm-alpine@sha256:fa01fb1645cd0fc566a5f146b099adace33b906571f972f71f2182a7c12d1cd7 AS builder
+php	maximuml/tracker-lp-bits	.docker/php/Dockerfile	46	FROM php:8.5-fpm-alpine@sha256:fa01fb1645cd0fc566a5f146b099adace33b906571f972f71f2182a7c12d1cd7
+php	easyrdf/easyrdf	docker/Dockerfile	1	FROM php:7.3-cli
+php	selimwdev/WAPTLab	Dockerfile	1	FROM php:8.2-fpm
+php	Akinaru/TECHNO	docker/php/Dockerfile	1	FROM php:7.4.33-apache
+php	ShashankD210/oss-scanner	projects/wordpress/Dockerfile	11	FROM php:8.4-apache-trixie
+php	SoftwareCraftersMurcia/kata-setup	php/Dockerfile	3	FROM php:8.5-cli-bookworm AS base
+php	SoftwareCraftersMurcia/kata-setup	php/Dockerfile	10	FROM base AS dependencies
+php	SoftwareCraftersMurcia/kata-setup	php/Dockerfile	14	FROM dependencies AS test
+php	hmj1026/docker_run	php/php85/Dockerfile	6	FROM php:8.5.12-fpm-bookworm
+php	cgrima/docker_i-librarian	Dockerfile	1	FROM php:7.4-apache
+php	martinhilgenkamp/vanda	Dockerfile	1	FROM php:8.2-apache
+php	DANAVPS/servimotos-fruna	Dockerfile	1	FROM php:8.2-fpm
+php	julien-boudry/Condorcet	Dockerfile	1	FROM php:8.5-cli-trixie
+php	JSignPdf/jsignpdf-php	Dockerfile	1	FROM php:8.4-cli
+php	fitse-hub/password-manager	Dockerfile	1	FROM php:8.4-fpm
+php	yaronpen/search_products_app	Dockerfile	1	FROM php:8.4-apache
+php	andreaskasper/askbot_php	Dockerfiles/web/Dockerfile	1	FROM php:8.3-apache
+php	tahiriqbalnajam/kps	Dockerfile	1	FROM php:8.1-fpm
+php	Tohohoya/monypo2	Dockerfile	1	FROM php:8.2-fpm
+php	apphp/laravel-docker	docker/php-cli/Dockerfile	2	FROM php:8.0-cli-alpine
+php	phpcfdi/cfditopdf	Dockerfile	1	FROM php:8.4-cli-alpine
+php	lexik/LexikTranslationBundle	Dockerfile	1	FROM php:8.4-cli-bullseye
+php	aamant/docker-php-dev	php-7.3-fpm/Dockerfile	1	FROM php:7.3-fpm-buster
+php	ngabor84/laravel-escher-auth	Dockerfile	1	FROM php:8.4-cli-alpine
+php	Phauthentic/event-store	docker/php/Dockerfile	1	FROM php:8.3-cli
+php	Intervention/validation	Dockerfile	1	FROM php:8.1-cli
+php	uploadcare/uploadcare-php-example	Dockerfile	1	FROM composer:latest as composer
+php	uploadcare/uploadcare-php-example	Dockerfile	2	FROM php:8.3-fpm-alpine
+php	joaooncode/tickets-api	apps/api/Dockerfile	2	FROM php:8.4-fpm-alpine
+php	MohammedBentalb/medix-gateway-service	docker/php/Dockerfile	1	FROM php:8.4-fpm-alpine
+php	sherazrazadev/swe-benching	tasks/stk-cms-ghsafvwq/tests/Dockerfile	7	FROM php:8.1-cli-bookworm
+php	X-com-b-v/docker-setup	docker/php70/Dockerfile	1	FROM php:7.0-fpm
+php	X-com-b-v/docker-setup	docker/php85/Dockerfile	2	FROM php:8.5-fpm-bookworm
+php	AdrianWii/wdpai-summer-26	docker/php/Dockerfile	1	FROM php:8.3-fpm-alpine3.21
+php	agendav/agendav	Dockerfile	1	FROM php:8.5-cli AS builder
+php	agendav/agendav	Dockerfile	30	FROM php:8.5-apache AS runtime
+php	stongao/stcode	libst/cpp/grpc/src/php/docker/alpine/Dockerfile	15	FROM php:7.2-alpine3.9
+php	developerintellectlao/r6s-modmenu2026	Website/wordpress/wp-content/plugins/wpvivid-backup-pro/vendor/guzzlehttp/guzzle/Dockerfile	1	FROM composer:latest as setup
+php	developerintellectlao/r6s-modmenu2026	Website/wordpress/wp-content/plugins/wpvivid-backup-pro/vendor/guzzlehttp/guzzle/Dockerfile	12	FROM php:7.3
+php	JaydinCodes/live-notes-app	backend/api/Dockerfile	3	FROM php:8.3-fpm
+php	JulienBrgs/Docker-DevContainer-Symfony	.devcontainer/Dockerfile	1	FROM php:8.5-cli
+php	musaabhasan/ai-chatbot-portal	Dockerfile	1	FROM php:8.3-apache
+php	RodolfoParada/cms-psicologo	Dockerfile	1	FROM php:8.3-apache
+php	Luka7420/bin-packing-3d-demo	Dockerfile	1	FROM php:8.2-apache
+php	hzdu/shopwowa.com	shopwowa.com/plugins/woo-import-export/vendor_deprecated/guzzlehttp/guzzle/Dockerfile	1	FROM composer:latest as setup
+php	hzdu/shopwowa.com	shopwowa.com/plugins/woo-import-export/vendor_deprecated/guzzlehttp/guzzle/Dockerfile	12	FROM php:7.3
+php	kamaho-source/shokusuu1	docker/kamakura-shokusu_web/Dockerfile	2	FROM php:8.3.36-apache
+php	Gte32/GusModelo	2do Semestre/SO/PruebaPhP/Dockerfile	3	FROM php:8.0-apache 
+php	marcoquagliozzi01/cartellow	docker/php/Dockerfile	6	FROM php:8.3-fpm-alpine AS base
+php	marcoquagliozzi01/cartellow	docker/php/Dockerfile	18	FROM base AS dev
+php	marcoquagliozzi01/cartellow	docker/php/Dockerfile	28	FROM base AS prod
+php	Gamelena/tangerine	Dockerfile	1	FROM php:8.1-apache
+php	AurelienEbeng/primal-training-gym-backend-laravel	Dockerfile	2	FROM php:8.3-apache
+php	dnj/php-alpine	docker/8.3-mysql.Dockerfile	1	FROM php:8.3-cli-alpine3.20
+php	Samgenix/student-resource-portal	Dockerfile	2	FROM php:8.2-apache
+php	luisrepo25/Ferreteria	Dockerfile	1	FROM php:8.4-cli
+php	dongasai/taskme	Dockerfile	2	FROM php:8.3-apache
+php	keboola/google-drive-writer	Dockerfile	1	FROM php:7.4-cli
+php	feater-dev/symfony-example	.docker/Dockerfile	1	FROM php:7.0-cli
+php	ILS-Research/openqda-composestack	Dockerfile	3	FROM php:8.4-cli AS base
+php	ILS-Research/openqda-composestack	Dockerfile	58	FROM php:8.4-cli
+php	PHProxy/phproxy	Dockerfile	1	FROM php:8.5.11-apache@sha256:974e3a920309308e1690ed607e6cc3061d6906f90cc8d30fe519daa48bccf101
+php	ReynardGerber-22/ffxiv	dev/php/Dockerfile	1	FROM php:8.5.12-fpm
+php	ischooluw/docker-php-fpm	7.4/default/Dockerfile	1	FROM php:7.4.33-fpm-alpine3.16
+php	keboola/db-adapter-snowflake	Dockerfile	1	FROM php:8.1-cli
+php	Yanjun1337/UOPF-Backend	Dockerfile	1	FROM composer:2 AS builder
+php	Yanjun1337/UOPF-Backend	Dockerfile	9	FROM php:8.4-fpm
+php	MaghanDas/code-arena-api	Dockerfile	2	FROM composer:2 AS composer
+php	MaghanDas/code-arena-api	Dockerfile	21	FROM php:8.4-fpm
+php	timeobvrt/CraftHub	Dockerfile	1	FROM oven/bun:1 AS frontend
+php	timeobvrt/CraftHub	Dockerfile	11	FROM php:8.5-fpm
+php	ashkanfekridev/event-manager-service	Dockerfile	1	FROM php:8.5-cli
+php	Ecc3ntr1cSage/hopexito	Dockerfile	3	FROM php:8.3-apache-bookworm AS php_dependencies
+php	Ecc3ntr1cSage/hopexito	Dockerfile	54	FROM node:22-bookworm-slim AS frontend
+php	Ecc3ntr1cSage/hopexito	Dockerfile	65	FROM php_dependencies AS app
+php	sebasmoreno7/integracion-continua	Dockerfile	1	FROM php:7.4-apache
+php	Ranagol/test-track-be	docker/Dockerfile.prod	2	FROM php:8.5.12-fpm
+php	webdeveric/wp-starter	Dockerfile	1	FROM php:8.5-apache
+php	LassanaToure/vite-et-gourmand	docker/php/Dockerfile	1	FROM php:8.3-apache
+php	bylexus/m450-template	docker/web/Dockerfile	2	FROM php:8.5-apache-trixie
+php	mnovaldr/SiRekap	Dockerfile	1	FROM php:8.3.36-apache
+php	Nam66/taskflow-app	Dockerfile	1	FROM php:8.4-cli
+php	BC-Landegem/Intraclub	docker/php/Dockerfile	1	FROM php:8.4-cli-bookworm
+php	InfiniteXgg/benjaminduve	benjaminduve/Dockerfile	1	FROM php:8.3-apache
+php	jhonathanvitor/kuradomodo	Dockerfile	1	FROM php:8.2-apache
+php	vjsigsig/opcache_master_sample	docker/php/Dockerfile	1	FROM php:8.4-fpm
+php	dedetc51/protec-gestion	docker/php/Dockerfile	1	FROM composer:2.8.12 AS composer
+php	dedetc51/protec-gestion	docker/php/Dockerfile	6	FROM node:24.11.1-bookworm-slim AS assets
+php	dedetc51/protec-gestion	docker/php/Dockerfile	14	FROM php:8.5-fpm-bookworm
+php	Gideon-dwijj/open-websoccer-main	Dockerfile	2	FROM composer:2 AS deps
+php	Gideon-dwijj/open-websoccer-main	Dockerfile	12	FROM php:8.5-apache
+php	abdo544445/rudood-platform	backend/Dockerfile	1	FROM php:8.4-fpm-alpine
+php	GhoStBirD-X/cutker	Dockerfile	1	FROM node:20-alpine AS frontend
+php	GhoStBirD-X/cutker	Dockerfile	16	FROM php:8.4-fpm-alpine AS app
+php	GhoStBirD-X/cutker	Dockerfile	50	FROM nginx:alpine AS web
+php	Ronan-Bozoc-cyber/gesticourrier	Dockerfile	1	FROM php:8.1-apache
+php	newnius/Dockerfiles	php/7.1/Dockerfile	1	FROM php:7.1-apache
+php	cryptzoa/Deductia	backend/Dockerfile	1	FROM php:8.3-fpm
+php	PrestaShopCorp/github-action-php-lint	7.2/Dockerfile	1	FROM php:7.2
+php	PrestaShopCorp/github-action-php-lint	7.3/Dockerfile	1	FROM php:7.3
+php	Framzy/Website-Kedai-Takjil	development/backend-mssql/Dockerfile	2	FROM php:8.4-apache-bookworm
+php	w3roman/php-enum-helper	.docker/php/8.1/cli/Dockerfile	1	FROM php:8.1.34-cli-alpine
+php	aleserrags/docker-env	php/8.5/Dockerfile	1	FROM php:8.5-cli
+php	oninonins/PWL_2026	docker/php/Dockerfile	1	FROM php:8.3-fpm
+php	TypesetterIO/typesetter-cli	Dockerfile	1	FROM composer:2.10.3 AS composer
+php	TypesetterIO/typesetter-cli	Dockerfile	3	FROM php:8.5.11-cli-alpine3.24
+php	mimis-s/zpudding	cmd/flatbuffers/tests/docker/languages/Dockerfile.testing.php.zend_7_3	1	FROM php:7.3-cli-stretch as base
+php	RefugesInfo/www.refuges.info	docker/Dockerfile	3	FROM php:8.4-apache
+php	porcelanosa/docker-multiversions	fpm/fpm-7.4/Dockerfile	1	FROM php:7.4-fpm
+php	clegginabox/airlock-php	.docker/worker/Dockerfile	1	FROM php:8.4-cli
+php	clegginabox/airlock-php	Dockerfile	1	FROM spiralscout/roadrunner AS roadrunner
+php	clegginabox/airlock-php	Dockerfile	3	FROM node:22-alpine AS node-build
+php	clegginabox/airlock-php	Dockerfile	17	FROM php:8.4-cli
+php	ZoltaniSzabolcs/resting-heritage	Dockerfile	2	FROM php:8.4-fpm
+php	ucfopen/UDOIT	Dockerfile	1	FROM php:8.5.12-fpm
+php	MatiasScott/sistemaInformaticodeGestion	Dockerfile	1	FROM php:8.3-apache
+php	Harsya1/cinema-xxl	Dockerfile	1	FROM php:8.4-fpm
+php	strobes-co/pentest-bench	lab_images/acmecorp-lab/Dockerfile	1	FROM php:8.2-apache
+php	KyosukeTajikawa/australia-visa-extension-jobs-navi	docker-config/php/Dockerfile	1	FROM php:8.3-fpm AS app-base
+php	KyosukeTajikawa/australia-visa-extension-jobs-navi	docker-config/php/Dockerfile	39	FROM node:20 AS node-build
+php	KyosukeTajikawa/australia-visa-extension-jobs-navi	docker-config/php/Dockerfile	52	FROM app-base AS final
+php	grxt777/herocomputer	Dockerfile	1	FROM php:8.4-cli
+php	ThomasVerzijl/Skill-heroes-2026	Dockerfile	16	FROM php:8.5.10-apache
+php	camoo/curl-http-client	Dockerfile	1	FROM php:8.2-cli-alpine
+php	rsanjoseo/alxarafe	.docker/php/Dockerfile	1	FROM php:8.2-fpm
+php	SoNdA11/memora	api/Dockerfile	4	FROM php:8.4.27-cli-alpine
+php	Benjamin-Harke/Aurora-P4-project-	Dockerfile	2	FROM php:8.2-apache
+php	DefaultValue/docker_infrastructure	templates/php/8.2/production.Dockerfile	1	FROM php:8.2.32-apache-trixie
+php	juliocsilvestre/php-flight	Dockerfile	1	FROM php:8.3-fpm
+php	eatae/docker_ex	guestbook/php-cli/Dockerfile	1	FROM php:7.4-cli
+php	ualia946/iac-devsecops-azure-lab	docker_image/Dockerfile	1	FROM alpine:latest AS builder
+php	ualia946/iac-devsecops-azure-lab	docker_image/Dockerfile	14	FROM php:7.4-apache
+php	denshoch/DenDenMarkdown	Dockerfile	1	FROM php:8.4-cli
+php	safayet404/quickhire-backend	Dockerfile	1	FROM php:8.2-fpm-alpine
+php	takahikouchida/n13-pgrouting	docker/Dockerfile.web	1	FROM php:8.3-apache
+php	rdlit-pt/stafiz_test	docker/php/Dockerfile	2	FROM php:8.4-fpm
+php	ExploryKod/glad_blog_MVC	Dockerfile	1	FROM php:8.1.2-apache
+php	ami0714/echoApi	Dockerfile	1	FROM php:8.4-cli-alpine
+php	b0urbonn/accredms	Dockerfile	1	FROM php:8.2-fpm-alpine
+php	Luchutong/llm-vuln-audit	labs/lab30/docker/web.Dockerfile	1	FROM php:8.4-apache-bookworm@sha256:e653ff90d7f6e2e6f81eddb07c864f1eae224ccbf5143f82a44f25e2f110e320
+php	faustbrian/math	docker/php/85/Dockerfile	1	FROM php:8.5-cli
+php	omid-tavassoli/bookit	backend/Dockerfile	1	FROM php:8.4-cli
+php	vulhub/vulhub	base/php/7.1.3-apache/Dockerfile	1	FROM php:7.1.3-apache
+php	zennouh/forumservices	docker/dockerfile	1	FROM php:8.4-cli
+php	InfinityZero3000/php-learning-english-web	Dockerfile.fly	1	FROM composer:2 AS composer
+php	InfinityZero3000/php-learning-english-web	Dockerfile.fly	3	FROM php:8.5-fpm-alpine
+php	phototix/webbycms	Dockerfile	4	FROM composer:2 AS vendor
+php	phototix/webbycms	Dockerfile	14	FROM php:8.3-apache
+php	marieorens/walab-api	Dockerfile	1	FROM php:8.4-fpm-alpine
+php	BrunoJubert/EmilieHedou-php	Dockerfile	1	FROM php:8.1-apache
+php	salatielkerne-blip/CREAINTEGRADO	Dockerfile	1	FROM php:8.2-apache
+php	GaniRhamadan/WargaLapor	backend/Dockerfile	1	FROM php:8.3-cli-alpine
+php	JanuaPort/januaport-plugins	ebics-abholer/Dockerfile	25	FROM --platform=$BUILDPLATFORM composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac AS vendor
+php	JanuaPort/januaport-plugins	ebics-abholer/Dockerfile	38	FROM php:8.5.11-cli-alpine3.24@sha256:93684051146ec037620855feb77f278090bde45ddc030801cd3f2a7685bc4deb AS erweiterungen
+php	JanuaPort/januaport-plugins	ebics-abholer/Dockerfile	44	FROM php:8.5.11-cli-alpine3.24@sha256:93684051146ec037620855feb77f278090bde45ddc030801cd3f2a7685bc4deb
+php	ricardocanedo/dashboard-lg	Dockerfile	1	FROM php:7.4-cli
+php	Zhaba1337228/lct_hackathon_fcp	infra/execution/PHP.Dockerfile	2	FROM php:8.5.11-cli-alpine@sha256:93684051146ec037620855feb77f278090bde45ddc030801cd3f2a7685bc4deb AS php-source
+php	Zhaba1337228/lct_hackathon_fcp	infra/execution/PHP.Dockerfile	4	FROM python:3.12.14-alpine@sha256:4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111
+php	duxdraco/ducdv-nro-service	ducdv-docker/php/Dockerfile	2	FROM php:7.2-fpm
+php	TFacundoDev/CVA-Muebles	Dockerfile	1	FROM php:8.2-apache
+php	sparkbox/sparkpress-wordpress-starter	Dockerfile	1	FROM php:8.1-apache-buster as dev
+php	sparkbox/sparkpress-wordpress-starter	Dockerfile	41	FROM dev as prod
+php	Xollll/PRS-NEXUS	Dockerfile	3	FROM node:22-alpine AS frontend
+php	Xollll/PRS-NEXUS	Dockerfile	17	FROM php:8.3-cli-alpine AS dependencies
+php	Xollll/PRS-NEXUS	Dockerfile	38	FROM php:8.3-cli-alpine
+php	PrimeIntellect-ai/prime-tasks	datasets/pi-swe-sweep/swe-sweep__phpspreadsheet/environment/Dockerfile	18	FROM docker.io/library/alpine:3.20 AS swesweep-src
+php	PrimeIntellect-ai/prime-tasks	datasets/pi-swe-sweep/swe-sweep__phpspreadsheet/environment/Dockerfile	28	FROM php:7.4-cli-bullseye
+php	openenergymonitor/heatpumpmonitor.org	Dockerfile	1	FROM php:8.4-apache
+php	debudash/agentforge-openemr	docker/library/dockers/dev-php-fpm-7-0-redis/Dockerfile	13	FROM php:7.0-fpm
+php	debudash/agentforge-openemr	docker/library/dockers/dev-php-fpm-8-2/Dockerfile	13	FROM php:8.2-fpm
+php	AdalbertMboudou01/Reseau_Social_Etudiant	backend/Dockerfile	1	FROM php:8.3-fpm-alpine
+php	shinjiro-takata/no.1	docker/php/Dockerfile	1	FROM php:8.1-fpm
+php	fairpm/aspirecloud	docker/cli/Dockerfile	1	FROM php:8.4.14-cli-bookworm@sha256:8ee2296ac8fafec3f0a414430c4a6ae90fe9b9165b2eda1146e4e554d7b33daa AS base
+php	fairpm/aspirecloud	docker/cli/Dockerfile	24	FROM base AS dev
+php	Ocean48/bathyal	.docker/Dockerfile	1	FROM php:8.3-fpm
+php	kevinquiroga/Moodle	Dockerfile	1	FROM php:8.1-apache
+php	E-AK/testing	docker/php/Dockerfile	2	FROM ghcr.io/roadrunner-server/roadrunner:${ROADRUNNER_VERSION} AS roadrunner
+php	E-AK/testing	docker/php/Dockerfile	4	FROM php:8.5-cli-bookworm AS base
+php	E-AK/testing	docker/php/Dockerfile	59	FROM base AS test
+php	fsi-tue/hhi	Dockerfile	1	FROM php:8.3-apache
+php	shivajee98/onprize-backend	Dockerfile	1	FROM php:8.4-fpm
+php	B-o-a-r-d/Board	.docker/Dockerfile	6	FROM node:22-alpine AS assets
+php	B-o-a-r-d/Board	.docker/Dockerfile	31	FROM php:8.3-fpm-alpine AS app
+php	B-o-a-r-d/Board	.docker/Dockerfile	125	FROM nginx:1.27-alpine AS web
+php	mailpoet/wordpress-images	8.5-cli/Dockerfile	1	FROM php:8.5-cli
+php	gaoxt/blog	2021/docker_xhgui/xhgui/Dockerfile	1	FROM php:7.3.14-fpm
+php	Akmal4163/Aplikasi-PHP-CRUD-red-team	Dockerfile	1	FROM php:8.4-apache
+php	CezaryMackowski/php-app-template	docker/fpm/Dockerfile	1	FROM php:8.5-fpm-trixie AS php-fpm-base
+php	CezaryMackowski/php-app-template	docker/fpm/Dockerfile	24	FROM php-fpm-base AS php-fpm-dev
+php	monkeysoftnl/docker-php	Dockerfile.alpine	1	FROM php:8.5-fpm-alpine
+php	sweida/laravel-blog-api	docker/app.dockerfile	1	FROM php:7.2-fpm
+php	davidhirtz/website	docker/Dockerfile	4	FROM php:8.5-cli-trixie
+php	mameyugo/baseapp-docker-lamp	bin/php70/Dockerfile	1	FROM php:7.0-apache
+php	xInterlopeRx/fieldops-public	docker/php/Dockerfile	4	FROM rust:1.88-alpine@sha256:9dfaae478ecd298b6b5a039e1f2cc4fc040fc818a2de9aa78fa714dea036574d AS bws-helper-builder
+php	xInterlopeRx/fieldops-public	docker/php/Dockerfile	14	FROM scratch AS bws-helper-export
+php	xInterlopeRx/fieldops-public	docker/php/Dockerfile	19	FROM php:8.5-fpm-alpine@sha256:fa01fb1645cd0fc566a5f146b099adace33b906571f972f71f2182a7c12d1cd7 AS php-extensions
+php	xInterlopeRx/fieldops-public	docker/php/Dockerfile	32	FROM php-extensions AS dev-runtime
+php	xInterlopeRx/fieldops-public	docker/php/Dockerfile	39	FROM composer:2.8@sha256:5248900ab8b5f7f880c2d62180e40960cd87f60149ec9a1abfd62ac72a02577c AS composer-build
+php	xInterlopeRx/fieldops-public	docker/php/Dockerfile	47	FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS frontend-build
+php	xInterlopeRx/fieldops-public	docker/php/Dockerfile	57	FROM php-extensions AS production
+php	Slamdunk/php-errorhandler-legacy	Dockerfile	1	FROM php:8.5
+php	stefankonarski/dyndns	Dockerfile	1	FROM node:20-alpine AS assets
+php	stefankonarski/dyndns	Dockerfile	8	FROM php:8.5-cli AS php-cli-base
+php	stefankonarski/dyndns	Dockerfile	22	FROM php-cli-base AS vendor
+php	stefankonarski/dyndns	Dockerfile	26	FROM php-cli-base AS test
+php	stefankonarski/dyndns	Dockerfile	35	FROM php:8.5-apache AS app
+php	andresayac/tribux	infra/docker/api/Dockerfile	1	FROM composer:2 AS composer
+php	andresayac/tribux	infra/docker/api/Dockerfile	3	FROM php:8.4-cli-bookworm
+php	aliabdm/laravel-ai-showcase	Dockerfile	2	FROM php:8.4-apache
+php	rastik1337/threesome	docker/Dockerfile	1	FROM php:8.3-apache
+php	aya/myos	docker/php/7.0-fpm-alpine/Dockerfile	1	FROM php:7.0-fpm-alpine as dist
+php	aya/myos	docker/php/7.0-fpm-alpine/Dockerfile	236	FROM dist as master
+php	Lewi217/Child-s_play	dockerfile	1	FROM php:8.4-fpm
+php	c0gnit00/HTB-Apocalypse	Provisioneds/Dockerfile	1	FROM php:8.4-apache
+php	ProyectoGAM/GAM-Backend	Dockerfile	6	FROM php:8.5-fpm AS php-base
+php	ProyectoGAM/GAM-Backend	Dockerfile	54	FROM php-base AS vendor
+php	ProyectoGAM/GAM-Backend	Dockerfile	108	FROM vendor AS development
+php	ProyectoGAM/GAM-Backend	Dockerfile	129	FROM php-base AS runtime
+php	slym1v98/ihrm	docker/php/Dockerfile	1	FROM php:8.4-cli-alpine
+php	g1san/Agents-for-Vulnerable-Dockers-and-related-Benchmarks	benchmark_logs/GPT-4o/2nd-benchmark-session/CVE-2022-46169/openai/cacti/Dockerfile	1	FROM php:7.4-apache
+php	g1san/Agents-for-Vulnerable-Dockers-and-related-Benchmarks	benchmark_logs/GPT-4o/4th-benchmark-session/1st-iteration/CVE-2022-46169/openai/cacti/Dockerfile	1	FROM php:7.4-apache
+php	g1san/Agents-for-Vulnerable-Dockers-and-related-Benchmarks	benchmark_logs/GPT-4o/7th-benchmark-session/CVE-2016-5734/custom_no_tool/phpmyadmin/Dockerfile	1	FROM php:7.3-apache
+php	g1san/Agents-for-Vulnerable-Dockers-and-related-Benchmarks	tests/gpt-oss-120b/3rd-test-set-results/CVE-2022-24816/custom_no_tool/web/Dockerfile	1	FROM php:7.4-apache
+php	CaptSiro/route-chasm	Dockerfile	1	FROM php:8.3-apache
+php	Perry-sama/EcoRideCorrection-main-full	back/Dockerfile	2	FROM php:8.1-fpm
+php	deniortyann66-art/ECF-STUDI	Back End V et G/Dockerfile	1	﻿FROM php:8.2-apache
+php	crealoz/easyaudit-cli	Dockerfile	1	FROM php:8.2-alpine
+php	thyagopacher/ms-payment-gateway	Dockerfile	1	FROM php:8.4-fpm-alpine
+php	cdani11/PruebaTT	backend/ServicioClientesPedidos/Dockerfile	3	FROM php:8.3-apache-bookworm
+php	CyberSCI/PastChallenges	challenges/regionals-2025-26/web/corpo/release_files/corporate_complexity/backend/Dockerfile	1	FROM php:8.1-apache
+php	leon-v/PNPVALG	docker/php-fpm/Dockerfile	1	FROM php:8.5-fpm
+php	ArttteoSoftware/Arttteo-Web-2026-	Dockerfile	1	FROM php:8.3.36-apache-bookworm
+php	JBZoo/CSV-Blueprint	Dockerfile	13	FROM alpine:3.24 AS preparatory
+php	JBZoo/CSV-Blueprint	Dockerfile	22	FROM php:8.5-zts-alpine
+php	mojtaba1996cs/jasmin	Dockerfile	1	FROM php:8.4-fpm
+php	plivo/plivo-php	Dockerfile	1	FROM php:7.3-alpine
+php	Jpallam09/booking-system	backend/Dockerfile	1	FROM php:8.4-fpm
+php	javanile/vtiger	7.0.0/Dockerfile	1	FROM php:7.0.33-apache
+php	JesusLugo2002/AED-Ahorcado	Dockerfile	2	FROM php:8.3-apache
+php	WNoisee/earthquake-prediction	backend/Dockerfile	1	FROM php:8.2-fpm
+php	faustbrian/mint	docker/php/85/Dockerfile	1	FROM php:8.5-cli
+php	rahimi-ali/personal-base-docker-images	php/8.5/mysql-full/Dockerfile	1	FROM php:8.5-alpine
+php	rahimi-ali/personal-base-docker-images	php/8.5/swoole-full/Dockerfile	1	FROM php:8.5-alpine
+php	rahimi-ali/personal-base-docker-images	php/8.5/swoole-pgsql/Dockerfile	1	FROM php:8.5-alpine
+php	biznisbox/biznisbox	Dockerfile	1	FROM php:8.5-fpm-alpine AS app_build
+php	biznisbox/biznisbox	Dockerfile	63	FROM php:8.5-fpm-alpine AS production
+php	Stonlifer/php2shell-old2	wordpress/Dockerfile	17	FROM wordpress:php8.4-apache@sha256:41815427d043bc629359121b347e2f1e4b7aba502062c369c2922f1d666ebf2a AS wp-core
+php	Stonlifer/php2shell-old2	wordpress/Dockerfile	19	FROM php:8.4.26-apache@sha256:60111400ff77bdc44fa79b4f072afe49a42abba71e0846ad496be4761dc9c11a
+php	WidCoder/Tencent-CTF	benchmarks/nyu_ctf/2021/CSAW-Quals/web/poem-collection/Dockerfile	1	FROM php:7.0-apache
+php	ashnafi1426/One_Hotel	Restaurant_system2/Server/Dockerfile	1	FROM php:8.4-fpm-bookworm
+php	acardielf/edis	docker/Dockerfile	1	FROM php:8.3-alpine
+php	biigle/core	.docker/worker.dockerfile	3	FROM php@sha256:ce5d49625b9c50020dc1ce3c9cf4cdfa31cba31b6651e72daa3e6f5a010d234a
+php	panshaigan/nerdik	docker/production/Dockerfile	5	FROM php:8.5.12-cli-bookworm AS vendor
+php	panshaigan/nerdik	docker/production/Dockerfile	52	FROM node:24-alpine AS assets
+php	panshaigan/nerdik	docker/production/Dockerfile	75	FROM php:8.5.12-fpm-bookworm AS runtime
+php	wimski/laravel-model-repositories	Dockerfile	1	FROM php:8.5-cli-alpine
+php	joshiabir/theapimiddleware	plucker-app/Dockerfile	1	FROM php:8.2-apache
+php	NoelDeMartin/lss	kanjuro/Dockerfile	1	FROM php:8.5-fpm-alpine
+php	IliasAlmerekov/darts-backend	app/Dockerfile	12	FROM composer:2 AS composer
+php	IliasAlmerekov/darts-backend	app/Dockerfile	14	FROM php:8.4.27-fpm-alpine AS base
+php	IliasAlmerekov/darts-backend	app/Dockerfile	41	FROM base AS build
+php	IliasAlmerekov/darts-backend	app/Dockerfile	62	FROM build AS prune
+php	IliasAlmerekov/darts-backend	app/Dockerfile	77	FROM base AS test
+php	IliasAlmerekov/darts-backend	app/Dockerfile	92	FROM base AS runtime
+php	pHAlkaline/phkondo	docker/images/Dockerfile.prod.old	1	FROM php:7.4-apache
+php	adamsalehuddin91/qalbu	api/Dockerfile	1	FROM php:8.3-fpm-alpine AS base
+php	YorCreative/Laravel-Scrubber	Dockerfile	1	FROM php:8.4-fpm
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	2	FROM golang:1.27.3-alpine AS golang_cgo
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	7	FROM golang_cgo AS dolt_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	15	FROM golang_cgo AS go_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	24	FROM rust:1.90-alpine3.22 AS rust_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	30	FROM debian:bookworm-slim AS dotnet_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	49	FROM debian:bookworm-slim AS c_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	64	FROM debian:bookworm-slim AS cpp_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	73	FROM python:3.14-slim-bookworm AS python_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	86	FROM elixir:1.18.3-slim AS elixir_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	105	FROM maven:3.9-eclipse-temurin-17-noble AS java_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	117	FROM node:22-bookworm-slim AS node_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	123	FROM ruby:3.4-bookworm AS ruby_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	130	FROM swift:5.10-bookworm AS swift_clients_build
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	137	FROM debian:bookworm-slim AS mariadb_clients
+php	dolthub/dolt	integration-tests/mysql-client-tests/Dockerfile	145	FROM php:8.3-bookworm AS runtime
+php	Powar-Goutxm/PassVault---Password-Manager	Dockerfile	1	FROM php:8.2-apache
+php	mongapi/mongapi	Dockerfile	1	FROM php:8.4-fpm
+php	BearPass/Docker-core	cron/Dockerfile	1	FROM php:8.5-cli-alpine
+php	mcastillocho/ingenieria-web	Dockerfile	2	FROM php:8.3.36-fpm
+php	namnguyenit/GoTicket	back-end/Dockerfile	2	FROM composer:2 AS vendor
+php	namnguyenit/GoTicket	back-end/Dockerfile	9	FROM php:8.3-fpm-alpine AS php
+php	Super-Visions/docker-itop	2.3/Dockerfile	1	FROM php:7.1-apache
+php	Super-Visions/docker-itop	2.4/Dockerfile	1	FROM php:7.1-apache
+php	Super-Visions/docker-itop	2.5/Dockerfile	1	FROM php:7.1-apache
+php	Juancjc/sinaliza-chat-aviso	Dockerfile	3	FROM node:22-bookworm-slim AS node-runtime
+php	Juancjc/sinaliza-chat-aviso	Dockerfile	7	FROM php:8.3-fpm-bookworm AS php-base
+php	Juancjc/sinaliza-chat-aviso	Dockerfile	40	FROM php-base AS build
+php	Juancjc/sinaliza-chat-aviso	Dockerfile	68	FROM php-base AS production
+php	jessicarojas1/jessicarojas1.github.io	apex/Dockerfile	2	FROM php:8.5-apache@sha256:098cbb56b025956f6aec60e35c4e4c8c8dc15359b6a215de4868a9aec2092dce
+php	otto-braga/shaula	.docker/supervisor/supervisor.dockerfile	1	FROM php:8.3-fpm AS supervisor
+php	muhamadabel/evolusi-pl-544597	Dockerfile	3	FROM php:8.2-cli AS composer-deps
+php	muhamadabel/evolusi-pl-544597	Dockerfile	31	FROM php:8.2-cli
+php	ubc/mediawiki-docker	Dockerfile	1	FROM php:8.3.36-apache
+php	tarteka/recetas	recetas-api/Dockerfile.prod	1	FROM php:8.4-apache
+php	sunnah-com/website	Dockerfile	1	FROM php:8.5-apache
+php	Morvarid-studio/Darooghe-project	Dockerfile	1	FROM php:8.2-fpm
+php	Xore-Inc/APIARY	arcane/home/honeypot-tanner/tanner/phpox/Dockerfile	3	FROM php:8.5-cli-alpine@sha256:d386a12bad6b5dbee1f7dbd0291a4526dbfcbe5cfc0e8833de8d8309be8f3e50
+php	salikhP/kbtu-php-spring-2026	dockerized-laravel-template/Docker/php.Dockerfile	1	FROM php:8.4-fpm-alpine
+php	M-anil111/Uberrito	plugins/redis-cache/dependencies/colinmollenhour/credis/testenv/env/php-7.2/Dockerfile	1	FROM php:7.2
+php	fathallah7/access-control-system	backend-api/Dockerfile	1	FROM php:8.4-apache
+php	bagint/laravel_docker	Dockerfile	1	FROM php:8.3-fpm
+php	astrana-project/astrana-trusted-attestation-server	php/Dockerfile	13	FROM --platform=$BUILDPLATFORM composer:2@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac AS vendor
+php	astrana-project/astrana-trusted-attestation-server	php/Dockerfile	21	FROM --platform=$BUILDPLATFORM php:8.4-cli@sha256:1d2cf2b7d715b5b3aa959f0150ccbcc7b71e0181b637e443abf40a7fb56bf79a AS shared-assets
+php	astrana-project/astrana-trusted-attestation-server	php/Dockerfile	29	FROM php:8.4-cli-trixie@sha256:1d2cf2b7d715b5b3aa959f0150ccbcc7b71e0181b637e443abf40a7fb56bf79a
+php	avackaamicheal/School_Cloud	Dockerfile	2	FROM php:8.3-apache
+php	otavioserra/conn2flow	dev-environment/docker/Dockerfile.php85	3	FROM php:8.5.12-apache
+php	vusnic/Pixel-Pro3	Dockerfile.prod	1	FROM php:8.4-fpm
+php	latv/DMS	api/Dockerfile	1	FROM php:8.5-fpm-bookworm
+php	morawskim/php-examples	benchmark-json-db/Dockerfile	1	FROM php:7.2-cli
+php	Deathnerd/php-wtforms	.devcontainer/Dockerfile	1	FROM php:8.5-cli
+php	m0067/php-project-notification-service	docker_config/php/Dockerfile	1	FROM php:8.4-fpm
+php	katsuhiro1215/Spra	Dockerfile.prod	11	FROM composer:2.7 AS vendor
+php	katsuhiro1215/Spra	Dockerfile.prod	34	FROM node:22-alpine AS frontend
+php	katsuhiro1215/Spra	Dockerfile.prod	54	FROM php:8.4.27-fpm-alpine AS app
+php	katsuhiro1215/Spra	Dockerfile.prod	115	FROM caddy:2-alpine AS caddy
+php	poymanov/auction	api/docker/php-fpm/Dockerfile	1	FROM php:7.4-fpm-alpine
+php	eldabc/merulink-back	Dockerfile	10	FROM php:8.3-fpm
+php	vyuldashev/laravel-docker	8.3/octane/Dockerfile	1	FROM php:8.3-cli
+php	madisite/wedding	Dockerfile	1	FROM php:8.2-cli
+php	Inur123/weding-mutia-restu	Dockerfile	3	FROM node:22-bookworm-slim AS node
+php	Inur123/weding-mutia-restu	Dockerfile	4	FROM composer:2 AS composer
+php	Inur123/weding-mutia-restu	Dockerfile	6	FROM php:8.3-fpm-bookworm AS php-base
+php	Inur123/weding-mutia-restu	Dockerfile	38	FROM php-base AS build
+php	Inur123/weding-mutia-restu	Dockerfile	63	FROM php-base AS app
+php	Inur123/weding-mutia-restu	Dockerfile	80	FROM nginx:1.27-alpine AS web
+php	yohei0819/modern-corporate-site	backend/Dockerfile.prod	1	FROM php:8.3-cli
+php	AhmadShawkat/LeLog	Dockerfile	1	FROM php:8.5-fpm-alpine AS php-base
+php	AhmadShawkat/LeLog	Dockerfile	9	FROM php-base AS vendor
+php	AhmadShawkat/LeLog	Dockerfile	23	FROM php-base AS application
+php	vannrosales/shutterbox-system	.agents/skills/laravel-devops-deployment/templates/Dockerfile	12	FROM composer:2 AS vendor
+php	vannrosales/shutterbox-system	.agents/skills/laravel-devops-deployment/templates/Dockerfile	33	FROM node:22-alpine AS assets
+php	vannrosales/shutterbox-system	.agents/skills/laravel-devops-deployment/templates/Dockerfile	49	FROM php:8.4-fpm-alpine AS runtime
+php	lphenom/http	Dockerfile.check	20	FROM vkcom/kphp:latest AS kphp-build
+php	lphenom/http	Dockerfile.check	64	FROM php:8.1.31-cli AS phar-build
+php	lphenom/http	Dockerfile.check	104	FROM scratch AS check-complete
+php	haliltek/quiza	Dockerfile	1	FROM php:8.1-fpm
+php	sergei-tsel/shortlinker	docker/php/Dockerfile	1	FROM php:8.5-fpm
+php	ZeeshanSultan/lvcscan	lvcscan/vuln-labs/first-party/livewire/2.12.5/cve-2024-47823_unauth-upload-rce_37001-38001/nginx/Dockerfile	22	FROM php:8.2-apache
+php	NareshPratista28/vital_hub_web	Dockerfile	1	FROM php:8.4-cli
+php	Muzakie-ID/dramabox-stream	Dockerfile	1	FROM php:8.2-apache
+php	Butyricoil/Laravel.testtask	Dockerfile	1	FROM php:8.3-cli
+php	Maosokchea1/MyProfolio_Backend	Dockerfile	1	FROM php:8.4-apache
+php	petert82/monolog-logfmt	docker/php8/Dockerfile	1	FROM php:8.4-cli
+php	lonnieezell/courier	Dockerfile	1	FROM php:8.4-cli-alpine
+php	sergey1998181devlop/test-taskPavel	backend/Dockerfile	2	FROM php:8.3-fpm
+php	scoutprojekt0-sys/scout-projesi	Dockerfile.prod	1	FROM composer:2 AS composer_deps
+php	scoutprojekt0-sys/scout-projesi	Dockerfile.prod	26	FROM node:22-alpine AS frontend_builder
+php	scoutprojekt0-sys/scout-projesi	Dockerfile.prod	37	FROM php:8.3-fpm-alpine AS app
+php	XFaiderrrr/-gestion-desarrollo-software-equipo01	docker/php-service.Dockerfile	1	﻿FROM php:7.3-apache
+php	huhaodong/MyDocWeb	server/vendor/guzzlehttp/guzzle/Dockerfile	1	FROM composer:latest as setup
+php	huhaodong/MyDocWeb	server/vendor/guzzlehttp/guzzle/Dockerfile	12	FROM php:7.3
+php	kahmada/hinweisgeberportal	Dockerfile	1	FROM php:8.4-fpm
+php	danielbrendel/hortusfox-web	dockerfile	2	FROM composer:latest AS composer
+php	danielbrendel/hortusfox-web	dockerfile	17	FROM php:8.3.36-apache
+php	diegodutradev/animedoro	docker/php/Dockerfile	1	FROM php:8.3-fpm-alpine
+php	nadino75/chuquis_coffee	docker/php/Dockerfile	1	FROM php:8.3-fpm
+php	Narrrf/narrrfs-world	12.0/LAB_NOTES/2025/SPECIAL_PROJECTS/Special_Pool_Website/Pool_Website_Files/improved_pages/Dockerfile	2	FROM php:8.2-apache
+php	EhfazAdnan/docker-app-laravel	Dockerfile	2	FROM php:8.3-fpm
+php	norbeyh/Rame_Subir	Dockerfile	1	FROM php:8.2-cli
+php	ElmanBoy/monitoring	core/vendor/wapmorgan/morphos/tests/Dockerfile	1	FROM php:7.4-cli
+php	ibrahimamreya/UnixTools	Docker_Examples/docker-compose-lamp/bin/php71/Dockerfile	1	FROM php:7.1.20-apache
+php	XekoJr/millionaire-game	backend/Dockerfile	1	FROM php:8.5.12-apache
+php	kurtneumannle/backend-final	Dockerfile	1	FROM php:8.4-fpm
+php	Hardcuan/warticket-tester-bz	Dockerfile	1	FROM node:22-alpine AS assets
+php	Hardcuan/warticket-tester-bz	Dockerfile	10	FROM php:8.5-fpm-alpine
+php	ElmehdiElkabia/EventFlow	backend/Dockerfile.render	1	FROM php:8.2-cli
+php	wnunezc/wsdd-rust	recursos/recursos/Docker-Structure/bin/php7.2/Dockerfile	1	FROM php:7.2-apache
+php	dhakalnitesh/complain_tracking	Dockerfile	1	FROM php:8.3-fpm-alpine
+php	murat-ertunc/NBTTech	Dockerfile	1	FROM php:7.4-apache
+php	striketm98/AutoSecForge-AI-Powered-Application-Security-DAST-Platform	Dockerfile	1	FROM php:8.3-apache
+php	kostyakond/down-detector	docker/php.Dockerfile	1	FROM php:8.1-fpm-alpine
+php	XyloTech/DocuMind.Ai	Dockerfile.cloudrun	1	FROM node:22-bookworm-slim AS assets
+php	XyloTech/DocuMind.Ai	Dockerfile.cloudrun	10	FROM php:8.4-cli-bookworm
+php	fmidev/smartalert-web	Dockerfile	1	FROM php:8.5.12-apache
+php	pteang/airline_backend_CS394	Dockerfile	4	FROM composer:2 AS vendor
+php	pteang/airline_backend_CS394	Dockerfile	17	FROM php:8.4-fpm-alpine AS app
+php	rtemismisaghi-dot/DTZ-CRM	Dockerfile	1	FROM php:8.3-apache
+php	LlewellynR/WebForum	Dockerfile	1	FROM php:8.5-apache
+php	abdulhakimhs/hunianid	docker/php/Dockerfile	1	FROM php:8.4-fpm
+php	Mcman23/BrandfulCRM	Dockerfile	1	FROM php:8.3-apache
+php	fakhrylinux/laravel-docker	docker/development/workspace/Dockerfile	3	FROM php:8.4-cli
+php	snow-gift111/orangehrm-ai-sdlc-capstone	Dockerfile	1	FROM php:8.3-apache-bookworm
+php	anastasia-escher/balcorpus	php/Dockerfile	3	FROM php:8.1-apache
+php	hakaioffsec/CVE-2026-114509-PoC	Dockerfile	1	FROM php:8.4-cli
+php	ssimk0/domcek.org-api	Dockerfile	1	FROM php:8.1-fpm
+php	rivassh/accounting-personal-platform	backend/Dockerfile	1	FROM php:8.3-fpm-alpine
+php	nshiqing/ssd_practical	php.Dockerfile	1	FROM php:8.3-fpm
+php	kibatic/symfony-docker	8.4-fpm-debian/Dockerfile	1	FROM php:8.4-fpm-bookworm
+php	hans-thomas/valravn	Dockerfile	1	FROM php:8.4-fpm
+php	faisal01h/march-seek	docker/php/Dockerfile	1	FROM php:8.5-fpm-alpine
+php	Owwwwyh/FoundIt	foundit-api/Dockerfile	2	FROM php:8.2-apache
+php	hoor113/Polyglot-Zip-Slip	PHP-Laravel/Dockerfile	1	FROM composer:2.8 AS build
+php	hoor113/Polyglot-Zip-Slip	PHP-Laravel/Dockerfile	12	FROM php:8.4-cli
+php	LiiiiPeggy/FAST_LIO2_dynablox	catkin_grpc/grpc/grpc/src/php/docker/php-zts/Dockerfile	15	FROM php:7.2-zts-stretch
+php	LiiiiPeggy/FAST_LIO2_dynablox	catkin_grpc/grpc/grpc/templates/tools/dockerfile/test/php73_zts_debian11_x64/Dockerfile.template	18	  FROM php:7.3-zts-bullseye
+php	elbrihi/dentailOffice	docker/create-schema/Dockerfile	1	FROM php:7.1-fpm
+php	voidjtest/simple-tools.	exploitation/nosqlmap/vuln_apps/docker/php/Dockerfile	1	FROM php:8.1-fpm
+php	Decicus/DecAPI	Dockerfile	2	FROM php:8.4-fpm
+php	iflixer/cis-bel-back	docker/php/Dockerfile	1	FROM php:7.4-fpm
+php	DevTorres404/georeferenced-incident-management	backend/Dockerfile.analysis	1	FROM php:8.4-cli-bookworm
+php	fmihel/docker	images/php7.4/Dockerfile	1	FROM php:7.4-apache
+php	wedevelopnl/silverstripe-elemental-widget-userforms	Dockerfile	3	FROM php:8.1-cli-alpine$ALPINE_VERSION AS php-cli
+php	xdebug/xdebug.org	Dockerfile	1	FROM php:8.0-fpm
+php	kodansha/docker-bedrock	php8.0-fpm/Dockerfile	1	FROM php:8.0.30-fpm
+php	nharrer/osticket-docker	Dockerfile.debug	3	FROM php:8.4-fpm-alpine3.24
+php	specsnl/php85	apache/Dockerfile	5	FROM mlocati/php-extension-installer:2.12.0 AS php_extension_installer
+php	specsnl/php85	apache/Dockerfile	8	FROM php:8.5.11-apache-trixie AS runtime
+php	specsnl/php85	apache/Dockerfile	67	FROM composer/composer:2.10.3-bin AS composer
+php	specsnl/php85	apache/Dockerfile	69	FROM runtime AS builder
+php	specsnl/php85	apache/Dockerfile	152	FROM node:24.21.0-trixie-slim AS node
+php	specsnl/php85	apache/Dockerfile	154	FROM builder AS builder_nodejs
+php	CyrilCharlier/rezilio	Dockerfile	1	FROM php:8.3-apache
+php	BrenoNevess/BeatSense	Dockerfile	1	FROM php:8.2-apache
+php	QuantumTan/CRMSystem	Dockerfile	1	FROM node:22-alpine AS frontend
+php	QuantumTan/CRMSystem	Dockerfile	7	FROM php:8.2-apache
+php	markkimsal/laravel-docker-platform	7.4/nginx-fpm/Dockerfile	1	FROM php:7.4.29-fpm-bullseye AS php-bullseye-build
+php	markkimsal/laravel-docker-platform	7.4/nginx-fpm/Dockerfile	140	FROM debian:bullseye-slim
+php	Daisuke106/hide-and-seek-earth	docker/php/Dockerfile	1	FROM php:8.5.12-fpm
+php	IQ2i/data-importer	Dockerfile	3	FROM php:8.4-cli-alpine
+php	stormxcar/myblog	Dockerfile	1	FROM php:8.1-apache
+php	atua/imagens-docker	php-apache/7.3.12-apache/Dockerfile	1	FROM php:7.3.12-apache
+php	bryanA-Q/LaboLaravel	docker/Dockerfile	1	FROM php:8.4-fpm
+php	Dodotree/BookStack-Tinymyst	dev/docker/Dockerfile	1	FROM php:8.3-apache
+php	sitepointsystems/getfastsite_gnu	docker/Dockerfile	2	FROM composer:2 AS vendor
+php	sitepointsystems/getfastsite_gnu	docker/Dockerfile	8	FROM php:8.3-fpm-alpine
+php	kinow/testlink-java-api	Dockerfile	1	FROM php:7.3.4-apache
+php	vinhvrs/Decision-System-Advisor	backend/Dockerfile	1	FROM php:8.2-fpm
+php	hydrange02/web	Dockerfile	2	FROM php:8.2-apache
+php	zverinec/kscuk-web	Dockerfile	1	FROM php:8.2-apache
+php	Jayen16/CVMS	Dockerfile	2	FROM composer:2.8 AS composer-bin
+php	Jayen16/CVMS	Dockerfile	3	FROM php:8.4-fpm-bookworm AS php-base
+php	Jayen16/CVMS	Dockerfile	13	FROM php-base AS vendor
+php	Jayen16/CVMS	Dockerfile	16	FROM node:22-bookworm-slim AS assets
+php	Jayen16/CVMS	Dockerfile	25	FROM php-base AS production
+php	Jayen16/CVMS	Dockerfile	40	FROM nginx:1.27-alpine AS nginx
+php	velkuns/adventofcode-2025	Dockerfile	1	FROM php:8.2-cli
+php	TheMightyNighty/SightMetrics	demo/Dockerfile	1	FROM php:8.5-cli
+php	JibayMcs/TableFlip2	.docker/Dockerfile	19	FROM composer:2 AS composer
+php	JibayMcs/TableFlip2	.docker/Dockerfile	31	FROM node:22-alpine AS node
+php	JibayMcs/TableFlip2	.docker/Dockerfile	44	FROM php:8.3-apache
+php	Zhenyaof/test-ubunto	laravel-app/Dockerfile	2	FROM node:24-alpine AS frontend
+php	Zhenyaof/test-ubunto	laravel-app/Dockerfile	14	FROM php:8.4-cli AS app
+php	mario-005/Capstone-Runtime-Error	Dockerfile	1	FROM php:8.4-cli-alpine
+php	Zullus/apachephp	84newrelic/Dockerfile	1	FROM php:8.4-apache
+php	alekhakumarswain/PHP2Shell	CVE-2026-109619/Dockerfile	1	FROM php:8.4.26-apache
+php	manalllb/Escape-game	Dockerfile	1	FROM php:8.4-cli
+php	qinglow/Gr8MathBackend	Dockerfile	1	FROM php:8.2-apache
+php	rleroi/Stremio-Laravel	Dockerfile	1	FROM php:8.2-fpm
+php	chocom1nt/webProgramming-bachelor	dockerfile	1	FROM php:8.2-apache
+php	shoppingflux/php-sdk	Dockerfile	1	FROM php:8.0-fpm
+php	Alvarolozz05/practica-final-despliegue	backend/Dockerfile	1	FROM php:8.2-apache
+php	FalveyLibraryTechnology/VuBib	docker/php/Dockerfile	1	FROM php:7.0-fpm
+php	bitrixdock/bitrixdock	php/php73/Dockerfile	1	FROM php:7.3-fpm
+php	loclamor/plantCompanion-symfony	.docker/php/Dockerfile	1	FROM php:8.3-fpm
+php	at2software/talvis	docker/Dockerfile.prod	14	FROM php:8.4-fpm-alpine
+php	Stepa73/docker-php	php85/apacheNode/Dockerfile	1	FROM node:latest as node
+php	Stepa73/docker-php	php85/apacheNode/Dockerfile	2	FROM php:8.5-apache
+php	matanki-saito/eu4_legacy_wiki	Dockerfile	1	FROM php:7.4.28-apache
+node	agnosticeng/agx	Dockerfile	1	FROM node:23 AS builder
+node	agnosticeng/agx	Dockerfile	15	FROM nginx
+node	DominateAi/Dominate-AI	backend/DockerFile	1	FROM node:15.5.1
+node	justinl-y/demo-platform	api-demo/Dockerfile.ci	2	FROM node:26-alpine
+node	MGeurts/genealogy	Dockerfile	7	FROM serversideup/php:8.4-fpm-nginx AS base
+node	MGeurts/genealogy	Dockerfile	19	FROM base AS development
+node	MGeurts/genealogy	Dockerfile	40	FROM serversideup/php:8.4-cli AS ci
+node	MGeurts/genealogy	Dockerfile	54	FROM composer:2 AS composer-stage
+node	MGeurts/genealogy	Dockerfile	75	FROM node:25 AS node
+node	MGeurts/genealogy	Dockerfile	100	FROM base AS deploy
+node	sourcegraph/lsif-node-action	Dockerfile	1	FROM node:13.3.0-alpine3.10
+node	AbubakrRehman/dsa_window_backend	Dockerfile.dev	2	FROM node:19.9.0-alpine
+node	Darvand/furmeets-api	Dockerfile	2	FROM node:23-alpine AS development
+node	Darvand/furmeets-api	Dockerfile	10	FROM node:23-alpine AS production
+node	aphus/microservices-shop	product-service/Dockerfile	1	FROM node:18
+node	luismiguelcasadodiaz/ft_transcendence	srcs/backend/Dockerfile	2	FROM node:24-alpine
+node	jehy/wodThrowBot	Dockerfile	1	FROM node:26.12.1-alpine
+node	Guardinary/web2gem	Dockerfile	1	FROM node:26-alpine AS deps
+node	Guardinary/web2gem	Dockerfile	10	FROM deps AS build
+node	Guardinary/web2gem	Dockerfile	17	FROM node:26-alpine AS runtime
+node	rezer-bleede/refdata-hub	reviewer-ui/Dockerfile	2	FROM node:20-alpine AS build
+node	rezer-bleede/refdata-hub	reviewer-ui/Dockerfile	15	FROM nginx:1.25-alpine
+node	ace-ify/GitOS	frontend/Dockerfile	2	FROM node:20-alpine AS deps
+node	ace-ify/GitOS	frontend/Dockerfile	8	FROM node:20-alpine AS builder
+node	ace-ify/GitOS	frontend/Dockerfile	19	FROM node:20-alpine AS runner
+node	bogomazdmitry/itransition-coursework	Dockerfile	3	FROM node:16-bullseye-slim AS node
+node	bogomazdmitry/itransition-coursework	Dockerfile	6	FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+node	bogomazdmitry/itransition-coursework	Dockerfile	20	FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
+node	RnK-web/spring-microservices-demo	frontend/Dockerfile	1	FROM node:25-alpine3.22 AS build
+node	RnK-web/spring-microservices-demo	frontend/Dockerfile	8	FROM nginx:1.29.4-alpine
+node	ShaikSazid/codebase-navigator	apps/api-gateway/Dockerfile	1	FROM node:24-alpine AS builder
+node	ShaikSazid/codebase-navigator	apps/api-gateway/Dockerfile	13	FROM node:24-alpine AS production
+node	PokeFred/project-thesis-tests	proof-of-concept-one/Dockerfile	2	FROM node:25-alpine AS builder
+node	PokeFred/project-thesis-tests	proof-of-concept-one/Dockerfile	11	FROM ubuntu:25.04
+node	Maptio/maptio	Dockerfile	1	FROM node:16.14.0
+node	xx-code/agni-think	config/frontend/dockerfile	1	FROM node:25-alpine3.23 as build
+node	xx-code/agni-think	config/frontend/dockerfile	32	FROM node:25-alpine3.23
+node	itsektionen/emit	frontend/Dockerfile	3	FROM node:26-slim
+node	elab-development/internet-tehnologije-2025-rentabike_2021_0076	frontend/Dockerfile	1	FROM node:20
+node	nearyou/Dominate-AI	backend/DockerFile	1	FROM node:15.5.1
+node	m-elhamlaoui/Keplereum	FrontEnd/dockerfile	1	FROM node:18-alpine AS build
+node	m-elhamlaoui/Keplereum	FrontEnd/dockerfile	13	FROM nginx:stable-alpine AS production
+node	openforis/sepal	modules/gui/Dockerfile	2	FROM node:26-alpine AS build
+node	openforis/sepal	modules/gui/Dockerfile	37	FROM nginxinc/nginx-unprivileged:alpine
+node	openforis/sepal	modules/task/Dockerfile	1	FROM node:26-alpine
+node	HatmanStack/warmreach	mock-linkedin/Dockerfile	1	FROM node:24-slim
+node	Huangxuanming0911/wechat-chatbot	Dockerfile	3	FROM node:19 as builder-default
+node	Huangxuanming0911/wechat-chatbot	Dockerfile	6	FROM node:19 as builder-aliyun
+node	Huangxuanming0911/wechat-chatbot	Dockerfile	12	FROM builder-${APT_SOURCE} AS builder
+node	Huangxuanming0911/wechat-chatbot	Dockerfile	44	FROM builder
+node	anchore/syft	test/cli/testdata/image-node-binary/Dockerfile	1	FROM node:19-alpine3.15@sha256:07050181369f52460e788738272bcb22b71c7cfc6fafee0b5cd27d2022513a86
+node	guddii/DSWS	apps/customs/Dockerfile	4	FROM node:19-alpine AS builder
+node	guddii/DSWS	apps/customs/Dockerfile	17	FROM node:19-alpine AS installer
+node	guddii/DSWS	apps/customs/Dockerfile	39	FROM node:19-alpine AS runner
+node	guddii/DSWS	apps/reconstruction-loan-corporation/Dockerfile	4	FROM node:19-alpine AS builder
+node	guddii/DSWS	apps/reconstruction-loan-corporation/Dockerfile	17	FROM node:19-alpine AS installer
+node	guddii/DSWS	apps/reconstruction-loan-corporation/Dockerfile	39	FROM node:19-alpine AS runner
+node	hedss/grafana_demo	source/mythical-beasts-requester/Dockerfile	1	FROM node:17-alpine3.14
+node	dargmuesli/jonas-thelemann	Dockerfile	6	FROM node:26.13.0-alpine AS base-image
+node	dargmuesli/jonas-thelemann	Dockerfile	22	FROM base-image AS development
+node	dargmuesli/jonas-thelemann	Dockerfile	50	FROM base-image AS prepare
+node	dargmuesli/jonas-thelemann	Dockerfile	66	FROM prepare AS build-node
+node	dargmuesli/jonas-thelemann	Dockerfile	84	FROM prepare AS build-static
+node	dargmuesli/jonas-thelemann	Dockerfile	96	FROM prepare AS build-static-test
+node	dargmuesli/jonas-thelemann	Dockerfile	108	FROM prepare AS lint
+node	dargmuesli/jonas-thelemann	Dockerfile	124	FROM mcr.microsoft.com/playwright:v1.64.1 AS test-e2e-base-image
+node	dargmuesli/jonas-thelemann	Dockerfile	139	FROM test-e2e-base-image AS test-e2e_development
+node	dargmuesli/jonas-thelemann	Dockerfile	166	FROM test-e2e-base-image AS test-e2e-prepare
+node	dargmuesli/jonas-thelemann	Dockerfile	197	FROM test-e2e-prepare AS test-e2e-static
+node	dargmuesli/jonas-thelemann	Dockerfile	207	FROM base-image AS collect
+node	dargmuesli/jonas-thelemann	Dockerfile	247	FROM collect AS production
+node	joonaskokko/ruuvi-api	Dockerfile	1	FROM node:23-alpine
+node	kfamaguana07/Api-Gateway	usuarios/Dockerfile	1	FROM node:22-alpine AS build
+node	kfamaguana07/Api-Gateway	usuarios/Dockerfile	8	FROM node:22-alpine
+node	M4Marvin/charon	Dockerfile	3	FROM node:22-slim AS build
+node	M4Marvin/charon	Dockerfile	20	FROM node:22-slim AS runtime
+node	uclaacm/lactf-archive	2023/web/metaverse/Dockerfile	1	FROM node:19-bullseye-slim
+node	uclaacm/lactf-archive	2024/admin-bot/Dockerfile	1	FROM node:21-bookworm-slim
+node	uclaacm/lactf-archive	2024/web/quickstyle/Dockerfile	1	FROM node:21-bookworm-slim
+node	uclaacm/lactf-archive	2025/web/chessbased/Dockerfile	1	FROM node:21-bookworm-slim AS frontend-builder
+node	uclaacm/lactf-archive	2025/web/chessbased/Dockerfile	10	FROM node:21-bookworm-slim
+node	uclaacm/lactf-archive	2026/web/clawcha/Dockerfile	1	FROM node:25-bookworm-slim
+node	uclaacm/lactf-archive	2026/web/the-trial/Dockerfile	1	FROM node:25-bookworm-slim
+node	bashtem/foodapp	apps/user-service/Dockerfile	1	FROM node:20-alpine
+node	ponyz1/invoice-checking	Dockerfile	4	FROM node:22-alpine AS builder
+node	ponyz1/invoice-checking	Dockerfile	18	FROM node:22-alpine AS runner
+node	derunovdmitry-bit/ai-for-developers-project-386	Dockerfile	3	FROM node:22-alpine AS backend-build
+node	derunovdmitry-bit/ai-for-developers-project-386	Dockerfile	12	FROM node:22-alpine AS frontend-build
+node	derunovdmitry-bit/ai-for-developers-project-386	Dockerfile	21	FROM node:22-alpine AS runtime
+node	mlivernoche/miporin	Dockerfile	2	FROM node:22-bookworm-slim AS builder
+node	mlivernoche/miporin	Dockerfile	27	FROM node:22-bookworm-slim AS runner
+node	epicweb-dev/react-e2e-testing-with-playwright	exercises/03.guides/02.solution.test-data/other/Dockerfile	4	FROM node:26-bookworm-slim as base
+node	epicweb-dev/react-e2e-testing-with-playwright	exercises/03.guides/02.solution.test-data/other/Dockerfile	13	FROM base as deps
+node	epicweb-dev/react-e2e-testing-with-playwright	exercises/03.guides/02.solution.test-data/other/Dockerfile	21	FROM base as production-deps
+node	epicweb-dev/react-e2e-testing-with-playwright	exercises/03.guides/02.solution.test-data/other/Dockerfile	30	FROM base as build
+node	epicweb-dev/react-e2e-testing-with-playwright	exercises/03.guides/02.solution.test-data/other/Dockerfile	55	FROM base
+node	helixml/helix	Dockerfile	6	FROM golang:1.25-bookworm@sha256:e3a54b77385b4f8a31c1db4d12429ffb3718ea76865731a787c497755d409547 AS api-base
+node	helixml/helix	Dockerfile	19	FROM registry.helixml.tech/helix/controlplane:2.11.52@sha256:58705ba01fc53a3af20099e44f1e3874550ca3242b736cdaa70d22693d86ca6a AS embedding-model
+node	helixml/helix	Dockerfile	24	FROM api-base AS tokenizers-lib
+node	helixml/helix	Dockerfile	31	FROM api-base AS api-dev-env
+node	helixml/helix	Dockerfile	62	FROM api-base AS api-build-env
+node	helixml/helix	Dockerfile	82	FROM node:23-alpine@sha256:a34e14ef1df25b58258956049ab5a71ea7f0d498e41d0b514f4b8de09af09456 AS ui-base
+node	helixml/helix	Dockerfile	94	FROM ui-base AS ui-dev-env
+node	helixml/helix	Dockerfile	101	FROM ui-base AS ui-build-env
+node	helixml/helix	Dockerfile	112	FROM debian:bookworm-slim@sha256:67b30a61dc87758f0caf819646104f29ecbda97d920aaf5edc834128ac8493d3
+node	Cleanskiier27/Nb-ssh-conf	cuda-binaries/networkbuster.network/Dockerfile	2	FROM node:24-alpine AS builder
+node	Cleanskiier27/Nb-ssh-conf	cuda-binaries/networkbuster.network/Dockerfile	13	FROM node:24-alpine
+node	bettersg/Mendisphere	Dockerfile	1	FROM node:19
+node	timbornemann/Total-Task-Tracker	Dockerfile	2	FROM node:18-alpine AS builder
+node	timbornemann/Total-Task-Tracker	Dockerfile	22	FROM node:18-alpine
+node	JonathanJomic/digikast-api	Dockerfile	1	FROM node:15.0.0-alpine AS node
+node	JonathanJomic/digikast-api	Dockerfile	2	FROM keymetrics/pm2:latest-alpine
+node	eduluma/track-promises	Dockerfile.api	2	FROM node:22-alpine AS deps
+node	eduluma/track-promises	Dockerfile.api	10	FROM node:22-alpine AS runner
+node	Rika-Labs/akter	apps/self-host/Dockerfile.node	1	FROM oven/bun:1.4.2-debian AS build
+node	Rika-Labs/akter	apps/self-host/Dockerfile.node	8	FROM node:24.18.0-bookworm-slim
+node	FanofHOTS/Learning_app	Dockerfile	1	FROM python:3.13-slim AS backend
+node	FanofHOTS/Learning_app	Dockerfile	29	FROM node:25-bookworm-slim AS frontend
+node	latitude-dev/latitude-llm	Dockerfile	6	FROM node:25-slim AS base
+node	latitude-dev/latitude-llm	Dockerfile	24	FROM base AS deps
+node	latitude-dev/latitude-llm	Dockerfile	35	FROM deps AS source
+node	latitude-dev/latitude-llm	Dockerfile	49	FROM source AS build-api
+node	latitude-dev/latitude-llm	Dockerfile	56	FROM source AS build-ingest
+node	latitude-dev/latitude-llm	Dockerfile	63	FROM source AS build-workers
+node	latitude-dev/latitude-llm	Dockerfile	70	FROM source AS build-workflows
+node	latitude-dev/latitude-llm	Dockerfile	77	FROM source AS build-web
+node	latitude-dev/latitude-llm	Dockerfile	95	FROM source AS build-migrations
+node	latitude-dev/latitude-llm	Dockerfile	100	FROM base AS runtime
+node	latitude-dev/latitude-llm	Dockerfile	139	FROM runtime AS api
+node	latitude-dev/latitude-llm	Dockerfile	162	FROM runtime AS ingest
+node	latitude-dev/latitude-llm	Dockerfile	184	FROM runtime AS workers
+node	latitude-dev/latitude-llm	Dockerfile	206	FROM runtime AS workflows
+node	latitude-dev/latitude-llm	Dockerfile	249	FROM runtime AS web
+node	latitude-dev/latitude-llm	Dockerfile	275	FROM runtime AS migrations
+node	AbdelazizKazoum/clinora-platform	apps/backend/services/clinic-service/Dockerfile	1	FROM node:22-alpine AS builder
+node	AbdelazizKazoum/clinora-platform	apps/backend/services/clinic-service/Dockerfile	16	FROM node:22-alpine AS runtime
+node	DeprecatedLuke/claude-loop	Dockerfile	1	FROM node:18-alpine
+node	nanocreek/codeforge-agent	Dockerfile	6	FROM node:24-bookworm-slim AS wrapper-builder
+node	nanocreek/codeforge-agent	Dockerfile	20	FROM node:24-bookworm-slim AS runtime
+node	ESCAFFRE-Lucas/docker-swarm-ci-cd	back_front/back/Dockerfile	1	FROM node:18-alpine
+node	Nirmaljangir91/Ai-project	Client/Dockerfile	2	FROM node:21 AS frontend-builder
+node	Nirmaljangir91/Ai-project	Client/Dockerfile	17	FROM node:21-slim
+node	schanoski/healthcare-api	Dockerfile	2	FROM node:25-bullseye-slim
+node	aldouzee/AnomaLens-v2	frontend/Dockerfile	1	FROM node:22-alpine
+node	gangasingh7058/Project-Algo	Backend/Dockerfile	1	FROM node:24-alpine3.21
+node	IssyPro101/reflex	apps/api/Dockerfile	1	FROM node:20-slim AS base
+node	sysdr/sdir	event_driven_architechture/event-driven-demo/services/payment/Dockerfile	1	FROM node:18-alpine
+node	Entroudy/budget-manager	src/Frontend/Dockerfile	1	FROM node:20-alpine AS build
+node	Entroudy/budget-manager	src/Frontend/Dockerfile	22	FROM caddy:2.8-alpine
+node	himanshu-nakrani/sourceful	Dockerfile	3	FROM node:22-alpine AS deps
+node	himanshu-nakrani/sourceful	Dockerfile	8	FROM node:22-alpine AS builder
+node	himanshu-nakrani/sourceful	Dockerfile	17	FROM node:22-alpine AS runner
+node	DEFRA/cdp-uploader-smoke-tests	Dockerfile	1	FROM node:21-alpine
+node	blackstorm/mdbrain	Dockerfile	1	FROM node:25-bookworm-slim AS app-builder
+node	blackstorm/mdbrain	Dockerfile	12	FROM clojure:temurin-25-tools-deps AS backend-builder
+node	blackstorm/mdbrain	Dockerfile	24	FROM eclipse-temurin:25-jre
+node	kpj2006/ZKmail	mailchain-send-api/Dockerfile	2	FROM node:14.14.0-alpine3.12 as common-build-stage
+node	kpj2006/ZKmail	mailchain-send-api/Dockerfile	13	FROM common-build-stage as development-build-stage
+node	kpj2006/ZKmail	mailchain-send-api/Dockerfile	20	FROM common-build-stage as production-build-stage
+node	lionboomer/IDentify	Dockerfile.app	2	FROM node:21
+node	Belleal/ti-engine	packages/tester/Dockerfile	13	FROM node:24-alpine AS deps
+node	Belleal/ti-engine	packages/tester/Dockerfile	28	FROM node:24-alpine AS runtime
+node	Thomascogez/nodemailer-mjml	Dockerfile	1	FROM node:23-alpine
+node	NYC00kie/Sn1054BotDev	Dockerfile	1	FROM node:25
+node	nicupopa/SkiMaster	bank/Dockerfile.dev	4	FROM node:24.12-alpine3.23 AS dev
+node	nicupopa/SkiMaster	bank/Dockerfile.dev	20	FROM node:24.12-alpine3.23 AS build
+node	nicupopa/SkiMaster	bank/Dockerfile.dev	36	FROM gcr.io/distroless/nodejs24-debian13:nonroot AS prod
+node	VeVarunSharma/gov-of-sask-build-days-appmod-to-agentic-sdlc	capstone-src/web-react/Dockerfile	1	FROM node:24-alpine AS build
+node	VeVarunSharma/gov-of-sask-build-days-appmod-to-agentic-sdlc	capstone-src/web-react/Dockerfile	10	FROM nginx:1.29-alpine
+node	EcoTplant/practica-docker-final	teslo-shop/Dockerfile	7	FROM node:19-alpine3.15 as dev
+node	EcoTplant/practica-docker-final	teslo-shop/Dockerfile	20	FROM node:19-alpine3.15 as dev-deps
+node	EcoTplant/practica-docker-final	teslo-shop/Dockerfile	32	FROM node:19-alpine3.15 as builder
+node	EcoTplant/practica-docker-final	teslo-shop/Dockerfile	45	FROM node:19-alpine3.15 as prod-deps
+node	EcoTplant/practica-docker-final	teslo-shop/Dockerfile	56	FROM node:19-alpine3.15 as prod
+node	josueguido/TaskFlow-App	frontend/Dockerfile.dev	1	FROM node:25-alpine3.21
+node	vlkosh/wb-parser	Dockerfile	1	FROM node:25-alpine AS builder
+node	vlkosh/wb-parser	Dockerfile	8	FROM node:25-alpine
+node	jscoobyced/jsc-comfyui-api	etc/docker/Dockerfile	1	FROM node:25-alpine AS builder
+node	jscoobyced/jsc-comfyui-api	etc/docker/Dockerfile	12	FROM node:25-alpine
+node	team-cowork/cowork-server	cowork-chat/Dockerfile	1	FROM node:26.8.2-alpine3.24@sha256:ef24c5053d50fdc3e4e56eb4e7ddb7861874ab0fdc797046ba897581deb8e868 AS builder
+node	team-cowork/cowork-server	cowork-chat/Dockerfile	12	FROM builder AS verification
+node	team-cowork/cowork-server	cowork-chat/Dockerfile	21	FROM scratch AS verify
+node	team-cowork/cowork-server	cowork-chat/Dockerfile	24	FROM node:26.8.2-alpine3.24@sha256:ef24c5053d50fdc3e4e56eb4e7ddb7861874ab0fdc797046ba897581deb8e868 AS runtime
+node	sambhavsaxena/syntext	Dockerfile	1	FROM node:16-alpine
+node	GuillaumeBlin/progweb	td6/Dockerfile	1	FROM node:23-alpine
+node	mattia-pellin/project-atlas-file-manager	Dockerfile	1	FROM node:26-slim AS frontend-builder
+node	mattia-pellin/project-atlas-file-manager	Dockerfile	19	FROM python:3.14-slim AS backend-builder
+node	mattia-pellin/project-atlas-file-manager	Dockerfile	38	FROM python:3.14-slim
+node	vinicioadb/bank-challenge	frontend/Dockerfile	1	FROM node:22-alpine AS build
+node	vinicioadb/bank-challenge	frontend/Dockerfile	7	FROM nginx:1.27-alpine
+node	dannyswat/jiceot	Dockerfile	2	FROM golang:1.24-alpine AS builder-go
+node	dannyswat/jiceot	Dockerfile	20	FROM node:24-alpine AS builder-client
+node	dannyswat/jiceot	Dockerfile	33	FROM alpine:latest
+node	kalviumcommunity/Karan_Squad62_Attendance_management_project	Desktop/rival-blog/backend/Dockerfile	1	FROM node:18-alpine
+node	cameri/nostream	Dockerfile	3	FROM node:24.22.1-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 AS build
+node	cameri/nostream	Dockerfile	17	FROM node:24.22.1-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
+node	zkas-audit/IGRA_BUG_FIX	kaspa-graph-inspector/web/Dockerfile	1	FROM node:15.8.0-alpine AS build
+node	zkas-audit/IGRA_BUG_FIX	kaspa-graph-inspector/web/Dockerfile	16	FROM node:15.8.0-alpine
+node	haideraljiryawe/Shubayr	backend/Dockerfile	9	FROM node:24-alpine AS dependencies
+node	haideraljiryawe/Shubayr	backend/Dockerfile	14	FROM dependencies AS development
+node	haideraljiryawe/Shubayr	backend/Dockerfile	20	FROM dependencies AS build
+node	haideraljiryawe/Shubayr	backend/Dockerfile	29	FROM build AS migrate
+node	haideraljiryawe/Shubayr	backend/Dockerfile	34	FROM build AS pruned
+node	haideraljiryawe/Shubayr	backend/Dockerfile	37	FROM node:24-alpine AS production
+node	livecvebench/CVE-Factory	cve_tasks/trainset_0313_part2/cve-2024-21512/Dockerfile	1	FROM node:18
+node	AhmadRafiee/DevOps_Certification	docker/scenario/voting-app/result/Dockerfile	1	FROM node:10-slim
+node	JeysonRG1804/AH1	base-js-wppconnect-memory/Dockerfile	1	FROM node:21-alpine3.18 as builder
+node	JeysonRG1804/AH1	base-js-wppconnect-memory/Dockerfile	33	FROM node:21-alpine3.18
+node	stevefortier/katafit-coach	Dockerfile	2	FROM node:26.10.0-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2 AS build
+node	stevefortier/katafit-coach	Dockerfile	18	FROM docker:29.1.3-cli@sha256:4fa0ee1f3a7e4354c4ea34558b6d4ee32859baf4973d4c8ccc8e7fe3dd730c04 AS dockercli
+node	stevefortier/katafit-coach	Dockerfile	19	FROM node:26.10.0-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2
+node	tarlepp/angular-ngrx-frontend	Dockerfile	4	FROM node:26.12.1-trixie@sha256:a98e6fda54fdbb22d4238054cca9a2a113bcd1191c09193a535aae22f400aa8e AS dependencies
+node	tarlepp/angular-ngrx-frontend	Dockerfile	19	FROM node:26.12.1-trixie-slim@sha256:36793bcbb160a6a16cede1e62b93f84e26b78a972a8a4c0b879c1c12f22761ec AS development
+node	tarlepp/angular-ngrx-frontend	Dockerfile	87	from pathlib import Path
+node	tarlepp/angular-ngrx-frontend	Dockerfile	141	FROM dependencies AS builder
+node	tarlepp/angular-ngrx-frontend	Dockerfile	152	FROM nginx:1.31.8-alpine-slim@sha256:b899b0ef5345e14c01720a5ff83e716bacda65c7077a7363602ff7e7970bf88a AS production
+node	juandiazzi/io	card-issuer/Dockerfile	1	FROM node:24-alpine AS builder
+node	juandiazzi/io	card-issuer/Dockerfile	12	FROM node:24-alpine AS runner
+node	kaspa-live/kaspa-graph-inspector	api/Dockerfile	1	FROM node:15.8.0-alpine
+node	1337x2/G24L	docker/Dockerfile	3	FROM node:18-alpine AS base
+node	1337x2/G24L	docker/Dockerfile	7	FROM base AS deps
+node	1337x2/G24L	docker/Dockerfile	13	FROM base AS builder
+node	1337x2/G24L	docker/Dockerfile	19	FROM base AS runner
+node	bcgov/address-change	frontend/Dockerfile	2	FROM node:26.12.1-bookworm-slim AS static
+node	bcgov/address-change	frontend/Dockerfile	10	FROM caddy:2.11.6-builder AS caddy
+node	bcgov/address-change	frontend/Dockerfile	21	FROM alpine:3.24.3
+node	safe-global/safe-client-gateway	Dockerfile	5	FROM node:26.12.1-alpine3.24 AS base
+node	safe-global/safe-client-gateway	Dockerfile	29	FROM node:26.12.1-alpine3.24 AS production
+node	Vinicius-Lozano/flowcapital-credit-score	frontend/Dockerfile	1	FROM node:22-slim
+node	paritytech/polkadot-hub-app	Dockerfile	1	FROM node:23
+node	Leon0926/SkyTrace	dashboard-ui/dockerfile	1	FROM node:13.12.0-alpine
+node	lionsgatevac-ux/Antigravity	Padlás födém szigetelés dokumentum managment/backend/Dockerfile.migration	1	FROM node:18-alpine
+node	0xdaksh-12/FileGo	server/Dockerfile	2	FROM node:22-alpine AS builder
+node	0xdaksh-12/FileGo	server/Dockerfile	15	FROM node:22-alpine AS runner
+node	paulmalmquist/kb_2	Dockerfile	1	FROM node:24-slim
+node	mhmmdmhdvi/Customers_Club	frontend/Dockerfile	1	FROM node:24.20.0-alpine AS build
+node	mhmmdmhdvi/Customers_Club	frontend/Dockerfile	9	FROM nginx:1.29-alpine
+node	smarcilla/football-oracle-monorepo	services/data-registry/Dockerfile	1	FROM node:25-alpine AS builder
+node	smarcilla/football-oracle-monorepo	services/data-registry/Dockerfile	33	FROM node:25-alpine AS runner
+node	aCard0s0/login-demo	Dockerfile	2	FROM eclipse-temurin:27-jdk-alpine AS build
+node	aCard0s0/login-demo	Dockerfile	12	FROM eclipse-temurin:27-jre-alpine AS runtime
+node	aCard0s0/login-demo	Dockerfile	17	FROM runtime AS auth-service
+node	aCard0s0/login-demo	Dockerfile	22	FROM runtime AS todo-service
+node	aCard0s0/login-demo	Dockerfile	27	FROM runtime AS agent-service
+node	aCard0s0/login-demo	Dockerfile	32	FROM runtime AS wallet-service
+node	aCard0s0/login-demo	Dockerfile	38	FROM node:25-alpine AS web
+node	huhgtzumo/videodownload	frontend/Dockerfile	1	FROM node:16-alpine
+node	microsoft/mosaic-apim	apps/web/Dockerfile	1	FROM node:24-alpine AS builder
+node	microsoft/mosaic-apim	apps/web/Dockerfile	8	FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime
+node	PuuGoo/note-vocabulary-v2	Dockerfile	5	FROM node:18-alpine AS base
+node	bio-tools/biotoolsRegistry	frontend/Dockerfile	1	FROM node:11.15.0-slim
+node	cuongbr/cinema	Dockerfile	1	FROM node:24-alpine
+node	johmik1997/frontend-starter	Dockerfile	1	FROM node:23.5 As build
+node	johmik1997/frontend-starter	Dockerfile	8	FROM nginx:alpine
+node	Noschvie/knx-garage-wled	Dockerfile	2	FROM node:26-alpine AS base
+node	Noschvie/knx-garage-wled	Dockerfile	6	FROM base AS deps
+node	Noschvie/knx-garage-wled	Dockerfile	11	FROM base AS runtime
+node	hypothesis/h	Dockerfile	2	FROM node:25.2-alpine as build
+node	hypothesis/h	Dockerfile	18	FROM python:3.11.11-alpine3.19
+node	ATD04/Abdalrhman-Dmour-9xai19	paperclip-master/docker/openclaw-smoke/Dockerfile	1	FROM node:22-alpine
+node	ayaangazali/eyes	Dockerfile	1	FROM node:26-slim
+node	xixi007666/care-companion	Dockerfile	1	FROM node:24-bookworm-slim
+node	OpenTMI/opentmi	Dockerfile	2	FROM node:14-stretch AS base
+node	OpenTMI/opentmi	Dockerfile	5	FROM base AS dependencies
+node	OpenTMI/opentmi	Dockerfile	14	FROM dependencies AS build
+node	OpenTMI/opentmi	Dockerfile	19	FROM base AS ui
+node	OpenTMI/opentmi	Dockerfile	28	FROM node:14-alpine AS release
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	2	FROM mcr.microsoft.com/devcontainers/python:3.14 as base
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	3	FROM mcr.microsoft.com/devcontainers/python:3.11 as base
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	19	FROM base as webdeps
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	30	FROM base as runtime
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	33	FROM node:25-alpine AS builder
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	43	FROM node:25-alpine AS production
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	56	FROM node:25-alpine AS build
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	61	FROM caddy:2.8-alpine
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	70	FROM ${NODE_IMAGE} AS builder
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	92	FROM ${NODE_IMAGE} AS production
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	130	FROM node:20-bookworm-slim
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	156	FROM base as webdeps
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	165	FROM base as runtime
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	177	FROM python:3.14-slim AS builder
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	183	FROM python:3.14-slim
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	192	FROM python:3.14 as builder
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	197	FROM python:3.14-slim
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	208	FROM node:25-alpine AS base
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	213	FROM base AS backend
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	224	FROM base AS frontend
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	235	FROM node:20-bookworm-slim AS base
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	241	FROM base AS dev
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	251	FROM base AS build
+node	BlackRoad-Archive/blackroad-os-prism-enterprise	Dockerfile	261	FROM node:20-bookworm-slim AS production
+node	phy0hk/chartdb	Dockerfile	1	FROM node:24-alpine AS builder
+node	phy0hk/chartdb	Dockerfile	25	FROM nginx:stable-alpine AS production
+node	moazzam-07/DialerJazz	Dockerfile	2	FROM node:22-alpine AS builder
+node	moazzam-07/DialerJazz	Dockerfile	25	FROM node:22-alpine AS production
+node	Michio-Inoue/tamron-cp2-ai-dx-source	backend/Dockerfile	1	FROM node:20-slim
+node	ANGJustinl/wallpaper-nas-panel	apps/server/Dockerfile.worker	1	FROM node:22-bookworm-slim AS node-runtime
+node	ANGJustinl/wallpaper-nas-panel	apps/server/Dockerfile.worker	3	FROM cm2network/steamcmd:root-bookworm
+node	mathewthe2/immersion_reader	resources/ebook-reader/apps/web/Dockerfile	3	FROM node:16-alpine as builder
+node	mathewthe2/immersion_reader	resources/ebook-reader/apps/web/Dockerfile	19	FROM nginx:1.22-alpine
+node	chaosmirage/mikrouli	apps/web/Dockerfile	14	FROM node:24-alpine AS builder
+node	chaosmirage/mikrouli	apps/web/Dockerfile	37	FROM node:24-alpine AS dev
+node	chaosmirage/mikrouli	apps/web/Dockerfile	62	FROM nginxinc/nginx-unprivileged:1.27-alpine AS production
+node	tuna2134-workspace/e2ee-voice	client/Dockerfile	2	FROM node:26-alpine AS builder
+node	tuna2134-workspace/e2ee-voice	client/Dockerfile	12	FROM nginx:1.27-alpine
+node	tomacheese/tomachi-emojis-sync-perms	Dockerfile	1	FROM node:26-alpine
+node	shaangill025/helmwright	packages/harness/sandbox/Dockerfile	2	FROM node:26-slim@sha256:930557a230abacbc3f4fd9b8648abf8f4bee1e17cb72195dcdfb2f709bc85b33
+node	tekteku/Housy-ILOGsys	Dockerfile	5	FROM node:18-alpine AS frontend-builder
+node	tekteku/Housy-ILOGsys	Dockerfile	25	FROM node:18-alpine AS backend-builder
+node	tekteku/Housy-ILOGsys	Dockerfile	42	FROM node:18-alpine AS production
+node	MatthieuDeroir/scale	Dockerfile	2	FROM node:22-bookworm-slim AS base
+node	MatthieuDeroir/scale	Dockerfile	6	FROM base AS deps
+node	MatthieuDeroir/scale	Dockerfile	11	FROM base AS build
+node	MatthieuDeroir/scale	Dockerfile	17	FROM base AS runtime
+node	hpi-sam/fuesim-digital	docker/Dockerfile	4	FROM rust AS docs-builder
+node	hpi-sam/fuesim-digital	docker/Dockerfile	20	FROM node:26.5.0-trixie-slim AS builder
+node	hpi-sam/fuesim-digital	docker/Dockerfile	48	FROM node:26.5.0-trixie-slim
+node	gusztavvargadr/foaas-mcp	Dockerfile	2	FROM node:26.12.1-bookworm-slim AS builder
+node	gusztavvargadr/foaas-mcp	Dockerfile	25	FROM node:26.12.1-bookworm-slim
+node	Ameobea/osutrack_irc_v2	Dockerfile	1	FROM node:21-bookworm-slim
+node	willfarrell/local-agent-isolation	t3code/Dockerfile	14	FROM node:26-alpine@sha256:ae8e1c19d56886270987e99b3cfcef13a919f0655b376ae322bc64ada76f88cd AS build
+node	willfarrell/local-agent-isolation	t3code/Dockerfile	53	FROM scratch AS herdr
+node	willfarrell/local-agent-isolation	t3code/Dockerfile	55	FROM herdr AS runtime
+node	wavesplatform/waves-ide	Dockerfile	1	FROM node:15 as dist
+node	wavesplatform/waves-ide	Dockerfile	20	FROM nginx:latest
+node	wavesplatform/waves-ide	backend/Dockerfile	1	FROM node:10
+node	235826/student-agent	deploy/Dockerfile.gateway	1	FROM node:24-alpine AS build
+node	235826/student-agent	deploy/Dockerfile.gateway	7	FROM caddy:2-alpine
+node	Boundless-azure/azure-ai	runner/docker/Dockerfile	1	FROM node:26-alpine
+node	PRODYNA/nextjs-observability	backend/Dockerfile	1	FROM node:25-alpine AS builder
+node	PRODYNA/nextjs-observability	backend/Dockerfile	9	FROM node:25-alpine
+node	PRODYNA/nextjs-observability	frontend/Dockerfile	1	FROM node:25-alpine AS builder
+node	PRODYNA/nextjs-observability	frontend/Dockerfile	9	FROM node:25-alpine
+node	jffc-dev/NestJS-Microservices	02-products/products-ms/dockerfile	1	FROM node:21-alpine3.19
+node	lashkarigroupofcompanies/lgc-tredar	ui/Dockerfile.relay	14	FROM node:24-alpine@sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf AS inventory-builder
+node	lashkarigroupofcompanies/lgc-tredar	ui/Dockerfile.relay	20	FROM node:24-alpine@sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf
+node	adrianeka/talent-pool	Dockerfile	2	FROM node:18.19.0-alpine3.18 AS builder
+node	adrianeka/talent-pool	Dockerfile	13	FROM nginx:alpine
+node	ahnaf-1232/Smart-Dhaka-Backend	management/Dockerfile	1	FROM node:20.16.0-alpine
+node	RXNova/retro14	Dockerfile.dev	1	FROM node:25-alpine
+node	EliaBigoni/BestBikePaths	Implementation/BackEnd/bbp-backend-system/services/trip-service/Dockerfile	1	FROM node:18-alpine
+node	akmalhazriq/documentation	Dockerfile	2	FROM node:25.7.0-alpine3.23 AS builder
+node	akmalhazriq/documentation	Dockerfile	20	FROM nginx:alpine
+node	vagabon/design-system-vagabond-angular	Dockerfile	1	FROM node:21-alpine
+node	eu-digital-identity-wallet/eudi-web-recruitment-service-demo	Dockerfile	2	FROM node:22.20.0-alpine AS builder
+node	eu-digital-identity-wallet/eudi-web-recruitment-service-demo	Dockerfile	18	FROM node:22.20.0-alpine
+node	prasanthkarthik25305/saas-analytics-dashboard	Dockerfile	1	FROM node:18-alpine AS base
+node	prasanthkarthik25305/saas-analytics-dashboard	Dockerfile	4	FROM base AS deps
+node	prasanthkarthik25305/saas-analytics-dashboard	Dockerfile	13	FROM base AS builder
+node	prasanthkarthik25305/saas-analytics-dashboard	Dockerfile	26	FROM base AS runner
+node	unsw-cse-comp99-3900/capstone-project-26t2-9900-h17b-bread	frontend/Dockerfile.prod	2	FROM node:20-alpine as build
+node	unsw-cse-comp99-3900/capstone-project-26t2-9900-h17b-bread	frontend/Dockerfile.prod	13	FROM nginx:alpine
+node	khanhnq1406/Personal_Financial_Management	src/wj-server/Dockerfile	1	FROM node:18-alpine
+node	argunv/EDU	Dockerfile	2	FROM python:3.12-slim AS api
+node	argunv/EDU	Dockerfile	13	FROM api AS api-test
+node	argunv/EDU	Dockerfile	21	FROM node:26.4.0-alpine AS web-builder
+node	argunv/EDU	Dockerfile	32	FROM nginx:alpine AS web
+node	argunv/EDU	Dockerfile	39	FROM api AS notifier
+node	TheGreatRambler/toost	Dockerfile	1	FROM emscripten/emsdk as builder
+node	TheGreatRambler/toost	Dockerfile	28	FROM node:17-alpine
+node	StaPH-B/docker-builds	build-files/auspice/2.12.0/Dockerfile	1	FROM node:13.13.0
+node	danschewy/twelvesocial	Dockerfile	2	FROM --platform=linux/amd64 node:20-alpine AS base
+node	danschewy/twelvesocial	Dockerfile	25	FROM node:20-alpine AS production
+node	agent-ix/quire	Dockerfile	2	FROM node:24.12-slim AS base
+node	agent-ix/quire	Dockerfile	10	FROM base AS deps
+node	agent-ix/quire	Dockerfile	19	FROM deps AS dev
+node	ClappFormOrg/SaidKick	Webapp/Dockerfile	8	FROM node:26-alpine AS builder
+node	ClappFormOrg/SaidKick	Webapp/Dockerfile	22	FROM node:26-alpine AS runner
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	5	FROM node:25-alpine AS base
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	30	FROM base AS development
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	37	FROM base AS production-base
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	42	FROM nginx:alpine AS web-production
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	49	FROM production-base AS electron-linux-x64
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	55	FROM electronuserland/builder:wine AS electron-windows-x64
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	61	FROM electronuserland/builder:darwin AS electron-macos-x64
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	67	FROM electronuserland/builder:darwin AS electron-macos-arm64
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	73	FROM production-base AS ios-production
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	79	FROM production-base AS android-production
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	85	FROM production-base AS blockchain-node
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	94	FROM python:3.14-slim AS ai-training
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	104	FROM ipfs/go-ipfs:latest AS ipfs-node
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	110	FROM node:25-alpine AS edge-node
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	118	FROM production-base AS quantum-node
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	125	FROM scratch AS manifest
+node	REChain-Network-Solutions/AIPlatform	Dockerfile.multiplatform	140	FROM web-production AS production
+node	danielAsaboro/tissue	Dockerfile.dashboard	1	FROM node:24-bookworm-slim@sha256:cb4e8f7c443347358b7875e717c29e27bf9befc8f5a26cf18af3c3dec80e58c5 AS base
+node	danielAsaboro/tissue	Dockerfile.dashboard	8	FROM base AS build
+node	danielAsaboro/tissue	Dockerfile.dashboard	23	FROM node:24-bookworm-slim@sha256:cb4e8f7c443347358b7875e717c29e27bf9befc8f5a26cf18af3c3dec80e58c5 AS runtime
+node	nickykapur/job-scrapper	Dockerfile	2	FROM node:22-alpine as frontend-build
+node	nickykapur/job-scrapper	Dockerfile	17	FROM python:3.11-slim
+node	TuanDangDuc/SyncSpace-PJ-FE	Dockerfile	1	FROM node:25 AS build
+node	TuanDangDuc/SyncSpace-PJ-FE	Dockerfile	14	FROM nginx:alpine
+node	D4marp/Web_Modul-OCR	Dockerfile	2	FROM node:20-alpine AS builder
+node	D4marp/Web_Modul-OCR	Dockerfile	14	FROM nginx:alpine
+node	kjh015/TripNow-fe	Dockerfile	2	FROM node:20 AS build
+node	kjh015/TripNow-fe	Dockerfile	10	FROM nginx:1.25
+node	haggardj2/KaraokeDock	dev/Dockerfile	1	FROM node:26.12.1-alpine AS web-build
+node	haggardj2/KaraokeDock	dev/Dockerfile	9	FROM ghcr.io/haggardj2/ffmpeg-rubberband:latest AS ffmpeg
+node	haggardj2/KaraokeDock	dev/Dockerfile	11	FROM node:26.12.1-alpine
+node	miikkalaitinen/tuwien-genai-project	frontend/Dockerfile	1	FROM node:25-alpine
+node	brainlife/warehouse	Dockerfile	1	FROM node:16
+node	ivandejanovic/nodebasic	Dockerfile	1	FROM node:20.14.0
+node	mblanc/storycraft	Dockerfile	1	FROM node:26.12.1-alpine AS base
+node	mblanc/storycraft	Dockerfile	4	FROM base AS deps
+node	mblanc/storycraft	Dockerfile	23	FROM base AS builder
+node	mblanc/storycraft	Dockerfile	40	FROM base AS runner
+node	notelix/notelix	server/Dockerfile.prod	1	FROM node:26.7.0-alpine3.24 AS extension-build
+node	notelix/notelix	server/Dockerfile.prod	12	FROM node:26.7.0-alpine3.24 AS build
+node	notelix/notelix	server/Dockerfile.prod	23	FROM node:26.7.0-alpine3.24 AS production-dependencies
+node	notelix/notelix	server/Dockerfile.prod	31	FROM node:26.7.0-alpine3.24 AS runtime
+node	benitorhuang-svg/Snowboarding_reservation	backend/Dockerfile	2	FROM node:25-alpine AS builder
+node	benitorhuang-svg/Snowboarding_reservation	backend/Dockerfile	14	FROM node:25-alpine
+node	DarkIntaqt/challenges	Dockerfile	1	FROM node:25-alpine AS development-dependencies-env
+node	DarkIntaqt/challenges	Dockerfile	6	FROM node:25-alpine AS production-dependencies-env
+node	DarkIntaqt/challenges	Dockerfile	11	FROM node:25-alpine AS build-env
+node	DarkIntaqt/challenges	Dockerfile	17	FROM node:25-alpine
+node	fabiobo2005/awesome_trainMate	apps/api/Dockerfile	1	FROM node:22-alpine AS builder
+node	fabiobo2005/awesome_trainMate	apps/api/Dockerfile	14	FROM node:22-alpine AS runner
+node	harry2611/ShopMind-an-AI-Enhanced-E-commerce-Platform	frontend/Dockerfile	1	FROM node:20-alpine
+node	drenathan/tribenest	Dockerfile	2	FROM node:23-alpine AS base
+node	drenathan/tribenest	Dockerfile	9	FROM base AS deps
+node	drenathan/tribenest	Dockerfile	27	FROM base AS builder
+node	drenathan/tribenest	Dockerfile	54	FROM base AS runner
+node	GatoHery/Tesis_SMR	ESP-BACK/Dockerfile	1	FROM node:23-slim
+node	sherazrazadev/swe-benching	tasks/payload-plugins-ds/environment/Dockerfile	9	FROM node:22-bookworm-slim
+node	IdoCohen560/gods-eye-worldview	Dockerfile	4	FROM node:26-bookworm-slim
+node	elementary/builds	Dockerfile	1	FROM node:26
+node	Zenika/grenoble-hands-devops-dgoss	front/Dockerfile	1	FROM node:14.15.3-alpine AS build
+node	Zenika/grenoble-hands-devops-dgoss	front/Dockerfile	10	FROM nginx:latest AS ngi
+node	alexkayuda/interview_prep	Docker/Udemy/AWS/basic_example/frontend/Dockerfile	1	FROM node:14-alpine
+node	UCDavisLibrary/ucdlib-ref-stats	services/Dockerfile	1	FROM node:26
+node	NomadAvian/MonoC-CPU-Emulator	frontend/Dockerfile.frontend	2	FROM node:20-slim AS builder
+node	NomadAvian/MonoC-CPU-Emulator	frontend/Dockerfile.frontend	15	FROM nginx:alpine
+node	diagridio/dev-dashboard	Dockerfile	3	FROM node:25-alpine@sha256:bdf2cca6fe3dabd014ea60163eca3f0f7015fbd5c7ee1b0e9ccb4ced6eb02ef4 AS web
+node	diagridio/dev-dashboard	Dockerfile	10	FROM golang:1.26-alpine@sha256:27f2d3b83cfc5803c8078f8e730af0f7c431bf067afaec8f60a36fb763187cba AS build
+node	diagridio/dev-dashboard	Dockerfile	26	FROM gcr.io/distroless/static:nonroot@sha256:d62067879de890a1def9da0e7766b7d20810a5e5555cef8506b752437d7a3e88
+node	buenhyden/hy-home.docker	infra/07-workflow/n8n/Dockerfile	3	FROM alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6 AS font-builder
+node	buenhyden/hy-home.docker	infra/07-workflow/n8n/Dockerfile	16	FROM node:26.11.1-alpine3.24@sha256:143494b1da2945f061539253adc65e4f1569ddf07da2d384c022c791a9d90a4a AS opsflow-builder
+node	buenhyden/hy-home.docker	infra/07-workflow/n8n/Dockerfile	31	FROM n8nio/n8n:${N8N_VERSION}@sha256:dd580fe1ab6e99e85bc66f2acf8bc8c5e9409fbe61b2e2803c5024403ef52833
+node	star0202/discord-profile	Dockerfile	1	FROM node:19-alpine
+node	natrimmer/kvweb	Dockerfile	2	FROM node:24-alpine AS frontend
+node	natrimmer/kvweb	Dockerfile	11	FROM golang:1.25-alpine AS builder
+node	natrimmer/kvweb	Dockerfile	24	FROM alpine:3.21
+node	wf-pro-dev/unipilot	docker/Dockerfile.nodejs	2	FROM node:25-alpine3.21
+node	sgawalsh/job-processor	frontend/Dockerfile	1	FROM node:25-alpine3@sha256:b9b5737eabd423ba73b21fe2e82332c0656d571daf1ebf19b0f89d0dd0d3ca93
+node	tolyavrnx/isoflow	Dockerfile	2	FROM node:21 as build
+node	tolyavrnx/isoflow	Dockerfile	20	FROM nginx:alpine
+node	bestnub/forgejo-runner-broker	Dockerfile	1	FROM node:24.21.0-alpine AS build
+node	bestnub/forgejo-runner-broker	Dockerfile	15	FROM platformatic/node-caged:26.12.1-alpine AS node-caged
+node	bestnub/forgejo-runner-broker	Dockerfile	17	FROM alpine:3.21.9 AS node-strip
+node	bestnub/forgejo-runner-broker	Dockerfile	22	FROM alpine:3.21.9
+node	piotrwicijowski/fooyin-vim-plugin	.devcontainer/Dockerfile	1	FROM node:25-trixie
+node	consi/flowcus	Dockerfile	2	FROM node:22-bookworm-slim AS frontend
+node	consi/flowcus	Dockerfile	11	FROM rust:1.85-bookworm AS builder
+node	consi/flowcus	Dockerfile	56	FROM debian:bookworm-slim
+node	amalsaji25/references	Dockerfile	1	FROM node:24-alpine AS frontend
+node	amalsaji25/references	Dockerfile	9	FROM maven:3.9-eclipse-temurin-17 AS backend
+node	amalsaji25/references	Dockerfile	17	FROM eclipse-temurin:17-jre
+node	Alexigbokwe/ExpressWebJs	DockerFile	1	FROM node:21-alpine3.18 as base
+node	Alexigbokwe/ExpressWebJs	DockerFile	4	FROM base as deps
+node	Alexigbokwe/ExpressWebJs	DockerFile	10	FROM base as production-deps
+node	Alexigbokwe/ExpressWebJs	DockerFile	17	FROM base as build
+node	Alexigbokwe/ExpressWebJs	DockerFile	24	FROM base
+node	charles-afk/qwick-chat	client/Dockerfile	1	FROM node:17-alpine
+node	shubham151/text-sanitizer	frontend/Dockerfile	1	FROM node:24-alpine AS base
+node	shubham151/text-sanitizer	frontend/Dockerfile	3	FROM base AS deps
+node	shubham151/text-sanitizer	frontend/Dockerfile	9	FROM base AS builder
+node	shubham151/text-sanitizer	frontend/Dockerfile	15	FROM base AS runner
+node	markuplint/markuplint	Dockerfile	1	FROM node:26
+node	pensarai/argus-validation-benchmarks	benchmarks/APEX-053-25/src/services/chat-app/Dockerfile	1	FROM node:18-alpine
+node	thisisnotleng/cloud_native_midterm	owner-service/Dockerfile	1	FROM node:24-alpine
+node	inspectr-hq/inspectr	Dockerfile	2	FROM node:24-alpine AS runtime
+node	HoangOnGIT/NguyenHuyHoang_KTPM_Lab_01	message-queue/producer/Dockerfile	1	FROM node:25-alpine
+node	codewisp-ai/review-constellation	Dockerfile	2	FROM node:18-alpine AS frontend-builder
+node	codewisp-ai/review-constellation	Dockerfile	10	FROM python:3.10-slim
+node	DurianPy-Davao-Python-User-Group/durianpy-cms	docker/local/Dockerfile	1	FROM node:24-alpine
+node	codegouvaor/economie	Dockerfile	11	FROM golang:1.26-alpine AS go-builder
+node	codegouvaor/economie	Dockerfile	30	FROM node:25-alpine AS node-builder
+node	codegouvaor/economie	Dockerfile	63	FROM node:25-alpine AS prisma-builder
+node	codegouvaor/economie	Dockerfile	83	FROM node:25-alpine
+node	dkleptsov/agentic-rag-assistant	frontend/Dockerfile	2	FROM node:26-alpine AS build
+node	dkleptsov/agentic-rag-assistant	frontend/Dockerfile	9	FROM nginx:1.27-alpine
+node	HeadySystems/Heady-Testing	Dockerfile.service	1	FROM node:25-alpine
+node	HeadySystems/Heady-Testing	audit/loose-configs/Dockerfile	1	FROM node:20-alpine AS base
+node	HeadySystems/Heady-Testing	audit/loose-configs/Dockerfile	4	FROM base AS deps
+node	HeadySystems/Heady-Testing	audit/loose-configs/Dockerfile	12	FROM base AS builder
+node	HeadySystems/Heady-Testing	audit/loose-configs/Dockerfile	25	FROM base AS runner
+node	malawi-ministry-of-health-dhd/MHFR	Dockerfile	1	FROM node:10-alpine3.9
+node	kwurzinger/ArtificialOrNaturalIntelligence	backend/Dockerfile	1	FROM node:26-alpine
+node	nickfchmail-ux/node-AI-job-application-engine-rest-api	Dockerfile	2	FROM node:18-alpine
+node	devjunioralves/shipix-challenge	Dockerfile	1	FROM node:25-alpine AS builder
+node	devjunioralves/shipix-challenge	Dockerfile	14	FROM node:25-alpine AS production
+node	devjunioralves/shipix-challenge	Dockerfile	38	FROM node:25-alpine AS development
+node	Saad1881/lecture-4.0-csd230-w26-saad-puthawala	Dockerfile	2	FROM node:20-alpine AS frontend-build
+node	Saad1881/lecture-4.0-csd230-w26-saad-puthawala	Dockerfile	12	FROM maven:3.9.6-eclipse-temurin-17-alpine AS backend-build
+node	Saad1881/lecture-4.0-csd230-w26-saad-puthawala	Dockerfile	22	FROM eclipse-temurin:17-jre-alpine
+node	Valentain2345/Cinemadcic	Movies/Dockerfile	2	FROM node:22-alpine
+node	jrhueiueng/serverless-dns-1	node.Dockerfile	1	FROM node:25 as setup
+node	jrhueiueng/serverless-dns-1	node.Dockerfile	17	FROM node:25-alpine AS runner
+node	codixor/augments-mcp-server	Dockerfile	1	FROM node:25-bookworm-slim
+node	budproj/execution-mode	Dockerfile	1	FROM node:15.5.1-alpine3.10 AS build
+node	budproj/execution-mode	Dockerfile	21	FROM node:15.5.1-alpine3.10 AS final
+node	polarfruit/pitch-test-website	claude-flow/v2/docker-test/Dockerfile.local-test	4	FROM node:20-slim
+node	MentorsMind/MentorsMind-Backend	Dockerfile	4	FROM node:22-bookworm-slim AS builder
+node	MentorsMind/MentorsMind-Backend	Dockerfile	20	FROM node:22-bookworm-slim AS runner
+node	Sovereignty-One/Sovereignty-AI-Studio_v1.0.1	external/SuperGrok-Heavy-4-2-Skeleton/Sovereignty-AI-Studio-main/apps/dashboards/Sovereignty-AI-Studio-Deploy/frontend/Dockerfile	1	FROM node:18-alpine
+node	jdoliveirasa/engenharia-de-software-com-ia-aplicada	modulo03-mcp-na-pratica/09-using-mcp-with-langchain/nodejs-fastify-mongodb-crud-z/Dockerfile	1	FROM node:25-alpine3.22 as build
+node	truvhq/quickstart	node/Dockerfile	1	FROM node:16
+node	sunflower312/MS-Auto-Learn	infra/docker/Dockerfile.web	1	FROM node:22-bookworm-slim AS build
+node	sunflower312/MS-Auto-Learn	infra/docker/Dockerfile.web	19	FROM nginx:1.27-alpine
+node	icco/realworldsre.com	Dockerfile	1	FROM node:26-alpine AS base
+node	icco/realworldsre.com	Dockerfile	5	FROM base AS deps
+node	icco/realworldsre.com	Dockerfile	15	FROM base AS builder
+node	icco/realworldsre.com	Dockerfile	25	FROM base AS runner
+node	testcontainers/testcontainers-node	packages/testcontainers/fixtures/docker/docker-with-dockerignore-nested-exclusions/Dockerfile	1	FROM node:10-alpine
+node	testcontainers/testcontainers-node	packages/testcontainers/fixtures/docker/docker-with-health-check-with-start-period/Dockerfile	1	FROM node:10-alpine
+node	Sathwik612/Sugar-Factory-	docker/api.Dockerfile	1	FROM node:24-bookworm-slim AS build
+node	Sathwik612/Sugar-Factory-	docker/api.Dockerfile	10	FROM node:24-bookworm-slim AS runtime
+node	innotelinc/orion	Dockerfile	7	FROM node:22-bookworm-slim AS web
+node	innotelinc/orion	Dockerfile	16	FROM ubuntu:24.04
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	5	FROM node:26.12.1-alpine3.23@sha256:bc2b334006f15c7167bbeb2f08f28c2df883f7594a0470e04454ebe7560cfe68 AS node-base
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	16	FROM node-base AS front-deps
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	34	FROM node-base AS server-deps
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	52	FROM server-deps AS twenty-server-build
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	74	FROM front-deps AS twenty-front-build
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	99	FROM node-base AS twenty-server
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	177	FROM twenty-server AS twenty-server-aws
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	189	FROM twenty-server AS twenty
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	201	FROM twenty AS twenty-aws
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	213	FROM alpine:3.20 AS s6-fetch
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	233	FROM clickhouse/clickhouse-server:25.8.8-alpine@sha256:68b9d9eb4cb949a03d1f90b76fd8d396a5999dd57ba1ee914ea36c77716ce937 AS clickhouse
+node	twentyhq/twenty	packages/twenty-docker/twenty/Dockerfile	235	FROM node-base AS twenty-app-dev
+node	afontana1/Data-Engineering	data-engineering-curriculum/8 - Basic Devops/3. devops-directive-docker-course/06-building-container-images/api-node/Dockerfile.7	3	FROM node:19.6-bullseye-slim
+node	williamwoldum/TrajViz	client/Dockerfile	1	FROM node:22-alpine AS builder
+node	williamwoldum/TrajViz	client/Dockerfile	13	FROM nginx:alpine
+node	Profiidev/hibernation	Dockerfile	11	FROM node:26-slim@sha256:c0753125a3789977aefe869cbebccf70e3cfd7ea84ca48547458f02e4f1d7146 AS frontend-builder
+node	Profiidev/hibernation	Dockerfile	29	FROM ghcr.io/profiidev/images/rust-gnu-builder:main@sha256:ff57874d1ac77b2bde727c89e113ac21eb6b001f77c859fed6b31f008a1acfd8 AS backend-planner
+node	Profiidev/hibernation	Dockerfile	47	FROM ghcr.io/profiidev/images/rust-gnu-builder:main@sha256:ff57874d1ac77b2bde727c89e113ac21eb6b001f77c859fed6b31f008a1acfd8 AS backend-builder
+node	Profiidev/hibernation	Dockerfile	79	FROM node:26-slim@sha256:c0753125a3789977aefe869cbebccf70e3cfd7ea84ca48547458f02e4f1d7146
+node	BoonyakornTanrattanakorn/WatchTogether	Dockerfile	1	FROM node:24-bookworm-slim
+node	tejaswinisa1/SENTINEL---Firmware-CVE-Analysis-Platform	frontend/Dockerfile	1	FROM node:20-slim AS builder
+node	tejaswinisa1/SENTINEL---Firmware-CVE-Analysis-Platform	frontend/Dockerfile	12	FROM nginx:1.27-alpine
+node	eyeoverthink/java-memory-V1	Asset-Manager/openclaw-main/openclaw-main/scripts/docker/install-sh-smoke/Dockerfile	1	FROM node:22-bookworm-slim
+node	karanshukla/bluejays-space	classify/Dockerfile	5	FROM node:26-alpine
+node	InvisiProxy/InvisiProxyLTS	Dockerfile	1	FROM node:26-alpine AS base
+node	InvisiProxy/InvisiProxyLTS	Dockerfile	5	FROM base AS deps
+node	InvisiProxy/InvisiProxyLTS	Dockerfile	9	FROM base AS build
+node	InvisiProxy/InvisiProxyLTS	Dockerfile	15	FROM node:26-alpine
+node	aristanetworks/training-infra-public	nested-labvm/atd-docker/ssh/Dockerfile	1	FROM node:15.3
+node	chitoku-k/chitoku.jp	Dockerfile	2	FROM node:26.13.0-slim AS dependencies
+node	chitoku-k/chitoku.jp	Dockerfile	16	FROM dependencies AS build
+node	chitoku-k/chitoku.jp	Dockerfile	25	FROM nginx/nginx-unprivileged:1.31.8
+node	sharmaShivam23/legalsetu-ai	Dockerfile	2	FROM node:20-alpine AS base
+node	sharmaShivam23/legalsetu-ai	Dockerfile	7	FROM base AS deps
+node	sharmaShivam23/legalsetu-ai	Dockerfile	12	FROM base AS builder
+node	sharmaShivam23/legalsetu-ai	Dockerfile	20	FROM base AS runner
+node	KARSIFT/vocanova-platform-sandbox	.github/docker/ci-base/Dockerfile	24	FROM node:24.18.0-bookworm-slim
+node	andersfischernielsen/task-runner	typescript/samples/FileConverter/Dockerfile	1	FROM node:26-alpine
+node	hoanhophuoc/Learnix	Dockerfile	1	FROM node:24-alpine AS base
+node	hoanhophuoc/Learnix	Dockerfile	6	FROM base AS builder
+node	hoanhophuoc/Learnix	Dockerfile	16	FROM base AS installer
+node	hoanhophuoc/Learnix	Dockerfile	40	FROM base AS runner
+node	turin-dev/AdofaiRichPresence	cdn-server/Dockerfile	1	FROM node:22-alpine
+node	VladislavKorecky/orrery	Dockerfile	1	FROM node:26-slim AS build
+node	VladislavKorecky/orrery	Dockerfile	13	FROM node:26-slim AS runtime
+node	aurva-io/AIOstack	newdocs/Dockerfile	1	FROM node:26-bookworm-slim AS base
+node	aurva-io/AIOstack	newdocs/Dockerfile	9	FROM base AS dependencies
+node	aurva-io/AIOstack	newdocs/Dockerfile	12	FROM dependencies AS build
+node	aurva-io/AIOstack	newdocs/Dockerfile	16	FROM node:26-bookworm-slim AS production
+node	VTT789/FreeLLMAPI	Dockerfile	1	﻿FROM node:20-alpine
+node	skygenesisenterprise/kami-sama	Dockerfile	11	FROM golang:1.26-alpine AS go-builder
+node	skygenesisenterprise/kami-sama	Dockerfile	30	FROM node:25-alpine AS node-builder
+node	skygenesisenterprise/kami-sama	Dockerfile	63	FROM node:25-alpine AS prisma-builder
+node	skygenesisenterprise/kami-sama	Dockerfile	83	FROM node:25-alpine
+node	Lakshmi786/Verisettle	apps/console/Dockerfile	1	FROM node:24-alpine AS deps
+node	Lakshmi786/Verisettle	apps/console/Dockerfile	12	FROM node:24-alpine AS builder
+node	Lakshmi786/Verisettle	apps/console/Dockerfile	18	FROM node:24-alpine AS runner
+node	andreseloysv/fastify-vs-ktor-benchmark	fastify/Dockerfile	1	FROM node:22-alpine
+node	JesusFilm/phoebe	.phoebe/container/Dockerfile	10	FROM node:26-bookworm-slim
+node	open-spaced-repetition/ts-fsrs	examples/nextjs/Dockerfile	3	FROM node:26.13.0-alpine AS base
+node	open-spaced-repetition/ts-fsrs	examples/nextjs/Dockerfile	8	FROM base AS deps
+node	open-spaced-repetition/ts-fsrs	examples/nextjs/Dockerfile	17	FROM deps AS builder
+node	open-spaced-repetition/ts-fsrs	examples/nextjs/Dockerfile	28	FROM base AS runner
+node	yashcdev/Browserstack-Assignments	Live/sample-app/Dockerfile	1	FROM node:14.15.0-alpine
+node	l3rady/object-cache-apcu	docker/Dockerfile	17	FROM php:${PHP_VERSION}-${PHP_VARIANT} AS base
+node	l3rady/object-cache-apcu	docker/Dockerfile	45	FROM base AS dev
+node	l3rady/object-cache-apcu	docker/Dockerfile	62	FROM base AS coverage-base
+node	l3rady/object-cache-apcu	docker/Dockerfile	65	FROM coverage-base AS coverage
+node	l3rady/object-cache-apcu	docker/Dockerfile	83	FROM coverage AS mutation
+node	l3rady/object-cache-apcu	docker/Dockerfile	95	FROM base AS wp-tests
+node	l3rady/object-cache-apcu	docker/Dockerfile	123	FROM node:26-alpine AS commitlint
+node	OmerTu/GoogleHomeKodi	Dockerfile	2	FROM node:25-alpine as test
+node	OmerTu/GoogleHomeKodi	Dockerfile	12	FROM node:25-alpine as production-builder
+node	OmerTu/GoogleHomeKodi	Dockerfile	19	FROM node:25-alpine as app
+node	stephenh/ts-proto	ts-proto.Dockerfile	1	FROM node:17-alpine as build
+node	stephenh/ts-proto	ts-proto.Dockerfile	17	FROM node:17-alpine
+node	JupiterOne/security-policy-builder	Dockerfile	1	FROM node:16-bullseye-slim
+node	CodeAIX/MicroBioLab	infra/docker/Dockerfile.builder	2	FROM node:24-bookworm-slim AS build
+node	CodeAIX/MicroBioLab	infra/docker/Dockerfile.builder	13	FROM node:24-bookworm-slim AS runtime
+node	RamyBouchareb25/hostifer-dashboard	Dockerfile	2	FROM oven/bun:1 AS deps
+node	RamyBouchareb25/hostifer-dashboard	Dockerfile	13	FROM oven/bun:1 AS builder
+node	RamyBouchareb25/hostifer-dashboard	Dockerfile	28	FROM node:25-alpine AS runner
+node	4444J99/metasystem-master	docs/reference/poc-v0.1.0-parent/poc-v0.1.0/server/Dockerfile	1	FROM node:26-alpine
+node	JeysonRG1804/POSWPCONECT	base-js-wppconnect-memory/Dockerfile	1	FROM node:21-alpine3.18 as builder
+node	JeysonRG1804/POSWPCONECT	base-js-wppconnect-memory/Dockerfile	33	FROM node:21-alpine3.18
+node	atomos-dev/devops-billing	Dockerfile	3	FROM node:20-alpine AS deps
+node	atomos-dev/devops-billing	Dockerfile	10	FROM node:20-alpine AS builder
+node	atomos-dev/devops-billing	Dockerfile	19	FROM node:20-alpine AS runner
+node	chaulagainrupak/paper-guides	astroBuild/Dockerfile	1	FROM node:22.12.0-slim
+node	waelzaid66-max/bancoboom-v-next-	deploy/aws/Dockerfile.api	17	FROM node:24-bookworm-slim AS builder
+node	waelzaid66-max/bancoboom-v-next-	deploy/aws/Dockerfile.api	34	FROM node:24-bookworm-slim AS runner
+node	Loganv308/TwitchAnalyticsBot	Dockerfile	1	FROM node:22-slim
+node	Vaibhav-12521/github-profile-analyzer	Dockerfile	2	FROM node:20-alpine
+node	vnglst/koenvangilst.nl	og-generator/Dockerfile	1	FROM node:26.13.0-alpine3.24@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94
+node	Nakkasenp65/device-assessment-dss	backend/Dockerfile	1	FROM node:20-alpine AS builder
+node	Nakkasenp65/device-assessment-dss	backend/Dockerfile	15	FROM node:20-alpine
+node	DevOpser-io/devopser	Dockerfile	10	FROM node:23-slim
+node	mcicerani/SQL-Injection	web/Dockerfile	1	FROM node:14
+node	CheesecakeLabs/stellar-token-factory	frontend/Dockerfile	1	FROM node:16.13-bullseye-slim AS builder
+node	CheesecakeLabs/stellar-token-factory	frontend/Dockerfile	5	FROM builder AS dev
+node	CheesecakeLabs/stellar-token-factory	frontend/Dockerfile	9	FROM builder AS dev-docker
+node	CheesecakeLabs/stellar-token-factory	frontend/Dockerfile	13	FROM builder AS builder-prod
+node	CheesecakeLabs/stellar-token-factory	frontend/Dockerfile	27	FROM node:16.13-bullseye-slim AS prod
+node	BGLuis/feeder	frontend/Dockerfile.dev	1	FROM node:24-alpine AS development
+node	skygenesisenterprise/my-enterprise	Dockerfile.cloud	4	FROM golang:1.25-alpine AS go-builder
+node	skygenesisenterprise/my-enterprise	Dockerfile.cloud	21	FROM node:25-alpine AS node-builder
+node	skygenesisenterprise/my-enterprise	Dockerfile.cloud	42	FROM alpine:3.23
+node	skygenesisenterprise/my-enterprise	Dockerfile.dev	4	FROM golang:1.25-alpine AS go-builder
+node	skygenesisenterprise/my-enterprise	Dockerfile.dev	22	FROM node:25-alpine AS node-builder
+node	skygenesisenterprise/my-enterprise	Dockerfile.dev	35	FROM node:25-alpine
+node	musta-krakish/sm-entity	Dockerfile	2	FROM node:21.5-alpine
+node	ThiagoDev202/sku-api	Dockerfile	1	FROM node:24-bookworm-slim AS development
+node	ThiagoDev202/sku-api	Dockerfile	16	FROM development AS build
+node	ThiagoDev202/sku-api	Dockerfile	20	FROM node:24-bookworm-slim AS production
+node	NullPointersGroup/SmartOrder	frontend/Dockerfile	1	FROM node:25-alpine
+node	razivelocity/RazeTechLabs	server/Dockerfile	1	FROM node:18-alpine
+node	LuisEnriqueGM03/Chaos-Launcher-Web	ChaosLauncher-Backend/Dockerfile	4	FROM node:20-alpine AS builder
+node	LuisEnriqueGM03/Chaos-Launcher-Web	ChaosLauncher-Backend/Dockerfile	26	FROM node:20-alpine AS runner
+node	thewca/statistics	client/Dockerfile	1	FROM node:21-alpine as build
+node	thewca/statistics	client/Dockerfile	12	FROM nginx:stable-alpine
+node	kilouio91/turbo-waffle	Dockerfile	2	FROM node:21
+node	catherine21550/ft_transcendence-fullstack-web-app	services/user/Dockerfile	1	FROM node:25-alpine3.22 AS builder
+node	catherine21550/ft_transcendence-fullstack-web-app	services/user/Dockerfile	17	FROM node:25-alpine3.22 AS app
+node	jouvence13/VibeEvent-front	Dockerfile.dev	1	FROM node:20-alpine
+node	verdaccio/verdaccio	packages/tools/Dockerfile	18	FROM node:26-alpine
+node	DaveHomeAssist/curl-plan	services/account-backend/Dockerfile	4	FROM node:20-alpine
+node	DAB0mB/redis-node-server	Dockerfile	1	FROM node:19
+node	iman-hussain/StocksVsSubscription	backend/Dockerfile	2	FROM node:22-alpine AS builder
+node	iman-hussain/StocksVsSubscription	backend/Dockerfile	20	FROM node:22-alpine AS runner
+node	Hisham-InfoGleam/infogleam-health-poc	fhir-app/Dockerfile	1	FROM node:22-alpine
+node	bfritscher/typesense-dashboard	Dockerfile	2	FROM node:24-alpine AS builder
+node	bfritscher/typesense-dashboard	Dockerfile	19	FROM caddy:2-alpine
+node	MapColonies/dem-heights	Dockerfile	1	FROM node:24-alpine AS build
+node	MapColonies/dem-heights	Dockerfile	15	FROM node:24-alpine AS production
+node	jjhickman/garbanzo-bot	Dockerfile	8	FROM --platform=$BUILDPLATFORM node:25-alpine AS web-builder
+node	jjhickman/garbanzo-bot	Dockerfile	19	FROM node:25-alpine AS builder
+node	jjhickman/garbanzo-bot	Dockerfile	52	FROM node:25-alpine
+node	HenryHdez/Alumnos	Servicios-telematicos/Clase_8/Ejemplo_1/paginacorreo/app/Dockerfile	2	FROM node:10-alpine
+node	uysalsamet/web-standards	plugins/frontend-standards/skills/frontend/templates/docker/Dockerfile	16	FROM node:24-alpine AS builder
+node	uysalsamet/web-standards	plugins/frontend-standards/skills/frontend/templates/docker/Dockerfile	61	FROM nginxinc/nginx-unprivileged:1.30-alpine
+node	HansrajS1/Au-Exam-Web	Dockerfile	1	FROM node:20 AS builder
+node	HansrajS1/Au-Exam-Web	Dockerfile	13	FROM nginx:stable-alpine
+node	Disane87/badger	Dockerfile	4	FROM node:22-alpine AS build
+node	Disane87/badger	Dockerfile	16	FROM node:22-alpine AS runtime
+node	STACKLEVEL-AI/stacklevel.group	bot-sender/Dockerfile	1	FROM node:25-alpine
+node	opslane/opslane_old	Dockerfile	3	FROM node:20.18.0-bookworm-slim
+node	callumvanzyl/touchstone	touchstone-gui/Dockerfile	1	﻿FROM node:13.14-alpine as develop-stage
+node	callumvanzyl/touchstone	touchstone-gui/Dockerfile	7	FROM develop-stage as build-stage
+node	callumvanzyl/touchstone	touchstone-gui/Dockerfile	11	FROM nginx:1.17.5-alpine as production-stage
+node	ministryofjustice/stg-tcom-manage-unpaid-work-webapp	Dockerfile	2	FROM node:22.14-bookworm-slim as base
+node	ministryofjustice/stg-tcom-manage-unpaid-work-webapp	Dockerfile	34	FROM base as build
+node	ministryofjustice/stg-tcom-manage-unpaid-work-webapp	Dockerfile	50	FROM base
+node	ZulfaNurhuda/NOVA.project	frontend/Dockerfile	2	FROM node:25-slim AS builder
+node	ZulfaNurhuda/NOVA.project	frontend/Dockerfile	10	FROM node:25-slim
+node	AlexeyShalaev/vpn-hub	Dockerfile	4	FROM node:25-alpine AS frontend
+node	AlexeyShalaev/vpn-hub	Dockerfile	13	FROM python:3.14-slim AS pydeps
+node	AlexeyShalaev/vpn-hub	Dockerfile	20	FROM python:3.14-slim AS runtime
+node	juanfont/headscale	Dockerfile.wasmclient	10	FROM golang:1.27.3-alpine AS build
+node	juanfont/headscale	Dockerfile.wasmclient	24	FROM node:26-alpine
+node	MahmoudElokaily/eloaily-docker	Dockerfile	1	FROM node:25 as base
+node	MahmoudElokaily/eloaily-docker	Dockerfile	5	FROM base as development
+node	MahmoudElokaily/eloaily-docker	Dockerfile	14	FROM base as production
+node	ThatsOurJake/strackerr	Dockerfile	1	FROM node:26-alpine AS base
+node	ThatsOurJake/strackerr	Dockerfile	7	FROM base AS deps
+node	ThatsOurJake/strackerr	Dockerfile	19	FROM deps AS builder
+node	ThatsOurJake/strackerr	Dockerfile	26	FROM node:26-alpine AS runtime
+node	Ayanfe19/week4-docker-assignment	assignment-1-compose-stack/app/Dockerfile	1	FROM node:18-alpine
+node	Safaa-Ettalhi/Evenza	frontend/Dockerfile	1	FROM node:20-alpine AS builder
+node	Safaa-Ettalhi/Evenza	frontend/Dockerfile	13	FROM node:20-alpine
+node	mrslbt/rippr	mcp/Dockerfile	1	FROM node:20-slim
+node	lakshyagrg23/MailWise	client/Dockerfile	2	FROM node:22-alpine AS build
+node	lakshyagrg23/MailWise	client/Dockerfile	17	FROM nginx:alpine
+node	hkjang/weekly	Dockerfile	2	FROM node:24-alpine AS frontend
+node	hkjang/weekly	Dockerfile	9	FROM golang:1.24-alpine AS backend
+node	hkjang/weekly	Dockerfile	24	FROM alpine:3.22
+node	fuseio/fusebox-backend	apps/charge-accounts-service/Dockerfile	1	FROM node:22-alpine AS development
+node	fuseio/fusebox-backend	apps/charge-accounts-service/Dockerfile	15	FROM node:22-alpine AS production
+node	rafaself/nonograma	Dockerfile	2	FROM node:25-alpine AS deps
+node	rafaself/nonograma	Dockerfile	9	FROM deps AS dev
+node	rafaself/nonograma	Dockerfile	17	FROM dev AS build
+node	rafaself/nonograma	Dockerfile	21	FROM nginx:stable-alpine AS production
+node	RoberttHernan/Arquitectura-Cloud	Salud_Plus/backend/Dockerfile	2	FROM node:18-alpine
+node	shakilahmedatik/amar-space	Dockerfile	2	FROM node:22-alpine AS deps
+node	shakilahmedatik/amar-space	Dockerfile	18	FROM node:22-alpine AS builder
+node	shakilahmedatik/amar-space	Dockerfile	40	FROM node:22-alpine AS runner
+node	ChristopherJTrent/music-downloader	Dockerfile	1	FROM node:25-alpine3.23 AS frontend_builder
+node	ChristopherJTrent/music-downloader	Dockerfile	7	FROM bellsoft/liberica-runtime-container:jdk-25-stream-musl AS builder
+node	ChristopherJTrent/music-downloader	Dockerfile	13	FROM bellsoft/liberica-runtime-container:jdk-25-stream-musl AS optimizer
+node	ChristopherJTrent/music-downloader	Dockerfile	19	FROM bellsoft/liberica-openjdk-alpine:25
+node	swchen07/wechat-bot	Dockerfile	3	FROM node:19 as builder-default
+node	swchen07/wechat-bot	Dockerfile	6	FROM node:19 as builder-aliyun
+node	swchen07/wechat-bot	Dockerfile	12	FROM builder-${APT_SOURCE} AS builder
+node	swchen07/wechat-bot	Dockerfile	44	FROM builder
+node	Akash7653/Take-Home-Challenge-Peblo-TV-Mini-	viewer/Dockerfile	1	FROM node:20-alpine AS builder
+node	Akash7653/Take-Home-Challenge-Peblo-TV-Mini-	viewer/Dockerfile	10	FROM nginx:alpine
+node	frontiercc/command-centre	Dockerfile	2	FROM node:22-alpine AS deps
+node	frontiercc/command-centre	Dockerfile	13	FROM node:22-alpine AS builder
+node	frontiercc/command-centre	Dockerfile	28	FROM node:22-alpine AS runner
+node	stefanluth/kummerkasten	Dockerfile	1	FROM node:21-alpine as dependencies
+node	stefanluth/kummerkasten	Dockerfile	7	FROM node:21-alpine as build
+node	stefanluth/kummerkasten	Dockerfile	28	FROM node:21-alpine as production
+node	Crashwif/game-lab	scripts/gallery/capture.Dockerfile	3	FROM node:24.21.0-bookworm-slim@sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20 AS node
+node	Crashwif/game-lab	scripts/gallery/capture.Dockerfile	4	FROM mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+node	vlocityinc/vlocity_build	devops/containers/sfdx-vlocity/Dockerfile	2	FROM node:14
+node	TheKyyn/Maxime_Rattrapage	Dockerfile	1	FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS dependencies
+node	TheKyyn/Maxime_Rattrapage	Dockerfile	6	FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS runtime
+node	jeffblankenburg/ai-order-demo	api/Dockerfile	1	FROM node:22-alpine AS build
+node	jeffblankenburg/ai-order-demo	api/Dockerfile	9	FROM node:22-alpine
+node	russellbrenner/jurisd	Dockerfile	14	FROM node:26-bookworm-slim@sha256:367679cf9792759492a486e4aa4b421764d71a9546a6dae8aab81a99eb797b3e AS builder
+node	russellbrenner/jurisd	Dockerfile	37	FROM node:26-bookworm-slim@sha256:367679cf9792759492a486e4aa4b421764d71a9546a6dae8aab81a99eb797b3e AS runtime
+node	Day-waah/BlinkIt	BlinkitClone/frontend/Dockerfile	2	FROM node:20-alpine AS build
+node	Day-waah/BlinkIt	BlinkitClone/frontend/Dockerfile	10	FROM nginx:stable-alpine
+node	restatedev/e2e-verification-runner	Dockerfile	1	FROM node:23 AS build
+node	restatedev/e2e-verification-runner	Dockerfile	9	FROM node:23 AS prod
+node	kl3inIT/northstar	web/Dockerfile	12	FROM node:24-alpine AS builder
+node	kl3inIT/northstar	web/Dockerfile	32	FROM nginx:1.29-alpine
+node	MuraliChowdhary/cake-delight	catalog-service/Dockerfile	1	FROM node:22-alpine
+node	sid-digi-gh-explore-org/vuln-app	Dockerfile	1	FROM node:12 as installer
+node	sid-digi-gh-explore-org/vuln-app	Dockerfile	8	FROM node:12-alpine
+node	rishivardhanmm/insightsql-ai	frontend/Dockerfile	1	FROM node:22-alpine AS dependencies
+node	rishivardhanmm/insightsql-ai	frontend/Dockerfile	6	FROM node:22-alpine AS builder
+node	rishivardhanmm/insightsql-ai	frontend/Dockerfile	14	FROM node:22-alpine AS runner
+node	SlimyTheMoon/manhattan-solo	Dockerfile	3	FROM node:20-alpine
+node	jaouadsiouahe1978/claude-devops-tools	projects/2026-05-07_kubernetes-multiapp/app/frontend/Dockerfile	1	FROM node:18-alpine AS builder
+node	jaouadsiouahe1978/claude-devops-tools	projects/2026-05-07_kubernetes-multiapp/app/frontend/Dockerfile	8	FROM nginx:alpine
+node	DEFRA/aqie-privatebeta-test	Dockerfile	1	FROM node:21-alpine
+node	bpschmitt/cosmic-coffee-demo	services/frontend/Dockerfile	1	FROM node:24-bookworm-slim AS build
+node	bpschmitt/cosmic-coffee-demo	services/frontend/Dockerfile	12	FROM nginx:bookworm
+node	muxuhang/express-admin	Dockerfile	2	FROM node:18.16.1
+node	thedamfr/site-saletesincere	Dockerfile	2	FROM node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 AS builder
+node	thedamfr/site-saletesincere	Dockerfile	19	FROM node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+node	ruilisi/LingtiStudio	Dockerfile	1	FROM node:20-bookworm-slim AS frontend-builder
+node	ruilisi/LingtiStudio	Dockerfile	15	FROM node:20-bookworm-slim
+node	ObaidulKabir/GrandSampanResort	backend/Dockerfile	1	FROM node:20-alpine AS base
+node	ObaidulKabir/GrandSampanResort	backend/Dockerfile	13	FROM base AS development
+node	ObaidulKabir/GrandSampanResort	backend/Dockerfile	18	FROM base AS production
+node	sankalphs/drawing-board	gateway/Dockerfile	1	FROM node:20-alpine
+node	kenken64/2ndBrain.ceo	Dockerfile	6	FROM rust:1.95-trixie AS clawmacdo-build
+node	kenken64/2ndBrain.ceo	Dockerfile	19	FROM node:26.12.1-trixie-slim AS base
+node	kenken64/2ndBrain.ceo	Dockerfile	23	FROM base AS deps
+node	kenken64/2ndBrain.ceo	Dockerfile	27	FROM base AS builder
+node	kenken64/2ndBrain.ceo	Dockerfile	44	FROM node:26.12.1-trixie-slim AS runner
+node	jsgiraldoh/noteops	frontend/Dockerfile	14	FROM node:26-alpine AS base
+node	jsgiraldoh/noteops	frontend/Dockerfile	26	FROM base AS dev
+node	jsgiraldoh/noteops	frontend/Dockerfile	36	FROM base AS builder
+node	jsgiraldoh/noteops	frontend/Dockerfile	53	FROM node:26-alpine AS prod
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	3	FROM node:18-alpine AS base
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	6	FROM base AS deps
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	15	FROM base AS builder
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	24	FROM base AS runner
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	52	FROM node:18-alpine AS base
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	55	FROM base AS deps
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	64	FROM base AS builder
+node	harireshmi22/pandit-ji-collection-store-main	Dockerfile	73	FROM base AS runner
+node	boosterchile/booster-ai	apps/document-service/Dockerfile	13	FROM node:24-slim AS base
+node	boosterchile/booster-ai	apps/document-service/Dockerfile	17	FROM base AS deps
+node	boosterchile/booster-ai	apps/document-service/Dockerfile	27	FROM deps AS build
+node	boosterchile/booster-ai	apps/document-service/Dockerfile	31	FROM build AS deploy
+node	boosterchile/booster-ai	apps/document-service/Dockerfile	34	FROM node:24-slim AS runtime
+node	lasitha-dev/secure-task-management-system	notifications-management/frontend/Dockerfile	2	FROM node:20-alpine AS builder
+node	lasitha-dev/secure-task-management-system	notifications-management/frontend/Dockerfile	35	FROM nginx:alpine
+node	MarcoBidoli/bookAfield	Dockerfile.dev	1	FROM node:26
+node	MarcoBidoli/bookAfield	Dockerfile.prod	2	FROM node:26-alpine AS frontend-builder
+node	MarcoBidoli/bookAfield	Dockerfile.prod	12	FROM node:26-alpine
+node	Sivakumar950/booking_application	user-api/Dockerfile	1	FROM node:17.9.0-slim

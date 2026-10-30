@@ -1,3 +1,5 @@
+**Superseded (2026-10-31):** the search was not in fact stopped; it finished all 280 pages at 2026-10-30T12:29:16Z. See README.md.
+
 # LR — stopped before the pool was complete (2026-10-30)
 
 The code search (`scripts/search.sh`, decision 2026-10-30-lr-dockerfile-lag-definitions, section 6.1) started at 2026-10-30T11:49:06Z. It was stopped from outside before it finished, because the machine ran low on memory. It was not restarted.

@@ -1,4 +1,4 @@
-# started 2026-10-30T02:02:25Z, node v24.22.1, git version 2.39.5
+# started 2026-10-30T02:40:42Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 == npx tsc -p tsconfig.json
 tsc exit 0
@@ -6,48 +6,54 @@ tsc exit 0
 
  RUN  v4.1.12 /w
 
- ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 55ms
- ✓ |node| packages/cli/test/judge.test.ts (66 tests) 83ms
- ✓ |node| packages/cli/test/epss.test.ts (51 tests) 183ms
- ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 151ms
- ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 190ms
- ✓ |node| packages/cli/test/candidate-judge.test.ts (26 tests) 191ms
- ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 334ms
- ✓ |node| packages/cli/test/action-patch.test.ts (6 tests) 64ms
- ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 202ms
- ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 5ms
- ✓ |node| packages/cli/test/judge-cli.test.ts (1 test) 20ms
- ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 33ms
- ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 489ms
-     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  424ms
- ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 861ms
- ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 575ms
- ✓ |node| packages/cli/test/security.test.ts (39 tests) 1560ms
- ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2013ms
-     ✓ duplicate members count once toward the 1,000  557ms
-     ✓ more than 1,000 literal members are read no further, and say so  987ms
- ✓ |node| packages/cli/test/branch.test.ts (22 tests) 2305ms
-     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  393ms
- ✓ |node| packages/cli/test/dependencies.test.ts (89 tests) 3444ms
-     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  406ms
-     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  381ms
- ✓ |node| packages/cli/test/deliver.test.ts (30 tests) 7212ms
-     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base  310ms
-     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  405ms
-     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  336ms
-     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  392ms
-     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  503ms
-     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  325ms
-     ✓ an applied fix with no bundle, and a bundle with no applied fix  341ms
-     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  406ms
-     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  457ms
-     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  519ms
-     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  613ms
+ ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 100ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 220ms
+ ✓ |node| packages/cli/test/judge.test.ts (66 tests) 106ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 194ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 242ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (26 tests) 296ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (6 tests) 66ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 475ms
+     ✓ names the step that failed even when the judge's modules are missing  336ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 216ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 6ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (1 test) 19ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 30ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 582ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  512ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 911ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 631ms
+ ✓ |node| packages/cli/test/security.test.ts (39 tests) 1706ms
+     ✓ validates without changing source by default; commits only FROM on its own branch when explicitly enabled  306ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2172ms
+     ✓ duplicate members count once toward the 1,000  577ms
+     ✓ more than 1,000 literal members are read no further, and say so  1052ms
+ ✓ |node| packages/cli/test/branch.test.ts (22 tests) 2479ms
+     ✓ commits only the given files on HEAD, on a new branch, and leaves the working tree and HEAD alone  329ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  408ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (89 tests) 3638ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  436ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  409ms
+ ✓ |node| packages/cli/test/deliver.test.ts (33 tests) 9575ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base  322ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  444ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  497ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  402ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  519ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  339ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  431ms
+     ✓ a file whose bytes are not the receipt's  586ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  775ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  489ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  538ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  629ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  411ms
+     ✓ Composer: each added or moved lock entry must carry the archive and commit Packagist lists  455ms
 
  Test Files  20 passed (20)
-      Tests  781 passed | 19 skipped (800)
-   Start at  02:02:36
-   Duration  7.75s (transform 2.87s, setup 0ms, import 4.93s, tests 19.97s, environment 2ms)
+      Tests  784 passed | 19 skipped (803)
+   Start at  02:40:54
+   Duration  10.89s (transform 7.23s, setup 0ms, import 10.72s, tests 23.66s, environment 3ms)
 
 vitest exit 0
-# finished 2026-10-30T02:02:44Z
+# finished 2026-10-30T02:41:05Z

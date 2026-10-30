@@ -1,4 +1,4 @@
-# started 2026-10-30T02:03:01Z, node v24.22.1, git version 2.39.5
+# started 2026-10-30T02:31:13Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       a parent other than the base accepted — packages/cli/test/deliver.test.ts
 caught       files outside the receipt's list accepted — packages/cli/test/deliver.test.ts
@@ -10,7 +10,7 @@ caught       bytes other than the receipt's accepted — packages/cli/test/deliv
 caught       a second PR while one is open — packages/cli/test/deliver.test.ts
 caught       a closed fix opened again — packages/cli/test/deliver.test.ts
 caught       a PR opened on a branch that holds another commit — packages/cli/test/deliver.test.ts
-NOT CAUGHT   a branch with another change reused — packages/cli/test/deliver.test.ts
+caught       a branch with another change reused — packages/cli/test/deliver.test.ts
 caught       the message beyond its subject accepted — packages/cli/test/deliver.test.ts
 caught       what the files say not checked — packages/cli/test/deliver.test.ts
 caught       npm: the judge's second refusal ignored — packages/cli/test/deliver.test.ts
@@ -20,7 +20,14 @@ caught       PHP: more than the FROM image accepted — packages/cli/test/delive
 caught       PHP: an older or other-branch release accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: another package changed — packages/cli/test/deliver.test.ts
 caught       composer.lock: a plugin accepted — packages/cli/test/deliver.test.ts
-caught       composer.lock: any archive accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: a new package from any archive accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: the planned package from another repository accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: a new package nothing requires accepted — packages/cli/test/deliver.test.ts
+caught       composer: Packagist not asked — packages/cli/test/deliver.test.ts
+caught       composer: another dist or source than Packagist's accepted — packages/cli/test/deliver.test.ts
+caught       PHP: Docker Hub not asked — packages/cli/test/deliver.test.ts
+caught       PHP: another digest under the tag accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: a new notification-url accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: a removed package accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: another top-level key accepted — packages/cli/test/deliver.test.ts
 caught       the push forced — packages/cli/test/deliver.test.ts
@@ -29,4 +36,17 @@ caught       a run off the default branch opens PRs — packages/cli/test/delive
 caught       a checkout at another commit accepted — packages/cli/test/deliver.test.ts
 caught       another author accepted — packages/cli/test/deliver.test.ts
 caught       another subject accepted — packages/cli/test/deliver.test.ts
-# stopped by Claude Code at this point: the system was low on memory (2026-10-30). The container was then stopped; the remaining mutations did not run.
+caught       another branch name accepted — packages/cli/test/deliver.test.ts
+caught       an npm fix without the judge's ready_except_build accepted — packages/cli/test/deliver.test.ts
+caught       a fix whose tests failed accepted — packages/cli/test/deliver.test.ts
+caught       another base_commit accepted — packages/cli/test/deliver.test.ts
+caught       an oversized bundle accepted — packages/cli/test/deliver.test.ts
+caught       any advisory text accepted — packages/cli/test/deliver.test.ts
+caught       a bundle without an applied fix accepted — packages/cli/test/deliver.test.ts
+caught       pack: a branch not at the receipt's commit packed — packages/cli/test/deliver.test.ts
+caught       patch mode: an OIDC token allowed — packages/cli/test/action-patch.test.ts
+caught       template: the validation job may write — packages/cli/test/action-patch.test.ts
+caught       action: the checkout keeps the credential — packages/cli/test/action-patch.test.ts
+caught       action: the validation step gets the token — packages/cli/test/action-patch.test.ts
+48 of 48 caught; without mutations: packages/cli/test/deliver.test.ts pass, packages/cli/test/action-patch.test.ts pass
+# finished 2026-10-30T02:40:18Z

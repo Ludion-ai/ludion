@@ -203,8 +203,19 @@ function commitOf(top: string, commit: string): { tree: string; parents: string[
 }
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
-/** composer.lock keys that describe a package without changing what is installed. */
-const COMPOSER_METADATA = new Set(["time", "published-time", "support", "funding", "description", "homepage", "keywords", "authors", "notification-url", "license"]);
+/**
+ * composer.lock keys that describe a package without changing what is installed or anything Composer calls.
+ * Not notification-url: Composer sends a request to it on install.
+ */
+const COMPOSER_METADATA = new Set(["time", "published-time", "support", "funding", "description", "homepage", "keywords", "authors", "license"]);
+/** The repository a pinned public archive comes from ("api.github.com/o/r" and the like), lower case; null otherwise. */
+function archiveRepository(value: unknown): string | null {
+  try {
+    const url = publicArchiveUrl(String(value)), [first, second, third] = url.pathname.split("/").filter(Boolean);
+    const [owner, name] = url.hostname === "api.github.com" ? [second, third] : [first, second];
+    return `${url.hostname === "codeload.github.com" || url.hostname === "api.github.com" ? "github.com" : url.hostname}/${owner}/${name}`.toLowerCase();
+  } catch { return null; }
+}
 const withoutMetadata = (entry: Record<string, unknown>) => Object.fromEntries(Object.entries(entry).filter(([key]) => !COMPOSER_METADATA.has(key)));
 
 /** composer.lock: why it says more than the fix, or null. See contentProblem. */
@@ -218,6 +229,8 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
     if (!["content-hash", "packages", "packages-dev", "plugin-api-version"].includes(key) && !isDeepStrictEqual(a[key], b[key])) return `composer.lock changes its ${plain(key).slice(0, 60)}.`;
   }
   const tos = new Set(fix.changes.map(c => c.to.replace(/^v/, "")));
+  const added: Record<string, unknown>[] = [];
+  let planned: Record<string, unknown> | null = null;
   for (const section of ["packages", "packages-dev"]) {
     const was = a[section] ?? [], is = b[section] ?? [];
     if (!Array.isArray(was) || !Array.isArray(is)) return `composer.lock's ${section} is not a list.`;
@@ -228,17 +241,42 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
       seen.add(entry.name);
       const earlier = prior.get(entry.name), name = plain(entry.name).slice(0, 200);
       if (entry.name === fix.package) {
+        if (!earlier) return `composer.lock moves ${name} between its package lists, or adds it.`;
         if (!tos.has(String(entry.version ?? "").replace(/^v/, ""))) return `composer.lock moves ${name} to ${plain(String(entry.version)).slice(0, 60)}, not to the fix's version.`;
-      } else if (earlier) {
+        // The same package from the same place: the archive's repository, the source's URL and the type stay the base's.
+        const old = (key: string, inner: string) => isObject(earlier[key]) ? (earlier[key] as Record<string, unknown>)[inner] : undefined;
+        const now = (key: string, inner: string) => isObject(entry[key]) ? (entry[key] as Record<string, unknown>)[inner] : undefined;
+        const repository = archiveRepository(now("dist", "url"));
+        if (!repository || repository !== archiveRepository(old("dist", "url"))) return `composer.lock takes ${name} from another archive repository than the base did, or from outside the pinned public archives.`;
+        if (now("source", "url") !== old("source", "url") || entry.type !== earlier.type) return `composer.lock changes where ${name} comes from (source URL) or its type.`;
+        if (isObject(entry["notification-url"]) || entry["notification-url"] !== earlier["notification-url"]) return `composer.lock changes ${name}'s notification-url.`;
+        planned = entry;
+        continue;
+      }
+      if (earlier) {
         if (!isDeepStrictEqual(withoutMetadata(earlier), withoutMetadata(entry))) return `composer.lock changes ${name}, which this fix does not plan.`;
         continue;
       }
-      // The planned package and each new one: from a pinned public archive, and neither a Composer plugin nor an installer.
-      try { publicArchiveUrl(String(isObject(entry.dist) ? entry.dist.url : "")); } catch { return `composer.lock takes ${name} from outside the pinned public archives.`; }
+      // A new package: from a pinned public archive, neither a Composer plugin nor an installer, no notification-url.
+      if (!archiveRepository(isObject(entry.dist) ? entry.dist.url : "")) return `composer.lock takes ${name} from outside the pinned public archives.`;
       if (typeof entry.type === "string" && /^composer-(plugin|installer)$/.test(entry.type)) return `composer.lock brings ${name}, a ${entry.type}.`;
+      if (entry["notification-url"] !== undefined) return `composer.lock gives the new ${name} a notification-url.`;
+      added.push(entry);
     }
     for (const name of prior.keys()) if (!seen.has(name) && name !== fix.package) return `composer.lock removes ${plain(String(name)).slice(0, 200)}.`;
   }
+  if (!planned) return `composer.lock does not have ${plain(fix.package).slice(0, 200)}.`;
+  // Each new package is required by the fixed version, or by a package that version newly brings: none comes from nowhere.
+  const reached = new Set<string>(), queue: Record<string, unknown>[] = [planned];
+  while (queue.length) {
+    const entry = queue.shift()!, requires = isObject(entry.require) ? Object.keys(entry.require).map(n => n.toLowerCase()) : [];
+    for (const next of added) {
+      const key = String(next.name).toLowerCase();
+      if (requires.includes(key) && !reached.has(key)) { reached.add(key); queue.push(next); }
+    }
+  }
+  const stray = added.filter(entry => !reached.has(String(entry.name).toLowerCase()));
+  if (stray.length) return `composer.lock adds ${stray.slice(0, 3).map(e => plain(String(e.name)).slice(0, 100)).join(", ")}, which the fixed version does not require.`;
   return null;
 }
 
@@ -380,7 +418,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by digest" : ecosystem === "npm" ? "package.json is what Ludion writes for this change" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, and that composer.lock moves only this package and adds no plugin or installer" : "pom.xml is what Ludion writes for this change"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, and that composer.lock moves only this package and adds only packages it requires, none of them a plugin or installer, each with the archive and commit Packagist lists" : "pom.xml is what Ludion writes for this change"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
@@ -452,11 +490,98 @@ async function judgeAgain(top: string, prefix: string, base: string, fix: Checke
   } finally { for (const dir of dirs) rmSync(dir, { recursive: true, force: true }); }
 }
 
+/** A bounded JSON or header read from an official registry; at most `max` bytes of body. */
+async function registryJson(fetchFn: typeof fetch, url: string, init: RequestInit = {}, max = 32 * 1024 * 1024): Promise<any> {
+  const res = await fetchFn(url, { redirect: "error", signal: AbortSignal.timeout(30_000), ...init, headers: { accept: "application/json", "user-agent": "Ludion-Security-Preview", ...(init.headers ?? {}) } });
+  if (!res.ok) { await res.body?.cancel().catch(() => {}); throw new Error(`${new URL(url).hostname} answered HTTP ${res.status}.`); }
+  const reader = res.body?.getReader(), chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const part = reader ? await reader.read() : { done: true as const, value: undefined };
+    if (part.done) break;
+    size += part.value.length;
+    if (size > max) { await reader?.cancel().catch(() => {}); throw new Error(`${new URL(url).hostname}'s answer is larger than ${max} bytes.`); }
+    chunks.push(part.value);
+  }
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+}
+
+/** Packagist's dist and source for one tagged release (repo.packagist.org's p2 metadata, minified entries expanded). */
+export type PackagistRelease = { dist: { url?: unknown; reference?: unknown }; source: { url?: unknown; reference?: unknown } };
+export async function packagistRelease(name: string, version: string, fetchFn: typeof fetch = fetch): Promise<PackagistRelease | null> {
+  if (!/^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/.test(name)) throw new Error(`Invalid Composer package name: ${plain(name).slice(0, 100)}`);
+  const doc = await registryJson(fetchFn, `https://repo.packagist.org/p2/${name}.json`);
+  const list = doc?.packages?.[name];
+  if (!Array.isArray(list)) throw new Error(`Invalid Packagist metadata for ${name}.`);
+  let current: Record<string, unknown> = {};
+  for (const entry of list) {
+    if (!isObject(entry)) throw new Error(`Invalid Packagist metadata for ${name}.`);
+    current = doc.minified === "composer/2.0" ? { ...current } : {};
+    for (const [key, value] of Object.entries(entry)) { if (value === "__unset") delete current[key]; else current[key] = value; }
+    if (String(current.version).replace(/^v(?=\d)/, "") === version.replace(/^v(?=\d)/, "")) {
+      return { dist: isObject(current.dist) ? current.dist : {}, source: isObject(current.source) ? current.source : {} };
+    }
+  }
+  return null;
+}
+
+/**
+ * Composer: every composer.lock entry the fix adds or moves (the planned package and the new ones) must name the archive
+ * and the commit Packagist lists for that name and version: dist URL and reference, and source URL and reference. A
+ * pinned archive from another repository, or a fork's commit served through the upstream's URL, is refused.
+ */
+async function composerAgain(top: string, prefix: string, base: string, fix: CheckedFix, release: (name: string, version: string) => Promise<PackagistRelease | null>): Promise<string | null> {
+  const read = (rev: string) => JSON.parse(git(top, ["cat-file", "blob", `${rev}:${prefix}composer.lock`]).stdout) as Record<string, unknown>;
+  const entries = (lock: Record<string, unknown>) => [...(Array.isArray(lock.packages) ? lock.packages : []), ...(Array.isArray(lock["packages-dev"]) ? lock["packages-dev"] : [])].filter(isObject);
+  try {
+    const before = new Set(entries(read(base)).map(e => `${e.name}@${e.version}`));
+    for (const entry of entries(read(fix.commit)).filter(e => !before.has(`${e.name}@${e.version}`))) {
+      const name = String(entry.name), version = String(entry.version), at = `${plain(name).slice(0, 100)}@${plain(version).slice(0, 60)}`;
+      const listed = await release(name, version);
+      if (!listed) return `Packagist lists no ${at}.`;
+      const field = (o: unknown, key: string) => isObject(o) ? o[key] : undefined;
+      for (const [part, key] of [["dist", "url"], ["dist", "reference"], ["source", "url"], ["source", "reference"]] as const) {
+        if (field(entry[part], key) !== field(listed[part], key)) return `composer.lock's ${part} ${key} for ${at} is not the one Packagist lists.`;
+      }
+    }
+    return null;
+  } catch (error) {
+    return `Packagist could not be read: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
+  }
+}
+
+/** The digest Docker Hub gives for an official PHP image tag now: the manifest list's (what `docker pull` records). */
+export async function dockerHubDigest(tag: string, fetchFn: typeof fetch = fetch): Promise<string> {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(tag)) throw new Error("Invalid image tag.");
+  const auth = await registryJson(fetchFn, "https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/php:pull", {}, 1024 * 1024);
+  if (typeof auth?.token !== "string") throw new Error("Docker Hub gave no pull token.");
+  const res = await fetchFn(`https://registry-1.docker.io/v2/library/php/manifests/${tag}`, {
+    method: "HEAD", redirect: "error", signal: AbortSignal.timeout(30_000),
+    headers: { authorization: `Bearer ${auth.token}`, accept: ["application/vnd.oci.image.index.v1+json", "application/vnd.docker.distribution.manifest.list.v2+json", "application/vnd.docker.distribution.manifest.v2+json", "application/vnd.oci.image.manifest.v1+json"].join(", ") },
+  });
+  const digest = res.headers.get("docker-content-digest") ?? "";
+  if (!res.ok || !/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error(`Docker Hub gave no digest for php:${tag} (HTTP ${res.status}).`);
+  return digest;
+}
+
+/** PHP: the digest the Dockerfile pins must be the one Docker Hub gives for the tag it names, so no other image hides under it. */
+async function phpAgain(top: string, prefix: string, fix: CheckedFix, digestOf: (tag: string) => Promise<string>): Promise<string | null> {
+  try {
+    const image = phpImage(git(top, ["cat-file", "blob", `${fix.commit}:${prefix}${fix.files[0]!.path}`]).stdout).reference;
+    const match = /php:([^@]+)@(sha256:[a-f0-9]{64})$/.exec(image);
+    if (!match) return "the Dockerfile's image is not pinned by digest.";
+    const listed = await digestOf(match[1]!);
+    return listed === match[2] ? null : `php:${match[1]} is pinned at ${match[2]}, and Docker Hub gives ${listed} for that tag now.`;
+  } catch (error) {
+    return `Docker Hub could not be read: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
+  }
+}
+
 /**
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -500,6 +625,15 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
       if (checked.ecosystem === "npm") {
         const refusal = await judgeAgain(top, prefix, checked.base, fix, options.judgeNpm ?? ((before, after) => judgeNpmCandidate(before, after)));
         if (refusal) throw new Error(`Not pushed: the judge was run again on this commit's lockfile. ${refusal}`);
+      }
+      // Composer and PHP: what the lockfile or the Dockerfile pins, against the official registry, here.
+      if (checked.ecosystem === "composer") {
+        const problem = await composerAgain(top, prefix, checked.base, fix, options.packagist ?? ((name, version) => packagistRelease(name, version)));
+        if (problem) throw new Error(`Not pushed: ${problem}`);
+      }
+      if (checked.ecosystem === "php") {
+        const problem = await phpAgain(top, prefix, fix, options.phpDigest ?? (tag => dockerHubDigest(tag)));
+        if (problem) throw new Error(`Not pushed: ${problem}`);
       }
       if (!remoteSha) push(top, options.remote, fix.commit, fix.branch, options.token);
       const created = await call(api, "POST", `/repos/${options.repo}/pulls`, { title: fix.subject, head: fix.branch, base: defaultBranch, body: pullRequestBody(checked, fix), maintainer_can_modify: false });

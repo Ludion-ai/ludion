@@ -1,43 +1,43 @@
-# started 2026-10-30T02:03:01Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+# started 2026-10-30T02:18:25Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
 npm ci exit 0
 build exit 0
 == case npm-two
 lockfile exit 0
-base 6721862fab55beddfe04a52b7b5773f8e0632ea0
+base bf7b02eac1e5cbeecda25b224f5f6baf2fb366ce
 -- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 2
-receipt 5dac5824-06e9-4a5b-8d56-9812bfa04e24: outcome partial, base 6721862fab55beddfe04a52b7b5773f8e0632ea0
-  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:03:20.543Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
-  minimist 1.2.5 -> 1.2.6: applied ludion/npm/minimist-1.2.6 b6acc4df8bde178669e447cd1439f3032d5a4be9 judge=ready_except_build published=2022-03-22T02:50:30.352Z found=2026-10-30T02:03:20.543Z applied=2026-10-30T02:03:32.946Z
+receipt 8d3aca7a-0bfe-4098-bd32-24355c4e12c3: outcome partial, base bf7b02eac1e5cbeecda25b224f5f6baf2fb366ce
+  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:18:40.438Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
+  minimist 1.2.5 -> 1.2.6: applied ludion/npm/minimist-1.2.6 3b06e066c01db8bc14deed5479766199c4ce7d5e judge=ready_except_build published=2022-03-22T02:50:30.352Z found=2026-10-30T02:18:40.438Z applied=2026-10-30T02:19:01.018Z
 Packed 1 applied fix into /e/npm-two/artifact1.
-pack exit 0
-  838 bytes fixes.bundle
-  61849 bytes receipt.json
-  head b6acc4df8bde178669e447cd1439f3032d5a4be9 refs/heads/ludion/npm/minimist-1.2.6
--- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt 5dac5824-06e9-4a5b-8d56-9812bfa04e24 on 6721862fab55: 1 applied fix; not applied: 1 failed.
-  minimist (ludion/npm/minimist-1.2.6): opened #1
-open exit 0
--- origin's branches:
-  ludion/npm/minimist-1.2.6 b6acc4df8bde178669e447cd1439f3032d5a4be9
-  main 6721862fab55beddfe04a52b7b5773f8e0632ea0
--- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
-patch exit 2
-receipt 5ced86d8-e8a6-48eb-8a83-628b20fd6d59: outcome partial, base 6721862fab55beddfe04a52b7b5773f8e0632ea0
-  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:03:37.762Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
-  minimist 1.2.5 -> 1.2.6: applied ludion/npm/minimist-1.2.6 75b23a1fa16bb32c4b1fd50ee90580b6c8f50edf judge=ready_except_build published=2022-03-22T02:50:30.352Z found=2026-10-30T02:03:37.762Z applied=2026-10-30T02:03:49.654Z
-Packed 1 applied fix into /e/npm-two/artifact2.
 pack exit 0
   839 bytes fixes.bundle
   61849 bytes receipt.json
-  head 75b23a1fa16bb32c4b1fd50ee90580b6c8f50edf refs/heads/ludion/npm/minimist-1.2.6
+  head 3b06e066c01db8bc14deed5479766199c4ce7d5e refs/heads/ludion/npm/minimist-1.2.6
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 8d3aca7a-0bfe-4098-bd32-24355c4e12c3 on bf7b02eac1e5: 1 applied fix; not applied: 1 failed.
+  minimist (ludion/npm/minimist-1.2.6): opened #1
+open exit 0
+-- origin's branches:
+  ludion/npm/minimist-1.2.6 3b06e066c01db8bc14deed5479766199c4ce7d5e
+  main bf7b02eac1e5cbeecda25b224f5f6baf2fb366ce
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+receipt 0a92e502-d072-492d-b157-e37bb50c32c1: outcome partial, base bf7b02eac1e5cbeecda25b224f5f6baf2fb366ce
+  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:19:07.079Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
+  minimist 1.2.5 -> 1.2.6: applied ludion/npm/minimist-1.2.6 7db5c8a00f5dc7e0baba3358418a7e260701c00c judge=ready_except_build published=2022-03-22T02:50:30.352Z found=2026-10-30T02:19:07.079Z applied=2026-10-30T02:19:21.931Z
+Packed 1 applied fix into /e/npm-two/artifact2.
+pack exit 0
+  838 bytes fixes.bundle
+  61849 bytes receipt.json
+  head 7db5c8a00f5dc7e0baba3358418a7e260701c00c refs/heads/ludion/npm/minimist-1.2.6
 -- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt 5ced86d8-e8a6-48eb-8a83-628b20fd6d59 on 6721862fab55: 1 applied fix; not applied: 1 failed.
+Receipt 0a92e502-d072-492d-b157-e37bb50c32c1 on bf7b02eac1e5: 1 applied fix; not applied: 1 failed.
   minimist (ludion/npm/minimist-1.2.6): open_pr_exists #1
 open exit 0
 -- origin's branches:
-  ludion/npm/minimist-1.2.6 b6acc4df8bde178669e447cd1439f3032d5a4be9
-  main 6721862fab55beddfe04a52b7b5773f8e0632ea0
+  ludion/npm/minimist-1.2.6 3b06e066c01db8bc14deed5479766199c4ce7d5e
+  main bf7b02eac1e5cbeecda25b224f5f6baf2fb366ce
 -- PRs in the stand-in:
   #1 open ludion/npm/minimist-1.2.6 -> main: ludion: minimist 1.2.5 -> 1.2.6 (npm)
   API calls: 6; POST: 1
@@ -45,7 +45,7 @@ open exit 0
   | <!-- ludion-fix -->
   | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
   | 
-  | Ludion found a published security fix and validated it on its own against the base commit `6721862fab55`. This PR holds that one fix (one commit).
+  | Ludion found a published security fix and validated it on its own against the base commit `bf7b02eac1e5`. This PR holds that one fix (one commit).
   | 
   | | | |
   | |---|---|
@@ -53,9 +53,9 @@ open exit 0
   | | Change | `1.2.5` → `1.2.6` |
   | | Advisories | `GHSA-xvch-5gv4-984h` |
   | | Fix published | `2022-03-22T02:50:30.352Z` (registry.npmjs.org's publish time of the fixed version) |
-  | | Found | `2026-10-30T02:03:20.543Z` (this run's lookup; an earlier run may have seen it first) |
-  | | Branch made | `2026-10-30T02:03:32.946Z` |
-  | | Receipt | `5dac5824-06e9-4a5b-8d56-9812bfa04e24` (in this run's ludion-fixes artifact) |
+  | | Found | `2026-10-30T02:18:40.438Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T02:19:01.018Z` |
+  | | Receipt | `8d3aca7a-0bfe-4098-bd32-24355c4e12c3` (in this run's ludion-fixes artifact) |
   | 
   | **What was checked**
   | 
@@ -69,39 +69,39 @@ open exit 0
   | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
   | - Production: nothing is deployed.
 == case php
-base 9b15e64819acfd4ffcd55a7b79cdb58d4ca09ecb
+base ce603582f3b0349541d978ac0c9ad34748c84533
 -- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 0
-receipt c473c403-430f-4c4d-892e-fd8415f084bf: outcome applied, base 9b15e64819acfd4ffcd55a7b79cdb58d4ca09ecb
-  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 0554927508de85c8060a8f927990c22fa28256f3 published=2026-10-21T00:00:00.000Z found=2026-10-30T02:03:51.627Z applied=2026-10-30T02:03:56.889Z
+receipt da8a51f5-09fa-4490-bae7-70a31e898e35: outcome applied, base ce603582f3b0349541d978ac0c9ad34748c84533
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 5b561dc41aa3c3304c1e2845e85a98bbdcde836d published=2026-10-21T00:00:00.000Z found=2026-10-30T02:19:24.235Z applied=2026-10-30T02:19:31.183Z
 Packed 1 applied fix into /e/php/artifact1.
 pack exit 0
-  763 bytes fixes.bundle
+  764 bytes fixes.bundle
   2147 bytes receipt.json
-  head 0554927508de85c8060a8f927990c22fa28256f3 refs/heads/ludion/php/8.4.27
+  head 5b561dc41aa3c3304c1e2845e85a98bbdcde836d refs/heads/ludion/php/8.4.27
 -- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt c473c403-430f-4c4d-892e-fd8415f084bf on 9b15e64819ac: 1 applied fix.
+Receipt da8a51f5-09fa-4490-bae7-70a31e898e35 on ce603582f3b0: 1 applied fix.
   php (ludion/php/8.4.27): opened #1
 open exit 0
 -- origin's branches:
-  ludion/php/8.4.27 0554927508de85c8060a8f927990c22fa28256f3
-  main 9b15e64819acfd4ffcd55a7b79cdb58d4ca09ecb
+  ludion/php/8.4.27 5b561dc41aa3c3304c1e2845e85a98bbdcde836d
+  main ce603582f3b0349541d978ac0c9ad34748c84533
 -- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 0
-receipt de80b892-ca2c-435c-9961-8a47eef17e1c: outcome applied, base 9b15e64819acfd4ffcd55a7b79cdb58d4ca09ecb
-  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 15ec433a8e8584b57cf30a14eb5b54788855192b published=2026-10-21T00:00:00.000Z found=2026-10-30T02:03:57.522Z applied=2026-10-30T02:04:02.781Z
+receipt 8b88a88f-75c6-4c21-ac13-7b7bb51f1635: outcome applied, base ce603582f3b0349541d978ac0c9ad34748c84533
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 f408aa7300553f66c986a3f4e2ff0f7f9fb0a5a7 published=2026-10-21T00:00:00.000Z found=2026-10-30T02:19:32.806Z applied=2026-10-30T02:19:38.675Z
 Packed 1 applied fix into /e/php/artifact2.
 pack exit 0
-  763 bytes fixes.bundle
+  764 bytes fixes.bundle
   2147 bytes receipt.json
-  head 15ec433a8e8584b57cf30a14eb5b54788855192b refs/heads/ludion/php/8.4.27
+  head f408aa7300553f66c986a3f4e2ff0f7f9fb0a5a7 refs/heads/ludion/php/8.4.27
 -- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt de80b892-ca2c-435c-9961-8a47eef17e1c on 9b15e64819ac: 1 applied fix.
+Receipt 8b88a88f-75c6-4c21-ac13-7b7bb51f1635 on ce603582f3b0: 1 applied fix.
   php (ludion/php/8.4.27): open_pr_exists #1
 open exit 0
 -- origin's branches:
-  ludion/php/8.4.27 0554927508de85c8060a8f927990c22fa28256f3
-  main 9b15e64819acfd4ffcd55a7b79cdb58d4ca09ecb
+  ludion/php/8.4.27 5b561dc41aa3c3304c1e2845e85a98bbdcde836d
+  main ce603582f3b0349541d978ac0c9ad34748c84533
 -- PRs in the stand-in:
   #1 open ludion/php/8.4.27 -> main: ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile
   API calls: 6; POST: 1
@@ -109,7 +109,7 @@ open exit 0
   | <!-- ludion-fix -->
   | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
   | 
-  | Ludion found a published security fix and validated it on its own against the base commit `9b15e64819ac`. This PR holds that one fix (one commit).
+  | Ludion found a published security fix and validated it on its own against the base commit `ce603582f3b0`. This PR holds that one fix (one commit).
   | 
   | | | |
   | |---|---|
@@ -117,14 +117,14 @@ open exit 0
   | | Change | `8.4.26` → `8.4.27` |
   | | Advisories | php.net's security release (no advisory ID read) |
   | | Fix published | `2026-10-21T00:00:00.000Z` (php.net's release day of the first newer security release, at 00:00 UTC) |
-  | | Found | `2026-10-30T02:03:51.627Z` (this run's lookup; an earlier run may have seen it first) |
-  | | Branch made | `2026-10-30T02:03:56.889Z` |
-  | | Receipt | `c473c403-430f-4c4d-892e-fd8415f084bf` (in this run's ludion-fixes artifact) |
+  | | Found | `2026-10-30T02:19:24.235Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T02:19:31.183Z` |
+  | | Receipt | `da8a51f5-09fa-4490-bae7-70a31e898e35` (in this run's ludion-fixes artifact) |
   | 
   | **What was checked**
   | 
   | - The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
-  | - This commit changes only `Dockerfile`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that only the FROM image changes, to the official image pinned by digest.
+  | - This commit changes only `Dockerfile`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag.
   | - PHP image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.
   | 
   | **Not checked**
@@ -133,39 +133,39 @@ open exit 0
   | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
   | - Production: nothing is deployed.
 == case composer
-base 0a273f19b7b6b03174f78566eb72e82821a8a786
+base 2ecc7015c3d58b96f9db770fab375e084ca2b48e
 -- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 0
-receipt 9950659c-2d75-4445-8ea4-699c534f0ae3: outcome applied, base 0a273f19b7b6b03174f78566eb72e82821a8a786
-  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 4971ce4e0851c76fd64c198d923161ff62e90204 published=2026-09-30T11:07:08.000Z found=2026-10-30T02:04:06.353Z applied=2026-10-30T02:04:20.126Z
+receipt 59065765-d9be-470d-b1fd-bea8770da0f9: outcome applied, base 2ecc7015c3d58b96f9db770fab375e084ca2b48e
+  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 093eb0370b9c6bd4823c746d082dda66c944dfbb published=2026-09-30T11:07:08.000Z found=2026-10-30T02:19:46.254Z applied=2026-10-30T02:20:04.266Z
 Packed 1 applied fix into /e/composer/artifact1.
 pack exit 0
   1273 bytes fixes.bundle
   109675 bytes receipt.json
-  head 4971ce4e0851c76fd64c198d923161ff62e90204 refs/heads/ludion/composer/symfony-http-foundation-5.4.54
+  head 093eb0370b9c6bd4823c746d082dda66c944dfbb refs/heads/ludion/composer/symfony-http-foundation-5.4.54
 -- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt 9950659c-2d75-4445-8ea4-699c534f0ae3 on 0a273f19b7b6: 1 applied fix.
+Receipt 59065765-d9be-470d-b1fd-bea8770da0f9 on 2ecc7015c3d5: 1 applied fix.
   symfony/http-foundation (ludion/composer/symfony-http-foundation-5.4.54): opened #1
 open exit 0
 -- origin's branches:
-  ludion/composer/symfony-http-foundation-5.4.54 4971ce4e0851c76fd64c198d923161ff62e90204
-  main 0a273f19b7b6b03174f78566eb72e82821a8a786
+  ludion/composer/symfony-http-foundation-5.4.54 093eb0370b9c6bd4823c746d082dda66c944dfbb
+  main 2ecc7015c3d58b96f9db770fab375e084ca2b48e
 -- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 0
-receipt bd86d2c5-c531-4d49-bd2e-497e6a1acde8: outcome applied, base 0a273f19b7b6b03174f78566eb72e82821a8a786
-  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 1e05e1276a445fcc092381a689ceef0a95cdfe7c published=2026-09-30T11:07:08.000Z found=2026-10-30T02:04:22.104Z applied=2026-10-30T02:04:31.717Z
+receipt 3f58f736-6742-4d19-ba75-26998f833349: outcome applied, base 2ecc7015c3d58b96f9db770fab375e084ca2b48e
+  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 6b4fbcd89b6f973aee9526a598ef61b27ededa25 published=2026-09-30T11:07:08.000Z found=2026-10-30T02:20:07.067Z applied=2026-10-30T02:20:20.287Z
 Packed 1 applied fix into /e/composer/artifact2.
 pack exit 0
   1273 bytes fixes.bundle
   109675 bytes receipt.json
-  head 1e05e1276a445fcc092381a689ceef0a95cdfe7c refs/heads/ludion/composer/symfony-http-foundation-5.4.54
+  head 6b4fbcd89b6f973aee9526a598ef61b27ededa25 refs/heads/ludion/composer/symfony-http-foundation-5.4.54
 -- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt bd86d2c5-c531-4d49-bd2e-497e6a1acde8 on 0a273f19b7b6: 1 applied fix.
+Receipt 3f58f736-6742-4d19-ba75-26998f833349 on 2ecc7015c3d5: 1 applied fix.
   symfony/http-foundation (ludion/composer/symfony-http-foundation-5.4.54): open_pr_exists #1
 open exit 0
 -- origin's branches:
-  ludion/composer/symfony-http-foundation-5.4.54 4971ce4e0851c76fd64c198d923161ff62e90204
-  main 0a273f19b7b6b03174f78566eb72e82821a8a786
+  ludion/composer/symfony-http-foundation-5.4.54 093eb0370b9c6bd4823c746d082dda66c944dfbb
+  main 2ecc7015c3d58b96f9db770fab375e084ca2b48e
 -- PRs in the stand-in:
   #1 open ludion/composer/symfony-http-foundation-5.4.54 -> main: ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)
   API calls: 6; POST: 1
@@ -173,7 +173,7 @@ open exit 0
   | <!-- ludion-fix -->
   | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
   | 
-  | Ludion found a published security fix and validated it on its own against the base commit `0a273f19b7b6`. This PR holds that one fix (one commit).
+  | Ludion found a published security fix and validated it on its own against the base commit `2ecc7015c3d5`. This PR holds that one fix (one commit).
   | 
   | | | |
   | |---|---|
@@ -181,14 +181,14 @@ open exit 0
   | | Change | `5.4.0` → `5.4.54` |
   | | Advisories | `GHSA-3rg7-wf37-54rm`, `GHSA-mrqx-rp3w-jpjp`, `GHSA-r925-mgvr-h9cc`, `PKSA-365x-2zjk-pt47`, `PKSA-b35n-565h-rs4q` |
   | | Fix published | `2026-09-30T11:07:08.000Z` (Packagist's release date of the fixed version, which its author sets) |
-  | | Found | `2026-10-30T02:04:06.353Z` (this run's lookup; an earlier run may have seen it first) |
-  | | Branch made | `2026-10-30T02:04:20.126Z` |
-  | | Receipt | `9950659c-2d75-4445-8ea4-699c534f0ae3` (in this run's ludion-fixes artifact) |
+  | | Found | `2026-10-30T02:19:46.254Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T02:20:04.266Z` |
+  | | Receipt | `59065765-d9be-470d-b1fd-bea8770da0f9` (in this run's ludion-fixes artifact) |
   | 
   | **What was checked**
   | 
   | - The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
-  | - This commit changes only `composer.json`, `composer.lock`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that composer.json is what Ludion writes for this change, and that composer.lock moves only this package and adds no plugin or installer.
+  | - This commit changes only `composer.json`, `composer.lock`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that composer.json is what Ludion writes for this change, and that composer.lock moves only this package and adds only packages it requires, none of them a plugin or installer, each with the archive and commit Packagist lists.
   | - Composer updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.
   | 
   | **Not checked**
@@ -197,41 +197,41 @@ open exit 0
   | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
   | - Production: nothing is deployed.
 == case maven
-base 063803d8dc73cc8ea80b8e79d0c3fb51df499bf0
+base 1f21338cd079f6c991f2976a08e7278585518e00
 -- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 2
-receipt 23f4ac6b-14ea-422d-ae52-74f10fe71a3b: outcome partial, base 063803d8dc73cc8ea80b8e79d0c3fb51df499bf0
-  org.apache.commons:commons-text 1.9 -> 1.10.0: failed published=null found=2026-10-30T02:04:36.745Z applied=null — Candidate still contains known advisory findings or incomplete inventory (org.apache.commons:commons-lang3@3.12.0 GHSA-j288-q9x7-2f5v); no source change was made.
-  org.apache.commons:commons-lang3 3.11 -> 3.18.0: applied ludion/maven/org.apache.commons-commons-lang3-3.18.0 8cee368e508d2c773814196209e1c70ae010258b published=null found=2026-10-30T02:04:36.745Z applied=2026-10-30T02:04:44.097Z
+receipt b884a6d2-68e9-4066-991d-17059e140c21: outcome partial, base 1f21338cd079f6c991f2976a08e7278585518e00
+  org.apache.commons:commons-text 1.9 -> 1.10.0: failed published=null found=2026-10-30T02:20:25.841Z applied=null — Candidate still contains known advisory findings or incomplete inventory (org.apache.commons:commons-lang3@3.12.0 GHSA-j288-q9x7-2f5v); no source change was made.
+  org.apache.commons:commons-lang3 3.11 -> 3.18.0: applied ludion/maven/org.apache.commons-commons-lang3-3.18.0 61d7833f2e6f5abd994bca2b85afe11e5817dddd published=null found=2026-10-30T02:20:25.841Z applied=2026-10-30T02:20:39.217Z
 Packed 1 applied fix into /e/maven/artifact1.
-pack exit 0
-  786 bytes fixes.bundle
-  48711 bytes receipt.json
-  head 8cee368e508d2c773814196209e1c70ae010258b refs/heads/ludion/maven/org.apache.commons-commons-lang3-3.18.0
--- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt 23f4ac6b-14ea-422d-ae52-74f10fe71a3b on 063803d8dc73: 1 applied fix; not applied: 1 failed.
-  org.apache.commons:commons-lang3 (ludion/maven/org.apache.commons-commons-lang3-3.18.0): opened #1
-open exit 0
--- origin's branches:
-  ludion/maven/org.apache.commons-commons-lang3-3.18.0 8cee368e508d2c773814196209e1c70ae010258b
-  main 063803d8dc73cc8ea80b8e79d0c3fb51df499bf0
--- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
-patch exit 2
-receipt 05f32143-0fe7-4636-9fc2-8acbf604f7c1: outcome partial, base 063803d8dc73cc8ea80b8e79d0c3fb51df499bf0
-  org.apache.commons:commons-text 1.9 -> 1.10.0: failed published=null found=2026-10-30T02:04:47.958Z applied=null — Candidate still contains known advisory findings or incomplete inventory (org.apache.commons:commons-lang3@3.12.0 GHSA-j288-q9x7-2f5v); no source change was made.
-  org.apache.commons:commons-lang3 3.11 -> 3.18.0: applied ludion/maven/org.apache.commons-commons-lang3-3.18.0 123b71fe21d5dc640147809de13b72be22ce6cc7 published=null found=2026-10-30T02:04:47.958Z applied=2026-10-30T02:04:55.308Z
-Packed 1 applied fix into /e/maven/artifact2.
 pack exit 0
   787 bytes fixes.bundle
   48711 bytes receipt.json
-  head 123b71fe21d5dc640147809de13b72be22ce6cc7 refs/heads/ludion/maven/org.apache.commons-commons-lang3-3.18.0
+  head 61d7833f2e6f5abd994bca2b85afe11e5817dddd refs/heads/ludion/maven/org.apache.commons-commons-lang3-3.18.0
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt b884a6d2-68e9-4066-991d-17059e140c21 on 1f21338cd079: 1 applied fix; not applied: 1 failed.
+  org.apache.commons:commons-lang3 (ludion/maven/org.apache.commons-commons-lang3-3.18.0): opened #1
+open exit 0
+-- origin's branches:
+  ludion/maven/org.apache.commons-commons-lang3-3.18.0 61d7833f2e6f5abd994bca2b85afe11e5817dddd
+  main 1f21338cd079f6c991f2976a08e7278585518e00
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+receipt ce449479-cfb3-4ae2-a59e-06aebdc35aa2: outcome partial, base 1f21338cd079f6c991f2976a08e7278585518e00
+  org.apache.commons:commons-text 1.9 -> 1.10.0: failed published=null found=2026-10-30T02:20:43.730Z applied=null — Candidate still contains known advisory findings or incomplete inventory (org.apache.commons:commons-lang3@3.12.0 GHSA-j288-q9x7-2f5v); no source change was made.
+  org.apache.commons:commons-lang3 3.11 -> 3.18.0: applied ludion/maven/org.apache.commons-commons-lang3-3.18.0 73610da28698d614e4d14b04def91179c25623d9 published=null found=2026-10-30T02:20:43.730Z applied=2026-10-30T02:20:52.124Z
+Packed 1 applied fix into /e/maven/artifact2.
+pack exit 0
+  788 bytes fixes.bundle
+  48711 bytes receipt.json
+  head 73610da28698d614e4d14b04def91179c25623d9 refs/heads/ludion/maven/org.apache.commons-commons-lang3-3.18.0
 -- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt 05f32143-0fe7-4636-9fc2-8acbf604f7c1 on 063803d8dc73: 1 applied fix; not applied: 1 failed.
+Receipt ce449479-cfb3-4ae2-a59e-06aebdc35aa2 on 1f21338cd079: 1 applied fix; not applied: 1 failed.
   org.apache.commons:commons-lang3 (ludion/maven/org.apache.commons-commons-lang3-3.18.0): open_pr_exists #1
 open exit 0
 -- origin's branches:
-  ludion/maven/org.apache.commons-commons-lang3-3.18.0 8cee368e508d2c773814196209e1c70ae010258b
-  main 063803d8dc73cc8ea80b8e79d0c3fb51df499bf0
+  ludion/maven/org.apache.commons-commons-lang3-3.18.0 61d7833f2e6f5abd994bca2b85afe11e5817dddd
+  main 1f21338cd079f6c991f2976a08e7278585518e00
 -- PRs in the stand-in:
   #1 open ludion/maven/org.apache.commons-commons-lang3-3.18.0 -> main: ludion: org.apache.commons:commons-lang3 3.11 -> 3.18.0 (maven)
   API calls: 6; POST: 1
@@ -239,7 +239,7 @@ open exit 0
   | <!-- ludion-fix -->
   | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
   | 
-  | Ludion found a published security fix and validated it on its own against the base commit `063803d8dc73`. This PR holds that one fix (one commit).
+  | Ludion found a published security fix and validated it on its own against the base commit `1f21338cd079`. This PR holds that one fix (one commit).
   | 
   | | | |
   | |---|---|
@@ -247,9 +247,9 @@ open exit 0
   | | Change | `3.11` → `3.18.0` |
   | | Advisories | `GHSA-j288-q9x7-2f5v` |
   | | Fix published | unknown (not read: Ludion does not read Maven Central's publish times yet) |
-  | | Found | `2026-10-30T02:04:36.745Z` (this run's lookup; an earlier run may have seen it first) |
-  | | Branch made | `2026-10-30T02:04:44.097Z` |
-  | | Receipt | `23f4ac6b-14ea-422d-ae52-74f10fe71a3b` (in this run's ludion-fixes artifact) |
+  | | Found | `2026-10-30T02:20:25.841Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T02:20:39.217Z` |
+  | | Receipt | `b884a6d2-68e9-4066-991d-17059e140c21` (in this run's ludion-fixes artifact) |
   | 
   | **What was checked**
   | 
@@ -263,31 +263,31 @@ open exit 0
   | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
   | - Production: nothing is deployed.
 == case npm
-base e4e19a3578f8c1e2a21b345a924672839438db5a
+base f652aee861af93831e805addbd05bf38a7b36dfb
 -- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 2
-receipt 1c7c7d7c-115a-400b-94d5-2a63642d8c8a: outcome failed, base e4e19a3578f8c1e2a21b345a924672839438db5a
-  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:04:58.317Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
+receipt 5b078661-de4e-4499-8a9b-54fdd32354c5: outcome failed, base f652aee861af93831e805addbd05bf38a7b36dfb
+  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:20:55.576Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
 Packed 0 applied fixes into /e/npm/artifact1.
 pack exit 0
   29468 bytes receipt.json
 -- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt 1c7c7d7c-115a-400b-94d5-2a63642d8c8a on e4e19a3578f8: 0 applied fixes; not applied: 1 failed.
+Receipt 5b078661-de4e-4499-8a9b-54fdd32354c5 on f652aee861af: 0 applied fixes; not applied: 1 failed.
 open exit 0
 -- origin's branches:
-  main e4e19a3578f8c1e2a21b345a924672839438db5a
+  main f652aee861af93831e805addbd05bf38a7b36dfb
 -- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
 patch exit 2
-receipt 89fd2a70-2fd8-44be-8abc-f464468b47b0: outcome failed, base e4e19a3578f8c1e2a21b345a924672839438db5a
-  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:05:08.153Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
+receipt beb4e39b-2494-497c-b3fd-d4d296ce6169: outcome failed, base f652aee861af93831e805addbd05bf38a7b36dfb
+  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T02:21:06.324Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
 Packed 0 applied fixes into /e/npm/artifact2.
 pack exit 0
   29468 bytes receipt.json
 -- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
-Receipt 89fd2a70-2fd8-44be-8abc-f464468b47b0 on e4e19a3578f8: 0 applied fixes; not applied: 1 failed.
+Receipt beb4e39b-2494-497c-b3fd-d4d296ce6169 on f652aee861af: 0 applied fixes; not applied: 1 failed.
 open exit 0
 -- origin's branches:
-  main e4e19a3578f8c1e2a21b345a924672839438db5a
+  main f652aee861af93831e805addbd05bf38a7b36dfb
 -- PRs in the stand-in:
   API calls: 2; POST: 0
-# finished 2026-10-30T02:05:16Z
+# finished 2026-10-30T02:21:15Z

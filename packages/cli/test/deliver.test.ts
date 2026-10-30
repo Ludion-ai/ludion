@@ -396,8 +396,79 @@ describe("the PR job refuses an artifact the validation job would not write", ()
   it("a checkout that is not at the base it is given", () => refused(p => ({ receipt: applied(p.work).receipt, refs: [`refs/heads/${BRANCH}`], base: p.first }), "The checkout is not at the base"));
 });
 
+const PHP_MESSAGE = (base: string) => `ludion: PHP 8.4.26 -> 8.4.27 in ./Dockerfile\n\nOfficial PHP security releases: 8.4.27.\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+/** A committed project of `files` on main, pushed to a bare origin. */
+function repository(files: Record<string, string>) {
+  const work = mkdtempSync(join(tmpdir(), "ludion-deliver-repo-"));
+  for (const [path, content] of Object.entries(files)) writeFileSync(join(work, path), content);
+  const base = commit(work);
+  git(work, "branch", "-M", "main");
+  const origin = mkdtempSync(join(tmpdir(), "ludion-deliver-origin-"));
+  git(origin, "init", "-q", "--bare");
+  git(work, "push", "-q", origin, "main:refs/heads/main");
+  const copy = mkdtempSync(join(tmpdir(), "ludion-deliver-copy-"));
+  snapshot(work, copy);
+  return { work, origin, base, gitBase: gitBase(work, copy) };
+}
+const composerEntry = (name: string, version: string, ref: string, extra: Record<string, unknown> = {}) => ({ name, version, dist: { type: "zip", url: `https://api.github.com/repos/${name}/zipball/${ref}`, reference: ref, shasum: "" }, type: "library", ...extra });
+
+describe("the PR job checks what a fix pins against the official registry", () => {
+  it("PHP: the digest must be the one Docker Hub gives for the tag", async () => {
+    for (const [given, outcome] of [[`sha256:${"1".repeat(64)}`, "opened"], [`sha256:${"9".repeat(64)}`, "failed"]] as const) {
+      const r = repository({ "ludion.security.json": `${JSON.stringify({ schema: 1, dockerfile: "./Dockerfile", test: ["php", "t.php"], timeout_seconds: 60 })}\n`, Dockerfile: "FROM php:8.4.26-cli-alpine\nWORKDIR /app\n" });
+      const after = `FROM php:8.4.27-cli-alpine@sha256:${"1".repeat(64)}\nWORKDIR /app\n`;
+      const made = fixBranch(r.gitBase, "ludion/php/8.4.27", [{ path: "Dockerfile", content: after }], PHP_MESSAGE(r.base));
+      const receipt = {
+        schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: r.base,
+        scan: { current: { version: "8.4.26" }, candidate: { version: "8.4.27" }, security_releases: [{ version: "8.4.27" }] }, dockerfile_after: sha256(after),
+        branch: "ludion/php/8.4.27", commit: made, fix_published_at: null, found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z",
+      };
+      const tags: string[] = [], gh = github(r.origin);
+      const result = await open(checkout(r.origin), artifact(r.work, receipt, ["refs/heads/ludion/php/8.4.27"], r.base), r.base, r.origin, gh, "refs/heads/main", { phpDigest: async tag => { tags.push(tag); return given; } });
+      expect(tags).toEqual(["8.4.27-cli-alpine"]);
+      expect(result.deliveries[0]).toMatchObject({ outcome, ...(outcome === "failed" ? { reason: expect.stringContaining("Docker Hub gives") } : {}) });
+      expect(branchAt(r.origin, "ludion/php/8.4.27")).toBe(outcome === "opened" ? made : "");
+    }
+  });
+  it("Composer: each added or moved lock entry must carry the archive and commit Packagist lists", async () => {
+    const a = "a".repeat(40), b = "b".repeat(40), c = "c".repeat(40), lock = (packages: unknown[]) => `${JSON.stringify({ "content-hash": "1", packages, "packages-dev": [] }, null, 4)}\n`;
+    for (const [listed, outcome] of [[c, "opened"], ["d".repeat(40), "failed"]] as const) {
+      const r = repository({
+        "ludion.security.json": `${JSON.stringify({ schema: 1, ecosystem: "composer", image: "composer:2", test: ["php", "t.php"], timeout_seconds: 60 })}\n`,
+        "composer.json": `${JSON.stringify({ name: "app/app", require: { "symfony/http-foundation": "5.4.0" } }, null, 2)}\n`,
+        "composer.lock": lock([composerEntry("symfony/deprecation-contracts", "v2.5.0", a), composerEntry("symfony/http-foundation", "v5.4.0", b)]),
+      });
+      const manifestDir = mkdtempSync(join(tmpdir(), "ludion-deliver-cj-"));
+      writeFileSync(join(manifestDir, "composer.json"), readFileSync(join(r.work, "composer.json")));
+      const change = { name: "symfony/http-foundation", from: "5.4.0", to: "5.4.54", advisories: ["GHSA-x7x7-x7x7-x7x7"] };
+      const json = changedManifest(manifestDir, "composer", [change]), fixedLock = lock([composerEntry("symfony/deprecation-contracts", "v2.5.0", a), composerEntry("symfony/http-foundation", "v5.4.54", c)]);
+      const branch = "ludion/composer/symfony-http-foundation-5.4.54", subject = "ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)";
+      const made = fixBranch(r.gitBase, branch, [{ path: "composer.json", content: json }, { path: "composer.lock", content: fixedLock }], `${subject}\n\nFixes GHSA-x7x7-x7x7-x7x7.\n\nLudion receipt ${ID}: the project's test passed on ${r.base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`);
+      const receipt = {
+        schema: 2, id: ID, ecosystem: "composer", scope: "dependency_files_only_not_deployed", outcome: "applied", baseline_passed: true, base_commit: r.base,
+        fixes: [{ package: change.name, changes: [change], outcome: "applied", branch, commit: made, candidate_passed: true, files: [{ path: "composer.json", before_hash: "", after_hash: sha256(json) }, { path: "composer.lock", before_hash: "", after_hash: sha256(fixedLock) }], fix_published_at: null, found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z" }],
+      };
+      const asked: string[] = [], gh = github(r.origin);
+      const packagist = async (name: string, version: string) => { asked.push(`${name}@${version}`); return { dist: { url: `https://api.github.com/repos/${name}/zipball/${listed}`, reference: listed }, source: {} }; };
+      const result = await open(checkout(r.origin), artifact(r.work, receipt, [`refs/heads/${branch}`], r.base), r.base, r.origin, gh, "refs/heads/main", { packagist });
+      expect(asked).toEqual(["symfony/http-foundation@v5.4.54"]);
+      expect(result.deliveries[0]).toMatchObject({ outcome, ...(outcome === "failed" ? { reason: expect.stringContaining("is not the one Packagist lists") } : {}) });
+      expect(branchAt(r.origin, branch)).toBe(outcome === "opened" ? made : "");
+    }
+  });
+  it("a branch with this fix's tree on an older base is left alone", async () => {
+    const { work, origin, first, base } = project(), fix = applied(work);
+    const tree = git(work, "rev-parse", `${fix.commit}^{tree}`);
+    const older = spawnSync("git", ["commit-tree", tree, "-p", first, "-m", "older"], { cwd: work, encoding: "utf8", env: { ...process.env, GIT_AUTHOR_NAME: "Ludion", GIT_AUTHOR_EMAIL: "ludion@ludion.invalid", GIT_COMMITTER_NAME: "Ludion", GIT_COMMITTER_EMAIL: "ludion@ludion.invalid" } }).stdout.trim();
+    git(work, "push", "-q", origin, `${older}:refs/heads/${BRANCH}`);
+    const gh = github(origin), result = await open(checkout(origin), artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base), base, origin, gh);
+    expect(result.deliveries[0]).toMatchObject({ outcome: "branch_differs" });
+    expect(branchAt(origin, BRANCH)).toBe(older);
+    expect(gh.opened).toHaveLength(0);
+  });
+});
+
 describe("the policy at the base decides what a fix may change, and what it may say", () => {
-  const PHP_MESSAGE = (base: string) => `ludion: PHP 8.4.26 -> 8.4.27 in ./Dockerfile\n\nOfficial PHP security releases: 8.4.27.\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
   it("PHP: only the Dockerfile ludion.security.json names, with the subject, message and branch patch.ts gives", () => {
     const work = mkdtempSync(join(tmpdir(), "ludion-deliver-php-"));
     writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify({ schema: 1, dockerfile: "./Dockerfile", test: ["php", "tests/smoke.php"], timeout_seconds: 60 })}\n`);
@@ -461,7 +532,18 @@ describe("the policy at the base decides what a fix may change, and what it may 
     const after = (packages: unknown[], top: Record<string, unknown> = {}) => files({ "composer.json": JSON.stringify(fixedJson), "composer.lock": `${JSON.stringify({ _readme: ["x"], "content-hash": "2", packages, "packages-dev": [], "plugin-api-version": "2.6.0", ...top }, null, 4)}\n` });
     // The fix itself, with descriptive metadata changed on another package, a new dependency, and the newer Composer of
     // the tool image (examples/composer-security: plugin-api-version 2.9.0 -> 2.11.0).
-    expect(contentProblem("composer", fix, files(before), after([entry("symfony/deprecation-contracts", "v2.5.0", a, { "published-time": "2026-06-27T21:46:34+00:00" }), entry("symfony/http-foundation", "v5.4.54", c), entry("symfony/polyfill-php83", "v1.31.0", c)], { "plugin-api-version": "2.11.0" }))).toBeNull();
+    const fixed = entry("symfony/http-foundation", "v5.4.54", c, { require: { "symfony/polyfill-php83": "^1.27" } });
+    expect(contentProblem("composer", fix, files(before), after([entry("symfony/deprecation-contracts", "v2.5.0", a, { "published-time": "2026-06-27T21:46:34+00:00" }), fixed, entry("symfony/polyfill-php83", "v1.31.0", c, { require: { "symfony/polyfill-mbstring": "^1" } }), entry("symfony/polyfill-mbstring", "v1.31.0", c)], { "plugin-api-version": "2.11.0" }))).toBeNull();
+    // The same package from another repository, a new package nothing requires, a notification-url (Composer calls it).
+    for (const [packages, why] of [
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...fixed, dist: { type: "zip", url: `https://api.github.com/repos/evil/http-foundation/zipball/${c}` } }], "from another archive repository than the base did"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...fixed, source: { type: "git", url: "https://github.com/evil/http-foundation.git", reference: c } }], "changes where symfony/http-foundation comes from"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, entry("symfony/polyfill-php83", "v1.31.0", c), entry("evil/unrequired", "1.0.0", c)], "adds evil/unrequired, which the fixed version does not require"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, { ...entry("symfony/polyfill-php83", "v1.31.0", c), dist: { type: "zip", url: "https://evil.invalid/polyfill.zip" } }], "takes symfony/polyfill-php83 from outside the pinned public archives"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a, { "notification-url": "https://evil.invalid/ping" }), fixed, entry("symfony/polyfill-php83", "v1.31.0", c)], "changes symfony/deprecation-contracts"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), fixed, entry("symfony/polyfill-php83", "v1.31.0", c, { "notification-url": "https://evil.invalid/ping" })], "gives the new symfony/polyfill-php83 a notification-url"],
+      [[entry("symfony/deprecation-contracts", "v2.5.0", a), { ...fixed, "notification-url": "https://evil.invalid/ping" }, entry("symfony/polyfill-php83", "v1.31.0", c)], "changes symfony/http-foundation's notification-url"],
+    ] as const) expect(contentProblem("composer", fix, files(before), after([...packages]))).toContain(why);
     for (const [packages, why] of [
       [[entry("symfony/deprecation-contracts", "v2.5.1", a), entry("symfony/http-foundation", "v5.4.54", c)], "changes symfony/deprecation-contracts"],
       [[entry("symfony/deprecation-contracts", "v2.5.0", a, { autoload: { files: ["evil.php"] } }), entry("symfony/http-foundation", "v5.4.54", c)], "changes symfony/deprecation-contracts"],

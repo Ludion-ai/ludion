@@ -1,0 +1,159 @@
+# started 2026-10-30T02:17:18Z, node v24.22.1, git version 2.39.5
+npm ci exit 0
+== npx tsc -p tsconfig.json
+tsc exit 0
+== npx vitest run --project node packages/cli/test
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 168ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 383ms
+ ✓ |node| packages/cli/test/judge.test.ts (66 tests) 294ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 922ms
+     ✓ lists directives it does not know in one bounded limitation instead of guessing what they mean  402ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (6 tests) 188ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 954ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 860ms
+     ✓ is linear in the fixed events of one record  387ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (26 tests) 1024ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 1481ms
+     ✓ names the step that failed even when the judge's modules are missing  1229ms
+ ❯ |node| packages/cli/test/readonly-rust.test.ts (80 tests | 1 failed) 1379ms
+     ✓ reads v1 with its [metadata] checksum table and full package ids 4ms
+     ✓ reads the oldest v1 layout, where the root package is a [root] table 1ms
+     ✓ reads v2 (no version marker, inline checksums, minimal ids) 0ms
+     ✓ reads v3 and v4, with crates.io as the git index id or the sparse URL 1ms
+     ✓ counts one package for the same crate version from both crates.io ids, direct if either is 0ms
+     ✓ reports an unknown format version instead of guessing, whatever follows it 0ms
+     ✓ reads multi-line dependency arrays with comments, blank lines, CRLF, tabs and escapes 1ms
+     ✓ reads real-world version strings: pre-releases and build metadata 0ms
+     ✓ skips workspace members and path crates, and makes what they name direct 11ms
+     ✓ resolves `name version` exactly when a name has several versions, and refuses an ambiguous or missing id 1ms
+     ✓ names git crates in a limitation and resolves the same version from git and crates.io by source 1ms
+     ✓ follows Cargo when an id without a source matches a path crate and a crates.io crate of the same version 1ms
+     ✓ accepts git branches with parentheses, which Cargo writes unencoded before v4 0ms
+     × resolves direct dependencies in linear time, whatever the shape of a hostile lock file 1262ms
+     ✓ bounds the list of crates it names 5ms
+     ✓ names crates from other registries or a recorded path, and never sends them as crates.io 0ms
+     ✓ does not read a crate replaced through [replace] as the one that is built 1ms
+     ✓ validates [[patch.unused]] but does not count patches Cargo did not use 1ms
+     ✓ says when no workspace member is listed, since direct dependencies are then unknown, including for an empty file 1ms
+     ✓ throws above 2,000 distinct crates.io package versions 38ms
+     ✓ throws on a package without a version 1ms
+     ✓ throws on a package without a name 0ms
+     ✓ throws on a range instead of a version 0ms
+     ✓ throws on a leading-zero version 0ms
+     ✓ throws on a version that is not a string 0ms
+     ✓ throws on an unknown package key 0ms
+     ✓ throws on dependencies that are not an array 0ms
+     ✓ throws on an invalid crate name 0ms
+     ✓ throws on a non-ASCII crates.io name 0ms
+     ✓ throws on an unsupported source protocol 0ms
+     ✓ throws on a source with no protocol 0ms
+     ✓ throws on a checksum that is not SHA-256 0ms
+     ✓ throws on a checksum without a source 0ms
+     ✓ throws on a package id with an unbracketed source 1ms
+     ✓ throws on a package id with a range 0ms
+     ✓ throws on an empty package id 1ms
+     ✓ throws on a [replace] id with an unsupported source 0ms
+     ✓ throws on a package listed twice 0ms
+     ✓ throws on a path crate listed twice 0ms
+     ✓ throws on an unterminated string 0ms
+     ✓ throws on an unterminated array 0ms
+     ✓ throws on an array of non-strings 0ms
+     ✓ throws on a missing comma in an array 0ms
+     ✓ throws on a duplicate key 0ms
+     ✓ throws on a duplicate key after a multi-line array 0ms
+     ✓ throws on an inline table 0ms
+     ✓ throws on a multi-line string 1ms
+     ✓ throws on a literal string 0ms
+     ✓ throws on a dotted key 0ms
+     ✓ throws on a control character 0ms
+     ✓ throws on a bad escape 0ms
+     ✓ throws on text after a value 0ms
+     ✓ throws on an unsupported table 0ms
+     ✓ throws on an unknown array table 0ms
+     ✓ throws on a broken header 0ms
+     ✓ throws on [metadata] twice 0ms
+     ✓ throws on a [metadata] value that is not a string 0ms
+     ✓ throws on a duplicate quoted key 0ms
+     ✓ throws on an unknown top-level key 0ms
+     ✓ throws on a format version that is not an integer 0ms
+     ✓ throws on a package listed twice without the source 0ms
+     ✓ throws on an id that matches no package without the source 0ms
+     ✓ throws on an id with an unsupported protocol without the source 0ms
+     ✓ throws on an id with an unbracketed source without the source 1ms
+     ✓ throws on a source where the version belongs without the source 0ms
+     ✓ throws on a source as the whole id without the source 0ms
+     ✓ throws on a package source with an unsupported protocol without the source 0ms
+     ✓ throws on a package source with whitespace without the source 0ms
+     ✓ throws on a package source over 2,000 characters without the source 0ms
+     ✓ throws on a [replace] id that is not valid without the source 0ms
+     ✓ throws on a v1 [metadata] key with a value that is not a string without the source 0ms
+     ✓ throws on a duplicate v1 [metadata] key without the source 0ms
+     ✓ throws on a quoted top-level key without the source 0ms
+     ✓ throws on a quoted key without = without the source 0ms
+     ✓ throws on a quoted package key without the source 0ms
+     ✓ names a credentialed git crate in its limitation by name and version only 0ms
+     ✓ reads Cargo.lock from a project directory 5ms
+     ✓ reports a Cargo.toml without Cargo.lock as unlocked and unchecked, with no packages 1ms
+     ✓ returns null when neither file exists 2ms
+     ✓ refuses symlinked, dangling, non-regular, oversized and malformed lock files instead of skipping them 20ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 6ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 35ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (1 test) 20ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 1793ms
+     ✓ reads a 4 MiB requirements.txt line made of a run of .whl in well under a second  596ms
+     ✓ fails deep or very long input with an ordinary error, never a stack overflow  317ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 766ms
+     ✓ parseRequirements: a run of backslash continuations  305ms
+ ✓ |node| packages/cli/test/security.test.ts (39 tests) 2524ms
+     ✓ validates without changing source by default; commits only FROM on its own branch when explicitly enabled  1023ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2964ms
+     ✓ duplicate members count once toward the 1,000  614ms
+     ✓ more than 1,000 literal members are read no further, and say so  1050ms
+ ✓ |node| packages/cli/test/branch.test.ts (22 tests) 3309ms
+     ✓ commits only the given files on HEAD, on a new branch, and leaves the working tree and HEAD alone  1131ms
+     ✓ compares the validated copy with HEAD, file by file  331ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  409ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (89 tests) 4432ms
+     ✓ refuses a lookalike official registry in tool-image evidence  559ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  416ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  409ms
+ ✓ |node| packages/cli/test/deliver.test.ts (33 tests) 10296ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base  996ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  419ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  497ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  406ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  519ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  338ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  358ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  1169ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  500ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  539ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  629ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  403ms
+     ✓ Composer: each added or moved lock entry must carry the archive and commit Packagist lists  452ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/cli/test/readonly-rust.test.ts > Cargo.lock sources, members and direct dependencies > resolves direct dependencies in linear time, whatever the shape of a hostile lock file
+AssertionError: expected 1163.6443490000001 to be less than 1000
+ ❯ packages/cli/test/readonly-rust.test.ts:163:43
+    161|       const started = performance.now();
+    162|       const result = parseCargoLock(text);
+    163|       expect(performance.now() - started).toBeLessThan(1000);
+       |                                           ^
+    164|       expect(result.packages).toEqual([]);
+    165|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 19 passed (20)
+      Tests  1 failed | 783 passed | 19 skipped (803)
+   Start at  02:17:31
+   Duration  11.51s (transform 6.51s, setup 0ms, import 12.09s, tests 33.80s, environment 1ms)
+
+vitest exit 1
+# finished 2026-10-30T02:17:42Z

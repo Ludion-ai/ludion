@@ -1095,6 +1095,29 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(result.receipt?.fixes[0]?.reason).toMatch(/^Gate 2 stops this fix: .*The publishers differ/);
     expect(git(root, "rev-parse", "ludion/npm/lodash-4.17.21")).toBe(head);
   });
+  it("stops only the fix whose next version is another account's; the run's other fixes go on", async () => {
+    const root = fixture(), deps = { lodash: "4.17.20", minimist: "1.2.5" };
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+    commit(root);
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(String(url).endsWith(minimistAdvisory.id) ? minimistAdvisory : advisory);
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => VULNERABLE[`${q.package.name}@${q.version}`] ? { vulns: [{ id: VULNERABLE[`${q.package.name}@${q.version}`]!.id }] } : {}) });
+    });
+    const tested: string[] = [];
+    const fetchFn = registry({ lodash: LODASH, minimist: MINIMIST_RELEASES }, one((name, version) => name === "lodash" && version === "4.17.21" ? { deprecated: "Bad release" } : name === "lodash" && version === "4.17.22" ? { _npmUser: { name: "mallory" } } : {}));
+    const result = await patchDependencies(root, apply, { fetchFn, client: osv, command: fakeCommand(), testRun: async name => { tested.push(name.replace(/^ludion-check-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, "")); } });
+    expect(result.receipt?.outcome).toBe("partial");
+    const [stopped, passed] = result.receipt!.fixes;
+    expect(stopped).toMatchObject({ package: "lodash", outcome: "failed", branch: null, commit: null, changes: [{ to: "4.17.21" }] });
+    expect(stopped?.reason).toMatch(/^Gate 2 stops this fix: .*The publishers differ/);
+    expect(stopped?.judgement).toBeUndefined();
+    expect(passed).toMatchObject({ package: "minimist", outcome: apply ? "applied" : "validated", candidate_passed: true, changes: [{ to: "1.2.6" }] });
+    expect(passed?.version_choice).toBeUndefined();
+    // The stopped fix's candidate was never acquired or tested.
+    expect(tested).toEqual(["baseline", "candidate-2"]);
+    if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("ludion/npm/minimist-1.2.6");
+  });
   it.each<[string, () => Record<string, Advisory>, string]>([
     ["has an OSV MAL- record", () => ({ "lodash@4.17.21": mal }), "in OSV's malicious-package records (MAL-2026-0009)"],
     ["is named by another advisory", () => ({ "lodash@4.17.21": later }), "OSV names it in GHSA-test-0009"],

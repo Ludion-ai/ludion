@@ -12,6 +12,8 @@
 
 Gate 2: the image is a Docker Hub official image, at the tag's current digest. Whether the official images' provenance attestations can be read is looked into, and they are used if they can. Tests for the failing side are added.
 
+Later comments changed this plan. Comment 6531046171, 3 took the evidence from docker-library's official records instead of time, with no wait at the PR stage. Comment 6533365853, 2 then corrected that: the evidence is that each manifest digest of the tag's index is listed in docker-library/meta's builds.json and that its revision matches the GitCommit official-images gives for the tag, both read in a container with no credentials, stopping when they cannot be read or do not match; and the wait stays. The definition of the work that builds it uses those comments.
+
 ## When it takes effect
 
 From this record's merge. The work that builds it starts after this record is on main (comment 6529705640, 6). Until docs/decisions/2026-10-31-gate-3-official-image-same-series.md takes effect, gate 3 stays as CLAUDE.md has it (comment 6529705640, 6). CLAUDE.md does not mention same-tag rebuilds; whether its text must change for this is not on the board (不明). docs/status.md says what is built.

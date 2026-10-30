@@ -24,7 +24,7 @@ The comment gives the chat's proposal for the rows, to be fixed in a definition 
 | A malicious version from a takeover passes the new gates | 1% | 299 | The takeover-shaped ones of the 1,148 past cases (docs/bench/2026-10-30-delta-v1); if too few, added from forward records |
 | Replacing condition (b): the shadow misses a version that received a malicious (MAL-) record | 1% | 299 | Widen the watched names. The definition is a new version of docs/decisions/2026-10-29-shadow-counting.md, fixed before counting |
 | The share protected without a person (decision 4) | ±10% | 97 repositories | The same public repositories as LR's sample (Dockerfiles on the official php or node images; not on main) |
-| Lateness of the scheduled run | quantiles | 200 runs or more | Run side by side at short intervals in the sample repository |
+| Lateness of the scheduled run | quantiles | 200 runs or more | Run side by side at short intervals in the sample repository. The slots that did not fire are part of the result: q (the share of slots that fired), and the mean and quantiles of the time from a moment to the next run, besides the quantiles of lateness. Unit of independence: (repository, time) (comment 6534448385, 2; audit comment 6533867423, 1) |
 
 docs/decisions/2026-10-31-independent-unit-of-counts.md later changes two of these rows: the malicious-version row promises no p0, and the breakage row takes 1 to 3 from a project.
 

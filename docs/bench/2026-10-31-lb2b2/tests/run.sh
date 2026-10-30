@@ -1,7 +1,11 @@
 #!/bin/bash
-# LB2b2 harness for action/check.sh. Mounted at /t: /t/trial/action-branch is a copy of ludion-trial's ludion-action
-# branch, /t/test holds the scan answers of this folder (php.json, php-fixed.json, npm.json, npm-fixed.json).
+# LB2b2 harness for action/check.sh. It expects one folder <dir>, mounted at /t, laid out like this:
+#   <dir>/trial/action-branch/action/check.sh and check.jq   a copy of ludion-trial's ludion-action branch (6162b79)
+#   <dir>/test/php.json, php-fixed.json, npm.json, npm-fixed.json   the scan answers saved next to this file
+#   <dir>/test/h/run.sh and cases.sh   this file and cases.sh
 # Run: docker run --rm --memory 512m -v <dir>:/t --entrypoint sh alpine:3.20 /t/test/h/cases.sh
+# The gh stub prints fixed answers and ignores --jq, so the jq expressions inside check.sh's gh calls are not tested here
+# (case 11 checks only that a moved path under the folder is caught; N3's previous_filename jq was tried on its own).
 # harness: stub node (scan) and gh; MAINRC/MAINOUT, HEADRC/HEADOUT choose the answers
 set -u
 A=/t/trial/action-branch

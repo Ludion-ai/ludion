@@ -115,7 +115,7 @@ for stratum in php node; do
       # a file gone since the search (404) has no qualifying line; any other failure is logged
       if [ $brc -ne 0 ]; then [ $brc -ne 4 ] && unread_hits=$((unread_hits + 1)); continue; fi
       res="$(printf '1\tfrom:%s\t%s\n' "$stratum" "$body" | classify)"
-      printf '%s\n' "$res" | awk -F'\t' -v s="$stratum" -v r="$repo" -v p="$p" '$2=="FROM"{print s"\t"r"\t"p"\t"$3"\t"$4}' >> "$froms"
+      printf '%s\n' "$res" | LR_P="$p" awk -F'\t' -v s="$stratum" -v r="$repo" '$2=="FROM"{print s"\t"r"\t"ENVIRON["LR_P"]"\t"$3"\t"$4}' >> "$froms"
       last="$(printf '%s\n' "$res" | awk -F'\t' '$2=="QUAL"{print $3}')"
       if [ -n "$last" ]; then path_found="$p"; line_found="$last"; measured_b64="$body"; break; fi
     done < <(awk -F'\t' -v s="$stratum" -v r="$repo" '$1==s && $4==r{print $6}' "$hits" | sort -u)
@@ -176,8 +176,12 @@ for stratum in php node; do
     if [ -n "$dir" ] && has "$root" "$mname"; then
       if body="$(b64_file "$repo" "$mname")"; then add mroot "$mname" "$body"; else l2unread+=" $mname"; fi
     fi
-    sign_where="$( { printf '%s\n' "$dlist" | sed "s|\$|\t${dir:-.}|"; [ -n "$dir" ] && printf '%s\n' "$root" | sed 's|$|\t.|'; } \
-      | awk -F'\t' '{n=tolower($2)} ($1=="dir" && (n=="test"||n=="tests"||n=="__tests__"||n=="spec")) || ($1=="file" && (n=="phpunit.xml"||n=="phpunit.xml.dist"||n=="phpunit.dist.xml")) {printf "%s%s/%s", sep, $3, $2; sep=" "}')"
+    # The directory comes from a third-party path: it reaches awk only as data (ENVIRON), never as program text.
+    signs() { # listing, directory label
+      printf '%s\n' "$1" | LR_DIR="$2" awk -F'\t' '{n=tolower($2)} ($1=="dir" && (n=="test"||n=="tests"||n=="__tests__"||n=="spec")) || ($1=="file" && (n=="phpunit.xml"||n=="phpunit.xml.dist"||n=="phpunit.dist.xml")) {printf "%s/%s ", ENVIRON["LR_DIR"], $2}'
+    }
+    sign_where="$(signs "$dlist" "${dir:-.}"; [ -n "$dir" ] && signs "$root" ".")"
+    sign_where="${sign_where% }"
 
     # LR2 section 3.4: workflows and platform files
     wf_total=0 wf_read=0 wf_unread=0 wf_names=()

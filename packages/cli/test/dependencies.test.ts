@@ -1049,8 +1049,9 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(tested).toEqual(["baseline", "candidate-1"]);
     // The scan's plan, in the receipt, still names the smallest fixed version.
     expect(result.receipt?.before.plan).toEqual([{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: [advisory.id] }]);
-    // OSV was asked about the listed versions that are not deprecated, by name and version only.
-    expect(batches(seen)[0]).toEqual(["lodash@4.17.22", "lodash@4.17.23"]);
+    // OSV was asked about the smallest, deprecated or not (for a MAL- record), then about the later listed versions that
+    // are not deprecated, by name and version only.
+    expect(batches(seen).slice(0, 2)).toEqual([["lodash@4.17.21"], ["lodash@4.17.22", "lodash@4.17.23"]]);
   });
   /** The fix stopped at gate 2 by the publisher check: no validation, no test, no branch, the smallest still in `changes`. */
   const stoppedBy = (root: string, result: Awaited<ReturnType<typeof run>>["result"], fix: FixReceipt, tested: string[], detail: string) => {
@@ -1118,13 +1119,46 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(tested).toEqual(["baseline", "candidate-2"]);
     if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("ludion/npm/minimist-1.2.6");
   });
-  it.each<[string, () => Record<string, Advisory>, string]>([
-    ["has an OSV MAL- record", () => ({ "lodash@4.17.21": mal }), "in OSV's malicious-package records (MAL-2026-0009)"],
-    ["is named by another advisory", () => ({ "lodash@4.17.21": later }), "OSV names it in GHSA-test-0009"],
-  ])("takes the next smallest when the smallest %s", async (_label, found, reason) => {
-    const { root, fix } = await run(registry({ lodash: LODASH }, one(), [], { ...VULNERABLE, ...found() }));
-    expect(fix.version_choice?.[0]).toMatchObject({ smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason }] });
+  it("takes the next smallest, as before, when the smallest is named by an advisory that is not MAL-", async () => {
+    const { root, fix } = await run(registry({ lodash: LODASH }, one(), [], { ...VULNERABLE, "lodash@4.17.21": later }));
+    expect(fix.version_choice?.[0]).toMatchObject({ smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason: "OSV names it in GHSA-test-0009" }], publisher_check: { result: "publisher" } });
+    expect(fix.version_choice?.[0]?.malicious).toBeUndefined();
     took(root, fix, "4.17.22");
+  });
+  /** The fix stopped at gate 2 because its smallest has a MAL- record: nothing later looked at, no test, no branch. */
+  const stoppedByMal = (root: string, result: Awaited<ReturnType<typeof run>>["result"], fix: FixReceipt, tested: string[], seen: string[], reason: string) => {
+    const note = `The smallest fixed version lodash@4.17.21 is ${reason}. Its source may be taken over, so no later version is taken, and this fix stops (docs/decisions/2026-10-30-mal-smallest-stops-the-fix.md).`;
+    expect(fix.version_choice).toEqual([{ package: "lodash", smallest: "4.17.21", chosen: null, skipped: [{ version: "4.17.21", reason }], malicious: ["MAL-2026-0009"], note }]);
+    expect(fix).toMatchObject({ outcome: "failed", changes: [{ to: "4.17.21" }], branch: null, commit: null, candidate_passed: false, reason: `Gate 2 stops this fix: ${note}` });
+    expect(fix.judgement).toBeUndefined();
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(tested).toEqual([]);
+    // OSV was asked about the smallest alone, and no later version's publisher or provenance was read.
+    expect(batches(seen)).toEqual([["lodash@4.17.21"]]);
+    expect(seen.filter(u => u.startsWith("https://registry.npmjs.org/"))).toEqual(["https://registry.npmjs.org/lodash"]);
+    if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("");
+  };
+  it("stops, taking no later version, when the smallest has an OSV MAL- record, though the next is the same account's", async () => {
+    const seen: string[] = [];
+    // Every version is jdalton's, so without the stop 4.17.22 would pass the publisher check and be taken.
+    const { root, result, fix, tested } = await run(registry({ lodash: LODASH }, one(), seen, { ...VULNERABLE, "lodash@4.17.21": mal }));
+    stoppedByMal(root, result, fix, tested, seen, "in OSV's malicious-package records (MAL-2026-0009)");
+  });
+  it("stops when the smallest has both an OSV MAL- record and another record", async () => {
+    const seen: string[] = [], npm = registry({ lodash: LODASH }, one(), seen, { ...VULNERABLE, "lodash@4.17.21": mal });
+    const fetchFn: typeof fetch = async (url, init) => {
+      if (String(url) !== "https://api.osv.dev/v1/querybatch") return npm(url, init);
+      const queries = JSON.parse(String(init?.body)).queries;
+      await npm(url, init);
+      return response({ results: queries.map((q: any) => q.version === "4.17.21" ? { vulns: [{ id: advisory.id }, { id: mal.id }] } : {}) });
+    };
+    const { root, result, fix, tested } = await run(fetchFn);
+    stoppedByMal(root, result, fix, tested, seen, `in OSV's malicious-package records (MAL-2026-0009); OSV also names it in ${advisory.id}`);
+  });
+  it("stops when the smallest has an OSV MAL- record and is also deprecated, so OSV is asked about a deprecated smallest", async () => {
+    const seen: string[] = [];
+    const { root, result, fix, tested } = await run(registry({ lodash: LODASH }, one((_name, version) => version === "4.17.21" ? { deprecated: "Compromised" } : {}), seen, { ...VULNERABLE, "lodash@4.17.21": mal }));
+    stoppedByMal(root, result, fix, tested, seen, "in OSV's malicious-package records (MAL-2026-0009); deprecated: Compromised");
   });
   it("passes over every version that cannot be used, and looks only at later stable versions of the same major", async () => {
     const seen: string[] = [];
@@ -1132,7 +1166,9 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     const { root, fix } = await run(registry(docs, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}), seen, { ...VULNERABLE, "lodash@4.17.22": mal }));
     expect(fix.version_choice?.[0]).toMatchObject({ chosen: "4.17.23", skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }, { version: "4.17.22", reason: "in OSV's malicious-package records (MAL-2026-0009)" }] });
     took(root, fix, "4.17.23");
-    expect(batches(seen)[0]).toEqual(["lodash@4.17.22", "lodash@4.17.23"]);
+    // A later version with a MAL- record is passed over, as before; only the smallest's stops the fix.
+    expect(fix.version_choice?.[0]?.malicious).toBeUndefined();
+    expect(batches(seen).slice(0, 2)).toEqual([["lodash@4.17.21"], ["lodash@4.17.22", "lodash@4.17.23"]]);
   });
   it("keeps the smallest, which then stops as before, when no later same-major version qualifies", async () => {
     const docs = { lodash: { ...LODASH, versions: { ...LODASH.versions, "5.0.0": "2021-02-26T00:00:00.000Z" } } };
@@ -1271,6 +1307,41 @@ describe("nextFix", () => {
     expect(choice).toMatchObject({ chosen: "1.0.2", skipped: [{ version: "1.0.0" }, { version: "1.0.1", reason: "OSV names it in GHSA-tiny-0002" }] });
     // A record that cannot be read throws, so the smallest stays.
     await expect(nextFix("tiny", "1.0.0", async (url, init) => String(url).includes("/vulns/") ? new Response("", { status: 503 }) : stub({ "1.0.0": {} }, { "1.0.0": ["GHSA-tiny-0004"] })(url, init))).rejects.toThrow("OSV lookup failed (HTTP 503)");
+  });
+  describe("a smallest with a MAL- record stops the fix (docs/decisions/2026-10-30-mal-smallest-stops-the-fix.md)", () => {
+    const note = (reason: string) => `The smallest fixed version tiny@1.0.0 is ${reason}. Its source may be taken over, so no later version is taken, and this fix stops (docs/decisions/2026-10-30-mal-smallest-stops-the-fix.md).`;
+    it("stops though the next version is the same account's, and asks about no later version", async () => {
+      const seen: string[] = [];
+      const reason = "in OSV's malicious-package records (MAL-2026-0200)";
+      expect(await nextFix("tiny", "1.0.0", stub({ "1.0.0": {}, "1.0.1": {} }, { "1.0.0": ["MAL-2026-0200"] }, seen))).toEqual({ package: "tiny", smallest: "1.0.0", chosen: null, skipped: [{ version: "1.0.0", reason }], malicious: ["MAL-2026-0200"], note: note(reason) });
+      expect(queried(seen)).toEqual([["1.0.0"]]);
+      // The registry's version list was read once; no publisher or provenance was read.
+      expect(seen.filter(s => s.startsWith("https://registry.npmjs.org/"))).toEqual(["https://registry.npmjs.org/tiny"]);
+    });
+    it("stops when the smallest has both a MAL- record and other records, naming each", async () => {
+      const reason = "in OSV's malicious-package records (MAL-2026-0201, MAL-2026-0202); OSV also names it in GHSA-tiny-0010";
+      expect(await nextFix("tiny", "1.0.0", stub({ "1.0.0": {}, "1.0.1": {} }, { "1.0.0": ["GHSA-tiny-0010", "MAL-2026-0201", "MAL-2026-0202"] }))).toMatchObject({ chosen: null, skipped: [{ version: "1.0.0", reason }], malicious: ["MAL-2026-0201", "MAL-2026-0202"], note: note(reason) });
+    });
+    it("stops when the smallest with a MAL- record is deprecated or no longer listed, which OSV is now asked about", async () => {
+      const seen: string[] = [];
+      expect(await nextFix("tiny", "1.0.0", stub({ "1.0.0": { deprecated: "Compromised" }, "1.0.1": {} }, { "1.0.0": ["MAL-2026-0203"] }, seen))).toMatchObject({ chosen: null, skipped: [{ version: "1.0.0", reason: "in OSV's malicious-package records (MAL-2026-0203); deprecated: Compromised" }], malicious: ["MAL-2026-0203"] });
+      expect(queried(seen)).toEqual([["1.0.0"]]);
+      expect(await nextFix("tiny", "1.0.0", stub({ "1.0.1": {} }, { "1.0.0": ["MAL-2026-0204"] }))).toMatchObject({ chosen: null, skipped: [{ version: "1.0.0", reason: "in OSV's malicious-package records (MAL-2026-0204); no longer listed by the registry (unpublished or withdrawn)" }], malicious: ["MAL-2026-0204"] });
+    });
+    it("is as before when no MAL- record in force names the smallest", async () => {
+      // An advisory that is not MAL-: the next smallest is taken after the publisher check.
+      const plain = await nextFix("tiny", "1.0.0", stub({ "1.0.0": {}, "1.0.1": {} }, { "1.0.0": ["GHSA-tiny-0011"] }));
+      expect(plain).toMatchObject({ chosen: "1.0.1", skipped: [{ version: "1.0.0", reason: "OSV names it in GHSA-tiny-0011" }], publisher_check: { result: "publisher" } });
+      expect(plain).not.toHaveProperty("malicious");
+      // A deprecated smallest with no record: passed over for the deprecation alone.
+      expect(await nextFix("tiny", "1.0.0", stub({ "1.0.0": { deprecated: "Bad release" }, "1.0.1": {} }))).toMatchObject({ chosen: "1.0.1", skipped: [{ version: "1.0.0", reason: "deprecated: Bad release" }] });
+      // A withdrawn MAL- record beside an advisory in force: only the advisory counts.
+      const withdrawn = await nextFix("tiny", "1.0.0", stub({ "1.0.0": {}, "1.0.1": {} }, { "1.0.0": ["MAL-2026-0205", "GHSA-tiny-0012"] }, [], ["MAL-2026-0205"]));
+      expect(withdrawn).toMatchObject({ chosen: "1.0.1", skipped: [{ version: "1.0.0", reason: "OSV names it in GHSA-tiny-0012" }] });
+      expect(withdrawn).not.toHaveProperty("malicious");
+      // A name that only contains MAL- is not a MAL- record.
+      expect(await nextFix("tiny", "1.0.0", stub({ "1.0.0": {}, "1.0.1": {} }, { "1.0.0": ["GHSA-MAL-0001"] }))).toMatchObject({ chosen: "1.0.1" });
+    });
   });
   it.each([null, "1.0.1", 7, []])("throws when a version's manifest is not an object (%j), as nothing about it can be judged", async manifest => {
     await expect(nextFix("tiny", "1.0.0", stub({ "1.0.0": { deprecated: "Bad release" }, "1.0.1": manifest as any }))).rejects.toThrow("Invalid registry manifest for tiny@1.0.1");

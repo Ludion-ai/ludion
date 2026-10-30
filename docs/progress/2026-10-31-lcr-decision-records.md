@@ -10,6 +10,7 @@ Started from main 47a21a9. Records only: no code, no test, no workflow, and neit
   - 2026-10-31-independent-unit-of-counts.md (6528291928, 3; the first audit's finding 2, 6527803283);
   - 2026-10-31-exposure-time-per-project-advisory.md (6529705640, "監査の指摘2"; the second audit's finding 2, 6529106910);
   - 2026-10-31-scheduled-run-hourly.md (6528291928, 4; the first audit's finding 6).
-- **Not yet in effect, because CLAUDE.md wins until changed:** counts in place of condition (b)'s four weeks, and gate 3 for official images. Both wait for LC0, a protected PR the owner merges.
+- **Not yet in effect, because CLAUDE.md wins until changed:** counts in place of condition (b)'s four weeks, and gate 3 for official images. Both wait for LC0, a protected PR the owner merges. Gate 3 for official images also waits for the owner's OK on its scope sentence, since an OK to a list does not approve a scope change inside it (comment 6531046171, 1).
+- **Added after the PR was opened** (comment 6531046171, 1 and 2): the two notes above on when decisions 1 and 3 take effect, and, in the exposure-time record, the denominator, right-censoring with a Kaplan–Meier median, and pairs with no fix in the same major.
 - **Checked:** a fresh-context subagent compared the records with the board's text, looking for overstatement, additions and omissions; its findings were applied before the PR. tools/records/test/records.test.ts in Docker (node:24, `--network none` after `npm ci --ignore-scripts`): 8 passed.
 - **Not done.** Nothing was released or merged.

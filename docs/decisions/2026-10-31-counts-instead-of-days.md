@@ -30,7 +30,7 @@ docs/decisions/2026-10-31-independent-unit-of-counts.md later changes two of the
 
 ## When it takes effect
 
-- CLAUDE.md's Product still says "four consecutive weeks" for condition (b), and CLAUDE.md wins until it is changed. Changing it, together with docs/status.md, is a protected PR (LC0) that the owner merges (comment 6528291928, 2; comment 6529705640, 7).
+- Without effect until CLAUDE.md's release line (line 34 at main 47a21a9) is changed; where this record and CLAUDE.md disagree, CLAUDE.md wins (comment 6531046171, 1). CLAUDE.md's Product still says "four consecutive weeks" for condition (b). Changing it, together with docs/status.md, is a protected PR (LC0) that the owner merges (comment 6528291928, 2; comment 6529705640, 7).
 - Each row's definition is fixed in a definition PR before its counting starts.
 
 ## Undo

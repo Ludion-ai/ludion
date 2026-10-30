@@ -1,11 +1,11 @@
-# 2026-10-31 — Gate 3 for a same-series patch of an official image
+# 2026-10-31 — Gate 3 for a same-series patch of an official image (proposed, waiting for the owner)
 
 **Proposed 2026-10-30 23:30 JST, waiting for the owner's OK on its scope sentence.** The owner's Claude chat listed it as decision 3 of four in ludion-ops#1 comment 6525272283, and the owner answered 「1〜4OK」 (the owner's words are quoted in docs/decisions/2026-10-31-counts-instead-of-days.md). Under CLAUDE.md's Scope rule (How we work; line 18 at main 47a21a9), that answer does not approve a narrowing of a gate: an OK to a list does not approve a scope change inside it. The chat called this its own error in presenting the list (comment 6531046171, 1, answering the audit in comment 6530612087).
 
-## Decided
+## Proposed (not decided)
 
-1. **For a patch within the same series of an official image, gate 3 is: the build passes, it starts, and, if there are tests, all of them pass.**
-2. **A missing test alone is not a reason to stop.**
+1. **For a patch within the same series of an official image, gate 3 would be: the build passes, it starts, and, if there are tests, all of them pass.**
+2. **A missing test alone would not be a reason to stop.**
 
 The board does not say how gate 3 checks that it starts, or which images count as official; both are 不明 here.
 
@@ -15,4 +15,4 @@ Not yet. Waiting for the owner's OK on the scope sentence, and without effect un
 
 ## Undo
 
-A later decision of the owner's, with its own record.
+Taking effect needs the owner's OK on the scope sentence and LC0; until then there is nothing to undo.

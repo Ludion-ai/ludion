@@ -20,6 +20,8 @@ Added 2026-10-31 03:54 JST by the chat (ludion-ops#1 comment 6531046171, 2, answ
 7. **Open pairs are right-censored.** The median is computed with Kaplan–Meier; if fewer than half of the pairs have ended, it is written as "median > t".
 8. **A pair with no fix in the same major** starts from the earliest fix in any major and is in the same denominator. It is also counted separately, as out of scope (範囲の外).
 
+Not on the board (不明), to be fixed in the definition before measuring: the window and how pairs already open when it starts are handled; the time at which an open pair is censored; the time at which a version is judged usable, and whether item 8's earliest fix skips unusable versions as item 2 does.
+
 ## When it takes effect
 
 Fixed now, before exposure time is measured (the exposure-time end is not built; docs/status.md). CLAUDE.md's Product names median exposure time as a measure; changing its wording for this unit is LC0, a protected PR the owner merges (comment 6529705640, "監査の指摘2"; 7).

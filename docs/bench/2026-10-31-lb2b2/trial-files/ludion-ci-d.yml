@@ -1,3 +1,4 @@
+# Record only. Do not copy. Forms B and B2 do not go into the template (docs/progress/2026-10-31-lb2b2-trial-ci.md).
 # LB2b2 trial (Ludion-ai/ludion-trial): action/patch-workflow.yml from Ludion-ai/ludion 47a21a9, with the action pin
 # (this repository's ludion-action branch: the bundles built from 859d40f plus the prototype mode check; not a release),
 # dir (php-d, a copy of the php sample), no schedule (CI form B2), and a first job check that ends a run with nothing to do

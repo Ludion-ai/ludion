@@ -98,19 +98,33 @@ describe("the rule on deleted files", () => {
 });
 
 describe("the rule on recording a review", () => {
-  // The three words before each `reviewed-sha: <...>` the two files spell out. Posting adds a footer after the
-  // review, so a review has the line rather than ends with it (docs/decisions/2026-10-30-reviewed-sha-has-the-line.md).
-  const said = (text: string) => [...flat(text).matchAll(/(\S+ \S+ \S+) `reviewed-sha: </g)].map(m => m[1]);
+  // What CLAUDE.md and docs/protected-paths.md say about it, word for word. Posting adds a footer after the review,
+  // so a review has the line rather than ends with it (docs/decisions/2026-10-30-reviewed-sha-has-the-line.md).
+  const RULE = "Every review, protected path or not, is posted on its PR as a comment that has the line `reviewed-sha: <the head SHA reviewed>`; a review with no such record on GitHub is never reported as a review.";
+  const STEP_1 = "1. A reviewer other than the author, with fresh context, reads the full diff at the current head and posts the review as a PR comment. Its first line states the verdict (`APPROVE` or `REQUEST CHANGES`), and it has the line `reviewed-sha: <head SHA it reviewed>`, which need not be its last line.";
+  const EVERY = "Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and has the line `reviewed-sha: <the head SHA it reviewed>`. That line starts with `reviewed-sha:` and gives the full SHA in lowercase; inside backticks, a list item or a quote it is not counted. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review.";
+  const SAYS = { "CLAUDE.md": [RULE], "docs/protected-paths.md": [STEP_1, EVERY] };
+  type Path = keyof typeof SAYS;
+  const missing = (path: Path, text: string) => SAYS[path].filter(sentence => !flat(text).includes(flat(sentence)));
+  const swap = (text: string, from: string, to: string) => { expect(text).toContain(from); return text.split(from).join(to); };
 
   it("says a review has the line reviewed-sha: in CLAUDE.md and in docs/protected-paths.md alike", () => {
-    expect(said(read("CLAUDE.md"))).toEqual(["has the line"]);
-    expect(said(read("docs/protected-paths.md"))).toEqual(["with a line", "has the line", "has the line"]);
+    for (const path of ["CLAUDE.md", "docs/protected-paths.md"] as const) expect([path, missing(path, read(path))]).toEqual([path, []]);
   });
 
-  it("tells the earlier wording, a review ending with the line, apart", () => {
-    expect(said("is posted as a comment on its PR ending `reviewed-sha: <the head SHA reviewed>`;")).toEqual(["its PR ending"]);
-    expect(said("(`APPROVE` or `REQUEST CHANGES`), and its last line is `reviewed-sha: <head SHA it reviewed>`.")).toEqual(["last line is"]);
-    expect(said("as a comment on that PR and ends with the line `reviewed-sha: <the head SHA it reviewed>`.")).toEqual(["with the line"]);
+  it("fails a file that goes back to a review ending with the line, or makes it the last line again", () => {
+    const claude = read("CLAUDE.md"), doc = read("docs/protected-paths.md");
+    const changes: [Path, string, string, string][] = [
+      ["CLAUDE.md", "is posted on its PR as a comment that has the line", "is posted as a comment on its PR ending", RULE],
+      ["CLAUDE.md", "`reviewed-sha: <the head SHA reviewed>`;", "`reviewed-sha: <the head SHA reviewed>` as its last line;", RULE],
+      ["docs/protected-paths.md", "and it has the line `reviewed-sha: <head SHA it reviewed>`, which need not be its last line.", "and its last line is `reviewed-sha: <head SHA it reviewed>`.", STEP_1],
+      ["docs/protected-paths.md", ", which need not be its last line.", " as its last line.", STEP_1],
+      ["docs/protected-paths.md", ", which need not be its last line.", ", and nothing after it.", STEP_1],
+      ["docs/protected-paths.md", "on that PR and has the line", "on that PR and ends with the line", EVERY],
+      ["docs/protected-paths.md", "`reviewed-sha: <the head SHA it reviewed>`. That line", "`reviewed-sha: <the head SHA it reviewed>` as its last line. That line", EVERY],
+      ["docs/protected-paths.md", "on that PR and has the line", "on that PR and usually has the line", EVERY],
+    ];
+    for (const [path, from, to, lost] of changes) expect([to, missing(path, swap(path === "CLAUDE.md" ? claude : doc, from, to))]).toEqual([to, [lost]]);
   });
 });
 

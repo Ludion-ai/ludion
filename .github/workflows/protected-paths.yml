@@ -1,8 +1,9 @@
 # Required check "protected-paths".
 # Fails a PR that touches a protected path until an independent review has approved the PR's CURRENT head:
 # the PR must carry the "review-approved" label AND the latest comment with a line "reviewed-sha: <head sha>" must
-# approve. Every review ends with that line, whatever its verdict, so the comment's first line, the verdict, decides
-# (REVIEWS below), and a later review of the same head that does not approve undoes an earlier approval.
+# approve. Every review has that line, whatever its verdict, but not always as its last line (a footer may follow it),
+# so every line of a comment is read. The comment's first line, the verdict, decides (REVIEWS below), and a later
+# review of the same head that does not approve undoes an earlier approval.
 # A push changes the head SHA, so any earlier approval stops counting by itself; nothing has to be removed.
 #
 # Runs on pull_request_target so the workflow definition always comes from the base branch; a PR cannot

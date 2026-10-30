@@ -30,7 +30,7 @@ Any push changes the head SHA, so an earlier `reviewed-sha:` stops counting by i
 
 ## Every review is recorded on its PR
 
-Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and has the line `reviewed-sha: <the head SHA it reviewed>`. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review. For a PR that touches no protected path, a later review may cover only what changed since the last one, when it says so; a protected PR's review always reads the full diff at the current head, as above.
+Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and has the line `reviewed-sha: <the head SHA it reviewed>`. That line starts with `reviewed-sha:` and gives the full SHA in lowercase; inside backticks, a list item or a quote it is not counted. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review. For a PR that touches no protected path, a later review may cover only what changed since the last one, when it says so; a protected PR's review always reads the full diff at the current head, as above.
 
 ## What this does and does not guarantee
 

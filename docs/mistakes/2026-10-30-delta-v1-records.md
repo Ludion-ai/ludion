@@ -7,7 +7,7 @@
   1. The cache statement was written from what this lane's runner caches. Nobody checked what the copied cache already held.
   2. The explanation was written to answer "why did it pass" fully. It was not checked against the definitions' own rule for how a reason may be written, nor against the brief's list of what may be committed.
 - **What changed.**
-  - The README states the cache exception.
+  - The cache exception is stated in item 1 above and in the header comments of the bench folder's `scripts/copycache.sh` and `scripts/run.sh`. Those comments cite a README section, "One exception in the cache", that was removed from the README before the merge.
   - The miss has its decision entry.
   - No file this lane adds names a path of a malicious version.
   - A test now fails if a malicious row in the committed results gains any field beyond those that carry no path, or a changed-code entry beyond capability names and counts.

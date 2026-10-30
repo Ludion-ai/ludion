@@ -133,6 +133,11 @@ describe("the Node.js image policy", () => {
       expect((await scanProject(root, undefined)).checks.map(c => c.ecosystem)).toEqual(["php"]);
     } finally { vi.unstubAllGlobals(); }
   });
+  /** An npm project with no dependencies: its check is clean and sends nothing. */
+  const npmProject = (root: string) => {
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "a" }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify({ name: "a", lockfileVersion: 3, packages: { "": { name: "a" } } }));
+  };
   // R231c's review (PR #231, comment 6534443349): these FROM lines name a node image in a form Ludion does not read, and
   // were left out of an unconfigured scan, which then exited 0 beside an npm lockfile.
   it.each([
@@ -146,7 +151,7 @@ describe("the Node.js image policy", () => {
       for (const lockfile of [false, true]) {
         const root = mkdtempSync(join(tmpdir(), "ludion-node-from-"));
         writeFileSync(join(root, "Dockerfile"), `${from}WORKDIR /app\n`);
-        if (lockfile) writeFileSync(join(root, "package-lock.json"), JSON.stringify({ name: "a", lockfileVersion: 3, packages: { "": { name: "a" } } }));
+        if (lockfile) npmProject(root);
         const scan = await scanProject(root);
         expect(scan.checks.map(c => `${c.ecosystem}:${"error" in c ? "error" : "ok"}`)).toEqual(lockfile ? ["npm:ok", "node:error"] : ["node:error"]);
         expect(scan.status).toBe("attention_required");
@@ -162,7 +167,7 @@ describe("the Node.js image policy", () => {
     try {
       const root = mkdtempSync(join(tmpdir(), "ludion-node-from-"));
       writeFileSync(join(root, "Dockerfile"), text);
-      writeFileSync(join(root, "package-lock.json"), JSON.stringify({ name: "a", lockfileVersion: 3, packages: { "": { name: "a" } } }));
+      npmProject(root);
       const scan = await scanProject(root);
       expect(scan.checks.map(c => c.ecosystem)).not.toContain("node");
       // A PHP image, --platform included, is still PHP's check (here it fails, as fetch is refused).

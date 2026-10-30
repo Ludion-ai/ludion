@@ -6,26 +6,28 @@ These lanes test a gate shape that LO's result suggested:
 
 Measured on the 192 genuine fixes and the 11 obtained malicious versions of lane LD. **It is an experiment that only reads.** No product code, gate or wait changed.
 
-The definitions are in `docs/decisions/2026-10-30-lold2-release-link-definitions.md`. They were committed (18c7a5d) and pushed at 12:22:35Z, before any tarball, reference list, tag, commit or source archive was fetched for these lanes, and are unchanged.
+The definitions are in `docs/decisions/2026-10-30-lold2-release-link-definitions.md`. They were committed (18c7a5d) and pushed (GitHub records the push at 12:22:31Z), before any tarball, reference list, tag, commit or source archive was fetched for these lanes, and are unchanged.
 
 ## When things were fixed, and what ran
 
 | What | Commit | Time (UTC) |
 | --- | --- | --- |
-| Definitions | 18c7a5d | committed 12:22:32Z, pushed before 12:22:35Z |
+| Definitions | 18c7a5d | committed 12:22:32Z (local clock), push recorded by GitHub at 12:22:31Z |
 | Runner, helpers, self-test | 1ec489c | committed before the first smoke run |
 | Runner: `--only` for smoke runs, and a lost line break fixed | 3a9bd45 | committed after the smoke runs |
 | **The execution** (the result), at 3a9bd45 | — | 12:32:29Z–12:44:12Z, exit 0 (`run.log`) |
+| The §3 time statistics recounted without rounding, from the committed rows (found in review) | `scripts/recount-tag-time.ts` | after the review's first round |
 
 - **Smoke runs** (outputs kept outside the repository and discarded, never the result):
   - at 1ec489c, first 6 genuine rows: failed once on the cache volume's owner (fixed outside the code), then ran;
   - with `--only` on 5 genuine rows (undici 6.21.1, @portkey-ai/gateway 1.14.0, mermaid 11.10.0, better-auth 1.2.10, ghost 6.0.9), to try the source diff: failed once because a comment had swallowed the line holding `import { execFileSync }`, then ran with the working tree that became 3a9bd45.
   - No definition changed after them.
-- **Setup.** The execution ran in Docker (node:24, Node v24.22.2, git 2.39.5) as user 1000, with a read-only root, a tmpfs `/tmp`, no credentials and no forwarded environment.
+- **Setup.** The execution ran in Docker (node:24, Node v24.22.2, git 2.39.5) as user 1000, with a read-only root, a tmpfs `/tmp`, no credentials and no forwarded environment. The command was `docker run --rm --name lold2-run --read-only --tmpfs /tmp:rw,size=2g --user 1000 --memory 10g -v lold2-w:/w:ro -v lold2-cache:/cache -v <this folder>:/out node:24 sh /w/docs/bench/2026-10-30-lold2/scripts/run.sh 3a9bd457b8dae2a6d1423936a5723fa8304d7c6e`. The commit in `run.log` is that argument, not read inside the container.
   - The repository at 3a9bd45 (`git archive`, dependencies installed with scripts off) was mounted read-only.
   - The self-test (`scripts/selftest.ts`) passed first.
 - **Nothing reached the host but the results.** Tarballs and source archives were held in memory. Git fetched only commit and tag objects (`--filter=tree:0`) into the tmpfs.
 - **The cache** (a named volume) held JSON answers and reference lists only. It was deleted at 12:44:22Z.
+- **Inputs.** `lold2.json`'s `data` gives the SHA-256 of `delta-v1.json` and `lo.json`. The third input, `docs/bench/2026-10-28-backtest-v5/malicious-v5.json` (only its `disputed` flags are read), is not hashed there; at 3a9bd45 its SHA-256 is `54184b17…4bfd4`, unchanged since v5 (51a8f0b).
 - **Blob hashes.** `lold2.json` records the git blob hashes of the runner, the helpers, LO's `lo.ts`, `delta.ts`, `archives-v5.ts`, `npm-facts.ts` and `judge.ts`; they equal 3a9bd45's.
 - **Requests** (`lold2.json`, `run.requests`): registry 580, registry tarballs 403, GitHub reference lists 19, git fetches 172 (0 failed), source archives 39 (1 failed: HTTP 404).
 
@@ -65,6 +67,9 @@ These counts include LO's 4 rows that had a release but were not comparable for 
 
 All 168 tag-tied rows were fetched; every peeled commit equals the one LO recorded (no tag moved).
 
+**The numbers below are from `tag-time-recount.json`, not from `lold2.json`'s `lo2.tag_time`.** The runner rounded each difference to 0.01 h before its statistics and buckets, which §3 does not say. So a commit made seconds after the publish counted in (−1, 0]. The recount (`scripts/recount-tag-time.ts`) reads the committed timestamps of the same rows, without rounding and without a new fetch. `lold2.json` is kept as the execution wrote it.
+- What the rounding changed: commit time, (−24, −1] 22 → 21, (−1, 0] 141 → 137 and (0, 1] 3 → 8; tagger time, (−1, 0] 83 → 69 and (0, 1] 9 → 23; the provenance commits' Q3, −0.06 → −0.07.
+
 **Commit time minus publish time** (hours; negative = the commit was made before the publish):
 
 | n | min | Q1 | median | Q3 | max |
@@ -73,9 +78,14 @@ All 168 tag-tied rows were fetched; every peeled commit equals the one LO record
 
 | ≤ −168 | (−168, −24] | (−24, −1] | (−1, 0] | (0, 1] | (1, 24] | (24, 168] | > 168 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0 | 2 | 22 | 141 | 3 | 0 | 0 | 0 |
+| 0 | 2 | 21 | 137 | 8 | 0 | 0 | 0 |
 
-- **In 165 of 168, the tagged commit was made before the publish;** in the other 3, at most 0.53 h after it.
+- **In 160 of 168, the tagged commit was made before the publish.**
+- **In the other 8, it was made at most 0.53 h after it:**
+  - 5 within 3 seconds: @plone/volto 16.34.0, 17.22.1 and 18.24.0; xml-crypto 6.0.1; @node-saml/node-saml 5.1.0;
+  - formidable 3.5.3, 61 seconds;
+  - react-server-dom-turbopack 19.0.2, 954 seconds;
+  - @jitbit/htmlsanitizer 2.0.3, 1,909 seconds.
 - The two earliest: zx 8.8.5 (−98.63 h) and next-auth 4.24.12 (−43.97 h).
 
 **Tagger time minus publish time** (shown; the 97 annotated tags of the 168, 57.74%):
@@ -86,7 +96,7 @@ All 168 tag-tied rows were fetched; every peeled commit equals the one LO record
 
 | ≤ −168 | (−168, −24] | (−24, −1] | (−1, 0] | (0, 1] | (1, 24] | (24, 168] | > 168 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0 | 1 | 1 | 83 | 9 | 2 | 1 | 0 |
+| 0 | 1 | 1 | 69 | 23 | 2 | 1 | 0 |
 
 - The latest: vega 6.2.0, tagged 75.63 h after the publish.
 
@@ -187,6 +197,8 @@ All 168 tag-tied rows were fetched; every peeled commit equals the one LO record
 
 - **The 2 GiB limit** (§6, as LO's) is applied to the gunzipped archive, not to the sum of file sizes as LO did. No archive reached it.
 - **The previous version's provenance repository** (§6) is compared with the fixed version's `owner/repo` ignoring case, where §6 says "the same `owner/repo`". One row used it: @openai/codex 0.38.0, whose provenance matched `openai/codex`. `lold2.json` does not keep the previous provenance's repository text, so whether it matched only when ignoring case cannot be checked from the committed data.
+- **The not-comparable reason's label.** `ld2.not_comparable_by_reason` labels pbkdf2 3.1.3 "previous commit", where §6 names it "source archive not read". The detail field holds the full text: "previous commit: source archive not read: HTTP 404".
+- **Attempts on a source archive.** On a 4xx answer other than 429, the runner stops after one attempt, where §6 says 3 attempts; LO's runner does the same. The one such answer was pbkdf2's 404.
 - **Test files** in the source package directory count (§6 says so); `undici`'s `net` and `dns` are also new in `test/interceptors/dns.js`.
 - **The tag-tied counts include rows LO could not compare** (above), as §2 says (any `release`).
 
@@ -195,7 +207,9 @@ All 168 tag-tied rows were fetched; every peeled commit equals the one LO record
 - `lold2.json`: the summary, and one row per version:
   - genuine: LO's release, provenance now, publish time, the tag's commit, committer, author and tagger times, the tarball and source diffs (capabilities and up to 20 paths each), and the outcome;
   - malicious: the previous and malicious versions' repository readings and the shown content diff (capability names only, no paths).
+- `tag-time-recount.json`: §3's statistics recounted from `lold2.json` without rounding (the numbers this README gives for §3).
 - `lold2.log`, `run.log`: the execution's log and times.
+- `scripts/recount-tag-time.ts`: the recount.
 - `scripts/lold2.ts`: the helpers.
 - `scripts/run-lold2.ts`: the runner.
 - `scripts/selftest.ts`: the helpers' checks on made-up inputs.

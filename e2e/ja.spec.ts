@@ -9,6 +9,14 @@ const PAIRS = [
 ];
 const SECTIONS = ["guard", "verify", "isolate", "receipt"] as const;
 
+/** No English label or sentence is left on the page (code, ids and product names aside), visible or not yet replaced by a script. */
+async function noEnglishLeft(page: Page) {
+  const text = await page.locator("body").evaluate((body) => body.textContent ?? "");
+  for (const english of ["Illustrated workflow", "Know the supported scope", "Try the preview", "Production deployment", "Replay", "security update", "dependency files", "application test", "fix branch", "tested update", "your project"]) {
+    expect(text, english).not.toContain(english);
+  }
+}
+
 async function alternates(page: Page) {
   return page.locator('link[rel="alternate"][hreflang]').evaluateAll((links) => links.map((l) => [l.getAttribute("hreflang"), l.getAttribute("href")]));
 }
@@ -37,7 +45,7 @@ for (const { en, ja } of PAIRS) {
     await expect(toEn).toHaveAttribute("href", en);
     await expect(toEn).toHaveAttribute("lang", "en");
     await toEn.click();
-    await expect(page).toHaveURL(new RegExp(`${en.replaceAll("/", "\\/")}$`));
+    await expect.poll(() => new URL(page.url()).pathname).toBe(en);
     expect(await page.locator("html").getAttribute("lang")).toBe("en");
   });
 
@@ -70,11 +78,7 @@ test("the Japanese home page carries the same workflow and limits, with its link
   await expect(page.locator("[data-guard-state]")).toHaveText([/update/, /no-match/, /unknown/, /unsupported/]);
   await expect(page.locator("#coverage")).toContainText("対応している範囲を確かめてください。");
   await expect(page.locator("#coverage tbody tr")).toHaveCount(4);
-  // No English sentence is left on the page (code, ids and product names aside).
-  const text = await page.locator("body").innerText();
-  for (const english of ["Illustrated workflow", "Know the supported scope", "Try the preview", "Production deployment", "Replay", "security update"]) {
-    expect(text, english).not.toContain(english);
-  }
+  await noEnglishLeft(page);
   const hrefs = await page.locator("a[href^='/']").evaluateAll((els) => els.map((el) => el.getAttribute("href") ?? ""));
   expect(hrefs.filter((href) => !href.startsWith("/ja/") && href !== "/")).toEqual([]);
   expect(hrefs.filter((href) => href === "/")).toEqual(["/"]);
@@ -88,6 +92,8 @@ test("the Japanese home page keeps its content without JavaScript", async ({ bro
   await expect(page.locator("[data-guard-state]")).toHaveCount(4);
   await expect(page.locator("[data-trace-panel=receipt]")).toContainText("ソースのハッシュ、テスト結果");
   await expect(page.locator("#receipt")).toContainText("本番へのデプロイ");
+  await expect(page.locator(".fallback-route")).toContainText("依存関係のファイル");
+  await noEnglishLeft(page);
   await context.close();
 });
 
@@ -125,7 +131,7 @@ test("the Japanese home page's motion follows reduced motion", async ({ page }) 
 test("the Japanese setup page keeps the commands, copies them, and opens each step by keyboard", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/ja/start/");
-  await expect(page.locator("h1")).toHaveText("ひとつの流れで、スタックのもっと多くを。");
+  await expect(page.locator("h1")).toHaveText("ひとつの流れで、スタックのより広い範囲を。");
   await expect(page.locator("#scan-command")).toHaveText("node packages/cli/dist/cli.js scan --dir /path/to/app");
   await expect(page.locator("#source-command")).toContainText("npm run build -w ludion-ai");
   await expect(page.locator(".where")).toContainText("npm 0.1.4 には、これらのコマンドは入っていません");

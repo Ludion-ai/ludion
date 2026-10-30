@@ -28,13 +28,13 @@ const routes = [
   <div class="delivery-bar"><span>{s.label}</span><div role="group" aria-label={s.choose} class="destinations" hidden>{routes.map((route,i) => <button type="button" data-delivery-target={route.id} aria-pressed={i === 0 ? "true" : "false"}>{route.name}</button>)}</div></div>
   <figure class="delivery-figure" aria-labelledby="delivery-caption">
     <div class="delivery-visual" data-delivery-visual aria-hidden="true">
-      <div class="fallback-route"><span><BrandMark size={24}/><code>patch</code></span><i>→</i><span><code data-static-destination>dependency files</code></span></div>
+      <div class="fallback-route"><span><BrandMark size={24}/><code>patch</code></span><i>→</i><span><code data-static-destination>{routes[0]!.file}</code></span></div>
       <div class="three-space" data-delivery-space></div>
-      <div class="visual-labels"><div><span>{s.context}</span><code>patch</code></div><div><span data-flat-mode>{s.reference}</span><code data-static-destination>dependency files</code></div></div>
+      <div class="visual-labels"><div><span>{s.context}</span><code>patch</code></div><div><span data-flat-mode>{s.reference}</span><code data-static-destination>{routes[0]!.file}</code></div></div>
       <div class="mobile-space" data-mobile-delivery>
         <div class="mobile-file"><span>{s.context}</span><code>patch</code></div>
         <div class="mobile-route"><i></i><div class="mobile-packet" data-mobile-packet><i class="paper-shape"></i></div></div>
-        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>{routes[0]!.name}</span><code data-static-destination>dependency files</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">patch</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
+        <div class="mobile-file mobile-destination" data-mobile-destination data-mode="reference"><span data-mobile-assistant>{routes[0]!.name}</span><code data-static-destination>{routes[0]!.file}</code><div class="mobile-received" data-mobile-received><span data-mobile-mode>{s.reference}</span><code class="mobile-reference">patch</code><div class="mobile-inline"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div></div></div>
       </div>
     </div>
     <figcaption id="delivery-caption" class="visually-hidden">{s.illustration}</figcaption>
@@ -51,7 +51,7 @@ const routes = [
   <p class="command"><a href={localPath(lang, "/start/")}>{s.setup}<span aria-hidden="true"> ↗</span></a></p>
   <p class="delivery-scope">{s.scope}</p><span class="visually-hidden" role="status" data-delivery-status></span>
   <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>patch</code></div><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></template>
-  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>dependency files</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>patch</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
+  <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>{routes[0]!.file}</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>patch</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>
   <template data-delivery-object="packet"><div class="packet"><div class="packet-papers"><i class="paper-shape"></i><i class="paper-shape"></i><i class="paper-shape"></i></div><span>{s.context}</span></div></template>
   <template data-delivery-object="floor"><div class="world-floor"></div></template>
 </div>

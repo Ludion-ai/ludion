@@ -66,7 +66,7 @@ describe("Japanese copy", () => {
     expect(ja.home.guard.note).toContain("OSV");
     expect(ja.home.isolate.scope).toContain("完了した更新ではありません");
     expect(ja.home.receipt.scope).toContain("実行の結果ではありません");
-    expect(ja.home.receipt.scope).toContain("セキュリティの認証を意味するものではありません");
+    expect(ja.home.receipt.scope).toContain("セキュリティの認定を意味するものではありません");
     expect(ja.home.coverage).toContain("本番へのデプロイは、いつものリリース手順のままです");
     expect(ja.home.supportedNote).toContain("本番への自動デプロイ");
     expect(ja.home.supportedNote).toContain("対応していません");

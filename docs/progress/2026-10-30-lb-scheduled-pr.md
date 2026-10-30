@@ -6,7 +6,7 @@ docs/status.md, "Missing before complete", items 1 and 2. Start: main fcbff49. D
 
 **Not run on GitHub.** Both jobs' commands ran locally in Docker, with a bare repository as GitHub's Git and a stand-in for GitHub's API. Nothing was placed in a user repository or in ludion-sandbox. Nothing is released.
 
-**Results** (`logs/e2e.log`, at the PR's last code; each case ran the workflow twice, clones depth 1 with HEAD detached):
+**Results at 8fe5b21** (before main's LV was merged in; that run's log is `logs/e2e.log` as committed in c965eb6; each case ran the workflow twice, clones depth 1 with HEAD detached):
 
 | Case | Validation job, each run | PR job, run 1 | PR job, run 2 |
 |---|---|---|---|
@@ -16,7 +16,9 @@ docs/status.md, "Missing before complete", items 1 and 2. Start: main fcbff49. D
 | maven | commons-text 1.9 → 1.10.0 failed (alone it brings commons-lang3 3.12.0, still vulnerable, as in LA); commons-lang3 3.11 → 3.18.0 applied; exit 2 | PR #1 opened, changing pom.xml | `open_pr_exists #1` |
 | npm (examples/npm-security as is) | lodash 4.17.20 → 4.18.0 failed (judge stop); exit 2 | nothing to open (0 applied, 1 failed) | the same |
 
-In every case with a fix, the stand-in received one POST (one PR). Run 2's commit differed (a new commit time) and was not pushed.
+In every case with a fix, the stand-in received one POST (one PR) per fix. Run 2's commit differed (a new commit time) and was not pushed.
+
+**At 13656a9, the last code with LV** (`logs/e2e.log` now): the same rows, except that lodash 4.17.20 → 4.18.1 is applied (`ready_except_build`) in npm-two and in npm, so npm-two opened two PRs (lodash, minimist) and npm one (lodash) on run 1, and none on run 2 (npm-two's stand-in: POST 2).
 
 **Found on the way.** The first e2e run showed every real fix refused (a mode check that rejected 100755 files). After the content checks were added, the Composer fix was refused once because the tool image's Composer rewrote `plugin-api-version`. Both were fixed with tests. Four fresh-context reviews asked for changes (the fourth, comment 6514147721 at 9007c7b: Composer and Maven downgrades): comment 6512945643 at d714435 (content not checked; a refused PR left a fix stuck), comment 6513266881 at 21cfbc5 (Composer archives from any repository; any digest under the PHP tag) and comment 6513705802 at 61fafa7 (the lock's own requirements and autoload trusted; a second copy of a name). All are addressed; what stays open is written in the design's "What these checks do not cover".
 

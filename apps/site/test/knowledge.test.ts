@@ -68,6 +68,7 @@ describe("Japanese copy", () => {
     expect(ja.home.receipt.scope).toContain("実行の結果ではありません");
     expect(ja.home.receipt.scope).toContain("セキュリティの認定を意味するものではありません");
     expect(ja.home.coverage).toContain("本番へのデプロイは、いつものリリース手順のままです");
+    expect(ja.home.supported[0]!.scope).toContain("バージョンまで正確に指定した");
     expect(ja.home.supportedNote).toContain("本番への自動デプロイ");
     expect(ja.home.supportedNote).toContain("対応していません");
     expect(ja.home.isolate.applyDetail).toContain("--apply");

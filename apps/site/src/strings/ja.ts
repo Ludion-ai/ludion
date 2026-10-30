@@ -133,7 +133,7 @@ export const ja: typeof en = {
         "name": "PHP ランタイム",
         "detect": "公式のセキュリティリリース",
         "apply": "Dockerfile の更新",
-        "scope": "公式の PHP イメージそのもの。シングルステージ。同じメジャー・マイナーの系列の中。"
+        "scope": "バージョンまで正確に指定した公式の PHP イメージ。シングルステージ。同じメジャー・マイナーの系列の中。"
       },
       {
         "name": "JavaScript / TypeScript",

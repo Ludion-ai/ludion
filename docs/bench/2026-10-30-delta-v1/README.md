@@ -17,7 +17,7 @@ The definitions are in `docs/decisions/2026-10-30-ld-delta-v1-definitions.md`. T
 - **The first execution stopped** after about 1,200 of the 1,348 pairs. `/[A-Za-z0-9+/]{200,}/` overflowed V8's regex stack on a multi-megabyte run in one fetched file. The fix counts the same maximal runs by hand, so the definitions are unchanged. The fix also records an analyzer error on one pair as undecidable; none occurred in the result. The first execution wrote no result, so nothing from it is reported beyond its log.
 - **Setup.** Both executions ran in Docker (node:24-slim, Node v24.22.2) as user 1000, with a read-only root, a tmpfs /tmp, no credentials, no forwarded environment, and the repository mounted read-only.
 - **No package file reached the host.** Tarballs and files were held in memory. A named volume cached the fetchers' answers: v5's ecosyste.ms, jsDelivr list and Software Heritage answers were copied in, and new ones were added.
-- **One exception in the cache** (found in review). v5's Software Heritage answers include the raw `package.json` text of the versions Software Heritage held for v5 (`swhManifest`). So the copied cache did hold that one file of those versions, as inert text, inside the volume. This execution's own fetches cached no package file.
+- **One exception in the cache** (found in review). v5's Software Heritage answers include the raw `package.json` text of the versions Software Heritage held for v5 (`swhManifest`). So the copied cache did hold that one file of those versions, as inert text, inside the volume. This execution's own fetches cached no package file. See `docs/mistakes/2026-10-30-delta-v1-records.md`.
 - **Removed afterwards.** The container and the volumes were deleted at the end (lane report).
 - **What is committed.** `delta-v1.json` holds names, versions, sources, outcomes, capability names and numbers. It holds file paths only for genuine fixes, and no file content.
 - **Blob hashes.** The output records the git blob hashes of `delta-v1.ts`, `delta.ts`, `archives-v5.ts` and `judge.ts` (main's, unchanged); they equal the commit's.
@@ -81,17 +81,20 @@ So 2 of 11 is not an estimate of the miss rate over the 1,148.
     - 3 build-configuration files removed.
   - **Further counts.** They go beyond the analyzer's facts, as recorded in `docs/decisions/2026-10-30-ld-delta-v1-miss-inspection.md`. They were measured after the result, inside a credential-free container, by `scripts/inspect-miss.ts`, which prints only numbers and module names:
     - the file went from 283 to 4,545 bytes;
-    - the added code is one line of 4,302 characters, after a run of 836 spaces;
-    - that line's entropy is 5.20 bits per character;
+    - its longest line went from 46 to 4,302 characters;
+    - that line is its only line of 1,000 or more, with entropy 5.20 bits per character;
+    - the longest run of spaces in the file is 836 characters;
     - the file `require`s only the package's own module;
-    - it has 2 computed property lookups on `global`.
+    - it has 2 occurrences of `global[`.
+
+    That the added code is that line, behind that whitespace, reaching what it uses through computed lookups on `global`, is inferred from these counts (the entry says which are printed and which are inferred).
   - **So no v1 rule could fire:**
     - 4,302 characters is under the very-long-line threshold of 5,000;
     - 5.20 is under the entropy threshold of 5.5;
     - no listed module, API or code-from-string name appears literally.
 - **@ensdomains/buffer 0.1.1.** **No code file changed.** In the analyzer's facts:
-- 1 file added, 2 removed and 2 changed (`package.json` among them), none of them code;
-- that is all 21,955 lines added and 14,572 removed. This is v5's disputed version: its code equals 0.1.0's, and the compromise named by the record's other sources is in 0.1.2 (v5 README, "The disputed category"). A diff check cannot catch it, because there is nothing new in it.
+  - 1 file added, 2 removed and 2 changed (`package.json` among them), none of them code;
+  - that is all 21,955 lines added and 14,572 removed. This is v5's disputed version: its code equals 0.1.0's, and the compromise named by the record's other sources is in 0.1.2 (v5 README, "The disputed category"). A diff check cannot catch it, because there is nothing new in it.
 
 ### Genuine fixes (200): 192 obtained, 51 false alarms
 
@@ -190,7 +193,13 @@ The runner is kept as it ran, so its blob hash matches the execution. These diff
 
 - **An unreadable tarball.** Definitions section 4 calls a pair undecidable when a tarball cannot be read. Instead, the runner moves on to the next source and, if none serves the version, reports "not obtained". No row has a "tarball unreadable" reason, so nothing is counted differently.
 - **A failed second fetch.** A pair whose versions were both held but whose second fetch failed would be marked "held, but a second fetch failed" and left out of `not_obtained_reasons`. There is no such row.
-- **A substitute publish time.** When the registry gives no publish time for a malicious version's previous version, the Software Heritage lookup uses V's publish time instead. This can only make "not in the first snapshots after publication" more likely, never a hold.
+- **A substitute publish time.** When the registry gives no publish time for the previous version of a pending pair (malicious or genuine), the Software Heritage lookup uses the new version's publish time instead. The definitions give no publish time in that case, so the lookup should have answered "no publish time". A later time selects later snapshots, so the substitute could create a hold as well as lose one.
+  - **No row is affected.** Software Heritage actually looked up only four previous versions:
+    - dialogflow-es 1.1.0 (held);
+    - dashboard-empty-state 1.0.2 (held);
+    - rxnt-healthchecks-nestjs 1.0.1-alpha-1609 (no visit with a snapshot after publication);
+    - amazon-chime-sdk-js-exp 10.10.11 (origin not archived).
+  - **Checked afterwards.** On 2026-10-30 at 07:48Z, from a credential-free container, the registry's packument `time` held each of those four versions. So the registry's time, not the substitute, was used. Every other previous version was "not looked up in time" (genuine ones included), so it never reached the substitute.
 - **Unhashed Software Heritage entries.** A directory entry that is neither a file nor a directory is stored as `link:<path>`, with no hash check. Software Heritage stores a symlink's target as plain content, where `untar` stores `link:<target>`. In a pair with sources of both kinds, this could count a link as changed. Of the three such pairs, @ensdomains/buffer has no changed code file and the other two are flagged by other files.
 - **Untested trust checks.** The runner's own checks are not unit-tested:
   - sha512 / shasum against the registry tarball;

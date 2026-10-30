@@ -90,22 +90,32 @@ const mutations = [
   off("npm: an added alias, or a version outside its requirer's range, accepted (security pass at 8b4856d)", "if ((found.name !== undefined && found.name !== name) || typeof range !== \"string\" || !semver.validRange(range) || !semver.satisfies(version, range)) {"),
   ["npm: the lock not read as the judge reads it (N3)", D, "    lockEntries(old); lockEntries(now);\n", "", T],
   // Review of aa5d75b (lane): B1, the lock as every npm reads it (judge.ts's readLock, which the PR job also uses).
-  ["lock views: a disagreeing npm 6 tree accepted", J, "    if (a !== b) throw new Error(", "    if (false) throw new Error(", JT],
+  ["lock views: a disagreeing npm 6 tree accepted", J, "if (a !== b) throw new Error(`package-lock.json's packages and", "if (false) throw new Error(`package-lock.json's packages and", JT],
   ["lock views: the npm 6 tree not walked", J, "  walk(tree, \"\");\n", "", JT],
-  ["lock views: a link's children read under the link, not its folder", J, "linked?.link && typeof linked.resolved === \"string\" ? `${linked.resolved}/` : `${path}/`", "`${path}/`", JT],
-  ["lock views: an alias read without its real name", J, ": alias ? `npm:${item.name}@${text(item.version)}` :", ": alias ? text(item.version) :", JT],
+  ["lock views: a link's children read under the link, not its folder", J, "const dir = linked && typeof linked.resolved === \"string\" ? `${linked.resolved}/` : `${path}/`;", "const dir = `${path}/`;", JT],
+  ["lock views: an alias read without its real name", J, "alias ? `npm:${item.name}@${field(item.version)}` :", "alias ? field(item.version) :", JT],
   ["lock: another lockfileVersion read", J, "(top.lockfileVersion !== 2 && top.lockfileVersion !== 3)", "false", JT],
   ["lock: a top-level key npm does not write read", J, "if (unknown.length) throw new Error(`package-lock.json has a top-level key", "if (false) throw new Error(`package-lock.json has a top-level key", JT],
-  ["lock views: the review's tree attack through the PR job", J, "    if (a !== b) throw new Error(", "    if (false) throw new Error(", T],
+  ["lock views: the review's tree attack through the PR job", J, "if (a !== b) throw new Error(`package-lock.json's packages and", "if (false) throw new Error(`package-lock.json's packages and", T],
   off("npm: the top-level lockfileVersion changed", "if (key !== \"packages\" && key !== \"dependencies\" && !isDeepStrictEqual(baseTop![key], fixTop![key])) return"),
   off("npm: a base with npm-shrinkwrap.json accepted", "if (ecosystem === \"npm\" && before(\"npm-shrinkwrap.json\") !== null) return"),
   ["judge: package-lock.json judged beside npm-shrinkwrap.json", "packages/cli/src/security/judge-cli.ts", "for (const dir of [before, after]) if (existsSync(join(dir, \"npm-shrinkwrap.json\")))", "for (const dir of [before, after]) if (false)", "packages/cli/test/judge-cli.test.ts"],
   // Review of 1e6f705 (lane): B1, the tree's requires and flags; N1, a moved entry's optional and peer dependencies.
-  ["lock views: the tree's requires not compared", J, "    return all.length ? JSON.stringify(all) : \"\";", "    return \"\";", JT],
-  ["lock views: the tree's requires attack through the PR job", J, "    return all.length ? JSON.stringify(all) : \"\";", "    return \"\";", T],
-  ["lock views: the flags not compared", J, "const TREE_FLAGS = [\"dev\", \"optional\", \"devOptional\", \"peer\", \"extraneous\", \"bundled\"];", "const TREE_FLAGS: string[] = [];", JT],
+  ["lock views: the tree's requires not compared", J, "const a = packagesView.get(path)?.key, b = treeView.get(path)?.key;", "const a = packagesView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\"), b = treeView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\");", JT],
+  ["lock views: the tree's requires attack through the PR job", J, "const a = packagesView.get(path)?.key, b = treeView.get(path)?.key;", "const a = packagesView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\"), b = treeView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\");", T],
+  ["lock views: the flags not compared", J, "const TREE_FLAGS = [\"dev\", \"optional\", \"bundled\"];", "const TREE_FLAGS: string[] = [];", JT],
   ["lock views: a tree key npm does not write read", J, "if (unknown.length) throw new Error(`package-lock.json's dependencies tree gives", "if (false) throw new Error(`package-lock.json's dependencies tree gives", JT],
-  ["lock views: a link's requires without its folder's devDependencies", J, "requirements(target?.dependencies, target?.optionalDependencies, target?.devDependencies)", "requirements(target?.dependencies, target?.optionalDependencies)", JT],
+  ["lock views: a link's requires without its folder's devDependencies", J, "requirementList(folder?.dependencies, folder?.optionalDependencies, folder?.devDependencies)", "requirementList(folder?.dependencies, folder?.optionalDependencies)", JT],
+  ["lock views: devOptional, peer and extraneous read in the tree (the closed list)", J, "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"bundled\", \"requires\", \"dependencies\"]);", "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"devOptional\", \"peer\", \"extraneous\", \"bundled\", \"requires\", \"dependencies\"]);", JT],
+  // Review of ebfe89d (lane): B1, every requirement found in its range by Node's lookup, in both views.
+  ["requirements: an unmet requirement accepted", J, "    if (!met) throw new Error(", "    if (false) throw new Error(", JT],
+  ["requirements: an unmet requirement accepted, through the PR job", J, "    if (!met) throw new Error(", "    if (false) throw new Error(", T],
+  ["requirements: a version outside the range accepted", J, "semver.satisfies(found.version, range, { loose: true }));", "true);", JT],
+  ["requirements: a copy of another package under the name accepted", J, ": found.name === wanted && semver.validRange", ": semver.validRange", JT],
+  ["requirements: a spec that is not a semver range accepted", J, "semver.validRange(range, { loose: true }) !== null && semver.valid(found.version, { loose: true }) !== null && ", "", JT],
+  ["requirements: a required peer not looked for", J, "needs: [...requires, ...peers],", "needs: requires,", JT],
+  ["requirements: an optional peer required", J, ".filter(([name]) => !(isPlain(meta[name]) && meta[name].optional === true));", ";", JT],
+  ["requirements: the project's own requirements not looked for", J, "requirementsMet(packagesView, projects(top.packages), \"packages\");", "requirementsMet(packagesView, [], \"packages\");", JT],
   off("npm: a tree added to a base without one accepted", "if (Object.hasOwn(baseTop!, \"dependencies\") !== Object.hasOwn(fixTop!, \"dependencies\")) return"),
   ["npm: a moved entry's peerDependencies not compared with the registry (N1)", D, "for (const key of [\"requires\", \"peers\", \"os\", \"cpu\"] as const) {", "for (const key of [\"requires\", \"os\", \"cpu\"] as const) {", T],
   ["npm: a moved entry's optionalDependencies not compared with the registry (N1)", D, ", ...(isObject(item.optionalDependencies) ? item.optionalDependencies : {}) },", " },", T],
@@ -127,7 +137,7 @@ const mutations = [
 ];
 /** "pass", "fail", or "timeout" when the run does not end within LIMIT; then its whole process group is killed. */
 const vitest = file => new Promise(resolve => {
-  const child = spawn("npx", ["vitest", "run", "--project", "node", file], { stdio: "ignore", detached: true, env: { ...process.env, NO_COLOR: "1" } });
+  const child = spawn("npx", ["vitest", "run", "--project", "node", "--maxWorkers=2", file], { stdio: "ignore", detached: true, env: { ...process.env, NO_COLOR: "1" } });
   const timer = setTimeout(() => { try { process.kill(-child.pid, "SIGKILL"); } catch {} resolve("timeout"); }, LIMIT);
   child.on("exit", code => { clearTimeout(timer); resolve(code === 0 ? "pass" : "fail"); });
 });

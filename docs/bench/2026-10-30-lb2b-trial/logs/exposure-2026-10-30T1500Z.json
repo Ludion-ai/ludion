@@ -1,0 +1,22 @@
+[
+  {
+    "number": 2,
+    "head": "ludion/npm/npm/lodash-4.18.1",
+    "state": "open",
+    "fix_published_at": "2026-04-01T21:01:20.458Z",
+    "created_at": "2026-10-30T14:57:55Z",
+    "merged_at": null,
+    "published_to_pr_hours": 5081.94,
+    "pr_to_merge_hours": null
+  },
+  {
+    "number": 1,
+    "head": "ludion/php/php/8.4.27",
+    "state": "open",
+    "fix_published_at": "2026-10-21T00:00:00.000Z",
+    "created_at": "2026-10-30T14:57:41Z",
+    "merged_at": null,
+    "published_to_pr_hours": 230.96,
+    "pr_to_merge_hours": null
+  }
+]

@@ -1,0 +1,95 @@
+{
+ "from": "docs/bench/2026-10-30-lold2/lold2.json",
+ "tag_rows_timed": 168,
+ "commit_minus_publish_hours": {
+  "n": 168,
+  "min": -98.63263666666667,
+  "q1": -0.18,
+  "median": -0.04,
+  "q3": -0.01,
+  "max": 0.5302105555555555,
+  "buckets": {
+   "<= -168h": 0,
+   "(-168h, -24h]": 2,
+   "(-24h, -1h]": 21,
+   "(-1h, 0h]": 137,
+   "(0h, 1h]": 8,
+   "(1h, 24h]": 0,
+   "(24h, 168h]": 0,
+   "> 168h": 0
+  }
+ },
+ "commit_before_publish": 160,
+ "commit_after_publish": [
+  {
+   "row": "react-server-dom-turbopack@19.0.2",
+   "seconds": 954
+  },
+  {
+   "row": "@plone/volto@17.22.1",
+   "seconds": 1
+  },
+  {
+   "row": "xml-crypto@6.0.1",
+   "seconds": 3
+  },
+  {
+   "row": "@plone/volto@16.34.0",
+   "seconds": 3
+  },
+  {
+   "row": "@plone/volto@18.24.0",
+   "seconds": 2
+  },
+  {
+   "row": "@node-saml/node-saml@5.1.0",
+   "seconds": 3
+  },
+  {
+   "row": "formidable@3.5.3",
+   "seconds": 61
+  },
+  {
+   "row": "@jitbit/htmlsanitizer@2.0.3",
+   "seconds": 1909
+  }
+ ],
+ "commit_equal_to_publish": 0,
+ "annotated": 97,
+ "tagger_minus_publish_hours": {
+  "n": 97,
+  "min": -43.967308611111115,
+  "q1": -0.08,
+  "median": -0.02,
+  "q3": 0,
+  "max": 75.62563583333333,
+  "buckets": {
+   "<= -168h": 0,
+   "(-168h, -24h]": 1,
+   "(-24h, -1h]": 1,
+   "(-1h, 0h]": 69,
+   "(0h, 1h]": 23,
+   "(1h, 24h]": 2,
+   "(24h, 168h]": 1,
+   "> 168h": 0
+  }
+ },
+ "provenance_commit_minus_publish_hours": {
+  "n": 4,
+  "min": -0.20192027777777777,
+  "q1": -0.18,
+  "median": -0.12,
+  "q3": -0.07,
+  "max": -0.022076944444444444,
+  "buckets": {
+   "<= -168h": 0,
+   "(-168h, -24h]": 0,
+   "(-24h, -1h]": 0,
+   "(-1h, 0h]": 4,
+   "(0h, 1h]": 0,
+   "(1h, 24h]": 0,
+   "(24h, 168h]": 0,
+   "> 168h": 0
+  }
+ }
+}

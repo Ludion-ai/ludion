@@ -1,7 +1,8 @@
 ---
-import { en } from "../strings/en.ts";
+import { strings, type Lang } from "../strings/index.ts";
 // An illustration of a PHP security update reaching a project. Not a run result.
-const s = en.home.scene;
+const { lang = "en" } = Astro.props as { lang?: Lang };
+const s = strings[lang].home.scene;
 const lines = Array.from({length: 28}, (_, row) => {
   const points = Array.from({length: 65}, (_, column) => {
     const x = column * 20;
@@ -29,7 +30,7 @@ const columns = Array.from({length: 35}, (_, column) => `M${column * 40},80 C${c
       <span class="bracket opening" aria-hidden="true"></span>
       <span class="bracket closing" aria-hidden="true"></span>
       <div class="document" aria-hidden="true">
-        <div class="document-head"><span class="version">stack <b>security update</b></span><span class="flow-arrow">→</span><span class="file">your project</span></div>
+        <div class="document-head"><span class="version">{s.from} <b>{s.update}</b></span><span class="flow-arrow">→</span><span class="file">{s.to}</span></div>
         <div class="document-body">
           <div class="context-lines">{Array.from({length: 11}, (_, row) => <span style={`--row:${row}`}><i></i><i></i><i></i><i></i></span>)}</div>
           <div class="focus-row"><span class="focus-bracket">「</span><code>test → patch</code><span class="focus-bracket">」</span></div>

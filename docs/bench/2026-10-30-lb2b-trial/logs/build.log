@@ -1,0 +1,6 @@
+
+> ludion-ai@0.3.0-preview.1 build
+> node build.ts
+
+Wrote dist/cli.js
+Wrote action/dist/record.js

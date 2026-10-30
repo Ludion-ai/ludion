@@ -44,7 +44,7 @@ Section 6 of `2026-10-30-ld-delta-v1-definitions.md` says each missed malicious 
 
 **What it changes:** nothing counted.
 - The miss stays a miss, every count stays as the execution wrote it, and no definition changes.
-- The README's reason for this one version cites these numbers and names this entry. The reason for the other miss uses only the analyzer's facts.
+- The progress entry's reason for this one version (`docs/progress/2026-10-30-ld-delta-v1.md`) draws on these numbers and names this entry; the bench README gives no reasons. The reason for the other miss uses only the analyzer's facts.
 - Any idea the numbers suggest for a v2 (lower thresholds, a whitespace-padding marker, computed access to `global`) needs a new definitions entry and a new run.
 
 **Paths.**

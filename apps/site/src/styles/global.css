@@ -34,6 +34,22 @@ h3 {
   line-height: 1.15;
 }
 
+/* Japanese pages. The brand face has no Japanese glyphs, so kana and kanji come from the device's Japanese font (no
+   web font is added). Lines break between phrases, by the strict rules, and inside a phrase only when it cannot fit
+   the line (enlarged text on a phone); headings keep the font's own spacing and get room for a second line. */
+html:lang(ja) {
+  --font-ui: "Schibsted Grotesk Variable", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP", system-ui, sans-serif;
+  /* Japanese in code-font labels (the receipt's values, the delivery stages) comes from the same device fonts. */
+  --font-code: "JetBrains Mono Variable", ui-monospace, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", monospace;
+  word-break: auto-phrase;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+html:lang(ja) :is(h1, h2, h3) {
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
 .claim {
   font-family: var(--font-ui);
   font-weight: 560;

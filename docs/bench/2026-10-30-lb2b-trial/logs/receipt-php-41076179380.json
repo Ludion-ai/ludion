@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "fa5fa47f-a855-4172-896a-794d19e55252",
+  "started_at": "2026-10-30T14:57:13.149Z",
+  "finished_at": "2026-10-30T14:57:19.522Z",
+  "outcome": "applied",
+  "scope": "dockerfile_only_not_deployed",
+  "scan": {
+    "schema": 1,
+    "checked_at": "2026-10-30T14:57:13.146Z",
+    "status": "update_available",
+    "scope": "dockerfile_base_image",
+    "current": {
+      "reference": "php:8.4.26-cli-alpine",
+      "version": "8.4.26",
+      "branch": "8.4",
+      "flavor": "-cli-alpine",
+      "start": 5,
+      "end": 26
+    },
+    "candidate": {
+      "version": "8.4.27",
+      "reference": "php:8.4.27-cli-alpine"
+    },
+    "security_releases": [
+      {
+        "version": "8.4.27",
+        "date": "21 Oct 2026",
+        "security": true
+      }
+    ],
+    "source": "https://www.php.net/releases/index.php?json&version=8.4&max=100",
+    "note": "Checks official PHP security-release metadata against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment."
+  },
+  "tree_hash": "9858781b93e3eb2e82e3ce036f5b8b8c3c76cd4c5ea354b00e327cb843321091",
+  "dockerfile_before": "d73a9987f5bee7a49d147997c630dd5427698a7b9e8ca48a354f18acd4d3e64b",
+  "dockerfile_after": "a0975ca636a21b524578b998665d2aef70910033df410d387a36f61e49c2db3f",
+  "old_digest": "php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1",
+  "new_digest": "php@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65",
+  "test": [
+    "php",
+    "tests/smoke.php"
+  ],
+  "baseline_passed": true,
+  "candidate_passed": true,
+  "fix_published_at": "2026-10-21T00:00:00.000Z",
+  "fix_published_note": "php.net's release date of PHP 8.4.27, the first security release newer than the Dockerfile's version. php.net gives a day only; recorded as 00:00 UTC that day.",
+  "found_at": "2026-10-30T14:57:13.146Z",
+  "applied_at": "2026-10-30T14:57:19.522Z",
+  "base_commit": "7a8585d602f84c7d25c335bdc887c74d3758d8ba",
+  "branch": "ludion/php/php/8.4.27",
+  "commit": "602b6c8daa6ba2954debe07b5ffcfa18ec694489"
+}

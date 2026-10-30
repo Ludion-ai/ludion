@@ -11,7 +11,8 @@ Definitions: `docs/decisions/2026-10-31-lt-takeover-definitions.md` (02e7c98, pu
   - 2 within a day after: @posthog/siphash 1.1.2 (+7.03 h) and @hyperlook/telemetry-sdk 1.0.19 (+0.74 h).
 - **Strengthened** (the tag's commit reachable from the default branch): 39 / 1148 tied.
 - **Condition 2** could not be measured on a malicious tarball: none of the 44 is listed in the registry.
-- **V's own repository** could not be read: ecosyste.ms's copies carry no `repository`. The 83 "no repository (ecosyste.ms)" are really "not obtained".
+- **V's own repository** was read from the registry for only 8 rows (1 GitHub, 7 none). For the other 1,140 it could not be read: they are not listed, and ecosyste.ms's copies carry no `repository`.
+- **The same applies to P:** the 83 "P names no repository (ecosyste.ms)" rows are really "not obtained". This changes no stopped or tied count.
 
 **Genuine (192):**
 - The tag or provenance commit is reachable from the default branch for 88 / 192 (45.83%).

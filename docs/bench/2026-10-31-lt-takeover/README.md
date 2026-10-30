@@ -17,7 +17,7 @@ Definitions: `docs/decisions/2026-10-31-lt-takeover-definitions.md`, committed a
 
 - **Docker:** node:24, user 1000, read-only root, tmpfs `/tmp`, `--memory 3g`, no credentials, no forwarded environment. The repository at 9d8d42b (`git archive`, dependencies installed with `npm ci --ignore-scripts`) was mounted read-only. Each phase was run once; there were no reruns and no smoke runs that fed a result.
 - **GH Archive:** 529 hourly files, 32.88 GB streamed and gunzipped in memory, none missing, none saved. Only the matching events were kept (per hour, in the cache volume).
-- **Host:** only `git`, `gh`, `docker`, `curl -I` (four GH Archive file sizes, before the archive phase, to estimate the volume) and shell tools ran there. No node, npm, npx or python.
+- **Host:** only `git`, `gh`, `docker`, `curl -I` (four GH Archive file sizes, before the archive phase, to estimate the volume; not recorded in a log) and shell tools ran there. No node, npm, npx or python.
 - **The cache volume** (`lt-cache`) and the repository volume (`lt-w`) are deleted after the run.
 
 ## Results: malicious versions (1,148)
@@ -66,9 +66,12 @@ Median +102.51 h, minimum −69,730.52 h, maximum +6,130.27 h (`lt.json`, `malic
 
 So 42 of the 44 tags have a commit more than a week away from V:
 - **20 more than a week before V** (form 1: 14, form 2: 5, form 3: 1):
-  - **19 of forms 1 and 2** (`vX`, `X`), which do not name the package. Most are in a repository that P's `package.json` names but that is not the package's own: for example devextreme-rpk and @ui-ux-gang/devextreme-rpk (DevExpress/DevExtreme), typeorm-orbit (typeorm/typeorm), @voiceflow/anthropic (anthropics/anthropic-sdk-typescript), uniswap-test-sdk-core (Uniswap/sdk-core). Any repository whose tag has that number ties them.
+  - **19 of forms 1 and 2** (`vX`, `X`), which do not name the package. Any repository whose tag has that number ties them:
+    - **7 in a repository named after another project:** devextreme-rpk and @ui-ux-gang/devextreme-rpk (DevExpress/DevExtreme), typeorm-orbit (typeorm/typeorm), wellness-expert-ng-gallery (MurhafSousli/ngx-gallery), @voiceflow/anthropic (anthropics/anthropic-sdk-typescript), uniswap-test-sdk-core (Uniswap/sdk-core), buffered-interpolation-babylon6 (frame-xr/buffered-interpolation).
+    - **7 in a monorepo:** 5 with P's own `repository.directory` (@asyncapi/generator-components ×2, @asyncapi/generator-helpers, @posthog/nextjs-config, @accordproject/markdown-it-cicero), and @asyncapi/generator-react-sdk ×2 in asyncapi/generator without one. There, a `vX`/`X` tag is the monorepo's release or another package's.
+    - **5 not told apart by the data.**
   - **1 of form 3**, which names the package: zapier-platform-legacy-scripting-runner 4.0.2, tag `zapier-platform-legacy-scripting-runner@4.0.2` in zapier/zapier-platform. Its commit is dated −252.66 h from V and is not reachable from the default branch (`diverged`). Dropping forms 1 and 2 would not remove it.
-- **22 more than a week after V** (form 1: 13, form 3: 9): 9 rows in the asyncapi organisation (8 @asyncapi-scoped packages and asyncapi-preview), @postman/tunnel-agent 0.6.5–0.6.7, zapier-platform-cli/core/schema 18.0.2–18.0.4, @accordproject/template-engine 2.7.2. The tagged commits are dated +197.99 h to +6,130.27 h after V. Who pushed these tags, and when, is not in the data.
+- **22 more than a week after V** (form 1: 13, form 3: 9): 9 rows in the asyncapi organisation (8 rows of 7 @asyncapi-scoped packages, and asyncapi-preview), @postman/tunnel-agent 0.6.5–0.6.7, zapier-platform-cli/core/schema 18.0.2–18.0.4, @accordproject/template-engine 2.7.2. The tagged commits are dated +197.99 h to +6,130.27 h after V. Who pushed these tags, and when, is not in the data.
 - **2 within a day after V:** @posthog/siphash 1.1.2 (+7.03 h, `PostHog/siphash-js` v1.1.2) and @hyperlook/telemetry-sdk 1.0.19 (+0.74 h, `DrDroidLab/telemetry-sdk` v1.0.19). Neither has a `CreateEvent` for the tag in its window.
 
 Commit times are written by whoever makes the commit, and the time a tag was pushed is not public. So these hours show when the tagged commit says it was made, not when the tag appeared.
@@ -83,7 +86,7 @@ Commit times are written by whoever makes the commit, and the time a tag was pus
 | not comparable: no release for the previous version | 3 |
 | not comparable: version commit (package directory not found) | 2 |
 
-The tarball side was computed for none of them: all 44 malicious versions are no longer listed in the registry. **So condition 2 could not be measured on any malicious version here.** The 20 "none" rows are diffs between maintainers' tags, made after V (or, in the earlier-release cases, unrelated to V), not the malicious tarball's code.
+The tarball side was computed for none of them: all 44 malicious versions are no longer listed in the registry. **So condition 2 could not be measured on any malicious version here.** The 20 "none" rows compare the tagged commits in the repository (18 dated more than a week after V, 1 at +0.74 h, 1 at −252.66 h), not the malicious tarball's code.
 
 ### Not measured
 
@@ -118,7 +121,7 @@ Found in review (PR comment 6528949262). The run is not repeated for them.
 From this data, as defined:
 1. **A `vX` or `X` tag dated long before V** (19 rows): P's `package.json` names a repository with a tag of forms 1 or 2 whose commit is dated more than a week before V. Forms 1 and 2 match it whatever the package is.
 2. **A tag naming the package, dated long before V** (1 row): zapier-platform-legacy-scripting-runner 4.0.2. Its form-3 tag's commit is dated −252.66 h and is not on the default branch, so the strengthened condition 1 does not tie it, but the plain one does.
-3. **A tag whose commit is dated long after V** (22 rows, +197.99 h to +6,130.27 h). GH Archive shows no tag event within 24 hours of V for any of them. Who pushed these tags, and when, is not public. If the commit dates are true, the tags did not exist when V was published, and a check made then would not have tied V. A check made after the tag appeared ties V.
+3. **A tag whose commit is dated long after V** (22 rows, +197.99 h to +6,130.27 h). GH Archive shows no tag event within 24 hours of V for any of them. Who pushed these tags, and when, is not public. If the commit dates are true, these tags did not point at these commits when V was published. Whether a tag of that name existed then on another commit and was moved later is not shown (a move outside the ±24 h window leaves no event the run read). A check made after the tag pointed where it does now ties V.
 4. **A tagged commit dated within a day after V** (2 rows): @posthog/siphash 1.1.2 and @hyperlook/telemetry-sdk 1.0.19. GH Archive shows no tag event in the window, so when the tag was pushed is unknown.
 5. **Not seen here:** an attacker who could also push a tag to the repository. No `CreateEvent` for V's tag was found within 24 hours for any of the 702 GitHub rows. The `CreateEvent` limit (more than three tags at once) and private repositories leave this short of proof.
 6. **Not measurable here:** V naming another repository than P (V's repository could not be read), and condition 2 on a malicious tarball (none is listed).

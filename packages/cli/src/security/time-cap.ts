@@ -121,7 +121,7 @@ export function timeCap(input: {
 export function renderTimeCap(cap: TimeCap): string[] {
   const lines = [`Published at or after T (${cap.t ?? "unknown"}, the fix's publish time): ${cap.t ? cap.after_t.length + cap.same_release.length : "unknown"} version(s)`];
   for (const v of cap.after_t) lines.push(`  ${v}`);
-  for (const s of cap.same_release) lines.push(`  ${s.version}: allowed, the same release as ${s.target} (${s.basis === "provenance" ? (s.by_id === false ? "provenance names the same repository, workflow and commit; neither records a repository id, so not compared by ID" : "provenance names the same repository, workflow, commit and repository id") : `no provenance; same publisher and version, at most ${SAME_RELEASE_MINUTES} minutes after it`})`);
+  for (const s of cap.same_release) lines.push(`  ${s.version}: allowed, the same release as ${s.target} (${s.basis === "provenance" ? (s.by_id === true ? "provenance names the same repository, workflow, commit and repository id" : "provenance names the same repository, workflow and commit; neither records a repository id, so not compared by ID") : `no provenance; same publisher and version, at most ${SAME_RELEASE_MINUTES} minutes after it`})`);
   return lines;
 }
 

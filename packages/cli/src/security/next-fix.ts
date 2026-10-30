@@ -44,7 +44,7 @@ export type PublisherCheck = {
 
 const plain = (text: string) => text.replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 200);
 const described = (version: string, f: ReleaseIdentity) => f.provenance
-  ? `${version} has provenance from repository ${f.provenance.repository === null ? "(none named)" : plain(f.provenance.repository)}, workflow ${f.provenance.workflow === null ? "(none named)" : plain(f.provenance.workflow)}, GitHub repository id ${f.provenance.repository_id ?? "(none recorded)"}, event ${f.provenance.event ?? "(none recorded)"}`
+  ? `${version} has provenance from repository ${f.provenance.repository === null ? "(none named)" : plain(f.provenance.repository)}, workflow ${f.provenance.workflow === null ? "(none named)" : plain(f.provenance.workflow)}, GitHub repository id ${f.provenance.repository_id == null ? "(none recorded)" : plain(f.provenance.repository_id)}, event ${f.provenance.event == null ? "(none recorded)" : plain(f.provenance.event)}`
   : `${version} has no provenance and was published by ${f.publisher === null ? "no single account (none, or trusted publishing's shared user)" : `the npm account ${plain(f.publisher)}`}`;
 
 /**

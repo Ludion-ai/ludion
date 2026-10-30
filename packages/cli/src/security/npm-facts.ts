@@ -83,14 +83,12 @@ export function provenanceFrom(attestations: unknown, subject?: { name: string; 
   const v1Commit = Array.isArray(resolved) ? commitOf(resolved[0]?.digest, "gitCommit") : null;
   const github = predicate?.buildDefinition?.internalParameters?.github, environment = predicate?.invocation?.environment;
   for (const part of [github, environment]) if (part !== undefined && part !== null && (typeof part !== "object" || Array.isArray(part))) throw new Error("The provenance statement's GitHub parameters are not an object.");
-  const ids = {
-    repository_id: githubValue(github?.repository_id ?? environment?.GITHUB_REPOSITORY_ID, REPOSITORY_ID, "repository id"),
-    event: githubValue(github?.event_name ?? environment?.GITHUB_EVENT_NAME, EVENT, "event name"),
-  };
-  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null, commit: v1Commit, ...ids };
+  // Both values from the one block of the statement's own form: v1's internalParameters, v0.2's environment.
+  const v1Ids = { repository_id: githubValue(github?.repository_id, REPOSITORY_ID, "repository id"), event: githubValue(github?.event_name, EVENT, "event name") };
+  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null, commit: v1Commit, ...v1Ids };
   const source = predicate?.invocation?.configSource;
-  if (source) return { repository: typeof source.uri === "string" ? withoutRef(source.uri) : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null, commit: commitOf(source.digest, "sha1"), ...ids };
-  return { repository: null, workflow: null, commit: v1Commit, ...ids };
+  if (source) return { repository: typeof source.uri === "string" ? withoutRef(source.uri) : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null, commit: commitOf(source.digest, "sha1"), repository_id: githubValue(environment?.GITHUB_REPOSITORY_ID, REPOSITORY_ID, "repository id"), event: githubValue(environment?.GITHUB_EVENT_NAME, EVENT, "event name") };
+  return { repository: null, workflow: null, commit: v1Commit, ...v1Ids };
 }
 
 /**

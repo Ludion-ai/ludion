@@ -99,9 +99,12 @@ describe("gate 2 and the wait", () => {
   it("lets push, release and workflow_dispatch publish, and judges the event of the version installed, not the one replaced", () => {
     for (const event of ["push", "release", "workflow_dispatch"]) expect(run({ provenance: { ...PROV, event } }, {}, { now: "2027-01-01T00:00:00Z" }).findings).toEqual([]);
     expect(run({}, { provenance: { ...PROV, event: "pull_request_target" } }, { now: "2027-01-01T00:00:00Z" }).verdict).toBe("ready_except_build");
-    // An event recorded without an id still counts, and the missing id on one side stops too.
+    // An event recorded with no id on either side is still checked.
     const eventOnly = run({ provenance: { ...OLD, event: "issue_comment" } }, { provenance: OLD }, { now: "2027-01-01T00:00:00Z" });
     expect(eventOnly.findings).toContainEqual(expect.objectContaining({ effect: "stop", message: expect.stringContaining("issue_comment event") }));
+  });
+  it("says the id and the event are the build's own claims, which only the wait and the re-query back", () => {
+    expect(run({}).not_checked).toContain("The GitHub repository id and event in a provenance statement are written by npm from the build's environment variables, which the publishing workflow can set; Ludion has not established that the registry matches them against the signing certificate. A re-registered repository name whose publisher writes the old id and an allowed event passes these checks and is caught only by the wait and the re-query.");
   });
   it("stops a package new to the project when its provenance was published from another event", () => {
     const result = judge({ changes: [change({ from: null })], facts: new Map([["lib@1.0.1", fact({ provenance: { ...PROV, event: "pull_request_target" } })]]), fixes: [], direct: ["lib"], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z"), created: new Map([["lib", "2020-01-01T00:00:00Z"]]) });
@@ -230,6 +233,9 @@ describe("rule 1's same-release exception", () => {
     const cap = sibling({ published_at: "2026-10-01T00:00:05Z", provenance: OLD }, { provenance: OLD }).time_cap;
     expect(cap.same_release).toEqual([{ version: "lib-env@1.0.1", target: "lib@1.0.1", basis: "provenance", by_id: false }]);
     expect(renderTimeCap(cap)[1]).toBe("  lib-env@1.0.1: allowed, the same release as lib@1.0.1 (provenance names the same repository, workflow and commit; neither records a repository id, so not compared by ID)");
+    // An entry that does not say it was compared by ID is shown as not compared by ID.
+    const { by_id: _unsaid, ...unsaid } = cap.same_release[0]!;
+    expect(renderTimeCap({ ...cap, same_release: [unsaid] })[1]).toContain("so not compared by ID");
   });
   it("counts the wait from the newest sibling", () => {
     const result = sibling({ published_at: "2026-10-01T00:10:00Z" });
@@ -588,6 +594,13 @@ describe("provenance records", () => {
     ["GitHub parameters that are a list", ["push"], "not an object"],
   ])("refuses a statement with %s", (_name, github, message) => {
     expect(() => provenanceFrom(v1(resolved, github))).toThrow(message);
+  });
+  it("reads both values from the one block of the statement's own form, never one from each", () => {
+    const both = (predicate: unknown) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: encode({ predicate }) } } }] });
+    const github = { repository_id: "123456789" }, environment = { GITHUB_EVENT_NAME: "push", GITHUB_REPOSITORY_ID: "555" };
+    // A v1 statement takes nothing from a v0.2 environment beside it, and a v0.2 statement nothing from v1's internalParameters.
+    expect(provenanceFrom(both({ buildDefinition: { externalParameters: { workflow: { repository: PROV.repository, path: PROV.workflow } }, internalParameters: { github }, resolvedDependencies: resolved }, invocation: { environment } }))).toEqual({ ...PROV, event: null });
+    expect(provenanceFrom(both({ buildDefinition: { internalParameters: { github: { repository_id: "1", event_name: "issue_comment" } } }, invocation: { configSource: { uri: "git+https://github.com/acme/lib@refs/heads/main", digest: { sha1: COMMIT }, entryPoint: PROV.workflow }, environment } }))).toEqual({ ...OLD, repository_id: "555", event: "push" });
   });
   it("refuses a v0.2 environment that is malformed", () => {
     expect(() => provenanceFrom(v02({ sha1: COMMIT }, { GITHUB_REPOSITORY_ID: 5 }))).toThrow("repository id is not in the expected form");

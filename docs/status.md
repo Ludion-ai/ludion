@@ -39,10 +39,9 @@ A proposal from the owner's Claude chat, to be fixed with the owner (CLAUDE.md, 
 
 ## Waiting for the owner
 
-Decided on 2026-10-29: every changed version counts as production (docs/decisions/2026-10-29-every-change-counts-as-production.md), and EPSS scores are downloaded whole (docs/decisions/2026-10-29-epss-downloaded-whole.md).
+Decided on 2026-10-29: every changed version counts as production (docs/decisions/2026-10-29-every-change-counts-as-production.md), and EPSS scores are downloaded whole (docs/decisions/2026-10-29-epss-downloaded-whole.md). Decided on 2026-10-30 (the owner, in the Claude chat): the shadow's dev-only row stays as it is; the replay keeps judging it at 168h and (b) is still counted on all four rows (docs/decisions/2026-10-29-shadow-counting.md, unchanged).
 
 1. **What "complete" means.** The working list above is a proposal.
 2. **Shorter waits for official runtime releases.** The owner's point (2026-10-29): once a fix is public the race is short. Whether a fix from a runtime's own official channel (php.net, the official Docker image) waits less than the table says changes the wait table, so it is the owner's.
 3. **Gates and learned models.** The owner, 2026-10-29 18:24 JST: 「ニューラルネットワーク式にやったらいいじゃない？関門は全てアルゴで まぁ設計はまた後で深掘りする」. Taken for now as: improve the way of working like training, each mistake fed back into a rule or a check, and every checkpoint as code (docs/decisions/2026-10-29-way-of-working.md). Whether any of Ludion's gates should use a learned model is for the design deep-dive. A note for it from the Claude chat: a learned score could add a reason to wait or to notify, but should not lift a stop, because a release can be tuned against a model and a receipt has to say why.
 4. **The design.** docs/design.md's roadmap puts the judge first, and its open decision on where to start says 「推奨は判定役から」; the Goal now wins over both, and the owner redoes the design.
-5. **The shadow's dev-only row.** The replay still judges each captured version in a dev-only row at 168h, which the wait table no longer has, and (b) is counted on all four rows as fixed before the shadow started (docs/decisions/2026-10-29-shadow-counting.md). Whether (b)'s count drops that row is the owner's call.

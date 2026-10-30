@@ -906,7 +906,8 @@ describe("the time cap on candidates", () => {
   it("lets an npm sibling of the same release move, from the registry's publisher and provenance", async () => {
     const commit = "535e26d3c69de49df8bd17618a424cbe65ec897b";
     const integrity = "sha512-" + "B".repeat(86) + "==", sha512 = Buffer.from(integrity.slice(7), "base64").toString("hex");
-    const statement = (name: string, version: string, sha: string) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: Buffer.from(JSON.stringify({ subject: [{ name: `pkg:npm/${name}@${version}`, digest: { sha512 } }], predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/lodash/lodash", path: ".github/workflows/release.yml" } }, resolvedDependencies: [{ digest: { gitCommit: sha } }] } } })).toString("base64") } } }] });
+    const statement = (name: string, version: string, sha: string, github: object) => ({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: Buffer.from(JSON.stringify({ subject: [{ name: `pkg:npm/${name}@${version}`, digest: { sha512 } }], predicate: { buildDefinition: { externalParameters: { workflow: { repository: "https://github.com/lodash/lodash", path: ".github/workflows/release.yml" } }, internalParameters: { github }, resolvedDependencies: [{ digest: { gitCommit: sha } }] } } })).toString("base64") } } }] });
+    const GITHUB = { event_name: "push", repository_id: "2131" };
     // No provenance: lodash.sib@4.17.21 10 s after the fix, lodash.late@4.17.21 16 minutes after, same publisher and
     // version. lodash.prov@1.0.0: an hour after, with provenance from `commit`.
     const times: Record<string, Record<string, string>> = {
@@ -917,12 +918,13 @@ describe("the time cap on candidates", () => {
     };
     /**
      * The fix's provenance commit (null: none), the attestation endpoint's status, the publisher every version records,
-     * and the package lodash.prov's statement names (another one, to test the subject check).
+     * the package lodash.prov's statement names (another one, to test the subject check), and lodash.prov's GitHub
+     * repository id and event.
      */
-    const fetchFn = (fixCommit: string | null, attestationStatus = 200, npmUser: object = { name: "bnjmn" }, provSubject = "lodash.prov"): typeof fetch => async url => {
+    const fetchFn = (fixCommit: string | null, attestationStatus = 200, npmUser: object = { name: "bnjmn" }, provSubject = "lodash.prov", provGithub: object = GITHUB): typeof fetch => async url => {
       const u = decodeURIComponent(String(url));
       const att = /\/-\/npm\/v1\/attestations\/(.+)@([^@]+)$/.exec(u);
-      if (att) return attestationStatus === 200 ? response(statement(att[1] === "lodash.prov" ? provSubject : att[1]!, att[2]!, att[1] === "lodash" ? fixCommit! : commit)) : new Response("", { status: attestationStatus });
+      if (att) return attestationStatus === 200 ? response(statement(att[1] === "lodash.prov" ? provSubject : att[1]!, att[2]!, att[1] === "lodash" ? fixCommit! : commit, att[1] === "lodash.prov" ? provGithub : GITHUB)) : new Response("", { status: attestationStatus });
       const name = u.replace("https://registry.npmjs.org/", "");
       if (!times[name]) return new Response("", { status: 404 });
       const attested = (v: string) => (name === "lodash" && v === "4.17.21" && fixCommit !== null) || (name === "lodash.prov" && v === "1.0.0");
@@ -936,8 +938,15 @@ describe("the time cap on candidates", () => {
     expect(plain.after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0"]);
     // The fix with provenance from the same commit: lodash.prov only; the siblings without provenance stop.
     const built = await candidateTimeCap("npm", before, after, plan, fetchFn(commit));
-    expect(built.same_release).toEqual([{ version: "lodash.prov@1.0.0", target: "lodash@4.17.21", basis: "provenance" }]);
+    expect(built.same_release).toEqual([{ version: "lodash.prov@1.0.0", target: "lodash@4.17.21", basis: "provenance", by_id: true }]);
     expect(built.after_t).toEqual(["lodash.late@4.17.21", "lodash.sib@4.17.21"]);
+    // The same commit, name and workflow, but another repository id, an id on one side only, or another event: it stops
+    // (docs/decisions/2026-10-30-provenance-immutable-id.md).
+    for (const github of [{ event_name: "push", repository_id: "666" }, { event_name: "push" }, { event_name: "pull_request_target", repository_id: "2131" }, { repository_id: "2131" }]) {
+      const cap = await candidateTimeCap("npm", before, after, plan, fetchFn(commit, 200, { name: "bnjmn" }, "lodash.prov", github));
+      expect(cap.same_release).toEqual([]);
+      expect(cap.after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0", "lodash.sib@4.17.21"]);
+    }
     // From another commit: everything after T stops.
     expect((await candidateTimeCap("npm", before, after, plan, fetchFn("0".repeat(40)))).after_t).toEqual(["lodash.late@4.17.21", "lodash.prov@1.0.0", "lodash.sib@4.17.21"]);
     // The attestation read fails: undecidable, and the receipt still has T and the count.
@@ -1406,7 +1415,10 @@ describe("nextFix", () => {
 });
 
 describe("the next smallest fix's publisher check (docs/decisions/2026-10-30-next-fix-same-publisher.md)", () => {
-  const release = { repository: "https://github.com/acme/tiny", workflow: ".github/workflows/release.yml" };
+  /** As npm writes provenance today, with GitHub's repository id and event; `old` has neither (an older or other format). */
+  const release = { repository: "https://github.com/acme/tiny", workflow: ".github/workflows/release.yml", repository_id: "4242", event: "push" };
+  const old = { repository: release.repository, workflow: release.workflow };
+  const seenAs = (p: { repository: string; workflow: string; repository_id?: string; event?: string }) => `repository ${p.repository}, workflow ${p.workflow}, GitHub repository id ${p.repository_id ?? "(none recorded)"}, event ${p.event ?? "(none recorded)"}`;
   /** tiny 1.0.0 is deprecated; 1.0.1 qualifies. `smallest` and `next` are their manifests' other fields. */
   const check = async (smallest: object, next: object, fetchFn?: (inner: typeof fetch) => typeof fetch) => {
     const seen: string[] = [];
@@ -1417,7 +1429,8 @@ describe("the next smallest fix's publisher check (docs/decisions/2026-10-30-nex
       const attested = /\/attestations\/tiny@(.+)$/.exec(String(url));
       if (attested) {
         const m = versions[attested[1] as "1.0.0"] as any, sha512 = Buffer.from(integrityOf("tiny", attested[1]!).slice(7), "base64").toString("hex");
-        const statement = { subject: [{ name: `pkg:npm/tiny@${m.subject ?? attested[1]}`, digest: { sha512 } }], predicate: { buildDefinition: { externalParameters: { workflow: { repository: m.provenance.repository, path: m.provenance.workflow } }, resolvedDependencies: [{ digest: { gitCommit: (attested[1] === "1.0.0" ? "a" : "b").repeat(40) } }] } } };
+        const github = { ...(m.provenance.repository_id === undefined ? {} : { repository_id: m.provenance.repository_id }), ...(m.provenance.event === undefined ? {} : { event_name: m.provenance.event }) };
+        const statement = { subject: [{ name: `pkg:npm/tiny@${m.subject ?? attested[1]}`, digest: { sha512 } }], predicate: { buildDefinition: { externalParameters: { workflow: { repository: m.provenance.repository, path: m.provenance.workflow } }, ...(Object.keys(github).length ? { internalParameters: { github } } : {}), resolvedDependencies:[{ digest: { gitCommit: (attested[1] === "1.0.0" ? "a" : "b").repeat(40) } }] } } };
         return response({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: Buffer.from(JSON.stringify(statement)).toString("base64") } } }] });
       }
       return response({ time: {}, versions: Object.fromEntries(Object.entries(versions).map(([v, m]) => [v, { _npmUser: { name: "alice" }, dist: { integrity: integrityOf("tiny", v), ...("provenance" in m ? { attestations: { url: "x" } } : {}) }, ...m }])) });
@@ -1433,7 +1446,7 @@ describe("the next smallest fix's publisher check (docs/decisions/2026-10-30-nex
   it("takes the version when both have provenance from the same repository and workflow, from different commits", async () => {
     const { choice, check: c } = await check({ provenance: release }, { provenance: release });
     expect(choice.chosen).toBe("1.0.1");
-    expect(c).toEqual({ version: "1.0.1", smallest: { publisher: "alice", provenance: { ...release, commit: "a".repeat(40) } }, candidate: { publisher: "alice", provenance: { ...release, commit: "b".repeat(40) } }, result: "provenance", detail: "The same provenance repository and workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml." });
+    expect(c).toEqual({ version: "1.0.1", smallest: { publisher: "alice", provenance: { ...release, commit: "a".repeat(40) } }, candidate: { publisher: "alice", provenance: { ...release, commit: "b".repeat(40) } }, result: "provenance", detail: `The same provenance repository, workflow and GitHub repository id: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has provenance from ${seenAs(release)}.` });
     // With provenance on both, the publisher account is not what is compared: trusted publishing's shared user is fine.
     const oidc = { _npmUser: { name: "GitHub Actions", email: "npm-oidc-no-reply@github.com", trustedPublisher: { id: "github" } } };
     expect((await check({ provenance: release, ...oidc }, { provenance: release, ...oidc })).choice.chosen).toBe("1.0.1");
@@ -1457,14 +1470,40 @@ describe("the next smallest fix's publisher check (docs/decisions/2026-10-30-nex
     expect((await check({}, { _npmUser: undefined })).check.result).toBe("stop");
   });
   it("stops when the provenance names another repository", async () => {
-    stops((await check({ provenance: release }, { provenance: { ...release, repository: "https://github.com/mallory/tiny" } })).choice, "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/mallory/tiny, workflow .github/workflows/release.yml.");
+    const other = { ...release, repository: "https://github.com/mallory/tiny" };
+    stops((await check({ provenance: release }, { provenance: other })).choice, `The provenance differs, or names no repository or workflow: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has provenance from ${seenAs(other)}.`);
   });
   it("stops when the provenance names another workflow", async () => {
-    stops((await check({ provenance: release }, { provenance: { ...release, workflow: ".github/workflows/other.yml" } })).choice, "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/other.yml.");
+    const other = { ...release, workflow: ".github/workflows/other.yml" };
+    stops((await check({ provenance: release }, { provenance: other })).choice, `The provenance differs, or names no repository or workflow: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has provenance from ${seenAs(other)}.`);
   });
   it("stops when only one of the two has provenance, either way round, even from the same account", async () => {
-    stops((await check({ provenance: release }, {})).choice, "Only one of the two has provenance: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has no provenance and was published by the npm account alice.");
-    stops((await check({}, { provenance: release })).choice, "Only one of the two has provenance: 1.0.0 has no provenance and was published by the npm account alice; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml.");
+    stops((await check({ provenance: release }, {})).choice, `Only one of the two has provenance: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has no provenance and was published by the npm account alice.`);
+    stops((await check({}, { provenance: release })).choice, `Only one of the two has provenance: 1.0.0 has no provenance and was published by the npm account alice; 1.0.1 has provenance from ${seenAs(release)}.`);
+  });
+  // docs/decisions/2026-10-30-provenance-immutable-id.md
+  it("stops when the repository id differs under the same name and workflow (SlugFest)", async () => {
+    const taken = { ...release, repository_id: "9999" };
+    stops((await check({ provenance: release }, { provenance: taken })).choice, `The GitHub repository ids differ: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has provenance from ${seenAs(taken)}.`);
+  });
+  it("stops when only one of the two records a repository id, either way round", async () => {
+    stops((await check({ provenance: release }, { provenance: old })).choice, `Only one of the two records a GitHub repository id, so they cannot be compared: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has provenance from ${seenAs(old)}.`);
+    stops((await check({ provenance: old }, { provenance: release })).choice, `Only one of the two records a GitHub repository id, so they cannot be compared: 1.0.0 has provenance from ${seenAs(old)}; 1.0.1 has provenance from ${seenAs(release)}.`);
+  });
+  it("stops when either side was published from an event other than push, release or workflow_dispatch", async () => {
+    for (const event of ["pull_request_target", "issue_comment", "workflow_run"]) {
+      const bad = { ...release, event };
+      stops((await check({ provenance: release }, { provenance: bad })).choice, `1.0.1's provenance was published from a GitHub ${event} event, not push, release or workflow_dispatch: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has provenance from ${seenAs(bad)}.`);
+      stops((await check({ provenance: bad }, { provenance: release })).choice, `1.0.0's provenance was published from a GitHub ${event} event, not push, release or workflow_dispatch: 1.0.0 has provenance from ${seenAs(bad)}; 1.0.1 has provenance from ${seenAs(release)}.`);
+    }
+    const noEvent = { repository: release.repository, workflow: release.workflow, repository_id: release.repository_id };
+    stops((await check({ provenance: release }, { provenance: noEvent })).choice, `1.0.1's provenance records a GitHub repository id but no triggering event: 1.0.0 has provenance from ${seenAs(release)}; 1.0.1 has provenance from ${seenAs(noEvent)}.`);
+    for (const event of ["release", "workflow_dispatch"]) expect((await check({ provenance: release }, { provenance: { ...release, event } })).choice.chosen).toBe("1.0.1");
+  });
+  it("takes the version when neither records a repository id, as before, and says it did not compare by ID", async () => {
+    const { choice, check: c } = await check({ provenance: old }, { provenance: old });
+    expect(choice.chosen).toBe("1.0.1");
+    expect(c).toMatchObject({ result: "provenance", detail: `The same provenance repository and workflow; neither records a GitHub repository id, so not compared by ID: 1.0.0 has provenance from ${seenAs(old)}; 1.0.1 has provenance from ${seenAs(old)}.` });
   });
   it("stops when the provenance cannot be read or does not name its version and tarball", async () => {
     const failing = (inner: typeof fetch): typeof fetch => async (url, init) => String(url).includes("/attestations/") ? new Response("", { status: 503 }) : inner(url, init);

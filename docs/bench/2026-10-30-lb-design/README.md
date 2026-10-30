@@ -188,7 +188,7 @@ The lane's review (comment 6525352604 at ebfe89d, REQUEST CHANGES) found a requi
 
 - **The tree's keys are a closed list:** `version`, `resolved`, `integrity`, `dev`, `optional`, `bundled`, `requires` and `dependencies`. Any other key refuses the lock, `devOptional`, `peer` and `extraneous` included (npm 11.19.1 wrote none of them in the locks here). Each key must be what `packages` says at the same path: the same `version`, `resolved` and `integrity`; `dev` and `optional` the same (absent is false); `bundled` the same as `inBundle`; `requires` exactly the entry's `dependencies` with its `optionalDependencies` (a link's: its folder's, `devDependencies` included, as npm writes it); the nested `dependencies` naming the same paths.
 - **Every requirement is met, in both views:** each requirement of each entry (in `packages` also the required peers, and the project's and its folders' own requirements, `devDependencies` included) is found by Node's lookup at a version its semver range takes (`semver.satisfies`, loose). An `npm:` alias must find the package it names, and a `file:` spec must find a link. A tag, URL or git spec cannot be shown to be met, and refuses. So the left-pad form (a tree `requires` naming what neither view has), a requirement left out, a copy outside its range (the axios form), and a moved version outside an unmoved dependent's range are all refused, with the same function in both views.
-- **What this changes for real locks:** a lock with an unmet requirement is no longer read by `ludion judge` either. That covers a project with `overrides` that force a version outside a range, a lock written with `--legacy-peer-deps` that leaves a peer out, and a git or URL dependency. Each is refused, which fails closed. The test locks in workspace-manifests.test.ts, judge.test.ts and deliver.test.ts that left requirements out, or put another package where one was required, were made complete or now expect the refusal.
+- **What this changed for real locks (undone in the seventh round, below):** a lock with an unmet requirement was no longer read by `ludion judge` either. That covers a project with `overrides` that force a version outside a range, a lock written with `--legacy-peer-deps` that leaves a peer out, and a git or URL dependency. Each is refused, which fails closed. The test locks in workspace-manifests.test.ts, judge.test.ts and deliver.test.ts that left requirements out, or put another package where one was required, were made complete or now expect the refusal.
 - **Not changed:** the review's N1. A real fix whose new version raises a dependency past the locked copy (axios 0.21.2 with follow-redirects moving 1.13.3 → 1.16.2) is still refused by the PR job's per-path check, so such a fix cannot be delivered. N2 is half done: the judgement's `not_checked` line on the npm 6 tree is corrected. N3 is done: this round's result is a new file in docs/progress. N4 is as in the fifth round.
 
 All ran in Docker, one container at a time, each with a `--memory` limit (tests 4g, mutations 6g), after checking `free -m`:
@@ -200,14 +200,44 @@ All ran in Docker, one container at a time, each with a `--memory` limit (tests 
   - vitest now runs with `--maxWorkers=2`.
 - **Both jobs** at 6efb04e (`logs/e2e-lb2a-fix6.log`; 55fbb67 only removed the guards that did nothing): npm-v2, npm-two and npm each opened their PRs on run 1 (lodash 4.17.20 → 4.18.1, and minimist 1.2.5 → 1.2.6 in npm-two) and none on run 2.
 
-### Scope of #215 (decided 2026-10-31)
+### What #215 leaves unchecked (2026-10-31)
 
-The lane's review of 2d6f224 (comment 6527878093, REQUEST CHANGES) found three more fields of a moved or added `packages` entry that change what npm installs and that the PR job does not tie to the base or the registry: `hasShrinkwrap` (npm 7 and later install the package's own shrinkwrap tree), `peerDependenciesMeta` (an optional mark takes a peer out of the requirement check) and the flags (`dev`, `optional`, `devOptional`, `peer`, which decide what a production install leaves out). The decision: #215 goes in when it is no worse than main, without further checks.
-- **Out of #215's scope:** npm 6's older lockfile forms (the legacy `dependencies` section, shrinkwraps, peer marks and the like). The PR job does not check the older lockfile forms npm 6 reads against the receipt; it checks `packages`, which npm 7 and later read, and the fields above are not compared.
-- **No worse than main:** main's PR job reads `lock.packages` only, compares versions by name, and never looks at the legacy section or at any of those fields.
-- **What comes next:** npm moves to a PR job that rebuilds the lockfile from the plan and compares it (plan D, lane LPD), instead of checking the artifact's lockfile field by field.
-- docs/status.md, both READMEs and the PR body Ludion writes say the same.
-- Tests at 2dc7e3e, after those text changes (`logs/test-lb2a-scope.log`, in Docker with `--memory 4g`): typecheck 0, build 0, 35 files, 1,219 passed, 19 skipped.
+The lane's review of 2d6f224 (comment 6527878093, REQUEST CHANGES) found three more fields of a moved or added `packages` entry that change what npm 7 and later install and that the PR job does not tie to the base or the registry:
+- `hasShrinkwrap`: npm installs the package's own shrinkwrap tree;
+- `peerDependenciesMeta`: an optional mark takes a peer out of the requirement check;
+- the flags (`dev`, `optional`, `devOptional`, `peer`): they decide what a production install leaves out.
+
+The decision: #215 goes in when it is no worse than main, without these checks.
+- They are written down as not yet checked, with `bin`, `hasInstallScript` and `engines`, in docs/status.md, both READMEs and the PR body Ludion writes.
+- Main's PR job reads `lock.packages` only, compares versions by name, and looks at none of them.
+- npm moves to a PR job that rebuilds the lockfile from the plan and compares it (plan D, lane LPD), instead of checking the artifact's lockfile field by field.
+- Tests at 2dc7e3e, after the text changes of that day (`logs/test-lb2a-scope.log`, in Docker with `--memory 4g`): typecheck 0, build 0, 35 files, 1,219 passed, 19 skipped.
+
+A first wording of this section (at 2dc7e3e) called these fields and the npm 6 section "out of #215's scope". The npm 6 section is read (its agreement with `packages`, above, and the requirement check below). The decision of 2026-10-31 after the R lane's review was not to narrow what Ludion does.
+
+### LB2a, seventh round (2026-10-31): the R lane's review of 217a6f8
+
+The R lane's review (comment 6529858505 at 217a6f8, REQUEST CHANGES) found:
+- **B1:** the sixth round's rule refused lockfiles npm 11 writes and main reads: `overrides` outside a dependent's range, and `--legacy-peer-deps`. That narrowed `ludion judge`, npm `patch` and the PR job, and nothing said so where users read.
+- **B2:** the PR job accepted a fix that left an npm alias of the receipt's package (an entry `name`d for it under another path) at the replaced version, while the texts said every such copy moves.
+- **N1 to N5:** non-blocking.
+
+The answer for B1 was (a): read those lockfiles, without narrowing.
+- **B1** (docs/decisions/2026-10-31-lock-requirements-against-the-base.md, committed before the code). readLock no longer refuses a lock for an unmet requirement on its own. `newUnmetRequirements` (judge.ts) compares the change with the base, in both views, and refuses a requirement the change leaves unmet that the base met. `ludion judge` and npm `patch`'s judge ask it through `packageLockInputs`; the PR job asks it in `npmLockProblem`.
+  - In `packages`, the project's package.json `overrides` count as npm 7 and later apply them: a top-level key, a key nested under a package the requirer is or is installed under, and `"$name"`.
+  - A peer is keyed without its spec, so a `--legacy-peer-deps` lock's left-out peer stays the same one when its requirer moves.
+  - Locks npm 11.19.1 wrote in Docker are fixtures and are read: `overrides` top-level and nested, and `--legacy-peer-deps` before and after react-dom moves (`packages/cli/test/fixtures/lock-v3-npm11-ovr.json`, `-ovr2`, `-lpd`, `-lpd2`). Forged changes from them are refused.
+- **B2.** A planned path is any install path holding the receipt's package: its entry's `name` for an npm alias, else the path's name. An alias of the package at a `from` must move with it; an alias of another package at the package's own path is not it. The texts now say "under its own name or an npm alias".
+- **N1.** `libc` is compared with the registry with `os` and `cpu`. `hasInstallScript` and `engines` are listed as not compared in the PR body Ludion writes, both READMEs and docs/status.md.
+- **N2.** New tests:
+  - a merge commit whose first parent is the base;
+  - shadowing through an unmoved entry's `optionalDependencies` and `peerDependencies`;
+  - shadowing through the project's `devDependencies`, `optionalDependencies` and `peerDependencies`.
+  Each has a mutation.
+- **N3.** The "npm 6's older lockfile forms" label for packages fields is gone (above).
+- **N4.** `projects()` includes the project's and folders' required peers. judge.ts's `not_checked` line says what the npm 6 section is read for.
+- **N5.** The PR job's own alias-and-range guard on added copies, which readLock's check made redundant, is removed. Whether an added copy is what its requirer asks is the requirement check's. So an added `npm:` alias that the requirer's registry-listed spec names is read, as npm reads it.
+- **Tests and mutations** run in Docker with `--network none` after `npm ci` (`scripts/install.sh`, then `scripts/test-offline.sh`) and `--memory 4g`. The numbers are in docs/progress/2026-10-31-lb2a-fix-a.md.
 
 ## The reviews
 

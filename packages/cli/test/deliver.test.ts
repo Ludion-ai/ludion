@@ -338,6 +338,12 @@ describe("the PR job refuses an artifact the validation job would not write", { 
     expect(git(p.work, "rev-list", "--parents", "-n", "1", made)).toBe(made);
     return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
   }, /does not have the base [0-9a-f]{12} as its only parent|needs commits other than the base/));
+  it("a merge commit whose first parent is the base and whose second is another commit in the bundle (review 6529858505, N2)", () => refused(p => {
+    const other = forge(p.work, "ludion/other-parent", p.base, { "package-lock.json": LOCK.replace("app", "app2") });
+    const made = raw(p.work, BRANCH, p.base, ["tree T", `parent ${p.base}`, `parent ${other}`, `author ${WHO}`, `committer ${WHO}`]);
+    expect(git(p.work, "rev-list", "--parents", "-n", "1", made)).toBe(`${made} ${p.base} ${other}`);
+    return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
+  }, /does not have the base [0-9a-f]{12} as its only parent/));
   it("headers out of Git's order or beyond it, even with the base as Git's parent", async () => {
     for (const headers of [
       (base: string) => ["tree T", `parent ${base}`, `author ${WHO}`, `parent ${base}`, `committer ${WHO}`],
@@ -450,6 +456,8 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       [async () => null, "failed", "the registry lists no minimist@1.2.6"],
       [async () => { throw new Error("registry.npmjs.org answered HTTP 503."); }, "failed", "the registry could not be read: registry.npmjs.org answered HTTP 503."],
       [async (name: string, version: string) => ({ name, version, dependencies: name === "minimist" ? { "is-number": "^7.0.0" } : {}, os: ["linux"] }), "failed", "package-lock.json's os for"],
+      // libc decides, like os and cpu, whether npm installs a package on a platform (review 6529858505, N1).
+      [async (name: string, version: string) => ({ name, version, dependencies: name === "minimist" ? { "is-number": "^7.0.0" } : {}, libc: ["musl"] }), "failed", "package-lock.json's libc for"],
       // The same lock, when the registry does list the requirement: opened.
       [registry({ "is-number": "^7.0.0" }), "opened", undefined],
     ] as const) {
@@ -752,8 +760,17 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "new-dep": "^1.0.0", nested: "2" } }, "node_modules/new-dep": { version: "1.0.0", optionalDependencies: { deeper: "*" } }, "node_modules/deeper": { version: "3.0.0" }, "node_modules/minimist/node_modules/nested": { version: "2.0.0" } }))).toBeNull();
     expect(contentProblem("npm", transitive, npmBase, lockOf({ "node_modules/minimist": { version: "1.2.6" } }))).toContain("the base's package-lock.json does not have minimist at that version");
     expect(contentProblem("npm", transitive, lockOf({}), lockOf({ "node_modules/lodash/node_modules/evil-copy": { version: "9.9.9" } }))).toContain("the base's package-lock.json does not have minimist");
-    // An alias that calls itself minimist, moved: the path's name counts, not the entry's.
-    expect(contentProblem("npm", transitive, lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.5" } }), lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.6" } }))).toContain("the base's package-lock.json does not have minimist at that version");
+    // An npm alias of minimist (an entry `name`d minimist under another path) is minimist: the base's alias at 1.2.5 is a
+    // planned path, so the fix must move it too (review 6529858505, B2), and moved, nothing more is asked of it here.
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.5" } }), lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.6" } }))).toBeNull();
+    // B2's example: the base has lodash at node_modules/lodash and an alias of it, both 4.17.20; a fix that moves only the
+    // first leaves the alias at the version replaced, and is refused.
+    const aliasRoot = { name: "app", dependencies: { lodash: "^4.17.20", "lodash-old": "npm:lodash@^4.17.20" } };
+    const withAlias = (version: string, alias: string) => files({ "package.json": version === "4.17.20" ? pkg : fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version }, "node_modules/lodash-old": { name: "lodash", version: alias } }, aliasRoot) });
+    expect(contentProblem("npm", fix, withAlias("4.17.20", "4.17.20"), withAlias("4.17.21", "4.17.20"))).toContain("does not have lodash at 4.17.21, the fix's version, at node_modules/lodash-old, where the base has 4.17.20");
+    expect(contentProblem("npm", fix, withAlias("4.17.20", "4.17.20"), withAlias("4.17.21", "4.17.21"))).toBeNull();
+    // An alias of another package at the package's own path is not it (the path's name alone does not count either).
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { name: "is-number", version: "1.2.5" } }), lockOf({ "node_modules/minimist": { name: "is-number", version: "1.2.6" } }))).toContain("the base's package-lock.json does not have minimist at that version");
     // The base has 1.2.5 only under another name (review 6518582507, N-b R5).
     expect(contentProblem("npm", transitive, lockOf({ "node_modules/other": { version: "1.2.5" }, "node_modules/minimist": { version: "1.2.0" } }), lockOf({ "node_modules/other": { version: "1.2.6" }, "node_modules/minimist": { version: "1.2.0" } }))).toContain("the base's package-lock.json does not have minimist at that version");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.5" }, "node_modules/lodash/node_modules/evil-copy": { version: "9.9.9" } }))).toContain("does not have minimist at 1.2.6, the fix's version");
@@ -784,24 +801,39 @@ describe("the policy at the base decides what a fix may change, and what it may 
     for (const [foo, range] of [[{ name: "evil", version: "1.0.0" }, "^1.0.0"], [{ version: "2.0.0" }, "^1.0.0"]] as const) {
       expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { foo: range } }, "node_modules/foo": foo }))).toMatch(/node_modules\/minimist requires foo \^1\.0\.0, and node_modules\/foo has (evil|foo)@[12]\.0\.0, which is not that/);
     }
-    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { foo: "npm:evil@1.0.0" } }, "node_modules/foo": { name: "evil", version: "1.0.0" } }))).toContain("which is not what node_modules/minimist requires (foo npm:evil@1.0.0)");
+    // An added alias that its requirer's own spec asks for (npm:evil@1.0.0) is what npm installs for it: read, as npm
+    // reads it (the registry check, npmAgain, ties that spec to the registry's).
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { foo: "npm:evil@1.0.0" } }, "node_modules/foo": { name: "evil", version: "1.0.0" } }))).toBeNull();
     // Read as the judge reads it (review of 7d25696, N3): two paths that differ only in case, and a version that is not semver.
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/Minimist": { version: "1.2.6" } }))).toContain("not one Ludion reads (Two package-lock paths differ only in case");
-    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { x: "*" } }, "node_modules/x": { version: "latest" } }))).toContain("not one Ludion reads (package-lock.json's packages: node_modules/minimist requires x *, and node_modules/x has x@latest, which is not that.)");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { x: "*" } }, "node_modules/x": { version: "latest" } }))).toContain("not one Ludion reads (Invalid locked version at node_modules/x.)");
     // An added copy that an unchanged package now loads instead of its own (review of 7d25696, B1 (B)): the nested
     // minimist 0.0.10 -> 0.2.4 under optimist, with a wordwrap 1.0.0 beside it that optimist then loads, not 0.0.3.
     const optimist = (packages: Record<string, unknown>, ranges = { minimist: "~0.0.1", wordwrap: "~0.0.2" }) => files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/minimist": { version: "1.2.8" }, "node_modules/optimist": { version: "0.6.1", dependencies: ranges }, "node_modules/wordwrap": { version: "0.0.3" }, ...packages }, { name: "app", dependencies: { optimist: "0.6.1" } }) });
     const nested = fixOf("minimist", "0.0.10", "0.2.4", ["package.json", "package-lock.json"]);
     // With optimist's real ranges the moved minimist is outside optimist's own (review of ebfe89d, B1: a dependent left
     // outside its range), which npm `install` would mend with an unpinned copy.
-    expect(contentProblem("npm", nested, optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.0.10" } }), optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.2.4", dependencies: { wordwrap: "1.0.0" } }, "node_modules/optimist/node_modules/wordwrap": { version: "1.0.0" } }))).toContain("not one Ludion reads (package-lock.json's packages: node_modules/optimist requires minimist ~0.0.1, and node_modules/optimist/node_modules/minimist has minimist@0.2.4, which is not that.)");
+    expect(contentProblem("npm", nested, optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.0.10" } }), optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.2.4", dependencies: { wordwrap: "1.0.0" } }, "node_modules/optimist/node_modules/wordwrap": { version: "1.0.0" } }))).toContain("package-lock.json's packages: node_modules/optimist requires minimist ~0.0.1, and node_modules/optimist/node_modules/minimist has minimist@0.2.4, which is not that.");
     // With ranges that take any version, the shadow itself is what is refused.
     const any = { minimist: "*", wordwrap: "*" };
     expect(contentProblem("npm", nested, optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.0.10" } }, any), optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.2.4", dependencies: { wordwrap: "1.0.0" } }, "node_modules/optimist/node_modules/wordwrap": { version: "1.0.0" } }, any))).toContain("changes what node_modules/optimist loads for wordwrap (node_modules/wordwrap -> node_modules/optimist/node_modules/wordwrap)");
     // Nested under the moved copy instead, wordwrap 1.0.0 is that copy's own: optimist still loads 0.0.3.
     expect(contentProblem("npm", nested, optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.0.10" } }, any), optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.2.4", dependencies: { wordwrap: "1.0.0" } }, "node_modules/optimist/node_modules/minimist/node_modules/wordwrap": { version: "1.0.0" } }, any))).toBeNull();
-    // A base whose own project requirement npm finds no copy of is not read at all: npm `install` would fetch it.
-    expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { version: "1.2.5" } }, { name: "app", dependencies: { lodash: "^4.17.20", "left-pad": "1" } }), lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "left-pad": "1" } }, "node_modules/left-pad": { version: "1.0.0" } }, { name: "app", dependencies: { lodash: "^4.17.20", "left-pad": "1" } }))).toContain("not one Ludion reads (package-lock.json's packages: the project requires left-pad 1, and npm finds no copy of it in the lock.)");
+    // The shadow check reads an unmoved entry's optional and peer requirements, and the project's dev, optional and peer
+    // groups, not only `dependencies` (review 6529858505, N2): an added copy under b, reached from the moved minimist,
+    // would change what b loads for w; and a top-level copy the project's own group asks for, missing at the base.
+    for (const group of ["optionalDependencies", "peerDependencies"]) {
+      const underB = (packages: Record<string, unknown>) => lockOf({ "node_modules/b": { version: "1.0.0", [group]: { w: "*" } }, "node_modules/w": { version: "1.0.0" }, ...packages }, { name: "app", dependencies: { lodash: "^4.17.20", b: "1.0.0" } });
+      expect(contentProblem("npm", transitive, underB({ "node_modules/b/node_modules/minimist": { version: "1.2.5" } }), underB({ "node_modules/b/node_modules/minimist": { version: "1.2.6", dependencies: { w: "*" } }, "node_modules/b/node_modules/w": { version: "2.0.0" } })), group).toContain("changes what node_modules/b loads for w (node_modules/w -> node_modules/b/node_modules/w)");
+    }
+    for (const group of ["devDependencies", "optionalDependencies", "peerDependencies"]) {
+      const project = { name: "app", dependencies: { lodash: "^4.17.20" }, [group]: { w: "*" } };
+      expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { version: "1.2.5" } }, project), lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { w: "*" } }, "node_modules/w": { version: "1.0.0" } }, project)), group).toContain("changes what the project loads for w (nothing -> node_modules/w)");
+    }
+    // A base whose own project requirement npm finds no copy of is read (the requirement is the project's own; see
+    // docs/decisions/2026-10-31-lock-requirements-against-the-base.md), and a fix that adds a copy the project then loads is
+    // refused by the shadow check.
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { version: "1.2.5" } }, { name: "app", dependencies: { lodash: "^4.17.20", "left-pad": "1" } }), lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "left-pad": "1" } }, "node_modules/left-pad": { version: "1.0.0" } }, { name: "app", dependencies: { lodash: "^4.17.20", "left-pad": "1" } }))).toContain("changes what the project loads for left-pad (nothing -> node_modules/left-pad)");
     // The review of ebfe89d's three forms, each refused by the same reading in both views: a requirement the lock leaves
     // out, one held by a copy outside its range (the axios 0.21.2 / follow-redirects 1.13.3 form), and npm 6's tree alike.
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "is-number": "^7.0.0" } } }))).toContain("node_modules/minimist requires is-number ^7.0.0, and npm finds no copy of it in the lock.");

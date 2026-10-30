@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, renameSync, rmSync, symlinkSync, writeFileSync 
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, describe, expect, it, vi } from "vitest";
-import { allChanges, judge, lockEntries, lockEntryChanges, manifestChanges, type Change, type Judgement, type VersionFacts } from "../src/security/judge.ts";
+import { allChanges, judge, lockEntries, lockEntryChanges, manifestChanges, newUnmetRequirements, type Change, type Judgement, type VersionFacts } from "../src/security/judge.ts";
 import { judgeCli, workspaceManifests } from "../src/security/judge-cli.ts";
 import { workspaceDir, workspaceManifestChanges } from "../src/security/workspace-manifests.ts";
 
@@ -222,6 +222,7 @@ describe("the judge with workspace package.json files", () => {
     ["a top-level __proto__ added", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, manifest: JSON.stringify(worker("^4.13.14")).replace(/^\{/, '{"__proto__":{},') } }, 'changes "__proto__"'],
     ["a file that is not JSON", "apps/worker/package.json", { ...SHAPE_161, after: { ...SHAPE_161.after, manifest: "{ not json" } }, "is not a JSON object on both sides"],
     ["a folder the root's workspaces do not name", "other/worker/package.json", { before: { manifest: worker("^4.13.13"), lock: otherWorker("^4.13.13", "4.13.13") }, after: { manifest: worker("^4.13.14"), lock: otherWorker("^4.13.14", "4.13.14") } }, "is not a workspace that the root package.json"],
+    ["a spec outside the registry", "apps/worker/package.json", { ...SHAPE_161, after: { manifest: worker("github:evil/hono"), lock: workerLock("github:evil/hono", "4.13.14") } }, "not a registry range"],
   ] as const)("stops %s, with the file still in the changed-files stop", (_name, file, shape, reason) => {
     const { workspaces, fixed } = judgeBoth(file, shape);
     expect(workspaces).toEqual([{ file, reasons: [expect.stringContaining(reason)] }]);
@@ -230,10 +231,13 @@ describe("the judge with workspace package.json files", () => {
     expect(fixed.findings.some(f => f.effect === "info" && f.message.includes("equal the lockfile's record"))).toBe(false);
     expect(fixed.verdict).toBe("stop");
   });
-  it("does not read a lock whose workspace requires a spec outside the registry that a registry copy is said to meet", () => {
-    // The rule-3 reason ("not a registry range") is in the rule's own test above; here the lock itself is not read, since
-    // npm would not take hono@4.13.14 for github:evil/hono (review of ebfe89d, B1).
-    expect(() => judgeBoth("apps/worker/package.json", { ...SHAPE_161, after: { manifest: worker("github:evil/hono"), lock: workerLock("github:evil/hono", "4.13.14") } })).toThrow("node_modules/@ludion/worker requires hono github:evil/hono, and node_modules/hono has hono@4.13.14, which is not that");
+  it("a lock change whose workspace requires a spec outside the registry that a registry copy is said to meet adds an unmet requirement", () => {
+    // npm would not take hono@4.13.14 for github:evil/hono, so packageLockInputs (`ludion judge`) refuses the change
+    // before judging it (newUnmetRequirements; review of ebfe89d, B1).
+    expect(newUnmetRequirements({ lock: lockText(SHAPE_161.before.lock) }, { lock: lockText(workerLock("github:evil/hono", "4.13.14")) })).toEqual([
+      "package-lock.json's packages: node_modules/@ludion/worker requires hono github:evil/hono, and node_modules/hono has hono@4.13.14, which is not that.",
+      "package-lock.json's packages: apps/worker requires hono github:evil/hono, and node_modules/hono has hono@4.13.14, which is not that.",
+    ]);
   });
   it("is undecidable when a side was not given or is not a regular file (judge.yml gives neither side today)", () => {
     for (const shape of [{ ...SHAPE_161, before: { lock: SHAPE_161.before.lock } }, { ...SHAPE_161, after: { lock: SHAPE_161.after.lock } }, { before: { lock: SHAPE_161.before.lock }, after: { lock: SHAPE_161.after.lock } }]) {

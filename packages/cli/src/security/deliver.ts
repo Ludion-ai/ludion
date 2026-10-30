@@ -9,7 +9,7 @@ import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryManifest } from "./npm-facts.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
-import { DECLARED, lockEntries, lockKey, readLock, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
+import { DECLARED, lockEntries, lockKey, newUnmetRequirements, readLock, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
 import { comparableVersion } from "./osv.ts";
 import { compare, phpImage } from "./php.ts";
@@ -253,15 +253,18 @@ const ROOT_GROUPS = ["dependencies", "devDependencies", "optionalDependencies", 
  * - every key is the root or an install path, read by the judge's own lockKey; a key in any other form (a folder, or
  *   "aaaaaaaaaaaaminimist", which npm installs nothing at) refuses the artifact, never is skipped (B1). `patch` does not
  *   fix workspaces, so a project folder has no place in a fix's lock; an extraneous folder may only stay as it was;
- * - the planned paths: each install path where the base has the fix's package (the path's name, not the entry's own
- *   `name`, which an alias sets) at a change's `from`. Each change has one, and in the fix each is at the same path at
- *   that change's `to`, under no other name; no install path has the package at a `from` any more;
+ * - the planned paths: each install path where the base has the fix's package at a change's `from`, whether the path
+ *   is named for it or is an npm alias of it under another name (its entry's `name`; an alias of another package at
+ *   the package's own path is not it) (review 6529858505, B2). Each change has one, and in the fix each is at the same
+ *   path at that change's `to`, as the same package; no install path has the package at a `from` any more;
  * - every added path is installed, and is what a planned path or another added path resolves for one of its own
  *   requirements (DECLARED, by Node's lookup), so none comes from nowhere;
- * - every other key is exactly as at the base; the root's only change is the fix's package's requirement.
+ * - every other key is exactly as at the base; the root's only change is the fix's package's requirement;
+ * - the fix leaves no requirement unmet that the base meets (newUnmetRequirements, with each side's package.json
+ *   `overrides`): npm install would fetch it, unpinned. That also covers an added copy that is not what its requirer asks.
  * The judge, run again in openFixes, checks the changed and added entries against the registry.
  */
-function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix): string | null {
+function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix, manifests: { before: string | null; after: string | null }): string | null {
   if (old === null || now === null) return "package-lock.json is missing.";
   const show = (path: string) => plain(path).slice(0, 200), pkg = show(fix.package);
   let was: Record<string, unknown>, is: Record<string, unknown>, kinds: Map<string, ReturnType<typeof lockKey>>;
@@ -279,6 +282,10 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
   // A tree npm 6 reads only where the base had one (review of 1e6f705, B1): a v3 base given one would hand npm 6 a tree to
   // install from. Where both have one, readLock has tied each to its packages section, which the checks below compare.
   if (Object.hasOwn(baseTop!, "dependencies") !== Object.hasOwn(fixTop!, "dependencies")) return `package-lock.json ${Object.hasOwn(fixTop!, "dependencies") ? "adds" : "removes"} the npm 6 dependencies tree.`;
+  // A requirement the fix leaves unmet, which the base meets, npm install would fetch unpinned (review of ebfe89d, B1).
+  const json = (text: string | null): unknown => { try { return text === null ? undefined : JSON.parse(text); } catch { return undefined; } };
+  const unmet = newUnmetRequirements({ lock: old, manifest: json(manifests.before) }, { lock: now, manifest: json(manifests.after) });
+  if (unmet.length) return plain(unmet[0]!).slice(0, 400);
   for (const [path, kind] of kinds) {
     if (kind === "folder") return `package-lock.json has ${show(path)}, which is not an install path (Ludion's fixes cover no workspace or local folder).`;
     if ([was, is].some(lock => Object.hasOwn(lock, path) && !isObject(lock[path]))) return `package-lock.json's ${show(path)} is not an object.`;
@@ -289,7 +296,8 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
     if (to.has(change.from) && to.get(change.from) !== change.to) return `the receipt moves ${pkg} from ${plain(change.from).slice(0, 60)} twice.`;
     to.set(change.from, change.to);
   }
-  const ours = (path: string, item: Record<string, unknown> | null) => kinds.get(path) === "install" && requireName(path) === fix.package && !!item && (item.name === undefined || item.name === fix.package) && !item.link;
+  // The package an install path holds: its entry's `name` for an npm alias, else the path's name.
+  const ours = (path: string, item: Record<string, unknown> | null) => kinds.get(path) === "install" && !!item && !item.link && (typeof item.name === "string" ? item.name : requireName(path)) === fix.package;
   const planned = Object.keys(was).filter(path => ours(path, entry(was, path)) && to.has(String(entry(was, path)!.version)));
   for (const change of fix.changes) {
     if (!planned.some(path => entry(was, path)!.version === change.from)) return `the receipt moves ${pkg} from ${plain(change.from).slice(0, 60)}, and the base's package-lock.json does not have ${pkg} at that version.`;
@@ -301,7 +309,7 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
   const tos = new Set(to.values());
   for (const path of Object.keys(is)) {
     const version = String(entry(is, path)!.version);
-    if (kinds.get(path) === "install" && requireName(path) === fix.package && to.has(version) && !tos.has(version)) return `package-lock.json still has ${pkg} at ${plain(version).slice(0, 60)}, which the fix moves (${show(path)}).`;
+    if (ours(path, entry(is, path)) && to.has(version) && !tos.has(version)) return `package-lock.json still has ${pkg} at ${plain(version).slice(0, 60)}, which the fix moves (${show(path)}).`;
   }
   // Each requirement group of the root with the fix's package's range blanked: nothing else of the root may change.
   const root = (item: Record<string, unknown> | null) => item && Object.fromEntries(Object.entries(item).map(([key, value]) => [key,
@@ -324,16 +332,10 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
   const reached = new Set<string>(), queue = [...planned];
   while (queue.length) {
     const path = queue.shift()!, item = entry(is, path)!;
-    for (const group of DECLARED) for (const [name, range] of isObject(item[group]) ? Object.entries(item[group]) : []) {
+    // Whether each added copy is what its requirer asks for is newUnmetRequirements' question, above (review 6529858505, N5).
+    for (const group of DECLARED) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
       const target = resolveFrom(installed, `${path}/`, name)?.path;
-      if (!target || !added.includes(target)) continue;
-      // The added copy is the package asked for, at a version its range takes: no alias of another package, and no range
-      // npm would not read as semver (a URL, a tag, "npm:…").
-      const found = entry(is, target)!, version = String(found.version);
-      if ((found.name !== undefined && found.name !== name) || typeof range !== "string" || !semver.validRange(range) || !semver.satisfies(version, range)) {
-        return `package-lock.json adds ${show(target)} (${plain(String(found.name ?? name)).slice(0, 100)}@${plain(version).slice(0, 60)}), which is not what ${show(path)} requires (${show(name)} ${plain(String(range)).slice(0, 60)}).`;
-      }
-      if (!reached.has(target)) { reached.add(target); queue.push(target); }
+      if (target && added.includes(target) && !reached.has(target)) { reached.add(target); queue.push(target); }
     }
   }
   const stray = added.filter(path => !reached.has(path));
@@ -356,14 +358,15 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
 const npmRequirements = (item: Record<string, unknown>) => ({
   requires: { ...(isObject(item.dependencies) ? item.dependencies : {}), ...(isObject(item.optionalDependencies) ? item.optionalDependencies : {}) },
   peers: isObject(item.peerDependencies) ? item.peerDependencies : {},
-  os: item.os ?? null, cpu: item.cpu ?? null,
+  os: item.os ?? null, cpu: item.cpu ?? null, libc: item.libc ?? null,
 });
 
 /**
  * npm: every package-lock.json entry the fix moves or adds must declare what the registry lists for that name and
- * version: its requirements (dependencies and optional ones together, and peers) and its `os` and `cpu`. contentProblem's
- * "required by a moved or added path" then rests on the registry's data, not on the artifact's (review of 7d25696, B1 (A)),
- * as composerAgain's does on Packagist's. `bin` and `hasInstallScript` are not compared.
+ * version: its requirements (dependencies and optional ones together, and peers) and its `os`, `cpu` and `libc`, which
+ * decide whether npm installs it on a platform (review 6529858505, N1). contentProblem's "required by a moved or added
+ * path" then rests on the registry's data, not on the artifact's (review of 7d25696, B1 (A)), as composerAgain's does on
+ * Packagist's. Not compared: `bin`, `hasInstallScript`, `engines`, `hasShrinkwrap`, `peerDependenciesMeta` and the flags.
  */
 async function npmAgain(top: string, prefix: string, base: string, fix: CheckedFix, manifest: (name: string, version: string) => Promise<Record<string, unknown> | null>): Promise<string | null> {
   try {
@@ -376,7 +379,7 @@ async function npmAgain(top: string, prefix: string, base: string, fix: CheckedF
       const listed = await manifest(name, version);
       if (!listed) return `the registry lists no ${at} (${plain(path).slice(0, 200)}).`;
       const lock = npmRequirements(item), registry = npmRequirements(listed);
-      for (const key of ["requires", "peers", "os", "cpu"] as const) {
+      for (const key of ["requires", "peers", "os", "cpu", "libc"] as const) {
         if (!isDeepStrictEqual(lock[key], registry[key])) return `package-lock.json's ${key === "requires" ? "dependencies" : key === "peers" ? "peerDependencies" : key} for ${at} (${plain(path).slice(0, 200)}) is not what the registry lists.`;
       }
     }
@@ -502,7 +505,7 @@ export function contentProblem(ecosystem: Ecosystem, fix: CheckedFix, before: (p
   // npm reads npm-shrinkwrap.json instead of package-lock.json when both are there, so a fix to package-lock.json would
   // install nothing of what the receipt says.
   if (ecosystem === "npm" && before("npm-shrinkwrap.json") !== null) return "the base has npm-shrinkwrap.json, which npm reads instead of package-lock.json.";
-  if (ecosystem === "npm") return npmLockProblem(before("package-lock.json"), after("package-lock.json"), fix);
+  if (ecosystem === "npm") return npmLockProblem(before("package-lock.json"), after("package-lock.json"), fix, { before: before("package.json"), after: after("package.json") });
   return ecosystem === "composer" ? composerLockProblem(before("composer.lock"), after("composer.lock"), fix) : null;
 }
 
@@ -620,7 +623,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package, at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry and nothing another package loads, and that each moved or added entry declares the requirements, os and cpu the registry lists" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
@@ -628,7 +631,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**Not checked**",
     "",
     "- Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.",
-    ...(ecosystem === "npm" ? ["- The older lockfile forms npm 6 reads (package-lock.json's legacy `dependencies` section) are not checked against the receipt; the `packages` section, which npm 7 and later read, is. Nor are a moved or added entry's `hasShrinkwrap`, `peerDependenciesMeta`, flags or `bin` compared with the base or the registry."] : []),
+    ...(ecosystem === "npm" ? ["- In package-lock.json, a moved or added entry's `hasShrinkwrap`, `peerDependenciesMeta`, flags (`dev`, `optional`, `devOptional`, `peer`), `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap; the flags decide what a production install leaves out)."] : []),
     "- Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.",
     "- Production: nothing is deployed.",
     "",

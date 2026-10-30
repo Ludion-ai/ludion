@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
+import { allChanges, installScripts, judge, lockDiff, lockEntries, newUnmetRequirements, unmetRequirements, lockEntryChanges, lockExtraneous, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { gatherFacts, osvIds, provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
 import { pnpmChanges } from "../src/security/judge-cli.ts";
 import { OsvClient } from "../src/security/osv.ts";
@@ -494,9 +494,13 @@ describe("gate 4 and urgency", () => {
     const shadow = verdict(lock({ ...common, "node_modules/foo": { version: "1.0.0" } }), lock({ ...common, "node_modules/a/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
     expect(shadow.verdict).toBe("stop");
     expect(shadow.findings.map(f => f.message)).toEqual(expect.arrayContaining([expect.stringContaining("lodash goes down from 4.17.21 to 3.10.1"), expect.stringContaining("GHSA-old")]));
-    // (B) The shadowing copy is another package under the name lodash, which a requires as lodash: the lock is not read
-    // at all (review of ebfe89d, B1), since what a finds there is not what it requires.
-    expect(() => verdict(lock({ ...common, "node_modules/foo": { version: "1.0.0" } }), lock({ ...common, "node_modules/a/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }))).toThrow("node_modules/a requires lodash *, and node_modules/a/node_modules/lodash has evil-pkg@1.0.0, which is not that");
+    // (B) The shadowing copy is another package under the name lodash. The judge stops it; and the change leaves a's
+    // requirement unmet, which packageLockInputs refuses before judging (newUnmetRequirements).
+    const aliasBefore = lock({ ...common, "node_modules/foo": { version: "1.0.0" } }), aliasAfter = lock({ ...common, "node_modules/a/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } });
+    const alias = verdict(aliasBefore, aliasAfter);
+    expect(alias.verdict).toBe("stop");
+    expect(alias.findings.some(f => f.message.includes("instead of lodash@4.17.21"))).toBe(true);
+    expect(newUnmetRequirements({ lock: aliasBefore }, { lock: aliasAfter })).toEqual(["package-lock.json's packages: node_modules/a requires lodash *, and node_modules/a/node_modules/lodash has evil-pkg@1.0.0, which is not that."]);
     // (C) a moves under x, its nested 4.17.21 is gone, and from there it now loads x's lodash 3.10.1.
     const before = lock({ ...common, "node_modules/a/node_modules/lodash": { version: "4.17.21" }, "node_modules/lodash": { version: "4.17.20" }, "node_modules/foo": { version: "1.0.0" } });
     const { "node_modules/a": _moved, ...rest } = common;
@@ -527,10 +531,10 @@ describe("gate 4 and urgency", () => {
     // (E2) moved and upgraded at once.
     const e2 = verdict(lock({ ...common, ...old, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...old, "node_modules/y/node_modules/a": a101, "node_modules/y/node_modules/lodash": { version: "3.10.1" }, "node_modules/foo": { version: "1.0.1" } }));
     expect(e2.verdict).toBe("stop");
-    // (E3) the other version of a loaded an alias; the moved a@1.0.0, which requires lodash itself, would load it instead
-    // of lodash: the lock is not read at all (review of ebfe89d, B1).
+    // (E3) the other version of a loaded an alias; the moved a@1.0.0 now loads it instead of lodash.
     const oldAlias = { "node_modules/x/node_modules/a": { version: "0.9.0", dependencies: { lodash: "npm:evil-pkg@1.0.0" } }, "node_modules/x/node_modules/a/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" } };
-    expect(() => verdict(lock({ ...common, ...oldAlias, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...oldAlias, "node_modules/y/node_modules/a": a, "node_modules/y/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }))).toThrow("node_modules/y/node_modules/a requires lodash *, and node_modules/y/node_modules/lodash has evil-pkg@1.0.0, which is not that");
+    const e3 = verdict(lock({ ...common, ...oldAlias, "node_modules/foo": { version: "1.0.0" } }), lock({ ...withoutA, ...oldAlias, "node_modules/y/node_modules/a": a, "node_modules/y/node_modules/lodash": { version: "1.0.0", name: "evil-pkg" }, "node_modules/foo": { version: "1.0.1" } }));
+    expect(e3.findings.some(f => f.effect === "stop" && f.message.includes("instead of lodash@4.17.21"))).toBe(true);
     // (F) the moved a@1.0.0 now loads lodash 5.0.0, which another version of a loaded and which has an advisory 4.17.21 did not.
     const f5 = new Map([...facts, ["lodash@5.0.0", fact({ advisories: ["GHSA-five"] })]]);
     const verdictF = (b: string, a2: string) => judge({ changes: allChanges(b, a2), entries: lockEntryChanges(lockEntries(b), lockEntries(a2)), facts: f5, fixes: [], direct: [...new Set([...f5.keys()].map(id => id.slice(0, id.lastIndexOf("@"))))], files: ["package-lock.json"], now: new Date("2027-01-01T00:00:00Z") });
@@ -767,25 +771,62 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
     }
   });
 
-  it("every requirement is found by Node's lookup, in its range, in both views (review of ebfe89d, B1)", () => {
+  it("a change that leaves a requirement unmet is refused, in both views (reviews of ebfe89d, B1, and 217a6f8, B1)", () => {
+    // docs/decisions/2026-10-31-lock-requirements-against-the-base.md: compared with the base, so each case below is a
+    // change from npm 11's own lock, which meets every requirement.
+    const added = (after: string) => newUnmetRequirements({ lock: nested }, { lock: after });
+    expect(unmetRequirements(nested).size).toBe(0);
     // The left-pad form: a requirement the tree names that neither view has, by URL or by range.
     for (const spec of ["https://registry.npmjs.org/left-pad/-/left-pad-1.3.0.tgz", "1.3.0"]) {
-      expect(() => lockEntries(edit(nested, l => { l.dependencies.minimist.requires = { "not-in-lock": spec }; l.packages["node_modules/minimist"].dependencies = { "not-in-lock": spec }; }))).toThrow(`npm 6 dependencies tree: node_modules/minimist requires not-in-lock ${spec}, and npm finds no copy of it in the lock`);
+      expect(added(edit(nested, l => { l.dependencies.minimist.requires = { "not-in-lock": spec }; l.packages["node_modules/minimist"].dependencies = { "not-in-lock": spec }; }))).toContain(`package-lock.json's npm 6 dependencies tree: node_modules/minimist requires not-in-lock ${spec}, and npm finds no copy of it in the lock.`);
     }
     // A requirement outside its range: mkdirp 0.5.1 requires minimist 0.0.8; its nested copy moved to 0.0.10, in both views.
-    expect(() => lockEntries(edit(nested, l => { l.packages["node_modules/mkdirp/node_modules/minimist"].version = "0.0.10"; l.dependencies.mkdirp.dependencies.minimist.version = "0.0.10"; }))).toThrow("npm 6 dependencies tree: node_modules/mkdirp requires minimist 0.0.8, and node_modules/mkdirp/node_modules/minimist has minimist@0.0.10, which is not that");
+    expect(added(edit(nested, l => { l.packages["node_modules/mkdirp/node_modules/minimist"].version = "0.0.10"; l.dependencies.mkdirp.dependencies.minimist.version = "0.0.10"; }))).toContain("package-lock.json's npm 6 dependencies tree: node_modules/mkdirp requires minimist 0.0.8, and node_modules/mkdirp/node_modules/minimist has minimist@0.0.10, which is not that.");
     // A missing requirement in a v3 lock (no tree): the same reading on packages.
     const v3 = (change: (l: any) => void) => edit(nested, l => { l.lockfileVersion = 3; delete l.dependencies; change(l); });
-    expect(() => lockEntries(v3(l => { delete l.packages["node_modules/nan"]; }))).toThrow("packages: node_modules/fsevents requires nan ^2.12.1, and npm finds no copy of it in the lock");
-    expect(() => lockEntries(v3(l => { l.packages["node_modules/nan"].version = "1.0.0"; }))).toThrow("node_modules/fsevents requires nan ^2.12.1, and node_modules/nan has nan@1.0.0, which is not that");
+    const v3base = v3(() => {});
+    const addedV3 = (after: string, manifest?: unknown) => newUnmetRequirements({ lock: v3base, manifest }, { lock: after, manifest });
+    expect(addedV3(v3(l => { delete l.packages["node_modules/nan"]; }))).toEqual(["package-lock.json's packages: node_modules/fsevents requires nan ^2.12.1, and npm finds no copy of it in the lock."]);
+    expect(addedV3(v3(l => { l.packages["node_modules/nan"].version = "1.0.0"; }))).toEqual(["package-lock.json's packages: node_modules/fsevents requires nan ^2.12.1, and node_modules/nan has nan@1.0.0, which is not that."]);
     // An alias requirement must find the package it names, and the project's own requirements count too.
-    expect(() => lockEntries(v3(l => { l.packages["node_modules/lodash-alias"].name = "left-pad"; }))).toThrow("the project requires lodash-alias npm:lodash@4.17.21, and node_modules/lodash-alias has left-pad@4.17.21, which is not that");
-    expect(() => lockEntries(v3(l => { l.packages[""].dependencies.minimist = "^2.0.0"; }))).toThrow("the project requires minimist ^2.0.0");
+    expect(addedV3(v3(l => { l.packages["node_modules/lodash-alias"].name = "left-pad"; }))).toEqual(["package-lock.json's packages: the project requires lodash-alias npm:lodash@4.17.21, and node_modules/lodash-alias has left-pad@4.17.21, which is not that."]);
+    expect(addedV3(v3(l => { l.packages[""].dependencies.minimist = "^2.0.0"; }))[0]).toContain("the project requires minimist ^2.0.0");
     // A spec npm resolves some other way than a semver range cannot be shown to be met.
-    expect(() => lockEntries(v3(l => { l.packages["node_modules/mkdirp"].dependencies.minimist = "latest"; }))).toThrow("node_modules/mkdirp requires minimist latest");
-    // A required peer counts; one marked optional does not.
-    expect(() => lockEntries(v3(l => { l.packages["node_modules/mkdirp"].peerDependencies = { react: "^18.0.0" }; }))).toThrow("node_modules/mkdirp requires react ^18.0.0, and npm finds no copy of it in the lock");
-    expect(lockEntries(v3(l => { l.packages["node_modules/mkdirp"].peerDependencies = { react: "^18.0.0" }; l.packages["node_modules/mkdirp"].peerDependenciesMeta = { react: { optional: true } }; })).length).toBeGreaterThan(0);
+    expect(addedV3(v3(l => { l.packages["node_modules/mkdirp"].dependencies.minimist = "latest"; }))[0]).toContain("node_modules/mkdirp requires minimist latest");
+    // A required peer counts, the project's own included (review 6529858505, N4); one marked optional does not.
+    expect(addedV3(v3(l => { l.packages["node_modules/mkdirp"].peerDependencies = { react: "^18.0.0" }; }))).toEqual(["package-lock.json's packages: node_modules/mkdirp requires react ^18.0.0, and npm finds no copy of it in the lock."]);
+    expect(addedV3(v3(l => { l.packages[""].peerDependencies = { react: "^18.0.0" }; }))).toEqual(["package-lock.json's packages: the project requires react ^18.0.0, and npm finds no copy of it in the lock."]);
+    expect(addedV3(v3(l => { l.packages["node_modules/mkdirp"].peerDependencies = { react: "^18.0.0" }; l.packages["node_modules/mkdirp"].peerDependenciesMeta = { react: { optional: true } }; }))).toEqual([]);
+    // What the base already leaves unmet is the project's own: the same unmet requirement in both is not new.
+    const gone = v3(l => { delete l.packages["node_modules/nan"]; });
+    expect(newUnmetRequirements({ lock: gone }, { lock: gone })).toEqual([]);
+    // lockEntries reads every one of these locks: an unmet requirement is not a reading error.
+    expect(lockEntries(gone).length).toBeGreaterThan(0);
+  });
+
+  it("reads npm 11's locks with overrides and with --legacy-peer-deps, and still refuses a change that adds an unmet requirement (review 6529858505, B1)", () => {
+    const ovr = fixture("lock-v3-npm11-ovr.json"), ovr2 = fixture("lock-v3-npm11-ovr2.json"), lpd = fixture("lock-v3-npm11-lpd.json"), lpd2 = fixture("lock-v3-npm11-lpd2.json");
+    // overrides { minimist: "0.2.4" }: mkdirp requires minimist ^1.2.5 and gets the override, which npm installs pinned.
+    const top = { name: "ovr", dependencies: { mkdirp: "0.5.5" }, overrides: { minimist: "0.2.4" } };
+    expect(lockEntries(ovr).map(e => `${e.name}@${e.version}`).sort()).toEqual(["minimist@0.2.4", "mkdirp@0.5.5"]);
+    expect([...unmetRequirements(ovr, top).values()]).toEqual([]);
+    // Without the project's overrides the same requirement is unmet; npm 6, which does not read overrides, sees it so.
+    expect([...unmetRequirements(ovr).values()]).toEqual(["package-lock.json's packages: node_modules/mkdirp requires minimist ^1.2.5, and node_modules/minimist has minimist@0.2.4, which is not that."]);
+    // A nested override applies under its package only, a "$name" value takes the project's own spec, and a forged copy
+    // at another version than the override's is a new unmet requirement.
+    const nestedTop = { name: "ovr2", dependencies: { mkdirp: "0.5.5", minimist: "^1.2.6" }, overrides: { mkdirp: { minimist: "0.2.4" } } };
+    expect([...unmetRequirements(ovr2, nestedTop).values()]).toEqual([]);
+    expect([...unmetRequirements(ovr, { ...top, overrides: { mkdirp: { minimist: "0.2.4" } } }).values()]).toEqual([]);
+    expect([...unmetRequirements(ovr, { ...top, overrides: { other: { minimist: "0.2.4" } } }).values()]).toHaveLength(1);
+    expect([...unmetRequirements(ovr, { name: "ovr", dependencies: { mkdirp: "0.5.5", minimist: "0.2.4" }, overrides: { minimist: "$minimist" } }).values()]).toEqual([]);
+    const forged = edit(ovr, l => { l.packages["node_modules/minimist"].version = "0.2.5"; });
+    expect(newUnmetRequirements({ lock: ovr, manifest: top }, { lock: forged, manifest: top })).toEqual(["package-lock.json's packages: node_modules/mkdirp requires minimist ^1.2.5, and node_modules/minimist has minimist@0.2.5, which is not that."]);
+    // --legacy-peer-deps: react-dom's peer react is left out, in the base and after react-dom moves (another peer range),
+    // so the change adds nothing; a change that leaves out a regular requirement still does.
+    expect(lockEntries(lpd).map(e => e.name).sort()).toEqual(["js-tokens", "loose-envify", "react-dom", "scheduler"]);
+    expect([...unmetRequirements(lpd).values()]).toEqual(["package-lock.json's packages: node_modules/react-dom requires react ^18.2.0, and npm finds no copy of it in the lock."]);
+    expect(newUnmetRequirements({ lock: lpd }, { lock: lpd2 })).toEqual([]);
+    expect(newUnmetRequirements({ lock: lpd }, { lock: edit(lpd2, l => { delete l.packages["node_modules/scheduler"]; }) })[0]).toContain("node_modules/react-dom requires scheduler");
   });
 
   it("refuses a v2 lock whose npm 6 tree requires, or flags, something else (review of 1e6f705, B1)", () => {

@@ -1,0 +1,16 @@
+# started 2026-10-30T09:10:46Z, node v24.22.1
+npm ci exit 0
+baseline passes: true
+caught: the MAL- check on the smallest removed (the next version is looked for)
+caught: a MAL- stop does not stop the fix in the patch
+caught: a MAL- record beside another record goes on
+caught: OSV is not asked about a deprecated or unlisted smallest
+caught: any id containing MAL- counts as a MAL- record
+caught: later versions are asked about before the stop
+caught: the stop takes the next listed version anyway
+caught: the stop's reason leaves out the other records
+caught: the stop's reason leaves out the deprecation or absence
+caught: the receipt does not name the MAL- records
+10 of 10 caught
+after restoring, passes: true
+# finished 2026-10-30T09:13:39Z

@@ -1,0 +1,27 @@
+# LV5: a smallest fixed version with an OSV MAL- record stops the fix (2026-10-30)
+
+Started from main 3384a53. The owner's decision of 2026-10-30 17:54 JST (docs/decisions/2026-10-30-mal-smallest-stops-the-fix.md, committed first, at 5a3e7b2, before the code). The gates' numbers and the wait table are unchanged.
+
+## What changed
+
+- `nextFix` (next-fix.ts): OSV is asked about the smallest fixed version whether or not the registry lists it or marks it deprecated (before, a deprecated or unlisted smallest was passed over without asking). When a MAL- record OSV does not mark withdrawn names it, `nextFix` returns at once: `chosen: null`, the smallest in `skipped` with every reason found (the MAL- ids, then any other records, then a deprecation or its absence from the registry), the MAL- ids in the new field `malicious`, and a note citing the decision. OSV is asked about no later version and no publisher or provenance is read, so there is no `publisher_check`.
+- `patchDependencies` (dependency-patch.ts): `malicious` sets the fix's reason to "Gate 2 stops this fix: " and the note, as a publisher stop does. The fix keeps the smallest in `changes`, is not validated and gets no branch; the run's other fixes go on.
+- Unchanged: a smallest passed over for a deprecation, for being unlisted, or for an OSV record that is not MAL- goes on to the next version and the publisher check as before (docs/decisions/2026-10-30-next-fix-same-publisher.md, not edited). A later version with a MAL- record is passed over, as before.
+- docs/status.md, README.md and packages/cli/README.md say this (the READMEs said a MAL- smallest gives way to the next version). docs/mistakes/2026-10-30-next-fix-trusted-the-malware-publisher.md records the flaw.
+
+## Checks (all in Docker; nothing ran on the host)
+
+`scripts/run.sh <script>` mounts the worktree read-only at /src and copies it into the volume ludion-lv5-w (image ludion-l9-node24-git), as LV3's scripts do.
+
+All on the code of commit e150e3a.
+
+- `scripts/test.sh`: tsc 0; `vitest run --project node packages/cli/test`: 21 files, 881 passed, 19 skipped (`logs/test.log`). A first run during development, while other Docker jobs ran on the machine, had two 5-second timeouts in unchanged tests (branch.test.ts "refuses a symbolic link in HEAD…", dependencies.test.ts "stops a fix whose npm candidate adds a vulnerable version…"); both passed on every run after.
+- `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository): typecheck 0, build 0, `npm test` 34 files, 1127 passed, 19 skipped (`logs/full.log`).
+- `scripts/mutate.mjs`: 10 of 10 mutations caught, and the tests pass without them (`logs/mutate.log`). Two remove the MAL- judgement itself: the check in `nextFix` (so the next version is looked for), and its use in `patchDependencies` (so the fix is not stopped). The others: a MAL- record beside another record goes on; OSV not asked about a deprecated or unlisted smallest; any id containing "MAL-" counts; later versions asked about before the stop; the stop takes the next version anyway; the reason leaves out the other records, or the deprecation or absence; the receipt does not name the MAL- records.
+- No live e2e: the live examples (examples/npm-security's lodash) have no MAL- record on a smallest fixed version, so a live run would only repeat LV3's result for the deprecated case.
+
+## Tests added or changed (packages/cli/test/dependencies.test.ts)
+
+- Through `patchDependencies`, with and without `--apply`: a MAL- smallest stops the fix though every version is the same account's (so without the stop the next would pass the publisher check); with a MAL- and another record on the smallest; with a MAL- record on a deprecated smallest. Each: `version_choice` exactly, the reason, no judgement, no test, no branch, OSV asked about the smallest alone, the registry read once. The case "takes the next smallest when the smallest has an OSV MAL- record" became the first of these; a non-MAL advisory still takes the next smallest after the publisher check.
+- `nextFix` alone: the same three stops, plus an unlisted smallest with a MAL- record; and "as before" for a non-MAL advisory, a deprecation alone, a withdrawn MAL- record beside an advisory in force, and an id that only contains MAL-.
+- Two existing tests now also expect OSV's first batch to ask about the deprecated smallest.

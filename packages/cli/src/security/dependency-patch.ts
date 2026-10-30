@@ -53,7 +53,8 @@ export type FixReceipt = {
   judgement?: Judgement;
   /**
    * npm: each smallest fixed version that was deprecated, no longer listed or named by OSV, with the versions passed over
-   * and the one taken instead (next-fix.ts); `changes` hold the versions taken, `before.plan` the smallest.
+   * and the one taken instead (next-fix.ts); `changes` hold the versions taken, `before.plan` the smallest. A version
+   * from another publisher or source than the smallest is not taken, and the fix stops (publisher_check).
    */
   version_choice?: VersionChoice[];
   reason?: string;
@@ -331,6 +332,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     if (!receipt.fixes.length) throw new Error(scan.blocked.join(" ") || "No fix was planned.");
     // npm, before the branch names: a smallest fixed version that is deprecated, no longer listed or named by OSV gives
     // way to the next smallest that is none of these. A failed lookup keeps the smallest, which the judge checks again.
+    // One from another publisher or source stops the fix (docs/decisions/2026-10-30-next-fix-same-publisher.md).
     if (ecosystem === "npm") for (const fix of receipt.fixes) {
       const taken = new Map<string, string>();
       for (const to of new Set(fix.changes.map(c => c.to))) {
@@ -341,6 +343,8 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         if (!choice) continue;
         (fix.version_choice ??= []).push(choice);
         if (choice.chosen) taken.set(to, choice.chosen);
+        // Gate 2: the version that qualified is not the smallest's publisher's, or cannot be compared; the fix stops.
+        if (choice.publisher_check?.result === "stop") fix.reason ??= `Gate 2 stops this fix: ${choice.note}`;
       }
       // New objects: the plan's own changes stay in `before.plan` as the smallest.
       if (taken.size) fix.changes = fix.changes.map(c => taken.has(c.to) ? { ...c, to: taken.get(c.to)! } : c);
@@ -352,6 +356,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     const branches = receipt.fixes.map(fix => base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), ecosystem, `${fix.package}-${[...new Set(fix.changes.map(c => c.to))].join("-")}`));
     const subject = (fix: FixReceipt) => `ludion: ${fix.package} ${fix.changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${ecosystem})`;
     for (const [index, fix] of receipt.fixes.entries()) {
+      if (fix.reason) continue;
       const branch = branches[index], tip = base && branch ? branchTip(base, branch) : null;
       // A branch of the same name is this fix only when its tip says so; otherwise the name is taken and the fix stops.
       if (base && branch && tip?.subject === subject(fix)) { fix.outcome = "skipped"; fix.branch = branch; fix.reason = skippedReason(base, branch, tip.parent, "fix"); }
@@ -443,7 +448,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const branch = branches[index];
         const published = await dependencyFixPublished(ecosystem, fix.changes, deps.fetchFn); active();
         fix.fix_published_at = published.at; fix.fix_published_note = published.note;
-        if (fix.fix_published_at && fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the publish time of the version taken.";
+        if (fix.fix_published_at && fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the latest publish time among the fix's planned versions, the version taken included.";
         const label = `candidate-${index + 1}`, candidate = await acquire(label, fix.changes);
         if (candidate.archives.length) fix.archives = candidate.archives;
         fix.changed_packages = changedPackages(baseline.inventory, candidate.inventory);

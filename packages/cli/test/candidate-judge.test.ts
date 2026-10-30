@@ -14,7 +14,7 @@ const hours = (h: number) => new Date(Date.parse(T) + h * 3_600_000);
 const LATER = hours(24 * 90);
 
 type Version = { published: string; npmUser?: object; deprecated?: string; scripts?: Record<string, string>; dependencies?: Record<string, string>; provenance?: { repository: string; workflow: string }; absent?: boolean };
-type World = { packages: Record<string, { created?: string; versions: Record<string, Version> }>; osv?: Record<string, string[]>; severity?: string; kev?: boolean; epss?: number; failing?: string; seen?: string[] };
+type World = { packages: Record<string, { created?: string; versions: Record<string, Version> }>; osv?: Record<string, string[]>; osvItem?: unknown; severity?: string; kev?: boolean; epss?: number; failing?: string; seen?: string[] };
 const integrityOf = (name: string, version: string) => `sha512-${Buffer.from(`${name}@${version}`.padEnd(64, "#")).toString("base64")}`;
 const json = (value: unknown) => new Response(JSON.stringify(value));
 
@@ -39,6 +39,7 @@ function fetchOf(world: World): typeof fetch {
     const u = decodeURIComponent(String(url));
     world.seen?.push(u, init?.body === undefined ? "" : String(init.body));
     if (world.failing && u.startsWith(world.failing)) return new Response("", { status: 500 });
+    if (u === "https://api.osv.dev/v1/querybatch" && world.osvItem !== undefined) return json({ results: JSON.parse(String(init?.body)).queries.map(() => world.osvItem) });
     if (u === "https://api.osv.dev/v1/querybatch") return json({ results: JSON.parse(String(init?.body)).queries.map((q: any) => ({ vulns: (world.osv?.[`${q.package.name}@${q.version}`] ?? []).map(id => ({ id })) })) });
     if (u.startsWith("https://api.osv.dev/v1/vulns/")) return json({ id: u.split("/").at(-1), aliases: ["CVE-2026-0001"], ...(world.severity ? { database_specific: { severity: world.severity } } : {}) });
     if (u.startsWith("https://www.cisa.gov/")) return json({ vulnerabilities: world.kev ? [{ cveID: "CVE-2026-0001" }] : [] });
@@ -214,6 +215,12 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
       expect(j.verdict).toBe("undecidable");
       expect(candidateRefusal(j)).toMatch(/^The judge cannot decide on the candidate: gate 2: A lookup failed: .* answered HTTP 500/);
     }
+  });
+
+  it.each([[null], [7], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }]])("cannot decide when OSV's batch item is not an answer (%j), rather than reading it as no record", async osvItem => {
+    const j = await run({ ...base(), osvItem });
+    expect(j.verdict).toBe("undecidable");
+    expect(candidateRefusal(j)).toMatch(/^The judge cannot decide on the candidate: gate 2: A lookup failed: Invalid OSV batch item; no clean result is available\./);
   });
 
   it("stops a version the candidate adds after the fix, as the time cap does", async () => {

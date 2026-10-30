@@ -1,0 +1,11 @@
+# 2026-10-30 (LV3) — OSV's batch answers checked in the judge; the next smallest fix's publisher check
+
+Started from main 8f7e1ec. Detail: docs/bench/2026-10-30-lv3-osv-publisher. The gates' numbers and the wait table are unchanged.
+
+- **osvIds (npm-facts.ts)**, finding 1 of #212's cloud review: a batch item that is `null`, a number, a string, a list, an object with a key other than `vulns`/`next_page_token`, or has `vulns` that is not a list now throws, as in `OsvClient.ids`, instead of reading as "no record". The judge (`ludion judge`, and the patch's judge) is then undecidable; `nextFix` throws and keeps the smallest.
+- **The publisher check (next-fix.ts, dependency-patch.ts)**, the owner's decision of 13:01 JST (docs/decisions/2026-10-30-next-fix-same-publisher.md, committed before the code): a later version is taken only when it and the smallest it passes over both have provenance from the same repository and workflow, or neither has provenance and the same account published both. Anything else stops that fix at gate 2 with what was compared in `version_choice[].publisher_check` and the reason. A smallest the registry no longer lists now stops (there is nothing to compare), where LV took the next version.
+- **Receipt sentence**: `fix_published_note` now says the time is the latest among the fix's planned versions, the version taken included (finding 3 of the first review of this PR).
+- **Mistakes records**: docs/mistakes/2026-10-30-osv-batch-item-read-as-no-record.md (with a test that the two OSV readers agree) and docs/mistakes/2026-10-30-fix-published-at-is-the-latest.md (second review of this PR, finding 1).
+- **Documents**: both READMEs and docs/status.md say this, and that with two changes in one fix, `fix_published_at` and T are the latest publish time among the planned versions.
+- **Checks** (Docker): CLI tests 18 files, 826 passed, 19 skipped; CI's checks except Playwright: typecheck 0, build 0, `npm test` 31 files, 1072 passed, 19 skipped; mutations 19 of 19 caught; the live e2e on examples/npm-security took lodash 4.18.1 (4.18.0 deprecated; both by jdalton, no provenance), applied, exit 0, and skipped it on the second run.
+- **Not done.** Nothing was released or merged.

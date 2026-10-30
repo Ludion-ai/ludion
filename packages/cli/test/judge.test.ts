@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { allChanges, installScripts, judge, lockDiff, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
-import { gatherFacts, provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
+import { gatherFacts, osvIds, provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
 import { pnpmChanges } from "../src/security/judge-cli.ts";
+import { OsvClient } from "../src/security/osv.ts";
 import { firstPublish, renderTimeCap, timeCap } from "../src/security/time-cap.ts";
 
 const INTEGRITY = "sha512-" + "A".repeat(86) + "==";
@@ -566,6 +567,28 @@ describe("provenance records", () => {
     expect(provenanceFrom({ attestations: [{ predicateType: "https://github.com/npm/attestation/tree/main/specs/publish/v0.1" }] })).toBeNull();
     expect(() => provenanceFrom({})).toThrow("Invalid");
     expect(() => provenanceFrom({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: {} }] })).toThrow("payload");
+  });
+});
+
+describe("OSV's batch answers for the judge", () => {
+  const answering = (item: unknown): typeof fetch => async () => new Response(JSON.stringify({ results: [item] }));
+  const one = [{ name: "lib", version: "1.0.0" }];
+  it.each([[null], [7], ["GHSA-x"], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }], [{ vulns: {} }], [[]]])("throws on an item that is not an answer (%j), as OsvClient.ids does, rather than reading it as no record", async item => {
+    await expect(osvIds(one, answering(item))).rejects.toThrow("Invalid OSV batch item; no clean result is available.");
+  });
+  it("reads an empty item as no record, and refuses a pagination token", async () => {
+    expect(await osvIds(one, answering({}))).toEqual(new Map([["lib@1.0.0", []]]));
+    expect(await osvIds(one, answering({ vulns: [{ id: "MAL-2026-0001" }], next_page_token: "" }))).toEqual(new Map([["lib@1.0.0", ["MAL-2026-0001"]]]));
+    await expect(osvIds(one, answering({ vulns: [], next_page_token: "abc" }))).rejects.toThrow("OSV paginated a judge query");
+    await expect(osvIds(one, answering({ vulns: [], next_page_token: 7 }))).rejects.toThrow("Invalid OSV pagination token.");
+    await expect(osvIds(one, answering({ vulns: [null] }))).rejects.toThrow("Invalid OSV advisory id.");
+  });
+  // The judge's reader and the scan's reader (OsvClient.ids) are two parsers of one answer; they must refuse the same
+  // items and read the same ids (docs/mistakes/2026-10-30-osv-batch-item-read-as-no-record.md).
+  it.each([[null], [7], ["GHSA-x"], [[]], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }], [{ vulns: {} }], [{ vulns: [null] }], [{ vulns: [{ id: "../x" }] }], [{ vulns: [], next_page_token: 7 }], [{}], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }]])("agrees with OsvClient.ids on %j", async item => {
+    const scan = await new OsvClient(answering(item)).ids([{ ecosystem: "npm", name: "lib", version: "1.0.0" }]).then(m => [...m.values()], () => "throws");
+    const judge = await osvIds(one, answering(item)).then(m => [...m.values()], () => "throws");
+    expect(judge).toEqual(scan);
   });
 });
 

@@ -10,7 +10,7 @@ import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, ty
 import { EPSS_LIST } from "../src/security/npm-facts.ts";
 import { OsvClient, type Advisory } from "../src/security/osv.ts";
 import { privateState, snapshot } from "../src/security/project.ts";
-import { nextFix, NEXT_FIX_LIMIT } from "../src/security/next-fix.ts";
+import { comparePublishers, nextFix, NEXT_FIX_LIMIT, type VersionChoice } from "../src/security/next-fix.ts";
 import { scanProject } from "../src/security/scan.ts";
 import { packagistReleases, renderTimeCap } from "../src/security/time-cap.ts";
 import { commit, git } from "./git.ts";
@@ -1009,6 +1009,8 @@ describe("the time cap on candidates", () => {
 describe.each([false, true])("the next smallest fix when the smallest cannot be used (LV), apply %s", apply => {
   const LODASH = { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z", "4.17.22": "2021-03-01T00:00:00.000Z", "4.17.23": "2021-03-02T00:00:00.000Z" } };
   const later: Advisory = { ...advisory, id: "GHSA-test-0009", aliases: [], affected: [{ package: { ecosystem: "npm", name: "lodash" }, ranges: [{ events: [{ introduced: "4.17.21" } as { fixed?: string }, { fixed: "4.17.22" }] }] }] };
+  /** Every version published by one npm account, so the version taken passes the publisher check (next-fix.ts). */
+  const one = (manifest: (name: string, version: string) => object = () => ({})) => (name: string, version: string) => ({ _npmUser: { name: "jdalton" }, ...manifest(name, version) });
   const mal: Advisory = { id: "MAL-2026-0009", summary: "Malicious code in lodash", aliases: [], affected: [{ package: { ecosystem: "npm", name: "lodash" }, ranges: [] }] };
   const run = async (fetchFn: typeof fetch) => {
     const root = fixture(), head = commit(root), before = snapshot(root), tested: string[] = [];
@@ -1024,7 +1026,7 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(fix).toMatchObject({ outcome: apply ? "applied" : "validated", candidate_passed: true, changes: [{ name: "lodash", from: "4.17.20", to: version }] });
     expect(fix.judgement).toMatchObject({ verdict: "ready_except_build", changes: [expect.objectContaining({ name: "lodash", from: "4.17.20", to: version })] });
     expect(fix.fix_published_at).toBe(LODASH.versions[version as keyof typeof LODASH.versions]);
-    expect(fix.fix_published_note).toContain("The smallest fixed version was passed over (version_choice)");
+    expect(fix.fix_published_note).toContain("The smallest fixed version was passed over (version_choice); this is the latest publish time among the fix's planned versions, the version taken included.");
     if (apply) {
       expect(fix.branch).toBe(`ludion/npm/lodash-${version}`);
       expect(JSON.parse(git(root, "show", `${fix.branch}:package.json`)).dependencies.lodash).toBe(version);
@@ -1035,9 +1037,14 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
 
   it("takes the next smallest when the smallest is deprecated, and keeps the smallest in the plan", async () => {
     const seen: string[] = [];
-    const { root, result, fix, tested } = await run(registry({ lodash: LODASH }, (_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}, seen));
+    const { root, result, fix, tested } = await run(registry({ lodash: LODASH }, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}), seen));
     expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
-    expect(fix.version_choice).toEqual([{ package: "lodash", smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }], note: expect.stringContaining("cannot be used (deprecated: Bad release). 4.17.22 is taken instead: the next smallest 4.x version") }]);
+    const jdalton = { publisher: "jdalton", provenance: null };
+    expect(fix.version_choice).toEqual([{
+      package: "lodash", smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }],
+      publisher_check: { version: "4.17.22", smallest: jdalton, candidate: jdalton, result: "publisher", detail: "The same publisher account: 4.17.21 has no provenance and was published by the npm account jdalton; 4.17.22 has no provenance and was published by the npm account jdalton." },
+      note: expect.stringContaining("cannot be used (deprecated: Bad release). 4.17.22 is the next smallest 4.x version the registry lists that is not deprecated and that no OSV record names, so it is taken instead. The same publisher account: "),
+    }]);
     took(root, fix, "4.17.22");
     expect(tested).toEqual(["baseline", "candidate-1"]);
     // The scan's plan, in the receipt, still names the smallest fixed version.
@@ -1045,37 +1052,91 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     // OSV was asked about the listed versions that are not deprecated, by name and version only.
     expect(batches(seen)[0]).toEqual(["lodash@4.17.22", "lodash@4.17.23"]);
   });
-  it("takes the next smallest when the registry no longer lists the smallest", async () => {
-    const npm = registry({ lodash: LODASH });
+  /** The fix stopped at gate 2 by the publisher check: no validation, no test, no branch, the smallest still in `changes`. */
+  const stoppedBy = (root: string, result: Awaited<ReturnType<typeof run>>["result"], fix: FixReceipt, tested: string[], detail: string) => {
+    expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: null, publisher_check: expect.objectContaining({ version: "4.17.22", result: "stop", detail }) })]);
+    expect(fix.version_choice?.[0]?.note).toContain("4.17.22 is the next smallest 4.x version the registry lists that is not deprecated and that no OSV record names, but it is not taken, and this fix stops: it must come from the same publisher account or provenance repository and workflow as 4.17.21 (docs/decisions/2026-10-30-next-fix-same-publisher.md).");
+    expect(fix).toMatchObject({ outcome: "failed", changes: [{ to: "4.17.21" }], branch: null, commit: null, candidate_passed: false });
+    expect(fix.reason).toBe(`Gate 2 stops this fix: ${fix.version_choice?.[0]?.note}`);
+    expect(fix.reason).toContain(detail);
+    expect(fix.judgement).toBeUndefined();
+    expect(result.receipt?.outcome).toBe("failed");
+    // The only fix stopped before any Docker work: no baseline either.
+    expect(tested).toEqual([]);
+    if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("");
+  };
+  it("stops when the registry no longer lists the smallest, as there is no publisher or provenance to compare", async () => {
+    const npm = registry({ lodash: LODASH }, one());
     const fetchFn: typeof fetch = async (url, init) => {
       const r = await npm(url, init);
       if (String(url) !== "https://registry.npmjs.org/lodash") return r;
       const doc = await r.json(); delete doc.versions["4.17.21"];
       return response(doc);
     };
-    const { root, fix } = await run(fetchFn);
-    expect(fix.version_choice?.[0]).toMatchObject({ smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason: "no longer listed by the registry (unpublished or withdrawn)" }] });
-    took(root, fix, "4.17.22");
+    const { root, result, fix, tested } = await run(fetchFn);
+    expect(fix.version_choice?.[0]?.skipped).toEqual([{ version: "4.17.21", reason: "no longer listed by the registry (unpublished or withdrawn)" }]);
+    stoppedBy(root, result, fix, tested, "4.17.21 is no longer listed by the registry, so there is no publisher or provenance to compare 4.17.22 with.");
+  });
+  it("stops when the version that qualifies was published by another account", async () => {
+    const { root, result, fix, tested } = await run(registry({ lodash: LODASH }, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : version === "4.17.22" ? { _npmUser: { name: "mallory" } } : {})));
+    stoppedBy(root, result, fix, tested, "The publishers differ, or one is no single account: 4.17.21 has no provenance and was published by the npm account jdalton; 4.17.22 has no provenance and was published by the npm account mallory.");
+    expect(fix.version_choice?.[0]?.publisher_check).toMatchObject({ smallest: { publisher: "jdalton", provenance: null }, candidate: { publisher: "mallory", provenance: null } });
+  });
+  it("stops when the publisher and provenance cannot be read", async () => {
+    // 4.17.22 has an attestation record, which this registry does not serve (HTTP 404).
+    const { root, result, fix, tested } = await run(registry({ lodash: LODASH }, one((name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : version === "4.17.22" ? { dist: { integrity: integrityOf(name, version), attestations: { url: "x" } } } : {})));
+    stoppedBy(root, result, fix, tested, "The publishers and provenance of 4.17.21 and 4.17.22 could not be read (registry.npmjs.org answered HTTP 404.).");
+  });
+  it("keeps the gate 2 stop as the reason when a branch of the smallest's name already exists", async () => {
+    const root = fixture(), head = commit(root);
+    git(root, "branch", "ludion/npm/lodash-4.17.21");
+    const result = await patchDependencies(root, apply, { fetchFn: registry({ lodash: LODASH }, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : version === "4.17.22" ? { _npmUser: { name: "mallory" } } : {})), client: client(), command: fakeCommand(), testRun: async () => {} });
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", branch: null, commit: null });
+    expect(result.receipt?.fixes[0]?.reason).toMatch(/^Gate 2 stops this fix: .*The publishers differ/);
+    expect(git(root, "rev-parse", "ludion/npm/lodash-4.17.21")).toBe(head);
+  });
+  it("stops only the fix whose next version is another account's; the run's other fixes go on", async () => {
+    const root = fixture(), deps = { lodash: "4.17.20", minimist: "1.2.5" };
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+    commit(root);
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(String(url).endsWith(minimistAdvisory.id) ? minimistAdvisory : advisory);
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => VULNERABLE[`${q.package.name}@${q.version}`] ? { vulns: [{ id: VULNERABLE[`${q.package.name}@${q.version}`]!.id }] } : {}) });
+    });
+    const tested: string[] = [];
+    const fetchFn = registry({ lodash: LODASH, minimist: MINIMIST_RELEASES }, one((name, version) => name === "lodash" && version === "4.17.21" ? { deprecated: "Bad release" } : name === "lodash" && version === "4.17.22" ? { _npmUser: { name: "mallory" } } : {}));
+    const result = await patchDependencies(root, apply, { fetchFn, client: osv, command: fakeCommand(), testRun: async name => { tested.push(name.replace(/^ludion-check-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, "")); } });
+    expect(result.receipt?.outcome).toBe("partial");
+    const [stopped, passed] = result.receipt!.fixes;
+    expect(stopped).toMatchObject({ package: "lodash", outcome: "failed", branch: null, commit: null, changes: [{ to: "4.17.21" }] });
+    expect(stopped?.reason).toMatch(/^Gate 2 stops this fix: .*The publishers differ/);
+    expect(stopped?.judgement).toBeUndefined();
+    expect(passed).toMatchObject({ package: "minimist", outcome: apply ? "applied" : "validated", candidate_passed: true, changes: [{ to: "1.2.6" }] });
+    expect(passed?.version_choice).toBeUndefined();
+    // The stopped fix's candidate was never acquired or tested.
+    expect(tested).toEqual(["baseline", "candidate-2"]);
+    if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("ludion/npm/minimist-1.2.6");
   });
   it.each<[string, () => Record<string, Advisory>, string]>([
     ["has an OSV MAL- record", () => ({ "lodash@4.17.21": mal }), "in OSV's malicious-package records (MAL-2026-0009)"],
     ["is named by another advisory", () => ({ "lodash@4.17.21": later }), "OSV names it in GHSA-test-0009"],
   ])("takes the next smallest when the smallest %s", async (_label, found, reason) => {
-    const { root, fix } = await run(registry({ lodash: LODASH }, () => ({}), [], { ...VULNERABLE, ...found() }));
+    const { root, fix } = await run(registry({ lodash: LODASH }, one(), [], { ...VULNERABLE, ...found() }));
     expect(fix.version_choice?.[0]).toMatchObject({ smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason }] });
     took(root, fix, "4.17.22");
   });
   it("passes over every version that cannot be used, and looks only at later stable versions of the same major", async () => {
     const seen: string[] = [];
     const docs = { lodash: { ...LODASH, versions: { ...LODASH.versions, "4.17.22-rc.1": "2021-02-25T00:00:00.000Z", "5.0.0": "2021-02-26T00:00:00.000Z", "4.17.19": "2020-07-01T00:00:00.000Z" } } };
-    const { root, fix } = await run(registry(docs, (_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}, seen, { ...VULNERABLE, "lodash@4.17.22": mal }));
+    const { root, fix } = await run(registry(docs, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}), seen, { ...VULNERABLE, "lodash@4.17.22": mal }));
     expect(fix.version_choice?.[0]).toMatchObject({ chosen: "4.17.23", skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }, { version: "4.17.22", reason: "in OSV's malicious-package records (MAL-2026-0009)" }] });
     took(root, fix, "4.17.23");
     expect(batches(seen)[0]).toEqual(["lodash@4.17.22", "lodash@4.17.23"]);
   });
   it("keeps the smallest, which then stops as before, when no later same-major version qualifies", async () => {
     const docs = { lodash: { ...LODASH, versions: { ...LODASH.versions, "5.0.0": "2021-02-26T00:00:00.000Z" } } };
-    const { root, result, fix, tested } = await run(registry(docs, (_name, version) => ["4.17.21", "4.17.22"].includes(version) ? { deprecated: "Bad release" } : {}, [], { ...VULNERABLE, "lodash@4.17.23": later }));
+    const { root, result, fix, tested } = await run(registry(docs, one((_name, version) => ["4.17.21", "4.17.22"].includes(version) ? { deprecated: "Bad release" } : {}), [], { ...VULNERABLE, "lodash@4.17.23": later }));
     expect(fix.version_choice).toEqual([{ package: "lodash", smallest: "4.17.21", chosen: null, skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }, { version: "4.17.22", reason: "deprecated: Bad release" }, { version: "4.17.23", reason: "OSV names it in GHSA-test-0009" }], note: expect.stringContaining("no later 4.x version qualifies (2 looked at); the smallest stays") }]);
     expect(result.receipt?.outcome).toBe("failed");
     expect(fix).toMatchObject({ outcome: "failed", changes: [{ to: "4.17.21" }], branch: null, commit: null });
@@ -1086,25 +1147,36 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
   it("keeps the smallest when the check cannot be made, and the judge checks it again", async () => {
     // The first OSV batch (the check's) fails; the judge's own lookups work.
     const failFirst = (inner: typeof fetch): typeof fetch => { let calls = 0; return async (url, init) => String(url) === "https://api.osv.dev/v1/querybatch" && calls++ === 0 ? new Response("", { status: 503 }) : inner(url, init); };
-    const ok = await run(failFirst(registry({ lodash: LODASH })));
+    const ok = await run(failFirst(registry({ lodash: LODASH }, one())));
     expect(ok.fix.version_choice).toEqual([{ package: "lodash", smallest: "4.17.21", chosen: null, skipped: [], note: expect.stringContaining("could not be read (api.osv.dev answered HTTP 503.); it stays, and the judge checks it again.") }]);
     expect(ok.fix).toMatchObject({ outcome: apply ? "applied" : "validated", changes: [{ to: "4.17.21" }] });
     expect(ok.fix.fix_published_note).not.toContain("passed over");
     // A deprecated smallest that the check could not see is still stopped by the judge.
-    const stopped = await run(failFirst(registry({ lodash: LODASH }, (_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {})));
+    const stopped = await run(failFirst(registry({ lodash: LODASH }, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}))));
     expect(stopped.fix).toMatchObject({ outcome: "failed", changes: [{ to: "4.17.21" }], branch: null });
     expect(stopped.fix.reason).toContain("lodash@4.17.21 is deprecated: Bad release");
   });
   it("replaces only the change whose smallest cannot be used, when one fix has two changes of the package", async () => {
-    const { root, osv, npm } = twoCopies((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {});
+    const { root, osv, npm } = twoCopies(one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}));
     const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => {} });
     const fix = result.receipt!.fixes[0]!;
     expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.22"], ["3.10.0", "3.10.2"]]);
     expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: "4.17.22" })]);
     expect(result.receipt?.before.plan.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
   });
+  it("stops the whole fix when one of its two changes would take a version from another account", async () => {
+    const { root, osv, npm } = twoCopies(one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : version === "4.17.22" ? { _npmUser: { name: "mallory" } } : {}));
+    let tests = 0;
+    const result = await patchDependencies(root, apply, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null });
+    expect(fix.changes.map(c => [c.from, c.to])).toEqual([["4.17.20", "4.17.21"], ["3.10.0", "3.10.2"]]);
+    expect(fix.version_choice).toEqual([expect.objectContaining({ smallest: "4.17.21", chosen: null, publisher_check: expect.objectContaining({ result: "stop" }) })]);
+    expect(fix.reason).toMatch(/^Gate 2 stops this fix: .*The publishers differ/);
+    expect(tests).toBe(0);
+  });
   it("adds the passed-over sentence to fix_published_note only when a publish time was read", async () => {
-    const npm = registry({ lodash: LODASH }, (_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {});
+    const npm = registry({ lodash: LODASH }, one((_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}));
     // The registry lists 4.17.22 but gives no publish time for it.
     const fetchFn: typeof fetch = async (url, init) => {
       const r = await npm(url, init);
@@ -1118,7 +1190,7 @@ describe.each([false, true])("the next smallest fix when the smallest cannot be 
     expect(fix.fix_published_note).toBe("Not found: the registry gives no publish time for lodash@4.17.22.");
   });
   it("records nothing when the smallest can be used", async () => {
-    const { root, fix } = await run(registry({ lodash: LODASH }));
+    const { root, fix } = await run(registry({ lodash: LODASH }, one()));
     expect(fix.version_choice).toBeUndefined();
     expect(fix).toMatchObject({ outcome: apply ? "applied" : "validated", changes: [{ to: "4.17.21" }] });
     expect(fix.fix_published_note).not.toContain("passed over");
@@ -1148,7 +1220,8 @@ describe("the next smallest fix is npm only", () => {
 });
 
 describe("nextFix", () => {
-  const doc = (versions: Record<string, object>) => response({ time: {}, versions });
+  /** Each object manifest published by one account (alice), so a version that qualifies passes the publisher check. */
+  const doc = (versions: Record<string, object>) => response({ time: {}, versions: Object.fromEntries(Object.entries(versions).map(([v, m]) => [v, m && typeof m === "object" && !Array.isArray(m) ? { _npmUser: { name: "alice" }, ...m } : m])) });
   /** OSV's batch answers by version from `found`; a record is withdrawn when `withdrawn` names it. */
   const stub = (versions: Record<string, object | null | string>, found: Record<string, string[]> = {}, seen: string[] = [], withdrawn: string[] = []): typeof fetch => async (url, init) => {
     seen.push(String(url), init?.body === undefined ? "" : String(init.body));
@@ -1208,5 +1281,94 @@ describe("nextFix", () => {
     await expect(nextFix("tiny", "1.0.0", async url => String(url).includes("osv") ? response({ results: [] }) : doc({ "1.0.0": {} }))).rejects.toThrow("OSV batch result count mismatch");
     await expect(nextFix("tiny", "latest", stub({}))).rejects.toThrow("not a semver version");
     await expect(nextFix("../x", "1.0.0", stub({}))).rejects.toThrow("Invalid npm package name");
+  });
+  it("throws, so the smallest stays, when OSV's batch item is not an answer", async () => {
+    for (const item of [null, 7, { vulnerabilities: [] }, { vulns: null }]) {
+      await expect(nextFix("tiny", "1.0.0", async (url, init) => String(url) === "https://api.osv.dev/v1/querybatch" ? response({ results: [item] }) : stub({ "1.0.0": { deprecated: "Bad release" }, "1.0.1": {} })(url, init))).rejects.toThrow("Invalid OSV batch item");
+    }
+  });
+});
+
+describe("the next smallest fix's publisher check (docs/decisions/2026-10-30-next-fix-same-publisher.md)", () => {
+  const release = { repository: "https://github.com/acme/tiny", workflow: ".github/workflows/release.yml" };
+  /** tiny 1.0.0 is deprecated; 1.0.1 qualifies. `smallest` and `next` are their manifests' other fields. */
+  const check = async (smallest: object, next: object, fetchFn?: (inner: typeof fetch) => typeof fetch) => {
+    const seen: string[] = [];
+    const versions = { "1.0.0": { deprecated: "Bad release", ...smallest }, "1.0.1": next };
+    const inner: typeof fetch = async url => {
+      seen.push(String(url));
+      if (String(url) === "https://api.osv.dev/v1/querybatch") return response({ results: [{}] });
+      const attested = /\/attestations\/tiny@(.+)$/.exec(String(url));
+      if (attested) {
+        const m = versions[attested[1] as "1.0.0"] as any, sha512 = Buffer.from(integrityOf("tiny", attested[1]!).slice(7), "base64").toString("hex");
+        const statement = { subject: [{ name: `pkg:npm/tiny@${m.subject ?? attested[1]}`, digest: { sha512 } }], predicate: { buildDefinition: { externalParameters: { workflow: { repository: m.provenance.repository, path: m.provenance.workflow } }, resolvedDependencies: [{ digest: { gitCommit: (attested[1] === "1.0.0" ? "a" : "b").repeat(40) } }] } } };
+        return response({ attestations: [{ predicateType: "https://slsa.dev/provenance/v1", bundle: { dsseEnvelope: { payload: Buffer.from(JSON.stringify(statement)).toString("base64") } } }] });
+      }
+      return response({ time: {}, versions: Object.fromEntries(Object.entries(versions).map(([v, m]) => [v, { _npmUser: { name: "alice" }, dist: { integrity: integrityOf("tiny", v), ...("provenance" in m ? { attestations: { url: "x" } } : {}) }, ...m }])) });
+    };
+    const choice = await nextFix("tiny", "1.0.0", fetchFn ? fetchFn(inner) : inner);
+    return { choice: choice!, check: choice!.publisher_check!, seen };
+  };
+  const stops = (choice: VersionChoice, detail: string) => {
+    expect(choice).toMatchObject({ chosen: null, publisher_check: { version: "1.0.1", result: "stop", detail } });
+    expect(choice.note).toContain("1.0.1 is the next smallest 1.x version the registry lists that is not deprecated and that no OSV record names, but it is not taken, and this fix stops");
+    expect(choice.note).toContain(detail);
+  };
+  it("takes the version when both have provenance from the same repository and workflow, from different commits", async () => {
+    const { choice, check: c } = await check({ provenance: release }, { provenance: release });
+    expect(choice.chosen).toBe("1.0.1");
+    expect(c).toEqual({ version: "1.0.1", smallest: { publisher: "alice", provenance: { ...release, commit: "a".repeat(40) } }, candidate: { publisher: "alice", provenance: { ...release, commit: "b".repeat(40) } }, result: "provenance", detail: "The same provenance repository and workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml." });
+    // With provenance on both, the publisher account is not what is compared: trusted publishing's shared user is fine.
+    const oidc = { _npmUser: { name: "GitHub Actions", email: "npm-oidc-no-reply@github.com", trustedPublisher: { id: "github" } } };
+    expect((await check({ provenance: release, ...oidc }, { provenance: release, ...oidc })).choice.chosen).toBe("1.0.1");
+    // Nor do two named accounts need to be the same one.
+    expect((await check({ provenance: release }, { provenance: release, _npmUser: { name: "bob" } })).check).toMatchObject({ result: "provenance", smallest: { publisher: "alice" }, candidate: { publisher: "bob" } });
+  });
+  it("takes the version when neither has provenance and the same account published both", async () => {
+    const { choice, check: c, seen } = await check({}, {});
+    expect(choice.chosen).toBe("1.0.1");
+    expect(c).toMatchObject({ result: "publisher", smallest: { publisher: "alice", provenance: null }, candidate: { publisher: "alice", provenance: null } });
+    // Only the registry is asked, by package name and version.
+    expect(seen.filter(u => u.startsWith("https://registry.npmjs.org/"))).toEqual(["https://registry.npmjs.org/tiny", "https://registry.npmjs.org/tiny"]);
+  });
+  it("stops when another account published it", async () => {
+    stops((await check({}, { _npmUser: { name: "mallory" } })).choice, "The publishers differ, or one is no single account: 1.0.0 has no provenance and was published by the npm account alice; 1.0.1 has no provenance and was published by the npm account mallory.");
+  });
+  it("stops when either is trusted publishing's shared user without provenance, which is no account", async () => {
+    const oidc = { _npmUser: { name: "GitHub Actions", email: "npm-oidc-no-reply@github.com", trustedPublisher: { id: "github" } } };
+    stops((await check(oidc, oidc)).choice, "The publishers differ, or one is no single account: 1.0.0 has no provenance and was published by no single account (none, or trusted publishing's shared user); 1.0.1 has no provenance and was published by no single account (none, or trusted publishing's shared user).");
+    expect((await check({}, oidc)).check.result).toBe("stop");
+    expect((await check({}, { _npmUser: undefined })).check.result).toBe("stop");
+  });
+  it("stops when the provenance names another repository", async () => {
+    stops((await check({ provenance: release }, { provenance: { ...release, repository: "https://github.com/mallory/tiny" } })).choice, "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/mallory/tiny, workflow .github/workflows/release.yml.");
+  });
+  it("stops when the provenance names another workflow", async () => {
+    stops((await check({ provenance: release }, { provenance: { ...release, workflow: ".github/workflows/other.yml" } })).choice, "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/other.yml.");
+  });
+  it("stops when only one of the two has provenance, either way round, even from the same account", async () => {
+    stops((await check({ provenance: release }, {})).choice, "Only one of the two has provenance: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has no provenance and was published by the npm account alice.");
+    stops((await check({}, { provenance: release })).choice, "Only one of the two has provenance: 1.0.0 has no provenance and was published by the npm account alice; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml.");
+  });
+  it("stops when the provenance cannot be read or does not name its version and tarball", async () => {
+    const failing = (inner: typeof fetch): typeof fetch => async (url, init) => String(url).includes("/attestations/") ? new Response("", { status: 503 }) : inner(url, init);
+    stops((await check({ provenance: release }, { provenance: release }, failing)).choice, "The publishers and provenance of 1.0.0 and 1.0.1 could not be read (registry.npmjs.org answered HTTP 503.).");
+    expect((await check({ provenance: release }, { provenance: release }, failing)).check).toMatchObject({ smallest: null, candidate: null });
+    stops((await check({ provenance: release }, { provenance: release, subject: "1.0.9" })).choice, "The publishers and provenance of 1.0.0 and 1.0.1 could not be read (The provenance statement does not name tiny@1.0.1 and its tarball.).");
+    // The registry fails on the second read of the package document, after the version list was read.
+    let reads = 0;
+    const second = (inner: typeof fetch): typeof fetch => async (url, init) => String(url) === "https://registry.npmjs.org/tiny" && reads++ === 1 ? new Response("", { status: 500 }) : inner(url, init);
+    stops((await check({}, {}, second)).choice, "The publishers and provenance of 1.0.0 and 1.0.1 could not be read (registry.npmjs.org answered HTTP 500.).");
+  });
+  it("stops when a provenance record names no repository or workflow, even on both", () => {
+    const none = { publisher: "alice", provenance: { repository: null, workflow: null, commit: null } };
+    expect(comparePublishers("1.0.0", none, "1.0.1", none).result).toBe("stop");
+    const noWorkflow = { publisher: "alice", provenance: { repository: release.repository, workflow: null, commit: null } };
+    expect(comparePublishers("1.0.0", noWorkflow, "1.0.1", noWorkflow).result).toBe("stop");
+    expect(comparePublishers("1.0.0", null, "1.0.1", none)).toEqual({ result: "stop", detail: "1.0.0 is no longer listed by the registry, so there is no publisher or provenance to compare 1.0.1 with." });
+    expect(comparePublishers("1.0.0", none, "1.0.1", null).result).toBe("stop");
+    // Registry text is made one line of at most 200 characters.
+    const odd = { publisher: `eve\n${"x".repeat(300)}`, provenance: null };
+    expect(comparePublishers("1.0.0", odd, "1.0.1", { publisher: "alice", provenance: null }).detail).toContain(`the npm account ${`eve ${"x".repeat(300)}`.slice(0, 200)};`);
   });
 });

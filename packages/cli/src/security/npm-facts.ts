@@ -4,7 +4,7 @@
 // OSV returned leave the machine; CISA's and FIRST's lists are downloaded whole and looked up here.
 import { gunzipSync } from "node:zlib";
 import { installScripts, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
-import { firstPublish, npmReleases } from "./time-cap.ts";
+import { firstPublish, npmReleases, type Provenance } from "./time-cap.ts";
 
 type Fetch = typeof fetch;
 
@@ -50,12 +50,21 @@ const withoutRef = (uri: string) => {
   const u = uri.replace(/^git\+/, ""), path = u.indexOf("/", u.indexOf("://") + 3), at = path > 0 ? u.indexOf("@", path) : -1;
   return at > path ? u.slice(0, at) : u;
 };
+const REPOSITORY_ID = /^[0-9]{1,20}$/, EVENT = /^[a-z_]{1,64}$/;
+/** A GitHub value the statement records: null when absent, else it must have the expected form, or the read fails. */
+const githubValue = (value: unknown, form: RegExp, what: string) => {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "string" || !form.test(value)) throw new Error(`The provenance statement's GitHub ${what} is not in the expected form.`);
+  return value;
+};
 /**
- * Repository, workflow and source commit from an SLSA provenance statement (v1 or v0.2), as the registry recorded it.
+ * Repository, workflow and source commit from an SLSA provenance statement (v1 or v0.2), as the registry recorded it,
+ * with GitHub's repository id and triggering event (v1's `internalParameters.github`, v0.2's `invocation.environment`;
+ * null when absent, docs/decisions/2026-10-30-provenance-immutable-id.md).
  * The commit is v1's first resolved dependency (`gitCommit`) or v0.2's config source (`sha1`). Given the version and
  * its registry integrity, the statement must name that version and that tarball (its subject), or it is refused.
  */
-export function provenanceFrom(attestations: unknown, subject?: { name: string; version: string; integrity: string | null }): { repository: string | null; workflow: string | null; commit: string | null } | null {
+export function provenanceFrom(attestations: unknown, subject?: { name: string; version: string; integrity: string | null }): Provenance | null {
   const list = (attestations as { attestations?: unknown })?.attestations;
   if (!Array.isArray(list)) throw new Error("Invalid attestations record.");
   const slsa = list.find(a => typeof a?.predicateType === "string" && a.predicateType.startsWith("https://slsa.dev/provenance/"));
@@ -72,10 +81,16 @@ export function provenanceFrom(attestations: unknown, subject?: { name: string; 
   const workflow = predicate?.buildDefinition?.externalParameters?.workflow;
   const resolved = predicate?.buildDefinition?.resolvedDependencies;
   const v1Commit = Array.isArray(resolved) ? commitOf(resolved[0]?.digest, "gitCommit") : null;
-  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null, commit: v1Commit };
+  const github = predicate?.buildDefinition?.internalParameters?.github, environment = predicate?.invocation?.environment;
+  for (const part of [github, environment]) if (part !== undefined && part !== null && (typeof part !== "object" || Array.isArray(part))) throw new Error("The provenance statement's GitHub parameters are not an object.");
+  const ids = {
+    repository_id: githubValue(github?.repository_id ?? environment?.GITHUB_REPOSITORY_ID, REPOSITORY_ID, "repository id"),
+    event: githubValue(github?.event_name ?? environment?.GITHUB_EVENT_NAME, EVENT, "event name"),
+  };
+  if (workflow) return { repository: typeof workflow.repository === "string" ? workflow.repository : null, workflow: typeof workflow.path === "string" ? workflow.path : null, commit: v1Commit, ...ids };
   const source = predicate?.invocation?.configSource;
-  if (source) return { repository: typeof source.uri === "string" ? withoutRef(source.uri) : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null, commit: commitOf(source.digest, "sha1") };
-  return { repository: null, workflow: null, commit: v1Commit };
+  if (source) return { repository: typeof source.uri === "string" ? withoutRef(source.uri) : null, workflow: typeof source.entryPoint === "string" ? source.entryPoint : null, commit: commitOf(source.digest, "sha1"), ...ids };
+  return { repository: null, workflow: null, commit: v1Commit, ...ids };
 }
 
 /**

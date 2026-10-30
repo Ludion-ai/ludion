@@ -68,7 +68,19 @@ describe("capabilityCounts", () => {
     expect(capabilityCounts(`"${"ab12".repeat(60)}"`)["obf:long-base64"]).toBe(0);
     expect(capabilityCounts("x".repeat(5000))["obf:very-long-line"]).toBe(1);
     expect(capabilityCounts("x".repeat(4999))["obf:very-long-line"]).toBe(0);
-    expect(capabilityCounts("var _0x1a2b = 1; _0x1a2b++; _0x12;")["obf:_0x-names"]).toBe(2);
+    expect(capabilityCounts("var _0x1a2b = 1; _0x1a2b++; _0x12; _0x1a2bg; a_0x1a2b;")["obf:_0x-names"]).toBe(2);
+    expect(capabilityCounts(`_0x${"f".repeat(1 << 22)}`)["obf:_0x-names"]).toBe(1);
+  });
+  it("counts runs of several megabytes without overflowing the stack (docs/mistakes/2026-10-30-delta-regex-stack.md)", () => {
+    const huge = "Zm9vYmFy".repeat(1 << 20);
+    const c = capabilityCounts(`a = "${huge}"; b = "${"ab".repeat(1 << 21)}"; c = "${"\\x41".repeat(1 << 20)}";`);
+    expect([c["obf:long-base64"], c["obf:long-hex"]]).toEqual([1, 2]);
+  });
+  it("counts maximal runs, as a regular expression would", () => {
+    expect(capabilityCounts(`"${"a1".repeat(150)}" + "${"b2".repeat(100)}"`)["obf:long-hex"]).toBe(2);
+    expect(capabilityCounts(`"${"\\x41".repeat(49)}\\u0041"`)["obf:long-hex"]).toBe(0);
+    expect(capabilityCounts(`"${"\\u0041".repeat(50)}"`)["obf:long-hex"]).toBe(1);
+    expect(capabilityCounts(`"${"Zm9v".repeat(50)}.${"Zm9v".repeat(49)}"`)["obf:long-base64"]).toBe(1);
   });
   it("finds a high-entropy line only when it is long enough", () => {
     let s = "";

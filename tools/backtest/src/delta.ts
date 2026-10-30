@@ -78,6 +78,49 @@ export function entropy(line: string): number {
   return h;
 }
 
+// Rule 7's runs are scanned by hand: a regular expression such as /[A-Za-z0-9+/]{200,}/ overflows V8's stack on a
+// run of several megabytes (docs/mistakes/2026-10-30-delta-regex-stack.md). Each counts maximal runs, as the regex would.
+const isHex = (c: number) => (c >= 48 && c <= 57) || (c >= 65 && c <= 70) || (c >= 97 && c <= 102);
+const isBase64 = (c: number) => (c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c === 43 || c === 47;
+/** Maximal runs of at least 200 hex digits, and of at least 200 base64 characters that are not all hex digits. */
+export function longRuns(text: string): { hex: number; base64: number } {
+  let hex = 0, base64 = 0, hexRun = 0, b64Run = 0, b64AllHex = true;
+  for (let i = 0; i <= text.length; i++) {
+    const c = i < text.length ? text.charCodeAt(i) : -1;
+    if (isHex(c)) hexRun++;
+    else { if (hexRun >= 200) hex++; hexRun = 0; }
+    if (isBase64(c)) { b64Run++; if (!isHex(c)) b64AllHex = false; }
+    else { if (b64Run >= 200 && !b64AllHex) base64++; b64Run = 0; b64AllHex = true; }
+  }
+  return { hex, base64 };
+}
+/** Maximal runs of at least 50 consecutive `\xHH` (kind "x", 2 digits) or `\uHHHH` (kind "u", 4 digits) escapes. */
+export function escapeRuns(text: string, kind: "x" | "u", digits: number): number {
+  let runs = 0, run = 0;
+  for (let i = 0; i < text.length;) {
+    let ok = text.charCodeAt(i) === 92 && text[i + 1] === kind;
+    for (let d = 0; ok && d < digits; d++) ok = isHex(text.charCodeAt(i + 2 + d));
+    if (ok) { run++; i += 2 + digits; continue; }
+    if (run >= 50) runs++;
+    run = 0;
+    i++;
+  }
+  return runs + (run >= 50 ? 1 : 0);
+}
+
+/** Identifiers `_0x` and at least 4 hex digits, as /\b_0x[0-9a-fA-F]{4,}\b/g counts them, the hex run scanned by hand. */
+export function obfuscatorNames(text: string): number {
+  let n = 0;
+  const re = /\b_0x[0-9a-fA-F]{4}/g;
+  for (let m; (m = re.exec(text));) {
+    let j = re.lastIndex;
+    while (j < text.length && isHex(text.charCodeAt(j))) j++;
+    if (j >= text.length || !/\w/.test(text[j]!)) n++;
+    re.lastIndex = j;
+  }
+  return n;
+}
+
 /** Rules 1-3 and 7 (and the shown-only counts) over one code file's text. */
 export function capabilityCounts(text: string): Counts {
   const out: Counts = Object.fromEntries([...FILE_CAPABILITIES, ...REFERENCE].map(c => [c, 0]));
@@ -91,13 +134,14 @@ export function capabilityCounts(text: string): Counts {
   out["api:WebSocket"] = count(text, /\bWebSocket\b/g);
   out["code:eval"] = count(text, /\beval\s*\(/g);
   out["code:new Function"] = count(text, /\bnew\s+Function\s*\(/g);
-  out["obf:long-hex"] = count(text, /[0-9a-fA-F]{200,}/g) + count(text, /(?:\\x[0-9a-fA-F]{2}){50,}/g) + count(text, /(?:\\u[0-9a-fA-F]{4}){50,}/g);
-  out["obf:long-base64"] = (text.match(/[A-Za-z0-9+/]{200,}/g) ?? []).filter(s => !/^[0-9a-fA-F]+$/.test(s)).length;
+  const runs = longRuns(text);
+  out["obf:long-hex"] = runs.hex + escapeRuns(text, "x", 2) + escapeRuns(text, "u", 4);
+  out["obf:long-base64"] = runs.base64;
   for (const line of text.split("\n")) {
     if (line.length >= 5000) out["obf:very-long-line"]!++;
     if (line.length >= 200 && entropy(line) >= 5.5) out["obf:high-entropy-line"]!++;
   }
-  out["obf:_0x-names"] = count(text, /\b_0x[0-9a-fA-F]{4,}\b/g);
+  out["obf:_0x-names"] = obfuscatorNames(text);
   out["ref:process.env"] = count(text, /\bprocess\.env\b/g);
   out["ref:homedir"] = count(text, /\bhomedir\s*\(/g);
   out["ref:base64-decode"] = count(text, /\bBuffer\.from\s*\([^)]{0,500}?['"]base64['"]\s*\)/g);

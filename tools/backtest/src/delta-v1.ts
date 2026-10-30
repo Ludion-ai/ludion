@@ -169,7 +169,9 @@ async function obtain(v: Version, phase: 1 | 2, fallbackTime: string | null): Pr
 }
 
 function judgeRow(p: Pair, a: Got, b: Got): Row {
-  const d = delta(a.files, b.files);
+  // An analyzer error is reported as undecidable, never as clean or flagged (README, "Runs").
+  let d: Delta;
+  try { d = delta(a.files, b.files); } catch (e) { d = { status: "undecidable", why: `analyzer error: ${String(e).slice(0, 200)}` }; }
   const base: Row = { set: p.set, id: p.id, name: p.next.name, prev: p.prev.version, version: p.next.version, sources: { prev: a.source, next: b.source }, tried: { prev: triedOf.get(key(p.prev)) ?? {}, next: triedOf.get(key(p.next)) ?? {} }, status: "undecidable" };
   details.push({ set: p.set, id: p.id, version: key(p.next), prev: p.prev.version, delta: d });
   if (d.status === "undecidable") return { ...base, undecidable: d.why };

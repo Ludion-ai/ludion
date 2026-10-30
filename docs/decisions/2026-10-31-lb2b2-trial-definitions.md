@@ -66,6 +66,13 @@ The trial's CI is `ci.yml` (above). For each form, one PR that Ludion opens on a
 
 If no form gives a green PR, a GitHub App is the owner's decision; none is created.
 
+### Addendum (committed 2026-10-30, after forms A–C ran and before B2 runs): form B2
+
+Added after seeing that form B's CI run is not on the PR. Forms A–C, their definitions and their results are not changed by it; B2 is a fourth form, reported apart.
+
+- Form B2, as B, and the dispatched CI reports its own result as a commit status (`ludion-ci-d.yml`, `php-d/`, a fourth copy of `php/`): the PR job adds `actions: write` as B does. `ci.yml` gains a second job `report`, only on `workflow_dispatch`, after `test` whatever its result, with `statuses: write` only; it checks nothing out and runs no project code, and posts the status context `ci/test` on the run's commit: `success` when `test` succeeded, `failure` otherwise, with the run's URL.
+- Green on the PR: the same definition as above, observed at least 10 minutes after the PR opens and after the dispatched CI run completed. Recorded: the permissions added (PR job `actions: write`; CI's `report` job `statuses: write`), and that the user's CI workflow has to be changed for it.
+
 ## 4. Actions minutes
 
 As LB2b's item 6: per job `completed_at − started_at` rounded up to whole minutes, skipped jobs 0, summed per run and per UTC day; the run timing API's `billable` recorded next to it. Monthly allowance assumed 2,000 (unconfirmed, as in LB2b); stop at 1,000 for the calendar month or a month's projection of 1,000 (minutes so far ÷ days elapsed × days in the month), by `gh workflow disable`. Also reported, not a stop rule: the projected minutes of a month of hourly runs with nothing to do (24 × days × billed minutes of an early-exit run, per workflow).

@@ -20,10 +20,18 @@ const ENGLISH = [...new Set(leaves(enStrings).filter((text) => !jaLeaves.has(tex
 /**
  * No English label or sentence is left on the page (code, ids and product names aside), visible or not yet replaced by
  * a script. Each English string of en.ts that ja.ts translates is looked for, so a string hard-coded in a component
- * shows up here.
+ * shows up here. Besides the body's text, it reads the title, the description and og: text, the labels and texts kept
+ * in attributes, and what each template holds.
  */
 async function noEnglishLeft(page: Page) {
-  const text = await page.locator("body").evaluate((body) => body.textContent ?? "");
+  const text = await page.evaluate(() => [
+    document.title,
+    document.body.textContent ?? "",
+    ...[...document.querySelectorAll("meta[name=description], meta[property^='og:']")].map((el) => el.getAttribute("content") ?? ""),
+    ...[...document.querySelectorAll("*")].flatMap((el) =>
+      ["aria-label", "title", "alt", "data-copied", "data-selected"].map((name) => el.getAttribute(name) ?? "")),
+    ...[...document.querySelectorAll("template")].map((el) => el.content.textContent ?? ""),
+  ].join("\n"));
   expect(ENGLISH.length).toBeGreaterThan(100);
   expect(ENGLISH.filter((english) => text.includes(english))).toEqual([]);
 }
@@ -64,6 +72,12 @@ for (const { en, ja } of PAIRS) {
     const response = await request.get(en, { maxRedirects: 0, headers: { "Accept-Language": "ja,en;q=0.5" } });
     expect(response.status()).toBe(200);
     expect(await response.text()).toContain('<html lang="en"');
+  });
+
+  test(`${ja} is not redirected by the browser's language`, async ({ request }) => {
+    const response = await request.get(ja, { maxRedirects: 0, headers: { "Accept-Language": "en" } });
+    expect(response.status()).toBe(200);
+    expect(await response.text()).toContain('<html lang="ja"');
   });
 }
 

@@ -1,0 +1,204 @@
+2026-10-30T12:32:31.096Z genuine 1/192 react-server-dom-turbopack 19.2.1 -> 19.2.2: tied true; time -1.99; ld2 no new capability
+2026-10-30T12:32:32.268Z genuine 2/192 axios 1.8.1 -> 1.8.2: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:32:33.685Z genuine 3/192 @react-native-community/cli-server-api 19.1.1 -> 19.1.2: tied true; time 0; ld2 no new capability
+2026-10-30T12:32:34.805Z genuine 4/192 mcp-remote 0.1.15 -> 0.1.16: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:32:46.609Z genuine 5/192 next 15.5.6 -> 15.5.7: tied true; time -0.14; ld2 no new capability
+2026-10-30T12:32:48.234Z genuine 6/192 react-server-dom-webpack 19.1.1 -> 19.1.2: tied true; time -0.98; ld2 no new capability
+2026-10-30T12:32:50.367Z genuine 7/192 @angular/platform-server 20.2.4 -> 20.3.0: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:32:52.050Z genuine 8/192 @sentry/nextjs 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:32:53.715Z genuine 9/192 react-server-dom-turbopack 19.0.1 -> 19.0.2: tied true; time 0.27; ld2 no new capability
+2026-10-30T12:32:54.624Z genuine 10/192 flowise 3.0.5 -> 3.0.6: tied false; time -; ld2 no new capability
+2026-10-30T12:32:57.742Z genuine 11/192 undici 6.21.0 -> 6.21.1: tied true; time -0.02; ld2 all explained
+2026-10-30T12:33:04.882Z genuine 12/192 @portkey-ai/gateway 1.13.0 -> 1.14.0: tied true; time -0.12; ld2 all explained
+2026-10-30T12:33:08.230Z genuine 13/192 @strapi/core 5.10.2 -> 5.10.3: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:33:10.168Z genuine 14/192 n8n 1.113.3 -> 1.114.0: tied true; time -0.11; ld2 no new capability
+2026-10-30T12:33:14.338Z genuine 15/192 @plone/volto 17.22.0 -> 17.22.1: tied true; time 0; ld2 no new capability
+2026-10-30T12:33:15.703Z genuine 16/192 xml-crypto 6.0.0 -> 6.0.1: tied true; time 0; ld2 no new capability
+2026-10-30T12:33:18.571Z genuine 17/192 @fedify/fedify 1.3.19 -> 1.3.20: tied true; time -0.36; ld2 no new capability
+2026-10-30T12:33:20.138Z genuine 18/192 tarteaucitronjs 1.21.0 -> 1.22.0: tied true; time -1.2; ld2 no new capability
+2026-10-30T12:33:22.379Z genuine 19/192 @auth0/nextjs-auth0 4.5.0 -> 4.5.1: tied true; time -0.06; ld2 no new capability
+2026-10-30T12:33:23.895Z genuine 20/192 dom-expressions 0.39.4 -> 0.39.5: tied true; time 0; ld2 no new capability
+2026-10-30T12:33:24.899Z genuine 21/192 tryton-sao 7.4.20 -> 7.4.21: tied false; time -; ld2 no new capability
+2026-10-30T12:33:37.846Z genuine 22/192 next 15.2.3 -> 15.2.4: tied true; time -0.26; ld2 no new capability
+2026-10-30T12:33:39.853Z genuine 23/192 @intlify/core 9.14.4 -> 9.14.5: tied true; time -0.07; ld2 no new capability
+2026-10-30T12:33:41.067Z genuine 24/192 brace-expansion 1.1.11 -> 1.1.12: tied true; time 0; ld2 no new capability
+2026-10-30T12:33:44.527Z genuine 25/192 vite 5.4.16 -> 5.4.17: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:33:52.641Z genuine 26/192 ghost 6.0.8 -> 6.0.9: tied true; time -0.15; ld2 no new capability
+2026-10-30T12:33:54.473Z genuine 27/192 snowflake-sdk 2.0.1 -> 2.0.2: tied true; time -1.24; ld2 no new capability
+2026-10-30T12:33:56.102Z genuine 28/192 psitransfer 2.3.0 -> 2.3.1: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:33:58.131Z genuine 29/192 @sentry/nestjs 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:34:01.649Z genuine 30/192 @plone/volto 16.33.0 -> 16.34.0: tied true; time 0; ld2 no new capability
+2026-10-30T12:34:03.116Z genuine 31/192 koa 2.16.2 -> 2.16.3: tied true; time -0.05; ld2 no new capability
+2026-10-30T12:34:07.318Z genuine 32/192 parse-server 8.0.1 -> 8.0.2: tied true; time 0; ld2 unexplained [obf:very-long-line]
+2026-10-30T12:34:16.153Z genuine 33/192 mermaid 11.9.0 -> 11.10.0: tied true; time -0.02; ld2 unexplained [obf:high-entropy-line, obf:very-long-line]
+2026-10-30T12:34:18.543Z genuine 34/192 @fedify/fedify 1.3.3 -> 1.3.4: tied true; time -0.18; ld2 no new capability
+2026-10-30T12:34:20.913Z genuine 35/192 @fedify/fedify 1.6.7 -> 1.6.8: tied true; time -0.26; ld2 no new capability
+2026-10-30T12:34:22.356Z genuine 36/192 get-jwks 11.0.1 -> 11.0.2: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:34:24.529Z genuine 37/192 vite 6.2.3 -> 6.2.4: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:34:26.290Z genuine 38/192 @fastify/reply-from 12.4.0 -> 12.5.0: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:34:27.920Z genuine 39/192 directus 11.4.1 -> 11.5.0: tied true; time -0.09; ld2 no new capability
+2026-10-30T12:34:30.064Z genuine 40/192 on-headers 1.0.2 -> 1.1.0: tied true; time -0.02; ld2 all explained
+2026-10-30T12:34:31.372Z genuine 41/192 react-server-dom-turbopack 19.2.2 -> 19.2.3: tied true; time -0.36; ld2 no new capability
+2026-10-30T12:34:32.737Z genuine 42/192 multer 2.0.0 -> 2.0.1: tied true; time -0.17; ld2 no new capability
+2026-10-30T12:34:34.669Z genuine 43/192 @sentry/nuxt 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:34:36.123Z genuine 44/192 vite-plugin-static-copy 2.3.1 -> 2.3.2: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:34:38.220Z genuine 45/192 @vitejs/plugin-rsc 0.5.6 -> 0.5.7: tied true; time -0.04; ld2 no new capability
+2026-10-30T12:34:39.757Z genuine 46/192 node-forge 1.3.1 -> 1.3.2: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:34:50.951Z genuine 47/192 next 15.0.6 -> 15.0.7: tied true; time -0.07; ld2 no new capability
+2026-10-30T12:34:55.367Z genuine 48/192 @finos/git-proxy 1.19.1 -> 1.19.2: tied true; time -0.08; ld2 all explained
+2026-10-30T12:34:58.584Z genuine 49/192 @plone/volto 18.23.0 -> 18.24.0: tied true; time 0; ld2 no new capability
+2026-10-30T12:35:00.522Z genuine 50/192 @angular/ssr 20.2.2 -> 20.3.0: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:35:02.016Z genuine 51/192 cloudinary 2.6.1 -> 2.7.0: tied true; time 0; ld2 no new capability
+2026-10-30T12:35:03.981Z genuine 52/192 @node-saml/node-saml 5.0.1 -> 5.1.0: tied true; time 0; ld2 no new capability
+2026-10-30T12:35:05.728Z genuine 53/192 @octokit/endpoint 9.0.5 -> 9.0.6: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:35:07.223Z genuine 54/192 mcp-server-kubernetes 2.4.9 -> 2.5.0: tied true; time -0.2; ld2 no new capability
+2026-10-30T12:35:08.452Z genuine 55/192 mcp-server-kubernetes 2.9.7 -> 2.9.8: tied true; time -0.17; ld2 no new capability
+2026-10-30T12:35:10.636Z genuine 56/192 @webrecorder/wabac 2.23.10 -> 2.23.11: tied false; time -; ld2 no new capability
+2026-10-30T12:35:12.161Z genuine 57/192 js-toml 1.0.1 -> 1.0.2: tied true; time -0.05; ld2 no new capability
+2026-10-30T12:35:13.759Z genuine 58/192 better-auth 1.2.9 -> 1.2.10: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:35:17.183Z genuine 59/192 @nestjs/common 10.4.15 -> 10.4.16: tied true; time 0; ld2 all explained
+2026-10-30T12:35:27.378Z genuine 60/192 @anthropic-ai/claude-code 1.0.92 -> 1.0.93: tied false; time -; ld2 not comparable (no release for the fixed version)
+2026-10-30T12:35:41.194Z genuine 61/192 next 16.0.8 -> 16.0.9: tied true; time -0.27; ld2 no new capability
+2026-10-30T12:35:44.817Z genuine 62/192 @directus/api 24.0.0 -> 24.0.1: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:35:46.554Z genuine 63/192 react-router 7.5.1 -> 7.5.2: tied true; time -0.12; ld2 no new capability
+2026-10-30T12:35:48.898Z genuine 64/192 screenshot-desktop 1.15.1 -> 1.15.2: tied true; time -0.01; ld2 all explained
+2026-10-30T12:35:51.203Z genuine 65/192 vite 4.5.10 -> 4.5.11: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:35:52.992Z genuine 66/192 astro 5.15.7 -> 5.15.8: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:36:07.022Z genuine 67/192 azle 0.29.0 -> 0.30.0: tied true; time -1.65; ld2 all explained
+2026-10-30T12:36:09.063Z genuine 68/192 react-server-dom-webpack 19.0.0 -> 19.0.1: tied true; time -6.55; ld2 no new capability
+2026-10-30T12:36:11.008Z genuine 69/192 @octokit/request-error 6.1.6 -> 6.1.7: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:36:13.348Z genuine 70/192 @astrojs/node 9.4.0 -> 9.4.1: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:36:14.834Z genuine 71/192 @backstage/plugin-scaffolder-backend 2.1.0 -> 2.1.1: tied false; time -; ld2 no new capability
+2026-10-30T12:36:17.512Z genuine 72/192 @angular/compiler 19.2.16 -> 19.2.17: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:36:23.002Z genuine 73/192 @umbraco-cms/backoffice 14.3.1 -> 14.3.2: tied false; time -; ld2 no new capability
+2026-10-30T12:36:24.969Z genuine 74/192 pbkdf2 3.1.2 -> 3.1.3: tied true; time -0.01; ld2 not comparable (previous commit: source archive not read: HTTP 404)
+2026-10-30T12:36:34.496Z genuine 75/192 next 14.2.25 -> 14.2.26: tied true; time -0.75; ld2 no new capability
+2026-10-30T12:36:38.600Z genuine 76/192 openpgp 5.11.2 -> 5.11.3: tied true; time -0.04; ld2 no new capability
+2026-10-30T12:36:39.920Z genuine 77/192 glob 11.0.3 -> 11.1.0: tied true; time 0; ld2 no new capability
+2026-10-30T12:36:41.785Z genuine 78/192 @auth0/nextjs-auth0 4.11.1 -> 4.11.2: tied true; time -1; ld2 no new capability
+2026-10-30T12:36:43.199Z genuine 79/192 mongosh 2.3.8 -> 2.3.9: tied true; time -19.78; ld2 no new capability
+2026-10-30T12:36:45.253Z genuine 80/192 vite 6.3.5 -> 6.3.6: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:36:47.373Z genuine 81/192 vite 6.0.13 -> 6.0.14: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:36:49.330Z genuine 82/192 @directus/api 28.0.1 -> 28.0.2: tied true; time -0.17; ld2 no new capability
+2026-10-30T12:36:51.446Z genuine 83/192 n8n 1.121.0 -> 1.121.1: tied true; time -0.12; ld2 no new capability
+2026-10-30T12:36:52.964Z genuine 84/192 react-server-dom-turbopack 19.1.2 -> 19.1.3: tied true; time -2; ld2 no new capability
+2026-10-30T12:36:55.059Z genuine 85/192 vite 7.0.6 -> 7.0.7: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:37:02.487Z genuine 86/192 better-auth 1.4.1 -> 1.4.2: tied true; time -0.03; ld2 unexplained [api:fetch, obf:high-entropy-line, obf:very-long-line]
+2026-10-30T12:37:04.799Z genuine 87/192 @sentry/astro 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:37:09.377Z genuine 88/192 snyk 1.1297.2 -> 1.1297.3: tied true; time -1.52; ld2 no new capability
+2026-10-30T12:37:10.847Z genuine 89/192 @lodestar/reqresp 1.24.0 -> 1.25.0: tied false; time -; ld2 no new capability
+2026-10-30T12:37:12.628Z genuine 90/192 @octokit/request-error 5.1.0 -> 5.1.1: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:37:25.606Z genuine 91/192 next 16.0.9 -> 16.0.10: tied true; time -0.16; ld2 no new capability
+2026-10-30T12:37:30.824Z genuine 92/192 mermaid 10.9.3 -> 10.9.4: tied true; time -22.73; ld2 no new capability
+2026-10-30T12:37:32.902Z genuine 93/192 @apollo/composition 2.12.0 -> 2.12.1: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:37:34.041Z genuine 94/192 @cloudflare/workers-oauth-provider 0.0.4 -> 0.0.5: tied false; time -; ld2 no new capability
+2026-10-30T12:37:34.711Z genuine 95/192 mailgen 2.0.29 -> 2.0.30: tied false; time -; ld2 no new capability
+2026-10-30T12:37:36.338Z genuine 96/192 better-auth 1.1.15 -> 1.1.16: tied true; time -0.05; ld2 no new capability
+2026-10-30T12:37:37.956Z genuine 97/192 next-auth 4.24.11 -> 4.24.12: tied true; time -43.97; ld2 no new capability
+2026-10-30T12:37:40.116Z genuine 98/192 @intlify/vue-i18n-core 9.14.4 -> 9.14.5: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:37:41.517Z genuine 99/192 flowise-components 2.2.3 -> 2.2.4: tied false; time -; ld2 not comparable (no release for the fixed version)
+2026-10-30T12:38:10.385Z genuine 100/192 next 15.2.1 -> 15.2.2: tied true; time -0.15; ld2 unexplained [obf:very-long-line]
+2026-10-30T12:38:12.534Z genuine 101/192 @fastify/multipart 8.3.0 -> 8.3.1: tied true; time 0; ld2 no new capability
+2026-10-30T12:38:13.177Z genuine 102/192 git-commiters 0.1.1 -> 0.1.2: tied false; time -; ld2 no new capability
+2026-10-30T12:38:15.272Z genuine 103/192 vite 7.1.10 -> 7.1.11: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:38:17.379Z genuine 104/192 @sentry/google-cloud-serverless 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:38:30.310Z genuine 105/192 next 15.5.7 -> 15.5.8: tied true; time -0.07; ld2 no new capability
+2026-10-30T12:38:32.311Z genuine 106/192 @escape.tech/graphql-armor-max-depth 2.4.1 -> 2.4.2: tied true; time -0.04; ld2 no new capability
+2026-10-30T12:38:34.637Z genuine 107/192 vite 7.1.4 -> 7.1.5: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:38:37.142Z genuine 108/192 typeorm 0.3.25 -> 0.3.26: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:38:38.421Z genuine 109/192 tar-fs 1.16.4 -> 1.16.5: tied true; time 0; ld2 no new capability
+2026-10-30T12:38:40.184Z genuine 110/192 formio 3.5.6 -> 3.5.7: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:38:50.903Z genuine 111/192 next 15.1.8 -> 15.1.9: tied true; time -0.45; ld2 no new capability
+2026-10-30T12:38:54.377Z genuine 112/192 form-data 2.5.3 -> 2.5.4: tied true; time -0.01; ld2 all explained
+2026-10-30T12:38:55.860Z genuine 113/192 tar-fs 3.1.0 -> 3.1.1: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:39:06.294Z genuine 114/192 @vitest/browser 3.0.3 -> 3.0.4: tied true; time -0.05; ld2 unexplained [api:fetch, api:WebSocket, obf:high-entropy-line, obf:very-long-line]
+2026-10-30T12:39:09.810Z genuine 115/192 x402 0.5.1 -> 0.5.2: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:39:12.828Z genuine 116/192 formidable 3.5.2 -> 3.5.3: tied true; time 0.02; ld2 all explained
+2026-10-30T12:39:30.851Z genuine 117/192 @openai/codex 0.38.0 -> 0.39.0: tied true; time -0.2; ld2 unexplained [binary]
+2026-10-30T12:39:32.433Z genuine 118/192 estree-util-value-to-estree 3.3.2 -> 3.3.3: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:39:34.397Z genuine 119/192 parse-server 8.2.1 -> 8.2.2: tied true; time 0; ld2 no new capability
+2026-10-30T12:39:36.261Z genuine 120/192 parse-server 7.5.3 -> 7.5.4: tied true; time 0; ld2 no new capability
+2026-10-30T12:39:38.022Z genuine 121/192 vite 6.0.14 -> 6.0.15: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:39:49.036Z genuine 122/192 next 15.3.2 -> 15.3.3: tied true; time -1.28; ld2 no new capability
+2026-10-30T12:39:51.556Z genuine 123/192 redoc 2.3.0 -> 2.4.0: tied true; time -0.12; ld2 no new capability
+2026-10-30T12:39:53.021Z genuine 124/192 langchain 0.3.36 -> 0.3.37: tied false; time -; ld2 no new capability
+2026-10-30T12:39:55.057Z genuine 125/192 @openzeppelin/contracts-upgradeable 5.3.0 -> 5.4.0: tied true; time -0.24; ld2 no new capability
+2026-10-30T12:39:56.230Z genuine 126/192 @apollo/sandbox 2.7.1 -> 2.7.2: tied false; time -; ld2 no new capability
+2026-10-30T12:39:57.556Z genuine 127/192 directus 11.12.0 -> 11.13.0: tied true; time -0.15; ld2 no new capability
+2026-10-30T12:40:07.384Z genuine 128/192 @anthropic-ai/claude-code 2.0.30 -> 2.0.31: tied false; time -; ld2 not comparable (no release for the fixed version)
+2026-10-30T12:40:09.007Z genuine 129/192 vue-i18n 9.14.4 -> 9.14.5: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:40:19.724Z genuine 130/192 next 15.1.9 -> 15.1.10: tied true; time -0.09; ld2 no new capability
+2026-10-30T12:40:21.169Z genuine 131/192 xml-crypto 3.2.0 -> 3.2.1: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:40:26.863Z genuine 132/192 @haxtheweb/haxcms-nodejs 11.0.7 -> 11.0.8: tied true; time 0; ld2 no new capability
+2026-10-30T12:40:28.239Z genuine 133/192 @anthropic-ai/sandbox-runtime 0.0.15 -> 0.0.16: tied false; time -; ld2 no new capability
+2026-10-30T12:40:40.146Z genuine 134/192 next 15.4.9 -> 15.4.10: tied true; time -0.07; ld2 no new capability
+2026-10-30T12:40:41.430Z genuine 135/192 react-server-dom-turbopack 19.0.2 -> 19.0.3: tied true; time -0.34; ld2 no new capability
+2026-10-30T12:40:43.122Z genuine 136/192 astro 5.12.7 -> 5.12.8: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:40:51.547Z genuine 137/192 next 15.2.2 -> 15.2.3: tied true; time -0.39; ld2 no new capability
+2026-10-30T12:40:54.336Z genuine 138/192 @workos-inc/authkit-react-router 0.6.1 -> 0.7.0: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:40:56.393Z genuine 139/192 @sentry/remix 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:41:05.642Z genuine 140/192 next 15.2.5 -> 15.2.6: tied true; time -0.07; ld2 no new capability
+2026-10-30T12:41:07.558Z genuine 141/192 vite 6.2.2 -> 6.2.3: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:41:09.414Z genuine 142/192 parse-server 7.5.2 -> 7.5.3: tied true; time 0; ld2 no new capability
+2026-10-30T12:41:11.265Z genuine 143/192 vite 6.2.5 -> 6.2.6: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:41:13.465Z genuine 144/192 @sentry/aws-serverless 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:41:21.000Z genuine 145/192 jspdf 3.0.0 -> 3.0.1: tied true; time -18.7; ld2 all explained
+2026-10-30T12:41:21.913Z genuine 146/192 node-code-sandbox-mcp 1.2.0 -> 1.3.0: tied false; time -; ld2 no new capability
+2026-10-30T12:41:22.556Z genuine 147/192 lightning-flow-scanner 6.10.5 -> 6.10.6: tied false; time -; ld2 no new capability
+2026-10-30T12:41:23.964Z genuine 148/192 qs 6.14.0 -> 6.14.1: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:41:25.982Z genuine 149/192 vite 5.4.20 -> 5.4.21: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:41:28.065Z genuine 150/192 @sentry/solidstart 8.48.0 -> 8.49.0: tied true; time -1.08; ld2 no new capability
+2026-10-30T12:41:29.463Z genuine 151/192 image-size 2.0.1 -> 2.0.2: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:41:38.228Z genuine 152/192 @anthropic-ai/claude-code 1.0.103 -> 1.0.105: tied false; time -; ld2 not comparable (no release for the fixed version)
+2026-10-30T12:41:39.993Z genuine 153/192 happy-dom 20.0.1 -> 20.0.2: tied true; time -0.07; ld2 no new capability
+2026-10-30T12:41:48.124Z genuine 154/192 next 14.2.29 -> 14.2.30: tied true; time -0.73; ld2 no new capability
+2026-10-30T12:41:50.155Z genuine 155/192 @supabase/auth-js 2.69.1 -> 2.70.0: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:41:52.071Z genuine 156/192 @sentry/nestjs 10.26.0 -> 10.27.0: tied true; time -0.7; ld2 no new capability
+2026-10-30T12:41:53.405Z genuine 157/192 systeminformation 5.27.13 -> 5.27.14: tied true; time -0.17; ld2 no new capability
+2026-10-30T12:41:55.211Z genuine 158/192 vite 4.5.12 -> 4.5.13: tied true; time -0.03; ld2 no new capability
+2026-10-30T12:41:57.153Z genuine 159/192 @elysiajs/cors 1.3.0 -> 1.3.1: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:41:58.824Z genuine 160/192 react-server-dom-parcel 19.2.1 -> 19.2.2: tied true; time -1.99; ld2 no new capability
+2026-10-30T12:42:01.228Z genuine 161/192 @tinacms/graphql 2.0.2 -> 2.0.3: tied true; time -0.04; ld2 no new capability
+2026-10-30T12:42:11.257Z genuine 162/192 next 15.0.5 -> 15.0.6: tied true; time -0.07; ld2 no new capability
+2026-10-30T12:42:13.060Z genuine 163/192 parse-server 8.6.0 -> 8.6.1: tied true; time 0; ld2 no new capability
+2026-10-30T12:42:14.481Z genuine 164/192 sveltekit-superforms 2.27.3 -> 2.27.4: tied true; time -0.04; ld2 no new capability
+2026-10-30T12:42:15.734Z genuine 165/192 mdast-util-to-hast 13.2.0 -> 13.2.1: tied true; time 0; ld2 no new capability
+2026-10-30T12:42:17.274Z genuine 166/192 zx 8.8.4 -> 8.8.5: tied true; time -98.63; ld2 no new capability
+2026-10-30T12:42:18.092Z genuine 167/192 tryton-sao 6.0.66 -> 6.0.67: tied false; time -; ld2 no new capability
+2026-10-30T12:42:20.113Z genuine 168/192 elysia 1.4.16 -> 1.4.17: tied true; time -0.05; ld2 no new capability
+2026-10-30T12:42:21.487Z genuine 169/192 tar 7.5.1 -> 7.5.2: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:42:23.539Z genuine 170/192 n8n 1.106.2 -> 1.107.0: tied true; time -0.18; ld2 no new capability
+2026-10-30T12:42:25.036Z genuine 171/192 ipx 3.1.0 -> 3.1.1: tied true; time 0; ld2 no new capability
+2026-10-30T12:42:26.812Z genuine 172/192 n8n 1.119.1 -> 1.119.2: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:42:30.181Z genuine 173/192 @cyanheads/git-mcp-server 2.1.4 -> 2.1.5: tied true; time -0.02; ld2 all explained
+2026-10-30T12:42:35.708Z genuine 174/192 @lobehub/chat 1.129.3 -> 1.129.4: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:42:42.707Z genuine 175/192 next 13.5.9 -> 13.5.10: tied true; time -0.1; ld2 no new capability
+2026-10-30T12:42:44.102Z genuine 176/192 tar-fs 2.1.3 -> 2.1.4: tied true; time 0; ld2 no new capability
+2026-10-30T12:42:46.073Z genuine 177/192 trix 2.1.15 -> 2.1.16: tied true; time -0.75; ld2 no new capability
+2026-10-30T12:42:47.799Z genuine 178/192 @sentry/astro 10.26.0 -> 10.27.0: tied true; time -0.7; ld2 no new capability
+2026-10-30T12:42:57.046Z genuine 179/192 next 15.2.6 -> 15.2.7: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:42:59.113Z genuine 180/192 vite 6.1.2 -> 6.1.3: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:43:01.064Z genuine 181/192 vite 4.5.9 -> 4.5.10: tied true; time -0.04; ld2 no new capability
+2026-10-30T12:43:02.532Z genuine 182/192 astro 5.14.1 -> 5.14.3: tied true; time -0.02; ld2 no new capability
+2026-10-30T12:43:04.821Z genuine 183/192 @jitbit/htmlsanitizer 2.0.2 -> 2.0.3: tied true; time 0.53; ld2 no new capability
+2026-10-30T12:43:06.228Z genuine 184/192 hono 4.9.6 -> 4.9.7: tied true; time 0; ld2 no new capability
+2026-10-30T12:43:08.337Z genuine 185/192 @akoskm/create-mcp-server-stdio 0.0.12 -> 0.0.13: tied true; time -0.11; ld2 no new capability
+2026-10-30T12:43:09.048Z genuine 186/192 flowise 3.0.7 -> 3.0.8: tied false; time -; ld2 no new capability
+2026-10-30T12:43:11.201Z genuine 187/192 @alizeait/unflatto 1.0.2 -> 1.0.3: tied true; time -0.01; ld2 no new capability
+2026-10-30T12:43:12.536Z genuine 188/192 js-yaml 3.14.1 -> 3.14.2: tied true; time -0.04; ld2 no new capability
+2026-10-30T12:43:14.118Z genuine 189/192 tarteaucitronjs 1.19.0 -> 1.20.1: tied true; time -0.08; ld2 no new capability
+2026-10-30T12:43:27.133Z genuine 190/192 aws-cdk-lib 2.188.0 -> 2.189.0: tied true; time -3.87; ld2 no new capability
+2026-10-30T12:43:34.929Z genuine 191/192 vega 6.1.2 -> 6.2.0: tied true; time -0.03; ld2 unexplained [api:fetch]
+2026-10-30T12:43:58.319Z genuine 192/192 next 15.0.4 -> 15.0.5: tied true; time -0.49; ld2 unexplained [api:fetch, code:eval, obf:very-long-line]
+2026-10-30T12:43:59.459Z malicious 1/11 @igh/server-updater-ssh 1.2.4 -> 1.2.16: previous no repository (tarball package.json); version no repository; removed false; content flagged
+2026-10-30T12:44:00.483Z malicious 2/11 @igh/server-updater-ssh-l1 1.2.8 -> 1.2.17: previous no repository (tarball package.json); version no repository; removed false; content flagged
+2026-10-30T12:44:04.519Z malicious 3/11 @asyncapi/studio 0.20.0 -> 0.20.1: previous no repository (tarball package.json); version no repository; removed false; content flagged
+2026-10-30T12:44:08.179Z malicious 4/11 @asyncapi/studio 0.20.0 -> 0.20.2: previous no repository (tarball package.json); version no repository; removed false; content flagged
+2026-10-30T12:44:08.587Z malicious 5/11 freo-design-system 1.0.0 -> 1.0.1: previous no repository (tarball package.json); version no repository; removed false; content flagged
+2026-10-30T12:44:08.834Z malicious 6/11 freo-design-system 1.0.0 -> 1.0.4: previous no repository (tarball package.json); version no repository; removed false; content flagged
+2026-10-30T12:44:09.775Z malicious 7/11 @dm3-org/dm3-lib-shared 1.7.1 -> 1.7.2: previous no repository (tarball package.json); version no repository; removed false; content flagged
+2026-10-30T12:44:10.784Z malicious 8/11 @react-native-aria/switch 0.2.4 -> 0.2.5: previous usable (tarball package.json); version repository not reachable (HTTP 401); removed false; content clean
+2026-10-30T12:44:11.329Z malicious 9/11 @ensdomains/buffer 0.1.0 -> 0.1.1: previous no repository (tarball package.json); version no repository; removed false; content a side read from Software Heritage
+2026-10-30T12:44:11.929Z malicious 10/11 @voiceflow/natural-language-commander 0.5.1 -> 0.5.3: previous usable (tarball package.json); version no tag of the 8 forms; removed false; content a side read from Software Heritage
+2026-10-30T12:44:12.145Z malicious 11/11 eslint-config-kinvey-flex-service 0.1.0 -> 0.1.1: previous no repository (tarball package.json); version no repository; removed false; content a side read from Software Heritage
+2026-10-30T12:44:12.175Z done: 192 genuine, 11 malicious

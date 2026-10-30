@@ -156,7 +156,7 @@ test("the Japanese home page's motion follows reduced motion", async ({ page }) 
 test("the Japanese setup page keeps the commands, copies them, and opens each step by keyboard", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/ja/start/");
-  await expect(page.locator("h1")).toHaveText("ひとつの流れで、スタックのより広い範囲を。");
+  await expect(page.locator("h1")).toHaveText("流れはひとつ。スタックは、より広く。");
   await noEnglishLeft(page);
   await expect(page.locator("#scan-command")).toHaveText("node packages/cli/dist/cli.js scan --dir /path/to/app");
   await expect(page.locator("#source-command")).toContainText("npm run build -w ludion-ai");

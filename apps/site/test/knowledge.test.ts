@@ -83,6 +83,50 @@ describe("Japanese copy", () => {
     expect(ja.start.privacy.source).toContain("ソースを Ludion にアップロードすることはなく");
     expect(ja.start.summary).toContain("安全の保証ではありません");
   });
+  // Sentence by sentence: a Japanese string with a sentence the English lacks (a claim it does not make) or without one
+  // the English has (a limit dropped) fails here, however it is worded. English ends a sentence at ".", "?", "!" or ";"
+  // before a space or the end; Japanese at "。", "？" or "！". Text after the last end (a heading, a label, a phrase
+  // that markup continues) counts as one more.
+  const sentences = (text: string, lang: "en" | "ja") => text.split(lang === "en" ? /[.?!;](?=\s|$)/ : /[。？！]/).filter((part) => part.trim() !== "").length;
+  it("has as many sentences as the English, string by string", () => {
+    expect(sentences("Keep 0.1.4 in .ludion/security/. Then stop; review", "en")).toBe(3);
+    expect(sentences("修正を 0.1.4 で残します。止めます。確かめる", "ja")).toBe(3);
+    const differ = all.filter(([, a, b]) => sentences(a, "en") !== sentences(b, "ja")).map(([path, a, b]) => `${path}: ${sentences(a, "en")} → ${sentences(b, "ja")}`);
+    expect(differ).toEqual([]);
+  });
+  // What stays as written in both languages: numbers and versions, --flags, paths, dotted file and host names,
+  // snake_case and camelCase names, advisory prefixes such as MAL- and key names such as Ctrl+C.
+  const CODE = [
+    /\d+(?:\.\d+)*/g,
+    /(?<![\w-])--[a-z][\w-]*/g,
+    /(?<![\w./])[./](?:[\w-]+(?:\.[\w-]+)*\/)+(?:[\w-]+(?:\.[\w-]+)*)?/g,
+    /(?<![\w./-])[a-z][\w-]*(?:\.[a-z][\w-]*)+/g,
+    /\b[a-z]+(?:_[a-z]+)+\b/g,
+    /\b[a-z]+(?:[A-Z][a-z]+)+\b/g,
+    /\b[A-Z]+-(?!\w)/g,
+    /\b\w+\+\w+\b/g,
+  ];
+  const code = (text: string) => [...new Set(CODE.flatMap((re) => text.match(re) ?? []))].sort();
+  it("keeps the English numbers, versions, flags, paths and code names, string by string", () => {
+    expect(code("Run watch --apply with npm 12.2.1, ludion.security.json, node_modules, dependencyManagement and MAL- in .ludion/security/. Ctrl+C stops.")).toEqual(
+      ["--apply", ".ludion/security/", "12.2.1", "Ctrl+C", "MAL-", "dependencyManagement", "ludion.security.json", "node_modules"],
+    );
+    const differ = all.filter(([, a, b]) => code(a).join(" ") !== code(b).join(" ")).map(([path, a, b]) => `${path}: ${code(a).join(" ")} → ${code(b).join(" ")}`);
+    expect(differ).toEqual([]);
+  });
+  // The supported-scope table, cell by cell: every item of a cell is there in Japanese too. An item ends at a sentence
+  // end or ";", " + ", " / ", ", ", " or " and " and " in English; at "。", " + ", " / ", "、" and "や" in Japanese.
+  const items = (text: string, lang: "en" | "ja") =>
+    text.split(lang === "en" ? /[.;](?=\s|$)|\s[+/]\s|,\s|\sor\s|\sand\s/ : /[。、や]|\s[+/]\s/).filter((part) => part.trim() !== "").length;
+  it("has every item of the supported-scope table, row by row", () => {
+    expect(items("Standalone POM; public Maven Central. Parents, profiles, modules and extensions need review.", "en")).toBe(6);
+    expect(ja.home.supported).toHaveLength(en.home.supported.length);
+    en.home.supported.forEach((row, i) => {
+      for (const key of Object.keys(row) as (keyof typeof row)[]) {
+        expect(items(ja.home.supported[i]![key], "ja"), `supported[${i}].${key}`).toBe(items(row[key], "en"));
+      }
+    });
+  });
   it("says nothing the product is not, or has not done", () => {
     const text = all.map(([, , b]) => b).join("\n");
     for (const banned of [/Capability Compiler/i, /判定して/, /コメントを返/, /関門/, /ゲートを通/, /自動(で)?マージ/, /保証します/, /安全です/, /認証済み/]) {

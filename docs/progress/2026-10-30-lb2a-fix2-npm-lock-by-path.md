@@ -1,0 +1,9 @@
+# 2026-10-30 — LB2a, second round: the npm lock checked by install path
+
+PR #215 (branch `lane/lb2a-deliver-checks`), after the cloud review's REQUEST CHANGES (comment 6518582507 at b6a7c88). Detail: docs/bench/2026-10-30-lb-design/README.md, "LB2a, second round".
+
+**Changed.** The PR job reads every package-lock.json key through the judge's own `lockKey` and refuses a key that is not the root or an install path (B1: `aaaaaaaaaaaaminimist` had counted as minimist). The npm lock check is by install path: each path where the base has the receipt's package at `from` moves to `to` in place, each added path is required by a moved or added one, and every other entry stays as at the base (N-a). fsck runs once per artifact (N-c). Packagist PKSA IDs are read only in the PR job's form (N-d). Tests for R4, R5 and R16 (N-b). A records test fails when a cited log or bench file is not in the tree.
+
+**Results at 15e589c, in Docker.** Tests: typecheck 0, build 0, 32 files, 1,123 passed, 19 skipped (docs/bench/2026-10-30-lb-design/logs/test-lb2a-fix2.log). Mutations: 81 of 81 caught, one by the 300 s limit (docs/bench/2026-10-30-lb-design/logs/mutate-lb2a-fix2.log). Both jobs on the examples: every real fix opened one PR on run 1 and none on run 2 (npm-two 2, Composer, PHP, Maven and npm 1 each; docs/bench/2026-10-30-lb-design/logs/e2e-lb2a-fix2.log and docs/bench/2026-10-30-lb-design/logs/e2e-lb2a-fix2-php-maven-npm.log). The review's four forged artifacts are refused before any push.
+
+**Not done.** Running on GitHub (LB2b). A real npm fix that also changes another lock entry (a `dev` flag, a copy npm moved, a dependency the fixed version dropped) is now refused by the PR job, which fails closed; how often that happens is not measured.

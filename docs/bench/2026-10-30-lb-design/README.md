@@ -124,6 +124,22 @@ All ran in Docker at ba2e819 (the code; the files differing from it at the time 
 
 Not done here: running on GitHub (LB2b, waiting for the owner to name a repository), and exposure.ts's receipt note for npm, which still says "the publish time of the fixed version".
 
+### LB2a, second round (2026-10-30): the cloud review of #215
+
+The cloud review of #215 (comment 6518582507 at b6a7c88) found N2 not closed (B1): the npm lock check named a `packages` key that has no `node_modules/` by the text after its 12th character, so with the real judge a PR "minimist 1.2.5 -> 1.2.6" opened for a lock that installs no minimist. It also asked for the npm check by install path (N-a), tests for three mutations it found not caught (N-b: R4, R5, R16), fsck once (N-c), Packagist's PKSA form matched to the PR job's (N-d), the sentence on mutation 28 corrected (N-f, above), and a check that the logs the docs cite are in the tree. Changed in the same PR:
+
+- **B1 and N-a.** The lock check above ("package-lock.json, by install path"). Keys go through `lockKey` (judge.ts), which `lockEntries` also uses, so the judge and the PR job cannot read a key two ways; the judge keeps reading a key with no `node_modules/` as a project folder (workspaces), and the PR job refuses any such key. The review's attacks, forged end to end through `openFixes`, are each refused before any push (deliver.test.ts, "forged transitive npm fixes"): the `aaaaaaaaaaaaminimist` key; the real move plus a package nothing requires; the top-level copy removed with 1.2.6 only nested; an alias of another package in minimist's place. A transitive fix as `patch` makes it is opened.
+- **N-b.** An upper-case `tree` header is refused (R4); a base that has the receipt's `from` only under another name is refused (R5); `fixBranchName`'s pair `a` at `1.0.0-2.0.0` and `a-1.0.0` at `2.0.0` gets two branches (R16, branch.test.ts).
+- **N-c.** fsck runs once (above).
+- **N-d.** packagist.ts reads a PKSA ID only in the form deliver.ts's ADVISORY lets through (no "-" at either end); a test ties the two patterns.
+- **Logs.** tools/records/test/records.test.ts fails when a bench README's `logs/…` file, or a `docs/bench/…` path in a bench README or a progress record from 2026-10-27 on, is not in the tree (docs/mistakes/2026-10-30-cited-logs-not-committed.md).
+
+All ran in Docker at 15e589c (the code; nothing differed from it), volumes ludion-lb2a-w, -m and -e:
+
+- **Tests** (`scripts/test-all.sh`, `logs/test-lb2a-fix2.log`): `npm run typecheck` 0, `npm run build` 0, `vitest run --project node`: 32 files, 1,123 passed, 19 skipped.
+- **Mutations** (`logs/mutate-lb2a-fix2.log`): 81 of 81 caught, one of them (24, the backtracking Composer-name pattern) by the 300 s limit; without mutations, deliver.test.ts, branch.test.ts, dependencies.test.ts and action-patch.test.ts pass. New or rewritten for this round: 27, 28, 55 (fsck once) and 57 to 69 (the npm lock checks, B1, N-a, R4, R5, R16, N-d). The shells waiting on the container were stopped by Claude Code for low memory; the container went on, and the log is its whole output (`docker logs`).
+- **Both jobs on the examples** (`logs/e2e-lb2a-fix2.log`: npm-two, composer; `logs/e2e-lb2a-fix2-php-maven-npm.log`: php, maven, npm): on run 1, npm-two opened two PRs (lodash 4.17.20 → 4.18.1, minimist 1.2.5 → 1.2.6), Composer, PHP and Maven (commons-lang3; commons-text fails alone, as before) one each, npm one (lodash → 4.18.1); on run 2 each found its PR open and opened none. So the per-path lock check and the single fsck refuse none of these real fixes.
+
 ## The reviews
 
 - **First (comment 6512945643, REQUEST CHANGES at d714435).** Blocking 1 (content not checked): content checks as above. Blocking 2 (a refused PR left the fix stuck): branch reuse with the same tree on the same base; anything else fails the job with what to do. 3: the whole message is compared. 4: the receipt is uploaded on every run. 5: `pushInvocation` is tested; `pushBranch` itself runs only against local bare repositories in the tests and e2e. 6: depth-1 detached checkouts. 7: cache poisoning written down. 8: no fsck, with the reason above. 9: logs committed. 10: concurrency per workflow. 11: red runs written down, not changed.

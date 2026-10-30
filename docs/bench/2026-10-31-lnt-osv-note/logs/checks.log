@@ -1,0 +1,6 @@
+# docker run --rm --memory 4g --network none -v lnt-osv-note:/w -w /w node:24 (after npm ci --ignore-scripts with network)
+typecheck=0
+build=0
+test=0
+ Test Files  36 passed (36)
+      Tests  1206 passed | 19 skipped (1225)

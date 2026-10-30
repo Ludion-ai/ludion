@@ -40,7 +40,7 @@ describe("What leaves your machine", () => {
   for (const [lang, strings] of [["en", en], ["ja", ja]] as const) {
     const text = Object.values(strings.start.privacy).join("\n");
     it(`names every host of packages/cli/src in the ${lang} copy`, () => {
-      const missing = [...hosts].filter(([host]) => !(host in NOT_REQUESTED) && !new RegExp(`(?<![\\w.-])${host.replace(/\./g, "\\.")}(?![\\w-]|\\.[a-z])`).test(text));
+      const missing = [...hosts].filter(([host]) => !(host in NOT_REQUESTED) && !new RegExp(`(?<![\\w.-])${host.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-]|\\.[a-z])`).test(text));
       expect(missing.map(([host, files]) => `${host} (${files.join(", ")})`)).toEqual([]);
     });
     it(`names GitHub, where deliver open pushes branches and opens PRs, in the ${lang} copy`, () => {

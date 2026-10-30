@@ -193,9 +193,14 @@ Median / maximum over the judged pairs:
   - computed access to `global`/`process`;
   - more malicious tarballs from a source that holds them.
 
-## What the runner does that the definitions do not say (found in review; no outcome affected)
+## What the runner and the analyzer do that the definitions do not say (found in review)
 
-The runner is kept as it ran, so its blob hash matches the execution. These differences are recorded here instead of fixed. None changes a flagged, clean, missed or undecidable count; only the deadline item can move a not-obtained reason.
+The runner and the analyzer are kept as they ran, so their blob hashes match the execution. These differences are recorded here instead of fixed.
+- **No malicious outcome is affected.**
+- **Two items can move a number:**
+  - the deadline item, one not-obtained reason;
+  - the `.` path-segment item, one genuine false alarm (51 could be 50).
+- Every other item changes nothing in this run.
 
 - **The deadline.** The runner checks the 6-hour deadline only before it starts a lookup.
   - The first lookup was at 01:18:44.781Z, so the 6 hours ended at 07:18:44.781Z.
@@ -221,11 +226,19 @@ The runner is kept as it ran, so its blob hash matches the execution. These diff
 
   The analyzer's checks are tested in `tools/backtest/test/delta.test.ts`.
 - **An analyzer error is recorded as undecidable.** Definitions section 4 lists the undecidable cases, and an analyzer error is not one of them. The runner adds it (since 9443192; `docs/mistakes/2026-10-30-delta-regex-stack.md`), so that one file's error cannot end a run. No row has it. The runner's comment cites a README section "Runs" that does not exist; the runner is kept as it ran.
-- **A `.` path segment is not removed.** `untar` keeps a path such as `./dist/index.cjs` (a tarball entry named under `package/./`) as written. npm would extract that to the same file as `dist/index.cjs`.
-  - In one genuine fix, js-toml 1.0.2, this file is counted as added with no previous file, and it is the only file the fix's flags fire on (high-entropy line, very long line).
-  - The data cannot say whether it duplicates `dist/index.cjs`.
-  - At most one false alarm is affected (51 could be 50); no malicious outcome is.
-- **"2 missed" in the first results commit.** That commit's subject (6d9960a) counts the disputed @ensdomains/buffer 0.1.1 among the misses. The table above shows it apart.
+- **A `.` path segment is not removed** (the analyzer's `untar`, delta.ts). `untar` keeps a path such as `./dist/index.cjs` (a tarball entry named under `package/./`) as written. npm would extract that to the same file as `dist/index.cjs`.
+  - **js-toml 1.0.2.** In this genuine fix, the dotted path is counted as added with no previous file, and it is the only file the fix's flags fire on (high-entropy line, very long line).
+  - **Checked afterwards** (2026-10-30 08:18Z, `scripts/check-dot-paths.ts`, in a credential-free container). Each tarball was compared with the registry's integrity. The script prints counts only:
+    - js-toml 1.0.2 has 1 dotted path, and the tarball also holds the same path without the dot: a duplicate entry. With the dot removed, the two would collide, and which copy counts is not decided here. So this false alarm could go, and 51 could be 50.
+    - js-toml 1.0.1 has no dotted path.
+    - @asyncapi/studio 0.20.0, 0.20.1 and 0.20.2 have no dotted path either.
+  - **No malicious outcome can change.** Removing a dot can only match a changed file with a real previous file, so it can only remove flags. The two misses cannot change.
+    - Of the 9 flagged, the @igh pair, both freo versions and dm3 compare every changed code file with a previous file at the same path.
+    - voiceflow and kinvey removed no file.
+    - The asyncapi pair, the only other case, has no dotted path.
+- **The first results commit's subject** (6d9960a, "9 of 11 obtained malicious flagged") counts both disputed versions without showing them apart. The tables above show them apart.
+- **A re-fetch may use another source.** When a pending pair is judged, a side is fetched again: from Software Heritage if that is where it was found, otherwise registry then jsDelivr. In principle the second source could differ from the one in `sources`. Here it does not: the 3 pending pairs judged are registry / Software Heritage, and none of their registry sides failed.
+- **"Registry, hash unknown"** (definitions section 2): 0 versions. Every registry tarball used had a known hash.
 
 ## Files
 
@@ -233,4 +246,4 @@ The runner is kept as it ran, so its blob hash matches the execution. These diff
   - Each row has its sources and what each source answered, its outcome, its new capabilities and sizes, and what its changed code files contain by capability (names only).
   - For genuine fixes only, the paths where each capability is new.
 - `delta-v1.log`, `run-times.txt`: the execution's log and times. `attempt1.log`: the first, failed execution.
-- `scripts/run.sh`, `scripts/copycache.sh`: what ran in the container. `scripts/inspect-miss.ts`: the after-the-result measurement of one miss (see above).
+- `scripts/run.sh`, `scripts/copycache.sh`: what ran in the container. Their comments were corrected after the run (the cache exception); only the comments changed. `scripts/inspect-miss.ts`: the after-the-result measurement of one miss (see above). `scripts/check-dot-paths.ts`: the after-the-result count of dotted paths (see above).

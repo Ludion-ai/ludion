@@ -3,7 +3,7 @@
 Section 6 of `2026-10-30-ld-delta-v1-definitions.md` says each missed malicious version's reason is "written from the analyzer's facts (which files changed, which capabilities the changed files already had), never by reading the code". For one miss, @react-native-aria/switch 0.2.5 (MAL-2025-4789), the analyzer's facts say only that one code file changed and every count is zero in both versions. They do not say why a version the record describes as connecting to a command-and-control server shows no capability at all.
 
 **The departure.** After the result was written, that one file was measured in both versions by `docs/bench/2026-10-30-delta-v1/scripts/inspect-miss.ts`. 
-- **The committed script** is the one that ran, except for two lines:
+- **The committed script** is the one that ran, except for two changes:
   - the header comment, which now lists everything it prints;
   - the file's path, which was written into the script and is now taken as its argument, so that no path of the malicious version is committed.
 - **Where it ran.** 2026-10-30 at about 07:30Z, in node:24-slim, with:

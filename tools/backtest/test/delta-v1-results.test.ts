@@ -12,6 +12,14 @@ describe("delta v1 results", () => {
     expect(malicious).toHaveLength(1148);
     for (const r of malicious) expect([`${r.name}@${r.version}`, Object.keys(r).filter(k => !MALICIOUS_KEYS.has(k))]).toEqual([`${r.name}@${r.version}`, []]);
   });
+  it("say why a version was not obtained only in fixed reasons, and count script files without naming them", () => {
+    const reason = /^(?:HTTP \d{3}|not listed|CDN HTTP \d{3}|not looked up in time|not held: (?:not in the first snapshots after publication|origin not archived|no visit with a snapshot after publication))$/;
+    for (const r of malicious) {
+      for (const side of ["prev", "next"]) for (const why of Object.values(r.tried[side] ?? {})) expect([`${r.name}@${r.version}`, why]).toEqual([`${r.name}@${r.version}`, expect.stringMatching(reason)]);
+      if (r.shown) expect(typeof r.shown.scriptFiles).toBe("number");
+      for (const c of r.capabilities ?? []) expect(c).toMatch(/^(?:module|api|code|obf):|^(?:install-script|new-dependency|binary)$/);
+    }
+  });
   it("give a malicious version's changed code files as capability names and counts only", () => {
     for (const r of malicious.filter(r => r.changed_code)) {
       expect(Object.keys(r.changed_code).sort()).toEqual(["after", "before", "files", "with_previous"]);

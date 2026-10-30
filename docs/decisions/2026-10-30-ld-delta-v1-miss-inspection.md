@@ -2,7 +2,9 @@
 
 Section 6 of `2026-10-30-ld-delta-v1-definitions.md` says each missed malicious version's reason is "written from the analyzer's facts (which files changed, which capabilities the changed files already had), never by reading the code". For one miss, @react-native-aria/switch 0.2.5 (MAL-2025-4789), the analyzer's facts say only that one code file changed and every count is zero in both versions. They do not say why a version the record describes as connecting to a command-and-control server shows no capability at all.
 
-**The departure.** After the result was written, that one file was measured in both versions by `docs/bench/2026-10-30-delta-v1/scripts/inspect-miss.ts`, committed as it ran.
+**The departure.** After the result was written, that one file was measured in both versions by `docs/bench/2026-10-30-delta-v1/scripts/inspect-miss.ts`. The committed script is the one that ran, except for two lines:
+- the header comment, which now lists everything it prints;
+- the file's path, which was written into the script and is now taken as its argument, so that no path of the malicious version is committed.
 - **Where it ran.** 2026-10-30 at about 07:30Z, in node:24-slim, with:
   - user 1000 and a read-only root;
   - a tmpfs /tmp;
@@ -35,7 +37,8 @@ Section 6 of `2026-10-30-ld-delta-v1-definitions.md` says each missed malicious 
 
 **What is inferred, not printed:**
 - That the code added in 0.2.5 is on its longest line. 0.2.4's longest line is 46 characters, and 0.2.5 has the only line of 1,000 or more.
-- That the 836-character whitespace run is on or before that line.
+- That the entropy of 5.20 belongs to that line. The script prints the highest entropy over all lines of 200 characters or more.
+- That the 836-character run of spaces or tabs is on or before that line.
 - That `global[` means computed property lookups on the global object.
 
 **What it changes:** nothing counted.
@@ -44,5 +47,10 @@ Section 6 of `2026-10-30-ld-delta-v1-definitions.md` says each missed malicious 
 - Any idea the numbers suggest for a v2 (lower thresholds, a whitespace-padding marker, computed access to `global`) needs a new definitions entry and a new run.
 
 **Paths.**
-- The README in the final tree names no file path of a malicious version, and the results JSON never held one (`tools/backtest/test/delta-v1-results.test.ts`).
-- The branch's earlier commits 6d9960a and 20810f5 named four paths of this version in the README. A squash merge keeps them out of main.
+- No file of the final tree names a file path of a malicious version. The README does not, the results JSON never held one (`tools/backtest/test/delta-v1-results.test.ts`), and the script takes the path as an argument.
+- The script's output, which did list both versions' files, was not committed.
+- The branch's earlier commits named paths of this version:
+  - 6d9960a and 20810f5 named four paths in the README;
+  - 5f96c3a and eb65fee named one path in the script.
+
+  A squash merge keeps them out of main.

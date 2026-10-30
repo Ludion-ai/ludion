@@ -79,11 +79,12 @@ So 2 of 11 is not an estimate of the miss rate over the 1,148.
     - every capability count is zero in both versions of it;
     - 2 lines added, 35 removed;
     - 3 build-configuration files removed.
-  - **Further counts.** They go beyond the analyzer's facts, as recorded in `docs/decisions/2026-10-30-ld-delta-v1-miss-inspection.md`. They were measured after the result, inside a credential-free container, by `scripts/inspect-miss.ts`, which prints only numbers and module names:
+  - **Further counts.** They go beyond the analyzer's facts, as recorded in `docs/decisions/2026-10-30-ld-delta-v1-miss-inspection.md`. They were measured after the result, inside a credential-free container, by `scripts/inspect-miss.ts`. The script prints the integrity flag, each version's file list (not committed), counts and module names, never the file's text:
     - the file went from 283 to 4,545 bytes;
     - its longest line went from 46 to 4,302 characters;
-    - that line is its only line of 1,000 or more, with entropy 5.20 bits per character;
-    - the longest run of spaces in the file is 836 characters;
+    - that line is its only line of 1,000 or more;
+    - the highest entropy of any line of 200 characters or more is 5.20 bits per character;
+    - the longest run of spaces or tabs in the file is 836 characters;
     - the file `require`s only the package's own module;
     - it has 2 occurrences of `global[`.
 
@@ -177,7 +178,7 @@ Median / maximum over the judged pairs:
 
 ## What this shows, and what it does not
 
-- **v1's rules on the 11 obtained malicious versions.** 9 are caught. One real miss (@react-native-aria/switch 0.2.5) adds its code in a way every v1 rule is blind to: one long line under the thresholds, behind whitespace, through computed names (decision entry above). The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
+- **v1's rules on the 11 obtained malicious versions.** 9 are caught. One real miss (@react-native-aria/switch 0.2.5) shows nothing to any v1 rule. The counts measured afterwards suggest why: one long line under the thresholds, behind whitespace, through computed names (inferred; decision entry above). The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
 - **On the genuine fixes, v1 raises a false alarm on 26.56%.** Most of them are bundled builds whose hashed file names make all their code look new.
 - **The data is the larger limit.** Only 11 of the 1,148 malicious versions could be fetched: the registry, and almost always jsDelivr, no longer serve removed versions, and Software Heritage rarely holds them and answers 120 requests an hour. Any rule tuned on these results would be tuned on 11 versions, 8 of them the registry's own leftovers. So whether diff checking can replace the wait is not decided here.
 - **What a v2 would look at.** Each item is an idea for a new definitions entry and a new run, never a change to this one:
@@ -187,9 +188,15 @@ Median / maximum over the judged pairs:
   - computed access to `global`/`process`;
   - more malicious tarballs from a source that holds them.
 
-## What the runner does that the definitions do not say (found in review; no row affected)
+## What the runner does that the definitions do not say (found in review; no outcome affected)
 
-The runner is kept as it ran, so its blob hash matches the execution. These differences are recorded here instead of fixed.
+The runner is kept as it ran, so its blob hash matches the execution. These differences are recorded here instead of fixed. None changes a flagged, clean, missed or undecidable count; only the deadline item can move a not-obtained reason.
+
+- **The deadline.** The runner checks the 6-hour deadline only before it starts a lookup.
+  - The first lookup was at 01:18:44.781Z, so the 6 hours ended at 07:18:44.781Z.
+  - The 228th lookup started before then and was waiting out a rate limit when the deadline passed. It ended at 07:20:10.931Z.
+  - Read strictly, section 2 counts that version as "not looked up in time", not with the "not held" reason it got. The log does not say which version it was.
+  - The held count was 7 from the 180th lookup on, so the 228th version was not held, and no outcome changes. At most that one version's not-obtained reason moves between groups, in every row it belongs to.
 
 - **An unreadable tarball.** Definitions section 4 calls a pair undecidable when a tarball cannot be read. Instead, the runner moves on to the next source and, if none serves the version, reports "not obtained". No row has a "tarball unreadable" reason, so nothing is counted differently.
 - **A failed second fetch.** A pair whose versions were both held but whose second fetch failed would be marked "held, but a second fetch failed" and left out of `not_obtained_reasons`. There is no such row.

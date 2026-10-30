@@ -1,4 +1,6 @@
-// Prints only numbers and module names about one file; never its text.
+// Prints, for one file of both versions: the integrity flag, each version's file list, counts, module names given to
+// require, and the analyzer's counts; never the file's text. Usage: node inspect-miss.ts <path of the file in the package>
+// (docs/decisions/2026-10-30-ld-delta-v1-miss-inspection.md: as run, except that the path is now an argument).
 import { createHash } from "node:crypto";
 import { registryTarball } from "/w/packages/cli/src/security/judge.ts";
 import { Archive, registryVersions } from "/w/tools/backtest/src/archives-v5.ts";
@@ -11,7 +13,7 @@ for (const version of ["0.2.4", "0.2.5"]) {
   const ok = `sha512-${createHash("sha512").update(res!.body!).digest("base64")}` === d![version]!.integrity;
   const files = untar(res!.body!);
   console.log(version, "integrity ok", ok, "files", [...files.keys()].sort().join(","));
-  const text = files.get("lib/commonjs/index.js")!.toString("utf8");
+  const text = files.get(process.argv[2]!)!.toString("utf8");
   const lines = text.split("\n");
   const lens = lines.map(l => l.length);
   const ws = Math.max(0, ...(text.match(/[ \t]{20,}/g) ?? []).map(s => s.length));

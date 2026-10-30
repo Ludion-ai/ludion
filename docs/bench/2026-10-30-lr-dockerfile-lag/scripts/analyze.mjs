@@ -142,7 +142,79 @@ for (const r of rows) {
 }
 const untaggedRepos = out.filter((r) => r.newer_untagged_releases > 0).length;
 
-writeFileSync(`${dir}/results.json`, JSON.stringify({ measurement_date: mdate, summary, digest, outcomes, untagged_repos: untaggedRepos, repos: out }, null, 2) + "\n");
+// LR2 (decision 2026-10-31-lr2-definitions): the five items and decision 4, from raw/lr2.tsv
+const l2lines = read(`${raw}/lr2.tsv`).split("\n").filter(Boolean);
+const l2head = l2lines.shift().split("\t");
+const l2 = new Map(l2lines.map((l) => {
+  const r = Object.fromEntries(l.split("\t").map((v, i) => [l2head[i], v]));
+  return [r.full_name, r];
+}));
+for (const r of out) Object.assign(r, { lr2: l2.get(r.repo) ?? null });
+const val = (r, k) => r.lr2?.[k] ?? "unknown";
+const tri = (rs, f) => {
+  const c = { yes: 0, no: 0, unknown: 0 };
+  for (const r of rs) c[f(r)] += 1;
+  return c;
+};
+const either = (a, b) => (a === "yes" || b === "yes" ? "yes" : a === "unknown" || b === "unknown" ? "unknown" : "no");
+const both = (a, b) => (a === "no" || b === "no" ? "no" : a === "unknown" || b === "unknown" ? "unknown" : "yes");
+const eolItem = (r) => (r.eol === true ? "yes" : r.eol === false ? "no" : "unknown");
+const ITEMS = {
+  test_script: (r) => val(r, "test_script"),
+  test_sign: (r) => val(r, "test_sign"),
+  offline_build: (r) => val(r, "offline_build"),
+  expose: (r) => val(r, "expose"),
+  healthcheck: (r) => val(r, "healthcheck"),
+  expose_and_healthcheck: (r) => both(val(r, "expose"), val(r, "healthcheck")),
+  expose_or_healthcheck: (r) => either(val(r, "expose"), val(r, "healthcheck")),
+  deploy_workflow: (r) => val(r, "deploy_workflow"),
+  deploy_platform: (r) => (r.lr2 ? (r.lr2.deploy_platform ? "yes" : r.lr2.unread.includes("root-listing") ? "unknown" : "no") : "unknown"),
+  deploy: (r) => val(r, "deploy"),
+  eol: eolItem,
+  digest: (r) => (r.digest === true ? "yes" : r.digest === false ? "no" : "unknown"),
+};
+const items = Object.fromEntries(["all", "php", "node"].map((g) => [g, Object.fromEntries(Object.entries(ITEMS).map(([k, f]) => [k, tri(groups[g], f)]))]));
+
+// Decision 4: H1 to H6 in order; a repository counts at a step only when it met every earlier one.
+const wilson = (k, n, z = 1.96) => {
+  if (!n) return null;
+  const p = k / n, d = 1 + (z * z) / n;
+  const c = (p + (z * z) / (2 * n)) / d;
+  const h = (z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n))) / d;
+  return [Math.max(0, c - h), Math.min(1, c + h)];
+};
+const H = [
+  ["H1 image is php", (r) => (r.stratum === "php" ? "yes" : "no")],
+  ["H2 phpImage accepts the Dockerfile", (r) => { const v = val(r, "php_image"); return v === "accepted" ? "yes" : v.startsWith("refused") ? "no" : "unknown"; }],
+  ["H3 series not past end of life", (r) => ({ yes: "no", no: "yes", unknown: "unknown" })[eolItem(r)]],
+  ["H4 builds with no network", (r) => val(r, "offline_build")],
+  ["H5 any test sign", (r) => val(r, "test_sign")],
+  ["H6 reaches the repository with no person (not built: no automatic merge, no release)", () => "no"],
+];
+const n4 = out.length;
+let still = out;
+const steps = [];
+for (const [name, f] of H) {
+  const res = tri(still, f);
+  steps.push({ step: name, of: still.length, ...res });
+  still = still.filter((r) => f(r) === "yes");
+  if (name.startsWith("H5")) {
+    const k = still.length;
+    steps.h1to5 = { k, n: n4, share: n4 ? k / n4 : null, wilson95: wilson(k, n4), deploy_on_merge: tri(still, ITEMS.deploy) };
+  }
+}
+const decision4 = {
+  n: n4, kept_patched_with_no_person: still.length, share: n4 ? still.length / n4 : null, wilson95: wilson(still.length, n4),
+  steps, h1_to_h5: steps.h1to5,
+  php_image_refusals: Object.entries(out.filter((r) => r.stratum === "php").reduce((a, r) => {
+    const v = val(r, "php_image");
+    const k = v === "accepted" ? "accepted" : v.replace(/\. .*/, ".");
+    a[k] = (a[k] ?? 0) + 1;
+    return a;
+  }, {})).sort((a, b) => b[1] - a[1]),
+};
+
+writeFileSync(`${dir}/results.json`, JSON.stringify({ measurement_date: mdate, summary, digest, outcomes, untagged_repos: untaggedRepos, lr2_items: items, decision4, repos: out }, null, 2) + "\n");
 
 const fmt = (x) => (x === null ? "-" : String(x));
 const md = [];
@@ -158,4 +230,16 @@ md.push("| stratum | outcome | repositories |", "|---|---|---|");
 for (const [k, n] of Object.entries(outcomes).sort()) md.push(`| ${k.replace("\t", " | ")} | ${n} |`);
 md.push("");
 for (const r of out.filter((x) => !x.countable)) md.push(`not countable: ${r.repo} ${r.from} — ${r.reason}`);
+md.push("", "LR2 items (yes / no / could not be counted):", "", "| item | all | php | node |", "|---|---|---|---|");
+const yn = (c) => `${c.yes} / ${c.no} / ${c.unknown}`;
+for (const k of Object.keys(ITEMS)) md.push(`| ${k} | ${yn(items.all[k])} | ${yn(items.php[k])} | ${yn(items.node[k])} |`);
+const pct = (x) => (x === null ? "-" : `${(100 * x).toFixed(1)}%`);
+const ci = (w) => (w ? `${pct(w[0])} to ${pct(w[1])}` : "-");
+md.push("", `Decision 4: kept patched with no person: ${decision4.kept_patched_with_no_person} of ${decision4.n} (${pct(decision4.share)}; 95% Wilson ${ci(decision4.wilson95)})`);
+const h5 = decision4.h1_to_h5;
+md.push(`Not what Ludion can do — H1 to H5 met: ${h5.k} of ${h5.n} (${pct(h5.share)}; 95% Wilson ${ci(h5.wilson95)}); of them deploy on merge ${yn(h5.deploy_on_merge)}`, "");
+md.push("| step | of | yes | no | could not be counted |", "|---|---|---|---|---|");
+for (const s of decision4.steps) md.push(`| ${s.step} | ${s.of} | ${s.yes} | ${s.no} | ${s.unknown} |`);
+md.push("", "php images, phpImage's answer:", "");
+for (const [k, c] of decision4.php_image_refusals) md.push(`- ${c}: ${k}`);
 process.stdout.write(md.join("\n") + "\n");

@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "ecosystem": "node",
+  "dockerfile": "Dockerfile",
+  "test": ["node", "tests/smoke.js"],
+  "timeout_seconds": 30
+}

@@ -23,6 +23,6 @@ if [ -f "$OUT/fixes.bundle" ]; then echo "packed=true" >> "$GITHUB_OUTPUT"; else
   echo
   echo "ludion patch --apply exited ${status}. Each fix (package and outcome); reasons are in the receipt:"
   echo
-  jq -r '(.receipt.fixes // (if .receipt then [{package: "php", outcome: .receipt.outcome}] else [] end))[]
+  jq -r '(.receipt.fixes // (if .receipt then [{package: (.receipt.scan.runtime // "php"), outcome: .receipt.outcome}] else [] end))[]
     | "- `\(.package | tostring | gsub("[^A-Za-z0-9@._/:~-]"; "?"))`: \(.outcome | tostring | gsub("[^a-z_]"; "?"))"' "$result"
 } >> "$GITHUB_STEP_SUMMARY"

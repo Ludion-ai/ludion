@@ -12,6 +12,7 @@ import type { Judgement } from "./judge.ts";
 import semver from "semver";
 import { comparableVersion } from "./osv.ts";
 import { compare, phpImage } from "./php.ts";
+import { nodeImage } from "./node.ts";
 import { CONFIG, rootPath } from "./project.ts";
 
 /**
@@ -44,7 +45,10 @@ const PATH = /^[A-Za-z0-9_][A-Za-z0-9._/-]{0,499}$/;
 const IDENTITY = /^Ludion <ludion@ludion\.invalid> \d{1,12} [+-]\d{4}$/;
 const VERDICTS = ["stop", "wait", "ready_except_build", "undecidable"] as const;
 
-type Ecosystem = "npm" | "composer" | "maven" | "php";
+type Ecosystem = "npm" | "composer" | "maven" | "php" | "node";
+/** The official runtime images (patch.ts): the Dockerfile policy's two ecosystems. */
+const IMAGES = { php: { label: "PHP", parse: phpImage }, node: { label: "Node.js", parse: nodeImage } } as const;
+const isImage = (ecosystem: Ecosystem | null): ecosystem is keyof typeof IMAGES => ecosystem === "php" || ecosystem === "node";
 /** One applied fix, as the PR job takes it from the receipt after checking every field it uses. */
 export type CheckedFix = {
   package: string; changes: Change[];
@@ -82,7 +86,7 @@ function workTree(root: string): { top: string; prefix: string } {
 
 /** The branch `patch --apply` names for a fix (dependency-patch.ts and patch.ts). */
 function fixBranchName(prefix: string, ecosystem: Ecosystem, pkg: string, tos: string[]): string {
-  return branchName("ludion", ...(prefix ? [prefix] : []), ecosystem, ecosystem === "php" ? tos[0]! : `${pkg}-${[...new Set(tos)].join("-")}`);
+  return branchName("ludion", ...(prefix ? [prefix] : []), ecosystem, isImage(ecosystem) ? tos[0]! : `${pkg}-${[...new Set(tos)].join("-")}`);
 }
 
 /**
@@ -121,7 +125,9 @@ function policyAt(top: string, prefix: string, base: string): { ecosystem: Ecosy
     const dockerfile = posix.normalize(text(config.dockerfile, /^[A-Za-z0-9._/-]{1,500}$/, "The Dockerfile in the project's policy"));
     text(dockerfile, PATH, "The Dockerfile in the project's policy");
     if (dockerfile.split("/").some(part => part === ".." || part === ".") || /(^|\/)\.git(hub)?\//.test(dockerfile)) refuse("the Dockerfile in the project's policy is not a plain project path.");
-    return { ecosystem: "php", dockerfile: config.dockerfile as string, allowed: [dockerfile] };
+    // project.ts: no ecosystem (or "php") is PHP's image, "node" Node.js's; any other with a Dockerfile is no policy.
+    if (config.ecosystem !== undefined && config.ecosystem !== "php" && config.ecosystem !== "node") refuse("the project's policy names a Dockerfile and no supported image.");
+    return { ecosystem: config.ecosystem === "node" ? "node" : "php", dockerfile: config.dockerfile as string, allowed: [dockerfile] };
   }
   const ecosystem = config.ecosystem;
   if (ecosystem !== "npm" && ecosystem !== "composer" && ecosystem !== "maven") refuse("the project's policy names no supported ecosystem.");
@@ -135,25 +141,29 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
   const id = text(r.id, ID, "The receipt's id");
   const notApplied: Record<string, number> = {};
   const count = (outcome: unknown) => { const key = typeof outcome === "string" && /^[a-z_]{1,20}$/.test(outcome) ? outcome : "other"; notApplied[key] = (notApplied[key] ?? 0) + 1; };
-  if (policy.ecosystem === "php") {
-    if (r.schema !== 1 || r.scope !== "dockerfile_only_not_deployed") refuse("the receipt is not a PHP Dockerfile receipt, and the project's policy is PHP.");
-    if (r.outcome !== "applied") { count(r.outcome); return { id, ecosystem: "php", fixes: [], notApplied }; }
+  if (isImage(policy.ecosystem)) {
+    const runtime = policy.ecosystem, label = IMAGES[runtime].label;
+    if (r.schema !== 1 || r.scope !== "dockerfile_only_not_deployed") refuse(`the receipt is not a ${label} Dockerfile receipt, and the project's policy is ${label}.`);
+    // A Node.js scan says so (php.ts, Scan.runtime); a PHP scan has no runtime, as before Node.js images were read.
+    const scanned = r.scan === null || typeof r.scan !== "object" ? undefined : (r.scan as Record<string, unknown>).runtime;
+    if (scanned !== (runtime === "node" ? "node" : undefined)) refuse(`the receipt's scan is not of the ${label} image, and the project's policy is ${label}.`);
+    if (r.outcome !== "applied") { count(r.outcome); return { id, ecosystem: runtime, fixes: [], notApplied }; }
     if (r.baseline_passed !== true || r.candidate_passed !== true) refuse("the receipt applies an update whose tests did not pass.");
     if (text(r.base_commit, SHA, "base_commit") !== base) refuse("the receipt's base_commit is not the commit this run checked out.");
     const scan = object(r.scan, "The receipt's scan"), current = object(scan.current, "scan.current"), candidate = object(scan.candidate, "scan.candidate");
-    const from = text(current.version, VERSION, "The current PHP version"), to = text(candidate.version, VERSION, "The candidate PHP version");
-    const releases = list(scan.security_releases, 1, 100, "The PHP security releases").map(release => text(object(release, "A PHP release").version, VERSION, "A PHP release's version"));
-    const subject = `ludion: PHP ${from} -> ${to} in ${policy.dockerfile}`;
+    const from = text(current.version, VERSION, `The current ${label} version`), to = text(candidate.version, VERSION, `The candidate ${label} version`);
+    const releases = list(scan.security_releases, 1, 100, `The ${label} security releases`).map(release => text(object(release, `A ${label} release`).version, VERSION, `A ${label} release's version`));
+    const subject = `ludion: ${label} ${from} -> ${to} in ${policy.dockerfile}`;
     const fix: CheckedFix = {
-      package: "php", changes: [{ name: "php", from, to, advisories: [] }],
+      package: runtime, changes: [{ name: runtime, from, to, advisories: [] }],
       branch: text(r.branch, /^ludion\/[A-Za-z0-9._/-]+$/, "The branch"), commit: text(r.commit, SHA, "The commit"), subject, tree: "",
       // patch.ts's message.
-      message: `${subject}\n\nOfficial PHP security releases: ${releases.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
+      message: `${subject}\n\nOfficial ${label} security releases: ${releases.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
       files: [{ path: policy.allowed[0]!, after_hash: text(r.dockerfile_after, HEX64, "dockerfile_after") }],
       fix_published_at: timeOrNull(r.fix_published_at, "fix_published_at"), found_at: time(r.found_at, "found_at"), applied_at: time(r.applied_at, "applied_at"), verdict: null,
     };
-    if (fix.branch !== fixBranchName(prefix, "php", "php", [to])) refuse(`the branch ${fix.branch} is not the one Ludion names for PHP ${to}.`);
-    return { id, ecosystem: "php", fixes: [fix], notApplied };
+    if (fix.branch !== fixBranchName(prefix, runtime, runtime, [to])) refuse(`the branch ${fix.branch} is not the one Ludion names for ${label} ${to}.`);
+    return { id, ecosystem: runtime, fixes: [fix], notApplied };
   }
   if (r.schema !== 2 || r.ecosystem !== policy.ecosystem || r.scope !== "dependency_files_only_not_deployed") refuse(`the receipt is not a ${policy.ecosystem} dependency receipt, and the project's policy is ${policy.ecosystem}.`);
   const fixes: CheckedFix[] = [];
@@ -328,8 +338,8 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
 /**
  * Null when each file of the fix says only what `patch --apply` writes for the receipt's change, else why not. Both
  * sides are read by Git from the base commit and the fix's commit; nothing is installed or run.
- * - Dockerfile: only the FROM image changes, to the official PHP image of a newer release of the same branch and flavor,
- *   pinned by digest.
+ * - Dockerfile: only the FROM image changes, to the official PHP or Node.js image of a newer release of the same branch
+ *   (Node.js: the same major) and flavor, pinned by digest.
  * - package.json, composer.json, pom.xml: exactly what `changedManifest` (inventory.ts, as `patch` calls it) makes from
  *   the base's files for the receipt's changes.
  * - composer.lock: no other top-level key changes; the planned package is at the fix's version; every other package is as
@@ -338,16 +348,16 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
  * - package-lock.json: the judge, run again by the PR job (openFixes), since it needs the registry.
  */
 export function contentProblem(ecosystem: Ecosystem, fix: CheckedFix, before: (path: string) => string | null, after: (path: string) => string | null): string | null {
-  if (ecosystem === "php") {
-    const path = fix.files[0]!.path, old = before(path), now = after(path), to = fix.changes[0]!.to;
+  if (isImage(ecosystem)) {
+    const path = fix.files[0]!.path, old = before(path), now = after(path), to = fix.changes[0]!.to, { label, parse } = IMAGES[ecosystem];
     if (old === null || now === null) return `${path} is missing.`;
     let current: ReturnType<typeof phpImage>;
-    try { current = phpImage(old); } catch { return `the base's ${path} is not one Ludion updates.`; }
-    if (!/^\d+\.\d+\.\d+$/.test(to) || !to.startsWith(`${current.branch}.`) || compare(to, current.version) <= 0) return `PHP ${to} is not a newer release of PHP ${current.branch}.`;
+    try { current = parse(old); } catch { return `the base's ${path} is not one Ludion updates.`; }
+    if (!/^\d+\.\d+\.\d+$/.test(to) || !to.startsWith(`${current.branch}.`) || compare(to, current.version) <= 0) return `${label} ${to} is not a newer release of ${label} ${current.branch}.`;
     const head = old.slice(0, current.start), tail = old.slice(current.end), image = now.slice(head.length, now.length - tail.length);
     const escape = (part: string) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const official = new RegExp(`^(?:(?:docker\\.io/)?library/)?php:${escape(to)}${escape(current.flavor)}@sha256:[a-f0-9]{64}$`);
-    if (!now.startsWith(head) || !now.endsWith(tail) || now.length < head.length + tail.length || !official.test(image)) return `${path} changes more than its FROM image to the official php:${to}${current.flavor}, pinned by digest.`;
+    const official = new RegExp(`^(?:(?:docker\\.io/)?library/)?${ecosystem}:${escape(to)}${escape(current.flavor)}@sha256:[a-f0-9]{64}$`);
+    if (!now.startsWith(head) || !now.endsWith(tail) || now.length < head.length + tail.length || !official.test(image)) return `${path} changes more than its FROM image to the official ${ecosystem}:${to}${current.flavor}, pinned by digest.`;
     return null;
   }
   // Composer and Maven: the update goes up (npm's downgrades stop at the judge, PHP's above). The versions come from the
@@ -447,6 +457,7 @@ const PUBLISHED: Record<Ecosystem, string> = {
   composer: "Packagist's release date of the fixed version, which its author sets",
   maven: "not read: Ludion does not read Maven Central's publish times yet",
   php: "php.net's release day of the first newer security release, at 00:00 UTC",
+  node: "nodejs.org's release day of the first newer security release of the line, at 00:00 UTC",
 };
 
 /** The PR's body, from checked fields only. Every value is in a code span; no free text from the artifact is used. */
@@ -463,7 +474,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "|---|---|",
     `| Package | ${code(fix.package)} (${ecosystem}) |`,
     `| Change | ${fix.changes.map(c => `${code(c.from)} → ${code(c.to)}`).join(", ")} |`,
-    `| Advisories | ${advisories.length ? advisories.map(code).join(", ") : ecosystem === "php" ? "php.net's security release (no advisory ID read)" : "none listed"} |`,
+    `| Advisories | ${advisories.length ? advisories.map(code).join(", ") : ecosystem === "php" ? "php.net's security release (no advisory ID read)" : ecosystem === "node" ? "nodejs.org's security release (no advisory ID read)" : "none listed"} |`,
     `| Fix published | ${fix.fix_published_at ? code(fix.fix_published_at) : "unknown"} (${PUBLISHED[ecosystem]}) |`,
     `| Found | ${code(fix.found_at)} (this run's lookup; an earlier run may have seen it first) |`,
     `| Branch made | ${code(fix.applied_at)} |`,
@@ -474,10 +485,10 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, and that no other package loses a version in package-lock.json" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${isImage(ecosystem) ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, and that no other package loses a version in package-lock.json" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
-      : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
+      : `- ${isImage(ecosystem) ? `${IMAGES[ecosystem].label} image` : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
     "",
     "**Not checked**",
     "",
@@ -624,28 +635,29 @@ export async function osvAdvisories(ecosystem: "Packagist" | "Maven", name: stri
   return ids;
 }
 
-/** The digest Docker Hub gives for an official PHP image tag now: the manifest list's (what `docker pull` records). */
-export async function dockerHubDigest(tag: string, fetchFn: typeof fetch = fetch): Promise<string> {
+/** The digest Docker Hub gives for an official PHP or Node.js image tag now: the manifest list's (what `docker pull` records). */
+export async function dockerHubDigest(tag: string, fetchFn: typeof fetch = fetch, repository: keyof typeof IMAGES = "php"): Promise<string> {
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(tag)) throw new Error("Invalid image tag.");
-  const auth = await registryJson(fetchFn, "https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/php:pull", {}, 1024 * 1024);
+  if (!isImage(repository)) throw new Error("Not an official image Ludion updates.");
+  const auth = await registryJson(fetchFn, `https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/${repository}:pull`, {}, 1024 * 1024);
   if (typeof auth?.token !== "string") throw new Error("Docker Hub gave no pull token.");
-  const res = await fetchFn(`https://registry-1.docker.io/v2/library/php/manifests/${tag}`, {
+  const res = await fetchFn(`https://registry-1.docker.io/v2/library/${repository}/manifests/${tag}`, {
     method: "HEAD", redirect: "error", signal: AbortSignal.timeout(30_000),
     headers: { authorization: `Bearer ${auth.token}`, accept: ["application/vnd.oci.image.index.v1+json", "application/vnd.docker.distribution.manifest.list.v2+json", "application/vnd.docker.distribution.manifest.v2+json", "application/vnd.oci.image.manifest.v1+json"].join(", ") },
   });
   const digest = res.headers.get("docker-content-digest") ?? "";
-  if (!res.ok || !/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error(`Docker Hub gave no digest for php:${tag} (HTTP ${res.status}).`);
+  if (!res.ok || !/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error(`Docker Hub gave no digest for ${repository}:${tag} (HTTP ${res.status}).`);
   return digest;
 }
 
-/** PHP: the digest the Dockerfile pins must be the one Docker Hub gives for the tag it names, so no other image hides under it. */
-async function phpAgain(top: string, prefix: string, fix: CheckedFix, digestOf: (tag: string) => Promise<string>): Promise<string | null> {
+/** PHP and Node.js: the digest the Dockerfile pins must be the one Docker Hub gives for the tag it names, so no other image hides under it. */
+async function imageAgain(top: string, prefix: string, fix: CheckedFix, repository: keyof typeof IMAGES, digestOf: (tag: string) => Promise<string>): Promise<string | null> {
   try {
-    const image = phpImage(git(top, ["cat-file", "blob", `${fix.commit}:${prefix}${fix.files[0]!.path}`]).stdout).reference;
-    const match = /php:([^@]+)@(sha256:[a-f0-9]{64})$/.exec(image);
+    const image = IMAGES[repository].parse(git(top, ["cat-file", "blob", `${fix.commit}:${prefix}${fix.files[0]!.path}`]).stdout).reference;
+    const match = new RegExp(`(?:^|/)${repository}:([^@]+)@(sha256:[a-f0-9]{64})$`).exec(image);
     if (!match) return "the Dockerfile's image is not pinned by digest.";
     const listed = await digestOf(match[1]!);
-    return listed === match[2] ? null : `php:${match[1]} is pinned at ${match[2]}, and Docker Hub gives ${listed} for that tag now.`;
+    return listed === match[2] ? null : `${repository}:${match[1]} is pinned at ${match[2]}, and Docker Hub gives ${listed} for that tag now.`;
   } catch (error) {
     return `Docker Hub could not be read: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
   }
@@ -655,7 +667,7 @@ async function phpAgain(top: string, prefix: string, fix: CheckedFix, digestOf: 
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -715,8 +727,9 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
           if (ids.length) throw new Error(`Not pushed: OSV lists ${ids.slice(0, 5).join(", ")} for ${fix.package}@${change.to}, the version this fix moves to.`);
         }
       }
-      if (checked.ecosystem === "php") {
-        const problem = await phpAgain(top, prefix, fix, options.phpDigest ?? (tag => dockerHubDigest(tag)));
+      if (isImage(checked.ecosystem)) {
+        const repository = checked.ecosystem, given = repository === "node" ? options.nodeDigest : options.phpDigest;
+        const problem = await imageAgain(top, prefix, fix, repository, given ?? (tag => dockerHubDigest(tag, undefined, repository)));
         if (problem) throw new Error(`Not pushed: ${problem}`);
       }
       if (!remoteSha) push(top, options.remote, fix.commit, fix.branch, options.token);

@@ -305,7 +305,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
   if (!scan.findings.length) return { scan, receipt: null, path: null };
   const state = privateState(root), lock = join(state, "patch.lock"), id = randomUUID();
   let fd: number;
-  try { fd = openSync(lock, "wx", 0o600); } catch { throw new Error("Another update or interrupted transaction holds patch.lock. Inspect its receipt/journal before retrying."); }
+  try { fd = openSync(lock, "wx", 0o600); } catch { throw new Error("Another update holds patch.lock, or an interrupted one left it. Inspect the receipt it names before retrying."); }
   const receiptPath = join(state, `${id}.json`), images: string[] = [];
   const receipt: DependencyReceipt = {
     schema: 2, id, ecosystem, scope: "dependency_files_only_not_deployed", started_at: new Date().toISOString(), finished_at: "", outcome: "failed", tree_hash: originalTree, config_hash: hash(configText), before: scan, tool_image: "", baseline_image: null, baseline_passed: false, test: [...config.test], base_commit: null,
@@ -443,7 +443,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const branch = branches[index];
         const published = await dependencyFixPublished(ecosystem, fix.changes, deps.fetchFn); active();
         fix.fix_published_at = published.at; fix.fix_published_note = published.note;
-        if (fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the publish time of the version taken.";
+        if (fix.fix_published_at && fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the publish time of the version taken.";
         const label = `candidate-${index + 1}`, candidate = await acquire(label, fix.changes);
         if (candidate.archives.length) fix.archives = candidate.archives;
         fix.changed_packages = changedPackages(baseline.inventory, candidate.inventory);

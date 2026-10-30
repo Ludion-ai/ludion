@@ -122,11 +122,17 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
   return facts;
 }
 
-/** Every version the registry still lists for a package (an unpublished one is not), with its deprecation message or null. */
+/**
+ * Every version the registry still lists for a package (an unpublished one is not), with its deprecation message or null.
+ * A version whose manifest is not an object (null, a string) cannot be judged listed or not deprecated, so it throws.
+ */
 export async function registryVersions(name: string, fetchFn: Fetch = fetch): Promise<Map<string, string | null>> {
   const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);
   if (!doc || typeof doc !== "object" || !doc.versions || typeof doc.versions !== "object" || Array.isArray(doc.versions)) throw new Error(`Invalid registry document for ${name}.`);
-  return new Map(Object.entries<any>(doc.versions).map(([version, manifest]) => [version, typeof manifest?.deprecated === "string" && manifest.deprecated ? manifest.deprecated : null]));
+  return new Map(Object.entries<any>(doc.versions).map(([version, manifest]) => {
+    if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) throw new Error(`Invalid registry manifest for ${name}@${version.replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 100)}.`);
+    return [version, typeof manifest.deprecated === "string" && manifest.deprecated ? manifest.deprecated : null];
+  }));
 }
 
 /** OSV advisory ids per `name@version` (malicious records included), via the batch API. */

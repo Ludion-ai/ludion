@@ -1,6 +1,6 @@
-# 2026-10-30 — Agents ran node on the host, once loading a script from the repository
+# 2026-10-30 — Agents ran node, npm and npx on the host, repository code included
 
-- **What happened.** Agents' briefs say project commands run only in Docker. On 2026-10-30, two lanes ran `node` on the owner's PC, outside Docker, in 31 commands. Times are JST.
+- **What happened.** Agents' briefs say project commands run only in Docker. Agents ran `node`, `npm` or `npx` on the owner's PC, outside Docker. This record began with two lanes on 2026-10-30 (LI and LB2a, which ran `node` in 31 commands), described first below. The audit further down (LAUD) counts every host run from the session records since 2026-10-28, and its counts replace this paragraph's: 735 calls and 955 commands in 49 sessions, of which 127 calls and 136 commands in 17 sessions on 10-30. On 10-28, one session ran repository code, and ran `npm ci` three times without turning off install scripts; on 10-29, a package npx downloaded (webpack) ran. Times are JST.
   - **LI (PR #221), 19:46:11, once.** A replacement script the lane had just written to its session's temporary folder. It imported only Node's file-system module (no repository code, no `node_modules`, no network). For each of six fixed strings, it checked that the string occurred once in the file it was given and replaced it; then it wrote the file back. It wrote `packages/cli/src/security/time-cap.ts` only (26 lines added, 6 removed). The lane's tests and mutations ran in Docker.
   - **LB2a (PR #215), 30 commands: 23 in its first round (15:50:16 to 16:48:44), 7 in its second and third (17:51:54 to 20:23:42).** One more, at 16:03:48, failed to parse and ran nothing.
     - **What the edit scripts loaded and wrote.** Each of the 30 ran an edit script that imported only Node's file-system module. They wrote these repository files:
@@ -19,14 +19,14 @@
         - whether npx started at all (on Windows, a call without a shell usually fails to find npx);
         - whether npx contacted the registry.
       - **What was checked afterwards.** The lane reported that the host had no vitest, that npx installed nothing (npx's cache had no newer entry) and that `deliver.ts` kept no mutation. A `git diff --stat` taken two minutes later shows no change left in `action.yml`.
-  - **Overall.** The edit scripts loaded no dependency code. One command loaded and ran a script from the repository, which the lanes had written themselves. Other agents' temporary folders hold scripts of the same kind. Whether those ran on the host has not been checked, and a file's presence does not show that it ran.
+  - **Overall.** The edit scripts loaded no dependency code. One command loaded and ran a script from the repository, which the lanes had written themselves. Other agents' temporary folders hold scripts of the same kind. Which of them ran on the host was then counted from the session records by the audit below (LAUD); a file's presence alone does not show that it ran.
 - **Why.** The briefs' "project commands only in Docker" was read as covering builds, tests and experiments, not an agent's own edit scripts. Nothing refused `node` on the host: the Bash guard refuses the backticks bash would run, not `node`, `npm` or `npx`. Checking syntax by importing a module was a mistake in itself, because an import runs the module's top level, while `node --check` only parses.
 - **What changed.** The Check is to be `.claude/hooks/guard.mjs` refusing `node`, `npm` and `npx` on the host, with its test. `.claude/` is a protected path, so that change is a protected PR the owner merges. Until it is merged, this record points to the rule below, and agents' briefs are to say: do not run node, npm or npx on the host, only inside Docker, and edit files with the editor's tools.
 - **Rule:** "Never run project-controlled or downloaded code or commands on the host."
 
 ## Every host run since 2026-10-28 (audit LAUD, 2026-10-30)
 
-The owner asked for every run of `node`, `npm`, `npx`, `pnpm`, `yarn`, `bun`, `deno`, `tsx` or `vitest` on the host since 2026-10-28, from the agents' session records. The records stayed on the owner's PC; they were read in a Python container with no network and a read-only mount. Below are the counting rules, then the results. Times are JST.
+The owner asked for every run of `node`, `npm`, `npx`, `pnpm`, `yarn`, `bun`, `deno`, `tsx` or `vitest` on the host since 2026-10-28, from the agents' session records. The records stayed on the owner's PC; they were read in a Python container with no network and a read-only mount. The lane itself also ran `python` on the host twice (see LAUD2 at the end). Below are the counting rules, then the results. Times are JST.
 
 ### How the runs were counted
 
@@ -95,8 +95,9 @@ These rules were fixed before the tables were made.
   - In worktrees under `C:/dev/ludion-wt/`, it ran `npm install`, `npm ci`, `npm run typecheck`/`build`, `npx vitest`, `npx playwright`, `npx wrangler dev`, the built CLI and `tools/backtest/src/*.ts`.
   - `tools/backtest` fetched from the registry and OSV.
   - Three `npm ci` runs (00:16:37, 00:22:22, 00:34:23) did not turn off install scripts.
-    - At 00:16:37, npm printed `npm warn allow-scripts Run npm approve-scripts --allow-scripts-pending to review`. That says some install scripts were held, not run.
-    - The other two sent their output to `/dev/null`, so whether install scripts ran is not known.
+    - At 00:16:37, npm printed `npm warn allow-scripts Run npm approve-scripts --allow-scripts-pending to review, or npm approve-scripts <pkg> to allow.` In the host's npm (11.17.0) that warning does not mean the scripts were held: npm runs install scripts nobody has reviewed and warns afterwards.
+    - The other two sent their output to `/dev/null`.
+    - LAUD2 (at the end) estimates that esbuild's and workerd's install scripts ran on the host in all three runs, and gives the evidence and what is not known.
 - **After 10-28 02:10, only two calls ran more than an agent's own script that uses only Node's built-in modules:**
   - **L1d (fcf1c424), 10-29 09:54:14.** In `node -e "…"`, bash ran the backtick spans of the text as commands. One of them was `npx webpack serve`.
     - npx downloaded webpack 5.112.2 and its dependencies (about 100 cache entries) into `_npx/89d6e678e21f2dae`.
@@ -116,7 +117,7 @@ These rules were fixed before the tables were made.
   - `997b427ff1499ad1` (`@deque/axe-auth`) and `faddb0ce4a03956a` (`axe-mcp-server`), both at 10-29 10:18;
   - `9833c18b2d85bc59` (`@playwright/mcp`), last written 10-30 22:43.
 
-  These belong to Claude Code's MCP plugins, not to agents' commands. L1d's webpack entry is gone (deleted, as above).
+  `@playwright/mcp` is Claude Code's MCP plugin: npm's `_logs` show it started by `npm exec @playwright/mcp@latest`. No log remains for the two axe entries at 10-29 10:18; they are put down to the axe MCP plugin from the package names and because no agent's call ran npx at that time. L1d's webpack entry is gone (deleted, as above).
 - **`_cacache`.** Index entries written since 10-28 (157):
 
   | Time | Entries | Source |
@@ -126,7 +127,7 @@ These rules were fixed before the tables were made.
   | 10-29 10:18 | 33 | The axe MCP plugin |
   | 10-30 22:42–22:43 | 2 | `@playwright/mcp` |
 
-  The 10-28 `npm ci` runs added no entries; everything they needed was already in the cache.
+  No index entry was written at the times of the 10-28 `npm ci` runs. That alone does not show whether they reached the registry (rows 30, 39 and 59 list network (registry) under Read). Two of them sent their output to `/dev/null`; the records keep only their exit code, printed as 0.
 - **`_logs`.** npm keeps its last 10 logs. The 11 logs written since 10-28 are all `npm exec @playwright/mcp@latest` (10-30 21:44 to 22:43), started by Claude Code sessions. Logs of the earlier runs are gone.
 
 ### Not counted, but node on the host all the same
@@ -276,8 +277,8 @@ The table below has one row per call, in time order. `sub` after a session id me
 | 75 | 10-28 00:40:54 | ludion (a786cd84) | node <lane script edit-e-test.cjs>; npx vitest run packages/cli | yes | files, repository code, node_modules | ../src/security/dependency-patch.ts, package-lock.json, package.json, packages/cli/test/dependencies.test.ts (of the files it names) |
 | 76 | 10-28 00:41:11 | ludion (a786cd84) | node <lane script edit-e-test2.cjs>; npx vitest run packages/cli; npm run typecheck | yes | files, repository code, node_modules | package-lock.json, packages/cli/test/dependencies.test.ts (of the files it names) |
 | 77 | 10-28 00:41:28 | ludion (a786cd84) | node -e (inline script); npm run typecheck | yes | files, repository code, node_modules | CLAUDE.md, docs/decisions.md, docs/progress.md, README.md, +1 more (of the files it names) |
-| 78 | 10-28 00:41:47 | ludion (a786cd84) | npm run build -w ludion-ai; npm install --package-lock-only --ignore-scripts --before=2019-06-01; node -e (inline script) ×3; node packages/cli/dist/cli.js p… | yes | repository code, node_modules, package manifests, network (registry), JSON files, node_modules: unknown, network: unknown, files | build output (dist/), package-lock.json, unknown |
-| 79 | 10-28 00:42:32 | ludion (a786cd84) | node <lane script edit-e-test3.cjs>; npx vitest run packages/cli; npm run typecheck; npm run build -w ludion-ai; node packages/cli/dist/cli.js patch; node -e… | yes | files, repository code, node_modules, node_modules: unknown, network: unknown, JSON files | package.json, packages/cli/test/dependencies.test.ts, build output (dist/), unknown (of the files it names) |
+| 78 | 10-28 00:41:47 | ludion (a786cd84) | npm run build -w ludion-ai; npm install --package-lock-only --ignore-scripts --before=2019-06-01; node -e (inline script) ×3; node packages/cli/dist/cli.js patch | yes | repository code, node_modules, package manifests, network (registry), JSON files, node_modules: unknown, network: unknown, files | build output (dist/), package-lock.json, unknown |
+| 79 | 10-28 00:42:32 | ludion (a786cd84) | node <lane script edit-e-test3.cjs>; npx vitest run packages/cli; npm run typecheck; npm run build -w ludion-ai; node packages/cli/dist/cli.js patch; node -e (inline script) ×2 | yes | files, repository code, node_modules, node_modules: unknown, network: unknown, JSON files | package.json, packages/cli/test/dependencies.test.ts, build output (dist/), unknown (of the files it names) |
 | 80 | 10-28 00:42:57 | ludion (a786cd84) | node packages/cli/dist/cli.js patch; npm run build; npx vitest run; node -e (inline script) | yes | repository code, node_modules: unknown, network: unknown, node_modules, files | unknown, build output (dist/) |
 | 81 | 10-28 00:43:55 | ludion (a786cd84) | node <lane script mal-scan.mjs> | yes | files | unknown |
 | 82 | 10-28 00:45:07 | ludion (a786cd84) | node <lane script mal-explicit.mjs> | yes | files | unknown |
@@ -372,7 +373,7 @@ The table below has one row per call, in time order. `sub` after a session id me
 | 171 | 10-28 01:50:35 | ludion (a786cd84 sub) | node <lane script noise.mts> | yes | repository code, temp files | nothing |
 | 172 | 10-28 01:50:42 | ludion (a786cd84 sub) | npm run typecheck; npx vitest run; npx vitest run packages/cli/test/judge.test.ts | yes | repository code, node_modules | nothing |
 | 173 | 10-28 01:52:16 | ludion (a786cd84) | node <lane script edit-judge-r6.cjs>; npx tsc -p tsconfig.json; npx vitest run packages/cli/test/judge.test.ts | yes | files, repository code, node_modules | packages/cli/src/security/judge.ts |
-| 174 | 10-28 01:52:36 | ludion (a786cd84) | node <lane script edit-r6-tests.cjs>; npx tsc -p tsconfig.json; npx vitest run packages/cli/test/judge.test.ts; npm run build; npx vitest run; node packages/… | yes | files, repository code, node_modules, node_modules: unknown, network: unknown | packages/cli/test/judge.test.ts, build output (dist/), unknown |
+| 174 | 10-28 01:52:36 | ludion (a786cd84) | node <lane script edit-r6-tests.cjs>; npx tsc -p tsconfig.json; npx vitest run packages/cli/test/judge.test.ts; npm run build; npx vitest run; node packages/cli/dist/cli.js judge ×2 | yes | files, repository code, node_modules, node_modules: unknown, network: unknown | packages/cli/test/judge.test.ts, build output (dist/), unknown |
 | 175 | 10-28 01:52:59 | ludion (a786cd84) | node <lane script edit-r6b.cjs>; npx vitest run; npm run typecheck; node -e (inline script) | yes | files, repository code, node_modules | packages/cli/test/judge.test.ts |
 | 176 | 10-28 01:53:24 | ludion (a786cd84) | node <lane script edit-docs-r6.cjs> | yes | temp files, files | temp: pr-f2.md, docs/progress.md, CLAUDE.md, docs/decisions.md (of the files it names) |
 | 177 | 10-28 01:55:52 | ludion (a786cd84 sub) | npm run typecheck; npx vitest run | yes (background) | repository code, node_modules | nothing |
@@ -907,7 +908,7 @@ The table below has one row per call, in time order. `sub` after a session id me
 | 706 | 10-30 15:54:58 | ludion-lb2a (bd74f75d) | node - (script on stdin) | yes | files | packages/cli/test/deliver.test.ts |
 | 707 | 10-30 15:55:11 | ludion-lb2a (bd74f75d) | node - (script on stdin) | yes | files | packages/cli/test/dependencies.test.ts |
 | 708 | 10-30 15:55:43 | ludion-lb2a (bd74f75d) | node - (script on stdin) | yes | files | packages/cli/test/branch.test.ts |
-| 709 | 10-30 15:56:44 | ludion-lb2a (bd74f75d) | node - (script on stdin); node -e (inline script) | yes | files, repository code | docs/bench/2026-10-30-lb-design/scripts/mutate.mjs |
+| 709 | 10-30 15:56:44 | ludion-lb2a (bd74f75d) | node - (script on stdin); node -e (inline script) | yes | files, repository code, node_modules: unknown, network: unknown | unknown: packages/cli/src/security/deliver.ts, action.yml, action/start.sh, action/patch-workflow.yml (mutations written and restored by the imported mutate.mjs); the edit script threw before writing |
 | 710 | 10-30 15:58:09 | ludion-lb2a (bd74f75d) | node - (script on stdin); node --check docs/bench/2026-10-30-lb-design/scripts/mutate.mjs | yes | files, parsed only | packages/cli/test/deliver.test.ts |
 | 711 | 10-30 15:58:58 | ludion-lb2a (bd74f75d) | node - (script on stdin) | yes | files | packages/cli/test/action-patch.test.ts |
 | 712 | 10-30 16:01:33 | ludion-lb2a (bd74f75d) | node - (script on stdin) | yes | files | packages/cli/test/deliver.test.ts |
@@ -936,3 +937,53 @@ The table below has one row per call, in time order. `sub` after a session id me
 | 735 | 10-30 20:23:42 | ludion-lb2a-fix2 (f45bc09b) | node -e (inline script) | yes | files | MEMORY.md |
 
 </details>
+
+## The three npm ci runs of 10-28, and LAUD's own python runs (LAUD2, 2026-10-30)
+
+A read-only follow-up. The session records, the lockfile and npm's own code were read in containers; nothing was run on the host. Times are JST.
+
+### The lockfile and OSV
+
+- **The runs.** All three were `npm ci --no-audit --no-fund`, without `--ignore-scripts`:
+
+  | Folder | Called | Commit |
+  |---|---|---|
+  | `ludion-wt/d` | 10-28 00:16:37 | ddfb4e6 |
+  | `ludion-wt/e` | 10-28 00:22:22 | 529642e |
+  | `ludion-wt/f` | 10-28 00:34:23 | 5e17224 |
+
+- **One lockfile.** At all three commits `package-lock.json` is the same file (blob ff799ae7). Its sha256 is `0779827517d749aca8451ac7beca5c6c6a1e677fc776c78ff7998b18cfe4763c` (193,549 bytes). It names 380 distinct name@version pairs, all resolved from `https://registry.npmjs.org/`.
+- **OSV.** One `querybatch` with the 380 names and versions only (10-30, about 23:51), 380 answers:
+  - `MAL-` records: 0;
+  - other vulnerability records: 0.
+  - As a control, `lodash@4.17.20` (not in the lockfile) returned 5 records, so the API was answering.
+
+### Install scripts: estimated to have run
+
+- **Which packages have one.** Three are marked `hasInstallScript` in the lockfile; the root and the four workspaces have no install-time scripts.
+  - `esbuild@0.28.2`: `postinstall: node install.js`.
+  - `workerd@1.20261023.1`: `postinstall: node install.js`.
+  - `fsevents@2.3.3`: `install: node-gyp rebuild`. It is for macOS only and is not in d, e or f's `node_modules`, so it did not run.
+- **Estimate: esbuild's and workerd's postinstall ran on the host in all three runs.** The evidence:
+  - The commands had no `--ignore-scripts`. The user's npm config, npm's built-in config and the lockfile's commit set nothing about scripts (no `ignore-scripts`, `allowScripts` or `allow-scripts`).
+  - The host's npm is 11.17.0. Its code, read in a container, skips only scripts explicitly denied (`@npmcli/arborist/lib/arborist/rebuild.js`, lines 229 to 238). Scripts nobody reviewed run, and `npm warn allow-scripts` is printed afterwards. `strict-allow-scripts`, which makes it an error instead, is off by default.
+  - On 10-28 at 22:13, another session's npm log, for the same two versions, said `2 packages have install scripts not yet covered by allowScripts`.
+- **What install.js does, as read (not run).** It looks for the binary package for the platform (`@esbuild/win32-x64`, `@cloudflare/workerd-windows-64`). If found, it runs that binary once with `--version`. Only if not found, it runs `npm install` or downloads the tarball from `registry.npmjs.org`.
+  - Both binary packages are in the lockfile and in d, e and f's `node_modules`, with times matching the `npm ci` runs. So install.js most likely took the found path and ran `esbuild.exe` and `workerd.exe` with `--version`.
+- **What is not known.**
+  - This is an estimate. No npm debug log of those runs remains, so there is no direct record that the scripts ran.
+  - For d, only the last line of the output remains. The output of e and f was sent to `/dev/null`, so how their scripts ended is not known.
+- **Correction.** This record said the 00:16:37 warning meant install scripts were held, not run. That was wrong and is corrected above.
+
+### LAUD ran python on the host twice
+
+LAUD's session (31bc6b92) has 49 calls with `python` in them. 46 ran in `python:3.14-slim` containers. One only had the word in a search pattern. Two ran on the host:
+
+| Time | Command | Result |
+|---|---|---|
+| 10-30 22:27:36 | `python -` with an empty heredoc | Timed out after 120 s, moved to the background, stopped at 22:29:44; its output is only `[killed]` |
+| 10-30 22:55:02 | `python3 --version` (stderr discarded) | Returned at 22:55:04 with no output |
+
+- Neither had a script to run. No `__pycache__` was left in the folder.
+- **Which python started is not known.** The PATH at the time is not in the records. On the host today, `python` resolves first to a CPython 3.13 install, and `python3` only to the Windows Store redirector, which is not an interpreter.
+- LAUD's first report said the first run stopped at Windows' python entry point; that cannot be confirmed. It did not list the 22:55:02 run.

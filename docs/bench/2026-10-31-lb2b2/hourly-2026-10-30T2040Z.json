@@ -1,0 +1,58 @@
+[
+  {
+    "workflow": "ludion-php",
+    "slots": [
+      {
+        "slot": "2026-10-30T19:23:00Z",
+        "state": "missed",
+        "run": null,
+        "created_at": null,
+        "run_started_at": null,
+        "conclusion": null,
+        "delay_seconds": null
+      },
+      {
+        "slot": "2026-10-30T20:23:00Z",
+        "state": "pending",
+        "run": null,
+        "created_at": null,
+        "run_started_at": null,
+        "conclusion": null,
+        "delay_seconds": null
+      }
+    ],
+    "ran": 0,
+    "missed": 1,
+    "pending": 1,
+    "median_delay_seconds": null,
+    "max_delay_seconds": null
+  },
+  {
+    "workflow": "ludion-npm",
+    "slots": [
+      {
+        "slot": "2026-10-30T19:23:00Z",
+        "state": "missed",
+        "run": null,
+        "created_at": null,
+        "run_started_at": null,
+        "conclusion": null,
+        "delay_seconds": null
+      },
+      {
+        "slot": "2026-10-30T20:23:00Z",
+        "state": "pending",
+        "run": null,
+        "created_at": null,
+        "run_started_at": null,
+        "conclusion": null,
+        "delay_seconds": null
+      }
+    ],
+    "ran": 0,
+    "missed": 1,
+    "pending": 1,
+    "median_delay_seconds": null,
+    "max_delay_seconds": null
+  }
+]

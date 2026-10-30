@@ -29,3 +29,7 @@ Gate 1's matching to the project's OS, configuration or use of the fixed compone
 ## Undo
 
 A later record. Removing Node.js again is a scope change (CLAUDE.md, Scope) and needs the owner's OK on one sentence.
+
+## Addendum, 2026-10-31 07:3x JST (LNODE3, after R231c's review, PR #231 comment 6534443349)
+
+Item 1's detection is widened, and nothing else changes. `init` and an unconfigured `scan` now take any `FROM` line that names a `node` image (after any `--flag` arguments, with any registry or namespace prefix, by tag, by digest or with neither; `node` must be followed by `:`, `@`, a space or the end of the line), still only on a `FROM` line, so `COPY --chown=node:node` and `USER node` do not count. What item 2 reads is unchanged: only the official image at an exact version, so each newly detected form (`--platform`, `docker.io/node`, `index.docker.io/library/node`, `ghcr.io/…/node`, `node@sha256:…`, `node`) is reported as a check that could not be made (exit 2), where before it was left out and `scan` could exit 0 beside an npm lockfile. No form is accepted that was refused before.

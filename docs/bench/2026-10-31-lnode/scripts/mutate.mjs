@@ -38,6 +38,14 @@ const M = [
   ["M9: the index deadline 300 s", `${S}node.ts`, "\"Node.js release\", 4, 30_000", "\"Node.js release\", 4, 300_000"],
   ["D2: the PR job takes the same version", `${S}deliver.ts`, "compare(to, current.version) <= 0", "compare(to, current.version) < 0"],
   ["H1: PHP's hyphen check removed", `${S}php.ts`, "if (!image.flavor.startsWith(\"-\")) throw", "if (false) throw"],
+  // LNODE3, after R231c's review 6534443349: which FROM lines an unconfigured scan and init take for a node image.
+  ["N1: detection back to the three forms of a4ee125", `${S}node.ts`, String.raw`/^[ \t]*FROM[ \t]+(?:--\S+[ \t]+)*(?:\S*\/)?node(?=[:@ \t\r]|$)/im`, String.raw`/^\s*FROM\s+(?:(?:docker\.io\/)?library\/)?node:/im`],
+  ["N2: no --flag before the image", `${S}node.ts`, String.raw`FROM[ \t]+(?:--\S+[ \t]+)*(?:\S*\/)?node`, String.raw`FROM[ \t]+(?:\S*\/)?node`],
+  ["N3: no registry or namespace prefix", `${S}node.ts`, String.raw`(?:--\S+[ \t]+)*(?:\S*\/)?node(`, String.raw`(?:--\S+[ \t]+)*node(`],
+  ["N4: only node: (no digest, no bare node)", `${S}node.ts`, String.raw`node(?=[:@ \t\r]|$)/im`, String.raw`node(?=:)/im`],
+  ["N5: any name starting with node", `${S}node.ts`, String.raw`node(?=[:@ \t\r]|$)/im`, String.raw`node/im`],
+  ["N6: not anchored on FROM", `${S}node.ts`, String.raw`/^[ \t]*FROM[ \t]+(?:--\S+`, String.raw`/(?:--\S+`],
+  ["N7: case-sensitive", `${S}node.ts`, String.raw`|$)/im;`, String.raw`|$)/m;`],
 ];
 
 const results = [];

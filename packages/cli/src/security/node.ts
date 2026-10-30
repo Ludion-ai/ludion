@@ -5,8 +5,13 @@ import { compare, officialImage, releaseJson, type Release, type RuntimeImage, t
  * The same path as PHP's image (php.ts): nodejs.org's release index marks each release `security: true` or `false`.
  */
 export const NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
-/** A Dockerfile line that names the official node image, for init and scan to offer the Node.js policy. */
-export const NODE_FROM = /^\s*FROM\s+(?:(?:docker\.io\/)?library\/)?node:/im;
+/**
+ * A FROM line that names a node image, for init and scan to offer the Node.js policy: after any --flag arguments, with
+ * any registry or namespace prefix, by tag, digest or neither. Only the FROM line counts (not `COPY --chown=node:node`).
+ * Detecting is not reading: nodeImage accepts only the official image at an exact version, and every other form found
+ * here becomes a check that could not be made, never a skipped one.
+ */
+export const NODE_FROM = /^[ \t]*FROM[ \t]+(?:--\S+[ \t]+)*(?:\S*\/)?node(?=[:@ \t\r]|$)/im;
 
 export function nodeImage(dockerfile: string): RuntimeImage {
   return officialImage(dockerfile, /^(?:(?:docker\.io\/)?library\/)?node:(\d+\.\d+\.\d+)((?:-[a-z][a-z0-9.-]{0,63})?)(?:@sha256:[a-f0-9]{64})?$/,

@@ -97,7 +97,7 @@ node packages/cli/dist/cli.js scan --dir /path/to/app
 node packages/cli/dist/cli.js init --dir /path/to/app --ecosystem npm
 ```
 
-Scan discovers all supported manifests in a project. A saved update policy selects one ecosystem at a time; pass --ecosystem when initializing a mixed project (an npm lockfile beside a Dockerfile whose FROM names node is one). A FROM node: line without an exact version (node:22-alpine, node:lts) is reported by scan as a check it could not make, and scan exits 2. Set the real application test before applying:
+Scan discovers all supported manifests in a project. A saved update policy selects one ecosystem at a time; pass --ecosystem when initializing a mixed project (an npm lockfile beside a Dockerfile whose FROM names node is one). A FROM line that names a node image in a form Ludion does not read (no exact version, as in node:22-alpine, node:lts or node; a flag such as --platform; a registry or namespace prefix other than library/ or docker.io/library/, as in docker.io/node or ghcr.io/acme/node; or a digest without a tag) is reported by scan as a check it could not make, and scan exits 2, or 1 when it also finds a known vulnerability or security release. Set the real application test before applying:
 
 ```json
 {

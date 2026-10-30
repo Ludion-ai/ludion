@@ -133,6 +133,42 @@ describe("the Node.js image policy", () => {
       expect((await scanProject(root, undefined)).checks.map(c => c.ecosystem)).toEqual(["php"]);
     } finally { vi.unstubAllGlobals(); }
   });
+  // R231c's review (PR #231, comment 6534443349): these FROM lines name a node image in a form Ludion does not read, and
+  // were left out of an unconfigured scan, which then exited 0 beside an npm lockfile.
+  it.each([
+    "FROM node:22-alpine\n", "FROM --platform=linux/amd64 node:22.11.0-alpine\n", "FROM --platform=$BUILDPLATFORM --pull node:22-alpine\n",
+    "FROM docker.io/node:22.11.0-alpine\n", "FROM index.docker.io/library/node:22.11.0-alpine\n", "FROM ghcr.io/acme/node:22.11.0\n",
+    `FROM node@sha256:${"c".repeat(64)}\n`, "FROM node\n", "FROM node AS build\n", "from Node:22-alpine\n",
+  ])("scan reports a FROM naming node in a form it cannot read as a failed check, and exits 2: %s", async from => {
+    vi.stubGlobal("fetch", async () => { throw new Error("no request expected"); });
+    const error = vi.spyOn(console, "error").mockImplementation(() => {}), log = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      for (const lockfile of [false, true]) {
+        const root = mkdtempSync(join(tmpdir(), "ludion-node-from-"));
+        writeFileSync(join(root, "Dockerfile"), `${from}WORKDIR /app\n`);
+        if (lockfile) writeFileSync(join(root, "package-lock.json"), JSON.stringify({ name: "a", lockfileVersion: 3, packages: { "": { name: "a" } } }));
+        const scan = await scanProject(root);
+        expect(scan.checks.map(c => `${c.ecosystem}:${"error" in c ? "error" : "ok"}`)).toEqual(lockfile ? ["npm:ok", "node:error"] : ["node:error"]);
+        expect(scan.status).toBe("attention_required");
+        expect(await securityCli("scan", ["--dir", root])).toBe(2);
+      }
+    } finally { vi.unstubAllGlobals(); error.mockRestore(); log.mockRestore(); }
+  });
+  it.each([
+    "FROM php:8.4.26-cli-alpine\nCOPY --chown=node:node . .\n", "FROM --platform=linux/amd64 php:8.4.26-cli-alpine\nUSER node:node\n",
+    "FROM nodejs:22\n", "FROM acme/node-app:1.0.0\n", "FROM php:8.4.26-cli-alpine AS node\n", "# FROM node:22\nFROM php:8.4.26-cli-alpine\n",
+  ])("scan does not take a FROM that names no node image for one: %s", async text => {
+    vi.stubGlobal("fetch", async () => { throw new Error("no request expected"); });
+    try {
+      const root = mkdtempSync(join(tmpdir(), "ludion-node-from-"));
+      writeFileSync(join(root, "Dockerfile"), text);
+      writeFileSync(join(root, "package-lock.json"), JSON.stringify({ name: "a", lockfileVersion: 3, packages: { "": { name: "a" } } }));
+      const scan = await scanProject(root);
+      expect(scan.checks.map(c => c.ecosystem)).not.toContain("node");
+      // A PHP image, --platform included, is still PHP's check (here it fails, as fetch is refused).
+      if (/\bphp:/.test(text)) expect(scan.checks.map(c => `${c.ecosystem}:${"error" in c ? "error" : "ok"}`)).toEqual(["npm:ok", "php:error"]);
+    } finally { vi.unstubAllGlobals(); }
+  });
 });
 
 describe("Node.js image patch, validated and applied as PHP's", () => {

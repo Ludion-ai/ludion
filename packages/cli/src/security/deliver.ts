@@ -7,6 +7,7 @@ import { isDeepStrictEqual, parseArgs } from "node:util";
 import { publicArchiveUrl } from "./acquisition.ts";
 import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
+import { registryManifest } from "./npm-facts.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
 import { DECLARED, lockEntries, lockKey, readLock, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
@@ -322,7 +323,52 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
   }
   const stray = added.filter(path => !reached.has(path));
   if (stray.length) return `package-lock.json adds ${stray.slice(0, 3).map(show).join(", ")}, which no package the fix moves or adds requires.`;
+  // What the root and every entry the fix does not move load stays the same path: an added copy that shadows another
+  // package's dependency would change what that package loads (review of 7d25696, B1 (B)).
+  const wasAt = new Map([...kinds].filter(([path, kind]) => kind === "install" && Object.hasOwn(was, path)).map(([path]) => [path, { path } as LockEntry]));
+  for (const path of Object.keys(is)) {
+    if (planned.includes(path) || added.includes(path) || (path && (kinds.get(path) !== "install" || entry(is, path)!.link))) continue;
+    const item = entry(is, path)!, dir = path ? `${path}/` : "";
+    for (const group of path ? DECLARED : ROOT_GROUPS) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
+      const then = resolveFrom(wasAt, dir, name)?.path, now = resolveFrom(installed, dir, name)?.path;
+      if (then !== now) return `package-lock.json changes what ${path ? show(path) : "the project"} loads for ${show(name)} (${show(then ?? "nothing")} -> ${show(now ?? "nothing")}), which this fix does not plan.`;
+    }
+  }
   return null;
+}
+
+/** The requirement groups compared with the registry: optional ones merged, as the registry also lists them in `dependencies`. */
+const npmRequirements = (item: Record<string, unknown>) => ({
+  requires: { ...(isObject(item.dependencies) ? item.dependencies : {}), ...(isObject(item.optionalDependencies) ? item.optionalDependencies : {}) },
+  peers: isObject(item.peerDependencies) ? item.peerDependencies : {},
+  os: item.os ?? null, cpu: item.cpu ?? null,
+});
+
+/**
+ * npm: every package-lock.json entry the fix moves or adds must declare what the registry lists for that name and
+ * version: its requirements (dependencies and optional ones together, and peers) and its `os` and `cpu`. contentProblem's
+ * "required by a moved or added path" then rests on the registry's data, not on the artifact's (review of 7d25696, B1 (A)),
+ * as composerAgain's does on Packagist's. `bin` and `hasInstallScript` are not compared.
+ */
+async function npmAgain(top: string, prefix: string, base: string, fix: CheckedFix, manifest: (name: string, version: string) => Promise<Record<string, unknown> | null>): Promise<string | null> {
+  try {
+    const read = (rev: string) => readLock(git(top, ["cat-file", "blob", `${rev}:${prefix}package-lock.json`]).stdout);
+    const was = read(base), is = read(fix.commit);
+    for (const [path, item] of Object.entries(is)) {
+      if (!isObject(item) || lockKey(path, item) !== "install" || item.link) continue;
+      if (Object.hasOwn(was, path) && isDeepStrictEqual(was[path], item)) continue;
+      const name = typeof item.name === "string" ? item.name : requireName(path), version = String(item.version), at = `${plain(name).slice(0, 100)}@${plain(version).slice(0, 60)}`;
+      const listed = await manifest(name, version);
+      if (!listed) return `the registry lists no ${at} (${plain(path).slice(0, 200)}).`;
+      const lock = npmRequirements(item), registry = npmRequirements(listed);
+      for (const key of ["requires", "peers", "os", "cpu"] as const) {
+        if (!isDeepStrictEqual(lock[key], registry[key])) return `package-lock.json's ${key === "requires" ? "dependencies" : key === "peers" ? "peerDependencies" : key} for ${at} (${plain(path).slice(0, 200)}) is not what the registry lists.`;
+      }
+    }
+    return null;
+  } catch (error) {
+    return `the registry could not be read: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
+  }
 }
 
 /** composer.lock: why it says more than the fix, or null. See contentProblem. */
@@ -556,7 +602,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json moves this package, at each install path where the base locks the fixed version, to the fix's version, adds only packages that those paths (or packages so added) require, and changes no other entry" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json moves this package, at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry and nothing another package loads, and that each moved or added entry declares the requirements, os and cpu the registry lists" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
@@ -737,7 +783,7 @@ async function phpAgain(top: string, prefix: string, fix: CheckedFix, digestOf: 
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -777,8 +823,11 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
           continue;
         }
       }
-      // The lockfile's content, which only the registry can confirm: the judge again, here, on the base and this commit.
+      // The lockfile's content, which only the registry can confirm: each moved or added entry's requirements as the
+      // registry lists them, then the judge again, here, on the base and this commit.
       if (checked.ecosystem === "npm") {
+        const problem = await npmAgain(top, prefix, checked.base, fix, options.npmManifest ?? ((name, version) => registryManifest(name, version)));
+        if (problem) throw new Error(`Not pushed: ${problem}`);
         const refusal = await judgeAgain(top, prefix, checked.base, fix, options.judgeNpm ?? ((before, after) => judgeNpmCandidate(before, after)));
         if (refusal) throw new Error(`Not pushed: the judge was run again on this commit's lockfile. ${refusal}`);
       }

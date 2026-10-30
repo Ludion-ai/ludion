@@ -81,6 +81,12 @@ const mutations = [
   off("npm: the root's other requirements changed (N-a)", "if (!isDeepStrictEqual(root(before), root(after))) return"),
   ["npm: an alias at the planned path accepted (N-a c)", D, " && (item.name === undefined || item.name === fix.package) && !item.link;", " && !item.link;", T],
   ["npm: from matched against any package's versions (R5)", D, "kinds.get(path) === \"install\" && requireName(path) === fix.package && !!item", "kinds.get(path) === \"install\" && !!item", T],
+  // Review of 7d25696 (lane): B1 (A) and (B), N3.
+  ["npm: the registry not asked about moved and added entries (B1 A)", D, "const problem = await npmAgain(top, prefix, checked.base, fix, options.npmManifest ?? ((name, version) => registryManifest(name, version)));", "const problem = null;", T],
+  off("npm: an entry's requirements other than the registry's accepted (B1 A)", "if (!isDeepStrictEqual(lock[key], registry[key])) return"),
+  off("npm: an entry the registry does not list accepted (B1 A)", "if (!listed) return"),
+  off("npm: another package loading another copy accepted (B1 B)", "if (then !== now) return"),
+  ["npm: the lock not read as the judge reads it (N3)", D, "    lockEntries(old); lockEntries(now);\n", "", T],
   ["the tree read from the raw headers, not from Git (R4)", D, "const tree = git(top, [\"rev-parse\", \"--verify\", `${commit}^{tree}`]).stdout.trim();", "const tree = (headers[0] ?? \"\").slice(\"tree \".length);", T],
   ["branch names: a version with \"-\" kept readable (R16)", B, "!tos[0]!.includes(\"-\") && ", "", BT],
   ["packagist: a PKSA ID with a \"-\" at an end read (N-d)", "packages/cli/src/security/packagist.ts", "export const PKSA_ID = /^PKSA-[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?$/;", "export const PKSA_ID = /^PKSA-[a-z0-9-]{1,60}$/;", "packages/cli/test/dependencies.test.ts"],

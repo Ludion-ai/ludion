@@ -11,6 +11,7 @@ import { fixBranch, fixBranchName, gitBase } from "../src/security/branch.ts";
 import { ADVISORY, BUNDLE_LIMIT, checkArtifact, closedWarnings, contentProblem, deliverCli, FILE_LIMIT, fileLimit, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
 import { changedManifest } from "../src/security/inventory.ts";
 import type { Judgement } from "../src/security/judge.ts";
+import { registryManifest } from "../src/security/npm-facts.ts";
 import { PKSA_ID } from "../src/security/packagist.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
@@ -26,6 +27,8 @@ const BRANCH = "ludion/npm/lodash-4.17.21";
 /** The message dependency-patch.ts writes for the fixture's fix. */
 const message = (base: string, subject = SUBJECT, extra = "") => `${subject}\n\nFixes GHSA-35jh-r3h4-6jhm, CVE-2021-23337.\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n${extra}`;
 const READY = async () => ({ verdict: "ready_except_build", findings: [] }) as unknown as Judgement;
+/** The registry's manifest for any version: one that requires nothing, as the fixtures' moved entries declare. */
+const NO_REQUIREMENTS = async (name: string, version: string) => ({ name, version });
 
 /** A project (npm policy) with two commits, and an origin it was pushed to. `base` is the second commit. */
 function project() {
@@ -147,7 +150,7 @@ function github(origin: string, pulls: { number: number; state: string; head: { 
   return { fetchFn, calls, opened, pulls };
 }
 const open = (dir: string, out: string, base: string, origin: string, gh: ReturnType<typeof github>, ref = "refs/heads/main", extra: Partial<Parameters<typeof openFixes>[0]> = {}) =>
-  openFixes({ dir, artifact: out, base, repo: "o/r", ref, api: "https://api.github.invalid", remote: origin, token: "t0ken", fetchFn: gh.fetchFn, judgeNpm: READY, osv: async () => [], ...extra });
+  openFixes({ dir, artifact: out, base, repo: "o/r", ref, api: "https://api.github.invalid", remote: origin, token: "t0ken", fetchFn: gh.fetchFn, judgeNpm: READY, npmManifest: NO_REQUIREMENTS, osv: async () => [], ...extra });
 const branchAt = (origin: string, branch: string) => spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`], { cwd: origin, encoding: "utf8" }).stdout.trim();
 
 describe("the validation job packs the applied fixes", { timeout: 30_000 }, () => {
@@ -401,6 +404,39 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       // N-a (c): an alias of another package at 1.2.6 in minimist's place.
       [{ ...MKDIRP, "node_modules/minimist": { name: "is-number", version: "1.2.6" } }, "does not have minimist at 1.2.6, the fix's version, at node_modules/minimist"],
     ] as const) await refused(p => minimistFix(p, packages), why);
+  });
+  it("reads one version's manifest from the registry, by the package's name only", async () => {
+    const urls: string[] = [];
+    const answer = (body: unknown) => (async (url: string | URL | Request) => { urls.push(String(url)); return new Response(JSON.stringify(body), { status: 200 }); }) as typeof fetch;
+    expect(await registryManifest("@scope/pkg", "1.0.0", answer({ versions: { "1.0.0": { dependencies: { a: "1" } } } }))).toEqual({ dependencies: { a: "1" } });
+    expect(urls).toEqual(["https://registry.npmjs.org/@scope%2Fpkg"]);
+    expect(await registryManifest("pkg", "2.0.0", answer({ versions: { "1.0.0": {} } }))).toBeNull();
+    expect(await registryManifest("pkg", "constructor", answer({ versions: {} }))).toBeNull();
+    await expect(registryManifest("pkg", "1.0.0", answer({ versions: { "1.0.0": "x" } }))).rejects.toThrow("Invalid registry manifest for pkg@1.0.0");
+    await expect(registryManifest("pkg", "1.0.0", answer({}))).rejects.toThrow("Invalid registry document for pkg");
+  });
+  it("npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))", async () => {
+    const forged = { ...MKDIRP, "node_modules/minimist": { version: "1.2.6", dependencies: { "is-number": "^7.0.0" } }, "node_modules/is-number": { version: "7.0.0" } };
+    // The registry's minimist 1.2.6 requires nothing: the lock's own "dependencies" cannot make is-number required.
+    const asked: string[] = [];
+    const registry = (requires: Record<string, string>) => async (name: string, version: string) => { asked.push(`${name}@${version}`); return name === "minimist" ? { name, version, dependencies: requires } : { name, version }; };
+    for (const [manifest, outcome, why] of [
+      [registry({}), "failed", "package-lock.json's dependencies for minimist@1.2.6 (node_modules/minimist) is not what the registry lists"],
+      [async () => null, "failed", "the registry lists no minimist@1.2.6"],
+      [async () => { throw new Error("registry.npmjs.org answered HTTP 503."); }, "failed", "the registry could not be read: registry.npmjs.org answered HTTP 503."],
+      [async (name: string, version: string) => ({ name, version, dependencies: name === "minimist" ? { "is-number": "^7.0.0" } : {}, os: ["linux"] }), "failed", "package-lock.json's os for"],
+      // The same lock, when the registry does list the requirement: opened.
+      [registry({ "is-number": "^7.0.0" }), "opened", undefined],
+    ] as const) {
+      const p = project(), s = minimistFix(p, forged), gh = github(p.origin);
+      const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh, "refs/heads/main", { npmManifest: manifest });
+      expect(result.deliveries[0]).toMatchObject({ outcome, ...(why ? { reason: expect.stringContaining(why) } : {}) });
+      expect(branchAt(p.origin, s.branch) === "").toBe(outcome !== "opened");
+      expect(gh.opened).toHaveLength(outcome === "opened" ? 1 : 0);
+    }
+    expect(asked).toContain("minimist@1.2.6");
+    expect(asked).toContain("is-number@7.0.0");
+    expect(asked).not.toContain("mkdirp@0.5.5");
   });
   it("a file outside the plan, beside the planned ones", () => refused(p => {
     const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED, "README.md": "changed\n" });
@@ -706,6 +742,18 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" } }, { name: "app", dependencies: { lodash: "4.17.21", evil: "1" } }))).toContain("changes the project's own entry beyond the fix's requirement");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" } }, { name: "app", dependencies: { lodash: "4.17.21", minimist: "1.2.6" } }))).toContain("changes the project's own entry beyond the fix's requirement");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/../x": { version: "1.0.0" } }))).toContain("package-lock.json is not one Ludion reads (Unexpected package-lock path: node_modules/../x.)");
+    // Read as the judge reads it (review of 7d25696, N3): two paths that differ only in case, and a version that is not semver.
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/Minimist": { version: "1.2.6" } }))).toContain("not one Ludion reads (Two package-lock paths differ only in case");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { x: "*" } }, "node_modules/x": { version: "latest" } }))).toContain("not one Ludion reads (Invalid locked version at node_modules/x.)");
+    // An added copy that an unchanged package now loads instead of its own (review of 7d25696, B1 (B)): the nested
+    // minimist 0.0.10 -> 0.2.4 under optimist, with a wordwrap 1.0.0 beside it that optimist then loads, not 0.0.3.
+    const optimist = (packages: Record<string, unknown>) => files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/minimist": { version: "1.2.8" }, "node_modules/optimist": { version: "0.6.1", dependencies: { minimist: "~0.0.1", wordwrap: "~0.0.2" } }, "node_modules/wordwrap": { version: "0.0.3" }, ...packages }, { name: "app", dependencies: { optimist: "0.6.1" } }) });
+    const nested = fixOf("minimist", "0.0.10", "0.2.4", ["package.json", "package-lock.json"]);
+    expect(contentProblem("npm", nested, optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.0.10" } }), optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.2.4", dependencies: { wordwrap: "1.0.0" } }, "node_modules/optimist/node_modules/wordwrap": { version: "1.0.0" } }))).toContain("changes what node_modules/optimist loads for wordwrap (node_modules/wordwrap -> node_modules/optimist/node_modules/wordwrap)");
+    // Nested under the moved copy instead, wordwrap 1.0.0 is that copy's own: optimist still loads 0.0.3.
+    expect(contentProblem("npm", nested, optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.0.10" } }), optimist({ "node_modules/optimist/node_modules/minimist": { version: "0.2.4", dependencies: { wordwrap: "1.0.0" } }, "node_modules/optimist/node_modules/minimist/node_modules/wordwrap": { version: "1.0.0" } }))).toBeNull();
+    // The root loads another copy (a top-level copy added where the project's requirement was unresolved).
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { version: "1.2.5" } }, { name: "app", dependencies: { lodash: "4.17.21", "left-pad": "1" } }), lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "left-pad": "1" } }, "node_modules/left-pad": { version: "1.0.0" } }, { name: "app", dependencies: { lodash: "4.17.21", "left-pad": "1" } }))).toContain("changes what the project loads for left-pad (nothing -> node_modules/left-pad)");
   });
   it("advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own)", () => {
     for (const id of ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337", "CVE-2024-1234567", "MAL-2024-12345", "PKSA-n8pg-4n3p-wcn3"]) expect(ADVISORY.test(id), id).toBe(true);

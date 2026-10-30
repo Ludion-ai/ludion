@@ -165,7 +165,22 @@ All ran in Docker after main c84d73c was merged in (92539c1; the conflict was on
 
 - **Tests** at d901755 (`logs/test-lb2a-fix4.log`): typecheck 0, build 0, 35 files, 1,215 passed, 19 skipped.
 - **Mutations** at 8f4ee7d (the same code; `logs/mutate-lb2a-fix4.log`): 97 of 97 caught, one (24) by the 300 s limit; without mutations deliver, judge, judge-cli, branch, dependencies and action-patch tests pass. New in this round: 73 to 82.
-- **Both jobs** at d901755 (`logs/e2e-lb2a-fix4.log`: npm-two two PRs, npm one, Composer one on run 1; none on run 2) and at 8f4ee7d (`logs/e2e-lb2a-fix4-npm-v2.log`: a new case, examples/npm-security with its lockfile written again by npm as v2; `patch`'s npm kept it v2 with both views, and lodash 4.17.20 → 4.18.1 opened one PR on run 1 and none on run 2). PHP and Maven were not run again.
+- **Both jobs (fourth round)** at d901755 (`logs/e2e-lb2a-fix4.log`: npm-two two PRs, npm one, Composer one on run 1; none on run 2) and at 8f4ee7d (`logs/e2e-lb2a-fix4-npm-v2.log`: a new case, examples/npm-security with its lockfile written again by npm as v2; `patch`'s npm kept it v2 with both views, and lodash 4.17.20 → 4.18.1 opened one PR on run 1 and none on run 2). PHP and Maven were not run again.
+
+### LB2a, fifth round (2026-10-30): the lane's review of 1e6f705
+
+The lane's review (comment 6524150863 at 1e6f705, REQUEST CHANGES) found the property still broken through the npm 6 tree (B1): only version, resolved and integrity were compared, so a tree entry's `requires`, which npm 6 `install` installs from any spec when the tree lacks the package, named left-pad by URL, and npm 6.14.18 installed it; a tree could also be added to a v3 base, and the tree's `dev` flag changed what npm 6 `--production` installs. Changed, still by requiring the two views to agree:
+
+- **lockViews (judge.ts)** also compares each install path's flags (`dev`, `optional`, `devOptional`, `peer`, `extraneous`, and `bundled`, which `packages` calls `inBundle`) and `requires`: a tree entry's `requires` must be the `packages` entry's `dependencies` with its `optionalDependencies`, and a link's must be its folder's, `devDependencies` included, which is how npm 11.19.1 writes them (seen in two more locks it wrote in Docker, `packages/cli/test/fixtures/lock-v2-npm11-flags.json` and `-workspace-dev.json`). npm writes no flags on a link. A tree entry with a key npm does not write (`version`, `resolved`, `integrity`, the flags, `requires`, `dependencies`), a flag that is not `true`, or `requires` that are not specs is refused. Unmoved tree entries then equal the base's through `packages`, whose unmoved entries the per-path check holds to the base's; moved and added ones carry the requirements `npmAgain` ties to the registry.
+- **PR job:** a fix may not add a tree the base did not have, nor remove one.
+- **N1:** a forged `optionalDependencies` or `peerDependencies` on a moved entry fails its fix (the registry lists neither), with a mutation each. **N5:** docs/mistakes/2026-10-30-deliver-checks-read-past-git.md names the third, fourth and fifth rounds' causes and their checks.
+- **Not done here (non-blocking in that review):** N2 (`patch` and the PR job check moves differently), N3 (`bin`, `hasInstallScript`, `libc`, `peerDependenciesMeta` and flags of moved `packages` entries are not compared with the registry), N4 (a dependency that differs only in case), N6 (locks npm 7.0 to 7.x writes, bundled and extraneous entries, have not been checked against this reading: a real lock refused this way stops every fix of its run), N7 (no test that fsck runs once), N8 (npm-shrinkwrap.json or a workspace root's lock above the project's folder is not looked for). A `peer` or `devOptional` flag has not been seen in a lock npm wrote here.
+
+All ran in Docker at a036529, one container at a time:
+
+- **Tests** (`logs/test-lb2a-fix5.log`): typecheck 0, build 0, 35 files, 1,217 passed, 19 skipped.
+- **Mutations** (`logs/mutate-lb2a-fix5.log`): 105 of 105 caught, one (24) by the 300 s limit; without mutations deliver, judge, judge-cli, branch, dependencies and action-patch tests pass. New in this round: 83 to 90.
+- **Both jobs** (`logs/e2e-lb2a-fix5.log`): npm-v2 (lockfileVersion 2) opened one PR on run 1 (lodash 4.17.20 → 4.18.1) and none on run 2; npm-two two PRs (lodash, minimist) and none. The other cases were not run again: only npm's reading changed.
 
 ## The reviews
 

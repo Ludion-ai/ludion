@@ -1,0 +1,25 @@
+# started 2026-10-30T01:27:30Z, node v24.22.1
+npm ci exit 0
+baseline passes: true
+caught: the check runs for every ecosystem
+caught: the check is never made
+caught: the version taken is not used
+caught: a failed check fails the fix
+caught: the plan's own changes are changed in place
+caught: the publish-time note is not marked
+caught: the choice is not recorded
+caught: a version the registry no longer lists is used
+caught: a deprecated version is used
+caught: a MAL- record is not told apart
+caught: a version OSV names is used
+caught: a prerelease can be taken
+caught: another major can be taken
+caught: another minor below 1.0.0 can be taken
+caught: no limit on the versions looked at
+caught: versions are not taken smallest first
+caught: OSV is also asked about deprecated versions
+caught: the deprecation message is not made one line
+caught: the registry document is not checked
+19 of 19 caught
+after restoring, passes: true
+# finished 2026-10-30T01:29:37Z

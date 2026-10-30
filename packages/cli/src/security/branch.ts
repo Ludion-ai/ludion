@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { delimiter, dirname, join, resolve } from "node:path";
 import { findProgram } from "../../../sandbox/src/docker.ts";
 import { notSnapshotted } from "./project.ts";
 
@@ -31,17 +31,27 @@ export const GIT_SETTINGS: readonly string[] = ["core.fsmonitor=", "core.splitIn
  * not the working directory, a node_modules folder (npx, npm exec and package scripts put the project's
  * node_modules/.bin first) or Yarn's shim folder, and nothing inside the repository (a Composer vendor/bin or a
  * .venv/bin the project's scripts put on PATH). The repository is the nearest folder at or above `dir` with a .git
- * entry, where Git itself looks, so for a project in a subfolder it is the whole repository.
+ * entry, where Git itself looks, so for a project in a subfolder it is the whole repository. It is looked for under each
+ * spelling of `dir`: as given, as the JavaScript walk resolves it and, on Windows, as the system resolves it
+ * (realpathSync.native, which also resolves subst drives and short names). A PATH folder inside the repository under any
+ * of them is skipped.
  */
 function gitProgram(dir: string): string {
-  let top = realpathSync(dir);
-  for (let at = top; ; at = dirname(at)) {
-    if (existsSync(join(at, ".git"))) { top = at; break; }
-    if (dirname(at) === at) break;
+  const spellings = new Set([resolve(dir), realpathSync(dir)]);
+  if (process.platform === "win32") try { spellings.add(realpathSync.native(dir)); } catch { /* the other spellings stand */ }
+  const tops = new Set([...spellings].map(spelling => {
+    for (let at = spelling; ; at = dirname(at)) {
+      if (existsSync(join(at, ".git"))) return at;
+      if (dirname(at) === at) return spelling;
+    }
+  }));
+  // One PATH folder at a time: a folder that one spelling skips finds no git under it, so the spellings disagree.
+  for (const folder of (process.env.PATH ?? "").split(delimiter)) {
+    const found = new Set([...tops].map(top => findProgram("git", folder, process.cwd(), process.platform, top)));
+    const [program] = found;
+    if (found.size === 1 && program) return program;
   }
-  const program = findProgram("git", process.env.PATH ?? "", process.cwd(), process.platform, top);
-  if (!program) throw new Error("--apply needs git, and none was found in PATH's absolute folders (the working directory, the repository, node_modules folders and Yarn's shim folder are skipped). Run without --apply to validate only. Nothing was validated or changed.");
-  return program;
+  throw new Error("--apply needs git, and none was found in PATH's absolute folders (the working directory, the repository, node_modules folders and Yarn's shim folder are skipped). Run without --apply to validate only. Nothing was validated or changed.");
 }
 
 function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {

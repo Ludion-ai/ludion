@@ -1,10 +1,12 @@
 // The next smallest fix (LV): when an npm package's smallest fixed version is deprecated, no longer listed by the
 // registry, or named by an OSV record (a MAL- record or an advisory), `ludion patch` takes the next smallest version in
 // the same major (and the same minor below 1.0.0) that is none of these. Without one, the smallest stays and its fix
-// stops, as before. Only package names and versions leave the machine. Composer and Maven have no per-version
+// stops, as before. Only package names and versions leave the machine, and, back to OSV, the ids of the records it
+// returned. Composer and Maven have no per-version
 // deprecation to read (Packagist marks a whole package abandoned; Maven Central lists versions only), so this is npm only.
 import semver from "semver";
 import { osvIds, registryVersions } from "./npm-facts.ts";
+import { OsvClient } from "./osv.ts";
 
 /** One smallest fixed version that was passed over, or kept because it could not be checked; in the fix's receipt. */
 export type VersionChoice = {
@@ -19,7 +21,11 @@ export type VersionChoice = {
 /** At most this many later versions are looked at, smallest first. */
 export const NEXT_FIX_LIMIT = 50;
 
-/** null when the smallest fixed version can be used; otherwise what was passed over and what is taken. A failed lookup throws. */
+/**
+ * null when the smallest fixed version can be used; otherwise what was passed over and what is taken. OSV is asked about
+ * the smallest first, and about later versions only when the smallest cannot be used. A record OSV marks withdrawn does
+ * not count, as in OsvClient.scan. A failed lookup, or a version OSV gave no answer for, throws.
+ */
 export async function nextFix(name: string, smallest: string, fetchFn: typeof fetch = fetch): Promise<VersionChoice | null> {
   const from = semver.valid(smallest);
   if (!from) throw new Error(`${name}@${smallest} is not a semver version.`);
@@ -27,19 +33,30 @@ export async function nextFix(name: string, smallest: string, fetchFn: typeof fe
   const scope = semver.major(from) === 0 ? `0.${semver.minor(from)}` : `${semver.major(from)}.x`;
   const later = [...listed.keys()].filter(v => semver.valid(v) === v && !semver.prerelease(v) && semver.gt(v, from) && semver.major(v) === semver.major(from) && (semver.major(from) !== 0 || semver.minor(v) === semver.minor(from))).sort(semver.compare);
   const looked = later.slice(0, NEXT_FIX_LIMIT);
-  // OSV is asked only about listed versions that are not deprecated: the others are passed over already.
-  const ids = await osvIds([from, ...looked].filter(v => listed.has(v) && !listed.get(v)).map(version => ({ name, version })), fetchFn);
+  // OSV is asked only about listed versions that are not deprecated: the others are passed over already. Each record it
+  // names is read once, for its withdrawal.
+  const ids = new Map<string, string[]>(), records = new OsvClient(fetchFn);
+  const ask = async (versions: string[]) => {
+    const found = await osvIds(versions.filter(v => listed.has(v) && !listed.get(v)).map(version => ({ name, version })), fetchFn);
+    const withdrawn = new Set<string>();
+    for (const id of new Set([...found.values()].flat())) if ((await records.advisory(id)).withdrawn) withdrawn.add(id);
+    for (const [key, named] of found) ids.set(key, named.filter(id => !withdrawn.has(id)));
+  };
   const why = (version: string): string | null => {
     if (!listed.has(version)) return "no longer listed by the registry (unpublished or withdrawn)";
     const deprecated = listed.get(version);
     if (deprecated) return `deprecated: ${deprecated.replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 200)}`;
-    const named = ids.get(`${name}@${version}`) ?? [], malicious = named.filter(id => id.startsWith("MAL-"));
+    const named = ids.get(`${name}@${version}`);
+    if (!named) throw new Error(`OSV gave no answer for ${name}@${version}.`);
+    const malicious = named.filter(id => id.startsWith("MAL-"));
     if (malicious.length) return `in OSV's malicious-package records (${malicious.join(", ")})`;
     if (named.length) return `OSV names it in ${named.join(", ")}`;
     return null;
   };
+  await ask([from]);
   const first = why(from);
   if (!first) return null;
+  await ask(looked);
   const skipped = [{ version: from, reason: first }];
   for (const version of looked) {
     const reason = why(version);

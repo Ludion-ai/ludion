@@ -1,6 +1,6 @@
 # Delta v1: does the diff from the previous version tell malicious from genuine? (2026-10-30, lane LD)
 
-The owner asked for an algorithm instead of a fixed wait (2026-10-30 08:41–08:43 JST). Malicious code has to be in the diff from the previous version, and a security fix's diff is usually small. So lane LD measured on real data whether checking the diff itself works. This is the body of gate 2's inspection for obfuscated code and new network or process calls, which docs/status.md lists as not built. **It is an experiment: no product code, gate, or wait changed.**
+The owner asked for an algorithm instead of a fixed wait (2026-10-30 08:41–08:43 JST). Malicious code has to be in the diff from the previous version, and a security fix's diff is usually small. So lane LD measured on real data whether checking the diff itself works. This is a measurement toward gate 2's inspection for obfuscated code and new network or process calls, which docs/status.md lists as not built. It builds no part of that inspection. **It is an experiment: no product code, gate, or wait changed.**
 
 The definitions are in `docs/decisions/2026-10-30-ld-delta-v1-definitions.md`. They were committed and pushed before any tarball, file list or file was fetched, and are unchanged.
 
@@ -16,7 +16,8 @@ The definitions are in `docs/decisions/2026-10-30-ld-delta-v1-definitions.md`. T
 
 - **The first execution stopped** after about 1,200 of the 1,348 pairs. `/[A-Za-z0-9+/]{200,}/` overflowed V8's regex stack on a multi-megabyte run in one fetched file. The fix counts the same maximal runs by hand, so the definitions are unchanged. The fix also records an analyzer error on one pair as undecidable; none occurred in the result. The first execution wrote no result, so nothing from it is reported beyond its log.
 - **Setup.** Both executions ran in Docker (node:24-slim, Node v24.22.2) as user 1000, with a read-only root, a tmpfs /tmp, no credentials, no forwarded environment, and the repository mounted read-only.
-- **No package file reached the host.** Tarballs and files were held in memory. A named volume cached the fetchers' JSON answers: v5's ecosyste.ms, jsDelivr list and Software Heritage answers were copied in, and new ones were added.
+- **No package file reached the host.** Tarballs and files were held in memory. A named volume cached the fetchers' answers: v5's ecosyste.ms, jsDelivr list and Software Heritage answers were copied in, and new ones were added.
+- **One exception in the cache** (found in review). v5's Software Heritage answers include the raw `package.json` text of the versions Software Heritage held for v5 (`swhManifest`). So the copied cache did hold that one file of those versions, as inert text, inside the volume. This execution's own fetches cached no package file.
 - **Removed afterwards.** The container and the volumes were deleted at the end (lane report).
 - **What is committed.** `delta-v1.json` holds names, versions, sources, outcomes, capability names and numbers. It holds file paths only for genuine fixes, and no file content.
 - **Blob hashes.** The output records the git blob hashes of `delta-v1.ts`, `delta.ts`, `archives-v5.ts` and `judge.ts` (main's, unchanged); they equal the commit's.
@@ -28,7 +29,7 @@ The definitions are in `docs/decisions/2026-10-30-ld-delta-v1-definitions.md`. T
 | Outcome | Count |
 | --- | --- |
 | Flagged (new capability) | **9** |
-| Clean, **a miss** | **2** |
+| Clean, **a miss** | **2**, of which disputed (v5): 1 |
 | Undecidable | 0 |
 | Not obtained | **1,137** (V only 1,021; both 111; previous only 5) |
 
@@ -70,18 +71,27 @@ So 2 of 11 is not an estimate of the miss rate over the 1,148.
 | **@react-native-aria/switch 0.2.5** (MAL-2025-4789) | 0.2.4 | registry / registry | **missed** | none |
 | **@ensdomains/buffer 0.1.1** (MAL-2025-190866) | 0.1.0 | registry / Software Heritage | **missed** | none |
 
-**Why each miss passed** (from the analyzer's facts and, for the first, counts read inside the container; no code was read on the host or is quoted here):
+**Why each miss passed.** No code was read on the host or is quoted here.
 
 - **@react-native-aria/switch 0.2.5.** This is a real miss: the MAL record says the version connects to a command-and-control server and allows arbitrary command execution.
-  - **Where the code is.** One code file changed, `lib/commonjs/index.js`, which went from 283 to 4,545 bytes. The added code is one line of 4,302 characters, pushed right by a run of 836 spaces.
-  - **Why no rule fired:**
+  - **The analyzer's facts:**
+    - one code file changed, the CommonJS entry file;
+    - every capability count is zero in both versions of it;
+    - 2 lines added, 35 removed;
+    - 3 build-configuration files removed.
+  - **Further counts.** They go beyond the analyzer's facts, as recorded in `docs/decisions/2026-10-30-ld-delta-v1-miss-inspection.md`. They were measured after the result, inside a credential-free container, by `scripts/inspect-miss.ts`, which prints only numbers and module names:
+    - the file went from 283 to 4,545 bytes;
+    - the added code is one line of 4,302 characters, after a run of 836 spaces;
+    - that line's entropy is 5.20 bits per character;
+    - the file `require`s only the package's own module;
+    - it has 2 computed property lookups on `global`.
+  - **So no v1 rule could fire:**
     - 4,302 characters is under the very-long-line threshold of 5,000;
-    - the line's entropy is 5.20 bits per character, under 5.5;
-    - it has no hex or base64 run of 200 characters and no `_0x` names;
-    - it reaches what it uses through computed property lookups on `global`, so no literal `require`/`import` of a listed module, no `eval(`, `new Function(`, `fetch(`, `XMLHttpRequest` or `WebSocket` appears.
-  - **Every count is zero** in both versions of the file.
-  - The diff is small, as a fix's would be: 2 lines added, 35 removed, 3 files removed (`babel.config.js`, `scripts/bootstrap.js`, `tsconfig.build.json`).
-- **@ensdomains/buffer 0.1.1.** **No code file changed.** Besides `package.json`, two inert files changed or were added (a cache JSON and `package-lock.json`), and two build JSON files were removed. That is all 21,955 lines added and 14,572 removed. This is v5's disputed version: its code equals 0.1.0's, and the compromise named by the record's other sources is in 0.1.2 (v5 README, "The disputed category"). A diff check cannot catch it, because there is nothing new in it.
+    - 5.20 is under the entropy threshold of 5.5;
+    - no listed module, API or code-from-string name appears literally.
+- **@ensdomains/buffer 0.1.1.** **No code file changed.** In the analyzer's facts:
+- 1 file added, 2 removed and 2 changed (`package.json` among them), none of them code;
+- that is all 21,955 lines added and 14,572 removed. This is v5's disputed version: its code equals 0.1.0's, and the compromise named by the record's other sources is in 0.1.2 (v5 README, "The disputed category"). A diff check cannot catch it, because there is nothing new in it.
 
 ### Genuine fixes (200): 192 obtained, 51 false alarms
 
@@ -164,7 +174,7 @@ Median / maximum over the judged pairs:
 
 ## What this shows, and what it does not
 
-- **v1's rules on the 11 obtained malicious versions.** 9 are caught. One real miss (@react-native-aria/switch 0.2.5) adds its code in a way every v1 rule is blind to: one long line under the thresholds, behind whitespace, through computed names. The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
+- **v1's rules on the 11 obtained malicious versions.** 9 are caught. One real miss (@react-native-aria/switch 0.2.5) adds its code in a way every v1 rule is blind to: one long line under the thresholds, behind whitespace, through computed names (decision entry above). The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
 - **On the genuine fixes, v1 raises a false alarm on 26.56%.** Most of them are bundled builds whose hashed file names make all their code look new.
 - **The data is the larger limit.** Only 11 of the 1,148 malicious versions could be fetched: the registry, and almost always jsDelivr, no longer serve removed versions, and Software Heritage rarely holds them and answers 120 requests an hour. Any rule tuned on these results would be tuned on 11 versions, 8 of them the registry's own leftovers. So whether diff checking can replace the wait is not decided here.
 - **What a v2 would look at.** Each item is an idea for a new definitions entry and a new run, never a change to this one:
@@ -174,10 +184,27 @@ Median / maximum over the judged pairs:
   - computed access to `global`/`process`;
   - more malicious tarballs from a source that holds them.
 
+## What the runner does that the definitions do not say (found in review; no row affected)
+
+The runner is kept as it ran, so its blob hash matches the execution. These differences are recorded here instead of fixed.
+
+- **An unreadable tarball.** Definitions section 4 calls a pair undecidable when a tarball cannot be read. Instead, the runner moves on to the next source and, if none serves the version, reports "not obtained". No row has a "tarball unreadable" reason, so nothing is counted differently.
+- **A failed second fetch.** A pair whose versions were both held but whose second fetch failed would be marked "held, but a second fetch failed" and left out of `not_obtained_reasons`. There is no such row.
+- **A substitute publish time.** When the registry gives no publish time for a malicious version's previous version, the Software Heritage lookup uses V's publish time instead. This can only make "not in the first snapshots after publication" more likely, never a hold.
+- **Unhashed Software Heritage entries.** A directory entry that is neither a file nor a directory is stored as `link:<path>`, with no hash check. Software Heritage stores a symlink's target as plain content, where `untar` stores `link:<target>`. In a pair with sources of both kinds, this could count a link as changed. Of the three such pairs, @ensdomains/buffer has no changed code file and the other two are flagged by other files.
+- **Untested trust checks.** The runner's own checks are not unit-tested:
+  - sha512 / shasum against the registry tarball;
+  - each jsDelivr file's sha256 against the list;
+  - each Software Heritage file's sha256 against the directory;
+  - an analyzer error recorded as undecidable.
+
+  The analyzer's checks are tested in `tools/backtest/test/delta.test.ts`.
+- **"2 missed" in the first results commit.** That commit's subject (6d9960a) counts the disputed @ensdomains/buffer 0.1.1 among the misses. The table above shows it apart.
+
 ## Files
 
 - `delta-v1.json`: summary and one row per pair.
   - Each row has its sources and what each source answered, its outcome, its new capabilities and sizes, and what its changed code files contain by capability (names only).
   - For genuine fixes only, the paths where each capability is new.
 - `delta-v1.log`, `run-times.txt`: the execution's log and times. `attempt1.log`: the first, failed execution.
-- `scripts/run.sh`, `scripts/copycache.sh`: what ran in the container.
+- `scripts/run.sh`, `scripts/copycache.sh`: what ran in the container. `scripts/inspect-miss.ts`: the after-the-result measurement of one miss (see above).

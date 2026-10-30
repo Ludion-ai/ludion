@@ -44,9 +44,9 @@ jobs:
           # full, "reviewed-sha: <40 lowercase hex>". A review's first line states its verdict; it approves when that
           # line has the word APPROVE and not REQUEST, and the comment has exactly one such line. A comment with two or
           # more (one quoting another review, say) approves nothing and undoes an earlier approval of each head it
-          # names (docs/protected-paths.md).
+          # names (docs/protected-paths.md). CRLF line ends are read as LF, so a review written with them still counts.
           REVIEWS: |
-            .[] | (.body | split("\n")) as $lines
+            .[] | (.body | gsub("\r\n"; "\n") | split("\n")) as $lines
             | [$lines[] | capture("^reviewed-sha: (?<sha>[0-9a-f]{40})$").sha] as $shas
             | (if ($shas | length) == 1 and ($lines[0] | test("\\bAPPROVE\\b") and (test("REQUEST") | not)) then "approve" else "other" end) as $verdict
             | $shas[] | "\($verdict) \(.)"

@@ -43,7 +43,7 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - id: ludion
-        uses: Ludion-ai/ludion-trial@6055465fb8fc8bb58fbb15b73e6ba7f3da26335f # ludion-action: 859d40f's bundles and mode check
+        uses: Ludion-ai/ludion-trial@6162b79e1989720e45f393195fc079deaa635305 # ludion-action: 859d40f's bundles and mode check (review fixes)
         with:
           mode: check
           dir: php-c
@@ -65,7 +65,7 @@ jobs:
           # No npm cache: it would be restored in the job that writes and saved by the job that runs candidate code.
           package-manager-cache: false
       - id: ludion
-        uses: Ludion-ai/ludion-trial@6055465fb8fc8bb58fbb15b73e6ba7f3da26335f # ludion-action: 859d40f's bundles and mode check
+        uses: Ludion-ai/ludion-trial@6162b79e1989720e45f393195fc079deaa635305 # ludion-action: 859d40f's bundles and mode check (review fixes)
         with:
           mode: patch
           dir: php-c
@@ -89,7 +89,7 @@ jobs:
           node-version: 24
           # No npm cache: it would be restored in the job that writes and saved by the job that runs candidate code.
           package-manager-cache: false
-      - uses: Ludion-ai/ludion-trial@6055465fb8fc8bb58fbb15b73e6ba7f3da26335f # ludion-action: 859d40f's bundles and mode check
+      - uses: Ludion-ai/ludion-trial@6162b79e1989720e45f393195fc079deaa635305 # ludion-action: 859d40f's bundles and mode check (review fixes)
         with:
           mode: pull-request
           dir: php-c

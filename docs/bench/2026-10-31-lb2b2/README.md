@@ -4,7 +4,8 @@ Definitions: docs/decisions/2026-10-31-lb2b2-trial-definitions.md. Summary: docs
 
 Everything under logs/ was saved by the host's `gh api` (no token in any container): runs, jobs and timing JSON per run, each job's log (escape codes stripped), PR JSON, each PR head's check runs, statuses, check suites and GraphQL rollup, and the Actions settings (read only). The scripts read those files in Docker (ghcr.io/jqlang/jq:1.7.1).
 
-- trial-files/: what ran in ludion-trial: the workflows on main at 0a425b5, and the diff of `ludion-action` 5f740a5..6055465 (the prototype mode check).
+- trial-files/: what runs in ludion-trial: the workflows on main at c33dc85 (identical blobs, checked), and the diffs of `ludion-action` 5f740a5..6055465 (the prototype mode check as first run) and 5f740a5..6162b79 (after the review fixes N1–N3).
+- tests/: the harness for action/check.sh (stubbed `node` and `gh`, run in alpine:3.20 with bash, jq and tar) and the four scan answers it feeds (from `ludion scan --json` on examples/php-security and examples/npm-security at 47a21a9, and on copies moved to PHP 8.4.27 and lodash 4.18.1), in Docker. Its 12 cases gave the expected answers on 6162b79's check.sh.
 - scripts/minutes.jq: billed minutes per run (definitions item 4). Output for the dispatched runs: minutes-dispatched.json.
 - scripts/hourly.jq: hourly slots per workflow (definitions item 1).
 
@@ -26,10 +27,15 @@ Everything under logs/ was saved by the host's `gh api` (no token in any contain
 | 41113821081 | ludion-ci-d | workflow_dispatch | 19:15:58Z | check 16, patch 21, pull-request 13 | 3 |
 | 41113953218 | ci (PR #6's branch) | workflow_dispatch | 19:16:56Z | test 13, report 5 | 2 |
 | 41113954193 | ci (PR #6) | pull_request | 19:16:57Z | none (`action_required`) | 0 |
+| 41120492328 | ludion-php (after the fixes) | workflow_dispatch | 20:05:19Z | check 19 | 1 |
+| 41120497103 | ludion-npm (after the fixes) | workflow_dispatch | 20:05:21Z | check 24 | 1 |
+| 41120501469 | ludion-ci-a (after the fixes) | workflow_dispatch | 20:05:23Z | check 20 | 1 |
 
-Total 19 billed minutes (created 2026-10-30 UTC). The timing API's `billable.UBUNTU.total_ms` was 0 for every run. With LB2b's 4 minutes (14:57Z), the trial used 23 minutes on 2026-10-30 UTC.
+Total 22 billed minutes (created 2026-10-30 UTC; minutes-dispatched.json). The timing API's `billable.UBUNTU.total_ms` was 0 for every run with jobs; the 4 `action_required` runs answered `"billable":{}`. With LB2b's 4 minutes (14:57Z), the trial used 26 minutes on 2026-10-30 UTC. The log of job 124285652641 (run 41120492328) was refused twice (HTTP 503, "Egress is over the account limit", 20:08Z and 20:09Z) and saved at 20:40Z.
 
-An early exit is 1 billed minute (one job of 10–20 s). Two workflows hourly with nothing to do: 2 × 24 × 30 = 1,440 minutes in a 30-day month, more than the 1,000 that the stop rule allows (half of an assumed 2,000); one workflow, 720.
+No run with `event` = `schedule` exists up to 20:40:09Z (logs/schedule-runs-2026-10-30T2040Z.json; slots: hourly-2026-10-30T2040Z.json).
+
+An early exit is 1 billed minute (one job of 10–24 s), for php and npm. Two workflows hourly with nothing to do: 2 × 24 × 30 = 1,440 minutes in a 30-day month, more than the 1,000 that the stop rule allows (half of an assumed 2,000); one workflow, 720.
 
 ## PRs
 

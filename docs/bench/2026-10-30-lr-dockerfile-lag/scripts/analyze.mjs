@@ -227,7 +227,7 @@ for (const [k, s] of Object.entries(summary)) {
 md.push("", `digest pinned: ${digest.all} of ${out.length} (php ${digest.php}, node ${digest.node})`);
 md.push(`repositories with an untagged PHP release newer than the pinned one: ${untaggedRepos}`, "");
 md.push("| stratum | outcome | repositories |", "|---|---|---|");
-for (const [k, n] of Object.entries(outcomes).sort()) md.push(`| ${k.replace("\t", " | ")} | ${n} |`);
+for (const [k, n] of Object.entries(outcomes).sort()) md.push(`| ${k.replaceAll("\t", " | ")} | ${n} |`);
 md.push("");
 for (const r of out.filter((x) => !x.countable)) md.push(`not countable: ${r.repo} ${r.from} — ${r.reason}`);
 md.push("", "LR2 items (yes / no / could not be counted):", "", "| item | all | php | node |", "|---|---|---|---|");

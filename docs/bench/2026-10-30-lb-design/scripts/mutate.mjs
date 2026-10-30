@@ -1,8 +1,11 @@
 // Each mutation undoes one check of the scheduled workflow's two jobs. The named test file must fail with it, and pass
-// without it. Usage (in /w, after npm ci): node /scripts/mutate.mjs
-import { execFileSync } from "node:child_process";
+// without it. A test run that does not end within LIMIT is stopped (its whole process group) and reported apart: the
+// ReDoS mutation makes vitest spin without end (review 6516135819, N7). Usage (in /w, after npm ci): node /scripts/mutate.mjs
+import { spawn } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 const D = "packages/cli/src/security/deliver.ts", T = "packages/cli/test/deliver.test.ts", A = "packages/cli/test/action-patch.test.ts";
+const B = "packages/cli/src/security/branch.ts", BT = "packages/cli/test/branch.test.ts";
+const LIMIT = 300_000;
 /** `text` starts with "if (": its whole condition, up to the matching ")", becomes false. */
 const off = (name, text) => {
   let depth = 0, end = -1;
@@ -36,7 +39,7 @@ const mutations = [
   off("composer.lock: a new package nothing requires accepted", "if (stray.length) return"),
   ["composer: the backtracking name pattern (CodeQL js/redos) back", D, "/^[a-z0-9][a-z0-9_.-]*\\/[a-z0-9][a-z0-9_.-]*$/", "/^[a-z0-9]([_.-]?[a-z0-9]+)*\\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/", T],
   off("composer and Maven: a downgrade accepted", "if (!from || !to || !semver.gt(to, from)) return"),
-  off("composer: a from the base does not lock accepted", "if (!fix.changes.some(c => c.from.replace(/^v(?=\d)/, \"\") === String(earlier.version ?? \"\").replace(/^v(?=\d)/, \"\"))) return"),
+  off("composer: a from the base does not lock accepted", "if (!fix.changes.some(c => c.from.replace(/^v(?=\\d)/, \"\") === String(earlier.version ?? \"\").replace(/^v(?=\\d)/, \"\"))) return"),
   off("npm: another package moving accepted", "if (gone.length) return"),
   ["npm: the entry's own name trusted", D, "const name = path.slice(path.lastIndexOf(\"node_modules/\") + \"node_modules/\".length);", "const name = typeof entry.name === \"string\" ? entry.name : path.slice(path.lastIndexOf(\"node_modules/\") + \"node_modules/\".length);", T],
   ["composer and Maven: OSV not asked", D, "if (checked.ecosystem === \"composer\" || checked.ecosystem === \"maven\") {", "if (false) {", T],
@@ -61,23 +64,46 @@ const mutations = [
   off("a fix whose tests failed accepted", "if (r.baseline_passed !== true || f.candidate_passed !== true) refuse("),
   ["another base_commit accepted", D, "a fix whose tests did not pass.\");\n    if (text(r.base_commit, SHA, \"base_commit\") !== base)", "a fix whose tests did not pass.\");\n    if (false)", T],
   off("an oversized bundle accepted", "if (size(bundleFile) > BUNDLE_LIMIT) refuse("),
-  ["any advisory text accepted", D, "const ADVISORY = /^[A-Za-z][A-Za-z0-9]{1,15}-[A-Za-z0-9._:-]{1,100}$/;", "const ADVISORY = /^.+$/;", T],
+  ["any advisory text accepted", D, "export const ADVISORY = /^(?:GHSA", "export const ADVISORY = /^.+$|^(?:GHSA", T],
+  ["advisories of any prefix accepted (GH-1)", D, "export const ADVISORY = /^(?:GHSA", "export const ADVISORY = /^[A-Za-z][A-Za-z0-9]{1,15}-[A-Za-z0-9._:-]{1,100}$|^(?:GHSA", T],
+  ["the parents read from the raw headers, not from Git", D, "const [, ...parents] = git(top, [\"rev-list\", \"--parents\", \"-n\", \"1\", commit]).stdout.trim().split(\" \");", "const parents = headers.filter(h => h.startsWith(\"parent \")).map(h => h.slice(7));", T],
+  off("headers out of Git's order accepted", "if (!c.inOrder) refuse("),
+  ["git fsck not run", D, "try { git(top, [\"fsck\", \"--no-dangling\", \"--no-reflogs\", \"--no-progress\", fix.commit]); }", "try { }", T],
+  off("a changed file of any size accepted", "if (bytes(fix.commit) > limit) refuse("),
+  off("npm: a from the base's lock does not have accepted", "if (!was.get(fix.package)?.has(change.from)) return"),
+  off("npm: a lock without the fix's version accepted", "if (!is.get(fix.package)?.has(change.to)) return"),
+  off("npm: a lock that still has the moved version accepted", "if (!tos.has(change.from) && is.get(fix.package)?.has(change.from)) return"),
+  ["a closed PR's fix not warned about", D, ".filter(d => d.outcome === \"closed_pr_exists\").map(", ".filter(d => false).map(", T],
+  ["deliver open does not print the warnings", D, "  for (const line of closedWarnings(deliveries)) console.error(line);\n", "", T],
+  ["branch names: cleaned names merged again (no hash)", B, "plainName ? readable : `${readable}-${id}`", "readable", BT],
   off("a bundle without an applied fix accepted", "if (hasBundle) refuse("),
   off("pack: a branch not at the receipt's commit packed", "if (tip !== commit) throw"),
+  ["scheduled modes: a self-hosted runner accepted", "action/start.sh", "if [ \"${RUNNER_ENVIRONMENT:-}\" != \"github-hosted\" ]; then", "if false; then", A],
+  ["template: setup-node's cache in the validation job", "action/patch-workflow.yml", "          package-manager-cache: false\n      - id: ludion\n", "      - id: ludion\n", A],
+  ["template: setup-node's cache in the PR job", "action/patch-workflow.yml", "          package-manager-cache: false\n      - uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet\n        with:\n          mode: pull-request", "      - uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet\n        with:\n          mode: pull-request", A],
   ["patch mode: an OIDC token allowed", "action/start.sh", "if [ -n \"${ACTIONS_ID_TOKEN_REQUEST_URL:-}\" ]; then", "if false; then", A],
   ["template: the validation job may write", "action/patch-workflow.yml", "      contents: read\n", "      contents: write\n", A],
   ["action: the checkout keeps the credential", "action.yml", "persist-credentials: false\n        fetch-depth: 1", "persist-credentials: true\n        fetch-depth: 1", A],
   ["action: the validation step gets the token", "action.yml", "        OUT: ${{ runner.temp }}/ludion/fixes\n      run: bash", "        OUT: ${{ runner.temp }}/ludion/fixes\n        GH_TOKEN: ${{ github.token }}\n      run: bash", A],
 ];
-const vitest = file => { try { execFileSync("npx", ["vitest", "run", "--project", "node", file], { stdio: "pipe", env: { ...process.env, NO_COLOR: "1" } }); return "pass"; } catch { return "fail"; } };
-let caught = 0;
-for (const [name, file, from, to, test] of mutations) {
+/** "pass", "fail", or "timeout" when the run does not end within LIMIT; then its whole process group is killed. */
+const vitest = file => new Promise(resolve => {
+  const child = spawn("npx", ["vitest", "run", "--project", "node", file], { stdio: "ignore", detached: true, env: { ...process.env, NO_COLOR: "1" } });
+  const timer = setTimeout(() => { try { process.kill(-child.pid, "SIGKILL"); } catch {} resolve("timeout"); }, LIMIT);
+  child.on("exit", code => { clearTimeout(timer); resolve(code === 0 ? "pass" : "fail"); });
+});
+let caught = 0, timedOut = 0;
+for (const [i, [name, file, from, to, test]] of mutations.entries()) {
   const original = readFileSync(file, "utf8");
-  if (original.split(from).length !== 2) { console.log(`NOT APPLIED  ${name} (the text is not found exactly once)`); continue; }
+  if (original.split(from).length !== 2) { console.log(`${i + 1}. NOT APPLIED  ${name} (the text is not found exactly once)`); continue; }
   writeFileSync(file, original.replace(from, to));
-  const result = vitest(test);
+  const started = Date.now(), result = await vitest(test);
   writeFileSync(file, original);
-  if (result === "fail") caught++;
-  console.log(`${result === "fail" ? "caught      " : "NOT CAUGHT  "} ${name} — ${test}`);
+  if (result !== "pass") caught++;
+  if (result === "timeout") timedOut++;
+  const label = { fail: "caught", timeout: `caught: no end within ${LIMIT / 1000} s`, pass: "NOT CAUGHT" }[result];
+  console.log(`${i + 1}. ${label}  ${name} — ${test} (${Math.round((Date.now() - started) / 1000)} s)`);
 }
-console.log(`${caught} of ${mutations.length} caught; without mutations: ${[...new Set(mutations.map(m => m[4]))].map(t => `${t} ${vitest(t)}`).join(", ")}`);
+const clean = [];
+for (const t of new Set(mutations.map(m => m[4]))) clean.push(`${t} ${await vitest(t)}`);
+console.log(`${caught} of ${mutations.length} caught, ${timedOut} of them by the time limit; without mutations: ${clean.join(", ")}`);

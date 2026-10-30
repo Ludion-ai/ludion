@@ -8,7 +8,7 @@ import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenG
 import { comparableVersion, OsvClient, type DependencyScan, type Finding } from "./osv.ts";
 import { hash } from "./php.ts";
 import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.ts";
-import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
+import { branchTip, fixBranch, fixBranchName, gitBase, skippedReason } from "./branch.ts";
 import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
 import { releaseIdentity, type Judgement } from "./judge.ts";
@@ -353,7 +353,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     // commit whose files are the ones validated.
     const base = apply ? gitBase(root, source, NOT_TESTED) : null;
     receipt.base_commit = base?.commit ?? null;
-    const branches = receipt.fixes.map(fix => base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), ecosystem, `${fix.package}-${[...new Set(fix.changes.map(c => c.to))].join("-")}`));
+    const branches = receipt.fixes.map(fix => base && fixBranchName(base.prefix, ecosystem, fix.package, fix.changes.map(c => c.to)));
     const subject = (fix: FixReceipt) => `ludion: ${fix.package} ${fix.changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${ecosystem})`;
     for (const [index, fix] of receipt.fixes.entries()) {
       if (fix.reason) continue;

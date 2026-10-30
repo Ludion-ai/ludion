@@ -6,9 +6,9 @@ import { createHash } from "node:crypto";
 import { chmodSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
-import { fixBranch, gitBase } from "../src/security/branch.ts";
-import { BUNDLE_LIMIT, checkArtifact, contentProblem, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
+import { describe, expect, it, vi } from "vitest";
+import { fixBranch, fixBranchName, gitBase } from "../src/security/branch.ts";
+import { ADVISORY, BUNDLE_LIMIT, checkArtifact, closedWarnings, contentProblem, deliverCli, FILE_LIMIT, fileLimit, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
 import { changedManifest } from "../src/security/inventory.ts";
 import type { Judgement } from "../src/security/judge.ts";
 import { snapshot } from "../src/security/project.ts";
@@ -98,6 +98,20 @@ function forge(work: string, branch: string, parent: string, files: Record<strin
   return made;
 }
 
+/**
+ * A commit written byte for byte (git hash-object --literally), to forge what commit-tree would not write: its tree is
+ * that of a correct fix commit on `parent`, and its header lines are `headers` (with T for the tree).
+ */
+function raw(work: string, branch: string, parent: string, headers: string[]): string {
+  const tree = git(work, "rev-parse", `${forge(work, "ludion/scratch", parent, { "package-lock.json": FIXED })}^{tree}`);
+  const text = `${headers.map(h => h.replace(/^tree T$/, `tree ${tree}`)).join("\n")}\n\n${message(parent)}`;
+  const r = spawnSync("git", ["hash-object", "-t", "commit", "-w", "--literally", "--stdin"], { cwd: work, input: text, encoding: "utf8" });
+  if (r.status !== 0) throw new Error(r.stderr);
+  git(work, "update-ref", `refs/heads/${branch}`, r.stdout.trim());
+  return r.stdout.trim();
+}
+const WHO = "Ludion <ludion@ludion.invalid> 1793000000 +0000";
+
 /** A stand-in for GitHub's API: the repository, PRs by head branch, branches and commits read from the origin, new PRs. */
 function github(origin: string, pulls: { number: number; state: string; head: { ref: string } }[] = [], options: { refuse?: boolean } = {}) {
   const calls: string[] = [], opened: Record<string, unknown>[] = [];
@@ -183,6 +197,11 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     expect((await open(checkout(origin), out, base, origin, closed)).deliveries).toEqual([{ package: "lodash", branch: BRANCH, outcome: "closed_pr_exists", pr: 7, reason: "A PR from this branch was closed; it is not opened again." }]);
     expect(closed.opened).toHaveLength(0);
     expect(branchAt(origin, BRANCH)).toBe("");
+    // The fix is still not on the default branch (this run applied it again), so each run warns, and the run stays green.
+    expect(closedWarnings([{ package: "lodash", branch: BRANCH, outcome: "closed_pr_exists", pr: 7 }, { package: "x", branch: "ludion/npm/x-1.0.1", outcome: "open_pr_exists", pr: 8 }])).toEqual([
+      `::warning::Ludion: the fix of lodash (branch ${BRANCH}) is still not on the default branch, and its PR #7 was closed, so Ludion does not open it again. Reopen #7 or apply the fix yourself.`,
+    ]);
+    expect(closedWarnings([{ package: "a%0Ab", branch: "ludion/npm/a-1", outcome: "closed_pr_exists", pr: 1 }])[0]).toContain("a%250Ab");
     // The branch exists on GitHub at another commit (here the base itself): it is left alone, no PR, and the fix fails.
     git(work, "push", "-q", origin, `${base}:refs/heads/${BRANCH}`);
     const gh = github(origin), result = await open(checkout(origin), out, base, origin, gh);
@@ -197,6 +216,19 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     expect(sameBase.deliveries[0]).toMatchObject({ outcome: "branch_differs" });
     expect(branchAt(origin, BRANCH)).toBe(other);
     expect(gh2.opened).toHaveLength(0);
+  });
+  it("deliver open warns, on stderr as a workflow command, about a closed PR's fix, and the run stays green", async () => {
+    const { work, origin, base } = project(), fix = applied(work);
+    const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base), dir = checkout(origin);
+    const gh = github(origin, [{ number: 7, state: "closed", head: { ref: BRANCH } }]);
+    vi.stubGlobal("fetch", gh.fetchFn);
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {}), logs = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      const code = await deliverCli(["open", "--dir", dir, "--artifact", out, "--base", base, "--repo", "o/r", "--ref", "refs/heads/main", "--api", "https://api.github.invalid", "--remote", origin], { GH_TOKEN: "t0ken" });
+      expect(code).toBe(0);
+      expect(errors.mock.calls.map(c => c[0])).toEqual([expect.stringMatching(/^::warning::Ludion: the fix of lodash \(branch ludion\/npm\/lodash-4\.17\.21\) is still not on the default branch, and its PR #7 was closed/)]);
+      expect(logs.mock.calls.flat().join("\n")).not.toContain("::warning::");
+    } finally { vi.unstubAllGlobals(); errors.mockRestore(); logs.mockRestore(); }
   });
   it("after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed", async () => {
     const { work, origin, base } = project(), fix = applied(work);
@@ -297,6 +329,39 @@ describe("the PR job refuses an artifact the validation job would not write", { 
     const made = forge(p.work, BRANCH, middle, { "package-lock.json": FIXED }, { base: p.base });
     return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
   }, "does not have the base"));
+  it("a parent header after author, which Git does not read as a parent (review 6516135819, N1)", () => refused(p => {
+    const made = raw(p.work, BRANCH, p.base, ["tree T", `author ${WHO}`, `parent ${p.base}`, `committer ${WHO}`]);
+    expect(git(p.work, "rev-list", "--parents", "-n", "1", made)).toBe(made);
+    return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
+  }, /does not have the base [0-9a-f]{12} as its only parent|needs commits other than the base/));
+  it("headers out of Git's order or beyond it, even with the base as Git's parent", async () => {
+    for (const headers of [
+      (base: string) => ["tree T", `parent ${base}`, `author ${WHO}`, `parent ${base}`, `committer ${WHO}`],
+      (base: string) => ["tree T", `parent ${base}`, `author ${WHO}`, `committer ${WHO}`, "encoding UTF-8"],
+      (base: string) => ["tree T", `parent ${base}`, `committer ${WHO}`, `author ${WHO}`],
+    ]) {
+      await refused(p => {
+        const made = raw(p.work, BRANCH, p.base, headers(p.base));
+        expect(git(p.work, "rev-list", "--parents", "-n", "1", made)).toBe(`${made} ${p.base}`);
+        return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
+      }, "headers are not exactly tree, parent, author and committer, in that order");
+    }
+  });
+  it("a commit git fsck finds an error in (a zero-padded date), with every other check passing", () => refused(p => {
+    const padded = WHO.replace(" 1793000000 ", " 01793000000 ");
+    const made = raw(p.work, BRANCH, p.base, ["tree T", `parent ${p.base}`, `author ${padded}`, `committer ${padded}`]);
+    return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
+  }, /does not pass git fsck \(.*zeroPaddedDate/));
+  it("a lockfile padded past its limit (review 6516135819, N4)", () => refused(p => {
+    const padded = FIXED + " ".repeat(fileLimit(LOCK.length) - FIXED.length + 1);
+    const made = forge(p.work, BRANCH, p.base, { "package-lock.json": padded });
+    return { receipt: receiptFor(p.base, made, padded), refs: [`refs/heads/${BRANCH}`] };
+  }, `'s package-lock.json is larger than ${fileLimit(LOCK.length)} bytes`));
+  it("a lockfile that does not move the receipt's package and adds another one (review 6516135819, N2)", () => refused(p => {
+    const lock = LOCK.replace(`"node_modules/lodash": { "version": "4.17.20" }`, `"node_modules/lodash": { "version": "4.17.20" }, "node_modules/lodash/node_modules/evil-copy": { "version": "9.9.9" }`);
+    const made = forge(p.work, BRANCH, p.base, { "package-lock.json": lock });
+    return { receipt: receiptFor(p.base, made, lock), refs: [`refs/heads/${BRANCH}`] };
+  }, "package-lock.json does not have lodash at 4.17.21, the fix's version"));
   it("a file outside the plan, beside the planned ones", () => refused(p => {
     const made = forge(p.work, BRANCH, p.base, { "package-lock.json": FIXED, "README.md": "changed\n" });
     return { receipt: receiptFor(p.base, made), refs: [`refs/heads/${BRANCH}`] };
@@ -390,6 +455,12 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       receipt.fixes[0]!.changes[0]!.advisories = ["GHSA-x`<img src=x>`"];
       return { receipt, refs: [`refs/heads/${BRANCH}`] };
     }, "An advisory is missing or not in the expected form");
+    // "Fixes GH-1." in the pushed commit would link issue #1 (review 6516135819, N3).
+    await refused(p => {
+      const fix = applied(p.work), receipt = fix.receipt as { fixes: { changes: { advisories: string[] }[] }[] };
+      receipt.fixes[0]!.changes[0]!.advisories = ["GH-1"];
+      return { receipt, refs: [`refs/heads/${BRANCH}`] };
+    }, "An advisory is missing or not in the expected form");
     await refused(p => ({ receipt: applied(p.work).receipt, refs: [`refs/heads/${BRANCH}`], tamper: out => writeFileSync(join(out, "receipt.json"), "{not json") }), "receipt.json is not JSON");
     await refused(p => ({ receipt: applied(p.work).receipt, refs: [`refs/heads/${BRANCH}`], tamper: out => writeFileSync(join(out, "fixes.bundle"), Buffer.alloc(BUNDLE_LIMIT + 1)) }), "fixes.bundle is larger than");
   });
@@ -443,7 +514,7 @@ describe("the PR job checks what a fix pins against the official registry", { ti
     const change = { name: "symfony/http-foundation", from: "5.4.0", to: "5.4.54", advisories: ["GHSA-x7x7-x7x7-x7x7"] };
     const planned = composerEntry("symfony/http-foundation", "v5.4.54", c, { require: { "symfony/polyfill-php83": "^1.27" } }), added = composerEntry("symfony/polyfill-php83", "v1.31.0", c);
     const json = changedManifest(manifestDir, "composer", [change]), fixedLock = lock([composerEntry("symfony/deprecation-contracts", "v2.5.0", a), planned, added]);
-    const branch = "ludion/composer/symfony-http-foundation-5.4.54", subject = "ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)";
+    const branch = fixBranchName("", "composer", "symfony/http-foundation", ["5.4.54"]), subject = "ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)";
     const made = fixBranch(r.gitBase, branch, [{ path: "composer.json", content: json }, { path: "composer.lock", content: fixedLock }], `${subject}\n\nFixes GHSA-x7x7-x7x7-x7x7.\n\nLudion receipt ${ID}: the project's test passed on ${r.base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`);
     const receipt = {
       schema: 2, id: ID, ecosystem: "composer", scope: "dependency_files_only_not_deployed", outcome: "applied", baseline_passed: true, base_commit: r.base,
@@ -557,6 +628,30 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.8" } }) }))).toContain("moves minimist from 1.2.6, which this fix does not plan");
     // The entry's own name is not trusted: minimist filed under "lodash" still counts as minimist.
     expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { name: "lodash", version: "1.2.8" } }) }))).toContain("moves minimist from 1.2.6");
+    // An alias in the base named for the fix's package: its move is still another package's (review 6516135819, N7).
+    const aliased = files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, "node_modules/m-alias": { name: "lodash", version: "1.0.0" } }) });
+    expect(contentProblem("npm", fix, aliased, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/m-alias": { name: "lodash", version: "2.0.0" } }) }))).toContain("moves m-alias from 1.0.0, which this fix does not plan");
+    // The lock is tied to the receipt's change, by install path (review 6516135819, N2): the base has the package at
+    // `from`, and the fix has it at `to` and nowhere at `from`; an entry's own name does not count.
+    // A transitive fix (package.json does not change), as the review forged it: minimist 1.2.5 -> 1.2.6.
+    const transitive = fixOf("minimist", "1.2.5", "1.2.6", ["package.json", "package-lock.json"]);
+    const lockOf = (packages: Record<string, unknown>) => files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, ...packages }) });
+    const vulnerable = lockOf({ "node_modules/minimist": { version: "1.2.5" } });
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/new-dep": { version: "1.0.0" } }))).toBeNull();
+    expect(contentProblem("npm", transitive, npmBase, lockOf({ "node_modules/minimist": { version: "1.2.6" } }))).toContain("the base's package-lock.json does not have minimist at that version");
+    expect(contentProblem("npm", transitive, lockOf({}), lockOf({ "node_modules/lodash/node_modules/evil-copy": { version: "9.9.9" } }))).toContain("the base's package-lock.json does not have minimist");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.5" }, "node_modules/lodash/node_modules/evil-copy": { version: "9.9.9" } }))).toContain("does not have minimist at 1.2.6, the fix's version");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.5" }, "node_modules/x": { name: "minimist", version: "1.2.6" } }))).toContain("does not have minimist at 1.2.6");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/lodash/node_modules/minimist": { version: "1.2.5" } }))).toContain("still has minimist at 1.2.5, which the fix moves");
+  });
+  it("advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own)", () => {
+    for (const id of ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337", "CVE-2024-1234567", "MAL-2024-12345", "PKSA-n8pg-4n3p-wcn3"]) expect(ADVISORY.test(id), id).toBe(true);
+    for (const id of ["GH-1", "GHSA-35jh-r3h4-6jh1", "GHSA-35jh-r3h4", "CVE-21-1", "MAL-x", "PYSEC-2021-1", "OSV-2020-1", "PKSA-", "PKSA-a-", "ghsa-35jh-r3h4-6jhm", "GHSA-35jh-r3h4-6jhm\n"]) expect(ADVISORY.test(id), id).toBe(false);
+  });
+  it("a changed file's size limit: twice the base's file and 1 MiB, at most 50 MiB", () => {
+    expect(fileLimit(0)).toBe(1024 * 1024);
+    expect(fileLimit(10 * 1024 * 1024)).toBe(21 * 1024 * 1024);
+    expect(fileLimit(40 * 1024 * 1024)).toBe(FILE_LIMIT);
   });
   it("Maven: pom.xml is exactly what changedManifest makes for the change", () => {
     const pom = readFileSync(new URL("../../../examples/maven-security/pom.xml", import.meta.url), "utf8");

@@ -1,25 +1,27 @@
 ---
 import BrandMark from "./BrandMark.astro";
-import { en } from "../strings/en.ts";
-const iso = en.home.isolate;
+import { localPath, strings, type Lang } from "../strings/index.ts";
+const { lang = "en" } = Astro.props as { lang?: Lang };
+const t = strings[lang];
+const iso = t.home.isolate;
 // Stage labels for the existing delivery animation. This page runs nothing.
 const s = {
   label: iso.bar,
   choose: iso.stagesLabel,
-  context: "security update",
-  reference: "security patch",
-  inline: "tested update",
+  context: iso.context,
+  reference: iso.reference,
+  inline: iso.inline,
   illustration: iso.scope,
-  replay: "Replay",
+  replay: iso.replay,
   scope: iso.scope,
   limits: iso.limits,
   unavailable: iso.unavailable,
-  setup: en.nav.start,
+  setup: t.nav.start,
 };
 const routes = [
-  { id: "install", name: iso.install, file: "dependency files", note: iso.installDetail },
-  { id: "run", name: iso.run, file: "application test", note: iso.runDetail },
-  { id: "apply", name: iso.apply, file: "fix branch", note: iso.applyDetail },
+  { id: "install", name: iso.install, file: iso.installFile, note: iso.installDetail },
+  { id: "run", name: iso.run, file: iso.runFile, note: iso.runDetail },
+  { id: "apply", name: iso.apply, file: iso.applyFile, note: iso.applyDetail },
 ];
 ---
 <div class="delivery" data-delivery data-reference={s.reference} data-inline={s.inline}>
@@ -46,7 +48,7 @@ const routes = [
   </div>
   <p class="limits">{s.limits}</p>
   <p class="unavailable">{s.unavailable}</p>
-  <p class="command"><a href="/start/">{s.setup}<span aria-hidden="true"> ↗</span></a></p>
+  <p class="command"><a href={localPath(lang, "/start/")}>{s.setup}<span aria-hidden="true"> ↗</span></a></p>
   <p class="delivery-scope">{s.scope}</p><span class="visually-hidden" role="status" data-delivery-status></span>
   <template data-delivery-object="source"><div class="world-file source-file"><span class="world-label">{s.context}</span><div class="world-file-head"><BrandMark size={24}/><code>patch</code></div><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></template>
   <template data-delivery-object="destination"><div class="world-file destination-file" data-mode="reference"><span class="world-label" data-world-assistant>{routes[0]!.name}</span><code data-world-file>dependency files</code><div class="world-received"><div class="world-reference"><span>{s.reference}</span><code>patch</code></div><div class="world-inline"><span>{s.inline}</span><div class="world-papers">{Array.from({length:3},()=> <i class="paper-shape"></i>)}</div></div></div></div></template>

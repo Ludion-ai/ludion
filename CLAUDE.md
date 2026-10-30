@@ -56,7 +56,7 @@ Every mistake is traced to its cause and fed back into a rule or a check, so the
 - Receipts show what was checked, not more (and, once implemented, the exposure-time timestamps). Keep evidence and historical attribution intact.
 - Every change goes through a PR. Never push directly to main.
   - **Protected PRs.** PRs changing this file, .github/, packages/sandbox/, tools/verify/, schemas, lessons/, ludion.config.json or wrangler.jsonc, or deleting a file as How we work's Scope says (full list: docs/protected-paths.md), require a fresh-context review subagent, its verdict posted to the PR, and the owner to merge.
-  - **Reviews.** Every review, protected path or not, is posted as a comment on its PR ending `reviewed-sha: <the head SHA reviewed>`; a review with no such record on GitHub is never reported as a review.
+  - **Reviews.** Every review, protected path or not, is posted as a comment on its PR that has the line `reviewed-sha: <the head SHA reviewed>`; a review with no such record on GitHub is never reported as a review.
   - **Merging.** PRs that are not protected PRs may auto-merge only with green CI. Agents never merge, or enable auto-merge on, a dependency-update PR (Dependabot, Renovate and the like), whatever its CI says, nor any PR an agent did not open.
 - Production deployment remains through deploy.yml only. No new accounts, spending, secret values or Cloudflare changes outside the ludion Worker and ludion.ai zone without owner authorization.
 - The lesson product (sync/teach, lesson data, MCP) ended on 2026-10-28. Its code, data and the earlier instructions are in the tag archive/lessons-2026-10-27. Its endpoints answer a fixed 410 until 2027-01-26, then those routes are removed.

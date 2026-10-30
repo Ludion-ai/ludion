@@ -97,6 +97,23 @@ describe("the rule on deleted files", () => {
   });
 });
 
+describe("the rule on recording a review", () => {
+  // The three words before each `reviewed-sha: <...>` the two files spell out. Posting adds a footer after the
+  // review, so a review has the line rather than ends with it (docs/decisions/2026-10-30-reviewed-sha-has-the-line.md).
+  const said = (text: string) => [...flat(text).matchAll(/(\S+ \S+ \S+) `reviewed-sha: </g)].map(m => m[1]);
+
+  it("says a review has the line reviewed-sha: in CLAUDE.md and in docs/protected-paths.md alike", () => {
+    expect(said(read("CLAUDE.md"))).toEqual(["has the line"]);
+    expect(said(read("docs/protected-paths.md"))).toEqual(["with a line", "has the line", "has the line"]);
+  });
+
+  it("tells the earlier wording, a review ending with the line, apart", () => {
+    expect(said("is posted as a comment on its PR ending `reviewed-sha: <the head SHA reviewed>`;")).toEqual(["its PR ending"]);
+    expect(said("(`APPROVE` or `REQUEST CHANGES`), and its last line is `reviewed-sha: <head SHA it reviewed>`.")).toEqual(["last line is"]);
+    expect(said("as a comment on that PR and ends with the line `reviewed-sha: <the head SHA it reviewed>`.")).toEqual(["with the line"]);
+  });
+});
+
 describe("test.yml", () => {
   it("fails a PR whose base is not main, before anything else runs", () => {
     const yml = read(".github/workflows/test.yml");

@@ -54,7 +54,8 @@ export type FixReceipt = {
   /**
    * npm: each smallest fixed version that was deprecated, no longer listed or named by OSV, with the versions passed over
    * and the one taken instead (next-fix.ts); `changes` hold the versions taken, `before.plan` the smallest. A version
-   * from another publisher or source than the smallest is not taken, and the fix stops (publisher_check).
+   * from another publisher or source than the smallest is not taken, and the fix stops (publisher_check); so does a fix
+   * whose smallest has a MAL- record (malicious), with no later version looked at.
    */
   version_choice?: VersionChoice[];
   reason?: string;
@@ -332,9 +333,11 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     if (!receipt.fixes.length) throw new Error(scan.blocked.join(" ") || "No fix was planned.");
     // npm, before the branch names: a smallest fixed version that is deprecated, no longer listed or named by OSV gives
     // way to the next smallest that is none of these. A failed lookup keeps the smallest, which the judge checks again.
-    // One from another publisher or source stops the fix (docs/decisions/2026-10-30-next-fix-same-publisher.md).
+    // One from another publisher or source stops the fix (docs/decisions/2026-10-30-next-fix-same-publisher.md), and so
+    // does a smallest with a MAL- record (docs/decisions/2026-10-30-mal-smallest-stops-the-fix.md).
     if (ecosystem === "npm") for (const fix of receipt.fixes) {
       const taken = new Map<string, string>();
+      let stopped = false;
       for (const to of new Set(fix.changes.map(c => c.to))) {
         let choice: VersionChoice | null;
         try { choice = await nextFix(fix.package, to, deps.fetchFn); }
@@ -342,12 +345,13 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         active();
         if (!choice) continue;
         (fix.version_choice ??= []).push(choice);
+        // Gate 2: the smallest has a MAL- record, or the version that qualified is not the smallest's publisher's, or
+        // cannot be compared; the fix stops, keeps the smallest, and nothing more is looked up for it.
+        if (choice.malicious?.length || choice.publisher_check?.result === "stop") { fix.reason ??= `Gate 2 stops this fix: ${choice.note}`; stopped = true; break; }
         if (choice.chosen) taken.set(to, choice.chosen);
-        // Gate 2: the version that qualified is not the smallest's publisher's, or cannot be compared; the fix stops.
-        if (choice.publisher_check?.result === "stop") fix.reason ??= `Gate 2 stops this fix: ${choice.note}`;
       }
       // New objects: the plan's own changes stay in `before.plan` as the smallest.
-      if (taken.size) fix.changes = fix.changes.map(c => taken.has(c.to) ? { ...c, to: taken.get(c.to)! } : c);
+      if (taken.size && !stopped) fix.changes = fix.changes.map(c => taken.has(c.to) ? { ...c, to: taken.get(c.to)! } : c);
     }
     // Before any build or test (for Maven, after its dependency graph was resolved): every fix branch starts from the
     // commit whose files are the ones validated.

@@ -1,0 +1,45 @@
+# started 2026-10-30T00:14:25Z, node v24.22.1, git version 2.39.5
+npm ci exit 0
+== npx tsc -p tsconfig.json
+tsc exit 0
+== npx vitest run --project node packages/cli/test 
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/action.test.ts (14 tests | 6 skipped) 75ms
+ ✓ |node| packages/cli/test/judge.test.ts (66 tests) 121ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 239ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 175ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 279ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (26 tests) 295ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 267ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 8ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 489ms
+     ✓ names the step that failed even when the judge's modules are missing  358ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (1 test) 23ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 43ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 699ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  608ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 900ms
+     ✓ parseRequirements: a run of backslash continuations  423ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 1046ms
+ ✓ |node| packages/cli/test/security.test.ts (39 tests) 1693ms
+     ✓ validates without changing source by default; commits only FROM on its own branch when explicitly enabled  331ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2103ms
+     ✓ duplicate members count once toward the 1,000  595ms
+     ✓ more than 1,000 literal members are read no further, and say so  969ms
+ ✓ |node| packages/cli/test/branch.test.ts (22 tests) 2392ms
+     ✓ commits only the given files on HEAD, on a new branch, and leaves the working tree and HEAD alone  347ms
+     ✓ compares the validated copy with HEAD, file by file  302ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  376ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (89 tests) 3518ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  405ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  365ms
+
+ Test Files  18 passed (18)
+      Tests  745 passed | 19 skipped (764)
+   Start at  00:14:36
+   Duration  4.14s (transform 3.36s, setup 0ms, import 5.56s, tests 14.37s, environment 1ms)
+
+vitest exit 0
+# finished 2026-10-30T00:14:41Z

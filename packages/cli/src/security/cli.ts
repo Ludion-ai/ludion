@@ -80,9 +80,15 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     const config = readConfig(root);
     const result = "dockerfile" in config ? await patchProject(root, !!values.apply, { signal }) : await patchDependencies(root, !!values.apply, { signal });
     if (values.json) console.log(JSON.stringify(result, null, 2));
-    else if (result.receipt) console.log(`Result: ${result.receipt.outcome}${result.receipt.reason ? ` — ${result.receipt.reason}` : ""}\nReceipt: ${result.path}\nSource update only. Production deployment was not changed.`);
+    else if (result.receipt) {
+      console.log(`Result: ${result.receipt.outcome}${result.receipt.reason ? ` — ${plain(result.receipt.reason)}` : ""}`);
+      // Each fix is validated, and with --apply committed on its own branch, on its own; one failing stops no other.
+      if ("fixes" in result.receipt) for (const fix of result.receipt.fixes) console.log(`  ${fix.package} ${fix.changes.map(c => `${c.from} → ${c.to}`).join(", ")}: ${fix.outcome}${fix.branch ? ` (branch ${fix.branch})` : ""}${fix.reason ? ` — ${plain(fix.reason)}` : ""}`);
+      else if (result.receipt.branch) console.log(`  Branch: ${result.receipt.branch}`);
+      console.log(`Receipt: ${result.path}\nSource update only${values.apply ? ", on branches; the working tree was not changed" : ""}. Production deployment was not changed.`);
+    }
     else console.log(`Result: ${result.scan.status}. No source update applied. No match is not a security guarantee.`);
-    return result.receipt?.outcome === "failed" || result.scan.status === "incomplete" ? 2 : 0;
+    return result.receipt?.outcome === "failed" || result.receipt?.outcome === "partial" || result.scan.status === "incomplete" ? 2 : 0;
   }
   if (command === "patch") return patch();
   if (command !== "watch") throw new Error("Unknown security command.");

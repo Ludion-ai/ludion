@@ -6,6 +6,8 @@ import { compare, parseReleases, phpImage, replaceImage, scanPhp } from "../src/
 import { DEFAULT_CONFIG, readConfig, snapshot } from "../src/security/project.ts";
 import { patchProject, type Command } from "../src/security/patch.ts";
 import { runArgs } from "../../sandbox/src/docker.ts";
+import { phpFixPublished } from "../src/security/exposure.ts";
+import { commit, git } from "./git.ts";
 
 const SOURCE = "FROM php:8.4.25-cli-alpine\nWORKDIR /app\nCOPY . .\n";
 const releases = {
@@ -20,6 +22,7 @@ function fixture(): string {
   const root = mkdtempSync(join(tmpdir(), "ludion-security-test-"));
   writeFileSync(join(root, "Dockerfile"), SOURCE);
   writeFileSync(join(root, "ludion.security.json"), JSON.stringify(DEFAULT_CONFIG));
+  commit(root);
   return root;
 }
 const command: Command = async args => args.includes("{{.Id}}") ? DIGEST : args[0] === "image" && args[1] === "inspect" ? JSON.stringify([`php@${DIGEST}`]) : "";
@@ -56,9 +59,9 @@ describe("official PHP security update decisions", () => {
 });
 
 describe("bounded patch application and evidence", () => {
-  it("validates without changing source by default; applies only FROM when explicitly enabled", async () => {
+  it("validates without changing source by default; commits only FROM on its own branch when explicitly enabled", async () => {
     for (const apply of [false, true]) {
-      const root = fixture(), before = snapshot(root), calls: string[][] = [];
+      const root = fixture(), head = git(root, "rev-parse", "HEAD"), before = snapshot(root), calls: string[][] = [];
       const result = await patchProject(root, apply, { fetchFn, command: async (args, timeout) => { calls.push(args); return command(args, timeout); }, testRun });
       expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
       expect(result.receipt?.baseline_passed).toBe(true);
@@ -66,10 +69,69 @@ describe("bounded patch application and evidence", () => {
       expect(result.receipt?.scope).toBe("dockerfile_only_not_deployed");
       expect(result.path && JSON.parse(readFileSync(result.path, "utf8")).outcome).toBe(apply ? "applied" : "validated");
       expect(calls.filter(a => a[0] === "build").every(a => a.includes("--network=none"))).toBe(true);
-      expect(readFileSync(join(root, "Dockerfile"), "utf8")).toBe(apply ? SOURCE.replace("php:8.4.25-cli-alpine", `php:8.4.28-cli-alpine@${DIGEST}`) : SOURCE);
-      if (!apply) expect(snapshot(root)).toBe(before);
+      // 8.4.27 is the first security release newer than 8.4.25; php.net gives its day.
+      expect(result.receipt).toMatchObject({ fix_published_at: "2026-10-21T00:00:00.000Z", found_at: result.scan.checked_at });
+      // The working tree is never changed.
+      expect(readFileSync(join(root, "Dockerfile"), "utf8")).toBe(SOURCE);
+      expect(snapshot(root)).toBe(before);
+      if (apply) {
+        expect(result.receipt).toMatchObject({ base_commit: head, branch: "ludion/php/8.4.28", commit: git(root, "rev-parse", "ludion/php/8.4.28") });
+        expect(result.receipt?.applied_at).toBeTruthy();
+        expect(git(root, "show", "ludion/php/8.4.28:Dockerfile") + "\n").toBe(SOURCE.replace("php:8.4.25-cli-alpine", `php:8.4.28-cli-alpine@${DIGEST}`));
+        expect(git(root, "rev-parse", "ludion/php/8.4.28^")).toBe(head);
+      } else expect(result.receipt).toMatchObject({ base_commit: null, branch: null, commit: null, applied_at: null });
       expect(existsSync(join(root, ".ludion/security/patch.lock"))).toBe(false);
     }
+  });
+  it("leaves an existing branch unchanged and runs no Docker work for it", async () => {
+    const root = fixture();
+    const first = await patchProject(root, true, { fetchFn, command, testRun });
+    let docker = 0;
+    const second = await patchProject(root, true, { fetchFn, command: async (args, timeout) => { docker++; return command(args, timeout); }, testRun });
+    expect(second.receipt).toMatchObject({ outcome: "skipped", branch: "ludion/php/8.4.28", commit: null });
+    expect(docker).toBe(0);
+    expect(git(root, "rev-parse", "ludion/php/8.4.28")).toBe(first.receipt?.commit);
+  });
+  it("stops when the branch name already holds another change, and leaves that branch alone", async () => {
+    const root = fixture(), head = git(root, "rev-parse", "HEAD");
+    git(root, "branch", "ludion/php/8.4.28", head);
+    let docker = 0;
+    const result = await patchProject(root, true, { fetchFn, command: async (args, timeout) => { docker++; return command(args, timeout); }, testRun });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.reason).toContain("holds another change (\"fixture\")");
+    expect(docker).toBe(0);
+    expect(git(root, "rev-parse", "ludion/php/8.4.28")).toBe(head);
+  });
+  it("applies when the config names the Dockerfile as ./Dockerfile", async () => {
+    const root = fixture();
+    writeFileSync(join(root, "ludion.security.json"), JSON.stringify({ ...DEFAULT_CONFIG, dockerfile: "./Dockerfile" }));
+    commit(root);
+    const result = await patchProject(root, true, { fetchFn, command, testRun });
+    expect(result.receipt).toMatchObject({ outcome: "applied", branch: "ludion/php/8.4.28" });
+  });
+  it("commits a Dockerfile checked out with CRLF ends with LF ends, as the last commit has it", async () => {
+    const root = fixture();
+    writeFileSync(join(root, "Dockerfile"), SOURCE.replace(/\n/g, "\r\n"));
+    const result = await patchProject(root, true, { fetchFn, command, testRun });
+    expect(result.receipt?.outcome).toBe("applied");
+    expect(git(root, "cat-file", "blob", "ludion/php/8.4.28:Dockerfile") + "\n").toBe(SOURCE.replace("php:8.4.25-cli-alpine", `php:8.4.28-cli-alpine@${DIGEST}`));
+  });
+  it("refuses --apply outside Git or with files that differ from the last commit, before Docker", async () => {
+    const plain = mkdtempSync(join(tmpdir(), "ludion-security-plain-"));
+    writeFileSync(join(plain, "Dockerfile"), SOURCE);
+    writeFileSync(join(plain, "ludion.security.json"), JSON.stringify(DEFAULT_CONFIG));
+    let docker = 0;
+    const counted: Command = async (args, timeout) => { docker++; return command(args, timeout); };
+    expect((await patchProject(plain, true, { fetchFn, command: counted, testRun })).receipt?.reason).toContain("not in a Git work tree");
+    const dirty = fixture(); writeFileSync(join(dirty, "Dockerfile"), `${SOURCE}RUN true\n`);
+    expect((await patchProject(dirty, true, { fetchFn, command: counted, testRun })).receipt?.reason).toContain("differ from it: Dockerfile");
+    expect(docker).toBe(0);
+  });
+  it("records the fix's php.net date as null when it cannot be read", async () => {
+    const scan = await scanPhp(SOURCE, fetchFn);
+    expect(phpFixPublished({ ...scan, security_releases: [{ version: "8.4.27", date: "2026-10-21", security: true }] })).toMatchObject({ at: null });
+    expect(phpFixPublished({ ...scan, security_releases: [{ version: "8.4.27", date: "31 Feb 2026", security: true }] })).toMatchObject({ at: null });
+    expect(phpFixPublished({ ...scan, security_releases: [] }).note).toContain("Not found");
   });
   it.each([1, 2, 3, 4])("blocks an update when validation step %s fails", async failureAt => {
     const root = fixture(); let count = 0;

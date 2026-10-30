@@ -1,34 +1,56 @@
 import { randomUUID } from "node:crypto";
-import { chmodSync, closeSync, cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { closeSync, cpSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve, sep } from "node:path";
 import semver from "semver";
 import { runContainer, runDockerImageCommand, type Tool } from "../../../sandbox/src/docker.ts";
 import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenGraph, packageEntry, parsePom, textFile, type Change, type Ecosystem, type Inventory } from "./inventory.ts";
-import { comparableVersion, OsvClient, type DependencyScan } from "./osv.ts";
+import { comparableVersion, OsvClient, type DependencyScan, type Finding } from "./osv.ts";
 import { hash } from "./php.ts";
-import { CONFIG, privateState, readConfig, regularFile, rootPath, snapshot, type DependencyConfig } from "./project.ts";
+import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.ts";
+import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
+import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
 import { releaseIdentity, type Judgement } from "./judge.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
+/**
+ * One run: one baseline, then each fix (every planned change of one package) validated on its own against it. `outcome`
+ * is "partial" when some fixes failed, or some findings have no supported fix, and others did not; "skipped" when every fix
+ * already had its branch, so nothing was validated.
+ */
 export type DependencyReceipt = {
-  schema: 1; id: string; ecosystem: Ecosystem; scope: "dependency_files_only_not_deployed";
-  started_at: string; finished_at: string; outcome: "failed" | "validated" | "applied";
-  tree_hash: string; config_hash: string; before: DependencyScan; after: DependencyScan | null;
-  tool_image: string; baseline_image: string | null; candidate_image: string | null;
-  baseline_passed: boolean; candidate_passed: boolean; test: string[];
+  schema: 2; id: string; ecosystem: Ecosystem; scope: "dependency_files_only_not_deployed";
+  started_at: string; finished_at: string; outcome: "failed" | "validated" | "applied" | "partial" | "skipped";
+  tree_hash: string; config_hash: string; before: DependencyScan;
+  tool_image: string; baseline_image: string | null; baseline_passed: boolean; test: string[];
+  /** With --apply: the commit every fix branch starts from, checked to hold the validated files. */
+  base_commit: string | null;
+  /** The baseline's Composer archives. */
+  archives?: ArchiveEvidence[];
+  fixes: FixReceipt[];
+  reason?: string;
+};
+/** One fix: its candidate is the baseline with only this package moved. A failed fix stops nothing else. */
+export type FixReceipt = {
+  package: string; changes: Change[];
+  /** "skipped": with --apply, a branch for this fix already exists; it was not validated again or changed. */
+  outcome: "failed" | "validated" | "applied" | "skipped";
+  /** Exposure-time timestamps (UTC): the fix's official publication, the advisory lookup of this run, the branch. */
+  fix_published_at: string | null; fix_published_note: string; found_at: string; applied_at: string | null;
+  branch: string | null; commit: string | null;
+  candidate_image: string | null; candidate_passed: boolean; after: DependencyScan | null;
   files: { path: string; before_hash: string; after_hash: string }[];
-  reason?: string; recovery_journal?: string;
   archives?: ArchiveEvidence[];
   /** Every package whose installed versions differ between baseline and candidate, planned or not. */
   changed_packages?: PackageChange[];
   /** Rules 1 and 2 of the time cap on the candidate (npm and Composer). */
   time_cap?: TimeCap;
-  /** npm: the judge's gates 1, 2 and 4 and its wait over the candidate's lockfile diff (candidate-judge.ts). */
+  /** npm: the judge's gates 1, 2 and 4 and its wait over this fix's lockfile diff (candidate-judge.ts). */
   judgement?: Judgement;
+  reason?: string;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
 /** The final manifest beside the pinned one in the npm candidate context (see resolverDockerfile). */
@@ -248,37 +270,19 @@ export async function resolvedMavenInventory(root: string, image: string = DEFAU
   }
 }
 
-/** A journal makes a multi-file source update recoverable. On ordinary write errors, roll back our own writes only. */
-export function applyFiles(root: string, state: string, id: string, files: { path: string; before: string; after: string }[], rename = renameSync): string {
-  const dir = join(state, `transaction-${id}`); mkdirSync(dir, { mode: 0o700 });
-  const journal = join(dir, "journal.json");
-  const entries = files.map(f => ({ path: f.path, before_hash: hash(f.before), after_hash: hash(f.after), mode: lstatSync(regularFile(root, f.path)).mode & 0o777 }));
-  const completed: typeof files = [];
-  for (const f of files) {
-    const target = regularFile(root, f.path);
-    if (readFileSync(target, "utf8") !== f.before) throw new Error("Dependency files changed before application.");
-    writeFileSync(join(dir, `${f.path}.before`), f.before, { flag: "wx", mode: 0o600 });
-    writeFileSync(join(dir, `${f.path}.next`), f.after, { flag: "wx", mode: lstatSync(target).mode & 0o777 });
-    chmodSync(join(dir, `${f.path}.next`), lstatSync(target).mode & 0o777);
-  }
-  const record = (phase: string) => writeFileSync(journal, `${JSON.stringify({ schema: 1, phase, files: entries, applied: completed.map(f => f.path) }, null, 2)}\n`, { mode: 0o600 });
-  record("prepared");
-  try {
-    for (const file of files) { rename(join(dir, `${file.path}.next`), regularFile(root, file.path)); completed.push(file); record("applying"); }
-    record("complete");
-  } catch (error) {
-    let failed = false;
-    for (const f of [...completed].reverse()) {
-      try {
-        if (hash(readFileSync(regularFile(root, f.path))) !== hash(f.after)) throw new Error("Concurrent change prevents rollback.");
-        rename(join(dir, `${f.path}.before`), join(root, f.path));
-        chmodSync(join(root, f.path), entries.find(e => e.path === f.path)!.mode);
-      } catch { failed = true; }
-    }
-    record(failed ? "manual_recovery_required" : "rolled_back");
-    throw new Error(`${error instanceof Error ? error.message : String(error)} ${failed ? "Partial update: manual recovery required." : "Our source changes were rolled back."} Journal: ${journal}`);
-  }
-  return journal;
+/** Top-level names that never reach the tests (the application image's .dockerignore below), so --apply does not compare them. */
+const NOT_TESTED = ["node_modules", "vendor", "target", ".npmrc", "auth.json", ".mvn"];
+
+/** A finding as name@version and advisory id. */
+const findingId = (f: Finding) => `${f.package.name}@${f.package.version} ${f.advisory.id}`;
+/** An OSV MAL- record (gate 2: a malicious package), by id or alias. */
+const malicious = (f: Finding) => [f.advisory.id, ...f.advisory.aliases].some(id => id.startsWith("MAL-"));
+
+/** One fix per package: every planned change of that package, in plan order. */
+export function fixesOf(plan: Change[]): Change[][] {
+  const fixes = new Map<string, Change[]>();
+  for (const change of plan) fixes.set(change.name, [...(fixes.get(change.name) ?? []), change]);
+  return [...fixes.values()];
 }
 
 export async function patchDependencies(dir: string, apply: boolean, deps: Dependencies = {}): Promise<{ scan: DependencyScan; receipt: DependencyReceipt | null; path: string | null }> {
@@ -297,7 +301,11 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
   let fd: number;
   try { fd = openSync(lock, "wx", 0o600); } catch { throw new Error("Another update or interrupted transaction holds patch.lock. Inspect its receipt/journal before retrying."); }
   const receiptPath = join(state, `${id}.json`), images: string[] = [];
-  const receipt: DependencyReceipt = { schema: 1, id, ecosystem, scope: "dependency_files_only_not_deployed", started_at: new Date().toISOString(), finished_at: "", outcome: "failed", tree_hash: originalTree, config_hash: hash(configText), before: scan, after: null, tool_image: "", baseline_image: null, candidate_image: null, baseline_passed: false, candidate_passed: false, test: [...config.test], files: [] };
+  const receipt: DependencyReceipt = {
+    schema: 2, id, ecosystem, scope: "dependency_files_only_not_deployed", started_at: new Date().toISOString(), finished_at: "", outcome: "failed", tree_hash: originalTree, config_hash: hash(configText), before: scan, tool_image: "", baseline_image: null, baseline_passed: false, test: [...config.test], base_commit: null,
+    fixes: fixesOf(scan.plan).map(changes => ({ package: changes[0]!.name, changes, outcome: "failed", fix_published_at: null, fix_published_note: "Not looked up.", found_at: scan.checked_at, applied_at: null, branch: null, commit: null, candidate_image: null, candidate_passed: false, after: null, files: [] })),
+  };
+  const save = () => writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { mode: 0o600 });
   let temp = "";
   const command = deps.command ?? runDockerImageCommand;
   const run = deps.testRun ?? (async (name, image, command, timeoutMs, tool) => {
@@ -311,31 +319,50 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     const source = join(temp, "source"); mkdirSync(source);
     if (snapshot(root, source) !== originalTree || hash(textFile(source, CONFIG)) !== receipt.config_hash) throw new Error("Source or update policy changed during advisory lookup.");
     if (initial.limitations.length) throw new Error(initial.limitations.join(" "));
-    if (scan.blocked.length) throw new Error(scan.blocked.join(" "));
+    // Gate 2: an OSV MAL- record stops the whole run, as before per-fix validation; nothing is installed or tested.
+    const marked = scan.findings.filter(malicious).map(findingId);
+    if (marked.length) throw new Error(`OSV has a MAL- record for an installed package (${marked.slice(0, 5).join(", ")}); nothing was validated or applied.`);
+    if (!receipt.fixes.length) throw new Error(scan.blocked.join(" ") || "No fix was planned.");
+    // Before any build or test (for Maven, after its dependency graph was resolved): every fix branch starts from the
+    // commit whose files are the ones validated.
+    const base = apply ? gitBase(root, source, NOT_TESTED) : null;
+    receipt.base_commit = base?.commit ?? null;
+    const branches = receipt.fixes.map(fix => base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), ecosystem, `${fix.package}-${[...new Set(fix.changes.map(c => c.to))].join("-")}`));
+    const subject = (fix: FixReceipt) => `ludion: ${fix.package} ${fix.changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${ecosystem})`;
+    for (const [index, fix] of receipt.fixes.entries()) {
+      const branch = branches[index], tip = base && branch ? branchTip(base, branch) : null;
+      // A branch of the same name is this fix only when its tip says so; otherwise the name is taken and the fix stops.
+      if (base && branch && tip?.subject === subject(fix)) { fix.outcome = "skipped"; fix.branch = branch; fix.reason = skippedReason(base, branch, tip.parent, "fix"); }
+      else if (branch && branches.indexOf(branch) !== index) fix.reason = `Another fix of this run has the branch name ${branch}; this fix was not validated.`;
+      else if (tip !== null) fix.reason = `The branch ${branch} already exists and holds another change ("${tip.subject.slice(0, 200)}"); it was not changed, and this fix was not validated.`;
+    }
+    const pending = receipt.fixes.filter(fix => fix.outcome !== "skipped" && !fix.reason);
     acquisitionPolicy(source, ecosystem);
-    const requested = config.image ?? DEFAULT_IMAGES[ecosystem];
-    const repo = { npm: "node", composer: "composer", maven: "maven" }[ecosystem];
-    if (!new RegExp(`^${repo}:[a-zA-Z0-9][a-zA-Z0-9._-]*(?:@sha256:[a-f0-9]{64})?$`).test(requested)) throw new Error(`Use an official ${repo} tool image; custom registries/images are not accepted by this adapter.`);
-    await command(["pull", requested], 300_000); active();
-    const digests: unknown = JSON.parse(await command(["image", "inspect", requested, "--format", "{{json .RepoDigests}}"], 15_000)); active();
-    const resolved = Array.isArray(digests) && digests.find(d => typeof d === "string" && new RegExp(`^(?:(?:docker\\.io/)?library/)?${repo}@sha256:[a-f0-9]{64}$`).test(d));
-    if (!resolved) throw new Error("Official tool image digest is unavailable.");
-    receipt.tool_image = `${requested.split("@")[0]}@${String(resolved).split("@")[1]}`;
-    let baselineInventory = initial;
-    let candidateFiles: { path: string; before: string; after: string }[] = [];
-    let finalManifest = "";
-    for (const label of ["baseline", "candidate"] as const) {
+    // No Docker work when every fix already has its branch.
+    if (pending.length) {
+      const requested = config.image ?? DEFAULT_IMAGES[ecosystem];
+      const repo = { npm: "node", composer: "composer", maven: "maven" }[ecosystem];
+      if (!new RegExp(`^${repo}:[a-zA-Z0-9][a-zA-Z0-9._-]*(?:@sha256:[a-f0-9]{64})?$`).test(requested)) throw new Error(`Use an official ${repo} tool image; custom registries/images are not accepted by this adapter.`);
+      await command(["pull", requested], 300_000); active();
+      const digests: unknown = JSON.parse(await command(["image", "inspect", requested, "--format", "{{json .RepoDigests}}"], 15_000)); active();
+      const resolved = Array.isArray(digests) && digests.find(d => typeof d === "string" && new RegExp(`^(?:(?:docker\\.io/)?library/)?${repo}@sha256:[a-f0-9]{64}$`).test(d));
+      if (!resolved) throw new Error("Official tool image digest is unavailable.");
+      receipt.tool_image = `${requested.split("@")[0]}@${String(resolved).split("@")[1]}`;
+    }
+    /** Acquire one side's dependencies: the baseline (no plan) or one fix's candidate. */
+    const acquire = async (label: string, plan: Change[] | null) => {
       active();
-      const context = join(temp, label), manifests = join(context, "manifests"), exported = join(temp, `${label}-export`), app = join(temp, `${label}-app`);
-      mkdirSync(manifests, { recursive: true }); mkdirSync(exported); mkdirSync(app);
+      const context = join(temp, label), manifests = join(context, "manifests"), exported = join(temp, `${label}-export`);
+      mkdirSync(manifests, { recursive: true }); mkdirSync(exported);
       for (const file of MANIFESTS[ecosystem]) writeFileSync(join(manifests, file), textFile(source, file));
-      if (label === "candidate") {
-        finalManifest = changedManifest(source, ecosystem, scan.plan);
-        writeFileSync(join(manifests, MANIFESTS[ecosystem][0]), ecosystem === "npm" ? changedManifest(source, ecosystem, scan.plan, true) : finalManifest);
+      let finalManifest = "";
+      if (plan) {
+        finalManifest = changedManifest(source, ecosystem, plan);
+        writeFileSync(join(manifests, MANIFESTS[ecosystem][0]), ecosystem === "npm" ? changedManifest(source, ecosystem, plan, true) : finalManifest);
         if (ecosystem === "npm") writeFileSync(join(manifests, NPM_FINAL_MANIFEST), finalManifest);
       }
       if (ecosystem === "maven") prepareMavenManifest(manifests, readFileSync(join(manifests, "pom.xml"), "utf8"));
-      writeFileSync(join(context, "Dockerfile"), resolverDockerfile(ecosystem, receipt.tool_image, label === "candidate", false, scan.plan));
+      writeFileSync(join(context, "Dockerfile"), resolverDockerfile(ecosystem, receipt.tool_image, !!plan, false, plan ?? []));
       const cache = `ludion-cache-${id}-${label}`; images.push(cache);
       // Online phase contains manifests only, never application files or host credentials. Scripts/plugins are disabled where supported.
       await command(["build", "--network=default", "--pull=false", "--target", "resolve", "--tag", cache, context], 600_000); active();
@@ -344,12 +371,12 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       writeFileSync(exportFile, `FROM ${cache} AS captured\nFROM scratch\n${exportedFiles.map(f => `COPY --from=captured /app/${f} /${f}`).join("\n")}\n`);
       await command(["build", "--network=none", "--pull=false", "--file", exportFile, "--output", `type=local,dest=${exported}`, context], 120_000); active();
       acquisitionPolicy(exported, ecosystem);
-      let installedCache = cache;
+      let installedCache = cache, archives: ArchiveEvidence[] = [];
       if (ecosystem === "composer") {
-        const install = join(temp, `${label}-install`), archives = join(install, "archives"); mkdirSync(install);
-        receipt.archives = [...(receipt.archives ?? []), ...await localComposerLock(exported, archives, join(temp, "archives-cache"), deps.fetchFn, deps.signal)]; active();
+        const install = join(temp, `${label}-install`), archiveDir = join(install, "archives"); mkdirSync(install);
+        archives = await localComposerLock(exported, archiveDir, join(temp, "archives-cache"), deps.fetchFn, deps.signal); active();
         writeFileSync(join(install, "composer.json"), textFile(exported, "composer.json"));
-        cpSync(join(archives, "composer.lock"), join(install, "composer.lock"));
+        cpSync(join(archiveDir, "composer.lock"), join(install, "composer.lock"));
         writeFileSync(join(install, "Dockerfile"), `FROM ${cache}\nUSER root\nRUN mkdir -p /archives && chown 65534:65534 /archives\nWORKDIR /app\nCOPY --chown=65534:65534 archives/ /archives/\nCOPY --chown=65534:65534 composer.json composer.lock /app/\nENV COMPOSER_DISABLE_NETWORK=1\nUSER 65534:65534\nRUN ["composer","install","--no-plugins","--no-scripts","--no-interaction","--prefer-dist","--no-progress"]\n`);
         installedCache = `ludion-installed-${id}-${label}`; images.push(installedCache);
         await command(["build", "--network=none", "--pull=false", "--tag", installedCache, install], 300_000); active();
@@ -360,31 +387,12 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         resolvedInventory.packages = mavenGraph(jsonFile(exported, "ludion-dependency-tree.json"), direct);
         resolvedInventory.scope = "resolved_dependencies_not_plugins_or_jdk";
       }
-      if (label === "baseline") {
-        for (const file of MANIFESTS[ecosystem]) if (textFile(exported, file) !== textFile(source, file)) throw new Error("Baseline acquisition changed a dependency file.");
-        baselineInventory = resolvedInventory;
-      } else {
-        if (ecosystem !== "maven" && textFile(exported, MANIFESTS[ecosystem][0]) !== finalManifest) throw new Error("The package manager changed the manifest beyond the planned fix.");
-        receipt.changed_packages = changedPackages(baselineInventory, resolvedInventory);
-        if (ecosystem !== "maven") {
-          const moved = unplannedRemovals(baselineInventory, resolvedInventory, scan.plan);
-          if (moved.length) throw new Error(`The candidate also moved packages that were not planned (${moved.slice(0, 10).join(", ")}${moved.length > 10 ? ", ..." : ""}); that needs review.`);
-        }
-        if (ecosystem !== "maven") {
-          const cap = receipt.time_cap = await candidateTimeCap(ecosystem, baselineInventory, resolvedInventory, scan.plan, deps.fetchFn); active();
-          if (cap.undecidable.length) throw new Error(`The time cap could not be checked: ${cap.undecidable.slice(0, 5).join(" ")}`);
-          if (cap.after_t.length || cap.young.length) throw new Error(`The candidate breaks the time cap. ${renderTimeCap(cap).join(" ")}${cap.young.length ? ` New dependencies first published less than ${cap.wait_hours}h before T: ${cap.young.join(", ")}.` : ""}`);
-          if (ecosystem === "npm") {
-            const refusal = candidateRefusal(receipt.judgement = await judgeNpmCandidate(source, exported, deps.fetchFn)); active();
-            if (refusal) throw new Error(refusal);
-          }
-        }
-        compatible(baselineInventory, resolvedInventory);
-        receipt.after = await client.scan(resolvedInventory); active();
-        if (receipt.after.findings.length || receipt.after.inventory.limitations.length) throw new Error("Candidate still contains known advisory findings or incomplete inventory; no source changes applied.");
-        candidateFiles = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(exported, path) })).filter(f => f.before !== f.after);
-        if (!candidateFiles.length) throw new Error("No dependency file changed.");
-      }
+      if (plan && ecosystem !== "maven" && textFile(exported, MANIFESTS[ecosystem][0]) !== finalManifest) throw new Error("The package manager changed the manifest beyond the planned fix.");
+      return { exported, installedCache, archives, inventory: resolvedInventory };
+    };
+    /** Build the application on one side's dependencies and run the project's test in the sandbox. Returns the image id. */
+    const test = async (label: string, exported: string, installedCache: string) => {
+      const app = join(temp, `${label}-app`); mkdirSync(app);
       cpSync(source, app, { recursive: true });
       // Installed dependency caches stay in the prepared image, not in the source COPY layer.
       writeFileSync(join(app, ".dockerignore"), "node_modules\nvendor\ntarget\n.ludion\n.git\n.env\n.env.*\n.npmrc\nauth.json\n.mvn\n");
@@ -393,21 +401,81 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       const image = `ludion-application-${id}-${label}`; images.push(image);
       await command(["build", "--network=none", "--pull=false", "--file", join(app, "Dockerfile.ludion"), "--tag", image, app], 300_000); active();
       const imageId = await command(["image", "inspect", image, "--format", "{{.Id}}"], 15_000); active();
-      if (label === "baseline") receipt.baseline_image = imageId; else receipt.candidate_image = imageId;
-      const name = `ludion-check-${id}-${label}`;
-      await run(name, imageId, config.test, config.timeout_seconds * 1000, ecosystem); active();
-      if (label === "baseline") receipt.baseline_passed = true; else receipt.candidate_passed = true;
+      await run(`ludion-check-${id}-${label}`, imageId, config.test, config.timeout_seconds * 1000, ecosystem); active();
+      return imageId;
+    };
+    const baseline = pending.length ? await acquire("baseline", null) : null;
+    if (baseline) {
+      for (const file of MANIFESTS[ecosystem]) if (textFile(baseline.exported, file) !== textFile(source, file)) throw new Error("Baseline acquisition changed a dependency file.");
+      if (baseline.archives.length) receipt.archives = baseline.archives;
+      receipt.baseline_image = await test("baseline", baseline.exported, baseline.installedCache);
+      receipt.baseline_passed = true;
     }
-    if (snapshot(root) !== receipt.tree_hash) throw new Error("Project changed during validation; no dependency file was updated.");
-    active();
-    receipt.files = candidateFiles.map(f => ({ path: f.path, before_hash: hash(f.before), after_hash: hash(f.after) }));
-    receipt.outcome = "validated";
-    writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx", mode: 0o600 });
-    if (apply) { active(); receipt.recovery_journal = join(state, `transaction-${id}`, "journal.json"); applyFiles(root, state, id, candidateFiles); receipt.outcome = "applied"; }
-  } catch (error) { receipt.outcome = "failed"; receipt.reason = error instanceof Error ? error.message : String(error); }
+    const versioned = new Set(scan.findings.map(f => findingId(f)));
+    for (const [index, fix] of receipt.fixes.entries()) {
+      if (!baseline || fix.outcome === "skipped" || fix.reason) continue;
+      try {
+        active();
+        const blocked = scan.blocked.filter(b => b.startsWith(`${fix.package}@`));
+        if (blocked.length) throw new Error(`This package also has a finding without a supported fix: ${blocked.join(" ")}`);
+        const branch = branches[index];
+        const published = await dependencyFixPublished(ecosystem, fix.changes, deps.fetchFn); active();
+        fix.fix_published_at = published.at; fix.fix_published_note = published.note;
+        const label = `candidate-${index + 1}`, candidate = await acquire(label, fix.changes);
+        if (candidate.archives.length) fix.archives = candidate.archives;
+        fix.changed_packages = changedPackages(baseline.inventory, candidate.inventory);
+        if (ecosystem !== "maven") {
+          const moved = unplannedRemovals(baseline.inventory, candidate.inventory, fix.changes);
+          if (moved.length) throw new Error(`The candidate also moved packages that were not planned (${moved.slice(0, 10).join(", ")}${moved.length > 10 ? ", ..." : ""}); that needs review.`);
+          const cap = fix.time_cap = await candidateTimeCap(ecosystem, baseline.inventory, candidate.inventory, fix.changes, deps.fetchFn); active();
+          if (cap.undecidable.length) throw new Error(`The time cap could not be checked: ${cap.undecidable.slice(0, 5).join(" ")}`);
+          if (cap.after_t.length || cap.young.length) throw new Error(`The candidate breaks the time cap. ${renderTimeCap(cap).join(" ")}${cap.young.length ? ` New dependencies first published less than ${cap.wait_hours}h before T: ${cap.young.join(", ")}.` : ""}`);
+          // The judge on this fix alone: the change from the project's lockfile to this fix's candidate, whose folder the
+          // branch commit's files are read from. A refusal stops only this fix.
+          if (ecosystem === "npm") {
+            const refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); active();
+            if (refusal) throw new Error(refusal);
+          }
+        }
+        compatible(baseline.inventory, candidate.inventory);
+        // This fix's package must have no finding left, and no package may have an advisory the baseline did not have on it.
+        const after = fix.after = await client.scan(candidate.inventory); active();
+        // Nothing may be left on the fix's own package, and no finding on any package version the baseline did not have:
+        // as before per-fix validation, a fix that passes only with another (Maven's commons-text with commons-lang3) stops.
+        const left = after.findings.filter(f => f.package.name === fix.package || !versioned.has(findingId(f))).map(findingId);
+        const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !scan.blocked.includes(b));
+        if (left.length || unfixable.length || after.inventory.limitations.length) throw new Error(`Candidate still contains known advisory findings or incomplete inventory${left.length ? ` (${left.slice(0, 5).join(", ")})` : ""}; no source change was made.`);
+        const files = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(candidate.exported, path) })).filter(f => f.before !== f.after);
+        if (!files.length) throw new Error("No dependency file changed.");
+        fix.candidate_image = await test(label, candidate.exported, candidate.installedCache);
+        fix.candidate_passed = true;
+        if (snapshot(root) !== receipt.tree_hash) throw new Error("Project changed during validation; no dependency file was updated.");
+        fix.files = files.map(f => ({ path: f.path, before_hash: hash(f.before), after_hash: hash(f.after) }));
+        fix.outcome = "validated";
+        // Persist the validation evidence before making the branch.
+        save();
+        if (base && branch) {
+          active();
+          const advisories = [...new Set(fix.changes.flatMap(c => c.advisories))];
+          const message = `${subject(fix)}\n\nFixes ${advisories.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`;
+          fix.commit = fixBranch(base, branch, files.map(f => ({ path: f.path, content: f.after })), message);
+          fix.branch = branch; fix.applied_at = new Date().toISOString(); fix.outcome = "applied";
+        }
+      } catch (error) { fix.outcome = "failed"; fix.reason = error instanceof Error ? error.message : String(error); }
+      finally { save(); }
+    }
+    const done = receipt.fixes.filter(f => f.outcome !== "skipped"), failed = done.filter(f => f.outcome === "failed").length;
+    const unplanned = scan.blocked.filter(b => !receipt.fixes.some(f => b.startsWith(`${f.package}@`)));
+    receipt.outcome = done.length && failed === done.length ? "failed" : failed || unplanned.length ? "partial" : !done.length ? "skipped" : apply ? "applied" : "validated";
+    const notes = [...(unplanned.length ? [`Findings without a supported fix: ${unplanned.join(" ")}`] : []), ...(done.length ? [] : ["Every fix already has its branch; nothing was validated again."])];
+    if (notes.length) receipt.reason = notes.join(" ");
+  } catch (error) {
+    receipt.outcome = "failed"; receipt.reason = error instanceof Error ? error.message : String(error);
+    for (const fix of receipt.fixes) if (fix.outcome === "failed" && !fix.reason) fix.reason = `Not validated: ${receipt.reason}`;
+  }
   finally {
     receipt.finished_at = new Date().toISOString();
-    try { writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { mode: 0o600 }); }
+    try { save(); }
     finally {
       for (const image of images.reverse()) await command(["image", "rm", image], 15_000).catch(() => {});
       if (temp && resolve(temp).startsWith(resolve(tmpdir()) + sep)) rmSync(temp, { recursive: true, force: true });

@@ -1,10 +1,10 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it, vi } from "vitest";
 import semver from "semver";
-import { acquisitionPolicy, applyFiles, candidateTimeCap, changedPackages, compatible, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals } from "../src/security/dependency-patch.ts";
+import { acquisitionPolicy, candidateTimeCap, changedPackages, compatible, fixesOf, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals, type FixReceipt } from "../src/security/dependency-patch.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl } from "../src/security/acquisition.ts";
 import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, type Inventory } from "../src/security/inventory.ts";
 import { EPSS_LIST } from "../src/security/npm-facts.ts";
@@ -12,12 +12,18 @@ import { OsvClient, type Advisory } from "../src/security/osv.ts";
 import { privateState, snapshot } from "../src/security/project.ts";
 import { scanProject } from "../src/security/scan.ts";
 import { packagistReleases, renderTimeCap } from "../src/security/time-cap.ts";
+import { commit, git } from "./git.ts";
 
 const DIGEST = `sha256:${"a".repeat(64)}`;
 /** The fixture registry's sha512 for a version's tarball (fixtures only, not a real hash). */
 const integrityOf = (name: string, version: string) => `sha512-${Buffer.from(`${name}@${version}`.padEnd(64, "#")).toString("base64")}`;
-const lock = (version = "4.17.20") => ({ lockfileVersion: 3, packages: { "": { dependencies: { lodash: version } }, "node_modules/lodash": { version, resolved: `https://registry.npmjs.org/lodash/-/lodash-${version}.tgz`, integrity: integrityOf("lodash", version) } } });
+const lockFor = (deps: Record<string, string>) => ({ lockfileVersion: 3, packages: { "": { dependencies: deps }, ...Object.fromEntries(Object.entries(deps).map(([name, version]) => [`node_modules/${name}`, { version, resolved: `https://registry.npmjs.org/${name}/-/${name.split("/").pop()}-${version}.tgz`, integrity: integrityOf(name, version) }])) } as Record<string, any> });
+const lock = (version = "4.17.20") => lockFor({ lodash: version });
 const advisory: Advisory = { id: "GHSA-test-0001", summary: "Example advisory", aliases: ["CVE-2026-0001"], affected: [{ package: { ecosystem: "npm", name: "lodash" }, ranges: [{ events: [{ fixed: "4.17.21" }] }] }] };
+const minimistAdvisory: Advisory = { ...advisory, id: "GHSA-test-0002", aliases: ["CVE-2026-0002"], affected: [{ package: { ecosystem: "npm", name: "minimist" }, ranges: [{ events: [{ fixed: "1.2.6" }] }] }] };
+const MINIMIST_RELEASES = { created: "2013-06-25T08:12:47.000Z", versions: { "1.2.5": "2020-03-12T00:00:00.000Z", "1.2.6": "2022-03-21T00:00:00.000Z" } };
+/** The versions the fake OSV (the judge's included) has an advisory for. */
+const VULNERABLE: Record<string, Advisory> = { "lodash@4.17.20": advisory, "minimist@1.2.5": minimistAdvisory };
 function fixture(): string {
   const root = mkdtempSync(join(tmpdir(), "ludion-dependency-test-"));
   writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "4.17.20" } }));
@@ -36,16 +42,17 @@ function client(candidateVulnerable = false): OsvClient {
 /**
  * registry.npmjs.org for the time cap and the judge: lodash 4.17.21 (the fix) and any extra versions given, each with
  * its fixture integrity and `manifest`'s fields. For the judge also OSV (lodash@4.17.20 has the advisory), an empty KEV
- * catalog and FIRST's whole EPSS list, which does not have the advisory's CVE. `seen` collects every URL and body.
+ * catalog and FIRST's whole EPSS list, which does not have the advisory's CVE. `seen` collects every URL and body. The
+ * judge's OSV answers come from `found`, by name@version.
  */
 const EPSS_DAY = "https://epss.empiricalsecurity.com/epss_scores-2026-10-29.csv.gz";
-function registry(extra: Record<string, { created: string; versions: Record<string, string> }> = {}, manifest: (name: string, version: string) => object = () => ({}), seen: string[] = []): typeof fetch {
+function registry(extra: Record<string, { created: string; versions: Record<string, string> }> = {}, manifest: (name: string, version: string) => object = () => ({}), seen: string[] = [], found: Record<string, Advisory> = VULNERABLE): typeof fetch {
   const docs: Record<string, { created: string; versions: Record<string, string> }> = { lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z" } }, ...extra };
   return async (url, init) => {
     const u = String(url);
     seen.push(u, init?.body === undefined ? "" : String(init.body));
-    if (u === "https://api.osv.dev/v1/querybatch") return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.package.name === "lodash" && q.version === "4.17.20" ? { vulns: [{ id: advisory.id }] } : {}) });
-    if (u.startsWith("https://api.osv.dev/v1/vulns/")) return response(advisory);
+    if (u === "https://api.osv.dev/v1/querybatch") return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => found[`${q.package.name}@${q.version}`] ? { vulns: [{ id: found[`${q.package.name}@${q.version}`]!.id }] } : {}) });
+    if (u.startsWith("https://api.osv.dev/v1/vulns/")) return response(Object.values(found).find(a => u.endsWith(`/${a.id}`)) ?? advisory);
     if (u.startsWith("https://www.cisa.gov/")) return response({ vulnerabilities: [] });
     if (u === EPSS_LIST) return new Response(null, { status: 302, headers: { location: EPSS_DAY } });
     if (u === EPSS_DAY) return new Response(gzipSync("cve,epss,percentile\nCVE-1999-0001,0.5,0.9\n"));
@@ -161,7 +168,7 @@ function fakeCommand() {
         writeFileSync(join(dest, "package-lock.json"), readFileSync(join(context, "manifests/package-lock.json")));
       } else {
         writeFileSync(join(dest, "package.json"), readFileSync(join(context, "manifests/ludion-final-package.json")));
-        writeFileSync(join(dest, "package-lock.json"), JSON.stringify(lock(semver.minVersion(manifest.dependencies.lodash)!.version)));
+        writeFileSync(join(dest, "package-lock.json"), JSON.stringify(lockFor(Object.fromEntries(Object.entries<string>(manifest.dependencies).map(([name, spec]) => [name, semver.minVersion(spec)!.version])))));
       }
     }
     return "";
@@ -170,54 +177,317 @@ function fakeCommand() {
 
 describe("dependency patch gates and recoverable application", () => {
   it("refuses a lookalike official registry in tool-image evidence", async () => {
-    const root = fixture(), before = snapshot(root), command = fakeCommand();
+    const root = fixture(); commit(root); const before = snapshot(root), command = fakeCommand();
     const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: async args => args.includes("{{json .RepoDigests}}") ? JSON.stringify([`dockerXio/library/node@${DIGEST}`]) : command(args), testRun: async () => {} });
     expect(result.receipt?.outcome).toBe("failed");
     expect(result.receipt?.reason).toContain("digest is unavailable");
     expect(snapshot(root)).toBe(before);
   });
-  it.each([false, true])("applies both dependency files only under explicit policy (apply=%s)", async apply => {
-    const root = fixture(), before = snapshot(root);
+  it.each([false, true])("commits both dependency files on the fix's own branch only under explicit policy (apply=%s)", async apply => {
+    const root = fixture(), head = commit(root), before = snapshot(root);
     const tools: string[] = [];
     const result = await patchDependencies(root, apply, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async (_name, _image, _command, _timeout, tool) => { tools.push(tool); } });
     expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
     // Baseline and candidate tests both run with the npm tool's fixed scratch directories.
     expect(tools).toEqual(["npm", "npm"]);
-    expect(result.receipt?.after?.findings).toEqual([]);
-    expect(result.receipt?.files).toHaveLength(2);
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix).toMatchObject({ package: "lodash", outcome: apply ? "applied" : "validated", candidate_passed: true, fix_published_at: "2021-02-20T15:42:16.891Z", found_at: result.scan.checked_at });
+    expect(fix.after?.findings).toEqual([]);
+    expect(fix.files).toHaveLength(2);
     // The judge's parts of gates 1, 2 and 4 and its wait found nothing to stop or wait for.
-    expect(result.receipt?.judgement).toMatchObject({ verdict: "ready_except_build", urgency: "normal", fixes: [expect.objectContaining({ id: advisory.id, package: "lodash", from: "4.17.20", to: "4.17.21" })] });
-    if (apply) expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).dependencies.lodash).toBe("4.17.21");
-    else expect(snapshot(root)).toBe(before);
+    expect(fix.judgement).toMatchObject({ verdict: "ready_except_build", urgency: "normal", fixes: [expect.objectContaining({ id: advisory.id, package: "lodash", from: "4.17.20", to: "4.17.21" })] });
+    // The judge's exposure times: here the fix's own publish time, seen after this run's lookup and before the branch.
+    expect(fix.judgement?.exposure.fix_published_at).toBe(fix.fix_published_at);
+    expect(Date.parse(fix.judgement!.exposure.detected_at)).toBeGreaterThanOrEqual(Date.parse(fix.found_at));
+    if (apply) expect(Date.parse(fix.applied_at!)).toBeGreaterThanOrEqual(Date.parse(fix.judgement!.exposure.detected_at));
+    // The working tree is never changed; with --apply the fix is one commit on HEAD, on its own branch.
+    expect(snapshot(root)).toBe(before);
+    expect(git(root, "rev-parse", "HEAD")).toBe(head);
+    if (apply) {
+      expect(fix).toMatchObject({ branch: "ludion/npm/lodash-4.17.21", commit: git(root, "rev-parse", "ludion/npm/lodash-4.17.21") });
+      expect(Date.parse(fix.applied_at!)).toBeGreaterThanOrEqual(Date.parse(fix.found_at));
+      expect(result.receipt?.base_commit).toBe(head);
+      expect(git(root, "rev-parse", `${fix.commit}^`)).toBe(head);
+      expect(git(root, "diff", "--name-only", head, fix.commit!).split("\n")).toEqual(["package-lock.json", "package.json"]);
+      expect(JSON.parse(git(root, "show", `${fix.commit}:package.json`)).dependencies.lodash).toBe("4.17.21");
+      expect(git(root, "log", "-1", "--format=%s", fix.commit!)).toBe("ludion: lodash 4.17.20 -> 4.17.21 (npm)");
+    } else expect(fix).toMatchObject({ branch: null, commit: null, applied_at: null });
     expect(existsSync(join(root, ".ludion/security/patch.lock"))).toBe(false);
   });
-  it.each([1, 2])("keeps source unchanged when baseline/candidate test %s fails", async at => {
-    const root = fixture(), before = snapshot(root); let count = 0;
+  it("validates each fix alone against one baseline, and one failing fix stops no other", async () => {
+    const root = fixture();
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "4.17.20", minimist: "1.2.5" } }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor({ lodash: "4.17.20", minimist: "1.2.5" })));
+    const head = commit(root), before = snapshot(root);
+    const minimist: Advisory = { ...advisory, id: "GHSA-test-0002", affected: [{ package: { ecosystem: "npm", name: "minimist" }, ranges: [{ events: [{ fixed: "1.2.6" }] }] }] };
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(String(url).includes("0002") ? minimist : advisory);
+      const queries = JSON.parse(String(init?.body)).queries;
+      return response({ results: queries.map((q: any) => q.version === "4.17.20" ? { vulns: [{ id: advisory.id }] } : q.version === "1.2.5" ? { vulns: [{ id: minimist.id }] } : {}) });
+    });
+    const tested: string[] = [], manifests: unknown[] = [], command = fakeCommand();
+    const result = await patchDependencies(root, true, {
+      fetchFn: registry({ minimist: { created: "2013-06-25T08:12:47.000Z", versions: { "1.2.5": "2020-03-12T00:00:00.000Z", "1.2.6": "2022-03-21T00:00:00.000Z" } } }), client: osv,
+      command: async args => { if (args.includes("resolve")) manifests.push(JSON.parse(readFileSync(join(args.at(-1)!, "manifests/package.json"), "utf8")).dependencies); return command(args); },
+      // The lodash candidate's test fails.
+      testRun: async name => { tested.push(name.replace(/^ludion-check-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, "")); if (name.endsWith("candidate-1")) throw new Error("lodash candidate test failure"); },
+    });
+    // One baseline, and each candidate moves only its own package.
+    expect(tested).toEqual(["baseline", "candidate-1", "candidate-2"]);
+    expect(manifests).toEqual([{ lodash: "4.17.20", minimist: "1.2.5" }, { lodash: "4.17.21", minimist: "1.2.5" }, { lodash: "4.17.20", minimist: "1.2.6" }]);
+    expect(result.receipt?.outcome).toBe("partial");
+    const [lodash, other] = result.receipt!.fixes;
+    expect(lodash).toMatchObject({ package: "lodash", outcome: "failed", branch: null, applied_at: null, candidate_passed: false });
+    expect(lodash?.reason).toContain("lodash candidate test failure");
+    expect(other).toMatchObject({ package: "minimist", outcome: "applied", branch: "ludion/npm/minimist-1.2.6", fix_published_at: "2022-03-21T00:00:00.000Z" });
+    // The minimist branch has only the minimist fix; the failed lodash fix has no branch.
+    expect(JSON.parse(git(root, "show", "ludion/npm/minimist-1.2.6:package.json")).dependencies).toEqual({ lodash: "4.17.20", minimist: "1.2.6" });
+    expect(git(root, "branch", "--list", "ludion/*")).toBe("ludion/npm/minimist-1.2.6");
+    expect(snapshot(root)).toBe(before);
+    expect(git(root, "rev-parse", "HEAD")).toBe(head);
+    // The receipt on disk is the one returned.
+    expect(JSON.parse(readFileSync(result.path!, "utf8")).fixes.map((f: any) => f.outcome)).toEqual(["failed", "applied"]);
+  });
+  it("stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had", async () => {
+    const minimist: Advisory = { ...advisory, id: "GHSA-test-0002", affected: [{ package: { ecosystem: "npm", name: "minimist" }, ranges: [{ events: [{ fixed: "1.2.6" }] }] }] };
+    const unseen: Advisory = { ...minimist, id: "GHSA-test-0003" };
+    const osv = () => new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response([advisory, minimist, unseen].find(a => String(url).endsWith(a.id)));
+      const ids: Record<string, string> = { "4.17.20": advisory.id, "1.2.5": minimist.id, "1.2.4": minimist.id, "1.3.0": minimist.id, "0.0.1": unseen.id };
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => ids[q.version] ? { vulns: [{ id: ids[q.version] }] } : {}) });
+    });
+    const npm = registry({ minimist: { created: "2013-06-25T08:12:47.000Z", versions: { "0.0.1": "2013-06-25T08:12:47.000Z", "1.2.4": "2019-11-12T00:00:00.000Z", "1.2.5": "2020-03-12T00:00:00.000Z", "1.3.0": "2020-06-01T00:00:00.000Z", "1.2.6": "2022-03-21T00:00:00.000Z" } } });
+    // Only Maven, which does not hold the graph fixed, may carry another package within an advisory it had. The judge
+    // stops 1.2.4, a copy that goes down within its major (gate 1). Its OSV answers mark neither 1.3.0 nor 0.0.1, so for
+    // those the re-scan after the judge is what stops the fix.
+    for (const [nested, outcome, reason] of [
+      ["1.2.4", "failed", "gate 1: minimist goes down from 1.2.5 to 1.2.4"], ["1.3.0", "failed", "minimist@1.3.0 GHSA-test-0002"], ["0.0.1", "failed", "minimist@0.0.1 GHSA-test-0003"],
+    ] as const) {
+      const root = fixture();
+      writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "4.17.20", minimist: "1.2.5" } }));
+      writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor({ lodash: "4.17.20", minimist: "1.2.5" })));
+      commit(root);
+      const command = fakeCommand();
+      // The lodash candidate also holds a second, nested copy of minimist.
+      const result = await patchDependencies(root, true, { fetchFn: npm, client: osv(), testRun: async () => {}, command: async args => {
+        const output = await command(args), out = args.find(a => a.startsWith("type=local,dest="))?.slice("type=local,dest=".length);
+        if (out?.endsWith("candidate-1-export")) {
+          const locked = JSON.parse(readFileSync(join(out, "package-lock.json"), "utf8"));
+          locked.packages["node_modules/lodash/node_modules/minimist"] = { version: nested, resolved: `https://registry.npmjs.org/minimist/-/minimist-${nested}.tgz`, integrity: integrityOf("minimist", nested) };
+          writeFileSync(join(out, "package-lock.json"), JSON.stringify(locked));
+        }
+        return output;
+      } });
+      expect(result.receipt?.fixes.map(f => [f.package, f.outcome])).toEqual([["lodash", outcome], ["minimist", "applied"]]);
+      expect(result.receipt?.fixes[0]?.reason).toContain(reason);
+    }
+  });
+  it("stops on an OSV MAL- record: in the baseline before any Docker work, in a candidate for that fix", async () => {
+    const evil: Advisory = { id: "MAL-2026-0001", summary: "Malicious code in evil", aliases: [], affected: [{ package: { ecosystem: "npm", name: "evil" }, ranges: [{ events: [{ introduced: "0" } as { fixed?: string }] }] }] };
+    const npm = registry({ evil: { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z", "1.0.1": "2016-01-01T00:00:00.000Z" } } });
+    const osvFor = (marked: string[]) => new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(String(url).endsWith(evil.id) ? evil : advisory);
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.version === "4.17.20" ? { vulns: [{ id: advisory.id }] } : marked.includes(`${q.package.name}@${q.version}`) ? { vulns: [{ id: evil.id }] } : {}) });
+    });
+    const project = () => {
+      const root = fixture(), deps = { lodash: "4.17.20", evil: "1.0.0" };
+      writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+      writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+      commit(root); return root;
+    };
+    // The cloud review's case: the baseline's evil@1.0.0 has the record, and the lodash candidate adds evil@1.0.1.
+    let docker = 0;
+    const counted = fakeCommand();
+    const stopped = await patchDependencies(project(), true, { fetchFn: npm, client: osvFor(["evil@1.0.0", "evil@1.0.1"]), command: async args => { docker++; return counted(args); }, testRun: async () => {} });
+    expect(stopped.receipt).toMatchObject({ outcome: "failed", reason: expect.stringContaining("MAL- record for an installed package (evil@1.0.0 MAL-2026-0001)") });
+    expect(stopped.receipt?.fixes[0]?.reason).toContain("Not validated:");
+    expect(docker).toBe(0);
+    // Only the candidate's added evil@1.0.1 has the record: that fix stops.
+    const command = fakeCommand();
+    const result = await patchDependencies(project(), true, { fetchFn: npm, client: osvFor(["evil@1.0.1"]), testRun: async () => {}, command: async args => {
+      const output = await command(args), out = args.find(a => a.startsWith("type=local,dest="))?.slice("type=local,dest=".length);
+      if (out?.endsWith("candidate-1-export")) {
+        const locked = JSON.parse(readFileSync(join(out, "package-lock.json"), "utf8"));
+        locked.packages["node_modules/lodash/node_modules/evil"] = { version: "1.0.1", resolved: "https://registry.npmjs.org/evil/-/evil-1.0.1.tgz", integrity: integrityOf("evil", "1.0.1") };
+        writeFileSync(join(out, "package-lock.json"), JSON.stringify(locked));
+      }
+      return output;
+    } });
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", branch: null });
+    expect(result.receipt?.fixes[0]?.reason).toContain("evil@1.0.1 MAL-2026-0001");
+  });
+  it("stops only the fix of a package with a finding that has no supported fix, and reports such findings", async () => {
+    // OSV answers by name@version.
+    const osvOf = (found: Record<string, Advisory[]>) => new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(Object.values(found).flat().find(a => String(url).endsWith(`/${a.id}`)));
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => found[`${q.package.name}@${q.version}`] ? { vulns: found[`${q.package.name}@${q.version}`]!.map(a => ({ id: a.id })) } : {}) });
+    });
+    const on = (name: string, id: string, fixed: string): Advisory => ({ ...advisory, id, affected: [{ package: { ecosystem: "npm", name }, ranges: [{ events: [{ fixed }] }] }] });
+    const npm = registry({ minimist: { created: "2013-06-25T08:12:47.000Z", versions: { "1.2.5": "2020-03-12T00:00:00.000Z", "1.2.6": "2022-03-21T00:00:00.000Z" } }, other: { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z", "1.0.1": "2016-01-01T00:00:00.000Z" } } });
+    const project = (deps: Record<string, string>) => {
+      const root = fixture();
+      writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+      writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+      commit(root); return root;
+    };
+    // lodash also has an advisory fixed only in the next major: its fix stops; minimist's goes on.
+    const first = await patchDependencies(project({ lodash: "4.17.20", minimist: "1.2.5" }), true, { fetchFn: npm, client: osvOf({ "lodash@4.17.20": [advisory, on("lodash", "GHSA-test-0009", "5.0.0")], "minimist@1.2.5": [on("minimist", "GHSA-test-0002", "1.2.6")] }), command: fakeCommand(), testRun: async () => {} });
+    expect(first.receipt?.fixes.map(f => [f.package, f.outcome])).toEqual([["lodash", "failed"], ["minimist", "applied"]]);
+    expect(first.receipt?.fixes[0]?.reason).toContain("finding without a supported fix: lodash@4.17.20: GHSA-test-0009");
+    expect(first.receipt?.outcome).toBe("partial");
+    // A package with only such a finding has no fix: the run is partial and says so.
+    const second = await patchDependencies(project({ lodash: "4.17.20", other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "lodash@4.17.20": [advisory], "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });
+    expect(second.receipt?.fixes.map(f => [f.package, f.outcome])).toEqual([["lodash", "applied"]]);
+    expect(second.receipt).toMatchObject({ outcome: "partial", reason: expect.stringContaining("Findings without a supported fix: other@1.0.0: GHSA-test-0010") });
+    // The candidate holding another copy of that package stops the fix, under the same advisory or a new one.
+    for (const [extra, outcome] of [["GHSA-test-0010", "failed"], ["GHSA-test-0011", "failed"]] as const) {
+      const command = fakeCommand();
+      const result = await patchDependencies(project({ lodash: "4.17.20", other: "1.0.0" }), true, { fetchFn: npm, testRun: async () => {},
+        client: osvOf({ "lodash@4.17.20": [advisory], "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")], "other@1.0.1": [on("other", extra, "2.0.0")] }),
+        command: async args => {
+          const output = await command(args), out = args.find(a => a.startsWith("type=local,dest="))?.slice("type=local,dest=".length);
+          if (out?.endsWith("candidate-1-export")) {
+            const locked = JSON.parse(readFileSync(join(out, "package-lock.json"), "utf8"));
+            locked.packages["node_modules/lodash/node_modules/other"] = { version: "1.0.1", resolved: "https://registry.npmjs.org/other/-/other-1.0.1.tgz", integrity: integrityOf("other", "1.0.1") };
+            writeFileSync(join(out, "package-lock.json"), JSON.stringify(locked));
+          }
+          return output;
+        } });
+      expect(result.receipt?.fixes[0]?.outcome).toBe(outcome);
+      expect(result.receipt?.fixes[0]?.reason).toContain(`other@1.0.1 ${extra}`);
+    }
+    // Only findings without a supported fix: nothing to validate, and the run fails.
+    const none = await patchDependencies(project({ other: "1.0.0" }), true, { fetchFn: npm, client: osvOf({ "other@1.0.0": [on("other", "GHSA-test-0010", "2.0.0")] }), command: fakeCommand(), testRun: async () => {} });
+    expect(none.receipt).toMatchObject({ outcome: "failed", fixes: [], reason: expect.stringContaining("other@1.0.0: GHSA-test-0010") });
+  });
+  it("stops a fix whose candidate has an entry without a supported fix the baseline did not have, on any package", async () => {
+    // A Composer candidate that adds a dependency whose Packagist advisories cannot be read gives such an entry with no
+    // finding, so only the comparison of the two scans' entries catches it. The same entry in the baseline does not stop.
+    const entry = "other@1.0.0: Packagist's advisories for other cannot be read.";
+    const osv = (inBaseline: boolean): OsvClient => {
+      const real = client();
+      let calls = 0;
+      return { scan: async (inv: Inventory) => {
+        const result = await real.scan(inv), candidate = ++calls > 1;
+        return candidate || inBaseline ? { ...result, blocked: [...result.blocked, entry] } : result;
+      } } as unknown as OsvClient;
+    };
+    const added = await patchDependencies((() => { const root = fixture(); commit(root); return root; })(), true, { fetchFn: registry(), client: osv(false), command: fakeCommand(), testRun: async () => {} });
+    expect(added.receipt?.fixes[0]).toMatchObject({ package: "lodash", outcome: "failed", branch: null, candidate_passed: false });
+    expect(added.receipt?.fixes[0]?.reason).toContain("Candidate still contains known advisory findings");
+    const kept = await patchDependencies((() => { const root = fixture(); commit(root); return root; })(), true, { fetchFn: registry(), client: osv(true), command: fakeCommand(), testRun: async () => {} });
+    expect(kept.receipt?.fixes[0]).toMatchObject({ package: "lodash", outcome: "applied", branch: "ludion/npm/lodash-4.17.21" });
+    expect(kept.receipt).toMatchObject({ outcome: "partial", reason: expect.stringContaining(`Findings without a supported fix: ${entry}`) });
+  });
+  it("validates only the first of two fixes whose branch names are the same", async () => {
+    // "@a/b" and "a-b" both clean to "a-b".
+    const deps = { "@a/b": "1.0.0", "a-b": "1.0.0" };
+    const root = fixture();
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+    commit(root);
+    const on = (name: string, id: string): Advisory => ({ ...advisory, id, affected: [{ package: { ecosystem: "npm", name }, ranges: [{ events: [{ fixed: "1.0.1" }] }] }] });
+    const found: Record<string, Advisory> = { "@a/b": on("@a/b", "GHSA-test-0021"), "a-b": on("a-b", "GHSA-test-0022") };
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(Object.values(found).find(a => String(url).endsWith(`/${a.id}`)));
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.version === "1.0.0" ? { vulns: [{ id: found[q.package.name]!.id }] } : {}) });
+    });
+    const npm = registry({ "@a/b": { created: "2020-01-01T00:00:00.000Z", versions: { "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": "2021-01-01T00:00:00.000Z" } }, "a-b": { created: "2020-01-01T00:00:00.000Z", versions: { "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": "2021-01-01T00:00:00.000Z" } } }, undefined, undefined, { "@a/b@1.0.0": found["@a/b"]!, "a-b@1.0.0": found["a-b"]! });
+    let tests = 0;
+    const result = await patchDependencies(root, true, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    expect(result.receipt?.fixes.map(f => [f.package, f.outcome, f.branch])).toEqual([["@a/b", "applied", "ludion/npm/a-b-1.0.1"], ["a-b", "failed", null]]);
+    expect(result.receipt?.fixes[1]?.reason).toContain("Another fix of this run has the branch name ludion/npm/a-b-1.0.1");
+    expect(tests).toBe(2);
+  });
+  it("fails a fix whose branch name already holds another change, and leaves that branch alone", async () => {
+    const root = fixture(), head = commit(root);
+    git(root, "branch", "ludion/npm/lodash-4.17.21", head);
+    let docker = 0;
+    const counted = fakeCommand();
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: async args => { docker++; return counted(args); }, testRun: async () => {} });
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", branch: null });
+    expect(result.receipt?.fixes[0]?.reason).toContain("holds another change (\"fixture\")");
+    expect(docker).toBe(0);
+    expect(git(root, "rev-parse", "ludion/npm/lodash-4.17.21")).toBe(head);
+  });
+  it("leaves a fix whose branch exists unchanged and does not validate it again", async () => {
+    const root = fixture(); commit(root);
+    const first = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });
+    const branch = first.receipt!.fixes[0]!.commit;
+    let tests = 0;
+    const second = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
+    expect(second.receipt?.fixes[0]).toMatchObject({ outcome: "skipped", branch: "ludion/npm/lodash-4.17.21", commit: null });
+    expect(second.receipt?.outcome).toBe("skipped");
+    expect(second.receipt?.reason).toContain("already has its branch");
+    expect(tests).toBe(0);
+    expect(git(root, "rev-parse", "ludion/npm/lodash-4.17.21")).toBe(branch);
+  });
+  it("refuses --apply before any Docker work outside Git, and when the files differ from the last commit", async () => {
+    let docker = 0;
+    const counted = fakeCommand(), command = async (args: string[]) => { docker++; return counted(args); };
+    const outside = await patchDependencies(fixture(), true, { fetchFn: registry(), client: client(), command, testRun: async () => {} });
+    expect(outside.receipt?.outcome).toBe("failed");
+    expect(outside.receipt?.reason).toContain("not in a Git work tree");
+    expect(outside.receipt?.fixes[0]?.reason).toContain("Not validated:");
+    for (const change of [
+      (root: string) => writeFileSync(join(root, "untracked.txt"), "x"),
+      (root: string) => writeFileSync(join(root, "package.json"), JSON.stringify({ name: "changed", dependencies: { lodash: "4.17.20" } })),
+    ]) {
+      const root = fixture(); commit(root); change(root);
+      const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command, testRun: async () => {} });
+      expect(result.receipt?.reason).toContain("differ from it");
+    }
+    // No git outside the project on PATH: refused the same way.
+    const path = process.env.PATH, root = fixture(); commit(root);
+    process.env.PATH = mkdtempSync(join(tmpdir(), "ludion-no-git-"));
+    try {
+      const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command, testRun: async () => {} });
+      expect(result.receipt).toMatchObject({ outcome: "failed", reason: expect.stringContaining("--apply needs git, and none was found") });
+      expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", branch: null, reason: expect.stringContaining("Not validated:") });
+    } finally { process.env.PATH = path; }
+    expect(docker).toBe(0);
+    // Without --apply, Git is not needed.
+    expect((await patchDependencies(fixture(), false, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} })).receipt?.outcome).toBe("validated");
+  });
+  it("puts the fix of a project in a repository's subfolder on a branch named for that folder", async () => {
+    const repo = mkdtempSync(join(tmpdir(), "ludion-monorepo-")), root = join(repo, "apps", "web");
+    mkdirSync(root, { recursive: true });
+    for (const name of ["package.json", "package-lock.json", "ludion.security.json"]) writeFileSync(join(root, name), readFileSync(join(fixture(), name)));
+    writeFileSync(join(repo, "README.md"), "other files of the repository are not compared");
+    const head = commit(repo);
+    writeFileSync(join(repo, "README.md"), "changed outside the project");
+    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "applied", branch: "ludion/apps-web/npm/lodash-4.17.21" });
+    expect(git(repo, "diff", "--name-only", head, "ludion/apps-web/npm/lodash-4.17.21").split("\n")).toEqual(["apps/web/package-lock.json", "apps/web/package.json"]);
+  });
+  it("groups every planned change of one package into one fix", () => {
+    const fix = (name: string, from: string, to: string) => ({ name, from, to, advisories: ["A"] });
+    expect(fixesOf([fix("a", "1.0.0", "1.0.1"), fix("b", "2.0.0", "2.0.1"), fix("a", "1.1.0", "1.1.2")]).map(f => f.map(c => `${c.name}@${c.to}`))).toEqual([["a@1.0.1", "a@1.1.2"], ["b@2.0.1"]]);
+  });
+  it.each([1, 2])("makes no branch when baseline/candidate test %s fails", async at => {
+    const root = fixture(); commit(root); const before = snapshot(root); let count = 0;
     const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { if (++count === at) throw new Error("failure"); } });
     expect(result.receipt?.outcome).toBe("failed"); expect(snapshot(root)).toBe(before);
+    expect(result.receipt?.fixes[0]?.reason).toContain(at === 1 ? "Not validated: failure" : "failure");
+    expect(git(root, "branch", "--list", "ludion/*")).toBe("");
   });
   it("refuses an application-compatible candidate that still has advisory findings", async () => {
-    const root = fixture(), before = snapshot(root);
+    const root = fixture(); commit(root); const before = snapshot(root);
     const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(true), command: fakeCommand(), testRun: async () => {} });
-    expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.reason).toContain("still contains"); expect(snapshot(root)).toBe(before);
+    expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.fixes[0]?.reason).toContain("still contains"); expect(snapshot(root)).toBe(before);
+    expect(git(root, "branch", "--list", "ludion/*")).toBe("");
   });
   it.each([false, true])("rejects source mutations even when not applying (apply=%s)", async apply => {
-    const root = fixture(); let count = 0;
+    const root = fixture(); commit(root); let count = 0;
     const result = await patchDependencies(root, apply, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { if (++count === 2) mkdirSync(join(root, "new-empty-directory")); } });
-    expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.reason).toContain("Project changed");
+    expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.fixes[0]?.reason).toContain("Project changed");
   });
   it("does not apply after a received stop request", async () => {
-    const root = fixture(), before = snapshot(root), abort = new AbortController(); let count = 0;
+    const root = fixture(); commit(root); const before = snapshot(root), abort = new AbortController(); let count = 0;
     const result = await patchDependencies(root, true, { signal: abort.signal, fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => { if (++count === 2) abort.abort(); } });
-    expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.reason).toContain("cancelled"); expect(snapshot(root)).toBe(before);
-  });
-  it("rolls back our first file if writing the second fails and records a journal", () => {
-    const root = fixture(), state = privateState(root), before = snapshot(root); let count = 0;
-    const files = ["package.json", "package-lock.json"].map(path => ({ path, before: readFileSync(join(root, path), "utf8"), after: "updated" }));
-    expect(() => applyFiles(root, state, "rollback-case", files, (old, next) => { if (++count === 2) throw new Error("simulated disk failure"); renameSync(old, next); })).toThrow("rolled back");
-    expect(snapshot(root)).toBe(before);
-    expect(JSON.parse(readFileSync(join(state, "transaction-rollback-case/journal.json"), "utf8")).phase).toBe("rolled_back");
-    expect(() => privateState(root)).not.toThrow();
+    expect(result.receipt?.outcome).toBe("failed"); expect(result.receipt?.fixes[0]?.reason).toContain("cancelled"); expect(snapshot(root)).toBe(before);
+    expect(git(root, "branch", "--list", "ludion/*")).toBe("");
   });
   it("blocks another update when an interrupted transaction needs recovery", () => {
     const root = fixture(), state = privateState(root); mkdirSync(join(state, "transaction-interrupted"));
@@ -354,11 +624,12 @@ describe("the smallest fix (docs/design.md)", () => {
     const root = fixture(), withOther = lock();
     (withOther.packages as Record<string, unknown>)["node_modules/other"] = { version: "1.0.0", resolved: "https://registry.npmjs.org/other/-/other-1.0.0.tgz" };
     writeFileSync(join(root, "package-lock.json"), JSON.stringify(withOther));
+    commit(root);
     const before = snapshot(root);
     const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });
     expect(result.receipt?.outcome).toBe("failed");
-    expect(result.receipt?.reason).toContain("moved packages that were not planned (other@1.0.0)");
-    expect(result.receipt?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }, { name: "other", from: ["1.0.0"], to: [] }]);
+    expect(result.receipt?.fixes[0]?.reason).toContain("moved packages that were not planned (other@1.0.0)");
+    expect(result.receipt?.fixes[0]?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }, { name: "other", from: ["1.0.0"], to: [] }]);
     expect(snapshot(root)).toBe(before);
   });
   it("records every changed package, planned or not, and refuses a manifest the package manager rewrote", async () => {
@@ -371,13 +642,13 @@ describe("the smallest fix (docs/design.md)", () => {
     const result = await patchDependencies(root, false, { fetchFn: registry(), client: client(), testRun: async () => {}, command: async args => {
       const output = await command(args);
       const out = args.find(a => a.startsWith("type=local,dest="));
-      if (out?.endsWith("candidate-export")) writeFileSync(join(out.slice("type=local,dest=".length), "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "^4.17.21" } }));
+      if (out?.endsWith("candidate-1-export")) writeFileSync(join(out.slice("type=local,dest=".length), "package.json"), JSON.stringify({ name: "test", dependencies: { lodash: "^4.17.21" } }));
       return output;
     } });
     expect(result.receipt?.outcome).toBe("failed");
-    expect(result.receipt?.reason).toContain("changed the manifest beyond the planned fix");
+    expect(result.receipt?.fixes[0]?.reason).toContain("changed the manifest beyond the planned fix");
     const ok = await patchDependencies(fixture(), false, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });
-    expect(ok.receipt?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }]);
+    expect(ok.receipt?.fixes[0]?.changed_packages).toEqual([{ name: "lodash", from: ["4.17.20"], to: ["4.17.21"] }]);
   });
   it("keeps only the properties the online Maven model uses, and refuses dependency-plugin parameter names", () => {
     const withProps = (props: string, version = "${text.version}") => pom.replace("<properties><text.version>1.9</text.version></properties>", `<properties>${props}</properties>`).replace("<version>${text.version}</version>", `<version>${version}</version>`);
@@ -446,8 +717,13 @@ describe("Composer plans also read Packagist's advisories", () => {
   });
 });
 
-describe.each([true, false])("the judge on npm candidates, apply %s", apply => {
+describe.each([true, false])("the judge on each npm fix, apply %s", apply => {
   const lodash = (fix: object, published = "2021-02-20T15:42:16.891Z") => registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": published } } }, (_name, version) => version === "4.17.21" ? fix : {});
+  /** With --apply the working tree never changes, so a refused fix shows as no branch and no commit. */
+  const nothingCommitted = (root: string, fix: FixReceipt) => {
+    expect(fix).toMatchObject({ branch: null, commit: null, applied_at: null });
+    if (apply) expect(git(root, "branch", "--list", `ludion/npm/${fix.package}-*`)).toBe("");
+  };
   it.each<[string, typeof fetch, string, string]>([
     ["a deprecated fix", lodash({ deprecated: "use 4.17.22" }), "stop", "The judge stops the candidate: gate 2: lodash@4.17.21 is deprecated: use 4.17.22"],
     ["a fix that adds an install script", lodash({ scripts: { postinstall: "node x.js" } }), "stop", "The judge stops the candidate: gate 2: lodash@4.17.21 adds install scripts: postinstall."],
@@ -456,38 +732,81 @@ describe.each([true, false])("the judge on npm candidates, apply %s", apply => {
     ["a fix published an hour ago", lodash({}, new Date(Date.now() - 3_600_000).toISOString()), "wait", "The judge's wait is not over: not applied before "],
     ["a candidate whose OSV lookup fails", async (url, init) => String(url).startsWith("https://api.osv.dev/") ? new Response("", { status: 503 }) : registry()(url, init), "undecidable", "The judge cannot decide on the candidate: gate 2: A lookup failed: api.osv.dev answered HTTP 503."],
   ])("does not apply %s, and does not run the candidate's tests", async (_label, fetchFn, verdict, reason) => {
-    const root = fixture(), before = snapshot(root); let tests = 0;
+    const root = fixture(); commit(root); let tests = 0;
     const result = await patchDependencies(root, apply, { fetchFn, client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
     expect(result.receipt?.outcome).toBe("failed");
-    expect(result.receipt?.judgement?.verdict).toBe(verdict);
-    expect(result.receipt?.reason).toContain(reason);
-    expect(result.receipt?.candidate_passed).toBe(false);
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix.outcome).toBe("failed");
+    expect(fix.judgement?.verdict).toBe(verdict);
+    expect(fix.reason).toContain(reason);
+    expect(fix.candidate_passed).toBe(false);
     expect(tests).toBe(1);
-    expect(snapshot(root)).toBe(before);
+    nothingCommitted(root, fix);
   });
   it("goes on to the candidate's tests when the judge finds nothing, downloading the EPSS list whole and sending no CVE ID", async () => {
-    const root = fixture(), seen: string[] = []; let tests = 0;
+    const root = fixture(), seen: string[] = []; commit(root); let tests = 0;
     const result = await patchDependencies(root, apply, { fetchFn: registry({}, () => ({}), seen), client: client(), command: fakeCommand(), testRun: async () => { tests++; } });
-    expect(result.receipt?.judgement?.verdict).toBe("ready_except_build");
+    expect(result.receipt?.fixes[0]?.judgement?.verdict).toBe("ready_except_build");
+    expect(result.receipt?.fixes[0]?.outcome).toBe(apply ? "applied" : "validated");
     expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
     expect(tests).toBe(2);
     expect(seen).toEqual(expect.arrayContaining([EPSS_LIST, EPSS_DAY]));
     expect(seen.filter(s => s.includes("CVE-"))).toEqual([]);
   });
+  it("refuses only the fix the judge refuses; the other goes on, and each judgement sees only its own fix's change", async () => {
+    const root = fixture(), deps = { lodash: "4.17.20", minimist: "1.2.5" };
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+    commit(root);
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(String(url).endsWith(minimistAdvisory.id) ? minimistAdvisory : advisory);
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => VULNERABLE[`${q.package.name}@${q.version}`] ? { vulns: [{ id: VULNERABLE[`${q.package.name}@${q.version}`]!.id }] } : {}) });
+    });
+    const tested: string[] = [], seen: string[] = [];
+    const fetchFn = registry({ minimist: MINIMIST_RELEASES }, (name, version) => name === "lodash" && version === "4.17.21" ? { deprecated: "use 4.17.22" } : {}, seen);
+    const result = await patchDependencies(root, apply, {
+      fetchFn, client: osv, command: fakeCommand(),
+      testRun: async name => { tested.push(name.replace(/^ludion-check-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, "")); },
+    });
+    expect(result.receipt?.outcome).toBe("partial");
+    const [refused, passed] = result.receipt!.fixes;
+    expect(refused).toMatchObject({ package: "lodash", outcome: "failed", candidate_passed: false });
+    expect(refused?.judgement?.verdict).toBe("stop");
+    expect(refused?.reason).toContain("The judge stops the candidate: gate 2: lodash@4.17.21 is deprecated: use 4.17.22");
+    nothingCommitted(root, refused!);
+    expect(passed).toMatchObject({ package: "minimist", outcome: apply ? "applied" : "validated", candidate_passed: true });
+    expect(passed?.judgement?.verdict).toBe("ready_except_build");
+    // The refused fix's candidate was not tested.
+    expect(tested).toEqual(["baseline", "candidate-2"]);
+    // Each judgement covers only its own fix's lockfile diff.
+    expect(refused?.judgement?.changes.map(c => [c.name, c.from, c.to])).toEqual([["lodash", "4.17.20", "4.17.21"]]);
+    expect(refused?.judgement?.fixes.map(f => [f.id, f.package])).toEqual([[advisory.id, "lodash"]]);
+    expect(passed?.judgement?.changes.map(c => [c.name, c.from, c.to])).toEqual([["minimist", "1.2.5", "1.2.6"]]);
+    expect(passed?.judgement?.fixes.map(f => [f.id, f.package])).toEqual([[minimistAdvisory.id, "minimist"]]);
+    // KEV and the EPSS list are downloaded whole once per judged fix, and no CVE ID is sent.
+    expect(seen.filter(s => s.startsWith("https://www.cisa.gov/"))).toHaveLength(2);
+    expect(seen.filter(s => s === EPSS_LIST)).toHaveLength(2);
+    expect(seen.filter(s => s.includes("CVE-"))).toEqual([]);
+    if (apply) {
+      expect(git(root, "branch", "--list", "ludion/*")).toBe("ludion/npm/minimist-1.2.6");
+      expect(JSON.parse(git(root, "show", "ludion/npm/minimist-1.2.6:package.json")).dependencies).toEqual({ lodash: "4.17.20", minimist: "1.2.6" });
+    } else expect(passed).toMatchObject({ branch: null, commit: null });
+  });
 });
 
-describe("the judge on npm candidates, when it throws", () => {
-  it("fails the receipt and applies nothing", async () => {
+describe("the judge on npm fixes, when it throws", () => {
+  it.each([false, true])("fails that fix and commits nothing (apply=%s)", async apply => {
     // Two lockfile paths that differ only in case: the inventory reads them, the judge's lockfile reader refuses them.
     const root = fixture(), withCase = lock() as any;
     withCase.packages["node_modules/other"] = { version: "1.0.0", resolved: "https://registry.npmjs.org/other/-/other-1.0.0.tgz", integrity: integrityOf("other", "1.0.0") };
     withCase.packages["node_modules/Other"] = { ...withCase.packages["node_modules/other"] };
     writeFileSync(join(root, "package-lock.json"), JSON.stringify(withCase));
-    const before = snapshot(root), command = fakeCommand(); let tests = 0;
-    const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), testRun: async () => { tests++; }, command: async args => {
+    commit(root);
+    const command = fakeCommand(); let tests = 0;
+    const result = await patchDependencies(root, apply, { fetchFn: registry(), client: client(), testRun: async () => { tests++; }, command: async args => {
       const output = await command(args);
       const out = args.find(a => a.startsWith("type=local,dest="));
-      if (out?.endsWith("candidate-export")) {
+      if (out?.endsWith("candidate-1-export")) {
         const file = join(out.slice("type=local,dest=".length), "package-lock.json"), candidate = JSON.parse(readFileSync(file, "utf8"));
         Object.assign(candidate.packages, { "node_modules/other": withCase.packages["node_modules/other"], "node_modules/Other": withCase.packages["node_modules/Other"] });
         writeFileSync(file, JSON.stringify(candidate));
@@ -495,10 +814,13 @@ describe("the judge on npm candidates, when it throws", () => {
       return output;
     } });
     expect(result.receipt?.outcome).toBe("failed");
-    expect(result.receipt?.reason).toBe("Two package-lock paths differ only in case: node_modules/Other.");
-    expect(result.receipt?.judgement).toBeUndefined();
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix.outcome).toBe("failed");
+    expect(fix.reason).toBe("Two package-lock paths differ only in case: node_modules/Other.");
+    expect(fix.judgement).toBeUndefined();
     expect(tests).toBe(1);
-    expect(snapshot(root)).toBe(before);
+    expect(fix).toMatchObject({ branch: null, commit: null, applied_at: null });
+    if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("");
   });
 });
 
@@ -589,10 +911,12 @@ describe("the time cap on candidates", () => {
     const noTime = registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z" } } });
     expect((await candidateTimeCap("npm", before, inv("npm", [["lodash", "4.17.21"]]), plan, noTime)).undecidable).toEqual(["lodash@4.17.21 has no publish time, so T is unknown."]);
     await expect(candidateTimeCap("npm", before, inv("npm", [["lodash", "4.17.21"], ["gone", "1.0.0"]]), plan, registry())).rejects.toThrow("HTTP 404");
-    const root = fixture(), snap = snapshot(root);
+    const root = fixture(); commit(root); const snap = snapshot(root);
     const result = await patchDependencies(root, true, { fetchFn: noTime, client: client(), command: fakeCommand(), testRun: async () => {} });
     expect(result.receipt?.outcome).toBe("failed");
-    expect(result.receipt?.reason).toContain("The time cap could not be checked: lodash@4.17.21 has no publish time");
+    expect(result.receipt?.fixes[0]?.reason).toContain("The time cap could not be checked: lodash@4.17.21 has no publish time");
+    // The fix's publish time could not be read either: null, and the receipt says so.
+    expect(result.receipt?.fixes[0]).toMatchObject({ fix_published_at: null, fix_published_note: "Not found: the registry gives no publish time for lodash@4.17.21." });
     expect(snapshot(root)).toBe(snap);
   });
   it("reads Packagist's minified metadata for Composer release times and requirements", async () => {

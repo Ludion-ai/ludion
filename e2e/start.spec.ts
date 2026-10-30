@@ -10,6 +10,13 @@ test("security setup explains preview scope, copies the scan command, and makes 
   await page.getByText("3 · Validate, then apply", { exact: true }).click();
   await expect(page.locator("#patch-command")).not.toContainText("--apply");
   await expect(page.locator("#apply-command")).toContainText("--apply");
+  // --apply commits each fix on its own branch; the site must not say it rewrites the project in place (#204).
+  await expect(page.locator(".apply-branches")).toContainText("does not change your files or your current branch");
+  await expect(page.locator(".apply-branches")).toContainText("ludion/<ecosystem>/<package>-<version>");
+  await expect(page.locator(".apply-branches")).toContainText("Fixes that pass only together are not applied");
+  await expect(page.locator(".apply-branches")).toContainText("stops every fix in the run");
+  await expect(page.locator(".apply-needs")).toContainText("--apply needs git");
+  await expect(page.locator("main")).not.toContainText("journal");
   await page.getByText("4 · Keep checking automatically", { exact: true }).click();
   await expect(page.locator("#watch-command")).toContainText("watch --dir /path/to/app --apply --interval 900");
   await expect(page.getByText("What leaves your machine", { exact: true })).toBeVisible();

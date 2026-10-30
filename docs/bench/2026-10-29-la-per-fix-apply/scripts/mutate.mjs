@@ -1,0 +1,70 @@
+// Each mutation undoes one property of the per-fix apply. The named test file must fail with it, and pass without it.
+// Usage (in /w, after npm ci): node /scripts/mutate.mjs
+import { execFileSync } from "node:child_process";
+import { readFileSync, writeFileSync } from "node:fs";
+const mutations = [
+  ["no hooks override", "packages/cli/src/security/branch.ts", "const config = [`core.hooksPath=${hooks}`, ", "const config = [", "packages/cli/test/branch.test.ts"],
+  // Since LA6 git is started by absolute path, so the working directory no longer chooses the program: the mutation
+  // undoes both, as the code was when the review of b572f81 found it.
+  ["git started in the project's folder", "packages/cli/src/security/branch.ts", [["{ cwd: hooks, env,", "{ cwd: dir, env,"], ["spawnSync(program, [", "spawnSync(\"git\", ["]], null, "packages/cli/test/branch.test.ts"],
+  ["no executable-bit check", "packages/cli/src/security/branch.ts", "(lstatSync(full).mode & 0o100 ? \"100755\" : \"100644\") === entry.mode", "true", "packages/cli/test/branch.test.ts"],
+  ["every fix skipped reads applied", "packages/cli/src/security/dependency-patch.ts", ": !done.length ? \"skipped\" : apply", ": apply", "packages/cli/test/dependencies.test.ts"],
+  ["no configuration check before a branch", "packages/cli/src/security/branch.ts", "  refuseConfiguration(base.top);\n", "", "packages/cli/test/branch.test.ts"],
+  ["two fixes on one branch name", "packages/cli/src/security/dependency-patch.ts", "else if (branch && branches.indexOf(branch) !== index)", "else if (false)", "packages/cli/test/dependencies.test.ts"],
+  ["a symbolic ref at the name accepted", "packages/cli/src/security/branch.ts", "ref], { allowFail: true }).status === 0) throw", "ref], { allowFail: true }).status === 0 && false) throw", "packages/cli/test/branch.test.ts"],
+  ["reftable accepted","packages/cli/src/security/branch.ts","  if (named !== \"files\") throw","  if (false) throw","packages/cli/test/branch.test.ts"],
+  ["a link at another loose object accepted","packages/cli/src/security/branch.ts","for (const file of readdirSync(join(common, \"objects\", name))) check(","for (const file of [] as string[]) check(","packages/cli/test/branch.test.ts"],
+  ["partial clone accepted", "packages/cli/src/security/branch.ts", "  if (promisor.length) throw", "  if (promisor.length && false) throw", "packages/cli/test/branch.test.ts"],
+  ["hooks named in configuration accepted", "packages/cli/src/security/branch.ts", "  if (hooks.length) throw", "  if (hooks.length && false) throw", "packages/cli/test/branch.test.ts"],
+  ["CRLF committed as checked out", "packages/cli/src/security/branch.ts", "base.crlf.has(file.path) ? file.content.replace(/\\r\\n/g, \"\\n\") : file.content", "file.content", "packages/cli/test/branch.test.ts"],
+  ["a path HEAD lacks is added", "packages/cli/src/security/branch.ts", "  if (unknown.length) throw", "  if (unknown.length && false) throw", "packages/cli/test/branch.test.ts"],
+  ["a taken branch name reads skipped", "packages/cli/src/security/dependency-patch.ts", "if (base && branch && tip?.subject === subject(fix)) {", "if (base && branch && tip) {", "packages/cli/test/dependencies.test.ts"],
+  ["a fix goes on beside its package's unfixable finding", "packages/cli/src/security/dependency-patch.ts", "        if (blocked.length) throw", "        if (blocked.length && false) throw", "packages/cli/test/dependencies.test.ts"],
+  ["unfixed findings ignored in the outcome", "packages/cli/src/security/dependency-patch.ts", ": failed || unplanned.length ? \"partial\"", ": failed ? \"partial\"", "packages/cli/test/dependencies.test.ts"],
+  ["PHP: a taken branch name reads skipped", "packages/cli/src/security/patch.ts", "if (tip !== null && tip.subject !== subject) throw", "if (false) throw", "packages/cli/test/security.test.ts"],
+  ["no fsmonitor override", "packages/cli/src/security/branch.ts", "\"core.fsmonitor=\", ", "", "packages/cli/test/branch.test.ts"],
+  ["fsmonitor set to false", "packages/cli/src/security/branch.ts", "\"core.fsmonitor=\", ", "\"core.fsmonitor=false\", ", "packages/cli/test/branch.test.ts"],
+  ["replace refs read", "packages/cli/src/security/branch.ts", [["\"--no-replace-objects\", ", ""], [", GIT_NO_REPLACE_OBJECTS: \"1\" }", " }"]], null, "packages/cli/test/branch.test.ts"],
+  ["no clean-tree check", "packages/cli/src/security/branch.ts", "  if (differs.length) throw", "  if (differs.length && false) throw", "packages/cli/test/branch.test.ts"],
+  // The reflog refusal also stops an existing branch before update-ref, so both defences go.
+  ["an existing branch is moved","packages/cli/src/security/branch.ts",[["ref, commit, \"0\".repeat(base.commit.length)]","ref, commit]"],["  if (existsSync(join(common, \"logs\", ...parts))) throw","  if (false) throw"]],null,"packages/cli/test/branch.test.ts"],
+  ["every fix in one candidate", "packages/cli/src/security/dependency-patch.ts", "candidate = await acquire(label, fix.changes);", "candidate = await acquire(label, scan.plan);", "packages/cli/test/dependencies.test.ts"],
+  ["a failing fix stops the rest", "packages/cli/src/security/dependency-patch.ts", "} catch (error) { fix.outcome = \"failed\"; fix.reason = error instanceof Error ? error.message : String(error); }", "} catch (error) { fix.outcome = \"failed\"; fix.reason = error instanceof Error ? error.message : String(error); throw error; }", "packages/cli/test/dependencies.test.ts"],
+  ["apply writes the working tree", "packages/cli/src/security/dependency-patch.ts", "          fix.commit = fixBranch(", "          for (const f of files) writeFileSync(join(root, f.path), f.after);\n          fix.commit = fixBranch(", "packages/cli/test/dependencies.test.ts"],
+  ["no publish time", "packages/cli/src/security/dependency-patch.ts", "fix.fix_published_at = published.at;", "fix.fix_published_at = null;", "packages/cli/test/dependencies.test.ts"],
+  ["PHP: no publish time", "packages/cli/src/security/patch.ts", "fix_published_at: published.at,", "fix_published_at: null,", "packages/cli/test/security.test.ts"],
+  ["PHP: branch for an existing one", "packages/cli/src/security/patch.ts", "    if (base && branch && tip?.subject === subject) {", "    if (false) {", "packages/cli/test/security.test.ts"],
+  ["a planted object accepted","packages/cli/src/security/branch.ts","!== contents[i]) throw","!== contents[i] && false) throw","packages/cli/test/branch.test.ts"],
+  ["alternates accepted","packages/cli/src/security/branch.ts","if (existsSync(join(common, \"objects\", \"info\", \"alternates\"))) throw","if (false) throw","packages/cli/test/branch.test.ts"],
+  ["a finding on a new version accepted","packages/cli/src/security/dependency-patch.ts","f.package.name === fix.package || !versioned.has(findingId(f))","f.package.name === fix.package","packages/cli/test/dependencies.test.ts"],
+  ["a baseline MAL- record accepted","packages/cli/src/security/dependency-patch.ts","    if (marked.length) throw","    if (marked.length && false) throw","packages/cli/test/dependencies.test.ts"],
+  ["a symbolic link in .git accepted","packages/cli/src/security/branch.ts","  if (linked.length) throw","  if (linked.length && false) throw","packages/cli/test/branch.test.ts"],
+  ["an existing reflog accepted","packages/cli/src/security/branch.ts","  if (existsSync(join(common, \"logs\", ...parts))) throw","  if (false) throw","packages/cli/test/branch.test.ts"],
+  // LA5 (2026-10-30): #203's judge, called once per fix (the review of f976ec2, comment 6501442567, "#204 がやること" 4).
+  ["the judge not called", "packages/cli/src/security/dependency-patch.ts", "const refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); active();", "const refusal = null as string | null;", "packages/cli/test/dependencies.test.ts"],
+  ["the judge's exception swallowed", "packages/cli/src/security/dependency-patch.ts", "const refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); active();", "let refusal: string | null = null; try { refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); } catch {} active();", "packages/cli/test/dependencies.test.ts"],
+  ["the refusal honoured only with --apply", "packages/cli/src/security/dependency-patch.ts", "            if (refusal) throw new Error(refusal);", "            if (refusal && apply) throw new Error(refusal);", "packages/cli/test/dependencies.test.ts"],
+  ["a wait let through", "packages/cli/src/security/candidate-judge.ts", "if (j.verdict === \"ready_except_build\") return null;", "if (j.verdict === \"ready_except_build\" || j.verdict === \"wait\") return null;", "packages/cli/test/dependencies.test.ts"],
+  ["every fix judged on the first fix's candidate", "packages/cli/src/security/dependency-patch.ts", "judgeNpmCandidate(source, candidate.exported, deps.fetchFn)", "judgeNpmCandidate(source, join(temp, \"candidate-1-export\"), deps.fetchFn)", "packages/cli/test/dependencies.test.ts"],
+  // LA6 (2026-10-30): git by absolute path, outside the repository (the review of 89fd0c8, comment 6503011718).
+  ["git started by name through PATH", "packages/cli/src/security/branch.ts", "spawnSync(program, [", "spawnSync(\"git\", [", "packages/cli/test/branch.test.ts"],
+  ["PATH folders inside the repository searched", "packages/cli/src/security/branch.ts", "process.platform, top);", "process.platform, null);", "packages/cli/test/branch.test.ts"],
+  ["only the project's folder skipped, not the repository's", "packages/cli/src/security/branch.ts", "top = at; break;", "break;", "packages/cli/test/branch.test.ts"],
+  ["no git found falls back to the name", "packages/cli/src/security/branch.ts", [["  if (!program) throw", "  if (false) throw"], ["  return program;\n}", "  return program ?? \"git\";\n}"]], null, "packages/cli/test/branch.test.ts"],
+  ["no git found falls back to the name (patch)", "packages/cli/src/security/branch.ts", [["  if (!program) throw", "  if (false) throw"], ["  return program;\n}", "  return program ?? \"git\";\n}"]], null, "packages/cli/test/dependencies.test.ts"],
+  ["a candidate's new entry without a supported fix ignored", "packages/cli/src/security/dependency-patch.ts", " || !scan.blocked.includes(b))", ")", "packages/cli/test/dependencies.test.ts"],
+];
+const vitest = file => { try { execFileSync("npx", ["vitest", "run", "--project", "node", file], { stdio: "pipe", env: { ...process.env, NO_COLOR: "1" } }); return "pass"; } catch { return "fail"; } };
+let caught = 0;
+for (const [name, file, from, to, test] of mutations) {
+  const original = readFileSync(file, "utf8");
+  // A mutation is one replacement, or (from as a list) several.
+  const pairs = Array.isArray(from) ? from : [[from, to]];
+  if (pairs.some(([a]) => original.split(a).length !== 2)) { console.log(`NOT APPLIED  ${name} (the text is not found exactly once)`); continue; }
+  writeFileSync(file, pairs.reduce((text, [a, b]) => text.replace(a, b), original));
+  const result = vitest(test);
+  writeFileSync(file, original);
+  if (result === "fail") caught++;
+  console.log(`${result === "fail" ? "caught      " : "NOT CAUGHT  "} ${name} — ${test}`);
+}
+console.log(`${caught} of ${mutations.length} caught; without mutations: ${[...new Set(mutations.map(m => m[4]))].map(t => `${t} ${vitest(t)}`).join(", ")}`);

@@ -37,3 +37,9 @@ The index on 2026-10-31 (read with curl, 336,201 bytes, 144 entries marked `secu
 ## Scripts
 
 Copied from docs/bench/2026-10-30-lb-design and changed: `sync.sh` (as is), `e2e.sh` (a `node` case through examples/node-security; the pushed branches are listed with the prefix `refs/heads/ludion/`, since `ludion/*` matched none, and their FROM line is shown), `github.mjs` (as is), `summary.mjs` (the image receipt's runtime and digests). New: `run.sh`, `ci.sh`, `test.sh` (a stand-in Git repository in /w, which apps/site/test/knowledge.test.ts needs), `mutate.sh`, `mutate.mjs`.
+
+## After the R lane's review (comment 6532823264, REQUEST CHANGES at a4ee125)
+
+main 5dc8f69 (#233) merged in (b3827ae, no conflict). Blocking: #233's osv-note.test.ts needs every host in packages/cli/src named in `SCAN_NOTE`; the note now names nodejs.org (the release index, downloaded whole) and the image tag (library/php or library/node) sent to Docker Hub. Non-blocking, fixed with tests only: the index request's `redirect: "error"` and 30 s deadline, the PR job refusing a FROM pinned at the same version (Node.js and PHP), and PHP's hyphen refusal; README says when init asks for --ecosystem and that a floating `node:` tag makes scan exit 2. Not changed: the order of PHP's hyphen check after the ADD/COPY/RUN check (both refuse).
+
+At c00f523: tsc exit 0; the node project 37 files, 1,238 passed, 19 skipped, osv-note.test.ts 6 passed (logs/test-fix.log). Mutations: the 26 above plus the review's four survivors (M1, M9, D2, H1), 30 of 30 caught (logs/mutate-fix.log).

@@ -196,10 +196,11 @@ Median / maximum over the judged pairs:
 ## What the runner and the analyzer do that the definitions do not say (found in review)
 
 The runner and the analyzer are kept as they ran, so their blob hashes match the execution. These differences are recorded here instead of fixed.
-- **No malicious outcome is affected.**
+- **No malicious outcome is affected.** This is shown below by after-the-result checks for the two items that could have changed one: dotted paths and backtick module names.
 - **Two items can move a number:**
   - the deadline item, one not-obtained reason;
   - the `.` path-segment item, one genuine false alarm (51 could be 50).
+- **Effect on the genuine fixes not known:** the backtick item.
 - Every other item changes nothing in this run.
 
 - **The deadline.** The runner checks the 6-hour deadline only before it starts a lookup.
@@ -216,7 +217,7 @@ The runner and the analyzer are kept as they ran, so their blob hashes match the
     - dashboard-empty-state 1.0.2 (held);
     - rxnt-healthchecks-nestjs 1.0.1-alpha-1609 (no visit with a snapshot after publication);
     - amazon-chime-sdk-js-exp 10.10.11 (origin not archived).
-  - **Checked afterwards.** On 2026-10-30 at 07:48Z, from a credential-free container, the registry's packument `time` held each of those four versions. So the registry's time, not the substitute, was used. Every other previous version was "not looked up in time" (genuine ones included), so it never reached the substitute.
+  - **Checked afterwards.** On 2026-10-30 at 07:48Z, and again at 08:30Z with the committed `scripts/check-prev-times.mjs` (output in `after-checks.txt`), from a credential-free container, the registry's packument `time` held each of those four versions. The run did not record its own packument answers. So it is inferred, not recorded, that the run also saw those times and used them instead of the substitute. Every other previous version was "not looked up in time" (genuine ones included), so it never reached the substitute.
 - **Unhashed Software Heritage entries.** A directory entry that is neither a file nor a directory is stored as `link:<path>`, with no hash check. Software Heritage stores a symlink's target as plain content, where `untar` stores `link:<target>`. In a pair with sources of both kinds, this could count a link as changed. Of the three such pairs, @ensdomains/buffer has no changed code file and the other two are flagged by other files.
 - **Untested trust checks.** The runner's own checks are not unit-tested:
   - sha512 / shasum against the registry tarball;
@@ -228,17 +229,25 @@ The runner and the analyzer are kept as they ran, so their blob hashes match the
 - **An analyzer error is recorded as undecidable.** Definitions section 4 lists the undecidable cases, and an analyzer error is not one of them. The runner adds it (since 9443192; `docs/mistakes/2026-10-30-delta-regex-stack.md`), so that one file's error cannot end a run. No row has it. The runner's comment cites a README section "Runs" that does not exist; the runner is kept as it ran.
 - **A `.` path segment is not removed** (the analyzer's `untar`, delta.ts). `untar` keeps a path such as `./dist/index.cjs` (a tarball entry named under `package/./`) as written. npm would extract that to the same file as `dist/index.cjs`.
   - **js-toml 1.0.2.** In this genuine fix, the dotted path is counted as added with no previous file, and it is the only file the fix's flags fire on (high-entropy line, very long line).
-  - **Checked afterwards** (2026-10-30 08:18Z, `scripts/check-dot-paths.ts`, in a credential-free container). Each tarball was compared with the registry's integrity. The script prints counts only:
-    - js-toml 1.0.2 has 1 dotted path, and the tarball also holds the same path without the dot: a duplicate entry. With the dot removed, the two would collide, and which copy counts is not decided here. So this false alarm could go, and 51 could be 50.
-    - js-toml 1.0.1 has no dotted path.
-    - @asyncapi/studio 0.20.0, 0.20.1 and 0.20.2 have no dotted path either.
-  - **No malicious outcome can change.** Removing a dot can only match a changed file with a real previous file, so it can only remove flags. The two misses cannot change.
-    - Of the 9 flagged, the @igh pair, both freo versions and dm3 compare every changed code file with a previous file at the same path.
-    - voiceflow and kinvey removed no file.
-    - The asyncapi pair, the only other case, has no dotted path.
+  - **Checked afterwards.** `scripts/check-dot-paths.ts` ran on 2026-10-30 at 08:30:04Z, in a credential-free container; its output is in `after-checks.txt`. It covers every version of the 11 obtained malicious pairs that came from the registry, and js-toml 1.0.1 and 1.0.2. A first, narrower run at 08:18Z covered only the asyncapi and js-toml versions and gave the same counts for them. It is replaced by this one.
+    - Every tarball matched the registry's sha512 integrity.
+    - The script prints names, versions, that flag and counts, never a path.
+  - **js-toml 1.0.2** has 1 dotted path, and the tarball also holds the same path without the dot: a duplicate entry. With the dot removed, the two would collide, and which copy counts is not decided here. So this false alarm could go, and 51 could be 50. js-toml 1.0.1 has no dotted path.
+  - **No malicious outcome can change.**
+    - **The registry's versions.** Every registry-held version of the 11 malicious pairs has 0 dotted paths:
+      - the 8 still-listed pairs, both versions each;
+      - the previous versions of @ensdomains/buffer, voiceflow and kinvey.
+    - **The other three.** Those three pairs' V's came from Software Heritage directories, whose paths have no `.` segment.
 - **The first results commit's subject** (6d9960a, "9 of 11 obtained malicious flagged") counts both disputed versions without showing them apart. The tables above show them apart.
 - **A re-fetch may use another source.** When a pending pair is judged, a side is fetched again: from Software Heritage if that is where it was found, otherwise registry then jsDelivr. In principle the second source could differ from the one in `sources`. Here it does not: the 3 pending pairs judged are registry / Software Heritage, and none of their registry sides failed.
 - **"Registry, hash unknown"** (definitions section 2): 0 versions. Every registry tarball used had a known hash.
+- **Module names in backticks.** Rule 1 writes `require("m")` and `import("m")` with quotes. The analyzer also counts the same calls with the name in backticks (a template literal without substitutions), which load the same module.
+  - **Checked afterwards** (`scripts/check-backtick-modules.ts`, 2026-10-30 08:31Z, output in `after-checks.txt`): every registry-held version of the 11 malicious pairs has 0 such calls in any code file.
+  - **The three Software Heritage V's** cannot change outcome either:
+    - @ensdomains/buffer 0.1.1 has no changed code file;
+    - voiceflow 0.5.3's and kinvey 0.1.1's previous versions have 0, so such calls could only add flags to versions already flagged.
+  - **So no malicious outcome is affected.** For the genuine fixes the effect is not known: it could add a flag, or remove one by raising a previous file's count.
+- **Escape runs.** Rule 7 counts runs of `\xHH` escapes and runs of `\uHHHH` escapes separately, so a run that mixes the two is not one run. The definitions do not say which reading to use, and the regular expressions the analyzer first used counted the same way.
 
 ## Files
 
@@ -246,4 +255,4 @@ The runner and the analyzer are kept as they ran, so their blob hashes match the
   - Each row has its sources and what each source answered, its outcome, its new capabilities and sizes, and what its changed code files contain by capability (names only).
   - For genuine fixes only, the paths where each capability is new.
 - `delta-v1.log`, `run-times.txt`: the execution's log and times. `attempt1.log`: the first, failed execution.
-- `scripts/run.sh`, `scripts/copycache.sh`: what ran in the container. Their comments were corrected after the run (the cache exception); only the comments changed. `scripts/inspect-miss.ts`: the after-the-result measurement of one miss (see above). `scripts/check-dot-paths.ts`: the after-the-result count of dotted paths (see above).
+- `scripts/run.sh`, `scripts/copycache.sh`: what ran in the container. Their comments were corrected after the run (the cache exception); only the comments changed. `scripts/inspect-miss.ts`: the after-the-result measurement of one miss (see above). `scripts/check-dot-paths.ts`, `scripts/check-prev-times.mjs` and `scripts/check-backtick-modules.ts`: the after-the-result checks above, with their output in `after-checks.txt`.

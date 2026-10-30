@@ -240,7 +240,9 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix)
     const packages = isObject(lock) && isObject(lock.packages) ? lock.packages : {};
     for (const [path, entry] of Object.entries(packages)) {
       if (!path || !isObject(entry) || typeof entry.version !== "string") continue;
-      const name = typeof entry.name === "string" ? entry.name : path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
+      // The name the install path gives, never the entry's own `name` (an alias's, and the artifact's to choose), so a
+      // moved package cannot be filed under the fix's name.
+      const name = path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
       map.set(name, (map.get(name) ?? new Set()).add(entry.version));
     }
     return map;

@@ -555,6 +555,8 @@ describe("the policy at the base decides what a fix may change, and what it may 
     const fix = fixOf("lodash", "4.17.20", "4.17.21", ["package.json", "package-lock.json"]);
     expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.6" }, "node_modules/new-dep": { version: "1.0.0" } }) }))).toBeNull();
     expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.8" } }) }))).toContain("moves minimist from 1.2.6, which this fix does not plan");
+    // The entry's own name is not trusted: minimist filed under "lodash" still counts as minimist.
+    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { name: "lodash", version: "1.2.8" } }) }))).toContain("moves minimist from 1.2.6");
   });
   it("Maven: pom.xml is exactly what changedManifest makes for the change", () => {
     const pom = readFileSync(new URL("../../../examples/maven-security/pom.xml", import.meta.url), "utf8");

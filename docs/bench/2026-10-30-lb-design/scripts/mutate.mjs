@@ -38,6 +38,7 @@ const mutations = [
   off("composer and Maven: a downgrade accepted", "if (!from || !to || !semver.gt(to, from)) return"),
   off("composer: a from the base does not lock accepted", "if (!fix.changes.some(c => c.from.replace(/^v(?=\d)/, \"\") === String(earlier.version ?? \"\").replace(/^v(?=\d)/, \"\"))) return"),
   off("npm: another package moving accepted", "if (gone.length) return"),
+  ["npm: the entry's own name trusted", D, "const name = path.slice(path.lastIndexOf(\"node_modules/\") + \"node_modules/\".length);", "const name = typeof entry.name === \"string\" ? entry.name : path.slice(path.lastIndexOf(\"node_modules/\") + \"node_modules/\".length);", T],
   ["composer and Maven: OSV not asked", D, "if (checked.ecosystem === \"composer\" || checked.ecosystem === \"maven\") {", "if (false) {", T],
   off("composer and Maven: OSV's advisories ignored", "if (ids.length) throw new Error(`Not pushed: OSV lists"),
   ["composer: Packagist not asked", D, "if (checked.ecosystem === \"composer\") {", "if (false) {", T],

@@ -1,5 +1,5 @@
-# at commit 8fe5b210facc06a84a62f588eaef405361b8b6f2, 3 files differing from it
-# started 2026-10-30T03:01:36Z, node v24.22.1, git version 2.39.5
+# at commit 579665c0b31495f4d29baaa68f88778941c0cc9e, 2 files differing from it
+# started 2026-10-30T03:27:20Z, node v24.22.1, git version 2.39.5
 npm ci exit 0
 caught       a parent other than the base accepted — packages/cli/test/deliver.test.ts
 caught       files outside the receipt's list accepted — packages/cli/test/deliver.test.ts
@@ -24,32 +24,3 @@ caught       composer.lock: a plugin accepted — packages/cli/test/deliver.test
 caught       composer.lock: a new package from any archive accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: the planned package from another repository accepted — packages/cli/test/deliver.test.ts
 caught       composer.lock: a new package nothing requires accepted — packages/cli/test/deliver.test.ts
-caught       composer: Packagist not asked — packages/cli/test/deliver.test.ts
-caught       composer: an entry other than Packagist's release accepted — packages/cli/test/deliver.test.ts
-caught       composer.lock: keys Ludion does not check accepted — packages/cli/test/deliver.test.ts
-caught       PHP: Docker Hub not asked — packages/cli/test/deliver.test.ts
-caught       PHP: another digest under the tag accepted — packages/cli/test/deliver.test.ts
-caught       composer.lock: a new notification-url accepted — packages/cli/test/deliver.test.ts
-caught       composer.lock: a name listed twice accepted — packages/cli/test/deliver.test.ts
-caught       composer.lock: a removed package accepted — packages/cli/test/deliver.test.ts
-caught       composer.lock: another top-level key accepted — packages/cli/test/deliver.test.ts
-caught       the push forced — packages/cli/test/deliver.test.ts
-caught       the token in the push's arguments — packages/cli/test/deliver.test.ts
-caught       a run off the default branch opens PRs — packages/cli/test/deliver.test.ts
-caught       a checkout at another commit accepted — packages/cli/test/deliver.test.ts
-caught       another author accepted — packages/cli/test/deliver.test.ts
-caught       another subject accepted — packages/cli/test/deliver.test.ts
-caught       another branch name accepted — packages/cli/test/deliver.test.ts
-caught       an npm fix without the judge's ready_except_build accepted — packages/cli/test/deliver.test.ts
-caught       a fix whose tests failed accepted — packages/cli/test/deliver.test.ts
-caught       another base_commit accepted — packages/cli/test/deliver.test.ts
-caught       an oversized bundle accepted — packages/cli/test/deliver.test.ts
-caught       any advisory text accepted — packages/cli/test/deliver.test.ts
-caught       a bundle without an applied fix accepted — packages/cli/test/deliver.test.ts
-caught       pack: a branch not at the receipt's commit packed — packages/cli/test/deliver.test.ts
-caught       patch mode: an OIDC token allowed — packages/cli/test/action-patch.test.ts
-caught       template: the validation job may write — packages/cli/test/action-patch.test.ts
-caught       action: the checkout keeps the credential — packages/cli/test/action-patch.test.ts
-caught       action: the validation step gets the token — packages/cli/test/action-patch.test.ts
-50 of 50 caught; without mutations: packages/cli/test/deliver.test.ts pass, packages/cli/test/action-patch.test.ts pass
-# finished 2026-10-30T03:11:01Z

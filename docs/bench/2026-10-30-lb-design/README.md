@@ -207,6 +207,7 @@ The lane's review of 2d6f224 (comment 6527878093, REQUEST CHANGES) found three m
 - **No worse than main:** main's PR job reads `lock.packages` only, compares versions by name, and never looks at the legacy section or at any of those fields.
 - **What comes next:** npm moves to a PR job that rebuilds the lockfile from the plan and compares it (plan D, lane LPD), instead of checking the artifact's lockfile field by field.
 - docs/status.md, both READMEs and the PR body Ludion writes say the same.
+- Tests at 2dc7e3e, after those text changes (`logs/test-lb2a-scope.log`, in Docker with `--memory 4g`): typecheck 0, build 0, 35 files, 1,219 passed, 19 skipped.
 
 ## The reviews
 

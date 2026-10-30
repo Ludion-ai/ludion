@@ -94,6 +94,12 @@ function fixedVersions(advisory: Advisory, ecosystem: string, name: string): str
   return [...fixed];
 }
 
+/**
+ * Every receipt's scan note. It names each host Ludion's code sends a request to, across all its commands, not only the
+ * scan's; packages/cli/test/osv-note.test.ts fails when a host in packages/cli/src is missing here, or one here is not there.
+ */
+export const SCAN_NOTE = "Known advisories for the recorded package inventory only. No match is not a security guarantee. Across its commands, Ludion sends package names and versions to OSV (api.osv.dev), and back to OSV the IDs of the advisories it returned; for npm, to the npm registry (registry.npmjs.org); for Composer, to Packagist (packagist.org, repo.packagist.org), and the archive URLs in composer.lock, which name each package's repository and commit, to their hosts (api.github.com, codeload.github.com, github.com, bitbucket.org); for Maven, to Maven Central (repo.maven.apache.org). For PHP Docker it sends the PHP branch to php.net (www.php.net) and the image tag to Docker Hub (auth.docker.io, registry-1.docker.io), and Docker pulls the images Ludion builds in from Docker Hub. It downloads CISA's catalog of exploited vulnerabilities (www.cisa.gov) and the EPSS list (epss.empiricalsecurity.com) whole, rather than sending them CVE IDs. `ludion deliver open` pushes each fix's commit to the project's own GitHub repository and opens its PR there; no other source is sent. Major-version fixes, unresolved inventory and unsupported builds require review.";
+
 /** Fixed-origin requests only, with bounded bodies, deadlines and explicit pagination. No registry or database failure becomes a clean result. */
 export class OsvClient {
   private cache = new Map<string, Advisory>();
@@ -191,7 +197,7 @@ export class OsvClient {
         change.to = next.at(-1)!; change.advisories = [...new Set([...change.advisories, ...still.map(a => a.advisory.id)])];
       }
     }
-    return { schema: 1, checked_at: new Date().toISOString(), source: "https://osv.dev", sources: composer.length ? ["https://osv.dev", PACKAGIST_ADVISORIES] : ["https://osv.dev"], status: findings.length ? "vulnerabilities_found" : inventory.limitations.length || unreadable.length ? "incomplete" : "no_known_vulnerabilities", inventory, findings, plan: [...planned.values()], blocked: [...new Set([...unreadable, ...blocked])], note: "Known advisories for the recorded package inventory only. No match is not a security guarantee. Package names and versions are sent to OSV, and Composer package names to Packagist; source is not. Major-version fixes, unresolved inventory and unsupported builds require review." };
+    return { schema: 1, checked_at: new Date().toISOString(), source: "https://osv.dev", sources: composer.length ? ["https://osv.dev", PACKAGIST_ADVISORIES] : ["https://osv.dev"], status: findings.length ? "vulnerabilities_found" : inventory.limitations.length || unreadable.length ? "incomplete" : "no_known_vulnerabilities", inventory, findings, plan: [...planned.values()], blocked: [...new Set([...unreadable, ...blocked])], note: SCAN_NOTE };
   }
   /**
    * Known advisories for an inventory Ludion reads but does not patch (PyPI, Go, crates.io): OSV's match on the exact

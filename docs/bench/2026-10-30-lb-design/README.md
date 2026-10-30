@@ -200,6 +200,14 @@ All ran in Docker, one container at a time, each with a `--memory` limit (tests 
   - vitest now runs with `--maxWorkers=2`.
 - **Both jobs** at 6efb04e (`logs/e2e-lb2a-fix6.log`; 55fbb67 only removed the guards that did nothing): npm-v2, npm-two and npm each opened their PRs on run 1 (lodash 4.17.20 → 4.18.1, and minimist 1.2.5 → 1.2.6 in npm-two) and none on run 2.
 
+### Scope of #215 (decided 2026-10-31)
+
+The lane's review of 2d6f224 (comment 6527878093, REQUEST CHANGES) found three more fields of a moved or added `packages` entry that change what npm installs and that the PR job does not tie to the base or the registry: `hasShrinkwrap` (npm 7 and later install the package's own shrinkwrap tree), `peerDependenciesMeta` (an optional mark takes a peer out of the requirement check) and the flags (`dev`, `optional`, `devOptional`, `peer`, which decide what a production install leaves out). The decision: #215 goes in when it is no worse than main, without further checks.
+- **Out of #215's scope:** npm 6's older lockfile forms (the legacy `dependencies` section, shrinkwraps, peer marks and the like). The PR job does not check the older lockfile forms npm 6 reads against the receipt; it checks `packages`, which npm 7 and later read, and the fields above are not compared.
+- **No worse than main:** main's PR job reads `lock.packages` only, compares versions by name, and never looks at the legacy section or at any of those fields.
+- **What comes next:** npm moves to a PR job that rebuilds the lockfile from the plan and compares it (plan D, lane LPD), instead of checking the artifact's lockfile field by field.
+- docs/status.md, both READMEs and the PR body Ludion writes say the same.
+
 ## The reviews
 
 - **First (comment 6512945643, REQUEST CHANGES at d714435).** Blocking 1 (content not checked): content checks as above. Blocking 2 (a refused PR left the fix stuck): branch reuse with the same tree on the same base; anything else fails the job with what to do. 3: the whole message is compared. 4: the receipt is uploaded on every run. 5: `pushInvocation` is tested; `pushBranch` itself runs only against local bare repositories in the tests and e2e. 6: depth-1 detached checkouts. 7: cache poisoning written down. 8: no fsck, with the reason above. 9: logs committed. 10: concurrency per workflow. 11: red runs written down, not changed.

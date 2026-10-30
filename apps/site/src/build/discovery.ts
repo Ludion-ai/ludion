@@ -1,11 +1,13 @@
 // /sitemap.xml and /llms.txt.
 const xml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-/** The sitemap lists the home page and the setup page. */
+/** The sitemap lists the home page and the setup page, in English and then in Japanese. */
 export function sitemap({ site, builtAt }: { site: string; builtAt: string }): string {
   const urls = [
     { loc: `${site}/`, lastmod: builtAt.slice(0, 10) },
     { loc: `${site}/start/` },
+    { loc: `${site}/ja/`, lastmod: builtAt.slice(0, 10) },
+    { loc: `${site}/ja/start/` },
   ];
   const body = urls.map((u) => `  <url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}</url>`).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;

@@ -79,6 +79,8 @@ const SCREEN = 1100;
 const pages: { path: string; moments: number }[] = [
   { path: "/", moments: MOMENTS },
   { path: "/start/", moments: 20 },
+  { path: "/ja/", moments: MOMENTS },
+  { path: "/ja/start/", moments: 20 },
 ];
 
 for (const { path, moments } of pages) {

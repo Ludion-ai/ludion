@@ -8,7 +8,8 @@ export const en = {
     "label": "Main",
     "skip": "Skip to content",
     "design": "How it works",
-    "start": "Try the preview"
+    "start": "Try the preview",
+    "language": "日本語"
   },
   "home": {
     "title": "Ludion — One workflow for security updates",
@@ -23,7 +24,10 @@ export const en = {
     "coverage": "Source preview · PHP Docker, npm package-lock, Composer and standalone Maven. Source updates are validated locally; production deployment stays with your release process.",
     "example": "Illustrated workflow. Run the preview to produce your own results.",
     "scene": {
-      "caption": "Your stack → relevant advisories → application checks → recorded updates."
+      "caption": "Your stack → relevant advisories → application checks → recorded updates.",
+      "from": "stack",
+      "update": "security update",
+      "to": "your project"
     },
     "chapters": {
       "label": "The update workflow",
@@ -83,7 +87,14 @@ export const en = {
       "applyDetail": "With --apply, commit each fix that passes on its own to a new Git branch. Your files and current branch stay unchanged. Production deployment remains a separate step.",
       "limits": "Online acquisition contains dependency manifests, not application source or host credentials. Application tests run offline. Source remains local to your configured Docker setup.",
       "unavailable": "Run watch --apply to repeat the saved ecosystem policy. A stop request cancels pending application; a Docker step already in flight may finish before exit.",
-      "scope": "Workflow illustration, not a completed update. Nothing is installed or executed by this page."
+      "scope": "Workflow illustration, not a completed update. Nothing is installed or executed by this page.",
+      "context": "security update",
+      "reference": "security patch",
+      "inline": "tested update",
+      "replay": "Replay",
+      "installFile": "dependency files",
+      "runFile": "application test",
+      "applyFile": "fix branch"
     },
     "receipt": {
       "title": "Know what changed, and what remains.",
@@ -106,6 +117,14 @@ export const en = {
     "closing": {
       "title": "Bring more of your stack into one workflow.",
       "action": "Try the multi-stack preview"
+    },
+    "coverageTable": {
+      "title": "Know the supported scope.",
+      "label": "Supported ecosystems",
+      "stack": "Your stack",
+      "detect": "Detect",
+      "apply": "Validate & apply",
+      "boundary": "Current boundary"
     },
     "supported": [
       {
@@ -134,6 +153,72 @@ export const en = {
       }
     ],
     "supportedNote": "Yarn/pnpm discovery is partial and does not enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP and automatic production deployment are not supported in this preview. Custom build tools may need an explicitly trusted offline cache."
+  },
+  "start": {
+    "title": "Try the multi-stack preview | Ludion",
+    "description": "Check PHP Docker, npm, Composer and Maven security updates. Choose an update policy and application test before committing fixes to Git branches.",
+    "heading": "One workflow. More of your stack.",
+    "intro": "Scan the project, choose an ecosystem policy, then validate its security update against your application.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "selected": "Selected",
+    "scan": {
+      "heading": "Check your project",
+      "where": "Source preview · Node 24+ · Docker for acquisition and validation. The published npm 0.1.4 release does not include these commands.",
+      "run": "After building this source revision, run:",
+      "copy": "Copy scan command",
+      "wiring": "Replace /path/to/app with your project directory. Scan detects supported lockfiles and the configured PHP Dockerfile. Maven resolves its graph in a manifest-only container. The original project is not modified."
+    },
+    "path": {
+      "label": "The update path",
+      "steps": [
+        { "title": "Detect", "detail": "Installed versions and relevant advisories" },
+        { "title": "Validate", "detail": "Your application test, old and new" },
+        { "title": "Apply", "detail": "One Git branch per fix" }
+      ]
+    },
+    "coverage": "PHP Docker · npm · Composer · Maven. An unavailable database or unsupported inventory stays visible. Production is not automatically redeployed.",
+    "reference": "From discovery to a validated update",
+    "source": {
+      "summary": "1 · Build the source preview",
+      "note": "Keep the existing npm install separate",
+      "body": "Use the multi-stack source revision. These commands become available on the default branch when its pull request is merged.",
+      "copy": "Copy source setup"
+    },
+    "init": {
+      "summary": "2 · Choose the ecosystem and test",
+      "note": "Required before validation",
+      "choose": "Choose php, npm, composer or maven. A project may scan several ecosystems together; its saved patch policy selects one manager at a time.",
+      "copy": "Copy init command",
+      "edit": "Edit ludion.security.json to select an official tool image matching your application and its real offline test command. npm acquisition uses npm 12.2.1; its Node tool image must support that version.",
+      "tests": "Tests must run with a read-only project and write only to supported scratch areas. Maven's online model excludes custom build/plugin configuration; those plugins must already be available for offline tests or validation will stop."
+    },
+    "apply": {
+      "summary": "3 · Validate, then apply",
+      "note": "Branches are opt-in",
+      "validate": "Acquire dependencies separately, run baseline/candidate tests offline and recheck the candidate inventory:",
+      "copyValidate": "Copy validation command",
+      "apply": "To validate again and commit each fix that passes on its own:",
+      "copyApply": "Copy apply command",
+      "branchesBefore": "--apply does not change your files or your current branch. Each fix becomes one commit on its own new branch, ",
+      "branchesAfter": ", and nothing is pushed. Fixes that pass only together are not applied. A fix whose branch already exists is not applied again. An OSV malicious-package record (MAL-) on any installed package stops every fix in the run.",
+      "needs": "--apply needs git installed outside the project, and a Git repository whose files are exactly those of its last commit. Uncommitted, untracked or ignored files (other than node_modules and .env files, and for npm, Composer and Maven a top-level vendor or target), Git LFS, submodules or Git configuration that names hooks make it refuse; run without --apply to validate only.",
+      "review": "Review .ludion/security/ for the receipt. npm/Composer may adjust dependency constraints within the same major and regenerate the lockfile. Maven can add dependencyManagement constraints for vulnerable transitives. Major-version fixes and unresolved cases require review. Merge a branch, then deploy through your normal process."
+    },
+    "watch": {
+      "summary": "4 · Keep checking automatically",
+      "note": "While the process is running",
+      "repeat": "Repeat the saved ecosystem policy every 900 seconds:",
+      "copy": "Copy watch command",
+      "stop": "Ctrl+C requests a stop. An in-flight Docker step may finish, but no branch is made after cancellation is received. A later run skips fixes whose branch already exists."
+    },
+    "privacy": {
+      "summary": "What leaves your machine",
+      "note": "Requests and boundaries",
+      "requests": "Package names and exact versions are sent to OSV. PHP uses php.net metadata. Tool images and dependencies come from the configured public sources; Composer ZIP redirects are checked before every request. npm URL/Git/file sources are disabled and Maven repositories are mirrored to public Central.",
+      "source": "Application source is sent to your configured Docker daemon for offline tests; choose a local daemon to keep it on your machine. No source is uploaded to Ludion and security commands send no telemetry. Online acquisition contains manifests only. Source snapshots exclude .env files, Git history and common credential directories, but they are not general secret scanners. This website uses Google Analytics."
+    },
+    "summary": "Known advisories and recorded application tests only. No match is not a security guarantee. Supported scope and unhandled cases stay explicit."
   },
   "footer": {
     "license": "Code is Apache-2.0.",

@@ -4,7 +4,7 @@ import "../styles/water.css";
 import Wordmark from "../components/Wordmark.astro";
 import BrandMark from "../components/BrandMark.astro";
 import { siteData } from "../build/data.ts";
-import { en } from "../strings/en.ts";
+import { localPath, otherLang, strings, type Lang } from "../strings/index.ts";
 
 interface Props {
   title: string;
@@ -17,16 +17,30 @@ interface Props {
   image?: string;
   /** Keep the page out of search results (the share cards' source pages). */
   noindex?: boolean;
+  lang?: Lang;
+  /** The English path of a page that has both languages ("/" or "/start/"): adds hreflang and the language link. */
+  page?: string;
 }
-const { title, description = en.site.description, canonical = true, canonicalPath, image, noindex = false } = Astro.props;
+const { lang = "en", page } = Astro.props;
+const t = strings[lang];
+const { title, description = t.site.description, canonical = true, canonicalPath, image, noindex = false } = Astro.props;
 const { config } = await siteData();
 // The trailing-slash URL: the one without it only redirects (307).
 const path = canonicalPath ?? (Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`);
 const canonicalUrl = new URL(path, config.site).href;
+// Each language names both, and English is the default. Nothing redirects by the browser's language.
+const other = otherLang(lang);
+const alternates = page
+  ? [
+      { hreflang: "en", href: new URL(page, config.site).href },
+      { hreflang: "ja", href: new URL(localPath("ja", page), config.site).href },
+      { hreflang: "x-default", href: new URL(page, config.site).href },
+    ]
+  : [];
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -34,11 +48,12 @@ const canonicalUrl = new URL(path, config.site).href;
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonicalUrl} />}
     {noindex && <meta name="robots" content="noindex" />}
+    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
     {
       image && (
         <>
           <meta property="og:type" content="website" />
-          <meta property="og:site_name" content={en.site.name} />
+          <meta property="og:site_name" content={t.site.name} />
           <meta property="og:title" content={title} />
           <meta property="og:description" content={description} />
           <meta property="og:url" content={canonicalUrl} />
@@ -54,14 +69,15 @@ const canonicalUrl = new URL(path, config.site).href;
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <script is:inline src="/ga.js" defer></script>
   </head>
-  <body class:list={[{ showcase: Astro.url.pathname === "/" }]}>
-    <a class="skip" href="#main">{en.nav.skip}</a>
+  <body class:list={[{ showcase: page === "/" }]}>
+    <a class="skip" href="#main">{t.nav.skip}</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a class="home" href="/" aria-label={en.site.name}><BrandMark /><Wordmark height={23} /></a>
-        <nav aria-label={en.nav.label}>
-          <a href="/#guard" aria-current={Astro.url.pathname === "/" ? "page" : undefined}>{en.nav.design}</a>
-          <a href="/start/" aria-current={Astro.url.pathname.startsWith("/start") ? "page" : undefined}>{en.nav.start}</a>
+        <a class="home" href={localPath(lang, "/")} aria-label={t.site.name}><BrandMark /><Wordmark height={23} /></a>
+        <nav aria-label={t.nav.label}>
+          <a href={`${localPath(lang, "/")}#guard`} aria-current={page === "/" ? "page" : undefined}>{t.nav.design}</a>
+          <a href={localPath(lang, "/start/")} aria-current={page === "/start/" ? "page" : undefined}>{t.nav.start}</a>
+          {page && <a href={localPath(other, page)} hreflang={other} lang={other}>{t.nav.language}</a>}
         </nav>
       </div>
     </header>
@@ -71,9 +87,9 @@ const canonicalUrl = new URL(path, config.site).href;
     <footer class="site-footer">
       <div class="wrap foot">
         <p>
-          {en.footer.license} <a href={`https://github.com/${config.org}/${config.repo}`}>{en.footer.github}</a>
+          {t.footer.license} <a href={`https://github.com/${config.org}/${config.repo}`}>{t.footer.github}</a>
         </p>
-        <p>{en.footer.analytics}</p>
+        <p>{t.footer.analytics}</p>
       </div>
     </footer>
     <script>

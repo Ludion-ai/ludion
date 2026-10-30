@@ -1,6 +1,7 @@
 ---
-import { en } from "../strings/en.ts";
-const states = en.home.guard.states;
+import { strings, type Lang } from "../strings/index.ts";
+const { lang = "en" } = Astro.props as { lang?: Lang };
+const states = strings[lang].home.guard.states;
 ---
 <ol class="states">
   {states.map((state) => (

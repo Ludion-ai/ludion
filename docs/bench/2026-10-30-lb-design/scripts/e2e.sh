@@ -3,7 +3,7 @@
 # git, the Docker CLI on the host's socket). GitHub's Git is a local bare repository and its API a stand-in
 # (github.mjs). Each case runs the workflow twice: validation job (a fresh clone, patch --apply, deliver pack), then
 # PR job (another fresh clone, deliver open). The second run must open no PR.
-# Usage: e2e.sh <case>...  Cases: npm, php, composer, maven.
+# Usage: e2e.sh <case>...  Cases: npm, npm-two, php, composer, maven.
 set -u
 sh /scripts/sync.sh
 cd /w
@@ -16,7 +16,15 @@ port=8790
 for case in "$@"; do
   d=/e/$case; rm -rf "$d"; mkdir -p "$d"
   echo "== case $case"
-  cp -r "/w/examples/$case-security" "$d/work"
+  case $case in
+    npm-two)
+      # Two fixes: lodash (as examples/npm-security) and minimist 1.2.5. The lockfile is made again with npm, here in Docker.
+      cp -r /w/examples/npm-security "$d/work"
+      node -e 'const f=process.argv[1],p=JSON.parse(require("fs").readFileSync(f));p.dependencies.minimist="1.2.5";require("fs").writeFileSync(f,JSON.stringify(p,null,2)+"\n")' "$d/work/package.json"
+      (cd "$d/work" && npm install --package-lock-only --ignore-scripts --no-audit --no-fund >/tmp/lock.log 2>&1; echo "lockfile exit $?")
+      ;;
+    *) cp -r "/w/examples/$case-security" "$d/work" ;;
+  esac
   G -C "$d/work" init -q && G -C "$d/work" add -A && G -C "$d/work" commit -qm example
   G init -q --bare "$d/origin.git" && G -C "$d/work" push -q "$d/origin.git" HEAD:refs/heads/main
   base=$(git -C "$d/work" rev-parse HEAD); echo "base $base"

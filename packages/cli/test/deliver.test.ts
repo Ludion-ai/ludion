@@ -3,7 +3,7 @@
 // validation job would not write, and nothing is pushed or opened for it.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -187,6 +187,15 @@ describe("the PR job opens one PR per fix", () => {
     const failing = await openFixes({ dir: checkout(fresh.origin), artifact: artifact(fresh.work, second.receipt, [`refs/heads/${BRANCH}`], fresh.base), base: fresh.base, repo: "o/r", ref: "refs/heads/main", api: "https://api.github.invalid", remote: fresh.origin, token: "t0ken", fetchFn: gh2.fetchFn, push: () => { throw new Error("git push failed: rejected"); } });
     expect(failing.deliveries[0]).toMatchObject({ outcome: "failed", reason: "git push failed: rejected" });
     expect(gh2.opened).toHaveLength(0);
+  });
+  it.skipIf(process.platform === "win32")("keeps a file's executable mode from the base (a checkout from a file system without modes)", async () => {
+    const { work, origin } = project();
+    chmodSync(join(work, "package-lock.json"), 0o755);
+    git(work, "add", "package-lock.json"); git(work, "commit", "-qm", "executable"); git(work, "push", "-q", origin, "HEAD:refs/heads/main");
+    const base = git(work, "rev-parse", "HEAD"), fix = applied(work), gh = github(origin);
+    expect(git(work, "ls-tree", fix.commit, "package-lock.json")).toMatch(/^100755 /);
+    const result = await open(checkout(origin), artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base), base, origin, gh);
+    expect(result.deliveries).toMatchObject([{ outcome: "opened" }]);
   });
   it("opens nothing for a run that is not on the default branch, before reading the artifact", async () => {
     const { work, origin, base } = project(), fix = applied(work), gh = github(origin);

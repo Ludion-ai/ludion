@@ -242,7 +242,7 @@ export function checkArtifact(dir: string, artifact: string, base: string): Chec
     if ([...paths].sort().join("\0") !== wanted.join("\0")) refuse(`${at} changes ${paths.map(plain).slice(0, 5).join(", ") || "nothing"}, not exactly ${wanted.join(", ")}.`);
     for (const [i, meta] of metas.entries()) {
       const [oldMode, newMode, , , status] = meta.replace(/^:/, "").split(" ");
-      if (status !== "M" || oldMode !== newMode || modes.get(paths[i]!) !== newMode || !/^1006[0-7]{2}$/.test(newMode!)) refuse(`${at} adds, removes or changes the mode of ${plain(paths[i]!)}.`);
+      if (status !== "M" || oldMode !== newMode || modes.get(paths[i]!) !== newMode || !/^100(644|755)$/.test(newMode!)) refuse(`${at} adds, removes or changes the mode of ${plain(paths[i]!)}.`);
       if (paths[i]!.split("/").some(part => part === ".github")) refuse(`${at} changes a file under .github/.`);
     }
     for (const file of fix.files) {

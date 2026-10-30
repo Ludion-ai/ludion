@@ -74,6 +74,17 @@ A change to that SHA (from Dependabot, for example) is an update to Ludion itsel
 
 Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 22 or later); only the root package.json and package-lock.json, and each changed */package.json, are read (the judge leaves a workspace package.json out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable); a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. It sends package names and versions to OSV and the npm registry, and the IDs of the advisories OSV returns back to OSV. It downloads CISA's catalog of exploited vulnerabilities and FIRST's daily list of EPSS scores whole and looks the CVE IDs up in them, so no CVE ID is sent; a list it cannot download or read makes the judgement undecidable. No source is sent.
 
+## On a schedule: one PR per security fix
+
+**プレビュー：マージは行わない。** Preview: Ludion opens PRs and merges nothing. Not released: the template pins a placeholder SHA, because no release commit exists yet.
+
+Copy [action/patch-workflow.yml](action/patch-workflow.yml) to `.github/workflows/ludion.yml` in a repository that has a `ludion.security.json` (`ludion init`, below), and allow "GitHub Actions to create and approve pull requests" in the repository's settings. Every 6 hours, or when run by hand, it does two jobs:
+
+- **patch** (`contents: read`, no secret): checks out the default branch's commit without keeping a credential and runs `ludion patch --apply`, so each fix that passes on its own is one commit on its own branch, built and tested in Docker. It uploads the receipt and a Git bundle of those branches. A failed fix makes the job fail; the fixes that passed go on.
+- **pull-request** (`contents: write`, `pull-requests: write`): runs no dependency code. It checks the artifact as untrusted data (each branch is one commit whose only parent is the run's commit, by Ludion, changing only the receipt's files among those the plan may change: package.json and package-lock.json, composer.json and composer.lock, pom.xml, or the policy's Dockerfile), then pushes each fix to its own branch and opens one PR per fix. It never force-pushes. A fix whose branch already has a PR, open or closed, gets no new one, and a branch that exists at another commit is left alone.
+
+Limits: GitHub's schedule can be hours late or skip runs. GitHub starts no workflow for a PR opened with the workflow's token, so start your CI on Ludion's PRs before merging. Each run validates every fix again, including those with an open PR. A PR whose base moved on is not rebuilt, and an older PR that a newer fix replaces is not closed. The PR carries what `patch` checks today (below), and the receipt's fix_published_at, found_at and applied_at; it does not record when a fix is merged. This has run only locally against a stand-in for GitHub (docs/bench/2026-10-30-lb-design), not on GitHub.
+
 ## Run the source preview
 
 The published npm ludion-ai 0.1.4 release is the earlier lesson product, which ended on 2026-10-28. These commands require building this repository, Node 24 and a local Docker daemon; no npm release is implied.

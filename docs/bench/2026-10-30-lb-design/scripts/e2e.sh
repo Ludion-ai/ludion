@@ -3,7 +3,7 @@
 # git, the Docker CLI on the host's socket). GitHub's Git is a local bare repository and its API a stand-in
 # (github.mjs). Clones are depth 1 with HEAD detached, as actions/checkout makes them. Each case runs the workflow twice: validation job (a fresh clone, patch --apply, deliver pack), then
 # PR job (another fresh clone, deliver open). The second run must open no PR.
-# Usage: e2e.sh <case>...  Cases: npm, npm-two, php, composer, maven.
+# Usage: e2e.sh <case>...  Cases: npm, npm-two, npm-v2, php, composer, maven.
 set -u
 sh /scripts/sync.sh
 echo "# at commit ${LB_HEAD:-unknown}, ${LB_DIRTY:-unknown} files differing from it"
@@ -23,6 +23,12 @@ for case in "$@"; do
       cp -r /w/examples/npm-security "$d/work"
       node -e 'const f=process.argv[1],p=JSON.parse(require("fs").readFileSync(f));p.dependencies.minimist="1.2.5";require("fs").writeFileSync(f,JSON.stringify(p,null,2)+"\n")' "$d/work/package.json"
       (cd "$d/work" && npm install --package-lock-only --ignore-scripts --no-audit --no-fund >/tmp/lock.log 2>&1; echo "lockfile exit $?")
+      ;;
+    npm-v2)
+      # examples/npm-security with its lockfile written again by npm as v2 (packages and the npm 6 tree), here in Docker.
+      cp -r /w/examples/npm-security "$d/work"
+      (cd "$d/work" && npm install --package-lock-only --ignore-scripts --no-audit --no-fund --lockfile-version 2 >/tmp/lock.log 2>&1; echo "lockfile exit $?")
+      grep -m1 '"lockfileVersion"' "$d/work/package-lock.json"
       ;;
     *) cp -r "/w/examples/$case-security" "$d/work" ;;
   esac

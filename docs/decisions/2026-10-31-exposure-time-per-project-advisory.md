@@ -17,10 +17,15 @@ Exposure time is the time a project carried a hole it could have fixed and had n
 Added 2026-10-31 03:54 JST by the chat (ludion-ops#1 comment 6531046171, 2, answering the audit in comment 6530612087):
 
 6. **Denominator:** every (project, advisory) that started within the measured window, including the pairs for which no PR could be opened.
-7. **Open pairs are right-censored.** The median is computed with Kaplan–Meier; if fewer than half of the pairs have ended, it is written as "median > t".
-8. **A pair with no fix in the same major** starts from the earliest fix in any major and is in the same denominator. It is also counted separately, as out of scope (範囲の外).
+7. **Open pairs are right-censored.** The median is computed with Kaplan–Meier. If the Kaplan–Meier estimate does not fall below 0.5 by the end of follow-up, it is written as "median > t", where t is the longest follow-up time. (6531046171 wrote "if fewer than half of the pairs have ended". With censoring, the estimate can fall below 0.5 even then, so the audit corrected the condition to this one, and comment 6533365853, 6 took it in.)
+8. **A pair with no fix in the same major** starts from the earliest usable fix in any major, skipping versions as item 2 does, and is in the same denominator. It is also counted separately, as out of scope (範囲の外).
 
-Not on the board (不明), to be fixed in the definition before measuring: the window and how pairs already open when it starts are handled; the time at which an open pair is censored; the time at which a version is judged usable, and whether item 8's earliest fix skips unusable versions as item 2 does.
+Added 2026-10-31 06:00 JST by the chat (ludion-ops#1 comment 6533365853, 6), which took in findings N1 to N4 of the review of this PR (comment 6532712835 on PR #230) and the audit's own correction of the "median > t" condition, as corrections to the definition before measuring:
+
+9. **The window** is fixed before counting. A pair already open when the window starts is either entered into Kaplan–Meier with delayed entry (left truncation) or always shown as a separate row of the same table; which of the two is fixed with the window. Choosing the window's start later cannot then drop the longest exposures.
+10. **Censoring time:** an open pair is censored at the last detection, within the window, that still found the advisory in the project's configuration.
+11. **When a version is judged usable** (items 2 and 8): as of the pair's end, or its censoring time while it is open. A version deprecated, withdrawn or given a MAL- record after that does not move the start of a pair already recorded, so a later deprecation does not shorten past exposure.
+12. **Which pairs exist** is decided by matching the advisory's affected range against the versions in the lockfile or the image (OSV), not by Ludion's own judgement. Pairs that Ludion's gate 1 finds not to apply are counted separately, and stay in the denominator.
 
 ## When it takes effect
 

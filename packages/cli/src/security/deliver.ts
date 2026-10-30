@@ -9,6 +9,8 @@ import { branchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
 import type { Judgement } from "./judge.ts";
+import semver from "semver";
+import { comparableVersion } from "./osv.ts";
 import { compare, phpImage } from "./php.ts";
 import { CONFIG, rootPath } from "./project.ts";
 
@@ -224,6 +226,34 @@ const COMPOSER_KEYS = new Set([...COMPOSER_INSTALL, ...COMPOSER_METADATA, "name"
 const PACKAGIST_NOTIFY = "https://packagist.org/downloads/";
 const withoutMetadata = (entry: Record<string, unknown>) => Object.fromEntries(Object.entries(entry).filter(([key]) => !COMPOSER_METADATA.has(key)));
 
+/**
+ * package-lock.json: no package but the fix's loses an installed version, so one PR holds one fix (gate 4), as `patch`'s
+ * candidate check (unplannedRemovals) requires; new versions may appear (the fixed version's new dependencies). The
+ * judge, run again in openFixes, checks the changed entries against the registry.
+ */
+function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix): string | null {
+  if (old === null || now === null) return "package-lock.json is missing.";
+  let a: unknown, b: unknown;
+  try { a = JSON.parse(old); b = JSON.parse(now); } catch { return "package-lock.json is not JSON."; }
+  const versions = (lock: unknown) => {
+    const map = new Map<string, Set<string>>();
+    const packages = isObject(lock) && isObject(lock.packages) ? lock.packages : {};
+    for (const [path, entry] of Object.entries(packages)) {
+      if (!path || !isObject(entry) || typeof entry.version !== "string") continue;
+      const name = typeof entry.name === "string" ? entry.name : path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
+      map.set(name, (map.get(name) ?? new Set()).add(entry.version));
+    }
+    return map;
+  };
+  const was = versions(a), is = versions(b);
+  for (const [name, set] of was) {
+    if (name === fix.package) continue;
+    const gone = [...set].filter(v => !is.get(name)?.has(v));
+    if (gone.length) return `package-lock.json moves ${plain(name).slice(0, 200)} from ${plain(gone[0]!).slice(0, 60)}, which this fix does not plan.`;
+  }
+  return null;
+}
+
 /** composer.lock: why it says more than the fix, or null. See contentProblem. */
 function composerLockProblem(old: string | null, now: string | null, fix: CheckedFix): string | null {
   if (old === null || now === null) return "composer.lock is missing.";
@@ -254,6 +284,7 @@ function composerLockProblem(old: string | null, now: string | null, fix: Checke
       if ((entry.name === fix.package || !earlier) && unknown.length) return `composer.lock gives ${name} keys Ludion does not check (${unknown.slice(0, 3).map(k => plain(k).slice(0, 40)).join(", ")}).`;
       if (entry.name === fix.package) {
         if (!earlier) return `composer.lock moves ${name} between its package lists, or adds it.`;
+        if (!fix.changes.some(c => c.from.replace(/^v(?=\d)/, "") === String(earlier.version ?? "").replace(/^v(?=\d)/, ""))) return `the receipt moves ${name} from ${plain(fix.changes.map(c => c.from).join(", ")).slice(0, 60)}, and the base's composer.lock has ${plain(String(earlier.version)).slice(0, 60)}.`;
         if (!tos.has(String(entry.version ?? "").replace(/^v/, ""))) return `composer.lock moves ${name} to ${plain(String(entry.version)).slice(0, 60)}, not to the fix's version.`;
         // The same package from the same place: the archive's repository, the source's URL and the type stay the base's.
         const old = (key: string, inner: string) => isObject(earlier[key]) ? (earlier[key] as Record<string, unknown>)[inner] : undefined;
@@ -317,6 +348,14 @@ export function contentProblem(ecosystem: Ecosystem, fix: CheckedFix, before: (p
     if (!now.startsWith(head) || !now.endsWith(tail) || now.length < head.length + tail.length || !official.test(image)) return `${path} changes more than its FROM image to the official php:${to}${current.flavor}, pinned by digest.`;
     return null;
   }
+  // Composer and Maven: the update goes up (npm's downgrades stop at the judge, PHP's above). The versions come from the
+  // receipt, so for Composer "from" must also be what the base's lock has; Maven's direct "from" is bound by changedManifest.
+  if (ecosystem === "composer" || ecosystem === "maven") {
+    for (const change of fix.changes) {
+      const from = comparableVersion(change.from.replace(/^v(?=\d)/, ""), ecosystem), to = comparableVersion(change.to.replace(/^v(?=\d)/, ""), ecosystem);
+      if (!from || !to || !semver.gt(to, from)) return `${fix.package} ${change.from} -> ${change.to} is not an update to a higher version Ludion can compare.`;
+    }
+  }
   const manifest = MANIFESTS[ecosystem][0], dir = mkdtempSync(join(tmpdir(), "ludion-manifest-"));
   try {
     for (const name of MANIFESTS[ecosystem]) { const content = before(name); if (content !== null) writeFileSync(join(dir, name), content); }
@@ -328,6 +367,7 @@ export function contentProblem(ecosystem: Ecosystem, fix: CheckedFix, before: (p
     else try { same = isDeepStrictEqual(JSON.parse(now), JSON.parse(expected)); } catch { same = false; }
     if (!same) return `${manifest} is not what Ludion writes for ${fix.package} ${fix.changes.map(c => c.to).join(", ")}.`;
   } finally { rmSync(dir, { recursive: true, force: true }); }
+  if (ecosystem === "npm") return npmLockProblem(before("package-lock.json"), after("package-lock.json"), fix);
   return ecosystem === "composer" ? composerLockProblem(before("composer.lock"), after("composer.lock"), fix) : null;
 }
 
@@ -415,7 +455,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "<!-- ludion-fix -->",
     "**プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.",
     "",
-    `Ludion found a published security fix and validated it on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one fix (one commit).`,
+    `Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one fix (one commit).`,
     "",
     "| | |",
     "|---|---|",
@@ -431,8 +471,8 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "",
     "**What was checked**",
     "",
-    `- The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, and that composer.lock moves only this package and adds only packages it requires, none of them a plugin or installer, each with the archive and commit Packagist lists" : "pom.xml is what Ludion writes for this change"}.`,
+    `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${ecosystem === "php" ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, and that no other package loses a version in package-lock.json" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${ecosystem === "php" ? "PHP image" : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
@@ -523,7 +563,8 @@ async function registryJson(fetchFn: typeof fetch, url: string, init: RequestIni
 /** One tagged release as Packagist lists it (repo.packagist.org's p2 metadata, minified entries expanded). */
 export type PackagistRelease = Record<string, unknown>;
 export async function packagistRelease(name: string, version: string, fetchFn: typeof fetch = fetch): Promise<PackagistRelease | null> {
-  if (!/^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/.test(name)) throw new Error(`Invalid Composer package name: ${plain(name).slice(0, 100)}`);
+  // The name comes from the untrusted lock: a pattern without nested repetition, so it runs in linear time (no ReDoS).
+  if (name.length > 214 || !/^[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*$/.test(name)) throw new Error(`Invalid Composer package name: ${plain(name).slice(0, 100)}`);
   const doc = await registryJson(fetchFn, `https://repo.packagist.org/p2/${name}.json`);
   const list = doc?.packages?.[name];
   if (!Array.isArray(list)) throw new Error(`Invalid Packagist metadata for ${name}.`);
@@ -567,6 +608,20 @@ async function composerAgain(top: string, prefix: string, base: string, fix: Che
   }
 }
 
+/**
+ * The IDs of OSV's advisories on one package version (api.osv.dev/v1/query; the name and version only are sent), not
+ * counting withdrawn ones. `patch` applies a fix only when its re-scan finds nothing left on the package, so the version
+ * a Composer or Maven fix moves to must have none.
+ */
+export async function osvAdvisories(ecosystem: "Packagist" | "Maven", name: string, version: string, fetchFn: typeof fetch = fetch): Promise<string[]> {
+  const doc = await registryJson(fetchFn, "https://api.osv.dev/v1/query", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ package: { ecosystem, name }, version }) }, 16 * 1024 * 1024);
+  const vulns = Array.isArray(doc?.vulns) ? doc.vulns : [];
+  if (!isObject(doc) || (doc.vulns !== undefined && !Array.isArray(doc.vulns))) throw new Error("OSV's answer is not a list of advisories.");
+  const ids = vulns.filter((v: unknown) => isObject(v) && !v.withdrawn).map((v: Record<string, unknown>) => plain(String(v.id)).slice(0, 100));
+  if (!ids.length && typeof doc.next_page_token === "string") throw new Error("OSV's answer has more pages.");
+  return ids;
+}
+
 /** The digest Docker Hub gives for an official PHP image tag now: the manifest list's (what `docker pull` records). */
 export async function dockerHubDigest(tag: string, fetchFn: typeof fetch = fetch): Promise<string> {
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(tag)) throw new Error("Invalid image tag.");
@@ -598,7 +653,7 @@ async function phpAgain(top: string, prefix: string, fix: CheckedFix, digestOf: 
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -647,6 +702,16 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
       if (checked.ecosystem === "composer") {
         const problem = await composerAgain(top, prefix, checked.base, fix, options.packagist ?? ((name, version) => packagistRelease(name, version)));
         if (problem) throw new Error(`Not pushed: ${problem}`);
+      }
+      // Composer and Maven: the version moved to has no OSV advisory now (npm's judge does this for npm).
+      if (checked.ecosystem === "composer" || checked.ecosystem === "maven") {
+        const ask = options.osv ?? ((ecosystem, name, version) => osvAdvisories(ecosystem, name, version));
+        for (const change of fix.changes) {
+          let ids: string[];
+          try { ids = await ask(checked.ecosystem === "composer" ? "Packagist" : "Maven", fix.package, change.to.replace(/^v(?=\d)/, "")); }
+          catch (error) { throw new Error(`Not pushed: OSV could not be read: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`); }
+          if (ids.length) throw new Error(`Not pushed: OSV lists ${ids.slice(0, 5).join(", ")} for ${fix.package}@${change.to}, the version this fix moves to.`);
+        }
       }
       if (checked.ecosystem === "php") {
         const problem = await phpAgain(top, prefix, fix, options.phpDigest ?? (tag => dockerHubDigest(tag)));

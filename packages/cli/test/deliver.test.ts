@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { fixBranch, gitBase } from "../src/security/branch.ts";
-import { BUNDLE_LIMIT, checkArtifact, contentProblem, openFixes, packFixes, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
+import { BUNDLE_LIMIT, checkArtifact, contentProblem, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
 import { changedManifest } from "../src/security/inventory.ts";
 import type { Judgement } from "../src/security/judge.ts";
 import { snapshot } from "../src/security/project.ts";
@@ -132,10 +132,10 @@ function github(origin: string, pulls: { number: number; state: string; head: { 
   return { fetchFn, calls, opened, pulls };
 }
 const open = (dir: string, out: string, base: string, origin: string, gh: ReturnType<typeof github>, ref = "refs/heads/main", extra: Partial<Parameters<typeof openFixes>[0]> = {}) =>
-  openFixes({ dir, artifact: out, base, repo: "o/r", ref, api: "https://api.github.invalid", remote: origin, token: "t0ken", fetchFn: gh.fetchFn, judgeNpm: READY, ...extra });
+  openFixes({ dir, artifact: out, base, repo: "o/r", ref, api: "https://api.github.invalid", remote: origin, token: "t0ken", fetchFn: gh.fetchFn, judgeNpm: READY, osv: async () => [], ...extra });
 const branchAt = (origin: string, branch: string) => spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`], { cwd: origin, encoding: "utf8" }).stdout.trim();
 
-describe("the validation job packs the applied fixes", () => {
+describe("the validation job packs the applied fixes", { timeout: 30_000 }, () => {
   it("writes the receipt and a bundle of exactly the applied fixes' branches, on the base", () => {
     const { work, base } = project(), fix = applied(work);
     const result = join(mkdtempSync(join(tmpdir(), "ludion-deliver-result-")), "patch.json");
@@ -157,7 +157,7 @@ describe("the validation job packs the applied fixes", () => {
   });
 });
 
-describe("the PR job opens one PR per fix", () => {
+describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
   it("pushes the checked commit to its branch and opens one PR; the next run opens none", async () => {
     const { work, origin, base } = project(), fix = applied(work);
     const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base), dir = checkout(origin), gh = github(origin);
@@ -278,7 +278,7 @@ describe("the PR job opens one PR per fix", () => {
   });
 });
 
-describe("the PR job refuses an artifact the validation job would not write", () => {
+describe("the PR job refuses an artifact the validation job would not write", { timeout: 30_000 }, () => {
   /** Runs the PR job on a forged artifact: it must throw `why`, push nothing and open nothing. */
   async function refused(setup: (p: ReturnType<typeof project>) => { receipt: unknown; refs: string[]; base?: string; tamper?: (out: string) => void }, why: string | RegExp) {
     const p = project(), s = setup(p), out = artifact(p.work, s.receipt, s.refs, s.base ?? p.base);
@@ -412,7 +412,7 @@ function repository(files: Record<string, string>) {
 }
 const composerEntry = (name: string, version: string, ref: string, extra: Record<string, unknown> = {}) => ({ name, version, dist: { type: "zip", url: `https://api.github.com/repos/${name}/zipball/${ref}`, reference: ref, shasum: "" }, type: "library", ...extra });
 
-describe("the PR job checks what a fix pins against the official registry", () => {
+describe("the PR job checks what a fix pins against the official registry", { timeout: 30_000 }, () => {
   it("PHP: the digest must be the one Docker Hub gives for the tag", async () => {
     for (const [given, outcome] of [[`sha256:${"1".repeat(64)}`, "opened"], [`sha256:${"9".repeat(64)}`, "failed"]] as const) {
       const r = repository({ "ludion.security.json": `${JSON.stringify({ schema: 1, dockerfile: "./Dockerfile", test: ["php", "t.php"], timeout_seconds: 60 })}\n`, Dockerfile: "FROM php:8.4.26-cli-alpine\nWORKDIR /app\n" });
@@ -430,31 +430,56 @@ describe("the PR job checks what a fix pins against the official registry", () =
       expect(branchAt(r.origin, "ludion/php/8.4.27")).toBe(outcome === "opened" ? made : "");
     }
   });
-  it("Composer: each added or moved lock entry must carry the archive and commit Packagist lists", async () => {
+  /** A Composer project whose fix moves symfony/http-foundation 5.4.0 -> 5.4.54 and adds symfony/polyfill-php83, which 5.4.54 requires. */
+  function composerFix() {
     const a = "a".repeat(40), b = "b".repeat(40), c = "c".repeat(40), lock = (packages: unknown[]) => `${JSON.stringify({ "content-hash": "1", packages, "packages-dev": [] }, null, 4)}\n`;
-    for (const [listed, outcome] of [[{}, "opened"], [{ dist: { type: "zip", url: `https://api.github.com/repos/symfony/http-foundation/zipball/${"d".repeat(40)}`, reference: "d".repeat(40), shasum: "" } }, "failed"], [{ autoload: { files: ["evil.php"] } }, "failed"]] as const) {
-      const r = repository({
-        "ludion.security.json": `${JSON.stringify({ schema: 1, ecosystem: "composer", image: "composer:2", test: ["php", "t.php"], timeout_seconds: 60 })}\n`,
-        "composer.json": `${JSON.stringify({ name: "app/app", require: { "symfony/http-foundation": "5.4.0" } }, null, 2)}\n`,
-        "composer.lock": lock([composerEntry("symfony/deprecation-contracts", "v2.5.0", a), composerEntry("symfony/http-foundation", "v5.4.0", b)]),
-      });
-      const manifestDir = mkdtempSync(join(tmpdir(), "ludion-deliver-cj-"));
-      writeFileSync(join(manifestDir, "composer.json"), readFileSync(join(r.work, "composer.json")));
-      const change = { name: "symfony/http-foundation", from: "5.4.0", to: "5.4.54", advisories: ["GHSA-x7x7-x7x7-x7x7"] };
-      const json = changedManifest(manifestDir, "composer", [change]), fixedLock = lock([composerEntry("symfony/deprecation-contracts", "v2.5.0", a), composerEntry("symfony/http-foundation", "v5.4.54", c)]);
-      const branch = "ludion/composer/symfony-http-foundation-5.4.54", subject = "ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)";
-      const made = fixBranch(r.gitBase, branch, [{ path: "composer.json", content: json }, { path: "composer.lock", content: fixedLock }], `${subject}\n\nFixes GHSA-x7x7-x7x7-x7x7.\n\nLudion receipt ${ID}: the project's test passed on ${r.base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`);
-      const receipt = {
-        schema: 2, id: ID, ecosystem: "composer", scope: "dependency_files_only_not_deployed", outcome: "applied", baseline_passed: true, base_commit: r.base,
-        fixes: [{ package: change.name, changes: [change], outcome: "applied", branch, commit: made, candidate_passed: true, files: [{ path: "composer.json", before_hash: "", after_hash: sha256(json) }, { path: "composer.lock", before_hash: "", after_hash: sha256(fixedLock) }], fix_published_at: null, found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z" }],
-      };
-      const asked: string[] = [], gh = github(r.origin);
-      const packagist = async (name: string, version: string) => { asked.push(`${name}@${version}`); return { ...composerEntry(name, version, c), "version_normalized": "5.4.54.0", ...listed }; };
-      const result = await open(checkout(r.origin), artifact(r.work, receipt, [`refs/heads/${branch}`], r.base), r.base, r.origin, gh, "refs/heads/main", { packagist });
-      expect(asked).toEqual(["symfony/http-foundation@v5.4.54"]);
-      expect(result.deliveries[0]).toMatchObject({ outcome, ...(outcome === "failed" ? { reason: expect.stringContaining("is not what Packagist lists") } : {}) });
-      expect(branchAt(r.origin, branch)).toBe(outcome === "opened" ? made : "");
+    const r = repository({
+      "ludion.security.json": `${JSON.stringify({ schema: 1, ecosystem: "composer", image: "composer:2", test: ["php", "t.php"], timeout_seconds: 60 })}\n`,
+      "composer.json": `${JSON.stringify({ name: "app/app", require: { "symfony/http-foundation": "5.4.0" } }, null, 2)}\n`,
+      "composer.lock": lock([composerEntry("symfony/deprecation-contracts", "v2.5.0", a), composerEntry("symfony/http-foundation", "v5.4.0", b)]),
+    });
+    const manifestDir = mkdtempSync(join(tmpdir(), "ludion-deliver-cj-"));
+    writeFileSync(join(manifestDir, "composer.json"), readFileSync(join(r.work, "composer.json")));
+    const change = { name: "symfony/http-foundation", from: "5.4.0", to: "5.4.54", advisories: ["GHSA-x7x7-x7x7-x7x7"] };
+    const planned = composerEntry("symfony/http-foundation", "v5.4.54", c, { require: { "symfony/polyfill-php83": "^1.27" } }), added = composerEntry("symfony/polyfill-php83", "v1.31.0", c);
+    const json = changedManifest(manifestDir, "composer", [change]), fixedLock = lock([composerEntry("symfony/deprecation-contracts", "v2.5.0", a), planned, added]);
+    const branch = "ludion/composer/symfony-http-foundation-5.4.54", subject = "ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)";
+    const made = fixBranch(r.gitBase, branch, [{ path: "composer.json", content: json }, { path: "composer.lock", content: fixedLock }], `${subject}\n\nFixes GHSA-x7x7-x7x7-x7x7.\n\nLudion receipt ${ID}: the project's test passed on ${r.base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`);
+    const receipt = {
+      schema: 2, id: ID, ecosystem: "composer", scope: "dependency_files_only_not_deployed", outcome: "applied", baseline_passed: true, base_commit: r.base,
+      fixes: [{ package: change.name, changes: [change], outcome: "applied", branch, commit: made, candidate_passed: true, files: [{ path: "composer.json", before_hash: "", after_hash: sha256(json) }, { path: "composer.lock", before_hash: "", after_hash: sha256(fixedLock) }], fix_published_at: null, found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z" }],
+    };
+    return { r, branch, made, out: artifact(r.work, receipt, [`refs/heads/${branch}`], r.base), packagist: { [planned.name]: planned, [added.name]: added } as Record<string, Record<string, unknown>> };
+  }
+  it("Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to", async () => {
+    for (const [change, outcome, why] of [
+      [{}, "opened", ""],
+      [{ "symfony/http-foundation": { dist: { type: "zip", url: `https://api.github.com/repos/symfony/http-foundation/zipball/${"d".repeat(40)}`, reference: "d".repeat(40), shasum: "" } } }, "failed", "dist for symfony/http-foundation@v5.4.54 is not what Packagist lists"],
+      [{ "symfony/http-foundation": { autoload: { files: ["evil.php"] } } }, "failed", "autoload for symfony/http-foundation@v5.4.54 is not what Packagist lists"],
+      // The added package, not only the planned one, is asked about.
+      [{ "symfony/polyfill-php83": { autoload: { files: ["bootstrap.php"] } } }, "failed", "autoload for symfony/polyfill-php83@v1.31.0 is not what Packagist lists"],
+      [{ osv: ["GHSA-1111-2222-3333"] }, "failed", "OSV lists GHSA-1111-2222-3333 for symfony/http-foundation@5.4.54"],
+    ] as const) {
+      const fix = composerFix(), asked: string[] = [], osvAsked: string[] = [], gh = github(fix.r.origin);
+      const packagist = async (name: string, version: string) => { asked.push(`${name}@${version}`); return { ...fix.packagist[name], version_normalized: "x", ...(change as Record<string, unknown>)[name] as object }; };
+      const osv = async (ecosystem: string, name: string, version: string) => { osvAsked.push(`${ecosystem}:${name}@${version}`); return "osv" in change ? [...change.osv] : []; };
+      const result = await open(checkout(fix.r.origin), fix.out, fix.r.base, fix.r.origin, gh, "refs/heads/main", { packagist, osv });
+      expect(osvAsked).toEqual(outcome === "opened" || "osv" in change ? ["Packagist:symfony/http-foundation@5.4.54"] : []);
+      if (outcome === "opened") expect(asked.sort()).toEqual(["symfony/http-foundation@v5.4.54", "symfony/polyfill-php83@v1.31.0"]);
+      expect(result.deliveries[0]).toMatchObject({ outcome, ...(why ? { reason: expect.stringContaining(why) } : {}) });
+      expect(branchAt(fix.r.origin, fix.branch)).toBe(outcome === "opened" ? fix.made : "");
     }
+  });
+  it("reads Packagist only for a plain package name, and a hostile name is refused at once", async () => {
+    const urls: string[] = [];
+    const fetchFn = (async (url: string | URL | Request) => { urls.push(String(url)); return new Response(JSON.stringify({ minified: "composer/2.0", packages: { "symfony/http-foundation": [{ version: "v5.4.54", dist: { url: "x" } }, { version: "v5.4.53" }] } })); }) as typeof fetch;
+    expect(await packagistRelease("symfony/http-foundation", "5.4.53", fetchFn)).toMatchObject({ version: "v5.4.53", dist: { url: "x" } });
+    expect(await packagistRelease("symfony/http-foundation", "9.9.9", fetchFn)).toBeNull();
+    expect(urls).toEqual(["https://repo.packagist.org/p2/symfony/http-foundation.json", "https://repo.packagist.org/p2/symfony/http-foundation.json"]);
+    const started = performance.now();
+    for (const name of [`a/${"0".repeat(200)}!`, "a b/c", "a/b?c", "../x/y", "a/b/c", `a/${"b".repeat(300)}`]) await expect(packagistRelease(name, "1.0.0", fetchFn)).rejects.toThrow("Invalid Composer package name");
+    expect(performance.now() - started).toBeLessThan(1000);
+    expect(urls).toHaveLength(2);
   });
   it("a branch with this fix's tree on an older base is left alone", async () => {
     const { work, origin, first, base } = project(), fix = applied(work);
@@ -468,7 +493,7 @@ describe("the PR job checks what a fix pins against the official registry", () =
   });
 });
 
-describe("the policy at the base decides what a fix may change, and what it may say", () => {
+describe("the policy at the base decides what a fix may change, and what it may say", { timeout: 30_000 }, () => {
   it("PHP: only the Dockerfile ludion.security.json names, with the subject, message and branch patch.ts gives", () => {
     const work = mkdtempSync(join(tmpdir(), "ludion-deliver-php-"));
     writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify({ schema: 1, dockerfile: "./Dockerfile", test: ["php", "tests/smoke.php"], timeout_seconds: 60 })}\n`);
@@ -511,6 +536,25 @@ describe("the policy at the base decides what a fix may change, and what it may 
     ]) expect(check(now)).toMatch(/changes more than its FROM image/);
     expect(check(old.replace("8.4.26", "8.4.25"), "8.4.25")).toMatch(/is not a newer release/);
     expect(check(old.replace("8.4.26", "8.5.0"), "8.5.0")).toMatch(/is not a newer release/);
+  });
+  it("Composer and Maven: the update goes up, and Composer's from is what the base locks; npm: no other package moves", () => {
+    const lock = (packages: unknown[]) => JSON.stringify({ "content-hash": "1", packages, "packages-dev": [] });
+    const entry = (version: string) => ({ name: "symfony/http-foundation", version, dist: { type: "zip", url: `https://api.github.com/repos/symfony/http-foundation/zipball/${"c".repeat(40)}`, reference: "c".repeat(40) }, type: "library" });
+    const json = (spec: string) => JSON.stringify({ name: "app/app", require: { "symfony/http-foundation": spec } });
+    const base = files({ "composer.json": json("5.4.0"), "composer.lock": lock([entry("v5.4.0")]) });
+    // A downgrade, and a "from" the base does not lock (4.4.0 -> 4.4.50 while the base has 5.4.0).
+    expect(contentProblem("composer", fixOf("symfony/http-foundation", "5.4.0", "5.3.0", ["composer.json", "composer.lock"]), base, files({ "composer.json": json("5.3.0"), "composer.lock": lock([entry("v5.3.0")]) }))).toContain("is not an update to a higher version");
+    expect(contentProblem("composer", fixOf("symfony/http-foundation", "4.4.0", "4.4.50", ["composer.json", "composer.lock"]), base, files({ "composer.json": json("4.4.50"), "composer.lock": lock([entry("v4.4.50")]) }))).toContain("the base's composer.lock has v5.4.0");
+    expect(contentProblem("composer", fixOf("symfony/http-foundation", "5.4.0", "5.4.54", ["composer.json", "composer.lock"]), base, files({ "composer.json": json("5.4.54"), "composer.lock": lock([entry("v5.4.54")]) }))).toBeNull();
+    const pom = readFileSync(new URL("../../../examples/maven-security/pom.xml", import.meta.url), "utf8");
+    expect(contentProblem("maven", fixOf("org.apache.commons:commons-lang3", "3.11", "3.10", ["pom.xml"]), files({ "pom.xml": pom }), files({ "pom.xml": pom }))).toContain("is not an update to a higher version");
+    // npm: the lockfile moves only the fix's package; another package losing a version is refused, a new one is not.
+    const npmLock = (packages: Record<string, unknown>) => JSON.stringify({ name: "app", lockfileVersion: 3, packages: { "": { name: "app", dependencies: { lodash: "4.17.21" } }, ...packages } });
+    const pkg = JSON.stringify({ name: "app", dependencies: { lodash: "4.17.20" } }), fixedPkg = JSON.stringify({ name: "app", dependencies: { lodash: "4.17.21" } });
+    const npmBase = files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, "node_modules/minimist": { version: "1.2.6" } }) });
+    const fix = fixOf("lodash", "4.17.20", "4.17.21", ["package.json", "package-lock.json"]);
+    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.6" }, "node_modules/new-dep": { version: "1.0.0" } }) }))).toBeNull();
+    expect(contentProblem("npm", fix, npmBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/minimist": { version: "1.2.8" } }) }))).toContain("moves minimist from 1.2.6, which this fix does not plan");
   });
   it("Maven: pom.xml is exactly what changedManifest makes for the change", () => {
     const pom = readFileSync(new URL("../../../examples/maven-security/pom.xml", import.meta.url), "utf8");

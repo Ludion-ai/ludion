@@ -1,0 +1,13 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: minimist@^1.2.6, required by s3@1.0.0
+npm ERR! missing: mkdirp@0.5.6, required by s3@1.0.0
+{
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "missing: minimist@^1.2.6, required by s3@1.0.0\nmissing: mkdirp@0.5.6, required by s3@1.0.0",
+    "detail": ""
+  }
+}
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_28_47_293Z-debug.log

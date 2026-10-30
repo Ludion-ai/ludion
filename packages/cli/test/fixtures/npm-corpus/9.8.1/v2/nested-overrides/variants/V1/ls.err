@@ -1,0 +1,4 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: minimist@^1.2.6, required by s3@1.0.0
+
+npm ERR! A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-30T22_29_08_265Z-debug-0.log

@@ -1,0 +1,13 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: react@^18.2.0, required by react-dom@18.2.0
+npm ERR! invalid: js-tokens@99.0.0 /out/8.19.4/v2/legacy-peer-deps/variants/V2/node_modules/js-tokens
+{
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "missing: react@^18.2.0, required by react-dom@18.2.0\ninvalid: js-tokens@99.0.0 /out/8.19.4/v2/legacy-peer-deps/variants/V2/node_modules/js-tokens",
+    "detail": ""
+  }
+}
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_28_53_799Z-debug-0.log

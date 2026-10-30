@@ -1,0 +1,12 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: minimist@1.2.5, required by mkdirp@0.5.6
+{
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "missing: minimist@1.2.5, required by mkdirp@0.5.6",
+    "detail": ""
+  }
+}
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_29_00_510Z-debug-0.log

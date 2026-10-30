@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "name": "s3",
+  "problems": [
+    "invalid: minimist@99.0.0 /out/10.8.2/v3/nested-overrides/variants/V2/node_modules/minimist"
+  ],
+  "dependencies": {
+    "minimist": {
+      "version": "99.0.0",
+      "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.8.tgz",
+      "overridden": true,
+      "invalid": "\"^1.2.6\" from the root project",
+      "problems": [
+        "invalid: minimist@99.0.0 /out/10.8.2/v3/nested-overrides/variants/V2/node_modules/minimist"
+      ]
+    },
+    "mkdirp": {
+      "version": "0.5.6",
+      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.6.tgz",
+      "overridden": true,
+      "dependencies": {
+        "minimist": {
+          "version": "1.2.5",
+          "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz",
+          "overridden": true
+        }
+      }
+    }
+  },
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "invalid: minimist@99.0.0 /out/10.8.2/v3/nested-overrides/variants/V2/node_modules/minimist",
+    "detail": ""
+  }
+}

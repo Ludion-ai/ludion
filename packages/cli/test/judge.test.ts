@@ -754,19 +754,23 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
   });
 
   it("the closed list of the npm 6 tree's keys: each one that differs from packages is refused, and so is any other key", () => {
-    // version, resolved, integrity, dev, optional, bundled, requires and dependencies; anything else (devOptional and
-    // peer included, which npm 11 did not write here) is refused.
+    // version, resolved, integrity, dev, optional, devOptional, peer, bundled, requires (by name) and dependencies;
+    // anything else is refused. npm 7 to 11 write devOptional and peer in the tree (the npm corpus; review 6533374683, B1).
     for (const [key, change] of [
       ["version", (l: any) => { l.dependencies.nan.version = "2.29.0"; }],
       ["resolved", (l: any) => { l.dependencies.nan.resolved = "https://registry.npmjs.org/nan/-/nan-2.29.0.tgz"; }],
       ["integrity", (l: any) => { l.dependencies.nan.integrity = LEFT_PAD.integrity; }],
       ["dev", (l: any) => { l.dependencies.minimist.dev = true; }],
       ["optional", (l: any) => { delete l.dependencies.nan.optional; }],
+      ["devOptional", (l: any) => { l.dependencies.minimist.devOptional = true; }],
+      ["peer", (l: any) => { l.dependencies.minimist.peer = true; }],
       ["bundled", (l: any) => { l.dependencies.nan.bundled = true; }],
       ["requires", (l: any) => { l.dependencies.fsevents.requires = { bindings: "^1.5.0" }; }],
       ["dependencies", (l: any) => { l.dependencies.mkdirp.dependencies = {}; }],
     ] as const) expect(() => lockEntries(edit(nested, change)), key).toThrow(/disagree at node_modules\/(nan|minimist|fsevents|mkdirp)/);
-    for (const key of ["devOptional", "peer", "extraneous", "from", "name"]) {
+    // The same flag in both views is read.
+    expect(lockEntries(edit(nested, l => { l.dependencies.minimist.devOptional = true; l.packages["node_modules/minimist"].devOptional = true; })).length).toBeGreaterThan(0);
+    for (const key of ["extraneous", "from", "name"]) {
       expect(() => lockEntries(edit(nested, l => { l.dependencies.minimist[key] = true; })), key).toThrow(`gives node_modules/minimist a key npm does not write: ${key}`);
     }
   });
@@ -844,7 +848,6 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
       // The review's attack: npm 6 installs what requires names when the tree lacks it, from any spec.
       [edit(nested, l => { l.dependencies.minimist.requires = { "left-pad": URL_SPEC }; }), "disagree at node_modules/minimist"],
       [edit(nested, l => { l.dependencies.minimist.requires = { "left-pad": "1.3.0" }; }), "disagree at node_modules/minimist"],
-      [edit(nested, l => { l.dependencies.mkdirp.requires.minimist = URL_SPEC; }), "disagree at node_modules/mkdirp"],
       [edit(nested, l => { delete l.dependencies.mkdirp.requires; }), "disagree at node_modules/mkdirp"],
       // A link's requires (the folder's own requirements, devDependencies included).
       [edit(wsdev, l => { l.dependencies.a.requires["left-pad"] = "1.3.0"; }), "disagree at node_modules/a"],
@@ -860,6 +863,24 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
     ] as const) expect(() => lockEntries(lock), why).toThrow(why);
     // The packages side says the same: a requirement only packages has disagrees too.
     expect(() => lockEntries(edit(nested, l => { l.packages["node_modules/minimist"].dependencies = { "left-pad": "1.3.0" }; }))).toThrow("disagree at node_modules/minimist");
+    // The views compare requirements by name: a v2 lock's tree writes an override's spec where packages has the
+    // package's own (the npm corpus). A tree spec the copy does not meet is the requirement check's to refuse.
+    const urlSpec = edit(nested, l => { l.dependencies.mkdirp.requires.minimist = URL_SPEC; });
+    expect(lockEntries(urlSpec).length).toBeGreaterThan(0);
+    expect(newUnmetRequirements({ lock: nested }, { lock: urlSpec }).join("\n")).toContain(`package-lock.json's npm 6 dependencies tree: node_modules/mkdirp requires minimist ${URL_SPEC}, and`);
+  });
+
+  it("reads a tree alias by the package it names, and an override key for its own name only (review 6533374683, N4)", () => {
+    // M18: a tree entry's requirement on an alias finds the package the tree's "npm:" version names.
+    const requiresAlias = (l: any) => { l.dependencies.minimist.requires = { "lodash-alias": "npm:lodash@4.17.21" }; l.packages["node_modules/minimist"].dependencies = { "lodash-alias": "npm:lodash@4.17.21" }; };
+    expect(newUnmetRequirements({ lock: nested }, { lock: edit(nested, requiresAlias) })).toEqual([]);
+    const otherPackage = edit(nested, l => { requiresAlias(l); l.dependencies["lodash-alias"].version = "npm:left-pad@4.17.21"; l.packages["node_modules/lodash-alias"].name = "left-pad"; });
+    expect(newUnmetRequirements({ lock: nested }, { lock: otherPackage })).toContain("package-lock.json's npm 6 dependencies tree: node_modules/minimist requires lodash-alias npm:lodash@4.17.21, and node_modules/lodash-alias has left-pad@4.17.21, which is not that.");
+    // M22: an override for minimist leaves mkdirp's own requirement on minimist's spec, not on the override's, and the
+    // project's requirement on mkdirp alone.
+    const ovr = fixture("lock-v3-npm11-ovr.json");
+    expect([...unmetRequirements(ovr, { name: "ovr", dependencies: { mkdirp: "0.5.5" }, overrides: { minimist: "0.2.4" } }).values()]).toEqual([]);
+    expect([...unmetRequirements(ovr, { name: "ovr", dependencies: { mkdirp: "0.5.5" }, overrides: { minimist: "0.2.4", other: "1.0.0" } }).values()]).toEqual([]);
   });
 
   it("refuses a v2 lock whose npm 6 tree installs something else", () => {

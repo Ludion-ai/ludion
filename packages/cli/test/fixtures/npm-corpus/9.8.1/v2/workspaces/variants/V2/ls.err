@@ -1,0 +1,4 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! invalid: is-buffer@99.0.0 /out/9.8.1/v2/workspaces/variants/V2/node_modules/is-buffer
+
+npm ERR! A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-30T22_29_12_287Z-debug-0.log

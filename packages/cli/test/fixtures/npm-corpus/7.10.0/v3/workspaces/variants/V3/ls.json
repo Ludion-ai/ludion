@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "name": "s4",
+  "problems": [
+    "missing: a@file:/out/7.10.0/v3/workspaces/variants/V3/packages/a, required by s4@1.0.0",
+    "missing: is-number@6.0.0, required by s4@1.0.0",
+    "missing: local@file:./local, required by s4@1.0.0"
+  ],
+  "dependencies": {
+    "a": {
+      "required": "file:/out/7.10.0/v3/workspaces/variants/V3/packages/a",
+      "missing": true,
+      "problems": [
+        "missing: a@file:/out/7.10.0/v3/workspaces/variants/V3/packages/a, required by s4@1.0.0"
+      ]
+    },
+    "is-number": {
+      "missing": true,
+      "problems": [
+        "missing: is-number@6.0.0, required by s4@1.0.0"
+      ]
+    },
+    "local": {
+      "missing": true,
+      "problems": [
+        "missing: local@file:./local, required by s4@1.0.0"
+      ]
+    }
+  }
+}

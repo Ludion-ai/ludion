@@ -1,0 +1,4 @@
+npm error code ELSPROBLEMS
+npm error missing: react@^18.2.0, required by react-dom@18.2.0
+npm error invalid: js-tokens@99.0.0 /out/11.19.1/v2/legacy-peer-deps/variants/V2/node_modules/js-tokens
+npm error A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-30T22_29_33_507Z-debug-0.log

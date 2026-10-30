@@ -5,7 +5,7 @@ import { spawn } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 const D = "packages/cli/src/security/deliver.ts", T = "packages/cli/test/deliver.test.ts", A = "packages/cli/test/action-patch.test.ts";
 const B = "packages/cli/src/security/branch.ts", BT = "packages/cli/test/branch.test.ts";
-const J = "packages/cli/src/security/judge.ts", JT = "packages/cli/test/judge.test.ts";
+const J = "packages/cli/src/security/judge.ts", JT = "packages/cli/test/judge.test.ts", C = "packages/cli/test/npm-corpus.test.ts";
 const LIMIT = 300_000;
 /** `text` starts with "if (": its whole condition, up to the matching ")", becomes false. */
 const off = (name, text) => {
@@ -102,20 +102,20 @@ const mutations = [
   // Review of 1e6f705 (lane): B1, the tree's requires and flags; N1, a moved entry's optional and peer dependencies.
   ["lock views: the tree's requires not compared", J, "const a = packagesView.get(path)?.key, b = treeView.get(path)?.key;", "const a = packagesView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\"), b = treeView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\");", JT],
   ["lock views: the tree's requires attack through the PR job", J, "const a = packagesView.get(path)?.key, b = treeView.get(path)?.key;", "const a = packagesView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\"), b = treeView.get(path)?.key.replace(/\\0[^\\0]*$/, \"\");", T],
-  ["lock views: the flags not compared", J, "const TREE_FLAGS = [\"dev\", \"optional\", \"bundled\"];", "const TREE_FLAGS: string[] = [];", JT],
+  ["lock views: the flags not compared", J, "const TREE_FLAGS = [\"dev\", \"optional\", \"devOptional\", \"peer\", \"bundled\"];", "const TREE_FLAGS: string[] = [];", JT],
   ["lock views: a tree key npm does not write read", J, "if (unknown.length) throw new Error(`package-lock.json's dependencies tree gives", "if (false) throw new Error(`package-lock.json's dependencies tree gives", JT],
   ["lock views: a link's requires without its folder's devDependencies", J, "requirementList(folder?.dependencies, folder?.optionalDependencies, folder?.devDependencies)", "requirementList(folder?.dependencies, folder?.optionalDependencies)", JT],
-  ["lock views: devOptional, peer and extraneous read in the tree (the closed list)", J, "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"bundled\", \"requires\", \"dependencies\"]);", "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"devOptional\", \"peer\", \"extraneous\", \"bundled\", \"requires\", \"dependencies\"]);", JT],
+  ["lock views: extraneous and from read in the tree (the closed list)", J, "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"devOptional\", \"peer\", \"bundled\", \"requires\", \"dependencies\"]);", "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"devOptional\", \"peer\", \"extraneous\", \"from\", \"bundled\", \"requires\", \"dependencies\"]);", JT],
   // Review of ebfe89d (lane): B1, every requirement found in its range by Node's lookup, in both views.
-  ["requirements: an unmet requirement accepted", J, "    if (found && (takes(found, name, spec) || overrideSpecs(overrides, project, view, consumer.path, name, spec).some(s => takes(found, name, s)))) continue;", "    continue;", JT],
-  ["requirements: an unmet requirement accepted, through the PR job", J, "    if (found && (takes(found, name, spec) || overrideSpecs(overrides, project, view, consumer.path, name, spec).some(s => takes(found, name, s)))) continue;", "    continue;", T],
+  ["requirements: an unmet requirement accepted", J, "    if (found && (overridden.length ? overridden.some(s => takes(found, name, s)) : takes(found, name, spec))) continue;", "    continue;", JT],
+  ["requirements: an unmet requirement accepted, through the PR job", J, "    if (found && (overridden.length ? overridden.some(s => takes(found, name, s)) : takes(found, name, spec))) continue;", "    continue;", T],
   ["requirements: a version outside the range accepted", J, "return found.name === wanted && semver.satisfies(found.version, range, { loose: true });", "return found.name === wanted;", JT],
   ["requirements: a copy of another package under the name accepted", J, "return found.name === wanted && semver.satisfies", "return semver.satisfies", JT],
   ["requirements: a required peer not looked for", J, "needs: [...requires, ...peers], peers:", "needs: requires, peers:", JT],
   ["requirements: an optional peer required", J, ".filter(([name]) => !(isPlain(meta[name]) && meta[name].optional === true));", ";", JT],
   ["requirements: the project's own requirements not looked for", J, "...requirementsMet(packagesView, projects(top.packages), \"packages\", project.overrides, project),", "...requirementsMet(packagesView, [], \"packages\", project.overrides, project),", JT],
   // Review 6529858505 (R lane): B1 (overrides, --legacy-peer-deps, compared with the base), N1 (libc), N2 (merge commit).
-  ["requirements: overrides not read", J, "overrideSpecs(overrides, project, view, consumer.path, name, spec).some(s => takes(found, name, s))", "false", JT],
+  ["requirements: overrides not read", J, "const overridden = overrideSpecs(overrides, project, view, consumer.path, name, spec);", "const overridden: string[] = [];", JT],
   ["requirements: a nested override applied everywhere", J, "if (isPlain(value) && ancestors.some(a => a.name === rule.name && takes(rule.selector, range => semver.satisfies(a.version, range, { loose: true })))) walk(value);", "if (isPlain(value)) walk(value);", JT],
   ["requirements: an override key's selector ignored (security pass at 549fe1e)", J, "if (rule.name === name && takes(rule.selector, range => semver.validRange(spec, { loose: true }) !== null && semver.intersects(spec, range, { loose: true }))) {", "if (rule.name === name) {", JT],
   ["requirements: a nested key's selector ignored (security pass at 549fe1e)", J, "ancestors.some(a => a.name === rule.name && takes(rule.selector, range => semver.satisfies(a.version, range, { loose: true })))", "ancestors.some(a => a.name === rule.name)", JT],
@@ -123,12 +123,12 @@ const mutations = [
   ["requirements: a peer keyed with its spec (a --legacy-peer-deps lock's move refused)", J, "peer ? \"<peer>\" : spec", "spec", JT],
   off("npm: the PR job does not compare requirements with the base", "if (unmet.length) return plain(unmet[0]!).slice(0, 400);"),
   ["judge: packageLockInputs does not compare requirements with the base", "packages/cli/src/security/judge-cli.ts", "  if (unmet.length) throw new Error(`The change leaves a requirement unmet", "  if (false) throw new Error(`The change leaves a requirement unmet", "packages/cli/test/judge-cli.test.ts"],
-  ["npm: a moved entry's libc not compared with the registry (N1)", D, "for (const key of [\"requires\", \"peers\", \"os\", \"cpu\", \"libc\"] as const) {", "for (const key of [\"requires\", \"peers\", \"os\", \"cpu\"] as const) {", T],
+  ["npm: a moved entry's libc not compared with the registry (N1)", D, "for (const key of [\"requires\", \"peers\", \"peersMeta\", \"os\", \"cpu\", \"libc\"] as const) {", "for (const key of [\"requires\", \"peers\", \"peersMeta\", \"os\", \"cpu\"] as const) {", T],
   ["the shadow check reads only an unmoved entry's dependencies (N2, R24)", D, "for (const group of path ? DECLARED : ROOT_GROUPS) for (const name of isObject(item[group])", "for (const group of path ? [\"dependencies\"] : ROOT_GROUPS) for (const name of isObject(item[group])", T],
   ["the shadow check reads only the project's dependencies (N2, R25)", D, "for (const group of path ? DECLARED : ROOT_GROUPS) for (const name of isObject(item[group])", "for (const group of path ? DECLARED : [\"dependencies\"]) for (const name of isObject(item[group])", T],
   ["a merge commit with the base as its first parent accepted (N2, R22)", D, "if (c.parents.length !== 1 || c.parents[0] !== base)", "if (c.parents[0] !== base)", T],
   off("npm: a tree added to a base without one accepted", "if (Object.hasOwn(baseTop!, \"dependencies\") !== Object.hasOwn(fixTop!, \"dependencies\")) return"),
-  ["npm: a moved entry's peerDependencies not compared with the registry (N1)", D, "for (const key of [\"requires\", \"peers\", \"os\", \"cpu\", \"libc\"] as const) {", "for (const key of [\"requires\", \"os\", \"cpu\", \"libc\"] as const) {", T],
+  ["npm: a moved entry's peerDependencies not compared with the registry (N1)", D, "for (const key of [\"requires\", \"peers\", \"peersMeta\", \"os\", \"cpu\", \"libc\"] as const) {", "for (const key of [\"requires\", \"peersMeta\", \"os\", \"cpu\", \"libc\"] as const) {", T],
   ["npm: a moved entry's optionalDependencies not compared with the registry (N1)", D, ", ...(isObject(item.optionalDependencies) ? item.optionalDependencies : {}) },", " },", T],
   ["the tree read from the raw headers, not from Git (R4)", D, "const tree = git(top, [\"rev-parse\", \"--verify\", `${commit}^{tree}`]).stdout.trim();", "const tree = (headers[0] ?? \"\").slice(\"tree \".length);", T],
   ["branch names: a version with \"-\" kept readable (R16)", B, "!tos[0]!.includes(\"-\") && ", "", BT],
@@ -145,6 +145,14 @@ const mutations = [
   ["template: the validation job may write", "action/patch-workflow.yml", "      contents: read\n", "      contents: write\n", A],
   ["action: the checkout keeps the credential", "action.yml", "persist-credentials: false\n        fetch-depth: 1", "persist-credentials: true\n        fetch-depth: 1", A],
   ["action: the validation step gets the token", "action.yml", "        OUT: ${{ runner.temp }}/ludion/fixes\n      run: bash", "        OUT: ${{ runner.temp }}/ludion/fixes\n        GH_TOKEN: ${{ github.token }}\n      run: bash", A],
+  // Review 6533374683 (R lane, R215b) and the npm corpus (docs/decisions/2026-10-31-lock-corpus-against-npm.md).
+  ["lock views: devOptional and peer refused in the tree (B1; npm 7 to 11 write them)", J, "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"devOptional\", \"peer\", \"bundled\", \"requires\", \"dependencies\"]);", "const TREE_KEYS = new Set([\"version\", \"resolved\", \"integrity\", \"dev\", \"optional\", \"bundled\", \"requires\", \"dependencies\"]);", C],
+  ["lock views: the tree's requires compared by spec (an override's spec in the tree refused)", J, "TREE_FLAGS.filter(flag => entry[flag] === true).join(\",\"), JSON.stringify(requires.map(([name]) => name))]", "TREE_FLAGS.filter(flag => entry[flag] === true).join(\",\"), JSON.stringify(requires)]", C],
+  ["lock views: devOptional and peer not compared between the views", J, "const TREE_FLAGS = [\"dev\", \"optional\", \"devOptional\", \"peer\", \"bundled\"];", "const TREE_FLAGS = [\"dev\", \"optional\", \"bundled\"];", JT],
+  ["requirements: an overridden copy taken by the requirement's own range (B2)", J, "overridden.length ? overridden.some(s => takes(found, name, s)) : takes(found, name, spec)", "takes(found, name, spec) || overridden.some(s => takes(found, name, s))", C],
+  ["requirements: a tree alias read under its path's name (M18, N4)", J, ": alias ? alias[1]! : name,", ": name,", JT],
+  ["requirements: an override key counting for every name (M22, N4)", J, "if (rule.name === name && takes(rule.selector, range => semver.validRange", "if (takes(rule.selector, range => semver.validRange", JT],
+  ["npm: a moved entry's peerDependenciesMeta not compared with the registry (N1)", D, "for (const key of [\"requires\", \"peers\", \"peersMeta\", \"os\", \"cpu\", \"libc\"] as const) {", "for (const key of [\"requires\", \"peers\", \"os\", \"cpu\", \"libc\"] as const) {", T],
 ];
 /** "pass", "fail", or "timeout" when the run does not end within LIMIT; then its whole process group is killed. */
 const vitest = file => new Promise(resolve => {

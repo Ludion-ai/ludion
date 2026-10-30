@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "name": "s2",
+  "problems": [
+    "missing: mkdirp@0.5.6, required by s2@1.0.0"
+  ],
+  "dependencies": {
+    "mkdirp": {
+      "required": "0.5.6",
+      "missing": true,
+      "problems": [
+        "missing: mkdirp@0.5.6, required by s2@1.0.0"
+      ]
+    }
+  }
+}

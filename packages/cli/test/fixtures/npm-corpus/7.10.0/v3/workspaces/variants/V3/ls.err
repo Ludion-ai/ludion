@@ -1,0 +1,14 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: a@file:/out/7.10.0/v3/workspaces/variants/V3/packages/a, required by s4@1.0.0
+npm ERR! missing: is-number@6.0.0, required by s4@1.0.0
+npm ERR! missing: local@file:./local, required by s4@1.0.0
+{
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "missing: a@file:/out/7.10.0/v3/workspaces/variants/V3/packages/a, required by s4@1.0.0\nmissing: is-number@6.0.0, required by s4@1.0.0\nmissing: local@file:./local, required by s4@1.0.0",
+    "detail": ""
+  }
+}
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_28_49_535Z-debug.log

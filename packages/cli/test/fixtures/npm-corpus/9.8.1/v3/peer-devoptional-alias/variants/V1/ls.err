@@ -1,0 +1,4 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: is-number@^7.0.0, required by to-regex-range@5.0.1
+
+npm ERR! A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-30T22_29_16_605Z-debug-0.log

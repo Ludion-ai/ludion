@@ -1,0 +1,12 @@
+npm WARN tarball tarball data for file:../packages/b (null) seems to be corrupted. Trying again.
+npm WARN tarball tarball data for file:../packages/b (null) seems to be corrupted. Trying again.
+npm ERR! code ENOENT
+npm ERR! syscall open
+npm ERR! path /out/8.19.4/v2/packages/b/package.json
+npm ERR! errno -2
+npm ERR! enoent ENOENT: no such file or directory, open '/out/8.19.4/v2/packages/b/package.json'
+npm ERR! enoent This is related to npm not being able to find a file.
+npm ERR! enoent 
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_26_40_367Z-debug-0.log

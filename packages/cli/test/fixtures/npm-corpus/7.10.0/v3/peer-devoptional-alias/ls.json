@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0",
+  "name": "s1",
+  "problems": [
+    "missing: lodash-alias@npm:lodash@4.17.21, required by s1@1.0.0",
+    "missing: minimist@1.2.8, required by s1@1.0.0",
+    "missing: mkdirp@0.5.1, required by s1@1.0.0",
+    "missing: react-dom@18.2.0, required by s1@1.0.0",
+    "missing: to-regex-range@5.0.1, required by s1@1.0.0"
+  ],
+  "dependencies": {
+    "is-number": {},
+    "lodash-alias": {
+      "missing": true,
+      "problems": [
+        "missing: lodash-alias@npm:lodash@4.17.21, required by s1@1.0.0"
+      ]
+    },
+    "minimist": {
+      "missing": true,
+      "problems": [
+        "missing: minimist@1.2.8, required by s1@1.0.0"
+      ]
+    },
+    "mkdirp": {
+      "missing": true,
+      "problems": [
+        "missing: mkdirp@0.5.1, required by s1@1.0.0"
+      ]
+    },
+    "react-dom": {
+      "missing": true,
+      "problems": [
+        "missing: react-dom@18.2.0, required by s1@1.0.0"
+      ]
+    },
+    "to-regex-range": {
+      "missing": true,
+      "problems": [
+        "missing: to-regex-range@5.0.1, required by s1@1.0.0"
+      ]
+    }
+  }
+}

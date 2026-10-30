@@ -458,6 +458,9 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       [async (name: string, version: string) => ({ name, version, dependencies: name === "minimist" ? { "is-number": "^7.0.0" } : {}, os: ["linux"] }), "failed", "package-lock.json's os for"],
       // libc decides, like os and cpu, whether npm installs a package on a platform (review 6529858505, N1).
       [async (name: string, version: string) => ({ name, version, dependencies: name === "minimist" ? { "is-number": "^7.0.0" } : {}, libc: ["musl"] }), "failed", "package-lock.json's libc for"],
+      // Which peers are optional: a mark the registry does not list would take a peer out of the requirement check
+      // (review 6533374683, N1).
+      [async (name: string, version: string) => ({ name, version, dependencies: name === "minimist" ? { "is-number": "^7.0.0" } : {}, peerDependenciesMeta: { react: { optional: true } } }), "failed", "package-lock.json's peerDependenciesMeta for"],
       // The same lock, when the registry does list the requirement: opened.
       [registry({ "is-number": "^7.0.0" }), "opened", undefined],
     ] as const) {

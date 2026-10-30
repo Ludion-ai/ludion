@@ -169,10 +169,14 @@ export function newUnmetRequirements(before: { lock: string; manifest?: unknown 
 
 const isPlain = (value: unknown): value is Record<string, any> => !!value && typeof value === "object" && !Array.isArray(value);
 
-/** The keys of an entry of the npm 6 `dependencies` tree, a closed list; any other is refused. */
-const TREE_KEYS = new Set(["version", "resolved", "integrity", "dev", "optional", "bundled", "requires", "dependencies"]);
+/**
+ * The keys of an entry of the npm 6 `dependencies` tree, a closed list; any other is refused. npm 7 to 11 write
+ * `devOptional` and `peer` there too (the npm corpus, docs/decisions/2026-10-31-lock-corpus-against-npm.md; review
+ * 6533374683, B1).
+ */
+const TREE_KEYS = new Set(["version", "resolved", "integrity", "dev", "optional", "devOptional", "peer", "bundled", "requires", "dependencies"]);
 /** The flags both views carry, as the tree names them (`packages` calls `bundled` `inBundle`); absent means false. */
-const TREE_FLAGS = ["dev", "optional", "bundled"];
+const TREE_FLAGS = ["dev", "optional", "devOptional", "peer", "bundled"];
 
 /**
  * One install path as a view says it. `key` is what the two views compare: "version\0resolved\0integrity\0flags\0requires".
@@ -213,7 +217,9 @@ function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
     const requires = item.link ? requirementList(folder?.dependencies, folder?.optionalDependencies, folder?.devDependencies) : requirementList(item.dependencies, item.optionalDependencies);
     const peers = item.link ? [] : requiredPeers(item);
     view.set(path, {
-      path, key: [version, item.link ? "" : field(item.resolved), item.link ? "" : field(item.integrity), flags, JSON.stringify(requires)].join("\0"),
+      // The requirements by name: a v2 lock's npm 6 tree writes the spec an override gives (`requires`), `packages` the
+      // package's own; whether each copy is what its spec asks is requirementsMet's question, per view.
+      path, key: [version, item.link ? "" : field(item.resolved), item.link ? "" : field(item.integrity), flags, JSON.stringify(requires.map(([name]) => name))].join("\0"),
       name: item.link ? (typeof folder?.name === "string" ? folder.name : requireName(path)) : alias ? item.name : requireName(path),
       version: item.link ? field(folder?.version) : field(item.version), link: item.link === true,
       dir: item.link ? `${field(item.resolved)}/` : `${path}/`, needs: [...requires, ...peers], peers: new Set(peers.map(([name]) => name)),
@@ -258,7 +264,7 @@ function viewOfTree(packages: Record<string, any>, tree: unknown): Map<string, V
       const requires = requirementList(entry.requires);
       const dir = linked && typeof linked.resolved === "string" ? `${linked.resolved}/` : `${path}/`;
       view.set(path, {
-        path, key: [field(entry.version), field(entry.resolved), field(entry.integrity), TREE_FLAGS.filter(flag => entry[flag] === true).join(","), JSON.stringify(requires)].join("\0"),
+        path, key: [field(entry.version), field(entry.resolved), field(entry.integrity), TREE_FLAGS.filter(flag => entry[flag] === true).join(","), JSON.stringify(requires.map(([name]) => name))].join("\0"),
         name: linked ? (typeof folder?.name === "string" ? folder.name : name) : alias ? alias[1]! : name,
         version: linked ? field(folder?.version) : alias ? alias[2]! : field(entry.version), link: !!linked, dir, needs: requires,
       });
@@ -309,8 +315,9 @@ function overrideSpecs(overrides: unknown, project: Record<string, any>, view: M
 /**
  * Every requirement of every entry of a view, and of `consumers`, that the view leaves unmet, keyed (see
  * newUnmetRequirements). A requirement is met when Node's lookup (resolveFrom) finds a copy its spec takes: the package
- * it names (an "npm:" alias names another) at a version its semver range takes, or a link for a "file:" spec; or, in
- * `packages`, a copy the project's `overrides` give for it. A spec npm would resolve some other way (a tag, a URL, a git
+ * it names (an "npm:" alias names another) at a version its semver range takes, or a link for a "file:" spec. In
+ * `packages`, where the project's `overrides` apply to the requirement, the copy is checked against their spec instead
+ * of the requirement's own, as npm does. A spec npm would resolve some other way (a tag, a URL, a git
  * spec) cannot be shown to be met (semver.satisfies is false for a range it cannot read). A peer is keyed without its
  * spec, so a peer the base already leaves out stays the same one when its requirer moves.
  */
@@ -324,7 +331,10 @@ function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], l
   };
   for (const consumer of [...view.values(), ...consumers]) for (const [name, spec] of consumer.needs) {
     const found = resolveFrom(view, consumer.dir, name);
-    if (found && (takes(found, name, spec) || overrideSpecs(overrides, project, view, consumer.path, name, spec).some(s => takes(found, name, s)))) continue;
+    // Where an override applies, npm checks the copy against the override's spec only, not the requirement's own
+    // (review 6533374683, B2).
+    const overridden = overrideSpecs(overrides, project, view, consumer.path, name, spec);
+    if (found && (overridden.length ? overridden.some(s => takes(found, name, s)) : takes(found, name, spec))) continue;
     const peer = consumer.peers?.has(name) === true;
     unmet.set([label, consumer.path, name, peer ? "<peer>" : spec, found ? `${found.path}@${found.name}@${found.version}` : "<none>"].join("\0"),
       `package-lock.json's ${label}: ${consumer.path || "the project"} requires ${name} ${spec}, and ${found ? `${found.path} has ${found.name}@${found.version}, which is not that` : "npm finds no copy of it in the lock"}.`);

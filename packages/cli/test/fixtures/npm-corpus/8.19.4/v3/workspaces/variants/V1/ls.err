@@ -1,0 +1,12 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: is-buffer@2.0.5, required by local@1.0.0
+{
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "missing: is-buffer@2.0.5, required by local@1.0.0",
+    "detail": ""
+  }
+}
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_29_02_561Z-debug-0.log

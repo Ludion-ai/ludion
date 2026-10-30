@@ -358,15 +358,18 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix,
 const npmRequirements = (item: Record<string, unknown>) => ({
   requires: { ...(isObject(item.dependencies) ? item.dependencies : {}), ...(isObject(item.optionalDependencies) ? item.optionalDependencies : {}) },
   peers: isObject(item.peerDependencies) ? item.peerDependencies : {},
+  // Which peers are optional: the requirement check leaves an optional peer out (review 6533374683, N1).
+  peersMeta: isObject(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {},
   os: item.os ?? null, cpu: item.cpu ?? null, libc: item.libc ?? null,
 });
 
 /**
  * npm: every package-lock.json entry the fix moves or adds must declare what the registry lists for that name and
- * version: its requirements (dependencies and optional ones together, and peers) and its `os`, `cpu` and `libc`, which
- * decide whether npm installs it on a platform (review 6529858505, N1). contentProblem's "required by a moved or added
- * path" then rests on the registry's data, not on the artifact's (review of 7d25696, B1 (A)), as composerAgain's does on
- * Packagist's. Not compared: `bin`, `hasInstallScript`, `engines`, `hasShrinkwrap`, `peerDependenciesMeta` and the flags.
+ * version: its requirements (dependencies and optional ones together, peers, and which peers are optional) and its
+ * `os`, `cpu` and `libc`, which decide whether npm installs it on a platform (reviews 6529858505, N1, and 6533374683,
+ * N1). contentProblem's "required by a moved or added path" then rests on the registry's data, not on the artifact's
+ * (review of 7d25696, B1 (A)), as composerAgain's does on Packagist's. Not compared: `bin`, `hasInstallScript`,
+ * `engines`, `hasShrinkwrap` and the flags.
  */
 async function npmAgain(top: string, prefix: string, base: string, fix: CheckedFix, manifest: (name: string, version: string) => Promise<Record<string, unknown> | null>): Promise<string | null> {
   try {
@@ -379,8 +382,8 @@ async function npmAgain(top: string, prefix: string, base: string, fix: CheckedF
       const listed = await manifest(name, version);
       if (!listed) return `the registry lists no ${at} (${plain(path).slice(0, 200)}).`;
       const lock = npmRequirements(item), registry = npmRequirements(listed);
-      for (const key of ["requires", "peers", "os", "cpu", "libc"] as const) {
-        if (!isDeepStrictEqual(lock[key], registry[key])) return `package-lock.json's ${key === "requires" ? "dependencies" : key === "peers" ? "peerDependencies" : key} for ${at} (${plain(path).slice(0, 200)}) is not what the registry lists.`;
+      for (const key of ["requires", "peers", "peersMeta", "os", "cpu", "libc"] as const) {
+        if (!isDeepStrictEqual(lock[key], registry[key])) return `package-lock.json's ${key === "requires" ? "dependencies" : key === "peers" ? "peerDependencies" : key === "peersMeta" ? "peerDependenciesMeta" : key} for ${at} (${plain(path).slice(0, 200)}) is not what the registry lists.`;
       }
     }
     return null;
@@ -631,7 +634,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**Not checked**",
     "",
     "- Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.",
-    ...(ecosystem === "npm" ? ["- In package-lock.json, a moved or added entry's `hasShrinkwrap`, `peerDependenciesMeta`, flags (`dev`, `optional`, `devOptional`, `peer`), `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap; the flags decide what a production install leaves out)."] : []),
+    ...(ecosystem === "npm" ? ["- In package-lock.json, a moved or added entry's `hasShrinkwrap`, flags (`dev`, `optional`, `devOptional`, `peer`), `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap; the flags decide what a production install leaves out)."] : []),
     "- Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.",
     "- Production: nothing is deployed.",
     "",

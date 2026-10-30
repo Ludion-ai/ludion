@@ -1,0 +1,12 @@
+npm ERR! code ELSPROBLEMS
+npm ERR! missing: mkdirp@0.5.6, required by s2@1.0.0
+{
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "missing: mkdirp@0.5.6, required by s2@1.0.0",
+    "detail": ""
+  }
+}
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_28_45_110Z-debug.log

@@ -1,0 +1,1 @@
+{ "name": "s4", "version": "1.0.0", "workspaces": ["packages/a"], "dependencies": { "is-number": "6.0.0", "local": "file:./local" } }

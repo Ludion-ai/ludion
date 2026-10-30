@@ -1,6 +1,6 @@
 # LT — hijacked versions and condition 1 (2026-10-31)
 
-Definitions: `docs/decisions/2026-10-31-lt-takeover-definitions.md`, committed and pushed (02e7c98, 16:20:38Z) before anything was fetched. They were not changed afterwards. One flaw in them, found after the run, is under "What the definitions got wrong" below; the results are given as defined and the flaw is shown beside them.
+Definitions: `docs/decisions/2026-10-31-lt-takeover-definitions.md`, committed and pushed (02e7c98, committed 16:20:31Z; GitHub records the branch created at 16:20:37Z) before anything was fetched. They were not changed afterwards. One flaw in them, found after the run, is under "What the definitions got wrong" below; the results are given as defined and the flaw is shown beside them.
 
 **This is an experiment that only reads.** No product code, gate or wait changes. Whether the gate shape is good enough is the owner's decision.
 
@@ -65,8 +65,10 @@ Forms: form 1 (`vX`) 29, form 2 (`X`) 5, form 3 (`N@X`) 10. Reachable from the d
 Median +102.51 h, minimum −69,730.52 h, maximum +6,130.27 h (`lt.json`, `malicious.tag_now.commit_minus_publish_hours`).
 
 So 42 of the 44 tags have a commit more than a week away from V:
-- **20 more than a week before V** (form 1: 14, form 2: 5, form 3: 1). These are tags of an earlier release that happen to carry V's number. Most are in a repository that P's `package.json` names but that is not the package's own: for example devextreme-rpk and @ui-ux-gang/devextreme-rpk (DevExpress/DevExtreme), typeorm-orbit (typeorm/typeorm), @voiceflow/anthropic (anthropics/anthropic-sdk-typescript), uniswap-test-sdk-core (Uniswap/sdk-core). Forms 1 and 2 do not name the package, so any repository with a release of that number ties them.
-- **22 more than a week after V** (form 1: 13, form 3: 9): @asyncapi packages (9 rows), @postman/tunnel-agent 0.6.5–0.6.7, zapier-platform-cli/core/schema 18.0.2–18.0.4, @accordproject/template-engine 2.7.2. The repository's own maintainers made these tags later; the hours are +197.99 to +6,130.27.
+- **20 more than a week before V** (form 1: 14, form 2: 5, form 3: 1):
+  - **19 of forms 1 and 2** (`vX`, `X`), which do not name the package. Most are in a repository that P's `package.json` names but that is not the package's own: for example devextreme-rpk and @ui-ux-gang/devextreme-rpk (DevExpress/DevExtreme), typeorm-orbit (typeorm/typeorm), @voiceflow/anthropic (anthropics/anthropic-sdk-typescript), uniswap-test-sdk-core (Uniswap/sdk-core). Any repository whose tag has that number ties them.
+  - **1 of form 3**, which names the package: zapier-platform-legacy-scripting-runner 4.0.2, tag `zapier-platform-legacy-scripting-runner@4.0.2` in zapier/zapier-platform. Its commit is dated −252.66 h from V and is not reachable from the default branch (`diverged`). Dropping forms 1 and 2 would not remove it.
+- **22 more than a week after V** (form 1: 13, form 3: 9): 9 rows in the asyncapi organisation (8 @asyncapi-scoped packages and asyncapi-preview), @postman/tunnel-agent 0.6.5–0.6.7, zapier-platform-cli/core/schema 18.0.2–18.0.4, @accordproject/template-engine 2.7.2. The tagged commits are dated +197.99 h to +6,130.27 h after V. Who pushed these tags, and when, is not in the data.
 - **2 within a day after V:** @posthog/siphash 1.1.2 (+7.03 h, `PostHog/siphash-js` v1.1.2) and @hyperlook/telemetry-sdk 1.0.19 (+0.74 h, `DrDroidLab/telemetry-sdk` v1.0.19). Neither has a `CreateEvent` for the tag in its window.
 
 Commit times are written by whoever makes the commit, and the time a tag was pushed is not public. So these hours show when the tagged commit says it was made, not when the tag appeared.
@@ -85,7 +87,7 @@ The tarball side was computed for none of them: all 44 malicious versions are no
 
 ### Not measured
 
-**V's own `repository`.** It was read for only 1 row (registry, GitHub). 447 are not obtained, and for 693 ecosyste.ms's copy has no `repository` (see below). So whether an attacker pointed V at another repository could not be measured: `version_names_other_repository` is empty for want of data, not because none did.
+**V's own `repository`.** V's version document came from the registry for only 8 rows (1 GitHub, 7 no repository). 447 are not obtained (ecosyste.ms 404 for 446, an empty copy for 1), and for 693 ecosyste.ms's copy has no `repository` (see below). So whether an attacker pointed V at another repository could not be measured: `version_names_other_repository` is empty for want of data, not because none did.
 
 ## Results: genuine fixes (192)
 
@@ -98,7 +100,14 @@ The tarball side was computed for none of them: all 44 malicious versions are no
 | both prongs, plain condition 1 (LO2's figure, reproduced) | 163 / 192 (84.90%) |
 | **both prongs, strengthened condition 1** | **83 / 192 (43.23%)** |
 
-The 83 commits off the default branch (82 tags and 1 provenance commit) belong to release lines kept on their own branches: next (19 rows; default `canary`), vite (13; `main`), react-server-dom-* (8), @sentry/* 8.49.0 (8; `develop`), @plone/volto (3), parse-server (3; `alpha`), and 29 rows of 26 other packages. The full list is in `lt.json` (`genuine.not_reachable`). Requiring the default branch drops these backported security fixes.
+83 rows (82 tags and 1 provenance commit; 73 distinct commits in `gh-compare.tsv`) are not reachable from today's default branch, all `diverged`: next (19 rows; default `canary`), vite (13; `main`), react-server-dom-* (8), @sentry/* 8.49.0 (8; `develop`), @plone/volto (3), parse-server (3; `alpha`), and 29 rows of 26 other packages. The full list is in `lt.json` (`genuine.not_reachable`). `diverged` shows only that the commit is not an ancestor of today's default branch. Whether each is a backport on a release branch, or a release flow that merges elsewhere, was not checked.
+
+## Where the run departed from the definitions
+
+Found in review (PR comment 6528949262). The run is not repeated for them.
+- **No match by `full_name` (§4).** `lt.ts` adds the current `full_name` to the names to match only when the API gave no id. But the API gives `full_name` only with an id, so matching by `full_name` never happened. Every repository with a `full_name` was matched by its id, which does not change on a rename, so the events found are the same.
+- **Commit dates read on the host (§9).** `gh.sh` reads `repos/<owner>/<repo>/commits/<sha>` for the 38 distinct malicious tag commits, which §9 does not list. Only the committer date is kept (`--jq`), but the whole answer, patches included, reached the host `gh` process. Nothing else from it was written or opened.
+- **`curl -I` on the host to GH Archive (§9).** Four `HEAD` requests for file sizes, before the archive phase, to estimate the volume. No file content was fetched on the host.
 
 ## What the definitions got wrong
 
@@ -107,8 +116,9 @@ The 83 commits off the default branch (82 tags and 1 provenance commit) belong t
 ## Kinds of malicious version that condition 1 does not stop
 
 From this data, as defined:
-1. **A repository with an earlier release of the same number** (20 rows): P's `package.json` names a repository with a `vX` or `X` tag from an earlier release. Forms 1 and 2 match it whatever the package is.
-2. **A tag made later by the maintainers** (22 rows): after the incident, the real project tagged that number. A check made when V is published, or within the wait, would find no tag (GH Archive: none within 24 hours for any of them). A check made weeks later ties V.
-3. **A tagged commit within a day of V** (2 rows): @posthog/siphash 1.1.2 and @hyperlook/telemetry-sdk 1.0.19. GH Archive shows no tag event in the window, so when the tag was pushed is unknown.
-4. **Not seen here:** an attacker who could also push a tag to the repository. No `CreateEvent` for V's tag was found within 24 hours for any of the 702 GitHub rows. The `CreateEvent` limit (more than three tags at once) and private repositories leave this short of proof.
-5. **Not measurable here:** V naming another repository than P (V's repository could not be read), and condition 2 on a malicious tarball (none is listed).
+1. **A `vX` or `X` tag dated long before V** (19 rows): P's `package.json` names a repository with a tag of forms 1 or 2 whose commit is dated more than a week before V. Forms 1 and 2 match it whatever the package is.
+2. **A tag naming the package, dated long before V** (1 row): zapier-platform-legacy-scripting-runner 4.0.2. Its form-3 tag's commit is dated −252.66 h and is not on the default branch, so the strengthened condition 1 does not tie it, but the plain one does.
+3. **A tag whose commit is dated long after V** (22 rows, +197.99 h to +6,130.27 h). GH Archive shows no tag event within 24 hours of V for any of them. Who pushed these tags, and when, is not public. If the commit dates are true, the tags did not exist when V was published, and a check made then would not have tied V. A check made after the tag appeared ties V.
+4. **A tagged commit dated within a day after V** (2 rows): @posthog/siphash 1.1.2 and @hyperlook/telemetry-sdk 1.0.19. GH Archive shows no tag event in the window, so when the tag was pushed is unknown.
+5. **Not seen here:** an attacker who could also push a tag to the repository. No `CreateEvent` for V's tag was found within 24 hours for any of the 702 GitHub rows. The `CreateEvent` limit (more than three tags at once) and private repositories leave this short of proof.
+6. **Not measurable here:** V naming another repository than P (V's repository could not be read), and condition 2 on a malicious tarball (none is listed).

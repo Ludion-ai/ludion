@@ -84,7 +84,7 @@ const mutations = [
   // Review of 7d25696 (lane): B1 (A) and (B), N3.
   ["npm: the registry not asked about moved and added entries (B1 A)", D, "const problem = await npmAgain(top, prefix, checked.base, fix, options.npmManifest ?? ((name, version) => registryManifest(name, version)));", "const problem = null;", T],
   off("npm: an entry's requirements other than the registry's accepted (B1 A)", "if (!isDeepStrictEqual(lock[key], registry[key])) return"),
-  off("npm: an entry the registry does not list accepted (B1 A)", "if (!listed) return"),
+  off("npm: an entry the registry does not list accepted (B1 A)", "if (!listed) return `the registry lists no"),
   off("npm: another package loading another copy accepted (B1 B)", "if (then !== now) return"),
   off("npm: an added alias, or a version outside its requirer's range, accepted (security pass at 8b4856d)", "if ((found.name !== undefined && found.name !== name) || typeof range !== \"string\" || !semver.validRange(range) || !semver.satisfies(version, range)) {"),
   ["npm: the lock not read as the judge reads it (N3)", D, "    lockEntries(old); lockEntries(now);\n", "", T],

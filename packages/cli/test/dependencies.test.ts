@@ -10,6 +10,7 @@ import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, ty
 import { EPSS_LIST } from "../src/security/npm-facts.ts";
 import { OsvClient, type Advisory } from "../src/security/osv.ts";
 import { privateState, snapshot } from "../src/security/project.ts";
+import { nextFix, NEXT_FIX_LIMIT } from "../src/security/next-fix.ts";
 import { scanProject } from "../src/security/scan.ts";
 import { packagistReleases, renderTimeCap } from "../src/security/time-cap.ts";
 import { commit, git } from "./git.ts";
@@ -940,5 +941,163 @@ describe("the time cap on candidates", () => {
     // vendor/new was already locked, is newly required by the fix, and first appeared 3 days before T: younger than 168h.
     expect(cap).toMatchObject({ t: "2026-05-01T00:00:00.000Z", after_t: ["vendor/dep@1.1.0"], young: ["vendor/new (first published 2026-04-28T00:00:00.000Z)"], undecidable: [] });
     await expect(packagistReleases("../etc/passwd", fetchFn)).rejects.toThrow("Invalid Composer package name");
+  });
+});
+
+describe.each([false, true])("the next smallest fix when the smallest cannot be used (LV), apply %s", apply => {
+  const LODASH = { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": "2021-02-20T15:42:16.891Z", "4.17.22": "2021-03-01T00:00:00.000Z", "4.17.23": "2021-03-02T00:00:00.000Z" } };
+  const later: Advisory = { ...advisory, id: "GHSA-test-0009", aliases: [], affected: [{ package: { ecosystem: "npm", name: "lodash" }, ranges: [{ events: [{ introduced: "4.17.21" } as { fixed?: string }, { fixed: "4.17.22" }] }] }] };
+  const mal: Advisory = { id: "MAL-2026-0009", summary: "Malicious code in lodash", aliases: [], affected: [{ package: { ecosystem: "npm", name: "lodash" }, ranges: [] }] };
+  const run = async (fetchFn: typeof fetch) => {
+    const root = fixture(), head = commit(root), before = snapshot(root), tested: string[] = [];
+    const result = await patchDependencies(root, apply, { fetchFn, client: client(), command: fakeCommand(), testRun: async name => { tested.push(name.replace(/^ludion-check-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, "")); } });
+    expect(snapshot(root)).toBe(before);
+    expect(git(root, "rev-parse", "HEAD")).toBe(head);
+    return { root, result, fix: result.receipt!.fixes[0]!, tested };
+  };
+  /** OSV batch queries the fetch saw, as name@version lists. */
+  const batches = (seen: string[]) => seen.filter(s => s.startsWith('{"queries"')).map(s => JSON.parse(s).queries.map((q: any) => `${q.package.name}@${q.version}`));
+  /** The fix went on with `version`: tested, judged, and with --apply committed on that version's branch. */
+  const took = (root: string, fix: FixReceipt, version: string) => {
+    expect(fix).toMatchObject({ outcome: apply ? "applied" : "validated", candidate_passed: true, changes: [{ name: "lodash", from: "4.17.20", to: version }] });
+    expect(fix.judgement).toMatchObject({ verdict: "ready_except_build", changes: [expect.objectContaining({ name: "lodash", from: "4.17.20", to: version })] });
+    expect(fix.fix_published_at).toBe(LODASH.versions[version as keyof typeof LODASH.versions]);
+    expect(fix.fix_published_note).toContain("The smallest fixed version was passed over (version_choice)");
+    if (apply) {
+      expect(fix.branch).toBe(`ludion/npm/lodash-${version}`);
+      expect(JSON.parse(git(root, "show", `${fix.branch}:package.json`)).dependencies.lodash).toBe(version);
+      expect(git(root, "log", "-1", "--format=%s", fix.commit!)).toBe(`ludion: lodash 4.17.20 -> ${version} (npm)`);
+      expect(git(root, "branch", "--list", "ludion/*")).toBe(`ludion/npm/lodash-${version}`);
+    } else expect(fix).toMatchObject({ branch: null, commit: null });
+  };
+
+  it("takes the next smallest when the smallest is deprecated, and keeps the smallest in the plan", async () => {
+    const seen: string[] = [];
+    const { root, result, fix, tested } = await run(registry({ lodash: LODASH }, (_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}, seen));
+    expect(result.receipt?.outcome).toBe(apply ? "applied" : "validated");
+    expect(fix.version_choice).toEqual([{ package: "lodash", smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }], note: expect.stringContaining("cannot be used (deprecated: Bad release). 4.17.22 is taken instead: the next smallest 4.x version") }]);
+    took(root, fix, "4.17.22");
+    expect(tested).toEqual(["baseline", "candidate-1"]);
+    // The scan's plan, in the receipt, still names the smallest fixed version.
+    expect(result.receipt?.before.plan).toEqual([{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: [advisory.id] }]);
+    // OSV was asked about the listed versions that are not deprecated, by name and version only.
+    expect(batches(seen)[0]).toEqual(["lodash@4.17.22", "lodash@4.17.23"]);
+  });
+  it("takes the next smallest when the registry no longer lists the smallest", async () => {
+    const npm = registry({ lodash: LODASH });
+    const fetchFn: typeof fetch = async (url, init) => {
+      const r = await npm(url, init);
+      if (String(url) !== "https://registry.npmjs.org/lodash") return r;
+      const doc = await r.json(); delete doc.versions["4.17.21"];
+      return response(doc);
+    };
+    const { root, fix } = await run(fetchFn);
+    expect(fix.version_choice?.[0]).toMatchObject({ smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason: "no longer listed by the registry (unpublished or withdrawn)" }] });
+    took(root, fix, "4.17.22");
+  });
+  it.each<[string, () => Record<string, Advisory>, string]>([
+    ["has an OSV MAL- record", () => ({ "lodash@4.17.21": mal }), "in OSV's malicious-package records (MAL-2026-0009)"],
+    ["is named by another advisory", () => ({ "lodash@4.17.21": later }), "OSV names it in GHSA-test-0009"],
+  ])("takes the next smallest when the smallest %s", async (_label, found, reason) => {
+    const { root, fix } = await run(registry({ lodash: LODASH }, () => ({}), [], { ...VULNERABLE, ...found() }));
+    expect(fix.version_choice?.[0]).toMatchObject({ smallest: "4.17.21", chosen: "4.17.22", skipped: [{ version: "4.17.21", reason }] });
+    took(root, fix, "4.17.22");
+  });
+  it("passes over every version that cannot be used, and looks only at later stable versions of the same major", async () => {
+    const seen: string[] = [];
+    const docs = { lodash: { ...LODASH, versions: { ...LODASH.versions, "4.17.22-rc.1": "2021-02-25T00:00:00.000Z", "5.0.0": "2021-02-26T00:00:00.000Z", "4.17.19": "2020-07-01T00:00:00.000Z" } } };
+    const { root, fix } = await run(registry(docs, (_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {}, seen, { ...VULNERABLE, "lodash@4.17.22": mal }));
+    expect(fix.version_choice?.[0]).toMatchObject({ chosen: "4.17.23", skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }, { version: "4.17.22", reason: "in OSV's malicious-package records (MAL-2026-0009)" }] });
+    took(root, fix, "4.17.23");
+    expect(batches(seen)[0]).toEqual(["lodash@4.17.22", "lodash@4.17.23"]);
+  });
+  it("keeps the smallest, which then stops as before, when no later same-major version qualifies", async () => {
+    const docs = { lodash: { ...LODASH, versions: { ...LODASH.versions, "5.0.0": "2021-02-26T00:00:00.000Z" } } };
+    const { root, result, fix, tested } = await run(registry(docs, (_name, version) => ["4.17.21", "4.17.22"].includes(version) ? { deprecated: "Bad release" } : {}, [], { ...VULNERABLE, "lodash@4.17.23": later }));
+    expect(fix.version_choice).toEqual([{ package: "lodash", smallest: "4.17.21", chosen: null, skipped: [{ version: "4.17.21", reason: "deprecated: Bad release" }, { version: "4.17.22", reason: "deprecated: Bad release" }, { version: "4.17.23", reason: "OSV names it in GHSA-test-0009" }], note: expect.stringContaining("no later 4.x version qualifies (2 looked at); the smallest stays") }]);
+    expect(result.receipt?.outcome).toBe("failed");
+    expect(fix).toMatchObject({ outcome: "failed", changes: [{ to: "4.17.21" }], branch: null, commit: null });
+    expect(fix.reason).toContain("The judge stops the candidate: gate 2: lodash@4.17.21 is deprecated: Bad release");
+    expect(tested).toEqual(["baseline"]);
+    if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("");
+  });
+  it("keeps the smallest when the check cannot be made, and the judge checks it again", async () => {
+    // The first OSV batch (the check's) fails; the judge's own lookups work.
+    const failFirst = (inner: typeof fetch): typeof fetch => { let calls = 0; return async (url, init) => String(url) === "https://api.osv.dev/v1/querybatch" && calls++ === 0 ? new Response("", { status: 503 }) : inner(url, init); };
+    const ok = await run(failFirst(registry({ lodash: LODASH })));
+    expect(ok.fix.version_choice).toEqual([{ package: "lodash", smallest: "4.17.21", chosen: null, skipped: [], note: expect.stringContaining("could not be read (api.osv.dev answered HTTP 503.); it stays, and the judge checks it again.") }]);
+    expect(ok.fix).toMatchObject({ outcome: apply ? "applied" : "validated", changes: [{ to: "4.17.21" }] });
+    expect(ok.fix.fix_published_note).not.toContain("passed over");
+    // A deprecated smallest that the check could not see is still stopped by the judge.
+    const stopped = await run(failFirst(registry({ lodash: LODASH }, (_name, version) => version === "4.17.21" ? { deprecated: "Bad release" } : {})));
+    expect(stopped.fix).toMatchObject({ outcome: "failed", changes: [{ to: "4.17.21" }], branch: null });
+    expect(stopped.fix.reason).toContain("lodash@4.17.21 is deprecated: Bad release");
+  });
+  it("records nothing when the smallest can be used", async () => {
+    const { root, fix } = await run(registry({ lodash: LODASH }));
+    expect(fix.version_choice).toBeUndefined();
+    expect(fix).toMatchObject({ outcome: apply ? "applied" : "validated", changes: [{ to: "4.17.21" }] });
+    expect(fix.fix_published_note).not.toContain("passed over");
+    if (apply) expect(git(root, "branch", "--list", "ludion/*")).toBe("ludion/npm/lodash-4.17.21");
+  });
+});
+
+describe("the next smallest fix is npm only", () => {
+  it("looks nothing up for a Composer fix", async () => {
+    const root = mkdtempSync(join(tmpdir(), "ludion-dependency-test-")), seen: string[] = [];
+    writeFileSync(join(root, "composer.json"), JSON.stringify({ require: { "vendor/lib": "1.0.0" } }));
+    writeFileSync(join(root, "composer.lock"), JSON.stringify({ packages: [{ name: "vendor/lib", version: "1.0.0" }] }));
+    writeFileSync(join(root, "ludion.security.json"), JSON.stringify({ schema: 1, ecosystem: "composer", test: ["php", "test.php"], timeout_seconds: 30 }));
+    const lib: Advisory = { ...advisory, id: "GHSA-test-0010", affected: [{ package: { ecosystem: "Packagist", name: "vendor/lib" }, ranges: [{ events: [{ fixed: "1.0.1" }] }] }] };
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).startsWith("https://packagist.org/")) return response({ advisories: [] });
+      if (String(url).includes("/vulns/")) return response(lib);
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.version === "1.0.0" ? { vulns: [{ id: lib.id }] } : {}) });
+    });
+    const result = await patchDependencies(root, false, { client: osv, fetchFn: async url => { seen.push(String(url)); return new Response("", { status: 404 }); }, command: async () => { throw new Error("no Docker in this test"); }, testRun: async () => {} });
+    expect(result.scan.plan).toEqual([{ name: "vendor/lib", from: "1.0.0", to: "1.0.1", advisories: [lib.id] }]);
+    // The run stops later, at the acquisition policy (no distribution archive); nothing asked npm or OSV for a version list.
+    expect(result.receipt?.reason).toContain("distribution archive");
+    expect(result.receipt?.fixes[0]?.version_choice).toBeUndefined();
+    expect(seen).toEqual([]);
+  });
+});
+
+describe("nextFix", () => {
+  const doc = (versions: Record<string, object>) => response({ time: {}, versions });
+  const stub = (versions: Record<string, object>, found: Record<string, string[]> = {}, seen: string[] = []): typeof fetch => async (url, init) => {
+    seen.push(String(url), init?.body === undefined ? "" : String(init.body));
+    if (String(url) === "https://api.osv.dev/v1/querybatch") return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => found[q.version] ? { vulns: found[q.version]!.map(id => ({ id })) } : {}) });
+    return String(url) === "https://registry.npmjs.org/tiny" ? doc(versions) : new Response("", { status: 404 });
+  };
+  it("stays in the same minor below 1.0.0", async () => {
+    const choice = await nextFix("tiny", "0.3.2", stub({ "0.3.2": { deprecated: "Bad release" }, "0.3.3": { deprecated: "also bad" }, "0.4.0": {} }));
+    expect(choice).toMatchObject({ chosen: null, skipped: [{ version: "0.3.2" }, { version: "0.3.3", reason: "deprecated: also bad" }], note: expect.stringContaining("no later 0.3 version qualifies (1 looked at)") });
+    expect((await nextFix("tiny", "0.3.2", stub({ "0.3.2": { deprecated: "Bad release" }, "0.3.10": {}, "0.3.3": { deprecated: "x" } })))?.chosen).toBe("0.3.10");
+  });
+  it("looks at no more than NEXT_FIX_LIMIT later versions", async () => {
+    const versions: Record<string, object> = { "1.0.0": { deprecated: "Bad release" } };
+    for (let patch = 1; patch <= NEXT_FIX_LIMIT + 5; patch++) versions[`1.0.${patch}`] = { deprecated: "Bad release" };
+    versions["1.1.0"] = {};
+    const choice = await nextFix("tiny", "1.0.0", stub(versions));
+    expect(choice).toMatchObject({ chosen: null, note: expect.stringContaining(`(${NEXT_FIX_LIMIT} looked at of ${NEXT_FIX_LIMIT + 6})`) });
+    expect(choice?.skipped).toHaveLength(NEXT_FIX_LIMIT + 1);
+  });
+  it("writes a deprecation message as one line of at most 200 characters", async () => {
+    const choice = await nextFix("tiny", "1.0.0", stub({ "1.0.0": { deprecated: `line one\nline two\u001b[31m${"x".repeat(300)}` }, "1.0.1": {} }));
+    expect(choice?.skipped[0]?.reason).toBe(`deprecated: ${`line one line two [31m${"x".repeat(300)}`.slice(0, 200)}`);
+    expect(choice?.chosen).toBe("1.0.1");
+  });
+  it("returns null for a usable smallest, and sends only the package's name and versions", async () => {
+    const seen: string[] = [];
+    expect(await nextFix("tiny", "1.0.0", stub({ "1.0.0": {}, "1.0.1": {}, "2.0.0": {} }, {}, seen))).toBeNull();
+    expect(seen.filter(s => s.startsWith("{"))).toEqual([JSON.stringify({ queries: [{ package: { ecosystem: "npm", name: "tiny" }, version: "1.0.0" }, { package: { ecosystem: "npm", name: "tiny" }, version: "1.0.1" }] })]);
+  });
+  it("throws on a failed lookup, a bad registry document or a version that is not semver", async () => {
+    await expect(nextFix("tiny", "1.0.0", async () => new Response("", { status: 503 }))).rejects.toThrow("registry.npmjs.org answered HTTP 503");
+    await expect(nextFix("tiny", "1.0.0", async () => response({ versions: [] }))).rejects.toThrow("Invalid registry document for tiny");
+    await expect(nextFix("tiny", "1.0.0", async url => String(url).includes("osv") ? response({ results: [] }) : doc({ "1.0.0": {} }))).rejects.toThrow("OSV batch result count mismatch");
+    await expect(nextFix("tiny", "latest", stub({}))).rejects.toThrow("not a semver version");
+    await expect(nextFix("../x", "1.0.0", stub({}))).rejects.toThrow("Invalid npm package name");
   });
 });

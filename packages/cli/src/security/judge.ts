@@ -239,7 +239,8 @@ function viewOfTree(packages: Record<string, any>, tree: unknown): Map<string, V
  * Every requirement of every entry of a view, and of `consumers`, is found in the view by Node's lookup (resolveFrom)
  * and is what its spec asks for: the package it names (an "npm:" alias names another) at a version its semver range
  * takes, or a link for a "file:" spec. A spec npm would resolve some other way (a tag, a URL, a git spec) cannot be
- * shown to be met, so it throws, as does a requirement the view does not have (review of ebfe89d, B1).
+ * shown to be met (semver.satisfies is false for a range it cannot read), so it throws, as does a requirement the
+ * view does not have (review of ebfe89d, B1).
  */
 function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], label: string): void {
   for (const consumer of [...view.values(), ...consumers]) for (const [name, spec] of consumer.needs) {
@@ -247,7 +248,7 @@ function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], l
     const alias = /^npm:((?:@[^/@]+\/)?[^/@]+)@(.+)$/.exec(spec);
     const [wanted, range] = alias ? [alias[1]!, alias[2]!] : [name, spec];
     const met = !!found && (spec.startsWith("file:") ? found.link
-      : found.name === wanted && semver.validRange(range, { loose: true }) !== null && semver.valid(found.version, { loose: true }) !== null && semver.satisfies(found.version, range, { loose: true }));
+      : found.name === wanted && semver.satisfies(found.version, range, { loose: true }));
     if (!met) throw new Error(`package-lock.json's ${label}: ${consumer.path || "the project"} requires ${name} ${spec}, and ${found ? `${found.path} has ${found.name}@${found.version}, which is not that` : "npm finds no copy of it in the lock"}.`);
   }
 }

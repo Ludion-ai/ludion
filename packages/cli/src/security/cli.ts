@@ -85,9 +85,10 @@ export async function securityCli(command: string, args: string[]): Promise<numb
       // Each fix is validated, and with --apply committed on its own branch, on its own; one failing stops no other.
       if ("fixes" in result.receipt) for (const fix of result.receipt.fixes) {
         console.log(`  ${fix.package} ${fix.changes.map(c => `${c.from} → ${c.to}`).join(", ")}: ${fix.outcome}${fix.branch ? ` (branch ${fix.branch})` : ""}${fix.reason ? ` — ${plain(fix.reason)}` : ""}`);
-        // A stopped fix's reason already carries its choice's note (dependency-patch.ts); it is printed once.
+        // A fix stopped by a choice's publisher check has exactly this reason (dependency-patch.ts); that note is printed
+        // once. Any other reason, or a text that drifts from it, prints the note again rather than leaving it out.
         for (const choice of fix.version_choice ?? []) {
-          const line = [fix.reason?.includes(choice.note) ? "" : plain(choice.note), choice.skipped.length > 1 ? `Passed over: ${choice.skipped.map(s => `${s.version} (${plain(s.reason)})`).join(", ")}.` : ""].filter(Boolean).join(" ");
+          const line = [fix.reason === `Gate 2 stops this fix: ${choice.note}` ? "" : plain(choice.note), choice.skipped.length > 1 ? `Passed over: ${choice.skipped.map(s => `${s.version} (${plain(s.reason)})`).join(", ")}.` : ""].filter(Boolean).join(" ");
           if (line) console.log(`    ${line}`);
         }
       }

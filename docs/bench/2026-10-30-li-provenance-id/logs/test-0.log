@@ -1,0 +1,542 @@
+# started 2026-10-30T10:47:42Z, node v24.22.1, git version 2.39.5
+npm ci exit 0
+== npx tsc -p tsconfig.json
+tsc exit 0
+== npx vitest run --project node packages/cli/test packages/cli/test/judge.test.ts packages/cli/test/dependencies.test.ts
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/action.test.ts (15 tests | 6 skipped) 63ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 208ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 147ms
+ ❯ |node| packages/cli/test/judge.test.ts (93 tests | 4 failed) 151ms
+     ✓ lists every added version, planned or not, with the version it replaces and whether it is dev-only 16ms
+     ✓ compares a changed copy with the copy at the same path, else the same major line 1ms
+     ✓ lists links to local directories, which a registry diff would not see 0ms
+     ✓ refuses lockfiles it cannot read exactly 1ms
+     ✓ names only lifecycle scripts that run at install 0ms
+     × is ready (except the build gate) only after the wait, with nothing found 16ms
+     ✓ stops on lost provenance, whatever the wait 3ms
+     ✓ stops on a different repository, whatever the wait 0ms
+     ✓ stops on a different workflow, whatever the wait 0ms
+     ✓ stops on a new install script, whatever the wait 0ms
+     ✓ stops on a malicious-package record, whatever the wait 0ms
+     ✓ stops on deprecation, whatever the wait 2ms
+     ✓ stops on withdrawal, whatever the wait 0ms
+     ✓ stops a downgrade, and a version with advisories the old one did not have 1ms
+     ✓ treats an unpublished predecessor like no predecessor 0ms
+     ✓ keeps an install script the previous version already had 0ms
+     ✓ extends the wait (and tells) on a publisher change or a new dependency 1ms
+     ✓ waits 12h for an exploited fix only when provenance is comparable, else 24h 0ms
+     ✓ counts the wait from the newest publish in the diff, not just the target 0ms
+     ✓ stops a version newer than the fix that was not in the lockfile, and always shows the count 1ms
+     ✓ takes the changed direct dependencies as targets when nothing is fixed, and is undecidable without any 1ms
+     ✓ stops on a new dependency whose package is younger than the base wait at T; an older one only extends 6ms
+     ✓ checks every changed package: a clean target does not hide a malicious passenger 0ms
+     ✓ is undecidable without facts or a publish time, and never ready 0ms
+     ✓ treats a new package as uncomparable: longer wait, and a stop if it runs install scripts 0ms
+     × allows a sibling whose provenance names the same repository, workflow and commit, at any time and any version 1ms
+     ✓ counts the wait from the newest sibling 0ms
+     ✓ stops a sibling with another commit 0ms
+     ✓ stops a sibling with another repository 0ms
+     ✓ stops a sibling with another workflow 0ms
+     ✓ stops a sibling with a record without a commit 0ms
+     ✓ stops a sibling with a record without a repository 0ms
+     ✓ stops a sibling with a record without a workflow 0ms
+     ✓ stops a sibling with provenance on the sibling only 0ms
+     ✓ stops a sibling with provenance on the fix only 0ms
+     ✓ without provenance, allows only the same publisher and version at most 15 minutes after T 1ms
+     ✓ does not count npm trusted publishing's shared user as the same publisher 0ms
+     ✓ with several targets, counts the 15 minutes from the matched target, not only from T 0ms
+     ✓ takes only the fixing version as a target: a newer copy of the fixed package added alongside neither sets T nor anchors a sibling 0ms
+     ✓ counts urgency only from the fixing version, not from another copy of its name 0ms
+     ✓ keeps, per advisory, package and vulnerable version, only the smallest version it changed to 0ms
+     ✓ does not let a dependent's newly loaded copy of the fixed package set T (through allChanges and gatherFacts) 24ms
+     ✓ allows nothing after T for a version without publisher and provenance facts 0ms
+     ✓ leaves rule 2 as it is: a young new sibling still stops 0ms
+     ✓ stops a change that touches other files, lacks sha512 integrity, or comes from elsewhere 1ms
+     ✓ checks every changed entry: a re-pointed unchanged version and a second copy of a new one 1ms
+     ✓ judges a path that moves to a version or another package already installed elsewhere 1ms
+     ✓ judges what a dependent falls back to when its nested copy is removed 1ms
+     ✓ lets package.json change only registry dependency specs 1ms
+     ✓ refuses lockfile keys that are not plain install paths, and stops on bundled dependencies 1ms
+     ✓ judges a version whose hash changed at its path, not only gate 4 0ms
+     ✓ judges what each dependent loads: shadowing copies, aliases and moved dependents 9ms
+     ✓ refuses lockfile paths that differ only in case, and dependency groups that are not objects 1ms
+     ✓ is undecidable when the given changed files leave out the lockfile 0ms
+     ✓ ranks urgency by exploitation, severity or EPSS, and dev-only last 0ms
+     × reads the repository, workflow and source commit from SLSA v1 and v0.2 statements 2ms
+     × refuses a statement that does not name the version and its tarball, when asked to check 1ms
+     ✓ keeps a v0.2 source URI's user part and drops only its ref 0ms
+     ✓ counts trusted publishing's shared user, and any name outside [a-z0-9][a-z0-9._-]*, as no account 0ms
+     ✓ names no commit when the statement has none or it is not a git hash 0ms
+     ✓ says none when there is no SLSA statement, and refuses malformed records 0ms
+     ✓ throws on an item that is not an answer (null), as OsvClient.ids does, rather than reading it as no record 1ms
+     ✓ throws on an item that is not an answer (7), as OsvClient.ids does, rather than reading it as no record 0ms
+     ✓ throws on an item that is not an answer ("GHSA-x"), as OsvClient.ids does, rather than reading it as no record 0ms
+     ✓ throws on an item that is not an answer ({"vulnerabilities":[]}), as OsvClient.ids does, rather than reading it as no record 5ms
+     ✓ throws on an item that is not an answer ({"vulns":[],"x":1}), as OsvClient.ids does, rather than reading it as no record 0ms
+     ✓ throws on an item that is not an answer ({"vulns":null}), as OsvClient.ids does, rather than reading it as no record 0ms
+     ✓ throws on an item that is not an answer ({"vulns":{}}), as OsvClient.ids does, rather than reading it as no record 0ms
+     ✓ throws on an item that is not an answer ([]), as OsvClient.ids does, rather than reading it as no record 1ms
+     ✓ reads an empty item as no record, and refuses a pagination token 1ms
+     ✓ keeps a repeated id once, in OSV's order 1ms
+     ✓ agrees with OsvClient.ids on null 1ms
+     ✓ agrees with OsvClient.ids on 7 0ms
+     ✓ agrees with OsvClient.ids on "GHSA-x" 0ms
+     ✓ agrees with OsvClient.ids on [] 0ms
+     ✓ agrees with OsvClient.ids on {"vulnerabilities":[]} 8ms
+     ✓ agrees with OsvClient.ids on {"vulns":[],"x":1} 2ms
+     ✓ agrees with OsvClient.ids on {"vulns":null} 0ms
+     ✓ agrees with OsvClient.ids on {"vulns":{}} 0ms
+     ✓ agrees with OsvClient.ids on {"vulns":[null]} 1ms
+     ✓ agrees with OsvClient.ids on {"vulns":[{"id":"../x"}]} 0ms
+     ✓ agrees with OsvClient.ids on {"vulns":[],"next_page_token":7} 3ms
+     ✓ agrees with OsvClient.ids on {} 0ms
+     ✓ agrees with OsvClient.ids on {"vulns":[{"id":"MAL-2026-0001"},{"id":"GHSA-aaaa-bbbb-cccc"}]} 0ms
+     ✓ agrees with OsvClient.ids on {"vulns":[{"id":"MAL-2026-0001"},{"id":"MAL-2026-0001"}]} 2ms
+     ✓ agrees with OsvClient.ids on {"vulns":[{"id":"GHSA-aaaa-bbbb-cccc"},{"id":"MAL-2026-0001"},{"id":"GHSA-aaaa-bbbb-cccc"}]} 2ms
+     ✓ agrees with OsvClient.ids on {"vulns":[{"id":"GHSA-aaaa-bbbb-cccc"},{"id":"GHSA-dddd-eeee-ffff"},{"id":"GHSA-aaaa-bbbb-cccc"}]} 0ms
+     ✓ agrees with OsvClient.ids on {"vulns":[{"id":"MAL-2026-0001"},{"id":"MAL-2026-0002"}]} 0ms
+     ✓ reads the versions a pnpm lockfile adds and applies the time cap, but is never ready 1ms
+     ✓ is the earliest of created and every version, so a re-created package keeps its age 0ms
+     ✓ skips an installed package's own workspace folder that npm records as extraneous 0ms
+     ✓ still refuses such a path when it is not extraneous, or carries a tarball, a hash, a link or a dot segment 1ms
+     ✓ stops the judge when such a folder is added, removed or changed 0ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 253ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (31 tests | 13 skipped) 408ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (6 tests) 87ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (31 tests) 319ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 251ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 6ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (1 test) 20ms
+ ✓ |node| packages/cli/test/patch-cli.test.ts (5 tests) 12ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 35ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 632ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  566ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 924ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 611ms
+ ✓ |node| packages/cli/test/security.test.ts (39 tests) 1756ms
+     ✓ validates without changing source by default; commits only FROM on its own branch when explicitly enabled  312ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2206ms
+     ✓ duplicate members count once toward the 1,000  594ms
+     ✓ more than 1,000 literal members are read no further, and say so  1067ms
+ ✓ |node| packages/cli/test/branch.test.ts (22 tests) 2521ms
+     ✓ commits only the given files on HEAD, on a new branch, and leaves the working tree and HEAD alone  360ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  415ms
+ ❯ |node| packages/cli/test/dependencies.test.ts (159 tests | 5 failed) 5971ms
+     ✓ reads installed npm versions and distinguishes unresolved direct requirements 8ms
+     ✓ includes Composer runtime and development packages 2ms
+     ✓ resolves literal Maven properties without executing a build 7ms
+     ✓ updates Maven direct versions and constrains vulnerable transitives without deleting the model 4ms
+     ✓ refuses missing declared dependencies and oversized/unresolved Maven graphs 1ms
+     ✓ rejects acquisition that needs an unconfigured trust policy 5ms
+     ✓ rejects acquisition that needs an unconfigured trust policy 2ms
+     ✓ rejects acquisition that needs an unconfigured trust policy 1ms
+     ✓ refuses Maven extensions and custom repositories before acquisition 6ms
+     ✓ plans a same-major fix and retains exact advisory ids 15ms
+     ✓ handles two-component Maven releases without inventing artifact versions 1ms
+     ✓ does not automatically select a major/prerelease fix: 5.0.0 2ms
+     ✓ does not automatically select a major/prerelease fix: 4.17.21-rc.1 3ms
+     ✓ reads all pages, associates results by request order and caches advisory details 3ms
+     ✓ does not interpret malformed/partial metadata as clean: {"results":[]} 2ms
+     ✓ does not interpret malformed/partial metadata as clean: {"results":[[]]} 2ms
+     ✓ does not interpret malformed/partial metadata as clean: {"results":[{"error":"quota failure"}]} 3ms
+     ✓ does not interpret malformed/partial metadata as clean: {"results":[{"vulns":[{"id":"../../private"}]}]} 3ms
+     ✓ reports outages and repeated pagination rather than a clean result 6ms
+     ✓ refuses a lookalike official registry in tool-image evidence 140ms
+     ✓ commits both dependency files on the fix's own branch only under explicit policy (apply=false) 78ms
+     ✓ commits both dependency files on the fix's own branch only under explicit policy (apply=true) 182ms
+     ✓ validates each fix alone against one baseline, and one failing fix stops no other 165ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  446ms
+     ✓ stops on an OSV MAL- record: in the baseline before any Docker work, in a candidate for that fix 91ms
+     ✓ stops on a record that names MAL- only as an alias, before any Docker work 24ms
+     ✓ stops a fix that leaves another copy of its package at a version the baseline had, still affected 35ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  410ms
+     ✓ stops a fix whose candidate has an entry without a supported fix the baseline did not have, on any package 181ms
+     ✓ validates only the first of two fixes whose branch names are the same 125ms
+     ✓ fails a fix whose branch name already holds another change, and leaves that branch alone 62ms
+     ✓ leaves a fix whose branch exists unchanged and does not validate it again 163ms
+     ✓ refuses --apply before any Docker work outside Git, and when the files differ from the last commit 139ms
+     ✓ puts the fix of a project in a repository's subfolder on a branch named for that folder 124ms
+     ✓ groups every planned change of one package into one fix 0ms
+     ✓ makes no branch when baseline/candidate test 1 fails 56ms
+     ✓ makes no branch when baseline/candidate test 2 fails 62ms
+     ✓ refuses an application-compatible candidate that still has advisory findings 57ms
+     ✓ rejects source mutations even when not applying (apply=false) 30ms
+     ✓ rejects source mutations even when not applying (apply=true) 60ms
+     ✓ does not apply after a received stop request 61ms
+     ✓ blocks another update when an interrupted transaction needs recovery 2ms
+     ✓ does not reject a graph merely because two existing majors coexist 1ms
+     ✓ strips the online Maven build model and pins every repository to public Central 2ms
+     ✓ requires the npm version that enforces direct and transitive source restrictions 0ms
+     ✓ rejects an untrusted or credential-bearing archive URL: https://host.docker.internal:8443/private/action.zip 0ms
+     ✓ rejects an untrusted or credential-bearing archive URL: https://127.0.0.1/archive.zip 0ms
+     ✓ rejects an untrusted or credential-bearing archive URL: https://github.com.example.org/a/b.zip 0ms
+     ✓ rejects an untrusted or credential-bearing archive URL: https://user:secret@api.github.com/repos/a/b/zipball/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+     ✓ checks each archive redirect before contacting its target 3ms
+     ✓ uses local verified archives without a source fallback and preserves cached redirect evidence 3ms
+     ✓ receives stop requests while acquiring an archive batch 2ms
+     ✓ keeps auto scanning a saved PHP Dockerfile outside the root 3ms
+     ✓ keeps the project's requirement style and raises only its floor 1ms
+     ✓ pins npm direct fixes exactly and transitive ones as overrides only in the first resolution step 2ms
+     ✓ resolves npm and Composer candidates for the planned packages only, never a blanket update 0ms
+     ✓ stops when the candidate moves a package version that no planned fix replaces 57ms
+     ✓ records every changed package, planned or not, and refuses a manifest the package manager rewrote 20ms
+     ✓ keeps only the properties the online Maven model uses, and refuses dependency-plugin parameter names 2ms
+     ✓ takes Packagist's later fix when OSV's fixed version is still affected there 1ms
+     ✓ keeps OSV's fix when it is the later one, and finds advisories only Packagist has 1ms
+     ✓ ignores advisories that do not affect the installed version and reports a clean empty answer 0ms
+     ✓ blocks when Packagist leaves no same-major fix or writes a range Ludion cannot read 1ms
+     ✓ never treats an outage as a clean Packagist answer 0ms
+     ✓ never treats a missing advisories field as a clean Packagist answer 0ms
+     ✓ never treats a name that was not asked for as a clean Packagist answer 0ms
+     ✓ never treats a record for another package as a clean Packagist answer 0ms
+     ✓ never treats an invalid advisory id as a clean Packagist answer 0ms
+     ✓ does not ask Packagist about npm or Maven inventories 1ms
+     ✓ does not apply a deprecated fix, and does not run the candidate's tests 58ms
+     ✓ does not apply a fix that adds an install script, and does not run the candidate's tests 59ms
+     ✓ does not apply a fix from another publisher, and does not run the candidate's tests 59ms
+     ✓ does not apply a fix published an hour ago, and does not run the candidate's tests 58ms
+     ✓ does not apply a candidate whose OSV lookup fails, and does not run the candidate's tests 59ms
+     ✓ goes on to the candidate's tests when the judge finds nothing, downloading the EPSS list whole and sending no CVE ID 114ms
+     ✓ refuses only the fix the judge refuses; the other goes on, and each judgement sees only its own fix's change 127ms
+     ✓ does not apply a deprecated fix, and does not run the candidate's tests 29ms
+     ✓ does not apply a fix that adds an install script, and does not run the candidate's tests 29ms
+     ✓ does not apply a fix from another publisher, and does not run the candidate's tests 28ms
+     ✓ does not apply a fix published an hour ago, and does not run the candidate's tests 28ms
+     ✓ does not apply a candidate whose OSV lookup fails, and does not run the candidate's tests 30ms
+     ✓ goes on to the candidate's tests when the judge finds nothing, downloading the EPSS list whole and sending no CVE ID 30ms
+     ✓ refuses only the fix the judge refuses; the other goes on, and each judgement sees only its own fix's change 34ms
+     ✓ fails that fix and commits nothing (apply=false) 28ms
+     ✓ fails that fix and commits nothing (apply=true) 58ms
+     ✓ stops a version the candidate adds that was published at or after the fix, and a young new package 2ms
+     × lets an npm sibling of the same release move, from the registry's publisher and provenance 8ms
+     ✓ takes only the plan's own versions as targets, so another copy of a planned package is checked against T 0ms
+     ✓ lets nothing published at or after T move in a Composer candidate 1ms
+     ✓ is undecidable when a time is missing, and a failed registry read fails the candidate 55ms
+     ✓ reads Packagist's minified metadata for Composer release times and requirements 1ms
+     ✓ takes the next smallest when the smallest is deprecated, and keeps the smallest in the plan 34ms
+     ✓ stops when the registry no longer lists the smallest, as there is no publisher or provenance to compare 25ms
+     ✓ stops when the version that qualifies was published by another account 24ms
+     ✓ stops when the publisher and provenance cannot be read 24ms
+     ✓ keeps the gate 2 stop as the reason when a branch of the smallest's name already exists 29ms
+     ✓ stops only the fix whose next version is another account's; the run's other fixes go on 31ms
+     ✓ takes the next smallest, as before, when the smallest is named by an advisory that is not MAL- 32ms
+     ✓ stops, taking no later version, when the smallest has an OSV MAL- record, though the next is the same account's 24ms
+     ✓ stops when the smallest has both an OSV MAL- record and another record 24ms
+     ✓ stops when the smallest has an OSV MAL- record and is also deprecated, so OSV is asked about a deprecated smallest 25ms
+     ✓ passes over every version that cannot be used, and looks only at later stable versions of the same major 34ms
+     ✓ keeps the smallest, which then stops as before, when no later same-major version qualifies 31ms
+     ✓ keeps the smallest when the check cannot be made, and the judge checks it again 62ms
+     ✓ replaces only the change whose smallest cannot be used, when one fix has two changes of the package 29ms
+     ✓ stops the whole fix when one of its two changes would take a version from another account 23ms
+     ✓ ends a fix's lookups at a MAL- stop on its first change, when one fix has two changes of the package 24ms
+     ✓ keeps every smallest in a stopped fix's changes, though an earlier change's next version qualified 23ms
+     ✓ ends a fix's lookups at a publisher stop on its first change, too 22ms
+     ✓ keeps every smallest in a fix stopped by the publisher check, though an earlier change's next version qualified 24ms
+     ✓ adds the passed-over sentence to fix_published_note only when a publish time was read 31ms
+     ✓ records nothing when the smallest can be used 32ms
+     ✓ takes the next smallest when the smallest is deprecated, and keeps the smallest in the plan 122ms
+     ✓ stops when the registry no longer lists the smallest, as there is no publisher or provenance to compare 54ms
+     ✓ stops when the version that qualifies was published by another account 52ms
+     ✓ stops when the publisher and provenance cannot be read 52ms
+     ✓ keeps the gate 2 stop as the reason when a branch of the smallest's name already exists 53ms
+     ✓ stops only the fix whose next version is another account's; the run's other fixes go on 118ms
+     ✓ takes the next smallest, as before, when the smallest is named by an advisory that is not MAL- 123ms
+     ✓ stops, taking no later version, when the smallest has an OSV MAL- record, though the next is the same account's 52ms
+     ✓ stops when the smallest has both an OSV MAL- record and another record 53ms
+     ✓ stops when the smallest has an OSV MAL- record and is also deprecated, so OSV is asked about a deprecated smallest 53ms
+     ✓ passes over every version that cannot be used, and looks only at later stable versions of the same major 125ms
+     ✓ keeps the smallest, which then stops as before, when no later same-major version qualifies 61ms
+     ✓ keeps the smallest when the check cannot be made, and the judge checks it again 178ms
+     ✓ replaces only the change whose smallest cannot be used, when one fix has two changes of the package 57ms
+     ✓ stops the whole fix when one of its two changes would take a version from another account 49ms
+     ✓ ends a fix's lookups at a MAL- stop on its first change, when one fix has two changes of the package 48ms
+     ✓ keeps every smallest in a stopped fix's changes, though an earlier change's next version qualified 49ms
+     ✓ ends a fix's lookups at a publisher stop on its first change, too 48ms
+     ✓ keeps every smallest in a fix stopped by the publisher check, though an earlier change's next version qualified 49ms
+     ✓ adds the passed-over sentence to fix_published_note only when a publish time was read 57ms
+     ✓ records nothing when the smallest can be used 121ms
+     ✓ looks nothing up for a Composer fix 4ms
+     ✓ stays in the same minor below 1.0.0 1ms
+     ✓ looks at no more than NEXT_FIX_LIMIT later versions 1ms
+     ✓ writes a deprecation message as one line of at most 200 characters 0ms
+     ✓ returns null for a usable smallest, asking OSV about the smallest alone, and sends only the package's name and versions 0ms
+     ✓ asks OSV about later versions only after the smallest cannot be used 0ms
+     ✓ does not count a record OSV marks withdrawn, as OsvClient.scan does not 1ms
+       ✓ stops though the next version is the same account's, and asks about no later version 0ms
+       ✓ stops when the smallest has both a MAL- record and other records, naming each 0ms
+       ✓ stops when the smallest with a MAL- record is deprecated or no longer listed, which OSV is now asked about 0ms
+       ✓ is as before when no MAL- record in force names the smallest 1ms
+     ✓ throws when a version's manifest is not an object (null), as nothing about it can be judged 0ms
+     ✓ throws when a version's manifest is not an object ("1.0.1"), as nothing about it can be judged 0ms
+     ✓ throws when a version's manifest is not an object (7), as nothing about it can be judged 0ms
+     ✓ throws when a version's manifest is not an object (undefined), as nothing about it can be judged 0ms
+     ✓ throws on a failed lookup, a bad registry document or a version that is not semver 0ms
+     ✓ throws, so the smallest stays, when OSV's batch item is not an answer 0ms
+     × takes the version when both have provenance from the same repository and workflow, from different commits 2ms
+     ✓ takes the version when neither has provenance and the same account published both 0ms
+     ✓ stops when another account published it 0ms
+     ✓ stops when either is trusted publishing's shared user without provenance, which is no account 0ms
+     × stops when the provenance names another repository 1ms
+     × stops when the provenance names another workflow 1ms
+     × stops when only one of the two has provenance, either way round, even from the same account 1ms
+     ✓ stops when the provenance cannot be read or does not name its version and tarball 1ms
+     ✓ stops when a provenance record names no repository or workflow, even on both 0ms
+ ✓ |node| packages/cli/test/deliver.test.ts (35 tests) 9519ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base  377ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  441ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  510ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  425ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  530ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  351ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  360ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  423ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  467ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  535ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  627ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  406ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1115ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/cli/test/dependencies.test.ts > the time cap on candidates > lets an npm sibling of the same release move, from the registry's publisher and provenance
+AssertionError: expected [ { …(4) } ] to deeply equal [ { …(3) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "basis": "provenance",
++     "by_id": false,
+      "target": "lodash@4.17.21",
+      "version": "lodash.prov@1.0.0",
+    },
+  ]
+
+ ❯ packages/cli/test/dependencies.test.ts:939:32
+    937|     // The fix with provenance from the same commit: lodash.prov only;…
+    938|     const built = await candidateTimeCap("npm", before, after, plan, f…
+    939|     expect(built.same_release).toEqual([{ version: "lodash.prov@1.0.0"…
+       |                                ^
+    940|     expect(built.after_t).toEqual(["lodash.late@4.17.21", "lodash.sib@…
+    941|     // From another commit: everything after T stops.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  |node| packages/cli/test/dependencies.test.ts > the next smallest fix's publisher check (docs/decisions/2026-10-30-next-fix-same-publisher.md) > takes the version when both have provenance from the same repository and workflow, from different commits
+AssertionError: expected { version: '1.0.1', …(4) } to deeply equal { version: '1.0.1', …(4) }
+
+- Expected
++ Received
+
+@@ -1,20 +1,24 @@
+  {
+    "candidate": {
+      "provenance": {
+        "commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++       "event": null,
+        "repository": "https://github.com/acme/tiny",
++       "repository_id": null,
+        "workflow": ".github/workflows/release.yml",
+      },
+      "publisher": "alice",
+    },
+-   "detail": "The same provenance repository and workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml.",
++   "detail": "The same provenance repository and workflow; neither records a GitHub repository id, so not compared by ID: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml, GitHub repository id (none recorded), event (none recorded); 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml, GitHub repository id (none recorded), event (none recorded).",
+    "result": "provenance",
+    "smallest": {
+      "provenance": {
+        "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++       "event": null,
+        "repository": "https://github.com/acme/tiny",
++       "repository_id": null,
+        "workflow": ".github/workflows/release.yml",
+      },
+      "publisher": "alice",
+    },
+    "version": "1.0.1",
+
+ ❯ packages/cli/test/dependencies.test.ts:1436:15
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  |node| packages/cli/test/dependencies.test.ts > the next smallest fix's publisher check (docs/decisions/2026-10-30-next-fix-same-publisher.md) > stops when the provenance names another repository
+AssertionError: expected { package: 'tiny', …(5) } to match object { chosen: null, …(1) }
+(10 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "chosen": null,
+    "publisher_check": {
+-     "detail": "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/mallory/tiny, workflow .github/workflows/release.yml.",
++     "detail": "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml, GitHub repository id (none recorded), event (none recorded); 1.0.1 has provenance from repository https://github.com/mallory/tiny, workflow .github/workflows/release.yml, GitHub repository id (none recorded), event (none recorded).",
+      "result": "stop",
+      "version": "1.0.1",
+    },
+  }
+
+ ❯ stops packages/cli/test/dependencies.test.ts:1429:20
+    1427|   };
+    1428|   const stops = (choice: VersionChoice, detail: string) => {
+    1429|     expect(choice).toMatchObject({ chosen: null, publisher_check: { ve…
+       |                    ^
+    1430|     expect(choice.note).toContain("1.0.1 is the next smallest 1.x vers…
+    1431|     expect(choice.note).toContain(detail);
+ ❯ packages/cli/test/dependencies.test.ts:1460:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  |node| packages/cli/test/dependencies.test.ts > the next smallest fix's publisher check (docs/decisions/2026-10-30-next-fix-same-publisher.md) > stops when the provenance names another workflow
+AssertionError: expected { package: 'tiny', …(5) } to match object { chosen: null, …(1) }
+(10 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "chosen": null,
+    "publisher_check": {
+-     "detail": "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/other.yml.",
++     "detail": "The provenance differs, or names no repository or workflow: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml, GitHub repository id (none recorded), event (none recorded); 1.0.1 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/other.yml, GitHub repository id (none recorded), event (none recorded).",
+      "result": "stop",
+      "version": "1.0.1",
+    },
+  }
+
+ ❯ stops packages/cli/test/dependencies.test.ts:1429:20
+    1427|   };
+    1428|   const stops = (choice: VersionChoice, detail: string) => {
+    1429|     expect(choice).toMatchObject({ chosen: null, publisher_check: { ve…
+       |                    ^
+    1430|     expect(choice.note).toContain("1.0.1 is the next smallest 1.x vers…
+    1431|     expect(choice.note).toContain(detail);
+ ❯ packages/cli/test/dependencies.test.ts:1463:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  |node| packages/cli/test/dependencies.test.ts > the next smallest fix's publisher check (docs/decisions/2026-10-30-next-fix-same-publisher.md) > stops when only one of the two has provenance, either way round, even from the same account
+AssertionError: expected { package: 'tiny', …(5) } to match object { chosen: null, …(1) }
+(10 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "chosen": null,
+    "publisher_check": {
+-     "detail": "Only one of the two has provenance: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml; 1.0.1 has no provenance and was published by the npm account alice.",
++     "detail": "Only one of the two has provenance: 1.0.0 has provenance from repository https://github.com/acme/tiny, workflow .github/workflows/release.yml, GitHub repository id (none recorded), event (none recorded); 1.0.1 has no provenance and was published by the npm account alice.",
+      "result": "stop",
+      "version": "1.0.1",
+    },
+  }
+
+ ❯ stops packages/cli/test/dependencies.test.ts:1429:20
+    1427|   };
+    1428|   const stops = (choice: VersionChoice, detail: string) => {
+    1429|     expect(choice).toMatchObject({ chosen: null, publisher_check: { ve…
+       |                    ^
+    1430|     expect(choice.note).toContain("1.0.1 is the next smallest 1.x vers…
+    1431|     expect(choice.note).toContain(detail);
+ ❯ packages/cli/test/dependencies.test.ts:1466:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  |node| packages/cli/test/judge.test.ts > gate 2 and the wait > is ready (except the build gate) only after the wait, with nothing found
+AssertionError: expected [ { gate: 2, package: 'lib', …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "effect": "info",
++     "gate": 2,
++     "message": "Neither lib@1.0.0 nor 1.0.1 records a GitHub repository id in its provenance: compared by repository name and workflow, not by ID.",
++     "package": "lib",
++   },
++ ]
+
+ ❯ packages/cli/test/judge.test.ts:63:28
+     61|     const later = run({}, {}, { now: "2026-10-02T00:00:00Z" });
+     62|     expect(later.verdict).toBe("ready_except_build");
+     63|     expect(later.findings).toEqual([]);
+       |                            ^
+     64|     expect(renderJudgement(later)).toContain("build/test gate not run"…
+     65|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  |node| packages/cli/test/judge.test.ts > rule 1's same-release exception > allows a sibling whose provenance names the same repository, workflow and commit, at any time and any version
+AssertionError: expected [ { version: 'lib-env@2.0.0', …(3) } ] to deeply equal [ { version: 'lib-env@2.0.0', …(2) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "basis": "provenance",
++     "by_id": false,
+      "target": "lib@1.0.1",
+      "version": "lib-env@2.0.0",
+    },
+  ]
+
+ ❯ packages/cli/test/judge.test.ts:194:42
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  |node| packages/cli/test/judge.test.ts > provenance records > reads the repository, workflow and source commit from SLSA v1 and v0.2 statements
+AssertionError: expected { …(5) } to deeply equal { …(3) }
+
+- Expected
++ Received
+
+  {
+    "commit": "535e26d3c69de49df8bd17618a424cbe65ec897b",
++   "event": null,
+    "repository": "https://github.com/acme/lib",
++   "repository_id": null,
+    "workflow": ".github/workflows/release.yml",
+  }
+
+ ❯ packages/cli/test/judge.test.ts:528:125
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  |node| packages/cli/test/judge.test.ts > provenance records > refuses a statement that does not name the version and its tarball, when asked to check
+AssertionError: expected { …(5) } to deeply equal { …(3) }
+
+- Expected
++ Received
+
+  {
+    "commit": "535e26d3c69de49df8bd17618a424cbe65ec897b",
++   "event": null,
+    "repository": "https://github.com/acme/lib",
++   "repository_id": null,
+    "workflow": ".github/workflows/release.yml",
+  }
+
+ ❯ packages/cli/test/judge.test.ts:535:108
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  2 failed | 19 passed (21)
+      Tests  9 failed | 885 passed | 19 skipped (913)
+   Start at  10:47:53
+   Duration  10.29s (transform 4.76s, setup 0ms, import 7.51s, tests 26.10s, environment 2ms)
+
+vitest exit 1
+# finished 2026-10-30T10:48:03Z

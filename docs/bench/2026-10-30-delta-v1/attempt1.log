@@ -1,0 +1,29 @@
+delta-v1 commit 8d576ebd8e74fef7a95f5bdf3d93ed677ee36fd8 start 2026-10-30T00:19:00Z
+delta-v1 end 2026-10-30T00:49:29Z exit 1
+---
+2026-10-30T00:22:00.506Z phase 1: 100/1348
+2026-10-30T00:24:21.295Z phase 1: 200/1348
+2026-10-30T00:27:02.201Z phase 1: 300/1348
+2026-10-30T00:29:36.504Z phase 1: 400/1348
+2026-10-30T00:32:12.491Z phase 1: 500/1348
+2026-10-30T00:34:08.030Z phase 1: 600/1348
+2026-10-30T00:36:19.068Z phase 1: 700/1348
+2026-10-30T00:38:24.192Z phase 1: 800/1348
+2026-10-30T00:41:51.710Z phase 1: 900/1348
+2026-10-30T00:44:14.757Z phase 1: 1000/1348
+2026-10-30T00:46:28.075Z phase 1: 1100/1348
+2026-10-30T00:48:51.388Z phase 1: 1200/1348
+file:///w/tools/backtest/src/delta.ts:95
+  out["obf:long-base64"] = (text.match(/[A-Za-z0-9+/]{200,}/g) ?? []).filter(s => !/^[0-9a-fA-F]+$/.test(s)).length;
+                                 ^
+
+RangeError: Maximum call stack size exceeded
+    at String.match (<anonymous>)
+    at capabilityCounts (file:///w/tools/backtest/src/delta.ts:95:34)
+    at total (file:///w/tools/backtest/src/delta.ts:206:95)
+    at delta (file:///w/tools/backtest/src/delta.ts:233:21)
+    at judgeRow (file:///w/tools/backtest/src/delta-v1.ts:172:13)
+    at file:///w/tools/backtest/src/delta-v1.ts:194:27
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.22.2

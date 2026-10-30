@@ -11,21 +11,41 @@ export type Release = { name: string; version: string };
  * What the same-release exception compares: the publisher's account (null when unknown, or when the registry names no
  * account, as for trusted publishing) and the provenance's source.
  */
-export type ReleaseIdentity = { publisher: string | null; provenance: { repository: string | null; workflow: string | null; commit: string | null } | null };
+export type ReleaseIdentity = { publisher: string | null; provenance: Provenance | null };
+/**
+ * Build provenance as the registry recorded it (npm-facts.ts, provenanceFrom). `repository_id` and `event` are GitHub's
+ * numeric repository id and the event that started the run; null (or absent, in facts read before they were) when the
+ * statement records none (docs/decisions/2026-10-30-provenance-immutable-id.md).
+ */
+export type Provenance = { repository: string | null; workflow: string | null; commit: string | null; repository_id?: string | null; event?: string | null };
+/** The only GitHub events a release may be published from: none of them runs on input from outside the repository. */
+export const PUBLISH_EVENTS = ["push", "release", "workflow_dispatch"];
+/** Why a statement's event cannot publish, or null. One with a repository id but no event cannot be told apart, so it has a reason. */
+export function eventProblem(p: Provenance): string | null {
+  const event = p.event ?? null;
+  if (event === null) return (p.repository_id ?? null) === null ? null : "records a GitHub repository id but no triggering event";
+  return PUBLISH_EVENTS.includes(event) ? null : `was published from a GitHub ${event} event, not push, release or workflow_dispatch`;
+}
+/** The two statements' repository ids: the same, different, recorded on one side only, or on neither (compared by name only). */
+export function repositoryIds(a: Provenance, b: Provenance): "same" | "differ" | "one" | "none" {
+  const x = a.repository_id ?? null, y = b.repository_id ?? null;
+  return x === null && y === null ? "none" : x === null || y === null ? "one" : x === y ? "same" : "differ";
+}
 /** A version published at or after T that the exception allows, the target it belongs with, and why. */
-export type SameRelease = { version: string; target: string; basis: "provenance" | "publisher" };
+export type SameRelease = { version: string; target: string; basis: "provenance" | "publisher"; by_id?: boolean };
 /** Without provenance, a sibling must be published at most this long after its target (and so after T). */
 export const SAME_RELEASE_MINUTES = 15;
 
 /**
  * Is a version published at or after T the same release as a target? With provenance on both: the same repository,
- * workflow and commit. Without provenance on either: the same publisher, the same version number, and at most 15 minutes
+ * workflow, commit and repository id (neither recording an id: compared without it), neither recorded as published from another event than push, release
+ * or workflow_dispatch. Without provenance on either: the same publisher, the same version number, and at most 15 minutes
  * after the target (T is the latest target, so also after T). Provenance on only one side, a record naming no
  * repository, workflow or commit, or an unknown publisher: no.
  */
 export function sameRelease(target: { version: string; published: number; identity: ReleaseIdentity }, other: { version: string; published: number; identity: ReleaseIdentity }, t: number): SameRelease["basis"] | null {
   const a = target.identity.provenance, b = other.identity.provenance;
-  if (a && b) return a.repository && a.workflow && a.commit && a.repository === b.repository && a.workflow === b.workflow && a.commit === b.commit ? "provenance" : null;
+  if (a && b) return a.repository && a.workflow && a.commit && a.repository === b.repository && a.workflow === b.workflow && a.commit === b.commit && ["same", "none"].includes(repositoryIds(a, b)) && !eventProblem(a) && !eventProblem(b) ? "provenance" : null;
   if (a || b) return null;
   const within = other.published >= t && other.published - target.published <= SAME_RELEASE_MINUTES * 60_000;
   return target.identity.publisher && target.identity.publisher === other.identity.publisher && target.version === other.version && within ? "publisher" : null;
@@ -82,7 +102,7 @@ export function timeCap(input: {
     const sibling = identity && input.targets.map(target => {
       const own = input.identity!(target.name, target.version);
       const basis = own && sameRelease({ version: target.version, published: Date.parse(input.published(target.name, target.version)!), identity: own }, { version: r.version, published: at, identity }, t);
-      return basis ? { version: id, target: `${target.name}@${target.version}`, basis } : null;
+      return basis ? { version: id, target: `${target.name}@${target.version}`, basis, ...(basis === "provenance" ? { by_id: repositoryIds(own.provenance!, identity.provenance!) === "same" } : {}) } : null;
     }).find(s => s !== null);
     if (sibling) out.same_release.push(sibling);
     else out.after_t.push(id);
@@ -101,7 +121,7 @@ export function timeCap(input: {
 export function renderTimeCap(cap: TimeCap): string[] {
   const lines = [`Published at or after T (${cap.t ?? "unknown"}, the fix's publish time): ${cap.t ? cap.after_t.length + cap.same_release.length : "unknown"} version(s)`];
   for (const v of cap.after_t) lines.push(`  ${v}`);
-  for (const s of cap.same_release) lines.push(`  ${s.version}: allowed, the same release as ${s.target} (${s.basis === "provenance" ? "provenance names the same repository, workflow and commit" : `no provenance; same publisher and version, at most ${SAME_RELEASE_MINUTES} minutes after it`})`);
+  for (const s of cap.same_release) lines.push(`  ${s.version}: allowed, the same release as ${s.target} (${s.basis === "provenance" ? (s.by_id === true ? "provenance names the same repository, workflow, commit and repository id" : "provenance names the same repository, workflow and commit; neither records a repository id, so not compared by ID") : `no provenance; same publisher and version, at most ${SAME_RELEASE_MINUTES} minutes after it`})`);
   return lines;
 }
 

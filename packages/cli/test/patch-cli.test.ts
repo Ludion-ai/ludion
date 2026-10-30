@@ -51,4 +51,25 @@ describe("ludion patch, a fix's version choice", () => {
     expect(out).toContain(`    ${NOTE}`);
     expect(times(out.join("\n"), NOTE)).toBe(1);
   });
+  // Each note is printed once, never zero times: only the reason dependency-patch.ts writes for a choice's publisher
+  // check leaves that choice's note out (docs/mistakes/2026-10-30-lv4-fixes-not-held-by-tests.md).
+  it("prints the note of a fix that took the next version and then failed validation: its reason does not carry it", async () => {
+    state.fixes = [fix({ reason: "Application validation failed (1): test failed", version_choice: [{ ...choice([{ version: "4.17.21", reason: "deprecated: Bad release" }]), chosen: "4.17.22" }] as FixReceipt["version_choice"] })];
+    await securityCli("patch", ["--dir", project()]);
+    expect(out).toContain("  lodash 4.17.20 → 4.17.21: failed — Application validation failed (1): test failed");
+    expect(out).toContain(`    ${NOTE}`);
+    expect(times(out.join("\n"), NOTE)).toBe(1);
+  });
+  it("prints a fix's second choice's note when its reason carries only the first's", async () => {
+    const second = "3.10.2 cannot be used (no longer listed). No other 3.x version fixes it, and this fix stops.";
+    state.fixes = [fix({
+      changes: [{ name: "lodash", from: "4.17.20", to: "4.17.21", advisories: [] }, { name: "lodash", from: "3.10.1", to: "3.10.2", advisories: [] }],
+      reason: `Gate 2 stops this fix: ${NOTE}`,
+      version_choice: [choice([{ version: "4.17.21", reason: "deprecated: Bad release" }]), { package: "lodash", smallest: "3.10.2", chosen: null, skipped: [{ version: "3.10.2", reason: "no longer listed" }], note: second }] as FixReceipt["version_choice"],
+    })];
+    await securityCli("patch", ["--dir", project()]);
+    expect(times(out.join("\n"), NOTE)).toBe(1);
+    expect(out).toContain(`    ${second}`);
+    expect(times(out.join("\n"), second)).toBe(1);
+  });
 });

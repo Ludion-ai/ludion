@@ -1,0 +1,130 @@
+# started 2026-10-30T01:28:21Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+npm ci exit 0
+build exit 0
+== case npm
+base 387192b7db97fdcd00b0cefcc204dd05e6e5e8bc
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+receipt dc19e873-7f15-4044-a635-becb617b3cfa: outcome failed, base 387192b7db97fdcd00b0cefcc204dd05e6e5e8bc
+  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T01:28:33.003Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
+Packed 0 applied fixes into /e/npm/artifact1.
+pack exit 0
+  29468 bytes receipt.json
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt dc19e873-7f15-4044-a635-becb617b3cfa on 387192b7db97: 0 applied fixes; not applied: 1 failed.
+open exit 0
+-- origin's branches:
+  main 387192b7db97fdcd00b0cefcc204dd05e6e5e8bc
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+receipt cdca654a-8925-44c6-a399-d200ec9b47d2: outcome failed, base 387192b7db97fdcd00b0cefcc204dd05e6e5e8bc
+  lodash 4.17.20 -> 4.18.0: failed judge=stop published=2026-03-31T18:18:42.717Z found=2026-10-30T01:28:43.660Z applied=null — The judge stops the candidate: gate 2: lodash@4.18.0 is deprecated: Bad release. Please use lodash@4.17.21 instead.
+Packed 0 applied fixes into /e/npm/artifact2.
+pack exit 0
+  29468 bytes receipt.json
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt cdca654a-8925-44c6-a399-d200ec9b47d2 on 387192b7db97: 0 applied fixes; not applied: 1 failed.
+open exit 0
+-- origin's branches:
+  main 387192b7db97fdcd00b0cefcc204dd05e6e5e8bc
+-- PRs in the stand-in:
+  API calls: 2; POST: 0
+== case php
+base 5a4e792043804a7bfc7476a8491ef8237b3fdb77
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt a8de6a9b-1c0e-4567-a8a1-8e0fe04cdc90: outcome applied, base 5a4e792043804a7bfc7476a8491ef8237b3fdb77
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 e2a30fd02ac3869e91427208fc068bdac4a57bdb published=2026-10-21T00:00:00.000Z found=2026-10-30T01:28:53.326Z applied=2026-10-30T01:28:58.664Z
+Packed 1 applied fix into /e/php/artifact1.
+pack exit 0
+  762 bytes fixes.bundle
+  2147 bytes receipt.json
+  head e2a30fd02ac3869e91427208fc068bdac4a57bdb refs/heads/ludion/php/8.4.27
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: ludion/php/8.4.27 (e2a30fd02ac3) adds, removes or changes the mode of Dockerfile.
+open exit 2
+-- origin's branches:
+  main 5a4e792043804a7bfc7476a8491ef8237b3fdb77
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 07ceaff4-e01d-4f30-a7c3-349a86e84f21: outcome applied, base 5a4e792043804a7bfc7476a8491ef8237b3fdb77
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 bf01ff86c42da0d14b90f385f6aca89be746a8c2 published=2026-10-21T00:00:00.000Z found=2026-10-30T01:28:59.203Z applied=2026-10-30T01:29:04.480Z
+Packed 1 applied fix into /e/php/artifact2.
+pack exit 0
+  763 bytes fixes.bundle
+  2147 bytes receipt.json
+  head bf01ff86c42da0d14b90f385f6aca89be746a8c2 refs/heads/ludion/php/8.4.27
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: ludion/php/8.4.27 (bf01ff86c42d) adds, removes or changes the mode of Dockerfile.
+open exit 2
+-- origin's branches:
+  main 5a4e792043804a7bfc7476a8491ef8237b3fdb77
+-- PRs in the stand-in:
+  API calls: 2; POST: 0
+== case composer
+base 2ed3146e34a9891afe31b296786e6db65f8ffbc1
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt ad00ea5d-9937-420b-9980-aa10c9625837: outcome applied, base 2ed3146e34a9891afe31b296786e6db65f8ffbc1
+  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 fedc14792b3768453fc12208079527f5381d1a4f published=2026-09-30T11:07:08.000Z found=2026-10-30T01:29:07.260Z applied=2026-10-30T01:29:21.101Z
+Packed 1 applied fix into /e/composer/artifact1.
+pack exit 0
+  1274 bytes fixes.bundle
+  109675 bytes receipt.json
+  head fedc14792b3768453fc12208079527f5381d1a4f refs/heads/ludion/composer/symfony-http-foundation-5.4.54
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: ludion/composer/symfony-http-foundation-5.4.54 (fedc14792b37) adds, removes or changes the mode of composer.json.
+open exit 2
+-- origin's branches:
+  main 2ed3146e34a9891afe31b296786e6db65f8ffbc1
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 229c6f45-f64d-493a-b2dc-279f11427d6f: outcome applied, base 2ed3146e34a9891afe31b296786e6db65f8ffbc1
+  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 dd6cfc2800e618e157f125fa239cce8edca48606 published=2026-09-30T11:07:08.000Z found=2026-10-30T01:29:23.758Z applied=2026-10-30T01:29:33.796Z
+Packed 1 applied fix into /e/composer/artifact2.
+pack exit 0
+  1273 bytes fixes.bundle
+  109675 bytes receipt.json
+  head dd6cfc2800e618e157f125fa239cce8edca48606 refs/heads/ludion/composer/symfony-http-foundation-5.4.54
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: ludion/composer/symfony-http-foundation-5.4.54 (dd6cfc2800e6) adds, removes or changes the mode of composer.json.
+open exit 2
+-- origin's branches:
+  main 2ed3146e34a9891afe31b296786e6db65f8ffbc1
+-- PRs in the stand-in:
+  API calls: 2; POST: 0
+== case maven
+base f827f319bbedb4a6a0adcd99b1996da5b5ee97f2
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+receipt da35e888-35e8-47b8-96c6-17bf2769f3f4: outcome partial, base f827f319bbedb4a6a0adcd99b1996da5b5ee97f2
+  org.apache.commons:commons-text 1.9 -> 1.10.0: failed published=null found=2026-10-30T01:29:40.255Z applied=null — Candidate still contains known advisory findings or incomplete inventory (org.apache.commons:commons-lang3@3.12.0 GHSA-j288-q9x7-2f5v); no source change was made.
+  org.apache.commons:commons-lang3 3.11 -> 3.18.0: applied ludion/maven/org.apache.commons-commons-lang3-3.18.0 9624290f3e52d0f52c6ba3a1a480e2cd028f4199 published=null found=2026-10-30T01:29:40.255Z applied=2026-10-30T01:29:51.570Z
+Packed 1 applied fix into /e/maven/artifact1.
+pack exit 0
+  786 bytes fixes.bundle
+  48711 bytes receipt.json
+  head 9624290f3e52d0f52c6ba3a1a480e2cd028f4199 refs/heads/ludion/maven/org.apache.commons-commons-lang3-3.18.0
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: ludion/maven/org.apache.commons-commons-lang3-3.18.0 (9624290f3e52) adds, removes or changes the mode of pom.xml.
+open exit 2
+-- origin's branches:
+  main f827f319bbedb4a6a0adcd99b1996da5b5ee97f2
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+receipt 1428c0c1-c2f5-4389-80dd-819b59ef576b: outcome partial, base f827f319bbedb4a6a0adcd99b1996da5b5ee97f2
+  org.apache.commons:commons-text 1.9 -> 1.10.0: failed published=null found=2026-10-30T01:29:55.849Z applied=null — Candidate still contains known advisory findings or incomplete inventory (org.apache.commons:commons-lang3@3.12.0 GHSA-j288-q9x7-2f5v); no source change was made.
+  org.apache.commons:commons-lang3 3.11 -> 3.18.0: applied ludion/maven/org.apache.commons-commons-lang3-3.18.0 6eacee627a89e60459ed34b7b36384d467c30a4b published=null found=2026-10-30T01:29:55.849Z applied=2026-10-30T01:30:03.687Z
+Packed 1 applied fix into /e/maven/artifact2.
+pack exit 0
+  787 bytes fixes.bundle
+  48711 bytes receipt.json
+  head 6eacee627a89e60459ed34b7b36384d467c30a4b refs/heads/ludion/maven/org.apache.commons-commons-lang3-3.18.0
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: ludion/maven/org.apache.commons-commons-lang3-3.18.0 (6eacee627a89) adds, removes or changes the mode of pom.xml.
+open exit 2
+-- origin's branches:
+  main f827f319bbedb4a6a0adcd99b1996da5b5ee97f2
+-- PRs in the stand-in:
+  API calls: 2; POST: 0
+# finished 2026-10-30T01:30:04Z

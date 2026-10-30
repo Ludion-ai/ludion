@@ -36,7 +36,7 @@ export const GIT_SETTINGS: readonly string[] = ["core.fsmonitor=", "core.splitIn
  * (realpathSync.native, which also resolves subst drives and short names). A PATH folder inside the repository under any
  * of them is skipped.
  */
-function gitProgram(dir: string): string {
+export function gitProgram(dir: string): string {
   const spellings = new Set([resolve(dir), realpathSync(dir)]);
   if (process.platform === "win32") try { spellings.add(realpathSync.native(dir)); } catch { /* the other spellings stand */ }
   const tops = new Set([...spellings].map(spelling => {
@@ -54,7 +54,7 @@ function gitProgram(dir: string): string {
   throw new Error("--apply needs git, and none was found in PATH's absolute folders (the working directory, the repository, node_modules folders and Yarn's shim folder are skipped). Run without --apply to validate only. Nothing was validated or changed.");
 }
 
-function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
+export function git(dir: string, args: string[], options: { input?: string; index?: string; allowFail?: boolean } = {}): { status: number; stdout: string } {
   const program = gitProgram(dir);
   // An empty hooks folder for every call, so no hook of the repository (or of core.hooksPath) can run. It is also the
   // working directory, never the project's folder, and the repository is named with -C instead.

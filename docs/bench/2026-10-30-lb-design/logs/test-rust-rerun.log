@@ -1,0 +1,17 @@
+# started 2026-10-30T02:17:55Z, node v24.22.1, git version 2.39.5
+npm ci exit 0
+== npx tsc -p tsconfig.json
+tsc exit 0
+== npx vitest run --project node packages/cli/test/readonly-rust.test.ts
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 259ms
+
+ Test Files  1 passed (1)
+      Tests  80 passed (80)
+   Start at  02:18:07
+   Duration  488ms (transform 108ms, setup 0ms, import 149ms, tests 259ms, environment 0ms)
+
+vitest exit 0
+# finished 2026-10-30T02:18:08Z

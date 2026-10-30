@@ -1,0 +1,132 @@
+# started 2026-10-30T02:45:31Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+npm ci exit 0
+build exit 0
+== case composer
+base 99fbe32dad1778fb54425ac41e5a0a2c9bc4dd91
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 93bc1ec5-6b34-4f0f-97f9-a8484a7bef27: outcome applied, base 99fbe32dad1778fb54425ac41e5a0a2c9bc4dd91
+  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 c8c2ff3362a093765e4b54b656b7a02999316bf2 published=2026-09-30T11:07:08.000Z found=2026-10-30T02:45:45.328Z applied=2026-10-30T02:45:59.789Z
+Packed 1 applied fix into /e/composer/artifact1.
+pack exit 0
+  1273 bytes fixes.bundle
+  109675 bytes receipt.json
+  head c8c2ff3362a093765e4b54b656b7a02999316bf2 refs/heads/ludion/composer/symfony-http-foundation-5.4.54
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 93bc1ec5-6b34-4f0f-97f9-a8484a7bef27 on 99fbe32dad17: 1 applied fix.
+  symfony/http-foundation (ludion/composer/symfony-http-foundation-5.4.54): opened #1
+open exit 0
+-- origin's branches:
+  ludion/composer/symfony-http-foundation-5.4.54 c8c2ff3362a093765e4b54b656b7a02999316bf2
+  main 99fbe32dad1778fb54425ac41e5a0a2c9bc4dd91
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt c657ed82-3573-4138-a533-be3dd5d8a951: outcome applied, base 99fbe32dad1778fb54425ac41e5a0a2c9bc4dd91
+  symfony/http-foundation 5.4.0 -> 5.4.54: applied ludion/composer/symfony-http-foundation-5.4.54 5440f056eca2770e02e6aa6d189ea3327704e635 published=2026-09-30T11:07:08.000Z found=2026-10-30T02:46:02.207Z applied=2026-10-30T02:46:14.211Z
+Packed 1 applied fix into /e/composer/artifact2.
+pack exit 0
+  1273 bytes fixes.bundle
+  109675 bytes receipt.json
+  head 5440f056eca2770e02e6aa6d189ea3327704e635 refs/heads/ludion/composer/symfony-http-foundation-5.4.54
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt c657ed82-3573-4138-a533-be3dd5d8a951 on 99fbe32dad17: 1 applied fix.
+  symfony/http-foundation (ludion/composer/symfony-http-foundation-5.4.54): open_pr_exists #1
+open exit 0
+-- origin's branches:
+  ludion/composer/symfony-http-foundation-5.4.54 c8c2ff3362a093765e4b54b656b7a02999316bf2
+  main 99fbe32dad1778fb54425ac41e5a0a2c9bc4dd91
+-- PRs in the stand-in:
+  #1 open ludion/composer/symfony-http-foundation-5.4.54 -> main: ludion: symfony/http-foundation 5.4.0 -> 5.4.54 (composer)
+  API calls: 6; POST: 1
+-- body of PR #1:
+  | <!-- ludion-fix -->
+  | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
+  | 
+  | Ludion found a published security fix and validated it on its own against the base commit `99fbe32dad17`. This PR holds that one fix (one commit).
+  | 
+  | | | |
+  | |---|---|
+  | | Package | `symfony/http-foundation` (composer) |
+  | | Change | `5.4.0` → `5.4.54` |
+  | | Advisories | `GHSA-3rg7-wf37-54rm`, `GHSA-mrqx-rp3w-jpjp`, `GHSA-r925-mgvr-h9cc`, `PKSA-365x-2zjk-pt47`, `PKSA-b35n-565h-rs4q` |
+  | | Fix published | `2026-09-30T11:07:08.000Z` (Packagist's release date of the fixed version, which its author sets) |
+  | | Found | `2026-10-30T02:45:45.328Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T02:45:59.789Z` |
+  | | Receipt | `93bc1ec5-6b34-4f0f-97f9-a8484a7bef27` (in this run's ludion-fixes artifact) |
+  | 
+  | **What was checked**
+  | 
+  | - The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
+  | - This commit changes only `composer.json`, `composer.lock`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that composer.json is what Ludion writes for this change, and that composer.lock moves only this package and adds only packages it requires, none of them a plugin or installer, each with the archive and commit Packagist lists.
+  | - Composer updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.
+  | 
+  | **Not checked**
+  | 
+  | - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
+  | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
+  | - Production: nothing is deployed.
+== case php
+base 0b4b65f65224617811dc3b66c87efa69d40359a6
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 2ff7709e-fc2a-42b6-8da5-b35127c02904: outcome applied, base 0b4b65f65224617811dc3b66c87efa69d40359a6
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 a2ab0098cee2ad4319da693b37d9eb8d4d951064 published=2026-10-21T00:00:00.000Z found=2026-10-30T02:46:16.269Z applied=2026-10-30T02:46:21.803Z
+Packed 1 applied fix into /e/php/artifact1.
+pack exit 0
+  764 bytes fixes.bundle
+  2147 bytes receipt.json
+  head a2ab0098cee2ad4319da693b37d9eb8d4d951064 refs/heads/ludion/php/8.4.27
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 2ff7709e-fc2a-42b6-8da5-b35127c02904 on 0b4b65f65224: 1 applied fix.
+  php (ludion/php/8.4.27): opened #1
+open exit 0
+-- origin's branches:
+  ludion/php/8.4.27 a2ab0098cee2ad4319da693b37d9eb8d4d951064
+  main 0b4b65f65224617811dc3b66c87efa69d40359a6
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 9e821d02-0650-4f7b-a7f0-4e9ddd584895: outcome applied, base 0b4b65f65224617811dc3b66c87efa69d40359a6
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 dd3eaf55ca154253d000b2978426ee268f50ee4a published=2026-10-21T00:00:00.000Z found=2026-10-30T02:46:23.896Z applied=2026-10-30T02:46:30.494Z
+Packed 1 applied fix into /e/php/artifact2.
+pack exit 0
+  764 bytes fixes.bundle
+  2147 bytes receipt.json
+  head dd3eaf55ca154253d000b2978426ee268f50ee4a refs/heads/ludion/php/8.4.27
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 9e821d02-0650-4f7b-a7f0-4e9ddd584895 on 0b4b65f65224: 1 applied fix.
+  php (ludion/php/8.4.27): open_pr_exists #1
+open exit 0
+-- origin's branches:
+  ludion/php/8.4.27 a2ab0098cee2ad4319da693b37d9eb8d4d951064
+  main 0b4b65f65224617811dc3b66c87efa69d40359a6
+-- PRs in the stand-in:
+  #1 open ludion/php/8.4.27 -> main: ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile
+  API calls: 6; POST: 1
+-- body of PR #1:
+  | <!-- ludion-fix -->
+  | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
+  | 
+  | Ludion found a published security fix and validated it on its own against the base commit `0b4b65f65224`. This PR holds that one fix (one commit).
+  | 
+  | | | |
+  | |---|---|
+  | | Package | `php` (php) |
+  | | Change | `8.4.26` → `8.4.27` |
+  | | Advisories | php.net's security release (no advisory ID read) |
+  | | Fix published | `2026-10-21T00:00:00.000Z` (php.net's release day of the first newer security release, at 00:00 UTC) |
+  | | Found | `2026-10-30T02:46:16.269Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T02:46:21.803Z` |
+  | | Receipt | `2ff7709e-fc2a-42b6-8da5-b35127c02904` (in this run's ludion-fixes artifact) |
+  | 
+  | **What was checked**
+  | 
+  | - The project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
+  | - This commit changes only `Dockerfile`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag.
+  | - PHP image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.
+  | 
+  | **Not checked**
+  | 
+  | - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
+  | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
+  | - Production: nothing is deployed.
+# finished 2026-10-30T02:46:30Z

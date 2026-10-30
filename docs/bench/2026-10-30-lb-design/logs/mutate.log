@@ -1,0 +1,27 @@
+# at commit 13656a9cfb882c2481635e12327ed6f24aa1f0e2, 2 files differing from it
+# started 2026-10-30T03:37:55Z, node v24.22.1, git version 2.39.5
+npm ci exit 0
+caught       a parent other than the base accepted — packages/cli/test/deliver.test.ts
+caught       files outside the receipt's list accepted — packages/cli/test/deliver.test.ts
+caught       a file the plan may not change accepted — packages/cli/test/deliver.test.ts
+caught       a new file or a changed mode accepted — packages/cli/test/deliver.test.ts
+caught       an executable mode refused (a checkout from a file system without modes) — packages/cli/test/deliver.test.ts
+caught       extra branches in the bundle accepted — packages/cli/test/deliver.test.ts
+caught       bytes other than the receipt's accepted — packages/cli/test/deliver.test.ts
+caught       a second PR while one is open — packages/cli/test/deliver.test.ts
+caught       a closed fix opened again — packages/cli/test/deliver.test.ts
+caught       a PR opened on a branch that holds another commit — packages/cli/test/deliver.test.ts
+caught       a branch with another change reused — packages/cli/test/deliver.test.ts
+caught       the message beyond its subject accepted — packages/cli/test/deliver.test.ts
+caught       what the files say not checked — packages/cli/test/deliver.test.ts
+caught       npm: the judge's second refusal ignored — packages/cli/test/deliver.test.ts
+caught       npm: the judge not run again — packages/cli/test/deliver.test.ts
+caught       manifest: another package.json accepted — packages/cli/test/deliver.test.ts
+caught       PHP: more than the FROM image accepted — packages/cli/test/deliver.test.ts
+caught       PHP: an older or other-branch release accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: another package changed — packages/cli/test/deliver.test.ts
+caught       composer.lock: a plugin accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: a new package from any archive accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: the planned package from another repository accepted — packages/cli/test/deliver.test.ts
+caught       composer.lock: a new package nothing requires accepted — packages/cli/test/deliver.test.ts
+# stopped by Claude Code: the system was low on memory (2026-10-30); the container was then stopped. The remaining mutations did not run.

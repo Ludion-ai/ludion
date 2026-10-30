@@ -819,6 +819,15 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
     expect([...unmetRequirements(ovr, { ...top, overrides: { mkdirp: { minimist: "0.2.4" } } }).values()]).toEqual([]);
     expect([...unmetRequirements(ovr, { ...top, overrides: { other: { minimist: "0.2.4" } } }).values()]).toHaveLength(1);
     expect([...unmetRequirements(ovr, { name: "ovr", dependencies: { mkdirp: "0.5.5", minimist: "0.2.4" }, overrides: { minimist: "$minimist" } }).values()]).toEqual([]);
+    // A key's selector, as npm applies it: on a requirement whose spec it intersects, and, for a nested key, under a
+    // package at a version it takes; a selector that is not a semver range applies to nothing (security pass at 549fe1e).
+    const withOverrides = (overrides: unknown) => [...unmetRequirements(ovr, { ...top, overrides }).values()].length;
+    expect(withOverrides({ "minimist@^1.0.0": "0.2.4" })).toBe(0);
+    expect(withOverrides({ "minimist@0.x": "0.2.4" })).toBe(1);
+    expect(withOverrides({ "minimist@latest": "0.2.4" })).toBe(1);
+    expect(withOverrides({ "mkdirp@0.5.5": { minimist: "0.2.4" } })).toBe(0);
+    expect(withOverrides({ "mkdirp@1": { minimist: "0.2.4" } })).toBe(1);
+    expect(withOverrides({ "mkdirp@0.5.5": { "minimist@0.x": "0.2.4" } })).toBe(1);
     const forged = edit(ovr, l => { l.packages["node_modules/minimist"].version = "0.2.5"; });
     expect(newUnmetRequirements({ lock: ovr, manifest: top }, { lock: forged, manifest: top })).toEqual(["package-lock.json's packages: node_modules/mkdirp requires minimist ^1.2.5, and node_modules/minimist has minimist@0.2.5, which is not that."]);
     // --legacy-peer-deps: react-dom's peer react is left out, in the base and after react-dom moves (another peer range),

@@ -270,27 +270,36 @@ function viewOfTree(packages: Record<string, any>, tree: unknown): Map<string, V
 }
 
 /**
- * The specs the project's `overrides` give for `name` as `consumer` requires it: a top-level key for the name (`name`
- * or `name@range`), and the same key nested under a package the consumer is or is installed under (its path's
- * node_modules segments). A value is a spec, `{ ".": spec }`, or `"$name"` (the project's own spec for that name).
+ * The specs the project's `overrides` give for `name` as `consumer` requires it with `spec`: a top-level key for the
+ * name, and the same key nested under a package the consumer is or is installed under (the install paths its own path
+ * runs through). A key is `name` or `name@selector`. As npm applies it, a selector must intersect the requirement's own
+ * spec for the key to apply to it, and, for a key one descends through, the package installed there must be at a
+ * version the selector takes; a selector that cannot be read as a semver range applies to nothing (an automated
+ * security pass at 549fe1e). A value is a spec, `{ ".": spec }`, or `"$name"` (the project's own spec for that name).
  */
-function overrideSpecs(overrides: unknown, project: Record<string, any>, consumerPath: string, name: string): string[] {
+function overrideSpecs(overrides: unknown, project: Record<string, any>, view: Map<string, ViewEntry>, consumerPath: string, name: string, spec: string): string[] {
   if (!isPlain(overrides)) return [];
-  const keyName = (key: string) => { const at = key.indexOf("@", key.startsWith("@") ? 1 : 0); return at < 0 ? key : key.slice(0, at); };
+  const parse = (key: string) => { const at = key.indexOf("@", key.startsWith("@") ? 1 : 0); return at < 0 ? { name: key, selector: null } : { name: key.slice(0, at), selector: key.slice(at + 1) }; };
+  const takes = (selector: string | null, test: (range: string) => boolean) => { if (selector === null || selector === "" || selector === "*") return true; try { return semver.validRange(selector, { loose: true }) !== null && test(selector); } catch { return false; } };
   const specOf = (value: unknown) => {
-    const spec = typeof value === "string" ? value : isPlain(value) && typeof value["."] === "string" ? value["."] : undefined;
-    if (spec === undefined || !spec.startsWith("$")) return spec;
-    const own = [project.dependencies, project.devDependencies, project.optionalDependencies, project.peerDependencies].find(group => isPlain(group) && typeof group[spec.slice(1)] === "string");
-    return own ? own[spec.slice(1)] as string : undefined;
+    const given = typeof value === "string" ? value : isPlain(value) && typeof value["."] === "string" ? value["."] : undefined;
+    if (given === undefined || !given.startsWith("$")) return given;
+    const own = [project.dependencies, project.devDependencies, project.optionalDependencies, project.peerDependencies].find(group => isPlain(group) && typeof group[given.slice(1)] === "string");
+    return own ? own[given.slice(1)] as string : undefined;
   };
-  const ancestors = new Set(consumerPath.split("node_modules/").slice(1).map(segment => segment.replace(/\/$/, "")));
+  // The packages the consumer is or is installed under: each install path its own path runs through, as `packages` has it.
+  const segments = consumerPath.split("node_modules/");
+  const ancestors = segments.slice(1).map((_, i) => view.get(segments.slice(0, i + 2).join("node_modules/").replace(/\/$/, ""))).filter((e): e is ViewEntry => !!e);
   const out: string[] = [];
   const walk = (level: Record<string, unknown>) => {
     for (const [key, value] of Object.entries(level)) {
       if (key === ".") continue;
-      const spec = keyName(key) === name ? specOf(value) : undefined;
-      if (spec !== undefined) out.push(spec);
-      if (isPlain(value) && ancestors.has(keyName(key))) walk(value);
+      const rule = parse(key);
+      if (rule.name === name && takes(rule.selector, range => semver.validRange(spec, { loose: true }) !== null && semver.intersects(spec, range, { loose: true }))) {
+        const given = specOf(value);
+        if (given !== undefined) out.push(given);
+      }
+      if (isPlain(value) && ancestors.some(a => a.name === rule.name && takes(rule.selector, range => semver.satisfies(a.version, range, { loose: true })))) walk(value);
     }
   };
   walk(overrides);
@@ -315,7 +324,7 @@ function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], l
   };
   for (const consumer of [...view.values(), ...consumers]) for (const [name, spec] of consumer.needs) {
     const found = resolveFrom(view, consumer.dir, name);
-    if (found && (takes(found, name, spec) || overrideSpecs(overrides, project, consumer.path, name).some(s => takes(found, name, s)))) continue;
+    if (found && (takes(found, name, spec) || overrideSpecs(overrides, project, view, consumer.path, name, spec).some(s => takes(found, name, s)))) continue;
     const peer = consumer.peers?.has(name) === true;
     unmet.set([label, consumer.path, name, peer ? "<peer>" : spec, found ? `${found.path}@${found.name}@${found.version}` : "<none>"].join("\0"),
       `package-lock.json's ${label}: ${consumer.path || "the project"} requires ${name} ${spec}, and ${found ? `${found.path} has ${found.name}@${found.version}, which is not that` : "npm finds no copy of it in the lock"}.`);

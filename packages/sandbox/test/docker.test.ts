@@ -1,6 +1,10 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
-import { runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { isAbsolute, join, relative } from "node:path";
+import { afterAll, beforeAll } from "vitest";
+import { dockerCwd, findDocker, findProgram, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
 
 // The module takes no spawn parameter (a caller could otherwise rewrite the argv), so tests replace node's spawn.
 const current = vi.hoisted(() => ({ spawn: undefined as unknown as (cmd: string, args: readonly string[], options: unknown) => unknown }));
@@ -21,15 +25,22 @@ function fakeChild(): FakeChild {
   return child;
 }
 function fakeSpawn(onSpawn: (args: readonly string[], child: FakeChild) => void = () => {}) {
-  const calls: { args: readonly string[]; options: unknown; child: FakeChild }[] = [];
-  current.spawn = (_cmd, args, options) => {
+  const calls: { cmd: string; args: readonly string[]; options: unknown; child: FakeChild }[] = [];
+  current.spawn = (cmd, args, options) => {
     const child = fakeChild();
-    calls.push({ args, options, child });
+    calls.push({ cmd, args, options, child });
     onSpawn(args, child);
     return child;
   };
   return { calls };
 }
+
+// A docker for findDocker to find, in an absolute PATH folder outside the working directory; spawn itself is faked.
+const bin = mkdtempSync(join(tmpdir(), "ludion-bin-"));
+const DOCKER = join(bin, process.platform === "win32" ? "docker.exe" : "docker");
+const savedPath = process.env.PATH;
+beforeAll(() => { writeFileSync(DOCKER, ""); chmodSync(DOCKER, 0o755); process.env.PATH = bin; });
+afterAll(() => { process.env.PATH = savedPath; rmSync(bin, { recursive: true, force: true }); });
 
 describe("security test container arguments", () => {
   it("are the fixed hardened argv, with the test argv only after the image", () => {
@@ -75,7 +86,7 @@ describe("Docker image commands", () => {
   it("return trimmed output, and reject on a non-zero exit, a timeout or a missing Docker", async () => {
     const ok = fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "sha256:abc\n"); child.emit("close", 0); }));
     await expect(runDockerImageCommand(["image", "inspect", "x"], 1_000)).resolves.toBe("sha256:abc");
-    expect(ok.calls[0]!.options).toEqual({ windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    expect(ok.calls[0]!.options).toEqual({ cwd: dockerCwd(), windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     fakeSpawn((_args, child) => queueMicrotask(() => { child.stderr.emit("data", "manifest unknown"); child.emit("close", 1); }));
     await expect(runDockerImageCommand(["pull", "x"], 1_000)).rejects.toThrow("Docker image command failed (1): manifest unknown");
     fakeSpawn();
@@ -94,7 +105,7 @@ describe("security test container runner", () => {
     }));
     await expect(runContainer("x", IMAGE, ["php", "t.php"], 1_000)).resolves.toEqual({ kind: "exited", exitCode: 3, stdout: "ok", stderr: "warn", timedOut: false });
     expect(calls.map(c => c.args)).toEqual([runArgs("x", IMAGE, ["php", "t.php"])]);
-    expect(calls[0]!.options).toEqual({ stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+    expect(calls[0]!.options).toEqual({ cwd: dockerCwd(), stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
   });
   it("passes the tool to runArgs and nothing else", async () => {
     const { calls } = fakeSpawn((_args, child) => queueMicrotask(() => child.emit("close", 0)));
@@ -131,5 +142,68 @@ describe("security test container runner", () => {
     }));
     const result = await runContainer("x", IMAGE, ["php"], 1_000);
     expect(result.kind === "exited" && result.stdout.length).toBe(1_000_000);
+  });
+  it("starts every docker process, the timeout kill included, from one empty private folder, not the working directory", async () => {
+    const { calls } = fakeSpawn((args, child) => { if (args[0] !== "run") queueMicrotask(() => child.emit("close", 0)); });
+    await runDockerImageCommand(["image", "inspect", "x"], 1_000);
+    const pending = runContainer("slow", IMAGE, ["php"], 20);
+    await vi.waitFor(() => expect(calls.filter(c => c.args[0] === "kill")).toHaveLength(1));
+    calls[1]!.child.emit("close", 137);
+    await pending;
+    expect(calls.map(c => c.args[0])).toEqual(["image", "run", "kill"]);
+    expect(new Set(calls.map(c => c.cmd))).toEqual(new Set([DOCKER]));
+    const dirs = calls.map(c => (c.options as { cwd?: string }).cwd);
+    expect(new Set(dirs)).toEqual(new Set([dockerCwd()]));
+    const dir = dockerCwd();
+    expect(isAbsolute(dir) && !relative(tmpdir(), dir).startsWith("..")).toBe(true);
+    expect(dir).not.toBe(process.cwd());
+    expect(existsSync(dir) && readdirSync(dir)).toEqual([]);
+  });
+  it("start nothing when no docker is found outside the working directory and node_modules", async () => {
+    const { calls } = fakeSpawn();
+    process.env.PATH = join(bin, "node_modules", ".bin");
+    try {
+      await expect(runDockerImageCommand(["image", "inspect", "x"], 1_000)).rejects.toThrow("Docker unavailable: docker was not found");
+      await expect(runContainer("x", IMAGE, ["php"], 1_000)).resolves.toEqual({ kind: "spawn_error", message: expect.stringContaining("docker was not found") });
+      expect(calls).toHaveLength(0);
+    } finally { process.env.PATH = bin; }
+  });
+});
+
+describe("findDocker", () => {
+  const root = mkdtempSync(join(tmpdir(), "ludion-find-"));
+  const folder = (name: string) => { const dir = join(root, name); mkdirSync(dir, { recursive: true }); return dir; };
+  const docker = (dir: string, mode = 0o755) => { const file = join(dir, "docker"); writeFileSync(file, ""); chmodSync(file, mode); return file; };
+  afterAll(() => rmSync(root, { recursive: true, force: true }));
+  it.skipIf(process.platform === "win32")("takes the first absolute PATH folder with an executable docker, skipping empty and relative entries, the working directory, node_modules folders and files that cannot run", () => {
+    const project = folder("project"), bins = docker(folder("project/node_modules/.bin")), plain = docker(folder("plain"), 0o644), good = folder("good"), later = folder("later");
+    docker(project); docker(later);
+    const found = docker(good);
+    expect(findDocker(["", "relative/bin", project, join(project, "node_modules", ".bin"), join(root, "plain"), good, later].join(":"), project)).toBe(found);
+    expect(findDocker(["", "relative/bin", project, join(project, "node_modules", ".bin"), join(root, "plain")].join(":"), project)).toBeNull();
+    expect([bins, plain].every(f => existsSync(f))).toBe(true);
+  });
+  it.skipIf(process.platform === "win32")("skips PATH folders inside the project (also through a link), Yarn's shim folder, a relative entry and a docker that is not a file", () => {
+    const project = folder("p2"), vendor = folder("p2/vendor/bin"), venv = folder("p2/.venv/bin"), dots = folder("p2/..bin"), berry = folder("xfs-1234"), berryDots = folder("xfs-1234/..x"), dirDocker = folder("dirdocker"), outside = folder("outside");
+    docker(vendor); docker(venv); docker(dots); docker(berry); docker(berryDots); mkdirSync(join(dirDocker, "docker")); const found = docker(outside);
+    const link = join(root, "link-to-vendor"); symlinkSync(vendor, link);
+    const rel = relative(process.cwd(), outside);
+    expect(findDocker([vendor, venv, dots, link, berry, berryDots, rel, dirDocker, outside].join(":"), root, "linux", project, berry)).toBe(found);
+    expect(findDocker([vendor, venv, dots, link, berry, berryDots, rel, dirDocker].join(":"), root, "linux", project, berry)).toBeNull();
+    expect(findDocker(vendor, root, "linux", null, undefined)).toBe(join(vendor, "docker"));
+  });
+  it.skipIf(process.platform === "win32")("finds any plain program name by the same rules, and refuses a name that is a path", () => {
+    const project = folder("p3"), inner = folder("p3/node_modules/.bin"), good = folder("good-git");
+    for (const dir of [inner, good]) { const file = join(dir, "git"); writeFileSync(file, ""); chmodSync(file, 0o755); }
+    expect(findProgram("git", [inner, good].join(":"), root, "linux", project, undefined)).toBe(join(good, "git"));
+    expect(() => findProgram("../git")).toThrow("plain program name");
+    expect(() => findProgram("git.exe")).toThrow("plain program name");
+  });
+  it("is told the project root by the security CLI right after it reads --dir", () => {
+    const cli = readFileSync(new URL("../../cli/src/security/cli.ts", import.meta.url), "utf8");
+    expect(cli).toMatch(/const root = rootPath\(values\.dir!\);\n(?:\s*\/\/.*\n)*\s*useProject\(root\);/);
+  });
+  it("on Windows, skips the working directory and node_modules folders whatever their case, and a quoted relative entry", () => {
+    expect(findDocker('C:\\Project;C:\\Project\\NODE_MODULES\\.bin;"relative"', "c:\\project", "win32")).toBeNull();
   });
 });

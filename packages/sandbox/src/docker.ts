@@ -3,6 +3,9 @@
 // no network, read-only root, no capabilities, the nobody user, resource limits, no host mounts or forwarded environment.
 // This package is a protected path (docs/protected-paths.md): the sandbox flags change only with an independent review.
 import { spawn, type ChildProcess } from "node:child_process";
+import { accessSync, constants, mkdtempSync, realpathSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { posix, resolve, win32 } from "node:path";
 
 export type ContainerOutcome =
   | { kind: "exited"; exitCode: number | null; stdout: string; stderr: string; timedOut: boolean }
@@ -15,13 +18,80 @@ const CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/;
 const OUTPUT_CAP = 1_000_000;
 const GRACE_MS = 10_000;
 
+let neutral: string | undefined;
+/**
+ * The folder every `docker` process starts in: an empty, private one this process made. Windows looks a program up in
+ * the working directory before PATH (and elsewhere a PATH with an empty entry means the working directory), so
+ * starting `docker` from where `ludion` was run, usually the project, could run a docker.exe the project ships.
+ * Callers pass absolute paths (build contexts are temporary folders), so nothing depends on the working directory.
+ */
+export function dockerCwd(): string {
+  return (neutral ??= mkdtempSync(resolve(tmpdir(), "ludion-docker-")));
+}
+
+let project: string | null = null;
+/**
+ * The project being checked. PATH folders inside it are skipped by findDocker: a project's own scripts can put its bin
+ * folders (Composer's vendor/bin, a .venv/bin) first on PATH. The security CLI calls this with the project root.
+ */
+export function useProject(root: string | null): void {
+  project = root === null ? null : realpathSync(root);
+}
+
+/**
+ * The docker program, by absolute path, from PATH's folders. Skipped: an empty or relative entry; the working
+ * directory itself; anything inside the project (useProject); any folder with a node_modules segment (npx, npm exec
+ * and package scripts put the project's node_modules/.bin first); and Yarn 2+'s temporary shim folder
+ * (BERRY_BIN_FOLDER, put first on PATH for every dependency's bins). Null when none is found. This removes the ways
+ * known to us in which a project or its package manager puts a docker of its own on PATH; a PATH folder outside the
+ * project that the user named is the user's own choice.
+ */
+export function findDocker(path = process.env.PATH ?? "", cwd = process.cwd(), platform: NodeJS.Platform = process.platform, root = project, berry = process.env.BERRY_BIN_FOLDER): string | null {
+  return findProgram("docker", path, cwd, platform, root, berry);
+}
+
+/** Any host program (`docker`, `git`) by the same rules as findDocker. */
+export function findProgram(program: string, path = process.env.PATH ?? "", cwd = process.cwd(), platform: NodeJS.Platform = process.platform, root = project, berry = process.env.BERRY_BIN_FOLDER): string | null {
+  if (!/^[a-z][a-z0-9-]*$/.test(program)) throw new Error("Expected a plain program name.");
+  const win = platform === "win32", P = win ? win32 : posix;
+  const fold = (a: string) => win ? a.toLowerCase() : a;
+  const real = (p: string) => { try { return realpathSync(p); } catch { return p; } };
+  const inside = (dir: string, base: string | null | undefined) => {
+    if (!base || !P.isAbsolute(base)) return false;
+    const rel = P.relative(fold(P.resolve(base)), fold(dir));
+    // Outside only when the path climbs out (".." or "../…"): a folder named "..bin" inside the project is inside.
+    return rel === "" || (rel !== ".." && !rel.startsWith(`..${P.sep}`) && !P.isAbsolute(rel));
+  };
+  const here = fold(P.resolve(cwd));
+  for (const raw of path.split(win ? ";" : ":")) {
+    const dir = raw.trim().replace(/^"(.*)"$/, "$1");
+    if (!dir || !P.isAbsolute(dir)) continue;
+    const full = P.resolve(dir), resolved = win ? full : real(full);
+    if (fold(full) === here || fold(resolved) === here) continue;
+    if ([full, resolved].some(d => d.split(/[\\/]/).some(part => fold(part) === "node_modules"))) continue;
+    if ([full, resolved].some(d => inside(d, root) || inside(d, berry))) continue;
+    for (const name of win ? [`${program}.exe`, `${program}.com`] : [program]) {
+      const candidate = P.join(full, name);
+      try {
+        if (!statSync(candidate).isFile()) continue;
+        if (!win) accessSync(candidate, constants.X_OK);
+        return candidate;
+      } catch { /* not here */ }
+    }
+  }
+  return null;
+}
+const NOT_FOUND = "docker was not found in PATH's absolute folders (the working directory, the project, node_modules folders and Yarn's shim folder are skipped).";
+
 /** Image retrieval/build/inspection only. Containers run only through runContainer. */
 export function runDockerImageCommand(args: string[], timeoutMs: number): Promise<string> {
   if (!["pull", "build", "image"].includes(args[0] ?? "") || (args[0] === "image" && !["inspect", "rm"].includes(args[1] ?? ""))) {
     return Promise.reject(new Error("Only Docker image retrieval, build, inspect and cleanup are allowed here."));
   }
+  const program = findDocker();
+  if (!program) return Promise.reject(new Error(`Docker unavailable: ${NOT_FOUND}`));
   return new Promise((resolve, reject) => {
-    const child = spawn("docker", args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(program, args, { cwd: dockerCwd(), windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     let output = "", error = "", timeout = false;
     const timer = setTimeout(() => { timeout = true; child.kill(); }, timeoutMs);
     child.stdout.on("data", chunk => { output = (output + String(chunk)).slice(-16_384); });
@@ -58,10 +128,12 @@ export function runArgs(name: string, image: string, command: readonly string[],
  */
 export function runContainer(name: string, image: string, command: readonly string[], timeoutMs: number, tool?: Tool): Promise<ContainerOutcome> {
   const args = runArgs(name, image, command, tool);
+  const program = findDocker();
+  if (!program) return Promise.resolve({ kind: "spawn_error", message: NOT_FOUND });
   return new Promise(resolve => {
     let child: ChildProcess;
     try {
-      child = spawn("docker", args, { stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+      child = spawn(program, args, { cwd: dockerCwd(), stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
     } catch (err) {
       resolve({ kind: "spawn_error", message: err instanceof Error && err.message ? err.message : String(err) });
       return;
@@ -70,7 +142,7 @@ export function runContainer(name: string, image: string, command: readonly stri
     let grace: ReturnType<typeof setTimeout> | undefined;
     const timer = setTimeout(() => {
       timedOut = true;
-      try { spawn("docker", ["kill", name], { stdio: "ignore" }).on("error", () => {}); } catch { /* the grace kill below still runs */ }
+      try { spawn(program, ["kill", name], { cwd: dockerCwd(), stdio: "ignore", windowsHide: true }).on("error", () => {}); } catch { /* the grace kill below still runs */ }
       grace = setTimeout(() => { try { child.kill(); } catch { /* already gone */ } }, GRACE_MS);
     }, timeoutMs);
     const finish = (result: ContainerOutcome) => {

@@ -585,10 +585,14 @@ describe("OSV's batch answers for the judge", () => {
   });
   it("keeps a repeated id once, in OSV's order", async () => {
     expect(await osvIds(one, answering({ vulns: [{ id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }, { id: "MAL-2026-0001" }] }))).toEqual(new Map([["lib@1.0.0", ["MAL-2026-0001", "GHSA-aaaa-bbbb-cccc"]]]));
+    // Only the whole id is one id: two ids with the same prefix stay two, or a newly named advisory reads as the old one
+    // and gate 1's "introduced" stop is lost (docs/mistakes/2026-10-30-lv4-fixes-not-held-by-tests.md).
+    expect(await osvIds(one, answering({ vulns: [{ id: "GHSA-aaaa-bbbb-cccc" }, { id: "GHSA-dddd-eeee-ffff" }, { id: "GHSA-aaaa-bbbb-cccc" }] }))).toEqual(new Map([["lib@1.0.0", ["GHSA-aaaa-bbbb-cccc", "GHSA-dddd-eeee-ffff"]]]));
+    expect(await osvIds(one, answering({ vulns: [{ id: "MAL-2026-0001" }, { id: "MAL-2026-0002" }] }))).toEqual(new Map([["lib@1.0.0", ["MAL-2026-0001", "MAL-2026-0002"]]]));
   });
   // The judge's reader and the scan's reader (OsvClient.ids) are two parsers of one answer; they must refuse the same
   // items and read the same ids (docs/mistakes/2026-10-30-osv-batch-item-read-as-no-record.md).
-  it.each([[null], [7], ["GHSA-x"], [[]], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }], [{ vulns: {} }], [{ vulns: [null] }], [{ vulns: [{ id: "../x" }] }], [{ vulns: [], next_page_token: 7 }], [{}], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "MAL-2026-0001" }] }], [{ vulns: [{ id: "GHSA-aaaa-bbbb-cccc" }, { id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }]])("agrees with OsvClient.ids on %j", async item => {
+  it.each([[null], [7], ["GHSA-x"], [[]], [{ vulnerabilities: [] }], [{ vulns: [], x: 1 }], [{ vulns: null }], [{ vulns: {} }], [{ vulns: [null] }], [{ vulns: [{ id: "../x" }] }], [{ vulns: [], next_page_token: 7 }], [{}], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "MAL-2026-0001" }] }], [{ vulns: [{ id: "GHSA-aaaa-bbbb-cccc" }, { id: "MAL-2026-0001" }, { id: "GHSA-aaaa-bbbb-cccc" }] }], [{ vulns: [{ id: "GHSA-aaaa-bbbb-cccc" }, { id: "GHSA-dddd-eeee-ffff" }, { id: "GHSA-aaaa-bbbb-cccc" }] }], [{ vulns: [{ id: "MAL-2026-0001" }, { id: "MAL-2026-0002" }] }]])("agrees with OsvClient.ids on %j", async item => {
     const scan = await new OsvClient(answering(item)).ids([{ ecosystem: "npm", name: "lib", version: "1.0.0" }]).then(m => [...m.values()], () => "throws");
     const judge = await osvIds(one, answering(item)).then(m => [...m.values()], () => "throws");
     expect(judge).toEqual(scan);

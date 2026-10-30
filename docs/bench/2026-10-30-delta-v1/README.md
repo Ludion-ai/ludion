@@ -28,7 +28,7 @@ The definitions are in `docs/decisions/2026-10-30-ld-delta-v1-definitions.md`. T
 
 | Outcome | Count |
 | --- | --- |
-| Flagged (new capability) | **9** |
+| Flagged (new capability) | **9**, of which disputed (v5): 1 |
 | Clean, **a miss** | **2**, of which disputed (v5): 1 |
 | Undecidable | 0 |
 | Not obtained | **1,137** (V only 1,021; both 111; previous only 5) |
@@ -71,6 +71,11 @@ So 2 of 11 is not an estimate of the miss rate over the 1,148.
 | **@react-native-aria/switch 0.2.5** (MAL-2025-4789) | 0.2.4 | registry / registry | **missed** | none |
 | **@ensdomains/buffer 0.1.1** (MAL-2025-190866) | 0.1.0 | registry / Software Heritage | **missed** | none |
 
+**The other disputed version is among the flagged: freo-design-system 1.0.4** (v5 README, "The disputed category").
+- **Why it is flagged.** Section 1 compares it with its row's `previous`, 1.0.0, so its flags (child_process, install script) come from changes across 1.0.1–1.0.3. v5 found that 1.0.3, which no MAL record names, added the `preinstall`. It also found that 1.0.4's code and `package.json` equal 1.0.3's in every field v5 compares.
+- **Compared with 1.0.3,** 1.0.4 would very likely show nothing new. That is an inference from v5's check, not measured here.
+- **So of the 9 flagged,** 8 are not disputed.
+
 **Why each miss passed.** No code was read on the host or is quoted here.
 
 - **@react-native-aria/switch 0.2.5.** This is a real miss: the MAL record says the version connects to a command-and-control server and allows arbitrary command execution.
@@ -79,7 +84,7 @@ So 2 of 11 is not an estimate of the miss rate over the 1,148.
     - every capability count is zero in both versions of it;
     - 2 lines added, 35 removed;
     - 3 build-configuration files removed.
-  - **Further counts.** They go beyond the analyzer's facts, as recorded in `docs/decisions/2026-10-30-ld-delta-v1-miss-inspection.md`. They were measured after the result, inside a credential-free container, by `scripts/inspect-miss.ts`. The script prints the integrity flag, each version's file list (not committed), counts and module names, never the file's text:
+  - **Further counts.** They go beyond the analyzer's facts, as recorded in `docs/decisions/2026-10-30-ld-delta-v1-miss-inspection.md`. They were measured after the result, inside a credential-free container, by `scripts/inspect-miss.ts`. The script prints the integrity flag, each version's file list (not committed), counts and the module names given to `require` (strings of at most 80 characters). It prints no line of code:
     - the file went from 283 to 4,545 bytes;
     - its longest line went from 46 to 4,302 characters;
     - that line is its only line of 1,000 or more;
@@ -95,7 +100,7 @@ So 2 of 11 is not an estimate of the miss rate over the 1,148.
     - no listed module, API or code-from-string name appears literally.
 - **@ensdomains/buffer 0.1.1.** **No code file changed.** In the analyzer's facts:
   - 1 file added, 2 removed and 2 changed (`package.json` among them), none of them code;
-  - that is all 21,955 lines added and 14,572 removed. This is v5's disputed version: its code equals 0.1.0's, and the compromise named by the record's other sources is in 0.1.2 (v5 README, "The disputed category"). A diff check cannot catch it, because there is nothing new in it.
+  - that is all 21,955 lines added and 14,572 removed. This is one of v5's two disputed versions: its code equals 0.1.0's, and the compromise named by the record's other sources is in 0.1.2 (v5 README, "The disputed category"). A diff check cannot catch it, because there is nothing new in it.
 
 ### Genuine fixes (200): 192 obtained, 51 false alarms
 
@@ -178,7 +183,7 @@ Median / maximum over the judged pairs:
 
 ## What this shows, and what it does not
 
-- **v1's rules on the 11 obtained malicious versions.** 9 are caught. One real miss (@react-native-aria/switch 0.2.5) shows nothing to any v1 rule. The counts measured afterwards suggest why: one long line under the thresholds, behind whitespace, through computed names (inferred; decision entry above). The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
+- **v1's rules on the 11 obtained malicious versions.** 9 are caught, 8 of them not disputed (freo-design-system 1.0.4 is disputed, and is flagged for changes first published in 1.0.3). One real miss (@react-native-aria/switch 0.2.5) shows nothing to any v1 rule. The counts measured afterwards suggest why: one long line under the thresholds, behind whitespace, through computed names (inferred; decision entry above). The other miss (@ensdomains/buffer 0.1.1) has no new code at all.
 - **On the genuine fixes, v1 raises a false alarm on 26.56%.** Most of them are bundled builds whose hashed file names make all their code look new.
 - **The data is the larger limit.** Only 11 of the 1,148 malicious versions could be fetched: the registry, and almost always jsDelivr, no longer serve removed versions, and Software Heritage rarely holds them and answers 120 requests an hour. Any rule tuned on these results would be tuned on 11 versions, 8 of them the registry's own leftovers. So whether diff checking can replace the wait is not decided here.
 - **What a v2 would look at.** Each item is an idea for a new definitions entry and a new run, never a change to this one:
@@ -215,6 +220,11 @@ The runner is kept as it ran, so its blob hash matches the execution. These diff
   - an analyzer error recorded as undecidable.
 
   The analyzer's checks are tested in `tools/backtest/test/delta.test.ts`.
+- **An analyzer error is recorded as undecidable.** Definitions section 4 lists the undecidable cases, and an analyzer error is not one of them. The runner adds it (since 9443192; `docs/mistakes/2026-10-30-delta-regex-stack.md`), so that one file's error cannot end a run. No row has it. The runner's comment cites a README section "Runs" that does not exist; the runner is kept as it ran.
+- **A `.` path segment is not removed.** `untar` keeps a path such as `./dist/index.cjs` (a tarball entry named under `package/./`) as written. npm would extract that to the same file as `dist/index.cjs`.
+  - In one genuine fix, js-toml 1.0.2, this file is counted as added with no previous file, and it is the only file the fix's flags fire on (high-entropy line, very long line).
+  - The data cannot say whether it duplicates `dist/index.cjs`.
+  - At most one false alarm is affected (51 could be 50); no malicious outcome is.
 - **"2 missed" in the first results commit.** That commit's subject (6d9960a) counts the disputed @ensdomains/buffer 0.1.1 among the misses. The table above shows it apart.
 
 ## Files

@@ -20,7 +20,7 @@ The definitions are in `docs/decisions/2026-10-30-lo-tarball-source-definitions.
   - The repository at b426c3f (`git archive`, dependencies installed with scripts off) and LD's `delta-v1.json` (sha256 `257f8430…61bf`, recorded in `lo.json`) were mounted read-only.
   - The self-test (`scripts/selftest.ts`) passed first.
 - **Nothing reached the host.** No package file and no source file reached the host. Tarballs and source archives were hashed in memory.
-- **The cache.** A named volume held the fetched answers: version documents, reference lists, Software Heritage listings, source listings (paths and hashes) and the source `package.json` texts. It also held the raw `package.json` text of the 3 malicious versions read from Software Heritage, against definitions §7 (see the last section). It was deleted at the end.
+- **The cache.** A named volume held the fetched answers: version documents, reference lists, Software Heritage listings, source listings (paths and hashes) and the source `package.json` texts. It also held the raw `package.json` text of the 3 malicious versions read from Software Heritage, against definitions §7 (see the last section). It was deleted at 11:13:42Z, after the review's first round.
 - **Blob hashes.** `lo.json` records the git blob hashes of `run-lo.ts`, `lo.ts`, `archives-v5.ts`, `npm-facts.ts` and `judge.ts`; they equal b426c3f's.
 
 ## Result

@@ -199,10 +199,10 @@ test("Japanese text breaks by phrase and by the strict rules, in the device's fo
     expect(style.font, path).toContain("Hiragino Sans");
     expect(style.font, path).toContain("Yu Gothic");
     expect(style.font, path).toContain("Noto Sans JP");
+    // No web font beyond the site's own two families.
+    const fonts = await page.evaluate(() => [...document.fonts].map((f) => f.family.replaceAll('"', "")));
+    expect([...new Set(fonts)].sort(), path).toEqual(["JetBrains Mono Variable", "Schibsted Grotesk Variable"]);
   }
-  // No web font beyond the site's own two families.
-  const fonts = await page.evaluate(() => [...document.fonts].map((f) => f.family.replaceAll('"', "")));
-  expect([...new Set(fonts)].sort()).toEqual(["JetBrains Mono Variable", "Schibsted Grotesk Variable"]);
 });
 
 test.describe("on a phone", () => {

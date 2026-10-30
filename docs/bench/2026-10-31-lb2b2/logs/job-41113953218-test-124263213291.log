@@ -1,0 +1,412 @@
+﻿2026-10-30T19:17:02.1801584Z Current runner version: '2.338.0'
+2026-10-30T19:17:02.1837644Z ##[group]Runner Image Provisioner
+2026-10-30T19:17:02.1839119Z Hosted Compute Agent
+2026-10-30T19:17:02.1840104Z Version: 20261021.618
+2026-10-30T19:17:02.1841290Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-30T19:17:02.1842566Z Build Date: 2026-10-21T00:45:21Z
+2026-10-30T19:17:02.1844243Z Worker ID: {3f807ac8-3f8f-417d-8caf-1d5bce0e8bd3}
+2026-10-30T19:17:02.1845628Z Region: westus2
+2026-10-30T19:17:02.1846646Z Cloud: Azure
+2026-10-30T19:17:02.1847740Z ##[endgroup]
+2026-10-30T19:17:02.1850150Z ##[group]Operating System
+2026-10-30T19:17:02.1851272Z Ubuntu
+2026-10-30T19:17:02.1852341Z 24.04.5
+2026-10-30T19:17:02.1853470Z LTS
+2026-10-30T19:17:02.1854453Z ##[endgroup]
+2026-10-30T19:17:02.1855490Z ##[group]Runner Image
+2026-10-30T19:17:02.1856651Z Image: ubuntu-24.04
+2026-10-30T19:17:02.1857850Z Version: 20261025.353.1
+2026-10-30T19:17:02.1860058Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-30T19:17:02.1863363Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+2026-10-30T19:17:02.1865120Z ##[endgroup]
+2026-10-30T19:17:02.1867084Z ##[group]GITHUB_TOKEN Permissions
+2026-10-30T19:17:02.1869667Z Contents: read
+2026-10-30T19:17:02.1870931Z Metadata: read
+2026-10-30T19:17:02.1871916Z ##[endgroup]
+2026-10-30T19:17:02.1875205Z Secret source: Actions
+2026-10-30T19:17:02.1876843Z Cache mode: write
+2026-10-30T19:17:02.1878192Z Prepare workflow directory
+2026-10-30T19:17:02.2562476Z Prepare all required actions
+2026-10-30T19:17:02.2636374Z Getting action download info
+2026-10-30T19:17:02.6405745Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-10-30T19:17:02.8302700Z Complete job name: test
+2026-10-30T19:17:02.9280208Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-10-30T19:17:02.9282009Z with:
+2026-10-30T19:17:02.9282874Z   persist-credentials: false
+2026-10-30T19:17:02.9284062Z   repository: Ludion-ai/ludion-trial
+2026-10-30T19:17:02.9291743Z   token: ***
+2026-10-30T19:17:02.9292631Z   ssh-strict: true
+2026-10-30T19:17:02.9293922Z   ssh-user: git
+2026-10-30T19:17:02.9294670Z   clean: true
+2026-10-30T19:17:02.9295489Z   sparse-checkout-cone-mode: true
+2026-10-30T19:17:02.9296455Z   fetch-depth: 1
+2026-10-30T19:17:02.9297290Z   fetch-tags: false
+2026-10-30T19:17:02.9298105Z   show-progress: true
+2026-10-30T19:17:02.9298909Z   lfs: false
+2026-10-30T19:17:02.9299626Z   submodules: false
+2026-10-30T19:17:02.9300413Z   set-safe-directory: true
+2026-10-30T19:17:02.9301301Z   allow-unsafe-pr-checkout: false
+2026-10-30T19:17:02.9302670Z ##[endgroup]
+2026-10-30T19:17:03.2205624Z Syncing repository: Ludion-ai/ludion-trial
+2026-10-30T19:17:03.2216082Z ##[group]Getting Git version info
+2026-10-30T19:17:03.2221046Z Working directory is '/home/runner/work/ludion-trial/ludion-trial'
+2026-10-30T19:17:03.2228730Z [command]/usr/bin/git version
+2026-10-30T19:17:03.2289119Z git version 2.56.0
+2026-10-30T19:17:03.2309802Z ##[endgroup]
+2026-10-30T19:17:03.2330019Z Temporarily overriding HOME='/home/runner/work/_temp/11f32d6b-fbc1-4cae-af19-6ca7952a6560' before making global git config changes
+2026-10-30T19:17:03.2332802Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T19:17:03.2336535Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludion-trial/ludion-trial
+2026-10-30T19:17:03.2477364Z Deleting the contents of '/home/runner/work/ludion-trial/ludion-trial'
+2026-10-30T19:17:03.2481450Z ##[group]Determining repository object format
+2026-10-30T19:17:03.2484133Z ##[endgroup]
+2026-10-30T19:17:03.2486412Z ##[group]Initializing the repository
+2026-10-30T19:17:03.2488637Z [command]/usr/bin/git init /home/runner/work/ludion-trial/ludion-trial
+2026-10-30T19:17:03.2553287Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-30T19:17:03.2556315Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-30T19:17:03.2559320Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-30T19:17:03.2560903Z hint: call:
+2026-10-30T19:17:03.2584414Z hint:
+2026-10-30T19:17:03.2585779Z hint: 	git config --global init.defaultBranch <name>
+2026-10-30T19:17:03.2587483Z hint:
+2026-10-30T19:17:03.2588841Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-30T19:17:03.2621377Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-30T19:17:03.2625497Z hint:
+2026-10-30T19:17:03.2646807Z hint: 	git branch -m <name>
+2026-10-30T19:17:03.2661376Z hint:
+2026-10-30T19:17:03.2665120Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-30T19:17:03.2667014Z Initialized empty Git repository in /home/runner/work/ludion-trial/ludion-trial/.git/
+2026-10-30T19:17:03.2669798Z [command]/usr/bin/git remote add origin https://github.com/Ludion-ai/ludion-trial
+2026-10-30T19:17:03.2672424Z ##[endgroup]
+2026-10-30T19:17:03.2694217Z ##[group]Disabling automatic garbage collection
+2026-10-30T19:17:03.2695458Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-30T19:17:03.3848847Z ##[endgroup]
+2026-10-30T19:17:03.3850564Z ##[group]Setting up auth
+2026-10-30T19:17:03.3851991Z Removing SSH command configuration
+2026-10-30T19:17:03.3854041Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T19:17:03.3858709Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T19:17:03.3863130Z Removing HTTP extra header
+2026-10-30T19:17:03.3866047Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T19:17:03.3896651Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T19:17:03.4155334Z Removing includeIf entries pointing to credentials config files
+2026-10-30T19:17:03.4159564Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T19:17:03.4215840Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T19:17:03.4494771Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-30T19:17:03.4549771Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path /home/runner/work/_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:03.4597617Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:03.4647549Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:03.4696475Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:03.4745475Z ##[endgroup]
+2026-10-30T19:17:03.4747139Z ##[group]Fetching the repository
+2026-10-30T19:17:03.4754835Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8f7eac28be7ba15e1258bd47ce8dde55bd137a88:refs/remotes/origin/ludion/php-d/php/8.4.27
+2026-10-30T19:17:03.8267738Z From https://github.com/Ludion-ai/ludion-trial
+2026-10-30T19:17:03.8269787Z  * [new ref]         8f7eac28be7ba15e1258bd47ce8dde55bd137a88 -> origin/ludion/php-d/php/8.4.27
+2026-10-30T19:17:03.8279805Z [command]/usr/bin/git branch --list --remote origin/ludion/php-d/php/8.4.27
+2026-10-30T19:17:03.8321624Z   origin/ludion/php-d/php/8.4.27
+2026-10-30T19:17:03.8333494Z [command]/usr/bin/git rev-parse refs/remotes/origin/ludion/php-d/php/8.4.27
+2026-10-30T19:17:03.8372616Z 8f7eac28be7ba15e1258bd47ce8dde55bd137a88
+2026-10-30T19:17:03.8379974Z ##[endgroup]
+2026-10-30T19:17:03.8381650Z ##[group]Determining the checkout info
+2026-10-30T19:17:03.8384948Z ##[endgroup]
+2026-10-30T19:17:03.8388256Z [command]/usr/bin/git sparse-checkout disable
+2026-10-30T19:17:03.8451813Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-30T19:17:03.8500995Z ##[group]Checking out the ref
+2026-10-30T19:17:03.8506336Z [command]/usr/bin/git checkout --progress --force -B ludion/php-d/php/8.4.27 refs/remotes/origin/ludion/php-d/php/8.4.27
+2026-10-30T19:17:03.8604931Z Switched to a new branch 'ludion/php-d/php/8.4.27'
+2026-10-30T19:17:03.8614154Z branch 'ludion/php-d/php/8.4.27' set up to track 'origin/ludion/php-d/php/8.4.27'.
+2026-10-30T19:17:03.8619431Z ##[endgroup]
+2026-10-30T19:17:03.8676294Z [command]/usr/bin/git log -1 --format=%H
+2026-10-30T19:17:03.8718240Z 8f7eac28be7ba15e1258bd47ce8dde55bd137a88
+2026-10-30T19:17:03.8727453Z ##[group]Removing auth
+2026-10-30T19:17:03.8728845Z Removing SSH command configuration
+2026-10-30T19:17:03.8732549Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T19:17:03.8780387Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T19:17:03.9174283Z Removing HTTP extra header
+2026-10-30T19:17:03.9236700Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T19:17:03.9311727Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T19:17:03.9895433Z Removing includeIf entries pointing to credentials config files
+2026-10-30T19:17:03.9915035Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T19:17:03.9938688Z includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path
+2026-10-30T19:17:03.9940942Z includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path
+2026-10-30T19:17:03.9942985Z includeif.gitdir:/github/workspace/.git.path
+2026-10-30T19:17:03.9945047Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-30T19:17:03.9955698Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path
+2026-10-30T19:17:04.0015113Z /home/runner/work/_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:04.0027920Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-84cb54a4\-cbb0\-4733\-b2ac\-38c0b011ae09\.config
+2026-10-30T19:17:04.0096908Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path
+2026-10-30T19:17:04.0165122Z /home/runner/work/_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:04.0182557Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-84cb54a4\-cbb0\-4733\-b2ac\-38c0b011ae09\.config
+2026-10-30T19:17:04.0260607Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-30T19:17:04.0329860Z /github/runner_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:04.0343368Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-84cb54a4\-cbb0\-4733\-b2ac\-38c0b011ae09\.config
+2026-10-30T19:17:04.0408221Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-30T19:17:04.0466593Z /github/runner_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config
+2026-10-30T19:17:04.0473697Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-84cb54a4\-cbb0\-4733\-b2ac\-38c0b011ae09\.config
+2026-10-30T19:17:04.0539530Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T19:17:04.0985252Z Removing credentials config '/home/runner/work/_temp/git-credentials-84cb54a4-cbb0-4733-b2ac-38c0b011ae09.config'
+2026-10-30T19:17:04.1015270Z ##[endgroup]
+2026-10-30T19:17:04.1377986Z ##[group]Run for dir in php php-a php-b php-c php-d; do
+2026-10-30T19:17:04.1379855Z for dir in php php-a php-b php-c php-d; do
+2026-10-30T19:17:04.1381366Z   docker build --tag "trial-${dir}" "$dir"
+2026-10-30T19:17:04.1383493Z   docker run --rm --network none "trial-${dir}" php tests/smoke.php
+2026-10-30T19:17:04.1385196Z done
+2026-10-30T19:17:04.1421291Z shell: /usr/bin/bash -e {0}
+2026-10-30T19:17:04.1422836Z ##[endgroup]
+2026-10-30T19:17:04.7495175Z #0 building with "default" instance using docker driver
+2026-10-30T19:17:04.7497098Z 
+2026-10-30T19:17:04.7497827Z #1 [internal] load build definition from Dockerfile
+2026-10-30T19:17:04.7499982Z #1 transferring dockerfile: 109B done
+2026-10-30T19:17:04.7500948Z #1 DONE 0.0s
+2026-10-30T19:17:04.7501344Z 
+2026-10-30T19:17:04.7502042Z #2 [internal] load metadata for docker.io/library/php:8.4.26-cli-alpine
+2026-10-30T19:17:04.9708017Z #2 ...
+2026-10-30T19:17:04.9708886Z 
+2026-10-30T19:17:04.9710094Z #3 [auth] library/php:pull token for registry-1.docker.io
+2026-10-30T19:17:04.9712568Z #3 DONE 0.0s
+2026-10-30T19:17:05.1209898Z 
+2026-10-30T19:17:05.1211348Z #2 [internal] load metadata for docker.io/library/php:8.4.26-cli-alpine
+2026-10-30T19:17:05.4548584Z #2 DONE 0.9s
+2026-10-30T19:17:05.5759326Z 
+2026-10-30T19:17:05.5760745Z #4 [internal] load .dockerignore
+2026-10-30T19:17:05.5761734Z #4 transferring context: 2B done
+2026-10-30T19:17:05.5762554Z #4 DONE 0.0s
+2026-10-30T19:17:05.5763314Z 
+2026-10-30T19:17:05.5763774Z #5 [internal] load build context
+2026-10-30T19:17:05.5764579Z #5 transferring context: 1.42kB done
+2026-10-30T19:17:05.5765366Z #5 DONE 0.0s
+2026-10-30T19:17:05.5765858Z 
+2026-10-30T19:17:05.5767068Z #6 [1/3] FROM docker.io/library/php:8.4.26-cli-alpine@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1
+2026-10-30T19:17:05.5769149Z #6 resolve docker.io/library/php:8.4.26-cli-alpine@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1 done
+2026-10-30T19:17:05.5770983Z #6 sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1 10.31kB / 10.31kB done
+2026-10-30T19:17:05.5772584Z #6 sha256:7cbe0a1996d1b77fc8fdc6547f35b8372fd57489c54aac3d634434ed2e851e7a 2.87kB / 2.87kB done
+2026-10-30T19:17:05.5774399Z #6 sha256:dbcb6a80c1f6b80fa76b7c1913562f6da2ac4874bcc96f694311e2fab9124f82 0B / 3.49MB 0.1s
+2026-10-30T19:17:05.5775921Z #6 sha256:de67e106975543d8b63c8f10fa4b645311de7e0365ece03b13ee9db3a4b36c99 930B / 930B 0.1s done
+2026-10-30T19:17:05.5777717Z #6 sha256:667617fe9bbfebf46c81c5f4aa5c8c6040276f864f3de91c09e59370dbc29a05 0B / 223B 0.1s
+2026-10-30T19:17:05.5779255Z #6 sha256:038203a809a83fc82c01a1961e03fd3486df23dee75ae30d02dad88400ce409e 8.26kB / 8.26kB done
+2026-10-30T19:17:05.5780738Z #6 sha256:2a5a3e2bbe84506b9ce00282e98ae40fec3dc44843b59a192f66aa92b6a5e93b 0B / 13.81MB 0.1s
+2026-10-30T19:17:05.7758437Z #6 sha256:dbcb6a80c1f6b80fa76b7c1913562f6da2ac4874bcc96f694311e2fab9124f82 2.10MB / 3.49MB 0.3s
+2026-10-30T19:17:05.7761238Z #6 sha256:667617fe9bbfebf46c81c5f4aa5c8c6040276f864f3de91c09e59370dbc29a05 223B / 223B 0.2s done
+2026-10-30T19:17:05.7774491Z #6 sha256:2a5a3e2bbe84506b9ce00282e98ae40fec3dc44843b59a192f66aa92b6a5e93b 1.05MB / 13.81MB 0.3s
+2026-10-30T19:17:05.7776174Z #6 sha256:25acc1dfd0bf21416b49abaa852a085768e756a604b1d6a103746e3af257c0bf 485B / 485B 0.3s done
+2026-10-30T19:17:05.7777636Z #6 sha256:5ebf0ecf7551def59d46b7ec978eeef31f7cc6fd94a8e618add9f01ed3268316 0B / 20.44MB 0.3s
+2026-10-30T19:17:05.8786385Z #6 sha256:dbcb6a80c1f6b80fa76b7c1913562f6da2ac4874bcc96f694311e2fab9124f82 3.49MB / 3.49MB 0.3s done
+2026-10-30T19:17:05.8788622Z #6 sha256:2a5a3e2bbe84506b9ce00282e98ae40fec3dc44843b59a192f66aa92b6a5e93b 5.24MB / 13.81MB 0.4s
+2026-10-30T19:17:05.8804149Z #6 sha256:5ebf0ecf7551def59d46b7ec978eeef31f7cc6fd94a8e618add9f01ed3268316 13.63MB / 20.44MB 0.4s
+2026-10-30T19:17:05.8824270Z #6 extracting sha256:dbcb6a80c1f6b80fa76b7c1913562f6da2ac4874bcc96f694311e2fab9124f82
+2026-10-30T19:17:05.8831095Z #6 sha256:973adf3097e9667eddef40e01c4219153e3dfb1bf7c5a791128bb6763f8027c0 0B / 2.45kB 0.4s
+2026-10-30T19:17:06.0770242Z #6 sha256:2a5a3e2bbe84506b9ce00282e98ae40fec3dc44843b59a192f66aa92b6a5e93b 8.39MB / 13.81MB 0.6s
+2026-10-30T19:17:06.0772294Z #6 sha256:5ebf0ecf7551def59d46b7ec978eeef31f7cc6fd94a8e618add9f01ed3268316 20.44MB / 20.44MB 0.4s done
+2026-10-30T19:17:06.0782162Z #6 extracting sha256:dbcb6a80c1f6b80fa76b7c1913562f6da2ac4874bcc96f694311e2fab9124f82 0.2s done
+2026-10-30T19:17:06.0783884Z #6 sha256:a224c7120d7e831f6d8c666ab879cafcaff2cb0533727588f0249d6b477c9993 22.42kB / 22.42kB 0.6s
+2026-10-30T19:17:06.2759579Z #6 sha256:2a5a3e2bbe84506b9ce00282e98ae40fec3dc44843b59a192f66aa92b6a5e93b 13.81MB / 13.81MB 0.8s
+2026-10-30T19:17:06.2761432Z #6 sha256:973adf3097e9667eddef40e01c4219153e3dfb1bf7c5a791128bb6763f8027c0 2.45kB / 2.45kB 0.6s done
+2026-10-30T19:17:06.3884205Z #6 sha256:2a5a3e2bbe84506b9ce00282e98ae40fec3dc44843b59a192f66aa92b6a5e93b 13.81MB / 13.81MB 0.8s done
+2026-10-30T19:17:06.3886106Z #6 sha256:a224c7120d7e831f6d8c666ab879cafcaff2cb0533727588f0249d6b477c9993 22.42kB / 22.42kB 0.8s done
+2026-10-30T19:17:06.3887844Z #6 sha256:28fc39bda447dd1a726776dbf47f1003b40cc3855d69c846640c8ef28ec38b72 22.44kB / 22.44kB 0.9s
+2026-10-30T19:17:06.6764183Z #6 sha256:28fc39bda447dd1a726776dbf47f1003b40cc3855d69c846640c8ef28ec38b72 22.44kB / 22.44kB 1.1s done
+2026-10-30T19:17:06.6767985Z #6 extracting sha256:de67e106975543d8b63c8f10fa4b645311de7e0365ece03b13ee9db3a4b36c99 done
+2026-10-30T19:17:06.6770012Z #6 extracting sha256:667617fe9bbfebf46c81c5f4aa5c8c6040276f864f3de91c09e59370dbc29a05 done
+2026-10-30T19:17:06.7915266Z #6 extracting sha256:2a5a3e2bbe84506b9ce00282e98ae40fec3dc44843b59a192f66aa92b6a5e93b 0.1s done
+2026-10-30T19:17:06.7917522Z #6 extracting sha256:25acc1dfd0bf21416b49abaa852a085768e756a604b1d6a103746e3af257c0bf done
+2026-10-30T19:17:06.7919792Z #6 extracting sha256:5ebf0ecf7551def59d46b7ec978eeef31f7cc6fd94a8e618add9f01ed3268316
+2026-10-30T19:17:07.4902589Z #6 extracting sha256:5ebf0ecf7551def59d46b7ec978eeef31f7cc6fd94a8e618add9f01ed3268316 0.5s done
+2026-10-30T19:17:07.4907427Z #6 extracting sha256:973adf3097e9667eddef40e01c4219153e3dfb1bf7c5a791128bb6763f8027c0
+2026-10-30T19:17:07.7386016Z #6 extracting sha256:973adf3097e9667eddef40e01c4219153e3dfb1bf7c5a791128bb6763f8027c0 done
+2026-10-30T19:17:07.7387021Z #6 extracting sha256:a224c7120d7e831f6d8c666ab879cafcaff2cb0533727588f0249d6b477c9993 done
+2026-10-30T19:17:07.7388235Z #6 extracting sha256:28fc39bda447dd1a726776dbf47f1003b40cc3855d69c846640c8ef28ec38b72 done
+2026-10-30T19:17:07.7389221Z #6 DONE 2.1s
+2026-10-30T19:17:07.7389576Z 
+2026-10-30T19:17:07.7389970Z #7 [2/3] WORKDIR /app
+2026-10-30T19:17:07.7390537Z #7 DONE 0.0s
+2026-10-30T19:17:07.7390743Z 
+2026-10-30T19:17:07.7390975Z #8 [3/3] COPY --chown=65534:65534 . /app
+2026-10-30T19:17:07.7391442Z #8 DONE 0.0s
+2026-10-30T19:17:07.7391642Z 
+2026-10-30T19:17:07.7391791Z #9 exporting to image
+2026-10-30T19:17:07.7392179Z #9 exporting layers
+2026-10-30T19:17:08.0073700Z #9 exporting layers 0.4s done
+2026-10-30T19:17:08.0284982Z #9 writing image sha256:09e9d9656eff81f7425d6e7c99321cf36f254454d34e7842d4cd6bbb2675a19a done
+2026-10-30T19:17:08.0286450Z #9 naming to docker.io/library/trial-php done
+2026-10-30T19:17:08.0286970Z #9 DONE 0.4s
+2026-10-30T19:17:08.2411460Z Response and JSON contracts passed.
+2026-10-30T19:17:08.5642146Z #0 building with "default" instance using docker driver
+2026-10-30T19:17:08.5644732Z 
+2026-10-30T19:17:08.5645440Z #1 [internal] load build definition from Dockerfile
+2026-10-30T19:17:08.5646826Z #1 transferring dockerfile: 109B done
+2026-10-30T19:17:08.5650597Z #1 DONE 0.0s
+2026-10-30T19:17:08.5651069Z 
+2026-10-30T19:17:08.5651612Z #2 [internal] load metadata for docker.io/library/php:8.4.26-cli-alpine
+2026-10-30T19:17:08.5652584Z #2 DONE 0.1s
+2026-10-30T19:17:08.5978146Z 
+2026-10-30T19:17:08.5989827Z #3 [internal] load .dockerignore
+2026-10-30T19:17:08.5995156Z #3 transferring context: 2B done
+2026-10-30T19:17:08.5995626Z #3 DONE 0.0s
+2026-10-30T19:17:08.5995842Z 
+2026-10-30T19:17:08.5996914Z #4 [1/3] FROM docker.io/library/php:8.4.26-cli-alpine@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1
+2026-10-30T19:17:08.5997988Z #4 DONE 0.0s
+2026-10-30T19:17:08.5998201Z 
+2026-10-30T19:17:08.5998381Z #5 [internal] load build context
+2026-10-30T19:17:08.5998698Z #5 transferring context: 1.42kB done
+2026-10-30T19:17:08.5998949Z #5 DONE 0.0s
+2026-10-30T19:17:08.5999065Z 
+2026-10-30T19:17:08.5999235Z #6 [2/3] WORKDIR /app
+2026-10-30T19:17:08.5999589Z #6 CACHED
+2026-10-30T19:17:08.5999774Z 
+2026-10-30T19:17:08.5999904Z #7 [3/3] COPY --chown=65534:65534 . /app
+2026-10-30T19:17:08.6000174Z #7 CACHED
+2026-10-30T19:17:08.6000279Z 
+2026-10-30T19:17:08.6000378Z #8 exporting to image
+2026-10-30T19:17:08.6000798Z #8 exporting layers done
+2026-10-30T19:17:08.6001752Z #8 writing image sha256:09e9d9656eff81f7425d6e7c99321cf36f254454d34e7842d4cd6bbb2675a19a done
+2026-10-30T19:17:08.6002567Z #8 naming to docker.io/library/trial-php-a done
+2026-10-30T19:17:08.6003355Z #8 DONE 0.0s
+2026-10-30T19:17:08.7477757Z Response and JSON contracts passed.
+2026-10-30T19:17:08.9201952Z #0 building with "default" instance using docker driver
+2026-10-30T19:17:08.9202908Z 
+2026-10-30T19:17:08.9203301Z #1 [internal] load build definition from Dockerfile
+2026-10-30T19:17:09.0687564Z #1 transferring dockerfile: 109B done
+2026-10-30T19:17:09.0688932Z #1 DONE 0.0s
+2026-10-30T19:17:09.0689309Z 
+2026-10-30T19:17:09.0689872Z #2 [internal] load metadata for docker.io/library/php:8.4.26-cli-alpine
+2026-10-30T19:17:09.0691764Z #2 DONE 0.1s
+2026-10-30T19:17:09.1109488Z 
+2026-10-30T19:17:09.1110482Z #3 [internal] load .dockerignore
+2026-10-30T19:17:09.1111085Z #3 transferring context: 2B done
+2026-10-30T19:17:09.1111518Z #3 DONE 0.0s
+2026-10-30T19:17:09.1111705Z 
+2026-10-30T19:17:09.1112504Z #4 [1/3] FROM docker.io/library/php:8.4.26-cli-alpine@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1
+2026-10-30T19:17:09.1113878Z #4 DONE 0.0s
+2026-10-30T19:17:09.1117409Z 
+2026-10-30T19:17:09.1121999Z #5 [internal] load build context
+2026-10-30T19:17:09.1135103Z #5 transferring context: 1.42kB done
+2026-10-30T19:17:09.1136769Z #5 DONE 0.0s
+2026-10-30T19:17:09.1137394Z 
+2026-10-30T19:17:09.1138181Z #6 [2/3] WORKDIR /app
+2026-10-30T19:17:09.1138732Z #6 CACHED
+2026-10-30T19:17:09.1139927Z 
+2026-10-30T19:17:09.1140274Z #7 [3/3] COPY --chown=65534:65534 . /app
+2026-10-30T19:17:09.1140863Z #7 CACHED
+2026-10-30T19:17:09.1141186Z 
+2026-10-30T19:17:09.1141465Z #8 exporting to image
+2026-10-30T19:17:09.1141968Z #8 exporting layers done
+2026-10-30T19:17:09.1142799Z #8 writing image sha256:09e9d9656eff81f7425d6e7c99321cf36f254454d34e7842d4cd6bbb2675a19a done
+2026-10-30T19:17:09.1144018Z #8 naming to docker.io/library/trial-php-b done
+2026-10-30T19:17:09.1145020Z #8 DONE 0.0s
+2026-10-30T19:17:09.2418034Z Response and JSON contracts passed.
+2026-10-30T19:17:09.5629043Z #0 building with "default" instance using docker driver
+2026-10-30T19:17:09.5630029Z 
+2026-10-30T19:17:09.5630571Z #1 [internal] load build definition from Dockerfile
+2026-10-30T19:17:09.5634255Z #1 transferring dockerfile: 109B done
+2026-10-30T19:17:09.5635374Z #1 DONE 0.0s
+2026-10-30T19:17:09.5637415Z 
+2026-10-30T19:17:09.5637706Z #2 [internal] load metadata for docker.io/library/php:8.4.26-cli-alpine
+2026-10-30T19:17:09.5638199Z #2 DONE 0.1s
+2026-10-30T19:17:09.5976238Z 
+2026-10-30T19:17:09.5976869Z #3 [internal] load .dockerignore
+2026-10-30T19:17:09.5978704Z #3 transferring context: 2B done
+2026-10-30T19:17:09.5981371Z #3 DONE 0.0s
+2026-10-30T19:17:09.5983137Z 
+2026-10-30T19:17:09.5984490Z #4 [1/3] FROM docker.io/library/php:8.4.26-cli-alpine@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1
+2026-10-30T19:17:09.5990794Z #4 DONE 0.0s
+2026-10-30T19:17:09.5991776Z 
+2026-10-30T19:17:09.5992098Z #5 [internal] load build context
+2026-10-30T19:17:09.5992679Z #5 transferring context: 1.42kB done
+2026-10-30T19:17:09.5993440Z #5 DONE 0.0s
+2026-10-30T19:17:09.5993776Z 
+2026-10-30T19:17:09.5994052Z #6 [2/3] WORKDIR /app
+2026-10-30T19:17:09.5994520Z #6 CACHED
+2026-10-30T19:17:09.5995108Z 
+2026-10-30T19:17:09.5995426Z #7 [3/3] COPY --chown=65534:65534 . /app
+2026-10-30T19:17:09.5996004Z #7 CACHED
+2026-10-30T19:17:09.5996305Z 
+2026-10-30T19:17:09.5996585Z #8 exporting to image
+2026-10-30T19:17:09.5997080Z #8 exporting layers done
+2026-10-30T19:17:09.5997889Z #8 writing image sha256:09e9d9656eff81f7425d6e7c99321cf36f254454d34e7842d4cd6bbb2675a19a done
+2026-10-30T19:17:09.5998844Z #8 naming to docker.io/library/trial-php-c done
+2026-10-30T19:17:09.5999472Z #8 DONE 0.0s
+2026-10-30T19:17:09.7363589Z Response and JSON contracts passed.
+2026-10-30T19:17:10.0673655Z #0 building with "default" instance using docker driver
+2026-10-30T19:17:10.0674201Z 
+2026-10-30T19:17:10.0674473Z #1 [internal] load build definition from Dockerfile
+2026-10-30T19:17:10.0675058Z #1 transferring dockerfile: 183B done
+2026-10-30T19:17:10.0675496Z #1 DONE 0.0s
+2026-10-30T19:17:10.0680450Z 
+2026-10-30T19:17:10.0681527Z #2 [internal] load metadata for docker.io/library/php:8.4.27-cli-alpine@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65
+2026-10-30T19:17:10.4075580Z #2 DONE 0.5s
+2026-10-30T19:17:10.5259639Z 
+2026-10-30T19:17:10.5260629Z #3 [internal] load .dockerignore
+2026-10-30T19:17:10.5261327Z #3 transferring context: 2B done
+2026-10-30T19:17:10.5261988Z #3 DONE 0.0s
+2026-10-30T19:17:10.5263606Z 
+2026-10-30T19:17:10.5263768Z #4 [internal] load build context
+2026-10-30T19:17:10.5264222Z #4 transferring context: 1.49kB done
+2026-10-30T19:17:10.5264683Z #4 DONE 0.0s
+2026-10-30T19:17:10.5264880Z 
+2026-10-30T19:17:10.5265546Z #5 [1/3] FROM docker.io/library/php:8.4.27-cli-alpine@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65
+2026-10-30T19:17:10.5267033Z #5 resolve docker.io/library/php:8.4.27-cli-alpine@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65 done
+2026-10-30T19:17:10.5268165Z #5 sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65 10.31kB / 10.31kB done
+2026-10-30T19:17:10.5268852Z #5 sha256:fc00eb814390ddaf9ce642f21c71a3800aa3274e2dc5ac1735bb146d2b0546de 8.26kB / 8.26kB done
+2026-10-30T19:17:10.5269482Z #5 sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788 0B / 3.85MB 0.1s
+2026-10-30T19:17:10.5270084Z #5 sha256:2c8980f3dbe0d688f813899b22c18938c913dd1fa4ea8b5432c84db8af5299c5 0B / 932B 0.1s
+2026-10-30T19:17:10.5270706Z #5 sha256:714ac63ece712cea6d3d397e21ce6304b4cb057b82ffe226b540aae0f028a2e2 2.87kB / 2.87kB done
+2026-10-30T19:17:10.5271365Z #5 sha256:376608520fec13724c5434a1ded7eb9031a39b655141a2e04968e0fbe586fdbc 3.49MB / 3.49MB 0.1s done
+2026-10-30T19:17:10.6267163Z #5 sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788 3.85MB / 3.85MB 0.2s done
+2026-10-30T19:17:10.6269240Z #5 sha256:2c8980f3dbe0d688f813899b22c18938c913dd1fa4ea8b5432c84db8af5299c5 932B / 932B 0.2s done
+2026-10-30T19:17:10.6270326Z #5 extracting sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788
+2026-10-30T19:17:10.6271419Z #5 sha256:87a137d44a72ff85dcecc5762b37ebe8661a17e4798f7cf59d124c8098d9e928 215B / 215B 0.2s done
+2026-10-30T19:17:10.6272435Z #5 sha256:017595bd4b1477cabd98654a7430bc5dd56644fd465a450fab575519abb23f06 0B / 13.89MB 0.2s
+2026-10-30T19:17:10.6274129Z #5 sha256:540cbae3c49d8c5ff3feadb183a8514c40b141d755946527b09519e73c7637fe 0B / 490B 0.2s
+2026-10-30T19:17:10.6275393Z #5 sha256:95bcb353c872c6bcb6f4aa3a75f504cfd7840cc59694661d588090384ac11c8b 0B / 20.50MB 0.2s
+2026-10-30T19:17:10.7271820Z #5 sha256:017595bd4b1477cabd98654a7430bc5dd56644fd465a450fab575519abb23f06 13.89MB / 13.89MB 0.3s done
+2026-10-30T19:17:10.7277224Z #5 sha256:540cbae3c49d8c5ff3feadb183a8514c40b141d755946527b09519e73c7637fe 490B / 490B 0.2s done
+2026-10-30T19:17:10.7280149Z #5 sha256:95bcb353c872c6bcb6f4aa3a75f504cfd7840cc59694661d588090384ac11c8b 4.19MB / 20.50MB 0.3s
+2026-10-30T19:17:10.7281384Z #5 sha256:d3e42d5661e3636baf24f0ff34d27e64c9025699602c72ee5d56d754c0125361 0B / 2.45kB 0.3s
+2026-10-30T19:17:10.7282450Z #5 sha256:887771f28d2cfecdba89393328498a1c9d75a36a30a78ade6d0418b870868ad7 0B / 22.36kB 0.3s
+2026-10-30T19:17:10.8801476Z #5 extracting sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788 0.2s done
+2026-10-30T19:17:10.8802974Z #5 sha256:95bcb353c872c6bcb6f4aa3a75f504cfd7840cc59694661d588090384ac11c8b 20.50MB / 20.50MB 0.4s done
+2026-10-30T19:17:10.8810024Z #5 sha256:d3e42d5661e3636baf24f0ff34d27e64c9025699602c72ee5d56d754c0125361 2.45kB / 2.45kB 0.3s done
+2026-10-30T19:17:10.8812142Z #5 sha256:887771f28d2cfecdba89393328498a1c9d75a36a30a78ade6d0418b870868ad7 22.36kB / 22.36kB 0.4s done
+2026-10-30T19:17:10.8814543Z #5 extracting sha256:376608520fec13724c5434a1ded7eb9031a39b655141a2e04968e0fbe586fdbc 0.1s
+2026-10-30T19:17:10.8816697Z #5 sha256:7e0cb78c1bd4273c28dca39b7bbdb4408f0858400791ccf6f0b614fb3b9b44d9 0B / 22.37kB 0.4s
+2026-10-30T19:17:10.9886643Z #5 extracting sha256:376608520fec13724c5434a1ded7eb9031a39b655141a2e04968e0fbe586fdbc 0.1s done
+2026-10-30T19:17:10.9887910Z #5 sha256:7e0cb78c1bd4273c28dca39b7bbdb4408f0858400791ccf6f0b614fb3b9b44d9 22.37kB / 22.37kB 0.4s done
+2026-10-30T19:17:10.9889098Z #5 extracting sha256:2c8980f3dbe0d688f813899b22c18938c913dd1fa4ea8b5432c84db8af5299c5 done
+2026-10-30T19:17:10.9890252Z #5 extracting sha256:87a137d44a72ff85dcecc5762b37ebe8661a17e4798f7cf59d124c8098d9e928 done
+2026-10-30T19:17:10.9891356Z #5 extracting sha256:017595bd4b1477cabd98654a7430bc5dd56644fd465a450fab575519abb23f06
+2026-10-30T19:17:11.0995617Z #5 extracting sha256:017595bd4b1477cabd98654a7430bc5dd56644fd465a450fab575519abb23f06 0.1s done
+2026-10-30T19:17:11.0996801Z #5 extracting sha256:540cbae3c49d8c5ff3feadb183a8514c40b141d755946527b09519e73c7637fe done
+2026-10-30T19:17:11.0997897Z #5 extracting sha256:95bcb353c872c6bcb6f4aa3a75f504cfd7840cc59694661d588090384ac11c8b
+2026-10-30T19:17:11.8131496Z #5 extracting sha256:95bcb353c872c6bcb6f4aa3a75f504cfd7840cc59694661d588090384ac11c8b 0.6s done
+2026-10-30T19:17:11.8264223Z #5 extracting sha256:d3e42d5661e3636baf24f0ff34d27e64c9025699602c72ee5d56d754c0125361
+2026-10-30T19:17:11.9311428Z #5 extracting sha256:d3e42d5661e3636baf24f0ff34d27e64c9025699602c72ee5d56d754c0125361 done
+2026-10-30T19:17:11.9312791Z #5 extracting sha256:887771f28d2cfecdba89393328498a1c9d75a36a30a78ade6d0418b870868ad7 done
+2026-10-30T19:17:11.9314307Z #5 extracting sha256:7e0cb78c1bd4273c28dca39b7bbdb4408f0858400791ccf6f0b614fb3b9b44d9 done
+2026-10-30T19:17:11.9315126Z #5 DONE 1.5s
+2026-10-30T19:17:11.9315347Z 
+2026-10-30T19:17:11.9315494Z #6 [2/3] WORKDIR /app
+2026-10-30T19:17:11.9316005Z #6 DONE 0.0s
+2026-10-30T19:17:11.9316189Z 
+2026-10-30T19:17:11.9317069Z #7 [3/3] COPY --chown=65534:65534 . /app
+2026-10-30T19:17:11.9317578Z #7 DONE 0.0s
+2026-10-30T19:17:12.0315943Z 
+2026-10-30T19:17:12.0316548Z #8 exporting to image
+2026-10-30T19:17:12.0316919Z #8 exporting layers 0.1s done
+2026-10-30T19:17:12.0539453Z #8 writing image sha256:4ab35d021056b34fafdf8821aa575ecd42023ef4e686bfce343ae271b3e6b1b6 done
+2026-10-30T19:17:12.0544950Z #8 naming to docker.io/library/trial-php-d done
+2026-10-30T19:17:12.0545794Z #8 DONE 0.1s
+2026-10-30T19:17:12.1890521Z Response and JSON contracts passed.
+2026-10-30T19:17:12.2466788Z Post job cleanup.
+2026-10-30T19:17:12.3483664Z [command]/usr/bin/git version
+2026-10-30T19:17:12.3549125Z git version 2.56.0
+2026-10-30T19:17:12.3632294Z Temporarily overriding HOME='/home/runner/work/_temp/509b7522-b869-40c0-ad26-d4eed3c5a5f7' before making global git config changes
+2026-10-30T19:17:12.3633977Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T19:17:12.3635224Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludion-trial/ludion-trial
+2026-10-30T19:17:12.3688735Z Removing SSH command configuration
+2026-10-30T19:17:12.3704065Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T19:17:12.3786901Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T19:17:12.4154822Z Removing HTTP extra header
+2026-10-30T19:17:12.4165512Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T19:17:12.4253728Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T19:17:12.5003815Z Removing includeIf entries pointing to credentials config files
+2026-10-30T19:17:12.5013742Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T19:17:12.5066364Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T19:17:12.5668805Z Cleaning up orphan processes

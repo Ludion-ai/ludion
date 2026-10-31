@@ -116,13 +116,25 @@ export async function dockerHubTag(repository: OfficialRepository, tag: string, 
 }
 
 /**
+ * A move stopped because Docker Hub has no tag for the line's newest release in the Dockerfile's variant. No move is
+ * decided, but the line's security releases newer than the Dockerfile's version (newest first) are kept, and named first
+ * in the message, so a scan still reports them (scan.ts).
+ */
+export class MissingImageTag extends Error {
+  readonly security_releases: Release[];
+  constructor(message: string, security_releases: Release[]) { super(message); this.name = "MissingImageTag"; this.security_releases = security_releases; }
+}
+const listed = (versions: string[]): string => versions.length > 1 ? `${versions.slice(0, -1).join(", ")} and ${versions.at(-1)}` : versions[0]!;
+
+/**
  * An official image's move (docs/decisions/2026-10-31-limgv-image-newest-built-release.md): when the Dockerfile's version is
  * older than the newest release of its line, to that release, marked security or not, since Docker's official images
  * rebuild (with OS-package fixes) only the line's newest tag. `releases` is newest first; `fixes` are the line's security
  * releases newer than the Dockerfile's version, newest first. With none, the move waits 72 hours from the end of the
  * candidate's release day (`day` reads it). A move that does not wait, or whose wait has ended, needs its tag in the
- * Dockerfile's variant on Docker Hub. A Dockerfile version newer than every listed release means the official list is
- * missing releases, so whether the tag is still the newest cannot be read: the lookup fails.
+ * Dockerfile's variant on Docker Hub; without it the lookup fails with MissingImageTag, which keeps `fixes`. A Dockerfile
+ * version newer than every listed release means the official list is missing releases, so whether the tag is still the
+ * newest cannot be read: the lookup fails.
  */
 export async function imageMove(repository: OfficialRepository, releases: Release[], current: RuntimeImage, line: string, day: (date: string) => Date | null, now: Date, fetchFn: typeof fetch): Promise<Pick<Scan, "status" | "candidate" | "security_releases" | "wait_until">> {
   const top = releases[0]!;
@@ -140,7 +152,8 @@ export async function imageMove(repository: OfficialRepository, releases: Releas
     if (now.getTime() < Date.parse(wait.wait_until)) return { status: "wait", candidate, security_releases: fixes, ...wait };
   }
   if (await dockerHubTag(repository, tag, fetchFn) === null) {
-    throw new Error(`Docker Hub has no ${repository}:${tag}, the newest release of ${line} in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`);
+    const named = fixes.length ? `${line.split(" ")[0]} ${listed(fixes.map(r => r.version))} ${fixes.length > 1 ? "are security releases" : "is a security release"} newer than ${current.version}; ` : "";
+    throw new MissingImageTag(`${named}Docker Hub has no ${repository}:${tag}, the newest release of ${line} in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`, fixes);
   }
   return { status: "update_available", candidate, security_releases: fixes, ...wait };
 }

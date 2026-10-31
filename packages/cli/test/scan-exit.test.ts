@@ -15,11 +15,11 @@ const PHP = { "8.4.30": { date: "30 Oct 2026", tags: [] }, "8.4.29": { date: "21
 const nodeEntry = (version: string, date: string, security: boolean) => ({ version, date, files: ["linux-x64"], npm: "10.9.0", lts: "Jod", security });
 // Node.js 22: 22.23.4 is a security release, 22.23.5 (2026-10-27) is not, so a move from 22.23.4 waits until 2026-10-31.
 const NODE = [nodeEntry("v22.23.5", "2026-10-27", false), nodeEntry("v22.23.4", "2026-10-20", true), nodeEntry("v22.23.3", "2026-09-01", false)];
-const official = withHub(async (url: string | URL | Request) => new Response(JSON.stringify(String(url).startsWith("https://www.php.net/") ? PHP : NODE)));
+const lists = async (url: string | URL | Request) => new Response(JSON.stringify(String(url).startsWith("https://www.php.net/") ? PHP : NODE));
 
 const CASES = {
-  php: { none: "FROM php:8.4.29-cli\nWORKDIR /app\n", between: "FROM php:8.4.28-cli\nWORKDIR /app\n", current: "8.4.29", before: "8.4.28", newest: "8.4.30", until: "2026-11-03T00:00:00.000Z" },
-  node: { none: "FROM node:22.23.4-alpine\nWORKDIR /app\n", between: "FROM node:22.23.3-alpine\nWORKDIR /app\n", current: "22.23.4", before: "22.23.3", newest: "22.23.5", until: "2026-10-31T00:00:00.000Z" },
+  php: { none: "FROM php:8.4.29-cli\nWORKDIR /app\n", between: "FROM php:8.4.28-cli\nWORKDIR /app\n", current: "8.4.29", before: "8.4.28", newest: "8.4.30", until: "2026-11-03T00:00:00.000Z", tag: "8.4.30-cli", label: "PHP", line: "PHP 8.4" },
+  node: { none: "FROM node:22.23.4-alpine\nWORKDIR /app\n", between: "FROM node:22.23.3-alpine\nWORKDIR /app\n", current: "22.23.4", before: "22.23.3", newest: "22.23.5", until: "2026-10-31T00:00:00.000Z", tag: "22.23.5-alpine", label: "Node.js", line: "Node.js 22" },
 } as const;
 
 function project(dockerfile: string, extra: Record<string, string> = {}): string {
@@ -28,15 +28,15 @@ function project(dockerfile: string, extra: Record<string, string> = {}): string
   for (const [name, text] of Object.entries(extra)) writeFileSync(join(root, name), text);
   return root;
 }
-/** The scan's exit code and what it printed, at `now`. */
-async function scan(root: string, now: string): Promise<{ exit: number; out: string[]; err: string[] }> {
+/** The scan's exit code and what it printed, at `now`. Docker Hub answers 404 for the tags in `missing`; `args` are added. */
+async function scan(root: string, now: string, missing: string[] = [], args: string[] = []): Promise<{ exit: number; out: string[]; err: string[] }> {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(new Date(now));
-  vi.stubGlobal("fetch", official);
+  vi.stubGlobal("fetch", withHub(lists, { missing }));
   const out: string[] = [], err: string[] = [];
   const log = vi.spyOn(console, "log").mockImplementation((line: unknown) => { out.push(String(line)); });
   const error = vi.spyOn(console, "error").mockImplementation((line: unknown) => { err.push(String(line)); });
-  try { return { exit: await securityCli("scan", ["--dir", root]), out, err }; } finally { log.mockRestore(); error.mockRestore(); }
+  try { return { exit: await securityCli("scan", ["--dir", root, ...args]), out, err }; } finally { log.mockRestore(); error.mockRestore(); }
 }
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 const before = (iso: string) => new Date(Date.parse(iso) - 1).toISOString();
@@ -90,5 +90,40 @@ describe.each(Object.entries(CASES))("scan of the official %s image", (ecosystem
     const { exit, err } = await scan(root, c.until);
     expect(exit).toBe(2);
     expect(err.join("\n")).toContain("it is missing releases");
+  });
+  // Docker Hub has no tag for the line's newest release in the Dockerfile's variant (php.ts, imageMove): Docker has not
+  // published it yet, or no longer builds the variant. No move is decided, but a newer security release is still found.
+  const noTag = (c: (typeof CASES)[keyof typeof CASES], ecosystem: string) => `Docker Hub has no ${ecosystem}:${c.tag}, the newest release of ${c.line} in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`;
+  it.each([["during", true], ["after", false]] as const)("exits 1 when Docker Hub has no tag for the move but a newer security release lies between, %s the other move's wait, and names both", async (_when, waiting) => {
+    const root = project(c.between);
+    const at = waiting ? before(c.until) : c.until;
+    const { exit, out, err } = await scan(root, at, [c.tag]);
+    expect(exit).toBe(1);
+    expect(out).toContain(`${ecosystem}: ${c.label} ${c.current} is a security release newer than ${c.before}; ${noTag(c, ecosystem)}`);
+    expect(err.join("\n")).not.toContain("unavailable");
+    const report = await scanProject(root);
+    expect(report.status).toBe("attention_required");
+    expect(report.checks).toEqual([{ ecosystem, error: `${c.label} ${c.current} is a security release newer than ${c.before}; ${noTag(c, ecosystem)}`, security_releases: [expect.objectContaining({ version: c.current, security: true })] }]);
+    // scan --json shows the security release and the missing tag together.
+    const json = await scan(root, at, [c.tag], ["--json"]);
+    expect(json.exit).toBe(1);
+    expect(JSON.parse(json.out.join("\n"))).toMatchObject({ status: "attention_required", checks: [{ ecosystem, error: expect.stringContaining(`Docker Hub has no ${ecosystem}:${c.tag}`), security_releases: [{ version: c.current }] }] });
+  });
+  it("exits 2 when Docker Hub has no tag for a move with no newer security release once its wait has ended, as before", async () => {
+    const root = project(c.none);
+    const { exit, out, err } = await scan(root, c.until, [c.tag]);
+    expect(exit).toBe(2);
+    expect(err).toContain(`${ecosystem}: unavailable — ${noTag(c, ecosystem)}`);
+    expect(out.join("\n")).not.toContain("security release newer than");
+    const report = await scanProject(root);
+    expect(report.status).toBe("attention_required");
+    expect(report.checks).toEqual([{ ecosystem, error: noTag(c, ecosystem) }]);
+    const json = await scan(root, c.until, [c.tag], ["--json"]);
+    expect(json.exit).toBe(2);
+    expect(JSON.parse(json.out.join("\n")).checks[0]).not.toHaveProperty("security_releases");
+  });
+  it("exits 0 for a move with no newer security release while it waits, without asking Docker Hub for the tag, as before", async () => {
+    const { exit } = await scan(project(c.none), before(c.until), [c.tag]);
+    expect(exit).toBe(0);
   });
 });

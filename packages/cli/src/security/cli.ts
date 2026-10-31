@@ -5,7 +5,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { patchProject } from "./patch.ts";
 import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
-import { scanProject, securityMove, vulnerable } from "./scan.ts";
+import { found, scanProject, securityMove } from "./scan.ts";
 import { CONFIG, DEFAULT_CONFIG, DEFAULT_NODE_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
 import { namesNodeImage } from "./node.ts";
 import type { Scan } from "./php.ts";
@@ -68,6 +68,8 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     if (values.json) console.log(JSON.stringify(only && (only.ecosystem === "php" || only.ecosystem === "node") && "result" in only && !report.unsupported.length ? only.result : report, null, 2));
     else {
       for (const check of report.checks) {
+        // A missing tag with a newer security release between is a finding: the text names both (php.ts, MissingImageTag).
+        if ("error" in check && check.security_releases?.length) { console.log(`${check.ecosystem}: ${check.error}`); continue; }
         if ("error" in check) { console.error(`${check.ecosystem}: unavailable — ${READONLY_ECOSYSTEMS.includes(check.ecosystem) ? plain(check.error) : check.error}`); continue; }
         if ("fixed_versions_note" in check.result) for (const line of readOnlyText(check.ecosystem, check.result)) console.log(line);
         else if ("findings" in check.result) {
@@ -80,8 +82,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
       if (report.unsupported.length) console.error(`Unsupported inventories: ${report.unsupported.join(", ")}. These have not been checked.`);
       console.log("Known data only; no match is not a security guarantee. Dependency coordinates are sent to OSV; source stays local to your Docker setup.");
     }
-    const found = report.checks.some(c => "result" in c && ("findings" in c.result ? vulnerable(c.result) : securityMove(c.result)));
-    return found ? 1 : report.status === "attention_required" ? 2 : 0;
+    return report.checks.some(found) ? 1 : report.status === "attention_required" ? 2 : 0;
   }
   async function patch(signal?: AbortSignal): Promise<number> {
     const config = readConfig(root);

@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NODE_INDEX_URL, nodeImage, parseNodeReleases, scanNode } from "../src/security/node.ts";
 import { nodeFixPublished } from "../src/security/exposure.ts";
-import { compare } from "../src/security/php.ts";
+import { compare, MissingImageTag } from "../src/security/php.ts";
 import { withHub } from "./hub.ts";
 import { DEFAULT_NODE_CONFIG, readConfig, snapshot } from "../src/security/project.ts";
 import { patchProject, type Command } from "../src/security/patch.ts";
@@ -95,6 +95,17 @@ describe("official Node.js image decisions: the newest release of the line that 
   });
   it.each([["FROM node:22.11.0-alpine\n", "22.23.5-alpine"], ["FROM node:22.23.4\n", "22.23.5"]])("stops when Docker Hub has no tag for the move: %s", async (text, tag) => {
     await expect(scanNode(text, withHub(fetchFn, { missing: [tag] }))).rejects.toThrow(`Docker Hub has no node:${tag}, the newest release of Node.js 22 in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`);
+  });
+  // The stop keeps the newer security releases, so a scan still reports them (scan.ts); with none, the reason is as before.
+  it.each([
+    ["FROM node:22.11.0-alpine\n", "22.23.5-alpine", "Node.js 22.23.4 and 22.23.2 are security releases newer than 22.11.0; ", ["22.23.4", "22.23.2"]],
+    ["FROM node:22.23.2-alpine\n", "22.23.5-alpine", "Node.js 22.23.4 is a security release newer than 22.23.2; ", ["22.23.4"]],
+    ["FROM node:22.23.4\n", "22.23.5", "", []],
+  ])("names the newer security releases when Docker Hub has no tag for the move: %s", async (text, tag, named, versions) => {
+    const stop = await scanNode(text, withHub(fetchFn, { missing: [tag] })).then(() => undefined, (error: unknown) => error);
+    expect(stop).toBeInstanceOf(MissingImageTag);
+    expect((stop as MissingImageTag).message).toBe(`${named}Docker Hub has no node:${tag}, the newest release of Node.js 22 in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`);
+    expect((stop as MissingImageTag).security_releases.map(r => r.version)).toEqual(versions);
   });
   it.each([
     "FROM node:22\n", "FROM node:lts-alpine\n", "FROM node:22-alpine\n", "FROM node:22.11-alpine\n", "FROM node:v22.11.0\n", "FROM node:22.11.0-Alpine\n",

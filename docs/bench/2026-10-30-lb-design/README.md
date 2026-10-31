@@ -248,12 +248,12 @@ The R lane's review (comment 6533374683 at 6ee07f4, REQUEST CHANGES) found:
 - **N3:** facts in this README (above) and in the PR body.
 - **N4:** two test gaps, M18 (a tree alias's name) and M22 (an override key counting for every name).
 
-That was the fourth REQUEST CHANGES in a row of one kind: a lock form npm writes that the reader got wrong. So the reader now has something to be checked against: locks npm 7.10.0 to 11.19.1 wrote, and npm's own report on them, under docs/decisions/2026-10-31-lock-corpus-against-npm.md (committed at 50a531c, before the corpus). The corpus, its gates and its results are in docs/bench/2026-10-31-lb2a-npm-corpus/README.md.
+That was the fourth REQUEST CHANGES in a row of one kind: a lock form npm writes that the reader got wrong. So the reader now has something to be checked against: locks npm 7.10.0 to 12.2.1 wrote, and npm 12.2.1's and npm 11.19.1's reports on them, under docs/decisions/2026-10-31-lock-corpus-against-npm.md and docs/decisions/2026-10-31-lock-corpus-npm12.md (committed at 50a531c and e97202b, each before its part of the corpus). The corpus, its gates and its results are in docs/bench/2026-10-31-lb2a-npm-corpus/README.md.
 - **B1:** `devOptional` and `peer` are tree keys, compared between the views as flags. The views compare requirements by name: a v2 tree writes an override's spec where `packages` writes the package's own, which the corpus showed for npm 8 to 11.
 - **B2:** where an override applies, the copy is checked against its spec only.
 - **N1:** `peerDependenciesMeta` is compared with the registry with the requirements, `os`, `cpu` and `libc`.
 - **N4:** tests for M18 and M22 (judge.test.ts), each with a mutation.
-- **The corpus gates:** G1 (no narrowing) and G3 (every lock npm writes is read) are met. G2 (agreement with npm's `missing`/`invalid`) is met for every variant but V3: 40 of 184, where npm takes another package at a required path under a range and Ludion does not. Ludion is not changed to take it.
+- **The corpus gates:** G1 (no narrowing) and G3 (every lock npm writes is read) are met. G2 (agreement with npm 12.2.1's `missing`/`invalid`) is met for every variant but V3: 56 of 272, where npm takes another package named at a required path under a range and Ludion does not. Ludion is not changed to take it; it waits for the brain's rule. npm 11.19.1 says the same as npm 12.2.1 of every variant.
 
 ## The reviews
 

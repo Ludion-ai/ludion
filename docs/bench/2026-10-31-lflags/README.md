@@ -48,7 +48,11 @@ The same in v2 and v3. npm ls does not report a peer nested under its dependent 
 
 ## Mutations
 
-See logs/mutate.log (`scripts/mutate.mjs`, run by `scripts/run.sh mutate` in `ludion-l9-node24-git` with `--network none`, on the volume `scripts/run.sh test` installed).
+`scripts/mutate.mjs`, run by `scripts/run.sh mutate` in `ludion-l9-node24-git` with `--network none`, on the volume `scripts/run.sh test` installed. 25 mutations; each result is also in logs/mutate-results.tsv (commit, result, seconds, name).
+
+- **At 6a0f1b3 (logs/mutate.log): 24 of 25 caught**, none by the 300 s limit; both test files pass without mutations. The shell that started the run was stopped by Claude Code for low memory while it ran; the container went on and finished (its log ends with the summary line).
+- **Not caught there: 5, "an optional peer that another group names checked as a peer too"** (npm's later edge replaces the peer's). No test had such an entry. bdb5fba adds one (npm-corpus.test.ts, "the project's optional peer: met when missing, checked when there").
+- **At 39ee847 (logs/mutate-5.log): 5 caught.**
 
 ## What this does not cover
 

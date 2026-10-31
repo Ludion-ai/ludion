@@ -1,0 +1,26 @@
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	19	rule 1: the walk follows optional peers
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	19	rule 2: an entry's optional peer not checked where it is there
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	rule 2: the project's optional peer not checked where it is there
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	19	rule 2: a missing optional peer counted unmet
+6a0f1b30695b8b0fc310a85e269619649caf4935	pass	20	rule 2: an optional peer that another group names checked as a peer too
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	22	flags: dev not taken off by a production edge
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	35	flags: optional not taken off by a required edge
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	23	flags: devOptional taken off by any edge from a node outside both trees
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	19	flags: peer not taken off by a non-peer edge
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	19	flags: an optional peer makes its target not extraneous
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	flags: a not extraneous package leaves the one it is installed under extraneous
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	23	flags: a link passes nothing to its target
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	flags: no workspace edges from the root
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	21	flags: peers replace dependencies (the groups' order)
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	30	flags: an installed package's devDependencies followed
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	29	flags: devOptional written beside dev or optional
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	40	flags: an optional peer meta read as required
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	check: the computed flags not compared at all
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	check: an entry whose place changes its flags not checked
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	check: an entry whose written flags changed not checked
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	check: a moved entry not checked
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	check: a flag with a value other than true read as absent
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	N1: optional left out of the flag list
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	N1: peer left out of the flag list
+6a0f1b30695b8b0fc310a85e269619649caf4935	fail	20	N2: name left out of the comparison
+39ee847a63daacfc5c7b5457798e4365e3dbe177	fail	20	rule 2: an optional peer that another group names checked as a peer too

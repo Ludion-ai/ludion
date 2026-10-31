@@ -17,13 +17,13 @@ Dates that give a commit id starting with 00, searched one second apart from 202
 | Run | Head | Result |
 |---|---|---|
 | branch.test.ts, the case at the 00 date with the old line `objects/00` (test first) | 250a7aa | 1 failed, 22 passed: `EISDIR: illegal operation on a directory, open '/tmp/ludion-branch-test-hGsDBF/.git/objects/00'`, the error of the CI runs |
-| branch.test.ts with the fix, 3 runs | fix | 23 passed, 3 of 3 |
-| The old line at each of the 5 dates | fix, edited in the container | 5 of 5 failed with EISDIR |
-| The fix at each of the 5 dates | fix, edited in the container | 5 of 5 passed (23 passed) |
-| Mutation: branch.ts no longer refuses a fan-out entry that is not a folder | fix, edited in the container | caught: 1 failed, 22 passed |
-| `npm run typecheck` | fix | exit 0 |
-| `npm run build` | fix | exit 0 |
-| `npx vitest run` (every suite) | fix | 42 files passed; 1445 passed, 25 skipped (1470) |
+| branch.test.ts with the fix, 3 runs | 9563175 | 23 passed, 3 of 3 |
+| The old line at each of the 5 dates | 9563175, edited in the container | 5 of 5 failed with EISDIR |
+| The fix at each of the 5 dates | 9563175, edited in the container | 5 of 5 passed (23 passed) |
+| Mutation: branch.ts no longer refuses a fan-out entry that is not a folder | 9563175, edited in the container | caught: 1 failed, 22 passed |
+| `npm run typecheck` | 9563175 | exit 0 |
+| `npm run build` | 9563175 | exit 0 |
+| `npx vitest run` (every suite) | 9563175 | 42 files passed; 1445 passed, 25 skipped (1470) |
 
 The CI runs that failed on it: deploy 41225586091 (main 8a6192c, 1 failed, 1453 passed) and test 41023531546 (lane/ld-delta-check 7f662a3, 1 failed, 1161 passed). Both logs show the EISDIR at `.git/objects/00`.
 

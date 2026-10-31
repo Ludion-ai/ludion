@@ -1,0 +1,192 @@
+baseline	status 0	failed 0	passed 357
+N-node	caught	runtime name: node dropped	
+N-nodejs	caught	runtime name: nodejs dropped	
+N-npm	caught	runtime name: npm dropped	
+N-npx	caught	runtime name: npx dropped	
+N-pnpm	caught	runtime name: pnpm dropped	
+N-pnpx	caught	runtime name: pnpx dropped	
+N-yarn	caught	runtime name: yarn dropped	
+N-yarnpkg	caught	runtime name: yarnpkg dropped	
+N-bun	caught	runtime name: bun dropped	
+N-bunx	caught	runtime name: bunx dropped	
+N-deno	caught	runtime name: deno dropped	
+N-tsx	caught	runtime name: tsx dropped	
+N-vitest	caught	runtime name: vitest dropped	
+N-corepack	caught	runtime name: corepack dropped	
+N-python	caught	runtime name: python[0-9.]* narrowed to python	
+N-python[0-9.]+	caught	runtime name: python[0-9.]* narrowed to python[0-9.]+	
+N-pythonw	caught	runtime name: pythonw dropped	
+N-py	caught	runtime name: pyw? narrowed to py	
+N-pyw	caught	runtime name: pyw? narrowed to pyw	
+N-pip	caught	runtime name: pip[0-9.]* narrowed to pip	
+N-pip[0-9.]+	caught	runtime name: pip[0-9.]* narrowed to pip[0-9.]+	
+N-uv	caught	runtime name: uvx? narrowed to uv	
+N-uvx	caught	runtime name: uvx? narrowed to uvx	
+B1	caught	base: backslash folders	
+B2	caught	base: folder dropped	
+B3	caught	base: .exe	
+B4	caught	base: .cmd	
+B5	caught	base: .bat	
+B6	caught	base: .ps1	
+B7	caught	base: .com	
+B8	caught	base: .js and .mjs	
+B9	caught	base: case	
+B10	caught	a program in node_modules	
+B11	caught	the runtime rule (names)	
+B12	caught	the runtime rule judges the program started, not npx's package	
+P1	caught	assignments	
+P2	caught	redirections	
+P3	caught	PowerShell $v = command	
+P4	caught	all wrappers	
+P5	caught	wrapper sudo	
+P6	caught	wrapper sudo -u value	
+P7	caught	wrapper env	
+P8	caught	wrapper env -S	
+P9	caught	wrapper time	
+P10	caught	wrapper exec	
+P11	caught	wrapper nice	
+P12	caught	wrapper nice -n value	
+P13	caught	wrapper nohup	
+P14	caught	wrapper stdbuf	
+P15	caught	wrapper timeout	
+P16	caught	wrapper timeout's duration	
+P17	caught	wrapper timeout -s value	
+P18	caught	wrapper xargs	
+P19	caught	wrapper xargs -n value	
+P20	caught	wrapper command	
+P21	caught	command -v only looks	
+P22	caught	wrapper builtin	
+P23	caught	wrapper call	
+P24	caught	wrapper wsl	
+P25	survived	wrapper wsl -e	passed 357
+P26	caught	wrapper wsl -d value	
+P27	caught	wrapper wsl --cd value	
+P29	caught	keyword if	
+P30	caught	keyword then	
+P31	caught	keyword else	
+P32	caught	keyword elif	
+P33	caught	keyword do	
+P34	survived	keyword while	passed 357
+P35	caught	keyword until	
+P36	caught	keyword !	
+P37	caught	keyword coproc	
+P38	caught	npx's package	
+P39	caught	node <path>/wrangler.js	
+S1	caught	Start-Process and start	
+S2	caught	starter start-process	
+S3	caught	starter saps	
+S4	caught	starter start	
+S5	caught	Start-Process -FilePath	
+S6	caught	Start-Process -ArgumentList	
+S7	caught	Start-Process -Verb takes a value	
+S8	caught	Start-Process switches take no value	
+S9	caught	cmd start /d takes a value	
+S10	caught	cmd start switches	
+S11	caught	cmd start title	
+S12	caught	starter's plain arguments	
+S13	not applied	-ArgumentList's commas	found 0 times
+S14	caught	find -exec	
+S15	caught	PowerShell -EncodedCommand	
+S16	caught	shell strings at all	
+S17	caught	POSIX -c in a flag group	
+S18	caught	cmd //c	
+S19	caught	pwsh -c abbreviation	
+S20	caught	shell string's words as a command	
+S21	caught	shell string as a command line	
+S22	caught	shell string after --	
+S23	caught	shell cmd	
+S24	caught	shell bash	
+S25	caught	shell powershell	
+S26	caught	eval and iex run their string	
+S27	caught	evaluator eval	
+S28	caught	evaluator iex	
+S29	caught	evaluator Invoke-Expression	
+S30	caught	too deep: the limit	
+S31	caught	too deep: refuse's check	
+F1	caught	a shell's heredoc or here-string	
+F2	caught	the heredoc of the stage before	
+F3	caught	echo or printf before	
+F4	caught	a lone string before	
+F5	caught	echoes: printf	
+F6	caught	readsProgram: -s	
+F7	caught	readsProgram: -	
+F8	caught	readsProgram: evaluators	
+F9	caught	download piped into a shell	
+L1	caught	single-quoted part joins its word	
+L2	caught	double-quoted part joins its word	
+L3	caught	an escape keeps only the character	
+L4	caught	backslash-newline joins lines	
+L5	caught	comments	
+L6	caught	a comment starts only after a space or separator	
+L7	caught	PowerShell <# #> comments	
+L8	caught	PowerShell here-strings	
+L9	caught	PowerShell @""@ expands $( )	
+L10	caught	<<< here-string	
+L11	caught	<<< word goes to stdin	
+L12	caught	heredocs	
+L13	caught	heredoc body goes to stdin	
+L14	caught	unquoted heredoc expands $( )	
+L15	not applied	quoted heredoc is literal, unquoted is not	found 2 times
+L16	not applied	<<- strips tabs	found 2 times
+L17	caught	heredoc terminator	
+L18	caught	$( ) inside double quotes	
+L19	caught	bash double quotes keep a backslash before other characters	
+L20	caught	expansions' $( )	
+L21	caught	&& and || end a pipeline	
+L22	caught	| starts a stage	
+L23	caught	|& is a pipe	
+L24	caught	; ends a command	
+L25	caught	>& and &> are redirections	
+L26	caught	& ends a command	
+L27	caught	( ) groups	
+L28	caught	{ } groups	
+L29	caught	a group's text stays in its word	
+L30	caught	a stray ) or } ends a command	
+L31	caught	a new line ends a command	
+L32	caught	PowerShell's escape is the backtick	
+T1	caught	Ludion-ai in any case	
+T2	caught	{owner} is the current repository	
+T3	caught	endpoint contents	
+T4	caught	endpoint readme	
+T5	caught	endpoint tarball	
+T6	caught	endpoint zipball	
+T7	caught	endpoint compare	
+T8	caught	endpoint git/blobs	
+T9	caught	endpoint commits/<ref>	
+T10	caught	endpoint pulls/<n>/files	
+T11	caught	a diff, patch or raw header	
+T12	caught	api.github.com URLs	
+T13	caught	raw.githubusercontent.com	
+T14	caught	codeload.github.com	
+T15	caught	github.com raw, blob, archive, commit, compare	
+T16	caught	github.com archive	
+T17	caught	github.com pull diff, patch, files	
+T18	caught	query string dropped	
+T19	caught	trailing / dropped	
+T20	caught	gh api --method takes a value	
+T21	caught	gh api -H is a header	
+T22	caught	gh api's third-party files	
+T23	caught	gh repo clone	
+T24	caught	a github.com URL names its owner	
+T25	caught	gh pr diff, pr checkout, release download	
+T26	caught	gh --repo	
+T27	caught	gh pr diff <url>	
+T28	caught	git clone	
+T29	caught	git -C takes a value	
+T30	caught	git clone --depth takes a value	
+T31	caught	git clone from another host	
+T32	caught	git clone of a relative path is local	
+T33	caught	git clone of a drive path is local	
+T34	caught	downloads' third-party files	
+T35	caught	downloads' headers	
+T36	caught	the third-party rule	
+E1	caught	wrangler deploy	
+E2	caught	wrangler deploy --dry-run is fine	
+E3	caught	wrangler secret	
+E4	caught	gh secret	
+E5	caught	gh repo delete	
+E6	caught	force push	
+E7	caught	a download given to an evaluator	
+E8	caught	the backtick rule	
+E9	caught	the message's Python example	
+total 190: caught 185, survived 2, not applied 3, void 0

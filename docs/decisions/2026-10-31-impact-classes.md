@@ -4,6 +4,8 @@
 
 **Changed in part the same day** by docs/decisions/2026-10-31-impact-classes-trap-published-record.md (comments 6538877641 and 6538690397): trap also covers a MAL- alias and CWE-506, and a stop in the protection record carries its reason. Point 3 and the CWE-506 row below are kept as first written.
 
+**Changed in part again** by docs/decisions/2026-10-31-impact-classes-cvss-vector.md (comment 6539200199, point 3): each CWE allows a set of classes and the record's CVSS vector chooses among them. Points 2 and 5 below are kept as first written.
+
 ## The owner's words (Claude chat, 2026-10-31)
 
 - 12:25 JST: 「表を作って、どれだけの危険性から守ったのかってのを」

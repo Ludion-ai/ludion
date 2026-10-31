@@ -3,7 +3,7 @@ import { closeSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync }
 import { tmpdir } from "node:os";
 import { join, posix, resolve } from "node:path";
 import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
-import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
+import { hash, imageReason, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { scanNode } from "./node.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
 import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
@@ -134,7 +134,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx", mode: 0o600 });
     if (base && branch) {
       active();
-      const message = `${subject}\n\nOfficial ${runtime.label} security releases: ${scan.security_releases.map(r => r.version).join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+      const message = `${subject}\n\n${imageReason(runtime.label, scan.current.version, scan.candidate.version, scan.security_releases.map(r => r.version))}\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
       // The path as Git names it: "./Dockerfile" in the config is "Dockerfile" in the commit.
       receipt.commit = fixBranch(base, branch, [{ path: posix.normalize(config.dockerfile), content: updated }], message);
       receipt.branch = branch; receipt.applied_at = new Date().toISOString(); receipt.outcome = "applied";

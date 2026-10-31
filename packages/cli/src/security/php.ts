@@ -82,6 +82,26 @@ export function parseReleases(input: unknown, branch: string): Release[] {
   return releases.sort((a, b) => compare(b.version, a.version));
 }
 
+/**
+ * An official image's move (docs/decisions/2026-10-31-limgv-official-image-newest-release.md): the newest release of the line,
+ * marked security or not, whenever it is newer than the Dockerfile's version, since Docker's official images rebuild (with
+ * OS-package fixes) only the line's newest tag. `releases` is newest first. `fixes` are the line's security releases newer
+ * than the Dockerfile's version, newest first. A Dockerfile version newer than every listed release means the official
+ * list is missing releases, so whether the tag is still the newest cannot be read: the lookup fails.
+ */
+export function newestRelease(releases: Release[], current: RuntimeImage, line: string): { fixes: Release[]; newest: Release | null } {
+  const top = releases[0]!;
+  if (compare(current.version, top.version) > 0) {
+    throw new Error(`The official ${line} release list has no release as new as ${current.version}; it is missing releases. No update decision was made.`);
+  }
+  return { fixes: releases.filter(r => r.security && compare(r.version, current.version) > 0), newest: compare(top.version, current.version) > 0 ? top : null };
+}
+
+/** An image fix's commit paragraph (patch.ts writes it, deliver.ts rebuilds it): its security releases, or why it moves without one. */
+export const imageReason = (label: string, from: string, to: string, releases: readonly string[]): string => releases.length
+  ? `Official ${label} security releases: ${releases.join(", ")}.`
+  : `No official ${label} security release is newer than ${from}; ${to} is the newest release of its line, the only tag of the line Docker's official image still rebuilds.`;
+
 /** An official release list as JSON: no redirect, at most `mib` MiB. `what` names it in errors ("PHP release"). */
 export async function releaseJson(url: string, what: string, mib: number, timeoutMs: number, fetchFn: typeof fetch): Promise<unknown> {
   const res = await fetchFn(url, { redirect: "error", signal: AbortSignal.timeout(timeoutMs), headers: { "User-Agent": "Ludion-Security-Preview", "Accept": "application/json" } });
@@ -106,11 +126,8 @@ export async function scanPhp(dockerfile: string, fetchFn: typeof fetch = fetch)
   const current = phpImage(dockerfile);
   const url = `${RELEASES_URL}?json&version=${current.branch}&max=100`;
   const releases = parseReleases(await releaseJson(url, "PHP release", 1, 15_000, fetchFn), current.branch);
-  const fixes = releases.filter(r => r.security && compare(r.version, current.version) > 0);
-  // As for Node.js (node.ts): a branch's releases are cumulative, so the newest security release is the smallest version
-  // holding every published fix; later releases not tagged security are not taken (docs/decisions/2026-10-31-lphpv-php-security-release.md).
-  const fixed = fixes[0];
-  const candidate = fixed ? { version: fixed.version, reference: `php:${fixed.version}${current.flavor}` } : null;
+  const { fixes, newest } = newestRelease(releases, current, `PHP ${current.branch}`);
+  const candidate = newest ? { version: newest.version, reference: `php:${newest.version}${current.flavor}` } : null;
   return {
     schema: 1, checked_at: new Date().toISOString(), status: candidate ? "update_available" : "no_newer_security_release",
     scope: "dockerfile_base_image", current, candidate, security_releases: fixes, source: url,

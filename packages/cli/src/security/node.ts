@@ -1,7 +1,8 @@
-import { compare, officialImage, releaseJson, withoutBom, type Release, type RuntimeImage, type Scan } from "./php.ts";
+import { compare, newestRelease, officialImage, releaseJson, withoutBom, type Release, type RuntimeImage, type Scan } from "./php.ts";
 
 /**
- * The official Node.js image, moved to a security release of its own line (docs/decisions/2026-10-31-lnode-node-image.md).
+ * The official Node.js image, moved to its line's newest release (docs/decisions/2026-10-31-lnode-node-image.md, item 5
+ * replaced by docs/decisions/2026-10-31-limgv-official-image-newest-release.md).
  * The same path as PHP's image (php.ts): nodejs.org's release index marks each release `security: true` or `false`.
  */
 export const NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
@@ -52,10 +53,8 @@ export function parseNodeReleases(input: unknown, line: string): Release[] {
 export async function scanNode(dockerfile: string, fetchFn: typeof fetch = fetch): Promise<Scan> {
   const current = nodeImage(dockerfile);
   const releases = parseNodeReleases(await releaseJson(NODE_INDEX_URL, "Node.js release", 4, 30_000, fetchFn), current.branch);
-  const fixes = releases.filter(r => r.security && compare(r.version, current.version) > 0);
-  // Releases of a line are cumulative: the newest security release is the smallest version holding every published fix.
-  const fixed = fixes[0];
-  const candidate = fixed ? { version: fixed.version, reference: `node:${fixed.version}${current.flavor}` } : null;
+  const { fixes, newest } = newestRelease(releases, current, `Node.js ${current.branch}`);
+  const candidate = newest ? { version: newest.version, reference: `node:${newest.version}${current.flavor}` } : null;
   return {
     schema: 1, checked_at: new Date().toISOString(), status: candidate ? "update_available" : "no_newer_security_release",
     scope: "dockerfile_base_image", runtime: "node", current, candidate, security_releases: fixes, source: NODE_INDEX_URL,

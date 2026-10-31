@@ -11,7 +11,7 @@ import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
 import type { Judgement } from "./judge.ts";
 import semver from "semver";
 import { comparableVersion } from "./osv.ts";
-import { compare, phpImage } from "./php.ts";
+import { compare, imageReason, phpImage } from "./php.ts";
 import { nodeImage } from "./node.ts";
 import { CONFIG, rootPath } from "./project.ts";
 
@@ -55,6 +55,8 @@ export type CheckedFix = {
   /** The commit message `patch --apply` writes for this fix, rebuilt from checked fields; the commit must carry exactly it. */
   branch: string; commit: string; subject: string; message: string; tree: string; files: { path: string; after_hash: string }[];
   fix_published_at: string | null; found_at: string; applied_at: string; verdict: (typeof VERDICTS)[number] | null;
+  /** An image fix with no newer security release: its tag was no longer the line's newest, the only one still rebuilt. */
+  rebuild_only?: true;
 };
 export type CheckedArtifact = { id: string | null; ecosystem: Ecosystem | null; base: string; fixes: CheckedFix[]; notApplied: Record<string, number> };
 export type Delivery = { package: string; branch: string; outcome: "opened" | "open_pr_exists" | "closed_pr_exists" | "branch_differs" | "failed"; pr?: number; url?: string; reason?: string };
@@ -152,15 +154,17 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
     if (text(r.base_commit, SHA, "base_commit") !== base) refuse("the receipt's base_commit is not the commit this run checked out.");
     const scan = object(r.scan, "The receipt's scan"), current = object(scan.current, "scan.current"), candidate = object(scan.candidate, "scan.candidate");
     const from = text(current.version, VERSION, `The current ${label} version`), to = text(candidate.version, VERSION, `The candidate ${label} version`);
-    const releases = list(scan.security_releases, 1, 100, `The ${label} security releases`).map(release => text(object(release, `A ${label} release`).version, VERSION, `A ${label} release's version`));
+    // None when the tag was no longer its line's newest release (php.ts, newestRelease).
+    const releases = list(scan.security_releases, 0, 100,`The ${label} security releases`).map(release => text(object(release, `A ${label} release`).version, VERSION, `A ${label} release's version`));
     const subject = `ludion: ${label} ${from} -> ${to} in ${policy.dockerfile}`;
     const fix: CheckedFix = {
       package: runtime, changes: [{ name: runtime, from, to, advisories: [] }],
       branch: text(r.branch, /^ludion\/[A-Za-z0-9._/-]+$/, "The branch"), commit: text(r.commit, SHA, "The commit"), subject, tree: "",
       // patch.ts's message.
-      message: `${subject}\n\nOfficial ${label} security releases: ${releases.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
+      message: `${subject}\n\n${imageReason(label, from, to, releases)}\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
       files: [{ path: policy.allowed[0]!, after_hash: text(r.dockerfile_after, HEX64, "dockerfile_after") }],
       fix_published_at: timeOrNull(r.fix_published_at, "fix_published_at"), found_at: time(r.found_at, "found_at"), applied_at: time(r.applied_at, "applied_at"), verdict: null,
+      ...(releases.length ? {} : { rebuild_only: true as const }),
     };
     if (fix.branch !== fixBranchName(prefix, runtime, runtime, [to])) refuse(`the branch ${fix.branch} is not the one Ludion names for ${label} ${to}.`);
     return { id, ecosystem: runtime, fixes: [fix], notApplied };
@@ -468,13 +472,15 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "<!-- ludion-fix -->",
     "**プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.",
     "",
-    `Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one fix (one commit).`,
+    fix.rebuild_only
+      ? `Ludion's validation job found that the image's tag is no longer the newest release of its line, the only tag of the line Docker's official image still rebuilds with OS-package fixes; no newer security release of the line is published. By its receipt, it validated the move to the line's newest release on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one change (one commit).`
+      : `Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one fix (one commit).`,
     "",
     "| | |",
     "|---|---|",
     `| Package | ${code(fix.package)} (${ecosystem}) |`,
     `| Change | ${fix.changes.map(c => `${code(c.from)} → ${code(c.to)}`).join(", ")} |`,
-    `| Advisories | ${advisories.length ? advisories.map(code).join(", ") : ecosystem === "php" ? "php.net's security release (no advisory ID read)" : ecosystem === "node" ? "nodejs.org's security release (no advisory ID read)" : "none listed"} |`,
+    `| Advisories | ${advisories.length ? advisories.map(code).join(", ") : fix.rebuild_only ? "none: no newer security release; the line's newest release, for the OS-package rebuilds" : ecosystem === "php" ?"php.net's security release (no advisory ID read)" : ecosystem === "node" ? "nodejs.org's security release (no advisory ID read)" : "none listed"} |`,
     `| Fix published | ${fix.fix_published_at ? code(fix.fix_published_at) : "unknown"} (${PUBLISHED[ecosystem]}) |`,
     `| Found | ${code(fix.found_at)} (this run's lookup; an earlier run may have seen it first) |`,
     `| Branch made | ${code(fix.applied_at)} |`,

@@ -2,7 +2,7 @@
 
 A measurement that only reads; no product code, gate or wait changed. Definitions: `docs/decisions/2026-10-30-lr-dockerfile-lag-definitions.md` (LR, 975e6fa) and `docs/decisions/2026-10-31-lr2-definitions.md` (LR2, b884cbb), each committed and pushed before counting. Detail: `docs/bench/2026-10-30-lr-dockerfile-lag/README.md`. Nothing was cloned and no third-party code ran; file contents were read only inside a container with no network.
 
-Sample: 100 repositories from GitHub's best-match code search (50 php, 50 node, one per owner, pushed within a year), measured on 2026-10-30. Nothing was "could not be counted".
+Sample: 100 repositories from GitHub's best-match code search (50 php, 50 node, one per owner, pushed within a year), measured on 2026-10-30. Nothing was "could not be counted". Only repositories whose Dockerfile has a `FROM` on the official image with a full-version tag (`X.Y.Z[-variant]`): 100 of the 748 pushed within a year (13%, 95% Wilson 11% to 16%); php 50/409, node 50/339. The 0 of 100 below is a count inside this stratum; with 748 as the denominator, the number today's Ludion can keep patched is still 0. (Added by L60 on 2026-10-31 from `raw/checked.tsv`; `docs/progress/2026-10-31-l60-schedule-60day.md`.)
 
 - **Lag behind the series' latest security release: median 9 days, p90 1,807 days (n = 100).** php: median 0, p90 1,457 (n = 50); node: median 9, p90 2,075 (n = 50). 54 of 100 are behind; 39 pin a series past its end of life.
 - **Dependabot docker or Renovate configured: 20 of 100**, median 0, p90 9 days; neither: 80, median 9, p90 2,075 days. Digest pinned: 16 of 100.

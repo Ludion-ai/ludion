@@ -61,3 +61,8 @@ php images, phpImage's answer:
 - 45: refused: Dockerfile frontend directives and continuations are not supported in this preview.
 - 4: accepted
 - 1: refused: ADD, external COPY and RUN network/mount overrides are not supported by the offline validator.
+
+Stratum (added by hand by L60 on 2026-10-31, not written by `analyze.mjs`; counted from `raw/checked.tsv`, whose rows give the outcomes above):
+
+- The sample is only repositories whose Dockerfile has a `FROM` on the official image with a full-version tag (`X.Y.Z[-variant]`): 100 of the 748 pushed within a year (13%, 95% Wilson 11% to 16%); php 50/409 (selected 50 + rejected:no-qualifying-from 359), node 50/339 (selected 50 + rejected:no-qualifying-from 289). The two node rows rejected:chosen-in-php and rejected:owner-already-chosen were rejected before their push date was read and are not in the 748.
+- The 0 of 100 for decision 4 is a count inside this stratum. With 748 as the denominator, the number today's Ludion can keep patched is still 0.

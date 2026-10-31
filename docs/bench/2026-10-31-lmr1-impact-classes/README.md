@@ -15,7 +15,21 @@ The CWE definitions in `logs/cwe-definitions.log` are MITRE's CWE 5.0 (2026-10-2
 
 These are every record of the two exports, not a sample, so the shares below are plain percentages with no interval.
 
+## Results (LMR1e-2: every CWE with every class its mechanism can give)
+
+docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (committed in fdf2e10 before the code and the count). `scripts/count.sh` (`logs/count.log`, 2026-10-31T08:57:14Z, impact.ts d121e485…) classified every record with the impact.ts of f25d51b (`osv/impact-before-lmr1e2.ts`, sha256 ffefa53e…) and with the new one. `counts.json` and `stronger.tsv` are this run. LMR1d's are kept as `counts-before-lmr1e2.json`, `stronger-before-lmr1e2.tsv` and `logs/count-before-lmr1e2.log`. Among records that are not MAL-:
+
+| | Before (LMR1d's sets) | After |
+|---|---|---|
+| npm + Packagist (15,469) | 11,288 (73.0%) | **11,340 (73.3%)** |
+| npm (8,073) | 6,067 (75.2%) | **6,077 (75.3%)** |
+| Packagist (7,396) | 5,221 (70.6%) | **5,263 (71.2%)** |
+
+1,402 records changed. 1,250 went to a stronger class, most often steal → takeover (489). 152 went to unclassified, all records with no vector. The rest is in docs/progress/2026-10-31-lmr1e2-impact-classes-every-cwe-widened.md.
+
 ## Results (LMR1d: no stronger class's condition follows from a weaker one's, and wider sets)
+
+Where this section names `counts.json`, `stronger.tsv` or `logs/count.log`, read `counts-before-lmr1e2.json`, `stronger-before-lmr1e2.tsv` and `logs/count-before-lmr1e2.log`. count.mjs no longer has its three ways; the count.mjs of f25d51b (git history) has them.
 
 docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (committed in 0566c3d before the code and the count). `scripts/count.sh` (`logs/count.log`, 2026-10-31T07:20:43Z, impact.ts e11540dd…) classified every record three ways:
 - with the impact.ts before LMR1d (`git show 0129ba8:packages/cli/src/security/impact.ts`, written to the volume as `osv/impact-before-lmr1d.ts`, sha256 2326b824…);

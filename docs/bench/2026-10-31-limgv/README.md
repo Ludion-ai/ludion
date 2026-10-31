@@ -41,6 +41,16 @@ The three points of the brief and what passes each (judged from the raw log, log
 
 The cases `node` and `php` (the examples as they are) are run too, as LNODE's were; they are not among the three points.
 
+### Result (run 2026-10-31 13:54:28Z to 13:55:59Z, at 581b464; container exit 0)
+
+All three points pass. Raw output: logs/e2e.log; the stand-in's state after each case (its PRs with title and body, and every API call): logs/e2e-<case>-github.json, copied out of the volume after the run.
+
+1. **Passes.** `node-newest`, run 1: `patch exit 0`, `receipt 869413b8-a89a-4f56-a7c9-880824fad606: outcome applied`, `node 24.22.1 -> 24.22.2: applied ludion/node/24.22.2 c40a3d73fe479bd59487c60005da838b88e34a96 published=null`, `scan: update_available, candidate 24.22.2, wait_until 2026-10-31T00:00:00.000Z`, `security releases ` (empty), `baseline_passed true candidate_passed true`; `pack exit 0`; `node (ludion/node/24.22.2): opened #1`, `open exit 0`; the branch's `FROM node:24.22.2-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85`; the commit's second paragraph `Node.js 24.22.2, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.` Run 2: `open_pr_exists #1`; the stand-in has one PR.
+2. **Passes.** `#1 open ludion/node/24.22.2: ludion: Node.js 24.22.1 -> 24.22.2 in Dockerfile; "security" in title or body: false`; a count of `/security/gi` over the stand-in's title and body (logs/e2e-node-newest-github.json) gives 0. The commit message does contain "security", in the paragraph above (`no newer security release`), which is decision 8's text; the PR's title is the commit's subject, and the body does not quote that paragraph.
+3. **Passes.** `node-missing`, both runs: `patch exit 2`, stderr `ludion: Docker Hub has no node:22.23.4-alpine3.22, the newest release of Node.js 22 in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`; patch wrote no JSON, so `pack exit 2` (`Unexpected end of JSON input`; in the action, action/patch.sh:13-14 turns this into `ludion patch exited 2 without a receipt to pack`) and `open exit 2` (`The artifact was refused, and nothing was pushed or opened: it has no receipt.json.`); the stand-in has no PR, and its only calls are `GET /repos/o/r` twice, one per run (logs/e2e-node-missing-github.json); the bare origin has only `refs/heads/main` (`git for-each-ref`, read after the run).
+
+The other two cases: `node` 22.22.0 → 22.23.4 (security releases 22.23.4, 22.23.2, 22.23.0, 22.22.2, published 2026-03-24T00:00:00.000Z, no wait_until), `php` 8.4.26 → 8.4.27 (security release 8.4.27, published 2026-10-21T00:00:00.000Z), each run 1 `opened #1`, run 2 `open_pr_exists #1`; their PRs say "security", as a security fix's do.
+
 ### As planned before LIMGV-CHK (the earlier text)
 
 As LNODE's (docs/bench/2026-10-31-lnode, its run `e2e`), with scripts/e2e.sh, which uses LNODE's github.mjs (the stand-in for GitHub's API) and summary.mjs. It needs the network, Docker on the host's socket and the image ludion-la-runner:
@@ -62,4 +72,4 @@ What each case should show (expectations, not results):
 
 ## Not done here
 
-The hand check above. A run on GitHub. LDGLAT, LDG, moving a variant's OS release, the CLAUDE.md sentence (LC0a), LR3 and decision 4, and the "OS layer age" number.
+A run on GitHub (the hand check's GitHub is a stand-in; it ran on 2026-10-31, above). LDGLAT, LDG, moving a variant's OS release, the CLAUDE.md sentence (LC0a), LR3 and decision 4, and the "OS layer age" number.

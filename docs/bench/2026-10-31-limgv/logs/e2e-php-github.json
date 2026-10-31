@@ -1,0 +1,24 @@
+{
+  "pulls": [
+    {
+      "number": 1,
+      "state": "open",
+      "head": {
+        "ref": "ludion/php/8.4.27"
+      },
+      "base": {
+        "ref": "main"
+      },
+      "title": "ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile",
+      "body": "<!-- ludion-fix -->\n**プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.\n\nLudion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `e927bb9674db`. This PR holds that one fix (one commit).\n\n| | |\n|---|---|\n| Package | `php` (php) |\n| Change | `8.4.26` → `8.4.27` |\n| Advisories | php.net's security release (no advisory ID read) |\n| Fix published | `2026-10-21T00:00:00.000Z` (php.net's release day of the first newer security release, at 00:00 UTC) |\n| Found | `2026-10-31T13:54:59.521Z` (this run's lookup; an earlier run may have seen it first) |\n| Branch made | `2026-10-31T13:55:06.054Z` |\n| Receipt | `f616456c-a27f-4fdf-bcdc-c3bc3349cf73` (in this run's ludion-fixes artifact) |\n\nThe times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.\n\n**What was checked**\n\n- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.\n- This commit changes only `Dockerfile`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag.\n- PHP image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.\n\n**Not checked**\n\n- Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.\n- Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.\n- Production: nothing is deployed.\n"
+    }
+  ],
+  "calls": [
+    "GET /repos/o/r",
+    "GET /repos/o/r/pulls?state=all&head=o%3Aludion%2Fphp%2F8.4.27&per_page=100",
+    "GET /repos/o/r/git/ref/heads/ludion/php/8.4.27",
+    "POST /repos/o/r/pulls",
+    "GET /repos/o/r",
+    "GET /repos/o/r/pulls?state=all&head=o%3Aludion%2Fphp%2F8.4.27&per_page=100"
+  ]
+}

@@ -2,6 +2,8 @@
 
 **Decided 2026-10-31** by the owner's Claude chat (ludion-ops#1 comment 6539943852 (a), 15:11 JST, and comment 6540209072 items 1 and 4, 15:42 JST, which replace part of (a)), for PR #236 (lane LMR1d). It changes docs/decisions/2026-10-31-impact-classes-cvss-vector.md (the conditions, point 5 and the sets) and docs/decisions/2026-10-31-impact-classes-trap-published-record.md (which CWEs make a trap). Those records stay as written; this one says what replaces them. Written and committed before the code was changed and before anything was counted with it.
 
+**Changed in part** by docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (comment 6540818608, point 2, LMR1e-2): point 7's sets. Every CWE in the table now gets every class its mechanism can give. Point 7 is kept as first written.
+
 ## Why
 
 The conditions of the vector record were nested: every vector consistent with steal or alter was also consistent with impersonate and takeover. So a vector could never move a record down from takeover or impersonate. LMR1c's count bears this out: no record went from impersonate to steal.

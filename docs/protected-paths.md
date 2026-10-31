@@ -18,11 +18,11 @@ Dependency files (`package.json`, lockfiles) outside the paths above are not pro
 The required check `protected-paths` (`.github/workflows/protected-paths.yml`) fails such a PR until **both** are true for the PR's current head:
 
 - the PR has the `review-approved` label, and
-- the latest PR comment with a line `reviewed-sha: <full 40-character head SHA>` approves. A comment approves when its first line has the word `APPROVE` and not `REQUEST`. So a review that does not approve the current head, posted after one that did, fails the check again.
+- the latest PR comment with a line `reviewed-sha: <full 40-character head SHA>` approves. A comment approves when its first line has the word `APPROVE` and not `REQUEST`, and it has exactly one `reviewed-sha:` line (below). So a review that does not approve the current head, posted after one that did, fails the check again.
 
 ## How a protected PR gets approved
 
-1. A reviewer other than the author, with fresh context, reads the full diff at the current head and posts the review as a PR comment. Its first line states the verdict (`APPROVE` or `REQUEST CHANGES`), and its last line is `reviewed-sha: <head SHA it reviewed>`.
+1. A reviewer other than the author, with fresh context, reads the full diff at the current head and posts the review as a PR comment. Its first line states the verdict (`APPROVE` or `REQUEST CHANGES`), and it has the line `reviewed-sha: <head SHA it reviewed>`, which need not be its last line.
 2. The owner (or 社長 on the owner's behalf) approves the merge.
 3. After both, the `review-approved` label is added, with a comment naming the reviewer, the verdict comment, and who approved.
 
@@ -30,7 +30,7 @@ Any push changes the head SHA, so an earlier `reviewed-sha:` stops counting by i
 
 ## Every review is recorded on its PR
 
-Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and ends with the line `reviewed-sha: <the head SHA it reviewed>`. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review. For a PR that touches no protected path, a later review may cover only what changed since the last one, when it says so; a protected PR's review always reads the full diff at the current head, as above.
+Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and has the line `reviewed-sha: <the head SHA it reviewed>`. That line is, in full, `reviewed-sha:`, one space and the 40-character SHA in lowercase, with nothing before or after it; a line in any other form is not counted. A comment with CRLF line ends is read as if they were LF. A comment with exactly one such line is a review of the head it names. A comment with two or more, as when it quotes another review's line, is not counted as a review: it approves nothing, and it undoes an earlier approval of each head it names. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review. For a PR that touches no protected path, a later review may cover only what changed since the last one, when it says so; a protected PR's review always reads the full diff at the current head, as above.
 
 ## What this does and does not guarantee
 

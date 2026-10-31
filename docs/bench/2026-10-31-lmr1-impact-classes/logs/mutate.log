@@ -1,11 +1,25 @@
-# started 2026-10-31T04:05:35Z, node v24.22.1
+# started 2026-10-31T04:30:53Z, node v24.22.1
 without mutations: passed
 caught: MAL- is not trap
 caught: MAL- anywhere in the id is trap
 caught: the weakest class wins
 caught: the first CWE wins
 caught: CWE-78 leaves the table
-caught: CWE-506 becomes trap
+caught: a MAL- alias is not trap
+caught: an alias containing MAL- anywhere is trap
+caught: CWE-506 is not trap
+caught: CWE-912 is trap too
+caught: a trap stop is accepted without its record classifying as trap
+caught: every stop is counted as a trap
+caught: traps are counted as unverified
+caught: a stopped row with no reason is accepted
+caught: a stop reason on another action is accepted
+caught: an unknown stop reason is accepted
+caught: stop reasons counted in the order given
+caught: the reasons left out of the summary
+caught: the trap cell without the record's id
+caught: the record's id not escaped
+caught: the Japanese unverified label shortened
 caught: cwe_ids not read
 caught: any severity string kept
 caught: | not escaped
@@ -16,5 +30,5 @@ caught: action before the fix accepted
 caught: Feb 30 accepted
 caught: summary counts every action as fixed
 after restoring: passed
-15 of 15 mutations caught
-# finished 2026-10-31T04:05:48Z
+29 of 29 mutations caught
+# finished 2026-10-31T04:31:16Z

@@ -9,6 +9,6 @@ echo "# started $(date -u +%Y-%m-%dT%H:%M:%SZ), node $(node -v), $(git --version
 git init -q && echo "osv/" >> .git/info/exclude && git add -A && git -c user.name=lmr1 -c user.email=lmr1@example.invalid commit -qm stand-in && echo "stand-in repository: $(git ls-files | wc -l) files"
 echo "== npm run typecheck"; npm run typecheck >/tmp/typecheck.log 2>&1; echo "typecheck exit $?"; tail -3 /tmp/typecheck.log
 echo "== npm run build"; npm run build >/tmp/build.log 2>&1; echo "build exit $?"; tail -3 /tmp/build.log
-echo "== npm test"; NO_COLOR=1 npm test >/tmp/test.log 2>&1; echo "npm test exit $?"; grep -E "Test Files|Tests |FAIL" /tmp/test.log | head -20
+echo "== npm test -- --maxWorkers=2"; NO_COLOR=1 npm test -- --maxWorkers=2 >/tmp/test.log 2>&1; echo "npm test exit $?"; grep -E "Test Files|Tests |FAIL" /tmp/test.log | head -20
 rm -rf /w/.git
 echo "# finished $(date -u +%Y-%m-%dT%H:%M:%SZ)"

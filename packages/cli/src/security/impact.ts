@@ -1,5 +1,6 @@
 // Impact Classes: Ludion's own classification of a vulnerability record by what the attacker gains, not by how the
-// hole works (CWE), and the protection record's Markdown table (docs/decisions/2026-10-31-impact-classes.md).
+// hole works (CWE), and the protection record's Markdown table (docs/decisions/2026-10-31-impact-classes.md and
+// docs/decisions/2026-10-31-impact-classes-trap-published-record.md).
 // The CWE table is fixed in this file and reviewed with it; nothing is inferred. Not wired into a PR body or a job
 // summary yet.
 
@@ -12,8 +13,8 @@ export type Classification = { class: ImpactClass; severity: Severity; cwes: str
 export const IMPACT_ORDER: readonly ImpactClass[] = ["trap", "takeover", "impersonate", "steal", "alter", "disrupt", "unclassified"];
 
 /**
- * Each CWE whose definition states what the attacker gains. A CWE not listed is unclassified. trap is never a CWE: it
- * is an OSV MAL- record.
+ * Each CWE whose definition states what the attacker gains. A CWE not listed is unclassified. trap is a published record
+ * that says the version is malicious: a MAL- id or alias, or TRAP_CWE.
  */
 export const CWE_CLASSES: Readonly<Record<"takeover" | "impersonate" | "steal" | "alter" | "disrupt", readonly number[]>> = {
   // Runs their own code or commands where the application runs: OS command (78) and command (77) injection, code (94),
@@ -40,13 +41,16 @@ export const CWE_CLASSES: Readonly<Record<"takeover" | "impersonate" | "steal" |
   disrupt: [400, 401, 405, 407, 409, 674, 770, 776, 789, 834, 835, 1050, 1333],
 };
 
+/** Embedded Malicious Code: a record listing it is a GitHub-reviewed malware advisory, so trap. */
+export const TRAP_CWE = 506;
+
 /**
  * CWEs decided unclassified, each with its reason in the decision record: too broad to say what the attacker gains
  * (20, 74, 116, 184, 668, 693, 707, 754, 913, 1188, 1395), or doubtful between classes.
  */
 export const DECIDED_UNCLASSIFIED: readonly number[] = [
   20, 59, 73, 74, 88, 93, 113, 116, 117, 119, 120, 122, 184, 190, 248, 276, 295, 326, 327, 328, 330, 338, 345, 346, 347,
-  362, 367, 416, 426, 476, 427, 436, 441, 444, 470, 506, 668, 693, 707, 732, 749, 754, 787, 843, 912, 913, 916, 942, 1021,
+  362, 367, 416, 426, 476, 427, 436, 441, 444, 470, 668, 693, 707, 732, 749, 754, 787, 843, 912, 913, 916, 942, 1021,
   1022, 1188, 1236, 1385, 1395,
 ];
 
@@ -72,6 +76,10 @@ export function classify(record: unknown): Classification {
   const ignoredNote = ignored.length ? ` Ignored cwe_ids entries not of the form CWE-<number>: ${ignored.slice(0, 5).join(", ")}${ignored.length > 5 ? ", …" : ""}.` : "";
   if (!id) return { class: "unclassified", severity, cwes, reason: `The record has no id.${ignoredNote}` };
   if (id.startsWith("MAL-")) return { class: "trap", severity, cwes, reason: `${id} is an OSV MAL- record: the version itself is malicious.${ignoredNote}` };
+  const aliases = isObject(record) && Array.isArray(record.aliases) ? record.aliases : [];
+  const malAlias = aliases.find((alias): alias is string => typeof alias === "string" && alias.startsWith("MAL-"));
+  if (malAlias) return { class: "trap", severity, cwes, reason: `${id} has the alias ${malAlias}, an OSV MAL- record: the version itself is malicious.${ignoredNote}` };
+  if (numbers.has(TRAP_CWE)) return { class: "trap", severity, cwes, reason: `${id} lists CWE-${TRAP_CWE} (Embedded Malicious Code): the version itself is malicious.${ignoredNote}` };
   if (!cwes.length) return { class: "unclassified", severity, cwes, reason: `${id} lists no CWE in database_specific.cwe_ids.${ignoredNote}` };
   let best: { cls: ImpactClass; cwe: string } | null = null;
   for (const cwe of cwes) {
@@ -84,6 +92,13 @@ export function classify(record: unknown): Classification {
 
 /** What Ludion did: opened a PR, stopped the update, is waiting before it, or the fix was merged. */
 export type Action = "opened" | "stopped" | "waited" | "fixed";
+/** Why Ludion stopped an update it could not verify; the decision record names the judge.ts findings each stands for. */
+export type StopReason = "provenance-lost" | "provenance-changed" | "install-scripts" | "deprecated" | "withdrawn" | "replaced" | "new-advisory" | "downgrade" | "after-fix" | "lockfile" | "tests" | "undecidable";
+/**
+ * A trap carries the published record (an OSV record) that says the version is malicious; renderRecord checks it with
+ * classify(). Any other stop is one Ludion could not verify, never a trap.
+ */
+export type Stop = { reason: "trap"; record: unknown } | { reason: StopReason };
 export type RecordRow = {
   package: string;
   from: string;
@@ -91,6 +106,8 @@ export type RecordRow = {
   class: ImpactClass;
   severity: Severity;
   action: Action;
+  /** Why it was stopped: required when action is "stopped", null otherwise. */
+  stop: Stop | null;
   /** The fix's official publish time (ISO 8601, UTC), or null when it is not known. */
   fixPublishedAt: string | null;
   /** When Ludion did `action` (ISO 8601, UTC). Its date is the row's date. */
@@ -99,13 +116,25 @@ export type RecordRow = {
 export type Lang = "en" | "ja";
 
 const ACTIONS: readonly Action[] = ["fixed", "stopped", "opened", "waited"];
+const STOP_REASONS: readonly StopReason[] = ["provenance-lost", "provenance-changed", "install-scripts", "deprecated", "withdrawn", "replaced", "new-advisory", "downgrade", "after-fix", "lockfile", "tests", "undecidable"];
 const LABELS = {
   en: {
     head: ["Date (UTC)", "Package", "Change", "Impact", "Severity", "Ludion", "Fix published to action"],
     class: { trap: "Trap", takeover: "Takeover", impersonate: "Impersonation", steal: "Data theft", alter: "Tampering", disrupt: "Disruption", unclassified: "Unclassified" },
     severity: { critical: "Critical", high: "High", moderate: "Moderate", low: "Low", unknown: "Unknown" },
-    action: { fixed: "fixed (merged)", stopped: "stopped", opened: "opened a PR", waited: "waiting" },
-    count: { fixed: "fixed", stopped: "stopped", opened: "PR opened", waited: "waiting" },
+    action: { fixed: "fixed (merged)", opened: "opened a PR", waited: "waiting" },
+    count: { fixed: "fixed", opened: "PR opened", waited: "waiting" },
+    trap: "trap stopped",
+    unverified: "stopped as unverified",
+    trapCell: (id: string) => `trap stopped (${id})`,
+    unverifiedCell: (reason: string) => `stopped as unverified: ${reason}`,
+    reasons: (list: string) => ` (${list})`,
+    stop: {
+      "provenance-lost": "provenance lost", "provenance-changed": "built from another repository or workflow", "install-scripts": "install scripts added",
+      deprecated: "deprecated", withdrawn: "no longer listed by the registry", replaced: "another package under the same name",
+      "new-advisory": "the new version has known advisories", downgrade: "the version goes down", "after-fix": "published at or after the fix",
+      lockfile: "the lockfile or the changed files do not check out", tests: "tests fail on the new version", undecidable: "could not be judged",
+    },
     lead: "Ludion: ",
     join: ", ",
     none: "No actions recorded. That does not mean the dependencies are safe.",
@@ -116,8 +145,19 @@ const LABELS = {
     head: ["日付（UTC）", "パッケージ", "変更", "分類", "深刻さ", "Ludion がしたこと", "修正の公開からの時間"],
     class: { trap: "罠", takeover: "乗っ取り", impersonate: "なりすまし", steal: "抜き取り", alter: "改ざん", disrupt: "停止", unclassified: "未分類" },
     severity: { critical: "重大", high: "高", moderate: "中", low: "低", unknown: "不明" },
-    action: { fixed: "直した（マージ済み）", stopped: "止めた", opened: "PR を開いた", waited: "待っている" },
-    count: { fixed: "直した", stopped: "止めた", opened: "PR を開いた", waited: "待っている" },
+    action: { fixed: "直した（マージ済み）", opened: "PR を開いた", waited: "待っている" },
+    count: { fixed: "直した", opened: "PR を開いた", waited: "待っている" },
+    trap: "罠を止めた",
+    unverified: "確かめられなかったので止めた",
+    trapCell: (id: string) => `罠を止めた（${id}）`,
+    unverifiedCell: (reason: string) => `確かめられなかったので止めた（${reason}）`,
+    reasons: (list: string) => `（${list}）`,
+    stop: {
+      "provenance-lost": "来歴が切れた", "provenance-changed": "作り元が変わった", "install-scripts": "install スクリプトが増えた",
+      deprecated: "非推奨になった", withdrawn: "取り下げられた", replaced: "同じ名前の別のパッケージ",
+      "new-advisory": "新しい版に既知の勧告がある", downgrade: "版が下がる", "after-fix": "修正の後に公開された",
+      lockfile: "ロックファイルか変更の範囲が合わない", tests: "新しい版でテストが通らない", undecidable: "判断できなかった",
+    },
     lead: "Ludion：",
     join: "、",
     none: "記録はありません。依存が安全だという意味ではありません。",
@@ -144,17 +184,40 @@ function code(text: string): string {
 
 /**
  * The protection record: a summary line, then one table row per input row, in the input's order. Every number is a
- * count of the input rows or a time between two of its timestamps. Throws on a row it cannot render truthfully.
+ * count of the input rows or a time between two of its timestamps. A stop is written as a trap only with a published
+ * record that classifies as trap; any other stop is "stopped as unverified" with its reason. Throws on a row it cannot
+ * render truthfully.
  */
 export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
   const l = LABELS[lang];
   if (!l) throw new Error(`Unknown language: ${JSON.stringify(lang)}`);
   if (!rows.length) return `${l.none}\n`;
-  const counts = new Map<Action, number>();
+  const counts = new Map<Exclude<Action, "stopped">, number>(), unverified = new Map<StopReason, number>();
+  let traps = 0;
   const lines = rows.map((row, i) => {
     if (!IMPACT_ORDER.includes(row.class)) throw new Error(`Row ${i}: unknown class ${JSON.stringify(row.class)}`);
     if (!Object.hasOwn(l.severity, row.severity)) throw new Error(`Row ${i}: unknown severity ${JSON.stringify(row.severity)}`);
     if (!ACTIONS.includes(row.action)) throw new Error(`Row ${i}: unknown action ${JSON.stringify(row.action)}`);
+    const stop = row.stop;
+    let did: string;
+    if (row.action !== "stopped") {
+      if (stop != null) throw new Error(`Row ${i}: only a stopped row has a stop reason`);
+      did = l.action[row.action];
+      counts.set(row.action, (counts.get(row.action) ?? 0) + 1);
+    } else if (typeof stop !== "object" || stop === null) {
+      throw new Error(`Row ${i}: a stopped row needs its reason`);
+    } else if (stop.reason === "trap") {
+      // A trap only when a published record says the version is malicious, that is when classify() gives it trap.
+      const c = classify(stop.record);
+      if (c.class !== "trap") throw new Error(`Row ${i}: the stop is given as a trap, but its record does not say the version is malicious (${c.reason})`);
+      did = l.trapCell(code((stop.record as { id: string }).id));
+      traps++;
+    } else if (STOP_REASONS.includes(stop.reason)) {
+      did = l.unverifiedCell(l.stop[stop.reason]);
+      unverified.set(stop.reason, (unverified.get(stop.reason) ?? 0) + 1);
+    } else {
+      throw new Error(`Row ${i}: unknown stop reason ${JSON.stringify((stop as { reason: unknown }).reason)}`);
+    }
     const acted = instant(row.actedAt, `Row ${i} actedAt`);
     let elapsed: string = l.unknown;
     if (row.fixPublishedAt !== null) {
@@ -162,10 +225,18 @@ export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
       if (minutes < 0) throw new Error(`Row ${i}: actedAt is before fixPublishedAt`);
       elapsed = l.time(minutes);
     }
-    counts.set(row.action, (counts.get(row.action) ?? 0) + 1);
-    const cells = [new Date(acted).toISOString().slice(0, 10), code(row.package), `${code(row.from)} → ${code(row.to)}`, l.class[row.class], l.severity[row.severity], l.action[row.action], elapsed];
+    const cells = [new Date(acted).toISOString().slice(0, 10), code(row.package), `${code(row.from)} → ${code(row.to)}`, l.class[row.class], l.severity[row.severity], did, elapsed];
     return `| ${cells.join(" | ")} |`;
   });
-  const summary = l.lead + ACTIONS.filter(a => counts.has(a)).map(a => `${l.count[a]} ${counts.get(a)}`).join(l.join);
-  return [summary, "", `| ${l.head.join(" | ")} |`, `|${l.head.map(() => "---").join("|")}|`, ...lines, ""].join("\n");
+  // Traps are counted apart, and only those a published record backs; every other stop is counted by its reason.
+  const parts = ACTIONS.flatMap(a => {
+    if (a !== "stopped") return counts.has(a) ? [`${l.count[a]} ${counts.get(a)}`] : [];
+    const reasons = STOP_REASONS.filter(r => unverified.has(r));
+    const total = reasons.reduce((sum, r) => sum + unverified.get(r)!, 0);
+    return [
+      ...(traps ? [`${l.trap} ${traps}`] : []),
+      ...(total ? [`${l.unverified} ${total}${l.reasons(reasons.map(r => `${l.stop[r]} ${unverified.get(r)}`).join(l.join))}`] : []),
+    ];
+  });
+  return [l.lead + parts.join(l.join), "", `| ${l.head.join(" | ")} |`, `|${l.head.map(() => "---").join("|")}|`, ...lines, ""].join("\n");
 }

@@ -1,4 +1,4 @@
-// node cwe.mjs <dir> <impact.ts>: download MITRE's CWE list and print, for every CWE in impact.ts's table or its
+// node cwe.mjs <dir> <impact.ts>: download MITRE's CWE list and print, for TRAP_CWE and every CWE in impact.ts's table or its
 // decided-unclassified list, its class there, abstraction, name and description, one per line (tab-separated).
 // So each entry of the table can be checked against the definition it was decided by.
 import { createHash } from "node:crypto";
@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { entries } from "./zip.mjs";
 
 const [dir, impactPath] = process.argv.slice(2);
-const { CWE_CLASSES, DECIDED_UNCLASSIFIED } = await import(impactPath);
+const { CWE_CLASSES, DECIDED_UNCLASSIFIED, TRAP_CWE } = await import(impactPath);
 const url = "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip";
 const fetched_at = new Date().toISOString();
 const response = await fetch(url, { redirect: "error" });
@@ -26,7 +26,7 @@ for (const [name, xml] of entries(join(dir, "cwec.zip"))) {
     defs.set(Number(m[2]), { kind: m[1], abstraction: m[4] ?? "-", name: unescape(m[3]), description: description ? unescape(description[1]) : "" });
   }
 }
-const rows = [...Object.entries(CWE_CLASSES).flatMap(([c, ids]) => ids.map(id => [id, c])), ...DECIDED_UNCLASSIFIED.map(id => [id, "unclassified (decided)"])];
+const rows = [[TRAP_CWE, "trap"], ...Object.entries(CWE_CLASSES).flatMap(([c, ids]) => ids.map(id => [id, c])), ...DECIDED_UNCLASSIFIED.map(id => [id, "unclassified (decided)"])];
 console.log(["cwe", "class", "abstraction", "name", "description"].join("\t"));
 for (const [id, c] of rows) {
   const d = defs.get(id);

@@ -13,7 +13,7 @@
 1. **trap** (`classify`) is a record that a published record says is malicious, in this order:
    - its OSV `id` starts with `MAL-` (OpenSSF Malicious Packages);
    - one of its `aliases` starts with `MAL-`: the same case written in another database;
-   - its `database_specific.cwe_ids` lists CWE-506 (Embedded Malicious Code): a GitHub-reviewed malware advisory. In the 2026-10-31 exports measured for #236, 403 records that are not MAL- listed CWE-506.
+   - its `database_specific.cwe_ids` lists CWE-506 (Embedded Malicious Code): a GitHub-reviewed malware advisory. In the 2026-10-31 exports measured for #236, 403 records that are not MAL- were unclassified for CWE-506 (its most frequent CWE among unclassified records). Measured again after this record was committed: 406 records that are not MAL- list CWE-506 (the 403, and 3 a takeover or steal CWE had classified), 12 of them through a MAL- alias as well (docs/bench/2026-10-31-lmr1-impact-classes).
 
    Each prefix is matched exactly (case and leading spaces count, as for the id). A record with no id stays unclassified. CWE-506 is the only CWE that makes a trap; CWE-912 (hidden functionality) stays unclassified, as decided in the first record, because its definition does not say the code is malicious.
 2. **A stop in the protection record** (`renderRecord`) carries its reason. A row whose action is `stopped` must have one, and a row with any other action must not.

@@ -1,0 +1,24 @@
+{
+  "pulls": [
+    {
+      "number": 1,
+      "state": "open",
+      "head": {
+        "ref": "ludion/node/24.22.2"
+      },
+      "base": {
+        "ref": "main"
+      },
+      "title": "ludion: Node.js 24.22.1 -> 24.22.2 in Dockerfile",
+      "body": "<!-- ludion-fix -->\n**プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.\n\nLudion's validation job moved the image to `24.22.2`, the newest release of its line: Docker rebuilds only the newest tag of a line, with its OS packages. No advisory names this move. By its receipt, it waited until `2026-10-31T00:00:00.000Z` (72 hours after the end of the release's day) and validated the move on its own against the base commit `888fbe4fabd9`. This PR holds that one change (one commit).\n\n| | |\n|---|---|\n| Package | `node` (node) |\n| Change | `24.22.1` → `24.22.2` |\n| Advisories | none (a move to the line's newest release) |\n| Fix published | none (no advisory; this move is not counted in exposure time) |\n| Found | `2026-10-31T13:55:16.306Z` (this run's lookup; an earlier run may have seen it first) |\n| Branch made | `2026-10-31T13:55:47.543Z` |\n| Receipt | `869413b8-a89a-4f56-a7c9-880824fad606` (in this run's ludion-fixes artifact) |\n\nThe times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.\n\n**What was checked**\n\n- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.\n- This commit changes only `Dockerfile`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag.\n- Node.js image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check. This move's 72-hour wait is the validation job's, by its receipt.\n\n**Not checked**\n\n- Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.\n- Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.\n- Production: nothing is deployed.\n"
+    }
+  ],
+  "calls": [
+    "GET /repos/o/r",
+    "GET /repos/o/r/pulls?state=all&head=o%3Aludion%2Fnode%2F24.22.2&per_page=100",
+    "GET /repos/o/r/git/ref/heads/ludion/node/24.22.2",
+    "POST /repos/o/r/pulls",
+    "GET /repos/o/r",
+    "GET /repos/o/r/pulls?state=all&head=o%3Aludion%2Fnode%2F24.22.2&per_page=100"
+  ]
+}

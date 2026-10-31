@@ -1,0 +1,90 @@
+# started 2026-10-31T09:39:48Z
+M1 caught:       Tests  25 failed | 1338 passed | 25 skipped (1388)
+         × applies when the config names the Dockerfile as ./Dockerfile 107ms
+         × commits a Dockerfile checked out with CRLF ends with LF ends, as the last commit has it 98ms
+         × compares versions by number in the scan, across a digit boundary (R237's R10, 0) 1ms
+M2 caught:       Tests  18 failed | 1345 passed | 25 skipped (1388)
+         × compares versions by number in the scan, across a digit boundary (R237's R10, 1) 1ms
+         × from node:22.23.4 at 2026-10-30T23:59:59.999Z, the move to 22.23.5 is wait 2ms
+         × from node:22.23.4 at 2026-10-31T00:00:00.000Z, the move to 22.23.5 is update_available 1ms
+M3 caught:       Tests  5 failed | 1358 passed | 25 skipped (1388)
+         × from node:22.23.4 at 2026-10-30T23:59:59.999Z, the move to 22.23.5 is wait 5ms
+         × from php:8.4.29 at 2026-10-30T12:00:00.000Z, the move to 8.4.30 is wait 6ms
+         × from php:8.4.29 at 2026-11-02T12:00:00.000Z, the move to 8.4.30 is wait 1ms
+M4 caught:       Tests  13 failed | 1350 passed | 25 skipped (1388)
+         × from node:22.23.4 at 2026-10-30T23:59:59.999Z, the move to 22.23.5 is wait 1ms
+         × from node:22.23.4 at 2026-10-31T00:00:00.000Z, the move to 22.23.5 is update_available 1ms
+         × from php:8.4.28, no longer the branch's newest release, moves to 8.4.30 with no newer security release, outside exposure time 6ms
+M5 caught:       Tests  7 failed | 1356 passed | 25 skipped (1388)
+         × does not wait when a security release lies between, on 8.4.30's own day 2ms
+         × from php:8.4.24 takes the branch's newest release, 8.4.30, which is not tagged security 1ms
+         × from php:8.4.25 takes the branch's newest release, 8.4.30, which is not tagged security 1ms
+M6 caught:       Tests  10 failed | 1353 passed | 25 skipped (1388)
+         × from node:22.23.4 at 2026-10-31T00:00:00.000Z, the move to 22.23.5 is update_available 1ms
+         × from php:8.4.29 at 2026-11-03T00:00:00.000Z, the move to 8.4.30 is update_available 1ms
+         × keeps the branch and flavor, choosing the branch's newest release, 8.4.28, though only 8.4.27 is tagged security 16ms
+M7 caught:       Tests  6 failed | 1357 passed | 25 skipped (1388)
+         × Docker Hub is asked for library/node's tag, with a pull token for library/node only 6ms
+         × stops before Docker when Docker Hub has no tag for the move, and leaves no branch or lock 97ms
+         × stops when Docker Hub has no tag for the move from php:8.4.25 (with a security release between) 6ms
+M8 caught:       Tests  6 failed | 1357 passed | 25 skipped (1388)
+         × stops when nodejs.org's index has no release of the line as new as node:22.100.0 1ms
+         × stops when nodejs.org's index has no release of the line as new as node:22.23.6 5ms
+         × stops when nodejs.org's index has no release of the line as new as node:24.22.2 1ms
+M9 caught:       Tests  1 failed | 1362 passed | 25 skipped (1388)
+         × takes the same newest release when php.net lists its releases oldest first (R237's R5) 7ms
+M10 caught:       Tests  1 failed | 1362 passed | 25 skipped (1388)
+         × takes the same newest release when the index lists its releases oldest first 3ms
+M11 caught:       Tests  1 failed | 1362 passed | 25 skipped (1388)
+         × compares versions by number in the scan, across a digit boundary (R237's R10, 0) 5ms
+M12 caught:       Tests  2 failed | 1361 passed | 25 skipped (1388)
+         × compares versions by number in the scan, across a digit boundary (R237's R10, 0) 6ms
+         × compares versions by number in the scan, across a digit boundary (R237's R10, 1) 1ms
+M13 caught:       Tests  1 failed | 1362 passed | 25 skipped (1388)
+         × stops when the newest release's day cannot be read, so its wait cannot be counted 6ms
+M14 caught:       Tests  6 failed | 1357 passed | 25 skipped (1388)
+         × from php:8.4.28, no longer the branch's newest release, moves to 8.4.30 with no newer security release, outside exposure time 6ms
+         × from php:8.4.29, no longer the branch's newest release, moves to 8.4.30 with no newer security release, outside exposure time 1ms
+         × moves node:22.23.4, a security release no longer the line's newest, to 22.23.5 with no newer security release, outside exposure time 5ms
+M15 caught:       Tests  7 failed | 1356 passed | 25 skipped (1388)
+         × from php:8.4.28, no longer the branch's newest release, moves to 8.4.30 with no newer security release, outside exposure time 6ms
+         × from php:8.4.29, no longer the branch's newest release, moves to 8.4.30 with no newer security release, outside exposure time 1ms
+         × moves node:22.23.4 to 22.23.5, the line's newest release, after its wait, with a commit that says only the fact 94ms
+M16 caught:       Tests  1 failed | 1362 passed | 25 skipped (1388)
+         × runs no Docker work and writes no receipt while that move waits 109ms
+M17 caught:       Tests  6 failed | 1357 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 211ms
+         × Node.js: a move to the line's newest release with no newer security release is pushed and opened 195ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 149ms
+M18 caught:       Tests  4 failed | 1359 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 128ms
+         × Node.js: a move to the line's newest release with no newer security release is pushed and opened 234ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 134ms
+M19 caught:       Tests  2 failed | 1361 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 327ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 256ms
+M20 caught:       Tests  2 failed | 1361 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 252ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 258ms
+M21 caught:       Tests  4 failed | 1359 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 167ms
+         × Node.js: a move to the line's newest release with no newer security release is pushed and opened 241ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 160ms
+M22 caught:       Tests  4 failed | 1359 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 168ms
+         × Node.js: a move to the line's newest release with no newer security release is pushed and opened 239ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 162ms
+M23 caught:       Tests  4 failed | 1359 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 160ms
+         × Node.js: a move to the line's newest release with no newer security release is pushed and opened 242ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 155ms
+M24 caught:       Tests  4 failed | 1359 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 164ms
+         × Node.js: a move to the line's newest release with no newer security release is pushed and opened 238ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 159ms
+M25 caught:       Tests  2 failed | 1361 passed | 25 skipped (1388)
+         × Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 159ms
+         × PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts 165ms
+# sources restored
+caught 25, survived 0, not applied 0, void 0
+# finished 2026-10-31T09:49:05Z

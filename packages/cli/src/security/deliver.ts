@@ -12,7 +12,7 @@ import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
 import { DECLARED, lockEntries, lockKey, newUnmetRequirements, readLock, requiredNames, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
 import { comparableVersion } from "./osv.ts";
-import { compare, phpImage } from "./php.ts";
+import { compare, dockerHubTag, imageReason, phpImage } from "./php.ts";
 import { nodeImage } from "./node.ts";
 import { CONFIG, rootPath } from "./project.ts";
 
@@ -69,6 +69,11 @@ export type CheckedFix = {
   /** The commit message `patch --apply` writes for this fix, rebuilt from checked fields; the commit must carry exactly it. */
   branch: string; commit: string; subject: string; message: string; tree: string; files: { path: string; after_hash: string }[];
   fix_published_at: string | null; found_at: string; applied_at: string; verdict: (typeof VERDICTS)[number] | null;
+  /**
+   * An image move with no newer security release (docs/decisions/2026-10-31-limgv-image-newest-built-release.md): the end
+   * of its 72-hour wait, from the receipt's scan. Absent for every other fix.
+   */
+  waited_until?: string;
 };
 export type CheckedArtifact = { id: string | null; ecosystem: Ecosystem | null; base: string; fixes: CheckedFix[]; notApplied: Record<string, number> };
 export type Delivery = { package: string; branch: string; outcome: "opened" | "open_pr_exists" | "closed_pr_exists" | "branch_differs" | "failed"; pr?: number; url?: string; reason?: string };
@@ -161,16 +166,24 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
     if (text(r.base_commit, SHA, "base_commit") !== base) refuse("the receipt's base_commit is not the commit this run checked out.");
     const scan = object(r.scan, "The receipt's scan"), current = object(scan.current, "scan.current"), candidate = object(scan.candidate, "scan.candidate");
     const from = text(current.version, VERSION, `The current ${label} version`), to = text(candidate.version, VERSION, `The candidate ${label} version`);
-    const releases = list(scan.security_releases, 1, 100, `The ${label} security releases`).map(release => text(object(release, `A ${label} release`).version, VERSION, `A ${label} release's version`));
+    // None for a move to the line's newest release with no newer security release (php.ts, imageMove).
+    const releases = list(scan.security_releases, 0, 100, `The ${label} security releases`).map(release => text(object(release, `A ${label} release`).version, VERSION, `A ${label} release's version`));
     const subject = `ludion: ${label} ${from} -> ${to} in ${policy.dockerfile}`;
     const fix: CheckedFix = {
       package: runtime, changes: [{ name: runtime, from, to, advisories: [] }],
       branch: text(r.branch, /^ludion\/[A-Za-z0-9._/-]+$/, "The branch"), commit: text(r.commit, SHA, "The commit"), subject, tree: "",
       // patch.ts's message.
-      message: `${subject}\n\nOfficial ${label} security releases: ${releases.join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
+      message: `${subject}\n\n${imageReason(label, to, releases)}\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
       files: [{ path: policy.allowed[0]!, after_hash: text(r.dockerfile_after, HEX64, "dockerfile_after") }],
       fix_published_at: timeOrNull(r.fix_published_at, "fix_published_at"), found_at: time(r.found_at, "found_at"), applied_at: time(r.applied_at, "applied_at"), verdict: null,
     };
+    if (!releases.length) {
+      // Such a move waits 72 hours and has no advisory, so no exposure-time start (the decision's items 6 and 7).
+      const waited = time(scan.wait_until, "scan.wait_until");
+      if (Date.parse(fix.applied_at) < Date.parse(waited)) refuse(`the receipt applies a ${label} move with no newer security release at ${fix.applied_at}, before its wait ends at ${waited}.`);
+      if (fix.fix_published_at !== null) refuse(`the receipt gives a ${label} move with no newer security release a fix_published_at; it has no advisory.`);
+      fix.waited_until = waited;
+    }
     if (fix.branch !== fixBranchName(prefix, runtime, null, [to])) refuse(`the branch ${fix.branch} is not the one Ludion names for ${label} ${to}.`);
     return { id, ecosystem: runtime, fixes: [fix], notApplied };
   }
@@ -635,18 +648,25 @@ const PUBLISHED: Record<Ecosystem, string> = {
 export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): string {
   const ecosystem = artifact.ecosystem!, code = (v: string) => `\`${v}\``;
   const advisories = [...new Set(fix.changes.flatMap(c => c.advisories))];
+  // An image move with no newer security release states only facts, and never calls itself a security release or fix
+  // (docs/decisions/2026-10-31-limgv-image-newest-built-release.md, item 8).
+  const newest = fix.waited_until !== undefined && isImage(ecosystem);
   return [
     "<!-- ludion-fix -->",
     "**プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.",
     "",
-    `Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one fix (one commit).`,
+    newest
+      ? `Ludion's validation job moved the image to ${code(fix.changes[0]!.to)}, the newest release of its line: Docker rebuilds only the newest tag of a line, with its OS packages. No advisory names this move. By its receipt, it waited until ${code(fix.waited_until!)} (72 hours after the end of the release's day) and validated the move on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one change (one commit).`
+      : `Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit ${code(artifact.base.slice(0, 12))}. This PR holds that one fix (one commit).`,
     "",
     "| | |",
     "|---|---|",
     `| Package | ${code(fix.package)} (${ecosystem}) |`,
     `| Change | ${fix.changes.map(c => `${code(c.from)} → ${code(c.to)}`).join(", ")} |`,
-    `| Advisories | ${advisories.length ? advisories.map(code).join(", ") : ecosystem === "php" ? "php.net's security release (no advisory ID read)" : ecosystem === "node" ? "nodejs.org's security release (no advisory ID read)" : "none listed"} |`,
-    `| Fix published | ${fix.fix_published_at ? code(fix.fix_published_at) : "unknown"} (${PUBLISHED[ecosystem]}) |`,
+    `| Advisories | ${advisories.length ? advisories.map(code).join(", ") : newest ? "none (a move to the line's newest release)" : ecosystem === "php" ? "php.net's security release (no advisory ID read)" : ecosystem === "node" ? "nodejs.org's security release (no advisory ID read)" : "none listed"} |`,
+    newest
+      ? "| Fix published | none (no advisory; this move is not counted in exposure time) |"
+      : `| Fix published | ${fix.fix_published_at ? code(fix.fix_published_at) : "unknown"} (${PUBLISHED[ecosystem]}) |`,
     `| Found | ${code(fix.found_at)} (this run's lookup; an earlier run may have seen it first) |`,
     `| Branch made | ${code(fix.applied_at)} |`,
     `| Receipt | ${code(artifact.id!)} (in this run's ludion-fixes artifact) |`,
@@ -659,7 +679,9 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${isImage(ecosystem) ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
-      : `- ${isImage(ecosystem) ? `${IMAGES[ecosystem].label} image` : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
+      : newest
+        ? `- ${IMAGES[ecosystem as keyof typeof IMAGES].label} image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check. This move's 72-hour wait is the validation job's, by its receipt.`
+        : `- ${isImage(ecosystem) ? `${IMAGES[ecosystem].label} image` : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
     "",
     "**Not checked**",
     "",
@@ -809,16 +831,9 @@ export async function osvAdvisories(ecosystem: "Packagist" | "Maven", name: stri
 
 /** The digest Docker Hub gives for an official PHP or Node.js image tag now: the manifest list's (what `docker pull` records). */
 export async function dockerHubDigest(tag: string, fetchFn: typeof fetch = fetch, repository: keyof typeof IMAGES = "php"): Promise<string> {
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(tag)) throw new Error("Invalid image tag.");
-  if (!isImage(repository)) throw new Error("Not an official image Ludion updates.");
-  const auth = await registryJson(fetchFn, `https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/${repository}:pull`, {}, 1024 * 1024);
-  if (typeof auth?.token !== "string") throw new Error("Docker Hub gave no pull token.");
-  const res = await fetchFn(`https://registry-1.docker.io/v2/library/${repository}/manifests/${tag}`, {
-    method: "HEAD", redirect: "error", signal: AbortSignal.timeout(30_000),
-    headers: { authorization: `Bearer ${auth.token}`, accept: ["application/vnd.oci.image.index.v1+json", "application/vnd.docker.distribution.manifest.list.v2+json", "application/vnd.docker.distribution.manifest.v2+json", "application/vnd.oci.image.manifest.v1+json"].join(", ") },
-  });
-  const digest = res.headers.get("docker-content-digest") ?? "";
-  if (!res.ok || !/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error(`Docker Hub gave no digest for ${repository}:${tag} (HTTP ${res.status}).`);
+  // The same HEAD the scan makes for a move's tag (php.ts, imageMove).
+  const digest = await dockerHubTag(repository, tag, fetchFn);
+  if (digest === null) throw new Error(`Docker Hub gave no digest for ${repository}:${tag} (HTTP 404).`);
   return digest;
 }
 

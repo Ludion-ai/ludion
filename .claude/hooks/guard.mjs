@@ -11,6 +11,15 @@ const command = String(request.tool_input?.command ?? "");
 const tool = String(request.tool_name ?? "Bash");
 const bash = tool !== "PowerShell";
 const ESCAPE = bash ? "\\" : "`";
+// PowerShell reads curly quotes as quotes, en and em dashes as "-", and a lone CR as a new line: read them so too. The
+// Unicode line separators are taken as new lines, which cuts more and so judges more.
+const line = bash
+  ? command
+  : command
+      .replace(/[\u{201C}\u{201D}\u{201E}]/gu, '"')
+      .replace(/[\u{2018}\u{2019}\u{201A}\u{201B}]/gu, "'")
+      .replace(/[\u{2013}\u{2014}\u{2015}]/gu, "-")
+      .replace(/\r\n?|[\u{85}\u{2028}\u{2029}]/gu, "\n");
 
 /**
  * The commands a command line starts, read the way bash (or PowerShell) reads it: pipelines, each a list of stages
@@ -19,7 +28,10 @@ const ESCAPE = bash ? "\\" : "`";
  * inside double quotes, an unquoted heredoc or a PowerShell @"…"@, comes out as pipelines of its own, and the group's
  * text stays in the word, so `iex (irm …)` still shows its download. A heredoc's body and a <<< word go to the stage's
  * stdin, a PowerShell here-string into its word: text, which check judges only when a shell reads it as its program.
- * # at the start of a word begins a comment. A backstop, not a parser.
+ * A heredoc whose delimiter or terminator line cannot be read marks its stage unread. Space, tab and CR end a word (bash
+ * keeps a CR in the word; cutting there only judges more), in PowerShell any white space. # begins a comment at the
+ * start of a word after a space, tab, new line or ;&|()<> only, so a CR or another space before it hides nothing.
+ * A backstop, not a parser.
  */
 function lex(src) {
   const out = [];
@@ -27,7 +39,40 @@ function lex(src) {
   return out;
 }
 
-const HEREDOC = /^<<(-?)[ \t]*(?:'([^'\n]*)'|"([^"\n]*)"|\\([^\s;&|<>()]+)|([^\s;&|<>()'"]+))/;
+/**
+ * The heredoc whose << ends just before i, as bash reads it: its delimiter word without quotes and backslashes,
+ * literal when any part of the word was quoted, strip for <<-, and where the word ends. A word that cannot be read
+ * (no word, an unclosed single quote, $'…' or $"…", a new line inside it) gives unread.
+ */
+function heredocWord(src, i) {
+  const strip = src[i] === "-";
+  if (strip) i++;
+  while (src[i] === " " || src[i] === "\t") i++;
+  let delim = "";
+  let literal = false;
+  for (; i < src.length && !" \t\n;&|<>()".includes(src[i]); i++) {
+    const c = src[i];
+    if (c === "'") {
+      const end = src.indexOf("'", i + 1);
+      if (end < 0) return { unread: true, strip, end: src.length };
+      delim += src.slice(i + 1, end);
+      literal = true;
+      i = end;
+    } else if (c === '"') {
+      literal = true;
+      for (i++; i < src.length && src[i] !== '"'; i++) {
+        if (src[i] === "\\" && i + 1 < src.length && "$`\"\\".includes(src[i + 1])) i++;
+        delim += src[i];
+      }
+    } else if (c === "\\") {
+      literal = true;
+      i++;
+      delim += src[i] ?? "";
+    } else if (c === "$" && (src[i + 1] === "'" || src[i + 1] === '"')) return { unread: true, strip, end: i };
+    else delim += c;
+  }
+  return delim && !delim.includes("\n") ? { delim, literal, strip, end: i } : { unread: true, strip, end: i };
+}
 
 /** Read src from i up to closer (")" or "}") or its end, adding the pipelines found to out. Returns where it stopped. */
 function scan(src, i, closer, out) {
@@ -44,7 +89,7 @@ function scan(src, i, closer, out) {
   };
   const endStage = () => {
     endWord();
-    if (stage.words.length || stage.stdin.length) pipeline.push(stage);
+    if (stage.words.length || stage.stdin.length || stage.unread) pipeline.push(stage);
     stage = { words: [], stdin: [] };
   };
   const endPipeline = () => {
@@ -55,13 +100,13 @@ function scan(src, i, closer, out) {
   for (; i < src.length; i++) {
     const c = src[i];
     const next = src[i + 1];
-    let m;
+    let h;
     if (c === closer) break;
     if (c === "\n") {
       endPipeline();
       if (pending.length) i = heredocBodies(src, i + 1, pending.splice(0), out) - 1;
-    } else if (c === " " || c === "\t" || c === "\r") endWord();
-    else if (c === "#" && word === null && (i === 0 || /[\s;&|]/.test(src[i - 1]))) {
+    } else if (c === " " || c === "\t" || c === "\r" || (!bash && /\s/.test(c))) endWord();
+    else if (c === "#" && word === null && (i === 0 || " \t\n;&|()<>".includes(src[i - 1]))) {
       const end = src.indexOf("\n", i);
       i = (end < 0 ? src.length : end) - 1;
     } else if (!bash && c === "<" && next === "#") {
@@ -89,10 +134,11 @@ function scan(src, i, closer, out) {
       endWord();
       hereString = true;
       i += 2;
-    } else if (bash && c === "<" && next === "<" && (m = HEREDOC.exec(src.slice(i)))) {
+    } else if (bash && c === "<" && next === "<" && (h = heredocWord(src, i + 2))) {
       endWord();
-      pending.push({ stage, delim: m[2] ?? m[3] ?? m[4] ?? m[5], literal: m[5] === undefined, strip: m[1] === "-" });
-      i += m[0].length - 1;
+      if (h.unread) stage.unread = true;
+      else pending.push({ stage, ...h });
+      i = h.end - 1;
     } else if ((c === "&" && next === "&") || (c === "|" && next === "|")) {
       endPipeline();
       i++;
@@ -144,13 +190,16 @@ function expansions(text, out) {
 function heredocBodies(src, i, list, out) {
   for (const h of list) {
     const lines = [];
-    while (i < src.length) {
+    let ended = false;
+    while (i < src.length && !ended) {
       const end = src.indexOf("\n", i);
-      const line = src.slice(i, end < 0 ? src.length : end);
+      const text = src.slice(i, end < 0 ? src.length : end);
       i = end < 0 ? src.length : end + 1;
-      if ((h.strip ? line.replace(/^\t+/, "") : line) === h.delim) break;
-      lines.push(line);
+      if ((h.strip ? text.replace(/^\t+/, "") : text) === h.delim) ended = true;
+      else lines.push(text);
     }
+    // With no terminator line, where bash ends the body cannot be told apart from what follows it.
+    if (!ended) h.stage.unread = true;
     const body = lines.join("\n");
     h.stage.stdin.push(body);
     if (!h.literal) expansions(body, out);
@@ -358,6 +407,7 @@ function thirdParty(name, args) {
 const DOWNLOAD_RUN = "Running a downloaded script runs code nobody read. Download it, read it, then decide.";
 const DEEP = "This command is nested too deep for the guard to read, so it cannot be judged. Run the inner command on its own.";
 const ENCODED = "The guard cannot read a PowerShell -EncodedCommand. Pass the command as text.";
+const UNREAD = "The guard cannot read this heredoc's delimiter, or it has no terminator line, so where its text ends cannot be judged. Use <<'EOF' and end it with a line that is exactly EOF.";
 const hostRun = (named) => {
   const python = /^(python[0-9.]*|pythonw|pyw?|pip[0-9.]*|uvx?)$/.test(base(named));
   const example = python ? "python:3.14-slim python <script>" : "node:24 node <script>";
@@ -421,6 +471,7 @@ function refuse(ws, depth = 0) {
 function check(line, depth = 0) {
   for (const stages of lex(line)) {
     for (const [k, stage] of stages.entries()) {
+      if (stage.unread) return UNREAD;
       const why = refuse(stage.words, depth);
       if (why) return why;
       // A shell or evaluator reading its program from stdin runs what it is fed: a heredoc, a here-string, or what the
@@ -450,8 +501,8 @@ function check(line, depth = 0) {
  * of a quoted heredoc (<<'EOF'). A markdown code span in double-quoted text (a PR body, a comment, a commit message)
  * runs this way; on 2026-10-29 one ran `npx webpack serve` on a host. $( ) is not refused: "$(cat <<'EOF' ... EOF)"
  * is how text is passed safely. A heredoc operator is recognised outside single quotes, wherever it stands.
- * A backstop, not a parser: it misses a backtick after a heredoc operator merely mentioned inside double quotes, after
- * an apostrophe in a # comment, inside $'...', and before a heredoc terminator ending in CRLF.
+ * The heredoc's delimiter is read as bash reads it (heredocWord). A backstop, not a parser: it misses a backtick after
+ * a heredoc operator merely mentioned inside double quotes, after an apostrophe in a # comment, and inside $'...'.
  */
 function runsBacktick(line) {
   let quote = null;
@@ -487,11 +538,9 @@ function runsBacktick(line) {
         continue;
       }
       if (text.startsWith("<<", i)) {
-        const m = /^<<(-?)\s*(?:'([^']*)'|"([^"]*)"|\\(\w+)|(\w+))/.exec(text.slice(i));
-        if (m) {
-          heredocs.push({ delim: m[2] ?? m[3] ?? m[4] ?? m[5], literal: m[5] === undefined, strip: m[1] === "-" });
-          i += m[0].length - 1;
-        }
+        const h = heredocWord(text, i + 2);
+        if (!h.unread) heredocs.push(h);
+        i = Math.max(i + 1, h.end - 1);
       }
     }
     if (heredocs.length) body = heredocs.shift();
@@ -501,7 +550,7 @@ function runsBacktick(line) {
 
 const BACKTICK = "A backtick outside single quotes runs as a command in bash, so a markdown code span inside double-quoted text runs on this machine. Write the text to a file and pass the file (--body-file, -F), or use a quoted heredoc (<<'EOF'); use $( ) for a command substitution you mean.";
 
-const why = check(command) ?? (bash && runsBacktick(command) ? BACKTICK : undefined);
+const why = check(line) ?? (bash && runsBacktick(command) ? BACKTICK : undefined);
 if (why) {
   process.stderr.write(`Blocked by .claude/hooks/guard.mjs: ${why}\n`);
   process.exit(2);

@@ -233,6 +233,80 @@ describe("guard hook: JavaScript and Python runtimes on the host", () => {
   });
 });
 
+// Where the guard read a command line differently from the shell, a runtime could hide (the automated security review of
+// 27fa8b8): a heredoc delimiter with a quoted part, a CR before #, and PowerShell's curly quotes and dashes.
+describe("guard hook: reading a command line as the shell does", () => {
+  it.each([
+    // bash ends the body at the delimiter with its quotes and backslashes removed, so node x runs.
+    "cat <<E\"OF\"\nEOF\nnode x\nE",
+    "cat <<'E'OF\nEOF\nnode x\nE",
+    "cat <<E\\OF\nEOF\nnode x\nE",
+    "cat <<'E'OF\nEOF\nnode x\n'E'OF",
+    "cat <<E\"OF\"\nEOF\nnode x\nE\"OF\"",
+    "cat <<E\\OF\nEOF\nnode x\nE\\OF",
+    "cat <<\"E\\\"F\"\nE\"F\nnode x\nE\\\"F",
+    "cat <<'E'OF\nEOF\necho `id`\nE",
+    // A heredoc it cannot read, or with no terminator line.
+    "cat <<EOF\nnode x",
+    "cat <<EOF\n",
+    "cat <<'EOF\nnode x\nEOF",
+    "cat <<$'EOF'\nEOF\nnode x\n$EOF",
+    "x <<\nnode y",
+    "cat <<\nnode x\n\nls",
+    "<<'EOF\nnode x",
+    "cat <<\"EOF\nnode x\nEOF",
+    // In bash a CR is part of a word, so the # after it starts no comment.
+    "echo x\r# ; node y",
+  ])("blocks in bash: %j", (command) => {
+    expect(exitFor(command)).toBe(2);
+  });
+
+  it("says why a heredoc it cannot read is refused", () => {
+    expect(run("cat <<EOF\nnode x").stderr).toContain("terminator line");
+  });
+
+  it.each([
+    "cat <<EOF\r\nnode x\r\nEOF\r\n",
+    "cat <<\\EOF\nnode x\nEOF",
+    "cat <<\"E\"OF\nnode x\nEOF",
+    "cat <<'E'OF\n$(node x)\nEOF",
+    "cat <<\"E\"OF\n$(node x)\nEOF",
+    "cat <<\\EOF\n$(node x)\nEOF",
+    "cat <<-EOF\n\tnode x\n\tEOF",
+    "git status\r\n",
+  ])("allows in bash: %j", (command) => {
+    expect(exitFor(command)).toBe(0);
+  });
+
+  // Written as \u{…} escapes, so that the characters can be seen.
+  it.each([
+    "& \u{2018}node\u{2019} x",
+    "& \u{201C}node.exe\u{201D} x",
+    "Invoke-Expression \u{201C}node x\u{201D}",
+    "iex \u{201A}npm ci\u{201B}",
+    "Start-Process \u{2013}FilePath node",
+    "Start-Process \u{2014}FilePath:node",
+    "Start-Process \u{2015}Wait node",
+    "pwsh \u{2013}EncodedCommand ZQBjAGgAbwA=",
+    "pwsh \u{2014}c node x",
+    "echo x\rnode y",
+    "echo x\u{2028}node y",
+    "echo x\u{85}node y",
+    "node\u{A0}x",
+    "echo x\u{A0}# ; node y",
+  ])("blocks in PowerShell: %j", (command) => {
+    expect(exitFor(command, "PowerShell")).toBe(2);
+  });
+
+  it.each([
+    "git commit -m \u{201C}node is refused\u{201D}",
+    "git commit -m \u{2018}node \u{2013} refused\u{2019}",
+    "Write-Host x\r\n",
+  ])("allows in PowerShell: %j", (command) => {
+    expect(exitFor(command, "PowerShell")).toBe(0);
+  });
+});
+
 // Third-party repositories are read only inside a container with no credentials (CLAUDE.md); on the host the guard
 // refuses reading their files through gh or a download.
 describe("guard hook: third-party repositories' files on the host", () => {

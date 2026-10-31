@@ -57,6 +57,14 @@ The command line is read the way bash reads it (PowerShell for the PowerShell to
 - **The hook only sees agents' Bash and PowerShell calls.** It counts nothing: whether a short-lived node ran is shown only by a record of process creation (Windows event 4688 with command lines, or Sysmon event 1), which is the PC's setting and the owner's decision (audit comment 6542250801, 5).
 - It is a backstop, not bash or PowerShell: `$'…'` strings, brace expansion and other syntax it does not model can hide a name.
 
+## Added after the automated security review of 27fa8b8 (2026-10-31, before any human review)
+
+The review found three places where the guard read a command line differently from the shell, so a runtime could hide. Each is fixed, with tests that fail on 27fa8b8; nothing refused before is let through now.
+
+- **A heredoc's delimiter is read as bash reads the whole word:** quotes and backslashes removed, literal when any part was quoted (`cat <<E"OF"` ends at `EOF`, not `E`). This adds a refusal: **a heredoc whose delimiter cannot be read** (no word, an unclosed single quote, `$'…'`, a new line inside it) **or that has no terminator line** is refused, since where its text ends cannot be judged. The backtick check reads the delimiter the same way.
+- **A `#` starts a comment only after a space, tab, new line or `;&|()<>`,** so a CR (or another space character) before it hides nothing. A CR still ends a word, which only judges more.
+- **PowerShell:** curly quotes are read as quotes and en and em dashes as `-`, as the review says PowerShell's tokenizer reads them. A lone CR and the Unicode line separators are taken as new lines, and any white space ends a word; how PowerShell itself treats each was not checked, and cutting there only judges more.
+
 ## The tests
 
 The tests stay where the guard's tests are, `.claude/hooks/guard.test.ts`, which the root `vitest.config.ts` (project `node`, `.claude/hooks/*.test.ts`) and CI already run. They run in Docker only (`--network none`, `--memory 2g`, `--cap-drop ALL`, a non-root user), never on the host. Every refusal rule above gets at least one mutation that turns it off, applied in Docker; each must make the tests fail. The mutations and their results are in docs/bench/2026-10-31-lguard/.

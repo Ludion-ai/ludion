@@ -128,21 +128,51 @@ M.push(
       i = doubleQuoted(`],
   ["L3", "an escape keeps only the character", R`      if (next !== "\n") add(next ?? "");`, R`      if (next !== "\n") add(c + (next ?? ""));`],
   ["L4", "backslash-newline joins lines", R`      if (next !== "\n") add(next ?? "");`, R`      add(next ?? "");`],
-  ["L5", "comments", R`else if (c === "#" && word === null && (i === 0 || /[\s;&|]/.test(src[i - 1]))) {`, R`else if (false) {`],
-  ["L6", "a comment starts only after a space or separator", R`(i === 0 || /[\s;&|]/.test(src[i - 1]))`, R`true`],
+  ["L5", "comments", R`else if (c === "#" && word === null && (i === 0 || " \t\n;&|()<>".includes(src[i - 1]))) {`, R`else if (false) {`],
+  ["L6", "a comment starts only after a space, tab, new line or separator", R`(i === 0 || " \t\n;&|()<>".includes(src[i - 1]))`, R`true`],
+  ["L6b", "a comment does not start after a CR or another space", R`(i === 0 || " \t\n;&|()<>".includes(src[i - 1]))`, R`(i === 0 || /\s/.test(src[i - 1]))`],
   ["L7", "PowerShell <# #> comments", R`} else if (!bash && c === "<" && next === "#") {`, R`} else if (false) {`],
   ["L8", "PowerShell here-strings", R`} else if (!bash && c === "@" &&`, R`} else if (false && c === "@" &&`],
   ["L9", "PowerShell @\"\"@ expands $( )", R`if (next === '"') expansions(body, out);`, R``],
   ["L10", "<<< here-string", R`} else if (bash && src.startsWith("<<<", i)) {`, R`} else if (false) {`],
   ["L11", "<<< word goes to stdin", R`(hereString ? stage.stdin : stage.words).push(word)`, R`stage.words.push(word)`],
-  ["L12", "heredocs", R`} else if (bash && c === "<" && next === "<" && (m = HEREDOC.exec(src.slice(i)))) {`, R`} else if (false) {`],
+  ["L12", "heredocs", R`} else if (bash && c === "<" && next === "<" && (h = heredocWord(src, i + 2))) {`, R`} else if (false) {`],
   ["L13", "heredoc body goes to stdin", R`    h.stage.stdin.push(body);`, R``],
   ["L14", "unquoted heredoc expands $( )", R`    if (!h.literal) expansions(body, out);`, R``],
-  ["L15", "quoted heredoc is literal, unquoted is not", R`pending.push({ stage, delim: m[2] ?? m[3] ?? m[4] ?? m[5], literal: m[5] === undefined,`, R`pending.push({ stage, delim: m[2] ?? m[3] ?? m[4] ?? m[5], literal: true,`],
-  ["L16", "<<- strips tabs", R`literal: m[5] === undefined, strip: m[1] === "-" });
-      i += m[0].length - 1;`, R`literal: m[5] === undefined, strip: false });
-      i += m[0].length - 1;`],
-  ["L17", "heredoc terminator", R`: line) === h.delim) break;`, R`: line) === h.delim + "x") break;`],
+  ["L15", "an unquoted heredoc is not literal", R`  let literal = false;`, R`  let literal = true;`],
+  ["L16", "<<- is read", R`  const strip = src[i] === "-";`, R`  const strip = false;`],
+  ["L16b", "<<- strips tabs from the terminator", R`(h.strip ? text.replace(/^\t+/, "") : text)`, R`(text)`],
+  ["L17", "heredoc terminator", R`: text) === h.delim) ended = true;`, R`: text) === h.delim + "x") ended = true;`],
+  // The heredoc delimiter, read as bash reads it (the automated security review of 27fa8b8, finding 1).
+  ["H1", "delimiter: a single-quoted part loses its quotes", R`      delim += src.slice(i + 1, end);`, R`      delim += src.slice(i, end + 1);`],
+  ["H2", "delimiter: a single-quoted part makes it literal", R`      literal = true;
+      i = end;`, R`      i = end;`],
+  ["H3", "delimiter: a double-quoted part makes it literal", R`    } else if (c === '"') {
+      literal = true;`, R`    } else if (c === '"') {`],
+  ["H4", "delimiter: a backslash escape inside double quotes", 'if (src[i] === "\\\\" && i + 1 < src.length && "$`\\"\\\\".includes(src[i + 1])) i++;', ""],
+  ["H5", "delimiter: a backslash makes it literal", R`      literal = true;
+      i++;
+      delim += src[i] ?? "";`, R`      i++;
+      delim += src[i] ?? "";`],
+  ["H6", "delimiter: a backslash is removed", R`      delim += src[i] ?? "";`, R`      delim += "\\" + (src[i] ?? "");`],
+  ["H7", "delimiter: $'...' cannot be read", R`} else if (c === "$" && (src[i + 1] === "'" || src[i + 1] === '"')) return { unread: true, strip, end: i };`, R`} else if (false) return { unread: true, strip, end: i };`],
+  ["H8", "delimiter: an unclosed single quote cannot be read", R`      if (end < 0) return { unread: true, strip, end: src.length };`, R`      if (end < 0) return { delim: "x", literal: true, strip, end: src.length };`],
+  ["H9", "delimiter: an empty one or one with a new line cannot be read", R`return delim && !delim.includes("\n") ? `, R`return true ? `],
+  ["H10", "a heredoc with no terminator line", R`    if (!ended) h.stage.unread = true;`, R``],
+  ["H11", "an unread heredoc is refused", R`      if (stage.unread) return UNREAD;`, R``],
+  ["H12", "a stage with only an unread heredoc is kept", R`stage.stdin.length || stage.unread) pipeline`, R`stage.stdin.length) pipeline`],
+  ["H13", "runsBacktick reads the delimiter the same way", R`const h = heredocWord(text, i + 2);`, R`const h = { delim: text.slice(i + 2).replace(/^-?\s*'?(\w).*$/s, "$1"), literal: true, strip: false, end: i + 2 };`],
+  // PowerShell's look-alike characters and white space (finding 3), and the comment after a CR (finding 2: L6b).
+  ["W1", "PowerShell: curly double quotes", R`
+      .replace(/[\u{201C}\u{201D}\u{201E}]/gu, '"')`, R``],
+  ["W2", "PowerShell: curly single quotes", R`
+      .replace(/[\u{2018}\u{2019}\u{201A}\u{201B}]/gu, "'")`, R``],
+  ["W3", "PowerShell: en and em dashes", R`
+      .replace(/[\u{2013}\u{2014}\u{2015}]/gu, "-")`, R``],
+  ["W4", "PowerShell: a lone CR is a new line", R`.replace(/\r\n?|[\u{85}\u{2028}\u{2029}]/gu, "\n")`, R`.replace(/\r\n|[\u{85}\u{2028}\u{2029}]/gu, "\n")`],
+  ["W5", "PowerShell: Unicode line separators", R`.replace(/\r\n?|[\u{85}\u{2028}\u{2029}]/gu, "\n")`, R`.replace(/\r\n?/gu, "\n")`],
+  ["W6", "PowerShell: any white space ends a word", R` || (!bash && /\s/.test(c))) endWord();`, R`) endWord();`],
+  ["W7", "the PowerShell reading is used", R`const why = check(line) ??`, R`const why = check(command) ??`],
   ["L18", "$( ) inside double quotes", R`} else if (c === "$" && next === "(") {`, R`} else if (false) {`],
   ["L19", "bash double quotes keep a backslash before other characters", R`(!bash || `, R`(true || `],
   ["L20", "expansions' $( )", R`else if (text[i] === "$" && text[i + 1] === "(") i = scan(text, i + 2, ")", out);`, R``],
@@ -216,7 +246,7 @@ M.push(
   ["E5", "gh repo delete", R`if (name === "gh" && sub[0] === "repo" && sub[1] === "delete") return`, R`if (false) return`],
   ["E6", "force push", R`if (push.some((a) =>`, R`if (false && push.some((a) =>`],
   ["E7", "a download given to an evaluator", R`if (args.some((a) => [...FETCHERS].some((f) => a.toLowerCase().includes(f)))) return DOWNLOAD_RUN;`, R``],
-  ["E8", "the backtick rule", R`const why = check(command) ?? (bash && runsBacktick(command) ? BACKTICK : undefined);`, R`const why = check(command);`],
+  ["E8", "the backtick rule", R`const why = check(line) ?? (bash && runsBacktick(command) ? BACKTICK : undefined);`, R`const why = check(line);`],
   ["E9", "the message's Python example", R`const python = /^(python`, R`const python = /^(xpython`],
 );
 

@@ -679,6 +679,30 @@ describe("the PR job checks what a fix pins against the official registry", { ti
       }
     }
   });
+  // docs/decisions/2026-10-31-limgv-image-newest-built-release.md: a move with no newer security release goes through the
+  // PR job (openFixes) to a pushed branch and an opened PR, whose title and body do not say "security".
+  it.each([
+    ["PHP", { schema: 1, dockerfile: "./Dockerfile", test: ["php", "t.php"], timeout_seconds: 60 }, "php", "8.4.27", "8.4.28", "-cli-alpine", {}],
+    ["Node.js", NODE_POLICY, "node", "22.23.4", "22.23.5", "-alpine", { runtime: "node" }],
+  ] as const)("%s: a move to the line's newest release with no newer security release is pushed and opened", async (label, policy, runtime, from, to, flavor, scanExtra) => {
+    const r = repository({ "ludion.security.json": `${JSON.stringify(policy)}\n`, Dockerfile: `FROM ${runtime}:${from}${flavor}\nWORKDIR /app\n` });
+    const after = `FROM ${runtime}:${to}${flavor}@sha256:${"1".repeat(64)}\nWORKDIR /app\n`, branch = `ludion/${runtime}/${to}`;
+    const made = fixBranch(r.gitBase, branch, [{ path: "Dockerfile", content: after }], `ludion: ${label} ${from} -> ${to} in ./Dockerfile\n\n${label} ${to}, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.\n\nLudion receipt ${ID}: the project's test passed on ${r.base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`);
+    const receipt = {
+      schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: r.base,
+      scan: { current: { version: from }, candidate: { version: to }, security_releases: [], wait_until: "2026-11-02T00:00:00.000Z", ...scanExtra }, dockerfile_after: sha256(after),
+      branch, commit: made, fix_published_at: null, found_at: "2026-11-02T01:00:00.000Z", applied_at: "2026-11-02T01:05:00.000Z",
+    };
+    const tags: string[] = [], gh = github(r.origin), digest = async (tag: string) => { tags.push(tag); return `sha256:${"1".repeat(64)}`; };
+    const result = await open(checkout(r.origin), artifact(r.work, receipt, [`refs/heads/${branch}`], r.base), r.base, r.origin, gh, "refs/heads/main", runtime === "node" ? { nodeDigest: digest } : { phpDigest: digest });
+    expect(tags).toEqual([`${to}${flavor}`]);
+    expect(result.deliveries).toMatchObject([{ outcome: "opened", branch }]);
+    expect(branchAt(r.origin, branch)).toBe(made);
+    expect(gh.opened).toHaveLength(1);
+    expect(gh.opened[0]).toMatchObject({ title: `ludion: ${label} ${from} -> ${to} in ./Dockerfile`, head: branch });
+    expect(`${String(gh.opened[0]!.title)}\n${String(gh.opened[0]!.body)}`.toLowerCase()).not.toContain("security");
+    expect(String(gh.opened[0]!.body)).toContain(`moved the image to \`${to}\`, the newest release of its line`);
+  });
   it("Docker Hub is asked for library/node's tag, with a pull token for library/node only", async () => {
     const urls: string[] = [];
     const fetchFn = (async (url: string | URL | Request) => {
@@ -688,6 +712,9 @@ describe("the PR job checks what a fix pins against the official registry", { ti
     expect(await dockerHubDigest("22.23.4-alpine", fetchFn, "node")).toBe(`sha256:${"3".repeat(64)}`);
     expect(urls).toEqual(["https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/node:pull", "https://registry-1.docker.io/v2/library/node/manifests/22.23.4-alpine"]);
     await expect(dockerHubDigest("22.23.4-alpine", fetchFn, "evil" as "node")).rejects.toThrow("Not an official image");
+    // A tag Docker Hub does not have: the PR job pushes nothing for it (the scan's own stop is in security.test.ts).
+    const missing = (async (url: string | URL | Request) => String(url).startsWith("https://auth.docker.io/") ? new Response(JSON.stringify({ token: "t" })) : new Response(null, { status: 404 })) as typeof fetch;
+    await expect(dockerHubDigest("22.23.9-alpine", missing, "node")).rejects.toThrow("Docker Hub gave no digest for node:22.23.9-alpine (HTTP 404).");
   });
   /** A Composer project whose fix moves symfony/http-foundation 5.4.0 -> 5.4.54 and adds symfony/polyfill-php83, which 5.4.54 requires. */
   function composerFix() {
@@ -807,7 +834,54 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(() => checkArtifact(work, artifact(work, { ...nodeReceipt(base, made, after), branch: "ludion/php/22.23.4" }, ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
     expect(() => checkArtifact(work, artifact(work, nodeReceipt(base, made, after, { security_releases: [{ version: "22.23.4" }] }), ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
   });
-  const fixOf = (pkg: string, from: string, to: string, files: string[]): CheckedFix => ({
+  // docs/decisions/2026-10-31-limgv-image-newest-built-release.md, items 6 to 8: a move to the line's newest release with
+  // no newer security release. Its receipt lists no security release, has waited, and has no exposure-time start.
+  it.each([
+    ["PHP", { schema: 1, dockerfile: "./Dockerfile", test: ["php", "t.php"], timeout_seconds: 60 }, "php", "8.4.27", "8.4.28", "-cli-alpine", {}],
+    ["Node.js", NODE_POLICY, "node", "22.23.4", "22.23.5", "-alpine", { runtime: "node" }],
+  ] as const)("%s: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts", (label, policy, runtime, from, to, flavor, scanExtra) => {
+    const work = mkdtempSync(join(tmpdir(), "ludion-deliver-newest-"));
+    writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify(policy)}\n`);
+    writeFileSync(join(work, "Dockerfile"), `FROM ${runtime}:${from}${flavor}\nWORKDIR /app\n`);
+    const base = commit(work), copy = mkdtempSync(join(tmpdir(), "ludion-deliver-copy-"));
+    snapshot(work, copy);
+    const after = `FROM ${runtime}:${to}${flavor}@sha256:${"1".repeat(64)}\nWORKDIR /app\n`, branch = `ludion/${runtime}/${to}`, ref = [`refs/heads/${branch}`];
+    const message = (why: string) => `ludion: ${label} ${from} -> ${to} in ./Dockerfile\n\n${why}\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+    const fact = message(`${label} ${to}, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.`);
+    const receipt = (made: string, extra: Record<string, unknown> = {}, scan: Record<string, unknown> = {}) => ({
+      schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: base,
+      scan: { current: { version: from }, candidate: { version: to }, security_releases: [], wait_until: "2026-11-02T00:00:00.000Z", ...scanExtra, ...scan }, dockerfile_after: sha256(after),
+      branch, commit: made, fix_published_at: null, found_at: "2026-11-02T01:00:00.000Z", applied_at: "2026-11-02T01:05:00.000Z", ...extra,
+    });
+    const made = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], fact);
+    const checked = checkArtifact(work, artifact(work, receipt(made), ref, base), base);
+    expect(checked.fixes).toMatchObject([{ package: runtime, branch, commit: made, message: fact, waited_until: "2026-11-02T00:00:00.000Z", fix_published_at: null }]);
+    const fix = checked.fixes[0]!, body = pullRequestBody(checked, fix);
+    expect(body).toContain(`Ludion's validation job moved the image to \`${to}\`, the newest release of its line: Docker rebuilds only the newest tag of a line, with its OS packages. No advisory names this move. By its receipt, it waited until \`2026-11-02T00:00:00.000Z\` (72 hours after the end of the release's day)`);
+    expect(body).toContain("| Advisories | none (a move to the line's newest release) |");
+    expect(body).toContain("| Fix published | none (no advisory; this move is not counted in exposure time) |");
+    expect(body).toContain(`${label} image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check. This move's 72-hour wait is the validation job's, by its receipt.`);
+    // The PR's title (the commit's subject) and body never call the move a security release or fix.
+    expect(`${fix.subject}\n${body}`.toLowerCase()).not.toContain("security");
+    // Refused: applied before its wait ends, no wait_until, a fix_published_at, a commit that claims a security release.
+    expect(() => checkArtifact(work, artifact(work, receipt(made, { applied_at: "2026-11-01T23:59:59.999Z" }), ref, base), base)).toThrow("before its wait ends at 2026-11-02T00:00:00.000Z");
+    expect(() => checkArtifact(work, artifact(work, receipt(made, {}, { wait_until: undefined }), ref, base), base)).toThrow("scan.wait_until is missing");
+    expect(() => checkArtifact(work, artifact(work, receipt(made, { fix_published_at: "2026-10-27T00:00:00.000Z" }), ref, base), base)).toThrow("it has no advisory");
+    git(work, "branch", "-D", branch);
+    const claims = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], message(`Official ${label} security releases: ${to}.`));
+    expect(() => checkArtifact(work, artifact(work, receipt(claims), ref, base), base)).toThrow();
+    // The same commit with a receipt that lists a security release: the commit then carries the wrong paragraph.
+    git(work, "branch", "-D", branch);
+    const again = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], fact);
+    expect(() => checkArtifact(work, artifact(work, receipt(again, {}, { security_releases: [{ version: to }] }), ref, base), base)).toThrow();
+    // A fix with a security release keeps its texts, and needs no wait.
+    git(work, "branch", "-D", branch);
+    const security = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], message(`Official ${label} security releases: ${to}.`));
+    const found = checkArtifact(work, artifact(work, receipt(security, { fix_published_at: "2026-10-27T00:00:00.000Z", applied_at: "2026-10-27T01:05:00.000Z" }, { security_releases: [{ version: to }], wait_until: undefined }), ref, base), base);
+    expect(found.fixes[0]!.waited_until).toBeUndefined();
+    expect(pullRequestBody(found, found.fixes[0]!)).toContain("found a published security fix");
+  });
+  const fixOf =(pkg: string, from: string, to: string, files: string[]): CheckedFix => ({
     package: pkg, changes: [{ name: pkg, from, to, advisories: [] }], branch: "ludion/x", commit: "a".repeat(40), subject: "", message: "", tree: "",
     files: files.map(path => ({ path, after_hash: "" })), fix_published_at: null, found_at: "", applied_at: "", verdict: null,
   });

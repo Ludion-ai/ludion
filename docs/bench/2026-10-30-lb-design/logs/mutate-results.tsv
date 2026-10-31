@@ -1,0 +1,23 @@
+2b496a1	fail	18	a parent other than the base accepted
+2b496a1	fail	17	files outside the receipt's list accepted
+2b496a1	fail	17	a file the plan may not change accepted
+2b496a1	fail	18	a new file or a changed mode accepted
+2b496a1	fail	18	an executable mode refused (a checkout from a file system without modes)
+2b496a1	fail	17	extra branches in the bundle accepted
+2b496a1	fail	17	bytes other than the receipt's accepted
+2b496a1	fail	17	a second PR while one is open
+2b496a1	fail	17	a closed fix opened again
+2b496a1	fail	17	a PR opened on a branch that holds another commit
+2b496a1	fail	17	a branch with another change reused
+2b496a1	fail	17	the message beyond its subject accepted
+2b496a1	fail	16	what the files say not checked
+2b496a1	fail	17	npm: the judge's second refusal ignored
+2b496a1	fail	15	npm: the judge not run again
+2b496a1	fail	17	manifest: another package.json accepted
+2b496a1	fail	17	PHP: more than the FROM image accepted
+2b496a1	fail	17	PHP: an older or other-branch release accepted
+2b496a1	fail	17	composer.lock: another package changed
+2b496a1	fail	17	composer.lock: a plugin accepted
+2b496a1	fail	17	composer.lock: a new package from any archive accepted
+2b496a1	fail	17	composer.lock: the planned package from another repository accepted
+2b496a1	fail	30	composer.lock: a new package nothing requires accepted

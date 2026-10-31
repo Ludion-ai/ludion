@@ -201,8 +201,8 @@ Severity (GHSA's, not MAL-) has not changed in any of the three: moderate 6,462,
 
 `logs/test.log`, `logs/full.log` and `logs/mutate.log` hold the latest lane's runs (LMR1f); each earlier lane's are in git history, and its numbers in its progress record:
 
-- `scripts/test.sh` (`logs/test.log`): LMR1F_TEST.
-- `scripts/full.sh` (`logs/full.log`): LMR1F_FULL.
+- `scripts/test.sh` (`logs/test.log`, 2026-10-31T10:00:10Z, tree 772a139): tsc 0; CLI tests 23 files, 983 passed, 24 skipped; impact.test.ts 48 passed.
+- `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository; `logs/full.log`, 10:00:49Z, tree 772a139): typecheck 0, build 0, `npm test -- --maxWorkers=2` 39 files, 1270 passed, 24 skipped.
 - `scripts/mutate.mjs` (`logs/mutate.log`, 2026-10-31T09:56:46Z, the code of cc44cbd): **90 of 90** mutations caught; it passes without them and after restoring. The list and what LMR1f added are in docs/progress/2026-10-31-lmr1f-impact-classes-takeover-direct.md.
 
 LMR1c's runs, as first written (the logs no longer hold them; git history at c5fdfff does; LMR1b's and LMR1's numbers are in git history at 218a83a and 0e62900):

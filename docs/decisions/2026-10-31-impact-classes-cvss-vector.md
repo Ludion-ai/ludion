@@ -2,6 +2,8 @@
 
 **Decided 2026-10-31** by the owner's Claude chat (ludion-ops#1 comment 6539200199, point 3), for PR #236 (lane LMR1c). It changes how docs/decisions/2026-10-31-impact-classes.md (point 2 and the CWE table's rule, point 5) gives a record its class; that record and docs/decisions/2026-10-31-impact-classes-trap-published-record.md stay as written, and this record says what replaces the part they decided about the CWE table. Written and committed before the code was changed and before anything was counted with it.
 
+**Changed in part** by docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (comments 6539943852 (a) and 6540209072, LMR1d): the conditions, point 5 and the sets. This record is kept as first written.
+
 ## The chat's words (6539200199, point 3, kept short)
 
 - 「頭脳は、例として 22・89 を steal、862 を impersonate に固定させた。でも、22（パス・トラバーサル）と 89（SQL インジェクション）は、読みも書きもありうる。判断記録が CWE-59・73 を doubtful にした理由と、同じ理由が当てはまる。」

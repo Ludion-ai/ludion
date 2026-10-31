@@ -2,6 +2,8 @@
 
 **Decided 2026-10-31** by the owner's Claude chat (ludion-ops#1 comments 6538877641 and 6538690397, point 5), for PR #236 (lane LMR1b). It changes points 3 and the CWE-506 row of docs/decisions/2026-10-31-impact-classes.md, which stay as written; this record says what replaces them. Written and committed before the share classified was measured again.
 
+**Changed in part** by docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (LMR1d): CWE-507 to 512 make a trap too, and CWE-912 enters the table. This record is kept as first written.
+
 ## The chat's words (6538877641, kept short)
 
 - 「trap の定義は『その版そのものが悪性』。CWE-506（Embedded Malicious Code）は、その定義そのもの。」「守るべき線は、MAL- かどうかではなく、『外の公開の記録が、悪性と言っているか』。Ludion が自分の検査で止めたものは、罠と数えない。」

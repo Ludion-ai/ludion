@@ -586,6 +586,44 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(() => checkArtifact(work, artifact(work, { ...nodeReceipt(base, made, after), branch: "ludion/php/22.23.4" }, ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
     expect(() => checkArtifact(work, artifact(work, nodeReceipt(base, made, after, { security_releases: [{ version: "22.23.4" }] }), ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
   });
+  // docs/decisions/2026-10-31-limgv-official-image-newest-release.md, item 5: a move with no newer security release.
+  it.each([
+    ["PHP", { schema: 1, dockerfile: "./Dockerfile", test: ["php", "t.php"], timeout_seconds: 60 }, "php", "8.4.27", "8.4.28", "-cli-alpine", {}],
+    ["Node.js", NODE_POLICY, "node", "22.23.4", "22.23.5", "-alpine", { runtime: "node" }],
+  ] as const)("%s: a move to the line's newest release with no newer security release says so, in the commit and the PR", (label, policy, runtime, from, to, flavor, scanExtra) => {
+    const work = mkdtempSync(join(tmpdir(), "ludion-deliver-rebuild-"));
+    writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify(policy)}\n`);
+    writeFileSync(join(work, "Dockerfile"), `FROM ${runtime}:${from}${flavor}\nWORKDIR /app\n`);
+    const base = commit(work), copy = mkdtempSync(join(tmpdir(), "ludion-deliver-copy-"));
+    snapshot(work, copy);
+    const after = `FROM ${runtime}:${to}${flavor}@sha256:${"1".repeat(64)}\nWORKDIR /app\n`, branch = `ludion/${runtime}/${to}`;
+    const message = (why: string) => `ludion: ${label} ${from} -> ${to} in ./Dockerfile\n\n${why}\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+    const rebuild = message(`No official ${label} security release is newer than ${from}; ${to} is the newest release of its line, the only tag of the line Docker's official image still rebuilds.`);
+    const receipt = (made: string, releases: { version: string }[]) => ({
+      schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: base,
+      scan: { current: { version: from }, candidate: { version: to }, security_releases: releases, ...scanExtra }, dockerfile_after: sha256(after),
+      branch, commit: made, fix_published_at: null, found_at: "2026-10-31T01:00:00.000Z", applied_at: "2026-10-31T01:05:00.000Z",
+    });
+    const made = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], rebuild);
+    const checked = checkArtifact(work, artifact(work, receipt(made, []), [`refs/heads/${branch}`], base), base);
+    expect(checked.fixes).toMatchObject([{ package: runtime, branch, commit: made, message: rebuild, rebuild_only: true, fix_published_at: null }]);
+    const body = pullRequestBody(checked, checked.fixes[0]!);
+    expect(body).toContain("found that the image's tag is no longer the newest release of its line, the only tag of the line Docker's official image still rebuilds with OS-package fixes; no newer security release of the line is published.");
+    expect(body).toContain("| Advisories | none: no newer security release; the line's newest release, for the OS-package rebuilds |");
+    expect(body).not.toContain("found a published security fix");
+    expect(body).not.toContain("security release (no advisory ID read)");
+    // The same commit with a receipt that lists a security release, and a commit that claims one the receipt does not list.
+    expect(() => checkArtifact(work, artifact(work, receipt(made, [{ version: to }]), [`refs/heads/${branch}`], base), base)).toThrow();
+    git(work, "branch", "-D", branch);
+    const claims = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], message(`Official ${label} security releases: ${to}.`));
+    expect(() => checkArtifact(work, artifact(work, receipt(claims, []), [`refs/heads/${branch}`], base), base)).toThrow();
+    // A fix with security releases is not marked rebuild_only, and its PR says a security fix was found.
+    git(work, "branch", "-D", branch);
+    const security = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], message(`Official ${label} security releases: ${to}.`));
+    const found = checkArtifact(work, artifact(work, receipt(security, [{ version: to }]), [`refs/heads/${branch}`], base), base);
+    expect(found.fixes[0]!.rebuild_only).toBeUndefined();
+    expect(pullRequestBody(found, found.fixes[0]!)).toContain("found a published security fix");
+  });
   const fixOf = (pkg: string, from: string, to: string, files: string[]): CheckedFix => ({
     package: pkg, changes: [{ name: pkg, from, to, advisories: [] }], branch: "ludion/x", commit: "a".repeat(40), subject: "", message: "", tree: "",
     files: files.map(path => ({ path, after_hash: "" })), fix_published_at: null, found_at: "", applied_at: "", verdict: null,

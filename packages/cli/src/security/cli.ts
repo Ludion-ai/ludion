@@ -68,7 +68,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     if (values.json) console.log(JSON.stringify(only && (only.ecosystem === "php" || only.ecosystem === "node") && "result" in only && !report.unsupported.length ? only.result : report, null, 2));
     else {
       for (const check of report.checks) {
-        // A missing tag with a newer security release between is a finding: the text names both (php.ts, MissingImageTag).
+        // A stop at Docker Hub with a newer security release between is a finding: the text names both (php.ts, ImageMoveStopped).
         if ("error" in check && check.security_releases?.length) { console.log(`${check.ecosystem}: ${check.error}`); continue; }
         if ("error" in check) { console.error(`${check.ecosystem}: unavailable — ${READONLY_ECOSYSTEMS.includes(check.ecosystem) ? plain(check.error) : check.error}`); continue; }
         if ("fixed_versions_note" in check.result) for (const line of readOnlyText(check.ecosystem, check.result)) console.log(line);

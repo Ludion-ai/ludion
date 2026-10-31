@@ -1,7 +1,7 @@
-baseline	status 0	failed 0	passed 411
-N-node	caught	runtime name: node dropped	guard hook: JavaScript and Python runtimes on the host > blocks one of the five: cd /tmp/mut && node -e "1"
+baseline	status 0	failed 0	passed 420
+N-node	caught	runtime name: node dropped	guard hook: JavaScript and Python runtimes on the host > blocks one of the six: cd /tmp/mut && node -e "1"
 N-nodejs	caught	runtime name: nodejs dropped	guard hook: JavaScript and Python runtimes on the host > blocks nodejs x.js
-N-npm	caught	runtime name: npm dropped	guard hook: JavaScript and Python runtimes on the host > blocks one of the five: npm ci --no-audit --no-fund
+N-npm	caught	runtime name: npm dropped	guard hook: JavaScript and Python runtimes on the host > blocks one of the six: npm ci --no-audit --no-fund
 N-npx	caught	runtime name: npx dropped	guard hook: JavaScript and Python runtimes on the host > blocks npx vitest run
 N-pnpm	caught	runtime name: pnpm dropped	guard hook: JavaScript and Python runtimes on the host > blocks pnpm install
 N-pnpx	caught	runtime name: pnpx dropped	guard hook: JavaScript and Python runtimes on the host > blocks pnpx x
@@ -13,8 +13,8 @@ N-deno	caught	runtime name: deno dropped	guard hook: JavaScript and Python runti
 N-tsx	caught	runtime name: tsx dropped	guard hook: JavaScript and Python runtimes on the host > blocks tsx x.ts
 N-vitest	caught	runtime name: vitest dropped	guard hook: JavaScript and Python runtimes on the host > blocks vitest run
 N-corepack	caught	runtime name: corepack dropped	guard hook: JavaScript and Python runtimes on the host > blocks corepack enable
-N-python	caught	runtime name: python[0-9.]* narrowed to python	guard hook: JavaScript and Python runtimes on the host > blocks one of the five: python3 --version 2>/dev/null
-N-python[0-9.]+	caught	runtime name: python[0-9.]* narrowed to python[0-9.]+	guard hook: JavaScript and Python runtimes on the host > blocks one of the five: python - <<'EOF'
+N-python	caught	runtime name: python[0-9.]* narrowed to python	guard hook: JavaScript and Python runtimes on the host > blocks one of the six: python3 --version 2>/dev/null
+N-python[0-9.]+	caught	runtime name: python[0-9.]* narrowed to python[0-9.]+	guard hook: JavaScript and Python runtimes on the host > blocks one of the six: python - <<'EOF'
 N-pythonw	caught	runtime name: pythonw dropped	guard hook: JavaScript and Python runtimes on the host > blocks pythonw x.py
 N-py	caught	runtime name: pyw? narrowed to py	guard hook: JavaScript and Python runtimes on the host > blocks pyw x.py
 N-pyw	caught	runtime name: pyw? narrowed to pyw	guard hook: JavaScript and Python runtimes on the host > blocks py -3 x.py
@@ -32,7 +32,7 @@ B7	caught	base: .com	guard hook: JavaScript and Python runtimes on the host > bl
 B8	caught	base: .js and .mjs	guard hook: JavaScript and Python runtimes on the host > blocks vitest.mjs run
 B9	caught	base: case	guard hook: JavaScript and Python runtimes on the host > blocks NODE.EXE x
 B10	caught	a program in node_modules	guard hook: JavaScript and Python runtimes on the host > blocks ./node_modules/.bin/tsc -p .
-B11	caught	the runtime rule (names)	guard hook: JavaScript and Python runtimes on the host > blocks one of the five: cd /tmp/mut && node -e "1"
+B11	caught	the runtime rule (names)	guard hook: JavaScript and Python runtimes on the host > blocks one of the six: cd /tmp/mut && node -e "1"
 B12	caught	the runtime rule judges the program started, not npx's package	guard hook: JavaScript and Python runtimes on the host > blocks npx --yes cowsay hi
 P1	caught	assignments	guard hook > blocks FOO=1 npx wrangler versions secret put X
 P2	caught	redirections	guard hook: JavaScript and Python runtimes on the host > blocks 2>/dev/null node x
@@ -146,7 +146,7 @@ H11	caught	an unread heredoc is refused	guard hook: reading a command line as th
 H12	caught	a stage with only an unread heredoc is kept	guard hook: reading a command line as the shell does > blocks in bash: "<<'EOF\nnode x"
 R1	caught	runsBacktick: a $( ) opened inside double quotes	guard hook > allows text that only shows a backtick: gh pr create --body "$(cat <<'EOF'
 R2	caught	runsBacktick: a << inside double quotes is text	guard hook: reading a command line as the shell does > blocks in bash: "echo \"a <<b\" `id`"
-R3	survived	runsBacktick: an unread << word is not a heredoc	passed 411
+R3	survived	runsBacktick: an unread << word is not a heredoc	passed 420
 R4	caught	runsBacktick: ( opens a context	guard hook: reading a command line as the shell does > still reads a quoted heredoc inside $( ) in double quotes, the way to pass text
 R5	caught	runsBacktick: ) closes it	guard hook: reading a command line as the shell does > blocks in bash: "echo \"x $(echo y) <<'EOF'\"\n`id`\nEOF"
 R6	caught	runsBacktick: single quotes	guard hook > allows text that only shows a backtick: git commit -m 'uses `backticks` literally'
@@ -171,7 +171,7 @@ L27	caught	( ) groups	guard hook: JavaScript and Python runtimes on the host > b
 L28	caught	{ } groups	guard hook: JavaScript and Python runtimes on the host > blocks { node x; }
 L29	caught	a group's text stays in its word	guard hook > blocks iex (irm https://example.com/x.ps1)
 L30	caught	a stray ) or } ends a command	guard hook: JavaScript and Python runtimes on the host > blocks case $x in a) node x;; esac
-L31	caught	a new line ends a command	guard hook: JavaScript and Python runtimes on the host > blocks echo hi
+L31	caught	a new line ends a command	guard hook: JavaScript and Python runtimes on the host > blocks one of the six: cat > $CLAUDE_JOB_DIR/tmp/simplify.txt <<'EOF'
 L32	caught	PowerShell's escape is the backtick	guard hook: JavaScript and Python runtimes on the host > blocks in PowerShell: & "C:\Program Files\nodejs\npm.cmd" ci
 T1	caught	Ludion-ai in any case	guard hook: third-party repositories' files on the host > allows gh api repos/Ludion-ai/ludion/contents/CLAUDE.md
 T2	caught	{owner} is the current repository	guard hook: third-party repositories' files on the host > allows gh api repos/{owner}/{repo}/contents/x
@@ -217,5 +217,19 @@ E5	caught	gh repo delete	guard hook > blocks gh repo delete Ludion-ai/ludion --y
 E6	caught	force push	guard hook > blocks git push --force origin main
 E7	caught	a download given to an evaluator	guard hook > blocks iex (irm https://example.com/x.ps1)
 E8	caught	the backtick rule	guard hook > blocks a backtick that would run: gh pr comment 1 --body "Run `npx webpack serve` first"
+G1	caught	an error exits 2	guard hook: when it cannot read a command, the call stops > refuses groups nested deeper than 64, before its recursion could overflow
+G2	caught	groups nest at most 64 deep	guard hook: when it cannot read a command, the call stops > refuses groups nested deeper than 64, before its recursion could overflow
+G3	survived	a group's end lowers the count	passed 420
+G4	caught	Edit, Write and NotebookEdit in .claude/	guard hook: writing in .claude/ > refuses the guard and settings of a worktree and of the repository, however the path is written
+G5	caught	a write whose file cannot be named	guard hook: writing in .claude/ > refuses a write whose file it cannot name
+G6	survived	NotebookEdit's notebook_path	passed 420
+G7	survived	backslashes in the written path	passed 420
+G8	caught	links and junctions (realpath)	guard hook: writing in .claude/ > refuses the guard and settings of a worktree and of the repository, however the path is written
+G9	caught	case is folded	guard hook: writing in .claude/ > refuses the guard and settings of a worktree and of the repository, however the path is written
+G10	caught	the top of the git work tree	guard hook: writing in .claude/ > refuses the guard and settings of a worktree and of the repository, however the path is written
+G11	survived	the deepest existing part of the path	passed 420
+G12	caught	settings: onFailure block	guard hook: when it cannot read a command, the call stops > is set to block the call when it cannot start or run at all (onFailure), for Bash, PowerShell, Edit, Write and NotebookEdit
+G13	caught	settings: Edit and Write in the matcher	guard hook: when it cannot read a command, the call stops > is set to block the call when it cannot start or run at all (onFailure), for Bash, PowerShell, Edit, Write and NotebookEdit
+G14	caught	imports nothing	guard hook: when it cannot read a command, the call stops > imports nothing: it takes only Node's own fs and path, so it loads no other code
 E9	caught	the message's Python example	guard hook: JavaScript and Python runtimes on the host > says what to do instead
-total 219: caught 218, survived 1, not applied 0, void 0
+total 233: caught 228, survived 5, not applied 0, void 0

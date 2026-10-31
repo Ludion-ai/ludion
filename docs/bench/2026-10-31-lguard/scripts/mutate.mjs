@@ -187,7 +187,7 @@ M.push(
   ["W4", "PowerShell: a lone CR is a new line", R`.replace(/\r\n?|[\u{85}\u{2028}\u{2029}]/gu, "\n")`, R`.replace(/\r\n|[\u{85}\u{2028}\u{2029}]/gu, "\n")`],
   ["W5", "PowerShell: Unicode line separators", R`.replace(/\r\n?|[\u{85}\u{2028}\u{2029}]/gu, "\n")`, R`.replace(/\r\n?/gu, "\n")`],
   ["W6", "PowerShell: any white space ends a word", R` || (!bash && /\s/.test(c))) endWord();`, R`) endWord();`],
-  ["W7", "the PowerShell reading is used", R`const why = check(line) ??`, R`const why = check(command) ??`],
+  ["W7", "the PowerShell reading is used", R`check(bash ? command : powershellText(command))`, R`check(command)`],
   ["L18", "$( ) inside double quotes", R`} else if (c === "$" && next === "(") {`, R`} else if (false) {`],
   ["L19", "bash double quotes keep a backslash before other characters", R`(!bash || `, R`(true || `],
   ["L20", "expansions' $( )", R`else if (text[i] === "$" && text[i + 1] === "(") i = scan(text, i + 2, ")", out);`, R``],
@@ -211,7 +211,7 @@ M.push(
   ["L31", "a new line ends a command", R`    if (c === "\n") {
       endPipeline();`, R`    if (c === "\n") {
       endWord();`],
-  ["L32", "PowerShell's escape is the backtick", 'const ESCAPE = bash ? "\\\\" : "`";', 'const ESCAPE = "\\\\";'],
+  ["L32", "PowerShell's escape is the backtick", 'ESCAPE = bash ? "\\\\" : "`";', 'ESCAPE = "\\\\";'],
   // Third-party repositories' files.
   ["T1", "Ludion-ai in any case", R`owner.toLowerCase() === "ludion-ai"`, R`owner === "ludion-ai"`],
   ["T2", "{owner} is the current repository", R` || /^(\{owner\}|:owner)$/i.test(owner)`, R``],
@@ -261,7 +261,24 @@ M.push(
   ["E5", "gh repo delete", R`if (name === "gh" && sub[0] === "repo" && sub[1] === "delete") return`, R`if (false) return`],
   ["E6", "force push", R`if (push.some((a) =>`, R`if (false && push.some((a) =>`],
   ["E7", "a download given to an evaluator", R`if (args.some((a) => [...FETCHERS].some((f) => a.toLowerCase().includes(f)))) return DOWNLOAD_RUN;`, R``],
-  ["E8", "the backtick rule", R`const why = check(line) ?? (bash && runsBacktick(command) ? BACKTICK : undefined);`, R`const why = check(line);`],
+  ["E8", "the backtick rule", R` ?? (bash && runsBacktick(command) ? BACKTICK : undefined);`, R`;`],
+  // A guard that fails stops the call; writes in .claude/ (the chat's comment 6544620643, 1). G-mutations with a file
+  // name change that file instead of guard.mjs.
+  ["G1", "an error exits 2", 'so it is refused.\\n`);\n  process.exit(2);', 'so it is refused.\\n`);\n  process.exit(1);'],
+  ["G2", "groups nest at most 64 deep", R`const MAX_NESTING = 64;`, R`const MAX_NESTING = 100000;`],
+  ["G3", "a group's end lowers the count", R`  nesting--;
+  return i;`, R`  return i;`],
+  ["G4", "Edit, Write and NotebookEdit in .claude/", R`const writes = ["Edit", "Write", "NotebookEdit"].includes(tool) &&`, R`const writes = false &&`],
+  ["G5", "a write whose file cannot be named", R`(typeof file !== "string" || writesGuardFolder(file))`, R`(typeof file === "string" && writesGuardFolder(file))`],
+  ["G6", "NotebookEdit's notebook_path", R` ?? request.tool_input?.notebook_path`, R``],
+  ["G7", "backslashes in the written path", R`path.resolve(file.replace(/\\/g, "/"))`, R`path.resolve(file)`],
+  ["G8", "links and junctions (realpath)", R`    existing = fs.realpathSync.native(existing);`, R``],
+  ["G9", "case is folded", R`const fold = (p) => p.replace(/\\/g, "/").toLowerCase();`, R`const fold = (p) => p.replace(/\\/g, "/");`],
+  ["G10", "the top of the git work tree", R`if (fs.existsSync(path.join(dir, ".git")))`, R`if (fs.existsSync(path.join(dir, ".gitx")))`],
+  ["G11", "the deepest existing part of the path", R`while (!fs.existsSync(existing) && path.dirname(existing) !== existing)`, R`while (false && path.dirname(existing) !== existing)`],
+  ["G12", "settings: onFailure block", R`, "onFailure": "block"`, R``, ".claude/settings.json"],
+  ["G13", "settings: Edit and Write in the matcher", R`"Bash|PowerShell|Edit|Write|NotebookEdit"`, R`"Bash|PowerShell|NotebookEdit"`, ".claude/settings.json"],
+  ["G14", "imports nothing", R`const path = process.getBuiltinModule("node:path");`, R`import * as path from "node:path";`],
   ["E9", "the message's Python example", R`const python = /^(python`, R`const python = /^(xpython`],
 );
 
@@ -280,14 +297,16 @@ try {
   const base = runTests();
   lines.push(`baseline\tstatus ${base.status}\tfailed ${base.failed}\tpassed ${base.passed}`);
   if (base.status !== 0 || base.failed !== 0) throw new Error(`the unchanged guard's tests do not pass: ${base.tail}`);
-  for (const [id, rule, from, to] of M) {
-    const at = original.split(from).length - 1;
+  for (const [id, rule, from, to, file] of M) {
+    const path = file ? `${root}/${file}` : target;
+    const text = file ? readFileSync(path, "utf8") : original;
+    const at = text.split(from).length - 1;
     let result;
     if (at !== 1) result = { verdict: "not applied", note: `found ${at} times` };
     else {
-      writeFileSync(target, original.split(from).join(to));
+      writeFileSync(path, text.split(from).join(to));
       const t = runTests();
-      writeFileSync(target, original);
+      writeFileSync(path, text);
       if (t.failed > 0) result = { verdict: "caught", note: t.first };
       else if (t.status === 0) result = { verdict: "survived", note: `passed ${t.passed}` };
       else result = { verdict: "void", note: `status ${t.status}: ${t.tail}` };

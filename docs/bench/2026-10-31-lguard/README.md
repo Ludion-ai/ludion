@@ -45,6 +45,25 @@ Run 5 (at 4d97495) left two survivors:
 - **H4 (the backslash escape inside a double-quoted delimiter):** no test made it matter alone; with it off, the misread word ran into a new line and was refused as unread anyway. 6c38b20 adds `cat <<"E\$F"`, whose delimiter is `E$F` to bash.
 - **R3 (the backtick check skips an unread `<<` word):** equivalent in every case tested. check() refuses an unread heredoc before the backtick check runs, so the backtick check's handling of it does not show. It stays, so that the backtick check does not take a word it cannot read as a heredoc where the two readings differ.
 
+## Resumption (2026-10-31 23:4x JST, the chat's comment 6544620643, 1)
+
+Main fdbcf50 was merged into the branch (1cc2bf6; main had not changed `.claude/`). Definitions first (6cb7457), then the code (dee0307): `"onFailure": "block"` and the matcher `Bash|PowerShell|Edit|Write|NotebookEdit` in settings.json; one try/catch in guard.mjs; groups nested at most 64 deep; no imports (`process.getBuiltinModule`); Edit, Write and NotebookEdit refused in `.claude/` at the top of the file's git work tree. The mistake record counts at least six host runs.
+
+| Run | How | Result |
+|---|---|---|
+| test | `--network none`, `--maxWorkers=2`: guard and records tests at dee0307 | 2 files, 434 passed |
+| typecheck | as above | both exit 0 |
+| live, this session on Windows | Write after settings.json changed | refused: `…\.claude\hooks\probe.txt`, `…\.CLAUDE\Hooks\probe.txt`, `C:/…/docs/../.claude/hooks/probe.txt`; allowed: this repository's `docs/` files |
+| mutations, run 7 | `--network none`: scripts/mutate.mjs at dee0307, with G1–G14 for the new rules (G12 and G13 change settings.json) | 233: caught 228, survived 5, not applied 0, void 0; the unchanged file's tests passed first (420 passed with `--bail=1`) (logs/mutations.txt; run 6's log is logs/mutations-run6.txt) |
+
+The new matcher applied to this lane's own session as soon as settings.json changed (Claude Code reloads settings), although the chat's comment 6543282859, 4 expected it to take effect only after the merge. The lane's next edit, two more tests in guard.test.ts (groups side by side are not counted as nested; a file not yet made, reached through a link, is refused), was refused, and the lane did not go round it with a Bash write. Mutations that only those tests would catch are reported as survived.
+
+Run 7's five survivors:
+
+- **G3 (a group's end lowers the count), G11 (the deepest existing part of the path), G6 (NotebookEdit's `notebook_path`):** each needs a test that could not be added after the matcher applied: groups side by side (`echo $(echo x) …` 80 times), a file not yet made reached through a link, and a NotebookEdit outside `.claude/` that must pass. Without G6's field, NotebookEdit is refused everywhere (a write whose file cannot be named), so the gap is too much refusal, not too little; without G3, many groups side by side would be refused; without G11, a new file reached through a link to `.claude/` would pass.
+- **G7 (backslashes become slashes before resolving):** on Windows `path.resolve` takes a backslash as a separator anyway; in the Linux test the case fold also turns backslashes into slashes, and the tested folder lies inside the repository's own `.claude/`, so the result does not change.
+- **R3:** equivalent, as in runs 5 and 6.
+
 ## Not done here
 
 - No run of the whole node test project: only `.claude/hooks/` and `docs/` changed, and the records test covers `docs/`.

@@ -1,4 +1,4 @@
-# started 2026-10-31T09:56:46Z, node v24.22.1
+# started 2026-10-31T12:55:12Z, node v24.22.1
 without mutations: passed
 caught: MAL- is not trap
 caught: MAL- anywhere in the id is trap
@@ -36,11 +36,17 @@ caught: code injection loses disrupt
 caught: the login and authorization set loses steal, alter and disrupt
 caught: CSRF can steal
 caught: the five-class row loses impersonate
-caught: the file, SSRF and XXE row loses disrupt
+caught: the {steal, alter, disrupt} row (files, SQL, 15, 611, 918) loses disrupt
 caught: out-of-bounds reads lose disrupt
 caught: CWE-912 leaves the table
-caught: path traversal and the file CWEs get takeover back
-caught: SQL injection, 15, 943 and 1321 get takeover back (with the login set)
+caught: the {steal, alter, disrupt} row (files, SQL, 15, 611, 918) gets takeover back
+caught: the login set gets takeover
+caught: SQL injection, 15 and 943 get impersonate back (with the files row)
+caught: 1321 gets impersonate back
+caught: 1321 gets steal back
+caught: 1321 loses disrupt
+caught: 1321 leaves the table
+caught: the login set loses impersonate
 caught: 434 and 912 lose takeover
 caught: code injection loses takeover
 caught: a MAL- alias is not trap
@@ -91,5 +97,5 @@ caught: a vector part with a second : read as its first two
 caught: a vector part with no : unreadable
 caught: a language found through the prototype
 after restoring: passed
-90 of 90 mutations caught
-# finished 2026-10-31T09:58:02Z
+96 of 96 mutations caught
+# finished 2026-10-31T12:56:32Z

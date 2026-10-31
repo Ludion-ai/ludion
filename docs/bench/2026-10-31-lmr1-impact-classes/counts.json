@@ -71,94 +71,7 @@
         "cwes": 13
       }
     ],
-    "lmr1e2": [
-      {
-        "classes": [
-          "takeover",
-          "impersonate",
-          "steal",
-          "alter",
-          "disrupt"
-        ],
-        "cwes": 6
-      },
-      {
-        "classes": [
-          "takeover",
-          "steal",
-          "alter",
-          "disrupt"
-        ],
-        "cwes": 35
-      },
-      {
-        "classes": [
-          "impersonate",
-          "steal",
-          "alter",
-          "disrupt"
-        ],
-        "cwes": 34
-      },
-      {
-        "classes": [
-          "impersonate",
-          "alter",
-          "disrupt"
-        ],
-        "cwes": 1
-      },
-      {
-        "classes": [
-          "impersonate",
-          "steal",
-          "alter"
-        ],
-        "cwes": 6
-      },
-      {
-        "classes": [
-          "impersonate",
-          "steal"
-        ],
-        "cwes": 6
-      },
-      {
-        "classes": [
-          "impersonate",
-          "alter"
-        ],
-        "cwes": 3
-      },
-      {
-        "classes": [
-          "steal",
-          "alter",
-          "disrupt"
-        ],
-        "cwes": 2
-      },
-      {
-        "classes": [
-          "steal",
-          "disrupt"
-        ],
-        "cwes": 3
-      },
-      {
-        "classes": [
-          "steal"
-        ],
-        "cwes": 21
-      },
-      {
-        "classes": [
-          "disrupt"
-        ],
-        "cwes": 13
-      }
-    ],
-    "after": [
+    "lmr1f": [
       {
         "classes": [
           "takeover",
@@ -244,6 +157,100 @@
         ],
         "cwes": 13
       }
+    ],
+    "after": [
+      {
+        "classes": [
+          "takeover",
+          "impersonate",
+          "steal",
+          "alter",
+          "disrupt"
+        ],
+        "cwes": 2
+      },
+      {
+        "classes": [
+          "takeover",
+          "steal",
+          "alter",
+          "disrupt"
+        ],
+        "cwes": 11
+      },
+      {
+        "classes": [
+          "impersonate",
+          "steal",
+          "alter",
+          "disrupt"
+        ],
+        "cwes": 34
+      },
+      {
+        "classes": [
+          "impersonate",
+          "alter",
+          "disrupt"
+        ],
+        "cwes": 1
+      },
+      {
+        "classes": [
+          "impersonate",
+          "steal",
+          "alter"
+        ],
+        "cwes": 6
+      },
+      {
+        "classes": [
+          "impersonate",
+          "steal"
+        ],
+        "cwes": 6
+      },
+      {
+        "classes": [
+          "impersonate",
+          "alter"
+        ],
+        "cwes": 3
+      },
+      {
+        "classes": [
+          "steal",
+          "alter",
+          "disrupt"
+        ],
+        "cwes": 29
+      },
+      {
+        "classes": [
+          "steal",
+          "disrupt"
+        ],
+        "cwes": 3
+      },
+      {
+        "classes": [
+          "alter",
+          "disrupt"
+        ],
+        "cwes": 1
+      },
+      {
+        "classes": [
+          "steal"
+        ],
+        "cwes": 21
+      },
+      {
+        "classes": [
+          "disrupt"
+        ],
+        "cwes": 13
+      }
     ]
   },
   "ecosystems": {
@@ -301,59 +308,7 @@
             "disrupt": 8
           }
         },
-        "lmr1e2": {
-          "records": 8073,
-          "classified": {
-            "count": 6077,
-            "pct": 75.3
-          },
-          "by_class": {
-            "trap": {
-              "count": 407,
-              "pct": 5
-            },
-            "takeover": {
-              "count": 1077,
-              "pct": 13.3
-            },
-            "impersonate": {
-              "count": 1666,
-              "pct": 20.6
-            },
-            "steal": {
-              "count": 1430,
-              "pct": 17.7
-            },
-            "alter": {
-              "count": 603,
-              "pct": 7.5
-            },
-            "disrupt": {
-              "count": 894,
-              "pct": 11.1
-            },
-            "unclassified": {
-              "count": 1996,
-              "pct": 24.7
-            }
-          },
-          "unclassified_by_reason": {
-            "vector_rules_out_every_class": 40,
-            "no_vector_several_classes": 435,
-            "no_cwe_in_table": 1287,
-            "no_cwe": 234,
-            "vector_unreadable": 0,
-            "no_id": 0
-          },
-          "ruled_out_by_vector_with_one_class": {
-            "takeover": 0,
-            "impersonate": 0,
-            "steal": 8,
-            "alter": 0,
-            "disrupt": 8
-          }
-        },
-        "after": {
+        "lmr1f": {
           "records": 8073,
           "classified": {
             "count": 6077,
@@ -404,42 +359,108 @@
             "alter": 0,
             "disrupt": 8
           }
+        },
+        "after": {
+          "records": 8073,
+          "classified": {
+            "count": 6072,
+            "pct": 75.2
+          },
+          "by_class": {
+            "trap": {
+              "count": 407,
+              "pct": 5
+            },
+            "takeover": {
+              "count": 703,
+              "pct": 8.7
+            },
+            "impersonate": {
+              "count": 1574,
+              "pct": 19.5
+            },
+            "steal": {
+              "count": 1600,
+              "pct": 19.8
+            },
+            "alter": {
+              "count": 887,
+              "pct": 11
+            },
+            "disrupt": {
+              "count": 901,
+              "pct": 11.2
+            },
+            "unclassified": {
+              "count": 2001,
+              "pct": 24.8
+            }
+          },
+          "unclassified_by_reason": {
+            "vector_rules_out_every_class": 45,
+            "no_vector_several_classes": 435,
+            "no_cwe_in_table": 1287,
+            "no_cwe": 234,
+            "vector_unreadable": 0,
+            "no_id": 0
+          },
+          "ruled_out_by_vector_with_one_class": {
+            "takeover": 0,
+            "impersonate": 0,
+            "steal": 8,
+            "alter": 0,
+            "disrupt": 8
+          }
         }
       },
       "changes_not_mal": {
-        "lmr1e2_to_after": {
-          "changed": 374,
+        "lmr1f_to_after": {
+          "changed": 390,
           "to_stronger": 0,
-          "to_weaker": 374,
+          "to_weaker": 390,
           "from_unclassified": 0,
-          "to_unclassified": 0,
+          "to_unclassified": 5,
           "to_takeover": {
             "count": 0,
             "by_class_before": {}
           },
+          "to_impersonate": {
+            "count": 0,
+            "by_class_before": {}
+          },
           "by_class": {
-            "takeover -> impersonate": 286,
-            "takeover -> steal": 88
+            "impersonate -> alter": 284,
+            "impersonate -> steal": 94,
+            "steal -> disrupt": 7,
+            "steal -> unclassified": 5
           }
         },
         "lmr1d_to_after": {
-          "changed": 813,
-          "to_stronger": 676,
+          "changed": 433,
+          "to_stronger": 296,
           "to_weaker": 137,
-          "from_unclassified": 147,
+          "from_unclassified": 142,
           "to_unclassified": 137,
           "to_takeover": {
             "count": 0,
             "by_class_before": {}
           },
+          "to_impersonate": {
+            "count": 151,
+            "by_class_before": {
+              "steal": 78,
+              "alter": 73
+            }
+          },
           "by_class": {
-            "alter -> impersonate": 360,
-            "steal -> impersonate": 169,
+            "unclassified -> disrupt": 106,
             "steal -> unclassified": 105,
-            "unclassified -> disrupt": 99,
+            "steal -> impersonate": 78,
+            "alter -> impersonate": 73,
             "alter -> unclassified": 32,
-            "unclassified -> steal": 26,
-            "unclassified -> alter": 22
+            "unclassified -> alter": 22,
+            "unclassified -> steal": 14,
+            "alter -> steal": 3
           }
         }
       },
@@ -505,59 +526,7 @@
             "disrupt": 2
           }
         },
-        "lmr1e2": {
-          "records": 7396,
-          "classified": {
-            "count": 5263,
-            "pct": 71.2
-          },
-          "by_class": {
-            "trap": {
-              "count": 1,
-              "pct": 0
-            },
-            "takeover": {
-              "count": 887,
-              "pct": 12
-            },
-            "impersonate": {
-              "count": 2412,
-              "pct": 32.6
-            },
-            "steal": {
-              "count": 1188,
-              "pct": 16.1
-            },
-            "alter": {
-              "count": 603,
-              "pct": 8.2
-            },
-            "disrupt": {
-              "count": 172,
-              "pct": 2.3
-            },
-            "unclassified": {
-              "count": 2133,
-              "pct": 28.8
-            }
-          },
-          "unclassified_by_reason": {
-            "vector_rules_out_every_class": 29,
-            "no_vector_several_classes": 297,
-            "no_cwe_in_table": 665,
-            "no_cwe": 1142,
-            "vector_unreadable": 0,
-            "no_id": 0
-          },
-          "ruled_out_by_vector_with_one_class": {
-            "takeover": 0,
-            "impersonate": 0,
-            "steal": 8,
-            "alter": 0,
-            "disrupt": 2
-          }
-        },
-        "after": {
+        "lmr1f": {
           "records": 7396,
           "classified": {
             "count": 5263,
@@ -608,27 +577,83 @@
             "alter": 0,
             "disrupt": 2
           }
+        },
+        "after": {
+          "records": 7396,
+          "classified": {
+            "count": 5263,
+            "pct": 71.2
+          },
+          "by_class": {
+            "trap": {
+              "count": 1,
+              "pct": 0
+            },
+            "takeover": {
+              "count": 546,
+              "pct": 7.4
+            },
+            "impersonate": {
+              "count": 2386,
+              "pct": 32.3
+            },
+            "steal": {
+              "count": 1552,
+              "pct": 21
+            },
+            "alter": {
+              "count": 606,
+              "pct": 8.2
+            },
+            "disrupt": {
+              "count": 172,
+              "pct": 2.3
+            },
+            "unclassified": {
+              "count": 2133,
+              "pct": 28.8
+            }
+          },
+          "unclassified_by_reason": {
+            "vector_rules_out_every_class": 29,
+            "no_vector_several_classes": 297,
+            "no_cwe_in_table": 665,
+            "no_cwe": 1142,
+            "vector_unreadable": 0,
+            "no_id": 0
+          },
+          "ruled_out_by_vector_with_one_class": {
+            "takeover": 0,
+            "impersonate": 0,
+            "steal": 8,
+            "alter": 0,
+            "disrupt": 2
+          }
         }
       },
       "changes_not_mal": {
-        "lmr1e2_to_after": {
-          "changed": 341,
+        "lmr1f_to_after": {
+          "changed": 303,
           "to_stronger": 0,
-          "to_weaker": 341,
+          "to_weaker": 303,
           "from_unclassified": 0,
           "to_unclassified": 0,
           "to_takeover": {
             "count": 0,
             "by_class_before": {}
           },
+          "to_impersonate": {
+            "count": 0,
+            "by_class_before": {}
+          },
           "by_class": {
-            "takeover -> impersonate": 277,
-            "takeover -> steal": 64
+            "impersonate -> steal": 300,
+            "impersonate -> alter": 3
           }
         },
         "lmr1d_to_after": {
-          "changed": 415,
-          "to_stronger": 400,
+          "changed": 112,
+          "to_stronger": 97,
           "to_weaker": 15,
           "from_unclassified": 57,
           "to_unclassified": 15,
@@ -636,10 +661,17 @@
             "count": 0,
             "by_class_before": {}
           },
+          "to_impersonate": {
+            "count": 40,
+            "by_class_before": {
+              "steal": 27,
+              "alter": 13
+            }
+          },
           "by_class": {
-            "steal -> impersonate": 327,
             "unclassified -> disrupt": 40,
-            "alter -> impersonate": 16,
+            "steal -> impersonate": 27,
+            "alter -> impersonate": 13,
             "steal -> unclassified": 11,
             "unclassified -> steal": 10,
             "unclassified -> alter": 7,
@@ -709,59 +741,7 @@
             "disrupt": 10
           }
         },
-        "lmr1e2": {
-          "records": 15469,
-          "classified": {
-            "count": 11340,
-            "pct": 73.3
-          },
-          "by_class": {
-            "trap": {
-              "count": 408,
-              "pct": 2.6
-            },
-            "takeover": {
-              "count": 1964,
-              "pct": 12.7
-            },
-            "impersonate": {
-              "count": 4078,
-              "pct": 26.4
-            },
-            "steal": {
-              "count": 2618,
-              "pct": 16.9
-            },
-            "alter": {
-              "count": 1206,
-              "pct": 7.8
-            },
-            "disrupt": {
-              "count": 1066,
-              "pct": 6.9
-            },
-            "unclassified": {
-              "count": 4129,
-              "pct": 26.7
-            }
-          },
-          "unclassified_by_reason": {
-            "vector_rules_out_every_class": 69,
-            "no_vector_several_classes": 732,
-            "no_cwe_in_table": 1952,
-            "no_cwe": 1376,
-            "vector_unreadable": 0,
-            "no_id": 0
-          },
-          "ruled_out_by_vector_with_one_class": {
-            "takeover": 0,
-            "impersonate": 0,
-            "steal": 16,
-            "alter": 0,
-            "disrupt": 10
-          }
-        },
-        "after": {
+        "lmr1f": {
           "records": 15469,
           "classified": {
             "count": 11340,
@@ -812,42 +792,108 @@
             "alter": 0,
             "disrupt": 10
           }
+        },
+        "after": {
+          "records": 15469,
+          "classified": {
+            "count": 11335,
+            "pct": 73.3
+          },
+          "by_class": {
+            "trap": {
+              "count": 408,
+              "pct": 2.6
+            },
+            "takeover": {
+              "count": 1249,
+              "pct": 8.1
+            },
+            "impersonate": {
+              "count": 3960,
+              "pct": 25.6
+            },
+            "steal": {
+              "count": 3152,
+              "pct": 20.4
+            },
+            "alter": {
+              "count": 1493,
+              "pct": 9.7
+            },
+            "disrupt": {
+              "count": 1073,
+              "pct": 6.9
+            },
+            "unclassified": {
+              "count": 4134,
+              "pct": 26.7
+            }
+          },
+          "unclassified_by_reason": {
+            "vector_rules_out_every_class": 74,
+            "no_vector_several_classes": 732,
+            "no_cwe_in_table": 1952,
+            "no_cwe": 1376,
+            "vector_unreadable": 0,
+            "no_id": 0
+          },
+          "ruled_out_by_vector_with_one_class": {
+            "takeover": 0,
+            "impersonate": 0,
+            "steal": 16,
+            "alter": 0,
+            "disrupt": 10
+          }
         }
       },
       "changes_not_mal": {
-        "lmr1e2_to_after": {
-          "changed": 715,
+        "lmr1f_to_after": {
+          "changed": 693,
           "to_stronger": 0,
-          "to_weaker": 715,
+          "to_weaker": 693,
           "from_unclassified": 0,
-          "to_unclassified": 0,
+          "to_unclassified": 5,
           "to_takeover": {
             "count": 0,
             "by_class_before": {}
           },
+          "to_impersonate": {
+            "count": 0,
+            "by_class_before": {}
+          },
           "by_class": {
-            "takeover -> impersonate": 563,
-            "takeover -> steal": 152
+            "impersonate -> steal": 394,
+            "impersonate -> alter": 287,
+            "steal -> disrupt": 7,
+            "steal -> unclassified": 5
           }
         },
         "lmr1d_to_after": {
-          "changed": 1228,
-          "to_stronger": 1076,
+          "changed": 545,
+          "to_stronger": 393,
           "to_weaker": 152,
-          "from_unclassified": 204,
+          "from_unclassified": 199,
           "to_unclassified": 152,
           "to_takeover": {
             "count": 0,
             "by_class_before": {}
           },
+          "to_impersonate": {
+            "count": 191,
+            "by_class_before": {
+              "steal": 105,
+              "alter": 86
+            }
+          },
           "by_class": {
-            "steal -> impersonate": 496,
-            "alter -> impersonate": 376,
-            "unclassified -> disrupt": 139,
+            "unclassified -> disrupt": 146,
             "steal -> unclassified": 116,
+            "steal -> impersonate": 105,
+            "alter -> impersonate": 86,
             "alter -> unclassified": 36,
-            "unclassified -> steal": 36,
-            "unclassified -> alter": 29
+            "unclassified -> alter": 29,
+            "unclassified -> steal": 24,
+            "alter -> steal": 3
           }
         }
       },
@@ -861,8 +907,8 @@
     }
   },
   "stronger": {
-    "lmr1e2_to_after": 0,
-    "lmr1d_to_after": 1076
+    "lmr1f_to_after": 0,
+    "lmr1d_to_after": 393
   },
   "stronger_records": "stronger.tsv (count.sh --stronger)"
 }

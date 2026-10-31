@@ -17,7 +17,33 @@ The CWE definitions in `logs/cwe-definitions.log` are MITRE's CWE 5.0 (2026-10-2
 
 These are every record of the two exports, not a sample, so the shares below are plain percentages with no interval.
 
+## Results (LMR1g: impersonate, like takeover, only when it is the direct result of the mechanism)
+
+docs/decisions/2026-10-31-impact-classes-impersonate-direct.md (committed and pushed in 5466dc8 before the code and the count). `scripts/count.sh` (`logs/count.log`, 2026-10-31T12:54:24Z, impact.ts 41d0eee6…, the code of 3b8a327) classified every record three times:
+- with the impact.ts of f25d51b (LMR1d, `osv/impact-before-lmr1e2.ts`, sha256 ffefa53e…);
+- with the impact.ts of 84ef289 (LMR1f, `osv/impact-before-lmr1g.ts`, written from `git show`, sha256 9538e75e…);
+- with the new one.
+
+`counts.json`, `stronger.tsv` (`logs/count-stronger.log`) and `strong-side.md` are this run. `strong-side.md` is made from stronger.tsv by `scripts/list-strong.mjs` and lists every record that moved to takeover or impersonate. LMR1f's results are kept as `counts-before-lmr1g.json`, `stronger-before-lmr1g.tsv`, `logs/count-before-lmr1g.log` and `logs/count-stronger-before-lmr1g.log`. Among records that are not MAL-:
+
+| | LMR1d | LMR1f | After |
+|---|---|---|---|
+| npm + Packagist (15,469) | 11,288 (73.0%) | 11,340 (73.3%) | **11,335 (73.3%)** |
+| npm (8,073) | 6,067 (75.2%) | 6,077 (75.3%) | **6,072 (75.2%)** |
+| Packagist (7,396) | 5,221 (70.6%) | 5,263 (71.2%) | **5,263 (71.2%)** |
+
+| Class | LMR1d | LMR1f | After |
+|---|---|---|---|
+| takeover | 1,249 | 1,249 | **1,249** |
+| impersonate | 3,769 | 4,641 | **3,960** |
+
+- **LMR1f → after:** 693 changed, all to a weaker class (impersonate → steal 394, impersonate → alter 287, steal → disrupt 7, steal → unclassified 5). No record moved to takeover or impersonate.
+- **LMR1d → after:** 393 records moved to a stronger class. **191 of them moved to impersonate** (from steal 105, from alter 86), each listed in strong-side.md; none to takeover.
+- `logs/unreadable.log` (3b8a327) lists no record. The rest is in docs/progress/2026-10-31-lmr1g-impact-classes-impersonate-direct.md.
+
 ## Results (LMR1f: takeover only when code running is the direct result of the mechanism)
+
+Where this section names `counts.json`, `stronger.tsv`, `logs/count.log` or `logs/count-stronger.log`, read `counts-before-lmr1g.json`, `stronger-before-lmr1g.tsv`, `logs/count-before-lmr1g.log` and `logs/count-stronger-before-lmr1g.log`. The count.mjs of 84ef289 (git history) compares with LMR1e-2.
 
 docs/decisions/2026-10-31-impact-classes-takeover-direct.md (committed and pushed in 05dde3b before the code and the count). `scripts/count.sh` (`logs/count.log`, 2026-10-31T09:56:04Z, impact.ts 9538e75e…, the code of cc44cbd) classified every record three times: with the impact.ts of f25d51b (LMR1d, `osv/impact-before-lmr1e2.ts`, sha256 ffefa53e…), of 42e30b6 (LMR1e-2, `osv/impact-before-lmr1f.ts`, written from `git show`, sha256 d121e485…) and the new one. `counts.json` and `stronger.tsv` (`count.sh --stronger`, `logs/count-stronger.log`) are this run. LMR1e-2's are kept as `counts-before-lmr1f.json`, `stronger-before-lmr1f.tsv`, `logs/count-before-lmr1f.log` and `logs/count-stronger-before-lmr1f.log`. Among records that are not MAL-:
 

@@ -8,7 +8,7 @@ The code was first committed at 27fa8b8. An automated security review ran on eac
 
 - `.claude/hooks/guard.mjs`: a reader that cuts a command line the way bash (or PowerShell, for the PowerShell tool) does, then the rules: runtimes on the host, third-party repositories' files on the host, `-EncodedCommand`, a heredoc it cannot read, and a depth limit. The rules that were there before (deploys, secrets, force pushes, downloads into a shell, backticks) still refuse what they refused; the backtick check now reads quotes, `$( )` and heredoc delimiters more closely.
 - `.claude/hooks/guard.test.ts`: the tests that were there, with the five commands that are no longer allowed (three `npx wrangler` runs, `npm test`, `curl … | node -e …`) moved to the refused list, plus the five host runs as typed, the other forms, the reviews' cases, and the commands that must stay allowed.
-- `.claude/settings.json`: unchanged. Its matcher `Bash|PowerShell` already sends both tools through the hook.
+- `.claude/settings.json`: unchanged up to 6c38b20, whose matcher `Bash|PowerShell` already sent both tools through the hook. From dee0307 (the resumption, below) it has the matcher `Bash|PowerShell|Edit|Write|NotebookEdit` and `"onFailure": "block"`.
 
 ## Runs
 

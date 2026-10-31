@@ -1,5 +1,7 @@
 # 2026-10-31 (LFLAGS) — The PR job computes npm's flags from the lock's graph, and an optional peer adds nothing
 
+**Scope changed on 2026-10-31 (the brain's ludion-ops#1 comment 6542470518, 6, item 4).** Section 1 (optional peers) and its gates P1, N1 and N2 are in #240. Section 2 (the flags computed from the lock's graph) and its gates F1 to F3 are not: a separate lane builds them, starting from this text. #240 was first built with section 2 too; the code was taken out at the narrowing, and F1's result at 39ee847 is kept in docs/bench/2026-10-31-lflags/README.md for that lane. In its place #240 builds gate 2's checks of every entry whose flags alone changed (docs/decisions/2026-10-31-flag-only-entries-gate2.md).
+
 Committed before the npm runs, the tests and the code that follow it. It carries out the "next step" of docs/decisions/2026-10-31-lock-flags-only.md, section 2 (the brain's ludion-ops#1 comment 6539200199, item 1), audit 6541743253's item 1 (an optional peer's location) and item 4 (review 6541119866's N1 and N2). It changes no gate's criteria and no wait.
 
 ## 1. An optional peer adds nothing, and is checked where it is there

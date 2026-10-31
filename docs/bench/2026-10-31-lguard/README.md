@@ -69,3 +69,16 @@ Run 7's five survivors:
 - No run of the whole node test project: only `.claude/hooks/` and `docs/` changed, and the records test covers `docs/`.
 - The hook was not tried live in this session with a runtime: had it let one through, the runtime would have run on the host. Its own calls (git, gh, docker) went through it after each change.
 - The remaining holes are in the decision record; the chat decides whether to close them.
+
+## 2026-11-01: Monitor denied, container examples read-only and pinned (the chat's comment 6550639256, 2)
+
+From 5afba97. The guard refuses Edit and Write under `.claude/`, so the changes to `.claude/` were made in a clone inside a Docker volume (node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413, Node 24.22.2, npm 11.19.1, user 1000, `--memory 4g`, `--cap-drop ALL`, no Docker socket), committed there and pushed from the host without checking the commit out in the host's worktree. Dependencies: `npm ci --ignore-scripts` (network on); everything after it ran with `--network none`. Nothing ran on the host but git, gh and docker.
+
+| step | command | result |
+|---|---|---|
+| before any change | `npx vitest run .claude/hooks/guard.test.ts tools/records/test/records.test.ts` | 2 files, 434 passed |
+| tests first, on 5afba97's guard.mjs and settings.json | same | 3 failed, 433 passed (436): "says what to do instead", "gives container examples that mount the worktree read-only and pin the image by digest", "denies the Monitor tool as a whole in permissions, and leaves the matcher as it is" |
+| with the change | same | 2 files, 436 passed |
+| typecheck | `npm run typecheck`, and `npx tsc` on a config that adds `.claude/hooks/guard.test.ts` | both exit 0 |
+
+The image digests were read with `docker buildx imagetools inspect` on 2026-11-01; each resolved on Docker Hub. The first version of the new mount check also matched `-v (Get-Command` in the message's `command -v` hint and failed with the change in place; it now matches only `-v <source>:/<target>`, and the three tests still fail on 5afba97's files (the second row was run again after that). No mutation run for this change.

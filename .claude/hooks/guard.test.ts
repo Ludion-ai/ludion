@@ -189,10 +189,32 @@ describe("guard hook: JavaScript and Python runtimes on the host", () => {
 
   it("says what to do instead", () => {
     const node = run("node x.mjs").stderr;
-    expect(node).toContain("docker run --rm --network none -v <worktree>:/w -w /w node:24 node <script>");
+    expect(node).toContain(
+      "docker run --rm --network none -v <worktree>:/w:ro -w /w node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c node <script>",
+    );
     expect(node).toContain("command -v");
-    expect(run("python3 x.py").stderr).toContain("python:3.14-slim python <script>");
+    expect(run("python3 x.py").stderr).toContain(
+      "python:3.14-slim@sha256:35caba83af2fe6da9a5d922f9b0156f21d1246a48278c58a08bd253303ba42e8 python <script>",
+    );
+    expect(run("gh api repos/someone/x/contents/a").stderr).toContain(
+      "curlimages/curl:8.11.1@sha256:c1fe1679c34d9784c1b0d1e5f62ac0a79fca01fb6377cdd33e90473c6f9f9a69 -fsSL <url>",
+    );
     expect(run("Start-Process node", "PowerShell").stderr).toContain("docker run");
+  });
+
+  // A container that can write to the worktree can change what the host runs later, this guard included
+  // (audit comment 6549505261, 1; the chat's comment 6550639256, 2): the examples an agent copies mount
+  // the worktree read-only and pin the image by digest.
+  it("gives container examples that mount the worktree read-only and pin the image by digest", () => {
+    const messages = [run("node x.mjs").stderr, run("python3 x.py").stderr, run("gh api repos/someone/x/contents/a").stderr];
+    for (const message of messages) {
+      expect(message).toContain("docker run --rm");
+      expect(message).toMatch(/@sha256:[0-9a-f]{64} /);
+      expect(message).not.toMatch(/(node:24|python:3\.14-slim|curl:8\.11\.1) /);
+      for (const mount of message.match(/-v \S+:\/\S*/g) ?? []) expect(mount).toMatch(/:ro$/);
+      if (message.includes("<worktree>")) expect(message).toContain("-v <worktree>:/w:ro ");
+    }
+    expect(run("node x.mjs").stderr).toContain("write to a Docker volume or another folder");
   });
 
   it.each([
@@ -456,6 +478,17 @@ describe("guard hook: when it cannot read a command, the call stops", () => {
     expect(guard).toHaveLength(1);
     expect(guard[0]!.matcher.split("|").sort()).toEqual(["Bash", "Edit", "NotebookEdit", "PowerShell", "Write"]);
     for (const h of guard[0]!.hooks) expect(h.onFailure).toBe("block");
+  });
+
+  // Lanes do not need the Monitor tool: it is denied as a whole tool in permissions, which is surer than
+  // adding it to the matcher (the chat's comment 6550639256, 2).
+  it("denies the Monitor tool as a whole in permissions, and leaves the matcher as it is", () => {
+    const settings = JSON.parse(readFileSync(settingsFile, "utf8"));
+    const deny: string[] = settings.permissions.deny;
+    expect(deny).toContain("Monitor");
+    expect(deny.filter((rule) => rule.startsWith("Monitor"))).toEqual(["Monitor"]);
+    const matchers: string[] = settings.hooks.PreToolUse.map((entry: { matcher: string }) => entry.matcher);
+    for (const matcher of matchers) expect(matcher.split("|")).not.toContain("Monitor");
   });
 
   it("imports nothing: it takes only Node's own fs and path, so it loads no other code", () => {

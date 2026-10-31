@@ -418,11 +418,13 @@ const ENCODED = "The guard cannot read a PowerShell -EncodedCommand. Pass the co
 const UNREAD = "The guard cannot read this heredoc's delimiter, or it has no terminator line, so where its text ends cannot be judged. Use <<'EOF' and end it with a line that is exactly EOF.";
 const hostRun = (named) => {
   const python = /^(python[0-9.]*|pythonw|pyw?|pip[0-9.]*|uvx?)$/.test(base(named));
-  const example = python ? "python:3.14-slim python <script>" : "node:24 node <script>";
-  return `${named.slice(0, 80)} on the host is refused: it would run with this machine's files and credentials. Run it inside Docker instead, for example: docker run --rm --network none -v <worktree>:/w -w /w ${example}. To see whether a program is installed, use command -v (Get-Command in PowerShell); to change files, use the editor's tools. docs/decisions/2026-10-31-lguard-host-runtime-guard.md`;
+  const example = python
+    ? "python:3.14-slim@sha256:35caba83af2fe6da9a5d922f9b0156f21d1246a48278c58a08bd253303ba42e8 python <script>"
+    : "node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c node <script>";
+  return `${named.slice(0, 80)} on the host is refused: it would run with this machine's files and credentials. Run it inside Docker instead, for example: docker run --rm --network none -v <worktree>:/w:ro -w /w ${example} (the worktree read-only, the image pinned by digest; to write, write to a Docker volume or another folder). To see whether a program is installed, use command -v (Get-Command in PowerShell); to change files, use the editor's tools. docs/decisions/2026-10-31-lguard-host-runtime-guard.md`;
 };
 const THIRD_PARTY = (owner) =>
-  `Reading the files of ${owner.slice(0, 80)}'s repository on the host is refused: third-party repositories are read only inside a container with no credentials (CLAUDE.md). For example: docker run --rm --read-only --cap-drop ALL curlimages/curl:8.11.1 -fsSL <url>.`;
+  `Reading the files of ${owner.slice(0, 80)}'s repository on the host is refused: third-party repositories are read only inside a container with no credentials (CLAUDE.md). For example: docker run --rm --read-only --cap-drop ALL curlimages/curl:8.11.1@sha256:c1fe1679c34d9784c1b0d1e5f62ac0a79fca01fb6377cdd33e90473c6f9f9a69 -fsSL <url>.`;
 
 /** Why one command is refused, or undefined. */
 function refuse(ws, depth = 0) {

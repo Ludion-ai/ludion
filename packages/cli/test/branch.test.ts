@@ -9,12 +9,15 @@ import { dependencyFixPublished } from "../src/security/exposure.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
 
-function project(): { root: string; copy: string } {
+/** A commit date at which project()'s commit id starts with 00, so its loose object is in objects/00/. */
+const COMMIT_ID_00 = "@1767225635 +0000";
+
+function project(date?: string): { root: string; copy: string } {
   const root = mkdtempSync(join(tmpdir(), "ludion-branch-test-"));
   writeFileSync(join(root, "package.json"), "{}\n");
   mkdirSync(join(root, "src"));
   writeFileSync(join(root, "src", "index.js"), "module.exports = 1;\n");
-  commit(root);
+  commit(root, date);
   const copy = mkdtempSync(join(tmpdir(), "ludion-branch-copy-"));
   snapshot(root, copy);
   return { root, copy };
@@ -211,7 +214,9 @@ describe("a fix on its own branch", () => {
     symlinkSync(join(outside, "tree"), join(fifth.root, ".git", "objects", "ab", "c".repeat(38)));
     expect(() => fixBranch(fifthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow(`objects/ab/${"c".repeat(38)}`);
     // A fan-out entry that is not a folder does not end the check: the link after it is still found.
-    const sixth = project(), sixthBase = gitBase(sixth.root, sixth.copy);
+    // The commit's id starts with 00, so objects/00 is already a folder, as it is for 1 run in 256 without a fixed date.
+    const sixth = project(COMMIT_ID_00), sixthBase = gitBase(sixth.root, sixth.copy);
+    expect(git(sixth.root, "rev-parse", "HEAD")).toMatch(/^00/);
     writeFileSync(join(sixth.root, ".git", "objects", "00"), "");
     expect(() => fixBranch(sixthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow("objects/00 (not a folder)");
     // A reflog file already there, which Git would append to.

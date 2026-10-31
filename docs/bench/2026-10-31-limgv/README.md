@@ -51,6 +51,8 @@ All three points pass. Raw output: logs/e2e.log; the stand-in's state after each
 
 The other two cases: `node` 22.22.0 → 22.23.4 (security releases 22.23.4, 22.23.2, 22.23.0, 22.22.2, published 2026-03-24T00:00:00.000Z, no wait_until), `php` 8.4.26 → 8.4.27 (security release 8.4.27, published 2026-10-21T00:00:00.000Z), each run 1 `opened #1`, run 2 `open_pr_exists #1`; their PRs say "security", as a security fix's do.
 
+After the results were committed (e9a0b59), `scripts/run.sh full` at e9a0b59: build exit 0, typecheck exit 0, `Test Files  40 passed (40)`, `Tests  1380 passed | 25 skipped (1405)` (logs/full-4.log).
+
 ### As planned before LIMGV-CHK (the earlier text)
 
 As LNODE's (docs/bench/2026-10-31-lnode, its run `e2e`), with scripts/e2e.sh, which uses LNODE's github.mjs (the stand-in for GitHub's API) and summary.mjs. It needs the network, Docker on the host's socket and the image ludion-la-runner:

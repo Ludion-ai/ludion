@@ -133,6 +133,65 @@ describe("the rule on deleted files", () => {
   });
 });
 
+describe("the rule on recording a review", () => {
+  // What CLAUDE.md and docs/protected-paths.md say about it, word for word. Posting adds a footer after the review,
+  // so a review has the line rather than ends with it (docs/decisions/2026-10-30-reviewed-sha-has-the-line.md).
+  const RULE = "Every review, protected path or not, is posted on its PR as a comment that has the line `reviewed-sha: <the head SHA reviewed>`; a review with no such record on GitHub is never reported as a review.";
+  const STEP_1 = "1. A reviewer other than the author, with fresh context, reads the full diff at the current head and posts the review as a PR comment. Its first line states the verdict (`APPROVE` or `REQUEST CHANGES`), and it has the line `reviewed-sha: <head SHA it reviewed>`, which need not be its last line.";
+  const EVERY = "Every review, of a protected PR or not and whatever its verdict, is posted as a comment on that PR and has the line `reviewed-sha: <the head SHA it reviewed>`. That line is, in full, `reviewed-sha:`, one space and the 40-character SHA in lowercase, with nothing before or after it; a line in any other form is not counted. A comment with CRLF line ends is read as if they were LF. A comment with exactly one such line is a review of the head it names. A comment with two or more, as when it quotes another review's line, is not counted as a review: it approves nothing, and it undoes an earlier approval of each head it names. A review made after a merge is posted on the merged PR. A review with no such comment on GitHub is never reported as a review.";
+  const CHECK = "A comment approves when its first line has the word `APPROVE` and not `REQUEST`, and it has exactly one `reviewed-sha:` line (below).";
+  const FORM = "The comment has exactly one such line, in the form docs/protected-paths.md gives.";
+  const SAYS = { "CLAUDE.md": [RULE, FORM], "docs/protected-paths.md": [CHECK, STEP_1, EVERY] };
+  type Path = keyof typeof SAYS;
+  const missing = (path: Path, text: string) => SAYS[path].filter(sentence => !flat(text).includes(flat(sentence)));
+  const swap = (text: string, from: string, to: string) => { expect(text).toContain(from); return text.split(from).join(to); };
+
+  it("says a review has the line reviewed-sha: in CLAUDE.md and in docs/protected-paths.md alike", () => {
+    for (const path of ["CLAUDE.md", "docs/protected-paths.md"] as const) expect([path, missing(path, read(path))]).toEqual([path, []]);
+  });
+
+  it("fails a file that goes back to a review ending with the line, or makes it the last line again", () => {
+    const claude = read("CLAUDE.md"), doc = read("docs/protected-paths.md");
+    const changes: [Path, string, string, string][] = [
+      ["CLAUDE.md", "is posted on its PR as a comment that has the line", "is posted as a comment on its PR ending", RULE],
+      ["CLAUDE.md", "`reviewed-sha: <the head SHA reviewed>`;", "`reviewed-sha: <the head SHA reviewed>` as its last line;", RULE],
+      ["docs/protected-paths.md", "and it has the line `reviewed-sha: <head SHA it reviewed>`, which need not be its last line.", "and its last line is `reviewed-sha: <head SHA it reviewed>`.", STEP_1],
+      ["docs/protected-paths.md", ", which need not be its last line.", " as its last line.", STEP_1],
+      ["docs/protected-paths.md", ", which need not be its last line.", ", and nothing after it.", STEP_1],
+      ["docs/protected-paths.md", "on that PR and has the line", "on that PR and ends with the line", EVERY],
+      ["docs/protected-paths.md", "`reviewed-sha: <the head SHA it reviewed>`. That line", "`reviewed-sha: <the head SHA it reviewed>` as its last line. That line", EVERY],
+      ["docs/protected-paths.md", "on that PR and has the line", "on that PR and usually has the line", EVERY],
+      ["docs/protected-paths.md", "and it has exactly one `reviewed-sha:` line", "and it has a `reviewed-sha:` line", CHECK],
+      ["docs/protected-paths.md", "A comment with exactly one such line", "A comment with at least one such line", EVERY],
+      ["docs/protected-paths.md", " A comment with CRLF line ends is read as if they were LF.", "", EVERY],
+      ["CLAUDE.md", "The comment has exactly one such line", "The comment has at least one such line", FORM],
+    ];
+    for (const [path, from, to, lost] of changes) expect([to, missing(path, swap(path === "CLAUDE.md" ? claude : doc, from, to))]).toEqual([to, [lost]]);
+  });
+
+  // A sentence added anywhere else in either file that makes the line the last one again: no sentence about a review, a
+  // comment or a line uses these words, except "which need not be its last line" and "CRLF line ends".
+  const ENDING = /\bends\b|\bending\b|\bend with\b|\blast line\b|\bnothing (?:may |must )?follows?\b|\bfollowed by nothing\b/i;
+  const ending = (text: string) => flat(text).replace("which need not be its last line", "").replace("CRLF line ends", "")
+    .split(/(?<=[.;!?])\s+/).filter(sentence => /review|comment|\bline\b/i.test(sentence)).map(sentence => sentence.match(ENDING)?.[0]).find(Boolean);
+
+  it("says nowhere else in either file that a review ends with the line", () => {
+    for (const path of ["CLAUDE.md", "docs/protected-paths.md"] as const) expect([path, ending(read(path))]).toEqual([path, undefined]);
+  });
+
+  it("fails a new sentence, anywhere in either file, that makes the line the last one again", () => {
+    const claude = read("CLAUDE.md"), doc = read("docs/protected-paths.md");
+    const added: [string, string, string][] = [
+      [claude, "in the form docs/protected-paths.md gives.", "in the form docs/protected-paths.md gives. The comment ends with that line."],
+      [claude, "require a fresh-context review subagent,", "require a fresh-context review subagent, its comment ending `reviewed-sha:`,"],
+      [claude, "auto-merge only with green CI.", "auto-merge only with green CI. A review's last line is its SHA."],
+      [doc, "approves.", "approves. Nothing may follow that line."],
+      [doc, "A review made after a merge is posted on the merged PR.", "A review made after a merge is posted on the merged PR and ends with the line."],
+    ];
+    for (const [text, from, to] of added) expect([to, ending(swap(text, from, to))]).not.toEqual([to, undefined]);
+  });
+});
+
 describe("test.yml", () => {
   it("fails a PR whose base is not main, before anything else runs", () => {
     const yml = read(".github/workflows/test.yml");

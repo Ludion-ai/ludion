@@ -1,0 +1,290 @@
+﻿2026-10-30T19:03:05.6351228Z Current runner version: '2.338.0'
+2026-10-30T19:03:05.6378286Z ##[group]Runner Image Provisioner
+2026-10-30T19:03:05.6379065Z Hosted Compute Agent
+2026-10-30T19:03:05.6379568Z Version: 20261021.618
+2026-10-30T19:03:05.6380252Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-30T19:03:05.6380936Z Build Date: 2026-10-21T00:45:21Z
+2026-10-30T19:03:05.6381596Z Worker ID: {1d37a296-651d-4b92-8d91-535b7d90ea66}
+2026-10-30T19:03:05.6382229Z Region: centralus
+2026-10-30T19:03:05.6382739Z Cloud: Azure
+2026-10-30T19:03:05.6383339Z ##[endgroup]
+2026-10-30T19:03:05.6384578Z ##[group]Operating System
+2026-10-30T19:03:05.6385191Z Ubuntu
+2026-10-30T19:03:05.6385665Z 24.04.5
+2026-10-30T19:03:05.6386117Z LTS
+2026-10-30T19:03:05.6386664Z ##[endgroup]
+2026-10-30T19:03:05.6387153Z ##[group]Runner Image
+2026-10-30T19:03:05.6387881Z Image: ubuntu-24.04
+2026-10-30T19:03:05.6388461Z Version: 20261025.353.1
+2026-10-30T19:03:05.6389616Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-30T19:03:05.6391163Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+2026-10-30T19:03:05.6392038Z ##[endgroup]
+2026-10-30T19:03:05.6393290Z ##[group]GITHUB_TOKEN Permissions
+2026-10-30T19:03:05.6395088Z Contents: write
+2026-10-30T19:03:05.6395707Z Metadata: read
+2026-10-30T19:03:05.6396204Z PullRequests: write
+2026-10-30T19:03:05.6396770Z ##[endgroup]
+2026-10-30T19:03:05.6398968Z Secret source: Actions
+2026-10-30T19:03:05.6399941Z Cache mode: write
+2026-10-30T19:03:05.6400560Z Prepare workflow directory
+2026-10-30T19:03:05.6816328Z Prepare all required actions
+2026-10-30T19:03:05.6873511Z Getting action download info
+2026-10-30T19:03:05.9341500Z Download action repository 'actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1' (SHA:949feb2413d6458794dcd2491c4babbbce0c15c1)
+2026-10-30T19:03:06.2303877Z Download action repository 'Ludion-ai/ludion-trial@6055465fb8fc8bb58fbb15b73e6ba7f3da26335f' (SHA:6055465fb8fc8bb58fbb15b73e6ba7f3da26335f)
+2026-10-30T19:03:06.5957095Z Getting action download info
+2026-10-30T19:03:06.7086646Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+2026-10-30T19:03:06.8711243Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-10-30T19:03:06.9202087Z Download action repository 'actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333' (SHA:9000827ccba6bdab643e8b6fd33ac0654aef8333)
+2026-10-30T19:03:07.3605168Z Complete job name: pull-request
+2026-10-30T19:03:07.4195746Z ##[group]Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+2026-10-30T19:03:07.4196143Z with:
+2026-10-30T19:03:07.4196292Z   node-version: 24
+2026-10-30T19:03:07.4196460Z   package-manager-cache: false
+2026-10-30T19:03:07.4196638Z   check-latest: false
+2026-10-30T19:03:07.4198503Z   token: ***
+2026-10-30T19:03:07.4198728Z ##[endgroup]
+2026-10-30T19:03:07.6556883Z Found in cache @ /opt/hostedtoolcache/node/24.22.1/x64
+2026-10-30T19:03:07.7800734Z ##[group]Environment details
+2026-10-30T19:03:08.0011802Z node: v24.22.1
+2026-10-30T19:03:08.0012803Z npm: 11.19.1
+2026-10-30T19:03:08.0013159Z yarn: 1.22.22
+2026-10-30T19:03:08.0013943Z ##[endgroup]
+2026-10-30T19:03:08.0403688Z ##[group]Run Ludion-ai/ludion-trial@6055465fb8fc8bb58fbb15b73e6ba7f3da26335f
+2026-10-30T19:03:08.0403961Z with:
+2026-10-30T19:03:08.0404101Z   mode: pull-request
+2026-10-30T19:03:08.0404246Z   dir: php-a
+2026-10-30T19:03:08.0404410Z   judge-workflow: .github/workflows/ludion-judge.yml
+2026-10-30T19:03:08.0404607Z ##[endgroup]
+2026-10-30T19:03:08.0459952Z ##[start-action display=Check the mode, the event and the tools;id=__Ludion-ai_ludion-trial.start]
+2026-10-30T19:03:08.0486079Z ##[group]Run bash "$GITHUB_ACTION_PATH/action/start.sh"
+2026-10-30T19:03:08.0486381Z bash "$GITHUB_ACTION_PATH/action/start.sh"
+2026-10-30T19:03:08.0511242Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-30T19:03:08.0511655Z env:
+2026-10-30T19:03:08.0511798Z   MODE: pull-request
+2026-10-30T19:03:08.0511956Z   EVENT: workflow_dispatch
+2026-10-30T19:03:08.0512153Z   RECORD: /home/runner/work/_temp/ludion/judgement.json
+2026-10-30T19:03:08.0512382Z   PR: 
+2026-10-30T19:03:08.0512540Z   HEAD_SHA: 
+2026-10-30T19:03:08.0512673Z   BASE_SHA: 
+2026-10-30T19:03:08.0512833Z   MERGE_SHA: 560210db514b1938f45552fa484b372095b6a923
+2026-10-30T19:03:08.0513021Z   REF: refs/heads/main
+2026-10-30T19:03:08.0513172Z   DEFAULT_BRANCH: main
+2026-10-30T19:03:08.0513318Z ##[endgroup]
+2026-10-30T19:03:08.0796400Z ##[end-action id=__Ludion-ai_ludion-trial.start;outcome=success;conclusion=success;duration_ms=33]
+2026-10-30T19:03:08.0800814Z ##[start-action display=Check that this commit of the action carries the bundled judge;id=__Ludion-ai_ludion-trial.bundle]
+2026-10-30T19:03:08.0820508Z ##[group]Run for file in packages/cli/dist/cli.js action/dist/record.js; do
+2026-10-30T19:03:08.0820883Z for file in packages/cli/dist/cli.js action/dist/record.js; do
+2026-10-30T19:03:08.0821178Z   if [ ! -f "$GITHUB_ACTION_PATH/$file" ]; then
+2026-10-30T19:03:08.0821512Z     echo "::error::This commit of the action has no bundled judge (${file}). Pin a release commit's SHA."
+2026-10-30T19:03:08.0821811Z     exit 1
+2026-10-30T19:03:08.0821956Z   fi
+2026-10-30T19:03:08.0822243Z done
+2026-10-30T19:03:08.0839335Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-30T19:03:08.0839557Z ##[endgroup]
+2026-10-30T19:03:08.0888008Z ##[end-action id=__Ludion-ai_ludion-trial.bundle;outcome=success;conclusion=success;duration_ms=8]
+2026-10-30T19:03:08.0891767Z ##[start-action display=Read the PR's package.json files and package-lock.json as data;id=__Ludion-ai_ludion-trial.read]
+2026-10-30T19:03:08.0896278Z ##[end-action id=__Ludion-ai_ludion-trial.read;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.0899959Z ##[start-action display=Judge;id=__Ludion-ai_ludion-trial.__run]
+2026-10-30T19:03:08.0903701Z ##[end-action id=__Ludion-ai_ludion-trial.__run;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.0905394Z ##[start-action display=Summary;id=__Ludion-ai_ludion-trial.__run_2]
+2026-10-30T19:03:08.0908168Z ##[end-action id=__Ludion-ai_ludion-trial.__run_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.0909601Z ##[start-action display=Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9;id=__Ludion-ai_ludion-trial.__actions_upload-artifact]
+2026-10-30T19:03:08.0912014Z ##[end-action id=__Ludion-ai_ludion-trial.__actions_upload-artifact;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.0915368Z ##[start-action display=Check the judgement and post it;id=__Ludion-ai_ludion-trial.__run_3]
+2026-10-30T19:03:08.0917681Z ##[end-action id=__Ludion-ai_ludion-trial.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.0918873Z ##[start-action display=Check out the run's commit;id=__Ludion-ai_ludion-trial.__actions_checkout]
+2026-10-30T19:03:08.0967931Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-10-30T19:03:08.0968173Z with:
+2026-10-30T19:03:08.0968330Z   ref: 560210db514b1938f45552fa484b372095b6a923
+2026-10-30T19:03:08.0968698Z   persist-credentials: false
+2026-10-30T19:03:08.0968865Z   fetch-depth: 1
+2026-10-30T19:03:08.0969023Z   repository: Ludion-ai/ludion-trial
+2026-10-30T19:03:08.0970657Z   token: ***
+2026-10-30T19:03:08.0970798Z   ssh-strict: true
+2026-10-30T19:03:08.0970944Z   ssh-user: git
+2026-10-30T19:03:08.0971084Z   clean: true
+2026-10-30T19:03:08.0971238Z   sparse-checkout-cone-mode: true
+2026-10-30T19:03:08.0971430Z   fetch-tags: false
+2026-10-30T19:03:08.0971580Z   show-progress: true
+2026-10-30T19:03:08.0971727Z   lfs: false
+2026-10-30T19:03:08.0971863Z   submodules: false
+2026-10-30T19:03:08.0972017Z   set-safe-directory: true
+2026-10-30T19:03:08.0972190Z   allow-unsafe-pr-checkout: false
+2026-10-30T19:03:08.0972481Z ##[endgroup]
+2026-10-30T19:03:08.1678028Z Syncing repository: Ludion-ai/ludion-trial
+2026-10-30T19:03:08.1679450Z ##[group]Getting Git version info
+2026-10-30T19:03:08.1680152Z Working directory is '/home/runner/work/ludion-trial/ludion-trial'
+2026-10-30T19:03:08.1681267Z [command]/usr/bin/git version
+2026-10-30T19:03:08.1807381Z git version 2.56.0
+2026-10-30T19:03:08.1840395Z ##[endgroup]
+2026-10-30T19:03:08.1846236Z Temporarily overriding HOME='/home/runner/work/_temp/d87b40a3-3217-4c9b-8e27-4c41f81fba22' before making global git config changes
+2026-10-30T19:03:08.1847189Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T19:03:08.1861393Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludion-trial/ludion-trial
+2026-10-30T19:03:08.1925041Z Deleting the contents of '/home/runner/work/ludion-trial/ludion-trial'
+2026-10-30T19:03:08.1927996Z ##[group]Determining repository object format
+2026-10-30T19:03:08.1929633Z ##[endgroup]
+2026-10-30T19:03:08.1930247Z ##[group]Initializing the repository
+2026-10-30T19:03:08.1934841Z [command]/usr/bin/git init /home/runner/work/ludion-trial/ludion-trial
+2026-10-30T19:03:08.2037711Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-30T19:03:08.2042136Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-30T19:03:08.2052394Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-30T19:03:08.2054807Z hint: call:
+2026-10-30T19:03:08.2055187Z hint:
+2026-10-30T19:03:08.2055678Z hint: 	git config --global init.defaultBranch <name>
+2026-10-30T19:03:08.2056145Z hint:
+2026-10-30T19:03:08.2056669Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-30T19:03:08.2057382Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-30T19:03:08.2058081Z hint:
+2026-10-30T19:03:08.2058455Z hint: 	git branch -m <name>
+2026-10-30T19:03:08.2058832Z hint:
+2026-10-30T19:03:08.2059407Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-30T19:03:08.2060232Z Initialized empty Git repository in /home/runner/work/ludion-trial/ludion-trial/.git/
+2026-10-30T19:03:08.2061711Z [command]/usr/bin/git remote add origin https://github.com/Ludion-ai/ludion-trial
+2026-10-30T19:03:08.2124224Z ##[endgroup]
+2026-10-30T19:03:08.2124882Z ##[group]Disabling automatic garbage collection
+2026-10-30T19:03:08.2130826Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-30T19:03:08.2197590Z ##[endgroup]
+2026-10-30T19:03:08.2198442Z ##[group]Setting up auth
+2026-10-30T19:03:08.2199343Z Removing SSH command configuration
+2026-10-30T19:03:08.2200191Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T19:03:08.2290648Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T19:03:08.2605163Z Removing HTTP extra header
+2026-10-30T19:03:08.2610930Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T19:03:08.2653931Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T19:03:08.2851126Z Removing includeIf entries pointing to credentials config files
+2026-10-30T19:03:08.2852869Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T19:03:08.2898287Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T19:03:08.3203237Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-30T19:03:08.3205945Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path /home/runner/work/_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.3316669Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.3424301Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.3430640Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.3444651Z ##[endgroup]
+2026-10-30T19:03:08.3459940Z ##[group]Fetching the repository
+2026-10-30T19:03:08.3461549Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 560210db514b1938f45552fa484b372095b6a923
+2026-10-30T19:03:08.7112617Z From https://github.com/Ludion-ai/ludion-trial
+2026-10-30T19:03:08.7113167Z  * branch            560210db514b1938f45552fa484b372095b6a923 -> FETCH_HEAD
+2026-10-30T19:03:08.7114618Z [command]/usr/bin/git rev-parse --verify --quiet 560210db514b1938f45552fa484b372095b6a923^{object}
+2026-10-30T19:03:08.7115138Z 560210db514b1938f45552fa484b372095b6a923
+2026-10-30T19:03:08.7115940Z ##[endgroup]
+2026-10-30T19:03:08.7116342Z ##[group]Determining the checkout info
+2026-10-30T19:03:08.7116761Z ##[endgroup]
+2026-10-30T19:03:08.7117106Z [command]/usr/bin/git sparse-checkout disable
+2026-10-30T19:03:08.7144779Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-30T19:03:08.7187291Z ##[group]Checking out the ref
+2026-10-30T19:03:08.7189668Z [command]/usr/bin/git checkout --progress --force 560210db514b1938f45552fa484b372095b6a923
+2026-10-30T19:03:08.7248826Z Note: switching to '560210db514b1938f45552fa484b372095b6a923'.
+2026-10-30T19:03:08.7249772Z 
+2026-10-30T19:03:08.7250359Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-30T19:03:08.7251106Z changes and commit them, and you can discard any commits you make in this
+2026-10-30T19:03:08.7251828Z state without impacting any branches by switching back to a branch.
+2026-10-30T19:03:08.7252312Z 
+2026-10-30T19:03:08.7252735Z If you want to create a new branch to retain commits you create, you may
+2026-10-30T19:03:08.7253398Z do so (now or later) by using -c with the switch command. Example:
+2026-10-30T19:03:08.7253848Z 
+2026-10-30T19:03:08.7254187Z   git switch -c <new-branch-name>
+2026-10-30T19:03:08.7254571Z 
+2026-10-30T19:03:08.7254901Z Or undo this operation with:
+2026-10-30T19:03:08.7255229Z 
+2026-10-30T19:03:08.7255521Z   git switch -
+2026-10-30T19:03:08.7255825Z 
+2026-10-30T19:03:08.7256288Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-30T19:03:08.7256795Z 
+2026-10-30T19:03:08.7257802Z HEAD is now at 560210d LB2b2: hourly cron with a check job before Docker; three CI forms (php-a, php-b, php-c) and ci.yml
+2026-10-30T19:03:08.7259568Z ##[endgroup]
+2026-10-30T19:03:08.7309074Z [command]/usr/bin/git log -1 --format=%H
+2026-10-30T19:03:08.7344961Z 560210db514b1938f45552fa484b372095b6a923
+2026-10-30T19:03:08.7351163Z ##[group]Removing auth
+2026-10-30T19:03:08.7351771Z Removing SSH command configuration
+2026-10-30T19:03:08.7354430Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T19:03:08.7393852Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T19:03:08.7599870Z Removing HTTP extra header
+2026-10-30T19:03:08.7600699Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T19:03:08.7640798Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T19:03:08.7849633Z Removing includeIf entries pointing to credentials config files
+2026-10-30T19:03:08.7851504Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T19:03:08.7891740Z includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path
+2026-10-30T19:03:08.7892911Z includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path
+2026-10-30T19:03:08.7893684Z includeif.gitdir:/github/workspace/.git.path
+2026-10-30T19:03:08.7894321Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-30T19:03:08.7922425Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path
+2026-10-30T19:03:08.7944737Z /home/runner/work/_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.7955340Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-42974760\-d758\-4325\-80c2\-8c380c6d0903\.config
+2026-10-30T19:03:08.7999209Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path
+2026-10-30T19:03:08.8034652Z /home/runner/work/_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.8043088Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ludion-trial/ludion-trial/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-42974760\-d758\-4325\-80c2\-8c380c6d0903\.config
+2026-10-30T19:03:08.8103133Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-30T19:03:08.8138122Z /github/runner_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.8143505Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-42974760\-d758\-4325\-80c2\-8c380c6d0903\.config
+2026-10-30T19:03:08.8189504Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-30T19:03:08.8225197Z /github/runner_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config
+2026-10-30T19:03:08.8229875Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-42974760\-d758\-4325\-80c2\-8c380c6d0903\.config
+2026-10-30T19:03:08.8273801Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T19:03:08.8480314Z Removing credentials config '/home/runner/work/_temp/git-credentials-42974760-d758-4325-80c2-8c380c6d0903.config'
+2026-10-30T19:03:08.8486900Z ##[endgroup]
+2026-10-30T19:03:08.8588376Z ##[end-action id=__Ludion-ai_ludion-trial.__actions_checkout;outcome=success;conclusion=success;duration_ms=766]
+2026-10-30T19:03:08.8596042Z ##[start-action display=Decide, before Docker, whether this run has anything to do;id=__Ludion-ai_ludion-trial.check]
+2026-10-30T19:03:08.8599907Z ##[end-action id=__Ludion-ai_ludion-trial.check;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.8602596Z ##[start-action display=Validate each fix and commit it on its own branch;id=__Ludion-ai_ludion-trial.patch]
+2026-10-30T19:03:08.8605150Z ##[end-action id=__Ludion-ai_ludion-trial.patch;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.8606500Z ##[start-action display=Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9;id=__Ludion-ai_ludion-trial.__actions_upload-artifact_2]
+2026-10-30T19:03:08.8609599Z ##[end-action id=__Ludion-ai_ludion-trial.__actions_upload-artifact_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.8611643Z ##[start-action display=Fail the job when a fix failed;id=__Ludion-ai_ludion-trial.__run_4]
+2026-10-30T19:03:08.8614506Z ##[end-action id=__Ludion-ai_ludion-trial.__run_4;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-30T19:03:08.8615847Z ##[start-action display=Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333;id=__Ludion-ai_ludion-trial.__actions_download-artifact]
+2026-10-30T19:03:08.8661278Z ##[group]Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+2026-10-30T19:03:08.8661532Z with:
+2026-10-30T19:03:08.8661699Z   name: ludion-fixes
+2026-10-30T19:03:08.8661866Z   path: /home/runner/work/_temp/ludion/fixes
+2026-10-30T19:03:08.8662053Z   merge-multiple: false
+2026-10-30T19:03:08.8662215Z   repository: Ludion-ai/ludion-trial
+2026-10-30T19:03:08.8662385Z   run-id: 41111849216
+2026-10-30T19:03:08.8662535Z   skip-decompress: false
+2026-10-30T19:03:08.8662691Z   digest-mismatch: error
+2026-10-30T19:03:08.8662851Z ##[endgroup]
+2026-10-30T19:03:08.9667617Z Downloading single artifact
+2026-10-30T19:03:09.1689072Z Preparing to download the following artifacts:
+2026-10-30T19:03:09.1690166Z - ludion-fixes (ID: 13003607547, Size: 2230, Expected Digest: sha256:9a90a7657368feaee97a7bcaa26f2c250510b7ccfe19838a6c43b6462ece1478)
+2026-10-30T19:03:09.5224493Z Redirecting to blob download url: https://productionresultssa15.blob.core.windows.net/actions-results/ca5fba45-c119-4dde-b41b-88257d60081c/workflow-job-run-a00f11d6-3707-5102-9895-a38f8ff9f3c4/artifacts/bfdf85641618a0eed87101d12be75781da547c50efaf40869f761960a0e1c825.zip
+2026-10-30T19:03:09.5225525Z Starting download of artifact to: /home/runner/work/_temp/ludion/fixes
+2026-10-30T19:03:09.6969032Z (node:2113) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-30T19:03:09.6970051Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-30T19:03:09.7098799Z SHA256 digest of downloaded artifact is 9a90a7657368feaee97a7bcaa26f2c250510b7ccfe19838a6c43b6462ece1478
+2026-10-30T19:03:09.7099789Z Artifact download completed successfully.
+2026-10-30T19:03:09.7100228Z Total of 1 artifact(s) downloaded
+2026-10-30T19:03:09.7100615Z Download artifact has finished successfully
+2026-10-30T19:03:09.7175442Z ##[end-action id=__Ludion-ai_ludion-trial.__actions_download-artifact;outcome=success;conclusion=success;duration_ms=855]
+2026-10-30T19:03:09.7180787Z ##[start-action display=Check the fixes as untrusted data and open one PR per fix;id=__Ludion-ai_ludion-trial.__run_5]
+2026-10-30T19:03:09.7196856Z ##[group]Run node "$CLI" deliver open --dir "$PROJECT" --artifact "$ARTIFACT" --base "$GITHUB_SHA" --repo "$GITHUB_REPOSITORY" \
+2026-10-30T19:03:09.7197325Z node "$CLI" deliver open --dir "$PROJECT" --artifact "$ARTIFACT" --base "$GITHUB_SHA" --repo "$GITHUB_REPOSITORY" \
+2026-10-30T19:03:09.7197960Z   --ref "$GITHUB_REF" --api "$GITHUB_API_URL" --remote "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" | tee -a "$GITHUB_STEP_SUMMARY"
+2026-10-30T19:03:09.7214312Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-30T19:03:09.7214502Z env:
+2026-10-30T19:03:09.7216181Z   GH_TOKEN: ***
+2026-10-30T19:03:09.7216586Z   CLI: /home/runner/work/_actions/Ludion-ai/ludion-trial/6055465fb8fc8bb58fbb15b73e6ba7f3da26335f/packages/cli/dist/cli.js
+2026-10-30T19:03:09.7216935Z   PROJECT: /home/runner/work/ludion-trial/ludion-trial/php-a
+2026-10-30T19:03:09.7217138Z   ARTIFACT: /home/runner/work/_temp/ludion/fixes
+2026-10-30T19:03:09.7217308Z ##[endgroup]
+2026-10-30T19:03:13.5303627Z Receipt 2715ca39-7fb0-4d9c-9259-023e51fb494d on 560210db514b: 1 applied fix.
+2026-10-30T19:03:13.5304732Z   php (ludion/php-a/php/8.4.27): opened #4
+2026-10-30T19:03:13.5478188Z ##[end-action id=__Ludion-ai_ludion-trial.__run_5;outcome=success;conclusion=success;duration_ms=3829]
+2026-10-30T19:03:13.5635323Z Post job cleanup.
+2026-10-30T19:03:13.5637919Z ##[start-action display=Check out the run's commit;id=__9b5f32db-6bcb-4d3d-9c12-4216465e8ef7.__actions_checkout]
+2026-10-30T19:03:13.5673293Z Post job cleanup.
+2026-10-30T19:03:13.6368250Z [command]/usr/bin/git version
+2026-10-30T19:03:13.6438411Z git version 2.56.0
+2026-10-30T19:03:13.6474311Z Temporarily overriding HOME='/home/runner/work/_temp/9048448c-1c5c-4765-879b-2153e72f766b' before making global git config changes
+2026-10-30T19:03:13.6475155Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T19:03:13.6475908Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludion-trial/ludion-trial
+2026-10-30T19:03:13.6578752Z Removing SSH command configuration
+2026-10-30T19:03:13.6588290Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T19:03:13.6606961Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T19:03:13.6889368Z Removing HTTP extra header
+2026-10-30T19:03:13.6890200Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T19:03:13.6982431Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T19:03:13.7296230Z Removing includeIf entries pointing to credentials config files
+2026-10-30T19:03:13.7301855Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T19:03:13.7345047Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T19:03:13.7644837Z ##[end-action id=__9b5f32db-6bcb-4d3d-9c12-4216465e8ef7.__actions_checkout;outcome=success;conclusion=success;duration_ms=200]
+2026-10-30T19:03:13.7684491Z Post job cleanup.
+2026-10-30T19:03:13.8740568Z Cleaning up orphan processes

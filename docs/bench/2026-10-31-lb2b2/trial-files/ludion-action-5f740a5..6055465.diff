@@ -1,0 +1,205 @@
+diff --git a/action.yml b/action.yml
+index ef7d374..88e9b1c 100644
+--- a/action.yml
++++ b/action.yml
+@@ -33,7 +33,7 @@ branding:
+ 
+ inputs:
+   mode:
+-    description: "judge (the read-only job, on pull_request), comment (the job that posts, on workflow_run), patch (the read-only job that validates fixes, on schedule) or pull-request (the job that opens their PRs, after patch)."
++    description: "judge (the read-only job, on pull_request), comment (the job that posts, on workflow_run), patch (the read-only job that validates fixes, on schedule), pull-request (the job that opens their PRs, after patch) or check (LB2b2 prototype: the job before patch that decides whether there is anything to do)."
+     required: true
+   judge-workflow:
+     description: "mode comment: the path of the workflow that runs mode judge. Only that workflow's runs are posted."
+@@ -48,6 +48,9 @@ outputs:
+   packed:
+     description: "mode patch: true when the ludion-fixes artifact holds at least one applied fix."
+     value: ${{ steps.patch.outputs.packed }}
++  work:
++    description: "mode check (LB2b2 prototype): false when this run has nothing to do (action/check.sh); otherwise true."
++    value: ${{ steps.check.outputs.work }}
+ 
+ runs:
+   using: composite
+@@ -160,17 +163,31 @@ runs:
+         CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+       run: bash "$GITHUB_ACTION_PATH/action/comment.sh"
+ 
+-    # modes patch and pull-request
++    # modes patch, pull-request and check
+ 
+     # The run's own commit, with no credential left in .git/config. The fixes are commits on it.
+     - name: Check out the run's commit
+-      if: ${{ inputs.mode == 'patch' || inputs.mode == 'pull-request' }}
++      if: ${{ inputs.mode == 'patch' || inputs.mode == 'pull-request' || inputs.mode == 'check' }}
+       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+       with:
+         ref: ${{ github.sha }}
+         persist-credentials: false
+         fetch-depth: 1
+ 
++    # mode check (LB2b2 prototype, ludion-trial only): runs no dependency code and reads no earlier run's artifact.
++    - name: Decide, before Docker, whether this run has anything to do
++      id: check
++      if: ${{ inputs.mode == 'check' && steps.bundle.outcome == 'success' }}
++      shell: bash
++      working-directory: ${{ runner.temp }}
++      env:
++        GH_TOKEN: ${{ github.token }}
++        REPO: ${{ github.repository }}
++        CLI: ${{ github.action_path }}/packages/cli/dist/cli.js
++        PROJECT: ${{ github.workspace }}/${{ inputs.dir }}
++        DIR: ${{ inputs.dir }}
++      run: bash "$GITHUB_ACTION_PATH/action/check.sh"
++
+     # No token here: only the checkout above used the job's read-only token, to fetch, and left no credential on disk.
+     - name: Validate each fix and commit it on its own branch
+       id: patch
+diff --git a/action/check.jq b/action/check.jq
+new file mode 100644
+index 0000000..340d403
+--- /dev/null
++++ b/action/check.jq
+@@ -0,0 +1,24 @@
++# action/check.sh (mode check, LB2b2 prototype): the finding keys of one `ludion scan --json` answer, one per line.
++# A PHP scan gives "php" when it has a candidate; a project scan gives "<ecosystem>:<package>" for each finding (only
++# kind "vulnerability" when the result has fixed_versions_note, as scan.ts's vulnerable() counts). A failed check, an
++# incomplete result, an unsupported inventory or an answer of another shape stops jq with an error: no keys, work=true.
++def clean: tostring | gsub("[^A-Za-z0-9@._/:~-]"; "?");
++def php_keys($ecosystem): if .candidate == null then empty else $ecosystem end;
++if has("candidate") then
++  php_keys("php")
++elif has("checks") and (.checks | type) == "array" then
++  if (.unsupported // [] | length) > 0 then error("unsupported: \(.unsupported | map(clean) | join(", "))")
++  elif any(.checks[]; has("error")) then error("a check failed: \([.checks[] | select(has("error")) | .ecosystem | clean] | join(", "))")
++  elif any(.checks[]; .result.status? == "incomplete") then error("a check is incomplete")
++  else
++    [.checks[] | (.ecosystem | clean) as $e | .result
++      | if has("candidate") then php_keys($e)
++        elif (.findings | type) == "array" then
++          has("fixed_versions_note") as $readonly
++          | .findings[] | select(($readonly | not) or .kind == "vulnerability") | "\($e):\(.package.name | clean)"
++        else error("a result of another shape") end]
++    | unique[]
++  end
++else
++  error("an answer of another shape")
++end
+diff --git a/action/check.sh b/action/check.sh
+new file mode 100644
+index 0000000..f759cc3
+--- /dev/null
++++ b/action/check.sh
+@@ -0,0 +1,79 @@
++#!/usr/bin/env bash
++# action.yml, mode check (LB2b2 prototype in Ludion-ai/ludion-trial, not in Ludion-ai/ludion): decides, before Docker,
++# whether this run has anything to do (docs/decisions/2026-10-31-lb2b2-trial-definitions.md in Ludion-ai/ludion, item 2).
++# Its only inputs are the run's commit, the live answers of `ludion scan` (OSV, php.net) and the open PRs through the API.
++# It never reads an earlier run's artifact (the job has no actions permission), so a forged receipt cannot quiet a fix.
++# work=false only when proven: nothing found, or every finding fixed by an open Ludion PR whose head is this commit's
++# folder plus its change. Anything else, an error included, is work=true and the full run goes on.
++set -uo pipefail
++
++answer() {
++  echo "work=$1" >> "$GITHUB_OUTPUT"
++  echo "Ludion check: work=$1: $2"
++  echo "**Ludion check (prototype):** work=\`$1\`: $2" >> "$GITHUB_STEP_SUMMARY"
++  exit 0
++}
++
++dir=${DIR%/}
++[ -n "$dir" ] || dir=.
++scratch="$RUNNER_TEMP/ludion/check"
++mkdir -p "$scratch"
++started=$(date +%s)
++
++node "$CLI" scan --dir "$PROJECT" --json > "$scratch/main.json"
++status=$?
++[ "$status" = 0 ] && answer false "ludion scan found nothing on ${GITHUB_SHA:0:12} (exit 0)."
++[ "$status" = 1 ] || answer true "ludion scan exited ${status}."
++jq -r -f "$GITHUB_ACTION_PATH/action/check.jq" "$scratch/main.json" > "$scratch/main.keys" \
++  || answer true "the scan's answer cannot be decided here (the error is above)."
++[ -s "$scratch/main.keys" ] || answer true "ludion scan exited 1 with no finding to cover."
++echo "Findings on ${GITHUB_SHA:0:12}: $(paste -sd' ' "$scratch/main.keys")"
++
++gh api --paginate "repos/$REPO/pulls?state=open&per_page=100" \
++  --jq '.[] | "\(.number) \(.head.sha) \(.head.repo.full_name // "-") \(.user.login) \(.head.ref)"' > "$scratch/pulls" \
++  || answer true "GitHub did not list the open PRs."
++
++: > "$scratch/covered"
++while read -r number head repo login ref; do
++  [ "$repo" = "$REPO" ] && [ "$login" = "github-actions[bot]" ] && [ "${ref#ludion/}" != "$ref" ] || continue
++  [[ "$number" =~ ^[0-9]+$ && "$head" =~ ^[0-9a-f]{40}$ ]] || continue
++  # The PR head's folder must be this commit's folder plus the PR's change: no file under it changed since the merge base.
++  if ! read -r behind base < <(gh api "repos/$REPO/compare/${GITHUB_SHA}...${head}" --jq '"\(.behind_by) \(.merge_base_commit.sha)"'); then
++    echo "PR #${number}: GitHub did not compare it with ${GITHUB_SHA:0:12}; not counted."
++    continue
++  fi
++  if [ "$behind" != 0 ]; then
++    if ! gh api "repos/$REPO/compare/${base}...${GITHUB_SHA}" --jq '(.files | length), .files[].filename' > "$scratch/moved"; then
++      echo "PR #${number}: GitHub did not list what changed since its merge base; not counted."
++      continue
++    fi
++    count=$(head -n 1 "$scratch/moved")
++    # The compare API lists at most 300 files: that many may hide one under the folder.
++    if ! [[ "$count" =~ ^[0-9]+$ ]] || [ "$count" -ge 300 ] || { [ "$dir" = . ] && [ "$count" -gt 0 ]; } \
++      || awk -v p="${dir}/" 'NR > 1 && index($0, p) == 1 { found = 1 } END { exit !found }' "$scratch/moved"; then
++      echo "PR #${number}: ${dir} may have changed on ${GITHUB_SHA:0:12} since the PR's merge base; not counted."
++      continue
++    fi
++  fi
++  rm -rf "$scratch/head" && mkdir -p "$scratch/head"
++  if ! gh api "repos/$REPO/tarball/${head}" > "$scratch/head.tgz" || ! tar -xzf "$scratch/head.tgz" -C "$scratch/head" --strip-components=1; then
++    echo "PR #${number}: its head's files could not be read; not counted."
++    continue
++  fi
++  node "$CLI" scan --dir "$scratch/head/$dir" --json > "$scratch/pr-${number}.json"
++  s=$?
++  if [ "$s" != 0 ] && [ "$s" != 1 ]; then echo "PR #${number}: ludion scan exited ${s} on its head; not counted."; continue; fi
++  if ! jq -r -f "$GITHUB_ACTION_PATH/action/check.jq" "$scratch/pr-${number}.json" > "$scratch/pr-${number}.keys"; then
++    echo "PR #${number}: the scan's answer on its head cannot be decided; not counted."
++    continue
++  fi
++  # Each finding of this commit that the PR's head no longer has is covered by this PR.
++  grep -v -x -F -f "$scratch/pr-${number}.keys" "$scratch/main.keys" | sed "s/\$/ #${number}/" >> "$scratch/covered"
++  echo "PR #${number} (${ref}, head ${head:0:12}): its head has $(wc -l < "$scratch/pr-${number}.keys") of these findings: $(paste -sd' ' "$scratch/pr-${number}.keys")"
++done < "$scratch/pulls"
++
++cut -d' ' -f1 "$scratch/covered" | sort -u > "$scratch/covered.keys"
++missing=$(grep -v -x -F -f "$scratch/covered.keys" "$scratch/main.keys" | paste -sd' ')
++seconds=$(( $(date +%s) - started ))
++[ -z "$missing" ] && answer false "every finding is fixed by an open Ludion PR ($(sort -u "$scratch/covered" | paste -sd',' | sed 's/,/, /g')); ${seconds} s."
++answer true "not fixed by an open Ludion PR: ${missing}; ${seconds} s."
+diff --git a/action/start.sh b/action/start.sh
+index 00a976a..1a331b6 100644
+--- a/action/start.sh
++++ b/action/start.sh
+@@ -29,8 +29,9 @@ case "$MODE" in
+     fi
+     need gh jq unzip
+     ;;
+-  patch|pull-request)
+-    # The scheduled workflow's two jobs (action/patch-workflow.yml): on a schedule or by hand, on the default branch.
++  patch|pull-request|check)
++    # The scheduled workflow's jobs (action/patch-workflow.yml): on a schedule or by hand, on the default branch.
++    # check (LB2b2 prototype, ludion-trial only) is the job before patch that decides whether there is anything to do.
+     # A scheduled run is always on the default branch; a dispatched one names its branch.
+     if [ "$EVENT" != "schedule" ] && [ "$EVENT" != "workflow_dispatch" ]; then
+       echo "::error::mode ${MODE} runs on schedule or workflow_dispatch, not ${EVENT}."
+@@ -47,13 +48,15 @@ case "$MODE" in
+         exit 1
+       fi
+       need node git docker jq
++    elif [ "$MODE" = "check" ]; then
++      need node git jq gh tar
+     else
+       need node git
+     fi
+     node -e 'if (Number(process.versions.node.split(".")[0]) < 22) { console.error(`::error::Ludion needs Node 22 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
+     ;;
+   *)
+-    echo "::error::mode must be judge, comment, patch or pull-request."
++    echo "::error::mode must be judge, comment, patch, pull-request or check."
+     exit 1
+     ;;
+ esac

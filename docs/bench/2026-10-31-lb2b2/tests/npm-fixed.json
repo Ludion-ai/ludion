@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "checked_at": "2026-10-30T18:52:54.834Z",
+  "status": "no_known_updates",
+  "checks": [
+    {
+      "ecosystem": "npm",
+      "result": {
+        "schema": 1,
+        "checked_at": "2026-10-30T18:52:54.834Z",
+        "source": "https://osv.dev",
+        "sources": [
+          "https://osv.dev"
+        ],
+        "status": "no_known_vulnerabilities",
+        "inventory": {
+          "ecosystem": "npm",
+          "files": [
+            "package.json",
+            "package-lock.json"
+          ],
+          "scope": "locked_dependencies",
+          "packages": [
+            {
+              "ecosystem": "npm",
+              "name": "lodash",
+              "version": "4.18.1",
+              "direct": true
+            }
+          ],
+          "limitations": []
+        },
+        "findings": [],
+        "plan": [],
+        "blocked": [],
+        "note": "Known advisories for the recorded package inventory only. No match is not a security guarantee. Package names and versions are sent to OSV, and Composer package names to Packagist; source is not. Major-version fixes, unresolved inventory and unsupported builds require review."
+      }
+    }
+  ],
+  "unsupported": []
+}

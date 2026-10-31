@@ -217,7 +217,7 @@ export const ja: typeof en = {
     "privacy": {
       "summary": "手元から外へ出るもの",
       "note": "送る内容と境界",
-      "requests": "OSV には、パッケージ名と正確なバージョンを送ります。PHP は php.net のメタデータを使います。ツールイメージと依存関係は、設定した公開の取得元から取ります。Composer の ZIP のリダイレクトは、リクエストのたびに前もって確かめます。npm の URL・Git・ファイルの取得元は無効にし、Maven のリポジトリはミラーの設定で公開の Central に向けます。",
+      "requests": "OSV（api.osv.dev）には、パッケージ名と正確なバージョンを送り、返ってきたアドバイザリーの ID を OSV に送り返します。Composer のパッケージ名は、Packagist のアドバイザリーの一覧（packagist.org）にも送ります。バージョン、公開の時刻、来歴を読むために、npm のパッケージ名とバージョンを npm レジストリ（registry.npmjs.org）に、Composer のパッケージ名を Packagist（repo.packagist.org）に送ります。PHP のリリースの一覧は www.php.net から読み、そのとき 8.4 のような PHP のブランチを送ります。CISA の悪用されている脆弱性のカタログ（www.cisa.gov）と、FIRST の毎日の EPSS スコアの一覧（epss.empiricalsecurity.com）は丸ごとダウンロードするので、CVE の ID は送りません。定期実行のワークフローの PR のジョブは、ワークフローのトークンで GitHub を使い、リポジトリとその PR を読み、修正ごとのコミットをそれぞれのブランチに push し、パッケージ名、バージョン、アドバイザリーの ID、レシートの時刻をタイトルと本文に載せた PR を開きます。また、公式の PHP イメージのタグのダイジェストを Docker Hub（auth.docker.io、registry-1.docker.io）に問い合わせます。ツールイメージは、公式の PHP イメージも含めて、お使いの Docker デーモンを通して、そのデーモンに設定されたレジストリから取ります。npm のパッケージは、URL・Git・ファイルの取得元を無効にして registry.npmjs.org から取り、Maven のリポジトリはミラーの設定で公開の Central（repo.maven.apache.org）に向けます。Composer の ZIP は、github.com、api.github.com、codeload.github.com、bitbucket.org にあるコミットで固定したアーカイブからだけ取り、リダイレクトのたびに次のリクエストの前に確かめます。",
       "source": "アプリケーションのソースは、オフラインのテストのために、設定した Docker デーモンへ送ります。手元から出さないためには、ローカルのデーモンを選んでください。ソースを Ludion にアップロードすることはなく、セキュリティのコマンドはテレメトリーを送りません。オンラインでの取得に含めるのはマニフェストだけです。ソースのスナップショットからは .env ファイル、Git の履歴、よくある認証情報のディレクトリを除きますが、秘密情報を広く探すスキャナーではありません。このウェブサイトは Google アナリティクスを使っています。"
     },
     "summary": "扱うのは、既知の脆弱性情報と、記録したアプリケーションのテストだけです。当てはまるものが無くても、安全の保証ではありません。対応する範囲と、扱えないものは、はっきり示します。"

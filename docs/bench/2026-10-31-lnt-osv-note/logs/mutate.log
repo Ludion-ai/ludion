@@ -1,0 +1,25 @@
+ce4ef5d note
+2f882ee x
+M1-note-drops-cisa: CAUGHT (1 failing)
+     × names every host of packages/cli/src 4ms
+M2-new-host-in-code: CAUGHT (1 failing)
+     × names every host of packages/cli/src 4ms
+M3-archive-host-removed: CAUGHT (2 failing)
+     × finds the hosts the CLI requests 4ms
+     × names no host the code does not request 1ms
+M4-scan-returns-old-note: CAUGHT (1 failing)
+     × is the note scan() puts in its result 7ms
+M5-note-drops-github: CAUGHT (1 failing)
+     × names GitHub, where deliver open pushes branches and opens PRs 3ms
+M6-maven-mirror-changed: CAUGHT (3 failing)
+     × finds the hosts the CLI requests 3ms
+     × names every host of packages/cli/src 2ms
+     × names no host the code does not request 1ms
+M7-note-drops-npm-registry: CAUGHT (1 failing)
+     × names every host of packages/cli/src 4ms
+M8-main-note-before-lnt: CAUGHT (3 failing)
+     × names every host of packages/cli/src 5ms
+     × names no host the code does not request 1ms
+     × names GitHub, where deliver open pushes branches and opens PRs 1ms
+after restore:
+?? .lnt-mutate.sh

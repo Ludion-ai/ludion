@@ -170,7 +170,8 @@ type Ref = { path: string; args: string[] };
  */
 function referenced(path: string, text: string, files: Map<string, string>, mapped: Map<string, string>, args: string[] = []): Ref[] {
   const out: Ref[] = [];
-  for (const m of text.matchAll(/(?<![\w.-])((?:[\w.${}()-]*\/)*)((?:[\w.-]|\$\{?\w+\}?)+\.(?:sh|mjs|cjs|js|ps1))(?![\w.])/g)) {
+  // A variable in a name is `${name}` or a whole `$name`, so each part of the name matches only one way (no backtracking).
+  for (const m of text.matchAll(/(?<![\w.-])((?:[\w.${}()-]*\/)*)((?:[\w.-]|\$\{\w+\}|\$\w+(?!\w))+\.(?:sh|mjs|cjs|js|ps1))(?![\w.])/g)) {
     const prefix = m[1] ?? "", written = m[2] ?? "";
     const names = written.includes("$") ? args.map(a => written.replace(/\$\{?\w+\}?/g, a)) : [written];
     const mount = /^\/([\w-]+)\//.exec(prefix)?.[1];

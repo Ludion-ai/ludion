@@ -4,7 +4,7 @@
 // severity only, and the protection record's table in English and Japanese, with traps apart from stops that could not be verified.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { CWE_CLASSES, DECIDED_UNCLASSIFIED, IMPACT_ORDER, TRAP_CWE, classify, renderRecord, type ImpactClass, type RecordRow, type StopReason } from "../src/security/impact.ts";
+import { CWE_CLASSES, DECIDED_UNCLASSIFIED, IMPACT_ORDER, TRAP_CWE, classify, codeSpan, renderRecord, type ImpactClass, type RecordRow, type StopReason } from "../src/security/impact.ts";
 
 const record = (cwes: unknown, extra: Record<string, unknown> = {}) => ({ id: "GHSA-xxxx-xxxx-xxxx", database_specific: { cwe_ids: cwes, ...extra } });
 const MAPPED = ["takeover", "impersonate", "steal", "alter", "disrupt"] as const;
@@ -324,14 +324,14 @@ describe("real GitHub malware advisories (packages/cli/test/fixtures/impact/trap
 });
 
 const rows: RecordRow[] = [
-  { package: "lodash", from: "4.17.20", to: "4.17.21", class: "alter", severity: "high", action: "fixed", stop: null, fixPublishedAt: "2026-10-01T00:00:00Z", actedAt: "2026-10-03T06:30:00Z" },
-  { package: "@scope/evil", from: "1.0.0", to: "1.0.1", class: "takeover", severity: "unknown", action: "stopped", stop: { reason: "trap", record: { id: "MAL-2025-1" } }, fixPublishedAt: null, actedAt: "2026-10-04T00:00:00.000Z" },
-  { package: "guzzlehttp/guzzle", from: "7.4.4", to: "7.4.5", class: "steal", severity: "moderate", action: "opened", stop: null, fixPublishedAt: "2026-10-05T10:00:00Z", actedAt: "2026-10-05T10:45:59Z" },
-  { package: "express", from: "4.19.1", to: "4.19.2", class: "impersonate", severity: "critical", action: "waited", stop: null, fixPublishedAt: "2026-10-06T00:00:00Z", actedAt: "2026-10-06T05:00:00Z" },
-  { package: "minimist", from: "1.2.5", to: "1.2.6", class: "unclassified", severity: "low", action: "fixed", stop: null, fixPublishedAt: "2026-10-07T00:00:00Z", actedAt: "2026-10-08T23:59:00Z" },
+  { ecosystem: "npm", package: "lodash", from: "4.17.20", to: "4.17.21", class: "alter", severity: "high", action: "fixed", stop: null, fixPublishedAt: "2026-10-01T00:00:00Z", actedAt: "2026-10-03T06:30:00Z" },
+  { ecosystem: "npm", package: "@scope/evil", from: "1.0.0", to: "1.0.1", class: "takeover", severity: "unknown", action: "stopped", stop: { reason: "trap", record: { id: "MAL-2025-1" } }, fixPublishedAt: null, actedAt: "2026-10-04T00:00:00.000Z" },
+  { ecosystem: "composer", package: "guzzlehttp/guzzle", from: "7.4.4", to: "7.4.5", class: "steal", severity: "moderate", action: "opened", stop: null, fixPublishedAt: "2026-10-05T10:00:00Z", actedAt: "2026-10-05T10:45:59Z" },
+  { ecosystem: "npm", package: "express", from: "4.19.1", to: "4.19.2", class: "impersonate", severity: "critical", action: "waited", stop: null, fixPublishedAt: "2026-10-06T00:00:00Z", actedAt: "2026-10-06T05:00:00Z" },
+  { ecosystem: "npm", package: "minimist", from: "1.2.5", to: "1.2.6", class: "unclassified", severity: "low", action: "fixed", stop: null, fixPublishedAt: "2026-10-07T00:00:00Z", actedAt: "2026-10-08T23:59:00Z" },
   // A trap class without a published record behind the stop: written as unverified, not counted as a trap.
-  { package: "ua-parser-js", from: "0.7.28", to: "0.7.29", class: "trap", severity: "critical", action: "stopped", stop: { reason: "install-scripts" }, fixPublishedAt: "2026-10-09T00:00:00Z", actedAt: "2026-10-09T13:00:00Z" },
-  { package: "left-pad", from: "1.2.0", to: "1.3.0", class: "disrupt", severity: "moderate", action: "stopped", stop: { reason: "provenance-lost" }, fixPublishedAt: "2026-10-10T00:00:00Z", actedAt: "2026-10-10T00:10:00Z" },
+  { ecosystem: "npm", package: "ua-parser-js", from: "0.7.28", to: "0.7.29", class: "trap", severity: "critical", action: "stopped", stop: { reason: "install-scripts" }, fixPublishedAt: "2026-10-09T00:00:00Z", actedAt: "2026-10-09T13:00:00Z" },
+  { ecosystem: "npm", package: "left-pad", from: "1.2.0", to: "1.3.0", class: "disrupt", severity: "moderate", action: "stopped", stop: { reason: "provenance-lost" }, fixPublishedAt: "2026-10-10T00:00:00Z", actedAt: "2026-10-10T00:10:00Z" },
 ];
 
 describe("renderRecord", () => {
@@ -409,7 +409,8 @@ describe("renderRecord", () => {
       "trap stopped (`MAL-2025-1`)", "trap stopped (`GHSA-aaaa-bbbb-cccc`)", "trap stopped (`GHSA-dddd-eeee-ffff`)", "stopped as unverified: could not be judged", "stopped as unverified: the new version has known advisories",
     ]);
     expect(renderRecord([stopped({ reason: "undecidable" }, "trap")], "ja").split("\n")[0]).toBe("Ludion：確かめられなかったので止めた 1（判断できなかった 1）");
-    expect(renderRecord([stopped({ reason: "trap", record: { id: "MAL-a|b`c" } })], "en")).toContain("| trap stopped (``MAL-a\\|b`c``) |");
+    // A record id not of an id's form is not shown; the row is counted as unreadable.
+    expect(renderRecord([stopped({ reason: "trap", record: { id: "MAL-a|b`c" } })], "en")).toBe("Rows that could not be read: 1. Their contents are not shown.\n");
   });
 
   it("refuses a stop given as a trap whose record does not say the version is malicious", () => {
@@ -437,16 +438,64 @@ describe("renderRecord", () => {
     expect([59, 60, 48 * 60].map(m => cell(m, "ja"))).toEqual(["59 分", "1 時間", "2 日"]);
   });
 
-  it("keeps every row whole whatever the package name or version holds", () => {
-    const names = ["a|b", "a\nb", "a\r\nb|", "a\u{2028}b", "a`b", "``", "`lead", " pad ", "", "a\\|b", "<script>x</script>", "x | y | z"];
-    const out = renderRecord(names.map(name => ({ ...rows[0]!, package: name, to: name })), "en").split("\n");
-    expect(out).toHaveLength(names.length + 5);
-    for (const line of out.slice(2, -1)) expect([line, line.replace(/\\\|/g, "").split("|").length]).toEqual([line, 9]);
-    expect(out[4]).toBe("| 2026-10-03 | `a\\|b` | `4.17.20` → `a\\|b` | Tampering | High | fixed (merged) | 2 d |");
-    expect(out[5]).toContain("| `a b` |");
-    expect(out[8]).toContain("| ``a`b`` |");
-    expect(out[9]).toContain("| ``` `` ``` |");
-    expect(out[10]).toContain("| `` `lead `` |");
+  it("shows the honest names and versions of every ecosystem", () => {
+    const honest: [RecordRow["ecosystem"], string, string][] = [
+      ["npm", "lodash", "4.17.21"], ["npm", "@babel/core", "7.24.0-rc.1+build.5"], ["npm", "JSONStream", "1.3.5"], ["npm", "lodash.merge", "4.6.2"],
+      ["composer", "guzzlehttp/guzzle", "7.4.5"], ["composer", "symfony/http-kernel", "v6.4.1"], ["composer", "drupal/core-recommended", "dev-main"], ["composer", "a.b_c/d--e", "1.0"],
+      ["maven", "org.apache.commons:commons-text", "1.10.0"], ["maven", "com.fasterxml.jackson.core:jackson-databind", "2.0.0-SNAPSHOT"],
+      ["php", "php", "8.3.12"],
+    ];
+    const out = renderRecord(honest.map(([ecosystem, name, version]) => ({ ...rows[0]!, ecosystem, package: name, to: version })), "en").split("\n");
+    expect(out[0]).toBe(`Ludion: fixed ${honest.length}`);
+    expect(out.slice(4, -1).map(line => line.split(" | ").slice(1, 3))).toEqual(honest.map(([, name, version]) => [`\`${name}\``, `\`4.17.20\` → \`${version}\``]));
+  });
+
+  it("counts a row whose shown values do not have their strict form as unreadable, and shows none of its values", () => {
+    const bad: Partial<RecordRow>[] = [
+      // Names that would break the table or the code span.
+      ...["a|b", "a\\|b", "a\\", "a\\\\|b", "a\nb", "a\r\nb", "a\u{2028}b", "a\u{2029}b", "a`b", "``", " pad ", "", "<script>x</script>", "x | y | z"].map(name => ({ package: name })),
+      ...["1.0.0\\", "1.0|1", "1.0\n1", "`1`", "", " 1.0"].flatMap(version => [{ from: version }, { to: version }]),
+      // Another ecosystem's form, or no ecosystem.
+      { ecosystem: "composer", package: "lodash" }, { ecosystem: "composer", package: "Guzzle/Guzzle" }, { ecosystem: "maven", package: "lodash" }, { ecosystem: "php", package: "php8" },
+      { ecosystem: "npm", package: "a:b" }, { ecosystem: "pypi" as RecordRow["ecosystem"] }, { ecosystem: ["npm"] as unknown as RecordRow["ecosystem"], package: "left-pad" }, { ecosystem: "toString" as RecordRow["ecosystem"] },
+      { package: `${"a".repeat(107)}/${"a".repeat(107)}` }, { package: 7 as unknown as string },
+      // Class and severity outside their lists.
+      { class: "rce" as ImpactClass }, { severity: "toString" as RecordRow["severity"] }, { severity: ["high"] as unknown as RecordRow["severity"] }, { severity: "HIGH" as RecordRow["severity"] },
+      // A trap's record id not of an id's form.
+      { action: "stopped", stop: { reason: "trap", record: { id: "MAL-a|b" } } }, { action: "stopped", stop: { reason: "trap", record: { id: "MAL-1\\" } } },
+    ];
+    for (const lang of ["en", "ja"] as const) {
+      const given = [rows[0]!, ...bad.map(change => ({ ...rows[2]!, ...change })), rows[3]!];
+      const out = renderRecord(given, lang);
+      const lines = out.split("\n");
+      expect(lines.slice(0, 2)).toEqual(lang === "en"
+        ? ["Ludion: fixed 1, waiting 1", `Rows that could not be read: ${bad.length}. Their contents are not shown.`]
+        : ["Ludion：直した 1、待っている 1", `読めない行が ${bad.length} 件あった。中身は出していない。`]);
+      expect(lines).toHaveLength(8);
+      for (const line of lines.slice(3, -1)) expect([line, line.split("|").length]).toEqual([line, 9]);
+      for (const text of ["guzzle", "Guzzle", "a|b", "pad", "script", "a\\", "php8", "pypi", "rce", "MAL-", "1.0.0\\", "1.0|1", "aaaa", "left-pad"]) expect([text, out.includes(text)]).toEqual([text, false]);
+    }
+    expect(renderRecord([{ ...rows[0]!, package: "a|b" }], "ja")).toBe("読めない行が 1 件あった。中身は出していない。\n");
+  });
+
+  it("escapes every \\ before every | in a code span, removes line breaks, and keeps the row's columns", () => {
+    // Two readings of where a row's cells split: at each | that no \ escapes, a \ escaping the character after it (as
+    // micromark reads it); and at each | with no \ right before it (as GitHub rendered `a\\|b` in one cell, 2026-10-31).
+    const escaped = (line: string) => {
+      let n = 0;
+      for (let i = 0; i < line.length; i++) if (line[i] === "\\") i++; else if (line[i] === "|") n++;
+      return n;
+    };
+    const github = (line: string) => [...line].filter((c, i) => c === "|" && line[i - 1] !== "\\").length;
+    const cases: [string, string][] = [
+      ["a|b", "`a\\|b`"], ["a\\|b", "`a\\\\\\|b`"], ["a\\", "`a\\\\`"], ["a\\\\|b", "`a\\\\\\\\\\|b`"], ["\\|", "`\\\\\\|`"],
+      ["a\nb", "`a b`"], ["a\r\nb|", "`a b\\|`"], ["a\u{2028}b\u{2029}c", "`a b c`"], ["a`b", "``a`b``"], ["``", "``` `` ```"], ["`lead", "`` `lead ``"], ["", "`  `"],
+    ];
+    for (const [text, want] of cases) {
+      expect([text, codeSpan(text)]).toEqual([text, want]);
+      const row = `| ${codeSpan(text)} | x |`;
+      expect([text, escaped(row), github(row)]).toEqual([text, 3, 3]);
+    }
   });
 
   it("gives the same output for the same input and leaves the input as it was", () => {
@@ -462,8 +511,6 @@ describe("renderRecord", () => {
       [{ actedAt: "2026-10-31T09:00:00+09:00" }, "actedAt is not an ISO 8601 UTC time"],
       [{ fixPublishedAt: "yesterday" }, "fixPublishedAt is not an ISO 8601 UTC time"],
       [{ fixPublishedAt: "2026-10-04T00:00:00Z" }, "actedAt is before fixPublishedAt"],
-      [{ class: "rce" as ImpactClass }, "unknown class"],
-      [{ severity: "toString" as RecordRow["severity"] }, "unknown severity"],
       [{ action: "merged" as RecordRow["action"] }, "unknown action"],
       [{ action: "stopped" }, "a stopped row needs its reason"],
       [{ action: "stopped", stop: undefined as unknown as null }, "a stopped row needs its reason"],

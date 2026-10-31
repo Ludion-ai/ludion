@@ -48,8 +48,9 @@ const mutations = [
   ["an unknown stop reason is accepted", "} else if (STOP_REASONS.includes(stop.reason)) {", "} else if (true) {"],
   ["stop reasons counted in the order given", "const reasons = STOP_REASONS.filter(r => unverified.has(r));", "const reasons = [...unverified.keys()];"],
   ["the reasons left out of the summary", "`${l.unverified} ${total}${l.reasons(reasons.map(r => `${l.stop[r]} ${unverified.get(r)}`).join(l.join))}`", "`${l.unverified} ${total}`"],
-  ["the trap cell without the record's id", "did = l.trapCell(code((stop.record as { id: string }).id));", 'did = l.trapCell("");'],
-  ["the record's id not escaped", "l.trapCell(code((stop.record as { id: string }).id))", 'l.trapCell("`" + (stop.record as { id: string }).id + "`")'],
+  ["the trap cell without the record's id", "did = l.trapCell(codeSpan((stop.record as { id: string }).id));", 'did = l.trapCell("");'],
+  // LMR1c-2 replaced "the record's id not escaped" by "a trap's record id not checked": an id must now have an id's
+  // form, which holds no character the code span would escape, so that mutation no longer changes any output.
   ["the Japanese unverified label shortened", 'unverified: "確かめられなかったので止めた",', 'unverified: "止めた",'],
   ["cwe_ids not read", "Array.isArray(specific.cwe_ids) ? specific.cwe_ids : []", "[]"],
   ["any severity string kept", "(SEVERITIES as readonly string[]).includes(raw) ? (raw as Severity) : \"unknown\"", "(raw || \"unknown\") as Severity"],
@@ -60,6 +61,21 @@ const mutations = [
   ["action before the fix accepted", "if (minutes < 0) throw", "if (minutes < -1e12) throw"],
   ["Feb 30 accepted", "new Date(at).toISOString().slice(0, 19) !== match[1]", "false"],
   ["summary counts every action as fixed", "`${l.count[a]} ${counts.get(a)}`", "`${l.count.fixed} ${counts.get(a)}`"],
+  // LMR1c-2: strict forms for every shown value, and \ escaped before | in the code span.
+  ["\\ not escaped", String.raw`.replace(/\\/g, "\\\\")`, ""],
+  ["\\ escaped after |", String.raw`.replace(/\\/g, "\\\\").replace(/\|/g, "\\|")`, String.raw`.replace(/\|/g, "\\|").replace(/\\/g, "\\\\")`],
+  ["the strict form not checked", "if (!readable(row)) {", "if (false) {"],
+  ["unreadable rows not counted", "unreadable++;", ""],
+  ["the unreadable note left out", "const note = unreadable ? [l.unreadable(unreadable)] : [];", "const note: string[] = [];"],
+  ["the npm form for every ecosystem", "NAMES[ecosystem as RecordEcosystem].test(row.package)", "NAMES.npm.test(row.package)"],
+  ["an ecosystem that is not a string accepted", 'typeof ecosystem !== "string" || ', ""],
+  ["the name limit dropped", "row.package.length > NAME_LIMIT || ", ""],
+  ["from not checked", "!VERSION.test(row.from) || ", ""],
+  ["to not checked", "!VERSION.test(row.to)) return false;", "false) return false;"],
+  ["the class list not checked", "if (!IMPACT_ORDER.includes(row.class) || ", "if ("],
+  ["the severity list not checked", '(row.severity !== "unknown" && !SEVERITIES.includes(row.severity))', "false"],
+  ["Composer names with capitals accepted", "(?:(?:[_.]|-{1,2})[a-z0-9]+)*$/,", "(?:(?:[_.]|-{1,2})[a-z0-9]+)*$/i,"],
+  ["a trap's record id not checked", 'return !(isObject(record) && typeof record.id === "string" && !RECORD_ID.test(record.id));', "return true;"],
 ];
 const run = () => {
   try {

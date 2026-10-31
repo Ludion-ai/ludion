@@ -174,7 +174,10 @@ export type StopReason = "provenance-lost" | "provenance-changed" | "install-scr
  * classify(). Any other stop is one Ludion could not verify, never a trap.
  */
 export type Stop = { reason: "trap"; record: unknown } | { reason: StopReason };
+/** The ecosystems whose names the record shows, as deliver.ts names them. */
+export type RecordEcosystem = "npm" | "composer" | "maven" | "php";
 export type RecordRow = {
+  ecosystem: RecordEcosystem;
   package: string;
   from: string;
   to: string;
@@ -189,6 +192,34 @@ export type RecordRow = {
   actedAt: string;
 };
 export type Lang = "en" | "ja";
+
+// The rows come from receipts, which are not trusted. Every value the table shows must have its strict form, as
+// deliver.ts checks the values it uses; none of these forms allows \, |, a backtick or a line break, so an honest
+// receipt loses no row. A row that does not match is counted as unreadable and none of its values is shown.
+const NAMES: Readonly<Record<RecordEcosystem, RegExp>> = {
+  // npm: an optional scope, then the name (older packages have capitals).
+  npm: /^(?:@[a-z0-9][a-z0-9._~-]{0,213}\/)?[A-Za-z0-9][A-Za-z0-9._~-]{0,213}$/,
+  // Composer's pattern for vendor/name, written without its optional separators so that it cannot backtrack.
+  composer: /^[a-z0-9]+(?:[_.-][a-z0-9]+)*\/[a-z0-9]+(?:(?:[_.]|-{1,2})[a-z0-9]+)*$/,
+  // Maven: groupId:artifactId.
+  maven: /^[A-Za-z0-9_.-]{1,200}:[A-Za-z0-9_.-]{1,200}$/,
+  // The official PHP image.
+  php: /^php$/,
+};
+const NAME_LIMIT = 214;
+const VERSION = /^[A-Za-z0-9][A-Za-z0-9.+_~-]{0,99}$/;
+const RECORD_ID = /^[A-Za-z][A-Za-z0-9]{1,15}-[A-Za-z0-9._:-]{1,100}$/;
+
+/** Whether every value the row shows has its strict form: ecosystem, package, versions, class, severity, a trap's record id. */
+function readable(row: RecordRow): boolean {
+  const ecosystem: unknown = row.ecosystem, record: unknown = isObject(row.stop) && row.stop.reason === "trap" ? row.stop.record : null;
+  if (typeof ecosystem !== "string" || !Object.hasOwn(NAMES, ecosystem)) return false;
+  if (typeof row.package !== "string" || row.package.length > NAME_LIMIT || !NAMES[ecosystem as RecordEcosystem].test(row.package)) return false;
+  if (typeof row.from !== "string" || !VERSION.test(row.from) || typeof row.to !== "string" || !VERSION.test(row.to)) return false;
+  if (!IMPACT_ORDER.includes(row.class) || (row.severity !== "unknown" && !SEVERITIES.includes(row.severity))) return false;
+  // A trap's record with no id is refused below with classify()'s reason; one with an id must have an id's form.
+  return !(isObject(record) && typeof record.id === "string" && !RECORD_ID.test(record.id));
+}
 
 const ACTIONS: readonly Action[] = ["fixed", "stopped", "opened", "waited"];
 const STOP_REASONS: readonly StopReason[] = ["provenance-lost", "provenance-changed", "install-scripts", "deprecated", "withdrawn", "replaced", "new-advisory", "downgrade", "after-fix", "lockfile", "tests", "undecidable"];
@@ -213,6 +244,7 @@ const LABELS = {
     lead: "Ludion: ",
     join: ", ",
     none: "No actions recorded. That does not mean the dependencies are safe.",
+    unreadable: (n: number) => `Rows that could not be read: ${n}. Their contents are not shown.`,
     unknown: "unknown",
     time: (minutes: number) => (minutes < 60 ? `${minutes} min` : minutes < 48 * 60 ? `${Math.floor(minutes / 60)} h` : `${Math.floor(minutes / 1440)} d`),
   },
@@ -236,6 +268,7 @@ const LABELS = {
     lead: "Ludion：",
     join: "、",
     none: "記録はありません。依存が安全だという意味ではありません。",
+    unreadable: (n: number) => `読めない行が ${n} 件あった。中身は出していない。`,
     unknown: "不明",
     time: (minutes: number) => (minutes < 60 ? `${minutes} 分` : minutes < 48 * 60 ? `${Math.floor(minutes / 60)} 時間` : `${Math.floor(minutes / 1440)} 日`),
   },
@@ -249,9 +282,12 @@ function instant(value: string, field: string): number {
   return at;
 }
 
-/** A Markdown code span that keeps a table row whole: no line break, every | escaped, a fence longer than any backtick run. */
-function code(text: string): string {
-  const flat = text.replace(/\r\n|[\r\n\u{2028}\u{2029}]/gu, " ").replace(/\|/g, "\\|");
+/**
+ * A Markdown code span that keeps a table row whole: no line break, every \ escaped before every |, a fence longer than
+ * any backtick run. The second defence: renderRecord shows only values of a strict form, which hold none of these.
+ */
+export function codeSpan(text: string): string {
+  const flat = text.replace(/\r\n|[\r\n\u{2028}\u{2029}]/gu, " ").replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
   const fence = "`".repeat(Math.max(0, ...[...flat.matchAll(/`+/g)].map(m => m[0].length)) + 1);
   const pad = /^[ `]|[ `]$/.test(flat) || flat === "" ? " " : "";
   return `${fence}${pad}${flat}${pad}${fence}`;
@@ -260,18 +296,21 @@ function code(text: string): string {
 /**
  * The protection record: a summary line, then one table row per input row, in the input's order. Every number is a
  * count of the input rows or a time between two of its timestamps. A stop is written as a trap only with a published
- * record that classifies as trap; any other stop is "stopped as unverified" with its reason. Throws on a row it cannot
- * render truthfully.
+ * record that classifies as trap; any other stop is "stopped as unverified" with its reason. A row whose shown values
+ * do not all have their strict form is not shown: a line says how many there were. Throws on a row it cannot render
+ * truthfully.
  */
 export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
   const l = LABELS[lang];
   if (!l) throw new Error(`Unknown language: ${JSON.stringify(lang)}`);
   if (!rows.length) return `${l.none}\n`;
   const counts = new Map<Exclude<Action, "stopped">, number>(), unverified = new Map<StopReason, number>();
-  let traps = 0;
-  const lines = rows.map((row, i) => {
-    if (!IMPACT_ORDER.includes(row.class)) throw new Error(`Row ${i}: unknown class ${JSON.stringify(row.class)}`);
-    if (!Object.hasOwn(l.severity, row.severity)) throw new Error(`Row ${i}: unknown severity ${JSON.stringify(row.severity)}`);
+  let traps = 0, unreadable = 0;
+  const lines = rows.flatMap((row, i) => {
+    if (!readable(row)) {
+      unreadable++;
+      return [];
+    }
     if (!ACTIONS.includes(row.action)) throw new Error(`Row ${i}: unknown action ${JSON.stringify(row.action)}`);
     const stop = row.stop;
     let did: string;
@@ -285,7 +324,7 @@ export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
       // A trap only when a published record says the version is malicious, that is when classify() gives it trap.
       const c = classify(stop.record);
       if (c.class !== "trap") throw new Error(`Row ${i}: the stop is given as a trap, but its record does not say the version is malicious (${c.reason})`);
-      did = l.trapCell(code((stop.record as { id: string }).id));
+      did = l.trapCell(codeSpan((stop.record as { id: string }).id));
       traps++;
     } else if (STOP_REASONS.includes(stop.reason)) {
       did = l.unverifiedCell(l.stop[stop.reason]);
@@ -300,8 +339,8 @@ export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
       if (minutes < 0) throw new Error(`Row ${i}: actedAt is before fixPublishedAt`);
       elapsed = l.time(minutes);
     }
-    const cells = [new Date(acted).toISOString().slice(0, 10), code(row.package), `${code(row.from)} → ${code(row.to)}`, l.class[row.class], l.severity[row.severity], did, elapsed];
-    return `| ${cells.join(" | ")} |`;
+    const cells = [new Date(acted).toISOString().slice(0, 10), codeSpan(row.package), `${codeSpan(row.from)} → ${codeSpan(row.to)}`, l.class[row.class], l.severity[row.severity], did, elapsed];
+    return [`| ${cells.join(" | ")} |`];
   });
   // Traps are counted apart, and only those a published record backs; every other stop is counted by its reason.
   const parts = ACTIONS.flatMap(a => {
@@ -313,5 +352,8 @@ export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
       ...(total ? [`${l.unverified} ${total}${l.reasons(reasons.map(r => `${l.stop[r]} ${unverified.get(r)}`).join(l.join))}`] : []),
     ];
   });
-  return [l.lead + parts.join(l.join), "", `| ${l.head.join(" | ")} |`, `|${l.head.map(() => "---").join("|")}|`, ...lines, ""].join("\n");
+  // Unreadable rows are only counted: none of their values is shown, and none enters the summary.
+  const note = unreadable ? [l.unreadable(unreadable)] : [];
+  if (!lines.length) return [...note, ""].join("\n");
+  return [l.lead + parts.join(l.join), ...note, "", `| ${l.head.join(" | ")} |`, `|${l.head.map(() => "---").join("|")}|`, ...lines, ""].join("\n");
 }

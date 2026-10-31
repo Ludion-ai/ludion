@@ -1,10 +1,10 @@
-# LMR1 and LMR1b: how many OSV records Impact Classes can classify (2026-10-31)
+# LMR1, LMR1b and LMR1c: how many OSV records Impact Classes classify (2026-10-31)
 
-Started from main 0702370. The classes, the strength order, the severity rule and the CWE table's rule are in docs/decisions/2026-10-31-impact-classes.md (ludion-ops#1 comments 6538391108 and 6538576259), and trap as a published record in docs/decisions/2026-10-31-impact-classes-trap-published-record.md (LMR1b, comments 6538877641 and 6538690397); the code is `packages/cli/src/security/impact.ts`. Nothing here is wired into a PR body or a job summary (the next lane).
+Started from main 0702370. The classes, the strength order, the severity rule and the CWE table's rule are in docs/decisions/2026-10-31-impact-classes.md (ludion-ops#1 comments 6538391108 and 6538576259); trap as a published record in docs/decisions/2026-10-31-impact-classes-trap-published-record.md (LMR1b, comments 6538877641 and 6538690397); each CWE's set of classes and the CVSS vectors that choose among them in docs/decisions/2026-10-31-impact-classes-cvss-vector.md (LMR1c, comment 6539200199, point 3). The code is `packages/cli/src/security/impact.ts`. Nothing here is wired into a PR body or a job summary (the next lane).
 
 ## Data
 
-OSV's bulk exports, fetched inside a container with no credentials, no host environment and every capability dropped (`scripts/fetch.sh`; `logs/fetch.log`, and `fetch` in counts.json). The zips are not committed.
+OSV's bulk exports, fetched inside a container with no credentials, no host environment and every capability dropped (`scripts/fetch.sh`; `logs/fetch.log`, and `fetch` in counts.json). The zips are not committed. LMR1, LMR1b and LMR1c all counted these same two zips.
 
 | Export | Fetched (UTC) | Last-Modified | Bytes | sha256 |
 |---|---|---|---|---|
@@ -13,81 +13,146 @@ OSV's bulk exports, fetched inside a container with no credentials, no host envi
 
 The CWE definitions in `logs/cwe-definitions.log` are MITRE's CWE 5.0 (2026-10-28), https://cwe.mitre.org/data/xml/cwec_latest.xml.zip, fetched 2026-10-31T04:04Z in the same kind of container (the sha256 is the log's first line).
 
-## Results (LMR1b: trap is a MAL- id, a MAL- alias or CWE-506)
+These are every record of the two exports, not a sample, so the shares below are plain percentages with no interval.
 
-docs/decisions/2026-10-31-impact-classes-trap-published-record.md (committed in e900122 before this count) made trap a published record that says the version is malicious: a MAL- id, a MAL- alias, or CWE-506. `scripts/count.sh` was run again on **the same two zips** (sha256 above, checked in the volume before the run; fetched 2026-10-31T03:50:00.668Z and 03:50:17.051Z), so the change below is the definition's alone. `counts.json` is this run (`logs/count.log`, impact.ts sha256 fc40d7d3…); the LMR1 run is kept as `counts-before-lmr1b.json` and `logs/count-before-lmr1b.log`. count.mjs also reads each trap's basis from the record's own fields, apart from `classify()`, and fails if the two disagree on any record; it did not fail.
+## Results (LMR1c: each CWE allows a set of classes, and the CVSS vectors choose among them)
 
-A record is a file in the zip; withdrawn records are counted (565 of the records that are not MAL-, 897 in all). Percentages with Wilson 95% intervals.
+The decision record was committed and pushed (0345636) before impact.ts was changed and before this count. `scripts/explore-vectors.sh` (`logs/explore-vectors.log`) read the vectors' shapes first, classifying nothing: the exports have only CVSS 3.0, 3.1 and 4.0 vectors (no CVSS 2), and none repeats or lacks C, I or A (VC, VI, VA, SC, SI, SA for CVSS 4).
 
-| | Records | MAL- id | With a CWE | Classified (not unclassified) | LMR1 (before) |
-|---|---|---|---|---|---|
-| npm + Packagist, all records | 238,389 | 222,920 | 14,093 (5.9%, 5.8–6.0) | 234,926 (98.5%, 98.5–98.6) | 234,523 (98.4%, 98.3–98.4) |
-| npm + Packagist, not MAL- | 15,469 | 0 | 14,093 (91.1%, 90.6–91.5) | **12,006 (77.6%, 76.9–78.3)** | 11,603 (75.0%, 74.3–75.7) |
-| npm, not MAL- | 8,073 | 0 | 7,839 (97.1%, 96.7–97.4) | **6,465 (80.1%, 79.2–80.9)** | 6,063 (75.1%, 74.1–76.0) |
-| Packagist, not MAL- | 7,396 | 0 | 6,254 (84.6%, 83.7–85.4) | **5,541 (74.9%, 73.9–75.9)** | 5,540 (74.9%, 73.9–75.9) |
+`scripts/count.sh` classified every record with the new impact.ts (sha256 d15c9be9…, tree 6bc011c) and with the one before LMR1c (`git show 218a83a:packages/cli/src/security/impact.ts`, written to the volume as `osv/impact-before-lmr1c.ts`, sha256 fc40d7d3…, the same as LMR1b's count), at 2026-10-31T05:28:29Z (`logs/count.log`). It checked both zips' sha256 against fetch.json before counting, and that trap is the same under both (it is: LMR1c does not change trap). `counts.json` is this run; LMR1b's is kept as `counts-before-lmr1c.json` and `logs/count-before-lmr1c.log`, LMR1's as `counts-before-lmr1b.json`.
 
-The share over all records (98.5%) is mostly records with a MAL- id (222,919 of npm's 230,992 records; 1 of Packagist's 7,397). The share asked for is the one over records whose id is not MAL-: **77.6%** (npm 80.1%, Packagist 74.9%).
+### How many records the table gives a class
 
-Traps among the records that are not MAL- (`trap_by` in counts.json): 406, of which 12 by a MAL- alias (all 12 also list CWE-506; all npm) and 394 by CWE-506 alone (393 npm, 1 Packagist). Of the 406, 403 were unclassified before and 3 were classified by another CWE (takeover 2, steal 1); so the share rose by 403 records, the upper bound LMR1 gave.
+Records whose id is not MAL- (withdrawn records counted):
 
-The CWE table's own share, over records that are neither MAL- nor trap (`not_trap_classified_by_table`): 11,600 of 15,063 (77.0%, 76.3–77.7); npm 6,060 of 7,668 (79.0%, 78.1–79.9), Packagist 5,540 of 7,395 (74.9%, 73.9–75.9).
+| | Records | Classified now | Before LMR1c | Change |
+|---|---|---|---|---|
+| npm + Packagist | 15,469 | **11,625 (75.2%)** | 12,006 (77.6%) | −381 |
+| npm | 8,073 | **6,208 (76.9%)** | 6,465 (80.1%) | −257 |
+| Packagist | 7,396 | **5,417 (73.2%)** | 5,541 (74.9%) | −124 |
 
-By class, npm + Packagist:
+The same with withdrawn records left out (565 of the 15,469; 410 npm, 155 Packagist):
 
-| Class | All records (238,389) | Not MAL- (15,469) | Not MAL-, LMR1 (before) |
+| | Records | Classified now | Before LMR1c |
 |---|---|---|---|
-| trap | 223,326 (93.7%, 93.6–93.8) | 406 (2.6%, 2.4–2.9) | 0 |
-| takeover | 1,675 (0.7%, 0.7–0.7) | 1,675 (10.8%, 10.3–11.3) | 1,677 |
-| impersonate | 5,604 (2.4%, 2.3–2.4) | 5,604 (36.2%, 35.5–37.0) | 5,604 |
-| steal | 2,762 (1.2%, 1.1–1.2) | 2,762 (17.9%, 17.3–18.5) | 2,763 |
-| alter | 639 (0.3%, 0.2–0.3) | 639 (4.1%, 3.8–4.5) | 639 |
-| disrupt | 920 (0.4%, 0.4–0.4) | 920 (5.9%, 5.6–6.3) | 920 |
-| unclassified | 3,463 (1.5%, 1.4–1.5) | 3,463 (22.4%, 21.7–23.1) | 3,866 |
+| npm + Packagist | 14,904 | **11,279 (75.7%)** | 11,651 (78.2%) |
+| npm | 7,663 | **5,972 (77.9%)** | 6,224 (81.2%) |
+| Packagist | 7,241 | **5,307 (73.3%)** | 5,427 (74.9%) |
 
-Of the 3,463 unclassified records, 1,376 list no CWE and 2,087 list only CWEs that are not in the table. Severity (GHSA's, not MAL-) is unchanged: moderate 6,462, high 5,096, critical 2,125, low 983, unknown 803 (800 of them Packagist's). Every MAL- record's severity is unknown.
+How many records the CWE table gives a class, over records that are neither MAL- nor trap (`not_trap_classified_by_table`): 11,219 of 15,063 (74.5%); npm 5,803 of 7,668 (75.7%), Packagist 5,416 of 7,395 (73.2%). Over all 238,389 records (222,920 with a MAL- id): 234,545 (98.4%; before LMR1c 234,926, 98.5%).
+
+By class, npm + Packagist, not MAL-:
+
+| Class | Now | Before LMR1c |
+|---|---|---|
+| trap | 406 (2.6%) | 406 |
+| takeover | 1,675 (10.8%) | 1,675 |
+| impersonate | 5,477 (35.4%) | 5,604 |
+| steal | 2,467 (15.9%) | 2,762 |
+| alter | 684 (4.4%) | 639 |
+| disrupt | 916 (5.9%) | 920 |
+| unclassified | 3,844 (24.8%) | 3,463 |
+
+Why the 3,844 are unclassified (`unclassified_by_reason`): only CWEs outside the table 2,087; no CWE 1,376; the vector rules out every class the CWEs allow 234; no vector to choose between a CWE's classes 147; a vector that could not be read 0.
+
+### What changed
+
+513 records that are not MAL- changed class (npm 348, Packagist 165), `changes_not_mal`:
+
+| Before → now | npm + Packagist | npm | Packagist |
+|---|---|---|---|
+| steal → unclassified | 168 | 122 | 46 |
+| impersonate → unclassified | 126 | 56 | 70 |
+| steal → alter | 126 | 86 | 40 |
+| alter → unclassified | 77 | 71 | 6 |
+| disrupt → unclassified | 10 | 8 | 2 |
+| alter → disrupt | 4 | 4 | 0 |
+| impersonate → disrupt | 1 | 1 | 0 |
+| steal → disrupt | 1 | 0 | 1 |
+
+No record rose to a stronger class, and no record that was unclassified became classified: with a vector the record can only lose classes, and with none a CWE with several classes decides nothing.
+
+By CWE (a changed record counts under each CWE it lists; all of them are in counts.json, `by_cwe`), the ones with 10 or more:
+
+| CWE | Changed | How |
+|---|---|---|
+| CWE-22 | 189 | steal → alter 108, steal → unclassified 80, impersonate → unclassified 1 |
+| CWE-1321 | 73 | alter → unclassified 69, alter → disrupt 4 |
+| CWE-89 | 37 | steal → unclassified 26, steal → alter 11 |
+| CWE-918 | 32 | steal → unclassified 31, impersonate → unclassified 1 |
+| CWE-284 | 25 | impersonate → unclassified 25 |
+| CWE-73 | 18 | steal → alter 16, steal → unclassified 2 |
+| CWE-352 | 18 | impersonate → unclassified 17, impersonate → disrupt 1 |
+| CWE-863 | 14 | impersonate → unclassified 14 |
+| CWE-400 | 13 | disrupt → unclassified 7, alter → disrupt 4, impersonate → disrupt 1, steal → disrupt 1 |
+| CWE-269 | 12 | impersonate → unclassified 12 |
+| CWE-285 | 12 | impersonate → unclassified 12 |
+| CWE-639 | 10 | impersonate → unclassified 10 |
+| CWE-862 | 10 | impersonate → unclassified 10 |
+
+CWE-73 is decided unclassified; its records changed through another CWE they list (CWE-22 among them).
+
+Vectors among the 15,469 (`vectors_not_mal`): none 2,128, CVSS 3 only 9,600, CVSS 4 only 2,084, both 1,657. In 193 of the 1,657 the CVSS 3 and 4 vectors disagree on whether confidentiality (87), integrity (72) or availability (114) is affected; such a record keeps only the classes both allow. 12 records (npm 9, Packagist 3) have no vector and are classified by point 5 of the decision (the strongest is certain) although their CWEs together allow several classes; they would be unclassified if the record's whole set had to be one class.
+
+Unclassified records that name the CWEs the decision record leaves for the chat (`unclassified_naming`): CWE-59 45, CWE-73 28, CWE-276 22, CWE-732 36 (a record naming two counts under each).
 
 ### The 20 CWEs most often left unclassified
 
-Counted over the 2,087 unclassified records that list a CWE; a record with two such CWEs counts once for each. CWE-506 (403 in LMR1's count) is now trap and has left the list; CWE-754 (30) entered it.
+Over the 2,468 unclassified records that list a CWE; a record with two counts once for each.
 
-| CWE | Records | Decision |
+| CWE | Records | Why |
 |---|---|---|
-| CWE-20 Improper Input Validation | 322 | too broad |
-| CWE-74 Injection | 164 | too broad |
-| CWE-347 Improper Verification of Cryptographic Signature | 82 | doubtful |
-| CWE-693 Protection Mechanism Failure | 70 | too broad |
-| CWE-248 Uncaught Exception | 64 | doubtful |
-| CWE-345 Insufficient Verification of Data Authenticity | 60 | doubtful |
-| CWE-367 TOCTOU Race Condition | 58 | doubtful |
+| CWE-20 Improper Input Validation | 327 | too broad |
+| CWE-74 Injection | 165 | too broad |
+| CWE-347 Improper Verification of Cryptographic Signature | 84 | doubtful |
+| CWE-22 Path Traversal | 81 | {steal, alter}: no vector (or none consistent) |
+| CWE-693 Protection Mechanism Failure | 74 | too broad |
+| CWE-1321 Prototype Pollution | 69 | {alter}: the vector says integrity is not affected |
+| CWE-248 Uncaught Exception | 66 | doubtful |
+| CWE-345 Insufficient Verification of Data Authenticity | 63 | doubtful |
+| CWE-367 TOCTOU Race Condition | 59 | doubtful |
 | CWE-346 Origin Validation Error | 56 | doubtful |
 | CWE-436 Interpretation Conflict | 52 | doubtful |
-| CWE-184 Incomplete List of Disallowed Inputs | 47 | too broad |
+| CWE-184 Incomplete List of Disallowed Inputs | 48 | too broad |
 | CWE-59 Improper Link Resolution Before File Access | 45 | doubtful |
 | CWE-668 Exposure of Resource to Wrong Sphere | 44 | too broad |
 | CWE-116 Improper Encoding or Escaping of Output | 40 | too broad |
 | CWE-93 CRLF Injection | 39 | doubtful |
 | CWE-732 Incorrect Permission Assignment for Critical Resource | 36 | doubtful |
+| CWE-295 Improper Certificate Validation | 35 | doubtful |
 | CWE-88 Argument Injection | 34 | doubtful |
-| CWE-295 Improper Certificate Validation | 33 | doubtful |
-| CWE-327 Broken or Risky Cryptographic Algorithm | 33 | doubtful |
-| CWE-362 Race Condition | 33 | doubtful |
-| CWE-754 Improper Check for Unusual or Exceptional Conditions | 30 | too broad |
+| CWE-362 Race Condition | 34 | doubtful |
 
-All 20 are in the decision record's list with their reasons. None was added to the table to raise the share: each one's definition does not say what the attacker gains. LMR1 wrote here that if CWE-506 became trap the share not MAL- would rise by at most 403 records (2.6 points); it rose by 403 (75.0% to 77.6%).
+### "malware" or "malicious" in records that are not trap
+
+A fixed-string search, case ignored, over each record's `summary` and `details` (`malware_or_malicious` in counts.json): 225,743 records match, 223,326 of them trap, **2,417 not trap**. Most of the 2,417 match only "malicious" (2,365), as in "a malicious user"; 20 match only "malware" and 32 both. By class: takeover 350, impersonate 901, steal 438, alter 109, disrupt 135, unclassified 484. Every one, with its id, ecosystem, class, the words it matched, its packages, CWEs and whether it is withdrawn, is in `malware-or-malicious.tsv` (`count.sh --words`).
+
+The 52 that say "malware" are listed by id in counts.json (`not_trap_with_malware`): takeover 12, impersonate 29, steal 3, unclassified 8. Of the 8 records that list CWE-912 (hidden functionality) and are not trap (`all_not_trap_listing_cwe_912`), one matches the search: GHSA-236c-vhj4-gfxg.
+
+ua-parser-js (`scripts/package.sh ua-parser-js`, `logs/package-ua-parser-js.log`): its 2021 malware advisory GHSA-pjwm-rvh2-c87w (CWE-506, CWE-912) is trap; GHSA-236c-vhj4-gfxg ("Duplicate Advisory: Embedded malware in ua-parser-js", CWE-829, CWE-912, withdrawn 2026-02-17) is takeover. Whether any of these records should be trap is for the chat; this lane decides nothing about them.
+
+## Before LMR1c
+
+LMR1b (trap is a MAL- id, a MAL- alias or CWE-506; one class per CWE), from `counts-before-lmr1c.json`: of the 15,469 records that are not MAL-, 12,006 classified (77.6%); npm 6,465 of 8,073 (80.1%), Packagist 5,541 of 7,396 (74.9%). 406 trap: 12 by a MAL- alias (all also CWE-506, all npm) and 394 by CWE-506 alone (393 npm, 1 Packagist); 403 of them were unclassified in LMR1 and 3 classified (takeover 2, steal 1). How many records the CWE table gave a class, over records neither MAL- nor trap: 11,600 of 15,063 (77.0%).
+
+LMR1 (trap is a MAL- id only), from `counts-before-lmr1b.json`: 11,603 of the 15,469 (75.0%); npm 6,063 (75.1%), Packagist 5,540 (74.9%).
+
+Severity (GHSA's, not MAL-) has not changed in any of the three: moderate 6,462, high 5,096, critical 2,125, low 983, unknown 803 (800 of them Packagist's). Every MAL- record's severity is unknown.
 
 ## How the table was checked
 
 - `logs/explore.log`: every CWE in the two zips with its record count, read before the table was written.
-- `logs/cwe-definitions.log`: each CWE in the table and in the decided-unclassified list, with its CWE 5.0 definition. Checking it moved CWE-476 from disrupt to unclassified (its definition does not say the application crashes) before the counts above; the count before that move gave 11,614 (75.1%) and is not the result. The log was made before LMR1b, so it lists CWE-506 as "unclassified (decided)"; its definition there ("The product contains code that appears to be malicious in nature") is the one trap now follows. cwe.mjs now lists TRAP_CWE first, as trap; it was not run again (it needs the network).
+- `logs/cwe-definitions.log`: each CWE in the table and in the decided-unclassified list, with its CWE 5.0 definition; the sets in the LMR1c decision record quote these definitions. Checking it moved CWE-476 from disrupt to unclassified before LMR1's count. The log was made before LMR1b and LMR1c, so it shows CWE-506 as "unclassified (decided)" and one class per CWE (the class each set's first class now is); cwe.mjs now lists TRAP_CWE first, as trap, and each CWE's set, but was not run again (it needs the network).
+- `logs/explore-vectors.log` (LMR1c): the CVSS vector shapes, read before the vector rule was written.
+- `logs/fixture-vectors.log` (LMR1c): each test fixture's CWEs and CVSS scores, from which the fixtures' expected classes were rewritten apart from `classify()`. Only GHSA-2444-8gj8-6fmx changed (CWE-91, alter; both its vectors say integrity is not affected, so unclassified).
 
 ## Checks (all in Docker; nothing ran on the host)
 
-`scripts/run.sh <script>` mounts the worktree read-only at /src and copies it into the volume ludion-lmr1-w (image ludion-l9-node24-git, `--rm --memory=4g --cpus=2`), as LV5's scripts do. `setup`, `fetch` and `cwe` have the network; the others run with `--network none`. `fetch`, `cwe`, `count`, `pick`, `pick-trap` and `explore`, which read third-party data, drop every capability (the first `explore` and `pick` runs, before that was added to run.sh, did not; both were run again after, and `pick` printed the same bytes).
+`scripts/run.sh <script>` mounts the worktree read-only at /src and copies it into the volume ludion-lmr1-w (image ludion-l9-node24-git, `--rm --memory=4g --cpus=2`), as LV5's scripts do. `setup`, `fetch` and `cwe` have the network; the others run with `--network none`. `fetch`, `cwe`, `count`, `package`, `pick`, `pick-trap`, `explore`, `explore-vectors` and `fixture-vectors`, which read third-party data, drop every capability.
 
-LMR1b's runs (the logs hold only these; LMR1's numbers are in git history at 0e62900):
+LMR1c's runs (the logs hold only these; LMR1b's and LMR1's numbers are in git history at 218a83a and 0e62900):
 
-- `scripts/test.sh` (`logs/test.log`, 2026-10-31T04:29Z): tsc 0; `vitest run --project node packages/cli/test`: 23 files, 968 passed, 24 skipped; impact.test.ts 33 passed.
-- `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository): typecheck 0, build 0, `npm test -- --maxWorkers=2` 39 files, 1255 passed, 24 skipped, at 04:31Z (before the docs were finished) and at 04:35Z on the committed tree 0e05cf7 (`logs/full.log`). A run at 04:34Z on the same tree failed one test, branch.test.ts "refuses a symbolic link inside .git where Git would write, and a reflog the branch already has" (`logs/full-0434-failed.log`); full.sh keeps only the summary lines, so its error is not known. That file passed 3 times of 3 alone right after, and the whole suite passed at 04:35Z. impact.ts is not used by branch.ts or its test.
-- `scripts/mutate.mjs` (`logs/mutate.log`, 04:30Z): 29 of 29 mutations of impact.ts caught by impact.test.ts, one at a time, which passes without them and after them. LMR1b's 15: a MAL- alias not trap; an alias containing MAL- anywhere trap; CWE-506 not trap; CWE-912 trap too; a trap stop accepted without its record classifying as trap; every stop counted as a trap; traps counted as unverified; a stopped row with no reason accepted; a stop reason on another action accepted; an unknown stop reason accepted; stop reasons counted in the order given; the reasons left out of the summary; the trap cell without the record's id; the record's id not escaped; the Japanese unverified label shortened. LMR1's 14 still apply (its "CWE-506 made trap" was dropped, since CWE-506 is now trap): MAL- not trap; any id containing MAL- trap; the weakest or the first CWE wins; CWE-78 dropped from the table; cwe_ids not read; any severity string kept; `|` not escaped; line breaks kept; the code-span fence not lengthened; minutes rounded instead of floored; an action before the fix accepted; Feb 30 accepted; the summary counting every action as fixed.
-- `scripts/pick.mjs` chose the 35 real records in packages/cli/test/fixtures/impact/records.json; their expected classes in impact.test.ts were written from each record's CWEs and severity. GHSA-226w-6hhj-69hp (CWE-506) is now trap.
-- `scripts/pick-trap.mjs` (`logs/pick-trap.log`) chose the 5 real records in packages/cli/test/fixtures/impact/trap-records.json from the records' own fields: npm's first 2 GHSA records with a MAL- alias (of 12) and first 2 with CWE-506 and no MAL- alias (of 393), and Packagist's only one with CWE-506 (no Packagist record has a MAL- alias).
+- `scripts/test.sh` (`logs/test.log`, 2026-10-31T05:28:47Z, tree 6bc011c): tsc 0; `vitest run --project node packages/cli/test`: 23 files, 977 passed, 24 skipped; impact.test.ts 42 passed.
+- `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository; `logs/full.log`): typecheck 0, build 0, `npm test -- --maxWorkers=2` 39 files, 1264 passed, 24 skipped, at 05:29Z on tree 6bc011c (before these docs) and again on the tree with them (the log's run).
+- `scripts/mutate.mjs` (`logs/mutate.log`, 05:27Z, the code of 6bc011c): **51 of 51** mutations of impact.ts caught by impact.test.ts, one at a time; it passes without them and after them. LMR1c's 22: the vectors not read; the weakest consistent class wins; one consistent vector is enough; steal needs no confidentiality; alter read from confidentiality; disrupt needs no availability; impersonate by confidentiality only; takeover needs all three; CVSS 4's subsequent systems not read; a vector of another version accepted; a score of another form skipped; a metric given twice accepted; any metric value accepted; N read as affected; an unreadable metric read as affected; with no vector, a CWE with several classes decides its strongest, never blocks, or blocks a stronger decided class; the reason names the first CWE; CWE-22's set loses alter; authorization's set loses steal and alter; XSS allows steal too. LMR1's "the weakest class wins", "the first CWE wins" and "CWE-78 leaves the table" were rewritten for the new code. LMR1b's 15 and LMR1's other 11 are unchanged. Another lane's mutation container (ludion-lb2a-mutate-g) was running on the same PC at the time, on its own volume.
+- `scripts/pick.mjs` chose the 35 real records in packages/cli/test/fixtures/impact/records.json, and `scripts/pick-trap.mjs` (`logs/pick-trap.log`) the 5 in trap-records.json; neither was run again.

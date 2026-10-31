@@ -7,7 +7,9 @@ import { entries } from "./zip.mjs";
 
 const [dir, impactPath] = process.argv.slice(2);
 const { classify, CWE_CLASSES } = await import(impactPath);
-const classOf = new Map(Object.entries(CWE_CLASSES).flatMap(([c, ids]) => ids.map(id => [`CWE-${id}`, c])));
+// LMR1c: the table is a list of [classes, ids]; a CWE's first (strongest) class is the one it had before LMR1c. Not run
+// again since LMR1 (its classify() would now choose other records).
+const classOf = new Map(CWE_CLASSES.flatMap(([classes, ids]) => ids.map(id => [`CWE-${id}`, classes[0]])));
 const picked = [];
 for (const ecosystem of ["npm", "Packagist"]) {
   const records = [];

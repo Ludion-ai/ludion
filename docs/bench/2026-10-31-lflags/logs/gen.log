@@ -1,0 +1,9 @@
+# npm 12.2.1, node v24.22.2
+optional v2 base exit 0 lockfileVersion 2; fix exit 0 lockfileVersion 2
+optional v3 base exit 0 lockfileVersion 3; fix exit 0 lockfileVersion 3
+peer v2 base exit 0 lockfileVersion 2; fix exit 0 lockfileVersion 2
+peer v3 base exit 0 lockfileVersion 3; fix exit 0 lockfileVersion 3
+optional-peer-other v2 base exit 0 lockfileVersion 2; fix exit 1 lockfileVersion 2
+optional-peer-other v3 base exit 0 lockfileVersion 3; fix exit 1 lockfileVersion 3
+optional-peer-in-range v2 base exit 0 lockfileVersion 2; fix exit 0 lockfileVersion 2
+optional-peer-in-range v3 base exit 0 lockfileVersion 3; fix exit 0 lockfileVersion 3

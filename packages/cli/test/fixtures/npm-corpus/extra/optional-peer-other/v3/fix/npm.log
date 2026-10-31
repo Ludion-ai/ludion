@@ -1,0 +1,25 @@
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve
+npm error
+npm error While resolving: node-fetch@2.6.7
+npm error Found: encoding@1.3.0
+npm error node_modules/encoding
+npm error   encoding@"npm:left-pad@1.3.0" from the root project
+npm error
+npm error Could not resolve dependency:
+npm error peerOptional encoding@"^0.1.0" from node-fetch@2.6.7
+npm error node_modules/node-fetch
+npm error   node-fetch@"2.6.7" from the root project
+npm error
+npm error Conflicting peer dependency: encoding@0.1.14
+npm error node_modules/encoding
+npm error   peerOptional encoding@"^0.1.0" from node-fetch@2.6.7
+npm error   node_modules/node-fetch
+npm error     node-fetch@"2.6.7" from the root project
+npm error
+npm error Fix the upstream dependency conflict, or retry this command with --force or --legacy-peer-deps to accept an incorrect (and potentially broken) dependency resolution.
+npm error
+npm error
+npm error For a full report see:
+npm error /home/node/.npm/_logs/2026-10-31T09_55_34_379Z-eresolve-report.txt
+npm error A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-31T09_55_34_379Z-debug-0.log

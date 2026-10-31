@@ -1,0 +1,10 @@
+B v2: added node_modules/node-fetch/node_modules/encoding
+C v2: added node_modules/encoding
+E v2: added node_modules/encoding
+P v2: added node_modules/encoding, node_modules/iconv-lite, node_modules/safer-buffer
+R v2: added node_modules/node-fetch/node_modules/encoding, node_modules/node-fetch/node_modules/iconv-lite, node_modules/node-fetch/node_modules/safer-buffer
+B v3: added node_modules/node-fetch/node_modules/encoding
+C v3: added node_modules/encoding
+E v3: added node_modules/encoding
+P v3: added node_modules/encoding, node_modules/iconv-lite, node_modules/safer-buffer
+R v3: added node_modules/node-fetch/node_modules/encoding, node_modules/node-fetch/node_modules/iconv-lite, node_modules/node-fetch/node_modules/safer-buffer

@@ -344,7 +344,14 @@ describe("bench-socket recall", () => {
   const AT_E2E = `${D}/e2e.sh:2`;
 
   type Probe = [id: string, files: Record<string, string>, where: string];
-  const ALIASES = ["ci", "clean-install", "ic", "install-clean", "isntall-clean", "install", "i", "in", "ins", "inst", "insta", "instal", "isnt", "isnta", "isntal", "isntall", "add", "install-test", "it", "install-ci-test", "cit", "clean-install-test", "sit", "rebuild", "rb", "update", "up", "upgrade", "udpate", "dedupe", "ddp"];
+  const ALIASES = ["ci", "clean-install", "ic", "install-clean", "isntall-clean", "install", "i", "in", "ins", "inst", "insta", "instal", "isnt", "isnta", "isntal", "isntall", "add", "install-test", "it", "install-ci-test", "cit", "clean-install-test", "sit", "rebuild", "rb", "update", "u", "up", "upgrade", "udpate", "dedupe", "ddp", "link", "ln", "prune"];
+  /** The id the review of PR #248 gave a probe of an alias, or "alias". */
+  const aliasId = (a: string) => ({ "clean-install": "P3", "install-ci-test": "P4", i: "P5" } as Record<string, string>)[a] ?? "alias";
+  /** A launcher whose socket container runs `script`, and the script holding `body`. */
+  const runs = (script: string, body: string, how = "sh") => ({
+    [`${D}/run.sh`]: `docker run --rm ${SOCK} -v "$here:/scripts:ro" img ${how} /scripts/${script}\n`,
+    [`${D}/${script}`]: `${body}\n`,
+  });
   const MUST_FIND: Probe[] = [
     // The command: an install with its scripts on, written another way.
     ["P1 --ignore-scripts=false", e2e("npm ci --ignore-scripts=false"), AT_E2E],
@@ -353,7 +360,11 @@ describe("bench-socket recall", () => {
     ["P2 --no-ignore-scripts after --ignore-scripts", e2e("npm ci --ignore-scripts --no-audit --no-ignore-scripts"), AT_E2E],
     ["P2 --ignore-scripts=0", e2e("npm ci --ignore-scripts=0"), AT_E2E],
     ["P2 a flag over the environment", e2e("npm_config_ignore_scripts=true npm ci --ignore-scripts=false"), AT_E2E],
-    ...ALIASES.map((a): Probe => [`P3 npm ${a}`, e2e(`npm ${a} --no-audit`), AT_E2E]),
+    ...ALIASES.map((a): Probe => [`${aliasId(a)} npm ${a}`, e2e(`npm ${a} --no-audit`), AT_E2E]),
+    ["npm link a folder", e2e("npm link ../pkg"), AT_E2E],
+    ["npm audit fix", e2e("npm audit fix"), AT_E2E],
+    ["npm audit fix --force", e2e("npm audit fix --force --no-fund"), AT_E2E],
+    ["npm audit fix with an option first", e2e("npm --prefix /w audit fix"), AT_E2E],
     ["P6 a continued line", e2e("npm \\\n  ci --no-audit"), AT_E2E],
     ["P7 npm in a variable", e2e("NPM=npm; $NPM ci"), AT_E2E],
     ["P7 a path in a variable", e2e("NPM=/usr/bin/npm\n\"${NPM}\" clean-install"), `${D}/e2e.sh:3`],
@@ -379,6 +390,13 @@ describe("bench-socket recall", () => {
     ["P17 an alias in an argument list", mjs("execFileSync(\"npm\", [\"clean-install\", \"--no-audit\"]);"), `${D}/github.mjs:1`],
     ["P17 --ignore-scripts false in an argument list", mjs("execFileSync(\"npm\", [\"ci\", \"--ignore-scripts\", \"false\"]);"), `${D}/github.mjs:1`],
     ["a script that runs the docker CLI in a string", { [`${D}/e2e.mjs`]: "execSync(\"docker ps\");\nexecSync(\"npm ci\");\n" }, `${D}/e2e.mjs:2`],
+    ["a command written to a shell's input", mjs("sh.stdin.write(\"npm ci\\n\");"), `${D}/github.mjs:1`],
+    ["a command passed to a function whose name ends in log", mjs("runAndlog(\"npm ci\");"), `${D}/github.mjs:1`],
+    // Scripts the socket container runs, by their kind.
+    ["a .ts script", runs("e2e.ts", "execSync(\"npm ci\");", "node"), `${D}/e2e.ts:1`],
+    ["a .mts script", runs("e2e.mts", "execSync(\"npm ci\");", "node"), `${D}/e2e.mts:1`],
+    ["a .cts script", runs("e2e.cts", "execSync(\"npm ci\");", "node"), `${D}/e2e.cts:1`],
+    ["a .bash script", runs("e2e.bash", "npm ci", "bash"), `${D}/e2e.bash:1`],
     // The command a socket line starts (R2, R3).
     ["R2 sh -c npx on the socket line", { [`${D}/run.sh`]: `docker run --rm ${SOCK} img sh -c "npx tsx /scripts/x.ts"\n` }, `${D}/run.sh:1`],
     ["R3 a README code block", { "docs/bench/x/README.md": `\`\`\`sh\ndocker run --rm ${SOCK} img sh -c "npm install"\n\`\`\`\n` }, "docs/bench/x/README.md:2"],
@@ -402,6 +420,14 @@ describe("bench-socket recall", () => {
       [`${D}/run.sh`]: `ARGS="${SOCK}"\ndocker run --rm $ARGS img sh /scripts/e2e.sh\n`,
       [`${D}/e2e.sh`]: "npm ci\n",
     }, `${D}/e2e.sh:1`],
+    ["Q3 the mount in a bash array", {
+      [`${D}/run.sh`]: `args=(${SOCK})\ndocker run --rm "\${args[@]}" -v "$here:/scripts:ro" img sh /scripts/e2e.sh\n`,
+      [`${D}/e2e.sh`]: "npm ci\n",
+    }, `${D}/e2e.sh:1`],
+    ["Q3 the socket's folder in a variable", {
+      [`${D}/run.sh`]: "SOCK_DIR=/var/run\ndocker run --rm -v \"$SOCK_DIR:/var/run\" -v \"$here:/scripts:ro\" img sh /scripts/e2e.sh\n",
+      [`${D}/e2e.sh`]: "npm ci\n",
+    }, `${D}/e2e.sh:1`],
     ["Q4 -v /:/host", e2e("npm ci", "-v /:/host"), AT_E2E],
     ["Q6 DOCKER_ARGS in a README code block", {
       "docs/bench/x/README.md": `\`\`\`sh\nIMAGE=runner DOCKER_ARGS="${SOCK}" sh docs/bench/x/scripts/run.sh full\n\`\`\`\n`,
@@ -417,6 +443,13 @@ describe("bench-socket recall", () => {
       "docs/bench/x/README.md": `- \`scripts/e2e.sh\` (image runner, \`DOCKER_ARGS="${SOCK}"\`)\n`,
       [`${D}/e2e.sh`]: "npm ci\n",
     }, `${D}/e2e.sh:1`],
+    // The review of PR #249: the same launcher reached twice with other arguments is read again (R248's N8).
+    ["N8 one launcher run with two arguments", {
+      "docs/bench/x/README.md": `\`\`\`sh\nDOCKER_ARGS="${SOCK}" sh docs/bench/x/scripts/run.sh test\nDOCKER_ARGS="${SOCK}" sh docs/bench/x/scripts/run.sh full\n\`\`\`\n`,
+      [`${D}/run.sh`]: "script=$1; shift\ndocker run --rm ${DOCKER_ARGS:-} img sh \"/scripts/$script.sh\"\n",
+      [`${D}/test.sh`]: "echo ok\n",
+      [`${D}/full.sh`]: "npm ci\n",
+    }, `${D}/full.sh:1`],
   ];
 
   const MUST_PASS: [id: string, files: Record<string, string>][] = [
@@ -449,6 +482,19 @@ describe("bench-socket recall", () => {
     }],
     ["a README prose line", { "docs/bench/x/README.md": `The e2e ran with ${SOCK} after npm ci.\n` }],
     ["a socket-less container from a host script", { [`${D}/run.sh`]: "docker run --rm img npm ci --no-audit\n" }],
+    ["npm audit (a report only)", e2e("npm audit; npm audit --json; npm audit signatures")],
+    ["npm audit fix --ignore-scripts", e2e("npm audit fix --ignore-scripts")],
+    ["npm pack (the project's own scripts, as npm run)", e2e("npm pack --dry-run")],
+    ["a folder variable that holds no socket", {
+      [`${D}/run.sh`]: "DIR=/var/lib\ndocker run --rm -v \"$DIR:/x\" -v \"$here:/scripts:ro\" img sh /scripts/e2e.sh\n",
+      [`${D}/e2e.sh`]: "npm ci\n",
+    }],
+    ["process.stdout.write naming npm ci", mjs("process.stdout.write(\"npm ci exit\\n\");")],
+    ["an Error naming npm ci", mjs("throw new Error(\"npm ci failed\");")],
+    ["a .ts script a socket-less container runs", {
+      [`${D}/run.sh`]: "docker run --rm --network none -v \"$here:/scripts:ro\" img node /scripts/e2e.ts\n",
+      [`${D}/e2e.ts`]: "execSync(\"npm ci\");\n",
+    }],
   ];
 
   const KNOWN_MISSES: [id: string, files: Record<string, string>, why: string][] = [
@@ -462,6 +508,37 @@ describe("bench-socket recall", () => {
       [`${D}/e2e.sh`]: "npm ci\n",
     }, "variables are read per file"],
     ["P7 a command name built at run time", e2e("c=n; ${c}pm ci"), "the name is not written out"],
+    // The review of PR #249 (blocking 3 and non-blocking 4): containers and commands this check cannot follow.
+    ["a heredoc given to the socket container", {
+      [`${D}/run.sh`]: `docker run -i --rm ${SOCK} img sh <<'EOF'\nnpm ci\nEOF\n`,
+    }, "a heredoc's lines are not read as the container's commands"],
+    ["docker exec in a container started with the socket", {
+      [`${D}/run.sh`]: `docker run -d --name c ${SOCK} img sleep infinity\ndocker exec c npm ci\n`,
+    }, "containers are not tracked by name across lines"],
+    ["docker exec of a script", {
+      [`${D}/run.sh`]: `docker run -d --name c ${SOCK} img sleep infinity\ndocker exec c sh /scripts/e2e.sh\n`,
+      [`${D}/e2e.sh`]: "npm ci\n",
+    }, "containers are not tracked by name across lines"],
+    ["--volumes-from a container with the socket", {
+      [`${D}/run.sh`]: `docker run -d --name s ${SOCK} img sleep infinity\ndocker run --rm --volumes-from s img sh /scripts/e2e.sh\n`,
+      [`${D}/e2e.sh`]: "npm ci\n",
+    }, "containers are not tracked by name across lines"],
+    ["a compose file", {
+      "docs/bench/x/compose.yml": "services:\n  e2e:\n    image: img\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock\n    command: sh -c \"npm ci\"\n",
+    }, "a compose service's other keys are not tied to its volumes"],
+    ["a script with no extension", runs("e2e2", "npm ci"), "only files ending in a script extension are followed"],
+    ["npm-cli.js run by node", e2e("node /usr/local/lib/node_modules/npm/bin/npm-cli.js ci"), "npm's own script is not read as npm"],
+    ["node \"$(command -v npm)\" ci", e2e("node \"$(command -v npm)\" ci"), "a command substitution is a separate segment"],
+    ["the command in a variable on the socket line", {
+      [`${D}/run.sh`]: `INSTALL="npm ci"\ndocker run --rm ${SOCK} img sh -c "cd /w && $INSTALL"\n`,
+    }, "a variable holding a whole command is not expanded"],
+    ["an argument list over several lines", mjs("spawnSync(\"npm\", [\n  \"ci\",\n]);"), "lines are read one at a time"],
+    ["an argument list joined", mjs("execSync([\"npm\", \"ci\"].join(\" \"));"), "the words are separate strings"],
+    ["npm in a JavaScript variable", mjs("const npm = \"npm\"; spawnSync(npm, [\"ci\"]);"), "JavaScript variables are not followed"],
+    ["npm in a template string's variable", mjs("execSync(`${npm} ci`);"), "JavaScript variables are not followed"],
+    ["--privileged", e2e("npm ci", "--privileged"), "it gives the host's devices, not the socket, and is not looked at"],
+    ["the rootless socket's folder", e2e("npm ci", "-v /run/user/1000:/run/user/1000"), "only /, /var, /run and /var/run count as the socket's folder"],
+    ["DOCKER_HOST in an --env-file", { ...e2e("npm ci", "--env-file /scripts/docker.env"), "docs/bench/x/scripts/docker.env": "DOCKER_HOST=tcp://host.docker.internal:2375\n" }, "env files are not read"],
   ];
 
   it.each(MUST_FIND)("finds %s", (_id, files, where) => {

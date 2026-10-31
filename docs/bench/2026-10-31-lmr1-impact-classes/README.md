@@ -15,6 +15,23 @@ The CWE definitions in `logs/cwe-definitions.log` are MITRE's CWE 5.0 (2026-10-2
 
 These are every record of the two exports, not a sample, so the shares below are plain percentages with no interval.
 
+## Results (LMR1d: no stronger class's condition follows from a weaker one's, and wider sets)
+
+docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (committed in 0566c3d before the code and the count). `scripts/count.sh` (`logs/count.log`, 2026-10-31T07:20:43Z, impact.ts e11540dd…) classified every record three ways:
+- with the impact.ts before LMR1d (`git show 0129ba8:packages/cli/src/security/impact.ts`, written to the volume as `osv/impact-before-lmr1d.ts`, sha256 2326b824…);
+- with the new `classify()` given the sets before widening (count.mjs's `NARROW`);
+- with the shipped sets.
+
+`counts.json` is this run, and `stronger.tsv` (`count.sh --stronger`) lists every record that moved to a stronger class. LMR1c's results are kept as `counts-before-lmr1d.json` and `logs/count-before-lmr1d.log`. The numbers and what changed are in docs/progress/2026-10-31-lmr1d-impact-classes-conditions-and-sets.md. In short, among records that are not MAL-:
+
+| | Before LMR1d | Sets before widening | Shipped sets |
+|---|---|---|---|
+| npm + Packagist (15,469) | 11,625 (75.2%) | 10,846 (70.1%) | **11,288 (73.0%)** |
+| npm (8,073) | 6,208 (76.9%) | 5,873 (72.7%) | **6,067 (75.2%)** |
+| Packagist (7,396) | 5,417 (73.2%) | 4,973 (67.2%) | **5,221 (70.6%)** |
+
+The sections below are LMR1c's, kept as they were. Where they name `counts.json`, `logs/count.log` or `count.sh --words`, read `counts-before-lmr1d.json`, `logs/count-before-lmr1d.log` and the count.mjs of 0129ba8 (git history); count.mjs no longer has `--words`.
+
 ## Results (LMR1c: each CWE allows a set of classes, and the CVSS vectors choose among them)
 
 The decision record was committed and pushed (0345636) before impact.ts was changed and before this count. `scripts/explore-vectors.sh` (`logs/explore-vectors.log`) read the vectors' shapes first, classifying nothing: the exports have only CVSS 3.0, 3.1 and 4.0 vectors (no CVSS 2), and none repeats or lacks C, I or A (VC, VI, VA, SC, SI, SA for CVSS 4).

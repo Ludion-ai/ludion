@@ -1,0 +1,77 @@
+# at commit 2fb15afb6c92ac592e897afe1be05b5ddede2583, 0 files differing from it
+# /w differs from /src in 1 entries
+# stand-in repository made in /w
+# started 2026-10-31T06:22:50Z, node v24.22.1, git version 2.39.5
+== npm run build
+build exit 0
+06:22:51 [build] ✓ Completed in 402ms.
+06:22:51 [build] 5 page(s) built in 547ms
+06:22:51 [build] Complete!
+== npm run typecheck
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+typecheck exit 0
+== npm test -- --maxWorkers=2
+
+> test
+> vitest run --maxWorkers=2
+
+
+ RUN  v4.1.12 /w
+
+ ✓ |node| packages/cli/test/node-image.test.ts (55 tests) 321ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (163 tests) 3594ms
+ ✓ |node| packages/cli/test/branch.test.ts (22 tests) 1420ms
+ ✓ |node| packages/cli/test/deliver.test.ts (39 tests) 6748ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  334ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  357ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  307ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  376ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  429ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  796ms
+ ✓ |node| .claude/hooks/guard.test.ts (53 tests) 1046ms
+ ✓ |node| tools/backtest/test/delta.test.ts (21 tests) 726ms
+     ✓ counts runs of several megabytes without overflowing the stack (docs/mistakes/2026-10-30-delta-regex-stack.md)  558ms
+ ✓ |node| packages/cli/test/security.test.ts (50 tests) 891ms
+ ✓ |node| tools/shadow/test/replay.test.ts (61 tests) 634ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 541ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 365ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 460ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (36 tests | 18 skipped) 244ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 309ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (18 tests) 138ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 167ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 101ms
+ ✓ |node| tools/shadow/test/recorder.test.ts (35 tests) 139ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 91ms
+ ✓ |node| packages/cli/test/judge.test.ts (123 tests) 70ms
+ ✓ |node| tools/backtest/test/delta-v1-results.test.ts (3 tests) 50ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (31 tests) 75ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (22 tests) 33ms
+ ✓ |node| packages/cli/test/action.test.ts (15 tests | 6 skipped) 33ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (7 tests) 31ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 32ms
+ ✓ |node| packages/sandbox/test/guard.test.ts (3 tests) 25ms
+ ✓ |node| tools/records/test/records.test.ts (12 tests) 16ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 19ms
+ ✓ |node| apps/site/test/knowledge.test.ts (12 tests) 12ms
+ ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 9ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (1 test) 10ms
+ ✓ |node| packages/sandbox/test/docker-lookup.test.ts (4 tests) 9ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 4ms
+ ✓ |node| packages/cli/test/patch-cli.test.ts (5 tests) 8ms
+ ✓ |node| packages/cli/test/osv-note.test.ts (6 tests) 4ms
+ ✓ |node| apps/site/test/discovery.test.ts (3 tests) 4ms
+ ✓ |node| apps/site/test/privacy-hosts.test.ts (6 tests) 4ms
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 3ms
+ ✓ |worker| apps/worker/test/app.test.ts (6 tests) 151ms
+
+ Test Files  39 passed (39)
+      Tests  1292 passed | 24 skipped (1316)
+   Start at  06:22:52
+   Duration  12.64s (transform 795ms, setup 0ms, import 2.06s, tests 18.54s, environment 2ms)
+
+test exit 0
+# finished 2026-10-31T06:23:05Z

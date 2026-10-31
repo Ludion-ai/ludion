@@ -183,7 +183,7 @@ describe("the Node.js image policy", () => {
   it.each([
     ["FROM node:22.23.4\nWORKDIR /app\n", "node", { status: "no_newer_security_release", candidate: null }, 0],
     ["FROM node:22.11.0-alpine\nWORKDIR /app\n", "node", { status: "update_available", candidate: { version: "22.23.4", reference: "node:22.23.4-alpine" } }, 1],
-    ["FROM php:8.4.27-fpm\nWORKDIR /app\n", "php", { status: "update_available", candidate: { version: "8.4.29", reference: "php:8.4.29-fpm" } }, 1],
+    ["FROM php:8.4.27-fpm\nWORKDIR /app\n", "php", { status: "update_available", candidate: { version: "8.4.28", reference: "php:8.4.28-fpm" } }, 1],
   ] as const)("reads a Dockerfile with a byte-order mark as Docker does, as without one: %s", async (text, ecosystem, expected, exit) => {
     const php = { "8.4.29": { date: "30 Oct 2026", tags: [] }, "8.4.28": { date: "29 Oct 2026", tags: ["security"] }, "8.4.27": { date: "21 Oct 2026", tags: ["security"] } };
     vi.stubGlobal("fetch", async (url: string | URL | Request) => new Response(JSON.stringify(String(url).startsWith("https://www.php.net/") ? php : INDEX)));

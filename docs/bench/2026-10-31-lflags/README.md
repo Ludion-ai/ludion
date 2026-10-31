@@ -1,5 +1,7 @@
 # LFLAGS: npm's flags from the lock's graph, and optional peers (2026-10-31)
 
+**Narrowed the same day (the brain's ludion-ops#1 comment 6542470518, 6, item 4).** #240 keeps the optional peers (section 1 of the decision; "The forged variants" below) and N1 and N2. It adds gate 2's checks of every entry whose flags alone changed (docs/decisions/2026-10-31-flag-only-entries-gate2.md). The flags computed from the lock's graph left #240 for a separate lane. "F1" and the first "Mutations" below record that code as it stood at 39ee847, for that lane; it is not in #240 any more. See "After the narrowing" at the end.
+
 What was made and run under docs/decisions/2026-10-31-lock-flags-from-graph.md (committed at 9ed2aa2, before any of it). Fixtures in packages/cli/test/fixtures/npm-corpus/extra/; the tests that read them are packages/cli/test/npm-corpus.test.ts ("LFLAGS: …") and packages/cli/test/deliver.test.ts.
 
 ## How it was made
@@ -59,3 +61,12 @@ The same in v2 and v3. npm ls does not report a peer nested under its dependent 
 - Gate 2's checks of an entry whose flags alone changed (docs/decisions/2026-10-31-lock-flags-only.md, section 4): not built here.
 - npm versions other than the six of the corpus, `--legacy-peer-deps` fixes (`patch` never runs npm with it: the project's .npmrc is not copied into the resolver), and the linked install strategy (`install-strategy=linked`, whose .store packages arborist treats differently).
 - An extraneous parent made not extraneous by a child (npm's `resolveParent` loop) is shown on a link-built graph only; npm writes no such lock in the corpus.
+
+## After the narrowing (#240 as it is)
+
+- The code of section 2 (`computedFlags`, `writtenFlags` and the PR job's flag check) and its tests were taken out (44da769, e67054b). The fixtures stay: X1 and X2 hold N1, and X4, X5 and the forged variants hold the optional peers.
+- Gate 2 on flag-only entries: judge.ts `lockFlagChanges` and the judge's checks; judge-cli.ts and candidate-judge.ts ask the registry and OSV for those versions.
+- Mutations (`scripts/mutate.mjs`, 18 in all: rule 1, rule 2, gate 2 on flag-only entries, N1, N2), `--network none`:
+  - logs/mutate-narrowed-1.log (mutations 1 to 10, at 44da769): 9 of 10 caught. Number 8, "ludion judge does not ask for their facts", was not caught; no test covered `ludion judge`'s own request.
+  - logs/mutate-narrowed-2.log (8 and 11 to 18, after its test in judge-cli.test.ts): 9 of 9 caught.
+  - So all 18 are caught, none by the time limit; each test file passes without mutations.

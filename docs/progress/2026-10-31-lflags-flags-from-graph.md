@@ -1,9 +1,13 @@
-# 2026-10-31 — LFLAGS: the PR job checks npm's flags against the lock's graph, and an optional peer adds nothing
+# 2026-10-31 — LFLAGS (#240): an optional peer adds nothing; gate 2 checks every entry whose flags alone changed
 
-Under docs/decisions/2026-10-31-lock-flags-from-graph.md (committed at 9ed2aa2, before the runs, the tests and the code). Detail: docs/bench/2026-10-31-lflags/README.md.
+Under docs/decisions/2026-10-31-lock-flags-from-graph.md (9ed2aa2; section 1) and docs/decisions/2026-10-31-flag-only-entries-gate2.md (662009a), each committed before its code. Detail: docs/bench/2026-10-31-lflags/README.md.
 
-- **Optional peers (audit 6541743253, item 1).** Rule 1: the PR job's walk follows only what npm installs, so a package reached only through an optional peer is stray. Rule 2: the requirement check holds an optional peer that the lookup finds to the package its spec names, in range; one it finds nothing for is met. npm 12.2.1 refuses with ERESOLVE the fix whose optional peer finds another package (X4), so rule 2 refuses nothing npm writes, and the decision's fallback did not apply. The audit's B, C and E and the variants P and R are refused in v2 and v3; npm ls reports C and E only.
-- **Flags (the brain's comment 6539200199, item 1, next step).** `computedFlags` follows npm 12.2.1's arborist. F1: on 102 locks npm 7.10.0 to 12.2.1 wrote, no entry's written flags differ from the computed ones (32 of the locks are npm 12.2.1's). The PR job requires the computed flags on every entry a fix moves, adds or changes in its flags, and on every one whose place in the graph changes them.
-- **N1 and N2 (review 6541119866).** npm 12.2.1's X1 (`optional` dropped) and X2 (`peer` dropped) fixes are taken, and a changed `name` on an unplanned entry is refused.
-- **Mutations:** 25, run in Docker with no network. 24 caught at 6a0f1b3. The 25th (an optional peer another group also names) was not caught. A test was added for it at bdb5fba, and it is caught at 39ee847 (docs/bench/2026-10-31-lflags/logs/).
-- **Not built here:** gate 2's checks of an entry whose flags alone changed (docs/decisions/2026-10-31-lock-flags-only.md, section 4).
+- **Optional peers (audit 6541743253, item 1).**
+  - Rule 1: the PR job's walk follows only what npm installs, so a package reached only through an optional peer is stray.
+  - Rule 2: the requirement check holds an optional peer the lookup finds to the package its spec names, in range. One it finds nothing for is met.
+  - npm 12.2.1 refuses with ERESOLVE the fix whose optional peer finds another package (X4), so rule 2 refuses nothing npm writes.
+  - The audit's B, C and E and the variants P and R are refused, in v2 and v3. npm ls reports C and E only.
+- **Gate 2 on flag-only entries** (docs/decisions/2026-10-31-lock-flags-only.md, section 4): `ludion judge`, npm `patch`'s judge and the PR job's judge ask the registry and OSV for each such version. They stop on a MAL- record, withdrawal or deprecation, cannot decide without facts, and report advisories.
+- **N1 and N2 (review 6541119866):** npm 12.2.1's X1 fix (`optional` dropped) and X2 fix (`peer` dropped) are taken. A changed `name` on an unplanned entry is refused.
+- **Narrowed (the brain's comment 6542470518, 6, item 4):** the flags computed from the lock's graph are a separate lane. Their code, F1 (no difference on 102 npm-written locks) and their 25 mutations at 39ee847 are recorded in the bench folder for that lane.
+- **Mutations of #240 as it is:** 18 of 18 caught. Number 8 was caught after a test was added for it.

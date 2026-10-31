@@ -4,6 +4,8 @@
 
 **Changed in part** by docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (comment 6540818608, point 2, LMR1e-2): point 7's sets. Every CWE in the table now gets every class its mechanism can give. Point 7 is kept as first written.
 
+**Changed in part again** by docs/decisions/2026-10-31-impact-classes-takeover-direct.md (comment 6541666295, LMR1f): one sentence added to point 6, and takeover taken out of the sets of 22 to 40, 59, 73, 276, 552, 732, 89, 943, 1321 and 15.
+
 ## Why
 
 The conditions of the vector record were nested: every vector consistent with steal or alter was also consistent with impersonate and takeover. So a vector could never move a record down from takeover or impersonate. LMR1c's count bears this out: no record went from impersonate to steal.
@@ -37,6 +39,8 @@ The conditions of the vector record were nested: every vector consistent with st
    The vector is still not read for a trap. GHSA-428f-mh7w-6w2x (CWE-509) is therefore trap.
 5. **CWE-912** (hidden functionality) is **not** trap: it is also given to features a legitimate product forgot to remove, so it does not say the version itself is malicious. It is in the table with the takeover set below. **The limit:** a hijack advisory that lists only CWE-912 and 829, like ua-parser-js's withdrawn duplicate GHSA-236c-vhj4-gfxg, is "takeover", not "trap". In the exports counted for #236, 8 records that are not trap list CWE-912: GHSA-236c-vhj4-gfxg, GHSA-457r-cqc8-9vj9, GHSA-8gr3-2gjw-jj7g, GHSA-8jh9-wqpf-q52c, GHSA-9wfr-w7mm-pc7f, GHSA-j9cw-5cpj-9qj5, GHSA-pg98-6v7f-2xfv and GHSA-qq6h-5g6j-q3cm. ua-parser-js's own malware advisory GHSA-pjwm-rvh2-c87w lists CWE-506 and stays trap.
 6. **The rule for sets** (comment 6540209072, item 4). A CWE's set holds every class an attacker can gain through its mechanism; the record's vector says which. A set has one class only when the mechanism truly gives only one.
+
+   *Added by LMR1f* (docs/decisions/2026-10-31-impact-classes-takeover-direct.md, comment 6541666295): takeover is in a CWE's set only when the attacker's code or commands running is the direct result of the mechanism. Every other class the mechanism can give goes into the set.
 7. **The sets.** No other CWE enters or leaves the table.
 
    | Set | CWEs |

@@ -2,6 +2,8 @@
 
 **Decided 2026-10-31** by the owner's Claude chat (ludion-ops#1 comment 6540818608, point 2, 16:50 JST), answering the three questions of PR #236's LMR1d report (lane LMR1e-2). It changes point 7 (the sets) of docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md, which stays as written; this record says what replaces it. The conditions, the design rule and its two checks (that record's point 1, as corrected in LMR1e) and the rule for sets (its point 6) do not change. Written and committed before the code was changed and before anything was counted with it.
 
+**Changed in part** by docs/decisions/2026-10-31-impact-classes-takeover-direct.md (comment 6541666295, LMR1f): takeover is in a set only when code running is the direct result of the mechanism, so "writing a file the application later runs counts" no longer holds, and takeover leaves the sets of 22 to 40, 59, 73, 276, 552, 732, 89, 943, 1321 and 15. This record is kept as first written.
+
 ## The chat's words (6540818608, point 2, kept short)
 
 - (a) 434 → {takeover, impersonate, steal, alter, disrupt}: an uploaded file can run code, enter the users' pages or overwrite files. 494, 502, 829 → the code-injection set {takeover, steal, alter, disrupt}.

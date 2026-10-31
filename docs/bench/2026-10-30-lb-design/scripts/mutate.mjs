@@ -41,7 +41,7 @@ const mutations = [
   ["composer: the backtracking name pattern (CodeQL js/redos) back", D, "/^[a-z0-9][a-z0-9_.-]*\\/[a-z0-9][a-z0-9_.-]*$/", "/^[a-z0-9]([_.-]?[a-z0-9]+)*\\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/", T],
   off("composer and Maven: a downgrade accepted", "if (!from || !to || !semver.gt(to, from)) return"),
   off("composer: a from the base does not lock accepted", "if (!fix.changes.some(c => c.from.replace(/^v(?=\\d)/, \"\") === String(earlier.version ?? \"\").replace(/^v(?=\\d)/, \"\"))) return"),
-  off("npm: another lock entry changing accepted", "if (!isDeepStrictEqual(before, after)) return"),
+  off("npm: another lock entry changing accepted", "if (!sameButFlags(before, after)) return"),
   ["npm: the entry's own name not read (an alias of the package not planned, B2 of 217a6f8)", D, "(typeof item.name === \"string\" ? item.name : requireName(path)) === fix.package;", "requireName(path) === fix.package;", T],
   ["composer and Maven: OSV not asked", D, "if (checked.ecosystem === \"composer\" || checked.ecosystem === \"maven\") {", "if (false) {", T],
   off("composer and Maven: OSV's advisories ignored", "if (ids.length) throw new Error(`Not pushed: OSV lists"),
@@ -181,9 +181,10 @@ if (RESULTS && existsSync(RESULTS)) for (const line of readFileSync(RESULTS, "ut
   if (head === HEAD && name) done.set(name, { result, seconds });
 }
 let caught = 0, timedOut = 0;
-const run = mutations.slice(FROM - 1);
-for (const [j, [name, file, from, to, test]] of run.entries()) {
-  const i = j + FROM - 1;
+// MUTATE_ONLY=27,30 runs only those (one whose text a later round changed, run again on its own).
+const ONLY = process.env.MUTATE_ONLY ? new Set(process.env.MUTATE_ONLY.split(",").map(Number)) : null;
+const run = [...mutations.entries()].filter(([i]) => i + 1 >= FROM && (!ONLY || ONLY.has(i + 1)));
+for (const [i, [name, file, from, to, test]] of run) {
   const original = readFileSync(file, "utf8");
   if (original.split(from).length !== 2) { console.log(`${i + 1}. NOT APPLIED  ${name} (the text is not found exactly once)`); continue; }
   const earlier = done.get(name);
@@ -203,5 +204,8 @@ for (const [j, [name, file, from, to, test]] of run.entries()) {
   console.log(`${i + 1}. ${label}  ${name} — ${test} (${seconds} s${earlier ? ", recorded by an earlier run" : ""})`);
 }
 const clean = [];
-for (const t of new Set(run.map(m => m[4]))) clean.push(`${t} ${await vitest(t)}`);
-console.log(`${caught} of ${run.length} caught (mutations ${FROM} to ${mutations.length}), ${timedOut} of them by the time limit; without mutations: ${clean.join(", ")}`);
+for (const t of new Set(run.map(([, m]) => m[4]))) clean.push(`${t} ${await vitest(t)}`);
+// A test file that fails without mutations makes every "caught" of this run worthless: at 0059cb3 the container hit
+// its memory limit (a tmpfs /tmp counts against it) and from mutation 72 on every run was killed in 1 s.
+if (clean.some(line => !line.endsWith(" pass"))) { console.log("RUN VOID: a test file fails without mutations, so no result of this run counts."); process.exitCode = 1; }
+console.log(`${caught} of ${run.length} caught (of ${mutations.length}: ${ONLY ? `only ${[...ONLY].join(", ")}` : `${FROM} to ${mutations.length}`}), ${timedOut} of them by the time limit; without mutations: ${clean.join(", ")}`);

@@ -1,6 +1,7 @@
 // Impact Classes: Ludion's own classification of a vulnerability record by what the attacker gains, not by how the
 // hole works (CWE), and the protection record's Markdown table (docs/decisions/2026-10-31-impact-classes.md,
-// docs/decisions/2026-10-31-impact-classes-trap-published-record.md and docs/decisions/2026-10-31-impact-classes-cvss-vector.md).
+// docs/decisions/2026-10-31-impact-classes-trap-published-record.md, docs/decisions/2026-10-31-impact-classes-cvss-vector.md
+// and docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md).
 // The CWE table is fixed in this file and reviewed with it; nothing is inferred. Not wired into a PR body or a job
 // summary yet.
 
@@ -15,27 +16,33 @@ export const IMPACT_ORDER: readonly ImpactClass[] = ["trap", "takeover", "impers
 /** A class the CWE table can give: what the attacker gains through the hole. */
 export type TableClass = Exclude<ImpactClass, "trap" | "unclassified">;
 
+/** The CWE table's shape: each set of classes with the CWEs that allow it. */
+export type CweTable = readonly (readonly [readonly TableClass[], readonly number[]])[];
+
 /**
- * Each CWE in the table with the set of classes its definition allows (docs/decisions/2026-10-31-impact-classes-cvss-vector.md).
- * A CWE not listed is unclassified. trap is a published record that says the version is malicious: a MAL- id or alias, or
- * TRAP_CWE.
+ * Each CWE in the table with every class an attacker can gain through its mechanism, strongest first; the record's
+ * CVSS vector says which (docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md). A set has one class only
+ * when the mechanism truly gives only one. A CWE not listed is unclassified. trap is a published record that says the
+ * version is malicious: a MAL- id or alias, or one of TRAP_CWES.
  */
-export const CWE_CLASSES: readonly (readonly [readonly TableClass[], readonly number[]])[] = [
-  // Runs their own code or commands where the application runs: OS command (78) and command (77) injection, code (94),
-  // eval (95) and static code (96) injection, PHP file inclusion (98), dangerous file upload processed in the
-  // application's environment (434), code downloaded without an integrity check (494), deserialization (502),
-  // functionality included from an untrusted sphere (829), expression language (917) and template (1336) injection.
-  [["takeover"], [77, 78, 94, 95, 96, 98, 434, 494, 502, 829, 917, 1336]],
-  // Gets past permissions to act, read or change: privileges (266, 269), access control (284), authorization (285, 425,
-  // 639, 862, 863).
-  [["impersonate", "steal", "alter"], [266, 269, 284, 285, 425, 639, 862, 863]],
-  // Acts as a user or the owner: XSS and its variants (79, 80, 83 to 87), authentication and its bypasses (287 to 290,
-  // 294, 302, 303, 305 to 307), CSRF (352), session fixation and expiry (384, 613), open redirect (601), password change
-  // and recovery (620, 640), hard-coded credentials (798), weak and default credentials (1390 to 1393).
-  [["impersonate"], [79, 80, 83, 84, 85, 86, 87, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 352, 384, 601, 613, 620, 640, 798, 1390, 1391, 1392, 1393]],
-  // Reads or writes data or files: path traversal and its variants (22, 23 to 40), SQL injection (89), files or
-  // directories accessible to external parties (552), data query logic (943).
-  [["steal", "alter"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 89, 552, 943]],
+export const CWE_CLASSES: CweTable = [
+  // Runs their own code or commands where the application runs, or, as a vector with lower impact says, only reads,
+  // changes or stops it: OS command (78) and command (77) injection, code (94), eval (95) and static code (96) injection,
+  // PHP file inclusion (98), dangerous file upload processed in the application's environment (434), code downloaded
+  // without an integrity check (494), deserialization (502), functionality included from an untrusted sphere (829),
+  // hidden functionality (912), expression language (917) and template (1336) injection.
+  [["takeover", "steal", "alter", "disrupt"], [77, 78, 94, 95, 96, 98, 434, 494, 502, 829, 912, 917, 1336]],
+  // Gets past login or permissions to act as someone, read or change: privileges (266, 269), access control (284),
+  // authorization (285, 425, 639, 862, 863), XSS and its variants (79, 80, 83 to 87), authentication and its bypasses
+  // (287 to 290, 294, 302, 303, 305 to 307), session fixation and expiry (384, 613), password change and recovery (620,
+  // 640), hard-coded credentials (798), weak and default credentials (1390 to 1393).
+  [["impersonate", "steal", "alter"], [79, 80, 83, 84, 85, 86, 87, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 384, 425, 613, 620, 639, 640, 798, 862, 863, 1390, 1391, 1392, 1393]],
+  // Makes the user act, without reading the answer: CSRF (352), open redirect (601).
+  [["impersonate", "alter"], [352, 601]],
+  // Reads or writes data or files: path traversal and its variants (22, 23 to 40), link following (59), external control
+  // of a file name (73), SQL injection (89), default and assigned permissions (276, 732), files or directories accessible
+  // to external parties (552), data query logic (943).
+  [["steal", "alter"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 59, 73, 89, 276, 552, 732, 943]],
   // Reads data, files or secrets they must not see: LDAP (90), XPath (643) and XQuery (652) injection, out-of-bounds reads
   // (125 to 127), SSRF (918), XXE (611), exposure of sensitive information (200 to 204, 208, 209, 212 to 215, 226, 359,
   // 497, 524 to 526, 532, 538, 548, 598), unprotected passwords and credentials (256, 257, 522), missing or cleartext
@@ -50,35 +57,54 @@ export const CWE_CLASSES: readonly (readonly [readonly TableClass[], readonly nu
   [["disrupt"], [400, 401, 405, 407, 409, 674, 770, 776, 789, 834, 835, 1050, 1333]],
 ];
 
-/** Embedded Malicious Code: a record listing it is a GitHub-reviewed malware advisory, so trap. */
-export const TRAP_CWE = 506;
+/**
+ * The malicious-code family: embedded malicious code (506), Trojan horse (507), malicious code (508, 509), trapdoor
+ * (510), logic or time bomb (511), spyware (512). A record listing one says the version itself is malicious, so trap.
+ * Hidden functionality (912) is not one of them: legitimate products get it for features they forgot to remove.
+ */
+export const TRAP_CWES: readonly number[] = [506, 507, 508, 509, 510, 511, 512];
 
 /**
  * CWEs decided unclassified, each with its reason in the decision record: too broad to say what the attacker gains
  * (20, 74, 116, 184, 668, 693, 707, 754, 913, 1188, 1395), or doubtful between classes.
  */
 export const DECIDED_UNCLASSIFIED: readonly number[] = [
-  20, 59, 73, 74, 88, 93, 113, 116, 117, 119, 120, 122, 184, 190, 248, 276, 295, 326, 327, 328, 330, 338, 345, 346, 347,
-  362, 367, 416, 426, 476, 427, 436, 441, 444, 470, 668, 693, 707, 732, 749, 754, 787, 843, 912, 913, 916, 942, 1021,
+  20, 74, 88, 93, 113, 116, 117, 119, 120, 122, 184, 190, 248, 295, 326, 327, 328, 330, 338, 345, 346, 347,
+  362, 367, 416, 426, 476, 427, 436, 441, 444, 470, 668, 693, 707, 749, 754, 787, 843, 913, 916, 942, 1021,
   1022, 1188, 1236, 1385, 1395,
 ];
 
-const CLASSES_OF = new Map<number, readonly TableClass[]>(CWE_CLASSES.flatMap(([classes, ids]) => ids.map(id => [id, classes] as const)));
+const lookups = new WeakMap<CweTable, Map<number, readonly TableClass[]>>();
+/** The table as a CWE number → set lookup, built once per table. */
+function lookup(table: CweTable): Map<number, readonly TableClass[]> {
+  let map = lookups.get(table);
+  if (!map) lookups.set(table, (map = new Map(table.flatMap(([classes, ids]) => ids.map(id => [id, classes] as const)))));
+  return map;
+}
 const SEVERITIES: readonly Severity[] = ["critical", "high", "moderate", "low"];
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** Whether a CVSS vector says confidentiality, integrity and availability are each affected (not N). */
-type Affects = { c: boolean; i: boolean; a: boolean };
-/** The OSV severity types read, each with its score's prefix and the base metrics for C, I and A (CVSS 4: vulnerable and subsequent systems). */
-const VECTORS: Readonly<Record<string, { prefix: RegExp; c: readonly string[]; i: readonly string[]; a: readonly string[] }>> = {
-  CVSS_V3: { prefix: /^CVSS:3\.[01]\//, c: ["C"], i: ["I"], a: ["A"] },
-  CVSS_V4: { prefix: /^CVSS:4\.0\//, c: ["VC", "SC"], i: ["VI", "SI"], a: ["VA", "SA"] },
+/**
+ * What a CVSS vector says: whether confidentiality, integrity and availability are each affected (not N), and whether
+ * one system's confidentiality and integrity are both H.
+ */
+type Affects = { c: boolean; i: boolean; a: boolean; full: boolean };
+/**
+ * The OSV severity types read, each with its score's prefix, the base metrics for C, I and A (CVSS 4: vulnerable and
+ * subsequent systems), and the pairs of C and I metrics of one system.
+ */
+const VECTORS: Readonly<Record<string, { prefix: RegExp; c: readonly string[]; i: readonly string[]; a: readonly string[]; systems: readonly (readonly [string, string])[] }>> = {
+  CVSS_V3: { prefix: /^CVSS:3\.[01]\//, c: ["C"], i: ["I"], a: ["A"], systems: [["C", "I"]] },
+  CVSS_V4: { prefix: /^CVSS:4\.0\//, c: ["VC", "SC"], i: ["VI", "SI"], a: ["VA", "SA"], systems: [["VC", "VI"], ["SC", "SI"]] },
 };
-/** When a class is consistent with a vector. */
+/**
+ * When a class is consistent with a vector. No stronger class's condition follows from a weaker one's, so a vector can
+ * move a record down from takeover or impersonate.
+ */
 const CONSISTENT: Readonly<Record<TableClass, (v: Affects) => boolean>> = {
-  takeover: v => v.c || v.i || v.a,
-  impersonate: v => v.c || v.i,
+  takeover: v => v.full,
+  impersonate: v => v.c && v.i,
   steal: v => v.c,
   alter: v => v.i,
   disrupt: v => v.a,
@@ -108,13 +134,22 @@ function vectors(record: Record<string, unknown>): { affects: Affects[] } | { un
     };
     const c = affected(spec.c), i = affected(spec.i), a = affected(spec.a);
     for (const result of [c, i, a]) if (typeof result === "string") return { unreadable: `its ${type} vector cannot be read: ${result}` };
-    affects.push({ c: c as boolean, i: i as boolean, a: a as boolean });
+    const full = spec.systems.some(([ck, ik]) => values.get(ck)![0] === "H" && values.get(ik)![0] === "H");
+    affects.push({ c: c as boolean, i: i as boolean, a: a as boolean, full });
   }
   return { affects };
 }
 
-/** Classifies one OSV record (parsed JSON). Never throws; a record it cannot read is unclassified with the reason. */
-export function classify(record: unknown): Classification {
+const TRAP_NAMES: Readonly<Record<number, string>> = {
+  506: "Embedded Malicious Code", 507: "Trojan Horse", 508: "Non-Replicating Malicious Code", 509: "Replicating Malicious Code",
+  510: "Trapdoor", 511: "Logic/Time Bomb", 512: "Spyware",
+};
+
+/**
+ * Classifies one OSV record (parsed JSON) with the CWE table (CWE_CLASSES unless another is given, as the measurements
+ * and tests do). Never throws; a record it cannot read is unclassified with the reason.
+ */
+export function classify(record: unknown, table: CweTable = CWE_CLASSES): Classification {
   const id = isObject(record) && typeof record.id === "string" ? record.id : "";
   const specific = isObject(record) && isObject(record.database_specific) ? record.database_specific : {};
   const raw = typeof specific.severity === "string" ? specific.severity.toLowerCase() : "";
@@ -133,10 +168,12 @@ export function classify(record: unknown): Classification {
   const aliases = isObject(record) && Array.isArray(record.aliases) ? record.aliases : [];
   const malAlias = aliases.find((alias): alias is string => typeof alias === "string" && alias.startsWith("MAL-"));
   if (malAlias) return { class: "trap", severity, cwes, reason: `${id} has the alias ${malAlias}, an OSV MAL- record: the version itself is malicious.${ignoredNote}` };
-  if (numbers.has(TRAP_CWE)) return { class: "trap", severity, cwes, reason: `${id} lists CWE-${TRAP_CWE} (Embedded Malicious Code): the version itself is malicious.${ignoredNote}` };
+  const trapCwe = TRAP_CWES.find(n => numbers.has(n));
+  if (trapCwe !== undefined) return { class: "trap", severity, cwes, reason: `${id} lists CWE-${trapCwe} (${TRAP_NAMES[trapCwe]}): the version itself is malicious.${ignoredNote}` };
   if (!cwes.length) return { class: "unclassified", severity, cwes, reason: `${id} lists no CWE in database_specific.cwe_ids.${ignoredNote}` };
+  const sets = lookup(table);
   const inTable = cwes.flatMap(cwe => {
-    const classes = CLASSES_OF.get(Number(cwe.slice(4)));
+    const classes = sets.get(Number(cwe.slice(4)));
     return classes ? [{ cwe, classes }] : [];
   });
   if (!inTable.length) return { class: "unclassified", severity, cwes, reason: `${id}: no CWE listed (${cwes.join(", ")}) is in Ludion's table.${ignoredNote}` };
@@ -144,25 +181,20 @@ export function classify(record: unknown): Classification {
   const read = vectors(record as Record<string, unknown>);
   if ("unreadable" in read) return { class: "unclassified", severity, cwes, reason: `${id}: ${read.unreadable}, so no class can be ruled out.${ignoredNote}` };
   const unclassified = (why: string): Classification => ({ class: "unclassified", severity, cwes, reason: `${id}: ${why}.${ignoredNote}` });
+  // The record's set is the union of its CWEs' sets, strongest first.
+  const allowed = [...new Set(inTable.flatMap(l => l.classes))].sort((a, b) => rank(a) - rank(b));
   if (read.affects.length) {
     // The vectors keep only the classes consistent with every one of them; the record takes the strongest kept.
-    const allowed = [...new Set(inTable.flatMap(l => l.classes))].sort((a, b) => rank(a) - rank(b));
     const best = allowed.find(cls => read.affects.every(CONSISTENT[cls]));
     const vector = read.affects.length > 1 ? "CVSS vectors" : "CVSS vector";
     if (!best) return unclassified(`its ${vector} rule${read.affects.length > 1 ? "" : "s"} out every class its CWEs allow (${allowed.join(", ")})`);
     const from = inTable.find(l => l.classes.includes(best))!.cwe;
     return { class: best, severity, cwes, reason: `${id}: ${best} (${from}), the strongest class its CWEs allow (${allowed.join(", ")}) that its ${vector} do${read.affects.length > 1 ? "" : "es"} not rule out.${ignoredNote}` };
   }
-  // No vector: a CWE with one class decides it, one with more decides nothing; the strongest decided class stands only
-  // when no undecided CWE allows a stronger one. Each set lists its classes strongest first.
-  let best: { cls: TableClass; cwe: string } | null = null;
-  for (const l of inTable) if (l.classes.length === 1 && (!best || rank(l.classes[0]!) < rank(best.cls))) best = { cls: l.classes[0]!, cwe: l.cwe };
-  const open = inTable.find(l => l.classes.length > 1 && (!best || rank(l.classes[0]!) < rank(best.cls)));
-  if (open || !best) {
-    const o = open ?? inTable[0]!;
-    return unclassified(`${o.cwe} allows ${o.classes.slice(0, -1).join(", ")} or ${o.classes.at(-1)}${best ? `, stronger than ${best.cls} (${best.cwe}),` : ""} and the record has no CVSS vector to choose`);
-  }
-  return { class: best.cls, severity, cwes, reason: `${id}: ${best.cwe} is ${best.cls}${cwes.length > 1 ? `, the strongest of ${cwes.join(", ")}` : ""}.${ignoredNote}` };
+  // No vector: only a record whose CWEs together allow one class gets it.
+  if (allowed.length > 1) return unclassified(`its CWEs allow ${allowed.slice(0, -1).join(", ")} or ${allowed.at(-1)}, and the record has no CVSS vector to choose`);
+  const only = allowed[0]!;
+  return { class: only, severity, cwes, reason: `${id}: ${inTable.map(l => l.cwe).join(", ")} ${inTable.length > 1 ? "are" : "is"} ${only}.${ignoredNote}` };
 }
 
 /** What Ludion did: opened a PR, stopped the update, is waiting before it, or the fix was merged. */

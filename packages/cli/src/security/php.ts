@@ -107,8 +107,10 @@ export async function scanPhp(dockerfile: string, fetchFn: typeof fetch = fetch)
   const url = `${RELEASES_URL}?json&version=${current.branch}&max=100`;
   const releases = parseReleases(await releaseJson(url, "PHP release", 1, 15_000, fetchFn), current.branch);
   const fixes = releases.filter(r => r.security && compare(r.version, current.version) > 0);
-  const latest = releases[0]!;
-  const candidate = fixes.length ? { version: latest.version, reference: `php:${latest.version}${current.flavor}` } : null;
+  // As for Node.js (node.ts): a branch's releases are cumulative, so the newest security release is the smallest version
+  // holding every published fix; later releases not tagged security are not taken (docs/decisions/2026-10-31-lphpv-php-security-release.md).
+  const fixed = fixes[0];
+  const candidate = fixed ? { version: fixed.version, reference: `php:${fixed.version}${current.flavor}` } : null;
   return {
     schema: 1, checked_at: new Date().toISOString(), status: candidate ? "update_available" : "no_newer_security_release",
     scope: "dockerfile_base_image", current, candidate, security_releases: fixes, source: url,

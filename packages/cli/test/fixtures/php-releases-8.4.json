@@ -1,0 +1,8 @@
+{
+  "8.4.30": { "announcement": true, "tags": [], "date": "30 Oct 2026", "source": [{ "filename": "php-8.4.30.tar.gz", "name": "PHP 8.4.30 (tar.gz)", "date": "30 Oct 2026" }] },
+  "8.4.29": { "announcement": true, "tags": [], "date": "23 Oct 2026", "source": [{ "filename": "php-8.4.29.tar.gz", "name": "PHP 8.4.29 (tar.gz)", "date": "23 Oct 2026" }] },
+  "8.4.28": { "announcement": true, "tags": ["security"], "date": "09 Oct 2026", "source": [{ "filename": "php-8.4.28.tar.gz", "name": "PHP 8.4.28 (tar.gz)", "date": "09 Oct 2026" }] },
+  "8.4.27": { "announcement": true, "tags": [], "date": "25 Sep 2026", "source": [{ "filename": "php-8.4.27.tar.gz", "name": "PHP 8.4.27 (tar.gz)", "date": "25 Sep 2026" }] },
+  "8.4.26": { "announcement": true, "tags": ["security"], "date": "11 Sep 2026", "source": [{ "filename": "php-8.4.26.tar.gz", "name": "PHP 8.4.26 (tar.gz)", "date": "11 Sep 2026" }] },
+  "8.4.25": { "announcement": true, "tags": [], "date": "28 Aug 2026", "source": [{ "filename": "php-8.4.25.tar.gz", "name": "PHP 8.4.25 (tar.gz)", "date": "28 Aug 2026" }] }
+}

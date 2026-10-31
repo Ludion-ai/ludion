@@ -34,3 +34,9 @@ Under packages/cli/test/fixtures/npm-corpus/extra/, written in Docker as the cor
 - **N1:** every inbundle lock is read by main's reader and by #215's (G1, G3), and `unmetRequirements` with its package.json is empty.
 
 **When a gate fails:** as in docs/decisions/2026-10-31-lock-corpus-against-npm.md, the result is reported as it is; the gate and these definitions are not loosened after seeing it.
+
+## 4. What gate 2 looks at in a lockfile (added 2026-10-31, the brain's ludion-ops#1 comment 6539943852, (d))
+
+The definition as it stands, written down: gate 2 looks at the lockfile entries in which any of name, version, resolved or integrity changed (an added entry included; judge.ts, `lockEntryChanges`, which `ludion judge`, npm `patch`'s judge and the PR job's judge use). An entry whose flags alone changed gets none of gate 2's checks. The brain's words: 「関門 2 が見る lockfile の差分は、name・version・resolved・integrity のどれかが変わった項目。印だけが変わった項目は、関門 2 の確かめを受けない」.
+
+Checking an entry that moves from dev-only to production (LFLAGS) is a separate lane after #215; this entry changes no code.

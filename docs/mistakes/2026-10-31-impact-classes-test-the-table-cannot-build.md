@@ -6,5 +6,4 @@
   - The record's point 1 now says where each check runs.
   - `chooseClass`, the step `classify()` runs after the union, is exported, and the 31 sets and 80 pairs are run through it directly.
   - The real `classify()` with real CWEs runs every set the shipped table's rows can form (13 sets, 33 pairs). A row added later that forms a set with no vector for one of its classes fails the test.
-- **Check:** `packages/cli/test/impact.test.ts` — "the design rule" tests: the 80 pairs at `chooseClass`, and every set and pair the shipped table's rows can form, through `classify()` (13 sets and 33 pairs when this was written).
-- **Since then.** LMR1e-2's table (docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md) forms 12 sets and 33 pairs, and LMR1f's (docs/decisions/2026-10-31-impact-classes-takeover-direct.md) the same 12 and 33; the test asserts the current numbers. Pointed out by the review of 42e30b6 (PR #236 comment 6541677765, point 6).
+- **Check:** `packages/cli/test/impact.test.ts` — "the design rule" tests: the 80 pairs at `chooseClass`, and the 13 sets and 33 pairs of the shipped table through `classify()`.

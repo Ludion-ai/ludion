@@ -256,6 +256,7 @@ That was the fourth REQUEST CHANGES in a row of one kind: a lock form npm writes
 - **The corpus gates:** G1 (no narrowing) and G3 (every lock npm writes is read) are met, over 392 locks npm 7.10.0 to 12.2.1 wrote or that change one of them. G2 (agreement with npm 12.2.1's `missing`/`invalid`) is met on every variant but V3. V3 puts another package at a location a range requires; `npm ls` does not look at which package a location holds, Ludion does, so V3 is refused by the identity rule (docs/decisions/2026-10-31-lock-corpus-alias.md), all 72. npm 11.19.1 says the same as npm 12.2.1 of every variant.
 - **Aliases:** locks npm 7 to 12 wrote with an alias under another real package's name (`"minimist": "npm:left-pad@1.3.0"` at the top, a workspace's `"is-number": "npm:left-pad@1.2.0"` nested) are read and leave nothing unmet, so #215 does not narrow what main reads there.
 - **Mutations:** mutate.mjs writes each result to a host file as it finishes (`MUTATE_RESULTS`), and a run again at the same commit skips what is recorded.
+- **Mutations of this round** (`logs/mutate-results.tsv`, `logs/mutate-lb2a-fix-e-part1.log` and `logs/mutate-lb2a-fix-e.log`): 133 of 133 caught at 2b496a1, one (24) by the 300 s limit; none survived, none failed to apply. The run was stopped after 23 by the machine's Docker engine and resumed from its record. Tests at 3cb03e7 (`logs/test-lb2a-fix-e.log`): typecheck 0, build 0, 36 files, 1,239 passed, 20 skipped.
 
 ## The reviews
 

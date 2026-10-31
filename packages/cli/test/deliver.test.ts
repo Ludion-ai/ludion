@@ -20,10 +20,8 @@ const ID = "0f1e2d3c-4b5a-4968-8776-655443322110";
 const sha256 = (text: string) => createHash("sha256").update(text).digest("hex");
 const PKG = "{\"name\":\"app\",\"dependencies\":{\"lodash\":\"4.17.20\"}}\n";
 const PKG_FIXED = "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"lodash\": \"4.17.21\"\n  }\n}\n";
-// The root requires lodash, as npm writes it: a lock whose graph does not reach the package carries other flags
-// (docs/decisions/2026-10-31-lock-flags-from-graph.md).
-const LOCK = "{\n  \"name\": \"app\",\n  \"lockfileVersion\": 3,\n  \"packages\": { \"\": { \"name\": \"app\", \"dependencies\": { \"lodash\": \"4.17.20\" } }, \"node_modules/lodash\": { \"version\": \"4.17.20\" } }\n}\n";
-const FIXED = LOCK.replaceAll("4.17.20", "4.17.21");
+const LOCK = "{\n  \"name\": \"app\",\n  \"lockfileVersion\": 3,\n  \"packages\": { \"node_modules/lodash\": { \"version\": \"4.17.20\" } }\n}\n";
+const FIXED = LOCK.replace("4.17.20", "4.17.21");
 const SUBJECT = "ludion: lodash 4.17.20 -> 4.17.21 (npm)";
 const BRANCH = "ludion/npm/lodash-4.17.21";
 /** The message dependency-patch.ts writes for the fixture's fix. */
@@ -507,9 +505,8 @@ describe("the PR job refuses an artifact the validation job would not write", { 
   });
   it("npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)", async () => {
     // Each makes the walk reach a stray is-number as the forged "dependencies" did; the registry's 1.2.6 lists neither.
-    // is-number carries the flag npm computes for it there (docs/decisions/2026-10-31-lock-flags-from-graph.md).
-    for (const [group, why, flag] of [["optionalDependencies", "package-lock.json's dependencies for minimist@1.2.6", "optional"], ["peerDependencies", "package-lock.json's peerDependencies for minimist@1.2.6", "peer"]] as const) {
-      const p = project(), s = minimistFix(p, { ...MKDIRP, "node_modules/minimist": { version: "1.2.6", [group]: { "is-number": "^7.0.0" } }, "node_modules/is-number": { version: "7.0.0", [flag]: true } }), gh = github(p.origin);
+    for (const [group, why] of [["optionalDependencies", "package-lock.json's dependencies for minimist@1.2.6"], ["peerDependencies", "package-lock.json's peerDependencies for minimist@1.2.6"]] as const) {
+      const p = project(), s = minimistFix(p, { ...MKDIRP, "node_modules/minimist": { version: "1.2.6", [group]: { "is-number": "^7.0.0" } }, "node_modules/is-number": { version: "7.0.0" } }), gh = github(p.origin);
       const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh);
       expect(result.deliveries[0], group).toMatchObject({ outcome: "failed", reason: expect.stringContaining(why) });
       expect(gh.opened, group).toHaveLength(0);
@@ -884,24 +881,13 @@ describe("the policy at the base decides what a fix may change, and what it may 
     const transitive = fixOf("minimist", "1.2.5", "1.2.6", ["package.json", "package-lock.json"]);
     const lockOf = (packages: Record<string, unknown>, root?: Record<string, unknown>) => files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, ...packages }, root) });
     const vulnerable = lockOf({ "node_modules/minimist": { version: "1.2.5" } });
-    // The project requires minimist itself where a test takes the fix: npm writes no lock whose graph leaves the moved
-    // package unreached (docs/decisions/2026-10-31-lock-flags-from-graph.md).
-    const ROOT_MINIMIST = { name: "app", dependencies: { lodash: "^4.17.20", minimist: "^1.2.5" } };
-    const reached = lockOf({ "node_modules/minimist": { version: "1.2.5" } }, ROOT_MINIMIST);
     // The fixed version's new dependencies, hoisted or nested, and theirs: each is what a moved or added path requires.
-    expect(contentProblem("npm", transitive, reached, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "new-dep": "^1.0.0", nested: "2" } }, "node_modules/new-dep": { version: "1.0.0", optionalDependencies: { deeper: "*" } }, "node_modules/deeper": { version: "3.0.0", optional: true }, "node_modules/minimist/node_modules/nested": { version: "2.0.0" } }, ROOT_MINIMIST))).toBeNull();
-    // F3 on what the fix moves and adds: each carries the flags npm computes for it there.
-    expect(contentProblem("npm", transitive, reached, lockOf({ "node_modules/minimist": { version: "1.2.6", dev: true } }, ROOT_MINIMIST))).toBe("package-lock.json gives node_modules/minimist the flags dev, and npm computes none from the lock's graph.");
-    expect(contentProblem("npm", transitive, reached, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "new-dep": "^1.0.0" } }, "node_modules/new-dep": { version: "1.0.0", optionalDependencies: { deeper: "*" } }, "node_modules/deeper": { version: "3.0.0" } }, ROOT_MINIMIST))).toBe("package-lock.json gives node_modules/deeper the flags none, and npm computes optional from the lock's graph.");
-    expect(contentProblem("npm", transitive, reached, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "new-dep": "^1.0.0" } }, "node_modules/new-dep": { version: "1.0.0", optionalDependencies: { deeper: "*" } }, "node_modules/deeper": { version: "3.0.0", optional: "yes" } }, ROOT_MINIMIST))).toBe("package-lock.json gives node_modules/deeper the flags with a value other than true, and npm computes optional from the lock's graph.");
-    // A moved entry is checked even where its flags and its place stay the base's: npm recomputes every flag of a tree it changes.
-    expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { version: "1.2.5", dev: true } }, ROOT_MINIMIST), lockOf({ "node_modules/minimist": { version: "1.2.6", dev: true } }, ROOT_MINIMIST))).toBe("package-lock.json gives node_modules/minimist the flags dev, and npm computes none from the lock's graph.");
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "new-dep": "^1.0.0", nested: "2" } }, "node_modules/new-dep": { version: "1.0.0", optionalDependencies: { deeper: "*" } }, "node_modules/deeper": { version: "3.0.0" }, "node_modules/minimist/node_modules/nested": { version: "2.0.0" } }))).toBeNull();
     expect(contentProblem("npm", transitive, npmBase, lockOf({ "node_modules/minimist": { version: "1.2.6" } }))).toContain("the base's package-lock.json does not have minimist at that version");
     expect(contentProblem("npm", transitive, lockOf({}), lockOf({ "node_modules/lodash/node_modules/evil-copy": { version: "9.9.9" } }))).toContain("the base's package-lock.json does not have minimist");
     // An npm alias of minimist (an entry `name`d minimist under another path) is minimist: the base's alias at 1.2.5 is a
     // planned path, so the fix must move it too (review 6529858505, B2), and moved, nothing more is asked of it here.
-    const evilRoot = { name: "app", dependencies: { lodash: "^4.17.20", evil: "npm:minimist@^1.2.5" } };
-    expect(contentProblem("npm", transitive, lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.5" } }, evilRoot), lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.6" } }, evilRoot))).toBeNull();
+    expect(contentProblem("npm", transitive, lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.5" } }), lockOf({ "node_modules/evil": { name: "minimist", version: "1.2.6" } }))).toBeNull();
     // B2's example: the base has lodash at node_modules/lodash and an alias of it, both 4.17.20; a fix that moves only the
     // first leaves the alias at the version replaced, and is refused.
     const aliasRoot = { name: "app", dependencies: { lodash: "^4.17.20", "lodash-old": "npm:lodash@^4.17.20" } };
@@ -942,7 +928,7 @@ describe("the policy at the base decides what a fix may change, and what it may 
     }
     // An added alias that its requirer's own spec asks for (npm:evil@1.0.0) is what npm installs for it: read, as npm
     // reads it (the registry check, npmAgain, ties that spec to the registry's).
-    expect(contentProblem("npm", transitive, reached, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { foo: "npm:evil@1.0.0" } }, "node_modules/foo": { name: "evil", version: "1.0.0" } }, ROOT_MINIMIST))).toBeNull();
+    expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { foo: "npm:evil@1.0.0" } }, "node_modules/foo": { name: "evil", version: "1.0.0" } }))).toBeNull();
     // Read as the judge reads it (review of 7d25696, N3): two paths that differ only in case, and a version that is not semver.
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6" }, "node_modules/Minimist": { version: "1.2.6" } }))).toContain("not one Ludion reads (Two package-lock paths differ only in case");
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { x: "*" } }, "node_modules/x": { version: "latest" } }))).toContain("not one Ludion reads (Invalid locked version at node_modules/x.)");
@@ -995,12 +981,11 @@ describe("the policy at the base decides what a fix may change, and what it may 
     }
     // The same fix with one more change to tr46 (v3, which has no npm 6 tree to keep in step).
     const was = files({ "package.json": pkg("v3", "base"), "package-lock.json": side("v3", "base") });
-    const forged = (path: string, change: (entry: Record<string, unknown>) => void, base = was) => {
+    const tr46 = (change: (entry: Record<string, unknown>) => void) => {
       const lock = JSON.parse(side("v3", "fix"));
-      change(lock.packages[path]);
-      return contentProblem("npm", fix, base, files({ "package.json": pkg("v3", "fix"), "package-lock.json": JSON.stringify(lock, null, 2) }));
+      change(lock.packages["node_modules/tr46"]);
+      return contentProblem("npm", fix, was, files({ "package.json": pkg("v3", "fix"), "package-lock.json": JSON.stringify(lock, null, 2) }));
     };
-    const tr46 = (change: (entry: Record<string, unknown>) => void) => forged("node_modules/tr46", change);
     for (const [what, change] of [
       ["another key", (e: Record<string, unknown>) => { e.license = "0BSD"; }],
       ["its integrity", (e: Record<string, unknown>) => { e.integrity = "sha512-AAAA"; }],
@@ -1012,28 +997,14 @@ describe("the policy at the base decides what a fix may change, and what it may 
       ["its name", (e: Record<string, unknown>) => { e.name = "tr46"; }],
     ] as const) expect(tr46(change), what).toContain("package-lock.json changes node_modules/tr46 (0.0.3 -> 0.0.3), which this fix does not plan.");
     expect(tr46(e => { e.name = "evil"; })).toContain("node_modules/whatwg-url requires tr46 ~0.0.3, and node_modules/tr46 has evil@0.0.3, which is not that.");
-    // F3 (docs/decisions/2026-10-31-lock-flags-from-graph.md): flags npm's graph does not give are refused, whether the
-    // fix changes them or keeps the base's where the graph changes them.
-    expect(tr46(e => { e.dev = true; e.devOptional = true; })).toBe("package-lock.json gives node_modules/tr46 the flags dev,devOptional, and npm computes none from the lock's graph.");
-    expect(forged("node_modules/webidl-conversions", e => { e.optional = true; })).toBe("package-lock.json gives node_modules/webidl-conversions the flags optional, and npm computes none from the lock's graph.");
-    expect(forged("node_modules/whatwg-url", e => { e.peer = true; })).toBe("package-lock.json gives node_modules/whatwg-url the flags peer, and npm computes none from the lock's graph.");
-    expect(forged("node_modules/whatwg-url", e => { e.dev = true; })).toBe("package-lock.json gives node_modules/whatwg-url the flags dev, and npm computes none from the lock's graph.");
-    // The hole of docs/decisions/2026-10-31-lock-flags-only.md: a package the base locks for development only, which the
-    // fix does not reach, made a production one. left-pad is in both locks as the project's dev dependency.
-    const devOnly = (lock: Record<string, any>, dev: boolean) => {
-      lock.packages[""].devDependencies = { ...lock.packages[""].devDependencies, "left-pad": "1.3.0" };
-      // left-pad 1.3.0's tarball as npm 12.2.1 locked it in extra/optional-peer-other.
-      lock.packages["node_modules/left-pad"] = { version: "1.3.0", resolved: "https://registry.npmjs.org/left-pad/-/left-pad-1.3.0.tgz", integrity: "sha512-XI5MPzVNApjAyhQzphX8BkmKsKUxD4LdyK24iZeQGinBN9yTQT3bFlCBy/aVx2HrNcqQGsdot8ghrjyrvMCoEA==", ...(dev ? { dev: true } : {}) };
-      return JSON.stringify(lock, null, 2);
-    };
-    const devBase = files({ "package.json": pkg("v3", "base"), "package-lock.json": devOnly(JSON.parse(side("v3", "base")), true) });
-    expect(contentProblem("npm", fix, devBase, files({ "package.json": pkg("v3", "fix"), "package-lock.json": devOnly(JSON.parse(side("v3", "fix")), true) }))).toBeNull();
-    expect(contentProblem("npm", fix, devBase, files({ "package.json": pkg("v3", "fix"), "package-lock.json": devOnly(JSON.parse(side("v3", "fix")), false) }))).toBe("package-lock.json gives node_modules/left-pad the flags none, and npm computes dev from the lock's graph.");
+    // Flags npm would not write there pass: whether they are the ones npm computes is not checked (the hole docs/status.md
+    // lists; the graph-computed flags are a separate lane, docs/decisions/2026-10-31-lock-flags-from-graph.md, section 2).
+    expect(tr46(e => { e.dev = true; e.devOptional = true; })).toBeNull();
   });
   // Review 6541119866, N1: `optional` and `peer` change alone as npm 12.2.1 writes it (X1 and X2 of
   // docs/decisions/2026-10-31-lock-flags-from-graph.md): node-fetch 2.6.7 makes the project's optional (X1) or peer (X2)
   // whatwg-url, and what it requires, production dependencies. X5: an optional peer that finds its package, in range.
-  it("npm: npm 12.2.1's fixes whose flags alone change (optional, peer) are taken, and an optional peer in range (N1, F2)", () => {
+  it("npm: npm 12.2.1's fixes whose flags alone change (optional, peer) are taken, and an optional peer in range (N1)", () => {
     const fix = fixOf("node-fetch", "2.6.1", "2.6.7", ["package.json", "package-lock.json"]);
     const at = (dir: string, v: string, s: "base" | "fix", file: string) => readFileSync(new URL(`fixtures/npm-corpus/extra/${dir}/${v}/${s}/${file}`, import.meta.url), "utf8");
     for (const [dir, flag] of [["optional", "optional"], ["peer", "peer"], ["optional-peer-in-range", null]] as const) for (const v of ["v2", "v3"]) {

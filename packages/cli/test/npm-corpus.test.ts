@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { computedFlags, lockEntries, newUnmetRequirements, readLock, unmetRequirements, writtenFlags } from "../src/security/judge.ts";
+import { lockEntries, newUnmetRequirements, readLock, unmetRequirements } from "../src/security/judge.ts";
 
 const root = new URL("fixtures/npm-corpus/", import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), "utf8");
@@ -155,37 +155,9 @@ describe("the npm corpus's bundled entries and B1's pair", () => {
   });
 });
 
-describe("LFLAGS: the flags from the lock's graph, and optional peers (docs/decisions/2026-10-31-lock-flags-from-graph.md)", () => {
+describe("LFLAGS: optional peers, and the flag-only fixes npm 12.2.1 writes (docs/decisions/2026-10-31-lock-flags-from-graph.md, section 1)", () => {
   const side = (lock: string) => ({ lock: read(`${lock}package-lock.json`), manifest: JSON.parse(read(`${lock}package.json`)) as unknown });
   const newProblems = (base: string, lock: string, npm: string) => [...counted(lock, npm)].filter(p => !counted(base, npm).has(p));
-
-  /** Every lock npm wrote, with the npm that wrote it. X4's fix lock is its base's (npm stopped), so it counts once. */
-  const npmWrote = [
-    ...written.map(e => ({ lock: dir(e), npm: e.npm })),
-    ...inBundle.map(lock => ({ lock, npm: lock.split("/")[2]! })),
-    ...[...nodeFetch, ...pairs.filter(p => !p.startsWith("extra/optional-peer-other/") || p.endsWith("/base/"))].map(lock => ({ lock, npm: "12.2.1" })),
-  ];
-  /** Each entry whose written flags are not the computed ones, as "lock path: written / computed". */
-  const differences = (lock: string) => {
-    const text = read(`${lock}package-lock.json`), computed = computedFlags(text);
-    return Object.entries(readLock(text)).filter(([path]) => computed.has(path)).map(([path, item]) => [path, writtenFlags(item), computed.get(path)] as const)
-      .filter(([, w, c]) => w !== c).map(([path, w, c]) => `${lock}${path}: ${w || "none"} / ${c || "none"}`);
-  };
-
-  it("F1: the computed flags are the ones npm 12.2.1 wrote, at every entry of every lock it wrote", () => {
-    const ours = npmWrote.filter(l => l.npm === "12.2.1");
-    expect(ours).toHaveLength(12 + 2 + 4 + 14);
-    // Every lock has flags to compute: the corpus's and the extra locks' entries number in the thousands.
-    expect(ours.reduce((n, l) => n + computedFlags(read(`${l.lock}package-lock.json`)).size, 0)).toBeGreaterThan(400);
-    expect(ours.flatMap(l => differences(l.lock))).toEqual([]);
-  });
-
-  it("F1: the other npm versions' locks, as they are", () => {
-    const other = npmWrote.filter(l => l.npm !== "12.2.1");
-    expect(other).toHaveLength(60 + 10);
-    expect(other.flatMap(l => differences(l.lock))).toEqual([]);
-  });
-
   it("X1, X2, X5: npm 12.2.1 writes the fix, reports nothing new on it, and Ludion finds no requirement unmet", () => {
     for (const x of ["optional", "peer", "optional-peer-in-range"]) for (const v of ["v2", "v3"]) {
       const [base, fix] = [`extra/${x}/${v}/base/`, `extra/${x}/${v}/fix/`];
@@ -209,36 +181,6 @@ describe("LFLAGS: the flags from the lock's graph, and optional peers (docs/deci
     }
   });
 
-  // Each step of the computation on a small graph (arborist's calc-dep-flags.js and node.js `_loadDeps` of npm 12.2.1).
-  it("computedFlags, step by step", () => {
-    const flags = (packages: Record<string, unknown>) => Object.fromEntries(computedFlags(JSON.stringify({ name: "x", lockfileVersion: 3, packages })));
-    const v = (more: Record<string, unknown> = {}) => ({ version: "1.0.0", ...more });
-    // dev, optional, and devOptional where the dev and optional trees meet; written without dev and optional.
-    expect(flags({ "": { devDependencies: { a: "1" }, optionalDependencies: { b: "1" }, dependencies: { p: "1" } }, "node_modules/a": v({ dependencies: { c: "1" } }), "node_modules/b": v({ dependencies: { c: "1" } }), "node_modules/c": v(), "node_modules/p": v() }))
-      .toEqual({ "node_modules/a": "dev", "node_modules/b": "optional", "node_modules/c": "devOptional", "node_modules/p": "" });
-    // A required peer of a production package keeps `peer`; an optional peer leaves its target extraneous; a peer that
-    // the package also lists as a dependency is a dependency (a later group replaces an earlier one).
-    const peers = (b: Record<string, unknown>) => flags({ "": { dependencies: { a: "1" } }, "node_modules/a": v(b), "node_modules/b": v() })["node_modules/b"];
-    expect(peers({ peerDependencies: { b: "1" } })).toBe("peer");
-    expect(peers({ peerDependencies: { b: "1" }, peerDependenciesMeta: { b: { optional: true } } })).toBe("extraneous");
-    expect(peers({ peerDependencies: { b: "1" }, dependencies: { b: "1" } })).toBe("");
-    // devDependencies come last at the root: npm 12.2.1 writes `dev` on a package the project lists in both groups
-    // (docs/bench/2026-10-31-lflags/logs/probe-dev-and-prod.log).
-    expect(flags({ "": { dependencies: { b: "1" }, devDependencies: { b: "1" } }, "node_modules/b": v() })).toEqual({ "node_modules/b": "dev" });
-    // An installed package's devDependencies are not installed for it.
-    expect(peers({ devDependencies: { b: "1" } })).toBe("extraneous");
-    // A workspace: the root's edge to its link, which passes its flags to the folder; a link a dev dependency reaches.
-    expect(flags({ "": { workspaces: ["packages/*"] }, "node_modules/a": { resolved: "packages/a", link: true }, "packages/a": { name: "a", version: "1.0.0", dependencies: { b: "1" } }, "node_modules/b": v() }))
-      .toEqual({ "packages/a": "", "node_modules/b": "" });
-    expect(flags({ "": { devDependencies: { a: "*" } }, "node_modules/a": { resolved: "packages/a", link: true }, "packages/a": { name: "a", version: "1.0.0", dependencies: { b: "1" } }, "node_modules/b": v() }))
-      .toEqual({ "packages/a": "dev", "node_modules/b": "dev" });
-    // A package that is not extraneous makes the extraneous one it is installed under not extraneous (its other flags stay).
-    expect(flags({ "": { dependencies: { x: "*" } }, "node_modules/x": { resolved: "node_modules/a/node_modules/c", link: true }, "node_modules/a": v(), "node_modules/a/node_modules/c": v() }))
-      .toEqual({ "node_modules/a": "dev,optional,peer", "node_modules/a/node_modules/c": "" });
-    // What nothing reaches, and a lock with no root entry.
-    expect(flags({ "node_modules/a": v() })).toEqual({ "node_modules/a": "extraneous" });
-  });
-
   // P1: npm's own report on each forged variant, as it is. Ludion refuses every one (deliver.test.ts); here, which ones
   // the requirement check refuses (rule 2), and that R, in range, is left to the walk (rule 1).
   it("P1: npm reports C and E, not B, P or R; Ludion's requirement check finds B, C, E and P unmet, and R met", () => {
@@ -247,8 +189,6 @@ describe("LFLAGS: the flags from the lock's graph, and optional peers (docs/deci
       for (const npm of ["12.2.1", "11.19.1"]) expect(newProblems(base, lock, npm).length > 0, `${lock} ${npm}`).toBe(x === "C" || x === "E");
       expect(newUnmetRequirements(side(`extra/node-fetch/${v}/base/`), side(lock)).length > 0, lock).toBe(x !== "R");
     }
-    // R's encoding, reached only through node-fetch's optional peer, stays extraneous, as npm 12.2.1 computes it.
-    expect(computedFlags(read("extra/optional-peer-forged/R/v3/package-lock.json")).get("node_modules/node-fetch/node_modules/encoding")).toBe("extraneous");
   });
 
   // Rule 2 for the project's own optional peers too (judge.ts, projects): present, the copy must be in range; missing, met.

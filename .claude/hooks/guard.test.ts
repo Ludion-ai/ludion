@@ -1,12 +1,17 @@
 // The guard hook (guard.mjs) blocks what it should and lets everyday commands through.
 // What it refuses and why: docs/decisions/2026-10-31-lguard-host-runtime-guard.md.
 import { spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const hook = fileURLToPath(new URL("./guard.mjs", import.meta.url));
-const run = (command: string, tool = "Bash") =>
-  spawnSync(process.execPath, [hook], { input: JSON.stringify({ tool_name: tool, tool_input: { command } }), encoding: "utf8" });
+const settingsFile = fileURLToPath(new URL("../settings.json", import.meta.url));
+const runWith = (file: string, input: string) => spawnSync(process.execPath, [file], { input, encoding: "utf8" });
+const call = (tool: string, toolInput: Record<string, unknown>) => runWith(hook, JSON.stringify({ tool_name: tool, tool_input: toolInput }));
+const run = (command: string, tool = "Bash") => call(tool, { command });
 const exitFor = (command: string, tool = "Bash") => run(command, tool).status;
 
 describe("guard hook", () => {
@@ -92,10 +97,10 @@ describe("guard hook", () => {
   });
 });
 
-// Five times by 2026-10-31 an agent ran node, npm, npx or python on the host although its brief said not to
+// At least six times by 2026-10-31 an agent ran node, npm, npx or python on the host although its brief said not to
 // (docs/mistakes/2026-10-31-host-runtimes-five-times.md). The guard refuses them; a container runs them instead.
 describe("guard hook: JavaScript and Python runtimes on the host", () => {
-  // The five, as they were typed.
+  // The six, as they were typed.
   it.each([
     'cd /tmp/mut && node -e "1"',
     'node -e "0"',
@@ -103,7 +108,8 @@ describe("guard hook: JavaScript and Python runtimes on the host", () => {
     "python3 --version 2>/dev/null",
     "npm ci --no-audit --no-fund",
     "node C:/Users/x/.claude/jobs/y/tmp/edit-node-ts.mjs",
-  ])("blocks one of the five: %s", (command) => {
+    "cat > $CLAUDE_JOB_DIR/tmp/simplify.txt <<'EOF'\nnotes\nEOF\npython3 --version 2>/dev/null; echo",
+  ])("blocks one of the six: %s", (command) => {
     expect(exitFor(command)).toBe(2);
   });
 
@@ -408,5 +414,113 @@ describe("guard hook: third-party repositories' files on the host", () => {
     "grep -n 'raw.githubusercontent.com/someone' notes.md",
   ])("allows %s", (command) => {
     expect(exitFor(command)).toBe(0);
+  });
+});
+
+// A guard that fails must stop the call, not let it through (audit comment 6544003261, 1; the chat's 6544620643, 1).
+describe("guard hook: when it cannot read a command, the call stops", () => {
+  it("refuses groups nested deeper than 64, before its recursion could overflow", () => {
+    const nested = (depth: number) => `${"(".repeat(depth)}node -e 1${")".repeat(depth)}`;
+    const deep = run(nested(5000));
+    expect(deep.status).toBe(2);
+    expect(deep.stderr).toContain("nested deeper than 64");
+    expect(run(`echo ${"$(".repeat(65)}x${")".repeat(65)}`).stderr).toContain("nested deeper than 64");
+    expect(exitFor(`${"(".repeat(60)}ls${")".repeat(60)}`)).toBe(0);
+  });
+
+  it("refuses when the request cannot be read", () => {
+    const garbled = runWith(hook, "{not json");
+    expect(garbled.status).toBe(2);
+    expect(garbled.stderr).toContain("could not read");
+  });
+
+  it("refuses every call when a copy of the guard throws", () => {
+    const dir = mkdtempSync(join(tmpdir(), "lguard-broken-"));
+    try {
+      const source = readFileSync(hook, "utf8");
+      expect(source.split("function lex(src) {").length).toBe(2);
+      const broken = join(dir, "guard.mjs");
+      writeFileSync(broken, source.replace("function lex(src) {", 'function lex(src) {\n  throw new Error("broken on purpose");'));
+      const result = runWith(broken, JSON.stringify({ tool_name: "Bash", tool_input: { command: "ls" } }));
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain("broken on purpose");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("is set to block the call when it cannot start or run at all (onFailure), for Bash, PowerShell, Edit, Write and NotebookEdit", () => {
+    const settings = JSON.parse(readFileSync(settingsFile, "utf8"));
+    const entries: { matcher: string; hooks: { command: string; onFailure?: string }[] }[] = settings.hooks.PreToolUse;
+    const guard = entries.filter((e) => e.hooks.some((h) => h.command.includes(".claude/hooks/guard.mjs")));
+    expect(guard).toHaveLength(1);
+    expect(guard[0]!.matcher.split("|").sort()).toEqual(["Bash", "Edit", "NotebookEdit", "PowerShell", "Write"]);
+    for (const h of guard[0]!.hooks) expect(h.onFailure).toBe("block");
+  });
+
+  it("imports nothing: it takes only Node's own fs and path, so it loads no other code", () => {
+    const source = readFileSync(hook, "utf8");
+    expect(source).not.toMatch(/^\s*import\b/m);
+    expect(source).not.toMatch(/\bimport\s*\(/);
+    expect(source).not.toMatch(/\brequire\s*\(/);
+    expect([...source.matchAll(/getBuiltinModule\(([^)]*)\)/g)].map((m) => m[1]).sort()).toEqual(['"node:fs"', '"node:path"']);
+  });
+});
+
+// Writing in .claude/ with Edit, Write or NotebookEdit is refused in every worktree; the place is .claude/ at the top of
+// the git work tree holding the file (audit comment 6544802528, 2). Drive-letter paths (C:\, C:/) only exist on
+// Windows and are not tried here; backslashes are.
+describe("guard hook: writing in .claude/", () => {
+  let root = "";
+  let repo = "";
+  let wt = "";
+  let home = "";
+  const write = (file: string, tool = "Write") => call(tool, tool === "NotebookEdit" ? { notebook_path: file, new_source: "x" } : { file_path: file, content: "x" }).status;
+
+  beforeAll(() => {
+    root = mkdtempSync(join(tmpdir(), "lguard-write-"));
+    home = join(root, "home");
+    repo = join(root, "repo");
+    wt = join(repo, ".claude", "worktrees", "w");
+    for (const dir of [join(home, ".claude", "jobs", "j", "tmp"), join(home, ".claude", "projects", "p", "memory"), join(repo, ".git"), join(repo, ".claude", "hooks"), join(wt, "packages"), join(wt, ".claude", "hooks")]) mkdirSync(dir, { recursive: true });
+    writeFileSync(join(wt, ".git"), "gitdir: ../../../.git/worktrees/w\n");
+    writeFileSync(join(repo, ".claude", "hooks", "guard.mjs"), "x");
+    writeFileSync(join(wt, ".claude", "hooks", "guard.mjs"), "x");
+    symlinkSync(join(wt, ".claude"), join(root, "link"));
+  });
+  afterAll(() => rmSync(root, { recursive: true, force: true }));
+
+  it("allows a job's temporary folder, the memory folder, a worktree's own files and the repository's other files", () => {
+    for (const file of [
+      join(home, ".claude", "jobs", "j", "tmp", "x"),
+      join(home, ".claude", "projects", "p", "memory", "x.md"),
+      join(wt, "packages", "x"),
+      join(wt, "packages", "new", "deeper", "x.ts"),
+      join(repo, "docs", "x.md"),
+    ]) {
+      expect([file, write(file)]).toEqual([file, 0]);
+      expect([file, write(file, "Edit")]).toEqual([file, 0]);
+    }
+  });
+
+  it("refuses the guard and settings of a worktree and of the repository, however the path is written", () => {
+    for (const file of [
+      join(wt, ".claude", "hooks", "guard.mjs"),
+      join(wt, ".CLAUDE", "Hooks", "guard.mjs"),
+      join(wt, "packages", "..", ".claude", "settings.json"),
+      `${wt}\\.claude\\hooks\\guard.mjs`,
+      join(repo, ".claude", "settings.json"),
+      join(repo, ".claude", "hooks", "new.mjs"),
+      join(root, "link", "hooks", "guard.mjs"),
+    ]) {
+      expect([file, write(file)]).toEqual([file, 2]);
+      expect([file, write(file, "Edit")]).toEqual([file, 2]);
+    }
+    expect(write(join(wt, ".claude", "x.ipynb"), "NotebookEdit")).toBe(2);
+    expect(call("Write", { file_path: join(repo, ".claude", "settings.json"), content: "x" }).stderr).toContain("reviewed PR");
+  });
+
+  it("refuses a write whose file it cannot name", () => {
+    expect(call("Edit", { old_string: "a", new_string: "b" }).status).toBe(2);
   });
 });

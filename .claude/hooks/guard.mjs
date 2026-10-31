@@ -3,19 +3,24 @@
 // settings.json denies the plain forms; this sees the whole command line and judges each command in it by what it
 // runs, not by words that merely appear (a commit message or a grep pattern that mentions a deploy or node is fine).
 // What it refuses and lets through, and its known holes: docs/decisions/2026-10-31-lguard-host-runtime-guard.md.
-// In Bash it also refuses a backtick that would run as a command (runsBacktick). Exit 2 blocks the call.
-let input = "";
-for await (const chunk of process.stdin) input += chunk;
-const request = JSON.parse(input || "{}");
-const command = String(request.tool_input?.command ?? "");
-const tool = String(request.tool_name ?? "Bash");
-const bash = tool !== "PowerShell";
-const ESCAPE = bash ? "\\" : "`";
+// In Bash it also refuses a backtick that would run as a command (runsBacktick). For Edit, Write and NotebookEdit it
+// refuses writing in .claude/ (writesGuardFolder). Exit 2 blocks the call; so does any error (the try at the end), and
+// settings.json's "onFailure": "block" covers a guard that cannot start or run at all.
+
+// The tool's shell, set from the request at the end; the reader's functions read these.
+let bash = true;
+let ESCAPE = "\\";
+// Node's own modules only, taken without an import: guard.mjs loads no other code (a test fixes it).
+const fs = process.getBuiltinModule("node:fs");
+const path = process.getBuiltinModule("node:path");
+// Groups (( ), { }, $( )) nest at most this deep; deeper is refused before the reader's recursion could overflow.
+const MAX_NESTING = 64;
+let nesting = 0;
+
 // PowerShell reads curly quotes as quotes, en and em dashes as "-", and a lone CR as a new line: read them so too. The
 // Unicode line separators are taken as new lines, which cuts more and so judges more.
-const line = bash
-  ? command
-  : command
+const powershellText = (text) =>
+  text
       .replace(/[\u{201C}\u{201D}\u{201E}]/gu, '"')
       .replace(/[\u{2018}\u{2019}\u{201A}\u{201B}]/gu, "'")
       .replace(/[\u{2013}\u{2014}\u{2015}]/gu, "-")
@@ -77,6 +82,7 @@ function heredocWord(src, i) {
 
 /** Read src from i up to closer (")" or "}") or its end, adding the pipelines found to out. Returns where it stopped. */
 function scan(src, i, closer, out) {
+  if (++nesting > MAX_NESTING) throw new RangeError(`groups nested deeper than ${MAX_NESTING}`);
   let pipeline = [];
   let stage = { words: [], stdin: [] };
   let word = null;
@@ -158,6 +164,7 @@ function scan(src, i, closer, out) {
     else add(c);
   }
   endPipeline();
+  nesting--;
   return i;
 }
 
@@ -557,8 +564,51 @@ function runsBacktick(line) {
 
 const BACKTICK = "A backtick outside single quotes runs as a command in bash, so a markdown code span inside double-quoted text runs on this machine. Write the text to a file and pass the file (--body-file, -F), or use a quoted heredoc (<<'EOF'); use $( ) for a command substitution you mean.";
 
-const why = check(line) ?? (bash && runsBacktick(command) ? BACKTICK : undefined);
-if (why) {
-  process.stderr.write(`Blocked by .claude/hooks/guard.mjs: ${why}\n`);
+/**
+ * Whether a file that Edit, Write or NotebookEdit would write lies in .claude/ at the top of the git work tree holding
+ * it: the nearest folder upwards with a .git file or folder, so a worktree under .claude/worktrees/ is its own tree.
+ * Backslashes become slashes, .. is resolved, the deepest existing part goes through links and junctions (realpath),
+ * and both sides are lowercased, since NTFS does not tell case apart.
+ */
+function writesGuardFolder(file) {
+  const fold = (p) => p.replace(/\\/g, "/").toLowerCase();
+  let existing = path.resolve(file.replace(/\\/g, "/"));
+  const rest = [];
+  while (!fs.existsSync(existing) && path.dirname(existing) !== existing) {
+    rest.unshift(path.basename(existing));
+    existing = path.dirname(existing);
+  }
+  try {
+    existing = fs.realpathSync.native(existing);
+  } catch {
+    // keep the path as written
+  }
+  const full = fold(path.join(existing, ...rest));
+  for (let dir = existing; ; dir = path.dirname(dir)) {
+    if (fs.existsSync(path.join(dir, ".git"))) return `${full}/`.startsWith(`${fold(dir).replace(/\/$/, "")}/.claude/`);
+    if (path.dirname(dir) === dir) return false;
+  }
+}
+
+const GUARD_FILES = "Files in .claude/ (the guard and its settings) change only through a reviewed PR that the owner merges, so Edit, Write and NotebookEdit there are refused in every worktree. docs/decisions/2026-10-31-lguard-host-runtime-guard.md";
+
+try {
+  let input = "";
+  for await (const chunk of process.stdin) input += chunk;
+  const request = JSON.parse(input || "{}");
+  const tool = String(request.tool_name ?? "Bash");
+  const command = String(request.tool_input?.command ?? "");
+  bash = tool !== "PowerShell";
+  ESCAPE = bash ? "\\" : "`";
+  const file = request.tool_input?.file_path ?? request.tool_input?.notebook_path;
+  // A write whose file cannot be named cannot be judged.
+  const writes = ["Edit", "Write", "NotebookEdit"].includes(tool) && (typeof file !== "string" || writesGuardFolder(file));
+  const why = (writes ? GUARD_FILES : undefined) ?? check(bash ? command : powershellText(command)) ?? (bash && runsBacktick(command) ? BACKTICK : undefined);
+  if (why) {
+    process.stderr.write(`Blocked by .claude/hooks/guard.mjs: ${why}\n`);
+    process.exit(2);
+  }
+} catch (error) {
+  process.stderr.write(`Blocked by .claude/hooks/guard.mjs: the guard could not read this command (${String(error?.message ?? error).slice(0, 120)}), so it is refused.\n`);
   process.exit(2);
 }

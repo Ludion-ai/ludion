@@ -1,9 +1,10 @@
 #!/bin/sh
-# From the worktree root on the host: sh docs/bench/2026-10-31-lmr1-impact-classes/scripts/run.sh setup|test|fetch|count [args]
+# From the worktree root on the host: sh docs/bench/2026-10-31-lmr1-impact-classes/scripts/run.sh <script> [args], where
+# <script> is setup, test, full, mutate, fetch, cwe, explore, count or pick.
 # The worktree is mounted read-only at /src and copied into the volume ludion-lmr1-w; nothing runs on the host.
-# setup (npm ci) and fetch (the two OSV zips) need the network; test and count run with --network none.
-# No host environment, credential or other host path reaches the container. fetch and count, which read OSV's
-# third-party data, also drop every capability.
+# setup (npm ci), fetch (the two OSV zips) and cwe (MITRE's CWE list) need the network; the others run with
+# --network none. No host environment, credential or other host path reaches the container. The scripts that read
+# third-party data (fetch, cwe, explore, count, pick) also drop every capability.
 set -u
 here=docs/bench/2026-10-31-lmr1-impact-classes/scripts
 script=$1; shift

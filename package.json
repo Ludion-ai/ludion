@@ -17,7 +17,7 @@
     "build": "npm run build --workspaces --if-present"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
+    "@axe-core/playwright": "^4.14.0",
     "@cloudflare/vitest-plugin": "^1.3.7",
     "@playwright/test": "^1.63.0",
     "@types/node": "^24.0.0",

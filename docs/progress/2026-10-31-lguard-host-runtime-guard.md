@@ -1,0 +1,9 @@
+# 2026-10-31 — LGUARD: the guard refuses node, npm, npx, python and others on the host
+
+Lane LGUARD, from main 355a91c. Decision: docs/decisions/2026-10-31-lguard-host-runtime-guard.md. Mistake: docs/mistakes/2026-10-31-host-runtimes-five-times.md. Detail: docs/bench/2026-10-31-lguard/README.md.
+
+- `.claude/hooks/guard.mjs` refuses, on the host, JavaScript and Python runtimes and package managers (node, npm, npx, pnpm, yarn, bun, deno, tsx, vitest, python, python3, py, pip, uv, corepack and the same programs' other names), however they are started; reading a third-party repository's files; and commands it cannot judge (a PowerShell `-EncodedCommand`, more than four levels of nesting, a heredoc it cannot read). Docker, git, gh on Ludion-ai's repositories, claude and text that only mentions a name stay allowed.
+- Tests, in Docker only: 425 passed (the guard's and the records' tests); `npm run typecheck` and the guard test's types exit 0.
+- Mutations, in Docker only: run 5 at 4d97495, 219 mutations, caught 217, survived 2 (one now has a test, one is equivalent). Run 6 at 6c38b20: 219, caught 218, survived 1 (R3, equivalent: check() refuses an unread heredoc before the backtick check runs), not applied 0, void 0.
+- An automated security review of each commit found six places where the guard read a command line differently from the shell; each was fixed with tests that fail on the commit before. Two more found in 4d97495 (the backtick check's reading of quotes after `${…}` and a `case` pattern's `)`) are open: the lane stopped there, as the brief says after the same failure three times in a row. The chat decides the way on.
+- The hook only refuses; it does not count. Other holes (a script file's contents, a program named through a variable, node programs on the PATH under their own names, other routes to third-party files) are in the decision record. `.claude/` is a protected path: the owner merges.

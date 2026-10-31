@@ -17,7 +17,7 @@ set -u
 sh /scripts/sync.sh
 cd /w
 echo "# started $(date -u +%Y-%m-%dT%H:%M:%SZ), node $(node -v), $(git --version), $(docker --version)"
-npm ci --no-audit --no-fund >/tmp/ci.log 2>&1; echo "npm ci exit $?"
+npm ci --ignore-scripts --no-audit --no-fund >/tmp/ci.log 2>&1; echo "npm ci exit $?"
 npm run build -w ludion-ai >/tmp/build.log 2>&1; echo "build exit $?"
 CLI=/w/packages/cli/dist/cli.js
 G() { git -c user.name=e2e -c user.email=e2e@example.invalid -c init.defaultBranch=main "$@"; }

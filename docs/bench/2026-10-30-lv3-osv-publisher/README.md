@@ -30,3 +30,7 @@ Started from main 8f7e1ec. Two requests in one PR: finding 1 of the cloud review
 ## Not checked
 
 - No real package with provenance on one version and not the next was looked for on the live registry; those cases are covered by stand-ins only.
+
+## The Docker socket (LSOCK, 2026-11-01)
+
+The e2e container is given the host's Docker socket (`-v /var/run/docker.sock:/var/run/docker.sock`), so whatever runs in it can start containers that mount the host's files: it runs with the host's power, as if on the host. Since 2026-11-01, `scripts/e2e.sh` runs `npm ci --ignore-scripts`; in the e2e runs recorded above, its `npm ci` had install scripts on, in that container (docs/mistakes/2026-11-01-docker-sock-npm-ci.md).

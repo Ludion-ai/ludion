@@ -2,6 +2,8 @@
 # From anywhere on the host: runs scripts/<name>.sh in Docker with the worktree read-only at /src (LNODE).
 # Usage: run.sh ci | run.sh full | run.sh test [vitest args] | run.sh mutate | run.sh e2e [cases]
 # ci (with network) copies the worktree into the volume and runs npm ci there; test and mutate then run with no network.
+# e2e passes the host's Docker socket: that container can start containers that mount the host's files, so whatever runs
+# in it has the host's power. e2e.sh therefore installs with --ignore-scripts (docs/mistakes/2026-11-01-docker-sock-npm-ci.md).
 set -u
 name=$1; shift
 LN_HEAD=$(git -C "$(dirname "$0")" rev-parse HEAD); LN_DIRTY=$(git -C "$(dirname "$0")" status --porcelain | wc -l | tr -d ' '); export LN_HEAD LN_DIRTY

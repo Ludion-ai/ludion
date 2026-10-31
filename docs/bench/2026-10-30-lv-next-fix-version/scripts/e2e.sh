@@ -6,7 +6,7 @@ set -u
 sh /scripts/sync.sh
 cd /w
 echo "# started $(date -u +%Y-%m-%dT%H:%M:%SZ), node $(node -v), $(git --version), $(docker --version)"
-npm ci --no-audit --no-fund >/tmp/ci.log 2>&1; echo "npm ci exit $?"
+npm ci --ignore-scripts --no-audit --no-fund >/tmp/ci.log 2>&1; echo "npm ci exit $?"
 npm run build -w ludion-ai >/tmp/build.log 2>&1; echo "build exit $?"
 CLI=/w/packages/cli/dist/cli.js
 dir=/e/npm; rm -rf "$dir"; mkdir -p /e; cp -r /w/examples/npm-security "$dir"

@@ -19,3 +19,7 @@ Started from main fcbff49. Before this, `ludion patch` planned each npm package 
 - `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository): typecheck 0, build 0, `npm test` 31 files, 1013 passed, 19 skipped (`logs/full.log`).
 - `scripts/mutate.mjs`: 19 of 19 mutations caught, and the tests pass without them (`logs/mutate.log`).
 - `scripts/e2e.sh` (live registry and OSV): the built CLI's `patch --apply` on a committed copy of examples/npm-security. lodash 4.17.20's smallest fixed version is 4.18.0, deprecated ("Bad release. Please use lodash@4.17.21 instead."); the fix took 4.18.1, the judge's verdict was `ready_except_build`, the baseline and candidate tests passed, and the branch `ludion/npm/lodash-4.18.1` was made; the second run skipped it (`logs/e2e.log`). The same example stopped at 4.18.0 in docs/bench/2026-10-29-la-per-fix-apply/logs/e2e-la6.log.
+
+## The Docker socket (LSOCK, 2026-11-01)
+
+The e2e container is given the host's Docker socket (`-v /var/run/docker.sock:/var/run/docker.sock`), so whatever runs in it can start containers that mount the host's files: it runs with the host's power, as if on the host. Since 2026-11-01, `scripts/e2e.sh` runs `npm ci --ignore-scripts`; in the e2e runs recorded above, its `npm ci` had install scripts on, in that container (docs/mistakes/2026-11-01-docker-sock-npm-ci.md).

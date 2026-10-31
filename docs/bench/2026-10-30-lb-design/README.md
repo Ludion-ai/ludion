@@ -253,7 +253,9 @@ That was the fourth REQUEST CHANGES in a row of one kind: a lock form npm writes
 - **B2:** where an override applies, the copy is checked against its spec only.
 - **N1:** `peerDependenciesMeta` is compared with the registry with the requirements, `os`, `cpu` and `libc`.
 - **N4:** tests for M18 and M22 (judge.test.ts), each with a mutation.
-- **The corpus gates:** G1 (no narrowing) and G3 (every lock npm writes is read) are met. G2 (agreement with npm 12.2.1's `missing`/`invalid`) is met for every variant but V3: 56 of 272, where npm takes another package named at a required path under a range and Ludion does not. Ludion is not changed to take it; it waits for the brain's rule. npm 11.19.1 says the same as npm 12.2.1 of every variant.
+- **The corpus gates:** G1 (no narrowing) and G3 (every lock npm writes is read) are met, over 392 locks npm 7.10.0 to 12.2.1 wrote or that change one of them. G2 (agreement with npm 12.2.1's `missing`/`invalid`) is met on every variant but V3. V3 puts another package at a location a range requires; `npm ls` does not look at which package a location holds, Ludion does, so V3 is refused by the identity rule (docs/decisions/2026-10-31-lock-corpus-alias.md), all 72. npm 11.19.1 says the same as npm 12.2.1 of every variant.
+- **Aliases:** locks npm 7 to 12 wrote with an alias under another real package's name (`"minimist": "npm:left-pad@1.3.0"` at the top, a workspace's `"is-number": "npm:left-pad@1.2.0"` nested) are read and leave nothing unmet, so #215 does not narrow what main reads there.
+- **Mutations:** mutate.mjs writes each result to a host file as it finishes (`MUTATE_RESULTS`), and a run again at the same commit skips what is recorded.
 
 ## The reviews
 

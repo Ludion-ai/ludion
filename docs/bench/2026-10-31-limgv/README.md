@@ -75,3 +75,7 @@ What each case should show (expectations, not results):
 ## Not done here
 
 A run on GitHub (the hand check's GitHub is a stand-in; it ran on 2026-10-31, above). LDGLAT, LDG, moving a variant's OS release, the CLAUDE.md sentence (LC0a), LR3 and decision 4, and the "OS layer age" number.
+
+## The Docker socket (LSOCK, 2026-11-01)
+
+The e2e container is given the host's Docker socket (`-v /var/run/docker.sock:/var/run/docker.sock`), so whatever runs in it can start containers that mount the host's files: it runs with the host's power, as if on the host. Since 2026-11-01, `scripts/e2e.sh` runs `npm ci --ignore-scripts`; in the e2e runs recorded above, its `npm ci` had install scripts on, in that container (docs/mistakes/2026-11-01-docker-sock-npm-ci.md).

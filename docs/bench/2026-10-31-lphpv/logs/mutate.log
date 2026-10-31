@@ -1,0 +1,9 @@
+# at commit 2fb15afb6c92ac592e897afe1be05b5ddede2583, 0 files differing from it
+P1 caught (22 failing lines)
+P2 caught (4 failing lines)
+P3 caught (22 failing lines)
+P4 caught (28 failing lines)
+P5 caught (6 failing lines)
+P6 caught (16 failing lines)
+# php.ts restored
+caught 6, survived 0, not applied 0

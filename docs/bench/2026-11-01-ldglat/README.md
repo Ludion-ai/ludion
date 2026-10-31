@@ -8,7 +8,7 @@ Everything ran in containers of the local image `ludion-l9-node24-git` (node 24.
 
 1. **Clone** (2026-10-31T15:19Z–15:21Z): `git clone --filter=blob:none --no-checkout https://github.com/docker-library/repo-info.git` into the volume; HEAD `2427e432ef7036b8bcc918aa1703b960a3d6dea7` (committed 2026-10-31T14:59:06Z, the data end). Nothing of it was checked out or copied to the host.
 2. **Extract** (`scripts/extract.mjs`, raw/extract-started.txt … extract-finished.txt): for the 13 files of the definition's section 2, every commit from 2025-09-01 on and the one before, each listing's Image ID, `Created` and every dpkg source package with its version and first binary package. Output: `raw/commits.tsv` (538 commits), `raw/packages.tsv` (61,777 rows). Only these fields left the container.
-3. **Snapshot** (`scripts/snapshot.mjs`, raw/snapshot-started.txt, raw/snapshot.log): for each of the 198 source packages in `raw/packages.tsv`, `/mr/package/<source>/`, then for each candidate version (those containing `deb12u`, and every version the files list) `/mr/package/<source>/<version>/allfiles?fileinfo=1`. Only Debian package names and versions were sent. The full answers stayed in the volume (cache); `raw/snapshot-files.jsonl` keeps, per candidate, the files that were used (the queried binary's amd64 and `all` files and the `.dsc`) with their whole `fileinfo`. Output: `raw/versions.tsv`, `raw/fixes.tsv`.
+3. **Snapshot** (`scripts/snapshot.mjs`, raw/snapshot-started.txt, docs/bench/2026-11-01-ldglat/raw/snapshot.log): for each of the 198 source packages in `raw/packages.tsv`, `/mr/package/<source>/`, then for each candidate version (those containing `deb12u`, and every version the files list) `/mr/package/<source>/<version>/allfiles?fileinfo=1`. Only Debian package names and versions were sent. The full answers stayed in the volume (cache); `raw/snapshot-files.jsonl` keeps, per candidate, the files that were used (the queried binary's amd64 and `all` files and the `.dsc`) with their whole `fileinfo`. Output: `raw/versions.tsv`, `raw/fixes.tsv`.
 4. **Analyze** (`scripts/analyze.mjs`): from the three TSV files, writes `units.tsv`, `tag-units.tsv`, `secondary-units.tsv`, `intervals.tsv`, `results.json` and `results.md`.
 
 To run again (Git Bash, `MSYS_NO_PATHCONV=1`), with `B` this folder:
@@ -24,15 +24,15 @@ docker run --rm --memory 2g --network none --user 1000:1000 -v "$B/scripts:/s:ro
 
 (The volume needs `chown 1000:1000` once. `extract.mjs` reads the repository's HEAD history; for the same data, `git -C /w/data/repo-info reset --soft 2427e432…` first.)
 
-Changed after their first run (summary.md, "Changes after the first run"): `snapshot.mjs` reads `srcfiles` when `allfiles` is 404 (first output kept as raw/fixes-run1.tsv); `analyze.mjs` leaves out versions ending in another release's suffix (`~deb11u1`) and prints stage 1's `Created` lower bound and the fixes the base already had.
+Changed after their first run (summary.md, "Changes after the first run"; recorded in docs/decisions/2026-11-01-ldglat-after-first-run.md): `snapshot.mjs` reads `srcfiles` when `allfiles` is 404 (first output kept as docs/bench/2026-11-01-ldglat/raw/fixes-run1.tsv, log docs/bench/2026-11-01-ldglat/raw/snapshot.log); `analyze.mjs` leaves out versions ending in another release's suffix (`~deb11u1`) and prints stage 1's `Created` lower bound and the fixes the base already had.
 
 The snapshot cache (the full JSON answers) stayed in the Docker volume and is not kept: the volume was removed at the end. raw/snapshot-files.jsonl keeps the parts used.
 
 ## What the times mean
 
 - **Start** is snapshot.debian.org's `first_seen` in `debian-security`: the first snapshot run that had the file. The file may have been published up to one snapshot run earlier (a few hours; several runs a day).
-- **Ends** are repo-info commit times: when its scan saw the changed listing. The image may have been pushed up to one scan interval earlier. The scan interval is not in the data (a commit is made only on a change), so it is 不明; the commit hours in results.md show that each image's commits come at a few fixed hours of the day. For the debian files, summary.md (stage 2) shows a case where the commit came at least 54 h after the image was in use by node, so a commit time can be days late.
-- For debian images, `Created` is the archive snapshot time the image was built from (00:00Z of a day), a lower bound of the push.
+- **Ends** are repo-info commit times: when its scan saw the changed listing. The image may have been pushed up to one scan interval earlier. The scan interval is not in the data (a commit is made only on a change), so it is 不明; the commit hours in results.md show that each image's commits come at a few fixed hours of the day. For the debian files, summary.md (stage 2) shows a case that, under its reading 2 (node got tzdata 2026e from the base image, not from its own apt), means the commit came at least 54 h after the image was in use by node, so a commit time can be days late. This is a reading, not a measurement.
+- For debian images, `Created` is the archive snapshot time the image was built from (usually 00:00Z of a day; one of the six ending base listings has 2026-10-20T21:32:55Z), a lower bound of the push.
 - amd64 only. Every security-archive upload counts the same.
 
 ## Not built here (design only)

@@ -6,7 +6,7 @@ Experiment, read-only. Every number is copied from [results.md](results.md) (pri
 
 - Candidate versions: 470. Left out: not in debian-security 326, no binary indexed and not in debian-security 8, other-release upload 2, start before the window 65, start after the data end 0. **Security fixes in the window: 69** (start from the binary 68, from the `.dsc` 1).
 - What the base listed at each fix's start (the same for debian:bookworm-slim and debian:bookworm): not listed 58, **units 10** (reached 9, not reached 1), already had the version 1 (libcap2 1:2.66-4+deb12u2).
-- **Independent events:** the 9 reached units per base image were ended by **6** distinct base-image commits (1, 2, 2, 2, 1, 1 units).
+- **Independent events:** the 9 reached units per base image were ended by **6** distinct base-image commits (1, 2, 2, 2, 1, 1 units). This is for stage 1; the totals end at tag commits (5 or 6 distinct per tag, see Total).
 - Secondary units (package only in the tag): php 23–30 per tag, node:22/24-bookworm 55 each; node:*-bookworm-slim none.
 
 ## Stage 1: fix → base image (per unit, n = 9 reached + 1 not reached)
@@ -42,7 +42,7 @@ The total below does not use the base image's commit time, so neither reading ch
 
 Secondary units (fix in a package the tag adds), median: php 169.1–179.9, node:22/24-bookworm 213.7.
 
-So a Debian security fix in the base image's packages reached the official tags in a median of about 200 hours (8 days), at most 585.7 hours (24 days), over **9 fixes and 6 independent rebuilds**. The sample is small. Exposure in the project then adds Ludion's part (LDG), which is not built.
+So a Debian security fix in the base image's packages reached the official tags in a median of 202.4 hours (about 8 days) over tags × units, at most 585.7 hours (24 days); with the 8 not reached by the data end counted as largest, the median is 353.9. The sample is small and the median is not stable: per unit (median across its tags), 4 units are at or under 148.1 h and 4 at or over 393.6 h (values 84.7, 103.2, 120.6, 148.1, 202.4, 393.6, 420.3, 480, 553.2). The totals end at tag commits, not base commits, so the independent events behind them are each tag's own rebuilds: the reached units end at 5 or 6 distinct commits per tag (tag-units.tsv), and tags of one family (the php tags; the node tags) move together. So the total rests on about 5 to 6 rebuilds per tag family, not on the base image's 6 commits. Exposure in the project then adds Ludion's part (LDG), which is not built. (The last three sentences and the 353.9 were added after the R242 review, N1 and N2; the numbers are unchanged.)
 
 ## Rebuild intervals (hours between consecutive new Image IDs, 2025-11-01 to the data end)
 
@@ -64,7 +64,7 @@ So a Debian security fix in the base image's packages reached the official tags 
 
 No interval was under 24 h. The debian base images got a new Image ID 21 times, of which 9 changed the package listing (median 504 h between those). These are intervals between repo-info commits, so an interval of about 72 h can be two scans three days apart of images pushed less than 72 h apart, or more.
 
-**For LDG's wait (not decided here):** with a 72 h wait counted from a tag's newest digest, 0 to 3 of each tag's 20–35 intervals were shorter than the wait, so a rebuild would rarely restart it. This is from repo-info commit times, whose resolution is about a day, and the forward record (decision section 8) would measure it to the hour.
+**For LDG's wait (not decided here):** with a 72 h wait counted from a tag's newest digest, 0 to 3 of each tag's 20–35 intervals were shorter than 72 h. But many sit on the threshold: intervals in [72, 76) h (all of them 72.0 to 72.9 h, scans at the same hour three days apart) number node:22-bookworm-slim 2, node:24-bookworm-slim 6, node:22-bookworm 3, node:24-bookworm 4, php:8.2-cli and 8.3-cli 0, php:8.4-cli, -fpm, -apache and 8.5-cli 2 each; under 96 h: 2, 8, 3, 5, 3, 3, and 6, 8, 6, 6 (of 29, 35, 30, 33, 26, 28, and 30, 32, 30, 28; counted from intervals.tsv by the R242 review and recounted by the lane). Whether those pushes were under or over 72 h apart is 不明 at this resolution (about a day, and a commit can be days late). A digest pushed and replaced between two scans never appears in repo-info, so every "under X h" count is a lower bound. **So how often a rebuild would restart a 72 h wait cannot be told from these data; the forward hourly record (decision section 8) is needed for it.** (Changed after the R242 review, PR #242 comment 6546018619, B1: this paragraph said "so a rebuild would rarely restart it", which the data do not support. The counts are unchanged.)
 
 ## What is missing or 不明
 
@@ -75,6 +75,6 @@ No interval was under 24 h. The debian base images got a new Image ID 21 times, 
 
 ## Changes after the first run
 
-1. `snapshot.mjs`: snapshot answers 404 to `allfiles` for 7 versions with no binary indexed (libpng1.6 1.6.39-2+deb12u2 and six systemd 252.x-1~deb12u1). The script then reads `srcfiles` (the definition's `.dsc` fallback). All 7 turned out not to be in debian-security. The first run's output is kept as raw/fixes-run1.tsv.
-2. `analyze.mjs`: two versions end in `~deb11u1` (ca-certificates 20230311+deb12u1~deb11u1 and 20250419~deb12u1~deb11u1, bullseye's copies). They contain `deb12u` but are not uploads for bookworm (definition section 3), so they are left out as `other-release-upload`. In the first output they made 8 secondary units (one per php and node full tag). The base-image units did not change.
+1. `snapshot.mjs`: snapshot answers 404 to `allfiles` for 7 versions with no binary indexed (libpng1.6 1.6.39-2+deb12u2 and six systemd 252.x-1~deb12u1). The script then reads `srcfiles` (the definition's `.dsc` fallback). All 7 turned out not to be in debian-security. The first run's output is kept as docs/bench/2026-11-01-ldglat/raw/fixes-run1.tsv (log: docs/bench/2026-11-01-ldglat/raw/snapshot.log).
+2. `analyze.mjs`: two versions end in `~deb11u1` (ca-certificates 20230311+deb12u1~deb11u1 and 20250419~deb12u1~deb11u1, bullseye's copies). They contain `deb12u` but are not uploads for bookworm (definition section 3), so they are left out as `other-release-upload`. Section 3 step 3's test (a file in `debian-security`) alone would have counted them, so this is recorded as a deviation in docs/decisions/2026-11-01-ldglat-after-first-run.md. In the first output they made 8 secondary units (one per php and node full tag, all reached). Direction: fixes in the window 71 → 69; the base-image units and tag units did not change; secondary medians fell or stayed the same (node:22/24-bookworm 228.3 → 213.7; php:8.5-cli 179.9 → 179.3; php:8.3-cli "not reached as largest" 179.9 → 169.1).
 3. `analyze.mjs` prints stage 1's lower bound (`Created` − start), which section 4 records, and the fixes the base already had at the start.

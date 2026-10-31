@@ -121,6 +121,9 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-cvss-vector.md)
     expect(classify(withVectors(["CWE-400", "CWE-22"], v3("C:N/I:H/A:H"), v4("VC:N/VI:H/VA:H/SC:N/SI:N/SA:N"))).reason).toBe(
       "GHSA-xxxx-xxxx-xxxx: alter (CWE-22), the strongest class its CWEs allow (steal, alter, disrupt) that its CVSS vectors do not rule out.",
     );
+    expect(classify(withVectors(["CWE-22", "CWE-400"], v3("C:N/I:N/A:H"))).reason).toBe(
+      "GHSA-xxxx-xxxx-xxxx: disrupt (CWE-400), the strongest class its CWEs allow (steal, alter, disrupt) that its CVSS vector does not rule out.",
+    );
     expect(classify(withVectors(["CWE-400"], v3("C:H/I:H/A:N"))).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CVSS vector rules out every class its CWEs allow (disrupt).");
   });
 

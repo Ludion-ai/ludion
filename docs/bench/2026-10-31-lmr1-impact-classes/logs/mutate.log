@@ -1,10 +1,32 @@
-# started 2026-10-31T04:30:53Z, node v24.22.1
+# started 2026-10-31T05:27:26Z, node v24.22.1
 without mutations: passed
 caught: MAL- is not trap
 caught: MAL- anywhere in the id is trap
 caught: the weakest class wins
 caught: the first CWE wins
 caught: CWE-78 leaves the table
+caught: the vectors are not read
+caught: the weakest consistent class wins
+caught: one consistent vector is enough
+caught: steal needs no confidentiality
+caught: alter read from confidentiality
+caught: disrupt needs no availability
+caught: impersonate by confidentiality only
+caught: takeover needs all three
+caught: CVSS 4's subsequent systems not read
+caught: a vector of another version accepted
+caught: a score of another form skipped
+caught: a metric given twice accepted
+caught: any metric value accepted
+caught: N read as affected
+caught: an unreadable metric read as affected
+caught: with no vector, a CWE with several classes decides its strongest
+caught: with no vector, a CWE with several classes never blocks
+caught: with no vector, a CWE with several classes blocks a stronger decided class
+caught: the reason names the first CWE
+caught: CWE-22's set loses alter
+caught: authorization's set loses steal and alter
+caught: XSS allows steal too
 caught: a MAL- alias is not trap
 caught: an alias containing MAL- anywhere is trap
 caught: CWE-506 is not trap
@@ -30,5 +52,5 @@ caught: action before the fix accepted
 caught: Feb 30 accepted
 caught: summary counts every action as fixed
 after restoring: passed
-29 of 29 mutations caught
-# finished 2026-10-31T04:31:16Z
+51 of 51 mutations caught
+# finished 2026-10-31T05:28:08Z

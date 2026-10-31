@@ -141,24 +141,23 @@ export function classify(record: unknown): Classification {
   });
   if (!inTable.length) return { class: "unclassified", severity, cwes, reason: `${id}: no CWE listed (${cwes.join(", ")}) is in Ludion's table.${ignoredNote}` };
   const rank = (cls: ImpactClass) => IMPACT_ORDER.indexOf(cls);
-  const strongest = (classes: Iterable<TableClass>) => [...classes].sort((a, b) => rank(a) - rank(b))[0];
   const read = vectors(record as Record<string, unknown>);
   if ("unreadable" in read) return { class: "unclassified", severity, cwes, reason: `${id}: ${read.unreadable}, so no class can be ruled out.${ignoredNote}` };
   const unclassified = (why: string): Classification => ({ class: "unclassified", severity, cwes, reason: `${id}: ${why}.${ignoredNote}` });
   if (read.affects.length) {
     // The vectors keep only the classes consistent with every one of them; the record takes the strongest kept.
     const allowed = [...new Set(inTable.flatMap(l => l.classes))].sort((a, b) => rank(a) - rank(b));
-    const best = strongest(allowed.filter(cls => read.affects.every(CONSISTENT[cls])));
+    const best = allowed.find(cls => read.affects.every(CONSISTENT[cls]));
     const vector = read.affects.length > 1 ? "CVSS vectors" : "CVSS vector";
     if (!best) return unclassified(`its ${vector} rule${read.affects.length > 1 ? "" : "s"} out every class its CWEs allow (${allowed.join(", ")})`);
     const from = inTable.find(l => l.classes.includes(best))!.cwe;
     return { class: best, severity, cwes, reason: `${id}: ${best} (${from}), the strongest class its CWEs allow (${allowed.join(", ")}) that its ${vector} do${read.affects.length > 1 ? "" : "es"} not rule out.${ignoredNote}` };
   }
   // No vector: a CWE with one class decides it, one with more decides nothing; the strongest decided class stands only
-  // when no undecided CWE allows a stronger one.
+  // when no undecided CWE allows a stronger one. Each set lists its classes strongest first.
   let best: { cls: TableClass; cwe: string } | null = null;
   for (const l of inTable) if (l.classes.length === 1 && (!best || rank(l.classes[0]!) < rank(best.cls))) best = { cls: l.classes[0]!, cwe: l.cwe };
-  const open = inTable.find(l => l.classes.length > 1 && (!best || rank(strongest(l.classes)!) < rank(best.cls)));
+  const open = inTable.find(l => l.classes.length > 1 && (!best || rank(l.classes[0]!) < rank(best.cls)));
   if (open || !best) {
     const o = open ?? inTable[0]!;
     return unclassified(`${o.cwe} allows ${o.classes.slice(0, -1).join(", ")} or ${o.classes.at(-1)}${best ? `, stronger than ${best.cls} (${best.cwe}),` : ""} and the record has no CVSS vector to choose`);

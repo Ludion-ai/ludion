@@ -134,7 +134,7 @@ function vectorShapes(records) {
   return { records: records.length, shapes, cvss3_and_4_disagree_on_not_n: disagree, classified_with_no_vector_whose_whole_set_is_several_classes: wholeSetSeveral };
 }
 
-const all = [], words = [];
+const all = [], words = [], cwe912 = [];
 const out = {
   fetched,
   zips_checked: {},
@@ -166,10 +166,12 @@ for (const ecosystem of ["npm", "Packagist"]) {
     if ((c.class === "trap") !== (before.class === "trap")) throw new Error(`${ecosystem}.zip ${name}: trap changed (${before.class} -> ${c.class}), which LMR1c does not change`);
     // A fixed-string search, case ignored: "malware" or "malicious" in the summary or the details.
     const said = `${typeof record.summary === "string" ? record.summary : ""}\n${typeof record.details === "string" ? record.details : ""}`.toLowerCase();
-    if (said.includes("malware") || said.includes("malicious")) {
+    const found = ["malware", "malicious"].filter(w => said.includes(w));
+    if (found.length) {
       const packages = (Array.isArray(record.affected) ? record.affected : []).map(a => a?.package?.name).filter(x => typeof x === "string");
-      words.push({ id, ecosystem, class: c.class, packages: [...new Set(packages)], cwes: c.cwes, withdrawn: typeof record.withdrawn === "string" });
+      words.push({ id, ecosystem, class: c.class, words: found, packages: [...new Set(packages)], cwes: c.cwes, withdrawn: typeof record.withdrawn === "string" });
     }
+    if (c.class !== "trap" && c.cwes.includes("CWE-912")) cwe912.push(id);
     records.push({ ...c, before: before.class, basis, mal: id.startsWith("MAL-"), withdrawn: typeof record.withdrawn === "string", vectors: vectorsOf(record) });
   }
   for (const r of records) all.push(r);
@@ -177,12 +179,25 @@ for (const ecosystem of ["npm", "Packagist"]) {
 }
 out.ecosystems.both = summarise(all);
 const notTrap = words.filter(w => w.class !== "trap").sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+if (process.argv.includes("--words")) {
+  // The records themselves, one per line (tab-separated): malware-or-malicious.tsv.
+  console.log(["id", "ecosystem", "class", "words", "packages", "cwes", "withdrawn"].join("\t"));
+  for (const w of notTrap) console.log([w.id, w.ecosystem, w.class, w.words.join(","), w.packages.join(",") || "-", w.cwes.join(",") || "-", w.withdrawn].join("\t"));
+  process.exit(0);
+}
+const byClass = list => Object.fromEntries(IMPACT_ORDER.filter(c => c !== "trap").map(c => [c, list.filter(w => w.class === c).length]));
+const withMalware = notTrap.filter(w => w.words.includes("malware"));
 out.malware_or_malicious = {
   search: 'summary or details contains "malware" or "malicious", case ignored (fixed strings)',
   matched: words.length,
   matched_trap: words.length - notTrap.length,
   not_trap: notTrap.length,
-  not_trap_by_class: Object.fromEntries(IMPACT_ORDER.filter(c => c !== "trap").map(c => [c, notTrap.filter(w => w.class === c).length])),
-  not_trap_records: notTrap,
+  not_trap_by_class: byClass(notTrap),
+  not_trap_by_word: { malware_only: notTrap.filter(w => w.words.length === 1 && w.words[0] === "malware").length, malicious_only: notTrap.filter(w => w.words.length === 1 && w.words[0] === "malicious").length, both: notTrap.filter(w => w.words.length === 2).length },
+  not_trap_with_malware: { count: withMalware.length, by_class: byClass(withMalware), ids: withMalware.map(w => w.id) },
+  not_trap_listing_cwe_912: notTrap.filter(w => w.cwes.includes("CWE-912")).map(w => w.id),
+  // Every record that lists CWE-912 and is not trap, matched or not.
+  all_not_trap_listing_cwe_912: cwe912.sort(),
+  not_trap_records: "malware-or-malicious.tsv (count.sh --words)",
 };
 console.log(JSON.stringify(out, null, 2));

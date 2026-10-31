@@ -48,7 +48,7 @@ const mutations = [
   ["composer: Packagist not asked", D, "if (checked.ecosystem === \"composer\") {", "if (false) {", T],
   off("composer: an entry other than Packagist's release accepted", "if (!isDeepStrictEqual(entry[key], listed[key])) return"),
   off("composer.lock: keys Ludion does not check accepted", "if ((entry.name === fix.package || !earlier) && unknown.length) return"),
-  ["PHP: Docker Hub not asked", D, "if (checked.ecosystem === \"php\") {", "if (false) {", T],
+  ["PHP: Docker Hub not asked", D, "if (isImage(checked.ecosystem)) {", "if (false) {", T],
   ["PHP: another digest under the tag accepted", D, "return listed === match[2] ? null :", "return true ? null :", T],
   off("composer.lock: a new notification-url accepted", "if (entry[\"notification-url\"] !== undefined && entry[\"notification-url\"] !== PACKAGIST_NOTIFY) return"),
   off("composer.lock: a name listed twice accepted", "if (twice.length) return"),

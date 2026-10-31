@@ -1,0 +1,1 @@
+{"createdAt":"2026-10-30T19:16:54Z","headRefName":"ludion/php-d/php/8.4.27","headRefOid":"8f7eac28be7ba15e1258bd47ce8dde55bd137a88","number":6,"statusCheckRollup":[{"__typename":"StatusContext","context":"ci/test","startedAt":"2026-10-30T19:17:20Z","state":"SUCCESS","targetUrl":"https://github.com/Ludion-ai/ludion-trial/actions/runs/41113953218"}]}

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "checked_at": "2026-10-30T18:52:54.291Z",
+  "status": "no_newer_security_release",
+  "scope": "dockerfile_base_image",
+  "current": {
+    "reference": "php:8.4.27-cli-alpine",
+    "version": "8.4.27",
+    "branch": "8.4",
+    "flavor": "-cli-alpine",
+    "start": 5,
+    "end": 26
+  },
+  "candidate": null,
+  "security_releases": [],
+  "source": "https://www.php.net/releases/index.php?json&version=8.4&max=100",
+  "note": "Checks official PHP security-release metadata against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment."
+}

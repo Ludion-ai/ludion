@@ -1,0 +1,60 @@
+﻿2026-10-30T18:57:09.5124800Z Current runner version: '2.338.0'
+2026-10-30T18:57:09.5200768Z ##[group]Runner Image Provisioner
+2026-10-30T18:57:09.5202059Z Hosted Compute Agent
+2026-10-30T18:57:09.5203452Z Version: 20261021.618
+2026-10-30T18:57:09.5204462Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-30T18:57:09.5205715Z Build Date: 2026-10-21T00:45:21Z
+2026-10-30T18:57:09.5206920Z Worker ID: {9fa703ff-c5d9-45c1-a68c-e562970fb02f}
+2026-10-30T18:57:09.5208133Z Region: westcentralus
+2026-10-30T18:57:09.5209149Z Cloud: Azure
+2026-10-30T18:57:09.5210040Z ##[endgroup]
+2026-10-30T18:57:09.5212120Z ##[group]Operating System
+2026-10-30T18:57:09.5233415Z Ubuntu
+2026-10-30T18:57:09.5234353Z 24.04.5
+2026-10-30T18:57:09.5235441Z LTS
+2026-10-30T18:57:09.5236260Z ##[endgroup]
+2026-10-30T18:57:09.5237109Z ##[group]Runner Image
+2026-10-30T18:57:09.5238281Z Image: ubuntu-24.04
+2026-10-30T18:57:09.5239223Z Version: 20261025.353.1
+2026-10-30T18:57:09.5241508Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-30T18:57:09.5244449Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+2026-10-30T18:57:09.5246187Z ##[endgroup]
+2026-10-30T18:57:09.5247765Z ##[group]GITHUB_TOKEN Permissions
+2026-10-30T18:57:09.5250921Z Metadata: read
+2026-10-30T18:57:09.5251841Z ##[endgroup]
+2026-10-30T18:57:09.5255468Z Secret source: Actions
+2026-10-30T18:57:09.5257031Z Cache mode: write
+2026-10-30T18:57:09.5258228Z Prepare workflow directory
+2026-10-30T18:57:09.5808205Z Prepare all required actions
+2026-10-30T18:57:09.5875279Z Getting action download info
+2026-10-30T18:57:09.8492013Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+2026-10-30T18:57:10.1002618Z Complete job name: forge
+2026-10-30T18:57:10.1912555Z ##[group]Run mkdir -p "$RUNNER_TEMP/forged"
+2026-10-30T18:57:10.1913581Z mkdir -p "$RUNNER_TEMP/forged"
+2026-10-30T18:57:10.1914792Z echo '{"forged_by":"LB2b2 case E2","result":{"receipt":{"schema":1,"ecosystem":"php","outcome":"skipped","fixes":[]}}}' > "$RUNNER_TEMP/forged/receipt.json"
+2026-10-30T18:57:10.1940918Z shell: /usr/bin/bash -e {0}
+2026-10-30T18:57:10.1941675Z ##[endgroup]
+2026-10-30T18:57:10.2274153Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+2026-10-30T18:57:10.2275011Z with:
+2026-10-30T18:57:10.2275446Z   name: ludion-fixes
+2026-10-30T18:57:10.2275967Z   path: /home/runner/work/_temp/forged
+2026-10-30T18:57:10.2276538Z   if-no-files-found: error
+2026-10-30T18:57:10.2277031Z   retention-days: 7
+2026-10-30T18:57:10.2277485Z   compression-level: 6
+2026-10-30T18:57:10.2277949Z   overwrite: false
+2026-10-30T18:57:10.2278415Z   include-hidden-files: false
+2026-10-30T18:57:10.2278921Z   archive: true
+2026-10-30T18:57:10.2279391Z ##[endgroup]
+2026-10-30T18:57:10.5262495Z With the provided path, there will be 1 file uploaded
+2026-10-30T18:57:10.5264836Z Artifact name is valid!
+2026-10-30T18:57:10.5266016Z Root directory input is valid!
+2026-10-30T18:57:10.8496642Z Uploading artifact: ludion-fixes.zip
+2026-10-30T18:57:10.8729741Z Beginning upload of artifact content to blob storage
+2026-10-30T18:57:11.1100198Z Uploaded bytes 240
+2026-10-30T18:57:11.1605560Z Finished uploading artifact content to blob storage!
+2026-10-30T18:57:11.1609059Z SHA256 digest of uploaded artifact is b8379980a8b94289426037c8e4b8d3aea6a96f808c453841639dea9b00a9bc7f
+2026-10-30T18:57:11.1620517Z Finalizing artifact upload
+2026-10-30T18:57:11.7648533Z Artifact ludion-fixes successfully finalized. Artifact ID 13003826651
+2026-10-30T18:57:11.7649864Z Artifact ludion-fixes has been successfully uploaded! Final size is 240 bytes. Artifact ID is 13003826651
+2026-10-30T18:57:11.7651362Z Artifact download URL: https://github.com/Ludion-ai/ludion-trial/actions/runs/41111203225/artifacts/13003826651
+2026-10-30T18:57:11.7812580Z Cleaning up orphan processes

@@ -1,0 +1,115 @@
+# LB2b2 trial (Ludion-ai/ludion-trial): action/patch-workflow.yml from Ludion-ai/ludion 47a21a9, with the action pin
+# (this repository's ludion-action branch: the bundles built from 859d40f plus the prototype mode check; not a release),
+# dir (php-a, a copy of the php sample), no schedule (CI form A), and a first job check that ends a run with nothing to do
+# before Docker (Ludion-ai/ludion docs/decisions/2026-10-31-lb2b2-trial-definitions.md on lane/lb2b2-trial-ci).
+# Ludion's scheduled workflow, for a user's repository: copy it to .github/workflows/ludion.yml (preview, not released;
+# docs/bench/2026-10-30-lb-design). It needs ludion.security.json in the project's folder (`ludion init`) and the
+# repository setting "Allow GitHub Actions to create and approve pull requests".
+#
+# Jobs (CLAUDE.md, "Ludion must not become the attack path"):
+#   check          reads the run's commit, ludion scan's live answers and the open PRs; runs no dependency code and
+#                  reads no earlier run's artifact. work=false (nothing found, or every finding fixed by an open
+#                  Ludion PR) skips the rest.
+#   patch          runs candidate code, only in Docker, so it holds no write permission and no secret.
+#   pull-request   writes (branches and PRs), so it runs no dependency code; it checks patch's artifact as untrusted data.
+#
+# Nothing is merged. PRs opened with the workflow's token start no CI; start it before merging. A fix that fails, waits
+# or is stopped makes the patch job fail on every run until that changes; its reasons are in the ludion-fixes artifact.
+#
+# Pin Ludion by a release commit's full SHA. No release exists yet: the SHA below is a placeholder.
+name: ludion-ci-a
+
+on:
+  workflow_dispatch:
+    inputs:
+      forge:
+        description: "LB2b2 case E2: only upload a forged ludion-fixes artifact (a receipt with no fixes); nothing else runs."
+        type: boolean
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: ludion-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  # LB2b2 case E2: an earlier run's artifact that says there is nothing to fix. check never reads it.
+  forge:
+    if: ${{ inputs.forge }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Write a forged receipt that says there is nothing to fix
+        run: |
+          mkdir -p "$RUNNER_TEMP/forged"
+          echo '{"forged_by":"LB2b2 case E2","result":{"receipt":{"schema":1,"ecosystem":"php","outcome":"skipped","fixes":[]}}}' > "$RUNNER_TEMP/forged/receipt.json"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ludion-fixes
+          path: ${{ runner.temp }}/forged
+          if-no-files-found: error
+          retention-days: 7
+
+  check:
+    if: ${{ !inputs.forge }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      work: ${{ steps.ludion.outputs.work }}
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - id: ludion
+        uses: Ludion-ai/ludion-trial@6162b79e1989720e45f393195fc079deaa635305 # ludion-action: 859d40f's bundles and mode check (review fixes)
+        with:
+          mode: check
+          dir: php-a
+
+  patch:
+    needs: check
+    # Also when check failed: only its answer work=false skips the run.
+    if: ${{ !cancelled() && !inputs.forge && needs.check.outputs.work != 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    outputs:
+      packed: ${{ steps.ludion.outputs.packed }}
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          # No npm cache: it would be restored in the job that writes and saved by the job that runs candidate code.
+          package-manager-cache: false
+      - id: ludion
+        uses: Ludion-ai/ludion-trial@6162b79e1989720e45f393195fc079deaa635305 # ludion-action: 859d40f's bundles and mode check (review fixes)
+        with:
+          mode: patch
+          dir: php-a
+
+  pull-request:
+    needs: patch
+    # Also after a failed fix: the fixes that passed are in the artifact.
+    if: ${{ !cancelled() && needs.patch.outputs.packed == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          # No npm cache: it would be restored in the job that writes and saved by the job that runs candidate code.
+          package-manager-cache: false
+      - uses: Ludion-ai/ludion-trial@6162b79e1989720e45f393195fc079deaa635305 # ludion-action: 859d40f's bundles and mode check (review fixes)
+        with:
+          mode: pull-request
+          dir: php-a

@@ -77,7 +77,15 @@ Its review of that fix (695424c) found that a `<<'EOF'` mentioned inside double 
 - `${…}` inside double quotes: bash lets `"` and `'` nest inside it, the check does not, so a `"` there closes its double-quoted string early and a later `<<'EOF'` can be taken as a heredoc whose body hides a backtick. The reader (`doubleQuoted`) has the same gap.
 - a `case … )` inside `$( )`: the pattern's `)` closes the check's `$( )` early, and its view of the quotes after it can go wrong.
 
-A backtick runs a command in bash, a runtime included, and the reader does not judge what is inside backticks; it relies on the backtick check. Main's backtick check has these gaps too, and more (it took any `<<` inside double quotes as a heredoc). The lane stopped fixing them one by one: the security review found a reading that differs from bash's in four commits in a row, and the brief says to stop work that fails the same way three times and report it. The chat decides the way on, for example: refuse any backtick in bash outside a quoted heredoc's body or a single-quoted string as the reader sees them, and refuse a command with a backtick that also has `${` with a quote inside, `case`, or `$((`; or judge the inside of backticks as commands; or keep the guard a backstop and say so.
+A backtick runs a command in bash, a runtime included, and the reader does not judge what is inside backticks; it relies on the backtick check. Main's backtick check has these gaps too, and more (it took any `<<` inside double quotes as a heredoc).
+
+The review of the pushed branch (head bdaca26) reported five more, of which the lane saw three (the other two are 不明), also not fixed:
+
+- a shell fed by a pipe with an option that takes a value (`bash -o pipefail`, `--rcfile x`) is taken to run a script file, so what it reads from the pipe is not judged;
+- `GH_REPO=<owner>/<repo>` (or `env GH_REPO=…`) points `gh api repos/{owner}/{repo}/…` at another repository, while `{owner}` counts as Ludion-ai;
+- launchers and wrappers not listed: `winpty` (common in Git Bash), `setsid`, `script -c`, `su -c`, `flock`, `watch`, `chrt`, `taskset`, `ionice`, `strace`, PowerShell's `.` used like `&`; a word with `$(` or `${` joined to letters where the program stands; and git `-c` settings that run a command (`alias.*=!…`, `core.pager`, `core.sshCommand`, an editor).
+
+The lane stopped fixing these one by one: the security review found a reading that differs from the shell's in four commits in a row, and the brief says to stop work that fails the same way three times and report it. The chat decides the way on, for example: refuse any backtick in bash outside a quoted heredoc's body or a single-quoted string as the reader sees them, and refuse a command with a backtick that also has `${` with a quote inside, `case`, or `$((`; or judge the inside of backticks as commands; for the others, add the wrappers and the GH_REPO check, and refuse a shell fed by a pipe unless it has a command string; or keep the guard a backstop and say so.
 
 ## The tests
 

@@ -184,12 +184,32 @@ const TREE_FLAGS = ["dev", "optional", "devOptional", "peer", "bundled"];
  * where its own requirements are looked up from, and `needs` are those requirements as [name, spec]; `peers` names the
  * ones that are peers.
  */
-type ViewEntry = { path: string; key: string; name: string; version: string; link: boolean; dir: string; needs: [string, string][]; peers?: Set<string> };
+type ViewEntry = { path: string; key: string; name: string; version: string; link: boolean; dir: string; needs: [string, string][]; peers?: Set<string>; optional?: Set<string> };
 
 /** `peerDependencies` that `peerDependenciesMeta` does not mark optional, which npm 7 and later install. */
 function requiredPeers(item: Record<string, any>): [string, string][] {
   const meta = isPlain(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {};
   return requirementList(item.peerDependencies).filter(([name]) => !(isPlain(meta[name]) && meta[name].optional === true));
+}
+
+/**
+ * The optional peers (`peerDependenciesMeta` marks them optional) that no other of the entry's groups names (npm's
+ * other edges replace a peer's, node.js `_loadDeps`). npm installs none, and one Node's lookup finds must still be the
+ * package its spec names, in range, as `npm ls` and npm 12.2.1's ERESOLVE hold it (audit 6541743253, item 1;
+ * docs/decisions/2026-10-31-lock-flags-from-graph.md, section 1).
+ */
+function optionalPeers(item: Record<string, any>, others: [string, string][]): [string, string][] {
+  const meta = isPlain(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {}, named = new Set(others.map(([name]) => name));
+  return requirementList(item.peerDependencies).filter(([name]) => isPlain(meta[name]) && meta[name].optional === true && !named.has(name));
+}
+
+/**
+ * The names an installed lock entry requires, which npm installs for it: `dependencies`, `optionalDependencies` and the
+ * peers that are not optional. An optional peer is not one: npm 12.2.1 leaves a package that only optional peers reach
+ * extraneous, and prunes it (arborist's calc-dep-flags.js), so a fix never adds one for it (audit 6541743253, item 1).
+ */
+export function requiredNames(item: Record<string, any>): string[] {
+  return [...new Set([...requirementList(item.dependencies, item.optionalDependencies), ...requiredPeers(item)].map(([name]) => name))];
 }
 
 /** Requirement groups as one list of [name, spec], sorted by name. A Map, not an object: a "__proto__" key stays a key. */
@@ -203,7 +223,7 @@ const field = (value: unknown) => typeof value === "string" ? value : value === 
  * `packages` as a view: every install path. A tree entry's `requires` is the entry's `dependencies` and
  * `optionalDependencies` (a link's: its folder's, `devDependencies` included, as npm writes it); npm 7 and later also
  * install an entry's peers, so the requirements it must find include its `peerDependencies` that `peerDependenciesMeta`
- * does not mark optional. npm writes no flags on a link.
+ * does not mark optional, and an optional one wherever the lookup finds a copy (`optional`). npm writes no flags on a link.
  */
 function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
   const view = new Map<string, ViewEntry>();
@@ -215,14 +235,15 @@ function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
     const version = item.link ? `file:${field(item.resolved)}` : alias ? `npm:${item.name}@${field(item.version)}` : field(item.version);
     const flags = item.link ? "" : TREE_FLAGS.filter(flag => (flag === "bundled" ? item.inBundle : item[flag]) === true).join(",");
     const requires = item.link ? requirementList(folder?.dependencies, folder?.optionalDependencies, folder?.devDependencies) : requirementList(item.dependencies, item.optionalDependencies);
-    const peers = item.link ? [] : requiredPeers(item);
+    const peers = item.link ? [] : requiredPeers(item), optional = item.link ? [] : optionalPeers(item, requires);
     view.set(path, {
       // The requirements by name: a v2 lock's npm 6 tree writes the spec an override gives (`requires`), `packages` the
       // package's own; whether each copy is what its spec asks is requirementsMet's question, per view.
       path, key: [version, item.link ? "" : field(item.resolved), item.link ? "" : field(item.integrity), flags, JSON.stringify(requires.map(([name]) => name))].join("\0"),
       name: item.link ? (typeof folder?.name === "string" ? folder.name : requireName(path)) : alias ? item.name : requireName(path),
       version: item.link ? field(folder?.version) : field(item.version), link: item.link === true,
-      dir: item.link ? `${field(item.resolved)}/` : `${path}/`, needs: [...requires, ...peers], peers: new Set(peers.map(([name]) => name)),
+      dir: item.link ? `${field(item.resolved)}/` : `${path}/`, needs: [...requires, ...peers, ...optional],
+      peers: new Set([...peers, ...optional].map(([name]) => name)), optional: new Set(optional.map(([name]) => name)),
     });
   }
   return view;
@@ -234,8 +255,8 @@ function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
  */
 function projects(packages: Record<string, any>): ViewEntry[] {
   return Object.entries(packages).filter(([path, item]) => isPlain(item) && (lockKey(path, item) === "root" || lockKey(path, item) === "folder")).map(([path, item]) => {
-    const peers = requiredPeers(item);
-    return { path, key: "", name: "", version: "", link: false, dir: path ? `${path}/` : "", needs: [...requirementList(item.dependencies, item.optionalDependencies, item.devDependencies), ...peers], peers: new Set(peers.map(([name]) => name)) };
+    const peers = requiredPeers(item), requires = requirementList(item.dependencies, item.optionalDependencies, item.devDependencies), optional = optionalPeers(item, requires);
+    return { path, key: "", name: "", version: "", link: false, dir: path ? `${path}/` : "", needs: [...requires, ...peers, ...optional], peers: new Set([...peers, ...optional].map(([name]) => name)), optional: new Set(optional.map(([name]) => name)) };
   });
 }
 
@@ -331,6 +352,8 @@ function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], l
   };
   for (const consumer of [...view.values(), ...consumers]) for (const [name, spec] of consumer.needs) {
     const found = resolveFrom(view, consumer.dir, name);
+    // An optional peer that the lookup finds nothing for is met; one it finds is checked as any requirement.
+    if (!found && consumer.optional?.has(name)) continue;
     // Where an override applies, npm checks the copy against the override's spec only, not the requirement's own
     // (review 6533374683, B2).
     const overridden = overrideSpecs(overrides, project, view, consumer.path, name, spec);
@@ -406,6 +429,21 @@ export function lockEntryChanges(before: LockEntry[], after: LockEntry[]): LockE
   return after.filter(e => {
     const b = atPath.get(e.path);
     return !b || b.name !== e.name || b.version !== e.version || b.resolved !== e.resolved || b.integrity !== e.integrity;
+  });
+}
+
+/** The flags npm writes from how an entry is reached, which decide what a production install leaves out. */
+const LOCK_FLAGS = ["dev", "optional", "devOptional", "peer"];
+/**
+ * Every install path both locks have with the same package, version, `resolved` and `integrity`, whose flags alone
+ * differ: lockEntryChanges leaves them out, and gate 2 checks them (docs/decisions/2026-10-31-flag-only-entries-gate2.md).
+ */
+export function lockFlagChanges(beforeText: string, afterText: string): LockEntry[] {
+  const [before, after] = [readLock(beforeText), readLock(afterText)], atPath = new Map(lockEntries(beforeText).map(e => [e.path, e]));
+  const flags = (item: Record<string, unknown>) => LOCK_FLAGS.filter(flag => item[flag] === true).join(",");
+  return lockEntries(afterText).filter(e => {
+    const b = atPath.get(e.path);
+    return !!b && b.name === e.name && b.version === e.version && b.resolved === e.resolved && b.integrity === e.integrity && flags(before[e.path]) !== flags(after[e.path]);
   });
 }
 
@@ -602,6 +640,8 @@ export function judge(input: {
   links?: string[];
   /** Every installed entry that changed at its path (lockEntryChanges); by default the first copy of each change. */
   entries?: LockEntry[];
+  /** Every entry whose flags alone changed (lockFlagChanges): gate 2's checks of its version, nothing else. */
+  flagged?: LockEntry[];
   now: Date;
   /** A stricter project wait, in hours, per urgency (design: the stricter setting wins). */
   projectWait?: Partial<Record<Urgency, number>>;
@@ -720,6 +760,18 @@ export function judge(input: {
     if (prev.publisher !== next.publisher) { add({ gate: 2, package: c.name, effect: "extend", message: `${c.name}@${c.to} was published by ${next.publisher ?? "unknown"}, ${c.from} by ${prev.publisher ?? "unknown"}.` }); extended = true; }
     const newDeps = next.dependencies.filter(d => !prev.dependencies.includes(d));
     if (newDeps.length) { add({ gate: 2, package: c.name, effect: "extend", message: `${c.name}@${c.to} adds dependencies: ${newDeps.join(", ")}.` }); extended = true; }
+  }
+
+  // Gate 2 on every entry whose flags alone changed ("Check every package in the lockfile diff";
+  // docs/decisions/2026-10-31-flag-only-entries-gate2.md): its own version's MAL- records, withdrawal and deprecation.
+  // It is its own predecessor, so nothing is compared, it sets no wait and the time cap does not count it.
+  for (const e of input.flagged ?? []) {
+    const fact = facts.get(`${e.name}@${e.version}`), what = `${e.name}@${e.version} at ${e.path} (its flags alone changed)`;
+    if (!fact) { add({ gate: 2, package: e.name, effect: "stop", message: `No registry facts for ${what}; undecidable.` }); undecidable = true; continue; }
+    if (fact.malicious.length) add({ gate: 2, package: e.name, effect: "stop", message: `${what} is in OSV's malicious-package records (${fact.malicious.join(", ")}).` });
+    if (!fact.present) add({ gate: 2, package: e.name, effect: "stop", message: `${what} is no longer listed by the registry (unpublished or withdrawn).` });
+    if (fact.deprecated) add({ gate: 2, package: e.name, effect: "stop", message: `${what} is deprecated: ${fact.deprecated.slice(0, 200)}` });
+    if (fact.advisories.length) add({ gate: 1, package: e.name, effect: "info", message: `${what} has known advisories, as before: ${fact.advisories.join(", ")}.` });
   }
 
   // Rules 1 and 2: T is the fix's publish time (the changed direct dependencies' when nothing is fixed). A version

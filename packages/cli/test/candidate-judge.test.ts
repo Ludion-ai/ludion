@@ -133,6 +133,26 @@ describe("the judge on a patch candidate: every package in the lockfile diff", (
     for (const j of [scripts, link, repointed]) expect(j.verdict).toBe("stop");
   });
 
+  // docs/decisions/2026-10-31-flag-only-entries-gate2.md: old-dep 1.0.0 stays, and only its `dev` flag goes (as npm drops
+  // it when a fix makes a dev-only package a production one). Its version gets gate 2's checks, by name and version only.
+  it("asks the registry and OSV for an entry whose flags alone changed, and stops on its MAL- record or deprecation", async () => {
+    const flagOnly = (world: World) => judgeNpmCandidate(project("4.17.20", [["old-dep", "1.0.0"]], ["old-dep"]), project("4.17.21", [["old-dep", "1.0.0"]]), fetchOf(world), LATER);
+    const clean: World = { ...base(), seen: [] };
+    expect((await flagOnly(clean)).verdict).toBe("ready_except_build");
+    expect(clean.seen).toContain("https://registry.npmjs.org/old-dep");
+    expect(clean.seen!.filter(s => s.includes('"name":"old-dep"') && s.includes('"version":"1.0.0"'))).toHaveLength(1);
+    const deprecated = base(); deprecated.packages["old-dep"]!.versions["1.0.0"]!.deprecated = "do not use";
+    const cases: [World, string][] = [
+      [{ ...base(), osv: { ...base().osv, "old-dep@1.0.0": ["MAL-2026-2"] } }, "old-dep@1.0.0 at node_modules/old-dep (its flags alone changed) is in OSV's malicious-package records (MAL-2026-2)."],
+      [deprecated, "old-dep@1.0.0 at node_modules/old-dep (its flags alone changed) is deprecated: do not use"],
+    ];
+    for (const [world, message] of cases) {
+      const j = await flagOnly(world);
+      expect(j.verdict, message).toBe("stop");
+      expect(stops(j), message).toEqual([message]);
+    }
+  });
+
   it("downloads the EPSS list whole and sends no CVE ID", async () => {
     const world: World = { ...base(), seen: [] };
     const j = await run(world);

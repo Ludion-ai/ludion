@@ -160,6 +160,22 @@ export function branchName(...parts: string[]): string {
   }).join("/");
 }
 
+/**
+ * The branch of one fix: `ludion/[<folder>/]<ecosystem>/<package>-<versions>`, or `.../php/<version>` (package null).
+ * branchName's cleaning merges names ("@foo/bar" and "foo-bar" both become "foo-bar"), and "-" joins the package and its
+ * versions ("a-1.0.0" at 2.0.0 and "a" at 1.0.0 and 2.0.0). So the name stays as it reads only when it can be read back
+ * in one way: no folder, every part unchanged by cleaning, one version, and no "-" in it. Otherwise it ends with 12 hex
+ * characters of a SHA-256 of all the parts, and two fixes never share a branch (and so neither silences the other).
+ */
+export function fixBranchName(prefix: string, ecosystem: string, pkg: string | null, versions: string[]): string {
+  const tos = [...new Set(versions)];
+  const readable = pkg === null ? tos.join("-") : `${pkg}-${tos.join("-")}`;
+  const unchanged = (part: string) => branchName(part) === part;
+  const plainName = !prefix && tos.length === 1 && !tos[0]!.includes("-") && unchanged(tos[0]!) && (pkg === null || unchanged(pkg));
+  const id = createHash("sha256").update(JSON.stringify([prefix, ecosystem, pkg, tos])).digest("hex").slice(0, 12);
+  return branchName("ludion", ...(prefix ? [prefix] : []), ecosystem, plainName ? readable : `${readable}-${id}`);
+}
+
 /** The branch's tip commit: the first line of its message and its first parent; null when there is no such branch. */
 export function branchTip(base: GitBase, branch: string): { subject: string; parent: string | null } | null {
   const tip = git(base.top, ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}^{commit}`], { allowFail: true });

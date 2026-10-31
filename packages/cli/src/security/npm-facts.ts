@@ -135,6 +135,16 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
   return facts;
 }
 
+/** One version's manifest as the registry lists it (only the package's name is sent), or null when it lists none. */
+export async function registryManifest(name: string, version: string, fetchFn: Fetch = fetch): Promise<Record<string, unknown> | null> {
+  const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);
+  if (!doc || typeof doc !== "object" || !doc.versions || typeof doc.versions !== "object") throw new Error(`Invalid registry document for ${name}.`);
+  if (!Object.hasOwn(doc.versions, version)) return null;
+  const manifest = doc.versions[version];
+  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) throw new Error(`Invalid registry manifest for ${name}@${version}.`);
+  return manifest;
+}
+
 /**
  * Every version the registry still lists for a package (an unpublished one is not), with its deprecation message or null.
  * A version whose manifest is not an object (null, a string) cannot be judged listed or not deprecated, so it throws.

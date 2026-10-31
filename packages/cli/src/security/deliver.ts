@@ -5,10 +5,11 @@ import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import { publicArchiveUrl } from "./acquisition.ts";
-import { branchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
+import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
+import { registryManifest } from "./npm-facts.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
-import type { Judgement } from "./judge.ts";
+import { DECLARED, lockEntries, lockKey, newUnmetRequirements, readLock, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
 import { comparableVersion } from "./osv.ts";
 import { compare, phpImage } from "./php.ts";
@@ -27,6 +28,14 @@ import { CONFIG, rootPath } from "./project.ts";
  */
 export const RECEIPT_LIMIT = 8 * 1024 * 1024;
 export const BUNDLE_LIMIT = 64 * 1024 * 1024;
+/**
+ * A changed file's size. A fix moves one package and adds the versions it brings, a few hundred bytes of lockfile per
+ * new entry, so twice the base's file plus 1 MiB (thousands of new entries) leaves room for any real fix, while a file
+ * padded with whitespace, which packs into a small bundle (40 MB into 41 KB in review 6516135819, N4), is refused.
+ * Never more than 50 MiB, the size above which GitHub warns on a push (it refuses files over 100 MiB).
+ */
+export const FILE_LIMIT = 50 * 1024 * 1024;
+export const fileLimit = (baseBytes: number) => Math.min(FILE_LIMIT, 2 * baseBytes + 1024 * 1024);
 const RECEIPT = "receipt.json", BUNDLE = "fixes.bundle";
 
 const plain = (text: string) => String(text).replace(/[\x00-\x1f\x7f-\x9f]/g, " ");
@@ -40,7 +49,12 @@ const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
 const NAME = /^@?[A-Za-z0-9][A-Za-z0-9._~/:-]{0,213}$/;
 const VERSION = /^[A-Za-z0-9][A-Za-z0-9.+_~-]{0,99}$/;
-const ADVISORY = /^[A-Za-z][A-Za-z0-9]{1,15}-[A-Za-z0-9._:-]{1,100}$/;
+/**
+ * The advisory IDs a receipt can hold: OSV's for npm, Packagist and Maven (GitHub's GHSA, CVE, OpenSSF's MAL) and
+ * Packagist's own (PKSA, packagist.ts). Each goes into the commit's "Fixes …" line, so no other form is let through:
+ * "GH-1" there would link, and maybe close, issue #1.
+ */
+export const ADVISORY = /^(?:GHSA(?:-[23456789cfghjmpqrvwx]{4}){3}|CVE-\d{4}-\d{4,7}|MAL-\d{4}-\d{1,7}|PKSA-[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?)$/;
 const PATH = /^[A-Za-z0-9_][A-Za-z0-9._/-]{0,499}$/;
 const IDENTITY = /^Ludion <ludion@ludion\.invalid> \d{1,12} [+-]\d{4}$/;
 const VERDICTS = ["stop", "wait", "ready_except_build", "undecidable"] as const;
@@ -82,11 +96,6 @@ function workTree(root: string): { top: string; prefix: string } {
   const inside = git(root, ["rev-parse", "--is-inside-work-tree"], { allowFail: true });
   if (inside.status !== 0 || inside.stdout.trim() !== "true") throw new Error("The project's folder is not in a Git work tree.");
   return { top: git(root, ["rev-parse", "--show-toplevel"]).stdout.trim(), prefix: git(root, ["rev-parse", "--show-prefix"]).stdout.trim() };
-}
-
-/** The branch `patch --apply` names for a fix (dependency-patch.ts and patch.ts). */
-function fixBranchName(prefix: string, ecosystem: Ecosystem, pkg: string, tos: string[]): string {
-  return branchName("ludion", ...(prefix ? [prefix] : []), ecosystem, isImage(ecosystem) ? tos[0]! : `${pkg}-${[...new Set(tos)].join("-")}`);
 }
 
 /**
@@ -162,7 +171,7 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
       files: [{ path: policy.allowed[0]!, after_hash: text(r.dockerfile_after, HEX64, "dockerfile_after") }],
       fix_published_at: timeOrNull(r.fix_published_at, "fix_published_at"), found_at: time(r.found_at, "found_at"), applied_at: time(r.applied_at, "applied_at"), verdict: null,
     };
-    if (fix.branch !== fixBranchName(prefix, runtime, runtime, [to])) refuse(`the branch ${fix.branch} is not the one Ludion names for ${label} ${to}.`);
+    if (fix.branch !== fixBranchName(prefix, runtime, null, [to])) refuse(`the branch ${fix.branch} is not the one Ludion names for ${label} ${to}.`);
     return { id, ecosystem: runtime, fixes: [fix], notApplied };
   }
   if (r.schema !== 2 || r.ecosystem !== policy.ecosystem || r.scope !== "dependency_files_only_not_deployed") refuse(`the receipt is not a ${policy.ecosystem} dependency receipt, and the project's policy is ${policy.ecosystem}.`);
@@ -203,14 +212,23 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
   return { id, ecosystem: policy.ecosystem, fixes, notApplied };
 }
 
-/** The commit's headers and message, from Git. Only tree, one parent, author and committer are allowed. */
-function commitOf(top: string, commit: string): { tree: string; parents: string[]; author: string; committer: string; message: string; other: string[] } {
+/**
+ * The commit's headers and message. The parents and the tree are Git's own reading (rev-list, rev-parse), not a parse
+ * of the raw text: Git counts only the `parent` lines right after `tree`, so a `parent` placed after `author` is no
+ * parent to Git. The raw headers must also be exactly `tree`, `parent`…, `author`, `committer`, in that order, and agree
+ * with Git's reading; `inOrder` is false otherwise.
+ */
+function commitOf(top: string, commit: string): { tree: string; parents: string[]; author: string; committer: string; message: string; inOrder: boolean } {
   const body = git(top, ["cat-file", "commit", commit]).stdout, split = body.indexOf("\n\n");
   const headers = (split < 0 ? body : body.slice(0, split)).split("\n");
-  const value = (key: string) => headers.filter(h => h.startsWith(`${key} `)).map(h => h.slice(key.length + 1));
+  const [, ...parents] = git(top, ["rev-list", "--parents", "-n", "1", commit]).stdout.trim().split(" ");
+  const tree = git(top, ["rev-parse", "--verify", `${commit}^{tree}`]).stdout.trim();
+  const expected = [`tree ${tree}`, ...parents.map(p => `parent ${p}`)];
+  const inOrder = split >= 0 && headers.length === expected.length + 2 && expected.every((h, i) => headers[i] === h)
+    && headers[expected.length]!.startsWith("author ") && headers[expected.length + 1]!.startsWith("committer ");
   return {
-    tree: value("tree")[0] ?? "", parents: value("parent"), author: value("author").join("\n"), committer: value("committer").join("\n"),
-    message: split < 0 ? "" : body.slice(split + 2), other: headers.filter(h => !/^(tree|parent|author|committer) /.test(h)),
+    tree, parents, author: (headers[expected.length] ?? "").slice("author ".length), committer: (headers[expected.length + 1] ?? "").slice("committer ".length),
+    message: split < 0 ? "" : body.slice(split + 2), inOrder,
   };
 }
 
@@ -236,34 +254,169 @@ const COMPOSER_KEYS = new Set([...COMPOSER_INSTALL, ...COMPOSER_METADATA, "name"
 const PACKAGIST_NOTIFY = "https://packagist.org/downloads/";
 const withoutMetadata = (entry: Record<string, unknown>) => Object.fromEntries(Object.entries(entry).filter(([key]) => !COMPOSER_METADATA.has(key)));
 
+/** The requirement groups of the project's own entry (""), which mirror package.json's. */
+const ROOT_GROUPS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];
+
 /**
- * package-lock.json: no package but the fix's loses an installed version, so one PR holds one fix (gate 4), as `patch`'s
- * candidate check (unplannedRemovals) requires; new versions may appear (the fixed version's new dependencies). The
- * judge, run again in openFixes, checks the changed entries against the registry.
+ * package-lock.json says the receipt's change and no other fix (gate 4: one fix per PR), by install path (review
+ * 6518582507, N-a), as Composer's walk of what the fixed version requires does by name:
+ * - every key is the root or an install path, read by the judge's own lockKey; a key in any other form (a folder, or
+ *   "aaaaaaaaaaaaminimist", which npm installs nothing at) refuses the artifact, never is skipped (B1). `patch` does not
+ *   fix workspaces, so a project folder has no place in a fix's lock; an extraneous folder may only stay as it was;
+ * - the planned paths: each install path where the base has the fix's package at a change's `from`, whether the path
+ *   is named for it or is an npm alias of it under another name (its entry's `name`; an alias of another package at
+ *   the package's own path is not it) (review 6529858505, B2). Each change has one, and in the fix each is at the same
+ *   path at that change's `to`, as the same package; no install path has the package at a `from` any more;
+ * - every added path is installed, and is what a planned path or another added path resolves for one of its own
+ *   requirements (DECLARED, by Node's lookup), so none comes from nowhere;
+ * - every other key is as at the base apart from its flags (sameButFlags); the root's only change is the fix's
+ *   package's requirement;
+ * - the fix leaves no requirement unmet that the base meets (newUnmetRequirements, with each side's package.json
+ *   `overrides`): npm install would fetch it, unpinned. That also covers an added copy that is not what its requirer asks.
+ * The judge, run again in openFixes, checks the changed and added entries against the registry.
  */
-function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix): string | null {
+function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix, manifests: { before: string | null; after: string | null }): string | null {
   if (old === null || now === null) return "package-lock.json is missing.";
-  let a: unknown, b: unknown;
-  try { a = JSON.parse(old); b = JSON.parse(now); } catch { return "package-lock.json is not JSON."; }
-  const versions = (lock: unknown) => {
-    const map = new Map<string, Set<string>>();
-    const packages = isObject(lock) && isObject(lock.packages) ? lock.packages : {};
-    for (const [path, entry] of Object.entries(packages)) {
-      if (!path || !isObject(entry) || typeof entry.version !== "string") continue;
-      // The name the install path gives, never the entry's own `name` (an alias's, and the artifact's to choose), so a
-      // moved package cannot be filed under the fix's name.
-      const name = path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
-      map.set(name, (map.get(name) ?? new Set()).add(entry.version));
+  const show = (path: string) => plain(path).slice(0, 200), pkg = show(fix.package);
+  let was: Record<string, unknown>, is: Record<string, unknown>, kinds: Map<string, ReturnType<typeof lockKey>>;
+  try {
+    was = readLock(old); is = readLock(now);
+    // The judge's reading of both, which also refuses two paths that differ only in case and an invalid version.
+    lockEntries(old); lockEntries(now);
+    kinds = new Map([...Object.entries(was), ...Object.entries(is)].map(([path, item]) => [path, lockKey(path, item)]));
+  } catch (error) { return `package-lock.json is not one Ludion reads (${plain(error instanceof Error ? error.message : String(error)).slice(0, 200)}).`; }
+  // The rest of the file as at the base: lockfileVersion decides whether npm 6 reads the dependencies tree at all.
+  const [baseTop, fixTop] = [JSON.parse(old), JSON.parse(now)] as Record<string, unknown>[];
+  for (const key of new Set([...Object.keys(baseTop!), ...Object.keys(fixTop!)])) {
+    if (key !== "packages" && key !== "dependencies" && !isDeepStrictEqual(baseTop![key], fixTop![key])) return `package-lock.json changes its top-level ${show(key)}.`;
+  }
+  // A tree npm 6 reads only where the base had one (review of 1e6f705, B1): a v3 base given one would hand npm 6 a tree to
+  // install from. Where both have one, readLock has tied each to its packages section, which the checks below compare.
+  if (Object.hasOwn(baseTop!, "dependencies") !== Object.hasOwn(fixTop!, "dependencies")) return `package-lock.json ${Object.hasOwn(fixTop!, "dependencies") ? "adds" : "removes"} the npm 6 dependencies tree.`;
+  // A requirement the fix leaves unmet, which the base meets, npm install would fetch unpinned (review of ebfe89d, B1).
+  const json = (text: string | null): unknown => { try { return text === null ? undefined : JSON.parse(text); } catch { return undefined; } };
+  const unmet = newUnmetRequirements({ lock: old, manifest: json(manifests.before) }, { lock: now, manifest: json(manifests.after) });
+  if (unmet.length) return plain(unmet[0]!).slice(0, 400);
+  for (const [path, kind] of kinds) {
+    if (kind === "folder") return `package-lock.json has ${show(path)}, which is not an install path (Ludion's fixes cover no workspace or local folder).`;
+    if ([was, is].some(lock => Object.hasOwn(lock, path) && !isObject(lock[path]))) return `package-lock.json's ${show(path)} is not an object.`;
+  }
+  const entry = (lock: Record<string, unknown>, path: string) => Object.hasOwn(lock, path) ? lock[path] as Record<string, unknown> : null;
+  const to = new Map<string, string>();
+  for (const change of fix.changes) {
+    if (to.has(change.from) && to.get(change.from) !== change.to) return `the receipt moves ${pkg} from ${plain(change.from).slice(0, 60)} twice.`;
+    to.set(change.from, change.to);
+  }
+  // The package an install path holds: its entry's `name` for an npm alias, else the path's name.
+  const ours = (path: string, item: Record<string, unknown> | null) => kinds.get(path) === "install" && !!item && !item.link && (typeof item.name === "string" ? item.name : requireName(path)) === fix.package;
+  const planned = Object.keys(was).filter(path => ours(path, entry(was, path)) && to.has(String(entry(was, path)!.version)));
+  for (const change of fix.changes) {
+    if (!planned.some(path => entry(was, path)!.version === change.from)) return `the receipt moves ${pkg} from ${plain(change.from).slice(0, 60)}, and the base's package-lock.json does not have ${pkg} at that version.`;
+  }
+  for (const path of planned) {
+    const from = String(entry(was, path)!.version), wanted = to.get(from)!;
+    if (!ours(path, entry(is, path)) || entry(is, path)!.version !== wanted) return `package-lock.json does not have ${pkg} at ${plain(wanted).slice(0, 60)}, the fix's version, at ${show(path)}, where the base has ${plain(from).slice(0, 60)}.`;
+  }
+  const tos = new Set(to.values());
+  for (const path of Object.keys(is)) {
+    const version = String(entry(is, path)!.version);
+    if (ours(path, entry(is, path)) && to.has(version) && !tos.has(version)) return `package-lock.json still has ${pkg} at ${plain(version).slice(0, 60)}, which the fix moves (${show(path)}).`;
+  }
+  // Each requirement group of the root with the fix's package's range blanked: nothing else of the root may change.
+  const root = (item: Record<string, unknown> | null) => item && Object.fromEntries(Object.entries(item).map(([key, value]) => [key,
+    ROOT_GROUPS.includes(key) && isObject(value) ? Object.fromEntries(Object.entries(value).map(([name, range]) => [name, name === fix.package ? "" : range])) : value]));
+  const added: string[] = [];
+  for (const path of kinds.keys()) {
+    if (planned.includes(path)) continue;
+    const before = entry(was, path), after = entry(is, path), version = (item: Record<string, unknown> | null) => plain(String(item?.version)).slice(0, 60);
+    if (path === "") { if (!isDeepStrictEqual(root(before), root(after))) return "package-lock.json changes the project's own entry beyond the fix's requirement."; continue; }
+    if (!after) return `package-lock.json removes ${show(path)} (${version(before)}), which this fix does not plan.`;
+    if (!before) {
+      if (kinds.get(path) !== "install" || after.link) return `package-lock.json adds ${show(path)}, which is not an installed package.`;
+      added.push(path);
+      continue;
     }
-    return map;
-  };
-  const was = versions(a), is = versions(b);
-  for (const [name, set] of was) {
-    if (name === fix.package) continue;
-    const gone = [...set].filter(v => !is.get(name)?.has(v));
-    if (gone.length) return `package-lock.json moves ${plain(name).slice(0, 200)} from ${plain(gone[0]!).slice(0, 60)}, which this fix does not plan.`;
+    if (!sameButFlags(before, after)) return `package-lock.json changes ${show(path)} (${version(before)} -> ${version(after)}), which this fix does not plan.`;
+  }
+  // From the planned paths, every added path some reached path resolves for one of its own requirements.
+  const installed = new Map([...kinds].filter(([, kind]) => kind === "install").filter(([path]) => Object.hasOwn(is, path)).map(([path]) => [path, { path } as LockEntry]));
+  const reached = new Set<string>(), queue = [...planned];
+  while (queue.length) {
+    const path = queue.shift()!, item = entry(is, path)!;
+    // Whether each added copy is what its requirer asks for is newUnmetRequirements' question, above (review 6529858505, N5).
+    for (const group of DECLARED) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
+      const target = resolveFrom(installed, `${path}/`, name)?.path;
+      if (target && added.includes(target) && !reached.has(target)) { reached.add(target); queue.push(target); }
+    }
+  }
+  const stray = added.filter(path => !reached.has(path));
+  if (stray.length) return `package-lock.json adds ${stray.slice(0, 3).map(show).join(", ")}, which no package the fix moves or adds requires.`;
+  // What the root and every entry the fix does not move load stays the same path: an added copy that shadows another
+  // package's dependency would change what that package loads (review of 7d25696, B1 (B)).
+  const wasAt = new Map([...kinds].filter(([path, kind]) => kind === "install" && Object.hasOwn(was, path)).map(([path]) => [path, { path } as LockEntry]));
+  for (const path of Object.keys(is)) {
+    if (planned.includes(path) || added.includes(path) || (path && (kinds.get(path) !== "install" || entry(is, path)!.link))) continue;
+    const item = entry(is, path)!, dir = path ? `${path}/` : "";
+    for (const group of path ? DECLARED : ROOT_GROUPS) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
+      const then = resolveFrom(wasAt, dir, name)?.path, now = resolveFrom(installed, dir, name)?.path;
+      if (then !== now) return `package-lock.json changes what ${path ? show(path) : "the project"} loads for ${show(name)} (${show(then ?? "nothing")} -> ${show(now ?? "nothing")}), which this fix does not plan.`;
+    }
   }
   return null;
+}
+
+/** The flags npm writes on a lock entry from how the project reaches it, which decide what a production install leaves out. */
+const NPM_FLAGS = ["dev", "optional", "devOptional", "peer"];
+
+/**
+ * Whether a lock entry is the base's apart from its flags, each `true` or absent, as npm writes them. A fix moves
+ * an entry's flags where it changes how the entry is reached: node-fetch 2.6.7 requires whatwg-url, which was dev-only,
+ * so npm drops `dev` from it and its dependencies (review 6538813186, B1). Version, resolved and integrity stay the
+ * base's, so no new code comes in; whether the flags are the ones npm computes is not checked
+ * (docs/decisions/2026-10-31-lock-flags-only.md).
+ */
+function sameButFlags(before: Record<string, unknown>, after: Record<string, unknown>): boolean {
+  const rest = (item: Record<string, unknown>) => Object.fromEntries(Object.entries(item).filter(([key]) => !NPM_FLAGS.includes(key)));
+  return NPM_FLAGS.every(flag => !Object.hasOwn(after, flag) || after[flag] === true) && isDeepStrictEqual(rest(before), rest(after));
+}
+
+/** The requirement groups compared with the registry: optional ones merged, as the registry also lists them in `dependencies`. */
+const npmRequirements = (item: Record<string, unknown>) => ({
+  requires: { ...(isObject(item.dependencies) ? item.dependencies : {}), ...(isObject(item.optionalDependencies) ? item.optionalDependencies : {}) },
+  peers: isObject(item.peerDependencies) ? item.peerDependencies : {},
+  // Which peers are optional: the requirement check leaves an optional peer out (review 6533374683, N1).
+  peersMeta: isObject(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {},
+  os: item.os ?? null, cpu: item.cpu ?? null, libc: item.libc ?? null,
+});
+
+/**
+ * npm: every package-lock.json entry the fix moves or adds must declare what the registry lists for that name and
+ * version: its requirements (dependencies and optional ones together, peers, and which peers are optional) and its
+ * `os`, `cpu` and `libc`, which decide whether npm installs it on a platform (reviews 6529858505, N1, and 6533374683,
+ * N1). contentProblem's "required by a moved or added path" then rests on the registry's data, not on the artifact's
+ * (review of 7d25696, B1 (A)), as composerAgain's does on Packagist's. Not compared: `bin`, `hasInstallScript`,
+ * `engines`, `hasShrinkwrap` and the flags; an entry whose flags alone changed is not compared at all.
+ */
+async function npmAgain(top: string, prefix: string, base: string, fix: CheckedFix, manifest: (name: string, version: string) => Promise<Record<string, unknown> | null>): Promise<string | null> {
+  try {
+    const read = (rev: string) => readLock(git(top, ["cat-file", "blob", `${rev}:${prefix}package-lock.json`]).stdout);
+    const was = read(base), is = read(fix.commit);
+    for (const [path, item] of Object.entries(is)) {
+      if (!isObject(item) || lockKey(path, item) !== "install" || item.link) continue;
+      // An entry the fix leaves as at the base, or changes in its flags only, declares what the base's did.
+      if (Object.hasOwn(was, path) && isObject(was[path]) && sameButFlags(was[path], item)) continue;
+      const name = typeof item.name === "string" ? item.name : requireName(path), version = String(item.version), at = `${plain(name).slice(0, 100)}@${plain(version).slice(0, 60)}`;
+      const listed = await manifest(name, version);
+      if (!listed) return `the registry lists no ${at} (${plain(path).slice(0, 200)}).`;
+      const lock = npmRequirements(item), registry = npmRequirements(listed);
+      for (const key of ["requires", "peers", "peersMeta", "os", "cpu", "libc"] as const) {
+        if (!isDeepStrictEqual(lock[key], registry[key])) return `package-lock.json's ${key === "requires" ? "dependencies" : key === "peers" ? "peerDependencies" : key === "peersMeta" ? "peerDependenciesMeta" : key} for ${at} (${plain(path).slice(0, 200)}) is not what the registry lists.`;
+      }
+    }
+    return null;
+  } catch (error) {
+    return `the registry could not be read: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
+  }
 }
 
 /** composer.lock: why it says more than the fix, or null. See contentProblem. */
@@ -379,7 +532,10 @@ export function contentProblem(ecosystem: Ecosystem, fix: CheckedFix, before: (p
     else try { same = isDeepStrictEqual(JSON.parse(now), JSON.parse(expected)); } catch { same = false; }
     if (!same) return `${manifest} is not what Ludion writes for ${fix.package} ${fix.changes.map(c => c.to).join(", ")}.`;
   } finally { rmSync(dir, { recursive: true, force: true }); }
-  if (ecosystem === "npm") return npmLockProblem(before("package-lock.json"), after("package-lock.json"), fix);
+  // npm reads npm-shrinkwrap.json instead of package-lock.json when both are there, so a fix to package-lock.json would
+  // install nothing of what the receipt says.
+  if (ecosystem === "npm" && before("npm-shrinkwrap.json") !== null) return "the base has npm-shrinkwrap.json, which npm reads instead of package-lock.json.";
+  if (ecosystem === "npm") return npmLockProblem(before("package-lock.json"), after("package-lock.json"), fix, { before: before("package.json"), after: after("package.json") });
   return ecosystem === "composer" ? composerLockProblem(before("composer.lock"), after("composer.lock"), fix) : null;
 }
 
@@ -414,16 +570,25 @@ export function checkArtifact(dir: string, artifact: string, base: string): Chec
   if (listed.join("\n") !== expected.join("\n")) refuse(`the bundle's branches are not exactly the receipt's applied fixes (bundle: ${listed.length}, receipt: ${expected.length}${listed.some(l => !expected.includes(l)) ? `; not in the receipt: ${plain(listed.filter(l => !expected.includes(l)).slice(0, 3).join(", ")).slice(0, 300)}` : ""}).`);
   if (git(top, ["bundle", "verify", "--quiet", bundleFile], { allowFail: true }).status !== 0) refuse("the bundle needs commits other than the base, or is damaged.");
   git(top, ["bundle", "unbundle", bundleFile]);
+  const where = (fix: CheckedFix) => `${fix.branch} (${fix.commit.slice(0, 12)})`;
+  const commits = new Map(checked.fixes.map(fix => {
+    const c = commitOf(top, fix.commit);
+    if (c.parents.length !== 1 || c.parents[0] !== base) refuse(`${where(fix)} does not have the base ${base.slice(0, 12)} as its only parent.`);
+    if (!c.inOrder) refuse(`${where(fix)}'s headers are not exactly tree, parent, author and committer, in that order.`);
+    return [fix.commit, c];
+  }));
+  // Git's own check, so nothing the checks read past is malformed. It runs once: fsck reads every object in the
+  // repository whatever heads it is given (review 6518582507, N-c). So an error in the base checkout itself refuses
+  // every artifact of that repository, which fails closed.
+  try { git(top, ["fsck", "--no-dangling", "--no-reflogs", "--no-progress", ...checked.fixes.map(f => f.commit)]); }
+  catch (error) { refuse(`the base checkout with the bundle's objects does not pass git fsck (${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}).`); }
   const modes = new Map<string, string>();
   for (const line of git(top, ["ls-tree", "-r", "-z", "--full-tree", base]).stdout.split("\0").filter(Boolean)) {
     const tab = line.indexOf("\t"), [mode, type] = line.slice(0, tab).split(" ");
     if (type === "blob") modes.set(line.slice(tab + 1), mode!);
   }
   for (const fix of checked.fixes) {
-    const at = `${fix.branch} (${fix.commit.slice(0, 12)})`;
-    const c = commitOf(top, fix.commit);
-    if (c.parents.length !== 1 || c.parents[0] !== base) refuse(`${at} does not have the base ${base.slice(0, 12)} as its only parent.`);
-    if (c.other.length) refuse(`${at} carries headers other than tree, parent, author and committer.`);
+    const at = where(fix), c = commits.get(fix.commit)!;
     if (!IDENTITY.test(c.author) || !IDENTITY.test(c.committer)) refuse(`${at} is not authored and committed by Ludion.`);
     if (c.message.split("\n")[0] !== fix.subject) refuse(`${at}'s subject is not the receipt's change.`);
     // The whole message, so nothing (a "Closes #1", a trailer) rides along with the fix.
@@ -439,6 +604,10 @@ export function checkArtifact(dir: string, artifact: string, base: string): Chec
       if (paths[i]!.split("/").some(part => part === ".github")) refuse(`${at} changes a file under .github/.`);
     }
     for (const file of fix.files) {
+      // Sizes as Git stores them, before any blob is read.
+      const bytes = (rev: string) => Number(git(top, ["cat-file", "-s", `${rev}:${prefix}${file.path}`]).stdout.trim());
+      const limit = fileLimit(bytes(base));
+      if (bytes(fix.commit) > limit) refuse(`${at}'s ${file.path} is larger than ${limit} bytes (twice the base's file and 1 MiB, at most ${FILE_LIMIT}).`);
       if (sha256(git(top, ["cat-file", "blob", `${fix.commit}:${prefix}${file.path}`]).stdout) !== file.after_hash) refuse(`${at}'s ${file.path} is not the receipt's file (after_hash).`);
     }
     // What the files say, not only which files change: the receipt's hashes come from the same untrusted artifact.
@@ -453,8 +622,8 @@ export function checkArtifact(dir: string, artifact: string, base: string): Chec
 }
 
 const PUBLISHED: Record<Ecosystem, string> = {
-  npm: "registry.npmjs.org's publish time of the fixed version",
-  composer: "Packagist's release date of the fixed version, which its author sets",
+  npm: "registry.npmjs.org's publish time: the latest among the fix's planned versions",
+  composer: "Packagist's release date, which its author sets: the latest among the fix's planned versions",
   maven: "not read: Ludion does not read Maven Central's publish times yet",
   php: "php.net's release day of the first newer security release, at 00:00 UTC",
   node: "nodejs.org's release day of the first newer security release of the line, at 00:00 UTC",
@@ -485,7 +654,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that ${isImage(ecosystem) ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, and that no other package loses a version in package-lock.json" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${isImage(ecosystem) ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${isImage(ecosystem) ? `${IMAGES[ecosystem].label} image` : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
@@ -493,6 +662,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**Not checked**",
     "",
     "- Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.",
+    ...(ecosystem === "npm" ? ["- In package-lock.json, a moved or added entry's `hasShrinkwrap`, flags (`dev`, `optional`, `devOptional`, `peer`), `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap; the flags decide what a production install leaves out). Another entry's flags may differ from the base's, and are not checked against what npm computes, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out."] : []),
     "- Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.",
     "- Production: nothing is deployed.",
     "",
@@ -667,7 +837,7 @@ async function imageAgain(top: string, prefix: string, fix: CheckedFix, reposito
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -707,8 +877,11 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
           continue;
         }
       }
-      // The lockfile's content, which only the registry can confirm: the judge again, here, on the base and this commit.
+      // The lockfile's content, which only the registry can confirm: each moved or added entry's requirements as the
+      // registry lists them, then the judge again, here, on the base and this commit.
       if (checked.ecosystem === "npm") {
+        const problem = await npmAgain(top, prefix, checked.base, fix, options.npmManifest ?? ((name, version) => registryManifest(name, version)));
+        if (problem) throw new Error(`Not pushed: ${problem}`);
         const refusal = await judgeAgain(top, prefix, checked.base, fix, options.judgeNpm ?? ((before, after) => judgeNpmCandidate(before, after)));
         if (refusal) throw new Error(`Not pushed: the judge was run again on this commit's lockfile. ${refusal}`);
       }
@@ -744,6 +917,16 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
   return { checked, deliveries };
 }
 
+/**
+ * A closed PR is not opened again, so it silences its fix for good. Every fix the PR job sees was applied by the
+ * validation job to this run's commit, so the default branch still lacks it: each run says so as a warning annotation
+ * (a workflow command, on stderr so that the step summary, which takes stdout, stays plain), and the run stays green.
+ */
+export function closedWarnings(deliveries: Delivery[]): string[] {
+  const escape = (value: string) => plain(value).replace(/%/g, "%25");
+  return deliveries.filter(d => d.outcome === "closed_pr_exists").map(d => `::warning::${escape(`Ludion: the fix of ${d.package} (branch ${d.branch}) is still not on the default branch, and its PR #${d.pr} was closed, so Ludion does not open it again. Reopen #${d.pr} or apply the fix yourself.`)}`);
+}
+
 /** `ludion deliver pack|open`: the scheduled workflow's two steps (action.yml). */
 export async function deliverCli(args: string[], env: NodeJS.ProcessEnv = process.env): Promise<number> {
   const [step, ...rest] = args;
@@ -763,6 +946,7 @@ export async function deliverCli(args: string[], env: NodeJS.ProcessEnv = proces
     console.log(`Receipt ${checked.id ?? "none"} on ${checked.base.slice(0, 12)}: ${checked.fixes.length} applied fix${checked.fixes.length === 1 ? "" : "es"}${Object.keys(checked.notApplied).length ? `; not applied: ${Object.entries(checked.notApplied).map(([k, n]) => `${n} ${k}`).join(", ")}` : ""}.`);
     for (const d of deliveries) console.log(`  ${d.package} (${d.branch}): ${d.outcome}${d.pr ? ` #${d.pr}` : ""}${d.reason ? ` — ${d.reason}` : ""}`);
   }
+  for (const line of closedWarnings(deliveries)) console.error(line);
   // A branch that holds another commit needs someone to act, so it fails the job as a failed fix does.
   return deliveries.some(d => d.outcome === "failed" || d.outcome === "branch_differs") ? 2 : 0;
 }

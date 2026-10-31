@@ -1,0 +1,1879 @@
+{
+  "version": "1.0.0",
+  "name": "s8",
+  "dependencies": {
+    "npm": {
+      "version": "10.9.2",
+      "resolved": "https://registry.npmjs.org/npm/-/npm-10.9.2.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@isaacs/string-locale-compare": {
+          "version": "1.1.0",
+          "overridden": false
+        },
+        "@npmcli/arborist": {
+          "version": "8.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@isaacs/string-locale-compare": {
+              "version": "1.1.0"
+            },
+            "@npmcli/fs": {
+              "version": "4.0.0"
+            },
+            "@npmcli/installed-package-contents": {
+              "version": "3.0.0",
+              "overridden": false,
+              "dependencies": {
+                "npm-bundled": {
+                  "version": "4.0.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "npm-normalize-package-bin": {
+                      "version": "4.0.0"
+                    }
+                  }
+                },
+                "npm-normalize-package-bin": {
+                  "version": "4.0.0"
+                }
+              }
+            },
+            "@npmcli/map-workspaces": {
+              "version": "4.0.2"
+            },
+            "@npmcli/metavuln-calculator": {
+              "version": "8.0.1",
+              "overridden": false,
+              "dependencies": {
+                "cacache": {
+                  "version": "19.0.1"
+                },
+                "json-parse-even-better-errors": {
+                  "version": "4.0.0"
+                },
+                "pacote": {
+                  "version": "20.0.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "@npmcli/git": {
+                      "version": "6.0.1"
+                    },
+                    "@npmcli/installed-package-contents": {
+                      "version": "3.0.0"
+                    },
+                    "@npmcli/package-json": {
+                      "version": "6.1.0"
+                    },
+                    "@npmcli/promise-spawn": {
+                      "version": "8.0.2"
+                    },
+                    "@npmcli/run-script": {
+                      "version": "9.0.2"
+                    },
+                    "cacache": {
+                      "version": "19.0.1"
+                    },
+                    "fs-minipass": {
+                      "version": "3.0.3"
+                    },
+                    "minipass": {
+                      "version": "7.1.2"
+                    },
+                    "npm-package-arg": {
+                      "version": "12.0.0"
+                    },
+                    "npm-packlist": {
+                      "version": "9.0.0"
+                    },
+                    "npm-pick-manifest": {
+                      "version": "10.0.0"
+                    },
+                    "npm-registry-fetch": {
+                      "version": "18.0.2"
+                    },
+                    "proc-log": {
+                      "version": "5.0.0"
+                    },
+                    "promise-retry": {
+                      "version": "2.0.1"
+                    },
+                    "sigstore": {
+                      "version": "3.0.0"
+                    },
+                    "ssri": {
+                      "version": "12.0.0"
+                    },
+                    "tar": {
+                      "version": "6.2.1"
+                    }
+                  }
+                },
+                "proc-log": {
+                  "version": "5.0.0"
+                },
+                "semver": {
+                  "version": "7.6.3"
+                }
+              }
+            },
+            "@npmcli/name-from-folder": {
+              "version": "3.0.0",
+              "overridden": false
+            },
+            "@npmcli/node-gyp": {
+              "version": "4.0.0",
+              "overridden": false
+            },
+            "@npmcli/package-json": {
+              "version": "6.1.0"
+            },
+            "@npmcli/query": {
+              "version": "4.0.0",
+              "overridden": false,
+              "dependencies": {
+                "postcss-selector-parser": {
+                  "version": "6.1.2",
+                  "overridden": false,
+                  "dependencies": {
+                    "cssesc": {
+                      "version": "3.0.0",
+                      "overridden": false
+                    },
+                    "util-deprecate": {
+                      "version": "1.0.2",
+                      "overridden": false
+                    }
+                  }
+                }
+              }
+            },
+            "@npmcli/redact": {
+              "version": "3.0.0"
+            },
+            "@npmcli/run-script": {
+              "version": "9.0.2"
+            },
+            "bin-links": {
+              "version": "5.0.0",
+              "overridden": false,
+              "dependencies": {
+                "cmd-shim": {
+                  "version": "7.0.0",
+                  "overridden": false
+                },
+                "npm-normalize-package-bin": {
+                  "version": "4.0.0"
+                },
+                "proc-log": {
+                  "version": "5.0.0"
+                },
+                "read-cmd-shim": {
+                  "version": "5.0.0",
+                  "overridden": false
+                },
+                "write-file-atomic": {
+                  "version": "6.0.0"
+                }
+              }
+            },
+            "cacache": {
+              "version": "19.0.1"
+            },
+            "common-ancestor-path": {
+              "version": "1.0.1",
+              "overridden": false
+            },
+            "hosted-git-info": {
+              "version": "8.0.2"
+            },
+            "json-parse-even-better-errors": {
+              "version": "4.0.0"
+            },
+            "json-stringify-nice": {
+              "version": "1.1.4",
+              "overridden": false
+            },
+            "lru-cache": {
+              "version": "10.4.3",
+              "overridden": false
+            },
+            "minimatch": {
+              "version": "9.0.5"
+            },
+            "nopt": {
+              "version": "8.0.0"
+            },
+            "npm-install-checks": {
+              "version": "7.1.1"
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "npm-pick-manifest": {
+              "version": "10.0.0"
+            },
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            },
+            "pacote": {
+              "version": "19.0.1"
+            },
+            "parse-conflict-json": {
+              "version": "4.0.0"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "proggy": {
+              "version": "3.0.0",
+              "overridden": false
+            },
+            "promise-all-reject-late": {
+              "version": "1.0.1",
+              "overridden": false
+            },
+            "promise-call-limit": {
+              "version": "3.0.2",
+              "overridden": false
+            },
+            "read-package-json-fast": {
+              "version": "4.0.0",
+              "overridden": false,
+              "dependencies": {
+                "json-parse-even-better-errors": {
+                  "version": "4.0.0"
+                },
+                "npm-normalize-package-bin": {
+                  "version": "4.0.0"
+                }
+              }
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "ssri": {
+              "version": "12.0.0"
+            },
+            "treeverse": {
+              "version": "3.0.0"
+            },
+            "walk-up-path": {
+              "version": "3.0.1",
+              "overridden": false
+            }
+          }
+        },
+        "@npmcli/config": {
+          "version": "9.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/map-workspaces": {
+              "version": "4.0.2"
+            },
+            "@npmcli/package-json": {
+              "version": "6.1.0"
+            },
+            "ci-info": {
+              "version": "4.1.0"
+            },
+            "ini": {
+              "version": "5.0.0"
+            },
+            "nopt": {
+              "version": "8.0.0"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "walk-up-path": {
+              "version": "3.0.1"
+            }
+          }
+        },
+        "@npmcli/fs": {
+          "version": "4.0.0",
+          "overridden": false,
+          "dependencies": {
+            "semver": {
+              "version": "7.6.3"
+            }
+          }
+        },
+        "@npmcli/map-workspaces": {
+          "version": "4.0.2",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/name-from-folder": {
+              "version": "3.0.0"
+            },
+            "@npmcli/package-json": {
+              "version": "6.1.0"
+            },
+            "glob": {
+              "version": "10.4.5"
+            },
+            "minimatch": {
+              "version": "9.0.5"
+            }
+          }
+        },
+        "@npmcli/package-json": {
+          "version": "6.1.0",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/git": {
+              "version": "6.0.1",
+              "overridden": false,
+              "dependencies": {
+                "@npmcli/promise-spawn": {
+                  "version": "8.0.2"
+                },
+                "ini": {
+                  "version": "5.0.0"
+                },
+                "lru-cache": {
+                  "version": "10.4.3"
+                },
+                "npm-pick-manifest": {
+                  "version": "10.0.0"
+                },
+                "proc-log": {
+                  "version": "5.0.0"
+                },
+                "promise-inflight": {
+                  "version": "1.0.1",
+                  "overridden": false
+                },
+                "promise-retry": {
+                  "version": "2.0.1"
+                },
+                "semver": {
+                  "version": "7.6.3"
+                },
+                "which": {
+                  "version": "5.0.0"
+                }
+              }
+            },
+            "glob": {
+              "version": "10.4.5"
+            },
+            "hosted-git-info": {
+              "version": "8.0.2"
+            },
+            "json-parse-even-better-errors": {
+              "version": "4.0.0"
+            },
+            "normalize-package-data": {
+              "version": "7.0.0"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            }
+          }
+        },
+        "@npmcli/promise-spawn": {
+          "version": "8.0.2",
+          "overridden": false,
+          "dependencies": {
+            "which": {
+              "version": "5.0.0"
+            }
+          }
+        },
+        "@npmcli/redact": {
+          "version": "3.0.0",
+          "overridden": false
+        },
+        "@npmcli/run-script": {
+          "version": "9.0.2",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/node-gyp": {
+              "version": "4.0.0"
+            },
+            "@npmcli/package-json": {
+              "version": "6.1.0"
+            },
+            "@npmcli/promise-spawn": {
+              "version": "8.0.2"
+            },
+            "node-gyp": {
+              "version": "11.0.0"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "which": {
+              "version": "5.0.0"
+            }
+          }
+        },
+        "@sigstore/tuf": {
+          "version": "3.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@sigstore/protobuf-specs": {
+              "version": "0.3.2",
+              "overridden": false
+            },
+            "tuf-js": {
+              "version": "3.0.1",
+              "overridden": false,
+              "dependencies": {
+                "@tufjs/models": {
+                  "version": "3.0.1",
+                  "overridden": false,
+                  "dependencies": {
+                    "@tufjs/canonical-json": {
+                      "version": "2.0.0",
+                      "overridden": false
+                    },
+                    "minimatch": {
+                      "version": "9.0.5"
+                    }
+                  }
+                },
+                "debug": {
+                  "version": "4.3.7",
+                  "overridden": false,
+                  "dependencies": {
+                    "ms": {
+                      "version": "2.1.3"
+                    }
+                  }
+                },
+                "make-fetch-happen": {
+                  "version": "14.0.3"
+                }
+              }
+            }
+          }
+        },
+        "abbrev": {
+          "version": "3.0.0",
+          "overridden": false
+        },
+        "archy": {
+          "version": "1.0.0",
+          "overridden": false
+        },
+        "cacache": {
+          "version": "19.0.1",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/fs": {
+              "version": "4.0.0"
+            },
+            "fs-minipass": {
+              "version": "3.0.3"
+            },
+            "glob": {
+              "version": "10.4.5"
+            },
+            "lru-cache": {
+              "version": "10.4.3"
+            },
+            "minipass-collect": {
+              "version": "2.0.1",
+              "overridden": false,
+              "dependencies": {
+                "minipass": {
+                  "version": "7.1.2"
+                }
+              }
+            },
+            "minipass-flush": {
+              "version": "1.0.5",
+              "overridden": false,
+              "dependencies": {
+                "minipass": {
+                  "version": "3.3.6",
+                  "overridden": false,
+                  "dependencies": {
+                    "yallist": {
+                      "version": "4.0.0"
+                    }
+                  }
+                }
+              }
+            },
+            "minipass-pipeline": {
+              "version": "1.2.4"
+            },
+            "minipass": {
+              "version": "7.1.2"
+            },
+            "p-map": {
+              "version": "7.0.2",
+              "overridden": false
+            },
+            "ssri": {
+              "version": "12.0.0"
+            },
+            "tar": {
+              "version": "7.4.3",
+              "overridden": false,
+              "dependencies": {
+                "@isaacs/fs-minipass": {
+                  "version": "4.0.1",
+                  "overridden": false,
+                  "dependencies": {
+                    "minipass": {
+                      "version": "7.1.2"
+                    }
+                  }
+                },
+                "chownr": {
+                  "version": "3.0.0",
+                  "overridden": false
+                },
+                "minipass": {
+                  "version": "7.1.2"
+                },
+                "minizlib": {
+                  "version": "3.0.1",
+                  "overridden": false,
+                  "dependencies": {
+                    "minipass": {
+                      "version": "7.1.2"
+                    },
+                    "rimraf": {
+                      "version": "5.0.10"
+                    }
+                  }
+                },
+                "mkdirp": {
+                  "version": "3.0.1",
+                  "overridden": false
+                },
+                "yallist": {
+                  "version": "5.0.0",
+                  "overridden": false
+                }
+              }
+            },
+            "unique-filename": {
+              "version": "4.0.0",
+              "overridden": false,
+              "dependencies": {
+                "unique-slug": {
+                  "version": "5.0.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "imurmurhash": {
+                      "version": "0.1.4"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "chalk": {
+          "version": "5.3.0",
+          "overridden": false
+        },
+        "ci-info": {
+          "version": "4.1.0",
+          "overridden": false
+        },
+        "cli-columns": {
+          "version": "4.0.0",
+          "overridden": false,
+          "dependencies": {
+            "string-width": {
+              "version": "4.2.3",
+              "overridden": false,
+              "dependencies": {
+                "emoji-regex": {
+                  "version": "8.0.0",
+                  "overridden": false
+                },
+                "is-fullwidth-code-point": {
+                  "version": "3.0.0",
+                  "overridden": false
+                },
+                "strip-ansi": {
+                  "version": "6.0.1"
+                }
+              }
+            },
+            "strip-ansi": {
+              "version": "6.0.1",
+              "overridden": false,
+              "dependencies": {
+                "ansi-regex": {
+                  "version": "5.0.1",
+                  "overridden": false
+                }
+              }
+            }
+          }
+        },
+        "fastest-levenshtein": {
+          "version": "1.0.16",
+          "overridden": false
+        },
+        "fs-minipass": {
+          "version": "3.0.3",
+          "overridden": false,
+          "dependencies": {
+            "minipass": {
+              "version": "7.1.2"
+            }
+          }
+        },
+        "glob": {
+          "version": "10.4.5",
+          "overridden": false,
+          "dependencies": {
+            "foreground-child": {
+              "version": "3.3.0",
+              "overridden": false,
+              "dependencies": {
+                "cross-spawn": {
+                  "version": "7.0.6",
+                  "overridden": false,
+                  "dependencies": {
+                    "path-key": {
+                      "version": "3.1.1",
+                      "overridden": false
+                    },
+                    "shebang-command": {
+                      "version": "2.0.0",
+                      "overridden": false,
+                      "dependencies": {
+                        "shebang-regex": {
+                          "version": "3.0.0",
+                          "overridden": false
+                        }
+                      }
+                    },
+                    "which": {
+                      "version": "2.0.2",
+                      "overridden": false,
+                      "dependencies": {
+                        "isexe": {
+                          "version": "2.0.0",
+                          "overridden": false
+                        }
+                      }
+                    }
+                  }
+                },
+                "signal-exit": {
+                  "version": "4.1.0"
+                }
+              }
+            },
+            "jackspeak": {
+              "version": "3.4.3",
+              "overridden": false,
+              "dependencies": {
+                "@isaacs/cliui": {
+                  "version": "8.0.2",
+                  "overridden": false,
+                  "dependencies": {
+                    "string-width-cjs": {
+                      "version": "4.2.3",
+                      "overridden": false,
+                      "dependencies": {
+                        "emoji-regex": {
+                          "version": "8.0.0"
+                        },
+                        "is-fullwidth-code-point": {
+                          "version": "3.0.0"
+                        },
+                        "strip-ansi": {
+                          "version": "6.0.1"
+                        }
+                      }
+                    },
+                    "string-width": {
+                      "version": "5.1.2",
+                      "overridden": false,
+                      "dependencies": {
+                        "eastasianwidth": {
+                          "version": "0.2.0",
+                          "overridden": false
+                        },
+                        "emoji-regex": {
+                          "version": "9.2.2",
+                          "overridden": false
+                        },
+                        "strip-ansi": {
+                          "version": "7.1.0"
+                        }
+                      }
+                    },
+                    "strip-ansi-cjs": {
+                      "version": "6.0.1",
+                      "overridden": false,
+                      "dependencies": {
+                        "ansi-regex": {
+                          "version": "5.0.1"
+                        }
+                      }
+                    },
+                    "strip-ansi": {
+                      "version": "7.1.0",
+                      "overridden": false,
+                      "dependencies": {
+                        "ansi-regex": {
+                          "version": "6.1.0",
+                          "overridden": false
+                        }
+                      }
+                    },
+                    "wrap-ansi-cjs": {
+                      "version": "7.0.0",
+                      "overridden": false,
+                      "dependencies": {
+                        "ansi-styles": {
+                          "version": "4.3.0",
+                          "overridden": false,
+                          "dependencies": {
+                            "color-convert": {
+                              "version": "2.0.1",
+                              "overridden": false,
+                              "dependencies": {
+                                "color-name": {
+                                  "version": "1.1.4",
+                                  "overridden": false
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "string-width": {
+                          "version": "4.2.3"
+                        },
+                        "strip-ansi": {
+                          "version": "6.0.1"
+                        }
+                      }
+                    },
+                    "wrap-ansi": {
+                      "version": "8.1.0",
+                      "overridden": false,
+                      "dependencies": {
+                        "ansi-styles": {
+                          "version": "6.2.1",
+                          "overridden": false
+                        },
+                        "string-width": {
+                          "version": "5.1.2",
+                          "overridden": false,
+                          "dependencies": {
+                            "eastasianwidth": {
+                              "version": "0.2.0"
+                            },
+                            "emoji-regex": {
+                              "version": "9.2.2",
+                              "overridden": false
+                            },
+                            "strip-ansi": {
+                              "version": "7.1.0"
+                            }
+                          }
+                        },
+                        "strip-ansi": {
+                          "version": "7.1.0",
+                          "overridden": false,
+                          "dependencies": {
+                            "ansi-regex": {
+                              "version": "6.1.0",
+                              "overridden": false
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "@pkgjs/parseargs": {
+                  "version": "0.11.0",
+                  "overridden": false
+                }
+              }
+            },
+            "minimatch": {
+              "version": "9.0.5"
+            },
+            "minipass": {
+              "version": "7.1.2"
+            },
+            "package-json-from-dist": {
+              "version": "1.0.1",
+              "overridden": false
+            },
+            "path-scurry": {
+              "version": "1.11.1",
+              "overridden": false,
+              "dependencies": {
+                "lru-cache": {
+                  "version": "10.4.3"
+                },
+                "minipass": {
+                  "version": "7.1.2"
+                }
+              }
+            }
+          }
+        },
+        "graceful-fs": {
+          "version": "4.2.11",
+          "overridden": false
+        },
+        "hosted-git-info": {
+          "version": "8.0.2",
+          "overridden": false,
+          "dependencies": {
+            "lru-cache": {
+              "version": "10.4.3"
+            }
+          }
+        },
+        "ini": {
+          "version": "5.0.0",
+          "overridden": false
+        },
+        "init-package-json": {
+          "version": "7.0.2",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/package-json": {
+              "version": "6.1.0"
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "promzard": {
+              "version": "2.0.0",
+              "overridden": false,
+              "dependencies": {
+                "read": {
+                  "version": "4.0.0"
+                }
+              }
+            },
+            "read": {
+              "version": "4.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "validate-npm-package-license": {
+              "version": "3.0.4",
+              "overridden": false,
+              "dependencies": {
+                "spdx-correct": {
+                  "version": "3.2.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "spdx-expression-parse": {
+                      "version": "3.0.1",
+                      "overridden": false,
+                      "dependencies": {
+                        "spdx-exceptions": {
+                          "version": "2.5.0"
+                        },
+                        "spdx-license-ids": {
+                          "version": "3.0.20"
+                        }
+                      }
+                    },
+                    "spdx-license-ids": {
+                      "version": "3.0.20"
+                    }
+                  }
+                },
+                "spdx-expression-parse": {
+                  "version": "3.0.1",
+                  "overridden": false,
+                  "dependencies": {
+                    "spdx-exceptions": {
+                      "version": "2.5.0"
+                    },
+                    "spdx-license-ids": {
+                      "version": "3.0.20"
+                    }
+                  }
+                }
+              }
+            },
+            "validate-npm-package-name": {
+              "version": "6.0.0"
+            }
+          }
+        },
+        "is-cidr": {
+          "version": "5.1.0",
+          "overridden": false,
+          "dependencies": {
+            "cidr-regex": {
+              "version": "4.1.1",
+              "overridden": false,
+              "dependencies": {
+                "ip-regex": {
+                  "version": "5.0.0",
+                  "overridden": false
+                }
+              }
+            }
+          }
+        },
+        "json-parse-even-better-errors": {
+          "version": "4.0.0",
+          "overridden": false
+        },
+        "libnpmaccess": {
+          "version": "9.0.0",
+          "overridden": false,
+          "dependencies": {
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            }
+          }
+        },
+        "libnpmdiff": {
+          "version": "7.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/arborist": {
+              "version": "8.0.0"
+            },
+            "@npmcli/installed-package-contents": {
+              "version": "3.0.0"
+            },
+            "binary-extensions": {
+              "version": "2.3.0",
+              "overridden": false
+            },
+            "diff": {
+              "version": "5.2.0",
+              "overridden": false
+            },
+            "minimatch": {
+              "version": "9.0.5"
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "pacote": {
+              "version": "19.0.1"
+            },
+            "tar": {
+              "version": "6.2.1"
+            }
+          }
+        },
+        "libnpmexec": {
+          "version": "9.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/arborist": {
+              "version": "8.0.0"
+            },
+            "@npmcli/run-script": {
+              "version": "9.0.2"
+            },
+            "ci-info": {
+              "version": "4.1.0"
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "pacote": {
+              "version": "19.0.1"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "read-package-json-fast": {
+              "version": "4.0.0"
+            },
+            "read": {
+              "version": "4.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "walk-up-path": {
+              "version": "3.0.1"
+            }
+          }
+        },
+        "libnpmfund": {
+          "version": "6.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/arborist": {
+              "version": "8.0.0"
+            }
+          }
+        },
+        "libnpmhook": {
+          "version": "11.0.0",
+          "overridden": false,
+          "dependencies": {
+            "aproba": {
+              "version": "2.0.0",
+              "overridden": false
+            },
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            }
+          }
+        },
+        "libnpmorg": {
+          "version": "7.0.0",
+          "overridden": false,
+          "dependencies": {
+            "aproba": {
+              "version": "2.0.0"
+            },
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            }
+          }
+        },
+        "libnpmpack": {
+          "version": "8.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/arborist": {
+              "version": "8.0.0"
+            },
+            "@npmcli/run-script": {
+              "version": "9.0.2"
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "pacote": {
+              "version": "19.0.1"
+            }
+          }
+        },
+        "libnpmpublish": {
+          "version": "10.0.1",
+          "overridden": false,
+          "dependencies": {
+            "ci-info": {
+              "version": "4.1.0"
+            },
+            "normalize-package-data": {
+              "version": "7.0.0"
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "sigstore": {
+              "version": "3.0.0",
+              "overridden": false,
+              "dependencies": {
+                "@sigstore/bundle": {
+                  "version": "3.0.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "@sigstore/protobuf-specs": {
+                      "version": "0.3.2"
+                    }
+                  }
+                },
+                "@sigstore/core": {
+                  "version": "2.0.0",
+                  "overridden": false
+                },
+                "@sigstore/protobuf-specs": {
+                  "version": "0.3.2"
+                },
+                "@sigstore/sign": {
+                  "version": "3.0.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "@sigstore/bundle": {
+                      "version": "3.0.0"
+                    },
+                    "@sigstore/core": {
+                      "version": "2.0.0"
+                    },
+                    "@sigstore/protobuf-specs": {
+                      "version": "0.3.2"
+                    },
+                    "make-fetch-happen": {
+                      "version": "14.0.3"
+                    },
+                    "proc-log": {
+                      "version": "5.0.0"
+                    },
+                    "promise-retry": {
+                      "version": "2.0.1"
+                    }
+                  }
+                },
+                "@sigstore/tuf": {
+                  "version": "3.0.0"
+                },
+                "@sigstore/verify": {
+                  "version": "2.0.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "@sigstore/bundle": {
+                      "version": "3.0.0"
+                    },
+                    "@sigstore/core": {
+                      "version": "2.0.0"
+                    },
+                    "@sigstore/protobuf-specs": {
+                      "version": "0.3.2"
+                    }
+                  }
+                }
+              }
+            },
+            "ssri": {
+              "version": "12.0.0"
+            }
+          }
+        },
+        "libnpmsearch": {
+          "version": "8.0.0",
+          "overridden": false,
+          "dependencies": {
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            }
+          }
+        },
+        "libnpmteam": {
+          "version": "7.0.0",
+          "overridden": false,
+          "dependencies": {
+            "aproba": {
+              "version": "2.0.0"
+            },
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            }
+          }
+        },
+        "libnpmversion": {
+          "version": "7.0.0",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/git": {
+              "version": "6.0.1"
+            },
+            "@npmcli/run-script": {
+              "version": "9.0.2"
+            },
+            "json-parse-even-better-errors": {
+              "version": "4.0.0"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            }
+          }
+        },
+        "make-fetch-happen": {
+          "version": "14.0.3",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/agent": {
+              "version": "3.0.0",
+              "overridden": false,
+              "dependencies": {
+                "agent-base": {
+                  "version": "7.1.1",
+                  "overridden": false,
+                  "dependencies": {
+                    "debug": {
+                      "version": "4.3.7"
+                    }
+                  }
+                },
+                "http-proxy-agent": {
+                  "version": "7.0.2",
+                  "overridden": false,
+                  "dependencies": {
+                    "agent-base": {
+                      "version": "7.1.1"
+                    },
+                    "debug": {
+                      "version": "4.3.7"
+                    }
+                  }
+                },
+                "https-proxy-agent": {
+                  "version": "7.0.5",
+                  "overridden": false,
+                  "dependencies": {
+                    "agent-base": {
+                      "version": "7.1.1"
+                    },
+                    "debug": {
+                      "version": "4.3.7"
+                    }
+                  }
+                },
+                "lru-cache": {
+                  "version": "10.4.3"
+                },
+                "socks-proxy-agent": {
+                  "version": "8.0.4",
+                  "overridden": false,
+                  "dependencies": {
+                    "agent-base": {
+                      "version": "7.1.1"
+                    },
+                    "debug": {
+                      "version": "4.3.7"
+                    },
+                    "socks": {
+                      "version": "2.8.3",
+                      "overridden": false,
+                      "dependencies": {
+                        "ip-address": {
+                          "version": "9.0.5",
+                          "overridden": false,
+                          "dependencies": {
+                            "jsbn": {
+                              "version": "1.1.0",
+                              "overridden": false
+                            },
+                            "sprintf-js": {
+                              "version": "1.1.3",
+                              "overridden": false
+                            }
+                          }
+                        },
+                        "smart-buffer": {
+                          "version": "4.2.0",
+                          "overridden": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "cacache": {
+              "version": "19.0.1"
+            },
+            "http-cache-semantics": {
+              "version": "4.1.1",
+              "overridden": false
+            },
+            "minipass-fetch": {
+              "version": "4.0.0",
+              "overridden": false,
+              "dependencies": {
+                "encoding": {
+                  "version": "0.1.13",
+                  "overridden": false,
+                  "dependencies": {
+                    "iconv-lite": {
+                      "version": "0.6.3",
+                      "overridden": false,
+                      "dependencies": {
+                        "safer-buffer": {
+                          "version": "2.1.2",
+                          "overridden": false
+                        }
+                      }
+                    }
+                  }
+                },
+                "minipass-sized": {
+                  "version": "1.0.3",
+                  "overridden": false,
+                  "dependencies": {
+                    "minipass": {
+                      "version": "3.3.6",
+                      "overridden": false,
+                      "dependencies": {
+                        "yallist": {
+                          "version": "4.0.0"
+                        }
+                      }
+                    }
+                  }
+                },
+                "minipass": {
+                  "version": "7.1.2"
+                },
+                "minizlib": {
+                  "version": "3.0.1",
+                  "overridden": false,
+                  "dependencies": {
+                    "minipass": {
+                      "version": "7.1.2"
+                    },
+                    "rimraf": {
+                      "version": "5.0.10"
+                    }
+                  }
+                }
+              }
+            },
+            "minipass-flush": {
+              "version": "1.0.5"
+            },
+            "minipass-pipeline": {
+              "version": "1.2.4"
+            },
+            "minipass": {
+              "version": "7.1.2"
+            },
+            "negotiator": {
+              "version": "1.0.0",
+              "overridden": false
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "promise-retry": {
+              "version": "2.0.1",
+              "overridden": false,
+              "dependencies": {
+                "err-code": {
+                  "version": "2.0.3",
+                  "overridden": false
+                },
+                "retry": {
+                  "version": "0.12.0",
+                  "overridden": false
+                }
+              }
+            },
+            "ssri": {
+              "version": "12.0.0"
+            }
+          }
+        },
+        "minimatch": {
+          "version": "9.0.5",
+          "overridden": false,
+          "dependencies": {
+            "brace-expansion": {
+              "version": "2.0.1",
+              "overridden": false,
+              "dependencies": {
+                "balanced-match": {
+                  "version": "1.0.2",
+                  "overridden": false
+                }
+              }
+            }
+          }
+        },
+        "minipass-pipeline": {
+          "version": "1.2.4",
+          "overridden": false,
+          "dependencies": {
+            "minipass": {
+              "version": "3.3.6",
+              "overridden": false,
+              "dependencies": {
+                "yallist": {
+                  "version": "4.0.0"
+                }
+              }
+            }
+          }
+        },
+        "minipass": {
+          "version": "7.1.2",
+          "overridden": false
+        },
+        "ms": {
+          "version": "2.1.3",
+          "overridden": false
+        },
+        "node-gyp": {
+          "version": "11.0.0",
+          "overridden": false,
+          "dependencies": {
+            "env-paths": {
+              "version": "2.2.1",
+              "overridden": false
+            },
+            "exponential-backoff": {
+              "version": "3.1.1",
+              "overridden": false
+            },
+            "glob": {
+              "version": "10.4.5"
+            },
+            "graceful-fs": {
+              "version": "4.2.11"
+            },
+            "make-fetch-happen": {
+              "version": "14.0.3"
+            },
+            "nopt": {
+              "version": "8.0.0"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "tar": {
+              "version": "7.4.3",
+              "overridden": false,
+              "dependencies": {
+                "@isaacs/fs-minipass": {
+                  "version": "4.0.1"
+                },
+                "chownr": {
+                  "version": "3.0.0",
+                  "overridden": false
+                },
+                "minipass": {
+                  "version": "7.1.2"
+                },
+                "minizlib": {
+                  "version": "3.0.1",
+                  "overridden": false,
+                  "dependencies": {
+                    "minipass": {
+                      "version": "7.1.2"
+                    },
+                    "rimraf": {
+                      "version": "5.0.10"
+                    }
+                  }
+                },
+                "mkdirp": {
+                  "version": "3.0.1",
+                  "overridden": false
+                },
+                "yallist": {
+                  "version": "5.0.0",
+                  "overridden": false
+                }
+              }
+            },
+            "which": {
+              "version": "5.0.0"
+            }
+          }
+        },
+        "nopt": {
+          "version": "8.0.0",
+          "overridden": false,
+          "dependencies": {
+            "abbrev": {
+              "version": "2.0.0",
+              "overridden": false
+            }
+          }
+        },
+        "normalize-package-data": {
+          "version": "7.0.0",
+          "overridden": false,
+          "dependencies": {
+            "hosted-git-info": {
+              "version": "8.0.2"
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "validate-npm-package-license": {
+              "version": "3.0.4"
+            }
+          }
+        },
+        "npm-audit-report": {
+          "version": "6.0.0",
+          "overridden": false
+        },
+        "npm-install-checks": {
+          "version": "7.1.1",
+          "overridden": false,
+          "dependencies": {
+            "semver": {
+              "version": "7.6.3"
+            }
+          }
+        },
+        "npm-package-arg": {
+          "version": "12.0.0",
+          "overridden": false,
+          "dependencies": {
+            "hosted-git-info": {
+              "version": "8.0.2"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            },
+            "validate-npm-package-name": {
+              "version": "6.0.0"
+            }
+          }
+        },
+        "npm-pick-manifest": {
+          "version": "10.0.0",
+          "overridden": false,
+          "dependencies": {
+            "npm-install-checks": {
+              "version": "7.1.1"
+            },
+            "npm-normalize-package-bin": {
+              "version": "4.0.0",
+              "overridden": false
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "semver": {
+              "version": "7.6.3"
+            }
+          }
+        },
+        "npm-profile": {
+          "version": "11.0.1",
+          "overridden": false,
+          "dependencies": {
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            }
+          }
+        },
+        "npm-registry-fetch": {
+          "version": "18.0.2",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/redact": {
+              "version": "3.0.0"
+            },
+            "jsonparse": {
+              "version": "1.3.1",
+              "overridden": false
+            },
+            "make-fetch-happen": {
+              "version": "14.0.3"
+            },
+            "minipass-fetch": {
+              "version": "4.0.0"
+            },
+            "minipass": {
+              "version": "7.1.2"
+            },
+            "minizlib": {
+              "version": "3.0.1",
+              "overridden": false,
+              "dependencies": {
+                "minipass": {
+                  "version": "7.1.2"
+                },
+                "rimraf": {
+                  "version": "5.0.10",
+                  "overridden": false,
+                  "dependencies": {
+                    "glob": {
+                      "version": "10.4.5"
+                    }
+                  }
+                }
+              }
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            }
+          }
+        },
+        "npm-user-validate": {
+          "version": "3.0.0",
+          "overridden": false
+        },
+        "p-map": {
+          "version": "4.0.0",
+          "overridden": false,
+          "dependencies": {
+            "aggregate-error": {
+              "version": "3.1.0",
+              "overridden": false,
+              "dependencies": {
+                "clean-stack": {
+                  "version": "2.2.0",
+                  "overridden": false
+                },
+                "indent-string": {
+                  "version": "4.0.0",
+                  "overridden": false
+                }
+              }
+            }
+          }
+        },
+        "pacote": {
+          "version": "19.0.1",
+          "overridden": false,
+          "dependencies": {
+            "@npmcli/git": {
+              "version": "6.0.1"
+            },
+            "@npmcli/installed-package-contents": {
+              "version": "3.0.0"
+            },
+            "@npmcli/package-json": {
+              "version": "6.1.0"
+            },
+            "@npmcli/promise-spawn": {
+              "version": "8.0.2"
+            },
+            "@npmcli/run-script": {
+              "version": "9.0.2"
+            },
+            "cacache": {
+              "version": "19.0.1"
+            },
+            "fs-minipass": {
+              "version": "3.0.3"
+            },
+            "minipass": {
+              "version": "7.1.2"
+            },
+            "npm-package-arg": {
+              "version": "12.0.0"
+            },
+            "npm-packlist": {
+              "version": "9.0.0",
+              "overridden": false,
+              "dependencies": {
+                "ignore-walk": {
+                  "version": "7.0.0",
+                  "overridden": false,
+                  "dependencies": {
+                    "minimatch": {
+                      "version": "9.0.5"
+                    }
+                  }
+                }
+              }
+            },
+            "npm-pick-manifest": {
+              "version": "10.0.0"
+            },
+            "npm-registry-fetch": {
+              "version": "18.0.2"
+            },
+            "proc-log": {
+              "version": "5.0.0"
+            },
+            "promise-retry": {
+              "version": "2.0.1"
+            },
+            "sigstore": {
+              "version": "3.0.0"
+            },
+            "ssri": {
+              "version": "12.0.0"
+            },
+            "tar": {
+              "version": "6.2.1"
+            }
+          }
+        },
+        "parse-conflict-json": {
+          "version": "4.0.0",
+          "overridden": false,
+          "dependencies": {
+            "json-parse-even-better-errors": {
+              "version": "4.0.0"
+            },
+            "just-diff-apply": {
+              "version": "5.5.0",
+              "overridden": false
+            },
+            "just-diff": {
+              "version": "6.0.2",
+              "overridden": false
+            }
+          }
+        },
+        "proc-log": {
+          "version": "5.0.0",
+          "overridden": false
+        },
+        "qrcode-terminal": {
+          "version": "0.12.0",
+          "overridden": false
+        },
+        "read": {
+          "version": "4.0.0",
+          "overridden": false,
+          "dependencies": {
+            "mute-stream": {
+              "version": "2.0.0",
+              "overridden": false
+            }
+          }
+        },
+        "semver": {
+          "version": "7.6.3",
+          "overridden": false
+        },
+        "spdx-expression-parse": {
+          "version": "4.0.0",
+          "overridden": false,
+          "dependencies": {
+            "spdx-exceptions": {
+              "version": "2.5.0",
+              "overridden": false
+            },
+            "spdx-license-ids": {
+              "version": "3.0.20",
+              "overridden": false
+            }
+          }
+        },
+        "ssri": {
+          "version": "12.0.0",
+          "overridden": false,
+          "dependencies": {
+            "minipass": {
+              "version": "7.1.2"
+            }
+          }
+        },
+        "supports-color": {
+          "version": "9.4.0",
+          "overridden": false
+        },
+        "tar": {
+          "version": "6.2.1",
+          "overridden": false,
+          "dependencies": {
+            "chownr": {
+              "version": "2.0.0",
+              "overridden": false
+            },
+            "fs-minipass": {
+              "version": "2.1.0",
+              "overridden": false,
+              "dependencies": {
+                "minipass": {
+                  "version": "3.3.6",
+                  "overridden": false,
+                  "dependencies": {
+                    "yallist": {
+                      "version": "4.0.0"
+                    }
+                  }
+                }
+              }
+            },
+            "minipass": {
+              "version": "5.0.0",
+              "overridden": false
+            },
+            "minizlib": {
+              "version": "2.1.2",
+              "overridden": false,
+              "dependencies": {
+                "minipass": {
+                  "version": "3.3.6",
+                  "overridden": false,
+                  "dependencies": {
+                    "yallist": {
+                      "version": "4.0.0"
+                    }
+                  }
+                },
+                "yallist": {
+                  "version": "4.0.0"
+                }
+              }
+            },
+            "mkdirp": {
+              "version": "1.0.4",
+              "overridden": false
+            },
+            "yallist": {
+              "version": "4.0.0",
+              "overridden": false
+            }
+          }
+        },
+        "text-table": {
+          "version": "0.2.0",
+          "overridden": false
+        },
+        "tiny-relative-date": {
+          "version": "1.3.0",
+          "overridden": false
+        },
+        "treeverse": {
+          "version": "3.0.0",
+          "overridden": false
+        },
+        "validate-npm-package-name": {
+          "version": "6.0.0",
+          "overridden": false
+        },
+        "which": {
+          "version": "5.0.0",
+          "overridden": false,
+          "dependencies": {
+            "isexe": {
+              "version": "3.1.1",
+              "overridden": false
+            }
+          }
+        },
+        "write-file-atomic": {
+          "version": "6.0.0",
+          "overridden": false,
+          "dependencies": {
+            "imurmurhash": {
+              "version": "0.1.4",
+              "overridden": false
+            },
+            "signal-exit": {
+              "version": "4.1.0",
+              "overridden": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

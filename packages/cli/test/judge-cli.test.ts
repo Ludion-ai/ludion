@@ -52,3 +52,27 @@ describe("ludion judge on dev-flagged lockfile entries", () => {
     expect(result.wait_hours).not.toBe(168);
   });
 });
+
+describe("ludion judge and npm-shrinkwrap.json (review of aa5d75b)", () => {
+  it("does not judge package-lock.json when npm would install from npm-shrinkwrap.json instead", async () => {
+    for (const side of ["before", "after"] as const) {
+      const dirs = { before: checkout(lock("1.0.0", "2.0.0")), after: checkout(lock("1.0.1", "2.0.0")) };
+      writeFileSync(join(dirs[side], "npm-shrinkwrap.json"), lock("1.0.0", "2.0.0"));
+      await expect(judgeCli(["--before", dirs.before, "--after", dirs.after, "--files", "package-lock.json"])).rejects.toThrow("npm-shrinkwrap.json is there, and npm installs from it instead of package-lock.json");
+    }
+  });
+});
+
+describe("ludion judge and a requirement the change leaves unmet (review 6529858505, B1)", () => {
+  it("refuses a change whose lock leaves a requirement unmet that the base met, and reads one the base already left so", async () => {
+    // eslint requires b ^2.0.0; the change moves the nested b to 3.0.0, outside it, which npm install would mend unpinned.
+    const dirs = { before: checkout(lock("1.0.0", "2.0.0")), after: checkout(lock("1.0.0", "3.0.0")) };
+    await expect(judgeCli(["--before", dirs.before, "--after", dirs.after, "--files", "package-lock.json"])).rejects.toThrow("The change leaves a requirement unmet that npm install would fetch: package-lock.json's packages: node_modules/eslint requires b ^2.0.0, and node_modules/eslint/node_modules/b has b@3.0.0, which is not that.");
+    // The same unmet requirement on both sides is the project's own: the change is judged.
+    const same = { before: checkout(lock("1.0.0", "3.0.0")), after: checkout(lock("1.0.1", "3.0.0")) };
+    const logs = vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.stubGlobal("fetch", async () => { throw new Error("offline"); });
+    try { expect(typeof await judgeCli(["--before", same.before, "--after", same.after, "--files", "package-lock.json", "--now", "2027-01-01T00:00:00Z", "--json"])).toBe("number"); }
+    finally { logs.mockRestore(); vi.unstubAllGlobals(); }
+  });
+});

@@ -1,0 +1,3 @@
+npm error code ELSPROBLEMS
+npm error invalid: minimist@99.0.0 /out/11.19.1/v2/overrides/variants/V2/node_modules/minimist
+npm error A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-30T23_50_07_397Z-debug-0.log

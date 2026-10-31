@@ -6,7 +6,7 @@ import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { scanNode } from "./node.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
-import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
+import { branchTip, fixBranch, fixBranchName, gitBase, skippedReason } from "./branch.ts";
 import { nodeFixPublished, phpFixPublished, type FixPublished } from "./exposure.ts";
 
 export type Command = (args: string[], timeoutMs: number) => Promise<string>;
@@ -86,7 +86,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     // Before any Docker work: the branch starts from the commit whose files are the ones validated.
     const base = apply ? gitBase(root, temporary) : null;
     receipt.base_commit = base?.commit ?? null;
-    const branch = base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), repository, scan.candidate.version);
+    const branch = base && fixBranchName(base.prefix, repository, null, [scan.candidate.version]);
     const subject = `ludion: ${runtime.label} ${scan.current.version} -> ${scan.candidate.version} in ${config.dockerfile}`;
     const tip = base && branch ? branchTip(base, branch) : null;
     // A branch of the same name is this update only when its tip says so; otherwise the name is taken and the update stops.

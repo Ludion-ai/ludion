@@ -1,0 +1,1 @@
+{ "name": "s1", "version": "1.0.0", "dependencies": { "react-dom": "18.2.0", "mkdirp": "0.5.1", "minimist": "1.2.8", "lodash-alias": "npm:lodash@4.17.21" }, "optionalDependencies": { "is-number": "7.0.0" }, "devDependencies": { "to-regex-range": "5.0.1" } }

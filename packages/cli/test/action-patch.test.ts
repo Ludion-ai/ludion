@@ -88,19 +88,22 @@ describe("action/start.sh refuses the scheduled modes outside their place", () =
   const start = (env: Record<string, string>) => spawnSync("bash", [fileURLToPath(new URL("action/start.sh", root))], {
     encoding: "utf8", env: { PATH: process.env.PATH ?? "", GITHUB_OUTPUT: join(mkdtempSync(join(tmpdir(), "ludion-start-")), "out"), RECORD: "/dev/null", ...env },
   });
-  it.skipIf(process.platform === "win32")("refuses another event, another branch, and an OIDC token in mode patch", () => {
+  it.skipIf(process.platform === "win32")("refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch", () => {
     for (const [env, why] of [
       [{ MODE: "patch", EVENT: "pull_request" }, "mode patch runs on schedule or workflow_dispatch, not pull_request."],
       [{ MODE: "pull-request", EVENT: "push" }, "mode pull-request runs on schedule or workflow_dispatch, not push."],
       [{ MODE: "patch", EVENT: "workflow_dispatch", REF: "refs/heads/feature", DEFAULT_BRANCH: "main" }, "mode patch runs on the default branch (main), not refs/heads/feature."],
-      [{ MODE: "patch", EVENT: "schedule", REF: "refs/heads/main", ACTIONS_ID_TOKEN_REQUEST_URL: "https://token.invalid" }, "must hold no secret"],
+      [{ MODE: "patch", EVENT: "schedule", REF: "refs/heads/main", RUNNER_ENVIRONMENT: "self-hosted" }, "mode patch runs only on GitHub-hosted runners (a fresh machine per job), not on self-hosted."],
+      [{ MODE: "pull-request", EVENT: "workflow_dispatch", REF: "refs/heads/main", DEFAULT_BRANCH: "main", RUNNER_ENVIRONMENT: "self-hosted" }, "mode pull-request runs only on GitHub-hosted runners"],
+      [{ MODE: "pull-request", EVENT: "schedule", REF: "refs/heads/main" }, "not on an unknown runner."],
+      [{ MODE: "patch", EVENT: "schedule", REF: "refs/heads/main", RUNNER_ENVIRONMENT: "github-hosted", ACTIONS_ID_TOKEN_REQUEST_URL: "https://token.invalid" }, "must hold no secret"],
       [{ MODE: "nope", EVENT: "schedule" }, "mode must be judge, comment, patch or pull-request."],
     ] as const) {
       const r = start(env);
       expect(r.status, JSON.stringify(env)).toBe(1);
       expect(r.stdout).toContain(why);
     }
-    const ok = start({ MODE: "pull-request", EVENT: "workflow_dispatch", REF: "refs/heads/main", DEFAULT_BRANCH: "main" });
+    const ok = start({ MODE: "pull-request", EVENT: "workflow_dispatch", REF: "refs/heads/main", DEFAULT_BRANCH: "main", RUNNER_ENVIRONMENT: "github-hosted" });
     expect(ok.stdout + ok.stderr).toBe("");
     expect(ok.status).toBe(0);
   });

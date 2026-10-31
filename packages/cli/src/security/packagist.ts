@@ -6,6 +6,11 @@ import semver from "semver";
 import type { Advisory } from "./osv.ts";
 
 export const PACKAGIST_ADVISORIES = "https://packagist.org/api/security-advisories/";
+/**
+ * A Packagist advisory ID, in the same form deliver.ts's ADVISORY lets into a fix's commit (review 6518582507, N-d):
+ * no "-" at either end, so an ID read here is never one the PR job refuses.
+ */
+export const PKSA_ID = /^PKSA-[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?$/;
 
 type Term = { op: "<" | "<=" | ">" | ">=" | "=" | "!="; version: string };
 /** Alternatives (`|`), each a conjunction of comparisons; null when any part cannot be read. */
@@ -72,7 +77,7 @@ export async function packagistAdvisories(fetchFn: typeof fetch, names: string[]
     for (const [name, items] of Object.entries<unknown>(advisories)) {
       if (!chunk.includes(name) || !Array.isArray(items)) throw new Error("Invalid Packagist advisory response; no clean result is available.");
       for (const item of items) {
-        if (!item || typeof item !== "object" || typeof item.advisoryId !== "string" || !/^PKSA-[a-z0-9-]{1,60}$/.test(item.advisoryId) || item.packageName !== name || typeof item.affectedVersions !== "string") throw new Error("Invalid Packagist advisory record; no clean result is available.");
+        if (!item || typeof item !== "object" || typeof item.advisoryId !== "string" || !PKSA_ID.test(item.advisoryId) || item.packageName !== name || typeof item.affectedVersions !== "string") throw new Error("Invalid Packagist advisory record; no clean result is available.");
         const constraint = parseConstraint(item.affectedVersions);
         const aliases = [item.cve, ...(Array.isArray(item.sources) ? item.sources.map((s: any) => s?.remoteId) : [])].filter((s: unknown): s is string => typeof s === "string" && /^(CVE-\d{4}-\d{4,}|GHSA(-[23456789cfghjmpqrvwx]{4}){3})$/.test(s));
         out.push({

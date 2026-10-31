@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { deflateSync } from "node:zlib";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { branchName, branchTip, fixBranch, GIT_SETTINGS, gitBase, skippedReason } from "../src/security/branch.ts";
+import { branchName, branchTip, fixBranch, fixBranchName, GIT_SETTINGS, gitBase, skippedReason } from "../src/security/branch.ts";
 import { dependencyFixPublished } from "../src/security/exposure.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
@@ -295,6 +295,36 @@ describe("a fix on its own branch", () => {
     expect(branchName("ludion", "apps/web/", "npm", "@scope/pkg-1.2.3")).toBe("ludion/apps-web/npm/scope-pkg-1.2.3");
     expect(branchName("ludion", "composer", "vendor/x..y.lock")).toBe("ludion/composer/vendor-x.y-lock");
     expect(branchName("ludion", "..", "php", "8.4.28")).toBe("ludion/x/php/8.4.28");
+  });
+  it("gives two different fixes two different branches (review 6516135819, N9)", () => {
+    const hashed = /-[0-9a-f]{12}$/;
+    // A name that reads back in one way stays as it was.
+    expect(fixBranchName("", "npm", "lodash", ["4.17.21", "4.17.21"])).toBe("ludion/npm/lodash-4.17.21");
+    expect(fixBranchName("", "npm", "path-to-regexp", ["0.1.12"])).toBe("ludion/npm/path-to-regexp-0.1.12");
+    expect(fixBranchName("", "php", null, ["8.4.28"])).toBe("ludion/php/8.4.28");
+    // Names cleaning merges, a folder, several versions, and a version with "-": each ends with a hash of all its parts.
+    const pairs: [string, string][] = [
+      [fixBranchName("", "npm", "@foo/bar", ["1.0.0"]), fixBranchName("", "npm", "foo-bar", ["1.0.0"])],
+      [fixBranchName("", "npm", "a", ["1.0.0", "2.0.0"]), fixBranchName("", "npm", "a-1.0.0", ["2.0.0"])],
+      [fixBranchName("", "npm", "a", ["1.0.0-2.0.0"]), fixBranchName("", "npm", "a", ["1.0.0", "2.0.0"])],
+      // Both would read "a-1.0.0-2.0.0" without the "no - in the version" rule (review 6518582507, N-b R16).
+      [fixBranchName("", "npm", "a", ["1.0.0-2.0.0"]), fixBranchName("", "npm", "a-1.0.0", ["2.0.0"])],
+      [fixBranchName("", "composer", "a/b-c", ["1.0.0"]), fixBranchName("", "composer", "a-b/c", ["1.0.0"])],
+      [fixBranchName("", "maven", "a.b:c-d", ["1.0"]), fixBranchName("", "maven", "a.b-c:d", ["1.0"])],
+      [fixBranchName("apps/web/", "php", null, ["8.4.28"]), fixBranchName("apps-web/", "php", null, ["8.4.28"])],
+      [fixBranchName("", "npm", "a", ["1.0.0+b"]), fixBranchName("", "npm", "a", ["1.0.0-b"])],
+    ];
+    for (const [one, other] of pairs) {
+      expect(one, other).not.toBe(other);
+      expect(one.replace(hashed, ""), one).toBe(other.replace(hashed, ""));
+    }
+    expect(fixBranchName("", "npm", "@foo/bar", ["1.0.0"])).toMatch(/^ludion\/npm\/foo-bar-1\.0\.0-[0-9a-f]{12}$/);
+    expect(fixBranchName("", "npm", "foo-bar", ["1.0.0"])).toBe("ludion/npm/foo-bar-1.0.0");
+    // The same fix always gets the same name, so the next run finds its branch.
+    expect(fixBranchName("apps/web/", "npm", "@foo/bar", ["1.0.0"])).toBe(fixBranchName("apps/web/", "npm", "@foo/bar", ["1.0.0"]));
+    const long = fixBranchName("", "maven", `io.opentelemetry.instrumentation:${"x".repeat(200)}`, ["2.10.0"]);
+    expect(long.split("/")[2]!.length).toBeLessThanOrEqual(200);
+    expect(long).not.toBe(fixBranchName("", "maven", `io.opentelemetry.instrumentation:${"x".repeat(200)}`, ["2.10.1"]));
   });
 });
 

@@ -1,0 +1,467 @@
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm@10.9.2',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'abbrev@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'bin-links@5.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'cacache@19.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'chownr@3.0.0',
+npm WARN EBADENGINE   required: { node: '>=18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'minizlib@3.0.1',
+npm WARN EBADENGINE   required: { node: '>= 18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'p-map@7.0.2',
+npm WARN EBADENGINE   required: { node: '>=18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'tar@7.4.3',
+npm WARN EBADENGINE   required: { node: '>=18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'yallist@5.0.0',
+npm WARN EBADENGINE   required: { node: '>=18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'cmd-shim@7.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'fs-minipass@3.0.3',
+npm WARN EBADENGINE   required: { node: '^14.17.0 || ^16.13.0 || >=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'hosted-git-info@8.0.2',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'ignore-walk@7.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'ini@5.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmaccess@9.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'init-package-json@7.0.2',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'json-parse-even-better-errors@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmdiff@7.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmexec@9.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmorg@7.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmpack@8.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmpublish@10.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmsearch@8.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmteam@7.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmversion@7.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'make-fetch-happen@14.0.3',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmhook@11.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'minipass-fetch@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'minizlib@3.0.1',
+npm WARN EBADENGINE   required: { node: '>= 18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'libnpmfund@6.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'node-gyp@11.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'chownr@3.0.0',
+npm WARN EBADENGINE   required: { node: '>=18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'minizlib@3.0.1',
+npm WARN EBADENGINE   required: { node: '>= 18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'tar@7.4.3',
+npm WARN EBADENGINE   required: { node: '>=18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'yallist@5.0.0',
+npm WARN EBADENGINE   required: { node: '>=18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'normalize-package-data@7.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-bundled@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'nopt@8.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'abbrev@2.0.0',
+npm WARN EBADENGINE   required: { node: '^14.17.0 || ^16.13.0 || >=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'mute-stream@2.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-normalize-package-bin@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-install-checks@7.1.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-packlist@9.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-pick-manifest@10.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-profile@11.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-user-validate@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-package-arg@12.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-registry-fetch@18.0.2',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'minizlib@3.0.1',
+npm WARN EBADENGINE   required: { node: '>= 18' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'parse-conflict-json@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-audit-report@6.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'proc-log@5.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'pacote@19.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'promzard@2.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'read-package-json-fast@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'read@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'proggy@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'read-cmd-shim@5.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'sigstore@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@sigstore/bundle@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@sigstore/core@2.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@sigstore/sign@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@sigstore/verify@2.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'ssri@12.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'treeverse@3.0.0',
+npm WARN EBADENGINE   required: { node: '^14.17.0 || ^16.13.0 || >=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'tuf-js@3.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@tufjs/models@3.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'unique-filename@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'validate-npm-package-name@6.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'write-file-atomic@6.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'unique-slug@5.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'which@5.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/git@6.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/fs@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/arborist@8.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/installed-package-contents@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@isaacs/fs-minipass@4.0.1',
+npm WARN EBADENGINE   required: { node: '>=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/map-workspaces@4.0.2',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/config@9.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/metavuln-calculator@8.0.1',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'pacote@20.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/agent@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/package-json@6.1.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/promise-spawn@8.0.2',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/query@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/run-script@9.0.2',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/redact@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/name-from-folder@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@npmcli/node-gyp@4.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@sigstore/protobuf-specs@0.3.2',
+npm WARN EBADENGINE   required: { node: '^16.14.0 || >=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@sigstore/tuf@3.0.0',
+npm WARN EBADENGINE   required: { node: '^18.17.0 || >=20.5.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@tufjs/canonical-json@2.0.0',
+npm WARN EBADENGINE   required: { node: '^16.14.0 || >=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v16.0.0', npm: '7.10.0' }
+npm WARN EBADENGINE }
+
+up to date in 2s
+npm notice 
+npm notice New major version of npm available! 7.10.0 -> 12.2.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v12.2.1>
+npm notice Run `npm install -g npm@12.2.1` to update!
+npm notice 

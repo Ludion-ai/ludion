@@ -1,0 +1,409 @@
+2b496a1	fail	18	a parent other than the base accepted
+2b496a1	fail	17	files outside the receipt's list accepted
+2b496a1	fail	17	a file the plan may not change accepted
+2b496a1	fail	18	a new file or a changed mode accepted
+2b496a1	fail	18	an executable mode refused (a checkout from a file system without modes)
+2b496a1	fail	17	extra branches in the bundle accepted
+2b496a1	fail	17	bytes other than the receipt's accepted
+2b496a1	fail	17	a second PR while one is open
+2b496a1	fail	17	a closed fix opened again
+2b496a1	fail	17	a PR opened on a branch that holds another commit
+2b496a1	fail	17	a branch with another change reused
+2b496a1	fail	17	the message beyond its subject accepted
+2b496a1	fail	16	what the files say not checked
+2b496a1	fail	17	npm: the judge's second refusal ignored
+2b496a1	fail	15	npm: the judge not run again
+2b496a1	fail	17	manifest: another package.json accepted
+2b496a1	fail	17	PHP: more than the FROM image accepted
+2b496a1	fail	17	PHP: an older or other-branch release accepted
+2b496a1	fail	17	composer.lock: another package changed
+2b496a1	fail	17	composer.lock: a plugin accepted
+2b496a1	fail	17	composer.lock: a new package from any archive accepted
+2b496a1	fail	17	composer.lock: the planned package from another repository accepted
+2b496a1	fail	30	composer.lock: a new package nothing requires accepted
+2b496a1	timeout	300	composer: the backtracking name pattern (CodeQL js/redos) back
+2b496a1	fail	17	composer and Maven: a downgrade accepted
+2b496a1	fail	17	composer: a from the base does not lock accepted
+2b496a1	fail	17	npm: another lock entry changing accepted
+2b496a1	fail	17	npm: the entry's own name not read (an alias of the package not planned, B2 of 217a6f8)
+2b496a1	fail	24	composer and Maven: OSV not asked
+2b496a1	fail	17	composer and Maven: OSV's advisories ignored
+2b496a1	fail	16	composer: Packagist not asked
+2b496a1	fail	16	composer: an entry other than Packagist's release accepted
+2b496a1	fail	17	composer.lock: keys Ludion does not check accepted
+2b496a1	fail	17	PHP: Docker Hub not asked
+2b496a1	fail	17	PHP: another digest under the tag accepted
+2b496a1	fail	17	composer.lock: a new notification-url accepted
+2b496a1	fail	17	composer.lock: a name listed twice accepted
+2b496a1	fail	17	composer.lock: a removed package accepted
+2b496a1	fail	17	composer.lock: another top-level key accepted
+2b496a1	fail	17	the push forced
+2b496a1	fail	17	the token in the push's arguments
+2b496a1	fail	17	a run off the default branch opens PRs
+2b496a1	fail	17	a checkout at another commit accepted
+2b496a1	fail	17	another author accepted
+2b496a1	fail	17	another subject accepted
+2b496a1	fail	17	another branch name accepted
+2b496a1	fail	17	an npm fix without the judge's ready_except_build accepted
+2b496a1	fail	17	a fix whose tests failed accepted
+2b496a1	fail	17	another base_commit accepted
+2b496a1	fail	51	an oversized bundle accepted
+2b496a1	fail	16	any advisory text accepted
+2b496a1	fail	17	advisories of any prefix accepted (GH-1)
+2b496a1	fail	16	the parents read from the raw headers, not from Git
+2b496a1	fail	22	headers out of Git's order accepted
+2b496a1	fail	22	git fsck not run
+2b496a1	fail	29	a changed file of any size accepted
+2b496a1	fail	20	npm: a from the base's lock does not have accepted
+2b496a1	fail	17	npm: a lock without the fix's version at the planned path accepted
+2b496a1	fail	17	npm: a lock that still has the moved version accepted
+2b496a1	fail	17	npm: a lock key that is not an install path accepted (B1)
+2b496a1	fail	16	npm: a new package nothing requires accepted (N-a)
+2b496a1	fail	17	npm: a removed lock entry accepted (N-a)
+2b496a1	fail	17	npm: an added link or folder accepted (N-a)
+2b496a1	fail	17	npm: the root's other requirements changed (N-a)
+2b496a1	fail	17	npm: an alias of another package at the planned path accepted (N-a c)
+2b496a1	fail	17	npm: from matched against any package's versions (R5)
+2b496a1	fail	16	npm: the registry not asked about moved and added entries (B1 A)
+2b496a1	fail	15	npm: an entry's requirements other than the registry's accepted (B1 A)
+2b496a1	fail	16	npm: an entry the registry does not list accepted (B1 A)
+2b496a1	fail	17	npm: another package loading another copy accepted (B1 B)
+2b496a1	fail	18	npm: the lock not read as the judge reads it (N3)
+2b496a1	fail	1	lock views: a disagreeing npm 6 tree accepted
+2b496a1	fail	1	lock views: the npm 6 tree not walked
+2b496a1	fail	1	lock views: a link's children read under the link, not its folder
+2b496a1	fail	1	lock views: an alias read without its real name
+2b496a1	fail	1	lock: another lockfileVersion read
+2b496a1	fail	1	lock: a top-level key npm does not write read
+2b496a1	fail	16	lock views: the review's tree attack through the PR job
+2b496a1	fail	17	npm: the top-level lockfileVersion changed
+2b496a1	fail	17	npm: a base with npm-shrinkwrap.json accepted
+2b496a1	fail	1	judge: package-lock.json judged beside npm-shrinkwrap.json
+2b496a1	fail	1	lock views: the tree's requires not compared
+2b496a1	fail	17	lock views: the tree's requires attack through the PR job
+2b496a1	fail	1	lock views: the flags not compared
+2b496a1	fail	1	lock views: a tree key npm does not write read
+2b496a1	fail	1	lock views: a link's requires without its folder's devDependencies
+2b496a1	fail	1	lock views: extraneous and from read in the tree (the closed list)
+2b496a1	fail	1	requirements: an unmet requirement accepted
+2b496a1	fail	16	requirements: an unmet requirement accepted, through the PR job
+2b496a1	fail	1	requirements: a version outside the range accepted
+2b496a1	fail	1	requirements: a copy of another package under the name accepted
+2b496a1	fail	1	requirements: a required peer not looked for
+2b496a1	fail	1	requirements: an optional peer required
+2b496a1	fail	1	requirements: the project's own requirements not looked for
+2b496a1	fail	1	requirements: overrides not read
+2b496a1	fail	1	requirements: a nested override applied everywhere
+2b496a1	fail	1	requirements: an override key's selector ignored (security pass at 549fe1e)
+2b496a1	fail	1	requirements: a nested key's selector ignored (security pass at 549fe1e)
+2b496a1	fail	1	requirements: the base's own unmet requirements refused too
+2b496a1	fail	1	requirements: a peer keyed with its spec (a --legacy-peer-deps lock's move refused)
+2b496a1	fail	21	npm: the PR job does not compare requirements with the base
+2b496a1	fail	1	judge: packageLockInputs does not compare requirements with the base
+2b496a1	fail	17	npm: a moved entry's libc not compared with the registry (N1)
+2b496a1	fail	17	the shadow check reads only an unmoved entry's dependencies (N2, R24)
+2b496a1	fail	17	the shadow check reads only the project's dependencies (N2, R25)
+2b496a1	fail	17	a merge commit with the base as its first parent accepted (N2, R22)
+2b496a1	fail	17	npm: a tree added to a base without one accepted
+2b496a1	fail	17	npm: a moved entry's peerDependencies not compared with the registry (N1)
+2b496a1	fail	17	npm: a moved entry's optionalDependencies not compared with the registry (N1)
+2b496a1	fail	17	the tree read from the raw headers, not from Git (R4)
+2b496a1	fail	3	branch names: a version with "-" kept readable (R16)
+2b496a1	fail	7	packagist: a PKSA ID with a "-" at an end read (N-d)
+2b496a1	fail	17	a closed PR's fix not warned about
+2b496a1	fail	17	deliver open does not print the warnings
+2b496a1	fail	3	branch names: cleaned names merged again (no hash)
+2b496a1	fail	17	a bundle without an applied fix accepted
+2b496a1	fail	22	pack: a branch not at the receipt's commit packed
+2b496a1	fail	1	scheduled modes: a self-hosted runner accepted
+2b496a1	fail	1	template: setup-node's cache in the validation job
+2b496a1	fail	1	template: setup-node's cache in the PR job
+2b496a1	fail	1	patch mode: an OIDC token allowed
+2b496a1	fail	1	template: the validation job may write
+2b496a1	fail	1	action: the checkout keeps the credential
+2b496a1	fail	1	action: the validation step gets the token
+2b496a1	fail	1	lock views: devOptional and peer refused in the tree (B1; npm 7 to 11 write them)
+2b496a1	fail	1	lock views: the tree's requires compared by spec (an override's spec in the tree refused)
+2b496a1	fail	1	lock views: devOptional and peer not compared between the views
+2b496a1	fail	1	requirements: an overridden copy taken by the requirement's own range (B2)
+2b496a1	fail	1	requirements: a tree alias read under its path's name (M18, N4)
+2b496a1	fail	1	requirements: an override key counting for every name (M22, N4)
+2b496a1	fail	18	npm: a moved entry's peerDependenciesMeta not compared with the registry (N1)
+2b496a1	fail	1	requirements: another package at a location accepted, against the corpus's V3
+2b496a1	fail	1	requirements: an alias read under its location's name, against the corpus's alias locks
+0059cb3	fail	12	a parent other than the base accepted
+0059cb3	fail	12	files outside the receipt's list accepted
+0059cb3	fail	12	a file the plan may not change accepted
+0059cb3	fail	12	a new file or a changed mode accepted
+0059cb3	fail	12	an executable mode refused (a checkout from a file system without modes)
+0059cb3	fail	12	extra branches in the bundle accepted
+0059cb3	fail	12	bytes other than the receipt's accepted
+0059cb3	fail	12	a second PR while one is open
+0059cb3	fail	12	a closed fix opened again
+0059cb3	fail	12	a PR opened on a branch that holds another commit
+0059cb3	fail	13	a branch with another change reused
+0059cb3	fail	12	the message beyond its subject accepted
+0059cb3	fail	11	what the files say not checked
+0059cb3	fail	12	npm: the judge's second refusal ignored
+0059cb3	fail	11	npm: the judge not run again
+0059cb3	fail	12	manifest: another package.json accepted
+0059cb3	fail	13	PHP: more than the FROM image accepted
+0059cb3	fail	12	PHP: an older or other-branch release accepted
+0059cb3	fail	12	composer.lock: another package changed
+0059cb3	fail	12	composer.lock: a plugin accepted
+0059cb3	fail	12	composer.lock: a new package from any archive accepted
+0059cb3	fail	13	composer.lock: the planned package from another repository accepted
+0059cb3	fail	12	composer.lock: a new package nothing requires accepted
+0059cb3	timeout	300	composer: the backtracking name pattern (CodeQL js/redos) back
+0059cb3	fail	12	composer and Maven: a downgrade accepted
+0059cb3	fail	12	composer: a from the base does not lock accepted
+0059cb3	fail	12	npm: the entry's own name not read (an alias of the package not planned, B2 of 217a6f8)
+0059cb3	fail	11	composer and Maven: OSV not asked
+0059cb3	fail	12	composer and Maven: OSV's advisories ignored
+0059cb3	fail	11	composer: Packagist not asked
+0059cb3	fail	12	composer: an entry other than Packagist's release accepted
+0059cb3	fail	12	composer.lock: keys Ludion does not check accepted
+0059cb3	fail	12	PHP: Docker Hub not asked
+0059cb3	fail	12	PHP: another digest under the tag accepted
+0059cb3	fail	12	composer.lock: a new notification-url accepted
+0059cb3	fail	12	composer.lock: a name listed twice accepted
+0059cb3	fail	12	composer.lock: a removed package accepted
+0059cb3	fail	12	composer.lock: another top-level key accepted
+0059cb3	fail	12	the push forced
+0059cb3	fail	12	the token in the push's arguments
+0059cb3	fail	12	a run off the default branch opens PRs
+0059cb3	fail	12	a checkout at another commit accepted
+0059cb3	fail	12	another author accepted
+0059cb3	fail	12	another subject accepted
+0059cb3	fail	12	another branch name accepted
+0059cb3	fail	12	an npm fix without the judge's ready_except_build accepted
+0059cb3	fail	12	a fix whose tests failed accepted
+0059cb3	fail	12	another base_commit accepted
+0059cb3	fail	35	an oversized bundle accepted
+0059cb3	fail	12	any advisory text accepted
+0059cb3	fail	12	advisories of any prefix accepted (GH-1)
+0059cb3	fail	12	the parents read from the raw headers, not from Git
+0059cb3	fail	12	headers out of Git's order accepted
+0059cb3	fail	12	git fsck not run
+0059cb3	fail	13	a changed file of any size accepted
+0059cb3	fail	12	npm: a from the base's lock does not have accepted
+0059cb3	fail	12	npm: a lock without the fix's version at the planned path accepted
+0059cb3	fail	12	npm: a lock that still has the moved version accepted
+0059cb3	fail	12	npm: a lock key that is not an install path accepted (B1)
+0059cb3	fail	12	npm: a new package nothing requires accepted (N-a)
+0059cb3	fail	12	npm: a removed lock entry accepted (N-a)
+0059cb3	fail	12	npm: an added link or folder accepted (N-a)
+0059cb3	fail	12	npm: the root's other requirements changed (N-a)
+0059cb3	fail	12	npm: an alias of another package at the planned path accepted (N-a c)
+0059cb3	fail	12	npm: from matched against any package's versions (R5)
+0059cb3	fail	11	npm: the registry not asked about moved and added entries (B1 A)
+0059cb3	fail	11	npm: an entry's requirements other than the registry's accepted (B1 A)
+0059cb3	fail	12	npm: an entry the registry does not list accepted (B1 A)
+0059cb3	fail	12	npm: another package loading another copy accepted (B1 B)
+0059cb3	fail	12	npm: the lock not read as the judge reads it (N3)
+0059cb3	fail	1	lock views: a disagreeing npm 6 tree accepted
+0059cb3	fail	1	lock views: the npm 6 tree not walked
+0059cb3	fail	1	lock views: a link's children read under the link, not its folder
+0059cb3	fail	1	lock views: an alias read without its real name
+0059cb3	fail	1	lock: another lockfileVersion read
+0059cb3	fail	1	lock: a top-level key npm does not write read
+0059cb3	fail	12	lock views: the review's tree attack through the PR job
+0059cb3	fail	10	npm: the top-level lockfileVersion changed
+0059cb3	fail	1	npm: a base with npm-shrinkwrap.json accepted
+0059cb3	fail	1	judge: package-lock.json judged beside npm-shrinkwrap.json
+0059cb3	fail	1	lock views: the tree's requires not compared
+0059cb3	fail	1	lock views: the tree's requires attack through the PR job
+0059cb3	fail	1	lock views: the flags not compared
+0059cb3	fail	1	lock views: a tree key npm does not write read
+0059cb3	fail	1	lock views: a link's requires without its folder's devDependencies
+0059cb3	fail	1	lock views: extraneous and from read in the tree (the closed list)
+0059cb3	fail	1	requirements: an unmet requirement accepted
+0059cb3	fail	1	requirements: an unmet requirement accepted, through the PR job
+0059cb3	fail	1	requirements: a version outside the range accepted
+0059cb3	fail	1	requirements: a copy of another package under the name accepted
+0059cb3	fail	1	requirements: a required peer not looked for
+0059cb3	fail	1	requirements: an optional peer required
+0059cb3	fail	1	requirements: the project's own requirements not looked for
+0059cb3	fail	1	requirements: overrides not read
+0059cb3	fail	1	requirements: a nested override applied everywhere
+0059cb3	fail	1	requirements: an override key's selector ignored (security pass at 549fe1e)
+0059cb3	fail	1	requirements: a nested key's selector ignored (security pass at 549fe1e)
+0059cb3	fail	1	requirements: the base's own unmet requirements refused too
+0059cb3	fail	1	requirements: a peer keyed with its spec (a --legacy-peer-deps lock's move refused)
+0059cb3	fail	1	npm: the PR job does not compare requirements with the base
+0059cb3	fail	1	judge: packageLockInputs does not compare requirements with the base
+0059cb3	fail	1	npm: a moved entry's libc not compared with the registry (N1)
+0059cb3	fail	1	the shadow check reads only an unmoved entry's dependencies (N2, R24)
+0059cb3	fail	1	the shadow check reads only the project's dependencies (N2, R25)
+0059cb3	fail	1	a merge commit with the base as its first parent accepted (N2, R22)
+0059cb3	fail	1	npm: a tree added to a base without one accepted
+0059cb3	fail	1	npm: a moved entry's peerDependencies not compared with the registry (N1)
+0059cb3	fail	1	npm: a moved entry's optionalDependencies not compared with the registry (N1)
+0059cb3	fail	1	the tree read from the raw headers, not from Git (R4)
+0059cb3	fail	1	branch names: a version with "-" kept readable (R16)
+0059cb3	fail	1	packagist: a PKSA ID with a "-" at an end read (N-d)
+0059cb3	fail	1	a closed PR's fix not warned about
+0059cb3	fail	1	deliver open does not print the warnings
+0059cb3	fail	1	branch names: cleaned names merged again (no hash)
+0059cb3	fail	1	a bundle without an applied fix accepted
+0059cb3	fail	1	pack: a branch not at the receipt's commit packed
+0059cb3	fail	1	scheduled modes: a self-hosted runner accepted
+0059cb3	fail	1	template: setup-node's cache in the validation job
+0059cb3	fail	1	template: setup-node's cache in the PR job
+0059cb3	fail	1	patch mode: an OIDC token allowed
+0059cb3	fail	1	template: the validation job may write
+0059cb3	fail	1	action: the checkout keeps the credential
+0059cb3	fail	1	action: the validation step gets the token
+0059cb3	fail	1	lock views: devOptional and peer refused in the tree (B1; npm 7 to 11 write them)
+0059cb3	fail	1	lock views: the tree's requires compared by spec (an override's spec in the tree refused)
+0059cb3	fail	1	lock views: devOptional and peer not compared between the views
+0059cb3	fail	1	requirements: an overridden copy taken by the requirement's own range (B2)
+0059cb3	fail	1	requirements: a tree alias read under its path's name (M18, N4)
+0059cb3	fail	1	requirements: an override key counting for every name (M22, N4)
+0059cb3	fail	1	npm: a moved entry's peerDependenciesMeta not compared with the registry (N1)
+0059cb3	fail	1	requirements: another package at a location accepted, against the corpus's V3
+0059cb3	fail	1	requirements: an alias read under its location's name, against the corpus's alias locks
+0059cb3	fail	1	npm: an unplanned entry's flags compared with the base's again (B1)
+0059cb3	fail	1	npm: an unplanned entry's other keys not compared when its flags change
+0059cb3	fail	1	npm: a flag that is not true accepted
+0059cb3	fail	1	npm: inBundle counted as a flag
+0059cb3	fail	1	npm: an entry whose flags alone changed compared with the registry again
+ddef04c	fail	18	a parent other than the base accepted
+1d28399	fail	18	a parent other than the base accepted
+1d28399	fail	18	files outside the receipt's list accepted
+1d28399	fail	18	a file the plan may not change accepted
+1d28399	fail	18	a new file or a changed mode accepted
+1d28399	fail	18	an executable mode refused (a checkout from a file system without modes)
+1d28399	fail	19	extra branches in the bundle accepted
+1d28399	fail	19	bytes other than the receipt's accepted
+1d28399	fail	18	a second PR while one is open
+1d28399	fail	18	a closed fix opened again
+1d28399	fail	18	a PR opened on a branch that holds another commit
+1d28399	fail	18	a branch with another change reused
+1d28399	fail	18	the message beyond its subject accepted
+1d28399	fail	17	what the files say not checked
+1d28399	fail	18	npm: the judge's second refusal ignored
+1d28399	fail	18	npm: the judge not run again
+1d28399	fail	24	manifest: another package.json accepted
+1d28399	fail	24	PHP: more than the FROM image accepted
+1d28399	fail	24	PHP: an older or other-branch release accepted
+1d28399	fail	18	composer.lock: another package changed
+1d28399	fail	18	composer.lock: a plugin accepted
+1d28399	fail	18	composer.lock: a new package from any archive accepted
+1d28399	fail	18	composer.lock: the planned package from another repository accepted
+1d28399	fail	18	composer.lock: a new package nothing requires accepted
+1d28399	timeout	300	composer: the backtracking name pattern (CodeQL js/redos) back
+1d28399	fail	18	composer and Maven: a downgrade accepted
+1d28399	fail	18	composer: a from the base does not lock accepted
+1d28399	fail	18	npm: another lock entry changing accepted
+1d28399	fail	18	npm: the entry's own name not read (an alias of the package not planned, B2 of 217a6f8)
+1d28399	fail	17	composer and Maven: OSV not asked
+1d28399	fail	18	composer and Maven: OSV's advisories ignored
+1d28399	fail	17	composer: Packagist not asked
+1d28399	fail	17	composer: an entry other than Packagist's release accepted
+1d28399	fail	18	composer.lock: keys Ludion does not check accepted
+1d28399	fail	19	PHP: another digest under the tag accepted
+1d28399	fail	18	composer.lock: a new notification-url accepted
+1d28399	fail	18	composer.lock: a name listed twice accepted
+1d28399	fail	18	composer.lock: a removed package accepted
+1d28399	fail	18	composer.lock: another top-level key accepted
+1d28399	fail	19	the push forced
+1d28399	fail	19	the token in the push's arguments
+1d28399	fail	19	a run off the default branch opens PRs
+1d28399	fail	19	a checkout at another commit accepted
+1d28399	fail	19	another author accepted
+1d28399	fail	20	another subject accepted
+1d28399	fail	41	another branch name accepted
+1d28399	fail	19	an npm fix without the judge's ready_except_build accepted
+1d28399	fail	19	a fix whose tests failed accepted
+1d28399	fail	19	another base_commit accepted
+1d28399	fail	54	an oversized bundle accepted
+1d28399	fail	18	any advisory text accepted
+1d28399	fail	19	advisories of any prefix accepted (GH-1)
+1d28399	fail	18	the parents read from the raw headers, not from Git
+1d28399	fail	19	headers out of Git's order accepted
+1d28399	fail	19	git fsck not run
+1d28399	fail	19	a changed file of any size accepted
+1d28399	fail	19	npm: a from the base's lock does not have accepted
+1d28399	fail	19	npm: a lock without the fix's version at the planned path accepted
+1d28399	fail	19	npm: a lock that still has the moved version accepted
+1d28399	fail	19	npm: a lock key that is not an install path accepted (B1)
+1d28399	fail	19	npm: a new package nothing requires accepted (N-a)
+1d28399	fail	20	npm: a removed lock entry accepted (N-a)
+1d28399	fail	20	npm: an added link or folder accepted (N-a)
+1d28399	fail	27	npm: the root's other requirements changed (N-a)
+1d28399	fail	27	npm: an alias of another package at the planned path accepted (N-a c)
+1d28399	fail	19	npm: from matched against any package's versions (R5)
+1d28399	fail	17	npm: the registry not asked about moved and added entries (B1 A)
+1d28399	fail	17	npm: an entry's requirements other than the registry's accepted (B1 A)
+1d28399	fail	18	npm: an entry the registry does not list accepted (B1 A)
+1d28399	fail	19	npm: another package loading another copy accepted (B1 B)
+1d28399	fail	19	npm: the lock not read as the judge reads it (N3)
+1d28399	fail	1	lock views: a disagreeing npm 6 tree accepted
+1d28399	fail	1	lock views: the npm 6 tree not walked
+1d28399	fail	1	lock views: a link's children read under the link, not its folder
+1d28399	fail	1	lock views: an alias read without its real name
+1d28399	fail	1	lock: another lockfileVersion read
+1d28399	fail	1	lock: a top-level key npm does not write read
+1d28399	fail	18	lock views: the review's tree attack through the PR job
+1d28399	fail	18	npm: the top-level lockfileVersion changed
+1d28399	fail	19	npm: a base with npm-shrinkwrap.json accepted
+1d28399	fail	1	judge: package-lock.json judged beside npm-shrinkwrap.json
+1d28399	fail	1	lock views: the tree's requires not compared
+1d28399	fail	19	lock views: the tree's requires attack through the PR job
+1d28399	fail	1	lock views: the flags not compared
+1d28399	fail	1	lock views: a tree key npm does not write read
+1d28399	fail	1	lock views: a link's requires without its folder's devDependencies
+1d28399	fail	1	lock views: extraneous and from read in the tree (the closed list)
+1d28399	fail	1	requirements: an unmet requirement accepted
+1d28399	fail	18	requirements: an unmet requirement accepted, through the PR job
+1d28399	fail	1	requirements: a version outside the range accepted
+1d28399	fail	1	requirements: a copy of another package under the name accepted
+1d28399	fail	1	requirements: a required peer not looked for
+1d28399	fail	1	requirements: an optional peer required
+1d28399	fail	1	requirements: the project's own requirements not looked for
+1d28399	fail	1	requirements: overrides not read
+1d28399	fail	1	requirements: a nested override applied everywhere
+1d28399	fail	1	requirements: an override key's selector ignored (security pass at 549fe1e)
+1d28399	fail	1	requirements: a nested key's selector ignored (security pass at 549fe1e)
+1d28399	fail	1	requirements: the base's own unmet requirements refused too
+1d28399	fail	1	requirements: a peer keyed with its spec (a --legacy-peer-deps lock's move refused)
+1d28399	fail	18	npm: the PR job does not compare requirements with the base
+1d28399	fail	1	judge: packageLockInputs does not compare requirements with the base
+1d28399	fail	18	npm: a moved entry's libc not compared with the registry (N1)
+1d28399	fail	19	the shadow check reads only an unmoved entry's dependencies (N2, R24)
+1d28399	fail	18	the shadow check reads only the project's dependencies (N2, R25)
+1d28399	fail	18	a merge commit with the base as its first parent accepted (N2, R22)
+1d28399	fail	18	npm: a tree added to a base without one accepted
+1d28399	fail	18	npm: a moved entry's peerDependencies not compared with the registry (N1)
+1d28399	fail	18	npm: a moved entry's optionalDependencies not compared with the registry (N1)
+1d28399	fail	18	the tree read from the raw headers, not from Git (R4)
+1d28399	fail	3	branch names: a version with "-" kept readable (R16)
+1d28399	fail	7	packagist: a PKSA ID with a "-" at an end read (N-d)
+1d28399	fail	18	a closed PR's fix not warned about
+1d28399	fail	18	deliver open does not print the warnings
+1d28399	fail	3	branch names: cleaned names merged again (no hash)
+1d28399	fail	18	a bundle without an applied fix accepted
+1d28399	fail	19	pack: a branch not at the receipt's commit packed
+1d28399	fail	1	scheduled modes: a self-hosted runner accepted
+1d28399	fail	1	template: setup-node's cache in the validation job
+1d28399	fail	1	template: setup-node's cache in the PR job
+1d28399	fail	1	patch mode: an OIDC token allowed
+1d28399	fail	1	template: the validation job may write
+1d28399	fail	1	action: the checkout keeps the credential
+1d28399	fail	1	action: the validation step gets the token
+1d28399	fail	1	lock views: devOptional and peer refused in the tree (B1; npm 7 to 11 write them)
+1d28399	fail	1	lock views: the tree's requires compared by spec (an override's spec in the tree refused)
+1d28399	fail	1	lock views: devOptional and peer not compared between the views
+1d28399	fail	1	requirements: an overridden copy taken by the requirement's own range (B2)
+1d28399	fail	1	requirements: a tree alias read under its path's name (M18, N4)
+1d28399	fail	1	requirements: an override key counting for every name (M22, N4)
+1d28399	fail	18	npm: a moved entry's peerDependenciesMeta not compared with the registry (N1)
+1d28399	fail	1	requirements: another package at a location accepted, against the corpus's V3
+1d28399	fail	1	requirements: an alias read under its location's name, against the corpus's alias locks
+1d28399	fail	25	npm: an unplanned entry's flags compared with the base's again (B1)
+1d28399	fail	21	npm: an unplanned entry's other keys not compared when its flags change
+1d28399	fail	27	npm: a flag that is not true accepted
+1d28399	fail	20	npm: inBundle counted as a flag
+1d28399	fail	18	npm: an entry whose flags alone changed compared with the registry again
+01ad089	fail	18	PHP: Docker Hub not asked

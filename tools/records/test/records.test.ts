@@ -55,6 +55,42 @@ describe("docs/mistakes/", () => {
   });
 });
 
+const exists = (path: string) => { try { statSync(new URL(path, root)); return true; } catch { return false; } };
+/**
+ * The files a record cites that are not in the tree: a bench README's own `logs/…` files (relative to its folder), and
+ * any `docs/bench/…` path. A test runs on a fresh checkout in CI, so a cited log that .gitignore's `*.log` kept out of
+ * the commit fails it (docs/mistakes/2026-10-30-cited-logs-not-committed.md). Placeholders (`logs/tests-<commit>.txt`)
+ * are not paths.
+ */
+function missingCited(name: string, text: string, dir: string | null): string[] {
+  const out: string[] = [];
+  if (dir !== null) for (const [path] of text.matchAll(/(?<![\w/.-])logs\/[A-Za-z0-9_./-]*\.[a-z0-9]+(?![\w<])/g)) if (!exists(`${dir}/${path}`)) out.push(`${name}: ${path}`);
+  for (const [path] of text.matchAll(/(?<![\w/.-])docs\/bench\/[A-Za-z0-9_./-]*[A-Za-z0-9_](?![\w<])/g)) if (!exists(path)) out.push(`${name}: ${path}`);
+  return [...new Set(out)];
+}
+
+describe("docs/bench/ and docs/progress/", () => {
+  it("cite only files that are in the tree", () => {
+    const missing: string[] = [];
+    for (const folder of readdirSync(new URL("docs/bench/", root))) {
+      const readme = `docs/bench/${folder}/README.md`;
+      if (isFile(readme)) missing.push(...missingCited(readme, read(readme), `docs/bench/${folder}`));
+    }
+    // From 2026-10-27: the earlier records cite the lesson product's bench folders, which were removed with it and are
+    // kept in the tag archive/lessons-2026-10-27 (CLAUDE.md, Engineering and security).
+    for (const name of readdirSync(new URL("docs/progress/", root)).filter(n => n.endsWith(".md") && n >= "2026-10-27")) {
+      missing.push(...missingCited(`docs/progress/${name}`, read(`docs/progress/${name}`), null));
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it("fails a record that cites a log or a bench file that is not there", () => {
+    const dir = "docs/bench/2026-10-30-lb-design";
+    expect(missingCited("r.md", "Log: `logs/gone.log`; `logs/tests-<commit>.txt`; npm-cache/_logs/x.log; `logs/test-lb2a.log`.", dir)).toEqual(["r.md: logs/gone.log"]);
+    expect(missingCited("p.md", "See docs/bench/2026-10-30-lb-design/logs/gone.log and docs/bench/2026-10-30-lb-design/README.md.", null)).toEqual(["p.md: docs/bench/2026-10-30-lb-design/logs/gone.log"]);
+  });
+});
+
 describe("CLAUDE.md", () => {
   const claude = read("CLAUDE.md");
 

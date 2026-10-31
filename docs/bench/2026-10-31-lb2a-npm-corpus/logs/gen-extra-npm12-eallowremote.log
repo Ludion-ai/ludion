@@ -1,0 +1,4 @@
+npm error code EALLOWREMOTE
+npm error Fetching packages of type "remote" have been disabled
+npm error Refusing to fetch "https://registry.npmjs.org/npm/-/npm-10.9.2.tgz"
+npm error A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-31T05_14_44_561Z-debug-0.log

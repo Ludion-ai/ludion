@@ -11,6 +11,7 @@
 # Nothing is merged. PRs opened with the workflow's token start no CI; start it before merging. A fix that fails, waits
 # or is stopped makes the patch job fail on every run until that changes; its reasons are in the ludion-fixes artifact.
 #
+# Both jobs need GitHub-hosted runners (a fresh machine per job); the action refuses a self-hosted one.
 # Pin Ludion by a release commit's full SHA. No release exists yet: the SHA below is a placeholder.
 name: ludion
 

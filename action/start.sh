@@ -40,6 +40,12 @@ case "$MODE" in
       echo "::error::mode ${MODE} runs on the default branch (${DEFAULT_BRANCH}), not ${REF}."
       exit 1
     fi
+    # The split between the job that runs candidate code and the job that writes holds only when each job gets a fresh
+    # machine: on a self-hosted runner, a sandbox escape in mode patch could stay for the job that holds the write token.
+    if [ "${RUNNER_ENVIRONMENT:-}" != "github-hosted" ]; then
+      echo "::error::mode ${MODE} runs only on GitHub-hosted runners (a fresh machine per job), not on ${RUNNER_ENVIRONMENT:-an unknown runner}."
+      exit 1
+    fi
     if [ "$MODE" = "patch" ]; then
       # The job that runs candidate code holds no secret: an OIDC token request means id-token: write was granted.
       if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then

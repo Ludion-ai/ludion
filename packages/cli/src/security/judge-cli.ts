@@ -5,7 +5,7 @@ import { join } from "node:path";
 import semver from "semver";
 import { fromPnpmLock } from "../lockfile.ts";
 import { parseArgs } from "node:util";
-import { allChanges, declaredByProject, judge, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, renderJudgement, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
+import { allChanges, declaredByProject, judge, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, newUnmetRequirements, renderJudgement, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
 import { gatherFacts } from "./npm-facts.ts";
 import { regularFile, rootPath } from "./project.ts";
 import { workspaceDir, workspaceManifestChanges } from "./workspace-manifests.ts";
@@ -26,6 +26,9 @@ export async function judgeCli(args: string[]): Promise<number> {
   if (!Number.isFinite(now.getTime())) throw new Error("--now must be an ISO date.");
   // pnpm: read as the set of versions pnpm-lock.yaml adds (pnpmChanges).
   if (!existsSync(join(after, "package-lock.json")) && existsSync(join(after, "pnpm-lock.yaml"))) return pnpm(readText(before, "pnpm-lock.yaml"), readText(after, "pnpm-lock.yaml"), JSON.parse(readText(after, "package.json")), files, now, !!values.json);
+  // npm installs from npm-shrinkwrap.json, not package-lock.json, when both are there: judging package-lock.json would
+  // judge a tree npm does not install.
+  for (const dir of [before, after]) if (existsSync(join(dir, "npm-shrinkwrap.json"))) throw new Error("npm-shrinkwrap.json is there, and npm installs from it instead of package-lock.json; the judge does not read it.");
   const beforeLock = readText(before, "package-lock.json"), afterLock = readText(after, "package-lock.json");
   const beforeManifest = readText(before, "package.json"), afterManifest = readText(after, "package.json");
   const lock = packageLockInputs({ before: beforeLock, after: afterLock }, { before: beforeManifest, after: afterManifest });
@@ -48,6 +51,11 @@ export async function judgeCli(args: string[]): Promise<number> {
  */
 export function packageLockInputs(lock: { before: string; after: string }, manifest: { before: string; after: string }) {
   const beforeEntries = lockEntries(lock.before), afterEntries = lockEntries(lock.after);
+  // A requirement the change leaves unmet would be fetched, unpinned and unjudged, by npm install; one the project
+  // already leaves unmet (overrides aside, a --legacy-peer-deps lock) is its own (judge.ts, newUnmetRequirements).
+  const parse = (text: string): unknown => { try { return JSON.parse(text); } catch { return undefined; } };
+  const unmet = newUnmetRequirements({ lock: lock.before, manifest: parse(manifest.before) }, { lock: lock.after, manifest: parse(manifest.after) });
+  if (unmet.length) throw new Error(`The change leaves a requirement unmet that npm install would fetch: ${unmet.slice(0, 3).join(" ")}`);
   const hadLinks = new Set(lockLinks(lock.before));
   const extraneousBefore = lockExtraneous(lock.before), extraneousAfter = lockExtraneous(lock.after);
   return {

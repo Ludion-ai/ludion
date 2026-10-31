@@ -107,11 +107,239 @@ export function installScripts(scripts: unknown): string[] {
   return LIFECYCLE.filter(name => typeof (scripts as Record<string, unknown>)[name] === "string");
 }
 
-type Lockfile = { lockfileVersion?: unknown; packages?: Record<string, any> };
+/** The top-level keys npm writes in a package-lock v2/v3; any other is refused. */
+const LOCK_KEYS = new Set(["name", "version", "lockfileVersion", "requires", "packages", "dependencies"]);
+
+/**
+ * The `packages` section of a package-lock v2/v3, after checking that every npm installs the same tree from the file.
+ * The judge and the PR job (deliver.ts) read package-lock.json only through this (reviews of aa5d75b and 1e6f705).
+ * - lockfileVersion 2 or 3 only, and no top-level key npm does not write.
+ * - A v2 lock holds the tree twice: `packages` (npm 7 and later) and the nested `dependencies` tree (npm 6). The two
+ *   views must say the same at every install path, under a closed list of the tree's keys.
+ * Anything else throws. Whether the lock meets its own requirements is a comparison with the base: newUnmetRequirements.
+ */
 export function readLock(lockText: string): Record<string, any> {
-  const lock = JSON.parse(lockText) as Lockfile;
-  if (!lock.packages || typeof lock.packages !== "object" || ![2, 3].includes(Number(lock.lockfileVersion))) throw new Error("The judge reads package-lock v2/v3 only.");
-  return lock.packages;
+  const { top } = lockViews(lockText);
+  return top.packages;
+}
+
+/** The parsed lock and its views: `packages`, and the npm 6 tree when npm 6 reads one (else null). */
+function lockViews(lockText: string): { top: Record<string, any>; packagesView: Map<string, ViewEntry>; treeView: Map<string, ViewEntry> | null } {
+  const lock: unknown = JSON.parse(lockText);
+  if (!isPlain(lock)) throw new Error("package-lock.json is not an object.");
+  const top = lock as Record<string, any>;
+  if (!isPlain(top.packages) || (top.lockfileVersion !== 2 && top.lockfileVersion !== 3)) throw new Error("The judge reads package-lock v2/v3 only.");
+  const unknown = Object.keys(top).filter(key => !LOCK_KEYS.has(key));
+  if (unknown.length) throw new Error(`package-lock.json has a top-level key npm does not write: ${unknown.slice(0, 3).join(", ")}.`);
+  const packagesView = viewOfPackages(top.packages);
+  // npm 6 reads the tree of a v2 lock (none at all means it installs nothing from the lock), and of any lock that has one.
+  if (top.lockfileVersion === 3 && top.dependencies === undefined) return { top, packagesView, treeView: null };
+  const treeView = viewOfTree(top.packages, top.dependencies);
+  for (const path of new Set([...packagesView.keys(), ...treeView.keys()])) {
+    const a = packagesView.get(path)?.key, b = treeView.get(path)?.key;
+    if (a !== b) throw new Error(`package-lock.json's packages and its npm 6 dependencies tree disagree at ${path}: ${a === undefined ? "only the dependencies tree has it" : b === undefined ? "only packages has it" : `${a.replaceAll("\0", " ")} against ${b.replaceAll("\0", " ")}`}.`);
+  }
+  return { top, packagesView, treeView };
+}
+
+/**
+ * The requirements a lock leaves unmet (requirementsMet), in each view npm reads, keyed so that the same unmet
+ * requirement in two locks has the same key. `manifest` is the project's package.json: its `overrides` count in the
+ * `packages` view (npm 7 and later), not in the npm 6 tree (npm 6 does not read them).
+ */
+export function unmetRequirements(lockText: string, manifest?: unknown): Map<string, string> {
+  const { top, packagesView, treeView } = lockViews(lockText);
+  const project = isPlain(manifest) ? manifest : {};
+  return new Map([
+    ...(treeView ? requirementsMet(treeView, [], "npm 6 dependencies tree", undefined, project) : []),
+    ...requirementsMet(packagesView, projects(top.packages), "packages", project.overrides, project),
+  ]);
+}
+
+/**
+ * The requirements "after" leaves unmet that "before" did not (docs/decisions/2026-10-31-lock-requirements-against-the-base.md):
+ * npm `install` fetches from the registry, unpinned, whatever a lock leaves missing or outside its range, so a change
+ * that adds such a requirement is refused (reviews of ebfe89d, B1). One the base already has (a `--legacy-peer-deps`
+ * lock) is the project's own. `ludion judge`, npm `patch`'s judge and the PR job all ask this.
+ */
+export function newUnmetRequirements(before: { lock: string; manifest?: unknown }, after: { lock: string; manifest?: unknown }): string[] {
+  const had = unmetRequirements(before.lock, before.manifest);
+  return [...unmetRequirements(after.lock, after.manifest)].filter(([key]) => !had.has(key)).map(([, message]) => message);
+}
+
+const isPlain = (value: unknown): value is Record<string, any> => !!value && typeof value === "object" && !Array.isArray(value);
+
+/**
+ * The keys of an entry of the npm 6 `dependencies` tree, a closed list; any other is refused. npm 7 to 11 write
+ * `devOptional` and `peer` there too (the npm corpus, docs/decisions/2026-10-31-lock-corpus-against-npm.md; review
+ * 6533374683, B1).
+ */
+const TREE_KEYS = new Set(["version", "resolved", "integrity", "dev", "optional", "devOptional", "peer", "bundled", "requires", "dependencies"]);
+/** The flags both views carry, as the tree names them (`packages` calls `bundled` `inBundle`); absent means false. */
+const TREE_FLAGS = ["dev", "optional", "devOptional", "peer", "bundled"];
+
+/**
+ * One install path as a view says it. `key` is what the two views compare: "version\0resolved\0integrity\0flags\0requires".
+ * `name` and `version` are the package a requirement finds there (an alias's real name; a link's folder's), `dir` is
+ * where its own requirements are looked up from, and `needs` are those requirements as [name, spec]; `peers` names the
+ * ones that are peers.
+ */
+type ViewEntry = { path: string; key: string; name: string; version: string; link: boolean; dir: string; needs: [string, string][]; peers?: Set<string> };
+
+/** `peerDependencies` that `peerDependenciesMeta` does not mark optional, which npm 7 and later install. */
+function requiredPeers(item: Record<string, any>): [string, string][] {
+  const meta = isPlain(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {};
+  return requirementList(item.peerDependencies).filter(([name]) => !(isPlain(meta[name]) && meta[name].optional === true));
+}
+
+/** Requirement groups as one list of [name, spec], sorted by name. A Map, not an object: a "__proto__" key stays a key. */
+function requirementList(...groups: unknown[]): [string, string][] {
+  return [...new Map(groups.flatMap(group => isPlain(group) ? Object.entries(group).map(([n, s]) => [n, typeof s === "string" ? s : `<${JSON.stringify(s)}>`] as [string, string]) : [])).entries()]
+    .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+}
+const field = (value: unknown) => typeof value === "string" ? value : value === undefined ? "" : `<${JSON.stringify(value)}>`;
+
+/**
+ * `packages` as a view: every install path. A tree entry's `requires` is the entry's `dependencies` and
+ * `optionalDependencies` (a link's: its folder's, `devDependencies` included, as npm writes it); npm 7 and later also
+ * install an entry's peers, so the requirements it must find include its `peerDependencies` that `peerDependenciesMeta`
+ * does not mark optional. npm writes no flags on a link.
+ */
+function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
+  const view = new Map<string, ViewEntry>();
+  for (const [path, item] of Object.entries(packages)) {
+    if (lockKey(path, item) !== "install") continue;
+    if (!isPlain(item)) throw new Error(`Unexpected package-lock entry at ${path}.`);
+    const folder = item.link && typeof item.resolved === "string" && Object.hasOwn(packages, item.resolved) && isPlain(packages[item.resolved]) ? packages[item.resolved] : undefined;
+    const alias = typeof item.name === "string" && item.name !== requireName(path);
+    const version = item.link ? `file:${field(item.resolved)}` : alias ? `npm:${item.name}@${field(item.version)}` : field(item.version);
+    const flags = item.link ? "" : TREE_FLAGS.filter(flag => (flag === "bundled" ? item.inBundle : item[flag]) === true).join(",");
+    const requires = item.link ? requirementList(folder?.dependencies, folder?.optionalDependencies, folder?.devDependencies) : requirementList(item.dependencies, item.optionalDependencies);
+    const peers = item.link ? [] : requiredPeers(item);
+    view.set(path, {
+      // The requirements by name: a v2 lock's npm 6 tree writes the spec an override gives (`requires`), `packages` the
+      // package's own; whether each copy is what its spec asks is requirementsMet's question, per view.
+      path, key: [version, item.link ? "" : field(item.resolved), item.link ? "" : field(item.integrity), flags, JSON.stringify(requires.map(([name]) => name))].join("\0"),
+      name: item.link ? (typeof folder?.name === "string" ? folder.name : requireName(path)) : alias ? item.name : requireName(path),
+      version: item.link ? field(folder?.version) : field(item.version), link: item.link === true,
+      dir: item.link ? `${field(item.resolved)}/` : `${path}/`, needs: [...requires, ...peers], peers: new Set(peers.map(([name]) => name)),
+    });
+  }
+  return view;
+}
+
+/**
+ * The project and its folders (workspaces, local packages), which require from `packages` too: devDependencies
+ * included, and the peers npm 7 and later install for them (review 6529858505, N4).
+ */
+function projects(packages: Record<string, any>): ViewEntry[] {
+  return Object.entries(packages).filter(([path, item]) => isPlain(item) && (lockKey(path, item) === "root" || lockKey(path, item) === "folder")).map(([path, item]) => {
+    const peers = requiredPeers(item);
+    return { path, key: "", name: "", version: "", link: false, dir: path ? `${path}/` : "", needs: [...requirementList(item.dependencies, item.optionalDependencies, item.devDependencies), ...peers], peers: new Set(peers.map(([name]) => name)) };
+  });
+}
+
+/**
+ * The npm 6 tree as a view. Its entry `b` inside `a` is node_modules/a/node_modules/b; inside a link (version
+ * "file:<folder>"), its children are in <folder>/node_modules. An alias is "npm:<name>@<version>". Only the keys of
+ * TREE_KEYS, flags that are `true`, and `requires` that are specs are read; anything else throws.
+ */
+function viewOfTree(packages: Record<string, any>, tree: unknown): Map<string, ViewEntry> {
+  const view = new Map<string, ViewEntry>();
+  if (tree === undefined) return view;
+  const walk = (level: unknown, prefix: string) => {
+    if (!isPlain(level)) throw new Error(`package-lock.json's dependencies tree is not an object under ${prefix || "the root"}.`);
+    for (const [name, entry] of Object.entries(level)) {
+      const path = `${prefix}node_modules/${name}`;
+      if (!isPlain(entry)) throw new Error(`Unexpected package-lock dependencies entry at ${path}.`);
+      if (view.has(path)) throw new Error(`package-lock.json's dependencies tree has ${path} twice.`);
+      const unknown = Object.keys(entry).filter(key => !TREE_KEYS.has(key));
+      if (unknown.length) throw new Error(`package-lock.json's dependencies tree gives ${path} a key npm does not write: ${unknown.slice(0, 3).join(", ")}.`);
+      const odd = TREE_FLAGS.filter(flag => entry[flag] !== undefined && entry[flag] !== true);
+      if (odd.length) throw new Error(`package-lock.json's dependencies tree gives ${path} a flag that is not true: ${odd.join(", ")}.`);
+      if (entry.requires !== undefined && (!isPlain(entry.requires) || Object.values(entry.requires).some(spec => typeof spec !== "string"))) throw new Error(`package-lock.json's dependencies tree gives ${path} requires that are not a list of specs.`);
+      const linked = Object.hasOwn(packages, path) && isPlain(packages[path]) && packages[path].link === true ? packages[path] : undefined;
+      const folder = linked && typeof linked.resolved === "string" && Object.hasOwn(packages, linked.resolved) && isPlain(packages[linked.resolved]) ? packages[linked.resolved] : undefined;
+      const alias = /^npm:((?:@[^/@]+\/)?[^/@]+)@(.+)$/.exec(field(entry.version));
+      const requires = requirementList(entry.requires);
+      const dir = linked && typeof linked.resolved === "string" ? `${linked.resolved}/` : `${path}/`;
+      view.set(path, {
+        path, key: [field(entry.version), field(entry.resolved), field(entry.integrity), TREE_FLAGS.filter(flag => entry[flag] === true).join(","), JSON.stringify(requires.map(([name]) => name))].join("\0"),
+        name: linked ? (typeof folder?.name === "string" ? folder.name : name) : alias ? alias[1]! : name,
+        version: linked ? field(folder?.version) : alias ? alias[2]! : field(entry.version), link: !!linked, dir, needs: requires,
+      });
+      if (entry.dependencies !== undefined) walk(entry.dependencies, dir);
+    }
+  };
+  walk(tree, "");
+  return view;
+}
+
+/**
+ * The specs the project's `overrides` give for `name` as `consumer` requires it with `spec`: a top-level key for the
+ * name, and the same key nested under a package the consumer is or is installed under (the install paths its own path
+ * runs through). A key is `name` or `name@selector`. As npm applies it, a selector must intersect the requirement's own
+ * spec for the key to apply to it, and, for a key one descends through, the package installed there must be at a
+ * version the selector takes; a selector that cannot be read as a semver range applies to nothing (an automated
+ * security pass at 549fe1e). A value is a spec, `{ ".": spec }`, or `"$name"` (the project's own spec for that name).
+ */
+function overrideSpecs(overrides: unknown, project: Record<string, any>, view: Map<string, ViewEntry>, consumerPath: string, name: string, spec: string): string[] {
+  if (!isPlain(overrides)) return [];
+  const parse = (key: string) => { const at = key.indexOf("@", key.startsWith("@") ? 1 : 0); return at < 0 ? { name: key, selector: null } : { name: key.slice(0, at), selector: key.slice(at + 1) }; };
+  const takes = (selector: string | null, test: (range: string) => boolean) => { if (selector === null || selector === "" || selector === "*") return true; try { return semver.validRange(selector, { loose: true }) !== null && test(selector); } catch { return false; } };
+  const specOf = (value: unknown) => {
+    const given = typeof value === "string" ? value : isPlain(value) && typeof value["."] === "string" ? value["."] : undefined;
+    if (given === undefined || !given.startsWith("$")) return given;
+    const own = [project.dependencies, project.devDependencies, project.optionalDependencies, project.peerDependencies].find(group => isPlain(group) && typeof group[given.slice(1)] === "string");
+    return own ? own[given.slice(1)] as string : undefined;
+  };
+  // The packages the consumer is or is installed under: each install path its own path runs through, as `packages` has it.
+  const segments = consumerPath.split("node_modules/");
+  const ancestors = segments.slice(1).map((_, i) => view.get(segments.slice(0, i + 2).join("node_modules/").replace(/\/$/, ""))).filter((e): e is ViewEntry => !!e);
+  const out: string[] = [];
+  const walk = (level: Record<string, unknown>) => {
+    for (const [key, value] of Object.entries(level)) {
+      if (key === ".") continue;
+      const rule = parse(key);
+      if (rule.name === name && takes(rule.selector, range => semver.validRange(spec, { loose: true }) !== null && semver.intersects(spec, range, { loose: true }))) {
+        const given = specOf(value);
+        if (given !== undefined) out.push(given);
+      }
+      if (isPlain(value) && ancestors.some(a => a.name === rule.name && takes(rule.selector, range => semver.satisfies(a.version, range, { loose: true })))) walk(value);
+    }
+  };
+  walk(overrides);
+  return out;
+}
+
+/**
+ * Every requirement of every entry of a view, and of `consumers`, that the view leaves unmet, keyed (see
+ * newUnmetRequirements). A requirement is met when Node's lookup (resolveFrom) finds a copy its spec takes: the package
+ * it names (an "npm:" alias names another) at a version its semver range takes, or a link for a "file:" spec. In
+ * `packages`, where the project's `overrides` apply to the requirement, the copy is checked against their spec instead
+ * of the requirement's own, as npm does. A spec npm would resolve some other way (a tag, a URL, a git
+ * spec) cannot be shown to be met (semver.satisfies is false for a range it cannot read). A peer is keyed without its
+ * spec, so a peer the base already leaves out stays the same one when its requirer moves.
+ */
+function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], label: string, overrides: unknown, project: Record<string, any>): Map<string, string> {
+  const unmet = new Map<string, string>();
+  const takes = (found: ViewEntry, name: string, spec: string) => {
+    if (spec.startsWith("file:")) return found.link;
+    const alias = /^npm:((?:@[^/@]+\/)?[^/@]+)@(.+)$/.exec(spec);
+    const [wanted, range] = alias ? [alias[1]!, alias[2]!] : [name, spec];
+    return found.name === wanted && semver.satisfies(found.version, range, { loose: true });
+  };
+  for (const consumer of [...view.values(), ...consumers]) for (const [name, spec] of consumer.needs) {
+    const found = resolveFrom(view, consumer.dir, name);
+    // Where an override applies, npm checks the copy against the override's spec only, not the requirement's own
+    // (review 6533374683, B2).
+    const overridden = overrideSpecs(overrides, project, view, consumer.path, name, spec);
+    if (found && (overridden.length ? overridden.some(s => takes(found, name, s)) : takes(found, name, spec))) continue;
+    const peer = consumer.peers?.has(name) === true;
+    unmet.set([label, consumer.path, name, peer ? "<peer>" : spec, found ? `${found.path}@${found.name}@${found.version}` : "<none>"].join("\0"),
+      `package-lock.json's ${label}: ${consumer.path || "the project"} requires ${name} ${spec}, and ${found ? `${found.path} has ${found.name}@${found.version}, which is not that` : "npm finds no copy of it in the lock"}.`);
+  }
+  return unmet;
 }
 
 /** A package-lock `packages` key: an optional workspace prefix, then one or more node_modules/<name> segments. */
@@ -126,6 +354,22 @@ export const requireName = (path: string) => path.slice(path.lastIndexOf("node_m
 const extraneousFolder = (path: string, item: any) => path.includes("node_modules/") && !LOCK_PATH.test(path) && item?.extraneous === true
   && item.resolved === undefined && item.integrity === undefined && item.link === undefined && !path.split("/").some(segment => segment === "." || segment === "..");
 
+/**
+ * What a package-lock `packages` key is: the project's root (""), an install path (LOCK_PATH), a folder of the project
+ * (no node_modules segment: a workspace, or a local package), or an installed package's extraneous folder, which is
+ * skipped (extraneousFolder). Any other key throws: a key in no known form is refused, never skipped. The judge
+ * (lockEntries) and the PR job (deliver.ts) read keys through this one function (review 6518582507, B1).
+ */
+export function lockKey(path: string, item: unknown): "root" | "install" | "folder" | "extraneous" {
+  if (path === "") return "root";
+  if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
+  if (!path.includes("node_modules/")) return "folder";
+  if (extraneousFolder(path, item)) return "extraneous";
+  // A key that is not a plain install path (.., backslashes, empty segments) could make two keys mean one place.
+  if (!LOCK_PATH.test(path) || path.split("/").some(segment => segment === "." || segment === "..")) throw new Error(`Unexpected package-lock path: ${path}.`);
+  return "install";
+}
+
 /** The skipped extraneous folders (see extraneousFolder), each with its entry, so a change to them can be stopped. */
 export function lockExtraneous(lockText: string): string[] {
   return Object.entries(readLock(lockText)).filter(([path, item]) => !path.includes("\\") && extraneousFolder(path, item)).map(([path, item]) => `${path} ${JSON.stringify(item)}`).sort();
@@ -139,11 +383,7 @@ export function lockEntries(lockText: string): LockEntry[] {
     // On Windows and macOS, node_modules/Lodash and node_modules/lodash are one folder.
     if (folded.has(path.toLowerCase())) throw new Error(`Two package-lock paths differ only in case: ${path}.`);
     folded.add(path.toLowerCase());
-    if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
-    if (!path.includes("node_modules/") || extraneousFolder(path, item)) continue;
-    // A key that is not a plain install path (.., backslashes, empty segments) could make two keys mean one place.
-    if (!LOCK_PATH.test(path) || path.split("/").some(segment => segment === "." || segment === "..")) throw new Error(`Unexpected package-lock path: ${path}.`);
-    if (item?.link) continue;
+    if (lockKey(path, item) !== "install" || item?.link) continue;
     // An alias (node_modules/my-name with "name": "real") installs the real package.
     const name = typeof item.name === "string" ? item.name : requireName(path);
     if (typeof item.version !== "string" || !semver.valid(item.version)) throw new Error(`Invalid locked version at ${path}.`);
@@ -170,7 +410,7 @@ export function lockEntryChanges(before: LockEntry[], after: LockEntry[]): LockE
 }
 
 /** What Node would load for `name` required from the package at `dir` ("" for the project root): the nearest node_modules. */
-export function resolveFrom(entries: Map<string, LockEntry>, dir: string, name: string): LockEntry | undefined {
+export function resolveFrom<T>(entries: Map<string, T>, dir: string, name: string): T | undefined {
   let at = dir;
   while (true) {
     const found = entries.get(`${at}node_modules/${name}`);
@@ -225,7 +465,8 @@ export function declaredByProject(lockText: string): string[] {
 
 /** Something that requires packages: the project root, a workspace folder, or an installed package. */
 type Consumer = { path: string; name: string; dir: string; requires: string[] };
-const DECLARED = ["dependencies", "optionalDependencies", "peerDependencies"];
+/** The requirements an installed package's lock entry declares (devDependencies are not installed for it). */
+export const DECLARED = ["dependencies", "optionalDependencies", "peerDependencies"];
 
 function consumers(lockText: string): Consumer[] {
   const out: Consumer[] = [];
@@ -530,7 +771,7 @@ export function judge(input: {
       "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (its repository, workflow and commit, and the same-release exception that relies on it) rests on the registry's checks at publish time.",
       "The GitHub repository id and event in a provenance statement are written by npm from the build's environment variables, which the publishing workflow can set; Ludion has not established that the registry matches them against the signing certificate. A re-registered repository name whose publisher writes the old id and an allowed event passes these checks and is caught only by the wait and the re-query.",
       "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
-      "The lockfile is read as npm 7 or later reads it (`packages`); the legacy `dependencies` section of a v2 lockfile is not compared.",
+      "A v2 lockfile's npm 6 `dependencies` tree is read to check that it says the same as `packages`, and both are read to check that the change leaves no requirement unmet that the base met (the project's `overrides` count in `packages`). This reading has been checked against locks npm 7.10.0, 8.19.4, 9.8.1, 10.8.2, 11.19.1 and 12.2.1 wrote (with nested copies, aliases, workspaces, local folders, `overrides`, `--legacy-peer-deps` and bundled entries) and against npm 12.2.1's own report on them and on one-change variants, not against other npm versions' locks.",
       "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it.",
     ],
   };

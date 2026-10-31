@@ -13,6 +13,7 @@ import { privateState, snapshot } from "../src/security/project.ts";
 import { comparePublishers, nextFix, NEXT_FIX_LIMIT, type VersionChoice } from "../src/security/next-fix.ts";
 import { scanProject } from "../src/security/scan.ts";
 import { packagistReleases, renderTimeCap } from "../src/security/time-cap.ts";
+import { fixBranchName } from "../src/security/branch.ts";
 import { commit, git } from "./git.ts";
 
 const DIGEST = `sha256:${"a".repeat(64)}`;
@@ -442,8 +443,8 @@ describe("dependency patch gates and recoverable application", () => {
     expect(kept.receipt?.fixes[0]).toMatchObject({ package: "lodash", outcome: "applied", branch: "ludion/npm/lodash-4.17.21" });
     expect(kept.receipt).toMatchObject({ outcome: "partial", reason: expect.stringContaining(`Findings without a supported fix: ${entry}`) });
   });
-  it("validates only the first of two fixes whose branch names are the same", async () => {
-    // "@a/b" and "a-b" both clean to "a-b".
+  it("gives two fixes whose names clean alike two branches, and stops one whose name an older-named branch holds", async () => {
+    // "@a/b" and "a-b" both clean to "a-b"; the scoped name's branch ends with its hash (fixBranchName).
     const deps = { "@a/b": "1.0.0", "a-b": "1.0.0" };
     const root = fixture();
     writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
@@ -456,11 +457,24 @@ describe("dependency patch gates and recoverable application", () => {
       return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => q.version === "1.0.0" ? { vulns: [{ id: found[q.package.name]!.id }] } : {}) });
     });
     const npm = registry({ "@a/b": { created: "2020-01-01T00:00:00.000Z", versions: { "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": "2021-01-01T00:00:00.000Z" } }, "a-b": { created: "2020-01-01T00:00:00.000Z", versions: { "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": "2021-01-01T00:00:00.000Z" } } }, undefined, undefined, { "@a/b@1.0.0": found["@a/b"]!, "a-b@1.0.0": found["a-b"]! });
+    const scoped = fixBranchName("", "npm", "@a/b", ["1.0.1"]);
+    expect(scoped).toMatch(/^ludion\/npm\/a-b-1\.0\.1-[0-9a-f]{12}$/);
     let tests = 0;
     const result = await patchDependencies(root, true, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
-    expect(result.receipt?.fixes.map(f => [f.package, f.outcome, f.branch])).toEqual([["@a/b", "applied", "ludion/npm/a-b-1.0.1"], ["a-b", "failed", null]]);
-    expect(result.receipt?.fixes[1]?.reason).toContain("Another fix of this run has the branch name ludion/npm/a-b-1.0.1");
-    expect(tests).toBe(2);
+    expect(result.receipt?.fixes.map(f => [f.package, f.outcome, f.branch])).toEqual([["@a/b", "applied", scoped], ["a-b", "applied", "ludion/npm/a-b-1.0.1"]]);
+    expect(tests).toBe(3);
+    // The next run: each branch is found under its name, so both are skipped.
+    const again = await patchDependencies(root, true, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    expect(again.receipt?.fixes.map(f => [f.package, f.outcome, f.branch])).toEqual([["@a/b", "skipped", scoped], ["a-b", "skipped", "ludion/npm/a-b-1.0.1"]]);
+    // A branch made before the names changed: "ludion/npm/a-b-1.0.1" holding @a/b's fix. @a/b is not found under it,
+    // so it is validated again under its new name; a-b's name holds another change, so a-b stops and the branch stays.
+    git(root, "branch", "-D", "-q", scoped, "ludion/npm/a-b-1.0.1");
+    const older = git(root, "commit-tree", "HEAD^{tree}", "-p", "HEAD", "-m", "ludion: @a/b 1.0.0 -> 1.0.1 (npm)");
+    git(root, "branch", "ludion/npm/a-b-1.0.1", older);
+    const renamed = await patchDependencies(root, true, { fetchFn: npm, client: osv, command: fakeCommand(), testRun: async () => { tests++; } });
+    expect(renamed.receipt?.fixes.map(f => [f.package, f.outcome, f.branch])).toEqual([["@a/b", "applied", scoped], ["a-b", "failed", null]]);
+    expect(renamed.receipt?.fixes[1]?.reason).toContain("The branch ludion/npm/a-b-1.0.1 already exists and holds another change (\"ludion: @a/b 1.0.0 -> 1.0.1 (npm)\")");
+    expect(git(root, "rev-parse", "ludion/npm/a-b-1.0.1")).toBe(older);
   });
   it("fails a fix whose branch name already holds another change, and leaves that branch alone", async () => {
     const root = fixture(), head = commit(root);
@@ -521,8 +535,12 @@ describe("dependency patch gates and recoverable application", () => {
     const head = commit(repo);
     writeFileSync(join(repo, "README.md"), "changed outside the project");
     const result = await patchDependencies(root, true, { fetchFn: registry(), client: client(), command: fakeCommand(), testRun: async () => {} });
-    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "applied", branch: "ludion/apps-web/npm/lodash-4.17.21" });
-    expect(git(repo, "diff", "--name-only", head, "ludion/apps-web/npm/lodash-4.17.21").split("\n")).toEqual(["apps/web/package-lock.json", "apps/web/package.json"]);
+    // A folder's name is cleaned ("apps/web/" to "apps-web", as "apps-web/" would be), so the name ends with its hash.
+    const branch = fixBranchName("apps/web/", "npm", "lodash", ["4.17.21"]);
+    expect(branch).toMatch(/^ludion\/apps-web\/npm\/lodash-4\.17\.21-[0-9a-f]{12}$/);
+    expect(branch).not.toBe(fixBranchName("apps-web/", "npm", "lodash", ["4.17.21"]));
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "applied", branch });
+    expect(git(repo, "diff", "--name-only", head, branch).split("\n")).toEqual(["apps/web/package-lock.json", "apps/web/package.json"]);
   });
   it("groups every planned change of one package into one fix", () => {
     const fix = (name: string, from: string, to: string) => ({ name, from, to, advisories: ["A"] });
@@ -770,6 +788,9 @@ describe("Composer plans also read Packagist's advisories", () => {
     ["a name that was not asked for", { advisories: { "evil/other": [] } }],
     ["a record for another package", { advisories: { "symfony/http-foundation": [{ ...pksa("PKSA-aaaa-bbbb-cccc", "<5.4.54"), packageName: "evil/other" }] } }],
     ["an invalid advisory id", { advisories: { "symfony/http-foundation": [pksa("../../x", "<5.4.54")] } }],
+    // The PR job's ADVISORY (deliver.ts) refuses these, so they are never read here (review 6518582507, N-d).
+    ["an advisory id ending with -", { advisories: { "symfony/http-foundation": [pksa("PKSA-aaaa-", "<5.4.54")] } }],
+    ["an advisory id starting with -", { advisories: { "symfony/http-foundation": [pksa("PKSA--aaaa", "<5.4.54")] } }],
   ])("never treats %s as a clean Packagist answer", async (_label, body) => {
     await expect(withSources(null, body).scan(installed())).rejects.toThrow(/Packagist/);
   });

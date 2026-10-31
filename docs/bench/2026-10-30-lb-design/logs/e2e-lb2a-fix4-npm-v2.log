@@ -1,0 +1,73 @@
+# at commit 8f4ee7d2efba988cea336fdb65e4fcbf656127a6, 0 files differing from it
+# started 2026-10-30T12:30:10Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+npm ci exit 0
+build exit 0
+== case npm-v2
+lockfile exit 0
+  "lockfileVersion": 2,
+base e89e043ca9130f8481da7ba8f872318f9a5f4b2e
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt d9bd1dbc-bbfd-423a-b355-276739a7a509: outcome applied, base e89e043ca9130f8481da7ba8f872318f9a5f4b2e
+  lodash 4.17.20 -> 4.18.1: applied ludion/npm/lodash-4.18.1 69b9e26eeb7edc2585d6d8f30bdc287da4f6dcfc judge=ready_except_build published=2026-04-01T21:01:20.458Z found=2026-10-30T12:30:23.798Z applied=2026-10-30T12:30:40.691Z
+Packed 1 applied fix into /e/npm-v2/artifact1.
+pack exit 0
+  963 bytes fixes.bundle
+  32699 bytes receipt.json
+  head 69b9e26eeb7edc2585d6d8f30bdc287da4f6dcfc refs/heads/ludion/npm/lodash-4.18.1
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt d9bd1dbc-bbfd-423a-b355-276739a7a509 on e89e043ca913: 1 applied fix.
+  lodash (ludion/npm/lodash-4.18.1): opened #1
+open exit 0
+-- origin's branches:
+  ludion/npm/lodash-4.18.1 69b9e26eeb7edc2585d6d8f30bdc287da4f6dcfc
+  main e89e043ca9130f8481da7ba8f872318f9a5f4b2e
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 5c64b3c5-df85-476f-a866-40f388de70b3: outcome applied, base e89e043ca9130f8481da7ba8f872318f9a5f4b2e
+  lodash 4.17.20 -> 4.18.1: applied ludion/npm/lodash-4.18.1 0d1f5e970565d38710d039ca2736148a21099219 judge=ready_except_build published=2026-04-01T21:01:20.458Z found=2026-10-30T12:30:47.037Z applied=2026-10-30T12:30:57.510Z
+Packed 1 applied fix into /e/npm-v2/artifact2.
+pack exit 0
+  963 bytes fixes.bundle
+  32699 bytes receipt.json
+  head 0d1f5e970565d38710d039ca2736148a21099219 refs/heads/ludion/npm/lodash-4.18.1
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 5c64b3c5-df85-476f-a866-40f388de70b3 on e89e043ca913: 1 applied fix.
+  lodash (ludion/npm/lodash-4.18.1): open_pr_exists #1
+open exit 0
+-- origin's branches:
+  ludion/npm/lodash-4.18.1 69b9e26eeb7edc2585d6d8f30bdc287da4f6dcfc
+  main e89e043ca9130f8481da7ba8f872318f9a5f4b2e
+-- PRs in the stand-in:
+  #1 open ludion/npm/lodash-4.18.1 -> main: ludion: lodash 4.17.20 -> 4.18.1 (npm)
+  API calls: 6; POST: 1
+-- body of PR #1:
+  | <!-- ludion-fix -->
+  | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
+  | 
+  | Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `e89e043ca913`. This PR holds that one fix (one commit).
+  | 
+  | | | |
+  | |---|---|
+  | | Package | `lodash` (npm) |
+  | | Change | `4.17.20` → `4.18.1` |
+  | | Advisories | `GHSA-29mw-wpgm-hmr9`, `GHSA-35jh-r3h4-6jhm`, `GHSA-f23m-r3pf-42rh`, `GHSA-r5fr-rjxr-66jc`, `GHSA-xxjr-mmjv-4gpg` |
+  | | Fix published | `2026-04-01T21:01:20.458Z` (registry.npmjs.org's publish time: the latest among the fix's planned versions) |
+  | | Found | `2026-10-30T12:30:23.798Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T12:30:40.691Z` |
+  | | Receipt | `d9bd1dbc-bbfd-423a-b355-276739a7a509` (in this run's ludion-fixes artifact) |
+  | 
+  | The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
+  | 
+  | **What was checked**
+  | 
+  | - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
+  | - This commit changes only `package.json`, `package-lock.json`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that package.json is what Ludion writes for this change, that package-lock.json says the same to every npm (a v2 lock's npm 6 tree agrees with its packages section), that it moves this package, at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry and nothing another package loads, and that each moved or added entry declares the requirements, os and cpu the registry lists.
+  | - Ludion's judge on the lockfile change, in both jobs: `ready_except_build`. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).
+  | 
+  | **Not checked**
+  | 
+  | - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
+  | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
+  | - Production: nothing is deployed.
+# finished 2026-10-30T12:30:58Z

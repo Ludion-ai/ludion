@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "name": "s6",
+  "problems": [
+    "missing: react@^18.2.0, required by react-dom@18.2.0",
+    "invalid: js-tokens@99.0.0 /out/8.19.4/v2/legacy-peer-deps/variants/V2/node_modules/js-tokens"
+  ],
+  "dependencies": {
+    "react-dom": {
+      "version": "18.2.0",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "loose-envify": {
+          "version": "1.4.0",
+          "resolved": "https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "js-tokens": {
+              "version": "99.0.0",
+              "resolved": "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz",
+              "overridden": false,
+              "invalid": "\"^3.0.0 || ^4.0.0\" from node_modules/loose-envify",
+              "problems": [
+                "invalid: js-tokens@99.0.0 /out/8.19.4/v2/legacy-peer-deps/variants/V2/node_modules/js-tokens"
+              ]
+            }
+          }
+        },
+        "react": {
+          "required": "^18.2.0",
+          "missing": true,
+          "problems": [
+            "missing: react@^18.2.0, required by react-dom@18.2.0"
+          ]
+        },
+        "scheduler": {
+          "version": "0.23.2",
+          "resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.23.2.tgz",
+          "overridden": false,
+          "dependencies": {
+            "loose-envify": {
+              "version": "1.4.0"
+            }
+          }
+        }
+      }
+    }
+  },
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "missing: react@^18.2.0, required by react-dom@18.2.0\ninvalid: js-tokens@99.0.0 /out/8.19.4/v2/legacy-peer-deps/variants/V2/node_modules/js-tokens",
+    "detail": ""
+  }
+}

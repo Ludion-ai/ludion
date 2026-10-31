@@ -1,0 +1,17 @@
+npm WARN tarball tarball data for file:../packages/b (null) seems to be corrupted. Trying again.
+npm WARN tarball tarball data for file:../packages/b (null) seems to be corrupted. Trying again.
+npm notice 
+npm notice New major version of npm available! 7.10.0 -> 12.2.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v12.2.1>
+npm notice Run `npm install -g npm@12.2.1` to update!
+npm notice 
+npm ERR! code ENOENT
+npm ERR! syscall open
+npm ERR! path /out/7.10.0/v2/packages/b/package.json
+npm ERR! errno -2
+npm ERR! enoent ENOENT: no such file or directory, open '/out/7.10.0/v2/packages/b/package.json'
+npm ERR! enoent This is related to npm not being able to find a file.
+npm ERR! enoent 
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/node/.npm/_logs/2026-10-30T22_26_28_757Z-debug.log

@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "name": "s7",
+  "problems": [
+    "invalid: is-number@99.0.0 /out/8.19.4/v2/alias/variants/V2/node_modules/is-number"
+  ],
+  "dependencies": {
+    "a": {
+      "version": "1.0.0",
+      "resolved": "file:../packages/a",
+      "overridden": false,
+      "dependencies": {
+        "is-number": {
+          "version": "1.2.0",
+          "resolved": "https://registry.npmjs.org/left-pad/-/left-pad-1.2.0.tgz",
+          "overridden": false
+        }
+      }
+    },
+    "is-number": {
+      "version": "99.0.0",
+      "resolved": "https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz",
+      "overridden": false,
+      "invalid": "\"7.0.0\" from the root project",
+      "problems": [
+        "invalid: is-number@99.0.0 /out/8.19.4/v2/alias/variants/V2/node_modules/is-number"
+      ]
+    },
+    "minimist": {
+      "version": "1.3.0",
+      "resolved": "https://registry.npmjs.org/left-pad/-/left-pad-1.3.0.tgz",
+      "overridden": false
+    },
+    "mkdirp": {
+      "version": "0.5.1",
+      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
+      "overridden": false,
+      "dependencies": {
+        "minimist": {
+          "version": "0.0.8",
+          "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz",
+          "overridden": false
+        }
+      }
+    }
+  },
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "invalid: is-number@99.0.0 /out/8.19.4/v2/alias/variants/V2/node_modules/is-number",
+    "detail": ""
+  }
+}
